@@ -1,0 +1,142 @@
+{
+  "complete": true,
+  "datasets": [
+    {
+      "columns": 15,
+      "format": "dope-benchmark-dataset",
+      "id": "Adult",
+      "license": {
+        "evidence_url": "https://archive.ics.uci.edu/dataset/2/adult",
+        "spdx": "CC-BY-4.0",
+        "status": "recorded"
+      },
+      "panel": "public_core",
+      "projected_files": {
+        "test": "7ec9dc1be384d75feb328f26501fd573cfa9ced43fca7987260d5c4336eeb8d8",
+        "train": "96748f4c113376951acfdde95cd922a9909bc4b71d022775530b3bd576bf2da6",
+        "validation": "9b26d7d58ffaa383074902aefbd2c7927814d63592cb678c5058de838439d808"
+      },
+      "projection_sha256": "001ea8cb8c5c1f88a1563ccde758f2a89e37714b2657accb292f543de5cf692b",
+      "raw_files": {
+        "0": {
+          "sha256": "6f8f2babc5ee744afd03f6d978d8d6b3e3b0aae240d931c4976a9cce7af0d347"
+        }
+      },
+      "rows": 48842,
+      "source": "https://archive.ics.uci.edu/static/public/2/adult.zip",
+      "source_archive_sha256": "7537312dd56c2b98035880805ce99e68183a30ee468aa5329d6df0fbb3cc21bb",
+      "source_identity": "uci:2:adult",
+      "source_row_hash": "f74cd3f91e2e3cb1dbce570fa07e6f6a2dc05556c874a6eba9cbb8c0d5d27696",
+      "split": {
+        "hashes": {
+          "test": "1ca272913cbdea46cabacf69db09a55e8f974a1b997fab050ff23ecc355e8e20",
+          "train": "32d74545aebc340a419373291c941a43b637a6fb01cad3d8f8fcba25b845fdf5",
+          "validation": "22c47f50d7f852dbbef8fb76c4dc7810f65d67e55209e8a820a444cdde2b338f"
+        },
+        "kind": "deterministic_grouped_60_20_20",
+        "rows": {
+          "test": 9768,
+          "train": 29306,
+          "validation": 9768
+        },
+        "seed": 1729
+      },
+      "target": "income",
+      "task": "binary",
+      "transformation_sha256": "c34c6f9109666fb7e0659b4b211f76ab724064078f4854154967ec052635ce7a",
+      "version": 1
+    },
+    {
+      "columns": 9,
+      "format": "dope-benchmark-dataset",
+      "id": "California",
+      "license": {
+        "evidence_url": "https://figshare.com/articles/dataset/cal_housing_tgz/3829992",
+        "spdx": "CC-BY-4.0",
+        "status": "recorded"
+      },
+      "panel": "public_core",
+      "projected_files": {
+        "test": "9b6b9c93b756ea5319f05f6b3193711242d5716548571ae16a4224e3911ab41b",
+        "train": "058e9f95ebb27a40a812f7948c6aeb498bb3593973ebace3a79fbc72277217f7",
+        "validation": "877453ef2c7062c0ab34502bd8194734d1b21e3ee9eae654ebc0a1a2f36916fe"
+      },
+      "projection_sha256": "1d83f3f11c2a7ff1b9cedcd7a03cd403e3e384d38d353174be26983e22a61214",
+      "raw_files": {
+        "0": {
+          "sha256": "157b6c0d3acd6d93a50c411d0cd4130d8c719ce5eb17b61f1c45300f2af6fc85"
+        }
+      },
+      "rows": 20640,
+      "source": "https://ndownloader.figshare.com/files/5976036",
+      "source_archive_sha256": "aaa5c9a6afe2225cc2aed2723682ae403280c4a3695a2ddda4ffb5d8215ea681",
+      "source_identity": "figshare:3829992:california-housing",
+      "source_row_hash": "4357c91f09818c8521407fc3cdf9291959dd789aef0fe7302417819d924a78f4",
+      "split": {
+        "hashes": {
+          "test": "16432452be1fdf77097f54de7fe302e62b56ce39ef9e6151f6d1e9a746a82a3a",
+          "train": "d37efea17b1166b94b71d7382d523c243bbf304e1b89b37ed078192c4a1197c7",
+          "validation": "a0da14c857318033b1a8d8660cf351e2e41c611b815c8ae406db4a92f9df15c3"
+        },
+        "kind": "deterministic_grouped_60_20_20",
+        "rows": {
+          "test": 4128,
+          "train": 12384,
+          "validation": 4128
+        },
+        "seed": 1729
+      },
+      "target": "MedHouseVal",
+      "task": "regression",
+      "transformation_sha256": "03ad2dc327686fb6fceee1fcbd88476af824a06d9ce6158148037036f48f796a",
+      "version": 1
+    },
+    {
+      "columns": 60,
+      "format": "dope-benchmark-dataset",
+      "id": "News",
+      "license": {
+        "evidence_url": "https://archive.ics.uci.edu/dataset/332/online+news+popularity",
+        "spdx": "CC-BY-4.0",
+        "status": "recorded"
+      },
+      "panel": "public_core",
+      "projected_files": {
+        "test": "6672b3396dbbb741a83ff7ab8bc85ebd57e57e2a95a40bbb722ce2d5c983c11f",
+        "train": "64eeac2059528e44e4451419d05c1d5dd49f699c7b646d5b5971580e1811b376",
+        "validation": "b4007f032b6542e48270217dc5a88e457ef6b81267618f5962da2361f05739bf"
+      },
+      "projection_sha256": "369477509a10d424eb8b915a2878935486c09cac4ea9b7dc4f4c53dc74df2bb4",
+      "raw_files": {
+        "0": {
+          "sha256": "502c1359dd5950b80e4f82bc51a22a8b0e082d38f84004605b6cbb40726b2242"
+        }
+      },
+      "rows": 39644,
+      "source": "https://archive.ics.uci.edu/static/public/332/online+news+popularity.zip",
+      "source_archive_sha256": "dba2ae526f62ccef6f2f8efb53b0268319f4d0d2719bb98d88958cfe31d58a22",
+      "source_identity": "uci:332:online-news-popularity",
+      "source_row_hash": "d950528c5967765c5615f286d2d020d04be73d98346387f896324175779b16e5",
+      "split": {
+        "hashes": {
+          "test": "7eb3eedc24f65c67bb86634d5c1c78a66dbd47e7040942054ea48c1d0fc1acc5",
+          "train": "f1bbac60824051d5043e62a8f56027ea09791e996c3015f04f884b17233f0322",
+          "validation": "1ccf783845aacfb6a22f18032ea92710861b75e4ca3bd8d10c35afb972fe46f6"
+        },
+        "kind": "deterministic_grouped_60_20_20",
+        "rows": {
+          "test": 7928,
+          "train": 23787,
+          "validation": 7929
+        },
+        "seed": 1729
+      },
+      "target": "shares",
+      "task": "regression",
+      "transformation_sha256": "c34c6f9109666fb7e0659b4b211f76ab724064078f4854154967ec052635ce7a",
+      "version": 1
+    }
+  ],
+  "format": "dope-benchmark-pilot-dataset-lock",
+  "version": 1
+}

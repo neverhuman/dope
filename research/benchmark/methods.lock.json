@@ -1,0 +1,421 @@
+{
+  "complete": false,
+  "format": "dope-benchmark-method-lock",
+  "frozen_for_final_evaluation": false,
+  "methods": {
+    "AIM": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": "python mechanisms/aim.py --dataset DATASET --domain DOMAIN --epsilon EPSILON --delta DELTA --max_model_size 80 --max_iters 1000",
+      "group": "dp",
+      "license": "Apache-2.0",
+      "license_evidence": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/LICENSE",
+      "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "note": "Author warns default AIM can take many hours; discrete preprocessing and accountant audit pending.",
+      "sampling_command": "AIM model synthetic_data via mbi inference; adapter pending",
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": "e9d10d045247577db2d4742b15de325817b5bc59",
+      "upstream_url": "https://github.com/ryan112358/mbi"
+    },
+    "ARF": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "compact",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "CDTD": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": "https://github.com/muellermarkus/cdtd"
+    },
+    "CTAB-GAN+": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "CTGAN": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "Chow-Liu": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "compact",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "DP-CTGAN": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "dp",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "ForestDiffusion/Forest-Flow": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": "https://github.com/SamsungSAILMontreal/ForestDiffusion"
+    },
+    "GEM-T": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "compact",
+      "license": null,
+      "note": "Paper located, author implementation not found in source search; author-code availability and two-experiment validation pending.",
+      "sampling_command": null,
+      "status": "availability_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "GReaT": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "llm",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "GaussianCopula": {
+      "adapter": "GaussianCopula",
+      "adapter_sha256": "acdc94c47420005d800258e65b84afe087834ed168e97885de64fa1261cf821d",
+      "default_config": {
+        "distribution": "Univariate",
+        "fit_timeout_seconds": 900,
+        "sample_timeout_seconds": 600
+      },
+      "dependency_or_container_digest": "sha256:6f010444385a304274e7587b45f56b860ca38b621529ad0f9bbd4024de91dd1d",
+      "dependency_version": "copulas==0.14.1",
+      "dependency_versions": {
+        "numpy": "1.26.4",
+        "pandas": "2.1.4",
+        "scipy": "1.16.3"
+      },
+      "fit_command": "research.benchmark.adapters.fit(GaussianCopula, TRAIN, METADATA, CONFIG, FIT_SEED, ARTIFACT)",
+      "group": "compact",
+      "license": "BUSL-1.1",
+      "license_evidence": "https://github.com/sdv-dev/Copulas/blob/ffb8ce4b704e5cb6c9f3c0a7880c7f0a5f64ad22/LICENSE",
+      "note": "Copulas 0.14.1 GaussianMultivariate numerical implementation; common-numeric track only; BSL permits non-production research use",
+      "sampling_command": "research.benchmark.adapters.sample(GaussianCopula, ARTIFACT, ROWS, SAMPLE_SEED, OUTPUT)",
+      "source_sha256": "6f010444385a304274e7587b45f56b860ca38b621529ad0f9bbd4024de91dd1d",
+      "status": "locked",
+      "tuning_search_space": {
+        "distribution": [
+          "Univariate",
+          "GaussianUnivariate"
+        ]
+      },
+      "upstream_commit": "ffb8ce4b704e5cb6c9f3c0a7880c7f0a5f64ad22",
+      "upstream_url": "https://github.com/sdv-dev/Copulas"
+    },
+    "MST": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "dp",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "PATE-GAN": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "dp",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": "https://github.com/spalabucr/pategan-audit"
+    },
+    "PrivBayes": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "compact",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "REaLTabFormer": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "llm",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "TAEGAN": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "TVAE": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "TVineSynth": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "compact",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "TabCascade": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": "https://github.com/muellermarkus/tabcascade"
+    },
+    "TabDDPM": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": "b476257dd460b778ba09eb97f7a51d6490fa17f8",
+      "upstream_url": "https://github.com/yandex-research/tab-ddpm"
+    },
+    "TabDiff": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": "MIT",
+      "license_evidence": "https://github.com/MinkaiXu/TabDiff/blob/5ecdb3356261aea72716cc9a779f31d7ad083bf4/LICENSE",
+      "license_sha256": "0ec2178fd0353f41dded18d337749e83a284155c5f760429170ea4029d4784b9",
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": "5ecdb3356261aea72716cc9a779f31d7ad083bf4",
+      "upstream_url": "https://github.com/MinkaiXu/TabDiff"
+    },
+    "TabKDE": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": "python main.py --dataname DATASET --method TabKDE --mode train",
+      "group": "compact",
+      "license": null,
+      "note": "Pinned source archive contains no LICENSE/COPYING/pyproject license declaration or README license grant; redistribution/execution terms require author clarification.",
+      "sampling_command": "python main.py --dataname DATASET --method TabKDE --mode sample",
+      "source_snapshot_sha256": "640afb2fd5a0c482b54a250742655023b0f1c11adb9c44f7c20ce6661daf7b2f",
+      "status": "license_missing",
+      "tuning_search_space": null,
+      "upstream_commit": "9d9e6cce0f8ecd97d8a10c52755b8c14482e028d",
+      "upstream_url": "https://github.com/tabkde/tabkde-main"
+    },
+    "TabPC": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": "python train_scripts/pc_sota.py --path DATASET --target-folder ARTIFACT",
+      "group": "compact",
+      "license": "Apache-2.0",
+      "license_evidence": "https://github.com/april-tools/tabpc/blob/a470848853cf2927ac5224272f2bff04c09d74bb/LICENSE",
+      "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "note": "Pinned source archive inspected. Upstream custom-data path requires a per-dataset JSON schema and its cirkit git submodule; submodule revision, dependency image, adapter, and default training config remain unaudited.",
+      "sampling_command": "article experiment sampling command and model export adapter pending",
+      "source_snapshot_sha256": "753d5c9f2dd79870e1c51b413e36a04d7fe123f8fcc3063209421ce510ab2c2d",
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": "a470848853cf2927ac5224272f2bff04c09d74bb",
+      "upstream_url": "https://github.com/april-tools/tabpc"
+    },
+    "TabPFGen": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "llm",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "TabSyn": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": "python main.py --dataname DATASET --method vae --mode train; python main.py --dataname DATASET --method tabsyn --mode train",
+      "group": "neural_flow",
+      "license": "Apache-2.0",
+      "license_evidence": "https://github.com/amazon-science/tabsyn/blob/cb5ac0f74ec36ee88e7a974a393dfbef50d42da7/LICENSE",
+      "license_sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b",
+      "sampling_command": "python main.py --dataname DATASET --method tabsyn --mode sample --save_path OUTPUT",
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7",
+      "upstream_url": "https://github.com/amazon-science/tabsyn"
+    },
+    "TabbyFlow": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "neural_flow",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    },
+    "dope": {
+      "adapter": "dope",
+      "adapter_sha256": "acdc94c47420005d800258e65b84afe087834ed168e97885de64fa1261cf821d",
+      "binary_sha256": "78d10acf4495577d22075e54ab452c0451a41e66cb029bbfd552cd2dd1c9e70c",
+      "default_config": {
+        "deadline_seconds": 600,
+        "fit_timeout_seconds": 660,
+        "sample_timeout_seconds": 600,
+        "tier": "l3"
+      },
+      "dependency_or_container_digest": "3eb1ed41110bfd4f8524e8a91c5d61021a43e7b3d540ef3e61801374a720b216",
+      "fit_command": "dope-kernel compile --dataset-dir WORKER --task TASK --tier l3 --seed SEED --deadline-seconds 600 --out ARTIFACT/model.dpk",
+      "group": "study_generator",
+      "license": "MIT",
+      "license_evidence": "https://github.com/neverhuman/dope/blob/581fd6999dcfd215c364369b3198daf161b89c2c/LICENSE",
+      "sampling_command": "dope-kernel sample --kernel ARTIFACT/model.dpk --rows ROWS --seed SEED --out OUTPUT",
+      "source_archive_format": "git-archive-tar",
+      "source_sha256": "08aa12c50364b2caf7556c430dfbcd80534478bad9e107021030284767730c66",
+      "status": "locked",
+      "tuning_search_space": {
+        "candidate": [
+          "default"
+        ]
+      },
+      "upstream_commit": "581fd6999dcfd215c364369b3198daf161b89c2c",
+      "upstream_url": "https://github.com/neverhuman/dope"
+    },
+    "independent_marginals": {
+      "adapter": "independent_marginals",
+      "adapter_sha256": "acdc94c47420005d800258e65b84afe087834ed168e97885de64fa1261cf821d",
+      "default_config": {
+        "bins": 16,
+        "fit_timeout_seconds": 600,
+        "sample_timeout_seconds": 600
+      },
+      "dependency_or_container_digest": "numpy==1.26.4",
+      "fit_command": "python -m research.benchmark.runner JOB METHODS OUTPUT_ROOT",
+      "group": "compact",
+      "license": "MIT",
+      "license_evidence": "https://github.com/neverhuman/dope/blob/581fd6999dcfd215c364369b3198daf161b89c2c/LICENSE",
+      "note": "study reference implementation, not an upstream author baseline",
+      "sampling_command": "research.benchmark.adapters.sample(independent_marginals, ARTIFACT, ROWS, SEED, OUTPUT)",
+      "source_note": "Study-owned adapter file SHA-256 is the executable source identity; repository commit pending research branch publication.",
+      "source_sha256": "acdc94c47420005d800258e65b84afe087834ed168e97885de64fa1261cf821d",
+      "status": "locked",
+      "tuning_search_space": {
+        "bins": [
+          8,
+          16,
+          32
+        ]
+      },
+      "upstream_commit": null,
+      "upstream_url": "https://github.com/neverhuman/dope"
+    },
+    "synthpop_CART": {
+      "default_config": null,
+      "dependency_or_container_digest": null,
+      "fit_command": null,
+      "group": "compact",
+      "license": null,
+      "sampling_command": null,
+      "status": "source_audit_pending",
+      "tuning_search_space": null,
+      "upstream_commit": null,
+      "upstream_url": null
+    }
+  },
+  "version": 1
+}

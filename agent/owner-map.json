@@ -29,6 +29,7 @@
     "src/dope_kernel/": "python-v1-compatibility",
     "tests/test_": "python-v1-compatibility",
     "validation/external/": "external-evidence",
+    "research/": "external-evidence",
     "validation/requirements-v1.txt": "python-v1-compatibility",
     "validation/": "external-evidence",
     "launch_tuner_tui.sh": "python-v1-compatibility"
