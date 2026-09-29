@@ -175,8 +175,8 @@ pub fn candidate_implementation_hash(id: &str) -> String {
         hasher.update(include_bytes!("model.rs"));
         hasher.update(include_bytes!("neural.rs"));
         hasher.update(include_bytes!("neural_train.rs"));
+        hasher.update(include_bytes!("../build.rs"));
         hasher.update(include_bytes!("libtorch.rs"));
-        hasher.update(include_bytes!("../cpp/libtorch_determinism.cpp"));
     }
     hasher.update(id.as_bytes());
     hasher.finalize().to_hex().to_string()
