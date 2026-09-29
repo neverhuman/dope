@@ -13,7 +13,7 @@ use dope_kernel::campaign::{
     run_routed_cert_matrix, serve, sign_gold_blocks, summarize_evidence, train_router_from_metrics,
     worker,
 };
-use dope_kernel::certification::certify_kernel;
+use dope_kernel::certification::certify_kernel_with_policy;
 use dope_kernel::certification::{GoldCellOptions, evaluate_gold_cell};
 use dope_kernel::codec::load_kernel;
 use dope_kernel::compiler::{CompileOptions, compile_kernel_from_dir};
@@ -294,6 +294,12 @@ enum Command {
         runtime_dictionary_bytes: usize,
         #[arg(long, default_value_t = 1)]
         supported_datasets: usize,
+        #[arg(long, default_value = "l3")]
+        tier: String,
+        #[arg(long)]
+        max_artifact_bytes: Option<usize>,
+        #[arg(long)]
+        require_formal_dp: bool,
     },
 }
 
@@ -1543,10 +1549,14 @@ fn run(command: Command) -> Result<()> {
                     supported_datasets,
                     synthetic_csv_seeds: synthetic_seed,
                     compile_options: CompileOptions {
+                        beam_width: match release_policy.tier {
+                            AnonymizationTier::L3 => Some(4),
+                            AnonymizationTier::L2 => Some(8),
+                            AnonymizationTier::L1 | AnonymizationTier::L0 => Some(16),
+                        },
                         release_policy,
                         ..Default::default()
                     },
-                    ..Default::default()
                 },
             )?;
             println!(
@@ -1711,14 +1721,19 @@ fn run(command: Command) -> Result<()> {
             seed,
             runtime_dictionary_bytes,
             supported_datasets,
+            tier,
+            max_artifact_bytes,
+            require_formal_dp,
         } => {
-            let report = certify_kernel(
+            let policy = parse_policy(&tier, max_artifact_bytes, require_formal_dp)?;
+            let report = certify_kernel_with_policy(
                 &real_dir,
                 &kernel,
                 &out,
                 seed,
                 runtime_dictionary_bytes,
                 supported_datasets,
+                &policy,
             )?;
             println!(
                 "{{\"certified\":{},\"out\":{}}}",

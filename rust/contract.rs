@@ -96,6 +96,27 @@ impl ReleasePolicy {
         let bytes = serde_json::to_vec(self).expect("release policy serializes");
         blake3::hash(&bytes).to_hex().to_string()
     }
+
+    pub fn accepts_artifact_bytes(&self, bytes: usize) -> bool {
+        self.maximum_artifact_bytes
+            .is_none_or(|limit| bytes <= limit)
+    }
+}
+
+#[cfg(test)]
+mod tier_policy_tests {
+    use super::*;
+
+    #[test]
+    fn l3_hard_boundary_and_formal_dp_failure() {
+        let policy = ReleasePolicy::default();
+        assert_eq!(policy.maximum_artifact_bytes, Some(10_240));
+        assert!(policy.accepts_artifact_bytes(10_240));
+        assert!(!policy.accepts_artifact_bytes(10_241));
+        assert!(ReleasePolicy::new(AnonymizationTier::L3, Some(10_241), false).is_err());
+        assert!(ReleasePolicy::new(AnonymizationTier::L3, Some(512), false).is_ok());
+        assert!(ReleasePolicy::new(AnonymizationTier::L3, None, true).is_err());
+    }
 }
 
 use crate::compiler::{CompileOptions, CompileResult, compile_kernel_from_arrays};

@@ -8,20 +8,20 @@ use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::auditor::{
-    PermutationImportance, auditor_backend, compare_permutation_importance, implementation_hash,
+    FeatureImportanceConsistency, PermutationImportance, auditor_backend,
+    compare_permutation_importance, implementation_hash,
 };
 use crate::codec::{LoadedKernel, decode_kernel, load_kernel};
-use crate::compiler::{CompileOptions, compile_kernel_from_arrays, ga2m_predictions};
+use crate::compiler::CompileOptions;
 use crate::contract::{
-    AUDITOR_SEEDS, GENERATION_REPEATS, GOLD_SIZE_MULTIPLIERS, RELEASE_SEED, auditor_specs,
-    candidate_implementation_hash, empirical_backend,
+    AUDITOR_SEEDS, AnonymizationTier, GENERATION_REPEATS, GOLD_SIZE_MULTIPLIERS, RELEASE_SEED,
+    ReleasePolicy, auditor_specs, candidate_implementation_hash, empirical_backend,
 };
 use crate::data::Table;
 use crate::error::{DopeError, Result, io_error};
 use crate::ledger::{CacheStatus, JOB_EVIDENCE_VERSION, JobEvidence};
 use crate::model::{Kernel, Marginal, SchemaKind, Task};
-use crate::production::{ContentHashes, canonical_json, hashes};
-use crate::sample::evaluate_target;
+use crate::production::{ContentHashes, KpiContract, canonical_json, hashes};
 use crate::sample::{SampleOptions, sample_kernel};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -75,7 +75,12 @@ pub struct FidelityReport {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PrivacyReport {
+    pub attack_suite_version: u8,
+    pub membership_attacks: BTreeMap<String, f64>,
     pub maximum_membership_auc: f64,
+    pub rare_slice_supported: bool,
+    pub rare_slice_membership_auc: Option<f64>,
+    pub rare_slice_attribute_advantage: Option<f64>,
     pub maximum_attribute_inference_advantage: f64,
     pub exact_copy_count: usize,
     pub near_copy_count: usize,
@@ -96,10 +101,13 @@ pub struct IsolationEvidence {
 pub struct CertificationReport {
     pub format: String,
     pub version: u8,
+    pub release_policy: ReleasePolicy,
+    pub release_policy_hash: String,
     pub certified: bool,
     pub gates: BTreeMap<String, bool>,
     pub failed_gates: Vec<String>,
     pub auditors: BTreeMap<String, AuditorReport>,
+    pub feature_importance: Vec<ImportanceEvidence>,
     pub minimum_gold_one_sided_95_retention: Option<f64>,
     pub fidelity: FidelityReport,
     pub privacy: PrivacyReport,
@@ -115,6 +123,15 @@ pub struct CertificationReport {
     pub effective_bytes: usize,
     pub bits_per_original_cell: f64,
     pub compression_vs_packed_f32: f64,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ImportanceEvidence {
+    pub auditor_id: String,
+    pub auditor_seed: u64,
+    pub synthetic_rows: usize,
+    pub generation_seed: u64,
+    pub consistency: FeatureImportanceConsistency,
 }
 
 pub fn null_normalized_excess_loss_retention(
@@ -353,7 +370,7 @@ fn cached_real_importance(
                 .iter()
                 .any(|value| !value.is_finite())
             || cached.importance.feature_indices.len() != cached.importance.importances.len()
-            || cached.importance.feature_indices.len() > 64
+            || cached.importance.feature_indices.len() != train.features
         {
             return Err(DopeError::Data(format!(
                 "real auditor cache identity mismatch at {}",
@@ -893,6 +910,9 @@ pub fn evaluate_prepared_gold_cell(
         feature_importance_top_k_agreement: feature_consistency.top_k_agreement,
         feature_importance_feature_count: feature_consistency.feature_count,
         feature_importance_informative_count: feature_consistency.informative_feature_count,
+        feature_importance_real_shares: feature_consistency.real_normalized_shares,
+        feature_importance_synthetic_shares: feature_consistency.synthetic_normalized_shares,
+        feature_importance_mean_ratio_error: feature_consistency.mean_ratio_error,
         exact_copies,
         near_copies,
         // Conservatively treat every source row as an extraction canary. This
@@ -924,32 +944,6 @@ fn completed(table: &Table, column: usize) -> Vec<f32> {
     table.columns[column]
         .iter()
         .map(|value| if value.is_nan() { fill } else { *value })
-        .collect()
-}
-
-fn predict(kernel: &Kernel, table: &Table) -> Vec<f32> {
-    let (_, target, _) = kernel
-        .symbolic()
-        .expect("direct kernel prediction is defined only for symbolic programs");
-    (0..table.rows)
-        .map(|row| {
-            let values: Vec<f32> = (0..table.features)
-                .map(|column| {
-                    let value = table.columns[column][row];
-                    if value.is_nan() {
-                        kernel.schema[column].impute
-                    } else {
-                        value
-                    }
-                })
-                .collect();
-            let (linear, logistic) = evaluate_target(target, &values);
-            if logistic {
-                1.0 / (1.0 + (-linear.clamp(-30.0, 30.0)).exp())
-            } else {
-                linear.clamp(0.0, 1.0)
-            }
-        })
         .collect()
 }
 
@@ -1139,6 +1133,42 @@ fn membership_auc(synthetic: &Table, train: &Table, test: &Table) -> f64 {
         }
     }
     wins / (train_distances.len() * test_distances.len()).max(1) as f64
+}
+
+fn joint_table(table: &Table) -> Table {
+    let mut joint = table.clone();
+    joint.columns.push(table.target.clone());
+    joint.features += 1;
+    joint
+}
+
+fn selected_rows(table: &Table, indices: &[usize]) -> Table {
+    Table {
+        rows: indices.len(),
+        features: table.features,
+        columns: table
+            .columns
+            .iter()
+            .map(|column| indices.iter().map(|&row| column[row]).collect())
+            .collect(),
+        target: indices.iter().map(|&row| table.target[row]).collect(),
+    }
+}
+
+fn rare_slice_indices(table: &Table, task: Task, minority: f32) -> Vec<usize> {
+    table
+        .target
+        .iter()
+        .enumerate()
+        .filter_map(|(row, &value)| {
+            let rare = if task == Task::Binary {
+                value == minority
+            } else {
+                value <= 0.1 || value >= 0.9
+            };
+            rare.then_some(row)
+        })
+        .collect()
 }
 
 fn calibration_error(task: Task, target: &[f32], prediction: &[f32]) -> f64 {
@@ -1576,29 +1606,6 @@ fn one_sided_clustered_lower(metrics: &[MetricVector], rows: usize) -> Option<f6
     bootstrap.get(bootstrap.len() / 20).copied()
 }
 
-fn sparse_predictions(
-    train: &Table,
-    test: &Table,
-    task: Task,
-    seed: u64,
-) -> Result<(Vec<f32>, Vec<f32>)> {
-    let compiled = compile_kernel_from_arrays(
-        &row_major(train),
-        &train.target,
-        train.rows,
-        train.features,
-        task,
-        &CompileOptions {
-            seed: Some(seed),
-            quantization_profiles: vec![8],
-            beam_width: Some(1),
-            ..Default::default()
-        },
-    )?;
-    let model = decode_kernel(&compiled.artifact)?;
-    Ok((predict(&model, train), predict(&model, test)))
-}
-
 pub fn certify_kernel(
     real_dir: &Path,
     kernel_path: &Path,
@@ -1607,6 +1614,35 @@ pub fn certify_kernel(
     runtime_dictionary_bytes: usize,
     supported_datasets: usize,
 ) -> Result<CertificationReport> {
+    certify_kernel_with_policy(
+        real_dir,
+        kernel_path,
+        out,
+        seed,
+        runtime_dictionary_bytes,
+        supported_datasets,
+        &ReleasePolicy::new(AnonymizationTier::L0, None, false)?,
+    )
+}
+
+pub fn certify_kernel_with_policy(
+    real_dir: &Path,
+    kernel_path: &Path,
+    out: &Path,
+    seed: u64,
+    runtime_dictionary_bytes: usize,
+    supported_datasets: usize,
+    policy: &ReleasePolicy,
+) -> Result<CertificationReport> {
+    policy.validate()?;
+    let artifact_bytes = fs::metadata(kernel_path)
+        .map_err(|error| io_error(kernel_path, error))?
+        .len() as usize;
+    if !policy.accepts_artifact_bytes(artifact_bytes) {
+        return Err(DopeError::Data(format!(
+            "artifact exceeds release-policy byte limit: {artifact_bytes} bytes"
+        )));
+    }
     let loaded = load_kernel(kernel_path)?;
     let source = match &loaded {
         LoadedKernel::V3(kernel) | LoadedKernel::V2(kernel) => kernel,
@@ -1616,14 +1652,14 @@ pub fn certify_kernel(
             ));
         }
     };
-    let train = Table::read_dataset_dir(real_dir, source.task)?;
+    let train = Table::read_dataset_dir_with_policy(real_dir, source.task, policy)?;
     let test_path = real_dir.join("test.csv");
     if !test_path.is_file() {
         return Err(DopeError::Data(
             "guarded certification requires an evaluator-owned test.csv".into(),
         ));
     }
-    let test = Table::read_csv(&test_path, source.task)?;
+    let test = Table::read_csv_with_policy(&test_path, source.task, policy)?;
     if train.features != test.features {
         return Err(DopeError::Data(
             "real train.csv and evaluator test.csv have different widths".into(),
@@ -1632,28 +1668,57 @@ pub fn certify_kernel(
     let base = train.target.iter().sum::<f32>() / train.rows.max(1) as f32;
     let null_prediction = vec![base; test.rows];
     let null_loss = loss(source.task, &test.target, &null_prediction);
+    let minority = if train.target.iter().filter(|&&value| value == 1.0).count() * 2 <= train.rows {
+        1.0
+    } else {
+        0.0
+    };
+    let rare_train_indices = rare_slice_indices(&train, source.task, minority);
+    let rare_test_indices = rare_slice_indices(&test, source.task, minority);
+    let rare_slice_required = rare_train_indices.len() >= 10;
+    let rare_slice_covered = !rare_slice_required || rare_test_indices.len() >= 10;
+    let rare_tables = (rare_slice_required && rare_slice_covered).then(|| {
+        (
+            selected_rows(&train, &rare_train_indices),
+            selected_rows(&test, &rare_test_indices),
+        )
+    });
 
-    let (_sparse_real_train, sparse_real_test) =
-        sparse_predictions(&train, &test, source.task, AUDITOR_SEEDS[0])?;
-    let (_additive_real_train, additive_real_test) = ga2m_predictions(&train, &test);
-    let sparse_real_loss = loss(source.task, &test.target, &sparse_real_test);
-    let additive_real_loss = loss(source.task, &test.target, &additive_real_test);
-    let sparse_real_calibration = calibration_error(source.task, &test.target, &sparse_real_test);
-    let additive_real_calibration =
-        calibration_error(source.task, &test.target, &additive_real_test);
+    let specs = auditor_specs();
+    let mut real_importances = BTreeMap::new();
+    for spec in &specs {
+        if !spec.available {
+            continue;
+        }
+        let auditor = auditor_backend(&spec.id)?;
+        for auditor_seed in AUDITOR_SEEDS {
+            real_importances.insert(
+                (spec.id.clone(), auditor_seed),
+                auditor.permutation_importance(&train, &test, source.task, auditor_seed)?,
+            );
+        }
+    }
 
     let sizes: Vec<_> = [1usize, 2, 4, 8]
         .into_iter()
         .map(|multiplier| train.rows.saturating_mul(multiplier))
         .collect();
     let gold_rows = [train.rows, train.rows.saturating_mul(4)];
-    let mut sparse_metrics = Vec::new();
-    let mut additive_metrics = Vec::new();
+    let mut metrics_by_auditor = BTreeMap::<String, Vec<MetricVector>>::new();
+    let mut importance_spearman = Vec::new();
+    let mut importance_jaccard = Vec::new();
+    let mut importance_applicable = false;
+    let mut importance_complete = true;
+    let mut importance_evidence = Vec::new();
     let mut drivers = Vec::new();
     let mut joints = Vec::new();
     let mut queries = Vec::new();
     let mut type_i_errors = Vec::new();
     let mut memberships = Vec::new();
+    let mut feature_memberships = Vec::new();
+    let mut joint_memberships = Vec::new();
+    let mut rare_memberships = Vec::new();
+    let mut rare_attributes = Vec::new();
     let mut attribute_advantages = Vec::new();
     let mut exact_copies = 0usize;
     let mut near_copies = 0usize;
@@ -1671,87 +1736,135 @@ pub fn certify_kernel(
                 },
             )?;
             let synthetic = table_from_sample(&sampled, synthetic_rows, train.features);
-            let (sparse_synthetic_train, sparse_synthetic_test) =
-                sparse_predictions(&synthetic, &test, source.task, AUDITOR_SEEDS[0])?;
-            let (additive_synthetic_train, additive_synthetic_test) =
-                ga2m_predictions(&synthetic, &test);
-
-            if gold_rows.contains(&synthetic_rows) {
+            let gold = gold_rows.contains(&synthetic_rows);
+            if gold {
                 drivers.push(driver_agreement(&train, &synthetic));
                 joints.push(joint_fidelity(&train, &synthetic));
                 queries.push(query_p95_normalized_error(&train, &synthetic));
                 type_i_errors.push(type_i_error(&train, &synthetic));
-                memberships.push(membership_auc(&synthetic, &train, &test));
+                let feature_attack = membership_auc(&synthetic, &train, &test);
+                let joint_attack = membership_auc(
+                    &joint_table(&synthetic),
+                    &joint_table(&train),
+                    &joint_table(&test),
+                );
+                feature_memberships.push(feature_attack);
+                joint_memberships.push(joint_attack);
+                memberships.push(feature_attack.max(joint_attack));
+                if let Some((rare_train, rare_test)) = &rare_tables {
+                    rare_memberships.push(membership_auc(&synthetic, rare_train, rare_test));
+                    rare_attributes.push(attribute_inference_advantage(
+                        &synthetic, rare_train, rare_test,
+                    ));
+                }
                 attribute_advantages.push(attribute_inference_advantage(&synthetic, &train, &test));
                 exact_copies += exact_copy_count(&train, &synthetic);
                 near_copies += near_copy_count(&train, &synthetic);
             }
-
-            for auditor_seed in AUDITOR_SEEDS {
-                for (
-                    metrics,
-                    real_loss,
-                    synthetic_test,
-                    synthetic_train,
-                    real_test,
-                    real_calibration,
-                ) in [
-                    (
-                        &mut sparse_metrics,
-                        sparse_real_loss,
-                        &sparse_synthetic_test,
-                        &sparse_synthetic_train,
-                        &sparse_real_test,
-                        sparse_real_calibration,
-                    ),
-                    (
-                        &mut additive_metrics,
-                        additive_real_loss,
-                        &additive_synthetic_test,
-                        &additive_synthetic_train,
-                        &additive_real_test,
-                        additive_real_calibration,
-                    ),
-                ] {
-                    let synthetic_loss = loss(source.task, &test.target, synthetic_test);
-                    let decision = retention_decision(null_loss, real_loss, synthetic_loss);
-                    metrics.push(MetricVector {
-                        synthetic_rows,
-                        generation_seed,
-                        auditor_seed,
-                        null_loss,
-                        trtr_loss: real_loss,
-                        tstr_loss: synthetic_loss,
-                        informative: decision.informative,
-                        retention: decision.retention,
-                        absolute_noninferiority_passed: decision.absolute_noninferiority_passed,
-                        calibration_degradation: calibration_error(
-                            source.task,
-                            &test.target,
-                            synthetic_test,
-                        ) - real_calibration,
-                        rare_class_or_tail_retention: rare_or_tail_retention(
-                            source.task,
-                            &test.target,
-                            &null_prediction,
-                            real_test,
-                            synthetic_test,
-                        ),
-                        supported_subgroup_retention: subgroup_retention(
-                            source.task,
+            for spec in &specs {
+                if !spec.available {
+                    continue;
+                }
+                let auditor = auditor_backend(&spec.id)?;
+                for auditor_seed in AUDITOR_SEEDS {
+                    let real = &real_importances[&(spec.id.clone(), auditor_seed)];
+                    let real_test = real
+                        .baseline_predictions
+                        .iter()
+                        .map(|&value| value as f32)
+                        .collect::<Vec<_>>();
+                    let synthetic_importance = if gold {
+                        Some(auditor.permutation_importance(
+                            &synthetic,
                             &test,
-                            &null_prediction,
-                            real_test,
-                            synthetic_test,
-                        ),
-                        nominal_95_coverage: nominal_coverage(
                             source.task,
-                            &synthetic.target,
-                            synthetic_train,
-                            &test.target,
-                            synthetic_test,
-                        ),
-                    });
+                            auditor_seed,
+                        )?)
+                    } else {
+                        None
+                    };
+                    let synthetic_test = if let Some(importance) = &synthetic_importance {
+                        importance
+                            .baseline_predictions
+                            .iter()
+                            .map(|&value| value as f32)
+                            .collect::<Vec<_>>()
+                    } else {
+                        auditor
+                            .predict(&synthetic, &test, source.task, auditor_seed)?
+                            .into_iter()
+                            .map(|value| value as f32)
+                            .collect::<Vec<_>>()
+                    };
+                    if let Some(synthetic_importance) = &synthetic_importance {
+                        let comparison =
+                            compare_permutation_importance(real, synthetic_importance)?;
+                        importance_complete &= comparison.feature_count == train.features;
+                        if comparison.informative_feature_count >= 2 {
+                            importance_applicable = true;
+                            importance_spearman.push(comparison.spearman);
+                            importance_jaccard.push(comparison.top_k_agreement);
+                        }
+                        importance_evidence.push(ImportanceEvidence {
+                            auditor_id: spec.id.clone(),
+                            auditor_seed,
+                            synthetic_rows,
+                            generation_seed,
+                            consistency: comparison,
+                        });
+                    }
+                    let synthetic_train = auditor
+                        .predict(&synthetic, &synthetic, source.task, auditor_seed)?
+                        .into_iter()
+                        .map(|value| value as f32)
+                        .collect::<Vec<_>>();
+                    let real_loss = loss(source.task, &test.target, &real_test);
+                    let synthetic_loss = loss(source.task, &test.target, &synthetic_test);
+                    let decision = retention_decision(null_loss, real_loss, synthetic_loss);
+                    metrics_by_auditor
+                        .entry(spec.id.clone())
+                        .or_default()
+                        .push(MetricVector {
+                            synthetic_rows,
+                            generation_seed,
+                            auditor_seed,
+                            null_loss,
+                            trtr_loss: real_loss,
+                            tstr_loss: synthetic_loss,
+                            informative: decision.informative,
+                            retention: decision.retention,
+                            absolute_noninferiority_passed: decision.absolute_noninferiority_passed,
+                            calibration_degradation: calibration_error(
+                                source.task,
+                                &test.target,
+                                &synthetic_test,
+                            ) - calibration_error(
+                                source.task,
+                                &test.target,
+                                &real_test,
+                            ),
+                            rare_class_or_tail_retention: rare_or_tail_retention(
+                                source.task,
+                                &test.target,
+                                &null_prediction,
+                                &real_test,
+                                &synthetic_test,
+                            ),
+                            supported_subgroup_retention: subgroup_retention(
+                                source.task,
+                                &test,
+                                &null_prediction,
+                                &real_test,
+                                &synthetic_test,
+                            ),
+                            nominal_95_coverage: nominal_coverage(
+                                source.task,
+                                &synthetic.target,
+                                &synthetic_train,
+                                &test.target,
+                                &synthetic_test,
+                            ),
+                        });
                 }
             }
         }
@@ -1813,11 +1926,14 @@ pub fn certify_kernel(
     };
 
     let mut auditors = BTreeMap::new();
-    for spec in auditor_specs() {
-        let report = match spec.id.as_str() {
-            "elastic_net_glm" => report_for(&spec, std::mem::take(&mut sparse_metrics)),
-            "ga2m" => report_for(&spec, std::mem::take(&mut additive_metrics)),
-            _ => AuditorReport {
+    for spec in specs {
+        let report = if spec.available {
+            report_for(
+                &spec,
+                metrics_by_auditor.remove(&spec.id).unwrap_or_default(),
+            )
+        } else {
+            AuditorReport {
                 available: false,
                 backend: spec.backend.clone(),
                 version: spec.frozen_version.clone(),
@@ -1831,7 +1947,7 @@ pub fn certify_kernel(
                 one_sided_95_lower_by_multiplier: BTreeMap::new(),
                 gold_gate_passed: false,
                 reason: spec.reason.clone(),
-            },
+            }
         };
         auditors.insert(spec.id, report);
     }
@@ -1850,6 +1966,16 @@ pub fn certify_kernel(
         .unwrap_or(f64::INFINITY);
     let type_i = type_i_errors.into_iter().reduce(f64::max).unwrap_or(1.0);
     let membership = memberships.into_iter().reduce(f64::max).unwrap_or(1.0);
+    let feature_attack_max = feature_memberships
+        .into_iter()
+        .reduce(f64::max)
+        .unwrap_or(1.0);
+    let joint_attack_max = joint_memberships
+        .into_iter()
+        .reduce(f64::max)
+        .unwrap_or(1.0);
+    let rare_slice_auc = rare_memberships.into_iter().reduce(f64::max);
+    let rare_slice_attribute = rare_attributes.into_iter().reduce(f64::max);
     let attribute = attribute_advantages
         .into_iter()
         .reduce(f64::max)
@@ -1860,6 +1986,14 @@ pub fn certify_kernel(
         .flat_map(|auditor| &auditor.metrics)
         .filter(|metric| gold_rows.contains(&metric.synthetic_rows))
         .collect();
+    let contract = KpiContract::embedded()?;
+    contract.validate()?;
+    let structure_spearman = importance_spearman
+        .iter()
+        .copied()
+        .collect::<Option<Vec<_>>>()
+        .and_then(|values| values.into_iter().reduce(f64::min));
+    let structure_jaccard = importance_jaccard.into_iter().reduce(f64::min);
     let mut gates: BTreeMap<String, bool> = BTreeMap::new();
     gates.insert(
         "auditor_family_coverage".into(),
@@ -1892,6 +2026,32 @@ pub fn certify_kernel(
         }),
     );
     gates.insert("driver".into(), driver >= 0.95);
+    gates.insert(
+        "feature_view_coverage".into(),
+        importance_complete && !importance_evidence.is_empty(),
+    );
+    gates.insert(
+        "feature_importance_spearman".into(),
+        !importance_applicable
+            || structure_spearman.is_some_and(|value| {
+                value
+                    >= contract
+                        .release_gates
+                        .feature_importance_spearman_min
+                        .unwrap_or(0.70)
+            }),
+    );
+    gates.insert(
+        "feature_importance_top_k_jaccard".into(),
+        !importance_applicable
+            || structure_jaccard.is_some_and(|value| {
+                value
+                    >= contract
+                        .release_gates
+                        .feature_importance_top_k_jaccard_min
+                        .unwrap_or(0.50)
+            }),
+    );
     gates.insert("joint_fidelity".into(), joint >= 0.90);
     gates.insert("query_fidelity".into(), query <= 0.05);
     gates.insert(
@@ -1903,13 +2063,34 @@ pub fn certify_kernel(
         }),
     );
     gates.insert("type_i_error".into(), type_i <= 0.06);
-    gates.insert("membership_inference".into(), membership <= 0.60);
+    gates.insert(
+        "membership_inference".into(),
+        membership <= contract.release_gates.membership_auc_max,
+    );
+    gates.insert("rare_slice_privacy_coverage".into(), rare_slice_covered);
+    gates.insert(
+        "rare_slice_membership".into(),
+        !rare_slice_required
+            || rare_slice_auc
+                .is_some_and(|value| value <= contract.release_gates.membership_auc_max),
+    );
+    gates.insert(
+        "rare_slice_attribute_inference".into(),
+        !rare_slice_required
+            || rare_slice_attribute.is_some_and(|value| {
+                value <= contract.release_gates.attribute_inference_advantage_max
+            }),
+    );
     gates.insert("attribute_inference".into(), attribute <= 0.05);
     gates.insert("exact_copies".into(), exact_copies == 0);
     gates.insert("near_copies".into(), near_copies == 0);
     gates.insert(
         "runtime_size".into(),
         runtime_dictionary_bytes <= 64 * 1024 * 1024,
+    );
+    gates.insert(
+        "artifact_size".into(),
+        policy.accepts_artifact_bytes(artifact_bytes),
     );
     let failed_gates: Vec<_> = gates
         .iter()
@@ -1924,10 +2105,13 @@ pub fn certify_kernel(
     let report = CertificationReport {
         format: "dope-kernel-certification".into(),
         version: 3,
+        release_policy: policy.clone(),
+        release_policy_hash: policy.hash(),
         certified: failed_gates.is_empty(),
         gates,
         failed_gates,
         auditors,
+        feature_importance: importance_evidence,
         minimum_gold_one_sided_95_retention,
         fidelity: FidelityReport {
             worst_driver_agreement: driver,
@@ -1936,7 +2120,15 @@ pub fn certify_kernel(
             maximum_type_i_error: type_i,
         },
         privacy: PrivacyReport {
+            attack_suite_version: 1,
+            membership_attacks: BTreeMap::from([
+                ("nearest_features".into(), feature_attack_max),
+                ("nearest_features_and_target".into(), joint_attack_max),
+            ]),
             maximum_membership_auc: membership,
+            rare_slice_supported: rare_slice_required,
+            rare_slice_membership_auc: rare_slice_auc,
+            rare_slice_attribute_advantage: rare_slice_attribute,
             maximum_attribute_inference_advantage: attribute,
             exact_copy_count: exact_copies,
             near_copy_count: near_copies,

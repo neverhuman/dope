@@ -18,6 +18,9 @@ pub struct FeatureImportanceConsistency {
     pub spearman: Option<f64>,
     pub top_k: usize,
     pub top_k_agreement: f64,
+    pub real_normalized_shares: Vec<(usize, f64)>,
+    pub synthetic_normalized_shares: Vec<(usize, f64)>,
+    pub mean_ratio_error: Option<f64>,
 }
 
 pub trait AuditorBackend: Send + Sync {
@@ -144,30 +147,41 @@ fn permutation_importance_for<B: AuditorBackend + ?Sized>(
     seed: u64,
 ) -> Result<PermutationImportance> {
     validate_tables(train, holdout)?;
-    let mut holdouts = Vec::with_capacity(holdout.features + 1);
-    holdouts.push(holdout.clone());
-    holdouts.extend(
-        (0..holdout.features).map(|feature| permuted_holdout(holdout, feature, seed ^ 0x91e1_0da5)),
-    );
-    let references = holdouts.iter().collect::<Vec<_>>();
-    let mut predictions = backend.predict_many(train, &references, task, seed)?;
-    if predictions.len() != holdouts.len() {
-        return Err(DopeError::Data(
-            "permutation auditor returned the wrong holdout count".into(),
-        ));
+    let mut baseline_predictions = None;
+    let mut baseline_loss = None;
+    let mut importances = Vec::with_capacity(holdout.features);
+    for batch in (0..holdout.features).collect::<Vec<_>>().chunks(32) {
+        let mut holdouts = Vec::with_capacity(batch.len() + 1);
+        holdouts.push(holdout.clone());
+        holdouts.extend(
+            batch
+                .iter()
+                .map(|&feature| permuted_holdout(holdout, feature, seed ^ 0x91e1_0da5)),
+        );
+        let references = holdouts.iter().collect::<Vec<_>>();
+        let mut predictions = backend.predict_many(train, &references, task, seed)?;
+        if predictions.len() != holdouts.len() {
+            return Err(DopeError::Data(
+                "permutation auditor returned the wrong holdout count".into(),
+            ));
+        }
+        let base = predictions.remove(0);
+        let current_loss = loss(task, &holdout.target, &base)?;
+        if baseline_loss.is_some_and(|prior: f64| (prior - current_loss).abs() > 1e-10) {
+            return Err(DopeError::Data(
+                "auditor baseline changed across importance batches".into(),
+            ));
+        }
+        baseline_predictions.get_or_insert(base);
+        baseline_loss.get_or_insert(current_loss);
+        for prediction in predictions {
+            importances.push(loss(task, &holdout.target, &prediction)? - current_loss);
+        }
     }
-    let baseline_predictions = predictions.remove(0);
-    let baseline_loss = loss(task, &holdout.target, &baseline_predictions)?;
-    let importances = predictions
-        .into_iter()
-        .map(|prediction| {
-            loss(task, &holdout.target, &prediction).map(|value| value - baseline_loss)
-        })
-        .collect::<Result<Vec<_>>>()?;
     Ok(PermutationImportance {
         feature_indices: (0..holdout.features).collect(),
-        baseline_predictions,
-        baseline_loss,
+        baseline_predictions: baseline_predictions.unwrap_or_default(),
+        baseline_loss: baseline_loss.unwrap_or(0.0),
         importances,
     })
 }
@@ -265,7 +279,7 @@ pub fn compare_permutation_importance(
     }
     let informative = common
         .iter()
-        .filter(|(_, real, synthetic)| real.abs() > 1e-12 || synthetic.abs() > 1e-12)
+        .filter(|(_, real, _)| *real > 1e-12)
         .copied()
         .collect::<Vec<_>>();
     let real_ranks = average_ranks(
@@ -280,9 +294,9 @@ pub fn compare_permutation_importance(
             .map(|(_, _, value)| *value)
             .collect::<Vec<_>>(),
     );
-    let top_k = common.len().min(10);
+    let top_k = informative.len().div_ceil(5).min(10);
     let top_features = |position: usize| {
-        let mut values = common.clone();
+        let mut values = informative.clone();
         values.sort_by(|left, right| {
             let score = |value: &(usize, f64, f64)| {
                 if position == 1 { value.1 } else { value.2 }
@@ -299,12 +313,58 @@ pub fn compare_permutation_importance(
     };
     let real_top = top_features(1);
     let synthetic_top = top_features(2);
+    let intersection = real_top.intersection(&synthetic_top).count();
+    let union = real_top.union(&synthetic_top).count();
+    let shares = |position: usize| {
+        let total = common
+            .iter()
+            .map(|(_, real, synthetic)| {
+                if position == 1 {
+                    real.max(0.0)
+                } else {
+                    synthetic.max(0.0)
+                }
+            })
+            .sum::<f64>();
+        common
+            .iter()
+            .map(|(feature, real, synthetic)| {
+                let value = if position == 1 { *real } else { *synthetic };
+                (
+                    *feature,
+                    if total > 0.0 {
+                        value.max(0.0) / total
+                    } else {
+                        0.0
+                    },
+                )
+            })
+            .collect::<Vec<_>>()
+    };
+    let real_shares = shares(1);
+    let synthetic_shares = shares(2);
+    let mean_ratio_error = (!informative.is_empty()).then(|| {
+        real_shares
+            .iter()
+            .zip(&synthetic_shares)
+            .filter(|((feature, _), _)| informative.iter().any(|(index, _, _)| index == feature))
+            .map(|((_, real), (_, synthetic))| (synthetic - real).abs() / real.max(1e-12))
+            .sum::<f64>()
+            / informative.len() as f64
+    });
     Ok(FeatureImportanceConsistency {
         feature_count: common.len(),
         informative_feature_count: informative.len(),
         spearman: pearson(&real_ranks, &synthetic_ranks),
         top_k,
-        top_k_agreement: real_top.intersection(&synthetic_top).count() as f64 / top_k as f64,
+        top_k_agreement: if union == 0 {
+            1.0
+        } else {
+            intersection as f64 / union as f64
+        },
+        real_normalized_shares: real_shares,
+        synthetic_normalized_shares: synthetic_shares,
+        mean_ratio_error,
     })
 }
 
@@ -313,7 +373,7 @@ struct BoundedAuditor {
 }
 
 const AUDITOR_TRAIN_ROW_LIMIT: usize = 256;
-const AUDITOR_FEATURE_LIMIT: usize = 64;
+const AUDITOR_FEATURE_LIMIT: usize = usize::MAX;
 
 impl AuditorBackend for BoundedAuditor {
     fn id(&self) -> &'static str {
@@ -1472,8 +1532,25 @@ mod tests {
         )
         .unwrap();
         assert_eq!(informative.spearman, Some(1.0));
-        assert_eq!(informative.top_k, 3);
+        assert_eq!(informative.top_k, 1);
         assert_eq!(informative.top_k_agreement, 1.0);
+        assert!(
+            (informative
+                .real_normalized_shares
+                .iter()
+                .map(|(_, share)| share)
+                .sum::<f64>()
+                - 1.0)
+                .abs()
+                < 1e-12
+        );
+        let changed_driver = compare_permutation_importance(
+            &evidence(vec![3.0, 2.0, 1.0]),
+            &evidence(vec![1.0, 2.0, 3.0]),
+        )
+        .unwrap();
+        assert_eq!(changed_driver.top_k_agreement, 0.0);
+        assert_eq!(changed_driver.spearman, Some(-1.0));
 
         let undefined = compare_permutation_importance(
             &evidence(vec![1.0, 1.0, 1.0]),
@@ -1482,6 +1559,46 @@ mod tests {
         .unwrap();
         assert_eq!(undefined.informative_feature_count, 3);
         assert_eq!(undefined.spearman, None);
+    }
+
+    #[test]
+    fn importance_covers_high_index_features() {
+        struct HighIndex;
+        impl AuditorBackend for HighIndex {
+            fn id(&self) -> &'static str {
+                "high_index_fixture"
+            }
+            fn predict(
+                &self,
+                _train: &Table,
+                test: &Table,
+                _task: Task,
+                _seed: u64,
+            ) -> Result<Vec<f64>> {
+                Ok(test.columns[69]
+                    .iter()
+                    .map(|value| f64::from(*value))
+                    .collect())
+            }
+        }
+        let rows = 32;
+        let mut values = vec![0.0; rows * 70];
+        let mut target = Vec::new();
+        for row in 0..rows {
+            let value = row as f32 / (rows - 1) as f32;
+            values[row * 70 + 69] = value;
+            target.push(value);
+        }
+        let table = Table::from_arrays(&values, &target, rows, 70, Task::Regression).unwrap();
+        let auditor = BoundedAuditor {
+            inner: Box::new(HighIndex),
+        };
+        let importance = auditor
+            .permutation_importance(&table, &table, Task::Regression, 57721)
+            .unwrap();
+        assert_eq!(importance.feature_indices.len(), 70);
+        assert_eq!(importance.feature_indices[69], 69);
+        assert!(importance.importances[69] > importance.importances[0]);
     }
 
     #[cfg(feature = "gpu-training")]

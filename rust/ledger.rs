@@ -12,7 +12,7 @@ use crate::production::{ContentHashes, canonical_json, hashes, read_json};
 pub const HEARTBEAT_SECONDS: u64 = 30;
 pub const LEASE_SECONDS: u64 = 600;
 pub const MAX_INFRASTRUCTURE_RETRIES: u8 = 2;
-pub const JOB_EVIDENCE_VERSION: u8 = 2;
+pub const JOB_EVIDENCE_VERSION: u8 = 3;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
@@ -115,6 +115,12 @@ pub struct JobEvidence {
     pub feature_importance_top_k_agreement: f64,
     pub feature_importance_feature_count: usize,
     pub feature_importance_informative_count: usize,
+    #[serde(default)]
+    pub feature_importance_real_shares: Vec<(usize, f64)>,
+    #[serde(default)]
+    pub feature_importance_synthetic_shares: Vec<(usize, f64)>,
+    #[serde(default)]
+    pub feature_importance_mean_ratio_error: Option<f64>,
     pub exact_copies: usize,
     pub near_copies: usize,
     pub canary_extractions: usize,
@@ -131,7 +137,7 @@ impl JobEvidence {
     pub fn validate_against(&self, spec: &JobSpec) -> Result<()> {
         let optional_finite = |value: Option<f64>| value.is_none_or(f64::is_finite);
         if self.format != "dope-job-evidence"
-            || self.version != JOB_EVIDENCE_VERSION
+            || !(self.version == 2 || self.version == JOB_EVIDENCE_VERSION)
             || !matches!(
                 self.phase.as_str(),
                 "training_gold" | "validation_select" | "validation_cert"
@@ -171,8 +177,26 @@ impl JobEvidence {
             || !self.feature_importance_top_k_agreement.is_finite()
             || !(0.0..=1.0).contains(&self.feature_importance_top_k_agreement)
             || self.feature_importance_feature_count == 0
-            || self.feature_importance_feature_count > 64
+            || self.feature_importance_feature_count > self.features
             || self.feature_importance_informative_count > self.feature_importance_feature_count
+            || (self.version == JOB_EVIDENCE_VERSION
+                && (self.feature_importance_feature_count != self.features
+                    || self.feature_importance_real_shares.len() != self.features
+                    || self.feature_importance_synthetic_shares.len() != self.features
+                    || self
+                        .feature_importance_real_shares
+                        .iter()
+                        .zip(&self.feature_importance_synthetic_shares)
+                        .enumerate()
+                        .any(|(index, (real, synthetic))| {
+                            real.0 != index
+                                || synthetic.0 != index
+                                || !real.1.is_finite()
+                                || !synthetic.1.is_finite()
+                                || real.1 < 0.0
+                                || synthetic.1 < 0.0
+                        })
+                    || !optional_finite(self.feature_importance_mean_ratio_error)))
             || self.peak_cpu_memory_bytes != self.peak_memory_bytes
             || self
                 .fitting_time_ms
@@ -914,7 +938,7 @@ mod tests {
     fn evidence(spec: &JobSpec) -> JobEvidence {
         JobEvidence {
             format: "dope-job-evidence".into(),
-            version: JOB_EVIDENCE_VERSION,
+            version: 2,
             phase: spec.phase.clone(),
             task: "regression".into(),
             candidate_id: spec.candidate_spec.clone(),
@@ -957,6 +981,9 @@ mod tests {
             feature_importance_top_k_agreement: 0.5,
             feature_importance_feature_count: 4,
             feature_importance_informative_count: 3,
+            feature_importance_real_shares: Vec::new(),
+            feature_importance_synthetic_shares: Vec::new(),
+            feature_importance_mean_ratio_error: None,
             exact_copies: 0,
             near_copies: 0,
             canary_extractions: 0,

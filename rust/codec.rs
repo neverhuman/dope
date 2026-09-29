@@ -1560,6 +1560,29 @@ mod tests {
     }
 
     #[test]
+    fn section_accounting_reconciles_exact_encoded_length() {
+        let encoded = encode_kernel(&kernel()).unwrap();
+        let accounting = account_artifact(&encoded).unwrap();
+        assert_eq!(accounting.header_bytes, HEADER_BYTES);
+        assert_eq!(accounting.total_bytes, encoded.len());
+        assert_eq!(
+            accounting
+                .sections
+                .iter()
+                .map(|section| section.framing_bytes + section.encoded_bytes)
+                .sum::<usize>()
+                + HEADER_BYTES,
+            encoded.len()
+        );
+        assert!(
+            accounting
+                .sections
+                .iter()
+                .all(|section| section.raw_bytes >= section.encoded_bytes || !section.compressed)
+        );
+    }
+
+    #[test]
     fn reads_v2_1_payloads_and_emits_v3() {
         let encoded_v3 = encode_kernel(&kernel()).unwrap();
         let expected = decode_kernel(&encoded_v3).unwrap();

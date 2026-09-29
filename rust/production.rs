@@ -821,6 +821,14 @@ pub struct GateEvidence {
     pub nominal_95_coverage_max: Option<f64>,
     pub type_i_error_max: Option<f64>,
     pub membership_auc_max: Option<f64>,
+    #[serde(default)]
+    pub feature_importance_complete: bool,
+    #[serde(default)]
+    pub feature_importance_applicable: bool,
+    #[serde(default)]
+    pub feature_importance_spearman_min: Option<f64>,
+    #[serde(default)]
+    pub feature_importance_top_k_jaccard_min: Option<f64>,
     pub attribute_inference_advantage_max: Option<f64>,
     pub exact_copies: usize,
     pub near_copies: usize,
@@ -896,6 +904,24 @@ impl GateEvidence {
             self.membership_auc_max
                 .is_some_and(|v| v <= gates.membership_auc_max),
         );
+        if contract.version >= 2 {
+            require("feature_view_coverage", self.feature_importance_complete);
+            if self.feature_importance_applicable {
+                require(
+                    "feature_importance_spearman",
+                    self.feature_importance_spearman_min.is_some_and(|value| {
+                        value >= gates.feature_importance_spearman_min.unwrap_or(0.70)
+                    }),
+                );
+                require(
+                    "feature_importance_top_k_jaccard",
+                    self.feature_importance_top_k_jaccard_min
+                        .is_some_and(|value| {
+                            value >= gates.feature_importance_top_k_jaccard_min.unwrap_or(0.50)
+                        }),
+                );
+            }
+        }
         require(
             "attribute_inference",
             self.attribute_inference_advantage_max
@@ -1086,10 +1112,32 @@ pub fn build_rc_manifest(
 }
 
 pub fn inventory_release_files(root: &Path, names: &[&str]) -> Result<Vec<ReleaseFile>> {
+    let expected = names.iter().copied().collect::<BTreeSet<_>>();
+    let mut observed = BTreeSet::new();
+    for entry in fs::read_dir(root).map_err(|error| io_error(root, error))? {
+        let entry = entry.map_err(|error| io_error(root, error))?;
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if !expected.contains(name.as_str()) {
+            return Err(DopeError::Data(format!("unexpected release file: {name}")));
+        }
+        let metadata =
+            fs::symlink_metadata(entry.path()).map_err(|error| io_error(entry.path(), error))?;
+        if !metadata.file_type().is_file() {
+            return Err(DopeError::Data(format!(
+                "release file is not a regular file: {name}"
+            )));
+        }
+        observed.insert(name);
+    }
+    if observed.len() != expected.len() {
+        return Err(DopeError::Data(
+            "release file inventory is incomplete".into(),
+        ));
+    }
     let mut files = Vec::with_capacity(names.len());
     for name in names {
         let path = root.join(name);
-        let metadata = fs::metadata(&path).map_err(|error| io_error(&path, error))?;
+        let metadata = fs::symlink_metadata(&path).map_err(|error| io_error(&path, error))?;
         if !metadata.is_file() {
             return Err(DopeError::Data(format!(
                 "release input is not a file: {name}"
@@ -1142,6 +1190,9 @@ mod tests {
         let digest = hashes(&canonical_json(&contract).unwrap());
         assert_eq!(digest.sha256, KPI_CONTRACT_SHA256);
         assert_eq!(digest.blake3, KPI_CONTRACT_BLAKE3);
+        let historical = KpiContract::embedded_v1().unwrap();
+        historical.validate().unwrap();
+        assert_eq!(historical.version, 1);
     }
 
     #[test]

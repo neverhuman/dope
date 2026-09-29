@@ -615,7 +615,7 @@ pub fn rebuild_deep_outcomes(
             ));
         }
         for evidence in block.evidence {
-            if evidence.version != JOB_EVIDENCE_VERSION {
+            if !(2..=JOB_EVIDENCE_VERSION).contains(&evidence.version) {
                 return Err(DopeError::Data(
                     "gold block mixes superseded job evidence with the neural campaign".into(),
                 ));

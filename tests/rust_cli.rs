@@ -583,9 +583,8 @@ fn native_cli_end_to_end() {
     );
 
     let release = root.join("release");
-    run(
-        binary,
-        &[
+    let conversion = Command::new(binary)
+        .args([
             "convert",
             "--dataset-dir",
             &dataset_s,
@@ -597,40 +596,12 @@ fn native_cli_end_to_end() {
             &text(&release),
             "--synthetic-seed",
             "23",
-        ],
-    );
-    for name in [
-        "kernel.dpk",
-        "conversion-report.json",
-        "synthetic-model.bundle",
-        "tstr-certification.json",
-        "synthetic-23.csv",
-    ] {
-        assert!(
-            release.join(name).is_file(),
-            "missing release output {name}"
-        );
-    }
-    let conversion: serde_json::Value =
-        serde_json::from_slice(&fs::read(release.join("conversion-report.json")).unwrap()).unwrap();
-    assert_eq!(conversion["version"], 3);
-    assert_eq!(conversion["release_label"], "strongest_explicit_kernel");
-    assert_eq!(
-        conversion["formal_dp_frontier"].as_array().unwrap().len(),
-        120
-    );
-    assert_eq!(
-        conversion["empirical_backend_registry"]
-            .as_array()
-            .unwrap()
-            .len(),
-        31
-    );
-    assert_eq!(conversion["sealed_test_open_count"], 1);
-    let bundle: serde_json::Value =
-        serde_json::from_slice(&fs::read(release.join("synthetic-model.bundle")).unwrap()).unwrap();
-    assert_eq!(bundle["trained_from"], "synthetic_only");
-    assert_eq!(bundle["contains_source_rows"], false);
+        ])
+        .output()
+        .unwrap();
+    assert!(!conversion.status.success());
+    assert!(String::from_utf8_lossy(&conversion.stderr).contains("auditor coverage"));
+    assert!(!release.exists());
 
     let v1 = root.join("v1.dk.json");
     let v1_sample = root.join("v1.csv");

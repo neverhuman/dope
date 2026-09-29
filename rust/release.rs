@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use crate::certification::{CertificationReport, certify_kernel};
+use crate::certification::{CertificationReport, certify_kernel_with_policy};
 use crate::codec::LoadedKernel;
 use crate::codec::{decode_kernel, encode_kernel};
 use crate::compiler::{
@@ -12,7 +12,8 @@ use crate::compiler::{
     compile_kernel_from_dir,
 };
 use crate::contract::{
-    FormalDpConfiguration, FrozenBackend, empirical_backends, formal_dp_configurations,
+    FormalDpConfiguration, FrozenBackend, ReleasePolicy, auditor_specs, empirical_backends,
+    formal_dp_configurations,
 };
 use crate::data::Table;
 use crate::error::{DopeError, Result, io_error};
@@ -35,7 +36,11 @@ impl Default for ConversionOptions {
             runtime_dictionary_bytes: 0,
             supported_datasets: 1,
             synthetic_csv_seeds: Vec::new(),
-            compile_options: CompileOptions::default(),
+            compile_options: CompileOptions {
+                release_policy: ReleasePolicy::default(),
+                beam_width: Some(4),
+                ..Default::default()
+            },
         }
     }
 }
@@ -82,6 +87,8 @@ pub struct ConversionReport {
     pub release_seed: u64,
     pub certified: bool,
     pub release_label: String,
+    pub evaluated_candidates: Vec<String>,
+    pub certified_candidates: Vec<String>,
     pub compiler: CompileReport,
     pub candidate_predictions: Vec<CandidateReport>,
     pub empirical_backend_registry: Vec<FrozenBackend>,
@@ -151,23 +158,103 @@ pub fn convert_release(
     out: &Path,
     options: &ConversionOptions,
 ) -> Result<ConversionResult> {
-    fs::create_dir_all(out).map_err(|error| io_error(out, error))?;
+    if out.exists() {
+        return Err(DopeError::Data(
+            "release output already exists; choose a new directory".into(),
+        ));
+    }
+    let missing_auditors = auditor_specs()
+        .into_iter()
+        .filter(|spec| !spec.available)
+        .map(|spec| spec.id)
+        .collect::<Vec<_>>();
+    if !missing_auditors.is_empty() {
+        return Err(DopeError::Unsupported(format!(
+            "release requires complete frozen auditor coverage; unavailable: {}",
+            missing_auditors.join(",")
+        )));
+    }
     let mut compile_options = options.compile_options.clone();
+    compile_options.release_policy.validate()?;
     compile_options.seed = Some(options.seed);
     let compiled = compile_kernel_from_dir(dataset_dir, task, &compile_options)?;
-    let kernel_path = out.join("kernel.dpk");
-    fs::write(&kernel_path, &compiled.artifact).map_err(|error| io_error(&kernel_path, error))?;
+    let evidence_dir = out.with_extension("candidate-evidence");
+    fs::create_dir_all(&evidence_dir).map_err(|error| io_error(&evidence_dir, error))?;
+    let mut evaluated_candidates = Vec::new();
+    let mut passing = Vec::new();
+    for candidate in &compiled.candidates {
+        let artifact = compiled
+            .candidate_artifacts
+            .get(&candidate.candidate_id)
+            .ok_or_else(|| DopeError::Data("compiler omitted a candidate artifact".into()))?;
+        let identity = blake3::hash(artifact).to_hex().to_string();
+        let candidate_path = evidence_dir.join(format!("{identity}.dpk"));
+        let report_path = evidence_dir.join(format!("{identity}.certification.json"));
+        fs::write(&candidate_path, artifact).map_err(|error| io_error(&candidate_path, error))?;
+        let report = certify_kernel_with_policy(
+            real_holdout_dir,
+            &candidate_path,
+            &report_path,
+            options.seed,
+            options.runtime_dictionary_bytes,
+            options.supported_datasets,
+            &compile_options.release_policy,
+        )?;
+        evaluated_candidates.push(candidate.candidate_id.clone());
+        if report.certified {
+            passing.push((candidate.clone(), artifact.clone(), report));
+        }
+    }
+    passing.sort_by(|left, right| {
+        left.1
+            .len()
+            .cmp(&right.1.len())
+            .then_with(|| {
+                right
+                    .2
+                    .minimum_gold_one_sided_95_retention
+                    .unwrap_or(f64::NEG_INFINITY)
+                    .total_cmp(
+                        &left
+                            .2
+                            .minimum_gold_one_sided_95_retention
+                            .unwrap_or(f64::NEG_INFINITY),
+                    )
+            })
+            .then_with(|| {
+                right
+                    .2
+                    .fidelity
+                    .worst_joint_fidelity
+                    .total_cmp(&left.2.fidelity.worst_joint_fidelity)
+            })
+            .then_with(|| left.0.candidate_id.cmp(&right.0.candidate_id))
+    });
+    let certified_candidates = passing
+        .iter()
+        .map(|entry| entry.0.candidate_id.clone())
+        .collect::<Vec<_>>();
+    let (winner, artifact, certification) = passing.into_iter().next().ok_or_else(|| {
+        DopeError::Data(format!(
+            "no evaluated candidate passed every release gate; evidence: {}",
+            evidence_dir.display()
+        ))
+    })?;
+    let staging = out.with_extension(format!("staging-{}", std::process::id()));
+    fs::create_dir(&staging).map_err(|error| io_error(&staging, error))?;
+    let kernel_path = staging.join("kernel.dpk");
+    fs::write(&kernel_path, &artifact).map_err(|error| io_error(&kernel_path, error))?;
 
     // A canonical decode/encode equality check is part of release construction,
     // not deferred to a consumer.
-    let canonical = encode_kernel(&decode_kernel(&compiled.artifact)?)?;
-    if canonical != compiled.artifact {
+    let canonical = encode_kernel(&decode_kernel(&artifact)?)?;
+    if canonical != artifact {
         return Err(crate::DopeError::Codec(
             "compiled Kernel V3 is not a canonical round trip".into(),
         ));
     }
 
-    let loaded = LoadedKernel::V3(Box::new(decode_kernel(&compiled.artifact)?));
+    let loaded = LoadedKernel::V3(Box::new(decode_kernel(&artifact)?));
     for synthetic_seed in &options.synthetic_csv_seeds {
         sample_kernel_to_csv(
             &loaded,
@@ -175,7 +262,7 @@ pub fn convert_release(
                 rows: compiled.report.rows,
                 seed: Some(*synthetic_seed),
             },
-            &out.join(format!("synthetic-{synthetic_seed}.csv")),
+            &staging.join(format!("synthetic-{synthetic_seed}.csv")),
         )?;
     }
 
@@ -241,19 +328,16 @@ pub fn convert_release(
         checksum: String::new(),
     };
     bundle.checksum = bundle_checksum(&bundle)?;
-    let bundle_path = out.join("synthetic-model.bundle");
+    let bundle_path = staging.join("synthetic-model.bundle");
     fs::write(&bundle_path, serde_json::to_vec_pretty(&bundle)?)
         .map_err(|error| io_error(&bundle_path, error))?;
 
-    let certification_path = out.join("tstr-certification.json");
-    let certification = certify_kernel(
-        real_holdout_dir,
-        &kernel_path,
+    let certification_path = staging.join("tstr-certification.json");
+    fs::write(
         &certification_path,
-        options.seed,
-        options.runtime_dictionary_bytes,
-        options.supported_datasets,
-    )?;
+        serde_json::to_vec_pretty(&certification)?,
+    )
+    .map_err(|error| io_error(&certification_path, error))?;
 
     let standalone = accounted(
         &compiled.pareto_frontier,
@@ -265,7 +349,7 @@ pub fn convert_release(
         options.runtime_dictionary_bytes,
         options.supported_datasets,
     );
-    let artifact_bytes = compiled.artifact.len();
+    let artifact_bytes = artifact.len();
     let standalone_bytes = artifact_bytes + options.runtime_dictionary_bytes;
     let allocated_bytes = artifact_bytes
         + options
@@ -286,22 +370,7 @@ pub fn convert_release(
     };
     let empirical = empirical_backends();
     let formal_dp = formal_dp_configurations(compiled.report.rows);
-    let mut failures: BTreeSet<String> = compiled.report.failed_gates.iter().cloned().collect();
-    failures.extend(certification.failed_gates.iter().cloned());
-    failures.extend(
-        empirical
-            .iter()
-            .filter(|backend| !backend.available)
-            .map(|backend| format!("empirical_backend_unavailable:{}", backend.id)),
-    );
-    failures.extend(
-        formal_dp
-            .iter()
-            .filter(|configuration| !configuration.available)
-            .map(|configuration| {
-                format!("formal_dp_backend_unavailable:{}", configuration.backend)
-            }),
-    );
+    let failures: BTreeSet<String> = certification.failed_gates.iter().cloned().collect();
     let mut checksums = BTreeMap::new();
     checksums.insert("kernel.dpk".into(), checksum_file(&kernel_path)?);
     checksums.insert(
@@ -314,19 +383,23 @@ pub fn convert_release(
     );
     for synthetic_seed in &options.synthetic_csv_seeds {
         let name = format!("synthetic-{synthetic_seed}.csv");
-        checksums.insert(name.clone(), checksum_file(&out.join(name))?);
+        checksums.insert(name.clone(), checksum_file(&staging.join(name))?);
     }
+    let mut compiler_report = compiled.report.clone();
+    compiler_report.selected_candidate = winner.candidate_id.clone();
+    compiler_report.artifact_bytes = artifact_bytes;
+    compiler_report.effective_bytes = artifact_bytes;
+    compiler_report.bits_per_original_cell = winner.bits_per_original_cell;
+    compiler_report.failed_gates = winner.failed_gates.clone();
     let report = ConversionReport {
         format: "dope-conversion-report".into(),
         version: 3,
         release_seed: options.seed,
-        certified: certification.certified,
-        release_label: if certification.certified {
-            "certified".into()
-        } else {
-            "strongest_explicit_kernel".into()
-        },
-        compiler: compiled.report,
+        certified: true,
+        release_label: "certified".into(),
+        evaluated_candidates,
+        certified_candidates,
+        compiler: compiler_report,
         candidate_predictions: compiled.candidates,
         empirical_backend_registry: empirical,
         standalone_pareto_frontier: standalone,
@@ -338,9 +411,44 @@ pub fn convert_release(
         failures: failures.into_iter().collect(),
         sealed_test_open_count: 1,
     };
-    let report_path = out.join("conversion-report.json");
+    let report_path = staging.join("conversion-report.json");
     fs::write(&report_path, serde_json::to_vec_pretty(&report)?)
         .map_err(|error| io_error(&report_path, error))?;
+    let expected = report
+        .checksums
+        .keys()
+        .cloned()
+        .chain(std::iter::once("conversion-report.json".into()))
+        .collect::<BTreeSet<_>>();
+    let actual = fs::read_dir(&staging)
+        .map_err(|error| io_error(&staging, error))?
+        .map(|entry| entry.map_err(|error| io_error(&staging, error)))
+        .collect::<Result<Vec<_>>>()?;
+    let mut found = BTreeSet::new();
+    for entry in actual {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        let metadata =
+            fs::symlink_metadata(entry.path()).map_err(|error| io_error(entry.path(), error))?;
+        if !metadata.file_type().is_file() || !expected.contains(&name) {
+            return Err(DopeError::Data(
+                "release staging contains an unexpected file or symlink".into(),
+            ));
+        }
+        found.insert(name);
+    }
+    if found != expected {
+        return Err(DopeError::Data(
+            "release staging inventory is incomplete".into(),
+        ));
+    }
+    for synthetic_seed in &options.synthetic_csv_seeds {
+        Table::read_csv_with_policy(
+            &staging.join(format!("synthetic-{synthetic_seed}.csv")),
+            task,
+            &compile_options.release_policy,
+        )?;
+    }
+    fs::rename(&staging, out).map_err(|error| io_error(out, error))?;
     Ok(ConversionResult {
         report,
         certification,

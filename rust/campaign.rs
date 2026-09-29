@@ -759,9 +759,47 @@ pub struct MeasuredEvidenceSummary {
     pub query_error_max: Option<f64>,
     pub type_i_error_max: Option<f64>,
     pub membership_auc_max: Option<f64>,
+    pub feature_importance_complete: bool,
+    pub feature_importance_applicable: bool,
+    pub feature_importance_spearman_min: Option<f64>,
+    pub feature_importance_top_k_jaccard_min: Option<f64>,
     pub attribute_advantage_max: Option<f64>,
     pub exact_copies: usize,
     pub near_copies: usize,
+}
+
+fn aggregate_importance<'a>(
+    cells: impl IntoIterator<Item = &'a JobEvidence>,
+) -> (bool, bool, Option<f64>, Option<f64>) {
+    let mut count = 0usize;
+    let mut complete = true;
+    let mut applicable = false;
+    let mut spearman = None::<f64>;
+    let mut jaccard = None::<f64>;
+    let mut missing_rank = false;
+    for cell in cells {
+        count += 1;
+        complete &= cell.version == JOB_EVIDENCE_VERSION
+            && cell.feature_importance_feature_count == cell.features
+            && cell.feature_importance_real_shares.len() == cell.features
+            && cell.feature_importance_synthetic_shares.len() == cell.features;
+        if cell.feature_importance_informative_count >= 2 {
+            applicable = true;
+            if let Some(value) = cell.feature_importance_spearman {
+                spearman = Some(spearman.map_or(value, |minimum| minimum.min(value)));
+            } else {
+                missing_rank = true;
+            }
+            let value = cell.feature_importance_top_k_agreement;
+            jaccard = Some(jaccard.map_or(value, |minimum| minimum.min(value)));
+        }
+    }
+    (
+        count > 0 && complete,
+        applicable,
+        if missing_rank { None } else { spearman },
+        jaccard,
+    )
 }
 
 fn bounded_router_utility(evidence: &JobEvidence) -> f64 {
@@ -883,6 +921,11 @@ pub fn summarize_evidence(metric_paths: &[PathBuf], out: &Path) -> Result<Measur
     let mut type_i_error_max = None;
     let mut membership_auc_max = None;
     let mut attribute_advantage_max = None;
+    let mut importance_complete = true;
+    let mut importance_applicable = false;
+    let mut importance_spearman_min = None::<f64>;
+    let mut importance_jaccard_min = None::<f64>;
+    let mut importance_missing_rank = false;
     let mut exact_copies = 0usize;
     let mut near_copies = 0usize;
     let update_min = |slot: &mut Option<f64>, value: Option<f64>| {
@@ -970,6 +1013,22 @@ pub fn summarize_evidence(metric_paths: &[PathBuf], out: &Path) -> Result<Measur
         update_max(&mut query_error_max, cell.query_p95_normalized_error);
         update_max(&mut type_i_error_max, cell.type_i_error);
         update_max(&mut membership_auc_max, cell.membership_auc);
+        importance_complete &= cell.version == JOB_EVIDENCE_VERSION
+            && cell.feature_importance_feature_count == cell.features
+            && cell.feature_importance_real_shares.len() == cell.features
+            && cell.feature_importance_synthetic_shares.len() == cell.features;
+        if cell.feature_importance_informative_count >= 2 {
+            importance_applicable = true;
+            if let Some(value) = cell.feature_importance_spearman {
+                update_min(&mut importance_spearman_min, Some(value));
+            } else {
+                importance_missing_rank = true;
+            }
+            update_min(
+                &mut importance_jaccard_min,
+                Some(cell.feature_importance_top_k_agreement),
+            );
+        }
         update_max(
             &mut attribute_advantage_max,
             cell.attribute_inference_advantage,
@@ -1003,7 +1062,7 @@ pub fn summarize_evidence(metric_paths: &[PathBuf], out: &Path) -> Result<Measur
     });
     let summary = MeasuredEvidenceSummary {
         format: "dope-measured-evidence-summary".into(),
-        version: 1,
+        version: 2,
         cells,
         lineage_groups: lineage_groups.len(),
         lineage_profile_outcomes: lineage_profile_outcomes.len(),
@@ -1021,6 +1080,14 @@ pub fn summarize_evidence(metric_paths: &[PathBuf], out: &Path) -> Result<Measur
         query_error_max,
         type_i_error_max,
         membership_auc_max,
+        feature_importance_complete: cells > 0 && importance_complete,
+        feature_importance_applicable: importance_applicable,
+        feature_importance_spearman_min: if importance_missing_rank {
+            None
+        } else {
+            importance_spearman_min
+        },
+        feature_importance_top_k_jaccard_min: importance_jaccard_min,
         attribute_advantage_max,
         exact_copies,
         near_copies,
@@ -1771,7 +1838,7 @@ fn validate_gold_record_block(
             cell.auditor_seed,
         );
         if cell.format != "dope-job-evidence"
-            || cell.version != JOB_EVIDENCE_VERSION
+            || !(2..=JOB_EVIDENCE_VERSION).contains(&cell.version)
             || cell.phase != phase
             || cell.task != record.task
             || cell.lineage_group_id != record.lineage_group_id
@@ -1807,7 +1874,7 @@ fn validate_gold_record_block(
             || !cell.feature_importance_top_k_agreement.is_finite()
             || !(0.0..=1.0).contains(&cell.feature_importance_top_k_agreement)
             || cell.feature_importance_feature_count == 0
-            || cell.feature_importance_feature_count > 64
+            || cell.feature_importance_feature_count > cell.features
             || cell.feature_importance_informative_count > cell.feature_importance_feature_count
             || cell.peak_cpu_memory_bytes != cell.peak_memory_bytes
             || cell
@@ -3930,6 +3997,12 @@ pub fn export_metrics(state_dir: &Path, out: &Path, receipt_key: &Path) -> Resul
                 && is_lower_hex(&evidence.artifact_sha256, &[64])
                 && is_lower_hex(&evidence.artifact_blake3, &[64])
         });
+    let (
+        feature_importance_complete,
+        feature_importance_applicable,
+        feature_importance_spearman_min,
+        feature_importance_top_k_jaccard_min,
+    ) = aggregate_importance(cert_successful.iter().copied());
     let evidence = GateEvidence {
         ptf_v1: kpi_report.ptf_v1,
         calibration_degradation_max: option_max(
@@ -3950,6 +4023,10 @@ pub fn export_metrics(state_dir: &Path, out: &Path, receipt_key: &Path) -> Resul
         nominal_95_coverage_max: option_max(cert_successful.iter().map(|e| e.nominal_95_coverage)),
         type_i_error_max: option_max(cert_successful.iter().map(|e| e.type_i_error)),
         membership_auc_max: option_max(cert_successful.iter().map(|e| e.membership_auc)),
+        feature_importance_complete,
+        feature_importance_applicable,
+        feature_importance_spearman_min,
+        feature_importance_top_k_jaccard_min,
         attribute_inference_advantage_max: option_max(
             cert_successful
                 .iter()
@@ -4344,6 +4421,11 @@ pub fn export_validation_cert_metrics(
     let mut membership_auc_max = None;
     let mut attribute_advantage_max = None;
     let mut across_seed_validation_loss_stddev = None;
+    let mut feature_importance_complete = true;
+    let mut feature_importance_applicable = false;
+    let mut feature_importance_spearman_min = None::<f64>;
+    let mut feature_importance_top_k_jaccard_min = None::<f64>;
+    let mut feature_importance_missing_rank = false;
     let mut exact_copies = 0usize;
     let mut near_copies = 0usize;
     let mut canary_extractions = 0usize;
@@ -4571,6 +4653,22 @@ pub fn export_validation_cert_metrics(
                 update_optional_max(&mut nominal_coverage_max, cell.nominal_95_coverage);
                 update_optional_max(&mut type_i_error_max, cell.type_i_error);
                 update_optional_max(&mut membership_auc_max, cell.membership_auc);
+                feature_importance_complete &= cell.version == JOB_EVIDENCE_VERSION
+                    && cell.feature_importance_feature_count == cell.features
+                    && cell.feature_importance_real_shares.len() == cell.features
+                    && cell.feature_importance_synthetic_shares.len() == cell.features;
+                if cell.feature_importance_informative_count >= 2 {
+                    feature_importance_applicable = true;
+                    if let Some(value) = cell.feature_importance_spearman {
+                        update_optional_min(&mut feature_importance_spearman_min, Some(value));
+                    } else {
+                        feature_importance_missing_rank = true;
+                    }
+                    update_optional_min(
+                        &mut feature_importance_top_k_jaccard_min,
+                        Some(cell.feature_importance_top_k_agreement),
+                    );
+                }
                 update_optional_max(
                     &mut attribute_advantage_max,
                     cell.attribute_inference_advantage,
@@ -4932,6 +5030,14 @@ pub fn export_validation_cert_metrics(
         nominal_95_coverage_max: nominal_coverage_max,
         type_i_error_max,
         membership_auc_max,
+        feature_importance_complete: feature_importance_complete && valid_expected_cells > 0,
+        feature_importance_applicable,
+        feature_importance_spearman_min: if feature_importance_missing_rank {
+            None
+        } else {
+            feature_importance_spearman_min
+        },
+        feature_importance_top_k_jaccard_min,
         attribute_inference_advantage_max: attribute_advantage_max,
         exact_copies,
         near_copies,

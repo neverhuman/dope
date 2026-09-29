@@ -103,6 +103,7 @@ pub struct CompileReport {
 #[derive(Clone, Debug)]
 pub struct CompileResult {
     pub artifact: Vec<u8>,
+    pub candidate_artifacts: BTreeMap<String, Vec<u8>>,
     pub report: CompileReport,
     pub candidates: Vec<CandidateReport>,
     pub pareto_frontier: Vec<CandidateReport>,
@@ -1892,40 +1893,6 @@ fn target_parameter_bytes(target: &Target) -> usize {
     }
 }
 
-pub(crate) fn ga2m_predictions(train: &Table, test: &Table) -> (Vec<f32>, Vec<f32>) {
-    let fits: Vec<_> = train
-        .columns
-        .iter()
-        .map(|column| fit_column(column))
-        .collect();
-    let completed_train: Vec<_> = fits.iter().map(|fit| fit.completed.clone()).collect();
-    let screen = target_screen(&completed_train, &train.target);
-    let model = fit_ga2m_target(train, &completed_train, &screen);
-    let predict = |table: &Table| {
-        (0..table.rows)
-            .map(|row| {
-                let values: Vec<_> = (0..table.features)
-                    .map(|column| {
-                        let value = table.columns[column][row];
-                        if value.is_nan() {
-                            fits[column].schema.impute
-                        } else {
-                            value
-                        }
-                    })
-                    .collect();
-                let (linear, logistic) = evaluate_target(&model, &values);
-                if logistic {
-                    1.0 / (1.0 + (-linear.clamp(-30.0, 30.0)).exp())
-                } else {
-                    linear.clamp(0.0, 1.0)
-                }
-            })
-            .collect()
-    };
-    (predict(train), predict(test))
-}
-
 pub fn compile_kernel_from_arrays(
     features: &[f32],
     target: &[f32],
@@ -2358,10 +2325,9 @@ fn compile_neural_table(
         program: KernelProgram::NeuralJoint(generator),
     };
     let artifact = encode_kernel(&kernel)?;
-    if options
+    if !options
         .release_policy
-        .maximum_artifact_bytes
-        .is_some_and(|limit| artifact.len() > limit)
+        .accepts_artifact_bytes(artifact.len())
     {
         return Err(DopeError::Data(format!(
             "no encoded neural candidate fits the release policy; smallest observed size: {} bytes",
@@ -2400,7 +2366,7 @@ fn compile_neural_table(
         task: task.as_str().into(),
         rows: table.rows,
         positional_features: table.features,
-        selected_candidate: candidate_id,
+        selected_candidate: candidate_id.clone(),
         artifact_bytes: artifact.len(),
         effective_bytes: artifact.len(),
         bits_per_original_cell: report.bits_per_original_cell,
@@ -2414,6 +2380,7 @@ fn compile_neural_table(
         contains_row_references: false,
     };
     Ok(CompileResult {
+        candidate_artifacts: BTreeMap::from([(candidate_id, artifact.clone())]),
         artifact,
         report: compile_report,
         candidates: vec![report.clone()],
@@ -2714,10 +2681,9 @@ fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<
         let artifact = encode_kernel(&kernel)?;
         smallest_observed =
             Some(smallest_observed.map_or(artifact.len(), |size| size.min(artifact.len())));
-        if options
+        if !options
             .release_policy
-            .maximum_artifact_bytes
-            .is_some_and(|limit| artifact.len() > limit)
+            .accepts_artifact_bytes(artifact.len())
         {
             continue;
         }
@@ -2764,7 +2730,7 @@ fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<
         })
         .unwrap()
         .clone();
-    let artifact = artifacts.remove(&selected.candidate_id).unwrap();
+    let artifact = artifacts.get(&selected.candidate_id).unwrap().clone();
     let report = CompileReport {
         format: "dope-kernel-compile-report".into(),
         version: 3,
@@ -2788,6 +2754,7 @@ fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<
     };
     Ok(CompileResult {
         artifact,
+        candidate_artifacts: artifacts,
         report,
         candidates,
         pareto_frontier: frontier,
@@ -2797,6 +2764,26 @@ fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn too_small_cap_reports_smallest_observed_encoded_candidate() {
+        let options = CompileOptions {
+            release_policy: ReleasePolicy::new(AnonymizationTier::L3, Some(1), false).unwrap(),
+            beam_width: Some(1),
+            ..Default::default()
+        };
+        let error = compile_kernel_from_arrays(
+            &[0.0, 0.25, 0.75, 1.0],
+            &[0.0, 0.25, 0.75, 1.0],
+            4,
+            1,
+            Task::Regression,
+            &options,
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(error.contains("smallest observed size:"));
+    }
 
     #[test]
     fn near_equal_discrete_values_are_counted_without_exact_search_panics() {

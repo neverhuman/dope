@@ -196,3 +196,27 @@ impl Table {
             .collect()
     }
 }
+
+#[cfg(test)]
+mod policy_tests {
+    use super::*;
+
+    #[test]
+    fn l3_rejects_out_of_range_and_nonbinary_targets_without_echoing_values() {
+        let policy = ReleasePolicy::default();
+        let error = Table::from_arrays_with_policy(&[1.2], &[0.0], 1, 1, Task::Binary, &policy)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("row 1, column 1"));
+        assert!(error.contains("normalize"));
+        assert!(!error.contains("1.2"));
+        let error = Table::from_arrays_with_policy(&[0.2], &[0.7], 1, 1, Task::Binary, &policy)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("binary target must be 0 or 1"));
+        let table =
+            Table::from_arrays_with_policy(&[f32::NAN], &[1.0], 1, 1, Task::Binary, &policy)
+                .unwrap();
+        assert!(table.columns[0][0].is_nan());
+    }
+}
