@@ -3,7 +3,7 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use crate::codec::{LoadedKernel, load_kernel};
+use crate::codec::{ArtifactAccounting, LoadedKernel, account_artifact, load_kernel};
 use crate::error::{Result, io_error};
 use crate::model::{Dependence, KernelProgram, Marginal, NeuralArchitecture, Noise, Target};
 
@@ -12,6 +12,7 @@ pub struct Inspection {
     pub format: String,
     pub version: u8,
     pub artifact_bytes: usize,
+    pub byte_accounting: Option<ArtifactAccounting>,
     pub task: String,
     pub rows_fitted: u64,
     pub positional_features: u32,
@@ -36,6 +37,13 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
         3
     } else {
         2
+    };
+    let byte_accounting = if native_version == 3 {
+        Some(account_artifact(
+            &fs::read(path).map_err(|error| io_error(path, error))?,
+        )?)
+    } else {
+        None
     };
     match loaded {
         LoadedKernel::V3(kernel) | LoadedKernel::V2(kernel) => {
@@ -136,6 +144,7 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
                 format: format!("dope-kernel-v{native_version}"),
                 version: native_version,
                 artifact_bytes,
+                byte_accounting,
                 task: kernel.task.as_str().into(),
                 rows_fitted: kernel.rows_fitted,
                 positional_features: kernel.features,
@@ -157,6 +166,7 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
                 format: "dope-kernel".into(),
                 version: 1,
                 artifact_bytes,
+                byte_accounting,
                 task: shell["task"].as_str().unwrap_or("unknown").into(),
                 rows_fitted: shell["n"].as_u64().unwrap_or(0),
                 positional_features: shell["p"].as_u64().unwrap_or(0) as u32,

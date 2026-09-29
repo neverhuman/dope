@@ -111,4 +111,20 @@ fn main() {
         "cargo:rustc-env=DOPE_KPI_CONTRACT_BLAKE3={}",
         blake3::hash(&bytes).to_hex()
     );
+    let v1_path = "production/kpi-contract-v1.json";
+    println!("cargo:rerun-if-changed={v1_path}");
+    let v1 = fs::read(v1_path).expect("historical KPI contract must be readable");
+    let v1_parsed: Value =
+        serde_json::from_slice(&v1).expect("historical KPI contract must be JSON");
+    let v1_bytes =
+        serde_json::to_vec(&canonical(&v1_parsed)).expect("historical KPI contract serializes");
+    assert_eq!(v1.strip_suffix(b"\n").unwrap_or(&v1), v1_bytes);
+    println!(
+        "cargo:rustc-env=DOPE_KPI_CONTRACT_V1_SHA256={:x}",
+        Sha256::digest(&v1_bytes)
+    );
+    println!(
+        "cargo:rustc-env=DOPE_KPI_CONTRACT_V1_BLAKE3={}",
+        blake3::hash(&v1_bytes).to_hex()
+    );
 }

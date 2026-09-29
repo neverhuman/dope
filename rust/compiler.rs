@@ -8,6 +8,7 @@ use statrs::distribution::{ContinuousCDF, Normal};
 
 use crate::calibration::{CandidateDescriptor, LanguageCalibration, describe_table};
 use crate::codec::encode_kernel;
+use crate::contract::{AnonymizationTier, ReleasePolicy};
 use crate::data::Table;
 use crate::error::{DopeError, Result};
 use crate::model::{
@@ -24,6 +25,7 @@ const MAX_TARGET_TERMS: usize = 24;
 
 #[derive(Clone, Debug)]
 pub struct CompileOptions {
+    pub release_policy: ReleasePolicy,
     pub seed: Option<u64>,
     pub deadline: Option<Duration>,
     pub beam_width: Option<usize>,
@@ -41,6 +43,8 @@ pub struct CompileOptions {
 impl Default for CompileOptions {
     fn default() -> Self {
         Self {
+            release_policy: ReleasePolicy::new(AnonymizationTier::L0, None, false)
+                .expect("fixed research policy"),
             seed: None,
             deadline: None,
             beam_width: None,
@@ -77,6 +81,8 @@ pub struct CandidateReport {
 pub struct CompileReport {
     pub format: String,
     pub version: u8,
+    pub release_policy: ReleasePolicy,
+    pub release_policy_hash: String,
     pub task: String,
     pub rows: usize,
     pub positional_features: usize,
@@ -1928,7 +1934,14 @@ pub fn compile_kernel_from_arrays(
     task: Task,
     options: &CompileOptions,
 ) -> Result<CompileResult> {
-    let table = Table::from_arrays(features, target, rows, columns, task)?;
+    let table = Table::from_arrays_with_policy(
+        features,
+        target,
+        rows,
+        columns,
+        task,
+        &options.release_policy,
+    )?;
     compile_table(&table, task, options)
 }
 
@@ -1937,7 +1950,7 @@ pub fn compile_kernel_from_dir(
     task: Task,
     options: &CompileOptions,
 ) -> Result<CompileResult> {
-    let table = Table::read_dataset_dir(path, task)?;
+    let table = Table::read_dataset_dir_with_policy(path, task, &options.release_policy)?;
     compile_table(&table, task, options)
 }
 
@@ -2345,6 +2358,16 @@ fn compile_neural_table(
         program: KernelProgram::NeuralJoint(generator),
     };
     let artifact = encode_kernel(&kernel)?;
+    if options
+        .release_policy
+        .maximum_artifact_bytes
+        .is_some_and(|limit| artifact.len() > limit)
+    {
+        return Err(DopeError::Data(format!(
+            "no encoded neural candidate fits the release policy; smallest observed size: {} bytes",
+            artifact.len()
+        )));
+    }
     let report = CandidateReport {
         candidate_id: candidate_id.clone(),
         artifact_bytes: artifact.len(),
@@ -2372,6 +2395,8 @@ fn compile_neural_table(
     let compile_report = CompileReport {
         format: "dope-kernel-compile-report".into(),
         version: 3,
+        release_policy: options.release_policy.clone(),
+        release_policy_hash: options.release_policy.hash(),
         task: task.as_str().into(),
         rows: table.rows,
         positional_features: table.features,
@@ -2558,8 +2583,18 @@ fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<
             .then_with(|| left.2.cmp(&right.2))
             .then_with(|| left.3.cmp(&right.3))
     });
-    for (knot_index, dependence_family, target_index, bits, _) in specs.into_iter().take(beam_width)
-    {
+    let mut selected_specs: Vec<_> = specs.into_iter().take(beam_width).collect();
+    if restricted_profile.is_none() {
+        let baseline = (0, 0, 0, options.quantization_profiles[0]);
+        if !selected_specs
+            .iter()
+            .any(|spec| (spec.0, spec.1, spec.2, spec.3) == baseline)
+        {
+            selected_specs.push((baseline.0, baseline.1, baseline.2, baseline.3, 0.0));
+        }
+    }
+    let mut smallest_observed = None::<usize>;
+    for (knot_index, dependence_family, target_index, bits, _) in selected_specs {
         if deadline.is_some_and(|limit| Instant::now() > limit) && !candidates.is_empty() {
             break;
         }
@@ -2677,6 +2712,15 @@ fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<
         // Compilation sees train.csv only. No train-only heuristic may certify an artifact.
         kernel.compliant = false;
         let artifact = encode_kernel(&kernel)?;
+        smallest_observed =
+            Some(smallest_observed.map_or(artifact.len(), |size| size.min(artifact.len())));
+        if options
+            .release_policy
+            .maximum_artifact_bytes
+            .is_some_and(|limit| artifact.len() > limit)
+        {
+            continue;
+        }
         let candidate_id = options
             .backend_id
             .clone()
@@ -2702,9 +2746,12 @@ fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<
         candidates.push(record);
     }
     if candidates.is_empty() {
-        return Err(DopeError::Data(
-            "deadline expired before baseline encoding".into(),
-        ));
+        return Err(DopeError::Data(match smallest_observed {
+            Some(size) => format!(
+                "no encoded candidate fits the release policy; smallest observed size: {size} bytes"
+            ),
+            None => "deadline expired before baseline encoding".into(),
+        }));
     }
     let frontier = pareto(&candidates);
     let selected = candidates
@@ -2721,6 +2768,8 @@ fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<
     let report = CompileReport {
         format: "dope-kernel-compile-report".into(),
         version: 3,
+        release_policy: options.release_policy.clone(),
+        release_policy_hash: options.release_policy.hash(),
         task: task.as_str().into(),
         rows: table.rows,
         positional_features: width,
@@ -2808,6 +2857,7 @@ mod tests {
             backend_id: None,
             neural_target_weight: 2.0,
             neural_structural_penalty: 0.0,
+            release_policy: ReleasePolicy::new(AnonymizationTier::L0, None, false).unwrap(),
         };
         let result =
             compile_kernel_from_arrays(&features, &target, rows, 2, Task::Regression, &options)
