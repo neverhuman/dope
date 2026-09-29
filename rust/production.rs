@@ -14,6 +14,7 @@ use crate::contract::{
     SYNTHETIC_SIZE_MULTIPLIERS, auditor_specs, empirical_backends,
 };
 use crate::error::{DopeError, Result, io_error};
+use crate::fitness::MasterFitnessContract;
 use crate::model::Task;
 
 /// Public identity of ordinary development builds. An RC identity is emitted
@@ -148,6 +149,8 @@ pub struct ReleaseGates {
     pub feature_importance_spearman_min: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub feature_importance_top_k_jaccard_min: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feature_importance_min_informative_features: Option<usize>,
     pub attribute_inference_advantage_max: f64,
     pub validation_training_regret_upper_max: f64,
     pub across_seed_validation_loss_stddev_max: f64,
@@ -170,6 +173,8 @@ pub struct KpiContract {
     pub profile_gating: ProfileGatingContract,
     pub profiles: ProfileBands,
     pub release_gates: ReleaseGates,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub master_fitness: Option<MasterFitnessContract>,
 }
 
 impl KpiContract {
@@ -209,6 +214,11 @@ impl KpiContract {
                             .release_gates
                             .feature_importance_top_k_jaccard_min
                             .is_none()
+                        && self
+                            .release_gates
+                            .feature_importance_min_informative_features
+                            .is_none()
+                        && self.master_fitness.is_none()
                 }
                 2 => {
                     self.tier_byte_limits.get("l3") == Some(&10_240)
@@ -217,6 +227,14 @@ impl KpiContract {
                         && self.release_gates.membership_auc_max == 0.55
                         && self.release_gates.feature_importance_spearman_min == Some(0.70)
                         && self.release_gates.feature_importance_top_k_jaccard_min == Some(0.50)
+                        && self
+                            .release_gates
+                            .feature_importance_min_informative_features
+                            == Some(3)
+                        && self
+                            .master_fitness
+                            .as_ref()
+                            .is_some_and(MasterFitnessContract::is_frozen_v2)
                 }
                 _ => false,
             };

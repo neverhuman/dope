@@ -13,6 +13,7 @@ pub mod data;
 pub mod deep_campaign;
 pub mod embedding;
 pub mod error;
+pub mod fitness;
 pub mod inspect;
 pub mod ledger;
 #[cfg(feature = "gpu-training")]

@@ -783,7 +783,7 @@ fn aggregate_importance<'a>(
             && cell.feature_importance_feature_count == cell.features
             && cell.feature_importance_real_shares.len() == cell.features
             && cell.feature_importance_synthetic_shares.len() == cell.features;
-        if cell.feature_importance_informative_count >= 2 {
+        if cell.feature_importance_informative_count >= 3 {
             applicable = true;
             if let Some(value) = cell.feature_importance_spearman {
                 spearman = Some(spearman.map_or(value, |minimum| minimum.min(value)));
@@ -4657,7 +4657,7 @@ pub fn export_validation_cert_metrics(
                     && cell.feature_importance_feature_count == cell.features
                     && cell.feature_importance_real_shares.len() == cell.features
                     && cell.feature_importance_synthetic_shares.len() == cell.features;
-                if cell.feature_importance_informative_count >= 2 {
+                if cell.feature_importance_informative_count >= 3 {
                     feature_importance_applicable = true;
                     if let Some(value) = cell.feature_importance_spearman {
                         update_optional_min(&mut feature_importance_spearman_min, Some(value));

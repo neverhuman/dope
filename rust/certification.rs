@@ -19,6 +19,7 @@ use crate::contract::{
 };
 use crate::data::Table;
 use crate::error::{DopeError, Result, io_error};
+use crate::fitness::{MasterFitnessReport, ParetoVector};
 use crate::ledger::{CacheStatus, JOB_EVIDENCE_VERSION, JobEvidence};
 use crate::model::{Kernel, Marginal, SchemaKind, Task};
 use crate::production::{ContentHashes, KpiContract, canonical_json, hashes};
@@ -111,6 +112,8 @@ pub struct CertificationReport {
     pub minimum_gold_one_sided_95_retention: Option<f64>,
     pub fidelity: FidelityReport,
     pub privacy: PrivacyReport,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub master_fitness: Option<MasterFitnessReport>,
     pub isolation: IsolationEvidence,
     pub geometric_mean_retention: f64,
     pub driver_agreement: f64,
@@ -1065,6 +1068,11 @@ fn wasserstein(real: &[f32], synthetic: &[f32]) -> f64 {
 }
 
 fn joint_fidelity(real: &Table, synthetic: &Table) -> f64 {
+    let (marginal, dependence) = fidelity_components(real, synthetic);
+    0.55 * marginal + 0.45 * dependence
+}
+
+fn fidelity_components(real: &Table, synthetic: &Table) -> (f64, f64) {
     let marginal = (0..real.features)
         .map(|column| {
             1.0 - (wasserstein(&real.columns[column], &synthetic.columns[column]) / 0.25).min(1.0)
@@ -1087,7 +1095,7 @@ fn joint_fidelity(real: &Table, synthetic: &Table) -> f64 {
             .sum::<f64>()
             / probes as f64
     };
-    0.55 * marginal + 0.45 * dependence
+    (marginal, dependence)
 }
 
 fn nearest_distances(reference: &Table, query: &Table) -> Vec<f64> {
@@ -1704,6 +1712,12 @@ pub fn certify_kernel_with_policy(
         .map(|multiplier| train.rows.saturating_mul(multiplier))
         .collect();
     let gold_rows = [train.rows, train.rows.saturating_mul(4)];
+    let contract = KpiContract::embedded()?;
+    contract.validate()?;
+    let minimum_informative_features = contract
+        .release_gates
+        .feature_importance_min_informative_features
+        .unwrap_or(3);
     let mut metrics_by_auditor = BTreeMap::<String, Vec<MetricVector>>::new();
     let mut importance_spearman = Vec::new();
     let mut importance_jaccard = Vec::new();
@@ -1712,6 +1726,8 @@ pub fn certify_kernel_with_policy(
     let mut importance_evidence = Vec::new();
     let mut drivers = Vec::new();
     let mut joints = Vec::new();
+    let mut marginal_fidelities = Vec::new();
+    let mut dependence_fidelities = Vec::new();
     let mut queries = Vec::new();
     let mut type_i_errors = Vec::new();
     let mut memberships = Vec::new();
@@ -1739,7 +1755,10 @@ pub fn certify_kernel_with_policy(
             let gold = gold_rows.contains(&synthetic_rows);
             if gold {
                 drivers.push(driver_agreement(&train, &synthetic));
-                joints.push(joint_fidelity(&train, &synthetic));
+                let (marginal, dependence) = fidelity_components(&train, &synthetic);
+                marginal_fidelities.push(marginal);
+                dependence_fidelities.push(dependence);
+                joints.push(0.55 * marginal + 0.45 * dependence);
                 queries.push(query_p95_normalized_error(&train, &synthetic));
                 type_i_errors.push(type_i_error(&train, &synthetic));
                 let feature_attack = membership_auc(&synthetic, &train, &test);
@@ -1800,7 +1819,7 @@ pub fn certify_kernel_with_policy(
                         let comparison =
                             compare_permutation_importance(real, synthetic_importance)?;
                         importance_complete &= comparison.feature_count == train.features;
-                        if comparison.informative_feature_count >= 2 {
+                        if comparison.informative_feature_count >= minimum_informative_features {
                             importance_applicable = true;
                             importance_spearman.push(comparison.spearman);
                             importance_jaccard.push(comparison.top_k_agreement);
@@ -1986,8 +2005,6 @@ pub fn certify_kernel_with_policy(
         .flat_map(|auditor| &auditor.metrics)
         .filter(|metric| gold_rows.contains(&metric.synthetic_rows))
         .collect();
-    let contract = KpiContract::embedded()?;
-    contract.validate()?;
     let structure_spearman = importance_spearman
         .iter()
         .copied()
@@ -2102,9 +2119,65 @@ pub fn certify_kernel_with_policy(
         .len() as usize;
     let effective_bytes =
         artifact_bytes + runtime_dictionary_bytes.div_ceil(supported_datasets.max(1));
+    let marginal_fidelity_min = marginal_fidelities.into_iter().reduce(f64::min);
+    let dependence_fidelity_min = dependence_fidelities.into_iter().reduce(f64::min);
+    let pareto_vector = ParetoVector {
+        utility_transfer: minimum_gold_one_sided_95_retention.map(|value| value.clamp(0.0, 1.0)),
+        driver_fidelity: structure_spearman
+            .zip(structure_jaccard)
+            .map(|(rank, top_k)| {
+                0.5 * ((rank + 1.0) / 2.0).clamp(0.0, 1.0) + 0.5 * top_k.clamp(0.0, 1.0)
+            }),
+        distribution_fidelity: marginal_fidelity_min,
+        structure_fidelity: dependence_fidelity_min,
+        // No PRDC or alpha/beta coverage estimator is certified yet.
+        coverage_realism: None,
+        compactness: policy
+            .maximum_artifact_bytes
+            .map(|limit| (1.0 - artifact_bytes as f64 / limit as f64).clamp(0.0, 1.0)),
+    };
+    let raw_metric_vector = BTreeMap::from([
+        (
+            "ptf_v1_gold_lower_bound".into(),
+            minimum_gold_one_sided_95_retention,
+        ),
+        ("feature_importance_spearman_min".into(), structure_spearman),
+        (
+            "feature_importance_top_k_jaccard_min".into(),
+            structure_jaccard,
+        ),
+        ("driver_agreement_min".into(), Some(driver)),
+        ("joint_fidelity_min".into(), Some(joint)),
+        ("marginal_w1_fidelity_min".into(), marginal_fidelity_min),
+        (
+            "pairwise_dependence_fidelity_min".into(),
+            dependence_fidelity_min,
+        ),
+        ("query_p95_normalized_error_max".into(), Some(query)),
+        ("type_i_error_max".into(), Some(type_i)),
+        ("membership_auc_max".into(), Some(membership)),
+        ("rare_slice_membership_auc_max".into(), rare_slice_auc),
+        (
+            "rare_slice_attribute_advantage_max".into(),
+            rare_slice_attribute,
+        ),
+        ("attribute_inference_advantage_max".into(), Some(attribute)),
+        ("exact_copy_count".into(), Some(exact_copies as f64)),
+        ("near_copy_count".into(), Some(near_copies as f64)),
+        ("artifact_bytes".into(), Some(artifact_bytes as f64)),
+    ]);
+    let master_fitness = MasterFitnessReport::evaluate(
+        contract
+            .master_fitness
+            .as_ref()
+            .expect("validated v2 fitness contract"),
+        gates.clone(),
+        pareto_vector,
+        raw_metric_vector,
+    );
     let report = CertificationReport {
         format: "dope-kernel-certification".into(),
-        version: 3,
+        version: 4,
         release_policy: policy.clone(),
         release_policy_hash: policy.hash(),
         certified: failed_gates.is_empty(),
@@ -2135,6 +2208,7 @@ pub fn certify_kernel_with_policy(
             near_copy_definition: "identical missingness and normalized RMS distance <= 1e-3"
                 .into(),
         },
+        master_fitness: Some(master_fitness),
         isolation: IsolationEvidence {
             generator_opened: vec!["train.csv".into()],
             evaluator_opened_real_test: true,

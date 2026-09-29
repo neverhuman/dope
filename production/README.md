@@ -6,6 +6,27 @@ the Rust binary at build time. `freeze-contract` binds it to a source commit,
 environment lock, corpus manifest, candidates, auditors, and workload before
 any job is admitted.
 
+The active v2 contract retains PTF-v1 as the primary release KPI. Its hard
+gates include joint fidelity, membership and attribute attacks, exact and near
+copies, and permutation importance Spearman (at least 0.70) and top-k Jaccard
+(at least 0.50) when at least three features are informative. Missing applicable
+rank evidence fails the gate. The v1 file remains available only for historical
+receipt verification.
+
+The contract also freezes MFS-v2: a geometric mean of utility transfer (0.30),
+driver fidelity (0.20), distribution fidelity (0.20), structure fidelity
+(0.15), coverage realism (0.10), and compactness (0.05). Privacy has zero soft
+weight. `tstr-certification.json` records all hard gates, the measured Pareto
+vector, raw metrics, and weight sensitivity. The score is `null` if any hard
+gate fails or a required soft term is unmeasured. Coverage realism needs a
+validated PRDC or alpha/beta estimator, so current reports leave that term
+unmeasured. The other current terms use the gold retention lower bound,
+permutation importance rank/top-k agreement, marginal W1 fidelity, sampled
+pairwise correlation fidelity, and artifact bytes relative to the tier cap.
+Sensitivity values are diagnostics, never a substitute release score. Neither
+an empirical privacy result nor a tier establishes formal
+DP or HIPAA de-identification.
+
 The production environment is Rust-only. GPU training and evaluation may link
 libtorch 2.7 through the pinned optional `tch-rs` feature; release inference
 must not link libtorch. A production freeze additionally requires source and
