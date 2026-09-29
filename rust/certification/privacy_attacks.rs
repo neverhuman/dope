@@ -859,4 +859,30 @@ mod tests {
         };
         assert_eq!(near_copy_count(&real, &changed_mask), 0);
     }
+
+    #[test]
+    fn certification_rejects_10241_bytes_before_decoding() {
+        let root = std::env::current_dir()
+            .unwrap()
+            .join("target")
+            .join(format!("certification-byte-boundary-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let artifact = root.join("candidate.dpk");
+        let output = root.join("certification.json");
+        let policy = ReleasePolicy::new(AnonymizationTier::L3, None, false).unwrap();
+
+        fs::write(&artifact, vec![b'X'; 10_240]).unwrap();
+        let at_limit = certify_kernel_with_policy(&root, &artifact, &output, 1, 0, 1, &policy)
+            .unwrap_err()
+            .to_string();
+        assert!(!at_limit.contains("byte limit"));
+
+        fs::write(&artifact, vec![b'X'; 10_241]).unwrap();
+        let over_limit = certify_kernel_with_policy(&root, &artifact, &output, 1, 0, 1, &policy)
+            .unwrap_err()
+            .to_string();
+        assert!(over_limit.contains("byte limit"));
+        assert!(!output.exists());
+        fs::remove_dir_all(root).unwrap();
+    }
 }

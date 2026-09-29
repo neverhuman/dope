@@ -17,8 +17,8 @@ receipt includes current SHA-256 hashes and check results and is regenerated
 before every audit. It cannot excuse missing tests or a failed builtin check.
 
 The audit job's strict security wrapper requires Cargo advisory and workflow
-lint tools. The separate required CI security job runs the pinned Gitleaks
-action and SPDX SBOM action; those checks are independent of the wrapper's
+lint tools. The separate required CI security job runs the SHA-verified pinned
+Gitleaks binary and SPDX SBOM action; those checks are independent of the wrapper's
 local optional binaries. A release profile requires all four binaries.
 `tools/security-lane.sh` is the canonical Jankurai wrapper and delegates to
 the same scanner script used by local `just security` and the CI security job.
@@ -26,6 +26,14 @@ the same scanner script used by local `just security` and the CI security job.
 The frozen `legacy_*` candidate IDs are wire identifiers in historical
 receipts. They are retained only for decode and comparator compatibility; no
 new implementation may use their names as a substitute for measured evidence.
-For each audit finding, record its fingerprint, source location, disposition,
-and rerun proof in `target/jankurai/repair-log.json`. Advisory exceptions need
-a specific technical reason and a passing compatibility fixture.
+For each of the 83 baseline findings, `agent/emit-audit-receipts.sh` records
+its fingerprint, source location, disposition, current rule fingerprints, and
+rerun proof in `target/jankurai/repair-log.json`. The 54 original wording
+findings were reviewed in context: launcher deletion and broad process killing
+were removed; early stopping and prior coefficient variables were renamed;
+atomic write paths are now named for staging; the V1 score probe was renamed.
+The preserved `legacy_*` IDs are historical wire values. The remaining
+literal terms describe checked lease states, explicit unsupported candidates,
+or a compatibility deserializer, with locked behavior tests. Current shape,
+build speed, and observability advisories remain visible with their own
+fingerprints and proof commands. An advisory does not override the score gate.

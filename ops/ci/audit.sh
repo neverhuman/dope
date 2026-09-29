@@ -5,7 +5,7 @@ source ops/ci/lib.sh
 case "${1:-run}" in
   prepare)
     python3 -m venv --system-site-packages target/ci-python
-    target/ci-python/bin/python -m pip install -r validation/requirements-v1.txt
+    bash ops/ci/install-python-v1.sh target/ci-python/bin/python
     export PATH="$PWD/target/ci-python/bin:$PATH"
     bash agent/check-python-v1-boundary.sh
     bash agent/check-external-boundary.sh

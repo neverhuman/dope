@@ -17,3 +17,5 @@ The full audit emits `repair-queue.json` and a hash-only
 `report-attestation.json` beside its JSON and Markdown report. Their schemas
 are in this directory. The attestation records `signature_kind=none`, so it
 proves a local digest and source association without claiming a signature.
+It also emits `repair-log.json`, which records a disposition and proof command
+for each of the 83 original audit fingerprints. Its schema is in this directory.

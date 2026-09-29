@@ -120,7 +120,7 @@
             .map_err(|error| DopeError::Data(format!("diffusion AdamW optimizer: {error}")))?;
         let mut best = f64::INFINITY;
         let mut best_checkpoint = None;
-        let mut stale = 0usize;
+        let mut plateau_checks = 0usize;
         let mut row_batches =
             DeterministicRowBatches::new(train_indices, config.seed ^ 0x7ab5_91d3, TRAIN_ROW_BATCH);
         for step in 0..1_500 {
@@ -130,7 +130,7 @@
                     restore(&mut store, checkpoint)?;
                 }
                 best = f64::INFINITY;
-                stale = 0;
+                plateau_checks = 0;
             }
             let timestep = (step * 37 + 17) % DIFFUSION_TRAIN_STEPS;
             let alpha = f64::from(schedule[timestep]);
@@ -177,10 +177,10 @@
                 if value + 1e-7 < best {
                     best = value;
                     best_checkpoint = Some(snapshot(&store)?);
-                    stale = 0;
+                    plateau_checks = 0;
                 } else if step + 1 >= 400 {
-                    stale += 1;
-                    if step >= 1_200 && stale >= 8 {
+                    plateau_checks += 1;
+                    if step >= 1_200 && plateau_checks >= 8 {
                         break;
                     }
                 }
@@ -354,7 +354,7 @@
             .map_err(|error| DopeError::Data(format!("transformer AdamW optimizer: {error}")))?;
         let mut best = f64::INFINITY;
         let mut best_checkpoint = None;
-        let mut stale = 0usize;
+        let mut plateau_checks = 0usize;
         let mut row_batches = DeterministicRowBatches::new(
             train_indices.clone(),
             config.seed ^ 0x71a4_5f09,
@@ -367,7 +367,7 @@
                     restore(&mut store, checkpoint)?;
                 }
                 best = f64::INFINITY;
-                stale = 0;
+                plateau_checks = 0;
             }
             let qat = step >= 1_600;
             let batch_indices = row_batches.next(device);
@@ -416,10 +416,10 @@
                 if validation + 1e-7 < best {
                     best = validation;
                     best_checkpoint = Some(snapshot(&store)?);
-                    stale = 0;
+                    plateau_checks = 0;
                 } else if step + 1 >= 400 {
-                    stale += 1;
-                    if qat && stale >= 8 {
+                    plateau_checks += 1;
+                    if qat && plateau_checks >= 8 {
                         break;
                     }
                 }

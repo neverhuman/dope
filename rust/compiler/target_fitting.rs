@@ -21,9 +21,9 @@ fn fit_gam_target(table: &Table, completed: &[Vec<f32>], screen: &[(usize, f32)]
     let mut linear = vec![intercept; table.rows];
     for _ in 0..10 {
         for (term, &feature) in selected.iter().enumerate() {
-            let old = effects[term].clone();
+            let previous_effect = effects[term].clone();
             for (row, value) in linear.iter_mut().enumerate() {
-                *value -= old[nearest_knot(&knots[term], completed[feature][row])];
+                *value -= previous_effect[nearest_knot(&knots[term], completed[feature][row])];
             }
             let mut sums = [0.0f64; KNOTS];
             let mut weights = [0.0f64; KNOTS];

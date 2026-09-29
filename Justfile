@@ -7,6 +7,7 @@ setup:
     cargo fetch --locked
     mkdir -p target/tmp
     export TMPDIR="$PWD/target/tmp"; python3 -m venv --system-site-packages target/venv
+    bash ops/ci/install-python-v1.sh target/venv/bin/python
     TMPDIR="$PWD/target/tmp" target/venv/bin/python -m pip install --no-deps -e .
     mkdir -p target/python-metadata
     if test -d src/dope_kernel.egg-info; then mv src/dope_kernel.egg-info "target/python-metadata/dope_kernel.$(date +%s%N).egg-info"; fi

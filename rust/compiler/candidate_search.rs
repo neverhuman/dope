@@ -501,12 +501,12 @@ fn dependence_name(family: u8) -> &'static str {
 
 fn strongest_sparse_edges(
     correlation: Option<&Vec<f32>>,
-    fallback: &[CopulaEdge],
+    baseline_edges: &[CopulaEdge],
     width: usize,
     limit: usize,
 ) -> Vec<CopulaEdge> {
     let Some(matrix) = correlation else {
-        return fallback.iter().take(limit).cloned().collect();
+        return baseline_edges.iter().take(limit).cloned().collect();
     };
     let mut pairs = Vec::with_capacity(width.saturating_mul(width.saturating_sub(1)) / 2);
     for left in 0..width {
@@ -532,7 +532,7 @@ fn strongest_sparse_edges(
 
 fn poet_dependence(
     correlation: Option<&Vec<f32>>,
-    fallback: &[CopulaEdge],
+    baseline_edges: &[CopulaEdge],
     width: usize,
 ) -> Dependence {
     let rank = width.clamp(1, 4);
@@ -555,7 +555,7 @@ fn poet_dependence(
         loadings,
         residual_edges: strongest_sparse_edges(
             correlation,
-            fallback,
+            baseline_edges,
             width,
             width.saturating_mul(2),
         ),
@@ -564,10 +564,10 @@ fn poet_dependence(
 
 fn vine_dependence(
     correlation: Option<&Vec<f32>>,
-    fallback: &[CopulaEdge],
+    baseline_edges: &[CopulaEdge],
     width: usize,
 ) -> Dependence {
-    let sparse = strongest_sparse_edges(correlation, fallback, width, width.saturating_mul(3));
+    let sparse = strongest_sparse_edges(correlation, baseline_edges, width, width.saturating_mul(3));
     Dependence::Vine {
         edges: sparse
             .into_iter()

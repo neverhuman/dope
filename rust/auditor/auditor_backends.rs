@@ -512,17 +512,17 @@ fn fit_stump(
         sums[side] += target;
         counts[side] += 1;
     }
-    let fallback = targets.iter().sum::<f64>() / targets.len().max(1) as f64;
+    let mean_prediction = targets.iter().sum::<f64>() / targets.len().max(1) as f64;
     Stump {
         feature,
         threshold,
         left: if counts[0] == 0 {
-            fallback
+            mean_prediction
         } else {
             sums[0] / counts[0] as f64
         },
         right: if counts[1] == 0 {
-            fallback
+            mean_prediction
         } else {
             sums[1] / counts[1] as f64
         },

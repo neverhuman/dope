@@ -110,7 +110,7 @@ fn fit_ga2m(
     let mut metrics = Vec::new();
     let mut best_validation = f64::INFINITY;
     let mut best = (main_terms.clone(), pair_surfaces.clone(), 0usize);
-    let mut stale = 0usize;
+    let mut plateau_checks = 0usize;
     let mut converged = false;
     for sweep in 1..=options.max_sweeps {
         let mut maximum_change = 0.0f64;
@@ -123,7 +123,7 @@ fn fit_ga2m(
                     sample.regret - training_predictions[sample_index] + term.coefficients[slot];
                 counts[slot] += 1;
             }
-            let old = term.coefficients.clone();
+            let previous_coefficients = term.coefficients.clone();
             for slot in 0..SPLINE_KNOTS {
                 if counts[slot] > 0 {
                     term.coefficients[slot] = sums[slot] / counts[slot] as f64;
@@ -131,14 +131,14 @@ fn fit_ga2m(
             }
             group_shrink(&mut term.coefficients, options.group_regularization);
             maximum_change = maximum_change.max(
-                old.iter()
+                previous_coefficients.iter()
                     .zip(&term.coefficients)
                     .map(|(left, right)| (left - right).abs())
                     .fold(0.0, f64::max),
             );
             for (sample_index, sample) in training.iter().enumerate() {
                 let slot = bin(&term.knots, sample.features[term.feature]);
-                training_predictions[sample_index] += term.coefficients[slot] - old[slot];
+                training_predictions[sample_index] += term.coefficients[slot] - previous_coefficients[slot];
             }
         }
         for surface in &mut pair_surfaces {
@@ -152,7 +152,7 @@ fn fit_ga2m(
                     sample.regret - training_predictions[sample_index] + surface.coefficients[slot];
                 counts[slot] += 1;
             }
-            let old = surface.coefficients.clone();
+            let previous_coefficients = surface.coefficients.clone();
             for slot in 0..sums.len() {
                 if counts[slot] > 0 {
                     surface.coefficients[slot] = sums[slot] / counts[slot] as f64;
@@ -160,7 +160,7 @@ fn fit_ga2m(
             }
             group_shrink(&mut surface.coefficients, options.group_regularization);
             maximum_change = maximum_change.max(
-                old.iter()
+                previous_coefficients.iter()
                     .zip(&surface.coefficients)
                     .map(|(left, right)| (left - right).abs())
                     .fold(0.0, f64::max),
@@ -169,7 +169,7 @@ fn fit_ga2m(
                 let left = bin(&surface.left_knots, sample.features[surface.left]);
                 let right = bin(&surface.right_knots, sample.features[surface.right]);
                 let slot = left * SPLINE_KNOTS + right;
-                training_predictions[sample_index] += surface.coefficients[slot] - old[slot];
+                training_predictions[sample_index] += surface.coefficients[slot] - previous_coefficients[slot];
             }
         }
         let model = Ga2mModel {
@@ -206,15 +206,15 @@ fn fit_ga2m(
         if best_validation - validation_loss >= options.minimum_validation_improvement {
             best_validation = validation_loss;
             best = (main_terms.clone(), pair_surfaces.clone(), sweep);
-            stale = 0;
+            plateau_checks = 0;
         } else {
-            stale += 1;
+            plateau_checks += 1;
         }
         if maximum_change <= options.convergence_tolerance {
             converged = true;
             break;
         }
-        if stale >= options.early_stopping_checks {
+        if plateau_checks >= options.early_stopping_checks {
             break;
         }
     }

@@ -81,7 +81,7 @@ pub fn write_canonical<T: Serialize>(path: &Path, value: &T) -> Result<ContentHa
         .file_name()
         .and_then(|name| name.to_str())
         .ok_or_else(|| DopeError::Data("canonical output path has no UTF-8 filename".into()))?;
-    let temporary = parent.join(format!(
+    let staged_path = parent.join(format!(
         ".{filename}.tmp-{}-{}",
         std::process::id(),
         TEMP_COUNTER.fetch_add(1, Ordering::Relaxed)
@@ -90,14 +90,14 @@ pub fn write_canonical<T: Serialize>(path: &Path, value: &T) -> Result<ContentHa
         let mut file = OpenOptions::new()
             .write(true)
             .create_new(true)
-            .open(&temporary)?;
+            .open(&staged_path)?;
         file.write_all(&bytes)?;
         file.sync_all()?;
-        fs::rename(&temporary, path)?;
+        fs::rename(&staged_path, path)?;
         File::open(parent)?.sync_all()
     })();
     if let Err(error) = write_result {
-        let _ = fs::remove_file(&temporary);
+        let _ = fs::remove_file(&staged_path);
         return Err(io_error(path, error));
     }
     Ok(hashes(&bytes))

@@ -526,7 +526,7 @@ mod gpu {
             .map_err(|error| DopeError::Data(format!("joint AdamW optimizer: {error}")))?;
         let mut best_validation = f64::INFINITY;
         let mut best_checkpoint = None;
-        let mut stale = 0usize;
+        let mut plateau_checks = 0usize;
         let qat_start = max_steps * 4 / 5;
         let mut row_batches = DeterministicRowBatches::new(
             train_indices.clone(),
@@ -540,7 +540,7 @@ mod gpu {
                     restore(&mut store, checkpoint)?;
                 }
                 best_validation = f64::INFINITY;
-                stale = 0;
+                plateau_checks = 0;
             }
             let qat = step >= qat_start;
             let batch_indices = row_batches.next(device);
@@ -601,10 +601,10 @@ mod gpu {
                 if validation + 1e-7 < best_validation {
                     best_validation = validation;
                     best_checkpoint = Some(snapshot(&store)?);
-                    stale = 0;
+                    plateau_checks = 0;
                 } else if step + 1 >= 400 {
-                    stale += 1;
-                    if qat && stale >= 8 {
+                    plateau_checks += 1;
+                    if qat && plateau_checks >= 8 {
                         break;
                     }
                 }

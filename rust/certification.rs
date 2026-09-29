@@ -259,23 +259,23 @@ fn atomic_cache_write(path: &Path, bytes: &[u8]) -> Result<()> {
         .parent()
         .ok_or_else(|| DopeError::Data("cache path has no parent".into()))?;
     fs::create_dir_all(parent).map_err(|error| io_error(parent, error))?;
-    let temporary = path.with_extension(format!("tmp-{}", std::process::id()));
+    let staged_path = path.with_extension(format!("tmp-{}", std::process::id()));
     let mut file = match OpenOptions::new()
         .write(true)
         .create_new(true)
-        .open(&temporary)
+        .open(&staged_path)
     {
         Ok(file) => file,
-        Err(_error) if temporary.is_file() || path.is_file() => return Ok(()),
-        Err(error) => return Err(io_error(&temporary, error)),
+        Err(_error) if staged_path.is_file() || path.is_file() => return Ok(()),
+        Err(error) => return Err(io_error(&staged_path, error)),
     };
     file.write_all(bytes)
         .and_then(|_| file.sync_all())
-        .map_err(|error| io_error(&temporary, error))?;
-    match fs::rename(&temporary, path) {
+        .map_err(|error| io_error(&staged_path, error))?;
+    match fs::rename(&staged_path, path) {
         Ok(()) => Ok(()),
         Err(_) if path.is_file() => {
-            fs::remove_file(&temporary).map_err(|error| io_error(&temporary, error))?;
+            fs::remove_file(&staged_path).map_err(|error| io_error(&staged_path, error))?;
             Ok(())
         }
         Err(error) => Err(io_error(path, error)),

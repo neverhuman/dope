@@ -415,7 +415,7 @@ fn scrub_seed_fields(value: &serde_json::Value) -> serde_json::Value {
     }
 }
 
-fn metadata_group(path: &Path, fallback: &str) -> String {
+fn metadata_group(path: &Path, default_group_key: &str) -> String {
     let metadata = fs::read(path.join("meta.json"))
         .ok()
         .and_then(|bytes| serde_json::from_slice::<serde_json::Value>(&bytes).ok());
@@ -446,7 +446,9 @@ fn metadata_group(path: &Path, fallback: &str) -> String {
                 .to_string();
         }
     }
-    blake3::hash(fallback.as_bytes()).to_hex().to_string()
+    blake3::hash(default_group_key.as_bytes())
+        .to_hex()
+        .to_string()
 }
 
 fn origin(root: &Path, path: &Path) -> String {

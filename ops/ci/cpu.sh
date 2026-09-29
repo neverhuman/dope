@@ -10,7 +10,7 @@ cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo test --locked
 python3 -m venv --system-site-packages target/ci-python
-target/ci-python/bin/python -m pip install -r validation/requirements-v1.txt
+bash ops/ci/install-python-v1.sh target/ci-python/bin/python
 PYTHONPATH=src target/ci-python/bin/python -m pytest -q tests
 ci_require_command uv
 cd validation/external

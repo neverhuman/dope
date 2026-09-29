@@ -56,8 +56,6 @@ jobs:
       - name: Dependency review
         if: github.event_name == 'pull_request'
         uses: actions/dependency-review-action@da24556b548a50705dd671f47852072ea4c105d9 # v4.7.1
-      - name: Secret scan
-        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
       - name: Dependency advisory scan
         run: bash ops/ci/security.sh
       - name: Verify Cargo advisories

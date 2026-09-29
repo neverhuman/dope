@@ -45,7 +45,11 @@ jobs:
           mode: standard
           fail-under: '85'
       - name: Pinned local equivalent and explicit full audit
-        run: jankurai audit . --full --no-badge --mode ratchet --baseline target/jankurai/accepted-baseline.json --fail-under 85 --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md --github-step-summary target/jankurai/summary.md --repair-queue-jsonl target/jankurai/repair-queue.jsonl --no-score-history
+        if: always()
+        run: |
+          bash ops/ci/install-jankurai.sh
+          cp agent/baselines/main.repo-score.json target/jankurai/accepted-baseline.json
+          target/jankurai/jankurai-1.7.1-x86_64-unknown-linux-gnu/jankurai audit . --full --no-badge --mode ratchet --baseline target/jankurai/accepted-baseline.json --fail-under 85 --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md --github-step-summary target/jankurai/summary.md --repair-queue-jsonl target/jankurai/repair-queue.jsonl --no-score-history
       - name: Emit repair queue and hash-only report attestation
         if: always()
         run: bash agent/emit-audit-receipts.sh
@@ -54,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: jankurai-action-v1.7.1
-          path: ${{ steps.full.outputs.report-directory }}
+          path: ${{ steps.full.outputs.report-directory || 'target/jankurai' }}
           if-no-files-found: warn
       - name: Upload local-equivalent JSON and Markdown even on failure
         if: always()
@@ -73,5 +77,6 @@ jobs:
             target/jankurai/rust/witness-graph.json
             target/jankurai/security/evidence.json
             target/jankurai/repair-queue.json
+            target/jankurai/repair-log.json
             target/jankurai/report-attestation.json
           if-no-files-found: warn
