@@ -28,7 +28,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: rust-cpu-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          key: rust-cpu-x86-64-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
       - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
         with:
           version: v0.16.0
@@ -39,6 +39,7 @@ jobs:
         env:
           CARGO_INCREMENTAL: '0'
           CARGO_PROFILE_DEV_DEBUG: line-tables-only
+          RUSTFLAGS: '-C target-cpu=x86-64'
           SCCACHE_GHA_ENABLED: 'true'
           RUSTC_WRAPPER: sccache
         run: bash ops/ci/cpu.sh
