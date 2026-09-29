@@ -1,4 +1,102 @@
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+
+/// Release tiers describe enforceable artifact and evidence requirements.
+/// They make no formal differential-privacy or de-identification claim.
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum AnonymizationTier {
+    L0,
+    L1,
+    L2,
+    #[default]
+    L3,
+}
+
+impl AnonymizationTier {
+    pub const fn byte_limit(self) -> Option<usize> {
+        match self {
+            Self::L3 => Some(10_240),
+            Self::L2 => Some(32_768),
+            Self::L1 | Self::L0 => None,
+        }
+    }
+}
+
+impl FromStr for AnonymizationTier {
+    type Err = String;
+
+    fn from_str(value: &str) -> std::result::Result<Self, Self::Err> {
+        match value.to_ascii_lowercase().as_str() {
+            "l0" => Ok(Self::L0),
+            "l1" => Ok(Self::L1),
+            "l2" => Ok(Self::L2),
+            "l3" => Ok(Self::L3),
+            _ => Err("tier must be l0, l1, l2, or l3".into()),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
+pub struct ReleasePolicy {
+    pub version: u8,
+    pub tier: AnonymizationTier,
+    pub maximum_artifact_bytes: Option<usize>,
+    pub require_formal_dp: bool,
+}
+
+impl Default for ReleasePolicy {
+    fn default() -> Self {
+        Self::new(AnonymizationTier::L3, None, false).expect("fixed L3 policy")
+    }
+}
+
+impl ReleasePolicy {
+    pub fn new(
+        tier: AnonymizationTier,
+        maximum_artifact_bytes: Option<usize>,
+        require_formal_dp: bool,
+    ) -> crate::error::Result<Self> {
+        if require_formal_dp {
+            return Err(DopeError::Unsupported(
+                "formal DP is unavailable: no verified backend is installed".into(),
+            ));
+        }
+        if maximum_artifact_bytes == Some(0)
+            || tier
+                .byte_limit()
+                .zip(maximum_artifact_bytes)
+                .is_some_and(|(ceiling, requested)| requested > ceiling)
+        {
+            return Err(DopeError::Data(
+                "the artifact byte limit must be positive and cannot raise the tier ceiling".into(),
+            ));
+        }
+        Ok(Self {
+            version: 1,
+            tier,
+            maximum_artifact_bytes: maximum_artifact_bytes.or(tier.byte_limit()),
+            require_formal_dp,
+        })
+    }
+
+    pub fn validate(&self) -> crate::error::Result<()> {
+        if self.version != 1 {
+            return Err(DopeError::Data("unsupported release-policy version".into()));
+        }
+        Self::new(
+            self.tier,
+            self.maximum_artifact_bytes,
+            self.require_formal_dp,
+        )?;
+        Ok(())
+    }
+
+    pub fn hash(&self) -> String {
+        let bytes = serde_json::to_vec(self).expect("release policy serializes");
+        blake3::hash(&bytes).to_hex().to_string()
+    }
+}
 
 use crate::compiler::{CompileOptions, CompileResult, compile_kernel_from_arrays};
 use crate::error::{DopeError, Result};

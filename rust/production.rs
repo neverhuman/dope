@@ -22,6 +22,8 @@ pub const DEVELOPMENT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const RELEASE_CANDIDATE_VERSION: &str = "1.0.0-rc.1";
 pub const KPI_CONTRACT_SHA256: &str = env!("DOPE_KPI_CONTRACT_SHA256");
 pub const KPI_CONTRACT_BLAKE3: &str = env!("DOPE_KPI_CONTRACT_BLAKE3");
+pub const KPI_CONTRACT_V1_SHA256: &str = env!("DOPE_KPI_CONTRACT_V1_SHA256");
+pub const KPI_CONTRACT_V1_BLAKE3: &str = env!("DOPE_KPI_CONTRACT_V1_BLAKE3");
 pub const CORPUS_MANIFEST_SHA256: &str =
     "045a90e9c0448a547368ec8cac2ca0f8fe1b110b04a0442a33ef407496c75973";
 pub const CORPUS_INVENTORY_SHA256: &str =
@@ -142,6 +144,10 @@ pub struct ReleaseGates {
     pub nominal_95_coverage_max: f64,
     pub type_i_error_max: f64,
     pub membership_auc_max: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feature_importance_spearman_min: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feature_importance_top_k_jaccard_min: Option<f64>,
     pub attribute_inference_advantage_max: f64,
     pub validation_training_regret_upper_max: f64,
     pub across_seed_validation_loss_stddev_max: f64,
@@ -151,6 +157,8 @@ pub struct ReleaseGates {
 pub struct KpiContract {
     pub format: String,
     pub version: u8,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub tier_byte_limits: BTreeMap<String, usize>,
     pub primary_kpi: String,
     pub release_seed: u64,
     pub generation_repeats: usize,
@@ -171,9 +179,15 @@ impl KpiContract {
         ))?)
     }
 
+    pub fn embedded_v1() -> Result<Self> {
+        Ok(serde_json::from_slice(include_bytes!(
+            "../production/kpi-contract-v1.json"
+        ))?)
+    }
+
     pub fn validate(&self) -> Result<()> {
         let valid = self.format == "dope-kpi-contract"
-            && self.version == 1
+            && (self.version == 1 || self.version == 2)
             && self.primary_kpi == "PTF-v1"
             && self.release_seed == RELEASE_SEED
             && self.generation_repeats == GENERATION_REPEATS
@@ -186,14 +200,38 @@ impl KpiContract {
             && (self.confidence.one_sided_level - 0.95).abs() <= f64::EPSILON
             && self.profile_gating.minimum_groups == 100
             && self.profile_gating.minimum_informative_groups == 30
-            && self.release_gates.ptf_v1_min == 0.99;
+            && self.release_gates.ptf_v1_min == 0.99
+            && match self.version {
+                1 => {
+                    self.tier_byte_limits.is_empty()
+                        && self.release_gates.feature_importance_spearman_min.is_none()
+                        && self
+                            .release_gates
+                            .feature_importance_top_k_jaccard_min
+                            .is_none()
+                }
+                2 => {
+                    self.tier_byte_limits.get("l3") == Some(&10_240)
+                        && self.tier_byte_limits.get("l2") == Some(&32_768)
+                        && self.tier_byte_limits.len() == 2
+                        && self.release_gates.membership_auc_max == 0.55
+                        && self.release_gates.feature_importance_spearman_min == Some(0.70)
+                        && self.release_gates.feature_importance_top_k_jaccard_min == Some(0.50)
+                }
+                _ => false,
+            };
         if !valid {
             return Err(DopeError::Data(
                 "KPI contract differs from the frozen PTF-v1 definition".into(),
             ));
         }
         let digest = hashes(&canonical_json(self)?);
-        if digest.sha256 != KPI_CONTRACT_SHA256 || digest.blake3 != KPI_CONTRACT_BLAKE3 {
+        let (sha256, blake3) = if self.version == 1 {
+            (KPI_CONTRACT_V1_SHA256, KPI_CONTRACT_V1_BLAKE3)
+        } else {
+            (KPI_CONTRACT_SHA256, KPI_CONTRACT_BLAKE3)
+        };
+        if digest.sha256 != sha256 || digest.blake3 != blake3 {
             return Err(DopeError::Data(
                 "KPI contract does not match the binary-embedded identity".into(),
             ));

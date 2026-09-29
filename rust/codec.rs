@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::Path;
 
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::error::{DopeError, Result, io_error};
@@ -13,6 +14,71 @@ use crate::model::{
 pub const MAGIC: &[u8; 4] = b"DPK3";
 pub const V2_MAGIC: &[u8; 4] = b"DPK2";
 pub const HEADER_BYTES: usize = 56;
+
+#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
+pub struct SectionAccounting {
+    pub tag: u8,
+    pub framing_bytes: usize,
+    pub raw_bytes: usize,
+    pub encoded_bytes: usize,
+    pub compressed: bool,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
+pub struct ArtifactAccounting {
+    pub header_bytes: usize,
+    pub sections: Vec<SectionAccounting>,
+    pub total_bytes: usize,
+}
+
+pub fn account_artifact(artifact: &[u8]) -> Result<ArtifactAccounting> {
+    if artifact.len() < HEADER_BYTES || !artifact.starts_with(MAGIC) {
+        return Err(DopeError::Codec(
+            "accounting requires a DPK3 artifact".into(),
+        ));
+    }
+    let payload_length = u64::from_le_bytes(artifact[32..40].try_into().unwrap()) as usize;
+    if payload_length != artifact.len() - HEADER_BYTES {
+        return Err(DopeError::Codec("payload length mismatch".into()));
+    }
+    let mut reader = Reader::new(&artifact[HEADER_BYTES..]);
+    let mut sections = Vec::new();
+    while reader.remaining() > 0 {
+        let start = reader.offset;
+        let encoded_tag = reader.byte()?;
+        let encoded_bytes = reader.usize(reader.remaining())?;
+        let compressed = encoded_tag & 0x80 != 0;
+        let raw_bytes = if compressed {
+            reader.usize(MAX_ARTIFACT_BYTES)?
+        } else {
+            encoded_bytes
+        };
+        let framing_bytes = reader.offset - start;
+        reader.take(encoded_bytes)?;
+        sections.push(SectionAccounting {
+            tag: encoded_tag & 0x7f,
+            framing_bytes,
+            raw_bytes,
+            encoded_bytes,
+            compressed,
+        });
+    }
+    let total_bytes = HEADER_BYTES
+        + sections
+            .iter()
+            .map(|section| section.framing_bytes + section.encoded_bytes)
+            .sum::<usize>();
+    if total_bytes != artifact.len() {
+        return Err(DopeError::Codec(
+            "section totals do not match artifact length".into(),
+        ));
+    }
+    Ok(ArtifactAccounting {
+        header_bytes: HEADER_BYTES,
+        sections,
+        total_bytes,
+    })
+}
 /// V3.1 raises the empirical champion ceiling while retaining all earlier
 /// decoder limits on individual operators and collections.
 pub const MAX_ARTIFACT_BYTES: usize = 2 * 1024 * 1024 * 1024;

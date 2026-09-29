@@ -17,6 +17,7 @@ use dope_kernel::certification::certify_kernel;
 use dope_kernel::certification::{GoldCellOptions, evaluate_gold_cell};
 use dope_kernel::codec::load_kernel;
 use dope_kernel::compiler::{CompileOptions, compile_kernel_from_dir};
+use dope_kernel::contract::{AnonymizationTier, ReleasePolicy};
 use dope_kernel::corpus::{
     build_split_manifest_multi, load_inventory, refresh_inventory_lineages, split_inventory,
     split_validation_manifest, write_exclusions, write_inventory, write_split_manifest,
@@ -182,6 +183,12 @@ enum Command {
         supported_datasets: usize,
         #[arg(long)]
         synthetic_seed: Vec<u64>,
+        #[arg(long, default_value = "l3")]
+        tier: String,
+        #[arg(long)]
+        max_artifact_bytes: Option<usize>,
+        #[arg(long)]
+        require_formal_dp: bool,
     },
     Compile {
         #[arg(long)]
@@ -206,6 +213,12 @@ enum Command {
         neural_target_weight: f64,
         #[arg(long, default_value_t = 0.0)]
         neural_structural_penalty: f64,
+        #[arg(long, default_value = "l3")]
+        tier: String,
+        #[arg(long)]
+        max_artifact_bytes: Option<usize>,
+        #[arg(long)]
+        require_formal_dp: bool,
     },
     Inspect {
         #[arg(long)]
@@ -699,6 +712,18 @@ enum CampaignCommand {
 
 fn parse_task(value: &str) -> Result<Task> {
     Task::parse(value).ok_or_else(|| DopeError::Data("task must be regression or binary".into()))
+}
+
+fn parse_policy(
+    tier: &str,
+    max_artifact_bytes: Option<usize>,
+    require_formal_dp: bool,
+) -> Result<ReleasePolicy> {
+    ReleasePolicy::new(
+        tier.parse::<AnonymizationTier>().map_err(DopeError::Data)?,
+        max_artifact_bytes,
+        require_formal_dp,
+    )
 }
 
 fn write_json(path: &PathBuf, value: &impl serde::Serialize) -> Result<()> {
@@ -1502,7 +1527,11 @@ fn run(command: Command) -> Result<()> {
             runtime_dictionary_bytes,
             supported_datasets,
             synthetic_seed,
+            tier,
+            max_artifact_bytes,
+            require_formal_dp,
         } => {
+            let release_policy = parse_policy(&tier, max_artifact_bytes, require_formal_dp)?;
             let result = convert_release(
                 &dataset_dir,
                 &real_holdout_dir,
@@ -1513,6 +1542,10 @@ fn run(command: Command) -> Result<()> {
                     runtime_dictionary_bytes,
                     supported_datasets,
                     synthetic_csv_seeds: synthetic_seed,
+                    compile_options: CompileOptions {
+                        release_policy,
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
             )?;
@@ -1535,8 +1568,12 @@ fn run(command: Command) -> Result<()> {
             candidate,
             neural_target_weight,
             neural_structural_penalty,
+            tier,
+            max_artifact_bytes,
+            require_formal_dp,
         } => {
             let options = CompileOptions {
+                release_policy: parse_policy(&tier, max_artifact_bytes, require_formal_dp)?,
                 seed,
                 deadline: deadline_seconds.map(Duration::from_secs_f64),
                 language: language.as_deref().map(load_language).transpose()?,
