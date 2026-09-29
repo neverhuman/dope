@@ -44,7 +44,7 @@ the 600-second compiler cap, GPU memory admission, and required sealed inputs.
 
 ## Launch gate evidence
 
-Security evidence is the CI secret scan, dependency review, workflow lint,
+Security evidence is the CI secret scan, dependency advisory scan, workflow lint,
 and SPDX SBOM. Backup evidence is the signed prior passing manifest and its
 hash-verified bundle. Monitoring evidence is the campaign ledger, certification
 JSON, and scheduled GPU job result. Rollback evidence is the restore procedure
@@ -52,7 +52,9 @@ in [release.md](release.md#rollback). Abuse controls are the strict input
 boundary, byte limits, privacy tests, and allowlisted release inventory. A
 production promotion needs all five evidence classes plus the exact source
 commit, contract digest, and sealed holdout receipt; missing evidence blocks
-promotion. A PR can establish the code and fixture gates without claiming a
+promotion. GitHub Dependency Review is unavailable on this repository, so the
+independent Cargo advisory scan and strict security wrapper provide the required
+dependency gate. A PR can establish the code and fixture gates without claiming a
 sealed-corpus release.
 
 Test reports and repair receipts live under `target/`. A failing gate should
