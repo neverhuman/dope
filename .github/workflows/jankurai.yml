@@ -1,0 +1,79 @@
+name: Full Jankurai audit
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  jankurai-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+        with:
+          version: 0.11.28
+      - name: Fresh Python V1 boundary receipt
+        run: bash ops/ci/audit.sh prepare
+      - name: Proof routing, copy review, and Rust witness
+        run: bash ops/ci/tool-adoption.sh
+      - name: Use pinned auditor in following steps
+        run: |
+          bash ops/ci/install-jankurai.sh
+          echo "$PWD/target/jankurai/jankurai-1.7.1-x86_64-unknown-linux-gnu" >> "$GITHUB_PATH"
+      - name: Strict security evidence
+        run: jankurai security run . --strict --profile ci --script tools/security-lane.sh --out target/jankurai/security/evidence.json
+      - name: Full v1.7.1 Jankurai audit
+        id: full
+        uses: neverhuman/jankurai-audit@9a101cda4bc32059a2c2f20a92e6d4948256507f # verified v1.7.1 tag target
+        with:
+          release-tag: v1.7.1
+          mode: standard
+          fail-under: '85'
+      - name: Pinned local equivalent and explicit full audit
+        if: always()
+        run: |
+          bash ops/ci/install-jankurai.sh
+          target/jankurai/jankurai-1.7.1-x86_64-unknown-linux-gnu/jankurai audit . --full --no-badge --mode standard --fail-under 85 --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md --github-step-summary target/jankurai/summary.md --repair-queue-jsonl target/jankurai/repair-queue.jsonl --no-score-history
+      - name: Emit repair queue and hash-only report attestation
+        if: always()
+        run: bash agent/emit-audit-receipts.sh
+      - name: Upload pinned action report even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: jankurai-action-v1.7.1
+          path: ${{ steps.full.outputs.report-directory || 'target/jankurai' }}
+          if-no-files-found: warn
+      - name: Upload local-equivalent JSON and Markdown even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: jankurai-v1.7.1
+          path: |
+            target/jankurai/repo-score.json
+            target/jankurai/repo-score.md
+            target/jankurai/summary.md
+            target/jankurai/repair-queue.jsonl
+            target/jankurai/proof-plan.json
+            target/jankurai/proof-plan.md
+            target/jankurai/copy-code.json
+            target/jankurai/copy-code.md
+            target/jankurai/rust/witness-graph.json
+            target/jankurai/security/evidence.json
+            target/jankurai/repair-queue.json
+            target/jankurai/repair-log.json
+            target/jankurai/report-attestation.json
+          if-no-files-found: warn

@@ -1,0 +1,8 @@
+minimum_score = 85
+fail_on = ["critical", "high"]
+advisory_on = ["medium", "low"]
+
+[history]
+dedupe = "consecutive-equivalent"
+max_bytes = 1048576
+max_rows = 500

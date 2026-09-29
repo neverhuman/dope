@@ -1,0 +1,16 @@
+version = 1
+cpu_pr_minutes = 35
+security_minutes = 30
+audit_minutes = 30
+scheduled_gpu_minutes = 120
+single_neural_fit_seconds = 600
+gpu_memory_bytes = 17179869184
+fitness_sample_rows = 128
+fitness_sample_dimensions = 32
+retry_rule = "repair-required"
+kill_switch = "cancel GitHub job or interrupt ops/ci/gpu.sh"
+
+[admission]
+require_sealed_corpus = true
+require_candidate_artifact = true
+require_pinned_cuda = true

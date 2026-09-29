@@ -1,5 +1,7 @@
 use std::cell::Cell;
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::time::Duration;
 
 use crate::error::{DopeError, Result};
 
@@ -13,9 +15,29 @@ thread_local! {
 }
 
 unsafe extern "C" {
-    fn dope_enable_libtorch_determinism();
-    fn dope_reset_cuda_peak_memory();
-    fn dope_cuda_peak_memory_bytes() -> u64;
+    fn cudaMemGetInfo(free_bytes: *mut usize, total_bytes: *mut usize) -> i32;
+}
+
+fn cuda_device_used_bytes() -> Result<u64> {
+    let (mut free, mut total) = (0usize, 0usize);
+    // SAFETY: CUDA writes exactly one size_t to each valid local pointer. The
+    // status is checked before either value is used. This is called only after
+    // tch confirms CUDA availability on the frozen device zero.
+    let status = unsafe { cudaMemGetInfo(&mut free, &mut total) };
+    if status != 0 || free > total {
+        return Err(DopeError::Data(format!(
+            "CUDA device-memory measurement failed with status {status}"
+        )));
+    }
+    Ok(total.saturating_sub(free) as u64)
+}
+
+struct StopSampler<'a>(&'a AtomicBool);
+
+impl Drop for StopSampler<'_> {
+    fn drop(&mut self) {
+        self.0.store(true, Ordering::Release);
+    }
 }
 
 pub(crate) fn clear_last_gpu_peak_memory_bytes() {
@@ -40,26 +62,37 @@ pub(crate) fn with_seeded_libtorch<T>(
     let _guard = SEEDED_LIBTORCH
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner);
-    // SAFETY: the bridge has no parameters, holds no Rust references, and
-    // only enables process-global libtorch flags while the global lock is held.
-    unsafe { dope_enable_libtorch_determinism() };
+    // The pinned tch controls and CUDA workspace configuration establish the
+    // supported deterministic training mode under this process-wide lock.
     tch::manual_seed(seed as i64);
     tch::Cuda::manual_seed_all(seed);
     tch::Cuda::cudnn_set_benchmark(false);
-    let measure_cuda = tch::Cuda::is_available();
-    if measure_cuda {
-        // SAFETY: device zero is the frozen CUDA device and the seeded lock keeps
-        // allocator peak resets from overlapping other campaign GPU operations.
-        unsafe { dope_reset_cuda_peak_memory() };
+    if !tch::Cuda::is_available() {
+        return operation();
     }
-    let result = operation();
-    if measure_cuda {
-        // SAFETY: the query returns a value-owned allocator statistic and is made
-        // under the same lock as the corresponding reset and operation.
-        let peak = unsafe { dope_cuda_peak_memory_bytes() };
-        LAST_GPU_PEAK_MEMORY_BYTES.set(Some(peak));
-    }
-    result
+    let initial = cuda_device_used_bytes()?;
+    let stop = AtomicBool::new(false);
+    let maximum = AtomicU64::new(initial);
+    std::thread::scope(|scope| {
+        let monitor = scope.spawn(|| {
+            while !stop.load(Ordering::Acquire) {
+                if let Ok(used) = cuda_device_used_bytes() {
+                    maximum.fetch_max(used, Ordering::Relaxed);
+                }
+                std::thread::sleep(Duration::from_millis(5));
+            }
+        });
+        let guard = StopSampler(&stop);
+        let result = operation();
+        tch::Cuda::synchronize(0);
+        maximum.fetch_max(cuda_device_used_bytes()?, Ordering::Relaxed);
+        drop(guard);
+        monitor
+            .join()
+            .map_err(|_| DopeError::Data("CUDA memory sampler panicked".into()))?;
+        LAST_GPU_PEAK_MEMORY_BYTES.set(Some(maximum.load(Ordering::Relaxed)));
+        result
+    })
 }
 
 #[cfg(test)]
@@ -76,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn seeded_operation_records_cuda_allocator_peak() {
+    fn seeded_operation_records_cuda_device_peak() {
         assert!(
             tch::Cuda::is_available(),
             "frozen CUDA runtime is unavailable"

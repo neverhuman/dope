@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOPE hash-only audit report attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "report_sha256", "report_fingerprint", "auditor_version", "source_commit", "dirty_worktree", "input_fingerprint", "score", "decision", "signature_kind"],
+  "properties": {
+    "format": {"const": "dope-audit-report-attestation"},
+    "version": {"const": 1},
+    "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "report_fingerprint": {"type": "string"},
+    "auditor_version": {"type": "string"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "dirty_worktree": {"type": "boolean"},
+    "input_fingerprint": {"type": "string"},
+    "score": {"type": "integer", "minimum": 0, "maximum": 100},
+    "decision": {"enum": ["pass", "fail"]},
+    "signature_kind": {"const": "none"}
+  }
+}

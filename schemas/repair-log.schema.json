@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOPE baseline audit fingerprint dispositions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "baseline_report_fingerprint", "current_report_fingerprint", "source_commit", "dirty_worktree", "dispositions"],
+  "properties": {
+    "format": {"const": "dope-baseline-fingerprint-dispositions"},
+    "version": {"const": 1},
+    "baseline_report_fingerprint": {"type": "string"},
+    "current_report_fingerprint": {"type": "string"},
+    "source_commit": {"type": "string"},
+    "dirty_worktree": {"type": "boolean"},
+    "dispositions": {
+      "type": "array",
+      "minItems": 83,
+      "maxItems": 83,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["original_fingerprint", "baseline_path", "rule_id", "status", "reason", "proof_command", "current_rule_fingerprints"],
+        "properties": {
+          "original_fingerprint": {"type": "string"},
+          "baseline_path": {"type": "string"},
+          "baseline_line": {"type": ["integer", "null"]},
+          "rule_id": {"type": "string"},
+          "status": {"enum": ["historical_wire_exception", "source_remediated", "reviewed_benign_context", "supported_followup_advisory", "resolved_in_clean_scan"]},
+          "reason": {"type": "string"},
+          "proof_command": {"type": "string"},
+          "current_rule_fingerprints": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}

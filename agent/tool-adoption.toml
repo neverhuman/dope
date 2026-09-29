@@ -1,0 +1,76 @@
+schema_version = "1.0.0"
+
+[[tools]]
+id = "audit-ci"
+mode = "auto"
+notes = "The pinned full audit is a required PR check and keeps JSON and Markdown."
+
+[[tools]]
+id = "proof-routing"
+mode = "advisory"
+notes = "The local proof plan informs narrow reruns; full CPU and audit gates remain required."
+
+[[tools]]
+id = "copy-code"
+mode = "advisory"
+notes = "Review duplicate classes during remediation; no claim of replacement without a receipt."
+
+[[tools]]
+id = "security"
+mode = "advisory"
+notes = "Pinned independent secret, dependency, workflow, and SBOM jobs are required."
+
+[[tools]]
+id = "rust-witness"
+mode = "advisory"
+notes = "Rust witness output supports review; locked tests and Clippy remain required."
+
+[[tools]]
+id = "proofbind"
+mode = "advisory"
+notes = "The current verifier cannot analyze the intentionally removed C++ bridge; the full audit and CPU tests remain the gate."
+
+[[tools]]
+id = "proofmark-rust"
+mode = "advisory"
+notes = "Proofmark awaits a proofbind obligation set that includes removed-file handling."
+
+[[tools]]
+id = "ci-bad-behavior"
+mode = "advisory"
+notes = "The full audit and actionlint cover the workflow surface."
+
+[[tools]]
+id = "git-bad-behavior"
+mode = "advisory"
+notes = "The full audit checks tracked Git and launcher behavior."
+
+[[tools]]
+id = "release-bad-behavior"
+mode = "advisory"
+notes = "The full audit checks release scripts; certification remains the promotion gate."
+
+[[tools]]
+id = "authz-matrix"
+mode = "advisory"
+notes = "The validation access broker tests cover the current role matrix."
+
+[[tools]]
+id = "input-boundary"
+mode = "advisory"
+notes = "Rust L3 negative fixtures and the full audit cover input rejection."
+
+[[tools]]
+id = "agent-tool-supply"
+mode = "advisory"
+notes = "Pinned workflow actions and the full audit cover current agent tool changes."
+
+[[tools]]
+id = "release-readiness"
+mode = "advisory"
+notes = "The staged bundle inventory and release checklist are tested before promotion."
+
+[[tools]]
+id = "cost-budget"
+mode = "advisory"
+notes = "Machine-readable budgets and the check-budgets script are required in CPU CI."

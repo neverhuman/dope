@@ -1,4 +1,20 @@
-# Dope Data Kernel V3.2
+# Dope Data Kernel
+
+[![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
+[![Jankurai gate](https://img.shields.io/badge/Jankurai-requires%20score%2085-blue)](docs/audit.md)
+
+Start with [AGENTS.md](AGENTS.md) for ownership and proof commands.
+
+## Quick start
+
+```bash
+just setup
+just fast
+cargo build --locked --release
+```
+
+The [architecture](docs/architecture.md), [testing](docs/testing.md), and
+[release](docs/release.md) guides cover product boundaries and promotion.
 
 Public source repository: https://github.com/neverhuman/dope
 
@@ -23,14 +39,20 @@ are genuine joint generators. Their per-channel int8 tensors, f32 scales and
 activations, normalization metadata, permutations, target marginal, and
 training/implementation hashes are encoded and charged to the artifact. V1 JSON artifacts
 and commands remain supported as baselines.
-Datasets are headerless CSV files with the target in the final column and all
-values in `[0, 1]`.
+L3 `compile`, `convert`, and `certify` expect headerless numeric CSV files with
+the target in the final column and values already in `[0, 1]`. Out-of-range
+values fail with normalization guidance. L3 has a hard 10,240-byte artifact
+limit, L2 32,768 bytes, L1 no hard limit, and L0 is research use. A compile
+may return an uncertified artifact within its limit; release requires measured
+utility, structure, and empirical privacy gates. A tier or empirical privacy
+result does not establish formal DP or HIPAA de-identification.
 
-The V3.2 artifact uses canonical varints, fixed-point parameter ladders,
+DPK3.2 uses canonical varints, fixed-point parameter ladders,
 deterministic static byte-rANS sections, a versioned header, and a BLAKE3
 checksum. Sections 3–5 are symbolic; section 6 is neural and cannot fall back
 to a symbolic target. The decoder retains V1 JSON and V2.0/V2.1 plus V3.0/V3.1
-binary compatibility. JSON reports,
+binary compatibility. New compact neural shapes and direct-rank TabDDPM use
+DPK3.3; existing full-model DPK3.2 bytes remain unchanged. JSON reports,
 inspectable language dictionaries, and S-expression disassembly are sidecars
 only.
 
@@ -42,11 +64,13 @@ encoder fitting cost is not included in the artifact byte count.
 
 Joint training is enabled with `--features gpu-training` and requires CUDA,
 libtorch 2.7, `CUBLAS_WORKSPACE_CONFIG=:4096:8`, and deterministic cuDNN
-settings. Seeded libtorch work is serialized process-wide, and all three joint
-trainers use deterministic bounded row minibatches. Exported artifacts sample
-using Rust only; libtorch is never used by the sampling path. The four
-unimplemented deep names (`ctgan`, `taegan`,
-`tabddpm`, and `masked_diffusion_transformer`) are explicit unavailable
+settings. Seeded libtorch work is serialized process-wide, and joint trainers
+use deterministic bounded row minibatches. Micro-TVAEs use latent/hidden
+widths 4/16, 8/24, and 12/32; TinyMAT profiles use widths 16 and 24.
+Direct rank-space TabDDPM is a GPU research comparator eligible only for L1
+certification, with no L3 size claim. Exported artifacts sample in Rust only.
+The historical deep names (`ctgan`, `taegan`, `tabddpm`, and
+`masked_diffusion_transformer`) remain explicit unavailable
 entries. Seven `legacy_*` IDs preserve the prior symbolic-plus-neural-residual
 comparators.
 
@@ -109,7 +133,10 @@ dimensions. Router promotion quality is reported separately in qualification
 version 2 and does not block embedding; it continues to block campaign/release
 promotion. Its version-1 vectors contain the
 standardized 856-value dataset sketch followed, in router candidate order, by
-each penultimate hidden state and ten standardized action predictions. These
+each penultimate hidden state and ten standardized action predictions. Public
+JSON exports use positional feature labels and omit source headers and
+raw extrema. `--restricted-metadata` explicitly emits that research metadata;
+restricted exports are not eligible release sidecars. These
 embeddings have dimension `856 + candidates × (hidden_width + 10)` (4,168 for
 24 candidates with width 128) and are action-set-specific rather than universal
 similarity embeddings.

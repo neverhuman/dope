@@ -148,7 +148,36 @@ fn embed_dataset_cli_writes_canonical_json_and_vector_csv() {
     assert_eq!(embedding["dimension"], 4168);
     assert_eq!(embedding["rows"], 3);
     assert_eq!(embedding["features"], 1);
+    assert_eq!(embedding["metadata_mode"], "public");
+    assert_eq!(
+        embedding["normalization"]["features"][0]["column"],
+        "feature_0"
+    );
+    assert_eq!(
+        embedding["normalization"]["features"][0]["minimum"],
+        serde_json::Value::Null
+    );
+    assert_eq!(embedding["normalization"]["target"]["column"], "target");
+    let public_text = fs::read_to_string(&out).unwrap();
+    assert!(!public_text.contains("outcome"));
+    assert!(!public_text.contains("\"maximum\":30"));
     assert_eq!(fs::read_to_string(&vector).unwrap().lines().count(), 2);
+
+    let restricted_out = root.join("embedding-restricted.json");
+    let restricted = Command::new(binary)
+        .args(base_args)
+        .args(["--out", &text(&restricted_out), "--restricted-metadata"])
+        .output()
+        .unwrap();
+    assert!(restricted.status.success());
+    let restricted: serde_json::Value =
+        serde_json::from_slice(&fs::read(restricted_out).unwrap()).unwrap();
+    assert_eq!(restricted["metadata_mode"], "restricted_research");
+    assert_eq!(
+        restricted["normalization"]["features"][0]["column"],
+        "feature"
+    );
+    assert_eq!(restricted["normalization"]["features"][0]["minimum"], 10.0);
 
     run(
         binary,
@@ -559,8 +588,16 @@ fn native_cli_end_to_end() {
     let report: serde_json::Value =
         serde_json::from_slice(&fs::read(&certification).unwrap()).unwrap();
     assert_eq!(report["format"], "dope-kernel-certification");
-    assert_eq!(report["version"], 3);
+    assert_eq!(report["version"], 5);
     assert_eq!(report["certified"], false);
+    assert_eq!(report["master_fitness"]["eligible"], false);
+    assert!(report["master_fitness"]["score"].is_null());
+    assert_eq!(report["master_fitness"]["privacy_soft_weight"], 0.0);
+    assert_eq!(report["master_fitness"]["version"], 2);
+    assert_eq!(report["fitness_diagnostics"].as_array().unwrap().len(), 6);
+    assert_eq!(report["fitness_diagnostics"][0]["version"], 1);
+    assert!(report["master_fitness"]["pareto_vector"]["coverage_realism"].is_number());
+    assert!(report["master_fitness"]["pareto_vector"]["distribution_fidelity"].is_number());
     assert_eq!(report["auditors"].as_object().unwrap().len(), 6);
     assert_eq!(
         report["auditors"]["elastic_net_glm"]["metrics"]
@@ -583,9 +620,8 @@ fn native_cli_end_to_end() {
     );
 
     let release = root.join("release");
-    run(
-        binary,
-        &[
+    let conversion = Command::new(binary)
+        .args([
             "convert",
             "--dataset-dir",
             &dataset_s,
@@ -597,40 +633,12 @@ fn native_cli_end_to_end() {
             &text(&release),
             "--synthetic-seed",
             "23",
-        ],
-    );
-    for name in [
-        "kernel.dpk",
-        "conversion-report.json",
-        "synthetic-model.bundle",
-        "tstr-certification.json",
-        "synthetic-23.csv",
-    ] {
-        assert!(
-            release.join(name).is_file(),
-            "missing release output {name}"
-        );
-    }
-    let conversion: serde_json::Value =
-        serde_json::from_slice(&fs::read(release.join("conversion-report.json")).unwrap()).unwrap();
-    assert_eq!(conversion["version"], 3);
-    assert_eq!(conversion["release_label"], "strongest_explicit_kernel");
-    assert_eq!(
-        conversion["formal_dp_frontier"].as_array().unwrap().len(),
-        120
-    );
-    assert_eq!(
-        conversion["empirical_backend_registry"]
-            .as_array()
-            .unwrap()
-            .len(),
-        31
-    );
-    assert_eq!(conversion["sealed_test_open_count"], 1);
-    let bundle: serde_json::Value =
-        serde_json::from_slice(&fs::read(release.join("synthetic-model.bundle")).unwrap()).unwrap();
-    assert_eq!(bundle["trained_from"], "synthetic_only");
-    assert_eq!(bundle["contains_source_rows"], false);
+        ])
+        .output()
+        .unwrap();
+    assert!(!conversion.status.success());
+    assert!(String::from_utf8_lossy(&conversion.stderr).contains("auditor coverage"));
+    assert!(!release.exists());
 
     let v1 = root.join("v1.dk.json");
     let v1_sample = root.join("v1.csv");
