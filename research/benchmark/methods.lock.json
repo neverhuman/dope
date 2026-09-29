@@ -67,16 +67,36 @@
       "upstream_url": null
     },
     "Chow-Liu": {
-      "default_config": null,
-      "dependency_or_container_digest": null,
-      "fit_command": null,
+      "adapter": "Chow-Liu",
+      "adapter_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
+      "default_config": {
+        "bins": 8,
+        "fit_timeout_seconds": 900,
+        "laplace_alpha": 1.0,
+        "sample_timeout_seconds": 600
+      },
+      "dependency_or_container_digest": "numpy==1.26.4",
+      "fit_command": "research.benchmark.adapters.fit(Chow-Liu, TRAIN, METADATA, CONFIG, FIT_SEED, ARTIFACT)",
       "group": "compact",
-      "license": null,
-      "sampling_command": null,
-      "status": "source_audit_pending",
-      "tuning_search_space": null,
+      "license": "MIT",
+      "license_evidence": "https://github.com/neverhuman/dope/blob/581fd6999dcfd215c364369b3198daf161b89c2c/LICENSE",
+      "note": "Study-owned discretized Chow-Liu reference implementation, not original author code; every projected column enters the mutual-information maximum spanning tree. Original method DOI is upstream_url.",
+      "sampling_command": "research.benchmark.adapters.sample(Chow-Liu, ARTIFACT, ROWS, SAMPLE_SEED, OUTPUT)",
+      "source_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
+      "status": "locked",
+      "tuning_search_space": {
+        "bins": [
+          8,
+          16,
+          32
+        ],
+        "laplace_alpha": [
+          0.5,
+          1.0
+        ]
+      },
       "upstream_commit": null,
-      "upstream_url": null
+      "upstream_url": "https://doi.org/10.1109/TIT.1968.1054142"
     },
     "DP-CTGAN": {
       "default_config": null,
@@ -129,7 +149,7 @@
     },
     "GaussianCopula": {
       "adapter": "GaussianCopula",
-      "adapter_sha256": "acdc94c47420005d800258e65b84afe087834ed168e97885de64fa1261cf821d",
+      "adapter_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
       "default_config": {
         "distribution": "Univariate",
         "fit_timeout_seconds": 900,
@@ -351,7 +371,7 @@
     },
     "dope": {
       "adapter": "dope",
-      "adapter_sha256": "acdc94c47420005d800258e65b84afe087834ed168e97885de64fa1261cf821d",
+      "adapter_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
       "binary_sha256": "78d10acf4495577d22075e54ab452c0451a41e66cb029bbfd552cd2dd1c9e70c",
       "default_config": {
         "deadline_seconds": 600,
@@ -378,7 +398,7 @@
     },
     "independent_marginals": {
       "adapter": "independent_marginals",
-      "adapter_sha256": "acdc94c47420005d800258e65b84afe087834ed168e97885de64fa1261cf821d",
+      "adapter_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
       "default_config": {
         "bins": 16,
         "fit_timeout_seconds": 600,
@@ -392,7 +412,7 @@
       "note": "study reference implementation, not an upstream author baseline",
       "sampling_command": "research.benchmark.adapters.sample(independent_marginals, ARTIFACT, ROWS, SEED, OUTPUT)",
       "source_note": "Study-owned adapter file SHA-256 is the executable source identity; repository commit pending research branch publication.",
-      "source_sha256": "acdc94c47420005d800258e65b84afe087834ed168e97885de64fa1261cf821d",
+      "source_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
       "status": "locked",
       "tuning_search_space": {
         "bins": [

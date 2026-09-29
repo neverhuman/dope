@@ -74,6 +74,15 @@ therefore stays incomplete; no `budget.lock.json` or final method–dataset
 matrix is frozen, and no public test partition or full campaign is opened. The
 final-analysis CLI checks the admission locks before reading result reports.
 
+Outside the fixed seven-method pilot, the study-owned Chow–Liu compact
+adapter is source/config locked for common-numeric runs. Its California seed
+11 default fit took 0.063 seconds. The numeric tree file was 10,192 B; adding
+the required 1,591 B projection map yields 11,783 B, above L3 and below L2.
+The 12,384-row sample and deterministic repeat took 0.148 seconds together.
+Validation-only CatBoost retention was 0.645 and C2ST AUC was 0.986, with no
+exact or near copies observed. These diagnostics are not a gate report, and
+this extra cost cell does not complete the seven-method pilot or method lock.
+
 These observations cannot justify a 14-day estimate for the protected compact
 panel: training and audit costs for most compact comparators remain unknown.
 The next admission decision requires the full seven-method pilot or an

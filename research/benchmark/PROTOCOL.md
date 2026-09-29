@@ -68,10 +68,10 @@ charges the projection map for every common-numeric artifact.
 method may enter final evaluation only with an audited source commit,
 dependency or container digest, license, literal default configuration, tuning
 search space, and fit/sample commands. The file is currently `complete: false`:
-DOPE, a study-owned independent-marginals adapter, and the pinned Copulas
-GaussianMultivariate adapter are the only runnable methods. The marginal
-adapter is labeled as a reference implementation, never represented as
-another author's code. GEM-T remains an availability check. If author code
+DOPE, study-owned independent-marginals and discretized Chow–Liu adapters,
+and the pinned Copulas GaussianMultivariate adapter are the only runnable
+methods. The study-owned adapters are labeled as reference implementations,
+never represented as another author's code. GEM-T remains an availability check. If author code
 cannot be located, a paper implementation requires validation against at
 least two reported experiments before comparison. An unavailable or
 unvalidated method is not a DOPE win.
@@ -137,8 +137,9 @@ controls. Apply the same access to all methods. For DP methods, report
 epsilon 1, 4, and 10; delta `min(1e-5,1/n^2)`; preprocessing and accountant
 assumptions; and the exact implementation. An unaudited implementation gets
 no formal guarantee. Empirical attack evidence is distinct from formal DP
-and from HIPAA de-identification. HHS describes Expert Determination and
-Safe Harbor as the two de-identification methods.
+and from HIPAA de-identification. [HHS describes Expert Determination and
+Safe Harbor](https://www.hhs.gov/hipaa/for-professionals/special-topics/de-identification/index.html)
+as the two de-identification methods.
 
 ## Analysis and handoff
 

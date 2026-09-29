@@ -55,7 +55,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
         raise ValueError("method is not source/config locked")
     if entry["adapter_sha256"] != sha256(Path(adapters.__file__)):
         raise ValueError("adapter source digest changed")
-    if method == "independent_marginals":
+    if method in ("independent_marginals", "Chow-Liu"):
         import numpy as np
         if entry["dependency_or_container_digest"] != f"numpy=={np.__version__}":
             raise ValueError("adapter dependency version changed")
@@ -80,11 +80,8 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
         if manifest["projected_hashes"][name] != sha256(worker / f"{name}.csv"):
             raise ValueError("worker table digest mismatch")
     scratch_root = Path(job.get("scratch_root", output_root.parent)).resolve()
-    if job["track"] == "author_faithful" and method != "dope":
-        raise ValueError("author-faithful adapter unavailable")
-    if job["track"] == "author_faithful" and method == "dope":
-        # DOPE accepts the same numeric projection in both tracks.
-        pass
+    if job["track"] == "author_faithful":
+        raise ValueError("author-faithful data preparation and adapter unavailable")
     n = manifest.get("train_rows")
     if n is None:
         with (worker / "train.csv").open() as stream:

@@ -40,6 +40,47 @@ def fit(method: str, train: Path, metadata: dict, config: dict, seed: int,
         (artifact_dir / "model.json").write_text(json.dumps({"columns": columns, "bins": bins},
                                                       sort_keys=True, separators=(",", ":")))
         return ["model.json"]
+    if method == "Chow-Liu":
+        import numpy as np
+        table = np.loadtxt(train, delimiter=",", ndmin=2)
+        bins, alpha = config["bins"], config["laplace_alpha"]
+        if bins not in (8, 16, 32) or alpha not in (0.5, 1.0):
+            raise ValueError("Chow-Liu configuration outside locked search space")
+        cards = [2 if np.isin(table[:, index], (0.0, 1.0)).all() else bins
+                 for index in range(table.shape[1])]
+        codes = np.column_stack([np.minimum((table[:, index] * card).astype(np.int32), card - 1)
+                                 for index, card in enumerate(cards)])
+        if (codes < 0).any() or (table > 1).any() or not np.isfinite(table).all():
+            raise ValueError("Chow-Liu expects finite common-numeric rows")
+        width = len(cards)
+        information = np.zeros((width, width))
+        for left in range(width):
+            for right in range(left + 1, width):
+                counts = np.bincount(codes[:, left] * cards[right] + codes[:, right],
+                                     minlength=cards[left] * cards[right]).reshape(cards[left], cards[right])
+                joint = counts / len(table)
+                expected = joint.sum(axis=1)[:, None] * joint.sum(axis=0)[None, :]
+                present = joint > 0
+                information[left, right] = information[right, left] = float(
+                    np.sum(joint[present] * np.log(joint[present] / expected[present])))
+        selected = {0}
+        edges = []
+        while len(selected) < width:
+            parent, child = max(((parent, child) for parent in sorted(selected)
+                                 for child in range(width) if child not in selected),
+                                key=lambda pair: (information[pair], -pair[0], -pair[1]))
+            selected.add(child)
+            counts = np.bincount(codes[:, parent] * cards[child] + codes[:, child],
+                                 minlength=cards[parent] * cards[child]).reshape(cards[parent], cards[child])
+            conditional = (counts + alpha) / (counts.sum(axis=1, keepdims=True) + alpha * cards[child])
+            edges.append({"parent": parent, "child": child, "conditional": conditional.tolist()})
+        root_counts = np.bincount(codes[:, 0], minlength=cards[0])
+        root_probs = ((root_counts + alpha) / (len(table) + alpha * cards[0])).tolist()
+        (artifact_dir / "model.json").write_text(json.dumps(
+            {"cards": cards, "root_probs": root_probs, "edges": edges,
+             "bins": bins, "alpha": alpha, "task": metadata["task"]},
+            sort_keys=True, separators=(",", ":")))
+        return ["model.json"]
     if method == "GaussianCopula":
         import pandas as pd
         from copulas.multivariate import GaussianMultivariate
@@ -79,6 +120,28 @@ def sample(method: str, artifact_dir: Path, row_count: int, seed: int,
                 bins = rng.choice(model["bins"], size=row_count, p=column["p"])
                 result[:, index] = (bins + rng.random(row_count)) / model["bins"]
         np.savetxt(output, result, fmt="%.17g", delimiter=",")
+        return
+    if method == "Chow-Liu":
+        import numpy as np
+        model = json.loads((artifact_dir / "model.json").read_text())
+        rng = np.random.default_rng(seed)
+        cards = model["cards"]
+        with output.open("w") as stream:
+            for start in range(0, row_count, 10000):
+                count = min(10000, row_count - start)
+                codes = np.empty((count, len(cards)), dtype=np.int32)
+                codes[:, 0] = rng.choice(cards[0], size=count, p=model["root_probs"])
+                for edge in model["edges"]:
+                    parent, child = edge["parent"], edge["child"]
+                    cumulative = np.cumsum(np.asarray(edge["conditional"]), axis=1)
+                    codes[:, child] = np.minimum(
+                        np.sum(rng.random(count)[:, None] > cumulative[codes[:, parent]], axis=1),
+                        cards[child] - 1)
+                values = np.empty((count, len(cards)))
+                for index, card in enumerate(cards):
+                    values[:, index] = (codes[:, index] if card == 2 else
+                                        (codes[:, index] + rng.random(count)) / card)
+                np.savetxt(stream, values, fmt="%.17g", delimiter=",")
         return
     if method == "GaussianCopula":
         import numpy as np
