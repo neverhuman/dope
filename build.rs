@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 use std::fs;
+use std::path::PathBuf;
 
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -34,6 +35,30 @@ fn main() {
     println!("cargo:rerun-if-changed={path}");
     let raw = fs::read(path).expect("production KPI contract must be readable");
     let parsed: Value = serde_json::from_slice(&raw).expect("production KPI contract must be JSON");
+    assert_eq!(
+        parsed["version"].as_u64(),
+        Some(2),
+        "active contract must be v2"
+    );
+    let limits = parsed["tier_byte_limits"]
+        .as_object()
+        .expect("v2 tier limits must be an object");
+    assert_eq!(limits.len(), 2, "only L2 and L3 have hard byte limits");
+    let l2 = limits["l2"]
+        .as_u64()
+        .expect("L2 byte limit must be numeric");
+    let l3 = limits["l3"]
+        .as_u64()
+        .expect("L3 byte limit must be numeric");
+    assert_eq!((l2, l3), (32_768, 10_240), "frozen tier limits changed");
+    let generated = format!(
+        "// Generated from production/kpi-contract.json by build.rs.\n\
+         pub const L2_ARTIFACT_LIMIT: usize = {l2};\n\
+         pub const L3_ARTIFACT_LIMIT: usize = {l3};\n"
+    );
+    let generated_path = PathBuf::from(std::env::var_os("OUT_DIR").expect("Cargo OUT_DIR"))
+        .join("kpi_contract_generated.rs");
+    fs::write(generated_path, generated).expect("generated contract constants must be writable");
     let bytes = serde_json::to_vec(&canonical(&parsed)).expect("canonical KPI contract serializes");
     let normalized = raw.strip_suffix(b"\n").unwrap_or(&raw);
     assert_eq!(

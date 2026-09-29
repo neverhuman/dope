@@ -48,5 +48,6 @@ requires at least three informative features and a defined rank correlation.
 No external result changes Rust certification,
 constitutes formal DP, or establishes HIPAA de-identification.
 
-Run the fixture smoke checks with `target/external-venv/bin/python -m unittest
-discover -s validation/external/tests -v` from the repository root.
+Run the fixture smoke checks with `PYTHONPATH=validation/external
+target/external-venv/bin/python -m unittest discover -s
+validation/external/tests -v` from the repository root.

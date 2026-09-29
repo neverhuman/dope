@@ -1,0 +1,73 @@
+[stack]
+id = "rust-ts-vite-react-postgres-bounded-python"
+version = "0.1.0"
+
+[python]
+allowed_non_product_paths = ["src/dope_kernel/", "validation/external/"]
+allowed_truth_paths = []
+
+[[streaming_exception]]
+runtime = "python"
+classification = "advanced-data"
+owner = "compatibility"
+reason = "The Python V1 numeric-data baseline remains available for historical CLI and test compatibility; Rust owns V3 contracts and releases."
+expires = "2027-09-29"
+migration_path = "Retire the V1 CLI after consumers move to the native Rust artifact and command set."
+
+[[streaming_exception]]
+runtime = "python"
+classification = "advanced-data"
+owner = "validation"
+reason = "Pinned external ML libraries are evaluated offline to substantiate exact-library claims; Rust owns certification and release decisions."
+expires = "2027-09-29"
+migration_path = "Retain only the fixture and evidence runner while the named Python libraries are required for claim verification."
+
+[[audited_runtime_boundary]]
+id = "python-v1-compatibility"
+paths = ["src/dope_kernel/*.py"]
+classification = "advanced-data"
+product_surface = false
+runtime_language = "python"
+target_stack_exception = true
+reclassifies = [
+    "non-optimal-product-language-found",
+    "too-much-python-in-product-surface",
+    "python-direct-product-truth-or-db-ownership",
+]
+proof_command = "bash agent/check-python-v1-boundary.sh"
+rerun_command = "bash agent/check-python-v1-boundary.sh"
+required_evidence = ["target/jankurai/boundaries/python-v1-compatibility/evidence.json"]
+required_checks = [
+    "manifest-coverage",
+    "payload-hash-match",
+    "pytest-v1",
+    "no-direct-db-access",
+    "no-product-routes",
+    "no-subprocess",
+    "no-import-escape",
+    "no-builtin-escape",
+]
+
+[[audited_runtime_boundary]]
+id = "external-learner-evidence"
+paths = ["validation/external/*.py", "validation/external/tests/*.py"]
+classification = "advanced-data"
+product_surface = false
+runtime_language = "python"
+target_stack_exception = true
+reclassifies = [
+    "non-optimal-product-language-found",
+    "python-direct-product-truth-or-db-ownership",
+]
+proof_command = "bash agent/check-external-boundary.sh"
+rerun_command = "bash agent/check-external-boundary.sh"
+required_evidence = ["target/jankurai/boundaries/external-learner-evidence/evidence.json"]
+required_checks = [
+    "manifest-coverage",
+    "payload-hash-match",
+    "pinned-dependencies",
+    "external-fixtures",
+    "no-direct-db-access",
+    "no-network-or-subprocess",
+    "no-product-routes",
+]

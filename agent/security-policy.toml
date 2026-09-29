@@ -1,0 +1,22 @@
+schema_version = "1.0.0"
+enabled_tools = ["cargo-audit", "actionlint"]
+required_tools = ["cargo-audit", "actionlint"]
+advisory_tools = ["gitleaks", "syft"]
+
+[severity_thresholds]
+fail_lane_on = "high"
+
+[profiles.local]
+enabled_tools = ["cargo-audit", "actionlint"]
+required_tools = ["cargo-audit", "actionlint"]
+advisory_tools = ["gitleaks", "syft"]
+
+[profiles.ci]
+enabled_tools = ["cargo-audit", "actionlint"]
+required_tools = ["cargo-audit", "actionlint"]
+advisory_tools = ["gitleaks", "syft"]
+
+[profiles.release]
+enabled_tools = ["cargo-audit", "actionlint", "gitleaks", "syft"]
+required_tools = ["cargo-audit", "actionlint", "gitleaks", "syft"]
+advisory_tools = []

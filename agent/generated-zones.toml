@@ -1,0 +1,6 @@
+[[zone]]
+path = "target/"
+source = "production/kpi-contract.json and build.rs (Cargo build output)"
+command = "cargo build --locked"
+read_only = true
+write_policy = "generated_build_output"

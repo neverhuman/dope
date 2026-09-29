@@ -7,10 +7,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-EXTERNAL = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(EXTERNAL))
-import run as external  # noqa: E402 - import the standalone runner from its directory
-import external_learners as learners  # noqa: E402
+import run as external
+import external_learners as learners
 
 
 class ExternalEvidenceTests(unittest.TestCase):
@@ -131,14 +129,7 @@ class ExternalEvidenceTests(unittest.TestCase):
         )
 
     def test_missing_optional_backend_withholds_claim(self):
-        original_import = learners.importlib.import_module
-
-        def unavailable(name):
-            if name == "xgboost":
-                raise ModuleNotFoundError("xgboost")
-            return original_import(name)
-
-        with patch.object(learners.importlib, "import_module", side_effect=unavailable):
+        with patch.dict(sys.modules, {"xgboost": None}):
             evidence = external.run(self.arguments("xgboost"))
         self.assertEqual(evidence["models"][0]["status"], "missing_library")
         self.assertEqual(evidence["supported_exact_library_claims"], [])

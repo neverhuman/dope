@@ -1,0 +1,32 @@
+{
+  "workspace": "dope",
+  "tests": {
+    "AGENTS.md": {"command": "just fast", "purpose": "verify repository guidance"},
+    "README.md": {"command": "just fast", "purpose": "verify onboarding guidance"},
+    "CHANGELOG.md": {"command": "just fast", "purpose": "verify release change record"},
+    "LICENSE": {"command": "just fast", "purpose": "verify repository metadata"},
+    ".cargo/": {"command": "just check", "purpose": "verify Cargo configuration"},
+    ".gitignore": {"command": "just fast", "purpose": "verify generated paths remain ignored"},
+    "rust-toolchain.toml": {"command": "just check", "purpose": "verify pinned Rust toolchain"},
+    "pyproject.toml": {"command": "PYTHONPATH=src python3 -m pytest -q tests", "purpose": "verify V1 package compatibility"},
+    "Justfile": {"command": "just fast", "purpose": "verify local proof recipes"},
+    ".github/": {"command": "just security", "purpose": "verify workflow syntax and scans"},
+    "agent/": {"command": "just score", "purpose": "verify audit policy and boundary evidence"},
+    "ops/": {"command": "bash scripts/ci-local.sh cpu", "purpose": "verify CI execution scripts"},
+    "tools/": {"command": "bash tools/security-lane.sh", "purpose": "verify canonical security wrapper"},
+    "scripts/": {"command": "bash scripts/ci-doctor.sh", "purpose": "verify local CI entry points"},
+    "docs/": {"command": "just score", "purpose": "verify release and repair guidance"},
+    "contracts/": {"command": "cargo test --locked production::tests::embedded_contract_is_canonical_and_bound", "purpose": "verify generated tier constants and embedded digest"},
+    "rust/": {"command": "just check", "purpose": "run Rust unit, CLI, and Clippy checks"},
+    "Cargo.toml": {"command": "just check", "purpose": "verify locked Rust graph"},
+    "Cargo.lock": {"command": "just check", "purpose": "verify locked Rust graph"},
+    "build.rs": {"command": "just check", "purpose": "verify embedded contract digest"},
+    "production/": {"command": "just check", "purpose": "verify contract and release fixtures"},
+    "src/dope_kernel/": {"command": "PYTHONPATH=src python3 -m pytest -q tests", "purpose": "preserve V1 compatibility"},
+    "tests/": {"command": "just check", "purpose": "verify Rust CLI and Python fixtures"},
+    "validation/external/": {"command": "PYTHONPATH=validation/external target/external-venv/bin/python -m unittest discover -s validation/external/tests -v", "purpose": "verify pinned external learner evidence fixtures"},
+    "validation/requirements-v1.txt": {"command": "bash agent/check-python-v1-boundary.sh", "purpose": "verify pinned Python V1 compatibility graph"},
+    "validation/": {"command": "just check", "purpose": "verify validation dependencies and fixtures"},
+    "launch_tuner_tui.sh": {"command": "bash -n launch_tuner_tui.sh", "purpose": "verify launcher syntax"}
+  }
+}

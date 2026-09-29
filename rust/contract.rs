@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
+mod generated {
+    include!(concat!(env!("OUT_DIR"), "/kpi_contract_generated.rs"));
+}
+
 /// Release tiers describe enforceable artifact and evidence requirements.
 /// They make no formal differential-privacy or de-identification claim.
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, Eq, PartialEq)]
@@ -16,8 +20,8 @@ pub enum AnonymizationTier {
 impl AnonymizationTier {
     pub const fn byte_limit(self) -> Option<usize> {
         match self {
-            Self::L3 => Some(10_240),
-            Self::L2 => Some(32_768),
+            Self::L3 => Some(generated::L3_ARTIFACT_LIMIT),
+            Self::L2 => Some(generated::L2_ARTIFACT_LIMIT),
             Self::L1 | Self::L0 => None,
         }
     }
@@ -106,6 +110,7 @@ impl ReleasePolicy {
 #[cfg(test)]
 mod tier_policy_tests {
     use super::*;
+    use crate::production::KpiContract;
 
     #[test]
     fn l3_hard_boundary_and_formal_dp_failure() {
@@ -116,6 +121,21 @@ mod tier_policy_tests {
         assert!(ReleasePolicy::new(AnonymizationTier::L3, Some(10_241), false).is_err());
         assert!(ReleasePolicy::new(AnonymizationTier::L3, Some(512), false).is_ok());
         assert!(ReleasePolicy::new(AnonymizationTier::L3, None, true).is_err());
+    }
+
+    #[test]
+    fn generated_tier_limits_match_the_embedded_v2_contract() {
+        let contract = KpiContract::embedded().unwrap();
+        contract.validate().unwrap();
+        assert_eq!(contract.version, 2);
+        assert_eq!(
+            contract.tier_byte_limits.get("l3").copied(),
+            AnonymizationTier::L3.byte_limit()
+        );
+        assert_eq!(
+            contract.tier_byte_limits.get("l2").copied(),
+            AnonymizationTier::L2.byte_limit()
+        );
     }
 }
 
@@ -171,10 +191,17 @@ pub fn candidate_implementation_hash(id: &str) -> String {
         };
         hasher.update(lineage.as_bytes());
         hasher.update(include_bytes!("compiler.rs"));
+        hasher.update(include_bytes!("compiler/target_fitting.rs"));
+        hasher.update(include_bytes!("compiler/candidate_search.rs"));
+        hasher.update(include_bytes!("compiler/neural_candidates.rs"));
         hasher.update(include_bytes!("codec.rs"));
+        hasher.update(include_bytes!("codec/section_encoding.rs"));
+        hasher.update(include_bytes!("codec/decoding.rs"));
         hasher.update(include_bytes!("model.rs"));
+        hasher.update(include_bytes!("model/generator_validation.rs"));
         hasher.update(include_bytes!("neural.rs"));
         hasher.update(include_bytes!("neural_train.rs"));
+        hasher.update(include_bytes!("neural_train/gpu_diffusion.rs"));
         hasher.update(include_bytes!("../build.rs"));
         hasher.update(include_bytes!("libtorch.rs"));
     }

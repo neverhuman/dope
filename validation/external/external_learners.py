@@ -2,14 +2,28 @@
 
 from __future__ import annotations
 
-import importlib
-import importlib.metadata
 import math
 import warnings
 
 import numpy as np
 
 MAX_FI_HOLDOUT_ROWS = 256
+
+
+def library_version(library: str) -> str:
+    if library == "scikit-learn":
+        import sklearn
+
+        return sklearn.__version__
+    if library == "xgboost":
+        import xgboost
+
+        return xgboost.__version__
+    if library == "lightgbm":
+        import lightgbm
+
+        return lightgbm.__version__
+    raise ValueError("unknown external library")
 
 
 def json_safe(value):
@@ -50,7 +64,7 @@ def make_estimator(model_id: str, task: str, seed: int):
         estimator = cls(n_estimators=64, max_depth=6, n_jobs=1, random_state=seed)
         library = "scikit-learn"
     elif model_id == "xgboost":
-        backend = importlib.import_module("xgboost")
+        import xgboost as backend
         cls = backend.XGBClassifier if task == "binary" else backend.XGBRegressor
         estimator = cls(
             n_estimators=64,
@@ -65,7 +79,7 @@ def make_estimator(model_id: str, task: str, seed: int):
         )
         library = "xgboost"
     elif model_id == "lightgbm":
-        backend = importlib.import_module("lightgbm")
+        import lightgbm as backend
         cls = backend.LGBMClassifier if task == "binary" else backend.LGBMRegressor
         estimator = cls(
             n_estimators=64,
@@ -264,7 +278,7 @@ def evaluate_model(
         "model_id": model_id,
         "estimator": type(real_model.steps[-1][1]).__name__,
         "library": library,
-        "library_version": importlib.metadata.version(library),
+        "library_version": library_version(library),
         "model_config": model_config,
         "fi_holdout_rows": len(fi_rows),
         "metrics": metric,

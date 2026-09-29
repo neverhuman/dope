@@ -148,7 +148,36 @@ fn embed_dataset_cli_writes_canonical_json_and_vector_csv() {
     assert_eq!(embedding["dimension"], 4168);
     assert_eq!(embedding["rows"], 3);
     assert_eq!(embedding["features"], 1);
+    assert_eq!(embedding["metadata_mode"], "public");
+    assert_eq!(
+        embedding["normalization"]["features"][0]["column"],
+        "feature_0"
+    );
+    assert_eq!(
+        embedding["normalization"]["features"][0]["minimum"],
+        serde_json::Value::Null
+    );
+    assert_eq!(embedding["normalization"]["target"]["column"], "target");
+    let public_text = fs::read_to_string(&out).unwrap();
+    assert!(!public_text.contains("outcome"));
+    assert!(!public_text.contains("\"maximum\":30"));
     assert_eq!(fs::read_to_string(&vector).unwrap().lines().count(), 2);
+
+    let restricted_out = root.join("embedding-restricted.json");
+    let restricted = Command::new(binary)
+        .args(base_args)
+        .args(["--out", &text(&restricted_out), "--restricted-metadata"])
+        .output()
+        .unwrap();
+    assert!(restricted.status.success());
+    let restricted: serde_json::Value =
+        serde_json::from_slice(&fs::read(restricted_out).unwrap()).unwrap();
+    assert_eq!(restricted["metadata_mode"], "restricted_research");
+    assert_eq!(
+        restricted["normalization"]["features"][0]["column"],
+        "feature"
+    );
+    assert_eq!(restricted["normalization"]["features"][0]["minimum"], 10.0);
 
     run(
         binary,

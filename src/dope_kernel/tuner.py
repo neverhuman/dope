@@ -640,7 +640,7 @@ def prepare_tuner_example(
                     **_event_candidate_fields(row),
                 },
             )
-        except Exception as exc:  # pragma: no cover - defensive for long unattended runs
+        except (ValueError, RuntimeError, OSError, FloatingPointError) as exc:
             row = _failed_candidate_record(candidate_index, config, exc)
             candidate_assets.append(None)
             feature_vec = np.zeros(_candidate_feature_dim(), dtype=np.float32)
@@ -1301,10 +1301,10 @@ def _smoke_prediction_agreement(
     seed: int,
     real_pred: np.ndarray | None = None,
 ) -> float:
-    dummy = np.zeros(len(X_test), dtype=float)
+    score_probe = np.zeros(len(X_test), dtype=float)
     if real_pred is None:
-        _, real_pred, _ = _smoke_predict_score(X_train, y_train, X_test, dummy, task, seed)
-    _, synth_pred, _ = _smoke_predict_score(X_synth, y_synth, X_test, dummy, task, seed)
+        _, real_pred, _ = _smoke_predict_score(X_train, y_train, X_test, score_probe, task, seed)
+    _, synth_pred, _ = _smoke_predict_score(X_synth, y_synth, X_test, score_probe, task, seed)
     diff = float(np.mean(np.abs(real_pred - synth_pred)))
     return float(np.clip(1.0 - min(1.0, diff / 0.5), 0.0, 1.0))
 
@@ -1830,7 +1830,7 @@ def _load_cached_example(path: Path, cache_key: str) -> TunerExample | None:
         return None
     try:
         payload = torch.load(path, map_location="cpu", weights_only=False)
-    except Exception:
+    except (RuntimeError, OSError, EOFError, ValueError, TypeError):
         return None
     if not isinstance(payload, dict) or payload.get("cache_key") != cache_key:
         return None
@@ -2844,7 +2844,7 @@ def _synthetic_example_from_anchor(anchor: TunerExample, seed: int, synthetic_la
     test_rows = max(2, int(anchor.sample_rows.get("test", 0) or train_rows // 2 or 2))
     try:
         sampled = sample_kernel(anchor.augmentation_kernel, train_rows + test_rows, seed=seed)
-    except Exception:
+    except (RuntimeError, ValueError, TypeError):
         return None
     X = _clean(sampled[:, :-1])
     y = _clean_y(sampled[:, -1], anchor.spec.task)
@@ -2955,7 +2955,7 @@ def _fast_relabel_synthetic_example(
             row["anchor_dataset_id"] = anchor.spec.dataset_id
             row["label_weight"] = FAST_RELABEL_SYNTHETIC_WEIGHT
             feature_vec = _candidate_feature_vector(config, kernel, len(X_train), X_train.shape[1] + 1)
-        except Exception as exc:  # pragma: no cover - defensive for long runs
+        except (RuntimeError, ValueError, OSError, FloatingPointError) as exc:
             row = _failed_candidate_record(candidate_index, config, exc)
             row["label_source"] = "synthetic_fast_relabel"
             row["anchor_dataset_id"] = anchor.spec.dataset_id

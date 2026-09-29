@@ -1,0 +1,36 @@
+name: Scheduled GPU and sealed corpus
+
+on:
+  schedule:
+    - cron: '17 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gpu:
+    runs-on: [self-hosted, linux, x64, gpu]
+    timeout-minutes: 120
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_DEV_DEBUG: line-tables-only
+      LIBTORCH_USE_PYTORCH: '1'
+      CUBLAS_WORKSPACE_CONFIG: ':4096:8'
+      SEALED_CORPUS_DIR: ${{ vars.DOPE_SEALED_CORPUS_DIR }}
+      SEALED_ARTIFACT: ${{ vars.DOPE_SEALED_ARTIFACT }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Repeat training, resources, and sealed corpus certification
+        run: bash ops/ci/gpu.sh
+      - name: Keep GPU evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: gpu-sealed-evidence
+          path: target/sealed-certification.json
+          if-no-files-found: warn

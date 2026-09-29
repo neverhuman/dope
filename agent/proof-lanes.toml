@@ -1,0 +1,25 @@
+[[lane]]
+name = "contract-drift"
+command = "just contract-drift"
+purpose = "verify generated tier constants, v2 digest, and v1 historical fixture"
+command_id = "lane.contract-drift"
+kind = "validation"
+cost = 4
+rules_covered = ["HLT-007-HANDWRITTEN-CONTRACT"]
+required_artifacts = ["target/contract-drift.json"]
+timeout_seconds = 300
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "focus"
+command = "just focus codec::tests"
+purpose = "reuse the lane target for a narrow Rust proof before the full CPU gate"
+command_id = "lane.focus"
+kind = "validation"
+cost = 2
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 300
+requires_network = false
+destructive = false
