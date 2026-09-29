@@ -16,6 +16,7 @@
     "tools/": "governance",
     "scripts/": "governance",
     "docs/": "governance",
+    "schemas/": "governance",
     "contracts/": "rust-core",
     "Cargo.toml": "rust-core",
     "Cargo.lock": "rust-core",

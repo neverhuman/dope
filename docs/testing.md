@@ -63,7 +63,10 @@ campaign matrices merely to repair a local source or fixture failure.
 
 ## Local repair
 
-Command errors include a typed repair hint and a local documentation path.
+Command errors print a JSON `repair_receipt` with `purpose`, `reason`,
+`common_fixes`, `docs_url`, and `repair_hint`. The fields describe a repair
+without copying the input value into the receipt; the error line supplies the
+row and column when input validation fails.
 For data failures, use the reported row and column to fix numeric input;
 avoid copying a source field into an issue or report. For an artifact failure,
 compare its recorded digest and regenerate it from the same source commit.

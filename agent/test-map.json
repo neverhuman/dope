@@ -16,6 +16,7 @@
     "tools/": {"command": "bash tools/security-lane.sh", "purpose": "verify canonical security wrapper"},
     "scripts/": {"command": "bash scripts/ci-doctor.sh", "purpose": "verify local CI entry points"},
     "docs/": {"command": "just score", "purpose": "verify release and repair guidance"},
+    "schemas/": {"command": "just score", "purpose": "verify receipt schemas against the emitted audit report"},
     "contracts/": {"command": "cargo test --locked production::tests::embedded_contract_is_canonical_and_bound", "purpose": "verify generated tier constants and embedded digest"},
     "rust/": {"command": "just check", "purpose": "run Rust unit, CLI, and Clippy checks"},
     "Cargo.toml": {"command": "just check", "purpose": "verify locked Rust graph"},

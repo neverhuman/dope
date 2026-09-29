@@ -25,7 +25,7 @@ pub enum DopeError {
 
 pub type Result<T> = std::result::Result<T, DopeError>;
 
-/// Stable, source-data-free guidance that accompanies a command failure.
+/// Stable, source-data-free JSON diagnostics that accompany a command failure.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 pub struct RepairHint {
     pub purpose: &'static str,

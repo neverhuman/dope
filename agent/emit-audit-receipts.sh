@@ -7,7 +7,47 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
+
+
+def validate_receipt(value: object, schema: dict, location: str = "receipt") -> None:
+    expected = schema.get("type")
+    types = {"object": dict, "array": list, "string": str, "integer": int, "boolean": bool, "null": type(None)}
+    if expected is not None:
+        allowed = expected if isinstance(expected, list) else [expected]
+        if not any(type(value) is types[kind] for kind in allowed):
+            raise ValueError(f"{location}: invalid schema type")
+    if "const" in schema and value != schema["const"]:
+        raise ValueError(f"{location}: invalid schema constant")
+    if "enum" in schema and value not in schema["enum"]:
+        raise ValueError(f"{location}: invalid schema value")
+    if isinstance(value, str):
+        if len(value) < schema.get("minLength", 0) or (
+            "pattern" in schema and re.search(schema["pattern"], value) is None
+        ):
+            raise ValueError(f"{location}: invalid schema string")
+    if type(value) is int and (
+        value < schema.get("minimum", float("-inf"))
+        or value > schema.get("maximum", float("inf"))
+    ):
+        raise ValueError(f"{location}: invalid schema integer")
+    if isinstance(value, dict):
+        required = set(schema.get("required", []))
+        if not required.issubset(value):
+            raise ValueError(f"{location}: missing required schema field")
+        properties = schema.get("properties", {})
+        if schema.get("additionalProperties") is False and not set(value).issubset(properties):
+            raise ValueError(f"{location}: unexpected schema field")
+        for key, child in value.items():
+            if key in properties:
+                validate_receipt(child, properties[key], f"{location}.{key}")
+    if isinstance(value, list):
+        if len(value) < schema.get("minItems", 0) or len(value) > schema.get("maxItems", float("inf")):
+            raise ValueError(f"{location}: invalid schema item count")
+        if "items" in schema:
+            for index, child in enumerate(value):
+                validate_receipt(child, schema["items"], f"{location}[{index}]")
 
 
 def main() -> None:
@@ -136,6 +176,8 @@ def main() -> None:
         "dispositions": dispositions,
     }
     for name, value in (("repair-queue.json", queue), ("report-attestation.json", attestation), ("repair-log.json", repair_log)):
+        schema_path = Path("schemas") / name.replace(".json", ".schema.json")
+        validate_receipt(value, json.loads(schema_path.read_text()), name)
         (destination / name).write_text(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n")
 
 
