@@ -2176,6 +2176,11 @@ fn compressed_kernel(kernel: &Kernel, fraction: f64, maximum_knots: usize) -> Ke
             sparsify_output_channels(&mut denoiser.hidden_2, fraction);
             sparsify_output_channels(&mut denoiser.hidden_3, fraction);
         }
+        JointNetwork::TabDdpm { denoiser, .. } => {
+            sparsify_output_channels(&mut denoiser.hidden_1, fraction);
+            sparsify_output_channels(&mut denoiser.hidden_2, fraction);
+            sparsify_output_channels(&mut denoiser.hidden_3, fraction);
+        }
     }
     let mut hasher = blake3::Hasher::new();
     hasher.update(b"joint-router-compression-v1");

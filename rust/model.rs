@@ -272,6 +272,44 @@ pub enum NeuralArchitecture {
     Tvae,
     MaskedAutoregressiveTransformer,
     TabSyn,
+    TabDdpm,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NeuralProfile {
+    #[default]
+    Full,
+    MicroTvae4,
+    MicroTvae8,
+    MicroTvae12,
+    TinyMat16,
+    TinyMat24,
+}
+
+impl NeuralProfile {
+    pub fn tvae_dimensions(self) -> Option<(usize, usize)> {
+        match self {
+            Self::Full => Some((NEURAL_LATENT_WIDTH, NEURAL_HIDDEN_WIDTH)),
+            Self::MicroTvae4 => Some((4, 16)),
+            Self::MicroTvae8 => Some((8, 24)),
+            Self::MicroTvae12 => Some((12, 32)),
+            Self::TinyMat16 | Self::TinyMat24 => None,
+        }
+    }
+
+    pub fn transformer_dimensions(self) -> Option<(usize, usize, usize)> {
+        match self {
+            Self::Full => Some((TRANSFORMER_WIDTH, TRANSFORMER_HEADS, TRANSFORMER_FF_WIDTH)),
+            Self::TinyMat16 => Some((16, 2, 32)),
+            Self::TinyMat24 => Some((24, 3, 48)),
+            _ => None,
+        }
+    }
+
+    pub fn is_full(&self) -> bool {
+        *self == Self::Full
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -332,18 +370,23 @@ pub struct JointDecoder {
 }
 
 impl JointDecoder {
-    fn validate(&self, tokens: usize) -> std::result::Result<(), String> {
+    fn validate(
+        &self,
+        tokens: usize,
+        latent: usize,
+        hidden: usize,
+    ) -> std::result::Result<(), String> {
         self.hidden_1.validate()?;
         self.hidden_2.validate()?;
         self.value_head.validate()?;
         self.missing_head.validate()?;
-        if self.hidden_1.input_dim as usize != NEURAL_LATENT_WIDTH
-            || self.hidden_1.output_dim as usize != NEURAL_HIDDEN_WIDTH
-            || self.hidden_2.input_dim as usize != NEURAL_HIDDEN_WIDTH
-            || self.hidden_2.output_dim as usize != NEURAL_HIDDEN_WIDTH
-            || self.value_head.input_dim as usize != NEURAL_HIDDEN_WIDTH
+        if self.hidden_1.input_dim as usize != latent
+            || self.hidden_1.output_dim as usize != hidden
+            || self.hidden_2.input_dim as usize != hidden
+            || self.hidden_2.output_dim as usize != hidden
+            || self.value_head.input_dim as usize != hidden
             || self.value_head.output_dim as usize != tokens * 2
-            || self.missing_head.input_dim as usize != NEURAL_HIDDEN_WIDTH
+            || self.missing_head.input_dim as usize != hidden
             || self.missing_head.output_dim as usize != tokens
             || !self.variance_floor.is_finite()
             || !(1e-4..=0.5).contains(&self.variance_floor)
@@ -367,7 +410,7 @@ pub struct TransformerBlock {
 }
 
 impl TransformerBlock {
-    fn validate(&self) -> std::result::Result<(), String> {
+    fn validate(&self, width: usize, ff_width: usize) -> std::result::Result<(), String> {
         for linear in [
             &self.query,
             &self.key,
@@ -380,16 +423,13 @@ impl TransformerBlock {
         }
         if [&self.query, &self.key, &self.value, &self.attention_output]
             .iter()
-            .any(|linear| {
-                linear.input_dim as usize != TRANSFORMER_WIDTH
-                    || linear.output_dim as usize != TRANSFORMER_WIDTH
-            })
-            || self.feed_forward_1.input_dim as usize != TRANSFORMER_WIDTH
-            || self.feed_forward_1.output_dim as usize != TRANSFORMER_FF_WIDTH
-            || self.feed_forward_2.input_dim as usize != TRANSFORMER_FF_WIDTH
-            || self.feed_forward_2.output_dim as usize != TRANSFORMER_WIDTH
-            || !self.attention_norm.validate(TRANSFORMER_WIDTH)
-            || !self.feed_forward_norm.validate(TRANSFORMER_WIDTH)
+            .any(|linear| linear.input_dim as usize != width || linear.output_dim as usize != width)
+            || self.feed_forward_1.input_dim as usize != width
+            || self.feed_forward_1.output_dim as usize != ff_width
+            || self.feed_forward_2.input_dim as usize != ff_width
+            || self.feed_forward_2.output_dim as usize != width
+            || !self.attention_norm.validate(width)
+            || !self.feed_forward_norm.validate(width)
         {
             return Err("transformer block violates the frozen architecture".into());
         }
@@ -408,24 +448,29 @@ pub struct AutoregressiveTransformer {
 }
 
 impl AutoregressiveTransformer {
-    fn validate(&self, tokens: usize) -> std::result::Result<(), String> {
+    fn validate(
+        &self,
+        tokens: usize,
+        width: usize,
+        ff_width: usize,
+    ) -> std::result::Result<(), String> {
         self.input_projection.validate()?;
         self.value_head.validate()?;
         self.missing_head.validate()?;
         for block in &self.blocks {
-            block.validate()?;
+            block.validate(width, ff_width)?;
         }
         if self.input_projection.input_dim != 2
-            || self.input_projection.output_dim as usize != TRANSFORMER_WIDTH
-            || self.positional_embeddings.len() != tokens * TRANSFORMER_WIDTH
+            || self.input_projection.output_dim as usize != width
+            || self.positional_embeddings.len() != tokens * width
             || self
                 .positional_embeddings
                 .iter()
                 .any(|value| !value.is_finite())
             || self.blocks.len() != 2
-            || self.value_head.input_dim as usize != TRANSFORMER_WIDTH
+            || self.value_head.input_dim as usize != width
             || self.value_head.output_dim != 2
-            || self.missing_head.input_dim as usize != TRANSFORMER_WIDTH
+            || self.missing_head.input_dim as usize != width
             || self.missing_head.output_dim != 1
         {
             return Err("autoregressive transformer violates the frozen architecture".into());
@@ -444,17 +489,21 @@ pub struct LatentDenoiser {
 
 impl LatentDenoiser {
     fn validate(&self) -> std::result::Result<(), String> {
+        self.validate_dimensions(NEURAL_LATENT_WIDTH * 2, NEURAL_LATENT_WIDTH)
+    }
+
+    fn validate_dimensions(&self, input: usize, output: usize) -> std::result::Result<(), String> {
         for layer in [&self.hidden_1, &self.hidden_2, &self.hidden_3, &self.output] {
             layer.validate()?;
         }
-        if self.hidden_1.input_dim as usize != NEURAL_LATENT_WIDTH * 2
+        if self.hidden_1.input_dim as usize != input
             || self.hidden_1.output_dim as usize != NEURAL_HIDDEN_WIDTH
             || self.hidden_2.input_dim as usize != NEURAL_HIDDEN_WIDTH
             || self.hidden_2.output_dim as usize != NEURAL_HIDDEN_WIDTH
             || self.hidden_3.input_dim as usize != NEURAL_HIDDEN_WIDTH
             || self.hidden_3.output_dim as usize != NEURAL_HIDDEN_WIDTH
             || self.output.input_dim as usize != NEURAL_HIDDEN_WIDTH
-            || self.output.output_dim as usize != NEURAL_LATENT_WIDTH
+            || self.output.output_dim as usize != output
         {
             return Err("latent denoiser violates the frozen architecture".into());
         }
@@ -477,6 +526,11 @@ pub enum JointNetwork {
         alpha_cumprod: Vec<f32>,
         inference_timesteps: Vec<u8>,
     },
+    TabDdpm {
+        denoiser: Box<LatentDenoiser>,
+        alpha_cumprod: Vec<f32>,
+        inference_timesteps: Vec<u8>,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -490,6 +544,8 @@ pub struct RankNormalization {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct JointGenerator {
     pub architecture: NeuralArchitecture,
+    #[serde(default, skip_serializing_if = "NeuralProfile::is_full")]
+    pub profile: NeuralProfile,
     /// Feature positions in generation order. The target is implicit and last.
     pub feature_permutation: Vec<u32>,
     pub target_marginal: Marginal,
@@ -528,11 +584,23 @@ impl JointGenerator {
             return Err("invalid neural normalization or provenance".into());
         }
         match (&self.architecture, &self.network) {
-            (NeuralArchitecture::Tvae, JointNetwork::Tvae { decoder }) => decoder.validate(tokens),
+            (NeuralArchitecture::Tvae, JointNetwork::Tvae { decoder }) => {
+                let (latent, hidden) = self
+                    .profile
+                    .tvae_dimensions()
+                    .ok_or("TVAE profile is incompatible with its architecture")?;
+                decoder.validate(tokens, latent, hidden)
+            }
             (
                 NeuralArchitecture::MaskedAutoregressiveTransformer,
                 JointNetwork::MaskedAutoregressiveTransformer { transformer },
-            ) => transformer.validate(tokens),
+            ) => {
+                let (width, _, ff_width) = self
+                    .profile
+                    .transformer_dimensions()
+                    .ok_or("transformer profile is incompatible with its architecture")?;
+                transformer.validate(tokens, width, ff_width)
+            }
             (
                 NeuralArchitecture::TabSyn,
                 JointNetwork::TabSyn {
@@ -542,7 +610,10 @@ impl JointGenerator {
                     inference_timesteps,
                 },
             ) => {
-                decoder.validate(tokens)?;
+                if self.profile != NeuralProfile::Full {
+                    return Err("TabSyn uses the full profile".into());
+                }
+                decoder.validate(tokens, NEURAL_LATENT_WIDTH, NEURAL_HIDDEN_WIDTH)?;
                 denoiser.validate()?;
                 if alpha_cumprod.len() != DIFFUSION_TRAIN_STEPS
                     || alpha_cumprod
@@ -559,9 +630,43 @@ impl JointGenerator {
                 }
                 Ok(())
             }
+            (
+                NeuralArchitecture::TabDdpm,
+                JointNetwork::TabDdpm {
+                    denoiser,
+                    alpha_cumprod,
+                    inference_timesteps,
+                },
+            ) => {
+                if self.profile != NeuralProfile::Full {
+                    return Err("TabDDPM uses the full profile".into());
+                }
+                denoiser.validate_dimensions(tokens + NEURAL_LATENT_WIDTH, tokens)?;
+                validate_diffusion_schedule(alpha_cumprod, inference_timesteps)
+            }
             _ => Err("neural architecture tag and tensor payload disagree".into()),
         }
     }
+}
+
+fn validate_diffusion_schedule(
+    alpha_cumprod: &[f32],
+    inference_timesteps: &[u8],
+) -> std::result::Result<(), String> {
+    if alpha_cumprod.len() != DIFFUSION_TRAIN_STEPS
+        || alpha_cumprod
+            .iter()
+            .any(|value| !value.is_finite() || !(0.0..=1.0).contains(value))
+        || !alpha_cumprod.windows(2).all(|pair| pair[0] >= pair[1])
+        || inference_timesteps.len() != DIFFUSION_INFERENCE_STEPS
+        || !inference_timesteps.windows(2).all(|pair| pair[0] > pair[1])
+        || inference_timesteps
+            .first()
+            .is_none_or(|step| usize::from(*step) >= DIFFUSION_TRAIN_STEPS)
+    {
+        return Err("invalid diffusion schedule".into());
+    }
+    Ok(())
 }
 
 fn valid_hash(value: &str) -> bool {

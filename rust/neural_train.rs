@@ -1,7 +1,9 @@
 use std::time::Instant;
 
 use crate::error::{DopeError, Result};
-use crate::model::{JointGenerator, Marginal, NeuralArchitecture, RankNormalization};
+use crate::model::{
+    JointGenerator, Marginal, NeuralArchitecture, NeuralProfile, RankNormalization,
+};
 
 #[derive(Clone, Debug)]
 pub struct NeuralTrainingData {
@@ -21,6 +23,7 @@ pub struct NeuralTrainingData {
 #[derive(Clone, Copy, Debug)]
 pub struct NeuralTrainingConfig {
     pub architecture: NeuralArchitecture,
+    pub profile: NeuralProfile,
     pub target_weight: f64,
     pub structural_penalty: f64,
     pub seed: u64,
@@ -54,8 +57,7 @@ mod gpu {
     use crate::model::{
         AutoregressiveTransformer, DIFFUSION_INFERENCE_STEPS, DIFFUSION_TRAIN_STEPS, JointDecoder,
         JointNetwork, LatentDenoiser, LayerNormParameters, NEURAL_HIDDEN_WIDTH,
-        NEURAL_LATENT_WIDTH, TRANSFORMER_FF_WIDTH, TRANSFORMER_HEADS, TRANSFORMER_WIDTH,
-        TransformerBlock,
+        NEURAL_LATENT_WIDTH, TRANSFORMER_HEADS, TRANSFORMER_WIDTH, TransformerBlock,
     };
     use crate::neural::quantize_linear;
 
@@ -72,7 +74,7 @@ mod gpu {
             _ => TRAIN_ROW_BATCH as u128,
         });
         let activations = match architecture {
-            NeuralArchitecture::Tvae | NeuralArchitecture::TabSyn => {
+            NeuralArchitecture::Tvae | NeuralArchitecture::TabSyn | NeuralArchitecture::TabDdpm => {
                 batch_rows
                     * (tokens * 5
                         + NEURAL_HIDDEN_WIDTH as u128 * 12
@@ -281,29 +283,34 @@ mod gpu {
         )
     }
 
-    fn build_decoder(path: &nn::Path<'_>, tokens: usize) -> DecoderLayers {
+    fn build_decoder(
+        path: &nn::Path<'_>,
+        tokens: usize,
+        latent_width: usize,
+        hidden_width: usize,
+    ) -> DecoderLayers {
         DecoderLayers {
             hidden_1: nn::linear(
                 path / "hidden_1",
-                NEURAL_LATENT_WIDTH as i64,
-                NEURAL_HIDDEN_WIDTH as i64,
+                latent_width as i64,
+                hidden_width as i64,
                 Default::default(),
             ),
             hidden_2: nn::linear(
                 path / "hidden_2",
-                NEURAL_HIDDEN_WIDTH as i64,
-                NEURAL_HIDDEN_WIDTH as i64,
+                hidden_width as i64,
+                hidden_width as i64,
                 Default::default(),
             ),
             value_head: nn::linear(
                 path / "value_head",
-                NEURAL_HIDDEN_WIDTH as i64,
+                hidden_width as i64,
                 (tokens * 2) as i64,
                 Default::default(),
             ),
             missing_head: nn::linear(
                 path / "missing_head",
-                NEURAL_HIDDEN_WIDTH as i64,
+                hidden_width as i64,
                 tokens as i64,
                 Default::default(),
             ),
@@ -478,6 +485,9 @@ mod gpu {
     )> {
         let device = Device::Cuda(0);
         let tokens = data.features + 1;
+        let (latent_width, hidden_width) = config.profile.tvae_dimensions().ok_or_else(|| {
+            DopeError::Data("TVAE profile is incompatible with autoencoder training".into())
+        })?;
         let binary_target_probability = match &data.target_marginal {
             Marginal::Bernoulli { probability } => Some(f64::from(*probability)),
             _ => None,
@@ -489,28 +499,28 @@ mod gpu {
         let encoder_1 = nn::linear(
             &root / "encoder_1",
             (tokens * 2) as i64,
-            NEURAL_HIDDEN_WIDTH as i64,
+            hidden_width as i64,
             Default::default(),
         );
         let encoder_2 = nn::linear(
             &root / "encoder_2",
-            NEURAL_HIDDEN_WIDTH as i64,
-            NEURAL_HIDDEN_WIDTH as i64,
+            hidden_width as i64,
+            hidden_width as i64,
             Default::default(),
         );
         let latent_location = nn::linear(
             &root / "latent_location",
-            NEURAL_HIDDEN_WIDTH as i64,
-            NEURAL_LATENT_WIDTH as i64,
+            hidden_width as i64,
+            latent_width as i64,
             Default::default(),
         );
         let latent_log_variance = nn::linear(
             &root / "latent_log_variance",
-            NEURAL_HIDDEN_WIDTH as i64,
-            NEURAL_LATENT_WIDTH as i64,
+            hidden_width as i64,
+            latent_width as i64,
             Default::default(),
         );
-        let decoder = build_decoder(&(&root / "decoder"), tokens);
+        let decoder = build_decoder(&(&root / "decoder"), tokens, latent_width, hidden_width);
         let mut optimizer = nn::AdamW::default()
             .build(&store, 2e-3)
             .map_err(|error| DopeError::Data(format!("joint AdamW optimizer: {error}")))?;
@@ -659,12 +669,11 @@ mod gpu {
         linear(&denoiser.output, &hidden, qat)
     }
 
-    fn train_tabsyn(
+    fn train_diffusion(
         data: &NeuralTrainingData,
         config: NeuralTrainingConfig,
+        direct_ranks: bool,
     ) -> Result<JointNetwork> {
-        let (autoencoder_store, encoder_1, encoder_2, latent_location, _, decoder) =
-            train_autoencoder(data, config, false, 1_000)?;
         let device = Device::Cuda(0);
         let tokens = data.features + 1;
         let ranks = Tensor::from_slice(&data.ranks)
@@ -673,15 +682,31 @@ mod gpu {
         let missing = Tensor::from_slice(&data.missing)
             .view([data.rows as i64, tokens as i64])
             .to_device(device);
-        let input = Tensor::cat(&[ranks, missing], 1);
-        let latent = transform_row_batches(&input, |batch| {
-            latent_location.forward(
-                &encoder_2
-                    .forward(&encoder_1.forward(batch).gelu("tanh"))
-                    .gelu("tanh"),
-            )
-        })
-        .detach();
+        let autoencoder = if direct_ranks {
+            None
+        } else {
+            Some(train_autoencoder(data, config, false, 1_000)?)
+        };
+        let latent = if let Some((_, encoder_1, encoder_2, latent_location, _, _)) = &autoencoder {
+            let input = Tensor::cat(&[ranks, missing], 1);
+            transform_row_batches(&input, |batch| {
+                latent_location.forward(
+                    &encoder_2
+                        .forward(&encoder_1.forward(batch).gelu("tanh"))
+                        .gelu("tanh"),
+                )
+            })
+            .detach()
+        } else {
+            // TabDDPM learns the Gaussian rank vector itself. No autoencoder or
+            // decoder participates in this training or Rust inference path.
+            ranks.detach()
+        };
+        let latent_width = if direct_ranks {
+            tokens
+        } else {
+            NEURAL_LATENT_WIDTH
+        };
         let (train_indices, validation_indices) = split_indices(data);
         let validation_indices_tensor = Tensor::from_slice(&validation_indices).to_device(device);
         let validation_latent = latent.index_select(0, &validation_indices_tensor);
@@ -692,7 +717,7 @@ mod gpu {
         let denoiser = DenoiserLayers {
             hidden_1: nn::linear(
                 &root / "hidden_1",
-                (NEURAL_LATENT_WIDTH * 2) as i64,
+                (latent_width + NEURAL_LATENT_WIDTH) as i64,
                 NEURAL_HIDDEN_WIDTH as i64,
                 Default::default(),
             ),
@@ -711,13 +736,13 @@ mod gpu {
             output: nn::linear(
                 &root / "output",
                 NEURAL_HIDDEN_WIDTH as i64,
-                NEURAL_LATENT_WIDTH as i64,
+                latent_width as i64,
                 Default::default(),
             ),
         };
         let mut optimizer = nn::AdamW::default()
             .build(&store, 2e-3)
-            .map_err(|error| DopeError::Data(format!("TabSyn AdamW optimizer: {error}")))?;
+            .map_err(|error| DopeError::Data(format!("diffusion AdamW optimizer: {error}")))?;
         let mut best = f64::INFINITY;
         let mut best_checkpoint = None;
         let mut stale = 0usize;
@@ -789,70 +814,69 @@ mod gpu {
         if let Some(checkpoint) = best_checkpoint {
             restore(&mut store, checkpoint)?;
         }
-        drop(autoencoder_store);
-        Ok(JointNetwork::TabSyn {
-            decoder: Box::new(export_decoder(&decoder)?),
-            denoiser: Box::new(LatentDenoiser {
-                hidden_1: export_linear(&denoiser.hidden_1, "TabSyn denoiser hidden 1")?,
-                hidden_2: export_linear(&denoiser.hidden_2, "TabSyn denoiser hidden 2")?,
-                hidden_3: export_linear(&denoiser.hidden_3, "TabSyn denoiser hidden 3")?,
-                output: export_linear(&denoiser.output, "TabSyn denoiser output")?,
-            }),
-            alpha_cumprod: schedule,
-            inference_timesteps: inference_timesteps(),
-        })
+        let exported = Box::new(LatentDenoiser {
+            hidden_1: export_linear(&denoiser.hidden_1, "diffusion denoiser hidden 1")?,
+            hidden_2: export_linear(&denoiser.hidden_2, "diffusion denoiser hidden 2")?,
+            hidden_3: export_linear(&denoiser.hidden_3, "diffusion denoiser hidden 3")?,
+            output: export_linear(&denoiser.output, "diffusion denoiser output")?,
+        });
+        if direct_ranks {
+            Ok(JointNetwork::TabDdpm {
+                denoiser: exported,
+                alpha_cumprod: schedule,
+                inference_timesteps: inference_timesteps(),
+            })
+        } else {
+            let (_, _, _, _, _, decoder) = autoencoder.expect("latent diffusion autoencoder");
+            Ok(JointNetwork::TabSyn {
+                decoder: Box::new(export_decoder(&decoder)?),
+                denoiser: exported,
+                alpha_cumprod: schedule,
+                inference_timesteps: inference_timesteps(),
+            })
+        }
     }
 
-    fn build_transformer(path: &nn::Path<'_>, tokens: usize) -> TransformerLayers {
+    fn build_transformer(
+        path: &nn::Path<'_>,
+        tokens: usize,
+        width: usize,
+        ff_width: usize,
+    ) -> TransformerLayers {
         let linear_width = || nn::LinearConfig::default();
         let blocks = (0..2)
             .map(|index| {
                 let block = path / format!("block_{index}");
                 TransformerTrainingBlock {
-                    query: nn::linear(
-                        &block / "query",
-                        TRANSFORMER_WIDTH as i64,
-                        TRANSFORMER_WIDTH as i64,
-                        linear_width(),
-                    ),
-                    key: nn::linear(
-                        &block / "key",
-                        TRANSFORMER_WIDTH as i64,
-                        TRANSFORMER_WIDTH as i64,
-                        linear_width(),
-                    ),
-                    value: nn::linear(
-                        &block / "value",
-                        TRANSFORMER_WIDTH as i64,
-                        TRANSFORMER_WIDTH as i64,
-                        linear_width(),
-                    ),
+                    query: nn::linear(&block / "query", width as i64, width as i64, linear_width()),
+                    key: nn::linear(&block / "key", width as i64, width as i64, linear_width()),
+                    value: nn::linear(&block / "value", width as i64, width as i64, linear_width()),
                     attention_output: nn::linear(
                         &block / "attention_output",
-                        TRANSFORMER_WIDTH as i64,
-                        TRANSFORMER_WIDTH as i64,
+                        width as i64,
+                        width as i64,
                         linear_width(),
                     ),
                     attention_norm: nn::layer_norm(
                         &block / "attention_norm",
-                        vec![TRANSFORMER_WIDTH as i64],
+                        vec![width as i64],
                         Default::default(),
                     ),
                     feed_forward_1: nn::linear(
                         &block / "feed_forward_1",
-                        TRANSFORMER_WIDTH as i64,
-                        TRANSFORMER_FF_WIDTH as i64,
+                        width as i64,
+                        ff_width as i64,
                         linear_width(),
                     ),
                     feed_forward_2: nn::linear(
                         &block / "feed_forward_2",
-                        TRANSFORMER_FF_WIDTH as i64,
-                        TRANSFORMER_WIDTH as i64,
+                        ff_width as i64,
+                        width as i64,
                         linear_width(),
                     ),
                     feed_forward_norm: nn::layer_norm(
                         &block / "feed_forward_norm",
-                        vec![TRANSFORMER_WIDTH as i64],
+                        vec![width as i64],
                         Default::default(),
                     ),
                 }
@@ -862,30 +886,20 @@ mod gpu {
             input_projection: nn::linear(
                 path / "input_projection",
                 2,
-                TRANSFORMER_WIDTH as i64,
+                width as i64,
                 Default::default(),
             ),
             positional_embeddings: path.var(
                 "positional_embeddings",
-                &[tokens as i64, TRANSFORMER_WIDTH as i64],
+                &[tokens as i64, width as i64],
                 nn::Init::Randn {
                     mean: 0.0,
                     stdev: 0.02,
                 },
             ),
             blocks,
-            value_head: nn::linear(
-                path / "value_head",
-                TRANSFORMER_WIDTH as i64,
-                2,
-                Default::default(),
-            ),
-            missing_head: nn::linear(
-                path / "missing_head",
-                TRANSFORMER_WIDTH as i64,
-                1,
-                Default::default(),
-            ),
+            value_head: nn::linear(path / "value_head", width as i64, 2, Default::default()),
+            missing_head: nn::linear(path / "missing_head", width as i64, 1, Default::default()),
         }
     }
 
@@ -893,18 +907,20 @@ mod gpu {
         transformer: &TransformerLayers,
         input: &Tensor,
         qat: bool,
+        width: usize,
+        heads: usize,
     ) -> (Tensor, Tensor) {
         let sizes = input.size();
         let rows = sizes[0];
         let tokens = sizes[1];
         let mut state = linear(&transformer.input_projection, input, qat)
             + transformer.positional_embeddings.unsqueeze(0);
-        let head_width = (TRANSFORMER_WIDTH / TRANSFORMER_HEADS) as i64;
+        let head_width = (width / heads) as i64;
         let mask = Tensor::ones([tokens, tokens], (Kind::Float, input.device())).triu(1) * -1e9;
         for block in &transformer.blocks {
             let reshape = |value: Tensor| {
                 value
-                    .view([rows, tokens, TRANSFORMER_HEADS as i64, head_width])
+                    .view([rows, tokens, heads as i64, head_width])
                     .transpose(1, 2)
             };
             let query = reshape(linear(&block.query, &state, qat));
@@ -916,7 +932,7 @@ mod gpu {
                 .matmul(&value)
                 .transpose(1, 2)
                 .contiguous()
-                .view([rows, tokens, TRANSFORMER_WIDTH as i64]);
+                .view([rows, tokens, width as i64]);
             state = block
                 .attention_norm
                 .forward(&(state + linear(&block.attention_output, &attention, qat)));
@@ -939,6 +955,10 @@ mod gpu {
     ) -> Result<JointNetwork> {
         let device = Device::Cuda(0);
         let tokens = data.features + 1;
+        let (width, heads, ff_width) =
+            config.profile.transformer_dimensions().ok_or_else(|| {
+                DopeError::Data("transformer profile is incompatible with training".into())
+            })?;
         let binary_target_probability = match &data.target_marginal {
             Marginal::Bernoulli { probability } => Some(f64::from(*probability)),
             _ => None,
@@ -953,7 +973,7 @@ mod gpu {
         let shifted_missing = Tensor::cat(&[zeros, missing.narrow(1, 0, tokens as i64 - 1)], 1);
         let input = Tensor::stack(&[shifted_rank, shifted_missing], 2);
         let mut store = nn::VarStore::new(device);
-        let transformer = build_transformer(&store.root(), tokens);
+        let transformer = build_transformer(&store.root(), tokens, width, ff_width);
         let mut optimizer = nn::AdamW::default()
             .build(&store, 2e-3)
             .map_err(|error| DopeError::Data(format!("transformer AdamW optimizer: {error}")))?;
@@ -976,8 +996,13 @@ mod gpu {
             }
             let qat = step >= 1_600;
             let batch_indices = row_batches.next(device);
-            let (parameters, logits) =
-                transformer_forward(&transformer, &input.index_select(0, &batch_indices), qat);
+            let (parameters, logits) = transformer_forward(
+                &transformer,
+                &input.index_select(0, &batch_indices),
+                qat,
+                width,
+                heads,
+            );
             let loss = reconstruction_loss(
                 parameters,
                 logits,
@@ -997,6 +1022,8 @@ mod gpu {
                         &transformer,
                         &input.index_select(0, &validation_indices),
                         qat,
+                        width,
+                        heads,
                     );
                     validation_sum += reconstruction_loss(
                         parameters,
@@ -1092,6 +1119,19 @@ mod gpu {
                 "invalid joint neural training matrix".into(),
             ));
         }
+        if match config.architecture {
+            NeuralArchitecture::Tvae => config.profile.tvae_dimensions().is_none(),
+            NeuralArchitecture::MaskedAutoregressiveTransformer => {
+                config.profile.transformer_dimensions().is_none()
+            }
+            NeuralArchitecture::TabSyn | NeuralArchitecture::TabDdpm => {
+                config.profile != NeuralProfile::Full
+            }
+        } {
+            return Err(DopeError::Data(
+                "neural profile is incompatible with its architecture".into(),
+            ));
+        }
         if estimated_gpu_bytes(data, config.architecture) > GPU_MEMORY_LIMIT_BYTES {
             return Err(DopeError::Data(
                 "GPU OOM: estimated neural training footprint exceeds the frozen 16 GiB limit"
@@ -1115,14 +1155,26 @@ mod gpu {
                 NeuralArchitecture::MaskedAutoregressiveTransformer => {
                     train_transformer(data, config)
                 }
-                NeuralArchitecture::TabSyn => train_tabsyn(data, config),
+                NeuralArchitecture::TabSyn => train_diffusion(data, config, false),
+                NeuralArchitecture::TabDdpm => train_diffusion(data, config, true),
             })?;
-        let candidate_id = match config.architecture {
-            NeuralArchitecture::Tvae => "tvae",
-            NeuralArchitecture::MaskedAutoregressiveTransformer => {
+        let candidate_id = match (config.architecture, config.profile) {
+            (NeuralArchitecture::Tvae, NeuralProfile::Full) => "tvae",
+            (NeuralArchitecture::Tvae, NeuralProfile::MicroTvae4) => "micro_tvae_4_16",
+            (NeuralArchitecture::Tvae, NeuralProfile::MicroTvae8) => "micro_tvae_8_24",
+            (NeuralArchitecture::Tvae, NeuralProfile::MicroTvae12) => "micro_tvae_12_32",
+            (NeuralArchitecture::MaskedAutoregressiveTransformer, NeuralProfile::Full) => {
                 "single_table_autoregressive_transformer"
             }
-            NeuralArchitecture::TabSyn => "tabsyn",
+            (NeuralArchitecture::MaskedAutoregressiveTransformer, NeuralProfile::TinyMat16) => {
+                "tiny_mat_16_2_32"
+            }
+            (NeuralArchitecture::MaskedAutoregressiveTransformer, NeuralProfile::TinyMat24) => {
+                "tiny_mat_24_3_48"
+            }
+            (NeuralArchitecture::TabSyn, NeuralProfile::Full) => "tabsyn",
+            (NeuralArchitecture::TabDdpm, NeuralProfile::Full) => "tabddpm_direct_rank",
+            _ => unreachable!("validated neural profile"),
         };
         let mut training_hasher = blake3::Hasher::new();
         training_hasher.update(b"joint-training-run-v1");
@@ -1133,6 +1185,7 @@ mod gpu {
         training_hasher.update(&config.structural_penalty.to_bits().to_le_bytes());
         let generator = JointGenerator {
             architecture: config.architecture,
+            profile: config.profile,
             feature_permutation: data.feature_permutation.clone(),
             target_marginal: data.target_marginal.clone(),
             normalization: data.normalization.clone(),
@@ -1152,7 +1205,11 @@ mod gpu {
 #[cfg(all(test, feature = "gpu-training"))]
 mod tests {
     use super::*;
-    use crate::model::{Marginal, QuantizedLinear, RankNormalization};
+    use crate::codec::encode_kernel;
+    use crate::model::{
+        ColumnSchema, Kernel, KernelProgram, Marginal, QuantizedLinear, RankNormalization,
+        SchemaKind, Task, Transform,
+    };
     use std::time::Duration;
     use tch::{Device, Tensor};
 
@@ -1197,6 +1254,7 @@ mod tests {
                 &data,
                 NeuralTrainingConfig {
                     architecture: NeuralArchitecture::Tvae,
+                    profile: NeuralProfile::Full,
                     target_weight: 2.0,
                     structural_penalty: 0.0,
                     seed: 17_729,
@@ -1206,6 +1264,64 @@ mod tests {
             .unwrap()
         };
         assert_eq!(train(), train());
+    }
+
+    #[test]
+    fn micro_tvae_and_direct_diffusion_repeat_and_export() {
+        let data = fixture(32, 2);
+        for (architecture, profile) in [
+            (NeuralArchitecture::Tvae, NeuralProfile::MicroTvae4),
+            (NeuralArchitecture::TabDdpm, NeuralProfile::Full),
+        ] {
+            let train = || {
+                fit_joint_generator(
+                    &data,
+                    NeuralTrainingConfig {
+                        architecture,
+                        profile,
+                        target_weight: 2.0,
+                        structural_penalty: 0.0,
+                        seed: 17_729,
+                        deadline: Instant::now() + Duration::from_secs(120),
+                    },
+                )
+                .unwrap()
+            };
+            let first = train();
+            let second = train();
+            assert_eq!(first, second);
+            let kernel = Kernel {
+                task: Task::Regression,
+                rows_fitted: data.rows as u64,
+                features: data.features as u32,
+                seed: 17_729,
+                seed_policy: 0,
+                quantization_bits: 8,
+                compliant: false,
+                schema: vec![
+                    ColumnSchema {
+                        kind: SchemaKind::Continuous,
+                        missing_probability: 0.0,
+                        impute: 0.5,
+                        transform: Transform::Identity,
+                    };
+                    data.features
+                ],
+                marginals: vec![
+                    Marginal::Gaussian {
+                        mean: 0.5,
+                        sigma: 0.2,
+                    };
+                    data.features
+                ],
+                program: KernelProgram::NeuralJoint(first),
+            };
+            let bytes = encode_kernel(&kernel).unwrap();
+            assert_eq!(&bytes[..6], b"DPK3\x03\x03");
+            if architecture == NeuralArchitecture::Tvae {
+                assert!(bytes.len() < 10_240, "micro TVAE is {} bytes", bytes.len());
+            }
+        }
     }
 
     fn parity_layer(input: usize, output: usize, salt: usize) -> QuantizedLinear {
@@ -1310,6 +1426,7 @@ mod tests {
             &data,
             NeuralTrainingConfig {
                 architecture: NeuralArchitecture::MaskedAutoregressiveTransformer,
+                profile: NeuralProfile::Full,
                 target_weight: 2.0,
                 structural_penalty: 0.0,
                 seed: 17_729,

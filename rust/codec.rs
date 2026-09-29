@@ -84,7 +84,7 @@ pub fn account_artifact(artifact: &[u8]) -> Result<ArtifactAccounting> {
 pub const MAX_ARTIFACT_BYTES: usize = 2 * 1024 * 1024 * 1024;
 pub const MAX_NEURAL_ARTIFACT_BYTES: usize = 16 * 1024 * 1024;
 const VERSION_MAJOR: u8 = 3;
-const VERSION_MINOR: u8 = 2;
+const VERSION_MINOR: u8 = 3;
 const V2_VERSION_MAJOR: u8 = 2;
 const V2_VERSION_MINOR: u8 = 1;
 const DECODER_ID: u8 = 1;
@@ -814,7 +814,15 @@ pub fn encode_kernel(kernel: &Kernel) -> Result<Vec<u8>> {
     artifact.extend_from_slice(MAGIC);
     artifact.extend_from_slice(&[
         VERSION_MAJOR,
-        VERSION_MINOR,
+        match &kernel.program {
+            KernelProgram::NeuralJoint(generator)
+                if !generator.profile.is_full()
+                    || generator.architecture == crate::model::NeuralArchitecture::TabDdpm =>
+            {
+                VERSION_MINOR
+            }
+            _ => 2,
+        },
         DECODER_ID,
         kernel.task.code(),
         kernel.quantization_bits,
@@ -1428,6 +1436,13 @@ pub fn decode_kernel(artifact: &[u8]) -> Result<Kernel> {
             if serde_json::to_vec(&generator)? != encoded {
                 return Err(DopeError::Codec(
                     "neural section is non-canonical or has unknown fields".into(),
+                ));
+            }
+            let historical_shape = generator.profile.is_full()
+                && generator.architecture != crate::model::NeuralArchitecture::TabDdpm;
+            if (artifact[5] == 2) != historical_shape {
+                return Err(DopeError::Codec(
+                    "neural profile requires its canonical DPK3 minor version".into(),
                 ));
             }
             KernelProgram::NeuralJoint(generator)

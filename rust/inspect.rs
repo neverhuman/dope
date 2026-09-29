@@ -112,6 +112,7 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
                             "masked_autoregressive_transformer"
                         }
                         NeuralArchitecture::TabSyn => "tabsyn",
+                        NeuralArchitecture::TabDdpm => "tabddpm_direct_rank",
                     }
                     .into(),
                     "joint_missingness_and_rank_variance".into(),

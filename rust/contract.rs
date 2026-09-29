@@ -131,6 +131,8 @@ pub const GOLD_SIZE_MULTIPLIERS: [usize; 2] = [1, 4];
 pub const DP_EPSILONS: [f64; 5] = [0.5, 1.0, 2.0, 4.0, 8.0];
 pub const DP_PARAMETER_BUDGETS: [usize; 4] = [16 << 10, 64 << 10, 256 << 10, 1 << 20];
 pub const DEEP_CANDIDATE_SET_VERSION: &str = "deep-joint-v3";
+pub const COMPACT_CANDIDATE_SET_VERSION: &str = "compact-neural-v1";
+pub const DIRECT_DIFFUSION_CANDIDATE_SET_VERSION: &str = "direct-diffusion-v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
 pub struct FrozenBackend {
@@ -160,7 +162,14 @@ pub fn candidate_implementation_hash(id: &str) -> String {
         // joint generator implementation evolves.
         hasher.update(b"dope-legacy-deep-candidate-set-v1");
     } else {
-        hasher.update(DEEP_CANDIDATE_SET_VERSION.as_bytes());
+        let lineage = if id == "tabddpm_direct_rank" {
+            DIRECT_DIFFUSION_CANDIDATE_SET_VERSION
+        } else if id.starts_with("micro_tvae_") || id.starts_with("tiny_mat_") {
+            COMPACT_CANDIDATE_SET_VERSION
+        } else {
+            DEEP_CANDIDATE_SET_VERSION
+        };
+        hasher.update(lineage.as_bytes());
         hasher.update(include_bytes!("compiler.rs"));
         hasher.update(include_bytes!("codec.rs"));
         hasher.update(include_bytes!("model.rs"));
@@ -171,6 +180,38 @@ pub fn candidate_implementation_hash(id: &str) -> String {
     }
     hasher.update(id.as_bytes());
     hasher.finalize().to_hex().to_string()
+}
+
+/// New profiles use a separate candidate set so historical campaign job counts stay fixed.
+pub fn compact_neural_backends() -> Vec<FrozenBackend> {
+    [
+        "micro_tvae_4_16",
+        "micro_tvae_8_24",
+        "micro_tvae_12_32",
+        "tiny_mat_16_2_32",
+        "tiny_mat_24_3_48",
+    ]
+    .into_iter()
+    .map(|id| {
+        backend(
+            id,
+            "compact_neural",
+            cfg!(feature = "gpu-training"),
+            (!cfg!(feature = "gpu-training"))
+                .then_some("compact neural training requires the gpu-training build"),
+        )
+    })
+    .collect()
+}
+
+pub fn direct_diffusion_backends() -> Vec<FrozenBackend> {
+    vec![backend(
+        "tabddpm_direct_rank",
+        "direct_diffusion_research",
+        cfg!(feature = "gpu-training"),
+        (!cfg!(feature = "gpu-training"))
+            .then_some("direct rank diffusion requires the gpu-training build"),
+    )]
 }
 
 /// The release candidate language is deliberately data- and path-independent.
@@ -378,6 +419,8 @@ impl EmpiricalBackend for FrozenBackendRunner {
 pub fn empirical_backend(id: &str) -> Result<Box<dyn EmpiricalBackend>> {
     empirical_backends()
         .into_iter()
+        .chain(compact_neural_backends())
+        .chain(direct_diffusion_backends())
         .find(|backend| backend.id == id)
         .map(|spec| Box::new(FrozenBackendRunner { spec }) as Box<dyn EmpiricalBackend>)
         .ok_or_else(|| DopeError::Data(format!("unknown frozen empirical backend {id}")))

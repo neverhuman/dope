@@ -1,8 +1,7 @@
 use crate::error::{DopeError, Result};
 use crate::model::{
     AutoregressiveTransformer, JointDecoder, JointGenerator, JointNetwork, LatentDenoiser,
-    LayerNormParameters, NEURAL_LATENT_WIDTH, QuantizedLinear, TRANSFORMER_HEADS,
-    TRANSFORMER_WIDTH,
+    LayerNormParameters, NEURAL_LATENT_WIDTH, QuantizedLinear,
 };
 
 #[inline]
@@ -163,7 +162,7 @@ fn denoiser_forward(
     latent: &[f32],
     timestep: usize,
 ) -> Result<Vec<f32>> {
-    let mut input = Vec::with_capacity(NEURAL_LATENT_WIDTH * 2);
+    let mut input = Vec::with_capacity(latent.len() + NEURAL_LATENT_WIDTH);
     input.extend_from_slice(latent);
     for index in 0..NEURAL_LATENT_WIDTH / 2 {
         let frequency = 10_000.0f32.powf(-2.0 * index as f32 / NEURAL_LATENT_WIDTH as f32);
@@ -224,18 +223,20 @@ struct AttentionCache {
     values: Vec<Vec<f32>>,
 }
 
-fn cached_attention(query: &[f32], cache: &AttentionCache) -> Result<Vec<f32>> {
-    if query.len() != TRANSFORMER_WIDTH
-        || cache.keys.is_empty()
-        || cache.keys.len() != cache.values.len()
-    {
+fn cached_attention(
+    query: &[f32],
+    cache: &AttentionCache,
+    width: usize,
+    heads: usize,
+) -> Result<Vec<f32>> {
+    if query.len() != width || cache.keys.is_empty() || cache.keys.len() != cache.values.len() {
         return Err(DopeError::Codec(
             "invalid autoregressive attention cache".into(),
         ));
     }
-    let head_width = TRANSFORMER_WIDTH / TRANSFORMER_HEADS;
-    let mut output = vec![0.0; TRANSFORMER_WIDTH];
-    for head in 0..TRANSFORMER_HEADS {
+    let head_width = width / heads;
+    let mut output = vec![0.0; width];
+    for head in 0..heads {
         let range = head * head_width..(head + 1) * head_width;
         let mut scores = cache
             .keys
@@ -263,6 +264,8 @@ fn transformer_sample(
     transformer: &AutoregressiveTransformer,
     tokens: usize,
     seed: u64,
+    width: usize,
+    heads: usize,
 ) -> Result<(Vec<f32>, Vec<bool>)> {
     let mut caches = (0..transformer.blocks.len())
         .map(|_| AttentionCache::default())
@@ -272,18 +275,20 @@ fn transformer_sample(
     let mut prior = [0.0f32, 0.0];
     for token in 0..tokens {
         let mut state = int8_linear(&transformer.input_projection, &prior)?;
-        for (value, position) in state.iter_mut().zip(
-            &transformer.positional_embeddings
-                [token * TRANSFORMER_WIDTH..(token + 1) * TRANSFORMER_WIDTH],
-        ) {
+        for (value, position) in state
+            .iter_mut()
+            .zip(&transformer.positional_embeddings[token * width..(token + 1) * width])
+        {
             *value += *position;
         }
         for (block, cache) in transformer.blocks.iter().zip(&mut caches) {
             let query = int8_linear(&block.query, &state)?;
             cache.keys.push(int8_linear(&block.key, &state)?);
             cache.values.push(int8_linear(&block.value, &state)?);
-            let attention =
-                int8_linear(&block.attention_output, &cached_attention(&query, cache)?)?;
+            let attention = int8_linear(
+                &block.attention_output,
+                &cached_attention(&query, cache, width, heads)?,
+            )?;
             for (value, residual) in state.iter_mut().zip(attention) {
                 *value += residual;
             }
@@ -323,7 +328,24 @@ fn tabsyn_sample(
     inference_timesteps: &[u8],
     seed: u64,
 ) -> Result<(Vec<f32>, Vec<bool>)> {
-    let mut latent = (0..NEURAL_LATENT_WIDTH)
+    let latent = diffusion_sample(
+        denoiser,
+        alpha_cumprod,
+        inference_timesteps,
+        NEURAL_LATENT_WIDTH,
+        seed,
+    )?;
+    decode_rank_values(decoder, &latent, seed ^ 0xced1_159b)
+}
+
+fn diffusion_sample(
+    denoiser: &LatentDenoiser,
+    alpha_cumprod: &[f32],
+    inference_timesteps: &[u8],
+    width: usize,
+    seed: u64,
+) -> Result<Vec<f32>> {
+    let mut latent = (0..width)
         .map(|index| normal(seed, index, 0x52d1_8b6c))
         .collect::<Vec<_>>();
     for (index, &encoded_timestep) in inference_timesteps.iter().enumerate() {
@@ -338,7 +360,7 @@ fn tabsyn_sample(
             *value = previous_alpha.sqrt() * clean + (1.0 - previous_alpha).sqrt() * noise;
         }
     }
-    decode_rank_values(decoder, &latent, seed ^ 0xced1_159b)
+    Ok(latent)
 }
 
 #[inline]
@@ -366,13 +388,22 @@ pub fn sample_joint(
     let tokens = features + 1;
     let (ordered_ranks, ordered_missing) = match &generator.network {
         JointNetwork::Tvae { decoder } => {
-            let latent = (0..NEURAL_LATENT_WIDTH)
+            let latent_width = generator
+                .profile
+                .tvae_dimensions()
+                .ok_or_else(|| DopeError::Codec("invalid TVAE profile".into()))?
+                .0;
+            let latent = (0..latent_width)
                 .map(|index| normal(seed, index, 0x1cc5_19a7))
                 .collect::<Vec<_>>();
             decode_rank_values(decoder, &latent, seed ^ 0xd8e4_915c)?
         }
         JointNetwork::MaskedAutoregressiveTransformer { transformer } => {
-            transformer_sample(transformer, tokens, seed)?
+            let (width, heads, _) = generator
+                .profile
+                .transformer_dimensions()
+                .ok_or_else(|| DopeError::Codec("invalid transformer profile".into()))?;
+            transformer_sample(transformer, tokens, seed, width, heads)?
         }
         JointNetwork::TabSyn {
             decoder,
@@ -380,6 +411,21 @@ pub fn sample_joint(
             alpha_cumprod,
             inference_timesteps,
         } => tabsyn_sample(decoder, denoiser, alpha_cumprod, inference_timesteps, seed)?,
+        JointNetwork::TabDdpm {
+            denoiser,
+            alpha_cumprod,
+            inference_timesteps,
+        } => {
+            let ranks =
+                diffusion_sample(denoiser, alpha_cumprod, inference_timesteps, tokens, seed)?;
+            let missing = generator
+                .normalization
+                .iter()
+                .enumerate()
+                .map(|(index, norm)| uniform(seed, index, 0xa737_812e) < norm.missing_probability)
+                .collect();
+            (ranks, missing)
+        }
     };
     if ordered_ranks.len() != tokens || ordered_missing.len() != tokens {
         return Err(DopeError::Codec(
@@ -406,7 +452,7 @@ mod tests {
     use crate::model::{
         AutoregressiveTransformer, ColumnSchema, JointGenerator, JointNetwork, Kernel,
         KernelProgram, LatentDenoiser, LayerNormParameters, Marginal, NeuralArchitecture,
-        RankNormalization, SchemaKind, Task, Transform, TransformerBlock,
+        RankNormalization, SchemaKind, TRANSFORMER_WIDTH, Task, Transform, TransformerBlock,
     };
     use crate::sample::{SampleOptions, sample_kernel};
 
@@ -420,18 +466,22 @@ mod tests {
         }
     }
 
-    fn zero_decoder(tokens: usize) -> Box<JointDecoder> {
+    fn zero_decoder_profile(tokens: usize, latent: usize, hidden: usize) -> Box<JointDecoder> {
         let mut value_biases = Vec::with_capacity(tokens * 2);
         for _ in 0..tokens {
             value_biases.extend([0.0, -2.0]);
         }
         Box::new(JointDecoder {
-            hidden_1: zero_linear(NEURAL_LATENT_WIDTH, 128, vec![0.0; 128]),
-            hidden_2: zero_linear(128, 128, vec![0.0; 128]),
-            value_head: zero_linear(128, tokens * 2, value_biases),
-            missing_head: zero_linear(128, tokens, vec![-20.0; tokens]),
+            hidden_1: zero_linear(latent, hidden, vec![0.0; hidden]),
+            hidden_2: zero_linear(hidden, hidden, vec![0.0; hidden]),
+            value_head: zero_linear(hidden, tokens * 2, value_biases),
+            missing_head: zero_linear(hidden, tokens, vec![-20.0; tokens]),
             variance_floor: 0.01,
         })
+    }
+
+    fn zero_decoder(tokens: usize) -> Box<JointDecoder> {
+        zero_decoder_profile(tokens, NEURAL_LATENT_WIDTH, 128)
     }
 
     fn normalization(tokens: usize) -> Vec<RankNormalization> {
@@ -450,6 +500,7 @@ mod tests {
         let tokens = features + 1;
         JointGenerator {
             architecture: NeuralArchitecture::Tvae,
+            profile: crate::model::NeuralProfile::Full,
             feature_permutation: (0..features as u32).collect(),
             target_marginal: Marginal::Bernoulli { probability: 0.4 },
             normalization: normalization(tokens),
@@ -541,6 +592,118 @@ mod tests {
     }
 
     #[test]
+    fn compact_profiles_encode_as_dpk33_and_sample_in_rust() {
+        use crate::model::NeuralProfile;
+        for profile in [
+            NeuralProfile::MicroTvae4,
+            NeuralProfile::MicroTvae8,
+            NeuralProfile::MicroTvae12,
+        ] {
+            let (latent, hidden) = profile.tvae_dimensions().unwrap();
+            let mut generator = tvae_generator(1);
+            generator.profile = profile;
+            generator.network = JointNetwork::Tvae {
+                decoder: zero_decoder_profile(2, latent, hidden),
+            };
+            let kernel = Kernel {
+                task: Task::Binary,
+                rows_fitted: 32,
+                features: 1,
+                seed: 7,
+                seed_policy: 0,
+                quantization_bits: 8,
+                compliant: false,
+                schema: vec![ColumnSchema {
+                    kind: SchemaKind::Binary,
+                    missing_probability: 0.0,
+                    impute: 0.0,
+                    transform: Transform::Identity,
+                }],
+                marginals: vec![Marginal::Bernoulli { probability: 0.5 }],
+                program: KernelProgram::NeuralJoint(generator.clone()),
+            };
+            let encoded = encode_kernel(&kernel).unwrap();
+            assert_eq!(&encoded[..6], b"DPK3\x03\x03");
+            assert_eq!(
+                encode_kernel(&decode_kernel(&encoded).unwrap()).unwrap(),
+                encoded
+            );
+            assert_eq!(encoded, encode_kernel(&kernel).unwrap());
+            assert_eq!(
+                sample_joint(&generator, 1, 73).unwrap(),
+                sample_joint(&generator, 1, 73).unwrap()
+            );
+            if profile == NeuralProfile::MicroTvae4 {
+                assert!(
+                    encoded.len() < 10_240,
+                    "micro TVAE encoded to {} bytes",
+                    encoded.len()
+                );
+            }
+            if let JointNetwork::Tvae { decoder } = &mut generator.network {
+                decoder.hidden_1.input_dim += 1;
+            }
+            assert!(generator.validate(1, Task::Binary).is_err());
+        }
+        for profile in [NeuralProfile::TinyMat16, NeuralProfile::TinyMat24] {
+            let (width, _, ff) = profile.transformer_dimensions().unwrap();
+            let norm = LayerNormParameters {
+                weight: vec![1.0; width],
+                bias: vec![0.0; width],
+            };
+            let block = || TransformerBlock {
+                query: zero_linear(width, width, vec![0.0; width]),
+                key: zero_linear(width, width, vec![0.0; width]),
+                value: zero_linear(width, width, vec![0.0; width]),
+                attention_output: zero_linear(width, width, vec![0.0; width]),
+                attention_norm: norm.clone(),
+                feed_forward_1: zero_linear(width, ff, vec![0.0; ff]),
+                feed_forward_2: zero_linear(ff, width, vec![0.0; width]),
+                feed_forward_norm: norm.clone(),
+            };
+            let mut generator = tvae_generator(1);
+            generator.architecture = NeuralArchitecture::MaskedAutoregressiveTransformer;
+            generator.profile = profile;
+            generator.network = JointNetwork::MaskedAutoregressiveTransformer {
+                transformer: Box::new(AutoregressiveTransformer {
+                    input_projection: zero_linear(2, width, vec![0.0; width]),
+                    positional_embeddings: vec![0.0; 2 * width],
+                    blocks: vec![block(), block()],
+                    value_head: zero_linear(width, 2, vec![0.0, -2.0]),
+                    missing_head: zero_linear(width, 1, vec![-20.0]),
+                }),
+            };
+            assert_eq!(
+                sample_joint(&generator, 1, 73).unwrap(),
+                sample_joint(&generator, 1, 73).unwrap()
+            );
+            let kernel = Kernel {
+                task: Task::Binary,
+                rows_fitted: 32,
+                features: 1,
+                seed: 7,
+                seed_policy: 0,
+                quantization_bits: 8,
+                compliant: false,
+                schema: vec![ColumnSchema {
+                    kind: SchemaKind::Binary,
+                    missing_probability: 0.0,
+                    impute: 0.0,
+                    transform: Transform::Identity,
+                }],
+                marginals: vec![Marginal::Bernoulli { probability: 0.5 }],
+                program: KernelProgram::NeuralJoint(generator),
+            };
+            let encoded = encode_kernel(&kernel).unwrap();
+            assert_eq!(&encoded[..6], b"DPK3\x03\x03");
+            assert_eq!(
+                encode_kernel(&decode_kernel(&encoded).unwrap()).unwrap(),
+                encoded
+            );
+        }
+    }
+
+    #[test]
     fn architecture_payload_mismatch_is_rejected() {
         let mut generator = tvae_generator(2);
         generator.architecture = NeuralArchitecture::TabSyn;
@@ -570,6 +733,7 @@ mod tests {
         };
         let transformer = JointGenerator {
             architecture: NeuralArchitecture::MaskedAutoregressiveTransformer,
+            profile: crate::model::NeuralProfile::Full,
             feature_permutation: vec![1, 0],
             target_marginal: Marginal::Bernoulli { probability: 0.5 },
             normalization: normalization(tokens),
@@ -590,6 +754,7 @@ mod tests {
             .collect::<Vec<_>>();
         let tabsyn = JointGenerator {
             architecture: NeuralArchitecture::TabSyn,
+            profile: crate::model::NeuralProfile::Full,
             feature_permutation: vec![0, 1],
             target_marginal: Marginal::Bernoulli { probability: 0.5 },
             normalization: normalization(tokens),
@@ -601,13 +766,58 @@ mod tests {
                     hidden_3: zero_linear(128, 128, vec![0.0; 128]),
                     output: zero_linear(128, 32, vec![0.0; 32]),
                 }),
-                alpha_cumprod: schedule,
+                alpha_cumprod: schedule.clone(),
                 inference_timesteps: (0..32).map(|index| (99 - index * 99 / 31) as u8).collect(),
             },
             training_hash: "e".repeat(64),
             implementation_hash: "f".repeat(64),
         };
-        for generator in [transformer, tabsyn] {
+        let tabddpm = JointGenerator {
+            architecture: NeuralArchitecture::TabDdpm,
+            profile: crate::model::NeuralProfile::Full,
+            feature_permutation: vec![0, 1],
+            target_marginal: Marginal::Bernoulli { probability: 0.5 },
+            normalization: normalization(tokens),
+            network: JointNetwork::TabDdpm {
+                denoiser: Box::new(LatentDenoiser {
+                    hidden_1: zero_linear(tokens + 32, 128, vec![0.0; 128]),
+                    hidden_2: zero_linear(128, 128, vec![0.0; 128]),
+                    hidden_3: zero_linear(128, 128, vec![0.0; 128]),
+                    output: zero_linear(128, tokens, vec![0.0; tokens]),
+                }),
+                alpha_cumprod: schedule,
+                inference_timesteps: (0..32).map(|index| (99 - index * 99 / 31) as u8).collect(),
+            },
+            training_hash: "1".repeat(64),
+            implementation_hash: "2".repeat(64),
+        };
+        let tabddpm_kernel = Kernel {
+            task: Task::Binary,
+            rows_fitted: 32,
+            features: features as u32,
+            seed: 7,
+            seed_policy: 0,
+            quantization_bits: 8,
+            compliant: false,
+            schema: vec![
+                ColumnSchema {
+                    kind: SchemaKind::Binary,
+                    missing_probability: 0.0,
+                    impute: 0.0,
+                    transform: Transform::Identity,
+                };
+                features
+            ],
+            marginals: vec![Marginal::Bernoulli { probability: 0.5 }; features],
+            program: KernelProgram::NeuralJoint(tabddpm.clone()),
+        };
+        let encoded = encode_kernel(&tabddpm_kernel).unwrap();
+        assert_eq!(&encoded[..6], b"DPK3\x03\x03");
+        assert_eq!(
+            encode_kernel(&decode_kernel(&encoded).unwrap()).unwrap(),
+            encoded
+        );
+        for generator in [transformer, tabsyn, tabddpm] {
             let first = sample_joint(&generator, features, 123).unwrap();
             let second = sample_joint(&generator, features, 123).unwrap();
             assert_eq!(first, second);
