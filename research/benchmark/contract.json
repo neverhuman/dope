@@ -1,0 +1,49 @@
+{
+  "format": "dope-generator-benchmark-contract",
+  "version": 1,
+  "production_kpi_sha256": "d04a2672ed25e92baeb89bec51ea5ccddb04165701cb44d2e1d53ca32f6e219b",
+  "production_commit_minimum": "581fd6999dcfd215c364369b3198daf161b89c2c",
+  "primary_endpoint": "paired_l3_generator_gate_pass_rate",
+  "secondary_endpoint": "mfs_v2_among_paired_passers",
+  "fit_seeds": [11, 23, 37, 53, 71],
+  "sample_seeds": [101, 211, 307],
+  "size_multipliers": [1, 2, 4, 8],
+  "required_ptf_size_multipliers": [1, 4],
+  "split_seed": 1729,
+  "tier_byte_limits": {"l3": 10240, "l2": 32768},
+  "mfs_v2": {
+    "epsilon": 0.000001,
+    "privacy_soft_weight": 0,
+    "weights": {
+      "utility_transfer": 0.30,
+      "driver_fidelity": 0.20,
+      "distribution_fidelity": 0.20,
+      "structure_fidelity": 0.15,
+      "coverage_realism": 0.10,
+      "compactness": 0.05
+    }
+  },
+  "generator_gates": {
+    "ptf_v1_min": 0.99,
+    "feature_importance_spearman_min": 0.70,
+    "feature_importance_top_k_jaccard_min": 0.50,
+    "feature_importance_min_informative_features": 3,
+    "joint_fidelity_min": 0.90,
+    "driver_agreement_min": 0.95,
+    "calibration_degradation_max": 0.02,
+    "query_p95_normalized_error_max": 0.05,
+    "rare_tail_subgroup_retention_min": 0.95,
+    "type_i_error_max": 0.06,
+    "nominal_95_coverage_min": 0.90,
+    "nominal_95_coverage_max": 0.98,
+    "membership_auc_max": 0.55,
+    "attribute_inference_advantage_max": 0.05,
+    "exact_copies_max": 0,
+    "near_copies_max": 0
+  },
+  "privacy_access": {
+    "sample_multipliers": [1, 10, 100],
+    "sample_row_cap": 1000000,
+    "attacks": ["shadow_membership", "attribute_inference", "rare_record", "exact_copy", "near_copy", "static_artifact", "released_rows_only", "real_vs_real_control"]
+  }
+}

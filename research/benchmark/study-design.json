@@ -1,0 +1,46 @@
+{
+  "format": "dope-benchmark-study-design",
+  "version": 1,
+  "public_core": {
+    "tabddpm": ["Abalone", "Adult", "Buddy", "California", "Cardio", "Churn", "Default", "Diabetes", "FB-Comments", "Gesture", "Higgs-small", "House16H", "Insurance", "King", "MiniBooNE", "Wilt"],
+    "tabsyn": ["Adult", "Default", "Shoppers", "Magic", "Beijing", "News"],
+    "deduplication": "source_identity_and_sorted_source_row_sha256",
+    "task_filter": ["binary", "regression"],
+    "compact_primary": "all_eligible_public_core",
+    "neural_llm_dp_primary": "applicable_tabsyn_six_only"
+  },
+  "public_extension": {
+    "binary_source": "OpenML-CC18",
+    "regression_source": "CTR23",
+    "max_per_task": 10,
+    "rows_min": 500,
+    "rows_max": 100000,
+    "features_min": 1,
+    "features_max": 2000,
+    "selection_order": "sha256_of_official_task_id_ascending",
+    "rights_required": true
+  },
+  "jopedime_supplement": {
+    "catalog_uri": "s3://veox-jopedime-datasets-use2/catalog/v1/catalog.jsonl",
+    "catalog_sha256": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120",
+    "eligible_license_status": "recorded",
+    "eligible_regression_count_at_catalog_freeze": 104,
+    "unknown_license_count_excluded": 3755,
+    "separate_from_public_headline": true
+  },
+  "pilot": {
+    "datasets": ["Adult", "California", "News"],
+    "methods": ["dope", "GaussianCopula", "TabPC", "TabKDE", "TabSyn", "TabDiff", "AIM"],
+    "fit_seeds": [11, 23],
+    "sample_seeds": [101, 211],
+    "maximum_hours": 24
+  },
+  "full_campaign_ceiling_days": 14,
+  "capacity_priority": ["compact_public_core", "openml_extension", "secondary_methods"],
+  "analysis": {
+    "first_endpoint": "dataset_paired_L3_gate_pass_difference",
+    "multiplicity": "Holm_adjusted_paired_sign_tests_plus_Bonferroni_dataset_clustered_95_percent_intervals",
+    "second_endpoint": "MFS_v2_only_when_both_pass_and_at_least_ten_paired_datasets",
+    "missing_and_timeout": "retain_as_failures_and_report_separately"
+  }
+}
