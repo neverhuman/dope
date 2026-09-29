@@ -20,6 +20,7 @@ use crate::contract::{
 use crate::data::Table;
 use crate::error::{DopeError, Result, io_error};
 use crate::fitness::{MasterFitnessReport, ParetoVector};
+use crate::fitness_metrics::{FitnessDiagnostics, evaluate as evaluate_fitness_diagnostics};
 use crate::ledger::{CacheStatus, JOB_EVIDENCE_VERSION, JobEvidence};
 use crate::model::{Kernel, Marginal, SchemaKind, Task};
 use crate::production::{ContentHashes, KpiContract, canonical_json, hashes};
@@ -112,6 +113,8 @@ pub struct CertificationReport {
     pub minimum_gold_one_sided_95_retention: Option<f64>,
     pub fidelity: FidelityReport,
     pub privacy: PrivacyReport,
+    #[serde(default)]
+    pub fitness_diagnostics: Vec<FitnessDiagnostics>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub master_fitness: Option<MasterFitnessReport>,
     pub isolation: IsolationEvidence,
@@ -1728,6 +1731,7 @@ pub fn certify_kernel_with_policy(
     let mut joints = Vec::new();
     let mut marginal_fidelities = Vec::new();
     let mut dependence_fidelities = Vec::new();
+    let mut fitness_diagnostics = Vec::new();
     let mut queries = Vec::new();
     let mut type_i_errors = Vec::new();
     let mut memberships = Vec::new();
@@ -1759,6 +1763,11 @@ pub fn certify_kernel_with_policy(
                 marginal_fidelities.push(marginal);
                 dependence_fidelities.push(dependence);
                 joints.push(0.55 * marginal + 0.45 * dependence);
+                if let Some(diagnostics) =
+                    evaluate_fitness_diagnostics(&test, &synthetic, generation_seed)
+                {
+                    fitness_diagnostics.push(diagnostics);
+                }
                 queries.push(query_p95_normalized_error(&train, &synthetic));
                 type_i_errors.push(type_i_error(&train, &synthetic));
                 let feature_attack = membership_auc(&synthetic, &train, &test);
@@ -2121,6 +2130,15 @@ pub fn certify_kernel_with_policy(
         artifact_bytes + runtime_dictionary_bytes.div_ceil(supported_datasets.max(1));
     let marginal_fidelity_min = marginal_fidelities.into_iter().reduce(f64::min);
     let dependence_fidelity_min = dependence_fidelities.into_iter().reduce(f64::min);
+    let diagnostics_complete = fitness_diagnostics.len() == 2 * GENERATION_REPEATS;
+    let worst_diagnostics = |metric: fn(&FitnessDiagnostics) -> f64| {
+        diagnostics_complete
+            .then(|| fitness_diagnostics.iter().map(metric).reduce(f64::min))
+            .flatten()
+    };
+    let sliced_fidelity_min = worst_diagnostics(|item| item.sliced_wasserstein_fidelity);
+    let mmd_fidelity_min = worst_diagnostics(|item| item.mmd_fidelity);
+    let coverage_realism_min = worst_diagnostics(|item| item.coverage_realism);
     let pareto_vector = ParetoVector {
         utility_transfer: minimum_gold_one_sided_95_retention.map(|value| value.clamp(0.0, 1.0)),
         driver_fidelity: structure_spearman
@@ -2128,10 +2146,12 @@ pub fn certify_kernel_with_policy(
             .map(|(rank, top_k)| {
                 0.5 * ((rank + 1.0) / 2.0).clamp(0.0, 1.0) + 0.5 * top_k.clamp(0.0, 1.0)
             }),
-        distribution_fidelity: marginal_fidelity_min,
+        distribution_fidelity: marginal_fidelity_min
+            .zip(sliced_fidelity_min)
+            .zip(mmd_fidelity_min)
+            .map(|((marginal, sliced), mmd)| 0.50 * marginal + 0.25 * sliced + 0.25 * mmd),
         structure_fidelity: dependence_fidelity_min,
-        // No PRDC or alpha/beta coverage estimator is certified yet.
-        coverage_realism: None,
+        coverage_realism: coverage_realism_min,
         compactness: policy
             .maximum_artifact_bytes
             .map(|limit| (1.0 - artifact_bytes as f64 / limit as f64).clamp(0.0, 1.0)),
@@ -2149,6 +2169,27 @@ pub fn certify_kernel_with_policy(
         ("driver_agreement_min".into(), Some(driver)),
         ("joint_fidelity_min".into(), Some(joint)),
         ("marginal_w1_fidelity_min".into(), marginal_fidelity_min),
+        (
+            "sliced_wasserstein_fidelity_min".into(),
+            sliced_fidelity_min,
+        ),
+        ("mmd_fidelity_min".into(), mmd_fidelity_min),
+        (
+            "prdc_precision_min".into(),
+            worst_diagnostics(|item| item.prdc_precision),
+        ),
+        (
+            "prdc_recall_min".into(),
+            worst_diagnostics(|item| item.prdc_recall),
+        ),
+        (
+            "prdc_density_min".into(),
+            worst_diagnostics(|item| item.prdc_density),
+        ),
+        (
+            "prdc_coverage_min".into(),
+            worst_diagnostics(|item| item.prdc_coverage),
+        ),
         (
             "pairwise_dependence_fidelity_min".into(),
             dependence_fidelity_min,
@@ -2177,7 +2218,7 @@ pub fn certify_kernel_with_policy(
     );
     let report = CertificationReport {
         format: "dope-kernel-certification".into(),
-        version: 4,
+        version: 5,
         release_policy: policy.clone(),
         release_policy_hash: policy.hash(),
         certified: failed_gates.is_empty(),
@@ -2208,6 +2249,7 @@ pub fn certify_kernel_with_policy(
             near_copy_definition: "identical missingness and normalized RMS distance <= 1e-3"
                 .into(),
         },
+        fitness_diagnostics,
         master_fitness: Some(master_fitness),
         isolation: IsolationEvidence {
             generator_opened: vec!["train.csv".into()],

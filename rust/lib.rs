@@ -14,6 +14,7 @@ pub mod deep_campaign;
 pub mod embedding;
 pub mod error;
 pub mod fitness;
+pub mod fitness_metrics;
 pub mod inspect;
 pub mod ledger;
 #[cfg(feature = "gpu-training")]

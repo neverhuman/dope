@@ -18,11 +18,16 @@ driver fidelity (0.20), distribution fidelity (0.20), structure fidelity
 (0.15), coverage realism (0.10), and compactness (0.05). Privacy has zero soft
 weight. `tstr-certification.json` records all hard gates, the measured Pareto
 vector, raw metrics, and weight sensitivity. The score is `null` if any hard
-gate fails or a required soft term is unmeasured. Coverage realism needs a
-validated PRDC or alpha/beta estimator, so current reports leave that term
-unmeasured. The other current terms use the gold retention lower bound,
-permutation importance rank/top-k agreement, marginal W1 fidelity, sampled
-pairwise correlation fidelity, and artifact bytes relative to the tier cap.
+gate fails or a required soft term is unmeasured. Coverage realism uses
+deterministic PRDC precision, recall, density, and coverage on the sealed
+holdout and a synthetic sample. Distribution fidelity combines marginal W1,
+16-slice Wasserstein, and three-bandwidth RBF MMD diagnostics. Each gold sample
+uses at most 128 rows and a shared embedding of at most 32 dimensions, with
+numeric feature values, missingness indicators, and target. The PRDC neighbor
+count is at most five and adapts to small samples. Fewer than six rows leave
+the diagnostics unmeasured. The other terms use the gold retention lower bound,
+permutation importance rank/top-k agreement, sampled pairwise correlation
+fidelity, and artifact bytes relative to the tier cap.
 Sensitivity values are diagnostics, never a substitute release score. Neither
 an empirical privacy result nor a tier establishes formal
 DP or HIPAA de-identification.

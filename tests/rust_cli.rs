@@ -559,12 +559,16 @@ fn native_cli_end_to_end() {
     let report: serde_json::Value =
         serde_json::from_slice(&fs::read(&certification).unwrap()).unwrap();
     assert_eq!(report["format"], "dope-kernel-certification");
-    assert_eq!(report["version"], 4);
+    assert_eq!(report["version"], 5);
     assert_eq!(report["certified"], false);
     assert_eq!(report["master_fitness"]["eligible"], false);
     assert!(report["master_fitness"]["score"].is_null());
     assert_eq!(report["master_fitness"]["privacy_soft_weight"], 0.0);
     assert_eq!(report["master_fitness"]["version"], 2);
+    assert_eq!(report["fitness_diagnostics"].as_array().unwrap().len(), 6);
+    assert_eq!(report["fitness_diagnostics"][0]["version"], 1);
+    assert!(report["master_fitness"]["pareto_vector"]["coverage_realism"].is_number());
+    assert!(report["master_fitness"]["pareto_vector"]["distribution_fidelity"].is_number());
     assert_eq!(report["auditors"].as_object().unwrap().len(), 6);
     assert_eq!(
         report["auditors"]["elastic_net_glm"]["metrics"]
