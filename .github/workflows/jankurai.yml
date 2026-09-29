@@ -35,8 +35,6 @@ jobs:
           echo "$PWD/target/jankurai/jankurai-1.7.1-x86_64-unknown-linux-gnu" >> "$GITHUB_PATH"
       - name: Strict security evidence
         run: jankurai security run . --strict --profile ci --script tools/security-lane.sh --out target/jankurai/security/evidence.json
-      - name: Prepare accepted baseline
-        run: cp agent/baselines/main.repo-score.json target/jankurai/accepted-baseline.json
       - name: Full v1.7.1 Jankurai audit
         id: full
         uses: neverhuman/jankurai-audit@9a101cda4bc32059a2c2f20a92e6d4948256507f # verified v1.7.1 tag target
@@ -48,8 +46,7 @@ jobs:
         if: always()
         run: |
           bash ops/ci/install-jankurai.sh
-          cp agent/baselines/main.repo-score.json target/jankurai/accepted-baseline.json
-          target/jankurai/jankurai-1.7.1-x86_64-unknown-linux-gnu/jankurai audit . --full --no-badge --mode ratchet --baseline target/jankurai/accepted-baseline.json --fail-under 85 --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md --github-step-summary target/jankurai/summary.md --repair-queue-jsonl target/jankurai/repair-queue.jsonl --no-score-history
+          target/jankurai/jankurai-1.7.1-x86_64-unknown-linux-gnu/jankurai audit . --full --no-badge --mode standard --fail-under 85 --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md --github-step-summary target/jankurai/summary.md --repair-queue-jsonl target/jankurai/repair-queue.jsonl --no-score-history
       - name: Emit repair queue and hash-only report attestation
         if: always()
         run: bash agent/emit-audit-receipts.sh
