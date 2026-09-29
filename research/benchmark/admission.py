@@ -31,17 +31,34 @@ def assess(repo_root: Path, lock_root: Path) -> dict:
             blockers.append(f"{name}:not_frozen")
     if "methods.lock.json" in locks:
         methods = locks["methods.lock.json"].get("methods", {})
-        if not methods or any(row.get("status") == "locked" and not all(row.get(key) is not None
-                for key in ("source_sha256", "adapter_sha256", "default_config",
-                            "tuning_search_space", "dependency_or_container_digest", "license"))
+        if not methods or any(row.get("status") not in ("locked", "unavailable") or
+                (row.get("status") == "locked" and not all(row.get(key) is not None
+                 for key in ("source_sha256", "adapter_sha256", "default_config",
+                             "tuning_search_space", "dependency_or_container_digest", "license")))
+                or (row.get("status") == "unavailable" and not row.get("note"))
                 for row in methods.values()):
             blockers.append("methods.lock.json:source_or_config_gap")
+    if "datasets.lock.json" in locks:
+        datasets = locks["datasets.lock.json"].get("datasets", [])
+        if not datasets or any(row.get("license", {}).get("status") != "recorded"
+                or not row.get("source_row_hash") or not row.get("split", {}).get("hashes")
+                for row in datasets):
+            blockers.append("datasets.lock.json:manifest_or_rights_gap")
     if "budget.lock.json" in locks:
         budget = locks["budget.lock.json"]
         if budget.get("campaign_ceiling_days") != 14 or not budget.get("pilot_receipts_sha256"):
             blockers.append("budget.lock.json:pilot_or_ceiling_gap")
     if "evaluator.lock.json" in locks and not locks["evaluator.lock.json"].get("metric_implementation_sha256"):
         blockers.append("evaluator.lock.json:metric_implementation_gap")
+    if "method-dataset-matrix.lock.json" in locks:
+        cells = locks["method-dataset-matrix.lock.json"].get("cells", [])
+        methods = locks.get("methods.lock.json", {}).get("methods", {})
+        if not cells or any(not all(key in row for key in
+                ("dataset", "method", "panel", "track", "tier", "applicable"))
+                or (row["applicable"] and methods.get(row["method"], {}).get("status") != "locked")
+                or (not row["applicable"] and not row.get("exclusion_reason"))
+                for row in cells):
+            blockers.append("method-dataset-matrix.lock.json:cell_gap")
     return {"format": "dope-benchmark-admission", "version": 1,
             "admitted": not blockers, "blockers": sorted(blockers)}
 

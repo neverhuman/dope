@@ -30,6 +30,7 @@ python3 -m research.benchmark.fetch_jope DATASET_HASH DATA_ROOT
 python3 -m research.benchmark.public_sources Adult ADULT.zip ADULT.csv
 python3 -m research.benchmark.california_source CAL_HOUSING.tgz CALIFORNIA.csv
 python3 -m research.benchmark.manifest SELECTION.json DATA_ROOT/prepared
+python3 -m research.benchmark.select_extension REVIEWED_TASK_CANDIDATES.json
 python3 -m research.benchmark.runner JOB.json research/benchmark/methods.lock.json RESULTS_ROOT
 python3 -m research.benchmark.pilot_metrics WORKER_DIR SAMPLE.csv
 python3 -m research.benchmark.analysis MATRIX.json GATE_REPORTS.jsonl research/benchmark/methods.lock.json
@@ -46,6 +47,8 @@ ceiling, counting the whole scratch root (the output root's parent by default).
 `admission` exits nonzero while any final source, data, budget, method matrix,
 or evaluator lock is absent or incomplete; public test evaluation must call it
 before reading test data.
+The current worker runs only the common-numeric track. Author-faithful input
+preparation and external adapters are still pending and fail closed.
 
 `PREPILOT_COST_REPORT.md` records the three-host DOPE probe and the first
 GaussianCopula cost cell. It is not the seven-method pilot or a benchmark
