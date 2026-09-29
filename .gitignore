@@ -1,0 +1,13 @@
+/target/
+/catboost_info/
+__pycache__/
+*.py[cod]
+
+# Generated campaign output and local caches stay outside the source repository.
+/runs/
+/.pytest_cache/
+/.venv/
+*.egg-info/
+.env
+.env.*
+!.env.example
