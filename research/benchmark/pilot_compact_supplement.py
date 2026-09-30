@@ -11,6 +11,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .fetch_jope import LIMIT, used_bytes
 from .pilot_queue import (DATASETS, FIT_SEEDS, PACKAGE, ROOT, SAMPLE_SEEDS,
                           SIZES, atomic_json, digest)
 
@@ -36,8 +37,10 @@ def dispatch(dataset: str, method: str, seed: int, deadline: float) -> dict:
         atomic_json(job_path, job)
     remaining = min(1200, int(deadline - time.time()))
     started = datetime.now(timezone.utc).isoformat()
-    if remaining <= 0:
-        receipt = {"name": name, "status": "not_started", "reason": "pilot_deadline",
+    stop_reason = ("pilot_deadline" if remaining <= 0 else
+                   "scratch_ceiling" if used_bytes(ROOT) > LIMIT - 20_000_000_000 else None)
+    if stop_reason:
+        receipt = {"name": name, "status": "not_started", "reason": stop_reason,
                    "host": "xbabe1", "started_utc": started, "elapsed_seconds": 0.0}
     else:
         command = ["env", f"PYTHONPATH={PACKAGE}", "CUDA_VISIBLE_DEVICES=",

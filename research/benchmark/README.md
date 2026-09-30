@@ -42,7 +42,8 @@ python3 -m research.benchmark.analysis MATRIX.json GATE_REPORTS.jsonl research/b
 python3 -m research.benchmark.admission REPO_ROOT LOCK_ROOT
 ```
 
-The runner enforces a 16-core affinity and one visible GPU, hashes worker
+The runner enforces a 16-core affinity and respects the launcher's GPU
+visibility setting (defaulting to GPU 0), hashes worker
 inputs, verifies repeated artifact sampling, and resumes receipts without
 refitting. The coordinator's JopeDime fetch reads only requested catalog,
 manifest, and blob objects through the named AWS profile. Credentials stay on
@@ -65,6 +66,8 @@ all bulk receipts live on benchmark scratch. Pilot-only AIM compatibility jobs
 are supplemental and do not alter the original 42-cell matrix.
 `pilot_compact_supplement.py` runs the two already locked reference compact
 methods on the pilot datasets with separate receipts and a separate matrix.
+`PILOT_COST_REPORT.md` records measured costs, validation-only vectors, the
+14-day capacity bound, and the full-campaign admission decision.
 The final public test remains closed until `admission.py` passes.
 
 `PREPILOT_COST_REPORT.md` records the three-host DOPE probe and the first

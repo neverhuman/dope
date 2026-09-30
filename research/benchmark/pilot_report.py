@@ -13,6 +13,7 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from .fetch_jope import LIMIT, used_bytes
 from .pilot_queue import DATASETS, FIT_SEEDS, ROSTER
 
 
@@ -44,7 +45,8 @@ def reconcile_jobs(root: Path) -> tuple[list[dict], list[dict]]:
         original = originals[name]
         if original["status"] != "ok":
             ledger.append({"cell": name, "attempt": 1, "status": original["status"],
-                           "reason": original.get("reason"), "error_type": original.get("error_type"),
+                           "reason": original.get("reason"), "detail": original.get("detail"),
+                           "error_type": original.get("error_type"),
                            "log_sha256": original.get("log_sha256")})
         current = original
         if name in repairs:
@@ -62,6 +64,7 @@ def reconcile_jobs(root: Path) -> tuple[list[dict], list[dict]]:
         final.append({"cell": name, "dataset": original["dataset"],
                       "method": original["method"], "fit_seed": original["fit_seed"],
                       "host": current.get("host"), "status": current["status"],
+                      "started_utc": current.get("started_utc"),
                       "attempts": 2 if name in repairs else 1,
                       "elapsed_seconds": current["elapsed_seconds"]})
     return final, ledger
@@ -98,10 +101,16 @@ def summarize_runner(root: Path) -> dict:
 
 def build_report(root: Path) -> dict:
     jobs, ledger = reconcile_jobs(root)
+    admission = _read(root / "admission-check.json")["result"]
     by_method = {method: dict(Counter(j["status"] for j in jobs if j["method"] == method))
                  for method in ROSTER}
     evidence = [root / "matrix.json", root / "queue-summary.json",
-                root / "host-inventory.json"]
+                root / "queue-summary-repair.json", root / "host-inventory.json",
+                root / "byte-reconciliation.json", root / "byte-reconciliation-final.json",
+                root / "admission-check.json"]
+    for package in ("package", "aim-package", "aim-package-hardcap"):
+        evidence += sorted((root / package / "research" / "benchmark").glob("*.py"))
+        evidence += sorted((root / package / "research" / "benchmark").glob("*.json"))
     evidence += sorted((root / "receipts").glob("*.json"))
     evidence += sorted((root / "repair-receipts").glob("*.json"))
     evidence += sorted((root / "results").glob("*/fit-receipt.json"))
@@ -115,16 +124,21 @@ def build_report(root: Path) -> dict:
         paths += sorted((root / directory).glob("**/fit-receipt.json"))
         paths += sorted((root / directory).glob("**/*.receipt.json"))
         if paths:
-            supplemental[directory] = [
-                {"path": str(path.relative_to(root)), "sha256": _hash(path),
-                 "status": _read(path).get("status", "probe"),
-                 "fit_seconds": _read(path).get("fit_seconds"),
-                 "artifact_bytes": _read(path).get("artifact_bytes")}
-                for path in paths]
+            records = []
+            for path in paths:
+                receipt = _read(path)
+                records.append({"path": str(path.relative_to(root)), "sha256": _hash(path),
+                                "status": receipt.get("status", "probe"),
+                                "fit_seconds": receipt.get("fit_seconds"),
+                                "artifact_bytes": receipt.get("artifact_bytes")})
+            supplemental[directory] = records
     evidence += sorted((root / "validation-metrics").glob("*.json"))
     evidence += sorted(root.glob("aim-*.log"))
     evidence += sorted(root.glob("tabpc-*.log"))
+    evidence += sorted((root / "tabpc-probe").glob("**/receipt-correction.json"))
     evidence += sorted((root / "compact-supplement").glob("receipts/*.json"))
+    evidence += sorted((root / "compact-supplement").glob("matrix.json"))
+    evidence += sorted((root / "compact-supplement").glob("resume-check.json"))
     evidence += sorted((root / "compact-supplement").glob("results/*/fit-receipt.json"))
     evidence += sorted((root / "compact-supplement").glob("results/*/*.receipt.json"))
     evidence += sorted((root / "compact-supplement").glob("logs/*.log"))
@@ -137,6 +151,10 @@ def build_report(root: Path) -> dict:
         "format": "dope-four-hour-pilot-reconciled-report", "version": 1,
         "scope": "validation_only_no_public_test", "fit_cells": len(jobs),
         "timing_note": "Original queue elapsed_seconds can include host-slot wait; use runner fit_seconds and sample_seconds for compute costs. Repair queue elapsed_seconds starts after slot admission.",
+        "scratch": {"used_bytes": used_bytes(root.parent), "ceiling_bytes": LIMIT},
+        "full_campaign_admission": {"admitted": admission["admitted"],
+                                    "blockers": admission["blockers"],
+                                    "budget_lock_frozen": False},
         "registered_matrix_bounds": {
             "pilot_fit_cells": 3 * 7 * 2,
             "pilot_potential_sample_cells": 3 * 7 * 2 * 2 * 4,
