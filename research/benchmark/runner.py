@@ -63,12 +63,80 @@ def _write_once(path: Path, value: dict) -> None:
         stream.write(encoded)
 
 
+def _attempt_path(root: Path) -> Path:
+    root.mkdir(parents=True, exist_ok=True)
+    numbers = [int(path.stem.split("-")[-1]) for path in root.glob("attempt-*.json")]
+    return root / f"attempt-{max(numbers, default=0) + 1:04d}.json"
+
+
 def reserve_scratch(root: Path, rows: int, columns: int) -> None:
     # Two simultaneous samples are held for determinism verification. The
     # numeric CSV upper allowance covers a full 17-digit float plus separators.
     allowance = 1_000_000_000 + 2 * 25 * rows * columns
     if used_bytes(root) + allowance > LIMIT:
         raise ValueError("benchmark scratch ceiling would be exceeded")
+
+
+def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
+                          scratch_root: Path) -> tuple[dict, dict]:
+    """Bind a final configuration to its validation selection and DP budget."""
+    choice = job.get("configuration")
+    if choice is None:
+        if job.get("final"):
+            raise ValueError("final job has no frozen configuration")
+        return entry["default_config"], {"kind": "default"}
+    if not isinstance(choice, dict) or choice.get("kind") not in ("default", "tuned"):
+        raise ValueError("invalid configuration kind")
+    kind = choice["kind"]
+    if kind == "default":
+        if set(choice) != {"kind"}:
+            raise ValueError("default configuration has unexpected fields")
+        config = dict(entry["default_config"])
+        identity = {"kind": kind}
+    else:
+        if set(choice) != {"kind", "values", "selection_path", "selection_sha256"}:
+            raise ValueError("tuned configuration is missing selection evidence")
+        config = choice["values"]
+        default = entry["default_config"]
+        search = entry["tuning_search_space"]
+        if (not isinstance(config, dict) or set(config) != set(default)
+                or not isinstance(search, dict)
+                or any(value != default[key] and value not in search.get(key, [])
+                       for key, value in config.items())):
+            raise ValueError("tuned configuration outside locked search space")
+        selection_path = Path(choice["selection_path"])
+        if not selection_path.resolve().is_relative_to(scratch_root.resolve()):
+            raise ValueError("selection evidence outside benchmark scratch")
+        if sha256(selection_path) != choice["selection_sha256"]:
+            raise ValueError("selection evidence digest mismatch")
+        selection = json.loads(selection_path.read_text())
+        trials = selection.get("trials")
+        if (selection.get("format") != "dope-benchmark-validation-selection"
+                or selection.get("partition") != "validation"
+                or selection.get("dataset") != dataset
+                or selection.get("method") != job["method"]
+                or selection.get("selected_config") != config
+                or not isinstance(trials, list) or len(trials) != 8
+                or any(not isinstance(trial, dict)
+                       or trial.get("status") not in ("ok", "timeout", "failed")
+                       or not isinstance(trial.get("wall_seconds"), (int, float))
+                       or not 0 <= trial["wall_seconds"] <= 43200 for trial in trials)
+                or sum(trial["wall_seconds"] for trial in trials) > 43200):
+            raise ValueError("invalid validation selection evidence")
+        identity = {"kind": kind, "selection_sha256": choice["selection_sha256"]}
+        config = dict(config)
+    if entry.get("group") == "dp" and job.get("final"):
+        epsilon = job.get("dp_epsilon")
+        if (epsilon not in (1, 4, 10)
+                or epsilon not in entry["tuning_search_space"].get("epsilon", [])):
+            raise ValueError("DP epsilon outside frozen budget")
+        if kind == "tuned" and config.get("epsilon") != epsilon:
+            raise ValueError("tuned selection differs from DP budget")
+        config["epsilon"] = epsilon
+        identity["dp_budget"] = {"epsilon": epsilon, "delta": min(1e-5, 1 / rows**2)}
+    elif "dp_epsilon" in job:
+        raise ValueError("DP epsilon on non-final or non-DP job")
+    return config, identity
 
 
 def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
@@ -121,13 +189,26 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
     if n is None:
         with (worker / "train.csv").open() as stream:
             n = sum(1 for _ in stream)
+    sample_seeds = job.get("sample_seeds", CONTRACT["sample_seeds"])
+    multipliers = job.get("size_multipliers", CONTRACT["size_multipliers"])
+    if (not sample_seeds or not multipliers or len(sample_seeds) != len(set(sample_seeds))
+            or len(multipliers) != len(set(multipliers))
+            or not set(sample_seeds).issubset(CONTRACT["sample_seeds"])
+            or not set(multipliers).issubset(CONTRACT["size_multipliers"])):
+        raise ValueError("sampling cells outside frozen contract")
+    if job.get("final") and (sample_seeds != CONTRACT["sample_seeds"]
+                             or multipliers != CONTRACT["size_multipliers"]):
+        raise ValueError("final job requires the complete sample matrix")
+    config, config_identity = resolve_configuration(job, entry, manifest["dataset_id"],
+                                                    n, scratch_root)
     fit_identity = {
         "dataset": manifest["dataset_id"], "split": manifest["split_hashes"],
         "projection": manifest["projection_sha256"], "track": job["track"],
         "method": method, "method_source": entry["source_sha256"],
         "adapter_sha256": entry["adapter_sha256"],
         "binary_sha256": entry.get("binary_sha256"),
-        "config": entry["default_config"], "fit_seed": job["fit_seed"],
+        "config": config, "configuration": config_identity, "fit_seed": job["fit_seed"],
+        "sample_seeds": sample_seeds, "size_multipliers": multipliers,
         "contract": sha256(Path(__file__).with_name("contract.json")),
         "runner_source": sha256(Path(__file__)),
     }
@@ -139,6 +220,20 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
     binary = Path(job["dope_binary"]) if method == "dope" else None
     if method == "dope" and sha256(binary) != entry["binary_sha256"]:
         raise ValueError("DOPE binary digest changed")
+    if not fit_receipt_path.exists():
+        attempts = sorted((directory / "fit-attempts").glob("attempt-*.json"))
+        if attempts:
+            previous = json.loads(attempts[-1].read_text())
+            if previous["status"] == "ok":
+                inventory, _ = artifact_inventory(artifact_dir, previous["artifact_files"])
+                if previous["fit_key"] != fit_key or inventory != previous["artifact_inventory"]:
+                    raise ValueError("successful fit attempt changed before resume")
+                if previous.get("fit_evidence_files"):
+                    evidence, _ = artifact_inventory(directory / "fit_evidence",
+                                                     previous["fit_evidence_files"])
+                    if evidence != previous["fit_evidence_inventory"]:
+                        raise ValueError("successful fit evidence changed before resume")
+                _write_once(fit_receipt_path, previous)
     if fit_receipt_path.exists():
         fit_receipt = json.loads(fit_receipt_path.read_text())
         if fit_receipt["fit_key"] != fit_key or fit_receipt["status"] != "ok":
@@ -152,6 +247,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                 raise ValueError("fit evidence changed since receipt")
     else:
         start = time.perf_counter()
+        attempt_path = _attempt_path(directory / "fit-attempts")
         try:
             if os.uname().nodename == "xbabe2":
                 reserve_scratch(scratch_root, 0, 0)
@@ -159,10 +255,10 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
             shutil.copyfile(worker / "projection.json", artifact_dir / "projection.json")
             files = call_adapter({"action": "fit", "method": method,
                                   "train": str(worker / "train.csv"), "metadata": projection,
-                                  "config": entry["default_config"], "seed": job["fit_seed"],
+                                  "config": config, "seed": job["fit_seed"],
                                   "artifact_dir": str(artifact_dir),
                                   "binary": str(binary) if binary else None},
-                                 entry["default_config"].get("fit_timeout_seconds", 1800))["files"]
+                                 config.get("fit_timeout_seconds", 1800))["files"]
             files = ["projection.json", *files]
             inventory, artifact_bytes = artifact_inventory(artifact_dir, files)
             fit_evidence_dir = directory / "fit_evidence"
@@ -185,39 +281,49 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                            "fit_seconds": time.perf_counter() - start,
                            "error_type": getattr(error, "source_error_type", type(error).__name__),
                            "host": os.uname().nodename}
-        _write_once(fit_receipt_path, fit_receipt)
+            for name in ("artifact", "fit_evidence"):
+                partial = directory / name
+                if partial.exists():
+                    partial.rename(attempt_path.parent / f"{attempt_path.stem}-{name}")
+        _write_once(attempt_path, fit_receipt)
         if fit_receipt["status"] != "ok":
             return [fit_receipt]
+        _write_once(fit_receipt_path, fit_receipt)
     receipts = []
-    sample_seeds = job.get("sample_seeds", CONTRACT["sample_seeds"])
-    multipliers = job.get("size_multipliers", CONTRACT["size_multipliers"])
-    if (not sample_seeds or not multipliers or len(sample_seeds) != len(set(sample_seeds))
-            or len(multipliers) != len(set(multipliers))
-            or not set(sample_seeds).issubset(CONTRACT["sample_seeds"])
-            or not set(multipliers).issubset(CONTRACT["size_multipliers"])):
-        raise ValueError("sampling cells outside frozen contract")
     for sample_seed in sample_seeds:
         for multiplier in multipliers:
             row_count = n * multiplier
             key = digest({**fit_identity, "sample_seed": sample_seed, "row_count": row_count})
             receipt_path = directory / f"{key}.receipt.json"
             output = directory / f"{key}.csv"
+            if not receipt_path.exists():
+                attempts = sorted((directory / "sample-attempts" / key).glob("attempt-*.json"))
+                if attempts:
+                    previous = json.loads(attempts[-1].read_text())
+                    if previous["status"] == "ok":
+                        if (previous["run_key"] != key
+                                or sha256(output) != previous["sample_sha256"]):
+                            raise ValueError("successful sample attempt changed before resume")
+                        _write_once(receipt_path, previous)
             if receipt_path.exists():
                 receipt = json.loads(receipt_path.read_text())
-                if receipt["status"] == "ok" and sha256(output) != receipt["sample_sha256"]:
+                if receipt["status"] != "ok":
+                    raise ValueError("existing sample receipt failed")
+                if sha256(output) != receipt["sample_sha256"]:
                     raise ValueError("sample changed since receipt")
                 receipts.append(receipt)
                 continue
             start = time.perf_counter()
+            attempt_path = _attempt_path(directory / "sample-attempts" / key)
+            repeat = directory / f"{key}.repeat.csv"
             try:
                 if os.uname().nodename == "xbabe2":
                     reserve_scratch(scratch_root, row_count, projection["output_features"] + 1)
                 sample_request = {"action": "sample", "method": method,
                                   "artifact_dir": str(artifact_dir), "row_count": row_count,
                                   "seed": sample_seed, "binary": str(binary) if binary else None}
-                sample_limit = entry["default_config"].get("sample_timeout_seconds", 600)
+                sample_limit = config.get("sample_timeout_seconds", 600)
                 call_adapter({**sample_request, "output": str(output)}, sample_limit)
-                repeat = directory / f"{key}.repeat.csv"
                 remaining = sample_limit - (time.perf_counter() - start)
                 call_adapter({**sample_request, "output": str(repeat)}, int(remaining))
                 first_hash, second_hash = sha256(output), sha256(repeat)
@@ -235,7 +341,12 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                            "row_count": row_count, "sample_seconds": time.perf_counter() - start,
                            "error_type": getattr(error, "source_error_type", type(error).__name__),
                            "host": os.uname().nodename}
-            _write_once(receipt_path, receipt)
+                for partial in (output, repeat):
+                    if partial.exists():
+                        partial.rename(attempt_path.parent / f"{attempt_path.stem}-{partial.name}")
+            _write_once(attempt_path, receipt)
+            if receipt["status"] == "ok":
+                _write_once(receipt_path, receipt)
             receipts.append(receipt)
     return receipts
 

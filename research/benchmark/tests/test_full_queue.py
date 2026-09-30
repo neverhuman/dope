@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from research.benchmark.full_queue import (available_slot, cpu_slots, latest_attempt,
-                                           verify_success, write_once)
+                                           validate_cell, verify_success, write_once)
 from research.benchmark.score import artifact_inventory, sha256
 
 
@@ -39,6 +39,28 @@ class FullQueueTests(unittest.TestCase):
         snapshot["memory"]["MemAvailable"] = 40_000_000_000
         snapshot["gpus"][0]["memory_free_mib"] = 12000
         self.assertIsNone(available_slot(snapshot, set(), self.cell(gpu=True)))
+        snapshot["gpus"][0]["memory_free_mib"] = 23000
+        self.assertIsNone(available_slot(snapshot, set(), self.cell(), 35_000_000_000))
+
+    def test_final_cell_requires_frozen_configuration_and_full_sample_matrix(self):
+        cell = {"id": "toy-default-11", "dataset": "toy", "method": "dope",
+                "panel": "public_core", "track": "common_numeric", "tier": "l3",
+                "applicable": True, "fit_seed": 11, "sample_seeds": [101, 211, 307],
+                "size_multipliers": [1, 2, 4, 8],
+                "worker_dir": "/mnt/fast-scratch/dope-benchmark/toy",
+                "scratch_reservation_bytes": 1000, "memory_reservation_bytes": 1000,
+                "requires_gpu": False, "gpu_vram_mib": 0,
+                "timeout_seconds": 600, "runtime_python": "/usr/bin/python3",
+                "configuration": {"kind": "default"}}
+        methods = {"methods": {"dope": {"status": "locked", "group": "study_generator"}}}
+        validate_cell(cell, methods)
+        cell["size_multipliers"] = [1, 4]
+        with self.assertRaisesRegex(ValueError, "incomplete sample matrix"):
+            validate_cell(cell, methods)
+        cell["size_multipliers"] = [1, 2, 4, 8]
+        cell["configuration"] = None
+        with self.assertRaisesRegex(ValueError, "frozen configuration"):
+            validate_cell(cell, methods)
 
     def test_attempt_receipts_are_immutable_and_latest_is_used_for_resume(self):
         with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:

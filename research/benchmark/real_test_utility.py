@@ -9,8 +9,9 @@ import os
 from pathlib import Path
 
 from .admission import assess
+from .manifest import digest
 from .pilot_metrics import _loss, _model
-from .score import sha256
+from .score import artifact_inventory, sha256
 
 
 ROOT = Path("/mnt/fast-scratch/dope-benchmark")
@@ -59,8 +60,15 @@ def evaluate(repo_root: Path, lock_root: Path, worker_dir: Path, evaluator_dir: 
         raise ValueError("metric receipts must stay on benchmark scratch")
     worker_manifest = json.loads((worker_dir / "worker-manifest.json").read_text())
     test_manifest = json.loads((evaluator_dir / "manifest.json").read_text())
+    frozen = json.loads((lock_root / "datasets.lock.json").read_text())["datasets"]
+    locked = next((row for row in frozen if row["id"] == test_manifest["id"]), None)
+    if locked is None or any(locked.get(key) != test_manifest.get(key) for key in
+                             ("source_row_hash", "projection_sha256", "split", "projected_files")):
+        raise ValueError("evaluator manifest differs from frozen dataset lock")
     if (worker_manifest["dataset_id"] != test_manifest["id"]
             or worker_manifest["projection_sha256"] != test_manifest["projection_sha256"]
+            or worker_manifest["split_hashes"] != {name: test_manifest["split"]["hashes"][name]
+                                                  for name in ("train", "validation")}
             or sha256(worker_dir / "train.csv") != test_manifest["projected_files"]["train"]
             or sha256(evaluator_dir / "test.csv") != test_manifest["projected_files"]["test"]):
         raise ValueError("frozen train/test manifest digest mismatch")
@@ -104,14 +112,38 @@ def evaluate(repo_root: Path, lock_root: Path, worker_dir: Path, evaluator_dir: 
               "rows": {"train": len(train), "test": len(test)},
               "auditor_seed": seed, "auditors": {}, "null_loss": null_loss}
     fit_keys = set()
+    sample_seeds = set()
     for multiplier in (1, 4):
         sample_path, receipt_path = samples[multiplier]
         receipt = json.loads(receipt_path.read_text())
         expected_rows = len(train) * multiplier
+        fit_dir = receipt_path.parent
+        fit_receipt = json.loads((fit_dir / "fit-receipt.json").read_text())
+        fit_identity = fit_receipt["fit_identity"]
+        inventory, artifact_bytes = artifact_inventory(fit_dir / "artifact",
+                                                       fit_receipt["artifact_files"])
+        if (fit_receipt.get("status") != "ok"
+                or fit_receipt.get("fit_key") != digest(fit_identity)
+                or fit_dir.name != fit_receipt["fit_key"]
+                or inventory != fit_receipt["artifact_inventory"]
+                or artifact_bytes != fit_receipt["artifact_bytes"]
+                or fit_identity.get("dataset") != test_manifest["id"]
+                or fit_identity.get("projection") != test_manifest["projection_sha256"]
+                or fit_identity.get("split") != worker_manifest["split_hashes"]
+                or fit_identity.get("sample_seeds") != [101, 211, 307]
+                or fit_identity.get("size_multipliers") != [1, 2, 4, 8]
+                or receipt.get("fit_key") != fit_receipt["fit_key"]
+                or receipt.get("run_key") != digest({**fit_identity,
+                    "sample_seed": receipt.get("sample_seed"), "row_count": expected_rows})
+                or receipt_path != fit_dir / f"{receipt['run_key']}.receipt.json"
+                or sample_path != fit_dir / f"{receipt['run_key']}.csv"
+                or receipt.get("artifact_sampling_verified") is not True):
+            raise ValueError("sample is not bound to frozen fit and artifact")
         if (receipt.get("status") != "ok" or receipt.get("row_count") != expected_rows
                 or receipt.get("sample_sha256") != sha256(sample_path)):
             raise ValueError("sample receipt digest or row count mismatch")
         fit_keys.add(receipt["fit_key"])
+        sample_seeds.add(receipt["sample_seed"])
         synthetic = load_numeric(sample_path)
         if synthetic.shape != (expected_rows, train.shape[1]):
             raise ValueError("synthetic shape mismatch")
@@ -134,8 +166,8 @@ def evaluate(repo_root: Path, lock_root: Path, worker_dir: Path, evaluator_dir: 
         report["auditors"][str(multiplier)] = {
             "sample_sha256": receipt["sample_sha256"], "receipt_sha256": sha256(receipt_path),
             "sample_seed": receipt["sample_seed"], "rows": expected_rows, "metrics": values}
-    if len(fit_keys) != 1:
-        raise ValueError("n and 4n came from different fits")
+    if len(fit_keys) != 1 or len(sample_seeds) != 1:
+        raise ValueError("n and 4n came from different fits or sample seeds")
     report["fit_key"] = fit_keys.pop()
     if output.exists():
         if json.loads(output.read_text()) != report:

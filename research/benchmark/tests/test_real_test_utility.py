@@ -5,8 +5,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 from research.benchmark import real_test_utility
+from research.benchmark.manifest import digest
 from research.benchmark.real_test_utility import evaluate, retention
-from research.benchmark.score import sha256
+from research.benchmark.score import artifact_inventory, sha256
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -43,27 +44,62 @@ class RealTestUtilityTests(unittest.TestCase):
             projection_hash = sha256(worker / "projection.json")
             (worker / "worker-manifest.json").write_text(json.dumps({
                 "dataset_id": "toy", "projection_sha256": projection_hash,
-                "train_rows": 30}))
-            (evaluator / "manifest.json").write_text(json.dumps({
+                "train_rows": 30, "split_hashes": {"train": "train-split", "validation": "valid-split"}}))
+            manifest = {
                 "id": "toy", "projection_sha256": projection_hash,
+                "source_row_hash": "source-rows",
+                "split": {"hashes": {"train": "train-split", "validation": "valid-split",
+                                     "test": "test-split"}},
                 "projected_files": {"train": sha256(worker / "train.csv"),
-                                    "test": sha256(evaluator / "test.csv")}}))
+                                    "test": sha256(evaluator / "test.csv")}}
+            (evaluator / "manifest.json").write_text(json.dumps(manifest))
+            (root / "datasets.lock.json").write_text(json.dumps({"datasets": [manifest]}))
+            fit_identity = {"dataset": "toy", "projection": projection_hash,
+                            "split": {"train": "train-split", "validation": "valid-split"},
+                            "sample_seeds": [101, 211, 307],
+                            "size_multipliers": [1, 2, 4, 8]}
+            fit_key = digest(fit_identity)
+            fit_dir = root / fit_key
+            artifact = fit_dir / "artifact"
+            artifact.mkdir(parents=True)
+            (artifact / "model.bin").write_bytes(b"fitted")
+            inventory, artifact_bytes = artifact_inventory(artifact, ["model.bin"])
+            (fit_dir / "fit-receipt.json").write_text(json.dumps({
+                "status": "ok", "fit_key": fit_key, "fit_identity": fit_identity,
+                "artifact_files": ["model.bin"], "artifact_inventory": inventory,
+                "artifact_bytes": artifact_bytes}))
             samples = {}
             for multiplier in (1, 4):
-                sample = root / f"sample-{multiplier}.csv"
-                receipt = root / f"receipt-{multiplier}.json"
+                run_key = digest({**fit_identity, "sample_seed": 101,
+                                  "row_count": 30 * multiplier})
+                sample = fit_dir / f"{run_key}.csv"
+                receipt = fit_dir / f"{run_key}.receipt.json"
                 write_rows(sample, 30 * multiplier)
-                receipt.write_text(json.dumps({"status": "ok", "fit_key": "same-fit",
+                receipt.write_text(json.dumps({"status": "ok", "fit_key": fit_key,
+                                               "run_key": run_key,
                                                "sample_seed": 101, "row_count": 30 * multiplier,
+                                               "artifact_sampling_verified": True,
                                                "sample_sha256": sha256(sample)}))
                 samples[multiplier] = sample, receipt
             output = root / "utility.json"
             with patch.object(real_test_utility, "assess", return_value={"admitted": True}), \
                  patch.object(real_test_utility, "ROOT", root):
+                altered = dict(manifest)
+                altered["source_row_hash"] = "other-source"
+                (root / "datasets.lock.json").write_text(json.dumps({"datasets": [altered]}))
+                with self.assertRaisesRegex(ValueError, "frozen dataset lock"):
+                    evaluate(ROOT, root, worker, evaluator, samples, output)
+                (root / "datasets.lock.json").write_text(json.dumps({"datasets": [manifest]}))
                 first = evaluate(ROOT, root, worker, evaluator, samples, output)
                 second = evaluate(ROOT, root, worker, evaluator, samples, output)
+                receipt_path = samples[4][1]
+                changed = json.loads(receipt_path.read_text())
+                changed["run_key"] = "wrong-run"
+                receipt_path.write_text(json.dumps(changed))
+                with self.assertRaisesRegex(ValueError, "frozen fit and artifact"):
+                    evaluate(ROOT, root, worker, evaluator, samples, output)
             self.assertEqual(first, second)
-            self.assertEqual(first["fit_key"], "same-fit")
+            self.assertEqual(first["fit_key"], fit_key)
             self.assertEqual(set(first["auditors"]), {"1", "4"})
             self.assertEqual(first["test_sha256"], sha256(evaluator / "test.csv"))
 

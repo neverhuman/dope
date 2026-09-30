@@ -16,7 +16,7 @@ from pathlib import Path
 
 from .admission import assess
 from .fetch_jope import LIMIT, used_bytes
-from .score import artifact_inventory, sha256
+from .score import CONTRACT, artifact_inventory, sha256
 
 
 HOSTS = ("xbabe1", "xbabe2", "xbabe3")
@@ -64,13 +64,14 @@ def cpu_slots(snapshot: dict) -> list[tuple[int, ...]]:
             if len(allowed[index:index + SLOT_CORES]) == SLOT_CORES]
 
 
-def available_slot(snapshot: dict, occupied: set[tuple[int, ...]], cell: dict) -> tuple[int, ...] | None:
+def available_slot(snapshot: dict, occupied: set[tuple[int, ...]], cell: dict,
+                   reserved_memory_bytes: int = 0) -> tuple[int, ...] | None:
     allowed = snapshot["allowed_cpus"]
     # The load check accounts for workloads outside this queue, including owners' jobs.
     if snapshot["load_average"][0] + SLOT_CORES > len(allowed) * 1.25:
         return None
     needed = max(MIN_FREE_MEMORY, cell["memory_reservation_bytes"])
-    if snapshot["memory"]["MemAvailable"] < needed:
+    if snapshot["memory"]["MemAvailable"] - reserved_memory_bytes < needed:
         return None
     if cell["requires_gpu"]:
         if snapshot["active_gpu_processes"]:
@@ -85,7 +86,7 @@ def validate_cell(cell: dict, methods: dict) -> None:
     required = ("id", "dataset", "method", "panel", "track", "tier", "applicable",
                 "fit_seed", "sample_seeds", "size_multipliers", "worker_dir",
                 "scratch_reservation_bytes", "memory_reservation_bytes", "requires_gpu",
-                "gpu_vram_mib", "timeout_seconds", "runtime_python")
+                "gpu_vram_mib", "timeout_seconds", "runtime_python", "configuration")
     if any(key not in cell for key in required):
         raise ValueError("matrix cell missing dispatch fields")
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", cell["id"]) or ".." in cell["id"]:
@@ -94,6 +95,19 @@ def validate_cell(cell: dict, methods: dict) -> None:
         raise ValueError("applicable method is not locked")
     if cell["track"] != "common_numeric":
         raise ValueError("author-faithful adapter is not available to this runner")
+    if (cell["fit_seed"] not in CONTRACT["fit_seeds"]
+            or cell["sample_seeds"] != CONTRACT["sample_seeds"]
+            or cell["size_multipliers"] != CONTRACT["size_multipliers"]):
+        raise ValueError("final cell has incomplete sample matrix")
+    choice = cell["configuration"]
+    if not isinstance(choice, dict) or choice.get("kind") not in ("default", "tuned"):
+        raise ValueError("final cell has no frozen configuration")
+    method = methods["methods"][cell["method"]]
+    if method.get("group") == "dp":
+        if cell.get("dp_epsilon") not in (1, 4, 10):
+            raise ValueError("final DP cell has no frozen epsilon")
+    elif "dp_epsilon" in cell:
+        raise ValueError("DP epsilon on non-DP cell")
     if (cell["scratch_reservation_bytes"] <= 0 or cell["memory_reservation_bytes"] <= 0
             or cell["timeout_seconds"] <= 0 or cell["gpu_vram_mib"] < 0):
         raise ValueError("invalid cell resource reservation")
@@ -147,7 +161,10 @@ def execute(cell: dict, host: str, slot: tuple[int, ...], attempt: int,
     job = {"worker_dir": cell["worker_dir"], "method": cell["method"],
            "fit_seed": cell["fit_seed"], "sample_seeds": cell["sample_seeds"],
            "size_multipliers": cell["size_multipliers"], "track": cell["track"],
+           "final": True, "configuration": cell["configuration"],
            "scratch_root": str(ROOT), "dope_binary": str(ROOT / "bin/dope-kernel")}
+    if "dp_epsilon" in cell:
+        job["dp_epsilon"] = cell["dp_epsilon"]
     job_path = queue_root / "jobs" / f"{name}.json"
     if job_path.exists():
         if json.loads(job_path.read_text()) != job:
@@ -272,7 +289,10 @@ def _run_locked(repo_root: Path, lock_root: Path, package: Path, queue_root: Pat
                     if cell["requires_gpu"] and any(running_host == host and running["requires_gpu"]
                                                      for running_host, _, running, _ in active.values()):
                         continue
-                    slot = available_slot(snapshot, occupied, cell)
+                    reserved_memory = sum(running["memory_reservation_bytes"]
+                                          for running_host, _, running, _ in active.values()
+                                          if running_host == host)
+                    slot = available_slot(snapshot, occupied, cell, reserved_memory)
                     if slot is None:
                         continue
                     attempt_dir = queue_root / "attempts" / name
