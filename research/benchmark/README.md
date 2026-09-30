@@ -25,6 +25,12 @@ worker partitions, and publishes validated trial receipts with
 `publish_compact_native`.
 The GaussianCopula validation wave uses `tune_copula freeze`, followed by
 `tune_copula tune DATASET_ID` for each frozen job, and `publish_copula`.
+The study-owned density baselines' complete S3 validation matrix is frozen by
+`freeze_all_native` and published by `publish_compact_native --expected-jobs 200
+--basename compact-native-all-validation` with its scratch round lock.
+The separate 100-lineage GaussianCopula matrix is frozen by
+`freeze_all_copula` and published by `publish_copula --expected-jobs 100
+--basename copula-native-all-validation` with its scratch round lock.
 An unavailable method is reported as unavailable; it is never a DOPE win.
 
 Use `python3 -m unittest discover -s research/benchmark/tests -v` for the
