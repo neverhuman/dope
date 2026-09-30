@@ -62,7 +62,14 @@ pub fn sample_joint(
     let mut missing = vec![false; tokens];
     for (ordered, &natural) in generator.feature_permutation.iter().enumerate() {
         ranks[natural as usize] = ordered_ranks[ordered];
-        missing[natural as usize] = ordered_missing[ordered];
+        let observed_rate = generator.normalization[natural as usize].missing_probability;
+        missing[natural as usize] = if observed_rate == 0.0 {
+            false
+        } else if observed_rate == 1.0 {
+            true
+        } else {
+            ordered_missing[ordered]
+        };
     }
     ranks[features] = ordered_ranks[features];
     // Targets are never emitted as missing, even if a corrupt training source

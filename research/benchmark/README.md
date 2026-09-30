@@ -15,6 +15,10 @@ The worker receives only training and validation data. The evaluator owns the
 test partition. Final evaluation is disabled until the data manifest, method
 source/config lock, budget lock, and method–dataset matrix are frozen. Missing
 privacy, utility, or attack evidence is a failed gate with a null MFS-v2 score.
+
+`RESULTS_STATUS.md` records the 2026-09-30 rights-cleared S3 preparation and
+validation-only GPU research. Its published JSON, table, and figures live in
+`results/`; the final comparison remains blocked by admission.
 An unavailable method is reported as unavailable; it is never a DOPE win.
 
 Use `python3 -m unittest discover -s research/benchmark/tests -v` for the

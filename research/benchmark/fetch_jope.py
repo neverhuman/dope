@@ -66,7 +66,8 @@ def fetch(dataset_hash: str, root: Path, profile: str) -> dict:
             raise ValueError("blob digest or byte count mismatch")
         files[kind] = str(path)
     return {"format": "dope-benchmark-source-fetch", "dataset_hash": dataset_hash,
-            "catalog_sha256": CATALOG_SHA256, "license": license_info,
+            "catalog_sha256": CATALOG_SHA256, "manifest_sha256": sha256(source_manifest),
+            "license": license_info,
             "files": {kind: {"path": files[kind], "sha256": selected["files"][kind]["sha256"]}
                       for kind in files}}
 

@@ -269,6 +269,19 @@ mod tests {
     }
 
     #[test]
+    fn neural_sampling_respects_observed_missingness_support() {
+        let mut generator = tvae_generator(2);
+        for seed in 0..64 {
+            let (_, missing) = sample_joint(&generator, 2, seed).unwrap();
+            assert_eq!(missing, vec![false, false, false]);
+        }
+        generator.normalization[0].missing_probability = 1.0;
+        generator.feature_permutation = vec![1, 0];
+        let (_, missing) = sample_joint(&generator, 2, 11).unwrap();
+        assert_eq!(missing, vec![true, false, false]);
+    }
+
+    #[test]
     fn transformer_and_ddim_sampling_are_deterministic_and_finite() {
         let features = 2;
         let tokens = features + 1;

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["format", "version", "panel", "catalog_sha256", "scratch_summary_sha256", "eligible_entries", "unknown_rights_excluded", "prepared", "excluded_after_checks", "final_evaluation_authorized", "entries"],
+  "properties": {
+    "format": {"const": "dope-benchmark-s3-data-lock"},
+    "version": {"const": 1},
+    "panel": {"const": "s3_matched_regression"},
+    "catalog_sha256": {"$ref": "#/$defs/sha256"},
+    "scratch_summary_sha256": {"$ref": "#/$defs/sha256"},
+    "eligible_entries": {"const": 104},
+    "unknown_rights_excluded": {"const": 3755},
+    "prepared": {"const": 100},
+    "excluded_after_checks": {"const": 4},
+    "final_evaluation_authorized": {"const": false},
+    "entries": {"type": "array", "minItems": 104, "maxItems": 104, "items": {"$ref": "#/$defs/entry"}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "entry": {
+      "type": "object",
+      "required": ["id", "status", "catalog_entry_sha256", "source_manifest_sha256", "object_sha256", "license", "receipt_sha256"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "status": {"enum": ["prepared", "excluded"]},
+        "catalog_entry_sha256": {"$ref": "#/$defs/sha256"},
+        "source_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "object_sha256": {
+          "type": "object", "required": ["train", "test", "meta"],
+          "properties": {"train": {"$ref": "#/$defs/sha256"}, "test": {"$ref": "#/$defs/sha256"}, "meta": {"$ref": "#/$defs/sha256"}}
+        },
+        "license": {"type": "object", "required": ["status", "spdx", "evidence_url"],
+                    "properties": {"status": {"const": "recorded"}, "spdx": {"const": "MIT"}, "evidence_url": {"type": "string", "minLength": 1}}},
+        "receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "source_row_hash": {"$ref": "#/$defs/sha256"},
+        "projection_sha256": {"$ref": "#/$defs/sha256"},
+        "row_group_assignments_sha256": {"$ref": "#/$defs/sha256"},
+        "evaluator_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "exclusion_reason": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "prepared"}}}, "then": {"required": ["source_row_hash", "split", "projection_sha256", "row_group_assignments_sha256", "projected_files", "evaluator_manifest_sha256"]}},
+        {"if": {"properties": {"status": {"const": "excluded"}}}, "then": {"required": ["exclusion_reason"]}}
+      ]
+    }
+  }
+}
