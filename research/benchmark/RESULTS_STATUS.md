@@ -89,6 +89,15 @@ round and immutable scratch attempt and KPI receipts. Regenerate them with
 `python3 -m research.benchmark.publish_compact_native`. Only the coordinator's
 training-derived worker partitions were used; official S3 tests remain closed.
 
+GaussianCopula used a separate frozen 12-cell validation matrix and its locked
+Copulas 0.14.1 environment. Both author-library distribution configurations
+completed on each dataset: 24 trials, no failures, and 7/12 selected artifacts
+within L3. The other five exceed 10,240 B. [Its validation JSON](results/copula-native-validation.json)
+and [schema](results/copula-native-validation.schema.json) carry per-trial
+status, KPI, bytes, and immutable scratch receipt hashes. Regenerate with
+`python3 -m research.benchmark.publish_copula`. This remains an exploratory
+single-fit-seed common-numeric result and is not a production comparison.
+
 ## Final admission still blocked
 
 The 29-method source inventory currently has four locked entries (DOPE and

@@ -1,0 +1,572 @@
+{
+  "aggregate": {
+    "cells": 12,
+    "failed_trials": 0,
+    "selected_within_l3": 7,
+    "trial_wall_seconds": 79.69213742646389,
+    "trials": 24
+  },
+  "cells": [
+    {
+      "dataset": "46c5a59e5ae42037",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 71945,
+      "selected_native_kpi": -12.052728544573979,
+      "selected_trial_index": 0,
+      "selected_within_l3": false,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/46c5a59e5ae42037/selection.json",
+      "selection_receipt_sha256": "00d769cc0409e0270a25360c6af2fc5f59c1f801692b3b337d6396ba229fc06c",
+      "stage": "confirmation",
+      "trials": [
+        {
+          "artifact_bytes": 71945,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/46c5a59e5ae42037/trial-00/attempt.json",
+          "attempt_receipt_sha256": "2cf534e98a977706e95718f45d10e318f74733efda5500864498d5049b83bc74",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "c84a1cf206cf7ad582b65d7189a3005ddeb23f1ca6cebe64df71b9fa434e0397",
+          "native_kpi": -12.052728544573979,
+          "status": "ok",
+          "wall_seconds": 4.903964657103643
+        },
+        {
+          "artifact_bytes": 4677,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/46c5a59e5ae42037/trial-01/attempt.json",
+          "attempt_receipt_sha256": "0ba716430401f4dc54b98302af3dc544f89f8370eb46242769ddfec2a8d2edb2",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "1e5f2a3a47b3ad40ea65400fc6f281c05f0e91caf9ab8265e949dd79e56f5bc7",
+          "native_kpi": -13.896789669575925,
+          "status": "ok",
+          "wall_seconds": 1.5908264280296862
+        }
+      ]
+    },
+    {
+      "dataset": "47c581af5de1136b",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 20600,
+      "selected_native_kpi": -35.499466660767396,
+      "selected_trial_index": 1,
+      "selected_within_l3": false,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/47c581af5de1136b/selection.json",
+      "selection_receipt_sha256": "44a1a5f004de18003df05ace996f73a8098366ad79c7a86d2a1c3a0712fc70de",
+      "stage": "confirmation",
+      "trials": [
+        {
+          "artifact_bytes": 54136,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/47c581af5de1136b/trial-00/attempt.json",
+          "attempt_receipt_sha256": "be60759358b45cf53e43324e02a941b0203ea2799f4f2625ce9a8b7c2e8cf66b",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "bc9d290b0478c50d8ad6a9369e8d13473ffe766ebd389960f98db1d24b14588d",
+          "native_kpi": -36.979585124309466,
+          "status": "ok",
+          "wall_seconds": 6.705962653970346
+        },
+        {
+          "artifact_bytes": 20600,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/47c581af5de1136b/trial-01/attempt.json",
+          "attempt_receipt_sha256": "5b79afb1aaebd7d3042dbdd1501b28bf6daeecec0a925b898c3a4cd2640c99db",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "22cbb0c3e57522dfbb394d040b24d4d022b2a8689764d8225e9fb632ba6bd332",
+          "native_kpi": -35.499466660767396,
+          "status": "ok",
+          "wall_seconds": 1.5441943649202585
+        }
+      ]
+    },
+    {
+      "dataset": "642738a361f1c63a",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 1257,
+      "selected_native_kpi": -2.873732704218109,
+      "selected_trial_index": 1,
+      "selected_within_l3": true,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/642738a361f1c63a/selection.json",
+      "selection_receipt_sha256": "1ff6c689afc6eec6e53198751c8c54817e68c6e53c6d903e59deb758c28fd76b",
+      "stage": "confirmation",
+      "trials": [
+        {
+          "artifact_bytes": 16300,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/642738a361f1c63a/trial-00/attempt.json",
+          "attempt_receipt_sha256": "a153d57af388daf455ad2e22569a61b04dc563d3bb1b07f9bb9ed4d7cd80bdef",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "e528fe3a5a18791fc8c857587cb01705ec5c4e74830849d781e44c259f7f83ee",
+          "native_kpi": -3.0704765436816337,
+          "status": "ok",
+          "wall_seconds": 2.4098247110377997
+        },
+        {
+          "artifact_bytes": 1257,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/642738a361f1c63a/trial-01/attempt.json",
+          "attempt_receipt_sha256": "cb8b2c48bc4e3ef2e35b6a8198d75cceb5f74607bc3543f85715c094af48d935",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "4f7d08e3f3fcb8c7e1f63b340b953f43952d6d95b085382e3a3381b486f55d5b",
+          "native_kpi": -2.873732704218109,
+          "status": "ok",
+          "wall_seconds": 1.538436303846538
+        }
+      ]
+    },
+    {
+      "dataset": "94a00ea67f49bf84",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 2452,
+      "selected_native_kpi": -7.024543315463142,
+      "selected_trial_index": 1,
+      "selected_within_l3": true,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/94a00ea67f49bf84/selection.json",
+      "selection_receipt_sha256": "b9f84577a8862ebe952abe8ca09731b1d77ef166d0f7d6012dc62c26fa51372d",
+      "stage": "confirmation",
+      "trials": [
+        {
+          "artifact_bytes": 9471,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/94a00ea67f49bf84/trial-00/attempt.json",
+          "attempt_receipt_sha256": "83c9c0b1f6d72e156f6f6b96e84c8324280ed8d0b4e25d18fa16350f3215a6af",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "d4c5fb90aa3790550658e6e487a2643754481da6d7b6b788c679ec185f4ce06d",
+          "native_kpi": -7.683972224400045,
+          "status": "ok",
+          "wall_seconds": 2.688245117198676
+        },
+        {
+          "artifact_bytes": 2452,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/94a00ea67f49bf84/trial-01/attempt.json",
+          "attempt_receipt_sha256": "f535057b25a06b92fc33f55ec3b0928276c65e8b23c2d5e56564904f596fe051",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "ec411bb9c2756ff111fefbecb02100032fd3c9221fcaef0c515c64d1bb0a2d0e",
+          "native_kpi": -7.024543315463142,
+          "status": "ok",
+          "wall_seconds": 1.6073241089470685
+        }
+      ]
+    },
+    {
+      "dataset": "ed2efb82fce4b098",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 5037,
+      "selected_native_kpi": -3.2640465367901967,
+      "selected_trial_index": 0,
+      "selected_within_l3": true,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/ed2efb82fce4b098/selection.json",
+      "selection_receipt_sha256": "527e43d3b166daec9724b31dd85c8645b8f44dfcb1f3dd1214b35b1879a537df",
+      "stage": "confirmation",
+      "trials": [
+        {
+          "artifact_bytes": 5037,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/ed2efb82fce4b098/trial-00/attempt.json",
+          "attempt_receipt_sha256": "eea8c229157001070e29b39146d71fc0a13e00f1b7d2d64921666c94c07f9e77",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "94d236a98e5e098067e315214615034e20f0f75ef5def4d5e5e511eb1570f7f6",
+          "native_kpi": -3.2640465367901967,
+          "status": "ok",
+          "wall_seconds": 2.2573749250732362
+        },
+        {
+          "artifact_bytes": 1212,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/ed2efb82fce4b098/trial-01/attempt.json",
+          "attempt_receipt_sha256": "1328fe35b0dc7651ce933cbfeb9a970931c2bf96751b7950f44c4b16407756d4",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "0ba869e8a98c764f5910fc093f00b31c3ff433f20d9425d1420b769aa0a40ae9",
+          "native_kpi": -3.9086962030260386,
+          "status": "ok",
+          "wall_seconds": 1.627047578105703
+        }
+      ]
+    },
+    {
+      "dataset": "f24e9383331c43e2",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 8349,
+      "selected_native_kpi": -12.910940453008575,
+      "selected_trial_index": 1,
+      "selected_within_l3": true,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/f24e9383331c43e2/selection.json",
+      "selection_receipt_sha256": "930904dcf3d5acf89bc95c4b7d40dd2474e9bcfc75ebd47790f20d7bca7531f6",
+      "stage": "confirmation",
+      "trials": [
+        {
+          "artifact_bytes": 153153,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/f24e9383331c43e2/trial-00/attempt.json",
+          "attempt_receipt_sha256": "567a1dae0418abc0b1c57bbe1d5ea2781b192420dda3f452351aff05c3a30931",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "e14cd8cc9e1ea7e4c47be8d7c3e8c1ce1af2f9e9201dbdd13477bebb666a0579",
+          "native_kpi": -13.272386116182481,
+          "status": "ok",
+          "wall_seconds": 5.376747478963807
+        },
+        {
+          "artifact_bytes": 8349,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/f24e9383331c43e2/trial-01/attempt.json",
+          "attempt_receipt_sha256": "bec9bfa3e6e0956d29708241b0dfebbe267ee8ec104678537389c185f15d25b7",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "5f012fd44fae7c6e9612cea151d9c4849d0b9c4d10555c2667dcf8753bfa4ca8",
+          "native_kpi": -12.910940453008575,
+          "status": "ok",
+          "wall_seconds": 1.6191723619122058
+        }
+      ]
+    },
+    {
+      "dataset": "0d482c1dd7cc6592",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 2396,
+      "selected_native_kpi": -6.2750171368588346,
+      "selected_trial_index": 1,
+      "selected_within_l3": true,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/0d482c1dd7cc6592/selection.json",
+      "selection_receipt_sha256": "aefd02cafdd59d3688a4a811ec8acfd83a96831efc42e06b456011daf9b12f0c",
+      "stage": "discovery",
+      "trials": [
+        {
+          "artifact_bytes": 3381,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/0d482c1dd7cc6592/trial-00/attempt.json",
+          "attempt_receipt_sha256": "6496508af594ac15f721f3575b7b4e766f0717e9715ee0b7d268bbadbe1dff2e",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "c815b9cf6a87ee73d3f3fd0241a645c76d671cfae3fd7f539ae7b21a1f7968a8",
+          "native_kpi": -6.899516484251269,
+          "status": "ok",
+          "wall_seconds": 2.9012081809341908
+        },
+        {
+          "artifact_bytes": 2396,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/0d482c1dd7cc6592/trial-01/attempt.json",
+          "attempt_receipt_sha256": "ea8967cc412ec5456306a7e7cc20fe2b0dd8dc597eb80d52305039b92bc169d4",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "101a99df43a3b8051222e3b68f06897ec54a38cef3ea44c98f41bcc49cb6acfb",
+          "native_kpi": -6.2750171368588346,
+          "status": "ok",
+          "wall_seconds": 1.6214250691700727
+        }
+      ]
+    },
+    {
+      "dataset": "0f86a714ec5f3ac6",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 179086,
+      "selected_native_kpi": -23.61260694472674,
+      "selected_trial_index": 0,
+      "selected_within_l3": false,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/0f86a714ec5f3ac6/selection.json",
+      "selection_receipt_sha256": "3db15272aab45c72dde477f7fe3156dae718f3f7960cc6c150275e7408482007",
+      "stage": "discovery",
+      "trials": [
+        {
+          "artifact_bytes": 179086,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/0f86a714ec5f3ac6/trial-00/attempt.json",
+          "attempt_receipt_sha256": "63cdf477de6ae87b80dc0304e29d78bfb5d2708d2c264f4d88691f67875c8731",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "eb3793b69f5b35b6af48f867f5c3a927440fb657c445c410665be927fd8ac607",
+          "native_kpi": -23.61260694472674,
+          "status": "ok",
+          "wall_seconds": 7.116914997110143
+        },
+        {
+          "artifact_bytes": 12288,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/0f86a714ec5f3ac6/trial-01/attempt.json",
+          "attempt_receipt_sha256": "aa7c61ce98df388a8f9fb2824c0e33ff8e204691daf04dd015a674b1a28dc0cf",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "1e65e8e5713bc3a05f48cf3824fb9805af9d94abba0534185754b3f68c9221c0",
+          "native_kpi": -26.42586825848062,
+          "status": "ok",
+          "wall_seconds": 1.5866613290272653
+        }
+      ]
+    },
+    {
+      "dataset": "1a4456d1cc71a26a",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 18823,
+      "selected_native_kpi": -9.791425555726327,
+      "selected_trial_index": 0,
+      "selected_within_l3": false,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/1a4456d1cc71a26a/selection.json",
+      "selection_receipt_sha256": "c251e7101803717ee4e4309e4ca14a5d8da9f17071d65fab8ae05e900a3f9ff2",
+      "stage": "discovery",
+      "trials": [
+        {
+          "artifact_bytes": 18823,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/1a4456d1cc71a26a/trial-00/attempt.json",
+          "attempt_receipt_sha256": "88e7804315dbdbc43f27df3cfb10c0a190c290ab32750df14b8d5873370c065c",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "49e132d80bbc6ff8428008a7e6c0d70caf81d35b7d15862d15eb8387c7966de4",
+          "native_kpi": -9.791425555726327,
+          "status": "ok",
+          "wall_seconds": 4.010685115121305
+        },
+        {
+          "artifact_bytes": 3566,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/1a4456d1cc71a26a/trial-01/attempt.json",
+          "attempt_receipt_sha256": "cadf14b376d322ec6870cecd05067e381a8a95c7f58dd8604fd9377d014d9161",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "c4015b08b83413506c8705a53f2667a51cfe1e71599cc285081b125178bd12f8",
+          "native_kpi": -10.84956786109315,
+          "status": "ok",
+          "wall_seconds": 1.5405814009718597
+        }
+      ]
+    },
+    {
+      "dataset": "297b7688a045c583",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 66352,
+      "selected_native_kpi": -78.78951344935712,
+      "selected_trial_index": 1,
+      "selected_within_l3": false,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/297b7688a045c583/selection.json",
+      "selection_receipt_sha256": "99c4fe0b0964ff376f511ee4f131804255a9bbdd3aad96b472cde8e41157650c",
+      "stage": "discovery",
+      "trials": [
+        {
+          "artifact_bytes": 100882,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/297b7688a045c583/trial-00/attempt.json",
+          "attempt_receipt_sha256": "8e77679aa1868a39162d16aab91b51f61977c3066d1cee168a361a93201e177b",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "80906b613207ec7816051cb13f57cd46c31a852e3ed829321e5de3adc8834f0a",
+          "native_kpi": -86.00966675834391,
+          "status": "ok",
+          "wall_seconds": 13.994747743010521
+        },
+        {
+          "artifact_bytes": 66352,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/297b7688a045c583/trial-01/attempt.json",
+          "attempt_receipt_sha256": "11930c339e39ec0843a3289b821b0d05e5d363ad5c2369dcb372ce0410010348",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "376f76858441da9299c6973910933bac61dde5338c1e46e52df357321be4d22d",
+          "native_kpi": -78.78951344935712,
+          "status": "ok",
+          "wall_seconds": 4.031693604076281
+        }
+      ]
+    },
+    {
+      "dataset": "471f11cc2d38853a",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 2018,
+      "selected_native_kpi": -6.533172985115271,
+      "selected_trial_index": 1,
+      "selected_within_l3": true,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/471f11cc2d38853a/selection.json",
+      "selection_receipt_sha256": "a7df9681e39800aabe77a8b20d0d15c8d8770f66788f194c168efaf623796a7a",
+      "stage": "discovery",
+      "trials": [
+        {
+          "artifact_bytes": 13756,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/471f11cc2d38853a/trial-00/attempt.json",
+          "attempt_receipt_sha256": "ff6d0d54f3469e77df4241b2f027ad80e1dc3a27f3c0d513e0499a6f2e5ac71c",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "a1e1f489ee5543e9f497eeb611d3ac4ed975765c92bc06d53b36e27758c29d5a",
+          "native_kpi": -7.11058956235761,
+          "status": "ok",
+          "wall_seconds": 3.769120241049677
+        },
+        {
+          "artifact_bytes": 2018,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/471f11cc2d38853a/trial-01/attempt.json",
+          "attempt_receipt_sha256": "9a47f49b396ecb8342a1b65f1b8ebd99fb65e9a55dae89a5dbf147652b82cc2e",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "6f8f706b3b893cf21a851e7d7542916585ad323c9f20832649f04eeeebfcde4c",
+          "native_kpi": -6.533172985115271,
+          "status": "ok",
+          "wall_seconds": 1.5978441790211946
+        }
+      ]
+    },
+    {
+      "dataset": "a863cd42be4d05d4",
+      "method": "GaussianCopula",
+      "objective": "mean_log_density",
+      "selected_artifact_bytes": 1216,
+      "selected_native_kpi": -2.2091485461215177,
+      "selected_trial_index": 1,
+      "selected_within_l3": true,
+      "selection_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/a863cd42be4d05d4/selection.json",
+      "selection_receipt_sha256": "1b4c022242bff9d9a41e642a241fda63e227f6f65e939c61bd833ac8f111c36d",
+      "stage": "discovery",
+      "trials": [
+        {
+          "artifact_bytes": 3294,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/a863cd42be4d05d4/trial-00/attempt.json",
+          "attempt_receipt_sha256": "91bc711028af63dab60c80fd8e2913c2ab9b46b79c5072070ad2a1ed59c18afb",
+          "config": {
+            "distribution": "Univariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 0,
+          "metric_receipt_sha256": "16951b03e2e8f6af227366d36af5395d992bf40b5d212f0cadc39cebeca48934",
+          "native_kpi": -2.6724909714916514,
+          "status": "ok",
+          "wall_seconds": 2.1299201529473066
+        },
+        {
+          "artifact_bytes": 1216,
+          "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/copula-native-v1/a863cd42be4d05d4/trial-01/attempt.json",
+          "attempt_receipt_sha256": "3c3e80673bc2cef228ff2742bf54435454f6873207cf33e111cdcec6b022e556",
+          "config": {
+            "distribution": "GaussianUnivariate",
+            "fit_timeout_seconds": 900,
+            "sample_timeout_seconds": 600
+          },
+          "failure_type": null,
+          "index": 1,
+          "metric_receipt_sha256": "784d76e7543d4558c14b476c435f09b2129dbfd212dfd62d6280964658553e1f",
+          "native_kpi": -2.2091485461215177,
+          "status": "ok",
+          "wall_seconds": 1.5222147249151021
+        }
+      ]
+    }
+  ],
+  "format": "dope-benchmark-copula-native-validation",
+  "method_lock_sha256": "406ac543c2b6f139c6fc665a556c754af48392962bcbdf4d39d256243bb0102e",
+  "mfs_v2": null,
+  "production_certified": false,
+  "ptf_v1": null,
+  "public_or_s3_test_opened": false,
+  "round_lock_sha256": "6aa401c0e1475e0ff16e2575509e81562c248259c5d310341a7a5b6718526b57",
+  "scope": "validation_only_one_fit_seed",
+  "version": 1
+}
