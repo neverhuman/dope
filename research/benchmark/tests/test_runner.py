@@ -72,26 +72,46 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(fit_receipt.exists())
             self.assertTrue(sample_receipt.exists())
 
-    def test_frozen_tuned_configuration_requires_eight_validation_trials(self):
+    def test_frozen_tuned_configuration_selects_native_validation_winner(self):
         with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:
             root = Path(directory)
             selected = {"bins": 32}
+            objective = {"status": "locked", "name": "mean_log_density",
+                         "direction": "maximize", "implementation_sha256": "metric",
+                         "tie_breaks": ["artifact_bytes_ascending", "config_sha256_ascending"]}
+            metric = root / "native-metric.json"
+            metric.write_text(json.dumps({"method": "independent_marginals",
+                                          "partition": "validation", "objective": "mean_log_density",
+                                          "implementation_sha256": "metric", "value": 1.0,
+                                          "artifact_sha256": "artifact"}))
             receipt = root / "selection.json"
             evidence = {"format": "dope-benchmark-validation-selection",
                         "partition": "validation", "dataset": "toy",
-                        "method": "independent_marginals", "selected_config": selected,
-                        "trials": [{"status": "ok", "wall_seconds": 1} for _ in range(8)]}
+                        "method": "independent_marginals", "objective": objective,
+                        "selected_config": selected, "selected_trial_index": 0,
+                        "trials": [{"status": "ok", "wall_seconds": 1, "config": selected,
+                                    "native_kpi": 1.0, "artifact_bytes": 100,
+                                    "artifact_sha256": "artifact",
+                                    "metric_receipt_path": str(metric),
+                                    "metric_receipt_sha256": sha256(metric)} for _ in range(8)]}
             receipt.write_text(json.dumps(evidence))
             job = {"final": True, "method": "independent_marginals",
                    "configuration": {"kind": "tuned", "values": selected,
                                      "selection_path": str(receipt),
                                      "selection_sha256": sha256(receipt)}}
             entry = {"group": "compact", "default_config": {"bins": 16},
-                     "tuning_search_space": {"bins": [8, 16, 32]}}
+                     "tuning_search_space": {"bins": [8, 16, 32]},
+                     "native_objective": objective}
             config, identity = runner.resolve_configuration(job, entry, "toy", 100, root)
             self.assertEqual(config, selected)
             self.assertEqual(identity["selection_sha256"], sha256(receipt))
-            evidence["trials"].pop()
+            evidence["selected_trial_index"] = 1
+            receipt.write_text(json.dumps(evidence))
+            job["configuration"]["selection_sha256"] = sha256(receipt)
+            with self.assertRaisesRegex(ValueError, "native KPI winner"):
+                runner.resolve_configuration(job, entry, "toy", 100, root)
+            evidence["selected_trial_index"] = 0
+            evidence["trials"].clear()
             receipt.write_text(json.dumps(evidence))
             job["configuration"]["selection_sha256"] = sha256(receipt)
             with self.assertRaisesRegex(ValueError, "invalid validation selection"):

@@ -112,6 +112,18 @@
       "group": "compact",
       "license": "MIT",
       "license_evidence": "https://github.com/neverhuman/dope/blob/581fd6999dcfd215c364369b3198daf161b89c2c/LICENSE",
+      "native_objective": {
+        "direction": "maximize",
+        "implementation_sha256": "fb17475eaea1e330f0521c25d8db3148bce050aeac44ccbd6e32f000747ece8a",
+        "name": "mean_log_density",
+        "partition": "validation",
+        "status": "locked",
+        "tie_breaks": [
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
+        ],
+        "track": "common_numeric"
+      },
       "note": "Study-owned discretized Chow-Liu reference implementation, not original author code; every projected column enters the mutual-information maximum spanning tree. Original method DOI is upstream_url.",
       "sampling_command": "research.benchmark.adapters.sample(Chow-Liu, ARTIFACT, ROWS, SAMPLE_SEED, OUTPUT)",
       "source_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
@@ -198,6 +210,18 @@
       "group": "compact",
       "license": "BUSL-1.1",
       "license_evidence": "https://github.com/sdv-dev/Copulas/blob/ffb8ce4b704e5cb6c9f3c0a7880c7f0a5f64ad22/LICENSE",
+      "native_objective": {
+        "direction": "maximize",
+        "implementation_sha256": "fb17475eaea1e330f0521c25d8db3148bce050aeac44ccbd6e32f000747ece8a",
+        "name": "mean_log_density",
+        "partition": "validation",
+        "status": "locked",
+        "tie_breaks": [
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
+        ],
+        "track": "common_numeric"
+      },
       "note": "Copulas 0.14.1 GaussianMultivariate numerical implementation; common-numeric track only; BSL permits non-production research use",
       "sampling_command": "research.benchmark.adapters.sample(GaussianCopula, ARTIFACT, ROWS, SAMPLE_SEED, OUTPUT)",
       "source_sha256": "6f010444385a304274e7587b45f56b860ca38b621529ad0f9bbd4024de91dd1d",
@@ -445,6 +469,18 @@
       "group": "compact",
       "license": "MIT",
       "license_evidence": "https://github.com/neverhuman/dope/blob/581fd6999dcfd215c364369b3198daf161b89c2c/LICENSE",
+      "native_objective": {
+        "direction": "maximize",
+        "implementation_sha256": "fb17475eaea1e330f0521c25d8db3148bce050aeac44ccbd6e32f000747ece8a",
+        "name": "mean_log_density",
+        "partition": "validation",
+        "status": "locked",
+        "tie_breaks": [
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
+        ],
+        "track": "common_numeric"
+      },
       "note": "study reference implementation, not an upstream author baseline",
       "sampling_command": "research.benchmark.adapters.sample(independent_marginals, ARTIFACT, ROWS, SEED, OUTPUT)",
       "source_note": "Study-owned adapter file SHA-256 is the executable source identity; repository commit pending research branch publication.",

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["format", "version", "scope", "s3_data_lock_sha256", "round_lock_sha256", "cells", "confirmation_pairs", "aggregate", "ptf_v1", "mfs_v2", "production_certified", "public_or_s3_test_opened"],
+  "properties": {
+    "format": {"const": "dope-benchmark-validation-research"},
+    "version": {"const": 1},
+    "scope": {"const": "validation_only_single_fit_seed_single_sample_seed"},
+    "s3_data_lock_sha256": {"$ref": "#/$defs/sha256"},
+    "round_lock_sha256": {"type": "object", "required": ["0", "1", "2", "3"], "additionalProperties": {"$ref": "#/$defs/sha256"}},
+    "cells": {"type": "array", "minItems": 172, "maxItems": 172, "items": {"$ref": "#/$defs/cell"}},
+    "confirmation_pairs": {"type": "array", "minItems": 6, "maxItems": 6,
+      "items": {"type": "object", "required": ["dataset", "symbolic_catboost_retention", "micro_default_catboost_retention", "symbolic_minus_micro_default"],
+                "properties": {"dataset": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+                  "symbolic_catboost_retention": {"type": "number"},
+                  "micro_default_catboost_retention": {"type": "number"},
+                  "symbolic_minus_micro_default": {"type": "number"}}}},
+    "aggregate": {"type": "object", "required": ["cells", "gpu_fits", "gpu_l3_artifact_fits", "s3_candidate_lineages", "survey_completed", "survey_catboost_retention_measured", "survey_catboost_retention_median", "confirmation_symbolic_above_micro_default"],
+      "properties": {"cells": {"const": 172}, "gpu_fits": {"const": 60}, "gpu_l3_artifact_fits": {"type": "integer", "minimum": 0, "maximum": 60}, "s3_candidate_lineages": {"const": 100}, "survey_completed": {"type": "integer", "minimum": 0, "maximum": 100}, "survey_catboost_retention_measured": {"type": "integer", "minimum": 0, "maximum": 100}, "survey_catboost_retention_median": {"type": ["number", "null"]}, "confirmation_symbolic_above_micro_default": {"type": "integer", "minimum": 0, "maximum": 6}}},
+    "ptf_v1": {"type": "null"},
+    "mfs_v2": {"type": "null"},
+    "production_certified": {"const": false},
+    "public_or_s3_test_opened": {"const": false}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nullable_number": {"type": ["number", "null"]},
+    "cell": {
+      "type": "object",
+      "required": ["phase", "dataset", "family", "target_weight", "structural_penalty", "status", "host", "attempt_receipt_path", "attempt_receipt_sha256", "artifact_bytes", "encoded_candidate_bytes", "failure_code", "fit_seconds", "peak_gpu_used_mib", "energy_joules_estimate", "metric_sha256", "catboost_retention", "linear_retention", "mlp_retention", "c2st_auc", "exact_copies", "near_copies"],
+      "properties": {
+        "phase": {"enum": ["discovery", "discovery_refinement", "confirmation", "all_validation_lineages"]},
+        "dataset": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "family": {"enum": ["symbolic_default", "micro_tvae_4_16", "tiny_mat_16_2_32", "tabsyn"]},
+        "target_weight": {"$ref": "#/$defs/nullable_number"},
+        "structural_penalty": {"$ref": "#/$defs/nullable_number"},
+        "status": {"enum": ["ok", "failed", "timeout", "memory_limit", "admission_blocked"]},
+        "host": {"type": ["string", "null"]},
+        "attempt_receipt_path": {"type": "string", "minLength": 1},
+        "attempt_receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "artifact_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "encoded_candidate_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "failure_code": {"type": ["string", "null"]},
+        "fit_seconds": {"$ref": "#/$defs/nullable_number"},
+        "peak_gpu_used_mib": {"type": ["integer", "null"], "minimum": 0},
+        "energy_joules_estimate": {"$ref": "#/$defs/nullable_number"},
+        "metric_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "catboost_retention": {"$ref": "#/$defs/nullable_number"},
+        "linear_retention": {"$ref": "#/$defs/nullable_number"},
+        "mlp_retention": {"$ref": "#/$defs/nullable_number"},
+        "c2st_auc": {"$ref": "#/$defs/nullable_number"},
+        "exact_copies": {"type": ["integer", "null"], "minimum": 0},
+        "near_copies": {"type": ["integer", "null"], "minimum": 0}
+      }
+    }
+  }
+}

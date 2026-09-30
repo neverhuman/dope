@@ -28,7 +28,9 @@ def digest(value: object) -> str:
 def read_csv(path: Path, header: bool) -> tuple[list[str], list[list[str]]]:
     with path.open(newline="", encoding="utf-8-sig") as stream:
         reader = csv.reader(stream)
-        first = next(reader)
+        first = next(reader, None)
+        if first is None:
+            raise ValueError("empty source CSV")
         columns = first if header else [f"c{i}" for i in range(len(first))]
         rows = list(reader) if header else [first, *reader]
     if not rows or len(columns) < 2 or any(len(row) != len(columns) for row in rows):
@@ -63,6 +65,26 @@ def split_rows(rows: list[list[str]], target_index: int, task: str, seed: int = 
     if any(not indices for indices in splits.values()):
         raise ValueError("split has an empty partition")
     return splits
+
+
+def split_official_training(rows: list[list[str]], seed: int = 1729) -> dict:
+    """Group identical official training rows into deterministic 80/20 fit/validation sets."""
+    groups = defaultdict(list)
+    for index, row in enumerate(rows):
+        groups[row_digest(row)].append(index)
+    members = sorted(groups.items())
+    random.Random(digest([seed, "official_training"])).shuffle(members)
+    split = {"train": [], "validation": []}
+    seen = 0
+    for _, indices in members:
+        name = "train" if seen < 0.8 * len(rows) else "validation"
+        split[name].extend(indices)
+        seen += len(indices)
+    for indices in split.values():
+        indices.sort()
+    if any(not indices for indices in split.values()):
+        raise ValueError("official training has insufficient distinct row groups")
+    return split
 
 
 def check_nonoverlap(parts: dict[str, list[list[str]]]) -> None:
@@ -179,6 +201,20 @@ def prepare(entry: dict, output_root: Path, seen: dict | None = None) -> dict:
         indices = split_rows(rows, columns.index(entry["target"]), entry["task"])
         parts = {name: [rows[i] for i in ids] for name, ids in indices.items()}
         split_kind = "deterministic_grouped_60_20_20"
+    elif set(raw) == {"train", "test"}:
+        if not entry.get("official_split_id") or not entry.get("official_split_source"):
+            raise ValueError("official split provenance incomplete")
+        train_path, test_path = Path(raw["train"]), Path(raw["test"])
+        columns, official_train = read_csv(train_path, header)
+        test_columns, official_test = read_csv(test_path, header)
+        if test_columns != columns:
+            raise ValueError("official split columns differ")
+        indices = split_official_training(official_train)
+        parts = {name: [official_train[i] for i in ids] for name, ids in indices.items()}
+        parts["test"] = official_test
+        raw_files = {name: {"path": str(path), "sha256": sha256(path)}
+                     for name, path in (("train", train_path), ("test", test_path))}
+        split_kind = "official_test_grouped_training_80_20"
     else:
         if not entry.get("official_split_id") or not entry.get("official_split_source"):
             raise ValueError("official split provenance incomplete")
@@ -206,6 +242,7 @@ def prepare(entry: dict, output_root: Path, seen: dict | None = None) -> dict:
         return {"format": "dope-benchmark-deduplication", "duplicate_id": entry["id"],
                 "canonical_id": seen[source_key], "source_row_hash": source_row_hash}
     split_hashes = {name: digest(sorted(row_digest(row) for row in rows)) for name, rows in parts.items()}
+    projected_parts = {name: project(rows, mapping) for name, rows in parts.items()}
     dataset_id = entry["id"]
     worker = output_root / "worker" / dataset_id
     evaluator = output_root / "evaluator" / dataset_id
@@ -213,9 +250,16 @@ def prepare(entry: dict, output_root: Path, seen: dict | None = None) -> dict:
         raise FileExistsError("prepared dataset already exists; freeze is immutable")
     worker.mkdir(parents=True)
     evaluator.mkdir(parents=True)
+    if split_kind == "official_test_grouped_training_80_20":
+        assignment = {row_digest(row): name for name in ("train", "validation")
+                      for row in parts[name]}
+        assignment_path = worker / "row-group-assignments.json"
+        assignment_path.write_text(json.dumps(assignment, sort_keys=True, separators=(",", ":")) + "\n")
+    else:
+        assignment_path = None
     for name, rows in parts.items():
         destination = (evaluator if name == "test" else worker) / f"{name}.csv"
-        write_numeric(destination, project(rows, mapping))
+        write_numeric(destination, projected_parts[name])
     (worker / "projection.json").write_text(json.dumps(mapping, sort_keys=True, indent=2) + "\n")
     manifest = {
         "format": "dope-benchmark-dataset", "version": 1, "id": dataset_id,
@@ -224,10 +268,12 @@ def prepare(entry: dict, output_root: Path, seen: dict | None = None) -> dict:
         "task": entry["task"], "target": entry["target"],
         "raw_files": raw_files, "source_row_hash": source_row_hash,
         "source_archive_sha256": entry.get("source_archive_sha256"),
+        "source_object": entry.get("source_object"),
         "transformation_sha256": entry.get("transformation_sha256"),
         "rows": len(all_rows), "columns": len(columns),
         "split": {"kind": split_kind, "seed": None if split_kind == "official" else 1729,
                   "hashes": split_hashes, "rows": {name: len(rows) for name, rows in parts.items()}},
+        "row_group_assignments_sha256": sha256(assignment_path) if assignment_path else None,
         "projection_sha256": sha256(worker / "projection.json"),
         "projected_files": {name: sha256((evaluator if name == "test" else worker) / f"{name}.csv") for name in parts},
     }

@@ -32,11 +32,22 @@ def assess(repo_root: Path, lock_root: Path) -> dict:
             blockers.append(f"{name}:not_frozen")
     if "methods.lock.json" in locks:
         methods = locks["methods.lock.json"].get("methods", {})
+        def objective_ready(row: dict) -> bool:
+            objective = row.get("native_objective")
+            return isinstance(objective, dict) and (
+                (objective.get("status") == "locked"
+                 and objective.get("name")
+                 and objective.get("direction") in ("maximize", "minimize")
+                 and objective.get("implementation_sha256")
+                 and objective.get("tie_breaks") ==
+                 ["artifact_bytes_ascending", "config_sha256_ascending"])
+                or (objective.get("status") == "inapplicable" and objective.get("reason")))
         if not methods or any(row.get("status") not in ("locked", "unavailable") or
                 (row.get("status") == "locked" and not all(row.get(key) is not None
                  for key in ("source_sha256", "adapter_sha256", "default_config",
                              "tuning_search_space", "dependency_or_container_digest", "license",
                              "license_evidence", "fit_command", "sampling_command")))
+                or (row.get("status") == "locked" and not objective_ready(row))
                 or (row.get("status") == "unavailable" and not row.get("note"))
                 for row in methods.values()):
             blockers.append("methods.lock.json:source_or_config_gap")

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import shutil
 import signal
@@ -111,18 +112,57 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
             raise ValueError("selection evidence digest mismatch")
         selection = json.loads(selection_path.read_text())
         trials = selection.get("trials")
+        objective = entry.get("native_objective")
         if (selection.get("format") != "dope-benchmark-validation-selection"
                 or selection.get("partition") != "validation"
                 or selection.get("dataset") != dataset
                 or selection.get("method") != job["method"]
+                or not isinstance(objective, dict)
+                or objective.get("status") != "locked"
+                or objective.get("direction") not in ("maximize", "minimize")
+                or selection.get("objective") != objective
                 or selection.get("selected_config") != config
-                or not isinstance(trials, list) or len(trials) != 8
-                or any(not isinstance(trial, dict)
-                       or trial.get("status") not in ("ok", "timeout", "failed")
-                       or not isinstance(trial.get("wall_seconds"), (int, float))
-                       or not 0 <= trial["wall_seconds"] <= 43200 for trial in trials)
-                or sum(trial["wall_seconds"] for trial in trials) > 43200):
+                or not isinstance(trials, list) or not 1 <= len(trials) <= 8):
             raise ValueError("invalid validation selection evidence")
+        successful = []
+        elapsed = 0.0
+        for index, trial in enumerate(trials):
+            if not isinstance(trial, dict) or trial.get("status") not in ("ok", "timeout", "failed"):
+                raise ValueError("invalid validation selection evidence")
+            trial_config = trial.get("config")
+            seconds = trial.get("wall_seconds")
+            if (not isinstance(trial_config, dict) or set(trial_config) != set(default)
+                    or any(value != default[key] and value not in search.get(key, [])
+                           for key, value in trial_config.items())
+                    or not isinstance(seconds, (int, float)) or not math.isfinite(seconds)
+                    or not 0 <= seconds <= 43200):
+                raise ValueError("invalid validation selection evidence")
+            elapsed += seconds
+            if trial["status"] != "ok":
+                continue
+            metric_path = Path(trial.get("metric_receipt_path", ""))
+            if (not metric_path.resolve().is_relative_to(scratch_root.resolve())
+                    or sha256(metric_path) != trial.get("metric_receipt_sha256")):
+                raise ValueError("invalid native KPI receipt")
+            metric = json.loads(metric_path.read_text())
+            value = trial.get("native_kpi")
+            artifact_bytes = trial.get("artifact_bytes")
+            if (metric.get("method") != job["method"]
+                    or metric.get("partition") != "validation"
+                    or metric.get("objective") != objective.get("name")
+                    or metric.get("implementation_sha256") != objective.get("implementation_sha256")
+                    or metric.get("value") != value
+                    or metric.get("artifact_sha256") != trial.get("artifact_sha256")
+                    or not isinstance(value, (int, float)) or not math.isfinite(value)
+                    or not isinstance(artifact_bytes, int) or artifact_bytes < 0):
+                raise ValueError("invalid native KPI receipt")
+            successful.append((index, value, artifact_bytes, trial_config))
+        if not successful or elapsed > 43200:
+            raise ValueError("invalid validation selection evidence")
+        sign = -1 if objective["direction"] == "maximize" else 1
+        winner = min(successful, key=lambda row: (sign * row[1], row[2], digest(row[3]), row[0]))
+        if selection.get("selected_trial_index") != winner[0] or config != winner[3]:
+            raise ValueError("selected configuration is not the native KPI winner")
         identity = {"kind": kind, "selection_sha256": choice["selection_sha256"]}
         config = dict(config)
     if entry.get("group") == "dp" and job.get("final"):
