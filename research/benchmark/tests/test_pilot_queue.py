@@ -1,4 +1,5 @@
 import unittest
+import queue
 
 from research.benchmark import pilot_queue
 
@@ -16,6 +17,15 @@ class PilotQueueTests(unittest.TestCase):
         self.assertTrue(all(cell["host"] == "xbabe2" for cell in cells
                             if cell["method"] == "GaussianCopula"))
         self.assertTrue(all("test" not in str(cell).lower() for cell in cells))
+
+    def test_cpu_slot_is_returned_after_worker_failure(self):
+        pool = queue.Queue()
+        pool.put(1)
+        with self.assertRaisesRegex(RuntimeError, "worker"):
+            with pilot_queue.cpu_slot("xbabe2", {"xbabe2": pool}) as slot:
+                self.assertEqual(slot, 1)
+                raise RuntimeError("worker")
+        self.assertEqual(pool.get_nowait(), 1)
 
 
 if __name__ == "__main__":

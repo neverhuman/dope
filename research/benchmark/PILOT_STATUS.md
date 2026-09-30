@@ -35,3 +35,21 @@ The AIM Adult retry also reached its 1,200 s child-process cap without a samplin
 ## Update 14:47 UTC
 
 The 12-fit compact reference supplement completed with 12 successful fits and all 96 deterministic sample cells. Fit costs were 0.06–1.77 s for Chow–Liu and 0.06–0.52 s for independent marginals; sampling across eight cells took 6–185 s per fit depending on dataset and method. Charged artifact bytes were: Adult 19,100/27,896, California 4,296/11,783, and News 25,937/71,671 for marginals/Chow–Liu respectively. Only California independent marginals is within L3 among these six dataset–method combinations. These are cost and byte observations, not generator-gate passes. Validation-only `n` metrics for both methods are being completed.
+
+## Update 15:02 UTC
+
+Both California GaussianCopula repair jobs fitted in 54.3–54.5 s and produced 1,619,430-byte charged artifacts, far above L2 and L3. Each attempted four sample cells; all eight sample attempts reached the 600 s in-process sampling cap. The 2,700 s outer job cap then stopped both jobs, and their attempt-2 timeout receipts are preserved. The two News GaussianCopula repair jobs have now started on xbabe2. The reconciled fixed-matrix tally is currently 6 successful DOPE jobs, 4 Gaussian timeouts, 2 Gaussian jobs in progress, and 30 source-blocked cells. No Gaussian sample has entered validation scoring.
+
+An independent xbabe1 rerun of the completed California Chow–Liu seed-11 host job returned all eight existing sample receipts with unchanged SHA-256 values for the fit and sample receipts. The check is saved as `compact-supplement/resume-check.json` on benchmark scratch. It demonstrates pilot host-job idempotence without opening test data.
+
+## Update 15:27 UTC
+
+Both News GaussianCopula repair fits have been active for about 25 minutes without a fit receipt. Each remains under the 2,700 s outer cap and 16-core affinity; the coordinator still reports more than 80 GiB memory available, so these pilot jobs are not pressuring other owners' workloads. The 21 completed runner artifact inventories available so far reconcile exactly with their charged byte receipts. The real-test admission check exited 2 with six missing or incomplete lock blockers, and the test partition remains sealed.
+
+The frozen queue placed both simultaneous GaussianCopula seeds on affinity 0–15. This does not exceed either job's 16-core cap but creates contention and weakens standalone timing inference. The reusable launcher now assigns disjoint 16-core slots per host; the already-running frozen attempts are left unchanged and will be reported with this limitation.
+
+## Closed 15:47 UTC
+
+The four-hour maximum pilot closed in 2 h 34 min. Reconciled fixed-matrix status: 6 DOPE successes with 48 deterministic samples, 6 GaussianCopula outer timeouts, and 30 source-blocked cells. The failure ledger retains 40 blocked, failed, or timed-out attempts across original and repair queues. News GaussianCopula did fit on both seeds in 2,327–2,329 s, producing 11,720,459-byte artifacts, but no sample receipt before the 2,700 s job cap. Adult GaussianCopula timed out without a fit artifact; California fitted but every attempted sample timed out. None of these outcomes is scored as an MFS-v2 comparison.
+
+The separate 12-fit compact reference supplement, one TabPC compatibility probe, and AIM pilot-only probes are accounted for in `PILOT_COST_REPORT.md`. The final artifact inventory audit reconciled all 23 completed runner fit artifacts. The public test remains unopened, `budget.lock.json` remains absent, and the admission check fails closed with six lock blockers. The decision is **no full campaign admission from this pilot** because the protected compact method set and evaluator are incomplete and the 14-day tuning and attack budget cannot be frozen from these measurements.

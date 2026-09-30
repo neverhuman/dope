@@ -233,7 +233,8 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                            "status": "timeout" if isinstance(error, TimeoutError) else "failed",
                            "run_key": key, "fit_key": fit_key, "sample_seed": sample_seed,
                            "row_count": row_count, "sample_seconds": time.perf_counter() - start,
-                           "error_type": type(error).__name__, "host": os.uname().nodename}
+                           "error_type": getattr(error, "source_error_type", type(error).__name__),
+                           "host": os.uname().nodename}
             _write_once(receipt_path, receipt)
             receipts.append(receipt)
     return receipts
@@ -251,7 +252,7 @@ def main() -> None:
         os.sched_setaffinity(0, set(sorted(os.sched_getaffinity(0))[:16]))
     for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS"):
         os.environ[name] = "16"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
     print(json.dumps(run(json.loads(args.job.read_text()), json.loads(args.methods.read_text()),
                          args.output_root), sort_keys=True))
 

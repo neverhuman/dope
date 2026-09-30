@@ -1,7 +1,8 @@
 # Prepilot cost and feasibility record
 
-Observed 2026-09-29. This record precedes the preregistered 24-hour,
-seven-method pilot. It measures worker and validation costs; it makes no MFS-v2,
+Observed 2026-09-29. This record precedes the seven-method pilot, whose
+maximum was amended from 24 hours to four hours before new dispatch on
+2026-09-30. It measures worker and validation costs; it makes no MFS-v2,
 privacy, or superiority claim. The public test partitions remain sealed.
 
 ## Inputs and execution

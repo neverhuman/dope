@@ -34,6 +34,9 @@ class PilotReportTests(unittest.TestCase):
             self.assertEqual(next(job for job in jobs if job["cell"] == "Adult-GaussianCopula-11")["status"], "ok")
             self.assertEqual(next(job for job in jobs if job["cell"] == "Adult-GaussianCopula-11")["attempts"], 2)
             self.assertEqual(next(item for item in ledger if item["cell"] == "Adult-GaussianCopula-11")["status"], "failed")
+            (root / "logs" / "Adult-GaussianCopula-11.log").write_text("unrelated failure\n")
+            with self.assertRaisesRegex(ValueError, "not the registered package-path failure"):
+                pilot_report.reconcile_jobs(root)
 
 
 if __name__ == "__main__":

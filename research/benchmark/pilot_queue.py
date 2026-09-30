@@ -7,12 +7,16 @@ import concurrent.futures
 import hashlib
 import json
 import os
+import queue
 import shlex
 import subprocess
 import threading
 import time
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+
+from .fetch_jope import LIMIT, used_bytes
 
 
 ROSTER = ("dope", "GaussianCopula", "TabPC", "TabKDE", "TabSyn", "TabDiff", "AIM")
@@ -24,6 +28,15 @@ HOST_SLOTS = {"xbabe1": 2, "xbabe2": 2, "xbabe3": 2}
 ROOT = Path("/mnt/fast-scratch/dope-benchmark")
 PACKAGE = ROOT / "pilot-4h" / "package"
 RESULTS = ROOT / "pilot-4h" / "results"
+
+
+@contextmanager
+def cpu_slot(host: str, pools: dict):
+    slot = pools[host].get()
+    try:
+        yield slot
+    finally:
+        pools[host].put(slot)
 
 
 def digest(path: Path) -> str:
@@ -80,7 +93,7 @@ def job_name(cell: dict) -> str:
     return f"{cell['dataset']}-{cell['method']}-{cell['fit_seed']}"
 
 
-def run_cell(cell: dict, deadline_epoch: float, semaphores: dict,
+def run_cell(cell: dict, deadline_epoch: float, semaphores: dict, cpu_pools: dict,
              repair_digest_mismatch: bool = False) -> dict:
     name = job_name(cell)
     directory = ROOT / "pilot-4h"
@@ -107,12 +120,20 @@ def run_cell(cell: dict, deadline_epoch: float, semaphores: dict,
         atomic_json(receipt_path, receipt)
         return receipt
     host = cell["host"]
-    with semaphores[host]:
+    with semaphores[host], cpu_slot(host, cpu_pools) as slot:
         start = time.time()
         common["started_utc"] = datetime.fromtimestamp(start, timezone.utc).isoformat()
+        common["cpu_affinity"] = f"{16 * slot}-{16 * slot + 15}"
         remaining = int(deadline_epoch - time.time())
         if remaining <= 0:
             receipt = {**common, "status": "not_started", "reason": "pilot_deadline",
+                       "elapsed_seconds": 0.0}
+            atomic_json(receipt_path, receipt)
+            return receipt
+        # The largest fixed-pilot eight-cell output allowance is below 3.2 GB;
+        # 20 GB covers all six concurrent pilot slots.
+        if used_bytes(ROOT) > LIMIT - 20_000_000_000:
+            receipt = {**common, "status": "not_started", "reason": "scratch_ceiling",
                        "elapsed_seconds": 0.0}
             atomic_json(receipt_path, receipt)
             return receipt
@@ -132,7 +153,7 @@ def run_cell(cell: dict, deadline_epoch: float, semaphores: dict,
                    str(PACKAGE / "research/benchmark/methods.lock.json"), str(RESULTS)]
         cap = min(remaining, 2700 if cell["method"] == "GaussianCopula" else 1200)
         command = ["timeout", "--signal=TERM", "--kill-after=20s", str(cap),
-                   "/usr/bin/time", "-v", *command]
+                   "/usr/bin/time", "-v", "taskset", "-c", common["cpu_affinity"], *command]
         if host != "xbabe2":
             command = ["ssh", "-o", "BatchMode=yes", host, shlex.join(command)]
         try:
@@ -189,8 +210,12 @@ def main() -> None:
         return
     deadline_epoch = datetime.fromisoformat(args.deadline_utc.replace("Z", "+00:00")).timestamp()
     semaphores = {host: threading.Semaphore(slots) for host, slots in HOST_SLOTS.items()}
+    cpu_pools = {host: queue.Queue() for host in HOST_SLOTS}
+    for host, pool in cpu_pools.items():
+        for slot in range(HOST_SLOTS[host]):
+            pool.put(slot)
     with concurrent.futures.ThreadPoolExecutor(max_workers=sum(HOST_SLOTS.values())) as pool:
-        futures = [pool.submit(run_cell, cell, deadline_epoch, semaphores,
+        futures = [pool.submit(run_cell, cell, deadline_epoch, semaphores, cpu_pools,
                                args.repair_digest_mismatch) for cell in cells]
         receipts = [future.result() for future in concurrent.futures.as_completed(futures)]
     report = summary(receipts)
