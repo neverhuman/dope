@@ -19,6 +19,10 @@ privacy, utility, or attack evidence is a failed gate with a null MFS-v2 score.
 `RESULTS_STATUS.md` records the 2026-09-30 rights-cleared S3 preparation and
 validation-only GPU research. Its published JSON, table, and figures live in
 `results/`; the final comparison remains blocked by admission.
+The compact native likelihood study freezes its twelve-dataset, two-method
+matrix with `freeze_native_round`, runs `tune_density` on training-derived
+worker partitions, and publishes validated trial receipts with
+`publish_compact_native`.
 An unavailable method is reported as unavailable; it is never a DOPE win.
 
 Use `python3 -m unittest discover -s research/benchmark/tests -v` for the
