@@ -18,40 +18,43 @@ METHODS = Path(__file__).with_name("methods.lock.json")
 RESULTS = Path(__file__).with_name("results")
 
 
-def build(round_path: Path = ROUND, methods_path: Path = METHODS) -> dict:
+def build(round_path: Path = ROUND, methods_path: Path = METHODS,
+          expected_jobs: int = 24) -> dict:
     locked = json.loads(round_path.read_text())
     entries = json.loads(methods_path.read_text())["methods"]
     if (locked["format"] != "dope-benchmark-compact-native-round"
             or locked["method_lock_sha256"] != sha256(methods_path)
             or locked["tuner_sha256"] != sha256(Path(tune_density.__file__))
-            or len(locked["jobs"]) != 24):
+            or len(locked["jobs"]) != expected_jobs):
         raise ValueError("compact validation matrix changed")
     cells = []
     for job in locked["jobs"]:
         root = round_path.parent / job["dataset"] / job["method"]
         selection_path = root / "selection.json"
-        selected = json.loads(selection_path.read_text())
-        if (selected.get("round_sha256") != sha256(round_path)
-                or selected.get("stage") != job["stage"]
-                or selected.get("test_opened") is not False
-                or [trial["config"] for trial in selected["trials"]] != job["configurations"]):
-            raise ValueError("native selection differs from matrix")
-        choice = {"kind": "tuned", "values": selected["selected_config"],
-                  "selection_path": str(selection_path),
-                  "selection_sha256": sha256(selection_path)}
-        runner.resolve_configuration({"final": True, "method": job["method"],
-                                      "configuration": choice}, entries[job["method"]],
-                                     job["dataset"], 100, SCRATCH)
+        selected = json.loads(selection_path.read_text()) if selection_path.exists() else None
+        if selected is not None:
+            if (selected.get("round_sha256") != sha256(round_path)
+                    or selected.get("stage") != job["stage"]
+                    or selected.get("test_opened") is not False
+                    or [trial["config"] for trial in selected["trials"]] != job["configurations"]):
+                raise ValueError("native selection differs from matrix")
+            choice = {"kind": "tuned", "values": selected["selected_config"],
+                      "selection_path": str(selection_path),
+                      "selection_sha256": sha256(selection_path)}
+            runner.resolve_configuration({"final": True, "method": job["method"],
+                                          "configuration": choice}, entries[job["method"]],
+                                         job["dataset"], 100, SCRATCH)
         trials = []
-        for index, trial in enumerate(selected["trials"]):
+        for index, config in enumerate(job["configurations"]):
             receipt_path = root / f"trial-{index:02d}/attempt.json"
-            if json.loads(receipt_path.read_text()) != trial:
+            trial = json.loads(receipt_path.read_text())
+            if selected is not None and selected["trials"][index] != trial:
                 raise ValueError("native attempt changed")
             identity = trial["identity"]
             if (identity["round_sha256"] != sha256(round_path)
                     or identity["train_sha256"] != job["train_sha256"]
                     or identity["validation_sha256"] != job["validation_sha256"]
-                    or identity["config"] != job["configurations"][index]
+                    or identity["config"] != config
                     or identity["fit_seed"] != job["fit_seed"]):
                 raise ValueError("native attempt identity changed")
             if trial["status"] == "ok":
@@ -72,15 +75,19 @@ def build(round_path: Path = ROUND, methods_path: Path = METHODS) -> dict:
                            "attempt_receipt_path": str(receipt_path),
                            "attempt_receipt_sha256": sha256(receipt_path),
                            "metric_receipt_sha256": trial.get("metric_receipt_sha256")})
-        winner = trials[selected["selected_trial_index"]]
+        if selected is None and any(trial["status"] == "ok" for trial in trials):
+            raise ValueError("successful native trial has no selection")
+        winner = trials[selected["selected_trial_index"]] if selected is not None else None
         cells.append({"stage": job["stage"], "dataset": job["dataset"],
                       "method": job["method"], "objective": "mean_log_density",
-                      "selected_trial_index": selected["selected_trial_index"],
-                      "selected_native_kpi": winner["native_kpi"],
-                      "selected_artifact_bytes": winner["artifact_bytes"],
-                      "selected_within_l3": winner["artifact_bytes"] <= 10_240,
-                      "selection_receipt_path": str(selection_path),
-                      "selection_receipt_sha256": sha256(selection_path),
+                      "selected_trial_index": selected["selected_trial_index"]
+                      if selected is not None else None,
+                      "selected_native_kpi": winner["native_kpi"] if winner else None,
+                      "selected_artifact_bytes": winner["artifact_bytes"] if winner else None,
+                      "selected_within_l3": winner["artifact_bytes"] <= 10_240
+                      if winner else False,
+                      "selection_receipt_path": str(selection_path) if winner else None,
+                      "selection_receipt_sha256": sha256(selection_path) if winner else None,
                       "trials": trials})
     cells.sort(key=lambda cell: (cell["stage"], cell["dataset"], cell["method"]))
     aggregate = {}
@@ -124,12 +131,17 @@ def main() -> None:
     parser.add_argument("--round-lock", type=Path, default=ROUND)
     parser.add_argument("--methods-lock", type=Path, default=METHODS)
     parser.add_argument("--results", type=Path, default=RESULTS)
+    parser.add_argument("--expected-jobs", type=int, choices=(24, 200), default=24)
+    parser.add_argument("--basename", default="compact-native-validation")
     args = parser.parse_args()
-    report = build(args.round_lock, args.methods_lock)
+    if (args.expected_jobs, args.basename) not in ((24, "compact-native-validation"),
+                                                   (200, "compact-native-all-validation")):
+        parser.error("result basename does not match frozen matrix size")
+    report = build(args.round_lock, args.methods_lock, args.expected_jobs)
     args.results.mkdir(parents=True, exist_ok=True)
-    (args.results / "compact-native-validation.json").write_text(
+    (args.results / f"{args.basename}.json").write_text(
         json.dumps(report, sort_keys=True, indent=2) + "\n")
-    (args.results / "compact-native-validation.csv").write_text(render_csv(report))
+    (args.results / f"{args.basename}.csv").write_text(render_csv(report))
     print(json.dumps(report["aggregate"], sort_keys=True))
 
 

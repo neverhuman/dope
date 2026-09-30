@@ -1,0 +1,257 @@
+{
+  "$defs": {
+    "aggregate": {
+      "additionalProperties": false,
+      "properties": {
+        "cells": {
+          "const": 100
+        },
+        "failed_trials": {
+          "maximum": 200,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "selected_within_l3": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "trial_wall_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "trials": {
+          "maximum": 200,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "cells",
+        "trials",
+        "failed_trials",
+        "selected_within_l3",
+        "trial_wall_seconds"
+      ],
+      "type": "object"
+    },
+    "cell": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "$ref": "#/$defs/dataset"
+        },
+        "method": {
+          "const": "GaussianCopula"
+        },
+        "objective": {
+          "const": "mean_log_density"
+        },
+        "selected_artifact_bytes": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "selected_native_kpi": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "selected_trial_index": {
+          "maximum": 7,
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "selected_within_l3": {
+          "type": "boolean"
+        },
+        "selection_receipt_path": {
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selection_receipt_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stage": {
+          "const": "all_validation_lineages"
+        },
+        "trials": {
+          "items": {
+            "$ref": "#/$defs/trial"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "stage",
+        "dataset",
+        "method",
+        "objective",
+        "selected_trial_index",
+        "selected_native_kpi",
+        "selected_artifact_bytes",
+        "selected_within_l3",
+        "selection_receipt_path",
+        "selection_receipt_sha256",
+        "trials"
+      ],
+      "type": "object"
+    },
+    "dataset": {
+      "pattern": "^[0-9a-f]{16}$",
+      "type": "string"
+    },
+    "hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "trial": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_bytes": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "attempt_receipt_path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "attempt_receipt_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "config": {
+          "type": "object"
+        },
+        "failure_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "index": {
+          "maximum": 7,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "metric_receipt_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "native_kpi": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "failed",
+            "timeout"
+          ]
+        },
+        "wall_seconds": {
+          "maximum": 43200,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "index",
+        "config",
+        "status",
+        "native_kpi",
+        "artifact_bytes",
+        "wall_seconds",
+        "failure_type",
+        "attempt_receipt_path",
+        "attempt_receipt_sha256",
+        "metric_receipt_sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "aggregate": {
+      "$ref": "#/$defs/aggregate"
+    },
+    "cells": {
+      "items": {
+        "$ref": "#/$defs/cell"
+      },
+      "maxItems": 100,
+      "minItems": 100,
+      "type": "array"
+    },
+    "format": {
+      "const": "dope-benchmark-copula-native-validation"
+    },
+    "method_lock_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "public_or_s3_test_opened": {
+      "const": false
+    },
+    "round_lock_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "scope": {
+      "const": "validation_only_one_fit_seed"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "scope",
+    "round_lock_sha256",
+    "method_lock_sha256",
+    "cells",
+    "aggregate",
+    "ptf_v1",
+    "mfs_v2",
+    "production_certified",
+    "public_or_s3_test_opened"
+  ],
+  "type": "object"
+}
