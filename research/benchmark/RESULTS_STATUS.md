@@ -67,6 +67,28 @@ sample have separate scratch hashes; the repaired 800-row sample had zero
 nonfinite values. A regression test covers the changed rule, including
 permuted feature order.
 
+## Compact native validation wave
+
+A separate 24-cell discovery and confirmation matrix tuned independent
+marginals and the study-owned Chow–Liu implementation on the same twelve
+training-derived S3 validation partitions. The matrix was frozen on scratch
+before fitting, with dataset, projection, method, trial grid, fit seed, and
+12-hour per-cell budget hashes. Each method used its locked held-out mean log
+density objective; these native KPI values are meaningful only within that
+method's search. The 108 planned trials all completed: 36 independent-marginal
+and 72 Chow–Liu trials, with no failures. Selected artifacts met the charged
+10,240 B L3 limit in 11/12 and 4/12 cells, respectively. The other selected
+artifacts remain visible as byte overruns; no production score or comparison
+win is assigned from this validation research. These are single-fit-seed
+reference results, and the Chow–Liu code is labeled as a study implementation.
+
+[The compact validation JSON](results/compact-native-validation.json),
+[schema](results/compact-native-validation.schema.json), and
+[trial table](results/compact-native-validation.csv) point to the frozen
+round and immutable scratch attempt and KPI receipts. Regenerate them with
+`python3 -m research.benchmark.publish_compact_native`. Only the coordinator's
+training-derived worker partitions were used; official S3 tests remain closed.
+
 ## Final admission still blocked
 
 The 29-method source inventory currently has four locked entries (DOPE and
