@@ -23,3 +23,21 @@ The News TabPC probe used the author's custom-data training code with its publis
 ## GEM-T availability check
 
 On 2026-09-30, the [author preprint](https://arxiv.org/abs/2509.17752) was searched for `github`, `repository`, and `code availability`; none appears in the downloaded PDF (SHA-256 `d58fefb7b1a6cbf4a4134cefc111ef8c70b59156f1c86bb4d2351a3848202734`). Exact-title, method-name, and author-name web searches did not locate an author repository, and GitHub repository API searches for `GEM-T synthetic tabular`, `gemt maxent tabular`, and `generative entropy maximization tables` each returned zero repositories at this check. This is an availability check, not proof that author code does not exist. GEM-T remains unscored until author code is obtained or a clearly labeled paper implementation reproduces at least two reported experiments. The author correspondence address is in the paper; no message has been sent.
+
+## Post-pilot source audit
+
+The live final-campaign lock now marks TabKDE and GEM-T `unavailable` under
+the documented license and implementation checks. This does not alter their
+frozen pilot receipts. Neither method enters a paired comparison or counts as
+a DOPE win unless a new licensed, validated source lock is frozen before test
+access.
+
+For ARF, the [author-affiliated Python implementation](https://github.com/bips-hb/arfpy)
+was pinned at commit `8b63c1b3999981125b4af2828ff52cba8e29169d`. The
+source archive SHA-256 is `0c9012778cb5ffe0a006fc32b33ae4ed3f85689c6742253d95f91c10c42bd2aa`
+and its MIT license file SHA-256 is
+`8f97b1e0e6c2a7c7b539e63e8a5c81c85d040556940a07b348596cd9674283ec`.
+Its fit object retains the training frame in `x_real`; a final adapter must
+export only the fitted generator state needed for sampling and verify the
+artifact's source-row independence. Runtime and adapter qualification remain
+open, so ARF is not yet runnable in the final matrix.

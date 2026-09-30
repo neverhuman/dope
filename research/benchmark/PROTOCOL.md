@@ -95,14 +95,15 @@ ceiling to four hours on 2026-09-30, before new pilot dispatch. The bounded
 pilot uses Adult, California, and News; DOPE, GaussianCopula, TabPC, TabKDE,
 TabSyn, TabDiff, and AIM; two fit seeds and two sample seeds. Measure fit,
 tuning, sample, attack, storage, timeout, and failure costs. Freeze
-`budget.lock.json` and the final method–dataset matrix after the pilot and
-before opening the public test set. The final evaluator also requires frozen
-`datasets.lock.json` and `evaluator.lock.json`; `admission.py` fails closed until
-all five source, data, budget, matrix, and evaluator locks are complete. A
-three-host full campaign has a 14-day
-ceiling. Protect compact public-core first; reduce extension, then secondary
-methods. If compact public-core exceeds the ceiling, stop after the pilot and
-issue a quantified feasibility report.
+`budget.lock.json` and the final method–dataset matrix after validation-only
+calibration and before opening the public test set. Each method–dataset has
+eight additional tuning trials under a 12-hour wall-time budget; every trial,
+timeout, and validation-only selection is retained. The final evaluator also
+requires frozen `datasets.lock.json` and `evaluator.lock.json`; `admission.py`
+fails closed until all five source, data, budget, matrix, and evaluator locks
+are complete. Day 14 is a reporting milestone, not a stop rule. Report
+progress, costs, exclusions, and the remaining schedule at that milestone;
+continue the frozen applicable matrix afterward.
 
 ## Jobs, artifacts, and metrics
 
@@ -116,6 +117,12 @@ weights, and metadata. L3 raw limit is 10,240 B; L2 is 32,768 B. Gzip is
 descriptive. Report shared pretrained weights and runtime bytes separately.
 Verify repeated sampling from the recorded artifact; source-row dependence
 prevents a compact-tier pass.
+The benchmark scratch ceiling is 200,000,000,000 bytes under
+`/mnt/fast-scratch/dope-benchmark`. Admit a cell only when its reserved output
+fits below this ceiling and the host has adequate free memory and filesystem
+space. Stream generated rows into evaluation after the shared evaluator is
+locked; retain hashes, byte inventories, and immutable failed attempts while
+keeping bulk rows, fits, weights, samples, and logs outside Git and `/`.
 
 The generator thresholds in `contract.json` are exact. Feature-importance
 Spearman and top-k Jaccard apply only with at least three measured informative
