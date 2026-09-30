@@ -23,6 +23,8 @@ The compact native likelihood study freezes its twelve-dataset, two-method
 matrix with `freeze_native_round`, runs `tune_density` on training-derived
 worker partitions, and publishes validated trial receipts with
 `publish_compact_native`.
+The GaussianCopula validation wave uses `tune_copula freeze`, followed by
+`tune_copula tune DATASET_ID` for each frozen job, and `publish_copula`.
 An unavailable method is reported as unavailable; it is never a DOPE win.
 
 Use `python3 -m unittest discover -s research/benchmark/tests -v` for the
