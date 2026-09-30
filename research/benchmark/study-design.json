@@ -1,6 +1,6 @@
 {
   "format": "dope-benchmark-study-design",
-  "version": 1,
+  "version": 2,
   "public_core": {
     "tabddpm": ["Abalone", "Adult", "Buddy", "California", "Cardio", "Churn", "Default", "Diabetes", "FB-Comments", "Gesture", "Higgs-small", "House16H", "Insurance", "King", "MiniBooNE", "Wilt"],
     "tabsyn": ["Adult", "Default", "Shoppers", "Magic", "Beijing", "News"],
@@ -28,12 +28,26 @@
     "unknown_license_count_excluded": 3755,
     "separate_from_public_headline": true
   },
+  "beyondarena_secondary": {
+    "role": "context_and_robustness_only",
+    "maximum_source_families": 12,
+    "selection": "rights_cleared_previously_unscored_binary_or_regression_source_families_by_task_id_sha256_with_iid_grouped_temporal_strata",
+    "test_partition": "evaluator_only",
+    "pooled_with_public_headline": false
+  },
+  "real_data_endpoint": {
+    "name": "null_normalized_TSTR_TRTR_retention",
+    "evaluation_partition": "untouched_real_test",
+    "auditors": ["CatBoost", "logistic_or_linear_regression", "MLP"],
+    "required_synthetic_sizes": [1, 4],
+    "reason": "Measures whether generated rows preserve downstream predictive utility on real held-out data, directly supporting the generator claim."
+  },
   "pilot": {
     "datasets": ["Adult", "California", "News"],
     "methods": ["dope", "GaussianCopula", "TabPC", "TabKDE", "TabSyn", "TabDiff", "AIM"],
     "fit_seeds": [11, 23],
     "sample_seeds": [101, 211],
-    "maximum_hours": 24
+    "maximum_hours": 4
   },
   "full_campaign_ceiling_days": 14,
   "capacity_priority": ["compact_public_core", "openml_extension", "secondary_methods"],

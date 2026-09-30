@@ -1,0 +1,36 @@
+"""Isolated fit/sample process so native-code stalls obey the job deadline."""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+from . import adapters
+
+
+def main() -> None:
+    request = json.load(sys.stdin)
+    try:
+        binary = Path(request["binary"]) if request.get("binary") else None
+        if request["action"] == "fit":
+            files = adapters.fit(request["method"], Path(request["train"]),
+                                 request["metadata"], request["config"],
+                                 request["seed"], Path(request["artifact_dir"]), binary)
+            result = {"status": "ok", "files": files}
+        elif request["action"] == "sample":
+            adapters.sample(request["method"], Path(request["artifact_dir"]),
+                            request["row_count"], request["seed"],
+                            Path(request["output"]), binary)
+            result = {"status": "ok"}
+        else:
+            raise ValueError("unknown adapter action")
+    except Exception as error:
+        result = {"status": "failed", "error_type": type(error).__name__}
+    print(json.dumps(result, sort_keys=True))
+    if result["status"] != "ok":
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
