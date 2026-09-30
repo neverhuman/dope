@@ -65,7 +65,14 @@ GPU. Attempts, logs, and admission inventories are immutable under benchmark
 scratch. A failed attempt remains visible and needs `--retry-failed` for another
 attempt. Worker environments disable AWS credential discovery. The real-test
 utility entry point checks admission before reading the test partition and
-requires matching frozen manifests and sample receipts for `n` and `4n`.
+requires matching frozen dataset manifests, fit artifacts, and sample receipts
+for `n` and `4n`. Final cells require the complete three-seed, four-size
+sample matrix. Each fit identity binds that matrix, the selected configuration,
+and any DP budget. Tuned configurations require an eight-trial validation
+selection receipt on scratch with a matching SHA-256 and a total wall time of
+at most 12 hours. Failed fit and sample attempts remain in attempt directories;
+only successful attempts occupy canonical receipt paths, so retries retain the
+earlier failure evidence.
 It is one endpoint of the unfinished shared evaluator, not a complete gate
 report.
 

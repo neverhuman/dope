@@ -54,7 +54,8 @@ class AdmissionTests(unittest.TestCase):
                     "size_multipliers": [1, 2, 4, 8], "worker_dir": "/mnt/fast-scratch/dope-benchmark/toy",
                     "scratch_reservation_bytes": 1000, "memory_reservation_bytes": 1000,
                     "requires_gpu": False, "gpu_vram_mib": 0,
-                    "timeout_seconds": 600, "runtime_python": "/usr/bin/python3"}]},
+                    "timeout_seconds": 600, "runtime_python": "/usr/bin/python3",
+                    "configuration": {"kind": "default"}}]},
             }
             for name, body in locks.items():
                 body.update({"complete": True, "frozen_for_final_evaluation": True})

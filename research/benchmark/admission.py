@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 from .fetch_jope import LIMIT
-from .score import validate_contract
+from .score import CONTRACT, validate_contract
 
 
 LOCK_NAMES = ("methods.lock.json", "datasets.lock.json", "budget.lock.json",
@@ -72,7 +72,17 @@ def assess(repo_root: Path, lock_root: Path) -> dict:
                 or (row["applicable"] and not all(key in row for key in
                     ("id", "fit_seed", "sample_seeds", "size_multipliers", "worker_dir",
                      "scratch_reservation_bytes", "memory_reservation_bytes", "requires_gpu",
-                     "gpu_vram_mib", "timeout_seconds", "runtime_python")))
+                     "gpu_vram_mib", "timeout_seconds", "runtime_python", "configuration")))
+                or (row["applicable"] and
+                    (row.get("fit_seed") not in CONTRACT["fit_seeds"]
+                     or row.get("sample_seeds") != CONTRACT["sample_seeds"]
+                     or row.get("size_multipliers") != CONTRACT["size_multipliers"]
+                     or not isinstance(row.get("configuration"), dict)
+                     or row["configuration"].get("kind") not in ("default", "tuned")
+                     or (methods.get(row["method"], {}).get("group") == "dp"
+                         and row.get("dp_epsilon") not in (1, 4, 10))
+                     or (methods.get(row["method"], {}).get("group") != "dp"
+                         and "dp_epsilon" in row)))
                 or (not row["applicable"] and not row.get("exclusion_reason"))
                 for row in cells)):
             blockers.append("method-dataset-matrix.lock.json:cell_gap")
