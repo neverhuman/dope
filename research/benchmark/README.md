@@ -40,6 +40,8 @@ python3 -m research.benchmark.pilot_evaluate Adult dope --fit-seed 11 --sample-s
 python3 -m research.benchmark.pilot_report --output /mnt/fast-scratch/dope-benchmark/pilot-4h/reconciled-report.json
 python3 -m research.benchmark.analysis MATRIX.json GATE_REPORTS.jsonl research/benchmark/methods.lock.json
 python3 -m research.benchmark.admission REPO_ROOT LOCK_ROOT
+python3 -m research.benchmark.full_queue --repo-root REPO_ROOT --lock-root LOCK_ROOT
+python3 -m research.benchmark.real_test_utility WORKER_DIR EVALUATOR_DIR SAMPLE_N RECEIPT_N SAMPLE_4N RECEIPT_4N OUTPUT
 ```
 
 The runner enforces a 16-core affinity and respects the launcher's GPU
@@ -48,13 +50,24 @@ inputs, verifies repeated artifact sampling, and resumes receipts without
 refitting. The coordinator's JopeDime fetch reads only requested catalog,
 manifest, and blob objects through the named AWS profile. Credentials stay on
 `xbabe2`. `pilot_metrics` consumes validation, never the test partition.
-On `xbabe2`, each fit and sample cell reserves space against the 100 GB scratch
+On `xbabe2`, each fit and sample cell reserves space against the 200 GB scratch
 ceiling, counting the whole scratch root (the output root's parent by default).
 `admission` exits nonzero while any final source, data, budget, method matrix,
 or evaluator lock is absent or incomplete; public test evaluation must call it
 before reading test data.
 The current worker runs only the common-numeric track. Author-faithful input
 preparation and external adapters are still pending and fail closed.
+The full queue also fails closed until admission passes. It checks each host's
+CPU affinity, load, available memory, benchmark scratch filesystem, GPU
+processes, and free VRAM before each dispatch. CPU jobs occupy distinct
+16-core slots, up to four per host; GPU jobs use one such slot and one visible
+GPU. Attempts, logs, and admission inventories are immutable under benchmark
+scratch. A failed attempt remains visible and needs `--retry-failed` for another
+attempt. Worker environments disable AWS credential discovery. The real-test
+utility entry point checks admission before reading the test partition and
+requires matching frozen manifests and sample receipts for `n` and `4n`.
+It is one endpoint of the unfinished shared evaluator, not a complete gate
+report.
 
 `PILOT_STATUS.md` records the four-hour dispatch. `PILOT_METHOD_AUDIT.md`
 records source and dependency findings. `pilot_queue.py` freezes all 42 fit
@@ -67,7 +80,10 @@ are supplemental and do not alter the original 42-cell matrix.
 `pilot_compact_supplement.py` runs the two already locked reference compact
 methods on the pilot datasets with separate receipts and a separate matrix.
 `PILOT_COST_REPORT.md` records measured costs, validation-only vectors, the
-14-day capacity bound, and the full-campaign admission decision.
+historical 14-day capacity bound, and the full-campaign admission decision.
+The later protocol amendment treats day 14 as a reporting milestone and sets
+the new full-campaign scratch ceiling to 200 GB. Historical pilot usage and
+its original 100 GB limit remain as recorded in the pilot cost report.
 The final public test remains closed until `admission.py` passes.
 
 `PREPILOT_COST_REPORT.md` records the three-host DOPE probe and the first

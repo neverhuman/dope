@@ -50,12 +50,17 @@
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "compact",
-      "license": null,
+      "license": "MIT",
+      "license_evidence": "https://github.com/bips-hb/arfpy/blob/8b63c1b3999981125b4af2828ff52cba8e29169d/LICENSE",
+      "license_sha256": "8f97b1e0e6c2a7c7b539e63e8a5c81c85d040556940a07b348596cd9674283ec",
+      "note": "Author-affiliated arfpy 0.1.1 source and license pinned. Source model stores x_real; artifact-only export, dependency lock, defaults/search space, and fit/sample validation remain pending.",
       "sampling_command": null,
+      "source_archive": "/mnt/fast-scratch/dope-benchmark/source-snapshots/arfpy-8b63c1b.tar.gz",
+      "source_sha256": "0c9012778cb5ffe0a006fc32b33ae4ed3f85689c6742253d95f91c10c42bd2aa",
       "status": "source_audit_pending",
       "tuning_search_space": null,
-      "upstream_commit": null,
-      "upstream_url": null
+      "upstream_commit": "8b63c1b3999981125b4af2828ff52cba8e29169d",
+      "upstream_url": "https://github.com/bips-hb/arfpy"
     },
     "CDTD": {
       "default_config": null,
@@ -157,7 +162,7 @@
       "license": null,
       "note": "2026-09-30 availability check: arXiv 2509.17752 PDF has no code, GitHub, or repository link; exact-title and algorithm searches plus GitHub repository API queries returned no author implementation. Author contact or a separately labeled paper implementation validated on two reported experiments is required before comparison.",
       "sampling_command": null,
-      "status": "availability_pending",
+      "status": "unavailable",
       "tuning_search_space": null,
       "upstream_commit": null,
       "upstream_url": null
@@ -339,7 +344,7 @@
       "note": "Pinned source archive contains no LICENSE/COPYING/pyproject license declaration or README license grant; redistribution/execution terms require author clarification.",
       "sampling_command": "python main.py --dataname DATASET --method TabKDE --mode sample",
       "source_snapshot_sha256": "640afb2fd5a0c482b54a250742655023b0f1c11adb9c44f7c20ce6661daf7b2f",
-      "status": "license_missing",
+      "status": "unavailable",
       "tuning_search_space": null,
       "upstream_commit": "9d9e6cce0f8ecd97d8a10c52755b8c14482e028d",
       "upstream_url": "https://github.com/tabkde/tabkde-main"

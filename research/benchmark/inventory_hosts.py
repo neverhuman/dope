@@ -18,6 +18,7 @@ def command(args: list[str]) -> str:
 
 def local() -> dict:
     disk = shutil.disk_usage("/home/ubuntu")
+    scratch = shutil.disk_usage("/mnt/fast-scratch/dope-benchmark")
     with Path("/proc/meminfo").open() as stream:
         memory = {parts[0].rstrip(":"): int(parts[1]) * 1024
                   for line in stream if (parts := line.split()) and parts[0] in ("MemAvailable:", "MemTotal:")}
@@ -34,8 +35,10 @@ def local() -> dict:
     except subprocess.CalledProcessError:
         active = []
     return {"host": socket.gethostname(), "observed_utc": datetime.now(timezone.utc).isoformat(),
-            "cpu_count": os.cpu_count(), "load_average": os.getloadavg(),
+            "cpu_count": os.cpu_count(), "allowed_cpus": sorted(os.sched_getaffinity(0)),
+            "load_average": os.getloadavg(),
             "memory": memory, "disk": {"total_bytes": disk.total, "free_bytes": disk.free},
+            "scratch_disk": {"total_bytes": scratch.total, "free_bytes": scratch.free},
             "gpus": gpu, "active_gpu_processes": active,
             "per_job_cap": {"gpus": 1, "cpu_cores": 16}}
 

@@ -49,7 +49,10 @@
     "sample_seeds": [101, 211],
     "maximum_hours": 4
   },
-  "full_campaign_ceiling_days": 14,
+  "reporting_milestone_days": 14,
+  "scratch_ceiling_bytes": 200000000000,
+  "tuning_trials_per_method_dataset": 8,
+  "tuning_wall_time_hours_per_method_dataset": 12,
   "capacity_priority": ["compact_public_core", "openml_extension", "secondary_methods"],
   "analysis": {
     "first_endpoint": "dataset_paired_L3_gate_pass_difference",

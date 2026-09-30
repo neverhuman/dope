@@ -13,7 +13,7 @@ from .score import sha256
 
 BUCKET = "veox-jopedime-datasets-use2"
 CATALOG_SHA256 = "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120"
-LIMIT = 100_000_000_000
+LIMIT = 200_000_000_000
 
 
 def used_bytes(root: Path) -> int:
