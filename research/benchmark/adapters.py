@@ -96,6 +96,9 @@ def fit(method: str, train: Path, metadata: dict, config: dict, seed: int,
             {"model": model.to_dict(), "task": metadata["task"]},
             sort_keys=True, separators=(",", ":")))
         return ["model.json"]
+    if method == "AIM":
+        from .aim_adapter import fit as fit_aim
+        return fit_aim(train, metadata, config, seed, artifact_dir)
     raise ValueError("method lacks an audited adapter")
 
 
@@ -153,5 +156,9 @@ def sample(method: str, artifact_dir: Path, row_count: int, seed: int,
         if artifact["task"] == "binary":
             result[:, -1] = (result[:, -1] >= 0.5).astype(float)
         np.savetxt(output, result, fmt="%.17g", delimiter=",")
+        return
+    if method == "AIM":
+        from .aim_adapter import sample as sample_aim
+        sample_aim(artifact_dir, row_count, seed, output)
         return
     raise ValueError("method lacks an audited adapter")

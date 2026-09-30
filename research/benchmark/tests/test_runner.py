@@ -1,4 +1,5 @@
 import csv
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -15,6 +16,17 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class RunnerTests(unittest.TestCase):
+    def test_native_worker_is_killed_at_hard_deadline(self):
+        with self.assertRaises(TimeoutError):
+            runner._run_worker([sys.executable, "-c", "import time; time.sleep(10)"],
+                               {}, 1)
+
+    def test_pilot_locked_method_cannot_enter_final_job(self):
+        methods = {"methods": {"AIM": {"status": "pilot_locked", "adapter": "AIM"}}}
+        with self.assertRaisesRegex(ValueError, "source/config locked"):
+            run({"method": "AIM", "fit_seed": 11, "track": "common_numeric"},
+                methods, ROOT / "target" / "unused-aim-test-results")
+
     def test_scratch_reservation_counts_existing_files(self):
         with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:
             root = Path(directory)

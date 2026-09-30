@@ -19,6 +19,14 @@ remains DOPE's frozen production KPI and is reported separately with its
 informative-group count, interval, and sparse-profile folding. A small public
 cohort cannot establish production-scale profile coverage.
 
+Jepson's 2026-09-30 decision makes the DOPE generator comparison the paper's
+primary claim. BeyondArena is a separate context and robustness panel. The
+real-data utility endpoint is null-normalized TSTR/TRTR retention measured on
+untouched real test rows, with CatBoost, logistic or linear regression, and MLP
+at synthetic sizes `n` and `4n`. It directly tests whether synthetic rows
+preserve downstream predictive utility on real data. The versioned benchmark
+retention gate remains separate from unmodified production PTF-v1.
+
 The generator-only gate is `contract.json` version 1. It inherits the frozen
 MFS-v2 scalar from production: weights 0.30 utility, 0.20 driver, 0.20
 distribution, 0.15 structure, 0.10 coverage, 0.05 compactness, privacy soft
@@ -42,7 +50,11 @@ CTR23 tasks. Require a defined target, 500–100,000 rows, 1–2,000 input
 features, recorded redistribution rights, and deduplication. Sort eligible
 official task IDs by SHA-256 and take the first ten per task. Record shortfall.
 
-The JopeDime robustness panel is separate. The pinned catalog hash is
+The BeyondArena panel is also separate. Select at most 12 rights-cleared,
+previously unscored binary or regression source families by official task-ID
+hash across IID, grouped, and temporal strata. Use official auditable folds;
+workers receive training and validation only. Never pool this panel with the
+public-core headline. The JopeDime robustness panel is separate. The pinned catalog hash is
 `ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120`.
 It has 104 regression entries with recorded MIT evidence. The 3,755 entries
 with unknown license status are ineligible for publication. Blob and dataset
@@ -78,7 +90,8 @@ unvalidated method is not a DOPE win.
 
 Run pinned defaults and equal-budget tuning as separate tracks. Published
 search spaces take precedence; otherwise the audited adapter search space is
-frozen before test. Select with validation data only. The 24-hour maximum
+frozen before test. Select with validation data only. Jepson amended the pilot
+ceiling to four hours on 2026-09-30, before new pilot dispatch. The bounded
 pilot uses Adult, California, and News; DOPE, GaussianCopula, TabPC, TabKDE,
 TabSyn, TabDiff, and AIM; two fit seeds and two sample seeds. Measure fit,
 tuning, sample, attack, storage, timeout, and failure costs. Freeze

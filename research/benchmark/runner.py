@@ -7,8 +7,9 @@ import json
 import os
 import shutil
 import signal
+import subprocess
+import sys
 import time
-from contextlib import contextmanager
 from pathlib import Path
 
 from . import adapters
@@ -17,27 +18,49 @@ from .manifest import digest
 from .score import CONTRACT, artifact_inventory, sha256
 
 
+class AdapterFailure(Exception):
+    def __init__(self, source_error_type: str):
+        self.source_error_type = source_error_type
+        super().__init__(source_error_type)
+
+
+def _run_worker(command: list[str], request: dict, seconds: int) -> tuple[str, int]:
+    if seconds <= 0:
+        raise TimeoutError("adapter deadline")
+    process = subprocess.Popen(
+        command,
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True, start_new_session=True)
+    try:
+        stdout, _ = process.communicate(json.dumps(request), timeout=seconds)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGTERM)
+        try:
+            process.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            os.killpg(process.pid, signal.SIGKILL)
+            process.communicate()
+        raise TimeoutError("adapter deadline") from None
+    return stdout, process.returncode
+
+
+def call_adapter(request: dict, seconds: int) -> dict:
+    stdout, returncode = _run_worker(
+        [sys.executable, "-m", "research.benchmark.adapter_worker"], request, seconds)
+    try:
+        result = json.loads(stdout.strip().splitlines()[-1])
+    except (IndexError, json.JSONDecodeError):
+        raise AdapterFailure("MalformedWorkerReceipt") from None
+    if returncode != 0 or result.get("status") != "ok":
+        raise AdapterFailure(result.get("error_type", "WorkerExit"))
+    return result
+
+
 def _write_once(path: Path, value: dict) -> None:
     encoded = (json.dumps(value, sort_keys=True, indent=2) + "\n").encode()
     descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
     with os.fdopen(descriptor, "wb") as stream:
         stream.write(encoded)
-
-
-@contextmanager
-def deadline(seconds: int):
-    if seconds <= 0:
-        raise ValueError("deadline must be positive")
-    def expired(_signum, _frame):
-        raise TimeoutError("job deadline")
-    old_handler = signal.getsignal(signal.SIGALRM)
-    signal.signal(signal.SIGALRM, expired)
-    signal.setitimer(signal.ITIMER_REAL, seconds)
-    try:
-        yield
-    finally:
-        signal.setitimer(signal.ITIMER_REAL, 0)
-        signal.signal(signal.SIGALRM, old_handler)
 
 
 def reserve_scratch(root: Path, rows: int, columns: int) -> None:
@@ -51,7 +74,9 @@ def reserve_scratch(root: Path, rows: int, columns: int) -> None:
 def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
     method = job["method"]
     entry = methods["methods"][method]
-    if entry["status"] != "locked" or entry["adapter"] != method:
+    if (entry["status"] not in ("locked", "pilot_locked")
+            or (entry["status"] == "pilot_locked" and job.get("pilot_only") is not True)
+            or entry["adapter"] != method):
         raise ValueError("method is not source/config locked")
     if entry["adapter_sha256"] != sha256(Path(adapters.__file__)):
         raise ValueError("adapter source digest changed")
@@ -69,6 +94,16 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
         if entry["dependency_versions"] != {"numpy": np.__version__, "pandas": pd.__version__,
                                             "scipy": scipy.__version__}:
             raise ValueError("copula transitive dependency version changed")
+    if method == "AIM":
+        from importlib.metadata import version
+        from . import aim_adapter
+        runtime_lock = Path(__file__).with_name("aim-runtime.lock.json")
+        versions = json.loads(runtime_lock.read_text())
+        if ({name: version(name) for name in versions} != versions
+                or entry["dependency_or_container_digest"] != sha256(runtime_lock)
+                or entry["aim_adapter_sha256"] != sha256(Path(aim_adapter.__file__))
+                or entry["source_sha256"] != sha256(Path(entry["source_archive"]))):
+            raise ValueError("AIM source, adapter, or dependency lock changed")
     if job["fit_seed"] not in CONTRACT["fit_seeds"] or job["track"] not in ("common_numeric", "author_faithful"):
         raise ValueError("job outside frozen contract")
     worker = Path(job["worker_dir"])
@@ -122,9 +157,12 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                 reserve_scratch(scratch_root, 0, 0)
             artifact_dir.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(worker / "projection.json", artifact_dir / "projection.json")
-            with deadline(entry["default_config"].get("fit_timeout_seconds", 1800)):
-                files = adapters.fit(method, worker / "train.csv", projection,
-                                     entry["default_config"], job["fit_seed"], artifact_dir, binary)
+            files = call_adapter({"action": "fit", "method": method,
+                                  "train": str(worker / "train.csv"), "metadata": projection,
+                                  "config": entry["default_config"], "seed": job["fit_seed"],
+                                  "artifact_dir": str(artifact_dir),
+                                  "binary": str(binary) if binary else None},
+                                 entry["default_config"].get("fit_timeout_seconds", 1800))["files"]
             files = ["projection.json", *files]
             inventory, artifact_bytes = artifact_inventory(artifact_dir, files)
             fit_evidence_dir = directory / "fit_evidence"
@@ -145,7 +183,8 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                            "status": "timeout" if isinstance(error, TimeoutError) else "failed",
                            "fit_key": fit_key, "fit_identity": fit_identity,
                            "fit_seconds": time.perf_counter() - start,
-                           "error_type": type(error).__name__, "host": os.uname().nodename}
+                           "error_type": getattr(error, "source_error_type", type(error).__name__),
+                           "host": os.uname().nodename}
         _write_once(fit_receipt_path, fit_receipt)
         if fit_receipt["status"] != "ok":
             return [fit_receipt]
@@ -173,10 +212,14 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
             try:
                 if os.uname().nodename == "xbabe2":
                     reserve_scratch(scratch_root, row_count, projection["output_features"] + 1)
-                with deadline(entry["default_config"].get("sample_timeout_seconds", 600)):
-                    adapters.sample(method, artifact_dir, row_count, sample_seed, output, binary)
-                    repeat = directory / f"{key}.repeat.csv"
-                    adapters.sample(method, artifact_dir, row_count, sample_seed, repeat, binary)
+                sample_request = {"action": "sample", "method": method,
+                                  "artifact_dir": str(artifact_dir), "row_count": row_count,
+                                  "seed": sample_seed, "binary": str(binary) if binary else None}
+                sample_limit = entry["default_config"].get("sample_timeout_seconds", 600)
+                call_adapter({**sample_request, "output": str(output)}, sample_limit)
+                repeat = directory / f"{key}.repeat.csv"
+                remaining = sample_limit - (time.perf_counter() - start)
+                call_adapter({**sample_request, "output": str(repeat)}, int(remaining))
                 first_hash, second_hash = sha256(output), sha256(repeat)
                 repeat.unlink()
                 receipt = {"format": "dope-benchmark-sample-receipt", "status": "ok",

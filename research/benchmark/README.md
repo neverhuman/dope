@@ -33,6 +33,11 @@ python3 -m research.benchmark.manifest SELECTION.json DATA_ROOT/prepared
 python3 -m research.benchmark.select_extension REVIEWED_TASK_CANDIDATES.json
 python3 -m research.benchmark.runner JOB.json research/benchmark/methods.lock.json RESULTS_ROOT
 python3 -m research.benchmark.pilot_metrics WORKER_DIR SAMPLE.csv
+python3 -m research.benchmark.pilot_queue --deadline-utc 2026-09-30T17:13:00Z --execute
+python3 -m research.benchmark.pilot_queue --deadline-utc 2026-09-30T17:13:00Z --execute --repair-digest-mismatch
+python3 -m research.benchmark.pilot_compact_supplement --deadline-utc 2026-09-30T17:13:00Z --execute
+python3 -m research.benchmark.pilot_evaluate Adult dope --fit-seed 11 --sample-seed 101 --multiplier 1
+python3 -m research.benchmark.pilot_report --output /mnt/fast-scratch/dope-benchmark/pilot-4h/reconciled-report.json
 python3 -m research.benchmark.analysis MATRIX.json GATE_REPORTS.jsonl research/benchmark/methods.lock.json
 python3 -m research.benchmark.admission REPO_ROOT LOCK_ROOT
 ```
@@ -49,6 +54,18 @@ or evaluator lock is absent or incomplete; public test evaluation must call it
 before reading test data.
 The current worker runs only the common-numeric track. Author-faithful input
 preparation and external adapters are still pending and fail closed.
+
+`PILOT_STATUS.md` records the four-hour dispatch. `PILOT_METHOD_AUDIT.md`
+records source and dependency findings. `pilot_queue.py` freezes all 42 fit
+cells, writes blocked receipts, and runs the 12 cells supported by the current
+source lock. `pilot_evaluate.py` writes validation-only descriptive vectors.
+`pilot_report.py` reconciles original and infrastructure-repair receipts while
+retaining every failed attempt in its ledger. The frozen queue package and
+all bulk receipts live on benchmark scratch. Pilot-only AIM compatibility jobs
+are supplemental and do not alter the original 42-cell matrix.
+`pilot_compact_supplement.py` runs the two already locked reference compact
+methods on the pilot datasets with separate receipts and a separate matrix.
+The final public test remains closed until `admission.py` passes.
 
 `PREPILOT_COST_REPORT.md` records the three-host DOPE probe and the first
 GaussianCopula cost cell. It is not the seven-method pilot or a benchmark

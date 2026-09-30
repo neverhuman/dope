@@ -4,17 +4,44 @@
   "frozen_for_final_evaluation": false,
   "methods": {
     "AIM": {
-      "default_config": null,
-      "dependency_or_container_digest": null,
-      "fit_command": "python mechanisms/aim.py --dataset DATASET --domain DOMAIN --epsilon EPSILON --delta DELTA --max_model_size 80 --max_iters 1000",
+      "adapter": "AIM",
+      "adapter_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
+      "aim_adapter_sha256": "060713a576614c081e84f30446d67e679b72ce7632094de08e539725d58416c7",
+      "default_config": {
+        "bins": 8,
+        "epsilon": 1.0,
+        "fit_timeout_seconds": 1200,
+        "max_iters": 1000,
+        "max_model_size": 80,
+        "sample_timeout_seconds": 600
+      },
+      "dependency_or_container_digest": "2f421e3ed1806a346aa08fc705710519fcf02422ddc055d6c2272fed0e7e327f",
+      "fit_command": "research.benchmark.adapters.fit(AIM, TRAIN, METADATA, CONFIG, FIT_SEED, ARTIFACT)",
       "group": "dp",
       "license": "Apache-2.0",
       "license_evidence": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/LICENSE",
       "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-      "note": "Author warns default AIM can take many hours; discrete preprocessing and accountant audit pending.",
-      "sampling_command": "AIM model synthetic_data via mbi inference; adapter pending",
-      "status": "source_audit_pending",
-      "tuning_search_space": null,
+      "note": "Pilot-only fixed public eight-bin common-numeric adapter. Source algorithm and default model-size/iteration settings; preprocessing projection is train-fitted, so no end-to-end formal DP claim. Author-faithful preprocessing and accountant audit remain pending.",
+      "sampling_command": "research.benchmark.adapters.sample(AIM, ARTIFACT, ROWS, SAMPLE_SEED, OUTPUT)",
+      "source_archive": "/mnt/fast-scratch/dope-benchmark/source-snapshots/mbi.tar.gz",
+      "source_sha256": "7655a7b42f8d46fdfa1a6f689b28469a857255cb9e1ab377f38e7e0879d133a8",
+      "status": "pilot_locked",
+      "tuning_search_space": {
+        "bins": [
+          8
+        ],
+        "epsilon": [
+          1.0,
+          4.0,
+          10.0
+        ],
+        "max_iters": [
+          1000
+        ],
+        "max_model_size": [
+          80
+        ]
+      },
       "upstream_commit": "e9d10d045247577db2d4742b15de325817b5bc59",
       "upstream_url": "https://github.com/ryan112358/mbi"
     },
@@ -68,7 +95,7 @@
     },
     "Chow-Liu": {
       "adapter": "Chow-Liu",
-      "adapter_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
+      "adapter_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
       "default_config": {
         "bins": 8,
         "fit_timeout_seconds": 900,
@@ -82,7 +109,7 @@
       "license_evidence": "https://github.com/neverhuman/dope/blob/581fd6999dcfd215c364369b3198daf161b89c2c/LICENSE",
       "note": "Study-owned discretized Chow-Liu reference implementation, not original author code; every projected column enters the mutual-information maximum spanning tree. Original method DOI is upstream_url.",
       "sampling_command": "research.benchmark.adapters.sample(Chow-Liu, ARTIFACT, ROWS, SAMPLE_SEED, OUTPUT)",
-      "source_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
+      "source_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
       "status": "locked",
       "tuning_search_space": {
         "bins": [
@@ -128,7 +155,7 @@
       "fit_command": null,
       "group": "compact",
       "license": null,
-      "note": "Paper located, author implementation not found in source search; author-code availability and two-experiment validation pending.",
+      "note": "2026-09-30 availability check: arXiv 2509.17752 PDF has no code, GitHub, or repository link; exact-title and algorithm searches plus GitHub repository API queries returned no author implementation. Author contact or a separately labeled paper implementation validated on two reported experiments is required before comparison.",
       "sampling_command": null,
       "status": "availability_pending",
       "tuning_search_space": null,
@@ -149,7 +176,7 @@
     },
     "GaussianCopula": {
       "adapter": "GaussianCopula",
-      "adapter_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
+      "adapter_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
       "default_config": {
         "distribution": "Univariate",
         "fit_timeout_seconds": 900,
@@ -290,12 +317,14 @@
     "TabDiff": {
       "default_config": null,
       "dependency_or_container_digest": null,
-      "fit_command": null,
+      "fit_command": "python main.py --dataname DATASET --method tabdiff --mode train --gpu GPU --deterministic --no_wandb",
       "group": "neural_flow",
       "license": "MIT",
       "license_evidence": "https://github.com/MinkaiXu/TabDiff/blob/5ecdb3356261aea72716cc9a779f31d7ad083bf4/LICENSE",
       "license_sha256": "0ec2178fd0353f41dded18d337749e83a284155c5f760429170ea4029d4784b9",
-      "sampling_command": null,
+      "note": "Pinned source and license inspected. Default training config has 8000 steps; upstream train path reads files named real/test/val, so validation-only staging and artifact-only sampling adapter are required before dispatch.",
+      "sampling_command": "python main.py --dataname DATASET --method tabdiff --mode test --num_samples_to_generate ROWS --ckpt_path ARTIFACT",
+      "source_snapshot_sha256": "f4965fdc1ae1659154f0264e0dcc91812e1041dff1ba0a9a429bb4e9b3321bb7",
       "status": "source_audit_pending",
       "tuning_search_space": null,
       "upstream_commit": "5ecdb3356261aea72716cc9a779f31d7ad083bf4",
@@ -323,7 +352,7 @@
       "license": "Apache-2.0",
       "license_evidence": "https://github.com/april-tools/tabpc/blob/a470848853cf2927ac5224272f2bff04c09d74bb/LICENSE",
       "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-      "note": "Pinned source archive inspected. Upstream custom-data path requires a per-dataset JSON schema and its cirkit git submodule; submodule revision, dependency image, adapter, and default training config remain unaudited.",
+      "note": "Pinned source and cirkit gitlink cc02ed2964308a2e3d009ca71bb5548920d18891 inspected. News author-config compatibility fit was executable, but its checkpoint stores and reloads training tensor data.pkl. A releasable adapter must remove source-row dependence and be validated; exact upstream Torch 2.9.1 image and general data staging remain pending.",
       "sampling_command": "article experiment sampling command and model export adapter pending",
       "source_snapshot_sha256": "753d5c9f2dd79870e1c51b413e36a04d7fe123f8fcc3063209421ce510ab2c2d",
       "status": "source_audit_pending",
@@ -351,7 +380,9 @@
       "license": "Apache-2.0",
       "license_evidence": "https://github.com/amazon-science/tabsyn/blob/cb5ac0f74ec36ee88e7a974a393dfbef50d42da7/LICENSE",
       "license_sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b",
+      "note": "Pinned source and license inspected. VAE default 4000 epochs and diffusion default 10001 epochs; custom preprocessing makes an internal split and VAE treats a test-named path as validation. Adapter must stage only frozen train/validation rows and pin runtime before dispatch.",
       "sampling_command": "python main.py --dataname DATASET --method tabsyn --mode sample --save_path OUTPUT",
+      "source_snapshot_sha256": "7c327eea3fc84e8b8d8e7fbeb021d7d44d1fc272c98d7ca81628c25bc3101bb0",
       "status": "source_audit_pending",
       "tuning_search_space": null,
       "upstream_commit": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7",
@@ -371,7 +402,7 @@
     },
     "dope": {
       "adapter": "dope",
-      "adapter_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
+      "adapter_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
       "binary_sha256": "78d10acf4495577d22075e54ab452c0451a41e66cb029bbfd552cd2dd1c9e70c",
       "default_config": {
         "deadline_seconds": 600,
@@ -398,7 +429,7 @@
     },
     "independent_marginals": {
       "adapter": "independent_marginals",
-      "adapter_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
+      "adapter_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
       "default_config": {
         "bins": 16,
         "fit_timeout_seconds": 600,
@@ -412,7 +443,7 @@
       "note": "study reference implementation, not an upstream author baseline",
       "sampling_command": "research.benchmark.adapters.sample(independent_marginals, ARTIFACT, ROWS, SEED, OUTPUT)",
       "source_note": "Study-owned adapter file SHA-256 is the executable source identity; repository commit pending research branch publication.",
-      "source_sha256": "99c4055756be21acae44d652b0f7599489108eb998fe644da9c8c0329f617680",
+      "source_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
       "status": "locked",
       "tuning_search_space": {
         "bins": [
