@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neverhuman.dev/dope/pilot24-news-q10-packed.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "method": {"enum": ["DOPE", "CTGAN", "TVAE"]},
+    "size": {"enum": [1, 4]},
+    "number": {"type": "number"}
+  },
+  "required": ["format", "version", "scope", "source_sha256", "locks", "dataset", "fit_seed", "sample_seeds", "size_multipliers", "l3_byte_cap", "original_q10_artifact_bytes", "packed_q10_artifact_bytes", "packed_q10_within_l3_bytes", "packed_sample_checks_exact", "first_attempt_status", "native_validation_kpi", "paired_cells", "summary", "notes", "official_tests_opened", "mfs_v2", "ptf_v1", "production_certified"],
+  "properties": {
+    "format": {"const": "dope-pilot24-news-q10-packed-validation-comparison"},
+    "version": {"const": 1},
+    "scope": {"const": "training_derived_validation_only"},
+    "source_sha256": {"$ref": "#/$defs/hash"},
+    "locks": {
+      "type": "object", "additionalProperties": false,
+      "required": ["failed_v1_receipt", "packed_v2_round", "packed_v2_receipt", "neural_comparison"],
+      "properties": {
+        "failed_v1_receipt": {"$ref": "#/$defs/hash"},
+        "packed_v2_round": {"$ref": "#/$defs/hash"},
+        "packed_v2_receipt": {"$ref": "#/$defs/hash"},
+        "neural_comparison": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "dataset": {"const": "News"},
+    "fit_seed": {"const": 23},
+    "sample_seeds": {"const": [101, 211, 307]},
+    "size_multipliers": {"const": [1, 4]},
+    "l3_byte_cap": {"const": 10240},
+    "original_q10_artifact_bytes": {"type": "integer", "minimum": 10241},
+    "packed_q10_artifact_bytes": {"type": "integer", "minimum": 1, "maximum": 10240},
+    "packed_q10_within_l3_bytes": {"const": true},
+    "packed_sample_checks_exact": {"const": 12},
+    "first_attempt_status": {"const": "failed_receipt_io"},
+    "native_validation_kpi": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["dataset", "method", "objective", "direction", "selected_native_value", "selected_trial", "selection_receipt_sha256"],
+        "properties": {
+          "dataset": {"const": "News"},
+          "method": {"enum": ["CTGAN", "TVAE"]},
+          "objective": {"type": "string"},
+          "direction": {"const": "maximize"},
+          "selected_native_value": {"$ref": "#/$defs/number"},
+          "selected_trial": {"type": "integer", "minimum": 0, "maximum": 7},
+          "selection_receipt_sha256": {"$ref": "#/$defs/hash"}
+        }
+      }
+    },
+    "paired_cells": {
+      "type": "array", "minItems": 12, "maxItems": 12,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["comparator", "sample_seed", "size_multiplier", "dope_retention", "comparator_retention", "difference_dope_minus_comparator", "dope_packed_artifact_bytes", "comparator_artifact_bytes", "dope_metric_receipt_sha256", "comparator_metric_receipt_sha256", "dope_sample_check_sha256"],
+        "properties": {
+          "comparator": {"enum": ["CTGAN", "TVAE"]},
+          "sample_seed": {"enum": [101, 211, 307]},
+          "size_multiplier": {"$ref": "#/$defs/size"},
+          "dope_retention": {"$ref": "#/$defs/number"},
+          "comparator_retention": {"$ref": "#/$defs/number"},
+          "difference_dope_minus_comparator": {"$ref": "#/$defs/number"},
+          "dope_packed_artifact_bytes": {"type": "integer", "minimum": 1, "maximum": 10240},
+          "comparator_artifact_bytes": {"type": "integer", "minimum": 10241},
+          "dope_metric_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "comparator_metric_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "dope_sample_check_sha256": {"$ref": "#/$defs/hash"}
+        }
+      }
+    },
+    "summary": {
+      "type": "array", "minItems": 6, "maxItems": 6,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["method", "size_multiplier", "median_catboost_retention", "artifact_bytes", "within_l3_bytes"],
+        "properties": {
+          "method": {"$ref": "#/$defs/method"},
+          "size_multiplier": {"$ref": "#/$defs/size"},
+          "median_catboost_retention": {"$ref": "#/$defs/number"},
+          "artifact_bytes": {"type": "integer", "minimum": 1},
+          "within_l3_bytes": {"type": "boolean"}
+        }
+      }
+    },
+    "notes": {"type": "array", "minItems": 6, "items": {"type": "string"}},
+    "official_tests_opened": {"const": false},
+    "mfs_v2": {"type": "null"},
+    "ptf_v1": {"type": "null"},
+    "production_certified": {"const": false}
+  }
+}
