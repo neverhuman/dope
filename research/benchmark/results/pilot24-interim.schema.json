@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOPE 24-hour validation interim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "scope", "official_tests_opened", "production_certified", "ptf_v1", "mfs_v2", "method_note", "artifact_note", "news_note", "source_sha256", "locks", "counts", "native_validation_kpi", "cells", "paired", "research_candidates", "neural_byte_failures"],
+  "properties": {
+    "format": {"const": "dope-24h-validation-interim"},
+    "version": {"const": 1},
+    "scope": {"const": "training_derived_validation_only"},
+    "official_tests_opened": {"const": false},
+    "production_certified": {"const": false},
+    "ptf_v1": {"type": "null"},
+    "mfs_v2": {"type": "null"},
+    "method_note": {"type": "string"},
+    "artifact_note": {"type": "string"},
+    "news_note": {"type": "string"},
+    "source_sha256": {"$ref": "#/$defs/sha"},
+    "locks": {
+      "type": "object",
+      "minProperties": 7,
+      "additionalProperties": {"$ref": "#/$defs/sha"}
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dope_metric_receipts", "compact_metric_receipts", "paired_comparisons", "research_candidate_metrics", "neural_byte_failures"],
+      "properties": {
+        "dope_metric_receipts": {"const": 24},
+        "compact_metric_receipts": {"const": 96},
+        "paired_comparisons": {"const": 24},
+        "research_candidate_metrics": {"const": 20},
+        "neural_byte_failures": {"const": 8}
+      }
+    },
+    "native_validation_kpi": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dataset", "method", "objective", "direction", "default_value", "tuned_value", "selection_receipt_sha256"],
+        "properties": {
+          "dataset": {"enum": ["Adult", "California", "News"]},
+          "method": {"enum": ["Chow-Liu", "independent_marginals"]},
+          "objective": {"const": "mean_log_density"},
+          "direction": {"const": "maximize"},
+          "default_value": {"type": "number"},
+          "tuned_value": {"type": "number"},
+          "selection_receipt_sha256": {"$ref": "#/$defs/sha"}
+        }
+      }
+    },
+    "cells": {
+      "type": "array",
+      "minItems": 120,
+      "maxItems": 120,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dataset", "method", "configuration", "fit_seed", "sample_seed", "size", "artifact_bytes_raw", "metric_receipt_sha256", "sample_receipt_sha256", "retention", "null_loss", "trtr_loss", "tstr_loss", "informative", "c2st_auc", "exact_row_copies", "real_vs_real_exact"],
+        "properties": {
+          "dataset": {"enum": ["Adult", "California", "News"]},
+          "method": {"enum": ["dope", "Chow-Liu", "independent_marginals"]},
+          "configuration": {"enum": ["q8_symbolic", "default", "tuned"]},
+          "fit_seed": {"enum": [11, 23]},
+          "sample_seed": {"enum": [101, 211]},
+          "size": {"enum": [1, 4]},
+          "artifact_bytes_raw": {"type": "integer", "minimum": 1},
+          "artifact_bytes_research_packed": {"type": "integer", "minimum": 1, "maximum": 10240},
+          "restricted_projection_receipt_sha256": {"$ref": "#/$defs/sha"},
+          "fit_receipt_sha256": {"$ref": "#/$defs/sha"},
+          "metric_receipt_sha256": {"$ref": "#/$defs/sha"},
+          "sample_receipt_sha256": {"$ref": "#/$defs/sha"},
+          "retention": {"type": "number"},
+          "null_loss": {"type": "number", "minimum": 0},
+          "trtr_loss": {"type": "number", "minimum": 0},
+          "tstr_loss": {"type": "number", "minimum": 0},
+          "informative": {"type": "boolean"},
+          "c2st_auc": {"type": "number", "minimum": 0, "maximum": 1},
+          "exact_row_copies": {"type": "integer", "minimum": 0},
+          "real_vs_real_exact": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "research_candidates": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["family", "dataset", "candidate", "target_weight", "fit_seed", "sample_seed", "size", "artifact_bytes_raw", "artifact_bytes_research_packed", "research_l3_byte_eligible", "fit_receipt_sha256", "sample_receipt_sha256", "metric_receipt_sha256", "retention", "null_loss", "trtr_loss", "tstr_loss", "informative", "c2st_auc", "exact_row_copies", "real_vs_real_exact"],
+        "properties": {
+          "family": {"enum": ["symbolic_refinement", "gpu_neural"]},
+          "dataset": {"enum": ["Adult", "California", "News"]},
+          "candidate": {"type": "string"},
+          "target_weight": {"type": "number"},
+          "fit_seed": {"const": 11},
+          "sample_seed": {"const": 101},
+          "size": {"enum": [1, 4]},
+          "artifact_bytes_raw": {"type": "integer", "minimum": 1},
+          "artifact_bytes_research_packed": {"type": "integer", "minimum": 1, "maximum": 10240},
+          "research_l3_byte_eligible": {"const": true},
+          "fit_receipt_sha256": {"$ref": "#/$defs/sha"},
+          "sample_receipt_sha256": {"$ref": "#/$defs/sha"},
+          "metric_receipt_sha256": {"$ref": "#/$defs/sha"},
+          "retention": {"type": "number"},
+          "null_loss": {"type": "number", "minimum": 0},
+          "trtr_loss": {"type": "number", "minimum": 0},
+          "tstr_loss": {"type": "number", "minimum": 0},
+          "informative": {"type": "boolean"},
+          "c2st_auc": {"type": "number", "minimum": 0, "maximum": 1},
+          "exact_row_copies": {"type": "integer", "minimum": 0},
+          "real_vs_real_exact": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "neural_byte_failures": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dataset", "candidate", "target_weight", "failure_code", "encoded_candidate_bytes", "fit_receipt_sha256"],
+        "properties": {
+          "dataset": {"enum": ["Adult", "News"]},
+          "candidate": {"enum": ["micro_tvae_4_16", "micro_tvae_8_24"]},
+          "target_weight": {"enum": [2.0, 4.0]},
+          "failure_code": {"const": "byte_cap"},
+          "encoded_candidate_bytes": {"type": "integer", "exclusiveMinimum": 10240},
+          "fit_receipt_sha256": {"$ref": "#/$defs/sha"}
+        }
+      }
+    },
+    "paired": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dataset", "baseline", "baseline_configuration", "size", "paired_replicates", "dope_median_retention", "baseline_median_retention", "median_paired_difference", "min_paired_difference", "max_paired_difference"],
+        "properties": {
+          "dataset": {"enum": ["Adult", "California", "News"]},
+          "baseline": {"enum": ["Chow-Liu", "independent_marginals"]},
+          "baseline_configuration": {"enum": ["default", "tuned"]},
+          "size": {"enum": [1, 4]},
+          "paired_replicates": {"const": 4},
+          "dope_median_retention": {"type": "number"},
+          "baseline_median_retention": {"type": "number"},
+          "median_paired_difference": {"type": "number"},
+          "min_paired_difference": {"type": "number"},
+          "max_paired_difference": {"type": "number"}
+        }
+      }
+    }
+  },
+  "$defs": {"sha": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}
