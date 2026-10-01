@@ -1,0 +1,67 @@
+{
+  "adapter_license": "GPL-2.0-only OR GPL-3.0-only",
+  "adapter_role": "restricted_research_only_not_mit_product_runtime",
+  "adapter_source_sha256": "a63f1234b9772f66578a38e7f8cdbbaef20d99cf33372d322e6ce4139e908310",
+  "artifact_policy": "restricted_donor_values_and_fitted_rpart_models_charged_in_full",
+  "auditor_source_sha256": "8b33b0bc86ae0476a74c1ef644bced7cf8a3cbb88d061627d7bce03238ad43fd",
+  "contract_probe_sha256": "5c6ec3c5ae6c32635e8300b5f9f7b4ecaa99cbf675554dbfb351763f7dc7f0a5",
+  "default_config": {
+    "cp": 1e-08,
+    "minbucket": 5
+  },
+  "fit_api": "synthpop::syn(data,method='cart',models=TRUE)",
+  "formal_dp_claim": false,
+  "format": "dope-synthpop-cart-source-audit",
+  "matrix_admission": "pending_methods_lock_update_after_active_ARF_rounds",
+  "mfs_v2": null,
+  "native_objective": {
+    "api": "synthpop::utility.gen(synthetic,validation,method='cart',resamp.method='none')$pMSE",
+    "direction": "minimize",
+    "implementation_source_sha256": "8a111232fd5f159040832e51fe5b46137d3b2bd785ff157394897176d1dd7277",
+    "name": "validation_cart_pMSE",
+    "tie_breaks": [
+      "artifact_bytes_ascending",
+      "config_sha256_ascending"
+    ]
+  },
+  "official_tests_opened": false,
+  "package": "synthpop",
+  "package_version": "1.9-3",
+  "ptf_v1": null,
+  "release_l3_claim": false,
+  "representation": "common_numeric_projection_only",
+  "runtime_explicit_lock_sha256": "a96d501cf4fa21609c96e85fd61713131c2a3caa879cb0055e10030a8a77def7",
+  "sample_api": "restricted_GPL_adapter_from_fitted_rpart_leaf_donors",
+  "source_archive_sha256": "65d4146e8ca5ac1236d42a89eec057291f57b1224645e958909f9539b9c54ff5",
+  "source_license": "GPL-2 | GPL-3",
+  "source_member_sha256": {
+    "DESCRIPTION": "a9bc3ea64c259c305c7c4a0cb3a6fc16c5e29030a2a1613547237bf1daebc0fe",
+    "R/functions.syn.r": "51393c3b4d34fbfc66081e65bb4473eaec493ebaa0463839664854ca60820e8c",
+    "R/sampler.syn.r": "3115099bdadf9ff89c03b4dd4a3867305db86c0eeeda3c28716d213f42204ee4",
+    "R/syn.r": "72dfb67b5a9cdc2f5e46ef58b30a85ee220fd6e5aca521cf25fefdd576500145",
+    "R/utility.syn.r": "8a111232fd5f159040832e51fe5b46137d3b2bd785ff157394897176d1dd7277"
+  },
+  "total_trial_cap_per_dataset": 8,
+  "total_wall_cap_seconds_per_dataset": 43200,
+  "tuning_search_space": [
+    {
+      "cp": 1e-08,
+      "minbucket": 5
+    },
+    {
+      "cp": 1e-08,
+      "minbucket": 10
+    },
+    {
+      "cp": 1e-08,
+      "minbucket": 20
+    },
+    {
+      "cp": 1e-05,
+      "minbucket": 10
+    }
+  ],
+  "tuning_trials_per_dataset": 4,
+  "upstream_url": "https://cran.r-project.org/package=synthpop",
+  "version": 1
+}
