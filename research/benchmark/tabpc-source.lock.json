@@ -1,0 +1,298 @@
+{
+  "adapter_source_sha256": "3b2b9e510a5f85c9ed0e0f1d5dccceaf77a6d074cf65c50928dec59132fe960c",
+  "artifact_policy": "all learned preprocessors/circuit/weights/config/projection files charged; retained data.pkl is an empty metadata tensor, verified exact sample parity",
+  "cirkit_archive_sha256": "e4b61ea488674d2310ce72b84648ddfca392d9fb10e91385c7bf238b591cb717",
+  "cirkit_commit": "cc02ed2964308a2e3d009ca71bb5548920d18891",
+  "cirkit_license": "GPL-3.0-or-later",
+  "cirkit_upstream_url": "https://github.com/dylanponsford/cirkit",
+  "compatibility_patch": "guard_only_unconditional_sampling_cuda_memory_stat_reset_when_cuda_is_unavailable",
+  "compatibility_patch_sha256": "63e3f6ca03b36a4d2f3d82cfb37d8351c16773ae39a8d7bd93363515451f1bf9",
+  "contracts": [
+    {
+      "artifact_bytes": 15066,
+      "artifact_files": 12,
+      "cost_receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/attempt-0001.json",
+        "sha256": "83219bfdbabd5513642531e6a4762f45bf4030ccabf9b39753439e07643fe56a"
+      },
+      "energy_joules_estimate": 746.5482368721813,
+      "fit_receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/contract-receipt.json",
+        "sha256": "29551026cc42ab0439d37a7ddb47830fcd12980492bfe375a819575cdc790e65"
+      },
+      "gpu_elapsed_seconds": 11.29197785211727,
+      "host": "xbabe2",
+      "independent_cuda_hidden_sample_replay": "exact",
+      "native_nll_finite": true,
+      "peak_gpu_used_mib": 442,
+      "retained_row_tensor_elements": 0,
+      "row_removal_replay": "exact",
+      "sample_receipts": [
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/cpu-sample-1.receipt.json",
+          "sha256": "34e1efe0729922fa3cfb79ae85eb5082864fa69fcb2a5fe00f99d6fc3facf5d9"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/cpu-sample-2.receipt.json",
+          "sha256": "2eed21b0800defb79b310781557082f3be0e4e3726d7e2c1751e43716584e1a4"
+        }
+      ],
+      "scope": "generated_inputs_only_not_reported_experiment_reproduction",
+      "serialized_replay": "exact",
+      "status": "ok",
+      "task": "regression"
+    },
+    {
+      "artifact_bytes": 17156,
+      "artifact_files": 12,
+      "cost_receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/attempt-0001.json",
+        "sha256": "bece89ae2c446b743928cbfc9bd65ac8555dc8b5ff6d4ff4aab836bff29a5810"
+      },
+      "energy_joules_estimate": 931.3212400813657,
+      "fit_receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/contract-receipt.json",
+        "sha256": "e82726a9e703d2697dfa08ab6f837de596e1ea6a5bdbcbabe5a4aec41443b7b3"
+      },
+      "gpu_elapsed_seconds": 11.26868181093596,
+      "host": "xbabe2",
+      "independent_cuda_hidden_sample_replay": "exact",
+      "native_nll_finite": true,
+      "peak_gpu_used_mib": 442,
+      "retained_row_tensor_elements": 0,
+      "row_removal_replay": "exact",
+      "sample_receipts": [
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/cpu-sample-1.receipt.json",
+          "sha256": "012add2923da7217f5ab6973e51fa33a94805401147d60e59e05f46b5c37c630"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/cpu-sample-2.receipt.json",
+          "sha256": "e6e258a11b3e83d9a15bea3053d9daaf0ebf39c4023a2462752edfb8b7012906"
+        }
+      ],
+      "scope": "generated_inputs_only_not_reported_experiment_reproduction",
+      "serialized_replay": "exact",
+      "status": "ok",
+      "task": "binary"
+    }
+  ],
+  "default_config": {
+    "batch_size": 256,
+    "epochs": 20,
+    "learning_rate": 0.05,
+    "num_units": 100
+  },
+  "environment": {
+    "Authlib": "1.8.0",
+    "Jinja2": "3.1.6",
+    "MarkupSafe": "3.0.3",
+    "Pygments": "2.21.0",
+    "RapidFuzz": "3.14.5",
+    "annotated-doc": "0.0.5",
+    "annotated-types": "0.8.0",
+    "arrow": "1.4.0",
+    "certifi": "2026.7.22",
+    "cffi": "2.1.1",
+    "charset-normalizer": "3.5.2",
+    "click": "8.5.0",
+    "cloudpickle": "3.1.2",
+    "codecarbon": "3.3.1",
+    "contourpy": "1.3.2",
+    "cryptography": "50.0.2",
+    "cycler": "0.12.1",
+    "einops": "0.8.0",
+    "filelock": "4.0.8",
+    "fonttools": "4.65.0",
+    "fsspec": "2026.9.0",
+    "graphviz": "0.20.3",
+    "idna": "3.20",
+    "joblib": "1.6.0",
+    "joserfc": "1.7.5",
+    "kiwisolver": "1.5.1",
+    "markdown-it-py": "4.2.0",
+    "matplotlib": "3.9.4",
+    "mdurl": "0.1.2",
+    "mpmath": "1.3.0",
+    "networkx": "3.4.2",
+    "numpy": "1.26.4",
+    "nvidia-cublas-cu12": "12.8.4.1",
+    "nvidia-cuda-cupti-cu12": "12.8.90",
+    "nvidia-cuda-nvrtc-cu12": "12.8.93",
+    "nvidia-cuda-runtime-cu12": "12.8.90",
+    "nvidia-cudnn-cu12": "9.10.2.21",
+    "nvidia-cufft-cu12": "11.3.3.83",
+    "nvidia-cufile-cu12": "1.13.1.3",
+    "nvidia-curand-cu12": "10.3.9.90",
+    "nvidia-cusolver-cu12": "11.7.3.90",
+    "nvidia-cusparse-cu12": "12.5.8.93",
+    "nvidia-cusparselt-cu12": "0.7.1",
+    "nvidia-ml-py": "13.615.71",
+    "nvidia-nccl-cu12": "2.27.5",
+    "nvidia-nvjitlink-cu12": "12.8.93",
+    "nvidia-nvshmem-cu12": "3.3.20",
+    "nvidia-nvtx-cu12": "12.8.90",
+    "opt_einsum": "3.4.0",
+    "packaging": "26.3",
+    "pandas": "2.3.2",
+    "pillow": "12.3.0",
+    "prometheus_client": "0.26.0",
+    "prompt_toolkit": "3.0.53",
+    "psutil": "7.2.2",
+    "py-cpuinfo": "9.0.0",
+    "pycountry": "26.2.16",
+    "pycparser": "3.0",
+    "pydantic": "2.13.5",
+    "pydantic_core": "2.46.5",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "2.9.0.post0",
+    "pytz": "2026.4",
+    "questionary": "2.1.1",
+    "requests": "2.34.2",
+    "rich": "15.0.0",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.14.1",
+    "shellingham": "1.5.4",
+    "six": "1.17.0",
+    "sympy": "1.14.0",
+    "threadpoolctl": "3.7.0",
+    "torch": "2.9.1",
+    "tqdm": "4.70.1",
+    "triton": "3.5.1",
+    "typer": "0.27.2",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.4",
+    "urllib3": "2.8.0",
+    "wcwidth": "0.9.1"
+  },
+  "fit_api": "author ProbabilisticCircuit._train with external grouped train/validation tensors",
+  "fixed_author_settings": {
+    "category_threshold": 50,
+    "chow_liu_mi_bins": 15,
+    "dequantize_all_floats": false,
+    "early_stopping_patience": 10,
+    "handle_inflated_values": true,
+    "lr_scheduler": "ReduceLROnPlateau(patience=0,factor=0.85,min_lr=0.0002)",
+    "optimizer": "RAdam",
+    "sum_product_layer": "cp"
+  },
+  "formal_dp_claim": false,
+  "format": "dope-tabpc-author-source-audit",
+  "gpu_vram_mib_cap": 16384,
+  "matrix_admission": "pending_final_methods_and_campaign_locks",
+  "method": "TabPC",
+  "mfs_v2": null,
+  "native_objective": {
+    "checkpoint_selection": "author validation NLL early stopping",
+    "direction": "minimize",
+    "implementation": "ProbabilisticCircuit.compute_log_likelihood return mean_NLL",
+    "name": "author_transformed_validation_mean_nll",
+    "native_values_cross_method_ranking": false,
+    "shared_kpi_used_for_selection": false,
+    "tie_breaks": [
+      "artifact_bytes_ascending",
+      "config_sha256_ascending"
+    ]
+  },
+  "official_tests_opened": false,
+  "patched_cpu_parity_receipt": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/compatibility-patched-regression.json",
+    "sha256": "907a9a417abf02397d6bf2e883f4b50f6e8daa7f6ab2df4141e7b14d7d597be3"
+  },
+  "per_gpu_fit_seconds": 600,
+  "preflight_failures": [
+    {
+      "reason": "upstream_unconditional_cuda_memory_stat_reset_fails_when_cuda_hidden",
+      "receipt_path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v1/compatibility-original-regression.json",
+      "receipt_sha256": "9c5338e2b8a9706c0162e8437131f4d0ae297dca1ce78ef2f56487a348d95f80"
+    },
+    {
+      "reason": "first_runtime_manifest_rejected_upstream_documentation_symlinks",
+      "receipt_path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v1/preflight-failure.json",
+      "receipt_sha256": "74e4e4812e0c2ce4c7125aaecd68b0673eed73028a61e3975fbf7c5b8ee83a00"
+    }
+  ],
+  "preprocessing": "author pipeline, fit preprocessors and circuit structure on fit partition only",
+  "ptf_v1": null,
+  "release_l3_claim": false,
+  "runtime_dependency_source_file_count": 5465,
+  "runtime_lock": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/runtime.lock.json",
+    "sha256": "d4f96925c63354741966191f737ef601411d4543f5d326772a6fd155d635c963"
+  },
+  "runtime_python": "3.10.12",
+  "runtime_role": "restricted_research_only_not_mit_product_runtime",
+  "sample_api": "author ProbabilisticCircuit.generate (CPU memory-stat guard only)",
+  "search_space_source": "author default pc.py plus preregistered seven-element subset of experiment_likelihoods.py / pc_lls.py grid",
+  "source_archive_sha256": "25569583dcf051ffca04b8ad219bcc53c04e0c74e01d39e9e77c5ac3b5e156ac",
+  "source_license": "Apache-2.0",
+  "source_member_sha256": {
+    "author-runtime-cpu-v1/src/models/probabilistic_circuit.py": "9af702885b5599f8bbe3890d3a45abf5a1f97ef41bcc3e5e5b9bf0e47b126e04",
+    "cirkit-source/LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "source/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "source/scripts/experiment_likelihoods.py": "1cc1222ec00019a6d578ecae9c1b23f5e224e5e60ac295950acfb5b58e44e198",
+    "source/src/models/model.py": "e7f16402b75e90234b1c0e8a35fc472fa89a1a2b852377695ffb3794abffc61d",
+    "source/src/models/probabilistic_circuit.py": "03fae5a18d5785b387cc20429843920c90b3c8d68e59e527b3e00cbc46f9a4d7",
+    "source/src/nn/training.py": "40d4c3140119c796b1d756508dfc73f4eae0902fa838db278d56cd61f1c9de51",
+    "source/src/preprocessors/compose.py": "e947c1e4ed8711001f5f43348fe73d21d2c0501c13bbcbacfcbe98659ad35552",
+    "source/src/preprocessors/df_quantile_normalizer.py": "61792dc67ea796e46b80d4099438041cec9bb2116491ed5fefd36234c02bcc84",
+    "source/train_scripts/pc.py": "28adeac8597de3ef706773c87d159606f1f3a265e5124a263768c0f8e0b3305b",
+    "source/train_scripts/pc_lls.py": "c7c2d6a8247954d484ca001dcf086c21b6f5026eb1c09052d05c0c46889ed0aa"
+  },
+  "total_trial_cap_per_dataset": 8,
+  "total_wall_cap_seconds_per_dataset": 43200,
+  "tuning_search_space": [
+    {
+      "batch_size": 256,
+      "epochs": 20,
+      "learning_rate": 0.05,
+      "num_units": 100
+    },
+    {
+      "batch_size": 256,
+      "epochs": 150,
+      "learning_rate": 0.1,
+      "num_units": 128
+    },
+    {
+      "batch_size": 512,
+      "epochs": 150,
+      "learning_rate": 0.25,
+      "num_units": 128
+    },
+    {
+      "batch_size": 64,
+      "epochs": 150,
+      "learning_rate": 0.5,
+      "num_units": 128
+    },
+    {
+      "batch_size": 256,
+      "epochs": 150,
+      "learning_rate": 0.1,
+      "num_units": 512
+    },
+    {
+      "batch_size": 512,
+      "epochs": 150,
+      "learning_rate": 0.25,
+      "num_units": 512
+    },
+    {
+      "batch_size": 64,
+      "epochs": 150,
+      "learning_rate": 0.5,
+      "num_units": 512
+    },
+    {
+      "batch_size": 256,
+      "epochs": 150,
+      "learning_rate": 0.1,
+      "num_units": 2048
+    }
+  ],
+  "upstream_commit": "b821a47a9ca9f674f1083d1309b1e7e548657c0d",
+  "upstream_url": "https://github.com/april-tools/tabpc",
+  "version": 1
+}
