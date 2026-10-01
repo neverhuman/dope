@@ -10,6 +10,34 @@ from research.benchmark.score import sha256
 
 
 class SdvRoundTests(unittest.TestCase):
+    def test_gpu_cpu_slot_is_disjoint_and_within_host_affinity(self):
+        snapshot = {"allowed_cpus": list(range(24, 128))}
+        slot = list(range(32, 48))
+        self.assertEqual(sdv_round.cpu_slot({"cpu_slot": slot}, snapshot), slot)
+        with self.assertRaisesRegex(ValueError, "slot"):
+            sdv_round.cpu_slot({"cpu_slot": list(range(16))}, snapshot)
+        with self.assertRaisesRegex(ValueError, "slot"):
+            sdv_round.cpu_slot({"cpu_slot": slot[:-1]}, snapshot)
+
+    def test_pilot_worker_root_is_training_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            worker = root / "workers" / "fixture"
+            worker.mkdir(parents=True)
+            for name in ("train.csv", "validation.csv", "projection.json"):
+                (worker / name).write_text("fixture")
+            lock = {"worker_root": str(root / "workers")}
+            with patch.object(sdv_round, "SCRATCH", root):
+                self.assertEqual(sdv_round.worker_for_job(lock, {"dataset": "fixture"}), worker)
+                (worker / "test.csv").write_text("sealed")
+                with self.assertRaisesRegex(ValueError, "sealed"):
+                    sdv_round.worker_for_job(lock, {"dataset": "fixture"})
+                (worker / "test.csv").unlink()
+                (worker / "train.csv").unlink()
+                (worker / "train.csv").symlink_to(root / "secret")
+                with self.assertRaisesRegex(ValueError, "sealed"):
+                    sdv_round.worker_for_job(lock, {"dataset": "fixture"})
+
     def test_gpu_retry_preserves_interrupted_attempt(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
