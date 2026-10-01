@@ -539,3 +539,23 @@ memory-stat compatibility guard, retained empty-row metadata tensor and full
 artifact charges are explicit in [TABPC.md](TABPC.md) and
 `tabpc-source.lock.json`. No real-data TabPC result or release score is inferred
 from these probes. Final campaign locks and official tests remain sealed.
+
+The later complete frozen TabPC pilot has 24 native trials (13 successes,
+eight Adult GPU allocation failures and three News fit timeouts), selected
+only by author transformed validation NLL. All 48 fixed-fit-23 common sample
+jobs are accounted for: 45 successful and three News tuned `8n` timeouts.
+All 24 planned `n`/`4n` metric cells completed. Median CatBoost retention
+across three sample seeds is California default 0.9620/0.9670 and
+native-selected 0.9247/0.9327 at `n`/`4n`, versus DOPE 0.7008/0.6948.
+News default is 0.5105/0.6937 and native-selected 0.4220/0.6675,
+versus the prior losslessly packed DOPE q10 result 0.3287/0.3109.
+All successful TabPC artifacts exceed L3; Adult unavailable tracks confer
+no DOPE win. This is a descriptive single-fit-seed pilot, not the final
+five-fit or public-core paired analysis. [The complete report](results/pilot24-tabpc-native.md),
+[JSON](results/pilot24-tabpc-native.json),
+[schema](results/pilot24-tabpc-native.schema.json),
+[CSV](results/pilot24-tabpc-native.csv), and
+[figure](results/pilot24-tabpc-native.svg) retain all outcomes and immutable
+receipt hashes. Original learned bytes are preserved through the sampling
+runtime metadata repair; no new common-validation fits or tuning occurred.
+Official tests remain sealed; MFS-v2/PTF-v1 and release-safe status remain null.

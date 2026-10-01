@@ -1,0 +1,1484 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bindings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array"
+    },
+    "common_cells": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_bytes": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "configuration": {
+            "enum": [
+              "default",
+              "tuned"
+            ]
+          },
+          "contributes_dope_win": {
+            "const": false
+          },
+          "dataset": {
+            "enum": [
+              "Adult",
+              "California",
+              "News"
+            ]
+          },
+          "fit_seed": {
+            "const": 23
+          },
+          "metric_receipt_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metrics": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "c2st_auc": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "copy_counts": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "exact": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "near": {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "exact",
+                      "near"
+                    ],
+                    "type": "object"
+                  },
+                  "dependencies": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "format": {
+                    "const": "dope-benchmark-validation-pilot-metrics"
+                  },
+                  "gate_profile_complete": {
+                    "const": false
+                  },
+                  "implementation_sha256": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "marginal_ks_mean": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "metric_seconds": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "mfs_v2": {
+                    "type": "null"
+                  },
+                  "null_loss": {
+                    "type": "number"
+                  },
+                  "pair_correlation_fidelity": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "real_vs_real_control_counts": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "exact": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "near": {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "exact",
+                      "near"
+                    ],
+                    "type": "object"
+                  },
+                  "rows": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "synthetic": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "train": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "validation": {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "synthetic",
+                      "train",
+                      "validation"
+                    ],
+                    "type": "object"
+                  },
+                  "task": {
+                    "enum": [
+                      "regression",
+                      "binary"
+                    ]
+                  },
+                  "utility": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "catboost": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "informative": {
+                            "type": "boolean"
+                          },
+                          "low_signal_noninferior": {
+                            "type": [
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "retention": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "trtr_loss": {
+                            "type": "number"
+                          },
+                          "tstr_loss": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "retention",
+                          "informative",
+                          "low_signal_noninferior",
+                          "trtr_loss",
+                          "tstr_loss"
+                        ],
+                        "type": "object"
+                      },
+                      "linear": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "informative": {
+                            "type": "boolean"
+                          },
+                          "low_signal_noninferior": {
+                            "type": [
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "retention": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "trtr_loss": {
+                            "type": "number"
+                          },
+                          "tstr_loss": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "retention",
+                          "informative",
+                          "low_signal_noninferior",
+                          "trtr_loss",
+                          "tstr_loss"
+                        ],
+                        "type": "object"
+                      },
+                      "mlp": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "informative": {
+                            "type": "boolean"
+                          },
+                          "low_signal_noninferior": {
+                            "type": [
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "retention": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "trtr_loss": {
+                            "type": "number"
+                          },
+                          "tstr_loss": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "retention",
+                          "informative",
+                          "low_signal_noninferior",
+                          "trtr_loss",
+                          "tstr_loss"
+                        ],
+                        "type": "object"
+                      }
+                    },
+                    "required": [
+                      "catboost",
+                      "linear",
+                      "mlp"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": 1
+                  }
+                },
+                "required": [
+                  "c2st_auc",
+                  "copy_counts",
+                  "dependencies",
+                  "format",
+                  "gate_profile_complete",
+                  "implementation_sha256",
+                  "marginal_ks_mean",
+                  "metric_seconds",
+                  "mfs_v2",
+                  "null_loss",
+                  "pair_correlation_fidelity",
+                  "real_vs_real_control_counts",
+                  "rows",
+                  "task",
+                  "utility",
+                  "version"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sample_receipt_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sample_seed": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "size_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          },
+          "source_unavailable": {
+            "const": false
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "fit_unavailable"
+            ]
+          }
+        },
+        "required": [
+          "dataset",
+          "configuration",
+          "fit_seed",
+          "sample_seed",
+          "size_multiplier",
+          "status",
+          "artifact_bytes",
+          "metrics",
+          "sample_receipt_sha256",
+          "metric_receipt_sha256",
+          "source_unavailable",
+          "contributes_dope_win"
+        ],
+        "type": "object"
+      },
+      "maxItems": 36,
+      "minItems": 36,
+      "type": "array"
+    },
+    "cost": {
+      "additionalProperties": false,
+      "properties": {
+        "common_sample_and_metric_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "native_attempt_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "new_validation_fits": {
+          "const": 0
+        },
+        "new_validation_tuning_trials": {
+          "const": 0
+        }
+      },
+      "required": [
+        "native_attempt_seconds",
+        "common_sample_and_metric_seconds",
+        "new_validation_fits",
+        "new_validation_tuning_trials"
+      ],
+      "type": "object"
+    },
+    "dope_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_bytes": {
+            "maximum": 10240,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "configuration": {
+            "enum": [
+              "q8_symbolic",
+              "q10_packed"
+            ]
+          },
+          "dataset": {
+            "enum": [
+              "Adult",
+              "California",
+              "News"
+            ]
+          },
+          "metric_receipt_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "retention": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sample_receipt_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "sample_seed": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "size_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          }
+        },
+        "required": [
+          "dataset",
+          "sample_seed",
+          "size_multiplier",
+          "retention",
+          "artifact_bytes",
+          "metric_receipt_sha256",
+          "sample_receipt_sha256",
+          "configuration"
+        ],
+        "type": "object"
+      },
+      "maxItems": 18,
+      "minItems": 18,
+      "type": "array"
+    },
+    "failed_tracks": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "configuration": {
+            "enum": [
+              "default",
+              "tuned"
+            ]
+          },
+          "contributes_dope_win": {
+            "const": false
+          },
+          "dataset": {
+            "const": "Adult"
+          },
+          "fit_receipt_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fit_receipt_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fit_status": {
+            "enum": [
+              "failed",
+              "all_native_trials_failed"
+            ]
+          },
+          "source_unavailable": {
+            "const": false
+          }
+        },
+        "required": [
+          "configuration",
+          "contributes_dope_win",
+          "dataset",
+          "fit_receipt_path",
+          "fit_receipt_sha256",
+          "fit_status",
+          "source_unavailable"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "format": {
+      "const": "dope-tabpc-complete-native-pilot-validation"
+    },
+    "helper_source_sha256": {
+      "additionalProperties": {
+        "pattern": "^[a-f0-9]{64}$",
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "input_report_sha256": {
+      "additionalProperties": false,
+      "properties": {
+        "pilot24-native-neural.json": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "pilot24-news-q10-packed.json": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "pilot24-native-neural.json",
+        "pilot24-news-q10-packed.json"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_attempts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_bytes": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "contributes_dope_win": {
+            "const": false
+          },
+          "elapsed_seconds": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "energy_joules_estimate": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence_files": {
+            "additionalProperties": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "host": {
+            "const": "xbabe2"
+          },
+          "job": {
+            "additionalProperties": false,
+            "properties": {
+              "config": {
+                "additionalProperties": false,
+                "properties": {
+                  "batch_size": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "epochs": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "learning_rate": {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "num_units": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "batch_size",
+                  "epochs",
+                  "learning_rate",
+                  "num_units"
+                ],
+                "type": "object"
+              },
+              "configuration_track": {
+                "enum": [
+                  "default",
+                  "native_trial"
+                ]
+              },
+              "dataset": {
+                "enum": [
+                  "Adult",
+                  "California",
+                  "News"
+                ]
+              },
+              "fit_seed": {
+                "const": 23
+              },
+              "formal_dp_budget": {
+                "type": "null"
+              },
+              "method": {
+                "const": "TabPC"
+              },
+              "projection_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "runtime_lock_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "sample_seeds": {
+                "const": [
+                  101,
+                  211,
+                  307
+                ]
+              },
+              "size_multipliers": {
+                "const": [
+                  1,
+                  2,
+                  4,
+                  8
+                ]
+              },
+              "source_audit_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "stage": {
+                "const": "pilot_author_native_validation"
+              },
+              "track": {
+                "const": "common_numeric"
+              },
+              "train_rows": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "train_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "trial": {
+                "maximum": 7,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "validation_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "config",
+              "configuration_track",
+              "dataset",
+              "fit_seed",
+              "formal_dp_budget",
+              "method",
+              "projection_sha256",
+              "runtime_lock_sha256",
+              "sample_seeds",
+              "size_multipliers",
+              "source_audit_sha256",
+              "stage",
+              "track",
+              "train_rows",
+              "train_sha256",
+              "trial",
+              "validation_sha256"
+            ],
+            "type": "object"
+          },
+          "native_kpi": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "direction": {
+                    "const": "minimize"
+                  },
+                  "fit_seed": {
+                    "const": 23
+                  },
+                  "not_comparable_across_methods": {
+                    "const": true
+                  },
+                  "objective": {
+                    "const": "author_transformed_validation_mean_nll"
+                  },
+                  "partition": {
+                    "const": "validation"
+                  },
+                  "preprocessing_fit_partition": {
+                    "const": "train_only"
+                  },
+                  "validation_sha256": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "direction",
+                  "fit_seed",
+                  "not_comparable_across_methods",
+                  "objective",
+                  "partition",
+                  "preprocessing_fit_partition",
+                  "validation_sha256",
+                  "value"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "peak_gpu_used_mib": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "receipt_path": {
+            "type": "string"
+          },
+          "receipt_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "source_unavailable": {
+            "const": false
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "failed",
+              "timeout"
+            ]
+          }
+        },
+        "required": [
+          "job",
+          "status",
+          "receipt_path",
+          "receipt_sha256",
+          "elapsed_seconds",
+          "native_kpi",
+          "artifact_bytes",
+          "peak_gpu_used_mib",
+          "energy_joules_estimate",
+          "host",
+          "evidence_files",
+          "source_unavailable",
+          "contributes_dope_win"
+        ],
+        "type": "object"
+      },
+      "maxItems": 24,
+      "minItems": 24,
+      "type": "array"
+    },
+    "native_objective": {
+      "const": {
+        "checkpoint_selection": "author validation NLL early stopping",
+        "direction": "minimize",
+        "implementation": "ProbabilisticCircuit.compute_log_likelihood return mean_NLL",
+        "name": "author_transformed_validation_mean_nll",
+        "native_values_cross_method_ranking": false,
+        "shared_kpi_used_for_selection": false,
+        "tie_breaks": [
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
+        ]
+      }
+    },
+    "native_round_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "native_selections": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "dataset": {
+            "enum": [
+              "Adult",
+              "California",
+              "News"
+            ]
+          },
+          "default_native_kpi": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "direction": {
+                    "const": "minimize"
+                  },
+                  "fit_seed": {
+                    "const": 23
+                  },
+                  "not_comparable_across_methods": {
+                    "const": true
+                  },
+                  "objective": {
+                    "const": "author_transformed_validation_mean_nll"
+                  },
+                  "partition": {
+                    "const": "validation"
+                  },
+                  "preprocessing_fit_partition": {
+                    "const": "train_only"
+                  },
+                  "validation_sha256": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "direction",
+                  "fit_seed",
+                  "not_comparable_across_methods",
+                  "objective",
+                  "partition",
+                  "preprocessing_fit_partition",
+                  "validation_sha256",
+                  "value"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "receipt_path": {
+            "type": "string"
+          },
+          "receipt_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "selected_native_kpi": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "direction": {
+                    "const": "minimize"
+                  },
+                  "fit_seed": {
+                    "const": 23
+                  },
+                  "not_comparable_across_methods": {
+                    "const": true
+                  },
+                  "objective": {
+                    "const": "author_transformed_validation_mean_nll"
+                  },
+                  "partition": {
+                    "const": "validation"
+                  },
+                  "preprocessing_fit_partition": {
+                    "const": "train_only"
+                  },
+                  "validation_sha256": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "direction",
+                  "fit_seed",
+                  "not_comparable_across_methods",
+                  "objective",
+                  "partition",
+                  "preprocessing_fit_partition",
+                  "validation_sha256",
+                  "value"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "selected_trial": {
+            "anyOf": [
+              {
+                "maximum": 7,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "all_native_trials_failed"
+            ]
+          }
+        },
+        "required": [
+          "dataset",
+          "selected_trial",
+          "default_native_kpi",
+          "selected_native_kpi",
+          "receipt_path",
+          "receipt_sha256",
+          "status"
+        ],
+        "type": "object"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "native_status_counts": {
+      "const": {
+        "failed": 8,
+        "ok": 13,
+        "timeout": 3
+      }
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "runtime_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "sampling": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "training": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "training",
+        "sampling"
+      ],
+      "type": "object"
+    },
+    "sample_receipts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "elapsed_seconds": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "fit_receipt_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "job": {
+            "additionalProperties": false,
+            "properties": {
+              "binding_path": {
+                "type": "string"
+              },
+              "binding_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "config_tracks": {
+                "items": {
+                  "enum": [
+                    "default",
+                    "tuned"
+                  ]
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "dataset": {
+                "enum": [
+                  "California",
+                  "News"
+                ]
+              },
+              "fit_job_digest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "fit_seed": {
+                "const": 23
+              },
+              "projection_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "row_count": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "sample_seed": {
+                "enum": [
+                  101,
+                  211,
+                  307
+                ]
+              },
+              "size_multiplier": {
+                "enum": [
+                  1,
+                  2,
+                  4,
+                  8
+                ]
+              },
+              "train_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "validation_sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "worker_dir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "binding_path",
+              "binding_sha256",
+              "config_tracks",
+              "dataset",
+              "fit_job_digest",
+              "fit_seed",
+              "projection_sha256",
+              "row_count",
+              "sample_seed",
+              "size_multiplier",
+              "train_sha256",
+              "validation_sha256",
+              "worker_dir"
+            ],
+            "type": "object"
+          },
+          "metric_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "receipt_path": {
+            "type": "string"
+          },
+          "receipt_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "sample_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "sample_timeout"
+            ]
+          }
+        },
+        "required": [
+          "job",
+          "status",
+          "artifact_bytes",
+          "receipt_path",
+          "receipt_sha256",
+          "fit_receipt_sha256",
+          "sample_sha256",
+          "metric_sha256",
+          "elapsed_seconds"
+        ],
+        "type": "object"
+      },
+      "maxItems": 48,
+      "minItems": 48,
+      "type": "array"
+    },
+    "sample_status_counts": {
+      "const": {
+        "ok": 45,
+        "sample_timeout": 3
+      }
+    },
+    "scope": {
+      "const": "training_derived_validation_only_single_fit_seed"
+    },
+    "source_manifests": {
+      "additionalProperties": false,
+      "properties": {
+        "native": {
+          "additionalProperties": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "validation": {
+          "additionalProperties": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "native",
+        "validation"
+      ],
+      "type": "object"
+    },
+    "source_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "summaries": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_bytes": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cell_status_counts": {
+            "additionalProperties": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "complete_informative_samples": {
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "configuration": {
+            "enum": [
+              "default",
+              "tuned"
+            ]
+          },
+          "dataset": {
+            "enum": [
+              "Adult",
+              "California",
+              "News"
+            ]
+          },
+          "max_catboost_retention": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "median_catboost_retention": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "min_catboost_retention": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "size_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          }
+        },
+        "required": [
+          "dataset",
+          "configuration",
+          "size_multiplier",
+          "complete_informative_samples",
+          "median_catboost_retention",
+          "min_catboost_retention",
+          "max_catboost_retention",
+          "artifact_bytes",
+          "cell_status_counts"
+        ],
+        "type": "object"
+      },
+      "maxItems": 12,
+      "minItems": 12,
+      "type": "array"
+    },
+    "validation_round_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "worker_hashes": {
+      "additionalProperties": false,
+      "properties": {
+        "Adult": {
+          "additionalProperties": false,
+          "properties": {
+            "projection.json": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "train.csv": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "validation.csv": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "train.csv",
+            "validation.csv",
+            "projection.json"
+          ],
+          "type": "object"
+        },
+        "California": {
+          "additionalProperties": false,
+          "properties": {
+            "projection.json": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "train.csv": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "validation.csv": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "train.csv",
+            "validation.csv",
+            "projection.json"
+          ],
+          "type": "object"
+        },
+        "News": {
+          "additionalProperties": false,
+          "properties": {
+            "projection.json": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "train.csv": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "validation.csv": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "train.csv",
+            "validation.csv",
+            "projection.json"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "Adult",
+        "California",
+        "News"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "scope",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe",
+    "production_certified",
+    "source_sha256",
+    "helper_source_sha256",
+    "native_round_sha256",
+    "validation_round_sha256",
+    "native_objective",
+    "native_attempts",
+    "native_status_counts",
+    "native_selections",
+    "sample_receipts",
+    "sample_status_counts",
+    "failed_tracks",
+    "bindings",
+    "source_manifests",
+    "runtime_locks",
+    "worker_hashes",
+    "common_cells",
+    "summaries",
+    "dope_references",
+    "input_report_sha256",
+    "cost",
+    "notes"
+  ],
+  "title": "Complete author-native TabPC pilot and DOPE validation references",
+  "type": "object"
+}
