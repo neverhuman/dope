@@ -359,6 +359,30 @@ rebuilds the table without restricted scratch. This one-fit-seed pilot does
 not support a paper superiority claim; official tests remain sealed and
 MFS-v2/PTF-v1 are null.
 
+The News q10 symbolic autoregressive DOPE candidate has now been assessed at
+five independent GPU fit seeds (11, 23, 37, 53, 71) under one frozen
+configuration and the same training-derived validation partition. Lossless
+projection packing charges 9,195–9,205 bytes per fitted artifact, below L3;
+all 60 `n`/`2n`/`4n`/`8n` sample identities matched their references and all
+30 `n`/`4n` metric payloads replayed exactly. Median CatBoost retention across
+the five fit-seed medians was **0.5723 at `n`** and **0.5478 at `4n`**. The
+`n` fit-seed medians range from 0.3287 to 0.9782, so the earlier high
+single-seed result is not a stable five-fit result. No sample in the 30 common
+metric cells was an exact or near training-row copy. The real MLP auditor was
+noninformative in all 30 cells, so its retention remains null. These are
+validation outcomes, not PTF-v1 scores or a 0.99 release pass: privacy attacks,
+official-test utility and other gates are still absent. The one-fit-seed
+native-tuned CTGAN/TVAE comparison remains a separate paired panel and is not
+treated as a five-fit-seed comparison. [The five-fit report](results/pilot24-news-q10-fivefit.md),
+[JSON](results/pilot24-news-q10-fivefit.json),
+[schema](results/pilot24-news-q10-fivefit.schema.json),
+[CSV](results/pilot24-news-q10-fivefit.csv), and
+[SVG](results/pilot24-news-q10-fivefit.svg)/[PDF](results/pilot24-news-q10-fivefit.pdf)
+retain every seed, artifact charge, GPU cost, validation metric and immutable
+receipt hash. Regenerate with
+`python3 -m research.benchmark.publish_news_q10_fivefit` and
+`python3 -m research.benchmark.publish_news_q10_fivefit_figure`.
+
 The two study-owned compact references also completed the same fixed-fit-23
 pilot validation protocol. Their default and native-likelihood-selected
 configurations produced 72 `n`/`4n` common metric cells, all exactly replayed.
