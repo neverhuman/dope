@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "California DOPE autoregressive pilot validation",
+  "type": "object",
+  "required": ["format", "version", "scope", "source_sha256", "fit_round_sha256", "validation_round_sha256", "preflight_failure_receipt_sha256", "prior_comparator_report_sha256", "fit_attempts", "cells", "summary", "status_counts", "notes", "official_tests_opened", "mfs_v2", "ptf_v1", "production_certified"],
+  "properties": {
+    "format": {"const": "dope-pilot24-california-q10-validation"},
+    "version": {"const": 1},
+    "scope": {"const": "training_derived_validation_only"},
+    "source_sha256": {"$ref": "#/$defs/hash"},
+    "fit_round_sha256": {"$ref": "#/$defs/hash"},
+    "validation_round_sha256": {"$ref": "#/$defs/hash"},
+    "preflight_failure_receipt_sha256": {"$ref": "#/$defs/hash"},
+    "prior_comparator_report_sha256": {"$ref": "#/$defs/hash"},
+    "fit_attempts": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["fit_seed", "host", "status", "artifact_bytes", "model_sha256", "fit_receipt_sha256", "dispatch_receipt_sha256", "compile_report_sha256", "elapsed_seconds", "peak_gpu_used_mib", "energy_joules_estimate", "compiler_failed_gates"],
+        "properties": {
+          "fit_seed": {"enum": [11, 23]},
+          "host": {"enum": ["xbabe1", "xbabe3"]},
+          "status": {"const": "ok"},
+          "artifact_bytes": {"const": 2525},
+          "model_sha256": {"$ref": "#/$defs/hash"},
+          "fit_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "dispatch_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "compile_report_sha256": {"$ref": "#/$defs/hash"},
+          "elapsed_seconds": {"type": "number", "minimum": 0, "maximum": 600},
+          "peak_gpu_used_mib": {"type": "number", "minimum": 0, "maximum": 16384},
+          "energy_joules_estimate": {"type": ["number", "null"], "minimum": 0},
+          "compiler_failed_gates": {"const": ["utility", "driver", "production_evidence_unmeasured"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "cells": {
+      "type": "array", "minItems": 12, "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": ["fit_seed", "sample_seed", "size_multiplier", "catboost_retention", "q8_same_seed_retention", "difference_q10_minus_q8", "exact_row_copies", "near_row_copies", "sample_sha256", "sample_receipt_sha256", "metric_receipt_sha256", "q8_metric_receipt_sha256", "artifact_bytes", "within_l3_bytes", "release_safe"],
+        "properties": {
+          "fit_seed": {"enum": [11, 23]},
+          "sample_seed": {"enum": [101, 211, 307]},
+          "size_multiplier": {"enum": [1, 4]},
+          "catboost_retention": {"type": "number"},
+          "q8_same_seed_retention": {"type": ["number", "null"]},
+          "difference_q10_minus_q8": {"type": ["number", "null"]},
+          "exact_row_copies": {"const": 0},
+          "near_row_copies": {"const": 0},
+          "sample_sha256": {"$ref": "#/$defs/hash"},
+          "sample_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "metric_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "q8_metric_receipt_sha256": {"oneOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]},
+          "artifact_bytes": {"const": 2525},
+          "within_l3_bytes": {"const": true},
+          "release_safe": {"type": "null"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["fit_seed", "size_multiplier", "median_catboost_retention", "median_q8_same_seed_retention", "median_paired_difference", "exact_row_copies", "near_row_copies"],
+        "properties": {
+          "fit_seed": {"enum": [11, 23]},
+          "size_multiplier": {"enum": [1, 4]},
+          "median_catboost_retention": {"type": "number"},
+          "median_q8_same_seed_retention": {"type": ["number", "null"]},
+          "median_paired_difference": {"type": ["number", "null"]},
+          "exact_row_copies": {"const": 0},
+          "near_row_copies": {"const": 0}
+        },
+        "additionalProperties": false
+      }
+    },
+    "status_counts": {
+      "const": {"fit_ok": 2, "metric_ok": 12, "preflight_non_gpu_failures": 4}
+    },
+    "notes": {"type": "array", "minItems": 3, "items": {"type": "string"}},
+    "official_tests_opened": {"const": false},
+    "mfs_v2": {"type": "null"},
+    "ptf_v1": {"type": "null"},
+    "production_certified": {"const": false}
+  },
+  "additionalProperties": false,
+  "$defs": {"hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}
