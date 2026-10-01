@@ -1,0 +1,4 @@
+dataset,default_status,selected_round,selected_trial,selected_native_kpi,selected_artifact_bytes,selected_within_l3_bytes,tuning_attempts,tuning_wall_seconds
+Adult,timeout,short,1,-3.5086214965680993,19187442,False,8,4404.385107912822
+California,ok,original,3,22.547445029980018,85471471,False,8,673.48244879907
+News,timeout,short,2,103.60140930981385,55316440,False,8,4203.754332876531
