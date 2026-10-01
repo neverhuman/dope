@@ -449,5 +449,23 @@ and prior `n`/`4n` paired receipt link is reconciled in the
 `python3 -m research.benchmark.publish_synthpop_sample_matrix`. Native
 tuning used validation CART pMSE. The shared validation metrics remain
 limited to `n` and `4n`; no `2n`/`8n` utility or release score is inferred.
-All six fitted synthpop artifacts exceed the 10,240-byte L3 cap. Official
-tests remain sealed, and MFS-v2/PTF-v1 remain null.
+All five distinct fitted synthpop artifacts exceed the 10,240-byte L3 cap;
+California default and tuned share the same fit, making six reported
+dataset/configuration cells. Official tests remain sealed, and MFS-v2/PTF-v1
+remain null.
+
+A bounded California DOPE autoregressive follow-up ran two fit seeds on
+GPU hosts and measured three sample seeds at `n` and `4n` on training-derived
+validation. Both 2,525-byte artifacts failed compiler utility and driver
+gates. Fit seed 23 median CatBoost retention was 0.6934 at `n` and 0.6910
+at `4n`, below the q8 seed-23 medians of 0.7008 and 0.6948; all 12 cells
+had zero exact and near training-row copies. The compiler selected a symbolic
+artifact, so host placement does not imply neural GPU training. The family
+was chosen after observing California validation utility, making this a
+descriptive follow-up rather than an independent dataset confirmation. The
+[report](results/pilot24-california-q10.md),
+[JSON](results/pilot24-california-q10.json),
+[schema](results/pilot24-california-q10.schema.json), and
+[CSV](results/pilot24-california-q10.csv) regenerate with
+`python3 -m research.benchmark.publish_california_q10`. Official tests
+remain sealed; MFS-v2/PTF-v1 and certification are null.
