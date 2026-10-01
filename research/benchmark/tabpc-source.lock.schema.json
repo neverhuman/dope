@@ -1106,6 +1106,91 @@
     },
     "version": {
       "const": 1
+    },
+    "input_error_privacy_repair": {
+      "type": "object",
+      "properties": {
+        "artifact_metadata_rebound_only": {
+          "const": true
+        },
+        "learned_parameter_bytes_changed": {
+          "const": false
+        },
+        "new_fits_started": {
+          "const": 0
+        },
+        "reason": {
+          "const": "independent_review_P2_numeric_conversion_echoed_source_value"
+        },
+        "repair_receipt": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "runtime_lock": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "prior_runtime_lock": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "formatted_traceback_rejection_test": {
+          "const": true
+        }
+      },
+      "required": [
+        "artifact_metadata_rebound_only",
+        "learned_parameter_bytes_changed",
+        "new_fits_started",
+        "reason",
+        "repair_receipt",
+        "runtime_lock",
+        "prior_runtime_lock",
+        "formatted_traceback_rejection_test"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
@@ -1154,7 +1239,8 @@
     "all_generated_input_fit_costs",
     "native_dataset_overrides",
     "gpu_fit_contract_adapter_sha256",
-    "integrity_order_repair"
+    "integrity_order_repair",
+    "input_error_privacy_repair"
   ],
   "title": "Frozen TabPC author source and contract audit",
   "type": "object"
