@@ -358,3 +358,23 @@ with `python3 -m research.benchmark.publish_synthpop_matched`; `--from-json`
 rebuilds the table without restricted scratch. This one-fit-seed pilot does
 not support a paper superiority claim; official tests remain sealed and
 MFS-v2/PTF-v1 are null.
+
+The two study-owned compact references also completed the same fixed-fit-23
+pilot validation protocol. Their default and native-likelihood-selected
+configurations produced 72 `n`/`4n` common metric cells, all exactly replayed.
+At `n`, tuned independent marginals had median CatBoost retention −0.097 on
+Adult and 0.008 on California versus DOPE's 0.827 and 0.701. Tuned Chow–Liu
+had 0.659 and 0.710 versus those same DOPE values; California is a measured
+case where Chow–Liu's median is higher. News reference retention was strongly
+negative with a small real-over-null utility denominator, so those values are
+retained in the tables with an instability note. Only 12 of 72 compact cells
+met the artifact byte cap, and four failed the row-copy screen. No compact or
+DOPE cell is certified release safe. These implementations are labeled as
+study references throughout, and their native density KPIs are never ranked
+against another method's KPI. [The paired compact report](results/pilot24-compact-matched.md),
+[JSON](results/pilot24-compact-matched.json),
+[schema](results/pilot24-compact-matched.schema.json), and
+[CSV](results/pilot24-compact-matched.csv) retain every cell and receipt hash.
+Regenerate with `python3 -m research.benchmark.publish_compact_matched`;
+`--from-json` rebuilds the table from committed results. Official tests remain
+sealed and MFS-v2/PTF-v1 are null.
