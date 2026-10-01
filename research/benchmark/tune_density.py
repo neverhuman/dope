@@ -6,6 +6,7 @@ import argparse
 import itertools
 import json
 import math
+import os
 import subprocess
 import sys
 import time
@@ -20,6 +21,14 @@ from .score import artifact_inventory, sha256
 SCRATCH = Path("/mnt/fast-scratch/dope-benchmark")
 METHODS = ("independent_marginals", "Chow-Liu")
 BUDGET_SECONDS = 43_200
+
+
+def cpu_affinity() -> tuple[int, ...]:
+    """Choose one bounded slot from CPUs actually assigned to this process."""
+    allowed = sorted(os.sched_getaffinity(0))
+    if not allowed:
+        raise ValueError("native tuning has no admitted CPU")
+    return tuple(allowed[16:32] if len(allowed) >= 32 else allowed[:16])
 
 
 def write_once(path: Path, value: dict) -> None:
@@ -85,6 +94,8 @@ def tune(worker: Path, method: str, methods_lock: Path, round_lock_path: Path,
     if used_bytes(SCRATCH) + 1_000_000_000 > LIMIT:
         raise ValueError("benchmark scratch ceiling reached")
     objective = entry["native_objective"]
+    affinity = cpu_affinity()
+    affinity_arg = ",".join(map(str, affinity))
     trial_configs = candidates(entry)
     round_sha256 = sha256(round_lock_path)
     root = output_root / dataset / method
@@ -121,7 +132,7 @@ def tune(worker: Path, method: str, methods_lock: Path, round_lock_path: Path,
                            "metadata": json.loads((worker / "projection.json").read_text()),
                            "config": config, "seed": 11, "artifact_dir": str(artifact),
                            "binary": None}
-                fit = subprocess.run(["taskset", "-c", "16-31", sys.executable, "-m",
+                fit = subprocess.run(["taskset", "-c", affinity_arg, sys.executable, "-m",
                                       "research.benchmark.adapter_worker"],
                                      input=json.dumps(request), capture_output=True, text=True,
                                      timeout=min(config["fit_timeout_seconds"],
@@ -135,7 +146,7 @@ def tune(worker: Path, method: str, methods_lock: Path, round_lock_path: Path,
                 remaining = BUDGET_SECONDS - total_wall - (time.monotonic() - started)
                 if remaining <= 0:
                     raise TimeoutError("native tuning budget exhausted")
-                metric = subprocess.run(["taskset", "-c", "16-31", sys.executable, "-m",
+                metric = subprocess.run(["taskset", "-c", affinity_arg, sys.executable, "-m",
                                          "research.benchmark.native_objective", method,
                                          str(artifact), str(worker / "validation.csv")],
                                         capture_output=True, text=True,
@@ -158,6 +169,7 @@ def tune(worker: Path, method: str, methods_lock: Path, round_lock_path: Path,
                          subprocess.TimeoutExpired)) else "failed", "config": config,
                          "error_type": type(error).__name__}
             trial["wall_seconds"] = time.monotonic() - started
+            trial["cpu_affinity"] = affinity
             trial["identity"] = {"dataset": dataset, "method": method,
                                  "round_sha256": round_sha256,
                                  "method_source_sha256": entry["source_sha256"],
@@ -171,7 +183,9 @@ def tune(worker: Path, method: str, methods_lock: Path, round_lock_path: Path,
         trials.append(trial)
     successful = [(index, row) for index, row in enumerate(trials) if row["status"] == "ok"]
     if not successful or total_wall > BUDGET_SECONDS:
-        raise ValueError("native tuning has no eligible selection")
+        errors = sorted({row.get("error_type", "budget_exhausted") for row in trials
+                         if row["status"] != "ok"})
+        raise ValueError("native tuning has no eligible selection: " + ",".join(errors))
     sign = -1 if objective["direction"] == "maximize" else 1
     selected_index, selected = min(successful,
         key=lambda pair: (sign * pair[1]["native_kpi"], pair[1]["artifact_bytes"],
