@@ -2,6 +2,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from research.benchmark.fetch_jope import used_bytes
 
@@ -28,6 +29,21 @@ class ScratchAccountingTests(unittest.TestCase):
             expected = 5 + sum(len(os.readlink(path)) for path in
                                (external, broken, linked_dir))
             self.assertEqual(used_bytes(scratch), expected)
+
+    def test_directory_scan_error_fails_closed(self):
+        (ROOT / "target").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:
+            scratch = Path(directory)
+            with patch("research.benchmark.fetch_jope.os.scandir",
+                       side_effect=PermissionError("scan denied")):
+                with self.assertRaises(PermissionError):
+                    used_bytes(scratch)
+
+    def test_missing_root_fails_closed(self):
+        (ROOT / "target").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:
+            with self.assertRaises(NotADirectoryError):
+                used_bytes(Path(directory) / "missing")
 
 
 if __name__ == "__main__":

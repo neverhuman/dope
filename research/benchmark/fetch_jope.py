@@ -17,8 +17,14 @@ LIMIT = 200_000_000_000
 
 
 def used_bytes(root: Path) -> int:
+    if not root.is_dir():
+        raise NotADirectoryError(root)
+
+    def fail_scan(error: OSError) -> None:
+        raise error
+
     total = 0
-    for directory, directories, files in os.walk(root, followlinks=False):
+    for directory, directories, files in os.walk(root, followlinks=False, onerror=fail_scan):
         for name in files:
             # lstat charges the link itself without following archived evidence
             # into a removed worktree or outside the benchmark scratch root.
