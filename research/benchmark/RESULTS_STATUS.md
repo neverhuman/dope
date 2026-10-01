@@ -378,3 +378,23 @@ against another method's KPI. [The paired compact report](results/pilot24-compac
 Regenerate with `python3 -m research.benchmark.publish_compact_matched`;
 `--from-json` rebuilds the table from committed results. Official tests remain
 sealed and MFS-v2/PTF-v1 are null.
+
+ARF completed its fixed-fit-23 common validation readout for every available
+default and native-tuned configuration. Twenty-three `n`/`4n` metric cells
+replayed exactly. One Adult tuned `4n` sample timed out, while original
+default fits on Adult and News were unavailable after native timeouts; none
+of these missing cells counts as a DOPE win. At `n`, tuned ARF median CatBoost
+retention was 0.8322 on Adult, 0.8993 on California, and 0.5743 on News,
+versus DOPE 0.8275, 0.7008, and 0.3287. These comparator leads are visible
+as measured validation quality. All ARF fitted artifacts exceed the charged
+10,240-byte L3 cap, and six measured cells fail the row-copy screen, so no
+ARF outcome is release safe. The native FORDE density evaluator is labeled
+as a study implementation of the author's fitted factors; its KPI values
+select ARF configurations within each dataset only. [The paired ARF report](results/pilot24-arf-matched.md),
+[JSON](results/pilot24-arf-matched.json),
+[schema](results/pilot24-arf-matched.schema.json), and
+[CSV](results/pilot24-arf-matched.csv) retain every success, timeout,
+unavailable default, artifact charge, copy count, and immutable receipt hash.
+Regenerate with `python3 -m research.benchmark.publish_arf_matched`;
+`--from-json` rebuilds the table. Official tests remain sealed and
+MFS-v2/PTF-v1 are null.
