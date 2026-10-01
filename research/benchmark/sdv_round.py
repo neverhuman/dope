@@ -54,6 +54,28 @@ def check_lock(lock_path: Path) -> dict:
     return lock
 
 
+def worker_for_job(lock: dict, job: dict) -> Path:
+    root = Path(lock.get("worker_root", str(WORKERS)))
+    if (not root.resolve().is_relative_to(SCRATCH.resolve())
+            or "evaluator" in root.parts):
+        raise ValueError("SDV worker root is outside benchmark training scratch")
+    worker = root / job["dataset"]
+    if ((worker / "test.csv").exists() or any(
+            (worker / name).is_symlink() or not (worker / name).is_file()
+            for name in ("train.csv", "validation.csv", "projection.json"))):
+        raise ValueError("SDV worker includes sealed or missing input")
+    return worker
+
+
+def cpu_slot(lock: dict, snapshot: dict) -> list[int]:
+    allowed = snapshot["allowed_cpus"]
+    slot = lock.get("cpu_slot", allowed[:16])
+    if (not isinstance(slot, list) or len(slot) != 16
+            or len(set(slot)) != 16 or not set(slot).issubset(allowed)):
+        raise ValueError("SDV CPU slot is outside admitted host affinity")
+    return slot
+
+
 def process(request: dict, prefix: Path, seconds: float, gpu: bool = False) -> dict:
     write_once(prefix.with_suffix(".request.json"), request)
     command = [sys.executable, "-m", "research.benchmark.sdv_adapter",
@@ -129,7 +151,7 @@ def run_job(lock_path: Path, job: dict, retry_failed: bool = False) -> dict:
     lock = check_lock(lock_path)
     if job not in lock["jobs"]:
         raise ValueError("job absent from frozen matrix")
-    worker = WORKERS / job["dataset"]
+    worker = worker_for_job(lock, job)
     for part in ("train", "validation"):
         if sha256(worker / f"{part}.csv") != job[f"{part}_sha256"]:
             raise ValueError("worker partition changed")
@@ -153,6 +175,7 @@ def run_job(lock_path: Path, job: dict, retry_failed: bool = False) -> dict:
     if len(prior) >= 8 or sum(item["wall_seconds"] for item in prior) >= 43_200:
         raise ValueError("per-cell trial or wall budget exhausted")
     snapshot = local()
+    slot = cpu_slot(lock, snapshot)
     if (snapshot["active_gpu_processes"] or snapshot["gpus"][0]["memory_free_mib"] < 17 * 1024
             or len(snapshot["allowed_cpus"]) < 16 or snapshot["memory"]["MemAvailable"] < 24 * 1024**3
             or snapshot["scratch_disk"]["free_bytes"] < 5_000_000_000
@@ -163,11 +186,11 @@ def run_job(lock_path: Path, job: dict, retry_failed: bool = False) -> dict:
     attempt.mkdir()
     write_once(attempt / "host.json", snapshot)
     original_affinity = os.sched_getaffinity(0)
-    os.sched_setaffinity(0, snapshot["allowed_cpus"][:16])
+    os.sched_setaffinity(0, slot)
     started = time.monotonic()
     receipt = {"format": "dope-sdv-validation-attempt", "version": 1, "job": job,
                "round_sha256": sha256(lock_path), "host": snapshot["host"],
-               "cpu_affinity": snapshot["allowed_cpus"][:16], "status": "failed",
+            "cpu_affinity": slot, "status": "failed",
                "validation_only": True, "ptf_v1": None, "mfs_v2": None}
     try:
         fitted = process({"action": "fit", "method": job["method"], "config": job["config"],
