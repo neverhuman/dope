@@ -37,6 +37,7 @@ zstd = "0.13.3"
 [features]
 default = []
 gpu-training = ["dep:tch"]
+gpu-research-training = ["gpu-training"]
 
 [dependencies.tch]
 version = "=0.20.0"
