@@ -94,9 +94,9 @@ def load_artifact(artifact: Path, expected_inventory: list[dict], runtime_lock: 
 def fit(train: Path, validation: Path, projection: Path, train_sha256: str,
         validation_sha256: str, projection_sha256: str, config: dict, seed: int,
         artifact: Path, runtime_lock: Path, runtime_lock_sha256: str) -> dict:
+    check_runtime(runtime_lock, runtime_lock_sha256)
     import numpy as np
     import torch
-    check_runtime(runtime_lock, runtime_lock_sha256)
     from src.models.probabilistic_circuit import ProbabilisticCircuit
     from src.nn.optimization import Optimization
     from src.preprocessors.df_type_conversion import TypeConversion
@@ -192,9 +192,9 @@ def fit(train: Path, validation: Path, projection: Path, train_sha256: str,
 
 def sample(artifact: Path, expected_inventory: list[dict], rows: int, seed: int, output: Path,
            runtime_lock: Path, runtime_lock_sha256: str) -> dict:
+    model, metadata = load_artifact(artifact, expected_inventory, runtime_lock, runtime_lock_sha256)
     import numpy as np
     import torch
-    model, metadata = load_artifact(artifact, expected_inventory, runtime_lock, runtime_lock_sha256)
     from src.util import set_seeds
     if type(rows) is not int or rows < 1:
         raise ValueError("invalid sample row count")

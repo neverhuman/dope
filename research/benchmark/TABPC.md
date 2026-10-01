@@ -5,6 +5,9 @@ GPL-3.0-or-later Cirkit submodule. This is an isolated research runtime;
 neither upstream package nor trained artifacts enter the MIT product bundle.
 The author sources, dependency sources, environment and compatibility patch
 are hashed by the immutable scratch runtime lock before every adapter action.
+The fit and sample entry points validate the runtime before importing NumPy,
+Torch or the author packages. Two instrumented entry-point tests prove changed
+dependencies are rejected without executing their initializers.
 
 The adapter calls the author's circuit trainer with the existing grouped fit
 and validation partitions. Every preprocessor and the circuit structure fit
@@ -21,6 +24,12 @@ The original failure and exact sample parity after the patch are receipted.
 Upstream source archives remain intact. A first runtime manifest also failed
 closed on upstream documentation symlinks; its failure and corrected manifest
 are retained separately.
+An independent review also found that the first adapter imported NumPy/Torch
+too early. The repaired runtime preserves the earlier GPU fit receipts and
+their exact source version. For verification, copies of the toy artifacts
+rebind only the adapter runtime metadata; every learned-parameter byte remains
+unchanged, and four current CPU sample processes reproduce the earlier hashes.
+No additional training is claimed or charged for this integrity-order repair.
 
 The trainer retains the concatenated fit/validation tensor for serialization.
 The adapter replaces it with an empty tensor carrying the same metadata before

@@ -107,6 +107,24 @@
             ],
             "type": "object"
           },
+          "current_sampling_contract_receipt": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
           "energy_joules_estimate": {
             "minimum": 0,
             "type": "number"
@@ -211,7 +229,8 @@
           "scope",
           "serialized_replay",
           "status",
-          "task"
+          "task",
+          "current_sampling_contract_receipt"
         ],
         "type": "object"
       },
@@ -716,8 +735,97 @@
     "format": {
       "const": "dope-tabpc-author-source-audit"
     },
+    "gpu_fit_contract_adapter_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
     "gpu_vram_mib_cap": {
       "const": 16384
+    },
+    "integrity_order_repair": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_metadata_rebound_only": {
+          "const": true
+        },
+        "entry_point_dependency_rejection_tests": {
+          "const": 2
+        },
+        "learned_parameter_bytes_changed": {
+          "const": false
+        },
+        "new_fits_started": {
+          "const": 0
+        },
+        "prior_gpu_contract_runtime_lock": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "reason": {
+          "const": "independent_review_P1_dependency_import_preceded_integrity_check"
+        },
+        "repair_receipt": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "runtime_lock": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "reason",
+        "runtime_lock",
+        "prior_gpu_contract_runtime_lock",
+        "repair_receipt",
+        "new_fits_started",
+        "learned_parameter_bytes_changed",
+        "entry_point_dependency_rejection_tests",
+        "artifact_metadata_rebound_only"
+      ],
+      "type": "object"
     },
     "matrix_admission": {
       "const": "pending_final_methods_and_campaign_locks"
@@ -1044,7 +1152,9 @@
     "upstream_url",
     "version",
     "all_generated_input_fit_costs",
-    "native_dataset_overrides"
+    "native_dataset_overrides",
+    "gpu_fit_contract_adapter_sha256",
+    "integrity_order_repair"
   ],
   "title": "Frozen TabPC author source and contract audit",
   "type": "object"
