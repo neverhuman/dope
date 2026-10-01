@@ -5,7 +5,7 @@
     "dataset": {"enum": ["Adult", "California", "News"]},
     "metric": {
       "type": "object", "additionalProperties": false,
-      "required": ["dataset", "method", "kind", "fit_seed", "sample_seed", "size_multiplier", "catboost_retention", "c2st_auc", "exact_row_copies", "artifact_bytes", "within_l3_bytes", "metric_receipt_sha256", "fit_receipt_sha256", "sample_receipt_sha256"],
+      "required": ["dataset", "method", "kind", "fit_seed", "sample_seed", "size_multiplier", "catboost_retention", "c2st_auc", "exact_row_copies", "artifact_bytes", "within_l3_bytes", "metric_receipt_sha256", "metric_replay_receipt_sha256", "fit_receipt_sha256", "sample_receipt_sha256"],
       "properties": {
         "dataset": {"$ref": "#/$defs/dataset"},
         "method": {"const": "GaussianCopula"},
@@ -19,6 +19,7 @@
         "artifact_bytes": {"type": "integer", "minimum": 1},
         "within_l3_bytes": {"type": "boolean"},
         "metric_receipt_sha256": {"$ref": "#/$defs/hash"},
+        "metric_replay_receipt_sha256": {"$ref": "#/$defs/hash"},
         "fit_receipt_sha256": {"$ref": "#/$defs/hash"},
         "sample_receipt_sha256": {"$ref": "#/$defs/hash"}
       }
@@ -64,11 +65,13 @@
     "source_sha256": {"$ref": "#/$defs/hash"},
     "locks": {
       "type": "object", "additionalProperties": false,
-      "required": ["matrix", "validation_v1", "validation_v2", "dope_neural_report"],
+      "required": ["matrix", "validation_v1", "validation_v2", "metric_replay", "metric_replay_manifest", "dope_neural_report"],
       "properties": {
         "matrix": {"$ref": "#/$defs/hash"},
         "validation_v1": {"$ref": "#/$defs/hash"},
         "validation_v2": {"$ref": "#/$defs/hash"},
+        "metric_replay": {"$ref": "#/$defs/hash"},
+        "metric_replay_manifest": {"$ref": "#/$defs/hash"},
         "dope_neural_report": {"$ref": "#/$defs/hash"}
       }
     },
@@ -102,7 +105,7 @@
         }
       }
     },
-    "notes": {"type": "array", "items": {"type": "string"}, "minItems": 4},
+    "notes": {"type": "array", "items": {"type": "string"}, "minItems": 5},
     "official_tests_opened": {"const": false},
     "mfs_v2": {"type": "null"},
     "ptf_v1": {"type": "null"},
