@@ -1,10 +1,10 @@
 {
   "adapter_license": "GPL-2.0-only OR GPL-3.0-only",
   "adapter_role": "restricted_research_only_not_mit_product_runtime",
-  "adapter_source_sha256": "a63f1234b9772f66578a38e7f8cdbbaef20d99cf33372d322e6ce4139e908310",
+  "adapter_source_sha256": "80ab24152b7093f54397a91cea0617bdfc8f50236946520c55cdf733f4bb3048",
   "artifact_policy": "restricted_donor_values_and_fitted_rpart_models_charged_in_full",
   "auditor_source_sha256": "8b33b0bc86ae0476a74c1ef644bced7cf8a3cbb88d061627d7bce03238ad43fd",
-  "contract_probe_sha256": "5c6ec3c5ae6c32635e8300b5f9f7b4ecaa99cbf675554dbfb351763f7dc7f0a5",
+  "contract_probe_sha256": "80b9f45385ace6270843eedb91d3697f835caf9ec97bb25fbecfe85bbbd2b207",
   "default_config": {
     "cp": 1e-08,
     "minbucket": 5

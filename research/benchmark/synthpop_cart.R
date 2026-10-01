@@ -19,7 +19,9 @@ draw_cart <- function(fit, xp) {
   if (!inherits(fit, "rpart") || fit$method != "anova")
     stop("unsupported synthpop CART model")
   y <- fit$y
-  leaves <- as.numeric(row.names(fit$frame[fit$where, , drop = FALSE]))
+  # Repeated data-frame rows gain decimal suffixes in R row names; syn.cart
+  # floors them back to their original rpart leaf identifiers.
+  leaves <- floor(as.numeric(row.names(fit$frame[fit$where, , drop = FALSE])))
   nodes <- as.numeric(predict(fit, newdata = xp))
   if (length(nodes) != nrow(xp) || any(!is.finite(nodes)))
     stop("invalid CART leaf predictions")

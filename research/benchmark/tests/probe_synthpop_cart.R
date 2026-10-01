@@ -44,8 +44,17 @@ cart_model <- fit$models[[first_cart]]
 set.seed(101)
 probe <- draw_cart(cart_model, generated)
 nodes <- as.numeric(predict(cart_model, newdata = generated))
-leaves <- as.numeric(row.names(cart_model$frame[cart_model$where, , drop = FALSE]))
+leaf_rows <- as.numeric(row.names(cart_model$frame[cart_model$where, , drop = FALSE]))
+stopifnot(any(leaf_rows != floor(leaf_rows)))
+leaves <- floor(leaf_rows)
 stopifnot(all(vapply(seq_along(probe), function(i) {
   probe[i] %in% cart_model$y[leaves == nodes[i]]
 }, logical(1))))
+# A single leaf with many distinct donors must not collapse to its first row.
+single <- synthpop:::syn.cart(seq_len(100) / 100,
+                              data.frame(a = rep(0, 100)),
+                              data.frame(a = rep(0, 200)),
+                              minbucket = 5, cp = 1e-8)$fit
+set.seed(101)
+stopifnot(length(unique(draw_cart(single, data.frame(a = rep(0, 200))))) > 20)
 cat("synthpop CART fit/native KPI/artifact-only sample contract: ok\n")
