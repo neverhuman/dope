@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neverhuman.dev/dope/pilot24-news-autoreg-identity.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "fit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target_weight", "fit_receipt_sha256", "fit_elapsed_seconds", "gpu_peak_used_mib", "gpu_energy_joules_estimate", "model_sha256", "raw_artifact_bytes"],
+      "properties": {
+        "target_weight": {"enum": [2.0, 4.0]},
+        "fit_receipt_sha256": {"$ref": "#/$defs/hash"},
+        "fit_elapsed_seconds": {"type": "number", "minimum": 0, "maximum": 600},
+        "gpu_peak_used_mib": {"type": "integer", "minimum": 0, "maximum": 16384},
+        "gpu_energy_joules_estimate": {"type": ["number", "null"], "minimum": 0},
+        "model_sha256": {"$ref": "#/$defs/hash"},
+        "raw_artifact_bytes": {"const": 13713}
+      }
+    }
+  },
+  "required": ["format", "version", "scope", "source_sha256", "source_snapshots", "receipt_hashes", "dataset", "candidate", "fit_seed", "fits", "fitted_model_identical", "packed_q10_artifact_bytes", "additional_sample_jobs_skipped", "shared_validation_reference", "notes", "official_tests_opened", "mfs_v2", "ptf_v1", "production_certified"],
+  "properties": {
+    "format": {"const": "dope-news-target-weight-identity-validation"},
+    "version": {"const": 1},
+    "scope": {"const": "training_derived_validation_only"},
+    "source_sha256": {"$ref": "#/$defs/hash"},
+    "source_snapshots": {
+      "type": "object", "additionalProperties": false,
+      "required": ["fit.py", "fit_v2.py", "identity.py"],
+      "properties": {
+        "fit.py": {"$ref": "#/$defs/hash"},
+        "fit_v2.py": {"$ref": "#/$defs/hash"},
+        "identity.py": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "receipt_hashes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["first_admission_failure", "repaired_round", "repaired_dispatch", "artifact_identity", "q10_packed_validation_report"],
+      "properties": {
+        "first_admission_failure": {"$ref": "#/$defs/hash"},
+        "repaired_round": {"$ref": "#/$defs/hash"},
+        "repaired_dispatch": {"$ref": "#/$defs/hash"},
+        "artifact_identity": {"$ref": "#/$defs/hash"},
+        "q10_packed_validation_report": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "dataset": {"const": "News"},
+    "candidate": {"const": "symbolic_autoregressive_residual"},
+    "fit_seed": {"const": 23},
+    "fits": {"type": "array", "minItems": 2, "maxItems": 2,
+             "items": {"$ref": "#/$defs/fit"}},
+    "fitted_model_identical": {"const": true},
+    "packed_q10_artifact_bytes": {"const": 9205},
+    "additional_sample_jobs_skipped": {"const": 6},
+    "shared_validation_reference": {"const": "pilot24-news-q10-packed.json"},
+    "notes": {"type": "array", "minItems": 4, "items": {"type": "string"}},
+    "official_tests_opened": {"const": false},
+    "mfs_v2": {"type": "null"},
+    "ptf_v1": {"type": "null"},
+    "production_certified": {"const": false}
+  }
+}
