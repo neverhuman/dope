@@ -1,0 +1,54 @@
+--- a/research/benchmark/arf_round.py
++++ b/research/benchmark/arf_short_round.py
+@@ -1 +1 @@
+-"""Bounded author-ARF native-likelihood pilot on training-derived validation."""
++"""Smaller author-ARF grid after the source-versioned default pilot timeout."""
+@@ -28 +28,2 @@
+-OUT = ROOT / "arf-native-v1"
++OUT = ROOT / "arf-native-short-v1"
++PARENT = ROOT / "arf-native-v1/round.lock.json"
+@@ -37 +38 @@
+-SLOT = list(range(48, 64))
++SLOT = list(range(64, 80))
+@@ -39,4 +40,4 @@
+-    {"num_trees": 30, "min_node_size": 5, "max_iters": 10, "alpha": 0.0},
+-    {"num_trees": 30, "min_node_size": 10, "max_iters": 10, "alpha": 0.0},
+-    {"num_trees": 30, "min_node_size": 5, "max_iters": 10, "alpha": 0.5},
+-    {"num_trees": 50, "min_node_size": 5, "max_iters": 10, "alpha": 0.5},
++    {"num_trees": 10, "min_node_size": 20, "max_iters": 1, "alpha": 0.0},
++    {"num_trees": 10, "min_node_size": 40, "max_iters": 1, "alpha": 0.5},
++    {"num_trees": 20, "min_node_size": 20, "max_iters": 1, "alpha": 0.5},
++    {"num_trees": 10, "min_node_size": 20, "max_iters": 2, "alpha": 0.5},
+@@ -77,0 +79,13 @@
++    from .arf_round import check_lock as check_parent
++
++    parent = check_parent(PARENT)
++    default = parent["jobs"][0]
++    first_attempt = PARENT.parent / "jobs" / digest(default) / "attempt-0001/receipt.json"
++    first_receipt = json.loads(first_attempt.read_text())
++    if (default["dataset"] != "Adult" or default["trial"] != 0
++            or first_receipt.get("job") != default
++            or first_receipt.get("status") != "timeout"
++            or first_receipt.get("round_sha256") != sha256(PARENT)
++            or parent.get("tuning_trials_per_dataset") != 4
++            or len(parent["jobs"]) != 12):
++        raise ValueError("ARF short round lacks parent timeout and trial budget")
+@@ -109,0 +124,4 @@
++            "parent_round_sha256": sha256(PARENT),
++            "parent_timeout_receipt_sha256": sha256(first_attempt),
++            "cumulative_tuning_trials_per_dataset": 8,
++            "refinement_reason": "Adult author-default timed out at the frozen 900-second cap",
+@@ -138,0 +157,5 @@
++            or lock.get("parent_round_sha256") != sha256(PARENT)
++            or lock.get("parent_timeout_receipt_sha256") != sha256(
++                PARENT.parent / "jobs" / digest(json.loads(PARENT.read_text())["jobs"][0])
++                / "attempt-0001/receipt.json")
++            or lock.get("cumulative_tuning_trials_per_dataset") != 8
+@@ -260,2 +283,2 @@
+-    command = ["taskset", "-c", "48-63", sys.executable, "-m",
+-               "research.benchmark.arf_round", "worker", str(lock_path),
++    command = ["taskset", "-c", "64-79", sys.executable, "-m",
++               "research.benchmark.arf_short_round", "worker", str(lock_path),
+@@ -327 +350 @@
+-    guard = OUT / "cpu-48-63.reservation"
++    guard = OUT / "cpu-64-79.reservation"

@@ -2,6 +2,7 @@
 
 import math
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
@@ -10,6 +11,7 @@ from scipy.stats import norm
 
 from research.benchmark.arf_native import heldout_mean_log_density, prepare_frames
 from research.benchmark.arf_select import winner
+from research.benchmark.arf_short_source import SOURCE_SHA256, materialize
 
 
 class OneLeafForest:
@@ -54,6 +56,11 @@ class ArfNativeTests(unittest.TestCase):
                                              (2, -1.0, 150))]
         self.assertEqual(winner(trials)["job"]["trial"], 2)
         self.assertIsNone(winner([{"status": "timeout"}]))
+
+    def test_short_grid_patch_reconstructs_frozen_source(self):
+        output = Path(__file__).parents[3] / "target/arf-short-source-test.py"
+        self.assertEqual(materialize(output), SOURCE_SHA256)
+        self.assertEqual(materialize(output), SOURCE_SHA256)
 
 
 if __name__ == "__main__":
