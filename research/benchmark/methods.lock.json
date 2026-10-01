@@ -6,7 +6,7 @@
     "AIM": {
       "adapter": "AIM",
       "adapter_sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e",
-      "aim_adapter_sha256": "060713a576614c081e84f30446d67e679b72ce7632094de08e539725d58416c7",
+      "aim_adapter_sha256": "b760827f7c4c871f1e2241f31219fcc769cdc42e52efd2a6b1e1d607d8eb50c1",
       "default_config": {
         "bins": 8,
         "epsilon": 1.0,
@@ -256,7 +256,7 @@
       "upstream_commit": "826da23f8f9385ad15fd206ecad691e04cb0ccdc",
       "upstream_url": "https://github.com/sdv-dev/CTGAN",
       "use": "non-production benchmark research",
-      "worker_sha256": "108a447414bd8e25f8b79f04b195f291c46342bad34175de566a8722474d22bc"
+      "worker_sha256": "9329241ba716bdbe5de73eb63e50211dbde19f1979a3e4f101d50691bb85351a"
     },
     "Chow-Liu": {
       "adapter": "Chow-Liu",
@@ -600,7 +600,7 @@
       "upstream_commit": "826da23f8f9385ad15fd206ecad691e04cb0ccdc",
       "upstream_url": "https://github.com/sdv-dev/CTGAN",
       "use": "non-production benchmark research",
-      "worker_sha256": "108a447414bd8e25f8b79f04b195f291c46342bad34175de566a8722474d22bc"
+      "worker_sha256": "9329241ba716bdbe5de73eb63e50211dbde19f1979a3e4f101d50691bb85351a"
     },
     "TVineSynth": {
       "default_config": null,

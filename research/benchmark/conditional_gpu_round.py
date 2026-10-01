@@ -64,17 +64,17 @@ def run(stage: str, root: Path, binary: Path, trigger: str) -> None:
         for index, job in enumerate(locked["gpu_jobs"]):
             output = root / stage / f"cell-{index:02d}.json"
             if output.exists():
-                old = json.loads(output.read_text())
-                fit_path = Path(old["fit"]["receipt"])
-                if (old["job"] != job or old["round_sha256"] != sha256(lock_path)
-                        or sha256(fit_path) != old["fit"]["receipt_sha256"]):
+                previous = json.loads(output.read_text())
+                fit_path = Path(previous["fit"]["receipt"])
+                if (previous["job"] != job or previous["round_sha256"] != sha256(lock_path)
+                        or sha256(fit_path) != previous["fit"]["receipt_sha256"]):
                     raise ValueError("resumed conditional identity changed")
                 original = json.loads(fit_path.read_text())
                 if original["artifact_sha256"] is not None and sha256(fit_path.with_suffix(".dpk")) != original["artifact_sha256"]:
                     raise ValueError("resumed conditional artifact changed")
-                if old["common_validation"] is not None and (
-                        sha256(fit_path.parent / "sample.csv") != old["sample_sha256"]
-                        or sha256(fit_path.parent / "common-validation.json") != old["metric_sha256"]):
+                if previous["common_validation"] is not None and (
+                        sha256(fit_path.parent / "sample.csv") != previous["sample_sha256"]
+                        or sha256(fit_path.parent / "common-validation.json") != previous["metric_sha256"]):
                     raise ValueError("resumed conditional metric changed")
                 continue
             snapshot = local()

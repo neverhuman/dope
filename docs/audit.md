@@ -16,6 +16,15 @@ owns V3 compilation, release decisions, and contract truth. The boundary
 receipt includes current SHA-256 hashes and check results and is regenerated
 before every audit. It cannot excuse missing tests or a failed builtin check.
 
+The offline research benchmark has a separate dated advanced-data exception.
+Its Python adapters run pinned author ML libraries for comparison and do not
+serve product requests, own a database, or set product release truth. The
+audited runtime boundary applies to its isolated adapter worker, which does not
+spawn processes. Its proof checks all tracked benchmark Python source, runs the
+benchmark contract tests, checks that final public-test admission fails closed,
+and rejects product imports or routes. The dispatcher and other benchmark code
+remain subject to the full audit; unsafe deserialization is never reclassified.
+
 The audit job's strict security wrapper requires Cargo advisory and workflow
 lint tools. The separate required CI security job runs the SHA-verified pinned
 Gitleaks binary and SPDX SBOM action; those checks are independent of the wrapper's
