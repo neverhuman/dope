@@ -235,3 +235,42 @@ Both comparisons use one fit seed, one sample seed, and `n` synthetic rows.
 Official tests remain unopened. Full attacks, repeated fits, required sample
 sizes, final public-core evaluation, and the other method outcomes remain
 outstanding. **PTF-v1 and MFS-v2 remain null.**
+
+## Adult / California / News 24-hour pilot
+
+The separate 24-hour pilot uses training-derived validation partitions. The
+official tests remain sealed. CTGAN and TVAE were tuned against their own
+locked author-library ML-efficacy objectives: mean binary F1 for Adult and
+mean regression R² for California and News. The selected configurations and
+their default configurations were evaluated with the same CatBoost
+TSTR/TRTR-retention auditor as DOPE. Native KPI values are compared only
+within one method and dataset.
+
+At fit seed 23, three sample seeds (101/211/307) and `n`/`4n` sizes produced
+66 hash-verified common metric cells. The median `n` retention was 0.8275
+for DOPE q8 versus 0.7951 for TVAE and 0.0139 for CTGAN on Adult; 0.7008
+for DOPE q8 versus 0.9154 for native-tuned TVAE and 0.6652 for CTGAN on
+California. On News, DOPE q8 was −3.9536, TVAE −1.0013, and CTGAN −0.8818;
+the over-cap DOPE q10 quality candidate reached 0.3287. News retention has
+a small real-model gain over the null and is unstable as a ratio. Two
+default CTGAN fixed fits timed out and remain explicit failures.
+
+DOPE q8 charged artifacts are 6,337 B on Adult, 2,525 B on California, and
+13,603 B on News. The News q10 quality artifact is 13,713 B. All measured
+CTGAN and TVAE artifacts exceed the 10,240 B L3 cap. Byte eligibility alone
+does not establish release safety. The q8 compiler candidate is symbolic;
+separate neural and conditional GPU training costs are recorded on scratch.
+No product PTF-v1 or MFS-v2 score, paper paired claim, or official-test result
+is available from this pilot.
+
+[The pilot JSON](results/pilot24-native-neural.json),
+[schema](results/pilot24-native-neural.schema.json),
+[table](results/pilot24-native-neural.md),
+[CSV](results/pilot24-native-neural.csv), and
+[SVG](results/pilot24-native-neural.svg)/[PDF](results/pilot24-native-neural.pdf)
+retain native selections, all common metric cells, failures, charged bytes,
+and immutable scratch receipt hashes. Regenerate with
+`python3 -m research.benchmark.pilot24_neural_comparison`; its
+`--render-existing` mode reproduces the table and figures from committed
+JSON. The GaussianCopula fixed-seed pilot matrix is still running and is not
+included in this report.
