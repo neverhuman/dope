@@ -422,3 +422,18 @@ unavailable default, artifact charge, copy count, and immutable receipt hash.
 Regenerate with `python3 -m research.benchmark.publish_arf_matched`;
 `--from-json` rebuilds the table. Official tests remain sealed and
 MFS-v2/PTF-v1 are null.
+
+The full ARF fixed-fit-23 sample schedule is now accounted for at
+`n`/`2n`/`4n`/`8n`: 44 successful samples and four 900-second timeouts
+across 48 frozen jobs. The timeouts are one Adult tuned `4n` and all three
+Adult tuned `8n` cells. California default and tuned, plus News tuned,
+completed all twelve sample cells per configuration. Adult and News original
+defaults remain unavailable from native fit timeouts. Every attempt, fitted
+artifact charge, source snapshot and receipt hash is reconciled in the
+[sample schedule](results/pilot24-arf-sample-matrix.md),
+[JSON](results/pilot24-arf-sample-matrix.json),
+[schema](results/pilot24-arf-sample-matrix.schema.json), and
+[CSV](results/pilot24-arf-sample-matrix.csv). Regenerate with
+`python3 -m research.benchmark.publish_arf_sample_matrix`. The shared
+validation metric panel still covers only `n` and `4n`; no `2n`/`8n` utility
+or release score is inferred.
