@@ -50,6 +50,38 @@ they are neither benchmark results nor reproductions of reported experiments.
 They confer no L3, MFS-v2, PTF-v1, formal DP or production certification claim.
 Final campaign admission still requires the five consistent frozen locks.
 
+## Complete native pilot validation
+
+The corrected local bibliography records the author study as
+`scassola2026sobering` (A Sobering Look at Tabular Data Generation via
+Probabilistic Circuits).
+
+The frozen Adult/California/News pilot now accounts for all 24 author-native
+trials (eight per dataset): 13 successes, eight Adult GPU allocation failures,
+and three News 600-second timeouts. Configuration selection minimizes only
+transformed validation mean NLL. Adult has no successful native candidate;
+its unavailable tracks confer no DOPE win.
+
+The separate fixed-fit-23 common-validation schedule accounts for all 48
+planned samples: 45 successes and three News tuned `8n` timeouts. All 24
+planned `n`/`4n` metric cells completed and replayed exactly. Copies rebind
+only runtime metadata to V5; every learned byte and charged artifact size
+matches its original fit. Common validation starts no new fit or tuning.
+
+The [report](results/pilot24-tabpc-native.md),
+[JSON](results/pilot24-tabpc-native.json),
+[schema](results/pilot24-tabpc-native.schema.json),
+[CSV](results/pilot24-tabpc-native.csv), and
+[SVG](results/pilot24-tabpc-native.svg)/[PDF](results/pilot24-tabpc-native.pdf)
+retain default/native-selected outcomes, all failures, native likelihood,
+three common utility auditors, copy controls, bytes, costs and immutable
+receipt/source/runtime hashes. Regenerate with
+`python3 -m research.benchmark.publish_tabpc_native` and
+`python3 -m research.benchmark.publish_tabpc_native_figure`; `--from-json`
+rebuilds tables without scratch access. These are descriptive single-fit
+validation results, separate from the unfinished final five-fit campaign.
+Official tests remain sealed and all gated scores remain null.
+
 Run the boundary checks without optional upstream libraries:
 
 ```sh
