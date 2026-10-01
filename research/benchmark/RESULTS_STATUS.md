@@ -323,3 +323,18 @@ immutable receipt hashes. Regenerate with
 `python3 -m research.benchmark.publish_arf_combined`; `--from-json` rebuilds
 the table. Fit-seed-23 common validation outcomes and release gates are still
 pending; ARF has no PTF-v1 or MFS-v2 score from this grid.
+
+The News seed-11 symbolic autoregressive candidate had a one-seed retention
+lead, so a frozen single-fit GPU confirmation tested target weight 4 at seed
+23. Its model bytes exactly matched the existing target-weight-2 q10 fit.
+The first confirmation attempt was blocked by CPU-affinity admission before
+fitting; its receipt is retained, and the repaired attempt kept the same
+600-second and 16-GiB limits. Six duplicate samples were skipped because the
+same model, binary, projection, fit seed, and deterministic sample seeds had
+already been replayed. This adds research cost and no independent validation
+win. The [identity report](results/pilot24-news-autoreg-identity.md),
+[JSON](results/pilot24-news-autoreg-identity.json),
+[schema](results/pilot24-news-autoreg-identity.schema.json), and
+[CSV](results/pilot24-news-autoreg-identity.csv) regenerate with
+`python3 -m research.benchmark.publish_news_autoreg_identity`.
+Official tests remain sealed and MFS-v2/PTF-v1 are null.

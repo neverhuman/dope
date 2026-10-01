@@ -1,0 +1,55 @@
+{
+  "additional_sample_jobs_skipped": 6,
+  "candidate": "symbolic_autoregressive_residual",
+  "dataset": "News",
+  "fit_seed": 23,
+  "fits": [
+    {
+      "fit_elapsed_seconds": 10.232826963998377,
+      "fit_receipt_sha256": "24484fb57dc641db9ac89d560653aaf30422f8d6edacc6b7881659463794e5e3",
+      "gpu_energy_joules_estimate": 436.50123178840613,
+      "gpu_peak_used_mib": 616,
+      "model_sha256": "8b464196c8354038a6bc9c4a6176dcea0655de7fdf26d3294f86b8b4355e5650",
+      "raw_artifact_bytes": 13713,
+      "target_weight": 2.0
+    },
+    {
+      "fit_elapsed_seconds": 12.397680919151753,
+      "fit_receipt_sha256": "d3c651ba01ce42c7f63ce697e713273958caed8f4e4bd2ee99c4087122bc4bfd",
+      "gpu_energy_joules_estimate": 740.7902160651422,
+      "gpu_peak_used_mib": 460,
+      "model_sha256": "8b464196c8354038a6bc9c4a6176dcea0655de7fdf26d3294f86b8b4355e5650",
+      "raw_artifact_bytes": 13713,
+      "target_weight": 4.0
+    }
+  ],
+  "fitted_model_identical": true,
+  "format": "dope-news-target-weight-identity-validation",
+  "mfs_v2": null,
+  "notes": [
+    "The seed-11 target-weight-4 result motivated a single frozen seed-23 confirmation fit.",
+    "The first attempt was blocked before fitting by CPU-affinity admission; the versioned repair retained the 600-second and 16-GiB GPU limits.",
+    "At seed 23, target weights 2 and 4 emitted identical model bytes with the same binary and projection, so the existing q10 deterministic samples and validation metrics are reused without counting an independent result.",
+    "The 9,205-byte packed projection remains restricted research evidence; public sidecar safety and release gates are incomplete."
+  ],
+  "official_tests_opened": false,
+  "packed_q10_artifact_bytes": 9205,
+  "production_certified": false,
+  "ptf_v1": null,
+  "receipt_hashes": {
+    "artifact_identity": "447ff317a01f41e87c711abd9906bc489c9067f8a72bc229dbccaed99e13f974",
+    "first_admission_failure": "91a6f6f04eea368bff918ca629c50eb2cb8816ab83f92ea08747a759751fb352",
+    "q10_packed_validation_report": "4968e14431b708639b783b6fc0a3cc5863a936407aa11daf6dbf9c66938dd0d8",
+    "repaired_dispatch": "b993fbb6333d41db1593cc9839d47f4e9a2de12b225318e2acbcfadcca1ede69",
+    "repaired_round": "817aacff231f2a988c5fadf531de8b554907a2f438e4152a965bfce8cda6fa1a"
+  },
+  "scope": "training_derived_validation_only",
+  "shared_validation_reference": "pilot24-news-q10-packed.json",
+  "source_sha256": "a4c417e8f7061d7c079e71d4e99d634209daa0c33c75b32430efc5f4c463a910",
+  "source_snapshots": {
+    "fit.py": "55cb988ba7f638874ab5f29207a3aa52a5592f0c603616442ac37e3d50dd6cb3",
+    "fit_v2.py": "5ca109846492f625e9891a3d7a1e7ce947985fb14d2f3639e9a39dd71a2f785b",
+    "identity.py": "ca024a6c1615d0d4f5ef62d379f654fef24466479d62ebb0012d9e8a2650d305"
+  },
+  "version": 1
+}
