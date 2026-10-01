@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "synthpop CART pilot full sample-size schedule",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "scope",
+    "source_sha256",
+    "sample_round_sha256",
+    "prior_paired_report_sha256",
+    "sample_source_sha256",
+    "l3_byte_cap",
+    "cells",
+    "status_counts",
+    "notes",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "production_certified",
+    "sample_engine_source_sha256"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-pilot24-synthpop-sample-matrix"
+    },
+    "version": {
+      "const": 1
+    },
+    "scope": {
+      "const": "training_derived_validation_only"
+    },
+    "source_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "sample_round_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "prior_paired_report_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "sample_source_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "l3_byte_cap": {
+      "const": 10240
+    },
+    "cells": {
+      "type": "array",
+      "minItems": 72,
+      "maxItems": 72,
+      "items": {
+        "type": "object",
+        "required": [
+          "dataset",
+          "configuration",
+          "fit_seed",
+          "sample_seed",
+          "size_multiplier",
+          "row_count",
+          "status",
+          "sample_sha256",
+          "sample_receipt_sha256",
+          "fit_receipt_sha256",
+          "artifact_bytes",
+          "within_l3_bytes",
+          "wall_seconds",
+          "contributes_dope_win"
+        ],
+        "properties": {
+          "dataset": {
+            "enum": [
+              "Adult",
+              "California",
+              "News"
+            ]
+          },
+          "configuration": {
+            "enum": [
+              "default",
+              "tuned"
+            ]
+          },
+          "fit_seed": {
+            "const": 23
+          },
+          "sample_seed": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "size_multiplier": {
+            "enum": [
+              1,
+              2,
+              4,
+              8
+            ]
+          },
+          "row_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "const": "ok"
+          },
+          "sample_sha256": {
+            "$ref": "#/$defs/hash"
+          },
+          "sample_receipt_sha256": {
+            "$ref": "#/$defs/hash"
+          },
+          "fit_receipt_sha256": {
+            "$ref": "#/$defs/hash"
+          },
+          "artifact_bytes": {
+            "type": "integer",
+            "exclusiveMinimum": 10240
+          },
+          "within_l3_bytes": {
+            "const": false
+          },
+          "wall_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 910
+          },
+          "contributes_dope_win": {
+            "const": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "status_counts": {
+      "type": "object",
+      "required": [
+        "ok"
+      ],
+      "properties": {
+        "ok": {
+          "const": 72
+        }
+      },
+      "additionalProperties": false
+    },
+    "notes": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "string"
+      }
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "sample_engine_source_sha256": {
+      "$ref": "#/$defs/hash"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}
