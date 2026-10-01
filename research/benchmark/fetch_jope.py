@@ -17,8 +17,17 @@ LIMIT = 200_000_000_000
 
 
 def used_bytes(root: Path) -> int:
-    return sum((Path(directory) / name).stat().st_size
-               for directory, _, files in os.walk(root) for name in files)
+    total = 0
+    for directory, directories, files in os.walk(root, followlinks=False):
+        for name in files:
+            # lstat charges the link itself without following archived evidence
+            # into a removed worktree or outside the benchmark scratch root.
+            total += (Path(directory) / name).lstat().st_size
+        for name in directories:
+            path = Path(directory) / name
+            if path.is_symlink():
+                total += path.lstat().st_size
+    return total
 
 
 def fetch_object(key: str, destination: Path, profile: str) -> None:
