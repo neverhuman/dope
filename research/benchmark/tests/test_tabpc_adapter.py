@@ -3,6 +3,7 @@
 import builtins
 import json
 import tempfile
+import traceback
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -43,6 +44,19 @@ class TabPCBoundaryTests(unittest.TestCase):
         (self.root / "test.csv").touch()
         with self.assertRaises(ValueError):
             adapter.load_table(table, expected)
+
+    def test_malformed_numeric_input_does_not_echo_source_value(self):
+        table = self.root / "train.csv"
+        marker = "private_numeric_fixture_marker"
+        table.write_text(f"{marker},0.25\n0.5,0.75\n")
+        try:
+            adapter.load_table(table, sha256(table))
+        except ValueError as error:
+            self.assertEqual(str(error), "invalid common-numeric input")
+            self.assertTrue(error.__suppress_context__)
+            self.assertNotIn(marker, "".join(traceback.format_exception(error)))
+        else:
+            self.fail("malformed numeric input accepted")
 
     def test_symlink_and_outside_scratch_fail_closed(self):
         table = self.root / "train.csv"

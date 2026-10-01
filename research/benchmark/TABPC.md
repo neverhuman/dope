@@ -8,6 +8,10 @@ are hashed by the immutable scratch runtime lock before every adapter action.
 The fit and sample entry points validate the runtime before importing NumPy,
 Torch or the author packages. Two instrumented entry-point tests prove changed
 dependencies are rejected without executing their initializers.
+Malformed CSV or numeric fields produce a generic error with the original
+exception context suppressed. A regression checks that neither the error nor
+its formatted traceback contains the source field. This repair has a separate
+runtime version and preserves all earlier fit and sample receipts.
 
 The adapter calls the author's circuit trainer with the existing grouped fit
 and validation partitions. Every preprocessor and the circuit structure fit

@@ -57,8 +57,11 @@ def load_table(path: Path, expected_sha256: str):
     if (path.name not in ("train.csv", "validation.csv") or "evaluator" in path.resolve().parts
             or (path.parent / "test.csv").exists() or sha256(path) != expected_sha256):
         raise ValueError("TabPC input is not a verified training partition")
-    frame = pd.read_csv(path, header=None)
-    values = frame.to_numpy(dtype=float)
+    try:
+        frame = pd.read_csv(path, header=None)
+        values = frame.to_numpy(dtype=float)
+    except (ValueError, TypeError, UnicodeError):
+        raise ValueError("invalid common-numeric input") from None
     if (values.shape[0] < 2 or values.shape[1] < 2
             or not np.isfinite(values).all() or ((values < 0) | (values > 1)).any()):
         raise ValueError("invalid common-numeric input")
