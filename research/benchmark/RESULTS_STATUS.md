@@ -437,3 +437,17 @@ artifact charge, source snapshot and receipt hash is reconciled in the
 `python3 -m research.benchmark.publish_arf_sample_matrix`. The shared
 validation metric panel still covers only `n` and `4n`; no `2n`/`8n` utility
 or release score is inferred.
+
+The full synthpop CART fixed-fit-23 schedule is now accounted for at
+`n`/`2n`/`4n`/`8n`: all 72 frozen default and native-tuned sample jobs
+succeeded. Every sample receipt, fitted artifact charge, source snapshot,
+and prior `n`/`4n` paired receipt link is reconciled in the
+[sample schedule](results/pilot24-synthpop-sample-matrix.md),
+[JSON](results/pilot24-synthpop-sample-matrix.json),
+[schema](results/pilot24-synthpop-sample-matrix.schema.json), and
+[CSV](results/pilot24-synthpop-sample-matrix.csv). Regenerate with
+`python3 -m research.benchmark.publish_synthpop_sample_matrix`. Native
+tuning used validation CART pMSE. The shared validation metrics remain
+limited to `n` and `4n`; no `2n`/`8n` utility or release score is inferred.
+All six fitted synthpop artifacts exceed the 10,240-byte L3 cap. Official
+tests remain sealed, and MFS-v2/PTF-v1 remain null.
