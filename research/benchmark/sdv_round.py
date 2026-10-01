@@ -139,12 +139,12 @@ def run_job(lock_path: Path, job: dict, retry_failed: bool = False) -> dict:
     root.mkdir(parents=True, exist_ok=True)
     attempts = sorted(root.glob("attempt-*/receipt.json"))
     if attempts:
-        old = json.loads(attempts[-1].read_text())
-        if old["round_sha256"] != sha256(lock_path) or old["job"] != job:
+        previous = json.loads(attempts[-1].read_text())
+        if previous["round_sha256"] != sha256(lock_path) or previous["job"] != job:
             raise ValueError("retry identity changed")
-        verify_attempt(attempts[-1].parent, old)
-        if old["status"] == "ok" or not retry_failed:
-            return old
+        verify_attempt(attempts[-1].parent, previous)
+        if previous["status"] == "ok" or not retry_failed:
+            return previous
     prior = []
     for p in (lock_path.parent / "jobs").glob("*/attempt-*/receipt.json"):
         item = json.loads(p.read_text())

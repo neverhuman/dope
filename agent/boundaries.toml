@@ -3,7 +3,7 @@ id = "rust-ts-vite-react-postgres-bounded-python"
 version = "0.1.0"
 
 [python]
-allowed_non_product_paths = ["src/dope_kernel/", "validation/external/"]
+allowed_non_product_paths = ["src/dope_kernel/", "validation/external/", "research/benchmark/"]
 allowed_truth_paths = []
 
 [[streaming_exception]]
@@ -21,6 +21,14 @@ owner = "validation"
 reason = "Pinned external ML libraries are evaluated offline to substantiate exact-library claims; Rust owns certification and release decisions."
 expires = "2027-09-29"
 migration_path = "Retain only the fixture and evidence runner while the named Python libraries are required for claim verification."
+
+[[streaming_exception]]
+runtime = "python"
+classification = "advanced-data"
+owner = "research"
+reason = "Offline, sealed-test benchmark adapters call pinned author ML libraries on rights-cleared data; Rust owns product compilation, contracts, and tier claims."
+expires = "2027-09-29"
+migration_path = "Retain audited offline adapters while the named ML libraries are required for comparative evidence."
 
 [[audited_runtime_boundary]]
 id = "python-v1-compatibility"
@@ -70,4 +78,30 @@ required_checks = [
     "no-direct-db-access",
     "no-network-or-subprocess",
     "no-product-routes",
+]
+
+[[audited_runtime_boundary]]
+id = "offline-benchmark-evidence"
+paths = ["research/benchmark/adapter_worker.py"]
+classification = "advanced-data"
+product_surface = false
+runtime_language = "python"
+target_stack_exception = true
+reclassifies = [
+    "non-optimal-product-language-found",
+    "too-much-python-in-product-surface",
+    "python-direct-product-truth-or-db-ownership",
+]
+proof_command = "bash agent/check-benchmark-boundary.sh"
+rerun_command = "bash agent/check-benchmark-boundary.sh"
+required_evidence = ["target/jankurai/boundaries/offline-benchmark-evidence/evidence.json"]
+required_checks = [
+    "manifest-coverage",
+    "payload-hash-match",
+    "benchmark-unit-tests",
+    "sealed-test-fail-closed",
+    "no-product-imports",
+    "no-direct-db-access",
+    "no-product-routes",
+    "no-subprocess",
 ]

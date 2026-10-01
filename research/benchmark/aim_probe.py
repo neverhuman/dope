@@ -9,11 +9,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import pickle
 import shutil
 import time
 from itertools import combinations
 from pathlib import Path
+
+from .aim_adapter import load_model, save_model
 
 ROOT = Path("/mnt/fast-scratch/dope-benchmark")
 
@@ -60,12 +61,10 @@ def main() -> None:
         raise FileExistsError("probe artifact already exists")
     artifact = probe / "artifact"
     artifact.mkdir(parents=True)
-    with (artifact / "model.pkl").open("wb") as stream:
-        pickle.dump(model, stream, protocol=pickle.HIGHEST_PROTOCOL)
+    save_model(model, artifact)
     shutil.copy2(worker / "projection.json", artifact / "projection.json")
     sample_start = time.perf_counter()
-    with (artifact / "model.pkl").open("rb") as stream:
-        loaded = pickle.load(stream)
+    loaded = load_model(artifact)
     np.random.seed(101)
     sample = loaded.synthetic_data(rows=100)
     result = np.column_stack([sample.data[name] for name in names])

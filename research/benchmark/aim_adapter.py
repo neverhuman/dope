@@ -3,9 +3,101 @@
 from __future__ import annotations
 
 import json
-import pickle
+import hashlib
 from itertools import combinations
 from pathlib import Path
+
+
+def save_model(model: object, artifact_dir: Path) -> None:
+    """Store only numeric MBI factors; never persist executable Python objects."""
+    import numpy as np
+
+    if model.constraints:
+        raise ValueError("AIM constraints need an audited numeric codec")
+    domain = model.potentials.domain
+    attributes = list(domain.attributes)
+    shape = [int(card) for card in domain.shape]
+    if not (1 <= len(attributes) <= 128 and len(attributes) == len(shape)
+            and attributes == [f"c{i}" for i in range(len(attributes))]
+            and all(1 <= card <= 256 for card in shape)):
+        raise ValueError("AIM model domain is outside the fixed numeric contract")
+    arrays = {}
+    vectors = {}
+    for kind in ("potentials", "marginals"):
+        vector = getattr(model, kind)
+        if vector.domain != domain or len(vector.cliques) > 4096:
+            raise ValueError("AIM factor domain or count is invalid")
+        cliques = []
+        for index, clique in enumerate(vector.cliques):
+            if len(clique) != len(set(clique)) or not set(clique) <= set(attributes):
+                raise ValueError("AIM factor clique is invalid")
+            values = np.asarray(vector.tables[clique].values, dtype=np.float64)
+            expected = tuple(shape[attributes.index(name)] for name in clique)
+            if values.shape != expected or values.size > 2_000_000 or not np.isfinite(values).all():
+                raise ValueError("AIM factor shape or values are invalid")
+            arrays[f"{kind}_{index}"] = values
+            cliques.append(list(clique))
+        vectors[kind] = cliques
+    total = float(model.total)
+    if not np.isfinite(total) or total <= 0:
+        raise ValueError("AIM model total is invalid")
+    numeric_path = artifact_dir / "model.npz"
+    np.savez_compressed(numeric_path, **arrays)
+    metadata = {"format": "dope-aim-numeric-v1", "attributes": attributes,
+                "shape": shape, "vectors": vectors, "total": total,
+                "model_sha256": hashlib.sha256(numeric_path.read_bytes()).hexdigest()}
+    (artifact_dir / "model-structure.json").write_text(
+        json.dumps(metadata, sort_keys=True, separators=(",", ":")))
+
+
+def load_model(artifact_dir: Path) -> object:
+    import jax.numpy as jnp
+    import numpy as np
+    from mbi import CliqueVector, Domain, Factor, MarkovRandomField
+
+    structure = json.loads((artifact_dir / "model-structure.json").read_text())
+    if structure.get("format") != "dope-aim-numeric-v1":
+        raise ValueError("AIM numeric artifact format mismatch")
+    attributes, shape = structure["attributes"], structure["shape"]
+    if not (isinstance(attributes, list) and isinstance(shape, list)
+            and 1 <= len(attributes) <= 128 and len(attributes) == len(shape)
+            and attributes == [f"c{i}" for i in range(len(attributes))]
+            and all(type(card) is int and 1 <= card <= 256 for card in shape)):
+        raise ValueError("AIM numeric artifact domain is invalid")
+    numeric_path = artifact_dir / "model.npz"
+    if (numeric_path.stat().st_size > 512_000_000 or
+            hashlib.sha256(numeric_path.read_bytes()).hexdigest() != structure["model_sha256"]):
+        raise ValueError("AIM numeric artifact digest or size mismatch")
+    domain = Domain(tuple(attributes), tuple(shape))
+    vectors = {}
+    with np.load(numeric_path, allow_pickle=False) as archive:
+        expected_keys = set()
+        for kind in ("potentials", "marginals"):
+            cliques = structure["vectors"][kind]
+            if not isinstance(cliques, list) or len(cliques) > 4096:
+                raise ValueError("AIM numeric artifact cliques are invalid")
+            tables = {}
+            for index, names in enumerate(cliques):
+                if (not isinstance(names, list) or not all(isinstance(name, str) for name in names)
+                        or len(names) != len(set(names)) or not set(names) <= set(attributes)):
+                    raise ValueError("AIM numeric artifact clique is invalid")
+                clique = tuple(names)
+                key = f"{kind}_{index}"
+                expected_keys.add(key)
+                values = archive[key]
+                expected = tuple(shape[attributes.index(name)] for name in clique)
+                if (values.dtype != np.float64 or values.shape != expected
+                        or values.size > 2_000_000 or not np.isfinite(values).all()):
+                    raise ValueError("AIM numeric artifact factor is invalid")
+                tables[clique] = Factor(domain.project(clique), jnp.asarray(values))
+            vectors[kind] = CliqueVector(domain, tuple(tuple(names) for names in cliques), tables)
+        if set(archive.files) != expected_keys:
+            raise ValueError("AIM numeric artifact has unexpected arrays")
+    total = structure["total"]
+    if not isinstance(total, (float, int)) or not np.isfinite(total) or total <= 0:
+        raise ValueError("AIM numeric artifact total is invalid")
+    return MarkovRandomField(potentials=vectors["potentials"],
+                             marginals=vectors["marginals"], total=total)
 
 
 def fit(train: Path, metadata: dict, config: dict, seed: int, artifact_dir: Path) -> list[str]:
@@ -33,22 +125,20 @@ def fit(train: Path, metadata: dict, config: dict, seed: int, artifact_dir: Path
     delta = min(1e-5, 1 / len(table) ** 2)
     model, _ = AIM(config["epsilon"], delta, prng=np.random.RandomState(seed),
                    max_model_size=80, max_iters=1000).run(data, workload, num_synth_rows=1)
-    with (artifact_dir / "model.pkl").open("wb") as stream:
-        pickle.dump(model, stream, protocol=pickle.HIGHEST_PROTOCOL)
+    save_model(model, artifact_dir)
     (artifact_dir / "model-meta.json").write_text(json.dumps(
         {"bins": bins, "columns": len(names), "task": metadata["task"],
          "epsilon": config["epsilon"], "delta": delta,
          "formal_dp_claim": False, "workload_pairs": len(workload)},
         sort_keys=True, separators=(",", ":")))
-    return ["model.pkl", "model-meta.json"]
+    return ["model.npz", "model-structure.json", "model-meta.json"]
 
 
 def sample(artifact_dir: Path, row_count: int, seed: int, output: Path) -> None:
     import numpy as np
 
     meta = json.loads((artifact_dir / "model-meta.json").read_text())
-    with (artifact_dir / "model.pkl").open("rb") as stream:
-        model = pickle.load(stream)
+    model = load_model(artifact_dir)
     np.random.seed(seed)
     generated = model.synthetic_data(rows=row_count)
     codes = np.column_stack([generated.data[f"c{i}"] for i in range(meta["columns"])])

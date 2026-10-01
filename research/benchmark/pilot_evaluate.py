@@ -49,8 +49,8 @@ def main() -> None:
     output.mkdir(exist_ok=True)
     destination = output / f"{args.dataset}-{args.method}-{args.fit_seed}-{args.sample_seed}-x{args.multiplier}.json"
     if destination.exists():
-        old = json.loads(destination.read_text())
-        if old["fit_key"] != fit["fit_key"] or old["sample_sha256"] != sha256(sample):
+        previous = json.loads(destination.read_text())
+        if previous["fit_key"] != fit["fit_key"] or previous["sample_sha256"] != sha256(sample):
             raise ValueError("existing metric identity differs")
         print(destination)
         return

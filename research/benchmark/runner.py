@@ -326,7 +326,8 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                            "host": os.uname().nodename,
                            "cpu_affinity": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
                            "visible_gpu": os.environ.get("CUDA_VISIBLE_DEVICES")}
-        except Exception as error:
+        except (AdapterFailure, TimeoutError, OSError, ValueError, KeyError,
+                TypeError, subprocess.SubprocessError) as error:
             fit_receipt = {"format": "dope-benchmark-fit-receipt",
                            "status": "timeout" if isinstance(error, TimeoutError) else "failed",
                            "fit_key": fit_key, "fit_identity": fit_identity,
@@ -334,9 +335,9 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                            "error_type": getattr(error, "source_error_type", type(error).__name__),
                            "host": os.uname().nodename}
             for name in ("artifact", "fit_evidence"):
-                partial = directory / name
-                if partial.exists():
-                    partial.rename(attempt_path.parent / f"{attempt_path.stem}-{name}")
+                staged = directory / name
+                if staged.exists():
+                    staged.rename(attempt_path.parent / f"{attempt_path.stem}-{name}")
         _write_once(attempt_path, fit_receipt)
         if fit_receipt["status"] != "ok":
             return [fit_receipt]
@@ -386,16 +387,17 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                            "artifact_sampling_verified": first_hash == second_hash,
                            "sample_seconds": time.perf_counter() - start,
                            "host": os.uname().nodename}
-            except Exception as error:
+            except (AdapterFailure, TimeoutError, OSError, ValueError, KeyError,
+                    TypeError, subprocess.SubprocessError) as error:
                 receipt = {"format": "dope-benchmark-sample-receipt",
                            "status": "timeout" if isinstance(error, TimeoutError) else "failed",
                            "run_key": key, "fit_key": fit_key, "sample_seed": sample_seed,
                            "row_count": row_count, "sample_seconds": time.perf_counter() - start,
                            "error_type": getattr(error, "source_error_type", type(error).__name__),
                            "host": os.uname().nodename}
-                for partial in (output, repeat):
-                    if partial.exists():
-                        partial.rename(attempt_path.parent / f"{attempt_path.stem}-{partial.name}")
+                for staged in (output, repeat):
+                    if staged.exists():
+                        staged.rename(attempt_path.parent / f"{attempt_path.stem}-{staged.name}")
             _write_once(attempt_path, receipt)
             if receipt["status"] == "ok":
                 _write_once(receipt_path, receipt)

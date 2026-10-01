@@ -43,7 +43,7 @@ def main() -> None:
             result = {"status": "ok"}
         else:
             raise ValueError("unknown adapter action")
-    except Exception as error:
+    except (ValueError, KeyError, TypeError, OSError, RuntimeError, TimeoutError) as error:
         result = {"status": "failed", "error_type": type(error).__name__}
     print(json.dumps(result, sort_keys=True))
     if result["status"] != "ok":

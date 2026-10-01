@@ -9,6 +9,7 @@ case "${1:-run}" in
     export PATH="$PWD/target/ci-python/bin:$PATH"
     bash agent/check-python-v1-boundary.sh
     bash agent/check-external-boundary.sh
+    bash agent/check-benchmark-boundary.sh
     ;;
   verify)
     ci_require_artifact "$2"
@@ -28,6 +29,7 @@ PY
   run)
     bash agent/check-python-v1-boundary.sh
     bash agent/check-external-boundary.sh
+    bash agent/check-benchmark-boundary.sh
     bash agent/run-jankurai.sh
     ;;
   *) echo "Usage: $0 {prepare|verify JSON MD|run}" >&2; exit 2 ;;

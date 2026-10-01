@@ -45,12 +45,12 @@ def digest(path: Path) -> str:
 
 def atomic_json(path: Path, value: dict) -> None:
     encoded = json.dumps(value, sort_keys=True, indent=2) + "\n"
-    temporary = path.with_name(path.name + f".{os.getpid()}.partial")
-    with temporary.open("x") as stream:
+    staged = path.with_name(path.name + f".{os.getpid()}.staged")
+    with staged.open("x") as stream:
         stream.write(encoded)
         stream.flush()
         os.fsync(stream.fileno())
-    os.replace(temporary, path)
+    os.replace(staged, path)
 
 
 def verify_inputs(lock: dict) -> None:
@@ -100,9 +100,9 @@ def run_cell(cell: dict, deadline_epoch: float, semaphores: dict, cpu_pools: dic
     receipt_path = directory / "receipts" / f"{name}.json"
     if receipt_path.exists():
         original = json.loads(receipt_path.read_text())
-        old_log = directory / "logs" / f"{name}.log"
+        previous_log = directory / "logs" / f"{name}.log"
         if not (repair_digest_mismatch and original["status"] == "failed"
-                and old_log.exists() and "adapter source digest changed" in old_log.read_text()):
+                and previous_log.exists() and "adapter source digest changed" in previous_log.read_text()):
             return original
         receipt_path = directory / "repair-receipts" / f"{name}-attempt2.json"
         if receipt_path.exists():

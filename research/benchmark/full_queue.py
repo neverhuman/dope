@@ -261,7 +261,8 @@ def _run_locked(repo_root: Path, lock_root: Path, package: Path, queue_root: Pat
                 host, slot, cell, attempt = active[future]
                 try:
                     future.result()
-                except Exception as error:
+                except (OSError, ValueError, RuntimeError, TimeoutError, KeyError,
+                        subprocess.SubprocessError) as error:
                     coordinator_failures += 1
                     receipt_path = (queue_root / "attempts" / cell["id"]
                                     / f"attempt-{attempt:04d}.json")
