@@ -74,7 +74,7 @@ def compare(matrix: list[dict], reports: list[dict], method_lock: dict) -> dict:
                        "gate_pass_difference": sum(pass_differences) / len(datasets) if datasets else None,
                        "gate_pass_familywise_95_ci": pass_ci,
                        "gate_pass_one_sided_sign_p": sign_pvalue(pass_differences),
-                       "gate_pass_superiority": bool(baseline_completed and pass_ci and pass_ci[0] > 0),
+                       "gate_pass_superiority": False,
                        "baseline_completed_datasets": baseline_completed,
                        "paired_passing_datasets": len(score_differences),
                        "mfs_v2_difference_among_paired_passers":
@@ -90,6 +90,11 @@ def compare(matrix: list[dict], reports: list[dict], method_lock: dict) -> dict:
         row["gate_pass_holm_adjusted_p"] = running
     for row in output:
         row.setdefault("gate_pass_holm_adjusted_p", None)
+        adjusted_p = row["gate_pass_holm_adjusted_p"]
+        pass_ci = row["gate_pass_familywise_95_ci"]
+        row["gate_pass_superiority"] = bool(
+            row["baseline_completed_datasets"] and pass_ci and pass_ci[0] > 0
+            and adjusted_p is not None and adjusted_p < 0.05)
     return {"format": "dope-benchmark-primary-analysis", "version": 1,
             "comparison_set": "paired_applicable_public_core_common_numeric_l3",
             "interval_method": "dataset_cluster_bootstrap_bonferroni_familywise_95",
