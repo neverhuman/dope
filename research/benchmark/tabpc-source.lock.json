@@ -1,5 +1,5 @@
 {
-  "adapter_source_sha256": "3b2b9e510a5f85c9ed0e0f1d5dccceaf77a6d074cf65c50928dec59132fe960c",
+  "adapter_source_sha256": "43d77b6af6404544e5faacc9d326c72f7df1a22686702cc51e57c506d5e922d7",
   "all_generated_input_fit_costs": {
     "fits": 6,
     "receipts": [
@@ -46,6 +46,10 @@
         "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/attempt-0001.json",
         "sha256": "7f0adceb9ae6dd2c16a3123c9b2f7d3fee63918f7afcd157289af610481de77f"
       },
+      "current_sampling_contract_receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/regression/contract-receipt.json",
+        "sha256": "2433ccc600057031e5571da96c3d2b33bd2eb51fcd877836f57ced1058119ea6"
+      },
       "energy_joules_estimate": 762.9497296666028,
       "fit_receipt": {
         "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/contract-receipt.json",
@@ -60,12 +64,12 @@
       "row_removal_replay": "exact",
       "sample_receipts": [
         {
-          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/cpu-sample-1.receipt.json",
-          "sha256": "4a160874d2337c6f285082c727d44650aacaf638add50692d3048286950f3cc6"
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/regression/cpu-sample-1.receipt.json",
+          "sha256": "e7faa649ee4499a5968bb9b9d0540fbba7427ce651772a324b1e46e1e53bce62"
         },
         {
-          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/cpu-sample-2.receipt.json",
-          "sha256": "573f299b78bef53b019472740f499adf70ae838a7378c0fdffce6ad082be38b5"
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/regression/cpu-sample-2.receipt.json",
+          "sha256": "c4fd723f90fd033d53e652fd881cd56baa66dec71df5a3ddf7808b35a4f825f0"
         }
       ],
       "scope": "generated_inputs_only_not_reported_experiment_reproduction",
@@ -79,6 +83,10 @@
       "cost_receipt": {
         "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/binary/attempt-0001.json",
         "sha256": "67f886009695b31cfbcbbbec5cad2e54bf97bd30f934feb507664098d0631e73"
+      },
+      "current_sampling_contract_receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/binary/contract-receipt.json",
+        "sha256": "d1ab3f8beedc5c8ce0317ca5a5606717971c43f805b0f3afc56d7b52cd4dba0f"
       },
       "energy_joules_estimate": 956.3304081261042,
       "fit_receipt": {
@@ -94,12 +102,12 @@
       "row_removal_replay": "exact",
       "sample_receipts": [
         {
-          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/binary/cpu-sample-1.receipt.json",
-          "sha256": "5f7d94df65cd4600edc357e549e5037ec332ef8ac16e6f794ee3351b70be31b5"
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/binary/cpu-sample-1.receipt.json",
+          "sha256": "00afb02e681199e9056ff6c448e05be5870d74443df4ffab4b9d437ed6fbec80"
         },
         {
-          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/binary/cpu-sample-2.receipt.json",
-          "sha256": "56a5a437d01849f5bc16b5bb1c41bfea27d0f7bad4bc35bfb3ea50dd88139f76"
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/binary/cpu-sample-2.receipt.json",
+          "sha256": "4ca55f3102c9e5a2e82c2ca3611faf5c9d1132f4a8b145c80b33be724218f387"
         }
       ],
       "scope": "generated_inputs_only_not_reported_experiment_reproduction",
@@ -210,7 +218,27 @@
   },
   "formal_dp_claim": false,
   "format": "dope-tabpc-author-source-audit",
+  "gpu_fit_contract_adapter_sha256": "3b2b9e510a5f85c9ed0e0f1d5dccceaf77a6d074cf65c50928dec59132fe960c",
   "gpu_vram_mib_cap": 16384,
+  "integrity_order_repair": {
+    "artifact_metadata_rebound_only": true,
+    "entry_point_dependency_rejection_tests": 2,
+    "learned_parameter_bytes_changed": false,
+    "new_fits_started": 0,
+    "prior_gpu_contract_runtime_lock": {
+      "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/runtime.lock.json",
+      "sha256": "552a298f1c59a9e9f99eebc513c54690af2863ca2d105666254eb283284f0807"
+    },
+    "reason": "independent_review_P1_dependency_import_preceded_integrity_check",
+    "repair_receipt": {
+      "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/repair.lock.json",
+      "sha256": "447e5137b4a2a33022c365182ace6d32607a02f1ea54d4dbc334a235ac21ef8f"
+    },
+    "runtime_lock": {
+      "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/runtime.lock.json",
+      "sha256": "3ac1b4ea85c4e5ffdc3dc563bc3a152f4e503055ec805404eda3d7b22fcec5d0"
+    }
+  },
   "matrix_admission": "pending_final_methods_and_campaign_locks",
   "method": "TabPC",
   "mfs_v2": null,
@@ -255,8 +283,8 @@
   "release_l3_claim": false,
   "runtime_dependency_source_file_count": 5465,
   "runtime_lock": {
-    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/runtime.lock.json",
-    "sha256": "552a298f1c59a9e9f99eebc513c54690af2863ca2d105666254eb283284f0807"
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v4/runtime.lock.json",
+    "sha256": "3ac1b4ea85c4e5ffdc3dc563bc3a152f4e503055ec805404eda3d7b22fcec5d0"
   },
   "runtime_python": "3.10.12",
   "runtime_role": "restricted_research_only_not_mit_product_runtime",
