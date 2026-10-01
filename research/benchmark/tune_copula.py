@@ -77,7 +77,8 @@ def freeze(cohort_path: Path = COHORT, workers: Path = WORKERS,
 
 def _process(command: list[str], *, input_text: str | None,
              timeout: float, root: Path, label: str) -> dict:
-    result = subprocess.run(["taskset", "-c", "16-31", *command], input=input_text,
+    affinity = ",".join(map(str, tune_density.cpu_affinity()))
+    result = subprocess.run(["taskset", "-c", affinity, *command], input=input_text,
                             capture_output=True, text=True, timeout=timeout)
     (root / f"{label}.stdout").write_text(result.stdout)
     (root / f"{label}.stderr").write_text(result.stderr)

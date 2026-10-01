@@ -13,6 +13,12 @@ METHODS = ROOT / "research/benchmark/methods.lock.json"
 
 
 class TuneDensityTests(unittest.TestCase):
+    def test_cpu_affinity_stays_inside_host_allocation(self):
+        with patch.object(tune_density.os, "sched_getaffinity", return_value={2, 4, 6, 8}):
+            self.assertEqual(tune_density.cpu_affinity(), (2, 4, 6, 8))
+        with patch.object(tune_density.os, "sched_getaffinity", return_value=set(range(40))):
+            self.assertEqual(tune_density.cpu_affinity(), tuple(range(16, 32)))
+
     def test_frozen_training_validation_identity_and_native_winner(self):
         with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:
             root = Path(directory)
