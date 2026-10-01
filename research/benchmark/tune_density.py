@@ -180,7 +180,8 @@ def tune(worker: Path, method: str, methods_lock: Path, round_lock_path: Path,
                                  "config": config, "fit_seed": 11}
             write_once(attempt_path, trial)
         total_wall += trial["wall_seconds"]
-        trials.append(trial)
+        trials.append({**trial, "attempt_receipt_path": str(attempt_path),
+                       "attempt_receipt_sha256": sha256(attempt_path)})
     successful = [(index, row) for index, row in enumerate(trials) if row["status"] == "ok"]
     if not successful or total_wall > BUDGET_SECONDS:
         errors = sorted({row.get("error_type", "budget_exhausted") for row in trials
@@ -192,6 +193,7 @@ def tune(worker: Path, method: str, methods_lock: Path, round_lock_path: Path,
                           digest(pair[1]["config"]), pair[0]))
     selection = {"format": "dope-benchmark-validation-selection", "version": 1,
                  "dataset": dataset, "method": method, "partition": "validation",
+                 "validation_sha256": manifest["projected_hashes"]["validation"],
                  "round_sha256": round_sha256, "stage": job["stage"],
                  "objective": objective, "selected_trial_index": selected_index,
                  "selected_config": selected["config"], "trials": trials,

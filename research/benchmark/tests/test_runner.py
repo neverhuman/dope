@@ -79,46 +79,79 @@ class RunnerTests(unittest.TestCase):
             objective = {"status": "locked", "name": "mean_log_density",
                          "direction": "maximize", "implementation_sha256": "metric",
                          "tie_breaks": ["artifact_bytes_ascending", "config_sha256_ascending"]}
-            metric = root / "native-metric.json"
+            trial_root = root / "trial-00"
+            artifact = trial_root / "artifact"
+            artifact.mkdir(parents=True)
+            (artifact / "model.json").write_text("{}")
+            (artifact / "projection.json").write_text("{}")
+            from research.benchmark.score import artifact_inventory
+            inventory, charged = artifact_inventory(artifact, ["model.json", "projection.json"])
+            metric = trial_root / "native-metric.json"
             metric.write_text(json.dumps({"method": "independent_marginals",
                                           "partition": "validation", "objective": "mean_log_density",
                                           "implementation_sha256": "metric", "value": 1.0,
-                                          "artifact_sha256": "artifact"}))
+                                          "validation_sha256": "validation",
+                                          "artifact_sha256": sha256(artifact / "model.json")}))
+            attempt = trial_root / "attempt.json"
+            trial = {"status": "ok", "wall_seconds": 1, "config": selected,
+                     "native_kpi": 1.0, "artifact_bytes": charged,
+                     "artifact_inventory": inventory,
+                     "artifact_sha256": sha256(artifact / "model.json"),
+                     "metric_receipt_path": str(metric),
+                     "metric_receipt_sha256": sha256(metric),
+                     "identity": {"dataset": "toy", "method": "independent_marginals",
+                                  "round_sha256": "round", "method_source_sha256": "source",
+                                  "validation_sha256": "validation", "config": selected}}
+            attempt.write_text(json.dumps(trial))
+            trial.update({"attempt_receipt_path": str(attempt),
+                          "attempt_receipt_sha256": sha256(attempt)})
             receipt = root / "selection.json"
             evidence = {"format": "dope-benchmark-validation-selection",
-                        "partition": "validation", "dataset": "toy",
+                        "partition": "validation", "validation_sha256": "validation",
+                        "test_opened": False, "dataset": "toy",
+                        "round_sha256": "round",
                         "method": "independent_marginals", "objective": objective,
                         "selected_config": selected, "selected_trial_index": 0,
-                        "trials": [{"status": "ok", "wall_seconds": 1, "config": selected,
-                                    "native_kpi": 1.0, "artifact_bytes": 100,
-                                    "artifact_sha256": "artifact",
-                                    "metric_receipt_path": str(metric),
-                                    "metric_receipt_sha256": sha256(metric)} for _ in range(8)]}
+                        "trials": [trial]}
             receipt.write_text(json.dumps(evidence))
             job = {"final": True, "method": "independent_marginals",
                    "configuration": {"kind": "tuned", "values": selected,
                                      "selection_path": str(receipt),
                                      "selection_sha256": sha256(receipt)}}
             entry = {"group": "compact", "default_config": {"bins": 16},
+                     "source_sha256": "source",
                      "tuning_search_space": {"bins": [8, 16, 32]},
                      "native_objective": objective}
-            config, identity = runner.resolve_configuration(job, entry, "toy", 100, root)
+            config, identity = runner.resolve_configuration(job, entry, "toy", 100, root, "validation")
             self.assertEqual(config, selected)
             self.assertEqual(identity["selection_sha256"], sha256(receipt))
             evidence["selected_trial_index"] = 1
             receipt.write_text(json.dumps(evidence))
             job["configuration"]["selection_sha256"] = sha256(receipt)
             with self.assertRaisesRegex(ValueError, "native KPI winner"):
-                runner.resolve_configuration(job, entry, "toy", 100, root)
+                runner.resolve_configuration(job, entry, "toy", 100, root, "validation")
+            evidence["selected_trial_index"] = 0
+            evidence["trials"][0]["attempt_receipt_sha256"] = "tampered"
+            receipt.write_text(json.dumps(evidence))
+            job["configuration"]["selection_sha256"] = sha256(receipt)
+            with self.assertRaisesRegex(ValueError, "attempt receipt"):
+                runner.resolve_configuration(job, entry, "toy", 100, root, "validation")
+            evidence["trials"][0]["attempt_receipt_sha256"] = sha256(attempt)
+            (artifact / "model.json").write_text('{"changed":true}')
+            receipt.write_text(json.dumps(evidence))
+            job["configuration"]["selection_sha256"] = sha256(receipt)
+            with self.assertRaisesRegex(ValueError, "native KPI receipt"):
+                runner.resolve_configuration(job, entry, "toy", 100, root, "validation")
+            (artifact / "model.json").write_text("{}")
             evidence["selected_trial_index"] = 0
             evidence["trials"].clear()
             receipt.write_text(json.dumps(evidence))
             job["configuration"]["selection_sha256"] = sha256(receipt)
             with self.assertRaisesRegex(ValueError, "invalid validation selection"):
-                runner.resolve_configuration(job, entry, "toy", 100, root)
+                runner.resolve_configuration(job, entry, "toy", 100, root, "validation")
             job["configuration"]["values"] = {"bins": 64}
             with self.assertRaisesRegex(ValueError, "outside locked search space"):
-                runner.resolve_configuration(job, entry, "toy", 100, root)
+                runner.resolve_configuration(job, entry, "toy", 100, root, "validation")
 
     def test_dp_budget_is_part_of_configuration_identity(self):
         entry = {"group": "dp", "default_config": {"epsilon": 1.0, "bins": 8},

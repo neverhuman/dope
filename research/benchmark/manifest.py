@@ -232,6 +232,10 @@ def prepare(entry: dict, output_root: Path, seen: dict | None = None) -> dict:
     check_nonoverlap(parts)
     if entry.get("transformed_sha256") and (len(raw_files) != 1 or next(iter(raw_files.values()))["sha256"] != entry["transformed_sha256"]):
         raise ValueError("transformed source digest mismatch")
+    if entry.get("transformed_files_sha256") and {
+            name: record["sha256"] for name, record in raw_files.items()
+            } != entry["transformed_files_sha256"]:
+        raise ValueError("transformed official source digest mismatch")
     all_rows = [row for rows in parts.values() for row in rows]
     if entry["panel"] == "public_extension" and not (500 <= len(all_rows) <= 100000 and 1 <= len(columns) - 1 <= 2000):
         raise ValueError("public extension size outside preregistered range")
@@ -269,6 +273,10 @@ def prepare(entry: dict, output_root: Path, seen: dict | None = None) -> dict:
         "raw_files": raw_files, "source_row_hash": source_row_hash,
         "source_archive_sha256": entry.get("source_archive_sha256"),
         "source_object": entry.get("source_object"),
+        "official_split_id": entry.get("official_split_id"),
+        "official_split_source": entry.get("official_split_source"),
+        "excluded_official_overlap_rows": entry.get("excluded_official_overlap_rows"),
+        "excluded_official_overlap_sha256": entry.get("excluded_official_overlap_sha256"),
         "transformation_sha256": entry.get("transformation_sha256"),
         "rows": len(all_rows), "columns": len(columns),
         "split": {"kind": split_kind, "seed": None if split_kind == "official" else 1729,

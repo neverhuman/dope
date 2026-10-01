@@ -1,5 +1,10 @@
 # Four-hour pilot status
 
+**2026-10-01 erratum:** Historical Adult quality numbers in this status log are
+withdrawn. Its pilot preparation mixed the official UCI Adult training and test
+files. The replacement official test is evaluator-only, and the new dataset
+lock is `pilot-24h-datasets.lock.json`. Historical cost receipts remain intact.
+
 Started 2026-09-30 13:13 UTC. Jepson approved the DOPE generator benchmark as the paper's primary comparison. BeyondArena is secondary. The real-data utility endpoint is null-normalized TSTR/TRTR retention on untouched real test rows; public test remains sealed during this pilot. The pilot cap is four hours, ending by 17:13 UTC.
 
 Adult, California, and News are the fixed pilot datasets. The requested roster is DOPE, GaussianCopula, TabPC, TabKDE, TabSyn, TabDiff, and AIM, with fit seeds 11 and 23 and sample seeds 101 and 211. The queue must produce a receipt for every planned fit, including methods blocked by source, license, dependency, or resource checks. It must never score an unavailable method as a DOPE win.

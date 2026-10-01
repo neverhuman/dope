@@ -59,8 +59,15 @@ class TuneDensityTests(unittest.TestCase):
                      "configuration": {"kind": "tuned", "values": selection["selected_config"],
                                        "selection_path": result["selection_path"],
                                        "selection_sha256": result["selection_sha256"]}},
-                    entry, "fixture", 6, root)
+                    entry, "fixture", 6, root, manifest["projected_hashes"]["validation"])
                 self.assertEqual(config, selection["selected_config"])
+                with self.assertRaisesRegex(ValueError, "invalid validation selection"):
+                    runner.resolve_configuration(
+                        {"final": True, "method": "independent_marginals",
+                         "configuration": {"kind": "tuned", "values": selection["selected_config"],
+                                           "selection_path": result["selection_path"],
+                                           "selection_sha256": result["selection_sha256"]}},
+                        entry, "fixture", 6, root, "wrong-validation-sha")
                 (worker / "validation.csv").write_text("0.9,0.9\n")
                 with self.assertRaisesRegex(ValueError, "worker partition digest mismatch"):
                     tune_density.tune(worker, "independent_marginals", METHODS,

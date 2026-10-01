@@ -79,7 +79,8 @@ def reserve_scratch(root: Path, rows: int, columns: int) -> None:
 
 
 def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
-                          scratch_root: Path) -> tuple[dict, dict]:
+                          scratch_root: Path,
+                          validation_sha256: str | None = None) -> tuple[dict, dict]:
     """Bind a final configuration to its validation selection and DP budget."""
     choice = job.get("configuration")
     if choice is None:
@@ -95,6 +96,8 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
         config = dict(entry["default_config"])
         identity = {"kind": kind}
     else:
+        if validation_sha256 is None:
+            raise ValueError("tuned configuration requires worker validation digest")
         if set(choice) != {"kind", "values", "selection_path", "selection_sha256"}:
             raise ValueError("tuned configuration is missing selection evidence")
         config = choice["values"]
@@ -122,6 +125,8 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                 or objective.get("direction") not in ("maximize", "minimize")
                 or selection.get("objective") != objective
                 or selection.get("selected_config") != config
+                or selection.get("validation_sha256") != validation_sha256
+                or selection.get("test_opened") is not False
                 or not isinstance(trials, list) or not 1 <= len(trials) <= 8):
             raise ValueError("invalid validation selection evidence")
         successful = []
@@ -138,21 +143,47 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                     or not 0 <= seconds <= 43200):
                 raise ValueError("invalid validation selection evidence")
             elapsed += seconds
+            attempt_path = Path(trial.get("attempt_receipt_path", ""))
+            if (not attempt_path.resolve().is_relative_to(scratch_root.resolve())
+                    or attempt_path.name != "attempt.json"
+                    or sha256(attempt_path) != trial.get("attempt_receipt_sha256")):
+                raise ValueError("invalid native tuning attempt receipt")
+            attempt = json.loads(attempt_path.read_text())
+            if (attempt != {key: value for key, value in trial.items()
+                            if key not in ("attempt_receipt_path", "attempt_receipt_sha256")}
+                    or attempt.get("identity", {}).get("dataset") != dataset
+                    or attempt["identity"].get("method") != job["method"]
+                    or attempt["identity"].get("method_source_sha256") != entry["source_sha256"]
+                    or attempt["identity"].get("round_sha256") != selection.get("round_sha256")
+                    or attempt["identity"].get("validation_sha256") != validation_sha256
+                    or attempt["identity"].get("config") != trial_config):
+                raise ValueError("native tuning attempt lineage mismatch")
             if trial["status"] != "ok":
                 continue
             metric_path = Path(trial.get("metric_receipt_path", ""))
             if (not metric_path.resolve().is_relative_to(scratch_root.resolve())
+                    or metric_path != attempt_path.parent / "native-metric.json"
                     or sha256(metric_path) != trial.get("metric_receipt_sha256")):
                 raise ValueError("invalid native KPI receipt")
             metric = json.loads(metric_path.read_text())
             value = trial.get("native_kpi")
             artifact_bytes = trial.get("artifact_bytes")
+            inventory = trial.get("artifact_inventory")
+            if (not isinstance(inventory, list)
+                    or sorted(item.get("path") for item in inventory if isinstance(item, dict))
+                    != ["model.json", "projection.json"]):
+                raise ValueError("invalid native artifact inventory")
+            actual_inventory, charged = artifact_inventory(
+                attempt_path.parent / "artifact", ["model.json", "projection.json"])
             if (metric.get("method") != job["method"]
                     or metric.get("partition") != "validation"
+                    or metric.get("validation_sha256") != validation_sha256
                     or metric.get("objective") != objective.get("name")
                     or metric.get("implementation_sha256") != objective.get("implementation_sha256")
                     or metric.get("value") != value
                     or metric.get("artifact_sha256") != trial.get("artifact_sha256")
+                    or trial.get("artifact_sha256") != sha256(attempt_path.parent / "artifact/model.json")
+                    or actual_inventory != inventory or charged != artifact_bytes
                     or not isinstance(value, (int, float)) or not math.isfinite(value)
                     or not isinstance(artifact_bytes, int) or artifact_bytes < 0):
                 raise ValueError("invalid native KPI receipt")
@@ -251,7 +282,8 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                              or multipliers != CONTRACT["size_multipliers"]):
         raise ValueError("final job requires the complete sample matrix")
     config, config_identity = resolve_configuration(job, entry, manifest["dataset_id"],
-                                                    n, scratch_root)
+                                                    n, scratch_root,
+                                                    manifest["projected_hashes"]["validation"])
     fit_identity = {
         "dataset": manifest["dataset_id"], "split": manifest["split_hashes"],
         "projection": manifest["projection_sha256"], "track": job["track"],

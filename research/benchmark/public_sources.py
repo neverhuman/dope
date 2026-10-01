@@ -9,6 +9,7 @@ import json
 import zipfile
 from pathlib import Path
 
+from .manifest import digest, row_digest
 from .score import sha256
 
 
@@ -30,22 +31,25 @@ SOURCES = {
 }
 
 
-def transform(name: str, archive: Path, output: Path) -> dict:
+def transform(name: str, archive: Path, output: Path,
+              test_output: Path | None = None) -> dict:
     source = SOURCES[name]
     if sha256(archive) != source["sha256"]:
         raise ValueError("public source ZIP hash mismatch")
-    if output.exists():
+    if output.exists() or (test_output is not None and test_output.exists()):
         raise FileExistsError("source transformation is immutable")
+    if name == "Adult" and (test_output is None or output.resolve() == test_output.resolve()):
+        raise ValueError("Adult official test requires a distinct evaluator output")
+    if name != "Adult" and test_output is not None:
+        raise ValueError("this public source has no official test file")
     output.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(archive) as source_zip, output.open("w", newline="") as target_stream:
-        writer = csv.writer(target_stream, lineterminator="\n")
+    with zipfile.ZipFile(archive) as source_zip:
         if name == "Adult":
             columns = ["age", "workclass", "fnlwgt", "education", "education-num",
                        "marital-status", "occupation", "relationship", "race", "sex",
                        "capital-gain", "capital-loss", "hours-per-week", "native-country", "income"]
-            writer.writerow(columns)
-            count = 0
-            for part in ("adult.data", "adult.test"):
+            def rows(part: str) -> list[list[str]]:
+                parsed = []
                 reader = csv.reader(io.TextIOWrapper(source_zip.open(part), encoding="utf-8"))
                 for row in reader:
                     if not row or row[0].startswith("|"):
@@ -54,31 +58,61 @@ def transform(name: str, archive: Path, output: Path) -> dict:
                     if len(row) != len(columns):
                         raise ValueError("unexpected Adult source width")
                     row[-1] = row[-1].rstrip(".")
-                    writer.writerow(row)
-                    count += 1
+                    parsed.append(row)
+                return parsed
+            official_test = rows("adult.test")
+            test_groups = {row_digest(row) for row in official_test}
+            official_train = rows("adult.data")
+            excluded = [row_digest(row) for row in official_train
+                        if row_digest(row) in test_groups]
+            official_train = [row for row in official_train
+                              if row_digest(row) not in test_groups]
+            assert test_output is not None
+            test_output.parent.mkdir(parents=True, exist_ok=True)
+            for path, part_rows in ((output, official_train), (test_output, official_test)):
+                with path.open("x", newline="") as target_stream:
+                    writer = csv.writer(target_stream, lineterminator="\n")
+                    writer.writerow(columns)
+                    writer.writerows(part_rows)
             task, target = "binary", "income"
+            transformed = {"train": sha256(output), "test": sha256(test_output)}
+            counts = {"train": len(official_train), "test": len(official_test)}
         elif name == "News":
-            reader = csv.reader(io.TextIOWrapper(
-                source_zip.open("OnlineNewsPopularity/OnlineNewsPopularity.csv"), encoding="utf-8"))
-            original = [cell.strip() for cell in next(reader)]
-            if "url" not in original or "shares" not in original:
-                raise ValueError("unexpected News source columns")
-            keep = [index for index, column in enumerate(original) if column != "url"]
-            writer.writerow([original[index] for index in keep])
-            count = 0
-            for row in reader:
-                if len(row) != len(original):
-                    raise ValueError("unexpected News source width")
-                writer.writerow([row[index].strip() for index in keep])
-                count += 1
+            with output.open("x", newline="") as target_stream:
+                writer = csv.writer(target_stream, lineterminator="\n")
+                reader = csv.reader(io.TextIOWrapper(
+                    source_zip.open("OnlineNewsPopularity/OnlineNewsPopularity.csv"), encoding="utf-8"))
+                original = [cell.strip() for cell in next(reader)]
+                if "url" not in original or "shares" not in original:
+                    raise ValueError("unexpected News source columns")
+                keep = [index for index, column in enumerate(original) if column != "url"]
+                writer.writerow([original[index] for index in keep])
+                count = 0
+                for row in reader:
+                    if len(row) != len(original):
+                        raise ValueError("unexpected News source width")
+                    writer.writerow([row[index].strip() for index in keep])
+                    count += 1
             task, target = "regression", "shares"
         else:
             raise ValueError("unknown public source")
-    return {"id": name, "panel": "public_core", "source": source["url"],
+    entry = {"id": name, "panel": "public_core", "source": source["url"],
             "source_identity": source["source_identity"], "license": source["license"],
-            "task": task, "target": target, "header": True, "raw": str(output),
-            "source_archive_sha256": source["sha256"], "transformation_sha256": sha256(Path(__file__)),
-            "transformed_sha256": sha256(output), "transformed_rows": count}
+            "task": task, "target": target, "header": True,
+            "source_archive_sha256": source["sha256"],
+            "transformation_sha256": sha256(Path(__file__))}
+    if name == "Adult":
+        entry.update({"raw": {"train": str(output), "test": str(test_output)},
+                      "official_split_id": "uci:2:adult:data-test",
+                      "official_split_source": source["url"],
+                      "transformed_files_sha256": transformed,
+                      "transformed_rows": counts,
+                      "excluded_official_overlap_rows": len(excluded),
+                      "excluded_official_overlap_sha256": digest(sorted(excluded))})
+    else:
+        entry.update({"raw": str(output), "transformed_sha256": sha256(output),
+                      "transformed_rows": count})
+    return entry
 
 
 def main() -> None:
@@ -86,10 +120,13 @@ def main() -> None:
     parser.add_argument("name", choices=sorted(SOURCES))
     parser.add_argument("archive", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--test-output", type=Path)
     args = parser.parse_args()
-    if args.output.resolve().is_relative_to(Path(__file__).resolve().parents[2]) or args.output.resolve().is_relative_to(Path("/tmp")):
-        parser.error("bulk transformed data must live outside worktrees and /tmp")
-    print(json.dumps(transform(args.name, args.archive, args.output), sort_keys=True))
+    for path in (args.output, args.test_output):
+        if path is not None and (path.resolve().is_relative_to(Path(__file__).resolve().parents[2])
+                                 or path.resolve().is_relative_to(Path("/tmp"))):
+            parser.error("bulk transformed data must live outside worktrees and /tmp")
+    print(json.dumps(transform(args.name, args.archive, args.output, args.test_output), sort_keys=True))
 
 
 if __name__ == "__main__":

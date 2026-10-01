@@ -10,6 +10,32 @@ from research.benchmark.score import sha256
 
 
 class SdvRoundTests(unittest.TestCase):
+    def test_gpu_retry_preserves_interrupted_attempt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            projection = root / "projection.json"
+            projection.write_text("{}")
+            identity = {"dataset": "fixture", "validation_sha256": "locked"}
+            (root / "attempt-0001.reservation.json").write_text(
+                json.dumps({"identity": identity, "attempt": 1}))
+            original_log = root / "attempt-0001.log"
+            original_log.write_text("partial GPU log")
+            original_model = root / "attempt-0001.dpk"
+            original_model.write_bytes(b"partial artifact")
+            number, prefix, lock = gpu_probe.reserve_attempt(root, identity, projection)
+            try:
+                self.assertEqual(number, 2)
+                self.assertEqual(prefix.name, "attempt-0002")
+                interrupted = json.loads((root / "attempt-0001.json").read_text())
+                self.assertEqual(interrupted["status"], "interrupted")
+                self.assertEqual(interrupted["log_sha256"], sha256(original_log))
+                self.assertEqual(interrupted["artifact_sha256"], sha256(original_model))
+                self.assertEqual(original_log.read_text(), "partial GPU log")
+                self.assertEqual(original_model.read_bytes(), b"partial artifact")
+                self.assertTrue((root / "attempt-0002.reservation.json").exists())
+            finally:
+                lock.close()
+
     def test_native_selection_ignores_common_metric_and_failed_trials(self):
         native_best = {"status": "ok", "native_kpi": {"value": 0.8}, "artifact_bytes": 100000,
                        "job": {"config": {"batch_size": 500}}, "catboost_retention": 0.1}

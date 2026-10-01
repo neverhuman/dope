@@ -1,0 +1,165 @@
+{
+  "complete": true,
+  "datasets": [
+    {
+      "columns": 15,
+      "excluded_official_overlap_rows": 25,
+      "excluded_official_overlap_sha256": "4a3084c985789d7d317f8ccbe519e4413088b64e22986c77513a36d8bb3ace6a",
+      "format": "dope-benchmark-dataset",
+      "id": "Adult",
+      "license": {
+        "evidence_url": "https://archive.ics.uci.edu/dataset/2/adult",
+        "spdx": "CC-BY-4.0",
+        "status": "recorded"
+      },
+      "official_split_id": "uci:2:adult:data-test",
+      "official_split_source": "https://archive.ics.uci.edu/static/public/2/adult.zip",
+      "panel": "public_core",
+      "projected_files": {
+        "test": "95e9d2c6de5d001d91af54554e3ec7ef2080943f38b4e6954c590abfb821d40c",
+        "train": "96a19af623f408961083ca7888ff4c40f85f402632a44f8bcb3c2e4f7f5d57d1",
+        "validation": "3032bd1bd7d2e551c52e8c92b2f2603cd2ae86d2b1f79853f66043fa5392ded9"
+      },
+      "projection_sha256": "f36e2dbd3e5a551e1fd7ad5aa7858769be4529652cfddde02adef52bf26a20f0",
+      "raw_files": {
+        "test": {
+          "sha256": "f6b1801c5d231515ea5ff04d4444997bacd57e04876e94710cb9b9bd5549c033"
+        },
+        "train": {
+          "sha256": "effc570d8f4a34bff501994079c138f36de9f02456b2dbdc4722a6e9ca7338cc"
+        }
+      },
+      "row_group_assignments_sha256": "c7d89e063c987ddf8ea3a2ba1115016bb992fd4c50ee5bcc75562287b65b8fb4",
+      "rows": 48817,
+      "source": "https://archive.ics.uci.edu/static/public/2/adult.zip",
+      "source_archive_sha256": "7537312dd56c2b98035880805ce99e68183a30ee468aa5329d6df0fbb3cc21bb",
+      "source_identity": "uci:2:adult",
+      "source_object": null,
+      "source_row_hash": "268a74256aa0c2806c361de2189ea03c0dc29bebbc5cd359d930665d2ee42df4",
+      "split": {
+        "hashes": {
+          "test": "edaed361e330d7492d318b5953e75492d77cd6958bf6112d1e44f744e3dd75ff",
+          "train": "562a775c5b536741042d1f2fd20c1ea45bf05f76f25ea8859369a0ffb7cc68e9",
+          "validation": "6c2dabc57f88b60636c498905bbed74fe1f3a4153d98633f8e78433bc85cc172"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 16281,
+          "train": 26029,
+          "validation": 6507
+        },
+        "seed": 1729
+      },
+      "target": "income",
+      "task": "binary",
+      "transformation_sha256": "8ab5289941461fb3c447487c919220af6abba025a216192c8dc0d4e6e990d19e",
+      "version": 1
+    },
+    {
+      "columns": 9,
+      "excluded_official_overlap_rows": null,
+      "excluded_official_overlap_sha256": null,
+      "format": "dope-benchmark-dataset",
+      "id": "California",
+      "license": {
+        "evidence_url": "https://figshare.com/articles/dataset/cal_housing_tgz/3829992",
+        "spdx": "CC-BY-4.0",
+        "status": "recorded"
+      },
+      "official_split_id": null,
+      "official_split_source": null,
+      "panel": "public_core",
+      "projected_files": {
+        "test": "9b6b9c93b756ea5319f05f6b3193711242d5716548571ae16a4224e3911ab41b",
+        "train": "058e9f95ebb27a40a812f7948c6aeb498bb3593973ebace3a79fbc72277217f7",
+        "validation": "877453ef2c7062c0ab34502bd8194734d1b21e3ee9eae654ebc0a1a2f36916fe"
+      },
+      "projection_sha256": "1d83f3f11c2a7ff1b9cedcd7a03cd403e3e384d38d353174be26983e22a61214",
+      "raw_files": {
+        "0": {
+          "sha256": "157b6c0d3acd6d93a50c411d0cd4130d8c719ce5eb17b61f1c45300f2af6fc85"
+        }
+      },
+      "row_group_assignments_sha256": null,
+      "rows": 20640,
+      "source": "https://ndownloader.figshare.com/files/5976036",
+      "source_archive_sha256": "aaa5c9a6afe2225cc2aed2723682ae403280c4a3695a2ddda4ffb5d8215ea681",
+      "source_identity": "figshare:3829992:california-housing",
+      "source_object": null,
+      "source_row_hash": "4357c91f09818c8521407fc3cdf9291959dd789aef0fe7302417819d924a78f4",
+      "split": {
+        "hashes": {
+          "test": "16432452be1fdf77097f54de7fe302e62b56ce39ef9e6151f6d1e9a746a82a3a",
+          "train": "d37efea17b1166b94b71d7382d523c243bbf304e1b89b37ed078192c4a1197c7",
+          "validation": "a0da14c857318033b1a8d8660cf351e2e41c611b815c8ae406db4a92f9df15c3"
+        },
+        "kind": "deterministic_grouped_60_20_20",
+        "rows": {
+          "test": 4128,
+          "train": 12384,
+          "validation": 4128
+        },
+        "seed": 1729
+      },
+      "target": "MedHouseVal",
+      "task": "regression",
+      "transformation_sha256": "03ad2dc327686fb6fceee1fcbd88476af824a06d9ce6158148037036f48f796a",
+      "version": 1
+    },
+    {
+      "columns": 60,
+      "excluded_official_overlap_rows": null,
+      "excluded_official_overlap_sha256": null,
+      "format": "dope-benchmark-dataset",
+      "id": "News",
+      "license": {
+        "evidence_url": "https://archive.ics.uci.edu/dataset/332/online+news+popularity",
+        "spdx": "CC-BY-4.0",
+        "status": "recorded"
+      },
+      "official_split_id": null,
+      "official_split_source": null,
+      "panel": "public_core",
+      "projected_files": {
+        "test": "6672b3396dbbb741a83ff7ab8bc85ebd57e57e2a95a40bbb722ce2d5c983c11f",
+        "train": "64eeac2059528e44e4451419d05c1d5dd49f699c7b646d5b5971580e1811b376",
+        "validation": "b4007f032b6542e48270217dc5a88e457ef6b81267618f5962da2361f05739bf"
+      },
+      "projection_sha256": "369477509a10d424eb8b915a2878935486c09cac4ea9b7dc4f4c53dc74df2bb4",
+      "raw_files": {
+        "0": {
+          "sha256": "502c1359dd5950b80e4f82bc51a22a8b0e082d38f84004605b6cbb40726b2242"
+        }
+      },
+      "row_group_assignments_sha256": null,
+      "rows": 39644,
+      "source": "https://archive.ics.uci.edu/static/public/332/online+news+popularity.zip",
+      "source_archive_sha256": "dba2ae526f62ccef6f2f8efb53b0268319f4d0d2719bb98d88958cfe31d58a22",
+      "source_identity": "uci:332:online-news-popularity",
+      "source_object": null,
+      "source_row_hash": "d950528c5967765c5615f286d2d020d04be73d98346387f896324175779b16e5",
+      "split": {
+        "hashes": {
+          "test": "7eb3eedc24f65c67bb86634d5c1c78a66dbd47e7040942054ea48c1d0fc1acc5",
+          "train": "f1bbac60824051d5043e62a8f56027ea09791e996c3015f04f884b17233f0322",
+          "validation": "1ccf783845aacfb6a22f18032ea92710861b75e4ca3bd8d10c35afb972fe46f6"
+        },
+        "kind": "deterministic_grouped_60_20_20",
+        "rows": {
+          "test": 7928,
+          "train": 23787,
+          "validation": 7929
+        },
+        "seed": 1729
+      },
+      "target": "shares",
+      "task": "regression",
+      "transformation_sha256": "8ab5289941461fb3c447487c919220af6abba025a216192c8dc0d4e6e990d19e",
+      "version": 1
+    }
+  ],
+  "format": "dope-benchmark-pilot-24h-dataset-lock",
+  "official_tests_evaluator_only": true,
+  "supersedes": "pilot-datasets.lock.json for all new Adult quality comparisons",
+  "version": 1
+}
