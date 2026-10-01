@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOPE 24-hour native-neural validation comparison",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "scope", "official_tests_opened", "production_certified", "mfs_v2", "ptf_v1", "source_sha256", "l3_byte_limit", "notes", "locks", "counts", "native_validation_kpi", "dope_validation_selection", "fixed_fit_failures", "cells", "summary"],
+  "properties": {
+    "format": {"const": "dope-24h-native-neural-validation-comparison"},
+    "version": {"const": 1},
+    "scope": {"const": "training_derived_validation_only"},
+    "official_tests_opened": {"const": false},
+    "production_certified": {"const": false},
+    "mfs_v2": {"type": "null"},
+    "ptf_v1": {"type": "null"},
+    "source_sha256": {"$ref": "#/$defs/sha"},
+    "l3_byte_limit": {"const": 10240},
+    "notes": {"type": "array", "minItems": 7, "items": {"type": "string"}},
+    "locks": {"type": "object", "minProperties": 9, "additionalProperties": {"$ref": "#/$defs/sha"}},
+    "counts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["common_metric_cells", "fixed_fit_failures", "native_selection_cells", "dope_conditional_fit_trials"],
+      "properties": {
+        "common_metric_cells": {"const": 66},
+        "fixed_fit_failures": {"const": 2},
+        "native_selection_cells": {"const": 6},
+        "dope_conditional_fit_trials": {"const": 24}
+      }
+    },
+    "native_validation_kpi": {
+      "type": "array", "minItems": 6, "maxItems": 6,
+      "items": {"$ref": "#/$defs/native_kpi"}
+    },
+    "dope_validation_selection": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": {"$ref": "#/$defs/dope_selection"}
+    },
+    "fixed_fit_failures": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {"$ref": "#/$defs/failure"}
+    },
+    "cells": {
+      "type": "array", "minItems": 66, "maxItems": 66,
+      "items": {"$ref": "#/$defs/cell"}
+    },
+    "summary": {
+      "type": "array", "minItems": 22, "maxItems": 22,
+      "items": {"$ref": "#/$defs/summary"}
+    }
+  },
+  "$defs": {
+    "sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "dataset": {"enum": ["Adult", "California", "News"]},
+    "method": {"enum": ["DOPE", "CTGAN", "TVAE"]},
+    "configuration": {"enum": ["q8_symbolic", "q10_overcap_quality", "default", "tuned", "default_and_tuned"]},
+    "native_kpi": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dataset", "method", "objective", "direction", "selected_trial", "selected_native_value", "default_native_value", "default_trial_status", "tuning_attempts", "tuning_wall_seconds", "selection_receipt_sha256", "selection_lock_sha256", "default_config_sha256", "selected_config_sha256"],
+      "properties": {
+        "dataset": {"$ref": "#/$defs/dataset"},
+        "method": {"enum": ["CTGAN", "TVAE"]},
+        "objective": {"type": "string", "minLength": 1},
+        "direction": {"const": "maximize"},
+        "selected_trial": {"type": "integer", "minimum": 0, "maximum": 7},
+        "selected_native_value": {"type": "number"},
+        "default_native_value": {"type": ["number", "null"]},
+        "default_trial_status": {"enum": ["ok", "timeout", "failed"]},
+        "tuning_attempts": {"type": "integer", "minimum": 1, "maximum": 8},
+        "tuning_wall_seconds": {"type": "number", "minimum": 0, "maximum": 43200},
+        "selection_receipt_sha256": {"$ref": "#/$defs/sha"},
+        "selection_lock_sha256": {"$ref": "#/$defs/sha"},
+        "default_config_sha256": {"$ref": "#/$defs/sha"},
+        "selected_config_sha256": {"$ref": "#/$defs/sha"}
+      }
+    },
+    "dope_selection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dataset", "selected_job", "selected_diagnostic_mean_retention", "selection_receipt_sha256", "fit_trials", "total_fit_seconds"],
+      "properties": {
+        "dataset": {"$ref": "#/$defs/dataset"},
+        "selected_job": {"type": ["object", "null"]},
+        "selected_diagnostic_mean_retention": {"type": ["number", "null"]},
+        "selection_receipt_sha256": {"$ref": "#/$defs/sha"},
+        "fit_trials": {"const": 8},
+        "total_fit_seconds": {"type": "number", "minimum": 0, "maximum": 43200}
+      }
+    },
+    "failure": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dataset", "method", "configuration", "fit_seed", "status", "fit_receipt_sha256"],
+      "properties": {
+        "dataset": {"$ref": "#/$defs/dataset"},
+        "method": {"enum": ["CTGAN", "TVAE"]},
+        "configuration": {"enum": ["default", "tuned", "default_and_tuned"]},
+        "fit_seed": {"const": 23},
+        "status": {"enum": ["timeout", "failed"]},
+        "fit_receipt_sha256": {"$ref": "#/$defs/sha"}
+      }
+    },
+    "cell": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dataset", "method", "configuration", "fit_seed", "sample_seed", "size_multiplier", "artifact_bytes", "within_l3_bytes", "metric_receipt_sha256", "sample_receipt_sha256", "fit_receipt_sha256", "catboost_retention", "catboost_informative", "catboost_trtr_loss", "catboost_tstr_loss", "null_loss", "linear_retention", "mlp_retention", "c2st_auc", "exact_row_copies", "near_row_copies", "real_vs_real_exact"],
+      "properties": {
+        "dataset": {"$ref": "#/$defs/dataset"},
+        "method": {"$ref": "#/$defs/method"},
+        "configuration": {"$ref": "#/$defs/configuration"},
+        "fit_seed": {"const": 23},
+        "sample_seed": {"enum": [101, 211, 307]},
+        "size_multiplier": {"enum": [1, 4]},
+        "artifact_bytes": {"type": "integer", "minimum": 1},
+        "within_l3_bytes": {"type": "boolean"},
+        "metric_receipt_sha256": {"$ref": "#/$defs/sha"},
+        "sample_receipt_sha256": {"$ref": "#/$defs/sha"},
+        "fit_receipt_sha256": {"$ref": "#/$defs/sha"},
+        "catboost_retention": {"type": ["number", "null"]},
+        "catboost_informative": {"type": "boolean"},
+        "catboost_trtr_loss": {"type": "number", "minimum": 0},
+        "catboost_tstr_loss": {"type": "number", "minimum": 0},
+        "null_loss": {"type": "number", "minimum": 0},
+        "linear_retention": {"type": ["number", "null"]},
+        "mlp_retention": {"type": ["number", "null"]},
+        "c2st_auc": {"type": "number", "minimum": 0, "maximum": 1},
+        "exact_row_copies": {"type": "integer", "minimum": 0},
+        "near_row_copies": {"type": "integer", "minimum": 0},
+        "real_vs_real_exact": {"type": "integer", "minimum": 0}
+      }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dataset", "method", "configuration", "fit_seed", "size_multiplier", "sample_seeds", "median_catboost_retention", "min_catboost_retention", "max_catboost_retention", "artifact_bytes", "within_l3_bytes", "exact_row_copies"],
+      "properties": {
+        "dataset": {"$ref": "#/$defs/dataset"},
+        "method": {"$ref": "#/$defs/method"},
+        "configuration": {"$ref": "#/$defs/configuration"},
+        "fit_seed": {"const": 23},
+        "size_multiplier": {"enum": [1, 4]},
+        "sample_seeds": {"const": [101, 211, 307]},
+        "median_catboost_retention": {"type": "number"},
+        "min_catboost_retention": {"type": "number"},
+        "max_catboost_retention": {"type": "number"},
+        "artifact_bytes": {"type": "integer", "minimum": 1},
+        "within_l3_bytes": {"type": "boolean"},
+        "exact_row_copies": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}
