@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 import re
+import signal
 import subprocess
 import time
 from pathlib import Path
@@ -16,7 +17,8 @@ from .score import sha256
 
 
 ROOT = Path("/mnt/fast-scratch/dope-benchmark")
-CANDIDATES = {"micro_tvae_4_16", "micro_tvae_8_24", "tiny_mat_16_2_32", "tabsyn"}
+CANDIDATES = {"micro_tvae_4_16", "micro_tvae_8_24", "tiny_mat_16_2_32", "tabsyn",
+              "compact_neural_residual_symbolic", "symbolic_autoregressive_residual"}
 
 
 def gpu_snapshot() -> dict:
@@ -98,12 +100,14 @@ def run(worker: Path, binary: Path, candidate: str, seed: int,
     energy = 0.0
     power_samples = 0
     peak_mib = gpu["used_mib"]
-    killed_for_memory = False
+    stopped_for = None
     with log.open("w") as stream:
-        process = subprocess.Popen(["taskset", "-c", ",".join(map(str, allowed[:16])), *command],
-                                   stdout=stream, stderr=subprocess.STDOUT, env=env)
+        process = subprocess.Popen(["timeout", "--signal=KILL", "600", "taskset", "-c",
+                                    ",".join(map(str, allowed[:16])), *command],
+                                   stdout=stream, stderr=subprocess.STDOUT, env=env,
+                                   start_new_session=True)
         while process.poll() is None:
-            time.sleep(2)
+            time.sleep(min(2, max(0, 600 - (time.monotonic() - started))))
             now = time.monotonic()
             try:
                 sample = gpu_snapshot()
@@ -112,22 +116,22 @@ def run(worker: Path, binary: Path, candidate: str, seed: int,
                     energy += sample["power_watts"] * (now - last)
                     power_samples += 1
                 if sample["used_mib"] > 16 * 1024:
-                    process.terminate()
-                    killed_for_memory = True
+                    stopped_for = "memory_limit"
             except (OSError, subprocess.SubprocessError, ValueError):
-                pass
+                stopped_for = "resource_monitor_failed"
             last = now
-            if now - started > 660:
-                process.terminate()
+            if time.monotonic() - started >= 600:
+                stopped_for = "timeout"
+            if stopped_for:
                 try:
-                    process.wait(timeout=10)
-                except subprocess.TimeoutExpired:
-                    process.kill()
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
                 break
         return_code = process.wait()
     elapsed = time.monotonic() - started
-    status = "ok" if return_code == 0 and model.is_file() else (
-        "memory_limit" if killed_for_memory else "timeout" if elapsed > 660 else "failed")
+    status = stopped_for or ("ok" if return_code == 0 and model.is_file() else
+                             "timeout" if elapsed >= 600 else "failed")
     byte_failure = re.search(r"smallest observed size: (\d+) bytes", log.read_text())
     receipt = {"format": "dope-benchmark-gpu-research-attempt", "version": 1,
                "identity": identity, "attempt": attempt, "status": status,

@@ -1,4 +1,4 @@
-# Benchmark campaign status — 2026-09-30
+# Benchmark campaign status — 2026-10-01
 
 The final public-core and matched S3 comparisons are **not admitted**. The
 public and S3 test partitions have not been used for model selection or common
@@ -135,8 +135,8 @@ both from the committed JSON with
 
 ## Final admission still blocked
 
-The 29-method source inventory currently has four locked entries (DOPE and
-three compact baselines), 22 pending source audits, one pilot-only AIM entry,
+The 29-method source inventory currently has six locked entries (DOPE,
+three compact baselines, CTGAN, and TVAE), 20 pending source audits, one pilot-only AIM entry,
 and two unavailable entries (TabKDE and GEM-T). Unavailable methods contribute
 no DOPE win. The density KPI implementation now gives GaussianCopula,
 independent marginals, and Chow-Liu held-out validation mean log density;
@@ -147,3 +147,91 @@ track, public-core datasets, evaluator gates, budget lock, and exact final job
 matrix are not complete. `admission.py` therefore keeps sealed-test common
 evaluation closed. The six-fit pilot and this single-seed research survey are
 cost and validation evidence only.
+
+## Completed CTGAN/TVAE GPU comparison and DOPE readout repair
+
+The research queue completed **96 author-library GPU fits** on the same twelve
+S3 discovery/confirmation datasets: CTGAN and TVAE, four frozen configurations
+each, including their 300-epoch author defaults. Every fit and deterministic
+sampling check succeeded. Native selection maximized the prespecified mean
+of SDMetrics LinearRegression and MLPRegressor raw R² efficacy, with bytes and
+configuration hash as tie-breaks. The component metrics are from the author
+library; the aggregation and four-point grid are study choices. DOPE's KPI
+did not select comparator configurations. See [the source and objective audit](SDV_METHOD_AUDIT.md).
+
+Shared validation CatBoost retention is reported below. The discovery and
+confirmation columns each contain six datasets; these are descriptive medians,
+not paired confidence bounds. Comparator tuning uses each dataset's validation
+partition, including datasets called confirmation in the DOPE architecture
+research. Thus comparator selected estimates can be optimistic.
+
+| Configuration | Discovery median | Confirmation median | All 12 median | Artifacts within L3 |
+|---|---:|---:|---:|---:|
+| DOPE symbolic default | 0.837 | 0.873 | 0.837 | 12/12 |
+| DOPE repaired GPU conditional q8 | 0.964 | 0.638 | 0.959 | 12/12 |
+| DOPE repaired GPU conditional q10 | 0.970 | 0.645 | 0.965 | 12/12 |
+| CTGAN author default | -0.399 | -0.237 | -0.237 | 0/12 |
+| CTGAN native selected | 0.087 | 0.091 | 0.089 | 0/12 |
+| TVAE author default | 0.327 | 0.272 | 0.327 | 0/12 |
+| TVAE native selected | 0.521 | 0.594 | 0.521 | 0/12 |
+
+Retention is `(null loss − synthetic-trained loss) / (null loss − real-trained
+loss)` on real validation rows. Values below zero mean the synthetic-trained
+auditor did worse than the constant baseline; values above one can occur in
+finite samples. It is not the production PTF-v1 score. Native KPI values remain
+in per-trial receipts and are never ranked across methods.
+
+The conditional GPU repair follows a separately recorded 12-fit discovery
+failure. The original model exported its readout after 96 AdamW steps; its
+prediction bias severely damaged low-variance targets. The repair retains the
+GPU-learned hidden basis and refits output coefficients with the existing
+regularized solver. A GPU regression test checks a small target signal and
+exact repeatability. Twelve repaired discovery fits met the frozen diagnostic
+promotion rule, followed by twelve disjoint confirmation fits. All 24 repaired
+artifacts meet the byte cap. q8 passed all twelve validation copy screens; q10
+had one near-copy failure on confirmation. One native-selected TVAE cell also
+had a copy-screen failure. The repaired GPU families beat the symbolic default
+on only one of six confirmation datasets, despite their larger pooled medians.
+No production family or superiority claim is selected from these results.
+
+CTGAN/TVAE observed fit time sums to 2,927.7 seconds across three hosts, with
+maximum single-fit time 108.1 seconds and peak observed device memory 634 MiB.
+The 36 original/repaired conditional GPU fits sum to 76.1 seconds, with peak
+observed device memory 440 MiB. These costs supplement the earlier DOPE
+architecture research and are not evidence of equal total R&D spending.
+The repaired probe enforces a process-group 600-second timeout and fails
+closed on a resource-monitor error; original frozen attempts retain their
+original source and accounting.
+
+[The neural comparison JSON](results/sdv-native-validation.json),
+[schema](results/sdv-native-validation.schema.json),
+[table](results/sdv-native-validation.csv), and
+[SVG](results/sdv-native-validation.svg)/[PDF](results/sdv-native-validation.pdf)
+include both defaults, every native tuning trial, DOPE references, common
+metrics, failures, and immutable scratch hashes.
+[The conditional repair JSON](results/conditional-gpu-validation.json),
+[schema](results/conditional-gpu-validation.schema.json),
+[table](results/conditional-gpu-validation.csv), and
+[SVG](results/conditional-gpu-validation.svg)/[PDF](results/conditional-gpu-validation.pdf)
+retain the unsuccessful original models as well as every repaired model.
+Regenerate with `python3 -m research.benchmark.publish_conditional_validation`
+and `python3 -m research.benchmark.publish_sdv_validation --evaluate --publish`.
+Both publishers accept `--render-existing` to rebuild tables and figures from
+committed JSON without opening scratch inputs.
+
+The [publication manifest](results/gpu-native-20261001.manifest.json) binds
+all ten result artifacts to scratch receipts and archived verification logs.
+Four stratified CTGAN/TVAE repeat fits reproduced artifact and sample hashes
+exactly, with zero native KPI difference. Two DOPE q8 repeat fits on the
+narrowest and widest discovery datasets reproduced artifact hashes, sample
+hashes, and all metric values exactly, excluding elapsed measurement time.
+Cross-host CTGAN and TVAE sampling hashes also matched. These audit fits are
+additional cost, separate from the 96 comparator and 36 conditional research
+fits. `python3 -m research.benchmark.publish_result_manifest` verifies and
+regenerates the manifest. Repository `just fast`, `just check`, the 45 research
+tests, and the focused GPU regression test passed.
+
+Both comparisons use one fit seed, one sample seed, and `n` synthetic rows.
+Official tests remain unopened. Full attacks, repeated fits, required sample
+sizes, final public-core evaluation, and the other method outcomes remain
+outstanding. **PTF-v1 and MFS-v2 remain null.**

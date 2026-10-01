@@ -14,7 +14,7 @@ from .score import artifact_inventory, sha256
 
 SCRATCH = Path("/mnt/fast-scratch/dope-benchmark")
 ROUND = SCRATCH / "compact-native-v1/round.lock.json"
-METHODS = Path(__file__).with_name("methods.lock.json")
+METHODS = Path(__file__).with_name("method-locks") / "2026-09-30.json"
 RESULTS = Path(__file__).with_name("results")
 
 

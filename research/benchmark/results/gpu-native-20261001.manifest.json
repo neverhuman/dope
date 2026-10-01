@@ -1,0 +1,177 @@
+{
+  "artifacts": {
+    "conditional-gpu-validation.csv": {
+      "bytes": 4568,
+      "sha256": "4ba3608eebd460843e7c2eccaae41c246a796e7322345a24a388a4ea78fd6e92"
+    },
+    "conditional-gpu-validation.json": {
+      "bytes": 117288,
+      "sha256": "ce3a219132485630e9c7e16fc9cb787397fe4c4c94ef3733dcaefcb066d71df0"
+    },
+    "conditional-gpu-validation.pdf": {
+      "bytes": 22150,
+      "sha256": "cfe59e830644339a34477db472d370849917db72d613b7ddb797fd26c73b1065"
+    },
+    "conditional-gpu-validation.schema.json": {
+      "bytes": 5092,
+      "sha256": "c1a8a0bd10bf9645a629c9eed4c465657591a5e286bba927ab7bdcca028e2d4a"
+    },
+    "conditional-gpu-validation.svg": {
+      "bytes": 67474,
+      "sha256": "d87e6e75d3b7d011375512dcfe586d9678207e63f1d1acda49b7a68e39cfd2ef"
+    },
+    "sdv-native-validation.csv": {
+      "bytes": 9238,
+      "sha256": "36b7dd63cb1a8c08dff4d4497177aad98e8be0b3fb6d683baede1f13392f8e17"
+    },
+    "sdv-native-validation.json": {
+      "bytes": 323527,
+      "sha256": "6cdbce873eb5c9df77e4e4f9649201a2da30bd3a1f0a6634a2abe2717e19ce6a"
+    },
+    "sdv-native-validation.pdf": {
+      "bytes": 34571,
+      "sha256": "100392ba393d28b5297c80ce6f7ace240de94c39cb6ef3416ec386b5026f09ea"
+    },
+    "sdv-native-validation.schema.json": {
+      "bytes": 6638,
+      "sha256": "6f3aeb986cb8a3f2c58c19708612fd5e8ec5a8e48d702f6131541653e55a120a"
+    },
+    "sdv-native-validation.svg": {
+      "bytes": 103394,
+      "sha256": "a1da9715acb10d607206342a25c0796e0694e956e506d944acab5bff2ef5e7a2"
+    }
+  },
+  "campaign_complete": false,
+  "cross_host_checks": {
+    "checks": [
+      {
+        "exact_match": true,
+        "method": "CTGAN",
+        "sample_sha256": "a88eb1862810c47d95b285e4c955b9067bce51b98744baa190f679e2009debd8",
+        "source_attempt": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/17a3002f32526a9880fef6a76937791ac4db593c680555c1807b991577b8d778/attempt-0001/receipt.json",
+        "source_host": "xbabe3",
+        "verification_host": "xbabe2"
+      },
+      {
+        "exact_match": true,
+        "method": "TVAE",
+        "sample_sha256": "a91ffee7011e610283e13c7aa635004e006a7835fa10a40ab34cfd3aa8bdcace",
+        "source_attempt": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/00449c5c2c378891db9d4399781cfe46797121300c2812e65e7fe156d36b8d60/attempt-0001/receipt.json",
+        "source_host": "xbabe2",
+        "verification_host": "xbabe3"
+      }
+    ],
+    "format": "dope-sdv-cross-host-sampling",
+    "version": 1
+  },
+  "cross_host_path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/cross-host/verification.json",
+  "cross_host_sha256": "3c903f3b697c1d2e6e2bb1f2368265f79e748c3899d1e9710e5b89ef31694bbf",
+  "date": "2026-10-01",
+  "dope_reproduction": {
+    "checks": [
+      {
+        "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/reproduction/fits/adafb1dfea9b95c86e8d68636a1aa23f97154a46ba9d9614be5dcfbea7f9d3da/attempt-0001.json",
+        "attempt_sha256": "ac67ca522b141002a79f16c0c629a53372b52ef4f3dae6bc416589e8970a242e",
+        "dataset": "a863cd42be4d05d4",
+        "exact_artifact_hash": true,
+        "exact_metrics_except_elapsed": true,
+        "exact_sample_hash": true,
+        "fit_seconds": 4.189359128009528,
+        "original_attempt_sha256": "92a4245f19b063db1c915fe737c68435813afcb228e2cc6a913a2713038bd487"
+      },
+      {
+        "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/reproduction/fits/534a8f914812809d2c719c5bf229b63b45be135ed4457821cde8233327c3b884/attempt-0001.json",
+        "attempt_sha256": "c2199637a47a8db5f17c47bc0280f88b8965479c623a38c232871fc1b91bb0fe",
+        "dataset": "297b7688a045c583",
+        "exact_artifact_hash": true,
+        "exact_metrics_except_elapsed": true,
+        "exact_sample_hash": true,
+        "fit_seconds": 2.069735902128741,
+        "original_attempt_sha256": "024afbf6a903d76a701a6a45fbca5fd6ebb2a31e718fa7598a53a9d098e9b07e"
+      }
+    ],
+    "format": "dope-conditional-reproduction-verification",
+    "passed": true,
+    "round_sha256": "efd232bcf77f0962dce34fa9da82ec6c654077228864924f252229190cf8d326"
+  },
+  "dope_reproduction_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/reproduction/verification.json",
+  "dope_reproduction_sha256": "3041ea4c9b8024bc26e54881076185a472cbd96cb148376dc704f912ab8ff831",
+  "format": "dope-validation-publication-manifest",
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sha256": "2dbb70722fbac8b2bee036c666544472d895a4562a51c9e45efce7678580ed6e",
+  "reproduction_lock_path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/reproduction/audit.lock.json",
+  "reproduction_lock_sha256": "9345a4562177d962926a55a308fc27aed0a03b625b6eac8fcb37fe2e30a0f7ad",
+  "reproductions": [
+    {
+      "dataset": "a863cd42be4d05d4",
+      "exact_artifact_hashes": true,
+      "exact_sample_hash": true,
+      "fit_seconds": 13.379982220940292,
+      "method": "CTGAN",
+      "native_kpi_absolute_difference": 0.0,
+      "passed": true,
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/reproduction/7b71500e5ba25aa0c098f6c9590202e9e129d6aa7332854d23fe660a2ccbf196/receipt.json",
+      "sha256": "3fd0240cc3d77bff7dfb7ace005305d62e65667b493b934bb765a3790c52b273"
+    },
+    {
+      "dataset": "a863cd42be4d05d4",
+      "exact_artifact_hashes": true,
+      "exact_sample_hash": true,
+      "fit_seconds": 8.68821217585355,
+      "method": "TVAE",
+      "native_kpi_absolute_difference": 0.0,
+      "passed": true,
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/reproduction/f0a06a15813de01921d715019ed413075f403622213bbb98f5a72ddccdd91a69/receipt.json",
+      "sha256": "53ac804a657b4c023f718a3dda83bf3715e5c7c45bfa34df8079c4d0a47e8c23"
+    },
+    {
+      "dataset": "297b7688a045c583",
+      "exact_artifact_hashes": true,
+      "exact_sample_hash": true,
+      "fit_seconds": 27.60281011182815,
+      "method": "CTGAN",
+      "native_kpi_absolute_difference": 0.0,
+      "passed": true,
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/reproduction/c881b09c62a79248bbf32437048fae40da280087c8cd169ff7306e4a10e42a6d/receipt.json",
+      "sha256": "53dc2213df0cb7dc7726ed0a646d2ab24c3f6da24cd06c9626b22d6757807f07"
+    },
+    {
+      "dataset": "297b7688a045c583",
+      "exact_artifact_hashes": true,
+      "exact_sample_hash": true,
+      "fit_seconds": 18.949714405462146,
+      "method": "TVAE",
+      "native_kpi_absolute_difference": 0.0,
+      "passed": true,
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/reproduction/5aee628f3493d9ac2fef31fa60981ec84d5b14fe2f180d19bac554d5a0848359/receipt.json",
+      "sha256": "3f90aba6ab8c4d74bbf204e20e3193238e444517a9b11e04d1b4ab1a88f027e7"
+    }
+  ],
+  "scope": "validation_research_only",
+  "verification": [
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/published-verification/just-fast-readout-20261001.log",
+      "sha256": "8a7d6db6b52e09e576b70d7cbd7c058e43a91785fd4705f4e5880248186e8d19"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/published-verification/just-check-completed-20261001.log",
+      "sha256": "9b0becd31f0a5ce0b9711606fce9fd6bce38c77a985dbb911c5acee4c57a6120"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/published-verification/benchmark-tests-completed-20261001.log",
+      "sha256": "0e905afb3f2447875e87a7bebfef37c4a20d3b0105e1c5a35de872a7132c12bb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/published-verification/conditional-readout-gpu-test-20261001.log",
+      "sha256": "3675fe7e60b783c0918b0764fce4e46e3967a1d806d4d02f3fcfe4ef99bdaf5c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/published-verification/result-verification-20261001.json",
+      "sha256": "d8c7702c28a96772eb3d2ccbb51c510b50474037ded6ce6539d454ad768f50a5"
+    }
+  ],
+  "version": 1
+}

@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GPU native validation publication manifest",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "scope",
+    "date",
+    "artifacts",
+    "reproduction_lock_path",
+    "reproduction_lock_sha256",
+    "reproductions",
+    "cross_host_path",
+    "cross_host_sha256",
+    "cross_host_checks",
+    "verification",
+    "publisher_sha256",
+    "ptf_v1",
+    "mfs_v2",
+    "campaign_complete",
+    "official_tests_opened",
+    "production_certified",
+    "dope_reproduction_path",
+    "dope_reproduction_sha256",
+    "dope_reproduction"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-validation-publication-manifest"
+    },
+    "version": {
+      "const": 1
+    },
+    "scope": {
+      "const": "validation_research_only"
+    },
+    "date": {
+      "const": "2026-10-01"
+    },
+    "artifacts": {
+      "type": "object",
+      "minProperties": 10,
+      "maxProperties": 10,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "sha256",
+          "bytes"
+        ],
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "reproduction_lock_path": {
+      "type": "string"
+    },
+    "reproduction_lock_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "reproductions": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256",
+          "dataset",
+          "method",
+          "passed",
+          "exact_artifact_hashes",
+          "exact_sample_hash",
+          "native_kpi_absolute_difference",
+          "fit_seconds"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "dataset": {
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "CTGAN",
+              "TVAE"
+            ]
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "exact_artifact_hashes": {
+            "type": "boolean"
+          },
+          "exact_sample_hash": {
+            "type": "boolean"
+          },
+          "native_kpi_absolute_difference": {
+            "type": "number",
+            "minimum": 0
+          },
+          "fit_seconds": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "cross_host_path": {
+      "type": "string"
+    },
+    "cross_host_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "cross_host_checks": {
+      "type": [
+        "object",
+        "array"
+      ]
+    },
+    "verification": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "publisher_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "campaign_complete": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "dope_reproduction_path": {
+      "type": "string"
+    },
+    "dope_reproduction_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "dope_reproduction": {
+      "type": "object",
+      "required": [
+        "checks",
+        "passed",
+        "round_sha256"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

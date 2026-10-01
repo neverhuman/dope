@@ -186,8 +186,19 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
             or (entry["status"] == "pilot_locked" and job.get("pilot_only") is not True)
             or entry["adapter"] != method):
         raise ValueError("method is not source/config locked")
-    if entry["adapter_sha256"] != sha256(Path(adapters.__file__)):
+    adapter_path = (Path(__file__).with_name("sdv_adapter.py")
+                    if method in ("CTGAN", "TVAE") else Path(adapters.__file__))
+    if entry["adapter_sha256"] != sha256(adapter_path):
         raise ValueError("adapter source digest changed")
+    if method in ("CTGAN", "TVAE"):
+        from importlib.metadata import version
+        runtime_lock = Path(__file__).with_name("sdv-runtime.lock.json")
+        versions = json.loads(runtime_lock.read_text())
+        if ({name: version(name) for name in versions} != versions
+                or entry["dependency_or_container_digest"] != sha256(runtime_lock)
+                or entry["worker_sha256"] != sha256(Path(__file__).with_name("adapter_worker.py"))
+                or entry["source_sha256"] != sha256(Path(entry["source_archive"]))):
+            raise ValueError("SDV source, worker, or dependency lock changed")
     if method in ("independent_marginals", "Chow-Liu"):
         import numpy as np
         if entry["dependency_or_container_digest"] != f"numpy=={np.__version__}":
@@ -246,6 +257,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
         "projection": manifest["projection_sha256"], "track": job["track"],
         "method": method, "method_source": entry["source_sha256"],
         "adapter_sha256": entry["adapter_sha256"],
+        "adapter_worker_sha256": sha256(Path(__file__).with_name("adapter_worker.py")),
         "binary_sha256": entry.get("binary_sha256"),
         "config": config, "configuration": config_identity, "fit_seed": job["fit_seed"],
         "sample_seeds": sample_seeds, "size_multipliers": multipliers,
@@ -298,7 +310,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                                   "config": config, "seed": job["fit_seed"],
                                   "artifact_dir": str(artifact_dir),
                                   "binary": str(binary) if binary else None},
-                                 config.get("fit_timeout_seconds", 1800))["files"]
+                                 config.get("fit_timeout_seconds", 600 if method in ("CTGAN", "TVAE") else 1800))["files"]
             files = ["projection.json", *files]
             inventory, artifact_bytes = artifact_inventory(artifact_dir, files)
             fit_evidence_dir = directory / "fit_evidence"
