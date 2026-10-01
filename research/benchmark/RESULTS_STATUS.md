@@ -469,3 +469,26 @@ descriptive follow-up rather than an independent dataset confirmation. The
 [CSV](results/pilot24-california-q10.csv) regenerate with
 `python3 -m research.benchmark.publish_california_q10`. Official tests
 remain sealed; MFS-v2/PTF-v1 and certification are null.
+
+The fixed DOPE q8 configuration now has five fit seeds on both Adult and
+California, with all 120 `n`/`2n`/`4n`/`8n` sample cells complete. All 60
+`n`/`4n` validation metric payloads replayed exactly, as did a separately
+frozen stratified 16-cell audit. Median CatBoost retention across fit-seed
+medians is Adult 0.8232/0.8289 and California 0.7032/0.6991 at `n`/`4n`.
+The ten fits consumed 116.88 seconds of summed fit elapsed time, and charged
+artifacts range from 2,524 to 6,342 bytes. Host costs, three preflight launch
+failures, per-seed outcomes, near-match rates, and real-vs-real controls are
+retained in the [stability report](results/pilot24-dope-q8-fivefit.md),
+[JSON](results/pilot24-dope-q8-fivefit.json),
+[schema](results/pilot24-dope-q8-fivefit.schema.json),
+[CSV](results/pilot24-dope-q8-fivefit.csv), and
+[figure](results/pilot24-dope-q8-fivefit.svg). Regenerate with
+`python3 -m research.benchmark.publish_dope_q8_fivefit` and
+`python3 -m research.benchmark.publish_dope_q8_fivefit_figure`;
+`--from-json` regenerates tables without scratch access. This is a fixed
+configuration replication following validation family selection; the
+existing native-tuned neural comparator panel has only one fit seed.
+Every compiler receipt still fails utility, driver, and unmeasured production
+evidence gates. Some California fits used negligible GPU memory, so GPU
+host placement is not interpreted as neural training for every artifact.
+Official tests remain sealed, and MFS-v2/PTF-v1 are null.
