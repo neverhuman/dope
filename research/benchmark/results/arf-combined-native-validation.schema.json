@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neverhuman.dev/dope/arf-combined-native-validation.schema.json",
+  "type": "object", "additionalProperties": false,
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "dataset": {"enum": ["Adult", "California", "News"]},
+    "config": {
+      "type": "object", "additionalProperties": false,
+      "required": ["num_trees", "min_node_size", "max_iters", "alpha"],
+      "properties": {
+        "num_trees": {"type": "integer", "minimum": 1},
+        "min_node_size": {"type": "integer", "minimum": 1},
+        "max_iters": {"type": "integer", "minimum": 1},
+        "alpha": {"type": "number", "minimum": 0}
+      }
+    }
+  },
+  "required": ["format", "version", "scope", "source_sha256", "locks", "l3_byte_cap", "cells", "aggregate", "notes", "official_tests_opened", "mfs_v2", "ptf_v1", "production_certified"],
+  "properties": {
+    "format": {"const": "dope-arf-eight-trial-native-validation-report"},
+    "version": {"const": 1},
+    "scope": {"const": "training_derived_validation_only"},
+    "source_sha256": {"$ref": "#/$defs/hash"},
+    "locks": {
+      "type": "object", "additionalProperties": false,
+      "required": ["original_round", "short_round", "author_source_archive", "short_publisher_source", "combined_selector_source"],
+      "properties": {
+        "original_round": {"$ref": "#/$defs/hash"},
+        "short_round": {"$ref": "#/$defs/hash"},
+        "author_source_archive": {"$ref": "#/$defs/hash"},
+        "short_publisher_source": {"$ref": "#/$defs/hash"},
+        "combined_selector_source": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "l3_byte_cap": {"const": 10240},
+    "cells": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["dataset", "method", "objective", "direction", "default_status", "selected_round", "selected_trial", "selected_native_kpi", "selected_artifact_bytes", "selected_within_l3_bytes", "tuning_attempts", "tuning_wall_seconds", "selection_receipt_sha256", "trials"],
+        "properties": {
+          "dataset": {"$ref": "#/$defs/dataset"},
+          "method": {"const": "ARF"},
+          "objective": {"const": "heldout_forde_mean_log_density"},
+          "direction": {"const": "maximize"},
+          "default_status": {"enum": ["ok", "timeout"]},
+          "selected_round": {"enum": ["original", "short"]},
+          "selected_trial": {"type": "integer", "minimum": 0, "maximum": 3},
+          "selected_native_kpi": {"type": "number"},
+          "selected_artifact_bytes": {"type": "integer", "minimum": 10241},
+          "selected_within_l3_bytes": {"const": false},
+          "tuning_attempts": {"const": 8},
+          "tuning_wall_seconds": {"type": "number", "minimum": 0, "maximum": 43200},
+          "selection_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "trials": {
+            "type": "array", "minItems": 8, "maxItems": 8,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["round", "trial", "config", "status", "native_kpi", "artifact_bytes", "wall_seconds", "attempt_receipt_sha256"],
+              "properties": {
+                "round": {"enum": ["original", "short"]},
+                "trial": {"type": "integer", "minimum": 0, "maximum": 3},
+                "config": {"$ref": "#/$defs/config"},
+                "status": {"enum": ["ok", "timeout", "failed", "invalid_evidence"]},
+                "native_kpi": {"type": ["number", "null"]},
+                "artifact_bytes": {"type": ["integer", "null"], "minimum": 1},
+                "wall_seconds": {"type": "number", "minimum": 0},
+                "attempt_receipt_sha256": {"$ref": "#/$defs/hash"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "aggregate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["datasets", "trials", "successful_trials", "timeout_trials", "selected_within_l3_bytes", "tuning_wall_seconds"],
+      "properties": {
+        "datasets": {"const": 3},
+        "trials": {"const": 24},
+        "successful_trials": {"const": 16},
+        "timeout_trials": {"const": 8},
+        "selected_within_l3_bytes": {"const": 0},
+        "tuning_wall_seconds": {"type": "number", "minimum": 0, "maximum": 129600}
+      }
+    },
+    "notes": {"type": "array", "minItems": 5, "items": {"type": "string"}},
+    "official_tests_opened": {"const": false},
+    "mfs_v2": {"type": "null"},
+    "ptf_v1": {"type": "null"},
+    "production_certified": {"const": false}
+  }
+}

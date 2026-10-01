@@ -305,3 +305,21 @@ sealed. The [packed comparison](results/pilot24-news-q10-packed.md),
 `python3 -m research.benchmark.publish_news_q10_packed`;
 `--from-json` rebuilds the table without scratch data. PTF-v1 and MFS-v2 are
 null.
+
+ARF completed four original and four bounded-refinement native trials per
+dataset, within eight trials and twelve hours per dataset. All four original
+Adult and News trials timed out at the unchanged 900-second limit; all four
+California originals and all twelve refinements succeeded. A labeled study
+implementation of held-out FORDE mean log density selected Adult short trial
+1, California original trial 3, and News short trial 2 using only the
+training-derived validation partition. Their charged artifacts are 19,187,442,
+85,471,471, and 55,316,440 bytes, respectively, so none is L3 byte eligible.
+The native density values compare configurations within a dataset only.
+[The complete ARF native report](results/arf-combined-native-validation.md),
+[JSON](results/arf-combined-native-validation.json),
+[schema](results/arf-combined-native-validation.schema.json), and
+[CSV](results/arf-combined-native-validation.csv) retain all 24 attempts and
+immutable receipt hashes. Regenerate with
+`python3 -m research.benchmark.publish_arf_combined`; `--from-json` rebuilds
+the table. Fit-seed-23 common validation outcomes and release gates are still
+pending; ARF has no PTF-v1 or MFS-v2 score from this grid.

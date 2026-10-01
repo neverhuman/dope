@@ -1,0 +1,446 @@
+{
+  "aggregate": {
+    "datasets": 3,
+    "selected_within_l3_bytes": 0,
+    "successful_trials": 16,
+    "timeout_trials": 8,
+    "trials": 24,
+    "tuning_wall_seconds": 9281.621889588423
+  },
+  "cells": [
+    {
+      "dataset": "Adult",
+      "default_status": "timeout",
+      "direction": "maximize",
+      "method": "ARF",
+      "objective": "heldout_forde_mean_log_density",
+      "selected_artifact_bytes": 19187442,
+      "selected_native_kpi": -3.5086214965680993,
+      "selected_round": "short",
+      "selected_trial": 1,
+      "selected_within_l3_bytes": false,
+      "selection_receipt_sha256": "cf5905911ffa9645fa140330605598c63921f57e8580f03c84a20eca765c5c68",
+      "trials": [
+        {
+          "artifact_bytes": null,
+          "attempt_receipt_sha256": "f76d6d9d4240c2ca96fcf1cb8059b963f7d46ed8d0d5e32fc416087e808818d9",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 30
+          },
+          "native_kpi": null,
+          "round": "original",
+          "status": "timeout",
+          "trial": 0,
+          "wall_seconds": 900.1766623361036
+        },
+        {
+          "artifact_bytes": null,
+          "attempt_receipt_sha256": "7d43509405a93dff9c61fbdf9c195e6d1ab138b9ea0191a60d17f550bacc0a8f",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 10,
+            "min_node_size": 10,
+            "num_trees": 30
+          },
+          "native_kpi": null,
+          "round": "original",
+          "status": "timeout",
+          "trial": 1,
+          "wall_seconds": 900.345890509896
+        },
+        {
+          "artifact_bytes": null,
+          "attempt_receipt_sha256": "0d0a8ed8177fedcefd20cde024caf7f66f7acab31cef150cccf53dd613d3e021",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 30
+          },
+          "native_kpi": null,
+          "round": "original",
+          "status": "timeout",
+          "trial": 2,
+          "wall_seconds": 900.379804899916
+        },
+        {
+          "artifact_bytes": null,
+          "attempt_receipt_sha256": "a12dd421afbb3cd30eaa99a268053d5eb9482f2899dda711987bbc17a0025d3f",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 50
+          },
+          "native_kpi": null,
+          "round": "original",
+          "status": "timeout",
+          "trial": 3,
+          "wall_seconds": 900.3041308259126
+        },
+        {
+          "artifact_bytes": 23262138,
+          "attempt_receipt_sha256": "5709c9c5110446205b949f39f07fd36e9d3f43bf6c913ea4894d9651e0a552ac",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 1,
+            "min_node_size": 20,
+            "num_trees": 10
+          },
+          "native_kpi": -14.011931892651857,
+          "round": "short",
+          "status": "ok",
+          "trial": 0,
+          "wall_seconds": 151.10172372497618
+        },
+        {
+          "artifact_bytes": 19187442,
+          "attempt_receipt_sha256": "11c15095c7e6a78c48c54eb3f4877c62b59b6696240031b0974910f7512e3d86",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 1,
+            "min_node_size": 40,
+            "num_trees": 10
+          },
+          "native_kpi": -3.5086214965680993,
+          "round": "short",
+          "status": "ok",
+          "trial": 1,
+          "wall_seconds": 103.56929809506983
+        },
+        {
+          "artifact_bytes": 65877756,
+          "attempt_receipt_sha256": "f77b678451268c7c3181134954e5ef66f43afb6cb4734f9599a71e2148fb1bad",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 1,
+            "min_node_size": 20,
+            "num_trees": 20
+          },
+          "native_kpi": -3.573866130836316,
+          "round": "short",
+          "status": "ok",
+          "trial": 2,
+          "wall_seconds": 248.15561213786714
+        },
+        {
+          "artifact_bytes": 40651205,
+          "attempt_receipt_sha256": "c32675e186df34bae3a6dde7b4ef9f6b01d9b2c58c38f9f077f653aa6feff18a",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 2,
+            "min_node_size": 20,
+            "num_trees": 10
+          },
+          "native_kpi": -6.4595380964616025,
+          "round": "short",
+          "status": "ok",
+          "trial": 3,
+          "wall_seconds": 300.3519853830803
+        }
+      ],
+      "tuning_attempts": 8,
+      "tuning_wall_seconds": 4404.385107912822
+    },
+    {
+      "dataset": "California",
+      "default_status": "ok",
+      "direction": "maximize",
+      "method": "ARF",
+      "objective": "heldout_forde_mean_log_density",
+      "selected_artifact_bytes": 85471471,
+      "selected_native_kpi": 22.547445029980018,
+      "selected_round": "original",
+      "selected_trial": 3,
+      "selected_within_l3_bytes": false,
+      "selection_receipt_sha256": "1a1c3f6de109bc7a90d37631f8ee4638d798879860000961637949b438055265",
+      "trials": [
+        {
+          "artifact_bytes": 50529033,
+          "attempt_receipt_sha256": "6d09646309e655f32dc39cdf97652bfb3f23086c58cb5f2beaf61320693d67ab",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 30
+          },
+          "native_kpi": 22.322232260168164,
+          "round": "original",
+          "status": "ok",
+          "trial": 0,
+          "wall_seconds": 137.59581535193138
+        },
+        {
+          "artifact_bytes": 25527009,
+          "attempt_receipt_sha256": "54ba77c9ef5da10cd3fe1ca2a356f8d8aea01c687a4f65954dbe301726df7770",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 10,
+            "min_node_size": 10,
+            "num_trees": 30
+          },
+          "native_kpi": 21.866812180658147,
+          "round": "original",
+          "status": "ok",
+          "trial": 1,
+          "wall_seconds": 129.5752306729555
+        },
+        {
+          "artifact_bytes": 50529033,
+          "attempt_receipt_sha256": "5d485b5686db13ec2e73905207a8a56e68235307afe2b5b47ac7115db10ffdcb",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 30
+          },
+          "native_kpi": 22.322232260168164,
+          "round": "original",
+          "status": "ok",
+          "trial": 2,
+          "wall_seconds": 129.09301180997863
+        },
+        {
+          "artifact_bytes": 85471471,
+          "attempt_receipt_sha256": "d8f38ad58f2e3a8d3812ef14c0e0ecaa3d9f88e2d8dcb49c4a3d638299519b82",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 50
+          },
+          "native_kpi": 22.547445029980018,
+          "round": "original",
+          "status": "ok",
+          "trial": 3,
+          "wall_seconds": 176.0982014008332
+        },
+        {
+          "artifact_bytes": 3490915,
+          "attempt_receipt_sha256": "47d3958a1766f0912db00f1279c084a93e6fa10c2bc265bb3e9f409eb4e144f4",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 1,
+            "min_node_size": 20,
+            "num_trees": 10
+          },
+          "native_kpi": 21.325199995041437,
+          "round": "short",
+          "status": "ok",
+          "trial": 0,
+          "wall_seconds": 20.525519624119624
+        },
+        {
+          "artifact_bytes": 1800461,
+          "attempt_receipt_sha256": "ae1acfaa830bfeb47dde369668dfc36cec9227c41d2a5e5cc80fa7161219b100",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 1,
+            "min_node_size": 40,
+            "num_trees": 10
+          },
+          "native_kpi": 20.70279018369105,
+          "round": "short",
+          "status": "ok",
+          "trial": 1,
+          "wall_seconds": 17.533417413011193
+        },
+        {
+          "artifact_bytes": 7001063,
+          "attempt_receipt_sha256": "8746bd93da2d1c355c381a06a77f0f929a6aad62657fc6dc8540687085fb3502",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 1,
+            "min_node_size": 20,
+            "num_trees": 20
+          },
+          "native_kpi": 21.538857881093836,
+          "round": "short",
+          "status": "ok",
+          "trial": 2,
+          "wall_seconds": 30.029925247188658
+        },
+        {
+          "artifact_bytes": 4015860,
+          "attempt_receipt_sha256": "1c8da5414698a0aee7f4962d703b2687890ca134e5ea5af589903a4f40db238c",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 2,
+            "min_node_size": 20,
+            "num_trees": 10
+          },
+          "native_kpi": 21.634404132548955,
+          "round": "short",
+          "status": "ok",
+          "trial": 3,
+          "wall_seconds": 33.031327279051766
+        }
+      ],
+      "tuning_attempts": 8,
+      "tuning_wall_seconds": 673.48244879907
+    },
+    {
+      "dataset": "News",
+      "default_status": "timeout",
+      "direction": "maximize",
+      "method": "ARF",
+      "objective": "heldout_forde_mean_log_density",
+      "selected_artifact_bytes": 55316440,
+      "selected_native_kpi": 103.60140930981385,
+      "selected_round": "short",
+      "selected_trial": 2,
+      "selected_within_l3_bytes": false,
+      "selection_receipt_sha256": "7c16073be7e48af6636df8764c977cffb1353ee53dded272e39d9b8623d9ffb7",
+      "trials": [
+        {
+          "artifact_bytes": null,
+          "attempt_receipt_sha256": "53648a2c069c137907a6c78cdb0efe42d64246d811a072665bd213b1d4e7f952",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 30
+          },
+          "native_kpi": null,
+          "round": "original",
+          "status": "timeout",
+          "trial": 0,
+          "wall_seconds": 900.235065649962
+        },
+        {
+          "artifact_bytes": null,
+          "attempt_receipt_sha256": "24c17d3bf5d3b10d931eb2c098e0e5376d9ba25cac8a2b0b24bea094ba7a49bc",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 10,
+            "min_node_size": 10,
+            "num_trees": 30
+          },
+          "native_kpi": null,
+          "round": "original",
+          "status": "timeout",
+          "trial": 1,
+          "wall_seconds": 900.4457323651295
+        },
+        {
+          "artifact_bytes": null,
+          "attempt_receipt_sha256": "34c0bf880ac6212fb31a0f15ab02326ccbf782e17a4c14c75274630a2e9bb7ab",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 30
+          },
+          "native_kpi": null,
+          "round": "original",
+          "status": "timeout",
+          "trial": 2,
+          "wall_seconds": 900.2389278660994
+        },
+        {
+          "artifact_bytes": null,
+          "attempt_receipt_sha256": "60e398883345dffc85438b673d31c2c0519b8b3256b8247802821754d8259a1e",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 50
+          },
+          "native_kpi": null,
+          "round": "original",
+          "status": "timeout",
+          "trial": 3,
+          "wall_seconds": 900.457234860165
+        },
+        {
+          "artifact_bytes": 27214951,
+          "attempt_receipt_sha256": "3580275f3e21ef79921a1b7164f3c9b9997b9a6e8b07c18c9541716f0a2f6d9e",
+          "config": {
+            "alpha": 0.0,
+            "max_iters": 1,
+            "min_node_size": 20,
+            "num_trees": 10
+          },
+          "native_kpi": 101.33547385761337,
+          "round": "short",
+          "status": "ok",
+          "trial": 0,
+          "wall_seconds": 110.06732142507099
+        },
+        {
+          "artifact_bytes": 17169042,
+          "attempt_receipt_sha256": "b05c05153e47935e3ab09606c0ce32b1322c94565672973ed8d97bdf166ce3e8",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 1,
+            "min_node_size": 40,
+            "num_trees": 10
+          },
+          "native_kpi": 99.46889667892908,
+          "round": "short",
+          "status": "ok",
+          "trial": 1,
+          "wall_seconds": 81.55918890796602
+        },
+        {
+          "artifact_bytes": 55316440,
+          "attempt_receipt_sha256": "6a8d1df213795bd37713c9a8d7766f9c9c4e20503f0945d8c5911afa462492ac",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 1,
+            "min_node_size": 20,
+            "num_trees": 20
+          },
+          "native_kpi": 103.60140930981385,
+          "round": "short",
+          "status": "ok",
+          "trial": 2,
+          "wall_seconds": 184.62776310718618
+        },
+        {
+          "artifact_bytes": 41006987,
+          "attempt_receipt_sha256": "32a6c9b150f31a1d9cb5a11d210704f1a0b353f0240ce5c0cba6cb05337ca15e",
+          "config": {
+            "alpha": 0.5,
+            "max_iters": 2,
+            "min_node_size": 20,
+            "num_trees": 10
+          },
+          "native_kpi": 103.5170934015414,
+          "round": "short",
+          "status": "ok",
+          "trial": 3,
+          "wall_seconds": 226.1230986949522
+        }
+      ],
+      "tuning_attempts": 8,
+      "tuning_wall_seconds": 4203.754332876531
+    }
+  ],
+  "format": "dope-arf-eight-trial-native-validation-report",
+  "l3_byte_cap": 10240,
+  "locks": {
+    "author_source_archive": "0c9012778cb5ffe0a006fc32b33ae4ed3f85689c6742253d95f91c10c42bd2aa",
+    "combined_selector_source": "113a805555276adf786a6af0cbaa001cddb9cbde9b066043edaaf8ab57414297",
+    "original_round": "c318ff88bc5295f864fc4d56ebe10c46134e867eb9aecb56a72680f4c70e5ccb",
+    "short_publisher_source": "64d4596fc12422dd7db98431cb71852135e0d46920a48c1c91ff6a3c484e721e",
+    "short_round": "a74f758083ee0af73274236ada3dd2c82206964579d9e7850d6b1b28f527b3cb"
+  },
+  "mfs_v2": null,
+  "notes": [
+    "ARF tuning maximized frozen held-out FORDE mean log density from a labeled study implementation of the author's fitted factors; values compare configurations within each dataset only.",
+    "Four original Adult and four original News trials timed out under the unchanged 900-second cap; all twelve short refinements succeeded.",
+    "The selected sampler artifacts exceed L3 on all three datasets; this native validation grid contributes no release-safe DOPE win.",
+    "Restricted fitted factors and source rows remain on scratch; official tests stayed sealed.",
+    "Shared validation outcomes and release gates are not complete; MFS-v2 and PTF-v1 remain null."
+  ],
+  "official_tests_opened": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "scope": "training_derived_validation_only",
+  "source_sha256": "56989587f89bf8ae31aac23264b309f1afd2b408330db64aba1afa8e5be7779e",
+  "version": 1
+}
