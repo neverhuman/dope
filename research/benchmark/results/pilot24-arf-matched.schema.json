@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOPE and ARF paired pilot validation",
+  "type": "object",
+  "required": ["format", "version", "scope", "source_sha256", "l3_byte_cap", "locks", "native_selections", "cells", "failed_sample_cells", "unavailable_default_cells", "summary", "notes", "official_tests_opened", "mfs_v2", "ptf_v1", "production_certified"],
+  "properties": {
+    "format": {"const": "dope-pilot24-arf-matched-validation"},
+    "version": {"const": 1},
+    "scope": {"const": "training_derived_validation_only"},
+    "source_sha256": {"$ref": "#/$defs/hash"},
+    "l3_byte_cap": {"const": 10240},
+    "locks": {
+      "type": "object",
+      "required": ["native_report", "final_sample_round", "final_validation_round", "exact_replay_manifest", "dope_neural_report", "dope_packed_news_report"],
+      "additionalProperties": {"$ref": "#/$defs/hash"}
+    },
+    "native_selections": {
+      "type": "object", "minProperties": 3, "maxProperties": 3,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["selection_receipt_sha256", "selected_round", "selected_trial", "selected_native_kpi", "default_status", "tuning_attempts", "tuning_wall_seconds"],
+        "properties": {
+          "selection_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "selected_round": {"enum": ["original", "short"]},
+          "selected_trial": {"type": "integer", "minimum": 0, "maximum": 3},
+          "selected_native_kpi": {"type": "number"},
+          "default_status": {"enum": ["ok", "timeout"]},
+          "tuning_attempts": {"const": 8},
+          "tuning_wall_seconds": {"type": "number", "minimum": 0, "maximum": 43200}
+        }
+      }
+    },
+    "cells": {
+      "type": "array", "minItems": 23, "maxItems": 23,
+      "items": {
+        "type": "object",
+        "required": ["dataset", "configuration", "fit_seed", "sample_seed", "size_multiplier", "native_objective", "native_validation_kpi", "arf_artifact_bytes", "arf_within_l3_bytes", "arf_retention", "arf_exact_copies", "arf_near_copies", "arf_copy_gate_pass", "arf_release_safe", "dope_configuration", "dope_artifact_bytes", "dope_retention", "dope_release_safe", "difference_dope_minus_arf", "fit_receipt_sha256", "sample_receipt_sha256", "metric_receipt_sha256", "replay_receipt_sha256", "dope_metric_receipt_sha256"],
+        "properties": {
+          "dataset": {"enum": ["Adult", "California", "News"]},
+          "configuration": {"enum": ["default", "tuned"]},
+          "fit_seed": {"const": 23},
+          "sample_seed": {"enum": [101, 211, 307]},
+          "size_multiplier": {"enum": [1, 4]},
+          "native_objective": {"const": "heldout_forde_mean_log_density"},
+          "native_validation_kpi": {"type": "number"},
+          "arf_artifact_bytes": {"type": "integer", "exclusiveMinimum": 10240},
+          "arf_within_l3_bytes": {"const": false},
+          "arf_retention": {"type": "number"},
+          "arf_exact_copies": {"type": "integer", "minimum": 0},
+          "arf_near_copies": {"type": "integer", "minimum": 0},
+          "arf_copy_gate_pass": {"type": "boolean"},
+          "arf_release_safe": {"const": false},
+          "dope_configuration": {"enum": ["q8_symbolic", "q10_packed"]},
+          "dope_artifact_bytes": {"type": "integer", "minimum": 0, "maximum": 10240},
+          "dope_retention": {"type": "number"},
+          "dope_release_safe": {"type": "null"},
+          "difference_dope_minus_arf": {"type": "number"},
+          "fit_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "sample_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "metric_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "replay_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "dope_metric_receipt_sha256": {"$ref": "#/$defs/hash"}
+        }
+      }
+    },
+    "failed_sample_cells": {
+      "type": "array", "minItems": 1, "maxItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["dataset", "configuration", "fit_seed", "sample_seed", "size_multiplier", "status", "sample_receipt_sha256", "arf_retention", "dope_retention", "contributes_dope_win"],
+        "properties": {
+          "dataset": {"const": "Adult"},
+          "configuration": {"const": "tuned"},
+          "fit_seed": {"const": 23},
+          "sample_seed": {"enum": [101, 211, 307]},
+          "size_multiplier": {"const": 4},
+          "status": {"const": "timeout"},
+          "sample_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "arf_retention": {"type": "null"},
+          "dope_retention": {"type": "number"},
+          "contributes_dope_win": {"const": false}
+        }
+      }
+    },
+    "unavailable_default_cells": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["dataset", "configuration", "status", "selection_receipt_sha256", "contributes_dope_win"],
+        "properties": {
+          "dataset": {"enum": ["Adult", "News"]},
+          "configuration": {"const": "default"},
+          "status": {"const": "native_fit_timeout"},
+          "selection_receipt_sha256": {"$ref": "#/$defs/hash"},
+          "contributes_dope_win": {"const": false}
+        }
+      }
+    },
+    "summary": {
+      "type": "array", "minItems": 8, "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["dataset", "configuration", "size_multiplier", "paired_sample_seeds", "failed_sample_seeds", "native_validation_kpi", "arf_artifact_bytes", "dope_artifact_bytes", "median_arf_retention", "median_dope_retention", "median_paired_difference", "arf_cells_failing_copy_gate"],
+        "properties": {
+          "dataset": {"enum": ["Adult", "California", "News"]},
+          "configuration": {"enum": ["default", "tuned"]},
+          "size_multiplier": {"enum": [1, 4]},
+          "paired_sample_seeds": {"type": "integer", "minimum": 2, "maximum": 3},
+          "failed_sample_seeds": {"type": "integer", "minimum": 0, "maximum": 1},
+          "native_validation_kpi": {"type": "number"},
+          "arf_artifact_bytes": {"type": "integer", "exclusiveMinimum": 10240},
+          "dope_artifact_bytes": {"type": "integer", "minimum": 0, "maximum": 10240},
+          "median_arf_retention": {"type": "number"},
+          "median_dope_retention": {"type": "number"},
+          "median_paired_difference": {"type": "number"},
+          "arf_cells_failing_copy_gate": {"type": "integer", "minimum": 0, "maximum": 3}
+        }
+      }
+    },
+    "notes": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "official_tests_opened": {"const": false},
+    "mfs_v2": {"type": "null"},
+    "ptf_v1": {"type": "null"},
+    "production_certified": {"const": false}
+  },
+  "$defs": {"hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}
