@@ -338,3 +338,23 @@ win. The [identity report](results/pilot24-news-autoreg-identity.md),
 [CSV](results/pilot24-news-autoreg-identity.csv) regenerate with
 `python3 -m research.benchmark.publish_news_autoreg_identity`.
 Official tests remain sealed and MFS-v2/PTF-v1 are null.
+
+Synthpop CART completed its four-trial-per-dataset native validation grid,
+selecting only by held-out CART pMSE. At the fixed fit seed 23, three paired
+sample seeds and `n`/`4n` sizes were measured and exactly replayed against the
+same training-derived validation partitions as DOPE. Median tuned `n`
+CatBoost TSTR/TRTR retention was 0.9255 for synthpop versus 0.8275 for DOPE
+on Adult, 0.9588 versus 0.7008 on California, and 0.6419 versus 0.3287 on
+News. Native pMSE and shared retention answer different questions; the native
+pMSE values are comparable only across synthpop configurations within one
+dataset. All synthpop fitted artifacts exceed the 10,240-byte L3 limit; Adult
+samples also failed the copy gate. DOPE's byte eligibility does not certify
+its other gates. [The paired synthpop report](results/pilot24-synthpop-matched.md),
+[JSON](results/pilot24-synthpop-matched.json),
+[schema](results/pilot24-synthpop-matched.schema.json), and
+[CSV](results/pilot24-synthpop-matched.csv) retain all 36 paired cells, native
+selections, bytes, copy counts, and immutable metric/replay hashes. Regenerate
+with `python3 -m research.benchmark.publish_synthpop_matched`; `--from-json`
+rebuilds the table without restricted scratch. This one-fit-seed pilot does
+not support a paper superiority claim; official tests remain sealed and
+MFS-v2/PTF-v1 are null.
