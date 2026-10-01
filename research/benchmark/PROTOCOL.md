@@ -167,8 +167,9 @@ The paired L3 public-core comparison is primary. Missing and timed-out
 applicable runs count as no pass and are reported separately. A source-unavailable
 method is excluded from the comparison. The analysis script uses dataset
 cluster bootstrap familywise 95% intervals and Holm-adjusted paired sign
-tests; the conservative Bonferroni intervals must be wholly positive against
-every executable compact comparator for a gate-pass superiority claim. MFS-v2
+tests; the conservative Bonferroni intervals must be wholly positive and the
+Holm-adjusted one-sided sign p-values must be below 0.05 against every
+executable compact comparator for a gate-pass superiority claim. MFS-v2
 superiority requires at least ten paired passing datasets and a positive
 adjusted interval. Otherwise report inconclusive. L2, unconstrained quality,
 neural/LLM/DP, and JopeDime are distinct analyses.
