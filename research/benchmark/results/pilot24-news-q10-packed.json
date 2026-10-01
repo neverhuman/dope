@@ -1,0 +1,277 @@
+{
+  "dataset": "News",
+  "first_attempt_status": "failed_receipt_io",
+  "fit_seed": 23,
+  "format": "dope-pilot24-news-q10-packed-validation-comparison",
+  "l3_byte_cap": 10240,
+  "locks": {
+    "failed_v1_receipt": "bf488ff570105dd27cc1f98009825d1b635617288db0b64a750018d37bcea761",
+    "neural_comparison": "caed08759ae5db059f404fda4d5f8901c934b4e8409aed1d2ab3786f49a4f1c0",
+    "packed_v2_receipt": "612c0e7a7886790aeab4cbbb3591870f9777e90d44eaceb382f7e780f7e1a1e2",
+    "packed_v2_round": "922d680e9d847789c224e5285515d1c856ff8f3908c39488e919d82b74c43d6e"
+  },
+  "mfs_v2": null,
+  "native_validation_kpi": [
+    {
+      "dataset": "News",
+      "default_config_sha256": "152a13a2b8818ba82063fc3a8576acf232c08f2343e4d1e0db79d76e72fac725",
+      "default_native_value": null,
+      "default_trial_status": "timeout",
+      "direction": "maximize",
+      "method": "CTGAN",
+      "objective": "sdmetrics_mean_regression_r2",
+      "selected_config_sha256": "45384bc16e5ec2de63bcd489658a89c56651619bd474388057a9dc6b391e8455",
+      "selected_native_value": -4.3629423495873265,
+      "selected_trial": 5,
+      "selection_lock_sha256": "4995807b4fbd4a972f2b5c360940d14b3bedc26f7f9e35fb33adaa8b9af4f4f7",
+      "selection_receipt_sha256": "f635cf3734659112dbeacf2439518b170ff51905eef14ce38e6850461d415f5a",
+      "tuning_attempts": 8,
+      "tuning_wall_seconds": 3228.4762048183475
+    },
+    {
+      "dataset": "News",
+      "default_config_sha256": "c7afba3c51f4137df9ac93459551ee154cb13299cfca4fdffffe980bc7b19073",
+      "default_native_value": -29.009973680235433,
+      "default_trial_status": "ok",
+      "direction": "maximize",
+      "method": "TVAE",
+      "objective": "sdmetrics_mean_regression_r2",
+      "selected_config_sha256": "c7afba3c51f4137df9ac93459551ee154cb13299cfca4fdffffe980bc7b19073",
+      "selected_native_value": -29.009973680235433,
+      "selected_trial": 0,
+      "selection_lock_sha256": "4995807b4fbd4a972f2b5c360940d14b3bedc26f7f9e35fb33adaa8b9af4f4f7",
+      "selection_receipt_sha256": "15a90876c46621a339758e3ef20c52e623fafe0a56ac0c45018b5062668c3d44",
+      "tuning_attempts": 4,
+      "tuning_wall_seconds": 2311.319613764761
+    }
+  ],
+  "notes": [
+    "DOPE q10 was trained on a GPU and fixed as an unconstrained quality candidate in earlier validation research; this is a lossless artifact-only packing refinement.",
+    "The packed projection map is restricted scratch material; public sidecar safety and release gates remain unverified.",
+    "CTGAN and TVAE were tuned on their own frozen author-library synthetic-ML efficacy objective.",
+    "Three sample seeds on one fit seed and one dataset are descriptive only; News retention has a small real-over-null denominator.",
+    "The failed v1 receipt-write attempt remains visible and contributes no score.",
+    "Official tests stayed sealed; MFS-v2 and PTF-v1 are null."
+  ],
+  "official_tests_opened": false,
+  "original_q10_artifact_bytes": 13713,
+  "packed_q10_artifact_bytes": 9205,
+  "packed_q10_within_l3_bytes": true,
+  "packed_sample_checks_exact": 12,
+  "paired_cells": [
+    {
+      "comparator": "CTGAN",
+      "comparator_artifact_bytes": 2922575,
+      "comparator_metric_receipt_sha256": "d248b26f6486e51fc94c6669aa14ab3524a2b1cbd4d49b27d99eb30935a18dec",
+      "comparator_retention": -0.8923711358536548,
+      "difference_dope_minus_comparator": 1.2128174971833403,
+      "dope_metric_receipt_sha256": "42fd37716dc86a073db9beca25e58be23fa2b8f704d6aafba4b7bc45409a36b1",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.3204463613296855,
+      "dope_sample_check_sha256": "8063042d3609f6d2e7f4776c3547c775f70c8d8475d6725472f1862769f8ec59",
+      "sample_seed": 101,
+      "size_multiplier": 1
+    },
+    {
+      "comparator": "CTGAN",
+      "comparator_artifact_bytes": 2922575,
+      "comparator_metric_receipt_sha256": "eb4dbcb45437b2ebc120696f687e5d0e30c9cffaa540c73b204851505de7dcab",
+      "comparator_retention": -0.843978810856476,
+      "difference_dope_minus_comparator": 1.154851287700634,
+      "dope_metric_receipt_sha256": "39837a72c1ad6e3b2cc612988c79b18670343297435b5c1045a57dd972e34ff2",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.3108724768441581,
+      "dope_sample_check_sha256": "81542a6c67f8e9b4fa5c7747da428eac61704732729a2ea547e2f4e52cbe8d9d",
+      "sample_seed": 101,
+      "size_multiplier": 4
+    },
+    {
+      "comparator": "CTGAN",
+      "comparator_artifact_bytes": 2922575,
+      "comparator_metric_receipt_sha256": "32dde3609396406cb3a2eee48d9be22d770c96babf42053f65e6212aa20d5440",
+      "comparator_retention": -0.8497062716975206,
+      "difference_dope_minus_comparator": 1.178356509209108,
+      "dope_metric_receipt_sha256": "17c1269f3999b0fa40a2dc6555a3b7885305f50d6d3d9bf9da3e28e4a3978dfa",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.32865023751158734,
+      "dope_sample_check_sha256": "b3d34ee9e5fe9826c0a70261673904d15a810c756969737c29c61b7527fcbd73",
+      "sample_seed": 211,
+      "size_multiplier": 1
+    },
+    {
+      "comparator": "CTGAN",
+      "comparator_artifact_bytes": 2922575,
+      "comparator_metric_receipt_sha256": "02f99b4252147e19204d4b03f36b374c9e4677b165632de5f4c26a38cb312a77",
+      "comparator_retention": -0.7305762682398876,
+      "difference_dope_minus_comparator": 1.0666656995653345,
+      "dope_metric_receipt_sha256": "4db6a8b3501e56d7f3afe038b4ea2eb5dc20d576ddf3acdeadbdfbeda32c65d7",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.3360894313254468,
+      "dope_sample_check_sha256": "41215e2ed1170707760f281c518b96e0ae713c44edda19d804d40c1eb315e369",
+      "sample_seed": 211,
+      "size_multiplier": 4
+    },
+    {
+      "comparator": "CTGAN",
+      "comparator_artifact_bytes": 2922575,
+      "comparator_metric_receipt_sha256": "24e6634b04ff9e997db77c1e04fbeed9045b361e713fe43d67745eb5b6145f0f",
+      "comparator_retention": -0.8817797409865338,
+      "difference_dope_minus_comparator": 1.2178342338657697,
+      "dope_metric_receipt_sha256": "d5e29e49dd0104689ed7e955c16656be75cf55593cf562321f514fb3145360fd",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.33605449287923594,
+      "dope_sample_check_sha256": "1eddc7d95a1564a3b0c7133b157b9740fcb4c03ab59a67295fa70ad5d0bbc344",
+      "sample_seed": 307,
+      "size_multiplier": 1
+    },
+    {
+      "comparator": "CTGAN",
+      "comparator_artifact_bytes": 2922575,
+      "comparator_metric_receipt_sha256": "564283e34eaf049ce381efb17f898f3b8e71ed002dd9f30411962ef34bf18de2",
+      "comparator_retention": -0.883358081293812,
+      "difference_dope_minus_comparator": 1.1662740759037409,
+      "dope_metric_receipt_sha256": "6a1881436ed34de5aec6bd55f26a02760151c1a48a56e257be313a46a93edfdd",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.28291599460992894,
+      "dope_sample_check_sha256": "105d78142546b5a23ee9d7584e8c0954f0b56ee18acf6ba30c8f070dd4369d95",
+      "sample_seed": 307,
+      "size_multiplier": 4
+    },
+    {
+      "comparator": "TVAE",
+      "comparator_artifact_bytes": 1485221,
+      "comparator_metric_receipt_sha256": "f7326aa3133169c5922b2cf1afd2dc970b7a9fdf71807a4748e5bbbd6aae5c45",
+      "comparator_retention": -1.0902109534937876,
+      "difference_dope_minus_comparator": 1.4106573148234731,
+      "dope_metric_receipt_sha256": "42fd37716dc86a073db9beca25e58be23fa2b8f704d6aafba4b7bc45409a36b1",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.3204463613296855,
+      "dope_sample_check_sha256": "8063042d3609f6d2e7f4776c3547c775f70c8d8475d6725472f1862769f8ec59",
+      "sample_seed": 101,
+      "size_multiplier": 1
+    },
+    {
+      "comparator": "TVAE",
+      "comparator_artifact_bytes": 1485221,
+      "comparator_metric_receipt_sha256": "dd03ca900bb70439330e6093b76ee2e81b2eaf40f1556fae8eaab22d81f9731e",
+      "comparator_retention": -1.0558287009664495,
+      "difference_dope_minus_comparator": 1.3667011778106075,
+      "dope_metric_receipt_sha256": "39837a72c1ad6e3b2cc612988c79b18670343297435b5c1045a57dd972e34ff2",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.3108724768441581,
+      "dope_sample_check_sha256": "81542a6c67f8e9b4fa5c7747da428eac61704732729a2ea547e2f4e52cbe8d9d",
+      "sample_seed": 101,
+      "size_multiplier": 4
+    },
+    {
+      "comparator": "TVAE",
+      "comparator_artifact_bytes": 1485221,
+      "comparator_metric_receipt_sha256": "95d5ac0df1aaf97f55a7bf2ea3574d4bd0cb521a6a1ebecf10703cd109913e26",
+      "comparator_retention": -0.861709990363192,
+      "difference_dope_minus_comparator": 1.1903602278747794,
+      "dope_metric_receipt_sha256": "17c1269f3999b0fa40a2dc6555a3b7885305f50d6d3d9bf9da3e28e4a3978dfa",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.32865023751158734,
+      "dope_sample_check_sha256": "b3d34ee9e5fe9826c0a70261673904d15a810c756969737c29c61b7527fcbd73",
+      "sample_seed": 211,
+      "size_multiplier": 1
+    },
+    {
+      "comparator": "TVAE",
+      "comparator_artifact_bytes": 1485221,
+      "comparator_metric_receipt_sha256": "8f587bb3ab1e0fabfa4c9f23c923e2c37d7e58e06960a10a568f3b626b069cd5",
+      "comparator_retention": -0.8873184121153553,
+      "difference_dope_minus_comparator": 1.223407843440802,
+      "dope_metric_receipt_sha256": "4db6a8b3501e56d7f3afe038b4ea2eb5dc20d576ddf3acdeadbdfbeda32c65d7",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.3360894313254468,
+      "dope_sample_check_sha256": "41215e2ed1170707760f281c518b96e0ae713c44edda19d804d40c1eb315e369",
+      "sample_seed": 211,
+      "size_multiplier": 4
+    },
+    {
+      "comparator": "TVAE",
+      "comparator_artifact_bytes": 1485221,
+      "comparator_metric_receipt_sha256": "443f482bd42df4ff78554e08c63db60d539d58834f07fbd29887e17417e50a6c",
+      "comparator_retention": -1.0013496634879795,
+      "difference_dope_minus_comparator": 1.3374041563672154,
+      "dope_metric_receipt_sha256": "d5e29e49dd0104689ed7e955c16656be75cf55593cf562321f514fb3145360fd",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.33605449287923594,
+      "dope_sample_check_sha256": "1eddc7d95a1564a3b0c7133b157b9740fcb4c03ab59a67295fa70ad5d0bbc344",
+      "sample_seed": 307,
+      "size_multiplier": 1
+    },
+    {
+      "comparator": "TVAE",
+      "comparator_artifact_bytes": 1485221,
+      "comparator_metric_receipt_sha256": "2b64b6f2fc72444c3440ec7876b70fecec82be0341bcb4f50f8c904844098fe1",
+      "comparator_retention": -0.9955839892050855,
+      "difference_dope_minus_comparator": 1.2784999838150144,
+      "dope_metric_receipt_sha256": "6a1881436ed34de5aec6bd55f26a02760151c1a48a56e257be313a46a93edfdd",
+      "dope_packed_artifact_bytes": 9205,
+      "dope_retention": 0.28291599460992894,
+      "dope_sample_check_sha256": "105d78142546b5a23ee9d7584e8c0954f0b56ee18acf6ba30c8f070dd4369d95",
+      "sample_seed": 307,
+      "size_multiplier": 4
+    }
+  ],
+  "production_certified": false,
+  "ptf_v1": null,
+  "sample_seeds": [
+    101,
+    211,
+    307
+  ],
+  "scope": "training_derived_validation_only",
+  "size_multipliers": [
+    1,
+    4
+  ],
+  "source_sha256": "fc9ee3619797634da9095334589f7b5b870e3f63fe55cff9d4f0bc061d397876",
+  "summary": [
+    {
+      "artifact_bytes": 9205,
+      "median_catboost_retention": 0.32865023751158734,
+      "method": "DOPE",
+      "size_multiplier": 1,
+      "within_l3_bytes": true
+    },
+    {
+      "artifact_bytes": 2922575,
+      "median_catboost_retention": -0.8817797409865338,
+      "method": "CTGAN",
+      "size_multiplier": 1,
+      "within_l3_bytes": false
+    },
+    {
+      "artifact_bytes": 1485221,
+      "median_catboost_retention": -1.0013496634879795,
+      "method": "TVAE",
+      "size_multiplier": 1,
+      "within_l3_bytes": false
+    },
+    {
+      "artifact_bytes": 9205,
+      "median_catboost_retention": 0.3108724768441581,
+      "method": "DOPE",
+      "size_multiplier": 4,
+      "within_l3_bytes": true
+    },
+    {
+      "artifact_bytes": 2922575,
+      "median_catboost_retention": -0.843978810856476,
+      "method": "CTGAN",
+      "size_multiplier": 4,
+      "within_l3_bytes": false
+    },
+    {
+      "artifact_bytes": 1485221,
+      "median_catboost_retention": -0.9955839892050855,
+      "method": "TVAE",
+      "size_multiplier": 4,
+      "within_l3_bytes": false
+    }
+  ],
+  "version": 1
+}

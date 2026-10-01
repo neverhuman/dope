@@ -272,5 +272,36 @@ retain native selections, all common metric cells, failures, charged bytes,
 and immutable scratch receipt hashes. Regenerate with
 `python3 -m research.benchmark.pilot24_neural_comparison`; its
 `--render-existing` mode reproduces the table and figures from committed
-JSON. The GaussianCopula fixed-seed pilot matrix is still running and is not
-included in this report.
+JSON.
+
+The frozen GaussianCopula fixed-seed matrix completed on the same three
+datasets. Its native tuning selected only by held-out mean log density. The
+paired fit-seed-23 DOPE q8 minus tuned-Copula median retention differences
+were +0.119 on Adult, −0.024 on California, and −3.309 on News. Four default
+fit cells timed out and two default cells exhausted all eight sample attempts;
+those failures have null outcomes. All 24 scored metrics were replayed exactly
+from verified validation samples except elapsed timing. The
+[paired Copula report](results/pilot24-copula-matched.md),
+[JSON](results/pilot24-copula-matched.json), and
+[schema](results/pilot24-copula-matched.schema.json) retain every failure and
+hash. These three datasets and one paired fit seed do not establish a paper
+superiority claim.
+
+A separate bounded lossless projection refinement repackaged the GPU-trained
+News q10 model with the repository's compact projection codec. The complete
+model and packed map charge **9,205 B**. All twelve frozen sample identities
+at `n/2n/4n/8n` reproduced their original hashes. The first frozen attempt
+failed while writing a verification receipt and remains an explicit failure;
+the versioned second attempt succeeded. On the common News validation rows,
+the packed q10 candidate retains the original median CatBoost values of
+0.3287 at `n` and 0.3109 at `4n`; native-tuned CTGAN recorded −0.8818 and
+−0.8440, and TVAE −1.0013 and −0.9956. This is a single-dataset descriptive
+comparison. The packed projection map remains restricted on scratch, public
+sidecar safety and other release gates are unverified, and official tests are
+sealed. The [packed comparison](results/pilot24-news-q10-packed.md),
+[JSON](results/pilot24-news-q10-packed.json),
+[schema](results/pilot24-news-q10-packed.schema.json), and
+[CSV](results/pilot24-news-q10-packed.csv) regenerate with
+`python3 -m research.benchmark.publish_news_q10_packed`;
+`--from-json` rebuilds the table without scratch data. PTF-v1 and MFS-v2 are
+null.
