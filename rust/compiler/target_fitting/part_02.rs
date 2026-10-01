@@ -83,21 +83,38 @@ fn fit_compact_neural_target(
             "neural hidden bias export",
         )?;
         let input_weights = tensor_values(hidden.ws.shallow_clone(), "neural input export")?;
-        let output_weights = tensor_values(residual.ws.shallow_clone(), "neural output export")?;
-        let residual_bias = residual
-            .bs
-            .as_ref()
-            .expect("linear bias")
-            .double_value(&[0]) as f32;
-        let skip_bias = skip.bs.as_ref().expect("linear bias").double_value(&[0]) as f32;
-        let linear_weights = tensor_values(skip.ws.shallow_clone(), "neural skip export")?;
+        // The short GPU fit learns the hidden basis. Refit its readout with the
+        // same regularized solver as the native candidate: an unfinished Adam
+        // intercept can otherwise dominate targets with small variance.
+        let mut basis: Vec<Vec<f32>> = selected
+            .iter()
+            .map(|feature| completed[*feature].clone())
+            .collect();
+        basis.extend((0..hidden_width).map(|unit| {
+            (0..table.rows)
+                .map(|row| {
+                    (hidden_biases[unit]
+                        + selected
+                            .iter()
+                            .enumerate()
+                            .map(|(input, feature)| {
+                                input_weights[unit * selected.len() + input]
+                                    * completed[*feature][row]
+                            })
+                            .sum::<f32>())
+                    .tanh()
+                })
+                .collect()
+        }));
+        let (intercept, coefficients) = fit_basis_coefficients(&table.target, &basis, logistic);
+        let (linear_weights, output_weights) = coefficients.split_at(selected.len());
         Ok(Target::CompactNeuralResidual {
-            intercept: residual_bias + skip_bias,
+            intercept,
             logistic,
             linear_terms: selected
                 .iter()
                 .copied()
-                .zip(linear_weights)
+                .zip(linear_weights.iter().copied())
                 .filter(|(_, coefficient)| coefficient.abs() >= 1e-5)
                 .map(|(feature, coefficient)| LinearTerm {
                     feature: feature as u32,
@@ -108,7 +125,7 @@ fn fit_compact_neural_target(
             hidden_width: hidden_width as u8,
             input_weights,
             hidden_biases,
-            output_weights,
+            output_weights: output_weights.to_vec(),
         })
     })
 }

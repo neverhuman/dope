@@ -19,7 +19,9 @@ class LockTests(unittest.TestCase):
                             "dependency_or_container_digest", "default_config",
                             "tuning_search_space", "fit_command", "sampling_command"):
                     self.assertIsNotNone(method.get(key), (name, key))
-                self.assertEqual(method["adapter_sha256"], adapter_hash, name)
+                expected = (hashlib.sha256((ROOT / "sdv_adapter.py").read_bytes()).hexdigest()
+                            if name in ("CTGAN", "TVAE") else adapter_hash)
+                self.assertEqual(method["adapter_sha256"], expected, name)
 
     def test_pilot_manifest_has_three_distinct_rights_recorded_sources(self):
         lock = json.loads((ROOT / "pilot-datasets.lock.json").read_text())

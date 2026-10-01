@@ -15,7 +15,7 @@ RESULTS = Path(__file__).with_name("results")
 
 
 def build(round_path: Path = tune_copula.ROOT / "round.lock.json",
-          methods_path: Path = tune_copula.METHODS,
+          methods_path: Path = Path(__file__).with_name("method-locks") / "2026-09-30.json",
           expected_jobs: int = 12) -> dict:
     lock = json.loads(round_path.read_text())
     entry = json.loads(methods_path.read_text())["methods"]["GaussianCopula"]

@@ -1,0 +1,3098 @@
+{
+  "cells": [
+    {
+      "artifact_bytes": 864,
+      "artifact_sha256": "da8f82d0754f87e255e15cc7231f21738b960d9a3113842f4d6d9dc87df334aa",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/7c1fcb23cbe793e8b9fbad09716825ddac73b233c76e81368569d65e3267a2b6/attempt-0001.json",
+      "attempt_sha256": "23da3476704c353306db2660f615aa7b5ef90457102c11352f4962d42c23a588",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-00.json",
+      "cell_sha256": "5571bac32460cb47ae43945203f46881cb2d77b9a5cd899ff0bab0857687ff79",
+      "common_validation": {
+        "c2st_auc": 0.6944444444444444,
+        "copy_counts": {
+          "exact": 0,
+          "near": 1
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.22916666666666666,
+        "metric_seconds": 0.5516043058596551,
+        "mfs_v2": null,
+        "null_loss": 0.07760199385943077,
+        "pair_correlation_fidelity": 0.8685105823774045,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 80,
+          "train": 80,
+          "validation": 20
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.7770085035214552,
+            "trtr_loss": 0.0009699873281063815,
+            "tstr_loss": 0.01805827314268002
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8000848807328903,
+            "trtr_loss": 0.001722537215280465,
+            "tstr_loss": 0.01689198784021926
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8609538465508776,
+            "trtr_loss": 0.0008176724199221261,
+            "tstr_loss": 0.01149423696128679
+          }
+        },
+        "version": 1
+      },
+      "dataset": "a863cd42be4d05d4",
+      "energy_joules_estimate": 472.7635284140124,
+      "fit_seconds": 4.154588795034215,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "0d4fdc44251bf9e30ddbf25f30192df098648729b4bc0e8f30050af3518c298d",
+      "peak_gpu_used_mib": 440,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 865,
+      "artifact_sha256": "eb3fec640263f545af73eb565028466dda28036df00eebf879055b8d415cfeb3",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/b253d6e4ded7ef645c894fb06166cafc5450b5bd021955929e851479b78bd92b/attempt-0001.json",
+      "attempt_sha256": "785aca3c419930f84ee7b204d2905800c33e07c384f3aa6a54ca2b9350199982",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-01.json",
+      "cell_sha256": "3d367deee30dc6c26b8e8d20883aced7ff39b362dfa2a4c84e6148e322deb53c",
+      "common_validation": {
+        "c2st_auc": 0.6944444444444444,
+        "copy_counts": {
+          "exact": 0,
+          "near": 2
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.22083333333333333,
+        "metric_seconds": 1.52247199206613,
+        "mfs_v2": null,
+        "null_loss": 0.07760199385943077,
+        "pair_correlation_fidelity": 0.8695283030420556,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 80,
+          "train": 80,
+          "validation": 20
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.767726381358235,
+            "trtr_loss": 0.0009699873281063815,
+            "tstr_loss": 0.01876958078891647
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.789197404355516,
+            "trtr_loss": 0.001722537215280465,
+            "tstr_loss": 0.017718123631960445
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8541084702045207,
+            "trtr_loss": 0.0008176724199221261,
+            "tstr_loss": 0.01201985453903987
+          }
+        },
+        "version": 1
+      },
+      "dataset": "a863cd42be4d05d4",
+      "energy_joules_estimate": 233.30750098917167,
+      "fit_seconds": 2.0582636471372098,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "a5970083709d55ee04184d45fb783cb692fdef2e5bd2bb1d3b27d100bdc6069d",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1609,
+      "artifact_sha256": "2f653fa50eee8d54250de2466dc9cb4d85f343dcba75fe6f11954f189e4fbeb2",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/aa1bd9a4f6490fd51ece279e2430cbf76c7f8a0296d122b5be8096287fee8240/attempt-0001.json",
+      "attempt_sha256": "f05bc6c9ea07fab196e984dd1e8e3bb6a7f739eb53d934f14d35e77fa206e45d",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-02.json",
+      "cell_sha256": "7b1d09c984adb25a801ff9a2d51b8d4931b22086f360ba59c21881cc6690d1a9",
+      "common_validation": {
+        "c2st_auc": 0.6,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.2175925925925926,
+        "metric_seconds": 1.5450385618023574,
+        "mfs_v2": null,
+        "null_loss": 0.020624324375972575,
+        "pair_correlation_fidelity": 0.9153078452095923,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 72,
+          "train": 72,
+          "validation": 18
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.511499188853473,
+            "trtr_loss": 0.002989706973931514,
+            "tstr_loss": 0.011604231879087233
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.5410047115183467,
+            "trtr_loss": 0.004081016584699577,
+            "tstr_loss": 0.01167431691679571
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.10657208914160336,
+            "trtr_loss": 0.00784140026931039,
+            "tstr_loss": 0.019262021448587022
+          }
+        },
+        "version": 1
+      },
+      "dataset": "0d482c1dd7cc6592",
+      "energy_joules_estimate": 234.04110479020514,
+      "fit_seconds": 2.0584429251030087,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "f5182efd7dada33466688a2a52cbfeb3b3f173e707e16c3847ad9ad391b8fb7d",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1608,
+      "artifact_sha256": "0988acdc7468ca57a9e5ca052faa6c8f6f900f2b27477e03c44a1cdff88d9a11",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/fd2332d0ad923a6b8b2d747ab2b50502a470f8d8f33e245c409046b2ad45587d/attempt-0001.json",
+      "attempt_sha256": "d5e0684ef959371656e7d2d0adcf963fd993dc356ee3bdd1165dc96e1192bc16",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-03.json",
+      "cell_sha256": "a514c0835e2d95a367e362d12ec86536db56055d6c12ba8d3b00b8d70341314d",
+      "common_validation": {
+        "c2st_auc": 0.6,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.2199074074074074,
+        "metric_seconds": 1.276139419991523,
+        "mfs_v2": null,
+        "null_loss": 0.020624324375972575,
+        "pair_correlation_fidelity": 0.9161388157002371,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 72,
+          "train": 72,
+          "validation": 18
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.5925490597925245,
+            "trtr_loss": 0.002989706973931514,
+            "tstr_loss": 0.010174948414592254
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.5922203451906959,
+            "trtr_loss": 0.004081016584699577,
+            "tstr_loss": 0.010827040925228952
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.16000033868185337,
+            "trtr_loss": 0.00784140026931039,
+            "tstr_loss": 0.018579052189562198
+          }
+        },
+        "version": 1
+      },
+      "dataset": "0d482c1dd7cc6592",
+      "energy_joules_estimate": 234.6267607873818,
+      "fit_seconds": 2.06332395109348,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "0d618b13b251118090c80037ab6224d14c3ef9ae4489e1c3d1829c1f7f302b38",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 10003,
+      "artifact_sha256": "bd53ff050b4392b7b1b93f434514414bda2117ced933ff4530918b53498957a5",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/a1a3c9addafd46021279f8ec0ea70b788f4ce439ae7c5f28804b9b9c00e00dbd/attempt-0001.json",
+      "attempt_sha256": "befd049c0c98d8aa613297c8e32b512037e0dad88cfaffc997ae7061a787df49",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-04.json",
+      "cell_sha256": "77d632475a811e641a976db102c98d3eeed01bc12ced553df0a74ecb5931dcff",
+      "common_validation": {
+        "c2st_auc": 0.6282051282051282,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.16830327866505151,
+        "metric_seconds": 0.9834928540512919,
+        "mfs_v2": null,
+        "null_loss": 0.04085123377245456,
+        "pair_correlation_fidelity": 0.927395608147776,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 167,
+          "train": 167,
+          "validation": 41
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -0.6110655943882585,
+            "trtr_loss": 0.014938944619400717,
+            "tstr_loss": 0.05668534214572583
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -2.2154027469143394,
+            "trtr_loss": 0.014558035084039907,
+            "tstr_loss": 0.09910125837193288
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -3.802713079483951,
+            "trtr_loss": 0.02627323138979541,
+            "tstr_loss": 0.09628719410574071
+          }
+        },
+        "version": 1
+      },
+      "dataset": "297b7688a045c583",
+      "energy_joules_estimate": 234.65287231461843,
+      "fit_seconds": 2.0557466419413686,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "ce7b8bcdb3c1d6fc8b9062df347a043e9348aaa464b295c154f7858c4e6974f1",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 10083,
+      "artifact_sha256": "92c13d43b8742177a7fa72d973aa1d427e8f030d7d37cea8b80c84879bf87885",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/3b303f64bd608a3b510782fd846554289038e87db96e85bb98d68e033503d65a/attempt-0001.json",
+      "attempt_sha256": "c9ab4436f6a3d86dc2a0a49e61f5f9d6f5b1c0eb6675572ee6ba1941e63a38f7",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-05.json",
+      "cell_sha256": "85ca12b1a4ef93a20cb52f311c671e0cbc673a42e09d2271bde7311e696e0f8c",
+      "common_validation": {
+        "c2st_auc": 0.6153846153846154,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.16666809852318315,
+        "metric_seconds": 1.8503226679749787,
+        "mfs_v2": null,
+        "null_loss": 0.04085123377245456,
+        "pair_correlation_fidelity": 0.9274477914387456,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 167,
+          "train": 167,
+          "validation": 41
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -0.467750018330752,
+            "trtr_loss": 0.014938944619400717,
+            "tstr_loss": 0.05297170749878724
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -2.0891574390520096,
+            "trtr_loss": 0.014558035084039907,
+            "tstr_loss": 0.09578186540882858
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -3.856695950197777,
+            "trtr_loss": 0.02627323138979541,
+            "tstr_loss": 0.09707415652362965
+          }
+        },
+        "version": 1
+      },
+      "dataset": "297b7688a045c583",
+      "energy_joules_estimate": 234.31029939844274,
+      "fit_seconds": 2.0556958459783345,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "721fb4821fddbe572521df6e278fdf640b0afae313c53190883324c31df0949a",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1255,
+      "artifact_sha256": "281696f7d5ac377759f030d3341f6d62c94c8a9aedec54f42896a373f58ccd03",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/5f0fb548f31681e20f1a9b6281418cf050fa93035b4ed1a81746deb2fefb8504/attempt-0001.json",
+      "attempt_sha256": "127337ad2e57898429cadfbd606a858886f2dac9783d671da6b5651fea79da29",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-06.json",
+      "cell_sha256": "a363317633d688da971434313921783b7b340f9c997120e05a7974e7ab8442e8",
+      "common_validation": {
+        "c2st_auc": 0.4966666666666667,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.0875,
+        "metric_seconds": 2.2578940941020846,
+        "mfs_v2": null,
+        "null_loss": 0.018785208124144453,
+        "pair_correlation_fidelity": 0.8941237681620113,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -1.9562552088950314,
+            "trtr_loss": 0.0005192453481862131,
+            "tstr_loss": 0.0545180929500955
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -2.7280645812977906,
+            "trtr_loss": 0.005441590061920861,
+            "tstr_loss": 0.05518745994606209
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -2.3335676872014854,
+            "trtr_loss": 0.003309827634056566,
+            "tstr_loss": 0.05489805598296183
+          }
+        },
+        "version": 1
+      },
+      "dataset": "471f11cc2d38853a",
+      "energy_joules_estimate": 234.9193752700975,
+      "fit_seconds": 2.0553050150629133,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "0e22618b99bdeb71155916563869e6c5d8de0a0a57b8aed9d1614b4d84617ea5",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1255,
+      "artifact_sha256": "438df53da9355df9ee49f8897877498b5884c6ce3808960a492c3e010d259ee6",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/3b2b2876b4af3b35e65cec220af93e3b3891685d0a45a5a9605a0f4d008ad821/attempt-0001.json",
+      "attempt_sha256": "704e93804ea7b24f4c84895e30e6593d3da56b77882b81189754c37ea05fffdd",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-07.json",
+      "cell_sha256": "1838023430f00ba6493a7f05ce4d00b1ea899e71e676e685365d15818b6d49a7",
+      "common_validation": {
+        "c2st_auc": 0.49972222222222223,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.089,
+        "metric_seconds": 2.3797994619235396,
+        "mfs_v2": null,
+        "null_loss": 0.018785208124144453,
+        "pair_correlation_fidelity": 0.8933107485628385,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -1.955816733845411,
+            "trtr_loss": 0.0005192453481862131,
+            "tstr_loss": 0.05451008378116095
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -2.728614350334344,
+            "trtr_loss": 0.005441590061920861,
+            "tstr_loss": 0.055194795854108296
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -2.335356701321649,
+            "trtr_loss": 0.003309827634056566,
+            "tstr_loss": 0.0549257416571735
+          }
+        },
+        "version": 1
+      },
+      "dataset": "471f11cc2d38853a",
+      "energy_joules_estimate": 234.6174296219251,
+      "fit_seconds": 2.0522083649411798,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "9169854e38d8076b78bc32da6959ddd06e6ced78014202a0d6c5ee79347ffc9b",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1950,
+      "artifact_sha256": "fb407e55d52da040365fc7216b7efe9ffe41dcf5d8a77ff79230269ebcc8184a",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/b61e9a254dd6b097910699e80c91714d062060a5bc46b885d2c51db54521542f/attempt-0001.json",
+      "attempt_sha256": "9a17f13e0b5b799d87db1cab168e8e3d76d8dd5a71b30f33d24364a8f5663175",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-08.json",
+      "cell_sha256": "d572be4e8161c1690dde612798fad7d27226abcbbeea3b48e457a146e010707b",
+      "common_validation": {
+        "c2st_auc": 0.6661111111111111,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.146875,
+        "metric_seconds": 3.044082134962082,
+        "mfs_v2": null,
+        "null_loss": 0.0004478121036077401,
+        "pair_correlation_fidelity": 0.9390812469846902,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -83.990860711936,
+            "trtr_loss": 0.00019904812552176834,
+            "tstr_loss": 0.02134171273717369
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -106.99152072216194,
+            "trtr_loss": 0.0002450842365732268,
+            "tstr_loss": 0.022137974890390558
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -166.55811977439808,
+            "trtr_loss": 0.00031559693658281973,
+            "tstr_loss": 0.02246932172893647
+          }
+        },
+        "version": 1
+      },
+      "dataset": "1a4456d1cc71a26a",
+      "energy_joules_estimate": 234.60245037373156,
+      "fit_seconds": 2.054283710895106,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "ea0ada93bf82abc843366cca3d1b3d9fd864a49e9657f3f8603dcfba3ea7820d",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1952,
+      "artifact_sha256": "f8ffca254255b6b70a6d96d5183df1316264c91c5de37591025b47edf3854b83",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/38d2948c43d9bc87b42d23651e94e2968435ce018cd1822627bbb9b38207e8d6/attempt-0001.json",
+      "attempt_sha256": "b6e44a3df06f089263a2844a5169672da882f882d0cfdb91d8923259d3edafc0",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-09.json",
+      "cell_sha256": "a7f20f32e1d0d7968e28b887f781cff75bce0e5b50f61c1500fb7ecb0abf4e10",
+      "common_validation": {
+        "c2st_auc": 0.675,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.1453125,
+        "metric_seconds": 0.7876182990148664,
+        "mfs_v2": null,
+        "null_loss": 0.0004478121036077401,
+        "pair_correlation_fidelity": 0.9388603096450859,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -86.61092420663864,
+            "trtr_loss": 0.00019904812552176834,
+            "tstr_loss": 0.021993490154953756
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -113.93516368851789,
+            "trtr_loss": 0.0002450842365732268,
+            "tstr_loss": 0.023545644818409102
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -176.88622819080757,
+            "trtr_loss": 0.00031559693658281973,
+            "tstr_loss": 0.02383485430826354
+          }
+        },
+        "version": 1
+      },
+      "dataset": "1a4456d1cc71a26a",
+      "energy_joules_estimate": 234.0179832440242,
+      "fit_seconds": 2.055149247869849,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "ad6d0249324087f4cf2463abbee8b3496f222863a3b3da3588d3ee9c624d0612",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 4006,
+      "artifact_sha256": "920dad7866b97e3323d4e5ba0a04ac929924ab9ff7abd6b569efcd0a50655169",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/b81a78bb5fba43562892c28d2ece58f51a9e0c6b9958c1efd787fcc235710f52/attempt-0001.json",
+      "attempt_sha256": "95588751e1067135de92c8baab167f0040e5644885d88102b7ea0cb53b2873f9",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-10.json",
+      "cell_sha256": "80d4df9ee25736348fb5b33ec4dd536bd85e2895bbe3267a5cc4df5ec2910b55",
+      "common_validation": {
+        "c2st_auc": 0.5797222222222222,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.11059210526315788,
+        "metric_seconds": 0.7382024249527603,
+        "mfs_v2": null,
+        "null_loss": 0.03500577487209302,
+        "pair_correlation_fidelity": 0.9585719923124132,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -3.073609376376985,
+            "trtr_loss": 0.028274577332133944,
+            "tstr_loss": 0.05569484674515693
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -5.295790184908055,
+            "trtr_loss": 0.02819448134552552,
+            "tstr_loss": 0.07107695627661696
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -17.31695467620544,
+            "trtr_loss": 0.03277880554909072,
+            "tstr_loss": 0.07357010170382378
+          }
+        },
+        "version": 1
+      },
+      "dataset": "0f86a714ec5f3ac6",
+      "energy_joules_estimate": 235.36047497046644,
+      "fit_seconds": 2.0556438639760017,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "14eebc5029879f487dfe9faf94c6889b2fca63c9d0df4cb88cd602d66a9599fe",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 4023,
+      "artifact_sha256": "ccd16c8da6726bfe9649c012e28b7f8829c5f612d2dd32b478b7d109263a2f98",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/fits/6538a60d2a17e2dc81f064003c77a5f5dffebf0180bb68f04a6a1e9125e193b8/attempt-0001.json",
+      "attempt_sha256": "6a126d741009dbe5aec4d3ad02b1e420c4e1ae1bf3b938f8dcf69b5e4c1b78be",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery/cell-11.json",
+      "cell_sha256": "cf4bf5fc51812fe9828ccfda8193897d7cd0f2f0fe0c2847bf65eb26e25d47bb",
+      "common_validation": {
+        "c2st_auc": 0.5875,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.10953947368421052,
+        "metric_seconds": 0.5173197609838098,
+        "mfs_v2": null,
+        "null_loss": 0.03500577487209302,
+        "pair_correlation_fidelity": 0.9586973925389177,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -2.9102038221576945,
+            "trtr_loss": 0.028274577332133944,
+            "tstr_loss": 0.05459493168058039
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -5.276138859703451,
+            "trtr_loss": 0.02819448134552552,
+            "tstr_loss": 0.07094310533246237
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -17.57453408623899,
+            "trtr_loss": 0.03277880554909072,
+            "tstr_loss": 0.07414372314820553
+          }
+        },
+        "version": 1
+      },
+      "dataset": "0f86a714ec5f3ac6",
+      "energy_joules_estimate": 234.87154776005772,
+      "fit_seconds": 2.0604239078238606,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "fda7d6116692744803ed0ae5ef2a7ca3b0779e8a6f6a563eb16c638a380ca2d6",
+      "peak_gpu_used_mib": 1,
+      "revision": "original",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 863,
+      "artifact_sha256": "b02d2d26963c37ad734e387677976d241fc55117d1b0af6de0524e3729d6f97a",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/1476c0b624f7e20ff763838b5328f0daddbb3de59eda086c1ce98d8b6a5fc83b/attempt-0001.json",
+      "attempt_sha256": "92a4245f19b063db1c915fe737c68435813afcb228e2cc6a913a2713038bd487",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-00.json",
+      "cell_sha256": "6e755f9418111b3aca0d0bb6c60cbfbd2b1e8b2adad911c035538513446aeb9c",
+      "common_validation": {
+        "c2st_auc": 0.6666666666666667,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.2625,
+        "metric_seconds": 0.47049801517277956,
+        "mfs_v2": null,
+        "null_loss": 0.07760199385943077,
+        "pair_correlation_fidelity": 0.9395658462991436,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 80,
+          "train": 80,
+          "validation": 20
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9773443856411963,
+            "trtr_loss": 0.0009699873281063815,
+            "tstr_loss": 0.002706132515621394
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9978907632998342,
+            "trtr_loss": 0.001722537215280465,
+            "tstr_loss": 0.001882584950022953
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9750436092606817,
+            "trtr_loss": 0.0008176724199221261,
+            "tstr_loss": 0.0027339319484199253
+          }
+        },
+        "version": 1
+      },
+      "dataset": "a863cd42be4d05d4",
+      "energy_joules_estimate": 232.96750195096712,
+      "fit_seconds": 2.0548640838824213,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "e4d0d7e12efcd2672717ee5aaf010d6bcbda70a94b587ff4a7e931c0e06b195b",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 863,
+      "artifact_sha256": "d5ae5a401a8816e443cbe06051ff31fcc577c6a6576ff5780b665536d22cb17c",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/55bae8719db52aeb0a0383e67c8a76f9c3158805f4f36579127a9b6ebe3f2aed/attempt-0001.json",
+      "attempt_sha256": "0381632b75412e6e50dea91506371804679837c8417bc209bff8c209711f5398",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-01.json",
+      "cell_sha256": "78f007264ca04b2f9c68cb16baa529d644d35b642690266379213f1cda51afc5",
+      "common_validation": {
+        "c2st_auc": 0.6666666666666667,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.2625,
+        "metric_seconds": 0.3175351719837636,
+        "mfs_v2": null,
+        "null_loss": 0.07760199385943077,
+        "pair_correlation_fidelity": 0.9385126813318643,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 80,
+          "train": 80,
+          "validation": 20
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9785937020640764,
+            "trtr_loss": 0.0009699873281063815,
+            "tstr_loss": 0.002610394891343561
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9979605768875024,
+            "trtr_loss": 0.001722537215280465,
+            "tstr_loss": 0.0018772875329243096
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.974021258803608,
+            "trtr_loss": 0.0008176724199221261,
+            "tstr_loss": 0.0028124324345396986
+          }
+        },
+        "version": 1
+      },
+      "dataset": "a863cd42be4d05d4",
+      "energy_joules_estimate": 233.41178857004735,
+      "fit_seconds": 2.0536595138255507,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "ed462f04b9796d7416fd629f5ec8912019e5f3f7298a44411c715718b23e3d19",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1611,
+      "artifact_sha256": "8c73684fc984d72a8fd28d63b2a4001f1833c42ca61a4f09b60caee05fff0bdd",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/34a08b6b4bec2c51c1c724c7cf64234f57e59e7139a64200d96ebf6005fd8bd5/attempt-0001.json",
+      "attempt_sha256": "c205343a99e1a5440662154e7c3db9e402b54812143cb5caae53b33847a8756c",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-02.json",
+      "cell_sha256": "470b8822e12d2f310eee12fad5bdb44c663dbccfad2a7bd293579ef64929868e",
+      "common_validation": {
+        "c2st_auc": 0.6,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.22453703703703706,
+        "metric_seconds": 0.32382447295822203,
+        "mfs_v2": null,
+        "null_loss": 0.020624324375972575,
+        "pair_correlation_fidelity": 0.9457806686174267,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 72,
+          "train": 72,
+          "validation": 18
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0311280677279007,
+            "trtr_loss": 0.002989706973931514,
+            "tstr_loss": 0.002440775409085166
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.1232856435551364,
+            "trtr_loss": 0.004081016584699577,
+            "tstr_loss": 0.002041464237121782
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9505532799545687,
+            "trtr_loss": 0.00784140026931039,
+            "tstr_loss": 0.00847347393897451
+          }
+        },
+        "version": 1
+      },
+      "dataset": "0d482c1dd7cc6592",
+      "energy_joules_estimate": 234.27647857399424,
+      "fit_seconds": 2.055500137154013,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "eada3deba730e12827c580edb811530b54446a80c095f949e67c545d2a47fac9",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1610,
+      "artifact_sha256": "73f9dfd875b42be72fba42ed954c4d534f553d06772a61b6ba84882584464164",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/d169177c9952044162ebcbd82b50850339d3b44bf38088e3e8779be985f0d7c1/attempt-0001.json",
+      "attempt_sha256": "3fc1b8206685b9bb26b54fb5bcf8a7012719522a6771b109267b670d58004f4e",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-03.json",
+      "cell_sha256": "3384df6c1532db897418ab8943e31cf521a53219faea8018317a550e30c2e7b4",
+      "common_validation": {
+        "c2st_auc": 0.6,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.22453703703703706,
+        "metric_seconds": 0.3139599577989429,
+        "mfs_v2": null,
+        "null_loss": 0.020624324375972575,
+        "pair_correlation_fidelity": 0.944191906193138,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 72,
+          "train": 72,
+          "validation": 18
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.04427443819317,
+            "trtr_loss": 0.002989706973931514,
+            "tstr_loss": 0.0022089441957046495
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.139580324038844,
+            "trtr_loss": 0.004081016584699577,
+            "tstr_loss": 0.0017718963225193608
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9574824430049319,
+            "trtr_loss": 0.00784140026931039,
+            "tstr_loss": 0.00838489897357903
+          }
+        },
+        "version": 1
+      },
+      "dataset": "0d482c1dd7cc6592",
+      "energy_joules_estimate": 234.06183265841798,
+      "fit_seconds": 2.0520789639558643,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "4b7edb238b660b4a975dd02c9acb1600eeb91bf393968aa163d83ee332f6b533",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 9999,
+      "artifact_sha256": "f3df6fa62d6c65c13aab865fe3dab4de5097990653f475fd36ed3e8d727925e6",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/7bcbba62696376da3aa0ab8f014a16aaf61ab24416900fae5468dbc0adb547a2/attempt-0001.json",
+      "attempt_sha256": "024afbf6a903d76a701a6a45fbca5fd6ebb2a31e718fa7598a53a9d098e9b07e",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-04.json",
+      "cell_sha256": "bd02f344ed1aee9911a0d5633998f7158a8329ab2aa04f4da07162bf8e470ff1",
+      "common_validation": {
+        "c2st_auc": 0.608974358974359,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.1672694782601225,
+        "metric_seconds": 0.7036737150046974,
+        "mfs_v2": null,
+        "null_loss": 0.04085123377245456,
+        "pair_correlation_fidelity": 0.9283215586002063,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 167,
+          "train": 167,
+          "validation": 41
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.7280460546548203,
+            "trtr_loss": 0.014938944619400717,
+            "tstr_loss": 0.021985893887498813
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9175527570728926,
+            "trtr_loss": 0.014558035084039907,
+            "tstr_loss": 0.016725836823634332
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -0.7679699680027658,
+            "trtr_loss": 0.02627323138979541,
+            "tstr_loss": 0.05204670179580955
+          }
+        },
+        "version": 1
+      },
+      "dataset": "297b7688a045c583",
+      "energy_joules_estimate": 234.14425210095942,
+      "fit_seconds": 2.056606149999425,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "c24d2bdbc40f09bb0e48e8b5f05f48c155165e9e44243e20603f5b67c3e1d7af",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 10079,
+      "artifact_sha256": "8e9cce74e00e24722e2eacffa84f72587ba07ed901c7e3e81ca0e82a19f30ffa",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/f563abc7b83badd567c1349285e15429d1ae599e4c542b9e59072e4abfa7bed6/attempt-0001.json",
+      "attempt_sha256": "4852b2fa5a36e879f6f6eed7a2f53fac899fca1f65b218b31472e497d601e1cb",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-05.json",
+      "cell_sha256": "e78dbe0112ac01b85297f117cccd7721c6df1eec551a50cfecd610a8475f7a54",
+      "common_validation": {
+        "c2st_auc": 0.608974358974359,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.16641036435020914,
+        "metric_seconds": 0.7078140280209482,
+        "mfs_v2": null,
+        "null_loss": 0.04085123377245456,
+        "pair_correlation_fidelity": 0.9283583183739048,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 167,
+          "train": 167,
+          "validation": 41
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.7088673322070144,
+            "trtr_loss": 0.014938944619400717,
+            "tstr_loss": 0.022482858489152525
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.928938683682061,
+            "trtr_loss": 0.014558035084039907,
+            "tstr_loss": 0.01642646439304776
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": -0.6055929543776295,
+            "trtr_loss": 0.02627323138979541,
+            "tstr_loss": 0.049679569304293236
+          }
+        },
+        "version": 1
+      },
+      "dataset": "297b7688a045c583",
+      "energy_joules_estimate": 235.04751331895824,
+      "fit_seconds": 2.0534017959143966,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "491c667cf286da6b6454d17549a4b495816b4f3df76ba74d57d7dee277dc5108",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1255,
+      "artifact_sha256": "b822ea3d35dd9d8f086399c297487277b87e717a66e4ea129a18b2a56fbdcefc",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/a76b20f2651e03d9035bef448234c58853a1b646e9b13c5fbff207456900013f/attempt-0001.json",
+      "attempt_sha256": "fd43ee1d1489262bcab229da8b70be86273d3b67e59e11fe8313b0e709b41509",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-06.json",
+      "cell_sha256": "53f4168fcef74a96d8c6f962c6c10a23a44bb3bf10d9168e2ba4771d01c5a3a8",
+      "common_validation": {
+        "c2st_auc": 0.46861111111111114,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.049499999999999995,
+        "metric_seconds": 0.6071821649093181,
+        "mfs_v2": null,
+        "null_loss": 0.018785208124144453,
+        "pair_correlation_fidelity": 0.9681933603478015,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8470502183252057,
+            "trtr_loss": 0.0005192453481862131,
+            "tstr_loss": 0.0033130203668489465
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.001610552792057,
+            "trtr_loss": 0.005441590061920861,
+            "tstr_loss": 0.005420099460594605
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8697314348335168,
+            "trtr_loss": 0.003309827634056566,
+            "tstr_loss": 0.005325783245905702
+          }
+        },
+        "version": 1
+      },
+      "dataset": "471f11cc2d38853a",
+      "energy_joules_estimate": 235.52006899114699,
+      "fit_seconds": 2.0548492250964046,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "561bb1149e34c6c5bc294948e36f7faa7844537adf5c90e32812acc970e6719c",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1255,
+      "artifact_sha256": "3d9d6eed7a59c3d4a9e4fe674f67a1fe6aca752acfb2d000e235378d34d4fc5e",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/ec970fb93bde7aa5fed2ab9ccedc4f1b4c92390a7bbb288cb6d737b524d79d37/attempt-0001.json",
+      "attempt_sha256": "2ef3be1c4e1f02af8a2b54247923d5d0f6b02fe4e9585733a15cf681afcb1ec9",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-07.json",
+      "cell_sha256": "25f4d1100b6c682c73cc1d6e35ea5c92c8c627af31c54db873d29bd91d5c6d44",
+      "common_validation": {
+        "c2st_auc": 0.465,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.050749999999999997,
+        "metric_seconds": 0.6423324560746551,
+        "mfs_v2": null,
+        "null_loss": 0.018785208124144453,
+        "pair_correlation_fidelity": 0.9677204107995916,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8570069417554244,
+            "trtr_loss": 0.0005192453481862131,
+            "tstr_loss": 0.0031311512273020604
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0074780541568589,
+            "trtr_loss": 0.005441590061920861,
+            "tstr_loss": 0.005341805763403113
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8766357745311434,
+            "trtr_loss": 0.003309827634056566,
+            "tstr_loss": 0.005218935962052113
+          }
+        },
+        "version": 1
+      },
+      "dataset": "471f11cc2d38853a",
+      "energy_joules_estimate": 234.53776450529696,
+      "fit_seconds": 2.053508687997237,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "9346e527ff07dc7d74bdfaa9839bfd1497d9599dadd38d7605e23fe5164a7ade",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1946,
+      "artifact_sha256": "32f5cf3f1d830bc43368ebaff890c39f5844e0e559c5e4d7b5673e07788aa4cc",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/ce779d63ed4dcee3e2e099bd65b414fd97f18e53455c2361aa48d71a4df749c7/attempt-0001.json",
+      "attempt_sha256": "c3d5a31b6973e5e39e7a70b1cafb557f537494e5ccd7d4f9aa10d218cd803e4b",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-08.json",
+      "cell_sha256": "8c3c1e9f8235d58582d61028f2452961569b60990c90f7b85fea1d7d27e0a38d",
+      "common_validation": {
+        "c2st_auc": 0.5080555555555556,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.133125,
+        "metric_seconds": 0.7117559558246285,
+        "mfs_v2": null,
+        "null_loss": 0.0004478121036077401,
+        "pair_correlation_fidelity": 0.9663712316443752,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0379410835296354,
+            "trtr_loss": 0.00019904812552176834,
+            "tstr_loss": 0.00018960975065004406
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0912880775229574,
+            "trtr_loss": 0.0002450842365732268,
+            "tstr_loss": 0.00022657759933131634
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.5733061533123327,
+            "trtr_loss": 0.00031559693658281973,
+            "tstr_loss": 0.0003720123347911354
+          }
+        },
+        "version": 1
+      },
+      "dataset": "1a4456d1cc71a26a",
+      "energy_joules_estimate": 234.65466428455431,
+      "fit_seconds": 2.0532910160254687,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "30a3a38ff3e073ddafc7a660e4bceef1008b8ffd6581257bf6a59b10eb4f73b0",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1950,
+      "artifact_sha256": "b6e8f4c0de68529709157c033551d4b8bc488a7bc08d41c83647e4b9de6ac786",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/3d01ae5c9b424cea4619909ee18b7635e4f52c4c954a9cda9e77561b9a8d2afc/attempt-0001.json",
+      "attempt_sha256": "b60c91c2924a9dcae8c5752c365a8c9e43003ff5718965205f2280cc80c67625",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-09.json",
+      "cell_sha256": "88e906a04cf69bc7de01008f4bbc31aabf7f326df236c1b4f0697553a9c6ad8e",
+      "common_validation": {
+        "c2st_auc": 0.5091666666666667,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.12828125,
+        "metric_seconds": 0.6710564361419529,
+        "mfs_v2": null,
+        "null_loss": 0.0004478121036077401,
+        "pair_correlation_fidelity": 0.966952384063262,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0760282885691164,
+            "trtr_loss": 0.00019904812552176834,
+            "tstr_loss": 0.00018013502601024671
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0789685655274954,
+            "trtr_loss": 0.0002450842365732268,
+            "tstr_loss": 0.00022907510772106246
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.5660343586818403,
+            "trtr_loss": 0.00031559693658281973,
+            "tstr_loss": 0.0003729737763327769
+          }
+        },
+        "version": 1
+      },
+      "dataset": "1a4456d1cc71a26a",
+      "energy_joules_estimate": 235.08294932818504,
+      "fit_seconds": 2.0553888760041445,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "405e4c54204c89370f2c0455bf5123bdd1259deb2d3288bf0dfb58a62ea405bd",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 4008,
+      "artifact_sha256": "b3aee497278d026d352a5f2d326d8de80be0dbf1d01bdb45a42de8f34b4ccf84",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/bda3a8f9a3a05bb12bb20fa4a4d46c01f4aaaac3906649b3f9bcd5f76fb82334/attempt-0001.json",
+      "attempt_sha256": "f5b93db0fcb34f98002b08d26f529a3187108d4ecaea693378c7e196fd920ebb",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-10.json",
+      "cell_sha256": "7f8dd8f258932ed3dcf90882e6b08afa0d5abe90fb8241f737ca4f3117a07e10",
+      "common_validation": {
+        "c2st_auc": 0.5766666666666668,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.11164473684210525,
+        "metric_seconds": 0.5997077119536698,
+        "mfs_v2": null,
+        "null_loss": 0.03500577487209302,
+        "pair_correlation_fidelity": 0.9629201923603153,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9512207443015783,
+            "trtr_loss": 0.028274577332133944,
+            "tstr_loss": 0.028602920138092194
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9212364336109988,
+            "trtr_loss": 0.02819448134552552,
+            "tstr_loss": 0.028730963115400292
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.8926393107911312,
+            "trtr_loss": 0.03277880554909072,
+            "tstr_loss": 0.030790925187452953
+          }
+        },
+        "version": 1
+      },
+      "dataset": "0f86a714ec5f3ac6",
+      "energy_joules_estimate": 234.6630121054407,
+      "fit_seconds": 2.05429057800211,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "e319afe5eef8ddf4a719b4bccce1d897e0ad9d2844d4d206e92440d2e0dfd34f",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 4023,
+      "artifact_sha256": "b5a37fec2e7157b246a5a5f3c083412669c7f2f62c186797418a7dd4c2710252",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/fits/d169bfa51c99aeb2132fcf73eafa576541c1c37b19826a78b76d84993575ab88/attempt-0001.json",
+      "attempt_sha256": "dd1250ea5b9f80c6ae4f80686f12659b8ef99502c25274515379b9d7e3c44ba7",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery/cell-11.json",
+      "cell_sha256": "5f4014f9118076fde122ad31a4a018ae9791f79448cc172973beced872ef6e84",
+      "common_validation": {
+        "c2st_auc": 0.5824999999999999,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.1075,
+        "metric_seconds": 0.5935503309592605,
+        "mfs_v2": null,
+        "null_loss": 0.03500577487209302,
+        "pair_correlation_fidelity": 0.9626861729073332,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9612990820610056,
+            "trtr_loss": 0.028274577332133944,
+            "tstr_loss": 0.02853508085575906
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8892691658050788,
+            "trtr_loss": 0.02819448134552552,
+            "tstr_loss": 0.028948701559668805
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.8846169223713352,
+            "trtr_loss": 0.03277880554909072,
+            "tstr_loss": 0.030808790800361047
+          }
+        },
+        "version": 1
+      },
+      "dataset": "0f86a714ec5f3ac6",
+      "energy_joules_estimate": 235.57508916237623,
+      "fit_seconds": 2.056182086933404,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "26eaaae372b852b82c701a5aa400e0aa3aa005fd1d31a324887d39ba4d75beb3",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "discovery",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 836,
+      "artifact_sha256": "d1531f8ea132b15b065ee1beedf30b9377994172f7bef972ba2532b47cbedda4",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/3eb8c439cf87c57bb6e3f119b6f9faef3ff934829381b3b0c30aea3e2881719e/attempt-0001.json",
+      "attempt_sha256": "e323c78a33c3978bb5cd5fddbce40867d67302df0a8c7f794f3f1b0dea409d31",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-00.json",
+      "cell_sha256": "61cb1c7effc23e5ddb04d1851127139347f1da7311d3b2069babd644384b7e06",
+      "common_validation": {
+        "c2st_auc": 0.4775,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.24537509930768356,
+        "metric_seconds": 1.3704997249878943,
+        "mfs_v2": null,
+        "null_loss": 0.004726191501850502,
+        "pair_correlation_fidelity": 0.8951923196618997,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 22
+        },
+        "rows": {
+          "synthetic": 267,
+          "train": 267,
+          "validation": 66
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.13792643899102816,
+            "trtr_loss": 0.00029233575520295433,
+            "tstr_loss": 0.0041146455677155
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.107902188805145,
+            "trtr_loss": 0.004238229190392508,
+            "tstr_loss": 0.004185576988931772
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.6515775954208934,
+            "trtr_loss": 0.0037878308056478877,
+            "tstr_loss": 0.004114776695781327
+          }
+        },
+        "version": 1
+      },
+      "dataset": "ed2efb82fce4b098",
+      "energy_joules_estimate": 234.79303304547443,
+      "fit_seconds": 2.054956184932962,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "02cd62a82d1f753ed653af97727494efc0e3e7dea49a787af22b7502d794245d",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 836,
+      "artifact_sha256": "2cbdedb5b81a1f256d2dcc4f5365b2039d0148e1441cb36d70b41faf35722176",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/7abe55cdd2d50021609f5add45f816ceb4e362bf506d7b280667282125514f87/attempt-0001.json",
+      "attempt_sha256": "5be205dd72cdae0ffed9dc177b2f628342cfda403f31a584e2ef3afc983d32f3",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-01.json",
+      "cell_sha256": "9529996eb236a8d0b7e15fde3059e31cbe820f55d8efa96d9fc51ae076cd78d9",
+      "common_validation": {
+        "c2st_auc": 0.4775,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.2386789240721825,
+        "metric_seconds": 1.2011651841457933,
+        "mfs_v2": null,
+        "null_loss": 0.004726191501850502,
+        "pair_correlation_fidelity": 0.9206100948976742,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 22
+        },
+        "rows": {
+          "synthetic": 267,
+          "train": 267,
+          "validation": 66
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.14953697127659069,
+            "trtr_loss": 0.00029233575520295433,
+            "tstr_loss": 0.0040631661424195215
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.2017522778750174,
+            "trtr_loss": 0.004238229190392508,
+            "tstr_loss": 0.004139781682538699
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.7989453073195194,
+            "trtr_loss": 0.0037878308056478877,
+            "tstr_loss": 0.003976492627046346
+          }
+        },
+        "version": 1
+      },
+      "dataset": "ed2efb82fce4b098",
+      "energy_joules_estimate": 234.91692691850477,
+      "fit_seconds": 2.0553239909932017,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "32d1b3551e7160271b0d6b1e25e3d402baa53d8c39f10e06ea14421e97e5a419",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1459,
+      "artifact_sha256": "685d09ddfbf96b67ecbbc221e343ef4982495b576e62391429410f1b7f1944b4",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/719bed7a419bc4020bf7da5cb5e5e5283ec9e24bcba5c04a5d966298372f6fde/attempt-0001.json",
+      "attempt_sha256": "d9fa931aac02aa8e0fbda32d7a8ac9b52afd073eb0793c903b6e54062853124b",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-02.json",
+      "cell_sha256": "23cdab1dce0d257d5320b13b6c2467b0d3554d385b9883c4f80490baee6206fa",
+      "common_validation": {
+        "c2st_auc": 0.46153846153846156,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.15899907502069033,
+        "metric_seconds": 1.5226821200922132,
+        "mfs_v2": null,
+        "null_loss": 0.05577375660976493,
+        "pair_correlation_fidelity": 0.8834537946741987,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 167,
+          "train": 167,
+          "validation": 41
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.3083926798485611,
+            "trtr_loss": 0.010103527339258104,
+            "tstr_loss": 0.04168939221573513
+          },
+          "linear": {
+            "informative": false,
+            "low_signal_noninferior": true,
+            "retention": null,
+            "trtr_loss": 0.05560000717074756,
+            "tstr_loss": 0.05241440392420476
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8379746813242902,
+            "trtr_loss": 0.0463159251407136,
+            "tstr_loss": 0.0478483332984678
+          }
+        },
+        "version": 1
+      },
+      "dataset": "94a00ea67f49bf84",
+      "energy_joules_estimate": 235.2803495761822,
+      "fit_seconds": 2.0557702358346432,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "af17780a014a07441ed0aef38ece060a8acb7591014b9d1aba0aea2f8952a477",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 1460,
+      "artifact_sha256": "c23b2af83572f256cc0dfe29f1ce0e42524a72e85e432f34977b8879ab3110cc",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/86c9ecb0dc4072ef7d9105c1de558a48d796f3cbb36c0964714d30691b34be23/attempt-0001.json",
+      "attempt_sha256": "42a6aa922b451c9e57a58460767fbcf39c65f9c72436360877d98bbf07900b12",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-03.json",
+      "cell_sha256": "f8537a15a22c97078b264edb5114e4c56f4990cc3eef3a4a35c674e0e9e5c8f7",
+      "common_validation": {
+        "c2st_auc": 0.44871794871794873,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.15800107102867436,
+        "metric_seconds": 1.7828350339550525,
+        "mfs_v2": null,
+        "null_loss": 0.05577375660976493,
+        "pair_correlation_fidelity": 0.8839503696953566,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 167,
+          "train": 167,
+          "validation": 41
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.3199710369272227,
+            "trtr_loss": 0.010103527339258104,
+            "tstr_loss": 0.04116060599337686
+          },
+          "linear": {
+            "informative": false,
+            "low_signal_noninferior": true,
+            "retention": null,
+            "trtr_loss": 0.05560000717074756,
+            "tstr_loss": 0.05212352905094992
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.68638305490307,
+            "trtr_loss": 0.0463159251407136,
+            "tstr_loss": 0.04928206135327909
+          }
+        },
+        "version": 1
+      },
+      "dataset": "94a00ea67f49bf84",
+      "energy_joules_estimate": 235.03331517672402,
+      "fit_seconds": 2.0560835090000182,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "bfe22e5ea3624e0afc2011551213622c6cfa621cb837eb8d6a271d3aadd47f44",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 5496,
+      "artifact_sha256": "cd4a6bed9bf2b49ddc79930e9749bef4a380c9d796b1c1cce65351eff0187fd1",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/7683f6842e32d028bc7351e37e42641e7f13c80bd5c3a187714b3691d0dc2a47/attempt-0001.json",
+      "attempt_sha256": "943077130f08dc94301291f90e6706fffcff03393ad271968cb1cb1ea38a814e",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-04.json",
+      "cell_sha256": "7f6ef4cf45fbbe622ea882af7ee325c44cedf120b90fc55e9cad6bfe56b4a155",
+      "common_validation": {
+        "c2st_auc": 0.5344,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.1146623917708255,
+        "metric_seconds": 0.7257138369604945,
+        "mfs_v2": null,
+        "null_loss": 0.0441442581296112,
+        "pair_correlation_fidelity": 0.9492308723465053,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 333,
+          "train": 333,
+          "validation": 83
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.24378383962030636,
+            "trtr_loss": 0.00571438406676032,
+            "tstr_loss": 0.03477567587444459
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.8688098293306561,
+            "trtr_loss": 0.031938631883657344,
+            "tstr_loss": 0.033539890073990254
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.7484405694173875,
+            "trtr_loss": 0.03272905754833387,
+            "tstr_loss": 0.035600658906546304
+          }
+        },
+        "version": 1
+      },
+      "dataset": "47c581af5de1136b",
+      "energy_joules_estimate": 235.64537713621743,
+      "fit_seconds": 2.054288951912895,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "703aac1752cd2e0d2fbf9803bddda529dd5398c5a618e1a188148d4016720127",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 5530,
+      "artifact_sha256": "a302d6b34707d98dd6fe54eff83ca6dafa3af878b302efc485a43ef9eb33211c",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/75ca52d4d11312fe01b94b6f94d57b93fb1f140ff170ee9d20ced5dc30729579/attempt-0001.json",
+      "attempt_sha256": "f67cf07a049e3321006219ad123d7c2be75ee49f8c4271d7874613e63802f799",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-05.json",
+      "cell_sha256": "fc9db48db7b9be26d0c934cc4a996fa5b30cb7091df313f24bf4608936ce90fa",
+      "common_validation": {
+        "c2st_auc": 0.5328,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.11408210805801167,
+        "metric_seconds": 0.7259512159507722,
+        "mfs_v2": null,
+        "null_loss": 0.0441442581296112,
+        "pair_correlation_fidelity": 0.9493444775659503,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 333,
+          "train": 333,
+          "validation": 83
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.23875822224477583,
+            "trtr_loss": 0.00571438406676032,
+            "tstr_loss": 0.034968809717274306
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9030447617025467,
+            "trtr_loss": 0.031938631883657344,
+            "tstr_loss": 0.03312203128490345
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.7669839361280774,
+            "trtr_loss": 0.03272905754833387,
+            "tstr_loss": 0.0353889826560916
+          }
+        },
+        "version": 1
+      },
+      "dataset": "47c581af5de1136b",
+      "energy_joules_estimate": 234.4473593454156,
+      "fit_seconds": 2.0551473959349096,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "1355064ce3977054f1ee93a8e5bdaf77bbab1314c367564d339401c3ac080264",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 882,
+      "artifact_sha256": "6805cf137b164d477255d52dcb2f4e8b6363978ec872ae848d804637b66f741e",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/df9774fb398e0cb9b257c111868d2eab356fa1224a307c07a34c1376b26114a4/attempt-0001.json",
+      "attempt_sha256": "0866eb396e9ffed1db3a1b9b04e5cffd53f14a3d0ae2b5dcd3a2086ac2615cda",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-06.json",
+      "cell_sha256": "b56f78c6c1d3dc70d52a5b5fb6b345cfeab68a606ab95e082b246ff1df183f40",
+      "common_validation": {
+        "c2st_auc": 0.5019444444444444,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.06333333333333334,
+        "metric_seconds": 0.4021131778135896,
+        "mfs_v2": null,
+        "null_loss": 0.043772834496753926,
+        "pair_correlation_fidelity": 0.9585258764833978,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9853651362678622,
+            "trtr_loss": 0.0001238941081888177,
+            "tstr_loss": 0.000762690402827675
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0004491510282967,
+            "trtr_loss": 0.0032263370824631254,
+            "tstr_loss": 0.003208125581455671
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9842996927722399,
+            "trtr_loss": 0.00013422184323396303,
+            "tstr_loss": 0.0008193614688874504
+          }
+        },
+        "version": 1
+      },
+      "dataset": "642738a361f1c63a",
+      "energy_joules_estimate": 235.22446523113177,
+      "fit_seconds": 2.057356175966561,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "3c092a72adad64bc0453e795d62002903bc5625cdea2342a62d654e9c5a04ed5",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 882,
+      "artifact_sha256": "850d4135c57580ede49b4f9ac9771a467887aeea5420d51dc61783bab74b8648",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/db7e942629cb273741656371255c358026c1d0706dbab5b7264f8eafbcb363b8/attempt-0001.json",
+      "attempt_sha256": "636e769e597f835113a5609a0935ac7b7a2c70926cd785ee2960be3b17cc7323",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-07.json",
+      "cell_sha256": "6a16e3a7ee78e726c03073eb9782d10c3bfe96a5fc2b9f4c4e958cfc93b00adc",
+      "common_validation": {
+        "c2st_auc": 0.5008333333333332,
+        "copy_counts": {
+          "exact": 0,
+          "near": 1
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.06208333333333333,
+        "metric_seconds": 0.46689652977511287,
+        "mfs_v2": null,
+        "null_loss": 0.043772834496753926,
+        "pair_correlation_fidelity": 0.9597504790118948,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9840522048456439,
+            "trtr_loss": 0.0001238941081888177,
+            "tstr_loss": 0.0008199984682103578
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9999306889760083,
+            "trtr_loss": 0.0032263370824631254,
+            "tstr_loss": 0.003229147401718182
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9834280959624602,
+            "trtr_loss": 0.00013422184323396303,
+            "tstr_loss": 0.0008573967444594672
+          }
+        },
+        "version": 1
+      },
+      "dataset": "642738a361f1c63a",
+      "energy_joules_estimate": 235.37998471867292,
+      "fit_seconds": 2.0560462870635092,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "d2ef30d8279678a4e4b217e523b9b9354386c4eab5eae312bcf7239f019ca7b1",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 2197,
+      "artifact_sha256": "d5fed6aa0f0e6ed2bac4bb5dfb80f061a4459e43667b36fc351ed276b41b041e",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/7f189bbf50b660dbb5e158cb903120f9a3c26420be57155f4166069cc5c13b7b/attempt-0001.json",
+      "attempt_sha256": "51facd39e0219ff8a81e8ebb484f7e5380bd7a06a891cb85e2abc42ae54db523",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-08.json",
+      "cell_sha256": "088f5bcf39690d3ac91350dbc05c19bf5b13aaf2da28128fe9df4ac3ffea7e12",
+      "common_validation": {
+        "c2st_auc": 0.46305555555555555,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.10600000000000001,
+        "metric_seconds": 0.7195990469772369,
+        "mfs_v2": null,
+        "null_loss": 0.03927067561112749,
+        "pair_correlation_fidelity": 0.9493348930671317,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.967453059950779,
+            "trtr_loss": 0.02130191421481876,
+            "tstr_loss": 0.021886742414743178
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9899748777795837,
+            "trtr_loss": 0.020793274910973877,
+            "tstr_loss": 0.020978513111308522
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9577563776837191,
+            "trtr_loss": 0.02334348348624885,
+            "tstr_loss": 0.024016305774931065
+          }
+        },
+        "version": 1
+      },
+      "dataset": "46c5a59e5ae42037",
+      "energy_joules_estimate": 235.0499504817277,
+      "fit_seconds": 2.057773295091465,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "c5e940f43f5c07081606e7ca708da91deee539ad58784d8d7a6183afc53a93cd",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 2200,
+      "artifact_sha256": "c46d67ae53361bf18d916734869ff935d473c76d434ca1ea54894922347516eb",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/a968a8e30876507a7521421da3ebdd2b72201881dd454ead93e0aadc8f5a0f0d/attempt-0001.json",
+      "attempt_sha256": "a967ed6236ddefd363ae5c8c2e717094be85ecc43f0e85e8e552a31d310349ca",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-09.json",
+      "cell_sha256": "0cc963164dea7aa7068b15f42ed629bb37c7a9c5fdb0fbd333fd4bc03072ddb4",
+      "common_validation": {
+        "c2st_auc": 0.4766666666666667,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.10175000000000001,
+        "metric_seconds": 0.7205343858804554,
+        "mfs_v2": null,
+        "null_loss": 0.03927067561112749,
+        "pair_correlation_fidelity": 0.948894294220112,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9691604426345647,
+            "trtr_loss": 0.02130191421481876,
+            "tstr_loss": 0.021856062862686043
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.995269508735672,
+            "trtr_loss": 0.020793274910973877,
+            "tstr_loss": 0.020880682093573442
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9801765657488024,
+            "trtr_loss": 0.02334348348624885,
+            "tstr_loss": 0.023659215132142572
+          }
+        },
+        "version": 1
+      },
+      "dataset": "46c5a59e5ae42037",
+      "energy_joules_estimate": 235.25621904669327,
+      "fit_seconds": 2.0644107239786536,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "bf8ddda19b44a831877bb455740e23b779b100b07e420eaa5bfd6f188362e6f5",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 3678,
+      "artifact_sha256": "30f781ed252c610a19260bbb7a7c435b5ad90e50a2deb0b7d3cf479b9df3755f",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/920ed49de672ebf58c02975d082183be7f2fd37548154d0864b38439c1f1c7f1/attempt-0001.json",
+      "attempt_sha256": "5d09c4155f43853d887e5187393b6f569c6f21fb61db67189fb1ea8d61958516",
+      "candidate": "compact_neural_residual_symbolic",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-10.json",
+      "cell_sha256": "1261e4cf0eabc1dde7bf17f6b721d91a157eb0a2937c5ef6c104387fcf33a6b7",
+      "common_validation": {
+        "c2st_auc": 0.5488888888888889,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.09549999999999999,
+        "metric_seconds": 1.0265528759919107,
+        "mfs_v2": null,
+        "null_loss": 0.023522917970949207,
+        "pair_correlation_fidelity": 0.9300105299670515,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0093462996379239,
+            "trtr_loss": 0.009292103720126631,
+            "tstr_loss": 0.009159098266046807
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0061600256084895,
+            "trtr_loss": 0.008569683925129473,
+            "tstr_loss": 0.008477571620477485
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9794168700023455,
+            "trtr_loss": 0.00880998025950915,
+            "tstr_loss": 0.009112818569071115
+          }
+        },
+        "version": 1
+      },
+      "dataset": "f24e9383331c43e2",
+      "energy_joules_estimate": 235.42841756185516,
+      "fit_seconds": 2.0600492709781975,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "d06fed0e3b03d36a93ac0161dd4135171a82960155a6fe02fe5cee6272bdb9b4",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    },
+    {
+      "artifact_bytes": 3679,
+      "artifact_sha256": "add5eda6550f649f4b6c18310d0051850181fb756eee3f5b6c87413230b20c20",
+      "attempt_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/fits/ed66c1fee8e7a4c5afff7ebd0bd801c6db49d6b445b1894800426f5e77e5143a/attempt-0001.json",
+      "attempt_sha256": "9dd40cb8168db3f02b1f6dd80ef924e1618874496640bf8d4469354099d0837e",
+      "candidate": "symbolic_autoregressive_residual",
+      "cell_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation/cell-11.json",
+      "cell_sha256": "3ab5d04c8584b55d3e15cc43bb2ef397c82e199f6846fabb6bd94aab614f8964",
+      "common_validation": {
+        "c2st_auc": 0.5452777777777778,
+        "copy_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "dependencies": {
+          "catboost": "1.2.10",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.7.2",
+          "scipy": "1.16.3"
+        },
+        "format": "dope-benchmark-validation-pilot-metrics",
+        "gate_profile_complete": false,
+        "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "marginal_ks_mean": 0.0945,
+        "metric_seconds": 1.384365410078317,
+        "mfs_v2": null,
+        "null_loss": 0.023522917970949207,
+        "pair_correlation_fidelity": 0.9304220917561368,
+        "real_vs_real_control_counts": {
+          "exact": 0,
+          "near": 0
+        },
+        "rows": {
+          "synthetic": 800,
+          "train": 800,
+          "validation": 200
+        },
+        "task": "regression",
+        "utility": {
+          "catboost": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0042898139164786,
+            "trtr_loss": 0.009292103720126631,
+            "tstr_loss": 0.00923105617511063
+          },
+          "linear": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 1.0036043100422394,
+            "trtr_loss": 0.008569683925129473,
+            "tstr_loss": 0.00851578783349417
+          },
+          "mlp": {
+            "informative": true,
+            "low_signal_noninferior": null,
+            "retention": 0.9795719249066674,
+            "trtr_loss": 0.00880998025950915,
+            "tstr_loss": 0.009110537255921973
+          }
+        },
+        "version": 1
+      },
+      "dataset": "f24e9383331c43e2",
+      "energy_joules_estimate": 235.9217188684642,
+      "fit_seconds": 2.0607315828092396,
+      "fit_seed": 11,
+      "host": "xbabe2",
+      "metric_sha256": "340cfefeb754c2216c92e11967bf4d218883cdbd067575c07d40277415a9b80f",
+      "peak_gpu_used_mib": 1,
+      "revision": "readout_refit",
+      "sample_seed": 101,
+      "stage": "confirmation",
+      "status": "ok"
+    }
+  ],
+  "format": "dope-conditional-gpu-validation",
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "production_family_selected": false,
+  "ptf_v1": null,
+  "rounds": [
+    {
+      "binary_sha256": "c37c25bf4d1f138b2b5190f77eb8a76035cb80ff7067f9caa123f5393eb087ff",
+      "fit_compute_ceiling_seconds": 7200,
+      "path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/discovery.lock.json",
+      "revision": "original",
+      "sha256": "557966b27681f44b4d4860f6599fc585a8eb86e5f1b5488d47b64e4d88001118",
+      "source_manifest_path": "/mnt/fast-scratch/dope-benchmark/conditional-gpu-v1/source/files.json",
+      "source_manifest_sha256": "46fd65715ca52ca65610adfae810f63d994b1ebc95cb5b1360e95b7568a09c3e",
+      "stage": "discovery"
+    },
+    {
+      "binary_sha256": "132f8467f56a79ec00e0830bbe48026524e61d0f0e3b3ccad918f3d0ae8a3e3c",
+      "fit_compute_ceiling_seconds": 7200,
+      "path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/discovery.lock.json",
+      "revision": "readout_refit",
+      "sha256": "5e219239cf7b3089aeb3cdd099b7908857e198f71359a87fb9a8aa0aa1e84f11",
+      "source_manifest_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/source/files.json",
+      "source_manifest_sha256": "fb705e6b1b38930ae94c1a72f4a9716ad7cec5ec6682933ee37b445e777e035b",
+      "stage": "discovery"
+    },
+    {
+      "binary_sha256": "132f8467f56a79ec00e0830bbe48026524e61d0f0e3b3ccad918f3d0ae8a3e3c",
+      "fit_compute_ceiling_seconds": 7200,
+      "path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/confirmation.lock.json",
+      "revision": "readout_refit",
+      "sha256": "2baa77b7d41fd75e21a76f1ee5cb08a6e94948623dcf817ba9e9d4a215d8a382",
+      "source_manifest_path": "/mnt/fast-scratch/dope-benchmark/conditional-readout-v1/source/files.json",
+      "source_manifest_sha256": "fb705e6b1b38930ae94c1a72f4a9716ad7cec5ec6682933ee37b445e777e035b",
+      "stage": "confirmation"
+    }
+  ],
+  "scope": "validation_only_one_fit_seed_one_sample_seed_n_rows",
+  "summary": [
+    {
+      "artifacts_within_l3": 6,
+      "candidate": "compact_neural_residual_symbolic",
+      "copy_screen_passes": 5,
+      "fit_cells": 6,
+      "measured_retention_cells": 6,
+      "median_catboost_retention": -1.2836604016416449,
+      "revision": "original",
+      "stage": "discovery"
+    },
+    {
+      "artifacts_within_l3": 6,
+      "candidate": "symbolic_autoregressive_residual",
+      "copy_screen_passes": 5,
+      "fit_cells": 6,
+      "measured_retention_cells": 6,
+      "median_catboost_retention": -1.2117833760880816,
+      "revision": "original",
+      "stage": "discovery"
+    },
+    {
+      "artifacts_within_l3": 6,
+      "candidate": "compact_neural_residual_symbolic",
+      "copy_screen_passes": 6,
+      "fit_cells": 6,
+      "measured_retention_cells": 6,
+      "median_catboost_retention": 0.6379228698996701,
+      "revision": "readout_refit",
+      "stage": "confirmation"
+    },
+    {
+      "artifacts_within_l3": 6,
+      "candidate": "symbolic_autoregressive_residual",
+      "copy_screen_passes": 5,
+      "fit_cells": 6,
+      "measured_retention_cells": 6,
+      "median_catboost_retention": 0.6445657397808937,
+      "revision": "readout_refit",
+      "stage": "confirmation"
+    },
+    {
+      "artifacts_within_l3": 6,
+      "candidate": "compact_neural_residual_symbolic",
+      "copy_screen_passes": 6,
+      "fit_cells": 6,
+      "measured_retention_cells": 6,
+      "median_catboost_retention": 0.9642825649713873,
+      "revision": "readout_refit",
+      "stage": "discovery"
+    },
+    {
+      "artifacts_within_l3": 6,
+      "candidate": "symbolic_autoregressive_residual",
+      "copy_screen_passes": 6,
+      "fit_cells": 6,
+      "measured_retention_cells": 6,
+      "median_catboost_retention": 0.969946392062541,
+      "revision": "readout_refit",
+      "stage": "discovery"
+    }
+  ],
+  "symbolic_reference_cells": [
+    {
+      "artifact_bytes": 1898,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round2-symbolic/receipts/46c5a59e5ae42037.json",
+      "attempt_receipt_sha256": "3b243500943beb01d80e4b6889a418ca9eec80babbf1f8c3654c6242e4865a3d",
+      "c2st_auc": 0.47972222222222227,
+      "catboost_retention": 1.0003115281202508,
+      "dataset": "46c5a59e5ae42037",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.6368357399478555,
+      "host": "xbabe2",
+      "linear_retention": 1.003941493808609,
+      "metric_sha256": "88fd026779871ec48341f1691074605d865b0c85b999b8a60caeb923fe32e1b7",
+      "mlp_retention": 1.0255717863991218,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "confirmation",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 5121,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round2-symbolic/receipts/47c581af5de1136b.json",
+      "attempt_receipt_sha256": "06b520192200918a457d6f34ad95a5a718daa9ae8fc1489aa5f71b83a5024389",
+      "c2st_auc": 0.536,
+      "catboost_retention": 0.611626317893822,
+      "dataset": "47c581af5de1136b",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.6371337249875069,
+      "host": "xbabe2",
+      "linear_retention": 0.8451791426812245,
+      "metric_sha256": "943b19a521a77bf3939cfa66f3b1e6214c5db774ec5f99a5a5b87959e5a5fca5",
+      "mlp_retention": 0.7093920076887489,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "confirmation",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 835,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round2-symbolic/receipts/642738a361f1c63a.json",
+      "attempt_receipt_sha256": "b72cad7991738292933b0ff31db855c80fec1d89293a982cb32a33a997c68e53",
+      "c2st_auc": 0.5397222222222222,
+      "catboost_retention": 0.9789218762818443,
+      "dataset": "642738a361f1c63a",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.48118787119165063,
+      "host": "xbabe2",
+      "linear_retention": 0.9979592744964806,
+      "metric_sha256": "b3c16f7633dbc0da694cb68b1f76f45ee5b1acca02118e588ebf7929dc019921",
+      "mlp_retention": 0.9853890823494483,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "confirmation",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 1777,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round2-symbolic/receipts/94a00ea67f49bf84.json",
+      "attempt_receipt_sha256": "24e6dd09a062c24bf3fbfe96456acf44ffe132c29aa9b0f1616c1f2a275e669c",
+      "c2st_auc": 0.46794871794871795,
+      "catboost_retention": 0.7679629874252625,
+      "dataset": "94a00ea67f49bf84",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.4446840069722384,
+      "host": "xbabe2",
+      "linear_retention": null,
+      "metric_sha256": "1d3d600aa7b66e68d53bfd093819ed7560164c0fd0530592bb03e2a3b23bb1b7",
+      "mlp_retention": 0.5664667298858596,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "confirmation",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 893,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round2-symbolic/receipts/ed2efb82fce4b098.json",
+      "attempt_receipt_sha256": "b75ecff9472bc4c91eb0bcba9051878d6109820e9e6f76f559e32fd29f76ea84",
+      "c2st_auc": 0.48500000000000004,
+      "catboost_retention": 0.5286106991234484,
+      "dataset": "ed2efb82fce4b098",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.4122835728339851,
+      "host": "xbabe2",
+      "linear_retention": -0.6766742000315427,
+      "metric_sha256": "0ba4230539d0e4d6a4b4f2cb779793fad68e758a959ed7c0d840334616debc9d",
+      "mlp_retention": 0.7172928091618846,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "confirmation",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 3486,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round2-symbolic/receipts/f24e9383331c43e2.json",
+      "attempt_receipt_sha256": "77e1fed44a35f1eedca21e0ebfc171a86913d4a736b90e8d895c551388226d39",
+      "c2st_auc": 0.5683333333333335,
+      "catboost_retention": 1.0239431196413042,
+      "dataset": "f24e9383331c43e2",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.8730357608292252,
+      "host": "xbabe2",
+      "linear_retention": 1.002742999106132,
+      "metric_sha256": "4171f8edd832d2dd4c5329356c92a913b8b831f07ab4dfea83442bb290a46ed3",
+      "mlp_retention": 0.9905490964516417,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "confirmation",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 1940,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round0-symbolic/receipts/0d482c1dd7cc6592.json",
+      "attempt_receipt_sha256": "54eab0fe4fc3787f4846864823d36a6619dcad82c7fd22fafc17550701ed93fc",
+      "c2st_auc": 0.5666666666666667,
+      "catboost_retention": 0.952022517843839,
+      "dataset": "0d482c1dd7cc6592",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.45219966885633767,
+      "host": "xbabe2",
+      "linear_retention": 1.1465568339819872,
+      "metric_sha256": "af9a9502a6d409e6d63b0944173dc7ea0f8ac290c20c7f16316fadc3c6af4dd0",
+      "mlp_retention": 0.6752707749480371,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "discovery",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 3984,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round0-symbolic/receipts/0f86a714ec5f3ac6.json",
+      "attempt_receipt_sha256": "4010c0faa0449a4a60ae09803371e24bbadaff90e30e05d42530b177502bf2af",
+      "c2st_auc": 0.5286111111111111,
+      "catboost_retention": 0.7260413858614337,
+      "dataset": "0f86a714ec5f3ac6",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.8723019191529602,
+      "host": "xbabe2",
+      "linear_retention": 0.6041231179885683,
+      "metric_sha256": "2be9abd604206917bff9ccf26875f8927782337cf911990fef121a094160bf93",
+      "mlp_retention": 0.1464073465912164,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "discovery",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 2082,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round0-symbolic/receipts/1a4456d1cc71a26a.json",
+      "attempt_receipt_sha256": "8de935aa26a76a8c040d3a067e2159e2f85b546fa82a1b3bc98c23130920c97d",
+      "c2st_auc": 0.49972222222222223,
+      "catboost_retention": 0.880384133553294,
+      "dataset": "1a4456d1cc71a26a",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.6540631100069731,
+      "host": "xbabe2",
+      "linear_retention": 0.9889306337807388,
+      "metric_sha256": "e82c30d1f7a8058a6effa08f81991a7ea9ddd38a3bfc95ed56a5958d1faed8cb",
+      "mlp_retention": -0.3449335586450048,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "discovery",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 8953,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round0-symbolic/receipts/297b7688a045c583.json",
+      "attempt_receipt_sha256": "0d031f28786aa1e4acfe75c6b16651fe14056fbd167698f182efb38fe71dd2f5",
+      "c2st_auc": 0.641025641025641,
+      "catboost_retention": 0.5425193266998031,
+      "dataset": "297b7688a045c583",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.6093405089341104,
+      "host": "xbabe2",
+      "linear_retention": 0.8149711959285544,
+      "metric_sha256": "9a86b70d5208dfbfad1fda8e2925ec18a376fa3e540ec4c503bab0a3fadb861f",
+      "mlp_retention": -0.7332805144327045,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "discovery",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 1581,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round0-symbolic/receipts/471f11cc2d38853a.json",
+      "attempt_receipt_sha256": "f2af0e8ffb4678c4db30bc3217c10150387038f89032376e77aff7fe67221108",
+      "c2st_auc": 0.4638888888888889,
+      "catboost_retention": 0.7936064319228278,
+      "dataset": "471f11cc2d38853a",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.560254282085225,
+      "host": "xbabe2",
+      "linear_retention": 0.9595538799629153,
+      "metric_sha256": "6757d9dbb1d9f177e8c0717c5af818db80fe58568432c3cce11cf6faa38cf364",
+      "mlp_retention": 0.8174464398401781,
+      "near_copies": 0,
+      "peak_gpu_used_mib": null,
+      "phase": "discovery",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    },
+    {
+      "artifact_bytes": 864,
+      "attempt_receipt_path": "/mnt/fast-scratch/dope-benchmark/gpu-research-v1/round0-symbolic/receipts/a863cd42be4d05d4.json",
+      "attempt_receipt_sha256": "512287c257b3e58a99996e80556f4d136866cb38e77d8c36212ab483e806bf62",
+      "c2st_auc": 0.6666666666666667,
+      "catboost_retention": 0.9801709072718354,
+      "dataset": "a863cd42be4d05d4",
+      "encoded_candidate_bytes": null,
+      "energy_joules_estimate": null,
+      "exact_copies": 0,
+      "failure_code": null,
+      "family": "symbolic_default",
+      "fit_seconds": 0.3981937179341912,
+      "host": "xbabe2",
+      "linear_retention": 0.9992413159506642,
+      "metric_sha256": "57725a478fa606a487ac7fb47e1e66f0ff16d20e42978ccb5a47dfec5ea8124c",
+      "mlp_retention": 0.9654157107327159,
+      "near_copies": 1,
+      "peak_gpu_used_mib": null,
+      "phase": "discovery",
+      "status": "ok",
+      "structural_penalty": null,
+      "target_weight": null
+    }
+  ],
+  "symbolic_results_sha256": "8d9b4ce195c20cbd6724e068628657c12003931677e01f625e1f60037f3c7bf1",
+  "total_fit_seconds": 76.12063463614322,
+  "version": 1
+}

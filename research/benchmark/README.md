@@ -16,8 +16,9 @@ test partition. Final evaluation is disabled until the data manifest, method
 source/config lock, budget lock, and method–dataset matrix are frozen. Missing
 privacy, utility, or attack evidence is a failed gate with a null MFS-v2 score.
 
-`RESULTS_STATUS.md` records the 2026-09-30 rights-cleared S3 preparation and
-validation-only GPU research. Its published JSON, table, and figures live in
+`RESULTS_STATUS.md` records the 2026-10-01 rights-cleared S3 preparation,
+DOPE GPU refinement, and native-tuned CTGAN/TVAE validation comparison.
+Its published JSON, tables, and figures live in
 `results/`; the final comparison remains blocked by admission.
 The compact native likelihood study freezes its twelve-dataset, two-method
 matrix with `freeze_native_round`, runs `tune_density` on training-derived
@@ -32,6 +33,16 @@ The separate 100-lineage GaussianCopula matrix is frozen by
 `freeze_all_copula` and published by `publish_copula --expected-jobs 100
 --basename copula-native-all-validation` with its scratch round lock.
 An unavailable method is reported as unavailable; it is never a DOPE win.
+
+`SDV_METHOD_AUDIT.md` records the CTGAN/TVAE author source, license, environment,
+native objective, grid, and cross-host sampler checks. `freeze_sdv_round` and
+`sdv_round` freeze and execute the 96-fit research matrix. The frozen package
+on scratch must be used to resume that matrix: current sources may have moved
+on. `publish_sdv_validation --evaluate --publish` verifies and publishes its
+native selections and common validation outcomes. `conditional_gpu_round`
+supports bounded DOPE conditional GPU refinement with a source snapshot and
+binary hash; `publish_conditional_validation` retains original and repaired
+results. Both publishers support `--render-existing` for offline regeneration.
 
 Use `python3 -m unittest discover -s research/benchmark/tests -v` for the
 research package checks. Run the repository's `just fast` and `just check`

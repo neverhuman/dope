@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CTGAN and TVAE native validation research comparison",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "scope",
+    "complete",
+    "round_lock_path",
+    "round_lock_sha256",
+    "dope_results_sha256",
+    "methods",
+    "cells",
+    "dope_reference_cells",
+    "planned_fit_attempts",
+    "selection_optimism",
+    "ptf_v1",
+    "mfs_v2",
+    "production_certified",
+    "official_tests_opened",
+    "dope_refinement_results_sha256",
+    "dope_refinement_cells"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-sdv-native-validation-comparison"
+    },
+    "version": {
+      "const": 1
+    },
+    "scope": {
+      "const": "validation_only_one_fit_seed_one_sample_seed_n_rows"
+    },
+    "complete": {
+      "const": true
+    },
+    "round_lock_path": {
+      "type": "string"
+    },
+    "round_lock_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "dope_results_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "planned_fit_attempts": {
+      "const": 96
+    },
+    "methods": {
+      "type": "object",
+      "required": [
+        "CTGAN",
+        "TVAE"
+      ],
+      "minProperties": 2,
+      "maxProperties": 2
+    },
+    "cells": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "dataset",
+          "method",
+          "stage",
+          "selection_receipt_sha256",
+          "trials"
+        ],
+        "properties": {
+          "dataset": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{16}$"
+          },
+          "method": {
+            "enum": [
+              "CTGAN",
+              "TVAE"
+            ]
+          },
+          "stage": {
+            "enum": [
+              "discovery",
+              "confirmation"
+            ]
+          },
+          "selection_receipt_sha256": {
+            "$ref": "#/$defs/hash"
+          },
+          "trials": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "$ref": "#/$defs/trial"
+            }
+          }
+        }
+      }
+    },
+    "dope_reference_cells": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {
+        "type": "object"
+      }
+    },
+    "selection_optimism": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "dope_refinement_results_sha256": {
+      "$ref": "#/$defs/hash"
+    },
+    "dope_refinement_cells": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "trial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trial",
+        "configuration",
+        "status",
+        "host",
+        "native_validation_kpi",
+        "artifact_bytes",
+        "fit_seconds",
+        "wall_seconds",
+        "peak_gpu_used_mib",
+        "energy_joules_estimate",
+        "attempt_path",
+        "attempt_sha256",
+        "default",
+        "native_selected",
+        "common_validation"
+      ],
+      "properties": {
+        "trial": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "configuration": {
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "failed",
+            "timeout",
+            "gpu_memory_limit",
+            "resource_monitor_failed",
+            "malformed_receipt"
+          ]
+        },
+        "host": {
+          "type": "string"
+        },
+        "native_validation_kpi": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "artifact_bytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "fit_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "wall_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "peak_gpu_used_mib": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "energy_joules_estimate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "attempt_path": {
+          "type": "string"
+        },
+        "attempt_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "native_selected": {
+          "type": "boolean"
+        },
+        "common_validation": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "metric_receipt_path",
+            "metric_receipt_sha256",
+            "retention",
+            "marginal_ks_mean",
+            "c2st_auc",
+            "copy_counts",
+            "real_vs_real_control_counts"
+          ],
+          "properties": {
+            "metric_receipt_path": {
+              "type": "string"
+            },
+            "metric_receipt_sha256": {
+              "$ref": "#/$defs/hash"
+            },
+            "retention": {
+              "type": "object",
+              "required": [
+                "catboost",
+                "linear",
+                "mlp"
+              ],
+              "additionalProperties": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "marginal_ks_mean": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "c2st_auc": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "copy_counts": {
+              "$ref": "#/$defs/counts"
+            },
+            "real_vs_real_control_counts": {
+              "$ref": "#/$defs/counts"
+            }
+          }
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "exact",
+        "near"
+      ],
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    }
+  }
+}
