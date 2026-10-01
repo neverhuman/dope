@@ -180,6 +180,7 @@ def tune(dataset: str, round_path: Path = ROOT / "round.lock.json",
             trial["wall_seconds"] = time.monotonic() - started
             trial["identity"] = {"round_sha256": sha256(round_path),
                                  "dataset": dataset, "method": "GaussianCopula",
+                                 "method_source_sha256": entry["source_sha256"],
                                  "train_sha256": job["train_sha256"],
                                  "validation_sha256": job["validation_sha256"],
                                  "config": config, "fit_seed": 11}
@@ -188,7 +189,8 @@ def tune(dataset: str, round_path: Path = ROOT / "round.lock.json",
                              if (trial_root / name).exists()}
             tune_density.write_once(receipt_path, trial)
         elapsed += trial["wall_seconds"]
-        trials.append(trial)
+        trials.append({**trial, "attempt_receipt_path": str(receipt_path),
+                       "attempt_receipt_sha256": sha256(receipt_path)})
     successful = [(index, trial) for index, trial in enumerate(trials)
                   if trial["status"] == "ok"]
     if not successful or elapsed > BUDGET_SECONDS:
@@ -198,7 +200,8 @@ def tune(dataset: str, round_path: Path = ROOT / "round.lock.json",
                           digest(pair[1]["config"]), pair[0]))
     selection = {"format": "dope-benchmark-validation-selection", "version": 1,
                  "method": "GaussianCopula", "dataset": dataset,
-                 "partition": "validation", "objective": entry["native_objective"],
+                 "partition": "validation", "validation_sha256": job["validation_sha256"],
+                 "objective": entry["native_objective"],
                  "round_sha256": sha256(round_path), "stage": job["stage"],
                  "selected_trial_index": winner_index,
                  "selected_config": winner["config"], "trials": trials,

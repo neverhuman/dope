@@ -1,5 +1,10 @@
 # Prepilot cost and feasibility record
 
+**2026-10-01 erratum:** The Adult prepilot input mixed official UCI training
+and test rows. Adult fit timing and artifact size below remain historical cost
+evidence; any Adult quality estimate from that input is withdrawn. Use
+`pilot-24h-datasets.lock.json` for new Adult comparisons.
+
 Observed 2026-09-29. This record precedes the seven-method pilot, whose
 maximum was amended from 24 hours to four hours before new dispatch on
 2026-09-30. It measures worker and validation costs; it makes no MFS-v2,

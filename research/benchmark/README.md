@@ -5,8 +5,12 @@ This package does not enter the Rust production binary or alter its release deci
 production KPI contract. A future contract change requires a new version.
 
 `PROTOCOL.md` is the pre-registration. `study-design.json` fixes the cohorts;
-`pilot-datasets.lock.json` pins three rights-cleared pilot inputs and their
-splits; `methods.lock.json` records audited methods and pending source checks.
+`pilot-datasets.lock.json` preserves the historical four-hour pilot inputs.
+Its Adult partition mixed UCI's official training and test files before splitting;
+all Adult quality metrics from that pilot are withdrawn. The replacement
+`pilot-24h-datasets.lock.json` pins the official Adult test as evaluator-only,
+with 25 overlapping training-row occurrences excluded and receipted.
+`methods.lock.json` records audited methods and pending source checks.
 The latter is incomplete, so no final evaluation or headline comparison is
 authorized by these files. `score.py` requires complete measured gate evidence
 and keeps MFS-v2 null otherwise.
@@ -54,7 +58,7 @@ Entry points:
 ```text
 python3 -m research.benchmark.inventory_hosts --output HOSTS.json
 python3 -m research.benchmark.fetch_jope DATASET_HASH DATA_ROOT
-python3 -m research.benchmark.public_sources Adult ADULT.zip ADULT.csv
+python3 -m research.benchmark.public_sources Adult ADULT.zip ADULT_TRAIN.csv --test-output ADULT_TEST.csv
 python3 -m research.benchmark.california_source CAL_HOUSING.tgz CALIFORNIA.csv
 python3 -m research.benchmark.manifest SELECTION.json DATA_ROOT/prepared
 python3 -m research.benchmark.select_extension REVIEWED_TASK_CANDIDATES.json

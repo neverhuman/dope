@@ -1,5 +1,11 @@
 # Four-hour generator benchmark pilot: cost and admission decision
 
+**Adult quality erratum (2026-10-01):** The four-hour Adult input mixed UCI
+`adult.data` and `adult.test` before splitting. All Adult quality estimates
+below are withdrawn and cannot enter a comparison or selection. The historical
+fit timings and artifact bytes remain cost evidence for that superseded input.
+The new official-test preparation and hashes are in `pilot-24h-datasets.lock.json`.
+
 Observed 2026-09-30 on `xbabe1`, `xbabe2`, and `xbabe3`. The pilot started at
 13:13 UTC and closed at 15:47 UTC, within its 17:13 UTC hard deadline. The public test
 partition has not been opened. Each worker directory contains only train,
@@ -104,9 +110,9 @@ the final evaluator.
 
 | Dataset | Method | CatBoost retention | Linear retention | MLP retention | C2ST AUC |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Adult | DOPE | 0.815 | 0.963 | 0.923 | 0.726 |
-| Adult | Independent marginals | -0.064 | -0.009 | -0.082 | 1.000 |
-| Adult | Chow–Liu | 0.700 | 0.721 | 0.661 | 0.925 |
+| Adult | DOPE | withdrawn | withdrawn | withdrawn | withdrawn |
+| Adult | Independent marginals | withdrawn | withdrawn | withdrawn | withdrawn |
+| Adult | Chow–Liu | withdrawn | withdrawn | withdrawn | withdrawn |
 | California | DOPE | 0.724 | 0.575 | 0.661 | 0.800 |
 | California | Independent marginals | -0.013 | 0.027 | 0.032 | 0.959 |
 | California | Chow–Liu | 0.645 | 0.819 | 0.743 | 0.986 |
@@ -115,7 +121,7 @@ the final evaluator.
 | News | Independent marginals | -101.146 | -108.692 | undefined | 0.993 |
 | News | Chow–Liu | -490.417 | -517.865 | undefined | 0.998 |
 
-The three DOPE CatBoost validation estimates are below the registered 0.99
+The California and News DOPE CatBoost validation estimates are below the registered 0.99
 retention gate threshold; the full paired lower-bound and profile-folding
 calculation has not run. This is a reason to test the claim carefully, not a
 paper conclusion. Copy and C2ST checks are descriptive and do not substitute
