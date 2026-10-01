@@ -35,6 +35,10 @@ def build() -> dict:
     matrix = read(matrix_path)
     parent = read(parent_path)
     validation = read(validation_path)
+    replay_lock_path = RUN / "metric-replay-v1/round.lock.json"
+    replay_manifest_path = RUN / "metric-replay-v1/manifest.json"
+    replay_lock = read(replay_lock_path)
+    replay_manifest = read(replay_manifest_path)
     if (len(matrix["jobs"]) != 12
             or validation["matrix_sha256"] != sha256(matrix_path)
             or validation["parent_validation_lock_sha256"] != sha256(parent_path)
@@ -43,6 +47,32 @@ def build() -> dict:
             or validation["official_tests_opened"] is not False
             or validation["mfs_v2"] is not None or validation["ptf_v1"] is not None):
         raise ValueError("GaussianCopula pilot matrix or validator changed")
+    if (replay_lock["source_sha256"] != sha256(
+            HERE / "pilot24_copula_metric_replay.py")
+            or replay_lock["validation_v2_lock_sha256"] != sha256(validation_path)
+            or replay_lock["comparison_policy"]
+            != "exact_metric_payload_except_elapsed_metric_seconds"
+            or replay_manifest["round_lock_sha256"] != sha256(replay_lock_path)
+            or replay_manifest["source_sha256"] != replay_lock["source_sha256"]
+            or replay_manifest["exact_cells"] != 24
+            or replay_manifest["official_tests_opened"] is not False
+            or replay_manifest["mfs_v2"] is not None
+            or replay_manifest["ptf_v1"] is not None):
+        raise ValueError("GaussianCopula metric replay is incomplete")
+    replay_by_metric = {}
+    for entry in replay_manifest["cells"]:
+        path = RUN / "metric-replay-v1/cells" / f"{entry['cell_digest']}.json"
+        replay = checked(path, entry["receipt_sha256"])
+        if (replay["status"] != "exact"
+                or replay["round_lock_sha256"] != sha256(replay_lock_path)
+                or replay["metric_sha256"] != entry["metric_sha256"]
+                or replay["official_tests_opened"] is not False
+                or replay["mfs_v2"] is not None or replay["ptf_v1"] is not None
+                or entry["metric_sha256"] in replay_by_metric):
+            raise ValueError("GaussianCopula metric replay receipt changed")
+        replay_by_metric[entry["metric_sha256"]] = (path, replay)
+    if len(replay_by_metric) != 24:
+        raise ValueError("GaussianCopula replay metric matrix is incomplete")
     rows = []
     failures = []
     native = []
@@ -148,6 +178,13 @@ def build() -> dict:
                     raise ValueError("GaussianCopula sample changed")
                 metric_path = RUN / "validation-metrics" / fit["fit_key"] / f"{sample_attempt['run_key']}.json"
                 metric = read(metric_path)
+                metric_sha = sha256(metric_path)
+                replay_path, replay = replay_by_metric[metric_sha]
+                if (replay["cell"]["metric_path"] != str(metric_path)
+                        or replay["metric_payload"] != {
+                            key: value for key, value in metric["metrics"].items()
+                            if key != "metric_seconds"}):
+                    raise ValueError("GaussianCopula metric replay payload changed")
                 if (metric["fit_receipt_sha256"] != sha256(fit_path)
                         or metric["sample_receipt_sha256"] != sha256(sample_path)
                         or metric["metric_source_sha256"] != validation["metric_sha256"]
@@ -173,6 +210,7 @@ def build() -> dict:
                              "artifact_bytes": fit["artifact_bytes"],
                              "within_l3_bytes": fit["artifact_bytes"] <= 10_240,
                              "metric_receipt_sha256": sha256(metric_path),
+                             "metric_replay_receipt_sha256": sha256(replay_path),
                              "fit_receipt_sha256": sha256(fit_path),
                              "sample_receipt_sha256": sha256(sample_path)})
         if entry["kind"] == "tuned" and entry["seed"] == 23:
@@ -238,12 +276,15 @@ def build() -> dict:
             "source_sha256": sha256(Path(__file__)),
             "locks": {"matrix": sha256(matrix_path), "validation_v1": sha256(parent_path),
                       "validation_v2": sha256(validation_path),
+                      "metric_replay": sha256(replay_lock_path),
+                      "metric_replay_manifest": sha256(replay_manifest_path),
                       "dope_neural_report": sha256(neural_path)},
             "native_validation_kpi": native, "copula_cells": rows,
             "failed_cells": failures, "paired_dope_q8_vs_tuned_copula": pairs,
             "paired_descriptive_summary": summary,
             "notes": ["Three datasets and one paired fit seed are descriptive only.",
                       "Failed default or sample cells remain visible and have no score.",
+                      "All 24 Copula metrics replayed exactly except elapsed timing.",
                       "Native mean log density is used only for GaussianCopula tuning.",
                       "No official test rows opened; MFS-v2 and PTF-v1 remain null."],
             "official_tests_opened": False, "mfs_v2": None, "ptf_v1": None,
@@ -302,7 +343,9 @@ def main() -> None:
                      f"{row['selected_trial_index']} |")
     lines += ["", "Six default fit/sample cells failed under their frozen time caps "
               "and remain explicit null outcomes. Artifact bytes include the fitted "
-              "generator and projection map. Native KPI values are used only within "
+              "generator and projection map. All 24 scored Copula metrics replayed "
+              "exactly from their verified samples, excluding elapsed timing. "
+              "Native KPI values are used only within "
               "GaussianCopula datasets. This three-dataset, one-fit-seed panel is "
               "descriptive and does not establish superiority or production certification. "
               "Official tests stayed sealed; MFS-v2 and PTF-v1 are null.", ""]

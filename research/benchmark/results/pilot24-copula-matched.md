@@ -14,4 +14,4 @@ Same Adult, California, and News training-derived validation partitions. Gaussia
 | California | -9.199259 | 1 |
 | News | -690.775528 | 1 |
 
-Six default fit/sample cells failed under their frozen time caps and remain explicit null outcomes. Artifact bytes include the fitted generator and projection map. Native KPI values are used only within GaussianCopula datasets. This three-dataset, one-fit-seed panel is descriptive and does not establish superiority or production certification. Official tests stayed sealed; MFS-v2 and PTF-v1 are null.
+Six default fit/sample cells failed under their frozen time caps and remain explicit null outcomes. Artifact bytes include the fitted generator and projection map. All 24 scored Copula metrics replayed exactly from their verified samples, excluding elapsed timing. Native KPI values are used only within GaussianCopula datasets. This three-dataset, one-fit-seed panel is descriptive and does not establish superiority or production certification. Official tests stayed sealed; MFS-v2 and PTF-v1 are null.
