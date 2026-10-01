@@ -1,4 +1,49 @@
 
+#[cfg(feature = "gpu-research-training")]
+fn bounded_research_training_settings(profile: &str) -> Result<(usize, usize, usize)> {
+    let (features, steps) = match profile {
+        "features12_steps512" => (12, 512),
+        "features12_steps2048" => (12, 2048),
+        "features24_steps512" => (24, 512),
+        "features24_steps2048" => (24, 2048),
+        _ => return Err(DopeError::Unsupported("unknown bounded GPU research profile".into())),
+    };
+    Ok((features, 16, steps))
+}
+
+#[cfg(feature = "gpu-training")]
+fn compact_neural_training_settings(feature_count: usize) -> Result<(usize, usize, usize)> {
+    #[cfg(feature = "gpu-research-training")]
+    match std::env::var("DOPE_RESEARCH_TARGET_PROFILE") {
+        Ok(profile) => return bounded_research_training_settings(&profile),
+        Err(std::env::VarError::NotUnicode(_)) => {
+            return Err(DopeError::Unsupported("unknown bounded GPU research profile".into()));
+        }
+        Err(std::env::VarError::NotPresent) => {}
+    }
+    Ok((12, feature_count.min(12).clamp(4, 12), 96))
+}
+
+#[cfg(all(test, feature = "gpu-research-training"))]
+mod bounded_research_training_tests {
+    use super::*;
+
+    #[test]
+    fn profiles_preserve_operator_dimensions_and_reject_unknown_requests() {
+        for (profile, features, steps) in [
+            ("features12_steps512", 12, 512),
+            ("features12_steps2048", 12, 2048),
+            ("features24_steps512", 24, 512),
+            ("features24_steps2048", 24, 2048),
+        ] {
+            let (limit, width, iterations) = bounded_research_training_settings(profile).unwrap();
+            assert_eq!((limit, width, iterations), (features, 16, steps));
+            assert!(limit <= 24 && width <= 16);
+        }
+        assert!(bounded_research_training_settings("features48_steps99999").is_err());
+    }
+}
+
 
 #[cfg(feature = "gpu-training")]
 fn fit_compact_neural_target(
@@ -20,12 +65,13 @@ fn fit_compact_neural_target(
         ));
     }
     crate::libtorch::with_seeded_libtorch(seed, || {
+        let (feature_limit, hidden_width, optimizer_steps) =
+            compact_neural_training_settings(screen.len())?;
         let selected = screen
             .iter()
-            .take(12)
+            .take(feature_limit)
             .map(|(feature, _)| *feature)
             .collect::<Vec<_>>();
-        let hidden_width = selected.len().clamp(4, 12);
         let mut rows = Vec::with_capacity(table.rows * selected.len());
         for row in 0..table.rows {
             for &feature in &selected {
@@ -64,7 +110,7 @@ fn fit_compact_neural_target(
         let mut optimizer = tch::nn::AdamW::default()
             .build(&store, 2e-3)
             .map_err(|error| DopeError::Data(format!("neural candidate optimizer: {error}")))?;
-        for _ in 0..96 {
+        for _ in 0..optimizer_steps {
             let prediction = forward(&x);
             let loss = if logistic {
                 prediction.binary_cross_entropy_with_logits::<&tch::Tensor>(
