@@ -486,12 +486,49 @@ retained in the [stability report](results/pilot24-dope-q8-fivefit.md),
 `python3 -m research.benchmark.publish_dope_q8_fivefit` and
 `python3 -m research.benchmark.publish_dope_q8_fivefit_figure`;
 `--from-json` regenerates tables without scratch access. This is a fixed
-configuration replication following validation family selection; the
-existing native-tuned neural comparator panel has only one fit seed.
+configuration replication following validation family selection. The initial
+native-tuned neural comparator panel had one fit seed; the completed matched
+five-fit panel below adds the fixed comparator replications.
 Every compiler receipt still fails utility, driver, and unmeasured production
 evidence gates. Some California fits used negligible GPU memory, so GPU
 host placement is not interpreted as neural training for every artifact.
 Official tests remain sealed, and MFS-v2/PTF-v1 are null.
+
+## Complete matched five-fit CTGAN/TVAE stability panel
+
+Adult and California now have the complete matched five-fit validation matrix:
+240 shared `n`/`4n` metric cells, including 210 successful cells and 30 explicit
+unavailable Adult default CTGAN cells. All 360 comparator `n`/`2n`/`4n`/`8n`
+sample identities are reconciled (300 successful, 60 unavailable); prior
+seed-23 fits and samples are reused once. The 30 distinct comparator fits
+include 25 successes and five Adult default CTGAN 600-second timeouts.
+Defaults and configurations selected on each comparator's frozen SDMetrics
+native F1/R² objective remain separate, except when they are identical and
+share a physical fit. Replication introduced no tuning.
+
+Median CatBoost retention across the five fit medians at `n`/`4n` is
+DOPE 0.8232/0.8289 versus TVAE 0.8180/0.8128 on Adult, and
+DOPE 0.7032/0.6991 versus native-selected TVAE 0.8929/0.8964 on California.
+These descriptive validation outcomes establish neither paired paper
+superiority nor a release score. DOPE's charged artifacts are 2,524–6,342
+bytes; every successful CTGAN/TVAE artifact exceeds the 10,240-byte L3 cap.
+Unconstrained comparator quality remains visible separately from byte
+eligibility. Failed executable fits confer no DOPE win.
+
+The [report](results/pilot24-native-neural-fivefit.md),
+[JSON](results/pilot24-native-neural-fivefit.json),
+[schema](results/pilot24-native-neural-fivefit.schema.json),
+[CSV](results/pilot24-native-neural-fivefit.csv), and
+[SVG](results/pilot24-native-neural-fivefit.svg)/
+[PDF](results/pilot24-native-neural-fivefit.pdf) retain per-seed outcomes,
+charged bytes, native KPI, near-match/real-vs-real controls, failed attempts,
+host costs, all three DOPE preflight failures, and immutable receipt hashes.
+Prior pilot R&D is charged separately; total campaign R&D remains incomplete,
+and equal total research spending is not claimed. Regenerate with
+`python3 -m research.benchmark.publish_native_neural_fivefit` and
+`python3 -m research.benchmark.publish_native_neural_fivefit_figure`;
+`--from-json` regenerates the tables without scratch access. Official tests
+remain sealed; MFS-v2/PTF-v1 and release-safe status remain null.
 
 ## TabPC author contracts
 
