@@ -9,6 +9,11 @@ case "${1:-run}" in
     export PATH="$PWD/target/ci-python/bin:$PATH"
     bash agent/check-python-v1-boundary.sh
     bash agent/check-external-boundary.sh
+    target/ci-python/bin/python - <<'PY'
+import json
+assert json.load(open("research/benchmark/sdv-runtime.lock.json"))["catboost"] == "1.2.10"
+PY
+    target/ci-python/bin/python -m pip install 'catboost==1.2.10'
     bash agent/check-benchmark-boundary.sh
     ;;
   verify)

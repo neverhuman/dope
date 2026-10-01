@@ -3,7 +3,10 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 evidence_dir=target/jankurai/boundaries/offline-benchmark-evidence
 mkdir -p "$evidence_dir"
-(cd target && PYTHONPATH=.. python3 -m unittest discover -s ../research/benchmark/tests -v) > "$evidence_dir/unittest.log" 2>&1
+if ! (cd target && PYTHONPATH=.. python3 -m unittest discover -s ../research/benchmark/tests -v) > "$evidence_dir/unittest.log" 2>&1; then
+  cat "$evidence_dir/unittest.log" >&2
+  exit 1
+fi
 python3 - <<'PY'
 import ast
 import hashlib
