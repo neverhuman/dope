@@ -13,6 +13,7 @@ author's transformed-space validation mean negative log likelihood. Native
 likelihood values are not ranked across different methods. The bounded search
 contains the author default and seven declared configurations from the
 author's likelihood grid, with at most eight trials, including failures.
+For News, the largest grid point uses the author's 1024-unit adjustment.
 
 The author sampler resets CUDA memory statistics even when sampling on CPU
 with CUDA hidden. The published one-line guard changes only that reset.

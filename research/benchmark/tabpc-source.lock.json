@@ -1,26 +1,57 @@
 {
   "adapter_source_sha256": "3b2b9e510a5f85c9ed0e0f1d5dccceaf77a6d074cf65c50928dec59132fe960c",
+  "all_generated_input_fit_costs": {
+    "fits": 6,
+    "receipts": [
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/contract-probe-v1/regression/attempt-0001.json",
+        "sha256": "2d0a3fa16536cbd340cfc9c5df15873218731b86719670b80b25a8a361788ff1"
+      },
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/contract-probe-v1/binary/attempt-0001.json",
+        "sha256": "f6ba2ebe499c456d19b1a9a4ef9c8b974942c484522ee17ee316643501aa1194"
+      },
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/attempt-0001.json",
+        "sha256": "83219bfdbabd5513642531e6a4762f45bf4030ccabf9b39753439e07643fe56a"
+      },
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/attempt-0001.json",
+        "sha256": "bece89ae2c446b743928cbfc9bd65ac8555dc8b5ff6d4ff4aab836bff29a5810"
+      },
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/attempt-0001.json",
+        "sha256": "7f0adceb9ae6dd2c16a3123c9b2f7d3fee63918f7afcd157289af610481de77f"
+      },
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/binary/attempt-0001.json",
+        "sha256": "67f886009695b31cfbcbbbec5cad2e54bf97bd30f934feb507664098d0631e73"
+      }
+    ],
+    "scope": "contract_development_compute_not_real_benchmark_tuning",
+    "summed_elapsed_seconds": 67.81319737713784
+  },
   "artifact_policy": "all learned preprocessors/circuit/weights/config/projection files charged; retained data.pkl is an empty metadata tensor, verified exact sample parity",
   "cirkit_archive_sha256": "e4b61ea488674d2310ce72b84648ddfca392d9fb10e91385c7bf238b591cb717",
   "cirkit_commit": "cc02ed2964308a2e3d009ca71bb5548920d18891",
   "cirkit_license": "GPL-3.0-or-later",
   "cirkit_upstream_url": "https://github.com/dylanponsford/cirkit",
   "compatibility_patch": "guard_only_unconditional_sampling_cuda_memory_stat_reset_when_cuda_is_unavailable",
-  "compatibility_patch_sha256": "63e3f6ca03b36a4d2f3d82cfb37d8351c16773ae39a8d7bd93363515451f1bf9",
+  "compatibility_patch_sha256": "9e584325f4a64e772d6c73278db95b220cc5633e28eb5b325e40a8ead332ed58",
   "contracts": [
     {
-      "artifact_bytes": 15066,
+      "artifact_bytes": 15068,
       "artifact_files": 12,
       "cost_receipt": {
-        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/attempt-0001.json",
-        "sha256": "83219bfdbabd5513642531e6a4762f45bf4030ccabf9b39753439e07643fe56a"
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/attempt-0001.json",
+        "sha256": "7f0adceb9ae6dd2c16a3123c9b2f7d3fee63918f7afcd157289af610481de77f"
       },
-      "energy_joules_estimate": 746.5482368721813,
+      "energy_joules_estimate": 762.9497296666028,
       "fit_receipt": {
-        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/contract-receipt.json",
-        "sha256": "29551026cc42ab0439d37a7ddb47830fcd12980492bfe375a819575cdc790e65"
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/contract-receipt.json",
+        "sha256": "40b36da3755b1610b30989997064280d34edc700f78cdc397ba63fb033c9a89e"
       },
-      "gpu_elapsed_seconds": 11.29197785211727,
+      "gpu_elapsed_seconds": 11.316457117907703,
       "host": "xbabe2",
       "independent_cuda_hidden_sample_replay": "exact",
       "native_nll_finite": true,
@@ -29,12 +60,12 @@
       "row_removal_replay": "exact",
       "sample_receipts": [
         {
-          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/cpu-sample-1.receipt.json",
-          "sha256": "34e1efe0729922fa3cfb79ae85eb5082864fa69fcb2a5fe00f99d6fc3facf5d9"
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/cpu-sample-1.receipt.json",
+          "sha256": "4a160874d2337c6f285082c727d44650aacaf638add50692d3048286950f3cc6"
         },
         {
-          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/regression/cpu-sample-2.receipt.json",
-          "sha256": "2eed21b0800defb79b310781557082f3be0e4e3726d7e2c1751e43716584e1a4"
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/regression/cpu-sample-2.receipt.json",
+          "sha256": "573f299b78bef53b019472740f499adf70ae838a7378c0fdffce6ad082be38b5"
         }
       ],
       "scope": "generated_inputs_only_not_reported_experiment_reproduction",
@@ -43,18 +74,18 @@
       "task": "regression"
     },
     {
-      "artifact_bytes": 17156,
+      "artifact_bytes": 17158,
       "artifact_files": 12,
       "cost_receipt": {
-        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/attempt-0001.json",
-        "sha256": "bece89ae2c446b743928cbfc9bd65ac8555dc8b5ff6d4ff4aab836bff29a5810"
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/binary/attempt-0001.json",
+        "sha256": "67f886009695b31cfbcbbbec5cad2e54bf97bd30f934feb507664098d0631e73"
       },
-      "energy_joules_estimate": 931.3212400813657,
+      "energy_joules_estimate": 956.3304081261042,
       "fit_receipt": {
-        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/contract-receipt.json",
-        "sha256": "e82726a9e703d2697dfa08ab6f837de596e1ea6a5bdbcbabe5a4aec41443b7b3"
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/binary/contract-receipt.json",
+        "sha256": "c56b83972943b0cc3334b2767bda8064a11371c1403d405892731bd7b370ecf0"
       },
-      "gpu_elapsed_seconds": 11.26868181093596,
+      "gpu_elapsed_seconds": 12.353722939034924,
       "host": "xbabe2",
       "independent_cuda_hidden_sample_replay": "exact",
       "native_nll_finite": true,
@@ -63,12 +94,12 @@
       "row_removal_replay": "exact",
       "sample_receipts": [
         {
-          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/cpu-sample-1.receipt.json",
-          "sha256": "012add2923da7217f5ab6973e51fa33a94805401147d60e59e05f46b5c37c630"
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/binary/cpu-sample-1.receipt.json",
+          "sha256": "5f7d94df65cd4600edc357e549e5037ec332ef8ac16e6f794ee3351b70be31b5"
         },
         {
-          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/binary/cpu-sample-2.receipt.json",
-          "sha256": "e6e258a11b3e83d9a15bea3053d9daaf0ebf39c4023a2462752edfb8b7012906"
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/binary/cpu-sample-2.receipt.json",
+          "sha256": "56a5a437d01849f5bc16b5bb1c41bfea27d0f7bad4bc35bfb3ea50dd88139f76"
         }
       ],
       "scope": "generated_inputs_only_not_reported_experiment_reproduction",
@@ -183,6 +214,12 @@
   "matrix_admission": "pending_final_methods_and_campaign_locks",
   "method": "TabPC",
   "mfs_v2": null,
+  "native_dataset_overrides": {
+    "News": {
+      "num_units_2048_replaced_with": 1024,
+      "source": "scripts/experiment_likelihoods.py author News OOM adjustment"
+    }
+  },
   "native_objective": {
     "checkpoint_selection": "author validation NLL early stopping",
     "direction": "minimize",
@@ -197,7 +234,7 @@
   },
   "official_tests_opened": false,
   "patched_cpu_parity_receipt": {
-    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/compatibility-patched-regression.json",
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/compatibility-patched-regression.json",
     "sha256": "907a9a417abf02397d6bf2e883f4b50f6e8daa7f6ab2df4141e7b14d7d597be3"
   },
   "per_gpu_fit_seconds": 600,
@@ -218,8 +255,8 @@
   "release_l3_claim": false,
   "runtime_dependency_source_file_count": 5465,
   "runtime_lock": {
-    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v2/runtime.lock.json",
-    "sha256": "d4f96925c63354741966191f737ef601411d4543f5d326772a6fd155d635c963"
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v3/runtime.lock.json",
+    "sha256": "552a298f1c59a9e9f99eebc513c54690af2863ca2d105666254eb283284f0807"
   },
   "runtime_python": "3.10.12",
   "runtime_role": "restricted_research_only_not_mit_product_runtime",
