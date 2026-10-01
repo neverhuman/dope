@@ -6,6 +6,51 @@
       "pattern": "^[0-9a-f]{64}$",
       "type": "string"
     },
+    "all_generated_input_fit_costs": {
+      "additionalProperties": false,
+      "properties": {
+        "fits": {
+          "const": 6
+        },
+        "receipts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "maxItems": 6,
+          "minItems": 6,
+          "type": "array"
+        },
+        "scope": {
+          "const": "contract_development_compute_not_real_benchmark_tuning"
+        },
+        "summed_elapsed_seconds": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "fits",
+        "summed_elapsed_seconds",
+        "scope",
+        "receipts"
+      ],
+      "type": "object"
+    },
     "artifact_policy": {
       "minLength": 1,
       "type": "string"
@@ -683,6 +728,14 @@
     "mfs_v2": {
       "type": "null"
     },
+    "native_dataset_overrides": {
+      "const": {
+        "News": {
+          "num_units_2048_replaced_with": 1024,
+          "source": "scripts/experiment_likelihoods.py author News OOM adjustment"
+        }
+      }
+    },
     "native_objective": {
       "additionalProperties": false,
       "properties": {
@@ -989,7 +1042,9 @@
     "tuning_search_space",
     "upstream_commit",
     "upstream_url",
-    "version"
+    "version",
+    "all_generated_input_fit_costs",
+    "native_dataset_overrides"
   ],
   "title": "Frozen TabPC author source and contract audit",
   "type": "object"
