@@ -492,3 +492,13 @@ Every compiler receipt still fails utility, driver, and unmeasured production
 evidence gates. Some California fits used negligible GPU memory, so GPU
 host placement is not interpreted as neural training for every artifact.
 Official tests remain sealed, and MFS-v2/PTF-v1 are null.
+
+## TabPC author contracts
+
+The pinned author TabPC/Cirkit runtime now passes regression and binary
+generated-input fit/sample contracts. Native tuning is frozen to author
+transformed validation mean NLL and the declared eight-trial grid; the CPU
+memory-stat compatibility guard, retained empty-row metadata tensor and full
+artifact charges are explicit in [TABPC.md](TABPC.md) and
+`tabpc-source.lock.json`. No real-data TabPC result or release score is inferred
+from these probes. Final campaign locks and official tests remain sealed.

@@ -1,0 +1,996 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "artifact_policy": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "cirkit_archive_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "cirkit_commit": {
+      "const": "cc02ed2964308a2e3d009ca71bb5548920d18891"
+    },
+    "cirkit_license": {
+      "const": "GPL-3.0-or-later"
+    },
+    "cirkit_upstream_url": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "compatibility_patch": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "compatibility_patch_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "contracts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "artifact_files": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "cost_receipt": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "energy_joules_estimate": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "fit_receipt": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "gpu_elapsed_seconds": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "host": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "independent_cuda_hidden_sample_replay": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "native_nll_finite": {
+            "const": true
+          },
+          "peak_gpu_used_mib": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "retained_row_tensor_elements": {
+            "const": 0
+          },
+          "row_removal_replay": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sample_receipts": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "type": "object"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "scope": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "serialized_replay": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "const": "ok"
+          },
+          "task": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_bytes",
+          "artifact_files",
+          "cost_receipt",
+          "energy_joules_estimate",
+          "fit_receipt",
+          "gpu_elapsed_seconds",
+          "host",
+          "independent_cuda_hidden_sample_replay",
+          "native_nll_finite",
+          "peak_gpu_used_mib",
+          "retained_row_tensor_elements",
+          "row_removal_replay",
+          "sample_receipts",
+          "scope",
+          "serialized_replay",
+          "status",
+          "task"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "default_config": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_size": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "epochs": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "learning_rate": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "num_units": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "batch_size",
+        "epochs",
+        "learning_rate",
+        "num_units"
+      ],
+      "type": "object"
+    },
+    "environment": {
+      "additionalProperties": false,
+      "properties": {
+        "Authlib": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "Jinja2": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "MarkupSafe": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "Pygments": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "RapidFuzz": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "annotated-doc": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "annotated-types": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "arrow": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "certifi": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "cffi": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "charset-normalizer": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "click": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "cloudpickle": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "codecarbon": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "contourpy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "cryptography": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "cycler": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "einops": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "filelock": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "fonttools": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "fsspec": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "graphviz": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idna": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "joblib": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "joserfc": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kiwisolver": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "markdown-it-py": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "matplotlib": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mdurl": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mpmath": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "networkx": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "numpy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cublas-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cuda-cupti-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cuda-nvrtc-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cuda-runtime-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cudnn-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cufft-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cufile-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-curand-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cusolver-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cusparse-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-cusparselt-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-ml-py": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-nccl-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-nvjitlink-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-nvshmem-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-nvtx-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "opt_einsum": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "packaging": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pandas": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pillow": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "prometheus_client": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "prompt_toolkit": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "psutil": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "py-cpuinfo": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pycountry": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pycparser": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pydantic": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pydantic_core": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pyparsing": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "python-dateutil": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pytz": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "questionary": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "requests": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "rich": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "scikit-learn": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "scipy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "shellingham": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "six": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sympy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "threadpoolctl": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "torch": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "tqdm": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "triton": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "typer": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "typing-inspection": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "typing_extensions": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "tzdata": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "urllib3": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "wcwidth": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "Authlib",
+        "Jinja2",
+        "MarkupSafe",
+        "Pygments",
+        "RapidFuzz",
+        "annotated-doc",
+        "annotated-types",
+        "arrow",
+        "certifi",
+        "cffi",
+        "charset-normalizer",
+        "click",
+        "cloudpickle",
+        "codecarbon",
+        "contourpy",
+        "cryptography",
+        "cycler",
+        "einops",
+        "filelock",
+        "fonttools",
+        "fsspec",
+        "graphviz",
+        "idna",
+        "joblib",
+        "joserfc",
+        "kiwisolver",
+        "markdown-it-py",
+        "matplotlib",
+        "mdurl",
+        "mpmath",
+        "networkx",
+        "numpy",
+        "nvidia-cublas-cu12",
+        "nvidia-cuda-cupti-cu12",
+        "nvidia-cuda-nvrtc-cu12",
+        "nvidia-cuda-runtime-cu12",
+        "nvidia-cudnn-cu12",
+        "nvidia-cufft-cu12",
+        "nvidia-cufile-cu12",
+        "nvidia-curand-cu12",
+        "nvidia-cusolver-cu12",
+        "nvidia-cusparse-cu12",
+        "nvidia-cusparselt-cu12",
+        "nvidia-ml-py",
+        "nvidia-nccl-cu12",
+        "nvidia-nvjitlink-cu12",
+        "nvidia-nvshmem-cu12",
+        "nvidia-nvtx-cu12",
+        "opt_einsum",
+        "packaging",
+        "pandas",
+        "pillow",
+        "prometheus_client",
+        "prompt_toolkit",
+        "psutil",
+        "py-cpuinfo",
+        "pycountry",
+        "pycparser",
+        "pydantic",
+        "pydantic_core",
+        "pyparsing",
+        "python-dateutil",
+        "pytz",
+        "questionary",
+        "requests",
+        "rich",
+        "scikit-learn",
+        "scipy",
+        "shellingham",
+        "six",
+        "sympy",
+        "threadpoolctl",
+        "torch",
+        "tqdm",
+        "triton",
+        "typer",
+        "typing-inspection",
+        "typing_extensions",
+        "tzdata",
+        "urllib3",
+        "wcwidth"
+      ],
+      "type": "object"
+    },
+    "fit_api": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "fixed_author_settings": {
+      "additionalProperties": false,
+      "properties": {
+        "category_threshold": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "chow_liu_mi_bins": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "dequantize_all_floats": {
+          "const": false
+        },
+        "early_stopping_patience": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "handle_inflated_values": {
+          "const": true
+        },
+        "lr_scheduler": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "optimizer": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sum_product_layer": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "category_threshold",
+        "chow_liu_mi_bins",
+        "dequantize_all_floats",
+        "early_stopping_patience",
+        "handle_inflated_values",
+        "lr_scheduler",
+        "optimizer",
+        "sum_product_layer"
+      ],
+      "type": "object"
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-tabpc-author-source-audit"
+    },
+    "gpu_vram_mib_cap": {
+      "const": 16384
+    },
+    "matrix_admission": {
+      "const": "pending_final_methods_and_campaign_locks"
+    },
+    "method": {
+      "const": "TabPC"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_objective": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_selection": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "direction": {
+          "const": "minimize"
+        },
+        "implementation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "const": "author_transformed_validation_mean_nll"
+        },
+        "native_values_cross_method_ranking": {
+          "const": false
+        },
+        "shared_kpi_used_for_selection": {
+          "const": false
+        },
+        "tie_breaks": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "checkpoint_selection",
+        "direction",
+        "implementation",
+        "name",
+        "native_values_cross_method_ranking",
+        "shared_kpi_used_for_selection",
+        "tie_breaks"
+      ],
+      "type": "object"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "patched_cpu_parity_receipt": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "per_gpu_fit_seconds": {
+      "const": 600
+    },
+    "preflight_failures": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "receipt_path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "receipt_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason",
+          "receipt_path",
+          "receipt_sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "preprocessing": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_l3_claim": {
+      "const": false
+    },
+    "runtime_dependency_source_file_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "runtime_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "runtime_python": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "runtime_role": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sample_api": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "search_space_source": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_archive_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_license": {
+      "const": "Apache-2.0"
+    },
+    "source_member_sha256": {
+      "additionalProperties": false,
+      "properties": {
+        "author-runtime-cpu-v1/src/models/probabilistic_circuit.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "cirkit-source/LICENSE": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/LICENSE": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/scripts/experiment_likelihoods.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/src/models/model.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/src/models/probabilistic_circuit.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/src/nn/training.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/src/preprocessors/compose.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/src/preprocessors/df_quantile_normalizer.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/train_scripts/pc.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source/train_scripts/pc_lls.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "author-runtime-cpu-v1/src/models/probabilistic_circuit.py",
+        "cirkit-source/LICENSE",
+        "source/LICENSE",
+        "source/scripts/experiment_likelihoods.py",
+        "source/src/models/model.py",
+        "source/src/models/probabilistic_circuit.py",
+        "source/src/nn/training.py",
+        "source/src/preprocessors/compose.py",
+        "source/src/preprocessors/df_quantile_normalizer.py",
+        "source/train_scripts/pc.py",
+        "source/train_scripts/pc_lls.py"
+      ],
+      "type": "object"
+    },
+    "total_trial_cap_per_dataset": {
+      "const": 8
+    },
+    "total_wall_cap_seconds_per_dataset": {
+      "const": 43200
+    },
+    "tuning_search_space": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "batch_size": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "epochs": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "learning_rate": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "num_units": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "batch_size",
+          "epochs",
+          "learning_rate",
+          "num_units"
+        ],
+        "type": "object"
+      },
+      "maxItems": 8,
+      "minItems": 8,
+      "type": "array"
+    },
+    "upstream_commit": {
+      "const": "b821a47a9ca9f674f1083d1309b1e7e548657c0d"
+    },
+    "upstream_url": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "adapter_source_sha256",
+    "artifact_policy",
+    "cirkit_archive_sha256",
+    "cirkit_commit",
+    "cirkit_license",
+    "cirkit_upstream_url",
+    "compatibility_patch",
+    "compatibility_patch_sha256",
+    "contracts",
+    "default_config",
+    "environment",
+    "fit_api",
+    "fixed_author_settings",
+    "formal_dp_claim",
+    "format",
+    "gpu_vram_mib_cap",
+    "matrix_admission",
+    "method",
+    "mfs_v2",
+    "native_objective",
+    "official_tests_opened",
+    "patched_cpu_parity_receipt",
+    "per_gpu_fit_seconds",
+    "preflight_failures",
+    "preprocessing",
+    "ptf_v1",
+    "release_l3_claim",
+    "runtime_dependency_source_file_count",
+    "runtime_lock",
+    "runtime_python",
+    "runtime_role",
+    "sample_api",
+    "search_space_source",
+    "source_archive_sha256",
+    "source_license",
+    "source_member_sha256",
+    "total_trial_cap_per_dataset",
+    "total_wall_cap_seconds_per_dataset",
+    "tuning_search_space",
+    "upstream_commit",
+    "upstream_url",
+    "version"
+  ],
+  "title": "Frozen TabPC author source and contract audit",
+  "type": "object"
+}
