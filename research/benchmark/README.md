@@ -48,6 +48,15 @@ supports bounded DOPE conditional GPU refinement with a source snapshot and
 binary hash; `publish_conditional_validation` retains original and repaired
 results. Both publishers support `--render-existing` for offline regeneration.
 
+The matched five-fit pilot panel uses `publish_native_neural_fivefit` to verify
+DOPE q8, CTGAN and TVAE against the same Adult/California training-derived
+validation inputs. All five fit seeds and three sample seeds must be accounted
+for, including failures. Native selections are retained without new tuning;
+shared `n`/`4n` outcomes never select comparator configurations. Generate the
+SVG/PDF with `publish_native_neural_fivefit_figure`; `--from-json` regenerates
+tables using committed rights-safe results alone. This descriptive stability
+panel keeps official tests sealed and all gated release scores null.
+
 Use `python3 -m unittest discover -s research/benchmark/tests -v` for the
 research package checks. Run the repository's `just fast` and `just check`
 before committing. Results and raw inputs belong outside worktrees and `/tmp`;
