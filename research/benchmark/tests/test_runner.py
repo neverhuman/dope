@@ -42,6 +42,10 @@ class RunnerTests(unittest.TestCase):
             with patch.object(importlib.metadata, "version", return_value="unexpected"):
                 with self.assertRaisesRegex(ValueError, "version changed"):
                     runner.check_numpy_runtime(entry, final=True)
+            with patch.object(importlib.metadata, "version",
+                              side_effect=importlib.metadata.PackageNotFoundError("numpy")):
+                with self.assertRaisesRegex(ValueError, "metadata unavailable"):
+                    runner.check_numpy_runtime(entry, final=True)
             first = lock["files"][0]["path"]
             installed_file = Path(importlib.metadata.distribution("numpy").locate_file(first))
             original_hash = runner.sha256
@@ -49,6 +53,17 @@ class RunnerTests(unittest.TestCase):
                               "0" * 64 if Path(path) == installed_file else original_hash(path)):
                 with self.assertRaisesRegex(ValueError, "source changed"):
                     runner.check_numpy_runtime(entry, final=True)
+
+    def test_final_flag_is_boolean_before_runtime_or_worker_access(self):
+        for name in ("independent_marginals", "Chow-Liu"):
+            for flag in (1, 0, "true", "false", None, [], {}):
+                with self.subTest(method=name, final=flag), \
+                     patch.object(runner, "check_numpy_runtime", side_effect=AssertionError("runtime accessed")), \
+                     patch.object(runner, "call_adapter", side_effect=AssertionError("fit attempted")):
+                    with self.assertRaisesRegex(ValueError, "invalid final"):
+                        runner.run({"method": name, "final": flag}, {}, ROOT / "target/unused")
+                    with self.assertRaisesRegex(ValueError, "invalid final"):
+                        runner.resolve_configuration({"method": name, "final": flag}, {}, "toy", 100, ROOT / "target")
 
     def test_native_worker_is_killed_at_hard_deadline(self):
         with self.assertRaises(TimeoutError):
