@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "s3-matched-forest-confirmation-validation.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-forest-confirmation-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-forest-confirmation-validation.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-forest-confirmation-validation.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-forest-confirmation-validation.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-forest-confirmation-validation.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "s3-matched-forest-confirmation-validation.csv",
+        "s3-matched-forest-confirmation-validation.json",
+        "s3-matched-forest-confirmation-validation.md",
+        "s3-matched-forest-confirmation-validation.pdf",
+        "s3-matched-forest-confirmation-validation.schema.json",
+        "s3-matched-forest-confirmation-validation.svg"
+      ],
+      "type": "object"
+    },
+    "campaign_complete": {
+      "const": false
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-s3-matched-forest-confirmation-publication-manifest"
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 799,
+      "minItems": 799,
+      "type": "array"
+    },
+    "matrix": {
+      "additionalProperties": false,
+      "properties": {
+        "datasets": {
+          "type": "integer"
+        },
+        "fit_seed_count": {
+          "type": "integer"
+        },
+        "logical_cells": {
+          "type": "integer"
+        },
+        "logical_status_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "fit_unavailable": {
+              "type": "integer"
+            },
+            "ok": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "fit_unavailable",
+            "ok"
+          ],
+          "type": "object"
+        },
+        "planned_physical_cells": {
+          "type": "integer"
+        },
+        "sample_seed_count": {
+          "type": "integer"
+        },
+        "size_count": {
+          "type": "integer"
+        },
+        "successful_physical_cells": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "datasets",
+        "fit_seed_count",
+        "logical_cells",
+        "logical_status_counts",
+        "planned_physical_cells",
+        "sample_seed_count",
+        "size_count",
+        "successful_physical_cells"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "type": "null"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest.py": {
+          "type": "string"
+        },
+        "publish_s3_confirmation.py": {
+          "type": "string"
+        },
+        "publish_s3_forest.py": {
+          "type": "string"
+        },
+        "publish_s3_forest_figure.py": {
+          "type": "string"
+        },
+        "publish_s3_forest_manifest.py": {
+          "type": "string"
+        },
+        "publish_s3_matched.py": {
+          "type": "string"
+        },
+        "score.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest.py",
+        "publish_s3_confirmation.py",
+        "publish_s3_forest.py",
+        "publish_s3_forest_figure.py",
+        "publish_s3_forest_manifest.py",
+        "publish_s3_matched.py",
+        "score.py"
+      ],
+      "type": "object"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "s3_data_lock_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "scope": {
+      "const": "Single-fit-seed matched S3 confirmation validation. Training cohorts are bounded subsets of official S3 training partitions. These descriptive validation outcomes are not public-core paired analysis, five-fit stability or certification. All four DOPE profiles remain visible; no production family is selected."
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "campaign_complete",
+    "counts_as_dope_win",
+    "format",
+    "immutable_references",
+    "matrix",
+    "mfs_v2",
+    "official_tests_opened",
+    "paired_superiority",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe_l3",
+    "s3_data_lock_sha256",
+    "scope",
+    "version"
+  ],
+  "type": "object"
+}
