@@ -221,6 +221,60 @@ class AdmissionTests(unittest.TestCase):
             self.write_locks(root, locks)
             with patch.object(admission, "SCRATCH_ROOT", root):
                 self.assertTrue(assess(ROOT, root)["admitted"])
+                sealed = root / "prepared/evaluator/toy/test.csv"
+                sealed.parent.mkdir(parents=True)
+                sealed.write_text("0,1\n1,0\n")
+                original_open = Path.open
+
+                def guarded_open(path, *args, **kwargs):
+                    if path.resolve() == sealed.resolve():
+                        raise AssertionError("native evidence opened sealed data")
+                    return original_open(path, *args, **kwargs)
+
+                # All three receipt readers reject a link to evaluator data
+                # before hashing, including when the apparent suffix is JSON.
+                for path in (selection, attempt, metric, artifact):
+                    saved = path.with_name(path.name + ".saved")
+                    path.rename(saved)
+                    path.symlink_to(sealed if path != artifact else sealed.parent, target_is_directory=path == artifact)
+                    with patch.object(Path, "open", guarded_open):
+                        self.assertFalse(assess(ROOT, root)["admitted"])
+                    path.unlink()
+                    saved.rename(path)
+                for cell in tuned:
+                    cell["configuration"]["selection_path"] = str(sealed)
+                self.write_locks(root, locks)
+                with patch.object(Path, "open", guarded_open):
+                    self.assertFalse(assess(ROOT, root)["admitted"])
+                for cell in tuned:
+                    cell["configuration"]["selection_path"] = str(selection)
+                self.write_locks(root, locks)
+                self.assertTrue(assess(ROOT, root)["admitted"])
+
+                # Rebind hashes so each malformed JSON object reaches its
+                # shape check instead of merely failing an earlier checksum.
+                pristine = {p: p.read_bytes() for p in (selection, attempt, metric)}
+                for bad in (selection, attempt, metric):
+                    bad.write_text("[]")
+                    if bad != selection:
+                        payload = json.loads(selection.read_text())
+                        selected_trial = payload["trials"][0]
+                        if bad == metric:
+                            selected_trial["metric_receipt_sha256"] = sha256(metric)
+                            attempt.write_text(json.dumps({k: v for k, v in selected_trial.items()
+                                if k not in ("attempt_receipt_path", "attempt_receipt_sha256")}))
+                        selected_trial["attempt_receipt_sha256"] = sha256(attempt)
+                        selection.write_text(json.dumps(payload))
+                    for cell in tuned:
+                        cell["configuration"]["selection_sha256"] = sha256(selection)
+                    self.write_locks(root, locks)
+                    self.assertIn("method-dataset-matrix.lock.json:native_selection_evidence_gap",
+                                  assess(ROOT, root)["blockers"])
+                    for p, content in pristine.items():
+                        p.write_bytes(content)
+                for cell in tuned:
+                    cell["configuration"]["selection_sha256"] = sha256(selection)
+                self.write_locks(root, locks)
                 (artifact / "model.json").write_text('{"changed":true}')
                 self.assertIn("method-dataset-matrix.lock.json:native_selection_evidence_gap", assess(ROOT, root)["blockers"])
 
@@ -237,6 +291,36 @@ class AdmissionTests(unittest.TestCase):
 
             with patch.object(Path, "open", sealed_open):
                 self.assertTrue(assess(ROOT, root)["admitted"])
+
+    def test_compact_runtime_digest_and_runner_agree(self):
+        from research.benchmark import adapters, runner
+        runtime = ROOT / "research/benchmark/numpy-runtime.lock.json"
+        versions = json.loads(runtime.read_text())["versions"]
+        for name in ("independent_marginals", "Chow-Liu"):
+            with self.subTest(method=name), tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:
+                root = Path(directory)
+                locks = self.fixture(root)
+                methods = locks["methods.lock.json"]["methods"]
+                method = methods.pop("author_default_fixture")
+                methods[name] = method
+                method.update({"adapter": name, "adapter_sha256": sha256(Path(adapters.__file__)),
+                               "dependency_or_container_digest": sha256(runtime),
+                               "dependency_versions": versions})
+                for cell in locks["method-dataset-matrix.lock.json"]["cells"]:
+                    cell.update({"method": name, "adapter_sha256": method["adapter_sha256"],
+                                 "dependency_or_container_digest": method["dependency_or_container_digest"]})
+                self.write_locks(root, locks)
+                self.assertTrue(assess(ROOT, root)["admitted"])
+                # Final execution passes the same dependency proof and reaches
+                # the deliberately absent worker manifest without fitting.
+                with patch.object(runner, "call_adapter", side_effect=AssertionError("fit forbidden")):
+                    with self.assertRaisesRegex(FileNotFoundError, "worker-manifest.json"):
+                        runner.run({"method": name, "final": True, "fit_seed": 11,
+                                    "track": "common_numeric", "worker_dir": str(root / "missing-worker")},
+                                   locks["methods.lock.json"], root / "unused")
+                method["dependency_or_container_digest"] = "0" * 64
+                self.write_locks(root, locks)
+                self.assertIn("methods.lock.json:compact_runtime_evidence_gap", assess(ROOT, root)["blockers"])
 
     def test_dp_schedule_requires_each_epsilon_for_all_fit_seeds(self):
         with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:

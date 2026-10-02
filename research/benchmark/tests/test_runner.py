@@ -17,6 +17,39 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class RunnerTests(unittest.TestCase):
+    def test_compact_final_runtime_digest_is_verified_before_initialization(self):
+        import builtins
+        import importlib.metadata
+        runtime = ROOT / "research/benchmark/numpy-runtime.lock.json"
+        lock = json.loads(runtime.read_text())
+        import jsonschema
+        schema = json.loads(runtime.with_name("numpy-runtime.schema.json").read_text())
+        jsonschema.Draft202012Validator.check_schema(schema)
+        jsonschema.Draft202012Validator(schema).validate(lock)
+        entry = {"dependency_or_container_digest": sha256(runtime),
+                 "dependency_versions": lock["versions"]}
+        original_import = builtins.__import__
+
+        def guarded_import(name, *args, **kwargs):
+            if name == "numpy" or name.startswith("numpy."):
+                raise AssertionError("runtime verifier initialized NumPy")
+            return original_import(name, *args, **kwargs)
+
+        with patch.object(builtins, "__import__", guarded_import):
+            runner.check_numpy_runtime(entry, final=True)
+            with self.assertRaisesRegex(ValueError, "digest changed"):
+                runner.check_numpy_runtime({"dependency_or_container_digest": "numpy==1.26.4"}, final=True)
+            with patch.object(importlib.metadata, "version", return_value="unexpected"):
+                with self.assertRaisesRegex(ValueError, "version changed"):
+                    runner.check_numpy_runtime(entry, final=True)
+            first = lock["files"][0]["path"]
+            installed_file = Path(importlib.metadata.distribution("numpy").locate_file(first))
+            original_hash = runner.sha256
+            with patch.object(runner, "sha256", side_effect=lambda path:
+                              "0" * 64 if Path(path) == installed_file else original_hash(path)):
+                with self.assertRaisesRegex(ValueError, "source changed"):
+                    runner.check_numpy_runtime(entry, final=True)
+
     def test_native_worker_is_killed_at_hard_deadline(self):
         with self.assertRaises(TimeoutError):
             runner._run_worker([sys.executable, "-c", "import time; time.sleep(10)"],

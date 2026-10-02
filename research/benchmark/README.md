@@ -131,6 +131,11 @@ budgets for DP methods. Each cell binds `method_source_sha256`, `adapter_sha256`
 to the corresponding locks. Dataset locks include the projected `train_rows`.
 Native selections are checked against immutable attempt, artifact and metric
 receipts before admission; admission never opens test rows or fits a model.
+Resolved native receipt paths must be JSON files outside evaluator storage,
+including their symlink targets. Compact NumPy methods bind a portable source
+and shared-library manifest in `numpy-runtime.lock.json`; final admission and
+execution verify the same digest, versions and installed files before import.
+Historical validation jobs retain their recorded version identities.
 The current worker runs only the common-numeric track. Author-faithful input
 preparation and external adapters are still pending and fail closed.
 The full queue also fails closed until admission passes. It checks each host's

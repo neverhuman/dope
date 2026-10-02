@@ -78,6 +78,47 @@ def reserve_scratch(root: Path, rows: int, columns: int) -> None:
         raise ValueError("benchmark scratch ceiling would be exceeded")
 
 
+def check_numpy_runtime(entry: dict, final: bool = False) -> None:
+    """Verify compact-method dependencies before any NumPy initializer runs."""
+    from importlib.metadata import distribution, version
+    if not final and entry["dependency_or_container_digest"] == f"numpy=={version('numpy')}":
+        return  # Historical validation receipts retain their version identity.
+    path = Path(__file__).with_name("numpy-runtime.lock.json")
+    if entry["dependency_or_container_digest"] != sha256(path):
+        raise ValueError("adapter dependency digest changed")
+    lock = json.loads(path.read_text())
+    if (not isinstance(lock, dict) or lock.get("format") != "dope-numpy-runtime-lock"
+            or lock.get("versions") != {"numpy": version("numpy")}
+            or entry.get("dependency_versions") != lock["versions"]):
+        raise ValueError("adapter dependency version changed")
+    installed = distribution("numpy")
+    files = {}
+    for name in ("numpy", "numpy.libs"):
+        root = Path(installed.locate_file(name))
+        for source in root.rglob("*"):
+            if source.is_file() and (source.suffix in (".py", ".so") or ".so." in source.name):
+                if source.is_symlink():
+                    raise ValueError("adapter dependency source is symlinked")
+                files[f"{name}/{source.relative_to(root).as_posix()}"] = sha256(source)
+    expected = lock.get("files")
+    if (not isinstance(expected, list) or not expected
+            or any(not isinstance(item, dict) or set(item) != {"path", "sha256"} for item in expected)
+            or len({item["path"] for item in expected}) != len(expected)
+            or not files or files != {item["path"]: item["sha256"] for item in expected}):
+        raise ValueError("adapter dependency source changed")
+
+
+def native_evidence_path(value: str, scratch_root: Path) -> Path:
+    """Reject table/evaluator paths, including symlinks, before reading bytes."""
+    path = Path(value)
+    resolved = path.resolve()
+    if (not resolved.is_relative_to(scratch_root.resolve())
+            or "evaluator" in path.parts or "evaluator" in resolved.parts
+            or path.suffix != ".json" or resolved.suffix != ".json"):
+        raise ValueError("native evidence outside receipt-only benchmark scratch")
+    return path
+
+
 def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                           scratch_root: Path,
                           validation_sha256: str | None = None) -> tuple[dict, dict]:
@@ -108,12 +149,12 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                 or any(value != default[key] and value not in search.get(key, [])
                        for key, value in config.items())):
             raise ValueError("tuned configuration outside locked search space")
-        selection_path = Path(choice["selection_path"])
-        if not selection_path.resolve().is_relative_to(scratch_root.resolve()):
-            raise ValueError("selection evidence outside benchmark scratch")
+        selection_path = native_evidence_path(choice["selection_path"], scratch_root)
         if sha256(selection_path) != choice["selection_sha256"]:
             raise ValueError("selection evidence digest mismatch")
         selection = json.loads(selection_path.read_text())
+        if not isinstance(selection, dict):
+            raise ValueError("invalid validation selection evidence")
         trials = selection.get("trials")
         objective = entry.get("native_objective")
         if (selection.get("format") != "dope-benchmark-validation-selection"
@@ -143,13 +184,13 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                     or not 0 <= seconds <= 43200):
                 raise ValueError("invalid validation selection evidence")
             elapsed += seconds
-            attempt_path = Path(trial.get("attempt_receipt_path", ""))
-            if (not attempt_path.resolve().is_relative_to(scratch_root.resolve())
-                    or attempt_path.name != "attempt.json"
+            attempt_path = native_evidence_path(trial.get("attempt_receipt_path", ""), scratch_root)
+            if (attempt_path.name != "attempt.json"
                     or sha256(attempt_path) != trial.get("attempt_receipt_sha256")):
                 raise ValueError("invalid native tuning attempt receipt")
             attempt = json.loads(attempt_path.read_text())
-            if (attempt != {key: value for key, value in trial.items()
+            if (not isinstance(attempt, dict) or not isinstance(attempt.get("identity"), dict)
+                    or attempt != {key: value for key, value in trial.items()
                             if key not in ("attempt_receipt_path", "attempt_receipt_sha256")}
                     or attempt.get("identity", {}).get("dataset") != dataset
                     or attempt["identity"].get("method") != job["method"]
@@ -160,9 +201,8 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                 raise ValueError("native tuning attempt lineage mismatch")
             if trial["status"] != "ok":
                 continue
-            metric_path = Path(trial.get("metric_receipt_path", ""))
-            if (not metric_path.resolve().is_relative_to(scratch_root.resolve())
-                    or metric_path != attempt_path.parent / "native-metric.json"
+            metric_path = native_evidence_path(trial.get("metric_receipt_path", ""), scratch_root)
+            if (metric_path != attempt_path.parent / "native-metric.json"
                     or sha256(metric_path) != trial.get("metric_receipt_sha256")):
                 raise ValueError("invalid native KPI receipt")
             metric = json.loads(metric_path.read_text())
@@ -173,9 +213,11 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                     or sorted(item.get("path") for item in inventory if isinstance(item, dict))
                     != ["model.json", "projection.json"]):
                 raise ValueError("invalid native artifact inventory")
+            for name in ("model.json", "projection.json"):
+                native_evidence_path(attempt_path.parent / "artifact" / name, scratch_root)
             actual_inventory, charged = artifact_inventory(
                 attempt_path.parent / "artifact", ["model.json", "projection.json"])
-            if (metric.get("method") != job["method"]
+            if (not isinstance(metric, dict) or metric.get("method") != job["method"]
                     or metric.get("partition") != "validation"
                     or metric.get("validation_sha256") != validation_sha256
                     or metric.get("objective") != objective.get("name")
@@ -231,9 +273,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
                 or entry["source_sha256"] != sha256(Path(entry["source_archive"]))):
             raise ValueError("SDV source, worker, or dependency lock changed")
     if method in ("independent_marginals", "Chow-Liu"):
-        import numpy as np
-        if entry["dependency_or_container_digest"] != f"numpy=={np.__version__}":
-            raise ValueError("adapter dependency version changed")
+        check_numpy_runtime(entry, job.get("final") is True)
     if method == "GaussianCopula":
         import copulas
         import numpy as np
