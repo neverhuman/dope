@@ -267,7 +267,10 @@
         "laplace_alpha": 1.0,
         "sample_timeout_seconds": 600
       },
-      "dependency_or_container_digest": "numpy==1.26.4",
+      "dependency_or_container_digest": "6da4893393d5ce71f942cfafaea0efa2f915f42da48c0af6af85845b9a5f1bd1",
+      "dependency_versions": {
+        "numpy": "1.26.4"
+      },
       "fit_command": "research.benchmark.adapters.fit(Chow-Liu, TRAIN, METADATA, CONFIG, FIT_SEED, ARTIFACT)",
       "group": "compact",
       "license": "MIT",
@@ -837,7 +840,10 @@
         "fit_timeout_seconds": 600,
         "sample_timeout_seconds": 600
       },
-      "dependency_or_container_digest": "numpy==1.26.4",
+      "dependency_or_container_digest": "6da4893393d5ce71f942cfafaea0efa2f915f42da48c0af6af85845b9a5f1bd1",
+      "dependency_versions": {
+        "numpy": "1.26.4"
+      },
       "fit_command": "python -m research.benchmark.runner JOB METHODS OUTPUT_ROOT",
       "group": "compact",
       "license": "MIT",

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "files": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "pattern": "^(numpy|numpy\\.libs)/[^\\x00]+$",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sha256",
+          "path"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "format": {
+      "const": "dope-numpy-runtime-lock"
+    },
+    "version": {
+      "const": 1
+    },
+    "versions": {
+      "additionalProperties": false,
+      "properties": {
+        "numpy": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "numpy"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "versions",
+    "files"
+  ],
+  "title": "NumPy compact adapter runtime lock",
+  "type": "object"
+}

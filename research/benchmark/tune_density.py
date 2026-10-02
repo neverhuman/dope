@@ -15,6 +15,7 @@ from pathlib import Path
 from . import adapters
 from .fetch_jope import LIMIT, used_bytes
 from .manifest import digest
+from .runner import check_numpy_runtime
 from .score import artifact_inventory, sha256
 
 
@@ -65,9 +66,7 @@ def tune(worker: Path, method: str, methods_lock: Path, round_lock_path: Path,
     if (entry["status"] != "locked" or entry["adapter_sha256"] != sha256(Path(adapters.__file__))
             or entry["native_objective"]["status"] != "locked"):
         raise ValueError("method or native objective is not source locked")
-    import numpy as np
-    if entry["dependency_or_container_digest"] != f"numpy=={np.__version__}":
-        raise ValueError("native adapter dependency changed")
+    check_numpy_runtime(entry)
     manifest = json.loads((worker / "worker-manifest.json").read_text())
     round_lock = json.loads(round_lock_path.read_text())
     dataset = manifest["dataset_id"]

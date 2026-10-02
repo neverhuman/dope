@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .fetch_jope import LIMIT
 from .manifest import digest
-from .runner import resolve_configuration
+from .runner import check_numpy_runtime, resolve_configuration
 from .score import CONTRACT, validate_contract
 
 
@@ -53,6 +53,12 @@ def final_set_blockers(locks: dict) -> list[str]:
         valid_hashes = valid_hashes and all(hash_value(value) for value in row["projected_files"].values())
     if not valid_hashes:
         blockers.append("final_lock_set:invalid_sha256")
+    for method, row in methods.items():
+        if method in ("independent_marginals", "Chow-Liu") and row["status"] == "locked":
+            try:
+                check_numpy_runtime(row, final=True)
+            except (KeyError, TypeError, ValueError, OSError):
+                blockers.append("methods.lock.json:compact_runtime_evidence_gap")
     cells = locks["method-dataset-matrix.lock.json"]["cells"]
     if {(row["method"], row["dataset"]) for row in cells} != {(method, dataset) for method in methods for dataset in datasets}:
         blockers.append("method-dataset-matrix.lock.json:pair_coverage_gap")
