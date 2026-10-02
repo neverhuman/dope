@@ -20,6 +20,7 @@ Physical operation costs include all four failed fit entrypoints: 818.082278s fi
 - Tensor-only weights and numeric quantile/discrete preprocessing arrays plus projection; no Python-object deserialization.
 - Author-core contract probe, not two reported-experiment reproductions, native tuning or a matched common-outcome benchmark.
 - Historical runtime lock omitted executable bytecode and directory aliases: fit-time executable closure is unverified. Current caches match pinned source; this cannot establish their historical bytes.
+- Publication verifies the resolved interpreter library tree before invoking its helper with an empty cache prefix. System shared libraries and drivers are not inventoried; no complete current runtime-closure claim.
 - The original lib64-to-lib ABI alias and interpreter aliases are explicitly pinned; every additional source/runtime symlink is rejected.
 - Regression only; classification/categorical and generic final-runner integration remain pending.
 - Learned quantiles/discrete state are charged; no claim that preprocessing is free of source observations.

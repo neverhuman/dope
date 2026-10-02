@@ -57,7 +57,7 @@
     23
   ],
   "contract_publication": "research/benchmark/results/tabddpm-author-contract.json",
-  "contract_publication_sha256": "e26ff731f4daa46c527e66eb986b7788b7281bcf8280fc4ee1cc014808630d35",
+  "contract_publication_sha256": "ef9235bc80d60427ff6013beffd1f813bd528d327a877edd7c45d87db70bbfda",
   "counts_as_dope_win": false,
   "default_config": {
     "batch_size": 4096,
@@ -101,14 +101,18 @@
         "symlink_target": "lib"
       }
     ],
-    "cache_file_count": 17,
-    "cache_verifier_source_sha256": "0cbdd368e812f0ca8873bf75534b6bcadb1df1dbd87ad33fc26ddf4c839aafaf",
-    "current_executable_closure_verified": true,
+    "cache_file_count": 65,
+    "cache_verifier_source_sha256": "92268c54ca4d4585d817fd9a7d5a26e6064d772c4058c4edfc615fad44b308f3",
+    "current_declared_inventories_verified": true,
+    "current_executable_closure_verified": false,
     "custody": {
-      "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/executable-closure-v2.lock.json",
-      "sha256": "9e796ebbcc3e168174d7206a695e22f952c0c1a976376c7bfffc0f6c0a1f1ea7"
+      "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/executable-closure-v3.lock.json",
+      "sha256": "26dca41a25f3143eefa4d68aeda4e6a8a957d06338a127cf3edc72eddca196e1"
     },
-    "historical_fit_executable_closure_verified": false
+    "historical_fit_executable_closure_verified": false,
+    "interpreter_library_file_count": 2228,
+    "scope": "author, environment and resolved interpreter-library inventories; system shared libraries and drivers not inventoried",
+    "verification_startup": "pinned interpreter libraries; -I -S -B and fresh empty pycache prefix"
   },
   "final_campaign_admitted": false,
   "fit_command": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9 -S /mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py fit VERIFIED_REQUEST",
@@ -122,6 +126,7 @@
   "limitations": [
     "Author-core contract probe, not two reported-experiment reproductions, native tuning or a matched common-outcome benchmark.",
     "Historical runtime lock omitted executable bytecode and directory aliases: fit-time executable closure is unverified. Current caches match pinned source; this cannot establish their historical bytes.",
+    "Publication verifies the resolved interpreter library tree before invoking its helper with an empty cache prefix. System shared libraries and drivers are not inventoried; no complete current runtime-closure claim.",
     "The original lib64-to-lib ABI alias and interpreter aliases are explicitly pinned; every additional source/runtime symlink is rejected.",
     "Regression only; classification/categorical and generic final-runner integration remain pending.",
     "Learned quantiles/discrete state are charged; no claim that preprocessing is free of source observations.",

@@ -219,14 +219,18 @@
         "symlink_target": "lib"
       }
     ],
-    "cache_file_count": 17,
-    "cache_verifier_source_sha256": "0cbdd368e812f0ca8873bf75534b6bcadb1df1dbd87ad33fc26ddf4c839aafaf",
-    "current_executable_closure_verified": true,
+    "cache_file_count": 65,
+    "cache_verifier_source_sha256": "92268c54ca4d4585d817fd9a7d5a26e6064d772c4058c4edfc615fad44b308f3",
+    "current_declared_inventories_verified": true,
+    "current_executable_closure_verified": false,
     "custody": {
-      "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/executable-closure-v2.lock.json",
-      "sha256": "9e796ebbcc3e168174d7206a695e22f952c0c1a976376c7bfffc0f6c0a1f1ea7"
+      "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/executable-closure-v3.lock.json",
+      "sha256": "26dca41a25f3143eefa4d68aeda4e6a8a957d06338a127cf3edc72eddca196e1"
     },
-    "historical_fit_executable_closure_verified": false
+    "historical_fit_executable_closure_verified": false,
+    "interpreter_library_file_count": 2228,
+    "scope": "author, environment and resolved interpreter-library inventories; system shared libraries and drivers not inventoried",
+    "verification_startup": "pinned interpreter libraries; -I -S -B and fresh empty pycache prefix"
   },
   "execution": {
     "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/execution.lock.json",
@@ -391,6 +395,7 @@
   "limitations": [
     "Author-core contract probe, not two reported-experiment reproductions, native tuning or a matched common-outcome benchmark.",
     "Historical runtime lock omitted executable bytecode and directory aliases: fit-time executable closure is unverified. Current caches match pinned source; this cannot establish their historical bytes.",
+    "Publication verifies the resolved interpreter library tree before invoking its helper with an empty cache prefix. System shared libraries and drivers are not inventoried; no complete current runtime-closure claim.",
     "The original lib64-to-lib ABI alias and interpreter aliases are explicitly pinned; every additional source/runtime symlink is rejected.",
     "Regression only; classification/categorical and generic final-runner integration remain pending.",
     "Learned quantiles/discrete state are charged; no claim that preprocessing is free of source observations.",
@@ -420,7 +425,7 @@
     "sha256": "6ecc1b3dcbec64baee27f0cc83ec1e24ed935cabbc74f95fa299d79e57b1478f",
     "verified_file_count": 10774
   },
-  "publisher_source_sha256": "5e716f5145c66c02c7eb60f17297ee5347ecb5d48b810b3a86dac595a6050f0e",
+  "publisher_source_sha256": "d32706101a60df3edd6940467a48b6159012b3c22021d7a5d2745eb192ba13ab",
   "release_safe_l3": null,
   "resume": {
     "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1.lock.json",
