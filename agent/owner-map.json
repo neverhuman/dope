@@ -37,6 +37,9 @@
     "research/benchmark/aim_native.py": "external-evidence",
     "research/benchmark/publish_s3_forest.py": "external-evidence",
     "research/benchmark/publish_s3_forest_figure.py": "external-evidence",
-    "research/benchmark/publish_s3_forest_manifest.py": "external-evidence"
+    "research/benchmark/publish_s3_forest_manifest.py": "external-evidence",
+    "research/benchmark/publish_dope_population_fits.py": "external-evidence",
+    "research/benchmark/publish_dope_population_fits_figure.py": "external-evidence",
+    "research/benchmark/publish_dope_population_fits_manifest.py": "external-evidence"
   }
 }

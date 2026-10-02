@@ -455,3 +455,34 @@ from the committed JSON. Runtime inventories do not certify the complete system
 or driver closure. Single-fit-seed validation is not five-fit stability, the
 public-core paired paper analysis or production certification. Official tests
 stay sealed; MFS-v2, PTF-v1, release-safe L3 and paired superiority stay null.
+
+### All 100 S3 DOPE GPU fit custody
+
+`publish_dope_population_fits` publishes the complete 400-cell architecture
+research round: 100 usable rights-cleared S3 lineages, four unchanged profiles,
+fit seed 11. There are 384 fits within the 10,240-byte charged cap and 16
+byte-cap failures. The charge includes the generator and projection. 354 new
+GPU fits and 46 immutable prior successes are reported separately; all failures
+and earlier repair/research costs remain visible. New fit operations consumed
+3121.035606 seconds; this excludes admission waiting and earlier research.
+
+This panel reports training and artifact accounting. Shared validation is a
+separate running study; no global family, five-fit stability, public-core
+paired outcome, privacy certification or final campaign admission is claimed.
+Official tests remain sealed. MFS-v2, PTF-v1, release-safe and superiority are
+null. Source and declared runtime identities are recorded; full system and
+dynamic-library closure is not certified. No cell contributes a DOPE win.
+
+```sh
+python3 -m research.benchmark.publish_dope_population_fits
+python3 -m research.benchmark.publish_dope_population_fits_figure \
+  research/benchmark/results/dope-s3-population-gpu-fits.json
+python3 -m research.benchmark.publish_dope_population_fits_manifest
+python3 -m unittest discover -s research/benchmark/tests \
+  -p test_dope_population_fits.py -v
+```
+
+The publisher verifies the externally pinned receipt lock before consuming
+fit records, rejects changed source/data/model/evidence inventories and
+reconciles every dataset/profile cell. Bulk artifacts and rows remain on
+scratch; committed outputs contain only rights-safe metadata and hashes.
