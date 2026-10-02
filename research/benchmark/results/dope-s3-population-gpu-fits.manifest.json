@@ -1,0 +1,93 @@
+{
+  "artifacts": {
+    "dope-s3-population-gpu-fits.csv": {
+      "bytes": 33977,
+      "sha256": "31c1f5bbc2b01bffa8650dd96cda8c97b330bb68fecf8330c4c15b5d2d3c3861"
+    },
+    "dope-s3-population-gpu-fits.json": {
+      "bytes": 461259,
+      "sha256": "df4a370ba66a595f665bf2f45d8a183dde9955b6ab65d7c28df0ec8ae24d4c21"
+    },
+    "dope-s3-population-gpu-fits.md": {
+      "bytes": 865,
+      "sha256": "6f1eb23c1a66dc67fdd5782a6e78bb9c4078ae20cb3377c5781c86071aaca462"
+    },
+    "dope-s3-population-gpu-fits.pdf": {
+      "bytes": 24954,
+      "sha256": "66a189d4275d0263ba0a8435143890efb3380975d36bffac5fd267190dfa5eaf"
+    },
+    "dope-s3-population-gpu-fits.schema.json": {
+      "bytes": 23140,
+      "sha256": "eba92f814ab6e5e72daa8f285f39747b1ae3a59c828708446526ba01d273d189"
+    },
+    "dope-s3-population-gpu-fits.svg": {
+      "bytes": 20664,
+      "sha256": "ecbe7e60d1785069c4040340160312a9e9e4d12492d1df0755ae227afafee4ee"
+    }
+  },
+  "campaign_complete": false,
+  "closed_fit_cells": 400,
+  "counts_as_dope_win": false,
+  "format": "dope-s3-population-gpu-fit-publication-manifest",
+  "global_family_selected": false,
+  "immutable_references": [
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/round.lock.json",
+      "sha256": "87d031fe6d1d49c9c86417d6f4e8995b16de507d89a8fefe8f30fc6ed20e9d64"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/receipt-lock-v1.json",
+      "sha256": "b0471a8936042b907c4481fb2b84e2205bedd2fbec7538bfd26d1f8d07d94461"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/reconciliation-v1.json",
+      "sha256": "76132e62124fd1535c741df86d0e46525c64a315fdda0268e6c278923fdb23f4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/completion.json",
+      "sha256": "6c2e9ded2d77ed1d794994a0100db70c6a9c4754fde2c862aa41292d6bc514d5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/coordinator-exit.json",
+      "sha256": "d5df8243b2dbdf78a34e38a10b85b17dcc17e59076613d8dbc053aef8d1da730"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/prior-fit-evidence.lock.json",
+      "sha256": "0f3b5aacc5b68651b7c3ef285856a80c840474e765056ecef5e863d3c187576c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/execution.lock.json",
+      "sha256": "c6005074d502b2e891949923d7981d279bc9f32122c55b689f5c9256f186cc54"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/freeze-proof.json",
+      "sha256": "e6c8c0022194d1610f705574549adabd2b866b245de00d81139e5c00ef233201"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/transport-execution-v1.lock.json",
+      "sha256": "8aa1709799e607ae8d62720769ec829996f8f72f2a1a7cd770c4d2fc366d5afa"
+    }
+  ],
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "paired_superiority": null,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
+    "publish_dope_population_fits.py": "bdb00519b4aac17b4b8689475848c48a049adc3ec7ec96e14d45c5b2f6b17821",
+    "publish_dope_population_fits_figure.py": "8f3697e8265372cf56ffe34f8148a8f486b41dd680ef09c395f27b89a856a111",
+    "publish_dope_population_fits_manifest.py": "8f725c35abfd0cf6f710c755d5d42419af6e9ae4ba0ad8bb2e0c84caa62822c9",
+    "publish_s3_forest.py": "52bcb15744f12d5e77744be6d197356f86c6509be847a61d8d6e287aee7921b5",
+    "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a",
+    "score.py": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+  },
+  "release_safe_l3": null,
+  "s3_data_lock_sha256": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
+  "scope": "Complete four-profile, single-fit-seed architecture research on 100 S3 training-derived validation lineages; fit custody only",
+  "status_counts": {
+    "charged_artifact_cap": 16,
+    "ok": 384
+  },
+  "version": 1
+}
