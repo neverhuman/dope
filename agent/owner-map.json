@@ -32,6 +32,7 @@
     "research/": "external-evidence",
     "validation/requirements-v1.txt": "python-v1-compatibility",
     "validation/": "external-evidence",
-    "launch_tuner_tui.sh": "python-v1-compatibility"
+    "launch_tuner_tui.sh": "python-v1-compatibility",
+    "research/benchmark/fixtures/tabddpm-native-prelaunch/": "external-evidence"
   }
 }
