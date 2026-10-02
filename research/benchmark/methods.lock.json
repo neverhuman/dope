@@ -1132,15 +1132,48 @@
       "upstream_url": null
     },
     "TabSyn": {
-      "default_config": null,
+      "default_config": {
+        "diffusion": {
+          "batch_size": 4096,
+          "data_loader_workers": 4,
+          "early_stop_patience": 500,
+          "hidden_dimension": 1024,
+          "learning_rate": 0.001,
+          "maximum_epochs": 10001,
+          "weight_decay": 0
+        },
+        "sampling": {
+          "cli_steps_forwarded_to_sampler": false,
+          "num_steps": 50,
+          "rows": "training latent row count"
+        },
+        "vae": {
+          "attention_heads": 1,
+          "batch_size": 4096,
+          "beta_decay": 0.7,
+          "data_loader_workers": 4,
+          "epochs": 4000,
+          "factor": 32,
+          "learning_rate": 0.001,
+          "max_beta": 0.01,
+          "min_beta": 1e-05,
+          "token_dimension": 4,
+          "transformer_layers": 2,
+          "weight_decay": 0
+        }
+      },
       "dependency_or_container_digest": null,
       "fit_command": "python main.py --dataname DATASET --method vae --mode train; python main.py --dataname DATASET --method tabsyn --mode train",
       "group": "neural_flow",
       "license": "Apache-2.0",
       "license_evidence": "https://github.com/amazon-science/tabsyn/blob/cb5ac0f74ec36ee88e7a974a393dfbef50d42da7/LICENSE",
       "license_sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b",
-      "note": "Pinned source and license inspected. VAE default 4000 epochs and diffusion default 10001 epochs; custom preprocessing makes an internal split and VAE treats a test-named path as validation. Adapter must stage only frozen train/validation rows and pin runtime before dispatch.",
+      "note": "Source-only audit verifies 96 original Git blobs, author defaults and native regression behavior. Runtime, numeric compatibility, fit/sample contract, generator tuning space and final runner remain pending; no campaign admission. See TABSYN_SOURCE_AUDIT.md.",
       "sampling_command": "python main.py --dataname DATASET --method tabsyn --mode sample --save_path OUTPUT",
+      "source_audit": {
+        "path": "research/benchmark/tabsyn-source.audit.json",
+        "sha256": "3beee41a43bb75d34954197e9d043a1a095b11b33abc6ec275e457cc3235d904"
+      },
       "source_snapshot_sha256": "7c327eea3fc84e8b8d8e7fbeb021d7d44d1fc272c98d7ca81628c25bc3101bb0",
       "status": "source_audit_pending",
       "tuning_search_space": null,
