@@ -117,6 +117,20 @@ ceiling, counting the whole scratch root (the output root's parent by default).
 `admission` exits nonzero while any final source, data, budget, method matrix,
 or evaluator lock is absent or incomplete; public test evaluation must call it
 before reading test data.
+All five final locks must carry the same `freeze_set_sha256`, computed by
+`admission.frozen_set_digest` from their complete payloads with only that field
+removed. Set this binding after every payload is final; any later change
+invalidates the set. Digest placeholders and version-only dependency pins do
+not satisfy final admission.
+Every declared method–dataset pair needs either an applicable schedule or an
+explicit exclusion. Applicable schedules include all five fit seeds, defaults
+and native-tuned configurations when tuning applies, and all three epsilon
+budgets for DP methods. Each cell binds `method_source_sha256`, `adapter_sha256`,
+`dependency_or_container_digest`, `projection_sha256`, `train_sha256`,
+`validation_sha256` and `evaluator_sha256`
+to the corresponding locks. Dataset locks include the projected `train_rows`.
+Native selections are checked against immutable attempt, artifact and metric
+receipts before admission; admission never opens test rows or fits a model.
 The current worker runs only the common-numeric track. Author-faithful input
 preparation and external adapters are still pending and fail closed.
 The full queue also fails closed until admission passes. It checks each host's
