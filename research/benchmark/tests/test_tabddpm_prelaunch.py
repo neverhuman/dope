@@ -38,6 +38,11 @@ class TabDDPMPrelaunchTests(unittest.TestCase):
             self.assertEqual(sha256(FIXTURES / name), expected)
             destination = source / (entry_name if name == 'entry.py' else name)
             destination.write_bytes((FIXTURES / name).read_bytes())
+        # Fit/sample must pass their own host and GPU inventory gates so an
+        # unrelated rejection cannot mask missing runtime verification.
+        (source / 'inventory_hosts.py').write_text(
+            "def local():\n    return {'active_gpu_processes': [], "
+            "'gpus': [{'memory_free_mib': 24 * 1024}]}\n")
         environment = root / 'environment'
         environment.mkdir()
         marker = root / 'initializer-ran'
@@ -68,7 +73,8 @@ class TabDDPMPrelaunchTests(unittest.TestCase):
                 'ssh_binary': str(command), 'ssh_binary_sha256': sha256(command),
                 'du_binary': str(command), 'du_binary_sha256': sha256(command),
                 'known_hosts': str(command), 'known_hosts_sha256': sha256(command),
-                'jobs': [job], 'cpu_slots': {'xbabe2': sorted(os.sched_getaffinity(0))},
+                'jobs': [job], 'cpu_slots': {host: sorted(os.sched_getaffinity(0))
+                                           for host in ('xbabe1', 'xbabe2')},
                 'environment_site': str(environment), 'original_entry': str(original)}
         round_path = root / 'round.lock.json'
         round_path.write_text(json.dumps(lock))
@@ -80,7 +86,8 @@ class TabDDPMPrelaunchTests(unittest.TestCase):
         request.write_text(json.dumps({'job': job, 'receipt': str(destination / 'receipt.json')}))
         return root, dependency, marker, expected_round, sha256(source / 'common.py')
 
-    def invoke(self, case, mode, entry_name, *, wrong_receipt_path=False):
+    def invoke(self, case, mode, entry_name, *, wrong_receipt_path=False,
+               bypass_runtime_verification=False):
         root, _, _, expected_round, common_digest = case
         request = root / 'request.json'
         if wrong_receipt_path:
@@ -90,17 +97,19 @@ class TabDDPMPrelaunchTests(unittest.TestCase):
         cache = root / 'empty-cache'
         cache.mkdir()
         bootstrap = '''import importlib.util,sys
-entry,mode,request,round_digest,common_digest=sys.argv[1:]
+entry,mode,request,round_digest,common_digest,bypass=sys.argv[1:]
 sys.argv=[entry,mode,request,round_digest,common_digest]
 spec=importlib.util.spec_from_file_location('frozen_entry',entry)
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-module.socket.gethostname=lambda:'xbabe2'
+module.socket.gethostname=lambda:'xbabe2' if mode=='native' else 'xbabe1'
+if bypass=='true': module.common.verify_runtime=lambda lock:None
 module.run()
 '''
         return subprocess.run([sys.executable, '-I', '-S', '-B', '-X',
                                'pycache_prefix=' + str(cache), '-c', bootstrap,
                                str(root / 'source' / entry_name), mode, str(request),
-                               expected_round, common_digest],
+                               expected_round, common_digest,
+                               'true' if bypass_runtime_verification else 'false'],
                               capture_output=True, timeout=10, cwd=root)
 
     def test_dependency_tail_drift_rejected_before_any_initializer(self):
@@ -124,12 +133,28 @@ module.run()
         self.assertIn(b'AssertionError', result.stderr)
         self.assertFalse(case[2].exists())
 
-    def test_unchanged_dependency_reaches_initializer(self):
-        case = self.fixture('entry-cpu.py')
-        result = self.invoke(case, 'native', 'entry-cpu.py')
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn(b'initializer reached', result.stderr)
-        self.assertTrue(case[2].exists())
+    def test_unchanged_dependency_reaches_initializer_in_every_mode(self):
+        for entry in ('entry.py', 'entry-cpu.py'):
+            for mode in ('fit', 'sample', 'native'):
+                with self.subTest(entry=entry, mode=mode):
+                    case = self.fixture(entry)
+                    result = self.invoke(case, mode, entry)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn(b'initializer reached', result.stderr)
+                    self.assertTrue(case[2].exists())
+
+    def test_bypassed_verification_reaches_drifted_canary_in_every_mode(self):
+        for entry in ('entry.py', 'entry-cpu.py'):
+            for mode in ('fit', 'sample', 'native'):
+                with self.subTest(entry=entry, mode=mode):
+                    case = self.fixture(entry)
+                    with case[1].open('r+b') as stream:
+                        stream.seek(-1, 2)
+                        stream.write(b'X')
+                    result = self.invoke(case, mode, entry, bypass_runtime_verification=True)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn(b'initializer reached', result.stderr)
+                    self.assertTrue(case[2].exists())
 
     def test_wrong_attempt_path_rejected_before_initializer(self):
         case = self.fixture('entry-cpu.py')

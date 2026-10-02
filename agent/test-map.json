@@ -26,7 +26,7 @@
     "src/dope_kernel/": {"command": "PYTHONPATH=src python3 -m pytest -q tests", "purpose": "preserve V1 compatibility"},
     "tests/": {"command": "just check", "purpose": "verify Rust CLI and Python fixtures"},
     "validation/external/": {"command": "PYTHONPATH=validation/external target/external-venv/bin/python -m unittest discover -s validation/external/tests -v", "purpose": "verify pinned external learner evidence fixtures"},
-    "research/benchmark/fixtures/tabddpm-native-prelaunch/": {"command": "python3 -m unittest research.benchmark.tests.test_tabddpm_prelaunch -v", "purpose": "verify frozen entry runtime drift rejection before dependency initialization"},
+    "research/benchmark/fixtures/tabddpm-native-prelaunch/": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_tabddpm_prelaunch.py -v", "purpose": "verify frozen entry runtime drift rejection before dependency initialization"},
     "research/": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "verify offline benchmark manifest, gate, run, and analysis contracts"},
     "validation/requirements-v1.txt": {"command": "bash agent/check-python-v1-boundary.sh", "purpose": "verify pinned Python V1 compatibility graph"},
     "validation/": {"command": "just check", "purpose": "verify validation dependencies and fixtures"},
