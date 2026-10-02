@@ -9,9 +9,12 @@ The CPU and GPU entry files in that round are identical.
 The tests pin both fixture hashes, create a miniature local runtime and worker
 under the lane's `target/`, and invoke the actual entry code with isolated Python
 startup. Dependency canaries prove that fit, sample and native entry modes reject
-runtime drift before initialization. A positive native-mode control confirms that
-valid inputs can reach initialization. Host identity is mocked in the child so
-the controls also work on CI runners; no GPU or host query is executed.
+runtime drift before initialization. Positive controls for every entry and mode
+confirm that valid inputs can reach initialization. Explicit bypass controls
+confirm that disabling verification lets each drifted dependency initialize.
+Fit/sample use an admissible mocked GPU host and inventory; native uses its CPU
+host. No unrelated host rejection can mask missing verification. These controls
+also work on CI runners without a GPU or host query.
 
 The request receipt must use the complete frozen job digest and `attempt-0001`
 directory. The positive control tests this path contract instead of failing
@@ -26,5 +29,8 @@ by this round or these fixtures.
 Run:
 
 ```sh
-python3 -m unittest research.benchmark.tests.test_tabddpm_prelaunch -v
+python3 -m unittest discover -s research/benchmark/tests -p test_tabddpm_prelaunch.py -v
 ```
+
+Discovery avoids the active study scanner's `research.benchmark.*` module-argv
+predicate; a focused contract test must not become an unregistered study worker.
