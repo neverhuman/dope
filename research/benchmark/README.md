@@ -430,3 +430,28 @@ accounting, so formal DP remains false. Author-faithful categorical preprocessin
 and its reproduction remain pending; binary-target adapter postprocessing is
 part of this common-numeric representation. AIM stays `pilot_locked`, the final
 five-lock admission remains closed, and MFS-v2/PTF-v1 remain null.
+
+### Matched S3 confirmation with original Forest-Flow
+
+`publish_s3_forest` extends the disjoint six-lineage S3 confirmation panel with
+the original MIT Forest-Flow generator. The two declared configurations are
+selected by the author's four-model, five-auditor-seed mean regression R².
+The study implements that author formula; its paper dependency environment has
+not been reproduced. Common validation outcomes never select Forest-Flow.
+Default and native-selected aliases share one physical fit and sample schedule.
+
+The panel retains all four DOPE research profiles and the prior default and
+native-selected CTGAN/TVAE configurations, on identical projected inputs and
+the same auditor implementation and package versions. Fit seed 11 and sample
+seeds 101/211/307 are reported at n and 4n. Tables show all three auditors;
+figures show CatBoost sample medians and ranges, with hatching for artifacts
+over the 10,240-byte cap. Every retained sampler and projection byte is charged.
+
+The publisher requires complete frozen receipt sets and checks their external
+digests before reading metrics. It rehashes source, executable bytecode, runtime,
+artifact, worker and sample inventories, rejects directory aliases, and verifies
+the declared deterministic replays. Its manifests reproduce tables and figures
+from the committed JSON. Runtime inventories do not certify the complete system
+or driver closure. Single-fit-seed validation is not five-fit stability, the
+public-core paired paper analysis or production certification. Official tests
+stay sealed; MFS-v2, PTF-v1, release-safe L3 and paired superiority stay null.

@@ -34,6 +34,9 @@
     "validation/": "external-evidence",
     "launch_tuner_tui.sh": "python-v1-compatibility",
     "research/benchmark/fixtures/tabddpm-native-prelaunch/": "external-evidence",
-    "research/benchmark/aim_native.py": "external-evidence"
+    "research/benchmark/aim_native.py": "external-evidence",
+    "research/benchmark/publish_s3_forest.py": "external-evidence",
+    "research/benchmark/publish_s3_forest_figure.py": "external-evidence",
+    "research/benchmark/publish_s3_forest_manifest.py": "external-evidence"
   }
 }
