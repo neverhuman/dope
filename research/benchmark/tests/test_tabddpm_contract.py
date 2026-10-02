@@ -2,12 +2,16 @@
 
 import copy
 import json
+import importlib.util
+import marshal
 from pathlib import Path
+import py_compile
 import tempfile
 import unittest
 from unittest.mock import patch
 
 from research.benchmark import publish_tabddpm_contract as publisher
+from research.benchmark import tabddpm_bytecode
 from research.benchmark.score import sha256
 
 
@@ -103,6 +107,128 @@ class TabDDPMContractTests(unittest.TestCase):
                     publisher.verify_source_inventory(files, environment, author)
             finally:
                 extra.unlink()
+
+    def test_directory_and_file_aliases_rejected_in_both_inventories(self):
+        environment, author = self.root / 'environment', self.root / 'author'
+        library = self.put('environment/library.py', {'fixture': 1})
+        source = self.put('author/source.py', {'fixture': 1})
+        external = self.put('outside/package/__init__.py', {'fixture': 1})
+        files = {str(library): sha256(library), str(source): sha256(source)}
+        for root in (environment, author):
+            for target in (external, external.parent):
+                alias = root / 'added_package'
+                alias.symlink_to(target, target_is_directory=target.is_dir())
+                try:
+                    with self.subTest(root=root, target=target), self.assertRaisesRegex(
+                            ValueError, 'inventory contains unpinned link'):
+                        publisher.verify_source_inventory(files, environment, author)
+                finally:
+                    alias.unlink()
+
+    def test_exact_pinned_abi_alias_cannot_admit_another_link(self):
+        environment, author = self.root / 'environment', self.root / 'author'
+        library = self.put('environment/lib/library.py', {'fixture': 1})
+        source = self.put('author/source.py', {'fixture': 1})
+        alias = environment / 'lib64'
+        alias.symlink_to('lib', target_is_directory=True)
+        files = {str(library): sha256(library), str(source): sha256(source)}
+        aliases = {str(alias): {'symlink_target': 'lib', 'resolved_path': str(library.parent)}}
+        publisher.verify_source_inventory(files, environment, author, aliases)
+        alias.unlink()
+        alias.symlink_to(author, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'inventory contains unpinned link'):
+            publisher.verify_source_inventory(files, environment, author, aliases)
+        alias.unlink()
+        with self.assertRaisesRegex(ValueError, 'pinned alias inventory changed'):
+            publisher.verify_source_inventory(files, environment, author, aliases)
+
+    def cache(self, source):
+        path = Path(importlib.util.cache_from_source(str(source)))
+        py_compile.compile(str(source), cfile=str(path), doraise=True)
+        row = {'path': str(path), 'sha256': sha256(path), 'source_path': str(source),
+               'source_sha256': sha256(source)}
+        return path, row
+
+    def test_pinned_cache_equivalence_and_hash_checked_without_execution(self):
+        marker = self.root / 'initializer-executed'
+        source = self.root / 'library.py'
+        source.write_text(f'from pathlib import Path\nPath({str(marker)!r}).touch()\n')
+        cache, row = self.cache(source)
+        self.assertTrue(tabddpm_bytecode.verify([row])[0]['code_equivalent'])
+        self.assertFalse(marker.exists())
+        cache.write_bytes(cache.read_bytes() + b'changed')
+        with patch.object(tabddpm_bytecode.marshal, 'loads') as decode:
+            with self.assertRaisesRegex(ValueError, 'cache or pinned source changed'):
+                tabddpm_bytecode.verify([row])
+            decode.assert_not_called()
+        self.assertFalse(marker.exists())
+
+    def test_header_valid_malicious_cache_rejected_even_with_frozen_cache_hash(self):
+        marker = self.root / 'initializer-executed'
+        source = self.root / 'library.py'
+        source.write_text('answer = 42\n')
+        cache, row = self.cache(source)
+        malicious = compile(f'from pathlib import Path\nPath({str(marker)!r}).touch()\n',
+                            str(source), 'exec')
+        cache.write_bytes(cache.read_bytes()[:16] + marshal.dumps(malicious))
+        row['sha256'] = sha256(cache)
+        with self.assertRaisesRegex(ValueError, 'cache differs from pinned source'):
+            tabddpm_bytecode.verify([row])
+        self.assertFalse(marker.exists())
+
+    def test_added_executable_cache_rejected_in_both_inventories(self):
+        environment, author = self.root / 'environment', self.root / 'author'
+        library = self.put('environment/library.py', {'fixture': 1})
+        source = self.put('author/source.py', {'fixture': 1})
+        files = {str(library): sha256(library), str(source): sha256(source)}
+        for root in (environment, author):
+            extra = root / 'added.pyc'
+            extra.touch()
+            try:
+                with self.subTest(root=root), self.assertRaisesRegex(ValueError, 'file inventory changed'):
+                    publisher.verify_source_inventory(files, environment, author)
+            finally:
+                extra.unlink()
+
+    def test_equal_numeric_values_with_different_constant_types_are_rejected(self):
+        source = self.root / 'library.py'
+        source.write_text('answer = 1\n')
+        cache, row = self.cache(source)
+        original = compile(source.read_bytes(), str(source), 'exec')
+        changed = original.replace(co_consts=tuple(True if type(x) is int and x == 1 else x
+                                                   for x in original.co_consts))
+        cache.write_bytes(cache.read_bytes()[:16] + marshal.dumps(changed))
+        row['sha256'] = sha256(cache)
+        with self.assertRaisesRegex(ValueError, 'cache differs from pinned source'):
+            tabddpm_bytecode.verify([row])
+
+    def test_changed_cache_blocks_build_before_metric_reads_or_verifier_launch(self):
+        environment = self.root / 'environment'
+        environment.mkdir()
+        source = environment / 'library.py'
+        source.write_text('answer = 42\n')
+        cache, row = self.cache(source)
+        row['bytes'] = cache.stat().st_size
+        lock = self.put('executable-custody.json', {
+            'original_custody': {'path': str(publisher.CUSTODY), 'sha256': publisher.CUSTODY_SHA256},
+            'historical_fit_executable_closure_verified': False, 'aliases': [], 'caches': [row]})
+        expected = sha256(lock)
+        cache.write_bytes(cache.read_bytes() + b'changed')
+        reads = []
+        original_read = publisher.read
+        def read(path):
+            reads.append(path)
+            return original_read(path)
+        with patch.object(publisher, 'ENV', environment), \
+                patch.object(publisher, 'EXECUTABLE_CUSTODY', lock), \
+                patch.object(publisher, 'EXECUTABLE_CUSTODY_SHA256', expected), \
+                patch.object(publisher, 'verify_custody', return_value={str(source): sha256(source)}), \
+                patch.object(publisher, 'read', read), \
+                patch.object(publisher.subprocess, 'run') as launch:
+            with self.assertRaisesRegex(ValueError, 'executable cache or source changed'):
+                publisher.build()
+            launch.assert_not_called()
+        self.assertEqual(reads, [lock])
 
     def test_native_five_seed_objective_rejects_partial_duplicate_or_shared_kpi(self):
         native = {'components': [{'sample_seed': s, 'r2': .5} for s in range(5)],

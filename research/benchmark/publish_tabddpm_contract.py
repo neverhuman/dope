@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
+import subprocess
 import tomllib
 
 from .publish_s3_matched import artifact_inventory, require, schema
@@ -16,6 +17,8 @@ AUTHOR = BASE / 'method-source-audits/tabddpm-v1/source'
 ENV = BASE / 'envs/tabddpm-py39'
 CUSTODY = BASE / 'tabddpm-publication-custody-v1/receipt-source.lock.json'
 CUSTODY_SHA256 = '6ecc1b3dcbec64baee27f0cc83ec1e24ed935cabbc74f95fa299d79e57b1478f'
+EXECUTABLE_CUSTODY = BASE / 'tabddpm-publication-custody-v1/executable-closure-v2.lock.json'
+EXECUTABLE_CUSTODY_SHA256 = '9e796ebbcc3e168174d7206a695e22f952c0c1a976376c7bfffc0f6c0a1f1ea7'
 COMPLETION_SHA256 = '0e9bc146d708b545b3741b2ad15a76b6e3f17d7b7ce35964087fd46a3edad5f1'
 NAME = 'tabddpm-author-contract'
 
@@ -66,15 +69,68 @@ def native_value(row):
     return row['value']
 
 
-def verify_source_inventory(files, environment, author):
+def verify_source_inventory(files, environment, author, aliases=None):
+    aliases = aliases or {}
+    seen_aliases = set()
+    for root in (environment, author):
+        require(root.is_dir() and not root.is_symlink() and root.resolve() == root,
+                'TabDDPM source root contains link')
+        for path in root.rglob('*'):
+            if path.is_symlink():
+                row = aliases.get(str(path))
+                require(row is not None and str(path.readlink()) == row['symlink_target']
+                        and str(path.resolve(strict=True)) == row['resolved_path'],
+                        'TabDDPM source inventory contains unpinned link')
+                seen_aliases.add(str(path))
+    require(seen_aliases == set(aliases), 'TabDDPM pinned alias inventory changed')
     def runtime_file(path):
-        return path.suffix in ('.py', '.so') or '.so.' in path.name
+        return path.suffix in ('.py', '.pyc', '.pyo', '.so') or '.so.' in path.name
     expected = {p for p in files if Path(p).is_relative_to(environment) and runtime_file(Path(p))}
     actual = {str(p) for p in environment.rglob('*') if p.is_file() and runtime_file(p)}
     require(actual == expected, 'TabDDPM runtime file inventory changed')
     expected = {p for p in files if Path(p).is_relative_to(author)}
     actual = {str(p) for p in author.rglob('*') if p.is_file()}
     require(actual == expected, 'TabDDPM author file inventory changed')
+
+
+def verify_executable_closure(files):
+    """Supplement the unchanged original custody with current cache evidence."""
+    require(not EXECUTABLE_CUSTODY.is_symlink()
+            and sha256(EXECUTABLE_CUSTODY) == EXECUTABLE_CUSTODY_SHA256,
+            'TabDDPM executable custody lock changed')
+    lock = read(EXECUTABLE_CUSTODY)
+    require(lock['original_custody'] == {'path': str(CUSTODY), 'sha256': CUSTODY_SHA256}
+            and lock['historical_fit_executable_closure_verified'] is False,
+            'TabDDPM historical executable attestation changed')
+    aliases = {r['path']: r for r in lock['aliases']}
+    require(len(aliases) == len(lock['aliases']), 'duplicate TabDDPM source alias')
+    augmented = dict(files)
+    for row in lock['caches']:
+        path = Path(row['path'])
+        require(path.is_relative_to(ENV) or path.is_relative_to(AUTHOR),
+                'TabDDPM cache outside source scope')
+        require(path.resolve(strict=True) == path and not path.is_symlink()
+                and str(path) not in augmented and path.stat().st_size == row['bytes']
+                and sha256(path) == row['sha256']
+                and files.get(row['source_path']) == row['source_sha256'],
+                'TabDDPM executable cache or source changed')
+        augmented[str(path)] = row['sha256']
+    verify_source_inventory(augmented, ENV, AUTHOR, aliases)
+    helper = Path(__file__).with_name('tabddpm_bytecode.py')
+    completed = subprocess.run([str(ENV / 'bin/python3.9'), '-I', '-S', str(helper)],
+                               input=json.dumps(lock['caches']), text=True,
+                               capture_output=True, timeout=30, check=False)
+    require(completed.returncode == 0, 'TabDDPM executable cache verification failed')
+    result = json.loads(completed.stdout)
+    expected = [{k: r[k] for k in ('path', 'sha256', 'source_path', 'source_sha256')}
+                | {'code_equivalent': True} for r in lock['caches']]
+    require(result == {'status': 'ok', 'caches': expected},
+            'TabDDPM executable cache differs from pinned source')
+    return augmented, {'custody': {'path': str(EXECUTABLE_CUSTODY), 'sha256': EXECUTABLE_CUSTODY_SHA256},
+                       'cache_verifier_source_sha256': sha256(helper),
+                       'cache_file_count': len(expected), 'current_executable_closure_verified': True,
+                       'historical_fit_executable_closure_verified': False,
+                       'aliases': lock['aliases']}
 
 
 def physical_operations(paths, aliases):
@@ -103,7 +159,8 @@ def physical_operations(paths, aliases):
 
 def build():
     files = verify_custody(CUSTODY, CUSTODY_SHA256, BASE)
-    verify_source_inventory(files, ENV, AUTHOR)
+    original_file_count = len(files)
+    files, executable_closure = verify_executable_closure(files)
 
     def frozen(path, expected=None):
         path = Path(path)
@@ -227,7 +284,9 @@ def build():
             'source_license': 'MIT', 'source_archive_sha256': round_lock['author_archive_sha256'],
             'license_evidence': 'https://github.com/yandex-research/tab-ddpm/blob/' + round_lock['author_commit'] + '/LICENSE.md',
             'source_license_sha256': files[str(AUTHOR / 'LICENSE.md')],
-            'publication_custody': {'path': str(CUSTODY), 'sha256': CUSTODY_SHA256, 'verified_file_count': len(files)},
+            'publication_custody': {'path': str(CUSTODY), 'sha256': CUSTODY_SHA256,
+                                    'verified_file_count': original_file_count},
+            'executable_closure': executable_closure,
             'completion': frozen(completion_path), 'round': frozen(round_path), 'runtime': frozen(runtime_path),
             'execution': frozen(ROOT / 'execution.lock.json'), 'resume': frozen(resume_path),
             'publisher_source_sha256': sha256(Path(__file__)), 'runtime_versions': runtime['versions'],
@@ -255,6 +314,8 @@ def build():
             'limits': {'neural_fit_seconds': 600, 'repair_fit_seconds': 250, 'total_fit_entrypoint_seconds': 1200,
                        'gpu_vram_bytes': 16 * 1024**3, 'original_pilot_deadline_unchanged': True},
             'limitations': ['Author-core contract probe, not two reported-experiment reproductions, native tuning or a matched common-outcome benchmark.',
+                            'Historical runtime lock omitted executable bytecode and directory aliases: fit-time executable closure is unverified. Current caches match pinned source; this cannot establish their historical bytes.',
+                            'The original lib64-to-lib ABI alias and interpreter aliases are explicitly pinned; every additional source/runtime symlink is rejected.',
                             'Regression only; classification/categorical and generic final-runner integration remain pending.',
                             'Learned quantiles/discrete state are charged; no claim that preprocessing is free of source observations.',
                             'Both artifacts exceed L3; copy, leakage, attacks, real-vs-real and production profile gates are not complete.',
@@ -275,8 +336,9 @@ def source_audit(report, report_sha256):
             'contract_publication': 'research/benchmark/results/' + NAME + '.json',
             'default_config': report['configuration'], 'default_source': report['author_default_source'],
             'adapter': report['adapter'], 'entry': report['entry'], 'runtime': report['runtime'],
+            'executable_closure': report['executable_closure'],
             'runtime_python': report['runtime_python'], 'runtime_versions': report['runtime_versions'],
-            'worker_startup': 'isolated pinned Python with -S; frozen controller/entry/source/runtime checks before dependency imports',
+            'worker_startup': 'historical -S worker checked source/native-library hashes before dependency imports; executable caches and directory aliases were omitted. Current publication verifies cache/source equivalence, not historical fit-time closure.',
             'fit_command': str(ENV / 'bin/python3.9') + ' -S ' + report['entry']['path'] + ' fit VERIFIED_REQUEST',
             'sampling_command': str(ENV / 'bin/python3.9') + ' -S ' + report['entry']['path'] + ' sample VERIFIED_REQUEST',
             'native_objective': {'status': 'locked', 'name': 'author_five_synthetic_seed_validation_catboost_r2_mean',

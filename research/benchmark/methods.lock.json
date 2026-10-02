@@ -723,6 +723,38 @@
       },
       "dependency_or_container_digest": "3741fa9f3001b15d75b284884d9ba146e353d1b31de2d76f15e689cbb337d3c8",
       "entry_sha256": "a494faa98f86eb6059cdba9050de0c8f401bc7229084a380e3d8dbfee44f345f",
+      "executable_closure": {
+        "aliases": [
+          {
+            "path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python",
+            "resolved_path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/bin/python3.9",
+            "symlink_target": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/bin/python3.9"
+          },
+          {
+            "path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3",
+            "resolved_path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/bin/python3.9",
+            "symlink_target": "python"
+          },
+          {
+            "path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9",
+            "resolved_path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/bin/python3.9",
+            "symlink_target": "python"
+          },
+          {
+            "path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/lib64",
+            "resolved_path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/lib",
+            "symlink_target": "lib"
+          }
+        ],
+        "cache_file_count": 17,
+        "cache_verifier_source_sha256": "0cbdd368e812f0ca8873bf75534b6bcadb1df1dbd87ad33fc26ddf4c839aafaf",
+        "current_executable_closure_verified": true,
+        "custody": {
+          "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/executable-closure-v2.lock.json",
+          "sha256": "9e796ebbcc3e168174d7206a695e22f952c0c1a976376c7bfffc0f6c0a1f1ea7"
+        },
+        "historical_fit_executable_closure_verified": false
+      },
       "fit_command": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9 -S /mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py fit VERIFIED_REQUEST",
       "fit_timeout_seconds": 600,
       "group": "neural_flow",
@@ -754,7 +786,7 @@
         ],
         "track": "common_numeric"
       },
-      "note": "Original MIT Trainer/DDPM/MLP author core, frozen train-only numeric artifact wrapper; two-seed S3 contract complete, own five-synthetic-seed CatBoost validation efficacy. Python patch variation and sampling/staging adaptations disclosed. Both artifacts exceed L3. No native tuning, common-outcome comparison, reported-experiment reproduction or final runner admission. Native tuning/common matrix and final five locks remain pending. Historical frozen wrappers/receipts preserved.",
+      "note": "Original MIT Trainer/DDPM/MLP author core, frozen train-only numeric artifact wrapper; two-seed S3 contract complete, own five-synthetic-seed CatBoost validation efficacy. Python patch variation and sampling/staging adaptations disclosed. Both artifacts exceed L3. No native tuning, common-outcome comparison, reported-experiment reproduction or final runner admission. Native tuning/common matrix and final five locks remain pending. Historical frozen wrappers/receipts preserved. Historical fit-time executable closure is unverified: original locks omitted .pyc and directory aliases. A separate current custody supplement pins all aliases/caches and verifies cache/source code equivalence without executing dependencies. This does not retroactively certify the fits.",
       "runtime_lock": {
         "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/runtime.lock.json",
         "sha256": "3741fa9f3001b15d75b284884d9ba146e353d1b31de2d76f15e689cbb337d3c8"
@@ -764,7 +796,7 @@
       "source_archive": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabddpm-v1/source.tar.gz",
       "source_archive_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
       "source_lock": "research/benchmark/tabddpm-source.lock.json",
-      "source_lock_sha256": "aeea1a09d235b9d0b1ab39df457a8cf6b086bc8db6abea0526965c8eea97c51b",
+      "source_lock_sha256": "2f6747a4828be439afb135f1077c3af5ba50aa39c728d686b3bee94902005eb8",
       "source_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
       "status": "pilot_locked",
       "supported_task": "regression",
