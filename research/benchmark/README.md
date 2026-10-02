@@ -289,6 +289,48 @@ sample min/max whiskers do not estimate fit uncertainty. Official tests remain
 sealed, and MFS-v2/PTF-v1/release-safe scores remain null pending the complete
 campaign and production gates.
 
+## S3 matched confirmation validation
+
+`results/s3-matched-confirmation-validation.json` is a separate panel on six
+disjoint confirmation lineages. It retains all four frozen DOPE GPU research
+profiles and the CTGAN/TVAE author defaults and native-selected configurations.
+The same bounded S3 training-derived partitions, fit seed 11, three sample
+seeds and n/4n sizes are used throughout. Native selections reuse the original
+four-trial author-library efficacy searches; no shared KPI selects a baseline
+and no new baseline fits or tuning trials are run for this panel.
+
+```sh
+python3 -m research.benchmark.publish_s3_confirmation
+python3 -m research.benchmark.publish_s3_confirmation_figure \
+  research/benchmark/results/s3-matched-confirmation-validation.json
+python3 -m research.benchmark.publish_s3_confirmation_manifest
+python3 -m unittest discover -s research/benchmark/tests \
+  -p test_s3_confirmation_panel.py -v
+```
+
+The evidence publisher requires closed controllers and the complete frozen
+matrix. It checks a separately pinned receipt lock before reading metrics,
+sample/metric replays, original native winners, successful operation receipts,
+charged model and projection bytes, and the declared source, dependency,
+runtime and worker inventories. It rejects directory aliases. Current and
+historical full executable closures remain unverified; inventories alone do
+not certify them. GPU admission failures retain unavailable sample cells and
+no artifact or DOPE win. Baseline quality is unconstrained where bytes exceed
+10,240. Host costs and prior tuning costs are reported separately; earlier
+architecture research and device-wide energy are not equal per-cell spend.
+
+For scratch-independent regeneration of the tables and figures:
+
+```sh
+python3 -m research.benchmark.publish_s3_confirmation --from-json
+python3 -m research.benchmark.publish_s3_confirmation_figure \
+  research/benchmark/results/s3-matched-confirmation-validation.json
+```
+
+This panel does not choose a production family, estimate five-fit uncertainty,
+replace the public-core paired analysis or open official tests. MFS-v2,
+PTF-v1, release-safe L3 and paired superiority remain null.
+
 ## Author TabDDPM contract evidence
 
 `tabddpm-source.lock.json` and `results/tabddpm-author-contract.json` record the
