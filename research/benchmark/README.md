@@ -412,3 +412,21 @@ This reconciliation does not admit final jobs. Generic final runner integration,
 the remaining method audits and the complete five-lock set are pending. The
 central lock remains incomplete and unfrozen for final evaluation; official
 tests stay sealed and gated scores stay null.
+
+### AIM fixed-budget query objective
+
+`aim_native.measure` implements the pinned author's synthetic marginal error:
+the mean, over all column pairs including the target, of half the L1 distance
+between independently normalized reference and synthetic histograms. The
+reference is training-derived validation. The existing common-numeric adapter
+uses eight public bins; synthetic seed 101 is fixed. Epsilon 1, 4 and 10 are
+separate comparison budgets. Selection may never choose between them.
+
+The current allowed algorithm settings remain the author's defaults at each
+budget. A native-selected alias still needs frozen fit, sample and objective
+receipts; this source audit provides no new fits, selections or measured values.
+The train-fitted projection and validation selection lack end-to-end privacy
+accounting, so formal DP remains false. Author-faithful categorical preprocessing
+and its reproduction remain pending; binary-target adapter postprocessing is
+part of this common-numeric representation. AIM stays `pilot_locked`, the final
+five-lock admission remains closed, and MFS-v2/PTF-v1 remain null.
