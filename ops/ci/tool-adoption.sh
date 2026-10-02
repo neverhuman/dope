@@ -4,6 +4,21 @@ cd "$(dirname "$0")/../.."
 source ops/ci/lib.sh
 bash ops/ci/install-jankurai.sh
 auditor=target/jankurai/jankurai-1.7.1-x86_64-unknown-linux-gnu/jankurai
+if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+  # synchronize events also have a before SHA, which can be unreachable after
+  # an amended push. Proof routing must cover the PR from its frozen base.
+  JANKURAI_COMPARISON_BASE="$(python3 - "$GITHUB_EVENT_PATH" <<'PY'
+import json
+import re
+import sys
+with open(sys.argv[1]) as stream:
+    base = json.load(stream)["pull_request"]["base"]["sha"]
+if not isinstance(base, str) or not re.fullmatch(r"[0-9a-f]{40}", base):
+    raise ValueError("invalid pull request comparison base")
+print(base)
+PY
+  )"
+fi
 if [[ -n "${JANKURAI_COMPARISON_BASE:-}" ]]; then
   comparison_base="$JANKURAI_COMPARISON_BASE"
   if [[ "$comparison_base" =~ ^0{40}$ ]]; then
