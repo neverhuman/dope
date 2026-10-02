@@ -315,15 +315,93 @@
       "upstream_url": null
     },
     "ForestDiffusion/Forest-Flow": {
-      "default_config": null,
-      "dependency_or_container_digest": null,
-      "fit_command": null,
+      "adapter_sha256": "1ff4688f85bdf1a79ce89f475a02d0d06766ff2aaa395ec9b97f9de7cbb137e5",
+      "default_config": {
+        "duplicate_K": 100,
+        "max_depth": 7,
+        "n_estimators": 100,
+        "n_t": 50
+      },
+      "dependency_or_container_digest": "94a3e51bb79cec5c799fd96aec3a6e3c0b577e9cd06cccf7ce52c72c629d2285",
+      "fit_command": "python -m research.benchmark.forestdiffusion_adapter fit --request VERIFIED_REQUEST --receipt RECEIPT",
       "group": "neural_flow",
-      "license": null,
-      "sampling_command": null,
-      "status": "source_audit_pending",
-      "tuning_search_space": null,
-      "upstream_commit": null,
+      "license": "MIT",
+      "license_evidence": "https://github.com/SamsungSAILMontreal/ForestDiffusion/blob/818ac3b9c8df7b7c763470c9a0691dacca8d8b37/Python-Package/base-ForestDiffusion/LICENSE.txt",
+      "license_sha256": "7a5d06dce31208b2378f0cd887ec4a387e73b242ef0104867626c47668aa62da",
+      "native_objective": {
+        "classification": "mean_macro_f1_over_linear_adaboost_random_forest_xgboost_and_seeds0_to4",
+        "direction": "maximize",
+        "regression": "mean_r2_over_linear_adaboost_random_forest_xgboost_and_seeds0_to4",
+        "sha256": "a5e8b76c3b7dfe6323259f2fc80e93c792e495d4b419859f057653c318da976a",
+        "shared_kpi_used_for_selection": false,
+        "tie_breaks": [
+          "smaller_charged_artifact_bytes",
+          "configuration_sha256"
+        ],
+        "url": "https://github.com/SamsungSAILMontreal/ForestDiffusion/blob/818ac3b9c8df7b7c763470c9a0691dacca8d8b37/metrics.py"
+      },
+      "note": "Original MIT Python generator, flow/common-numeric GPU wrapper; author four-model five-seed native ML formula independently implemented in study wrapper. Repository-root experiment code with unresolved rights is not imported. Full five-lock/job-matrix admission and author-faithful paper environment remain pending; earlier generated GPU probe aggregate reservation gap remains explicit. CPU historical adapter/runtime receipts remain immutable.",
+      "sampling_command": "python -m research.benchmark.forestdiffusion_adapter sample --request VERIFIED_REQUEST --receipt RECEIPT",
+      "source_lock": "research/benchmark/forestdiffusion-source.lock.json",
+      "source_lock_sha256": "0ee58f0de8152cafdec498d3bc5dea74f0f63dd246a997ba9572b9fdbf275ad4",
+      "source_snapshot_sha256": "c1f18ea76a30d60e7368a0008b0956ad6cf82b14927233a830ae281e2039f268",
+      "status": "pilot_locked",
+      "tuning_search_space": {
+        "combined_trial_cap": 8,
+        "cpu_trials": [
+          {
+            "duplicate_K": 100,
+            "max_depth": 7,
+            "n_estimators": 100,
+            "n_t": 50
+          },
+          {
+            "duplicate_K": 10,
+            "max_depth": 7,
+            "n_estimators": 100,
+            "n_t": 10
+          },
+          {
+            "duplicate_K": 10,
+            "max_depth": 7,
+            "n_estimators": 100,
+            "n_t": 20
+          },
+          {
+            "duplicate_K": 10,
+            "max_depth": 7,
+            "n_estimators": 100,
+            "n_t": 50
+          },
+          {
+            "duplicate_K": 100,
+            "max_depth": 7,
+            "n_estimators": 100,
+            "n_t": 10
+          },
+          {
+            "duplicate_K": 100,
+            "max_depth": 7,
+            "n_estimators": 100,
+            "n_t": 20
+          }
+        ],
+        "gpu_trials": [
+          {
+            "duplicate_K": 100,
+            "max_depth": 7,
+            "n_estimators": 100,
+            "n_t": 50
+          },
+          {
+            "duplicate_K": 10,
+            "max_depth": 7,
+            "n_estimators": 100,
+            "n_t": 10
+          }
+        ]
+      },
+      "upstream_commit": "818ac3b9c8df7b7c763470c9a0691dacca8d8b37",
       "upstream_url": "https://github.com/SamsungSAILMontreal/ForestDiffusion"
     },
     "GEM-T": {

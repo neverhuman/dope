@@ -1,0 +1,411 @@
+{
+  "adapter_source_sha256": "1ff4688f85bdf1a79ce89f475a02d0d06766ff2aaa395ec9b97f9de7cbb137e5",
+  "artifact_policy": "charge sampler, adapter metadata and projection; remove retained row containers with exact original/serialized sample parity",
+  "author_default_config": {
+    "duplicate_K": 100,
+    "max_depth": 7,
+    "n_estimators": 100,
+    "n_t": 50
+  },
+  "author_faithful_paper_dependency_reproduction": false,
+  "author_package_files": {
+    "ForestDiffusion/__init__.py": "260b4bae6acf9203ebfafdd2e529724f119279d8cf60f96570a7acd1b23fa5da",
+    "ForestDiffusion/diffusion_with_trees_class.py": "1a54e27cfc09935bea297b19b5e45c2693668cc30d662b84a4b6024d4f9a6875",
+    "ForestDiffusion/utils/__init__.py": "62dc42bf40cd8a7df6ab5632076b7b157c72011ad19bff0bf12e241775a932c9",
+    "ForestDiffusion/utils/diffusion.py": "fbbab641058554163a1f8a6901221806f90245cd27897089737b74507b5a5682",
+    "ForestDiffusion/utils/utils_diffusion.py": "452c4152ab1a94a942cef0616f646889122cccb90bf8e073595105823fb4be9f",
+    "LICENSE.txt": "7a5d06dce31208b2378f0cd887ec4a387e73b242ef0104867626c47668aa62da",
+    "setup.py": "7a05fb7f7738aaad86f049e1cd52b3cbf876d062cf2c679f10b9dc3e52f3bc3b"
+  },
+  "cpu_native_search_space": [
+    {
+      "duplicate_K": 100,
+      "max_depth": 7,
+      "n_estimators": 100,
+      "n_t": 50
+    },
+    {
+      "duplicate_K": 10,
+      "max_depth": 7,
+      "n_estimators": 100,
+      "n_t": 10
+    },
+    {
+      "duplicate_K": 10,
+      "max_depth": 7,
+      "n_estimators": 100,
+      "n_t": 20
+    },
+    {
+      "duplicate_K": 10,
+      "max_depth": 7,
+      "n_estimators": 100,
+      "n_t": 50
+    },
+    {
+      "duplicate_K": 100,
+      "max_depth": 7,
+      "n_estimators": 100,
+      "n_t": 10
+    },
+    {
+      "duplicate_K": 100,
+      "max_depth": 7,
+      "n_estimators": 100,
+      "n_t": 20
+    }
+  ],
+  "cpu_runtime": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/adapter-contract-v1/runtime.lock.json",
+    "sha256": "542200b48d5f9f3ab940b901a7673e9aa16205e8a3436ddbfe4625d3c82e910f"
+  },
+  "dependency_inventory": {
+    "complete_runtime_reference": {
+      "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/runtime.lock.json",
+      "sha256": "94a3e51bb79cec5c799fd96aec3a6e3c0b577e9cd06cccf7ce52c72c629d2285"
+    },
+    "files": 12061,
+    "sha256": "27c09a5c25bfcd6bd74572b0c4040bf07526c5a326e28fc320126649616e77ea"
+  },
+  "environment": {
+    "Jinja2": "3.1.6",
+    "MarkupSafe": "3.0.3",
+    "catboost": "1.2.10",
+    "cloudpickle": "3.1.2",
+    "contourpy": "1.3.3",
+    "cycler": "0.12.1",
+    "filelock": "3.32.3",
+    "fonttools": "4.66.1",
+    "formulaic": "1.2.2",
+    "fsspec": "2026.7.0",
+    "graphviz": "0.21",
+    "interface_meta": "2.0.1",
+    "joblib": "1.6.0",
+    "kiwisolver": "1.5.1",
+    "lightgbm": "4.7.0",
+    "matplotlib": "3.11.2",
+    "mpmath": "1.3.0",
+    "narwhals": "2.26.0",
+    "networkx": "3.6.1",
+    "numpy": "1.26.4",
+    "nvidia-nccl-cu12": "2.32.3",
+    "packaging": "26.3",
+    "pandas": "2.3.2",
+    "patsy": "1.0.3",
+    "pillow": "12.3.0",
+    "plotly": "7.1.0",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "2.9.0.post0",
+    "pytz": "2026.4",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.16.3",
+    "six": "1.17.0",
+    "statsmodels": "0.15.0",
+    "sympy": "1.14.0",
+    "threadpoolctl": "3.7.0",
+    "torch": "2.9.1+cpu",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.4",
+    "wrapt": "2.5.0",
+    "xgboost": "3.2.0"
+  },
+  "fit_seconds_cap": 600,
+  "formal_dp_claim": false,
+  "format": "dope-forestdiffusion-source-lock",
+  "full_matrix_admission": false,
+  "generated_contract_costs": {
+    "fits": 4,
+    "operations": [
+      {
+        "elapsed_seconds": 9.731988894985989,
+        "operation": "fit",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/adapter-contract-v1/regression/fit.attempt.json",
+        "peak_gpu_used_mib": null,
+        "sha256": "c72170f9491f7e4c217d596fa38267075ea537ee0da246be64a27bf23f69272c"
+      },
+      {
+        "elapsed_seconds": 8.334241908043623,
+        "operation": "native",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/adapter-contract-v1/regression/native.attempt.json",
+        "peak_gpu_used_mib": null,
+        "sha256": "03064d4efae95af4984d0f91b0bd78eba61fa0412307f0f98a7e3c59bbf37c09"
+      },
+      {
+        "elapsed_seconds": 5.274124399991706,
+        "operation": "sample",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/adapter-contract-v1/regression/sample.attempt.json",
+        "peak_gpu_used_mib": null,
+        "sha256": "04cc1ff8b45e0c4d79b9a4b46e3714c9b261ac1a161eee68284a3d29598b272b"
+      },
+      {
+        "elapsed_seconds": 5.834803657839075,
+        "operation": "fit",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/adapter-contract-v1/binary/fit.attempt.json",
+        "peak_gpu_used_mib": null,
+        "sha256": "937eb37ab1ddbdf86acb0fb4f37092ef703b926789dd7945f0e9d1bce3bb4d21"
+      },
+      {
+        "elapsed_seconds": 8.887005808996037,
+        "operation": "native",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/adapter-contract-v1/binary/native.attempt.json",
+        "peak_gpu_used_mib": null,
+        "sha256": "a8cae552afb7ca27e050361d4e4d1f99d1a496ccf04e0df6c5a97543835df8b2"
+      },
+      {
+        "elapsed_seconds": 5.477267104899511,
+        "operation": "sample",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/adapter-contract-v1/binary/sample.attempt.json",
+        "peak_gpu_used_mib": null,
+        "sha256": "9a53e49178858e5dfd75f2ad43273f62237b86c07b7ad2134ab9eb2c14d21774"
+      },
+      {
+        "elapsed_seconds": 51.602027834393084,
+        "operation": "fit",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/fit.attempt.json",
+        "peak_gpu_used_mib": 530,
+        "sha256": "540b5c3d78623f4cda33e8c384e60a97c8328f9c985e0b61aaab29266cda8446"
+      },
+      {
+        "elapsed_seconds": 86.7362524215132,
+        "operation": "native",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/native.attempt.json",
+        "peak_gpu_used_mib": 466,
+        "sha256": "2a07a8706870b9e241025d16b35461aef0bb90ea2524d44bf612ddbb93940c19"
+      },
+      {
+        "elapsed_seconds": 43.89869391731918,
+        "operation": "repeat",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/repeat.attempt.json",
+        "peak_gpu_used_mib": 466,
+        "sha256": "1207d6fe2306b5d87c5944ee463a6155ef833e2a4d7b97393a98aa6286291622"
+      },
+      {
+        "elapsed_seconds": 46.61801986489445,
+        "operation": "sample",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/sample.attempt.json",
+        "peak_gpu_used_mib": 466,
+        "sha256": "6fa397a2866e4dcd78541d07fe843c4581d795b69c60e31586ff74868214ea0f"
+      },
+      {
+        "elapsed_seconds": 47.727612655609846,
+        "operation": "fit",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/fit.attempt.json",
+        "peak_gpu_used_mib": 466,
+        "sha256": "4d42661fb06317b4675f785d302dd2031477f5ae82780165cc093781e851608f"
+      },
+      {
+        "elapsed_seconds": 101.78387168888003,
+        "operation": "native",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/native.attempt.json",
+        "peak_gpu_used_mib": 466,
+        "sha256": "1d9a0afc4dbe3774893c8e5f37ec6cffba567d012846ff2c1310b03f90a1fc32"
+      },
+      {
+        "elapsed_seconds": 69.94922130741179,
+        "operation": "repeat",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/repeat.attempt.json",
+        "peak_gpu_used_mib": 464,
+        "sha256": "b0236e8e363b62566ab5452cf36549ad1e0c97217b358b0d9573bc1dd4f9ea0c"
+      },
+      {
+        "elapsed_seconds": 62.25982083659619,
+        "operation": "sample",
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/sample.attempt.json",
+        "peak_gpu_used_mib": 466,
+        "sha256": "72294bcfea1e66009ec0f05ac5ad309bc0db92b0f5338ec7ff3b824a39103f42"
+      }
+    ],
+    "scope": "contract development, no real benchmark fitting or reported-experiment reproduction",
+    "summed_operation_seconds": 554.1149523013737
+  },
+  "generated_input_contracts": [
+    {
+      "artifact_bytes": 44079,
+      "artifact_inventory": [
+        {
+          "bytes": 434,
+          "path": "adapter.json",
+          "sha256": "787d58610c33e01d49d8b99d6313e0c978b107f035f787b9f2276f6a54da5f0a"
+        },
+        {
+          "bytes": 72,
+          "path": "projection.json",
+          "sha256": "28aa6c96d7948b16196655940978035df5fc1a75741cbdad605816605c6cff0c"
+        },
+        {
+          "bytes": 43573,
+          "path": "sampler.pkl",
+          "sha256": "2fb0a70d5092443bbcda0108b9182bbfacf7333ab2b976885533788b89778a82"
+        }
+      ],
+      "native_mean_verified": true,
+      "receipts": [
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/fit.receipt.json",
+          "sha256": "9b9f50f320891fc4dccd156cc0ca74f10efc5553471ffe7d8aa26ff8232dd20f"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/sample.receipt.json",
+          "sha256": "ef41335831c23a9e8e4c9413e6175bfbc3085577378abfb698ded133b6679e56"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/repeat.receipt.json",
+          "sha256": "ef41335831c23a9e8e4c9413e6175bfbc3085577378abfb698ded133b6679e56"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/native.receipt.json",
+          "sha256": "f1d118c467e90c1eca0f162a58d4284d7b875b56211308fdc14d73c075b1fe10"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/regression/verification.json",
+          "sha256": "7f1f811fba20df8f6806ee79f03a6fe9558fc64fae2f291567c818dc25d2b05f"
+        }
+      ],
+      "row_removal_replay": "exact",
+      "sample_replay": "exact",
+      "sample_rows": 49,
+      "status": "ok",
+      "task": "regression",
+      "trained_devices": [
+        "cuda:0"
+      ]
+    },
+    {
+      "artifact_bytes": 69821,
+      "artifact_inventory": [
+        {
+          "bytes": 430,
+          "path": "adapter.json",
+          "sha256": "a46020243604d3af2d2d437e0668384428dbe93062c4f7852c84ce93cd136df5"
+        },
+        {
+          "bytes": 68,
+          "path": "projection.json",
+          "sha256": "79fb2d0aaaa05c2847d7d2bc839cd5df6119d9da84158c84c40463abcfb4d73b"
+        },
+        {
+          "bytes": 69323,
+          "path": "sampler.pkl",
+          "sha256": "fd02855dacfd79fd91e527556f11252fd4f361ccdd9ae6b9cde92818e41358dd"
+        }
+      ],
+      "native_mean_verified": true,
+      "receipts": [
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/fit.receipt.json",
+          "sha256": "6f1b582d7c0cffceea6fccfbdda7e7b72aab608ad9564ad13ff3e2d45dc8615d"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/sample.receipt.json",
+          "sha256": "b5d50bdee135f6fe5261d41ab28bbf37bf8929976119a0ec3df3ebbef488b303"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/repeat.receipt.json",
+          "sha256": "b5d50bdee135f6fe5261d41ab28bbf37bf8929976119a0ec3df3ebbef488b303"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/native.receipt.json",
+          "sha256": "fd1741a929ae555936c349c2447f374823da320b620d49f4877a4e6b86152dcd"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/binary/verification.json",
+          "sha256": "5cae1ab87919a77c73ee07383ad27bbd016b9eef7a610be5a40056b917cc1a8d"
+        }
+      ],
+      "row_removal_replay": "exact",
+      "sample_replay": "exact",
+      "sample_rows": 49,
+      "status": "ok",
+      "task": "binary",
+      "trained_devices": [
+        "cuda:0"
+      ]
+    }
+  ],
+  "generation_process": "flow",
+  "git_blob_verification": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/git-blob-verification.json",
+    "sha256": "926dfc6502f9b3a3fc0948ca9dbe101ef9985a1bab2f1219fdebe57429e54bab"
+  },
+  "gpu_native_search_space": [
+    {
+      "duplicate_K": 100,
+      "max_depth": 7,
+      "n_estimators": 100,
+      "n_t": 50
+    },
+    {
+      "duplicate_K": 10,
+      "max_depth": 7,
+      "n_estimators": 100,
+      "n_t": 10
+    }
+  ],
+  "gpu_runtime": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/runtime.lock.json",
+    "sha256": "94a3e51bb79cec5c799fd96aec3a6e3c0b577e9cd06cccf7ce52c72c629d2285"
+  },
+  "gpu_vram_mib_cap": 16384,
+  "historical_admission_correction": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/gpu-adapter-contract-v1/aggregate-admission-gap.json",
+    "sha256": "0116607875022a71fec6cb1edde96dd64bf64911a2c39da921970d594abf0830"
+  },
+  "historical_aggregate_resource_admission_complete": false,
+  "implementation": "original_author_generator_with_study_fit_sample_wrapper",
+  "independent_cpu_sample_and_initializer_checks": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/forestdiffusion-v1/adapter-contract-v1/independent-verification-v1/manifest.json",
+    "sha256": "15bf4b1aa3815da4260ce21a5cebc7d032515f0b8b21b9ed61fae819782daa39"
+  },
+  "independent_generator_implementation": false,
+  "license": "MIT",
+  "license_evidence": {
+    "sha256": "7a5d06dce31208b2378f0cd887ec4a387e73b242ef0104867626c47668aa62da",
+    "url": "https://github.com/SamsungSAILMontreal/ForestDiffusion/blob/818ac3b9c8df7b7c763470c9a0691dacca8d8b37/Python-Package/base-ForestDiffusion/LICENSE.txt"
+  },
+  "license_scope": "original Python package only",
+  "method": "ForestDiffusion/Forest-Flow",
+  "method_dataset_seconds_cap": 43200,
+  "mfs_v2": null,
+  "n_batch": 1,
+  "native_metric_implementation": "study_implemented_author_four_model_five_seed_formula",
+  "native_objective": {
+    "classification": "mean_macro_f1_over_linear_adaboost_random_forest_xgboost_and_seeds0_to4",
+    "direction": "maximize",
+    "regression": "mean_r2_over_linear_adaboost_random_forest_xgboost_and_seeds0_to4",
+    "sha256": "a5e8b76c3b7dfe6323259f2fc80e93c792e495d4b419859f057653c318da976a",
+    "shared_kpi_used_for_selection": false,
+    "tie_breaks": [
+      "smaller_charged_artifact_bytes",
+      "configuration_sha256"
+    ],
+    "url": "https://github.com/SamsungSAILMontreal/ForestDiffusion/blob/818ac3b9c8df7b7c763470c9a0691dacca8d8b37/metrics.py"
+  },
+  "official_tests_opened": false,
+  "portable_interpreter": {
+    "files": 1928,
+    "manifest": {
+      "path": "/mnt/fast-scratch/dope-benchmark/envs/forestdiffusion-python311-portable-v1/runtime-manifest.json",
+      "sha256": "11f37c6189277077d2ef94637990bca823c29407b4bc3aa7e69ad6ac97eba502"
+    },
+    "version": "3.11.15"
+  },
+  "ptf_v1": null,
+  "release_safe": null,
+  "reported_experiment_reproductions_claimed": 0,
+  "repository_root_experiment_code_license": "unresolved_not_imported",
+  "resource_overrides": {
+    "gpu_hist": true,
+    "n_jobs": 1
+  },
+  "source_archive_sha256": "c1f18ea76a30d60e7368a0008b0956ad6cf82b14927233a830ae281e2039f268",
+  "status": "pilot_locked",
+  "supported_tasks": [
+    "binary",
+    "regression"
+  ],
+  "total_trial_cap_per_dataset": 8,
+  "track": "common_numeric",
+  "upstream_commit": "818ac3b9c8df7b7c763470c9a0691dacca8d8b37",
+  "upstream_url": "https://github.com/SamsungSAILMontreal/ForestDiffusion",
+  "version": 1
+}
