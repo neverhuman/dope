@@ -57,6 +57,12 @@ SVG/PDF with `publish_native_neural_fivefit_figure`; `--from-json` regenerates
 tables using committed rights-safe results alone. This descriptive stability
 panel keeps official tests sealed and all gated release scores null.
 
+[`TABSYN_SOURCE_AUDIT.md`](TABSYN_SOURCE_AUDIT.md) records the pinned author
+defaults, native regression evaluator behavior and the remaining representation,
+runtime and sampling gaps. Its 96 source/documentation files match the archive
+and original Git blobs. This source-only audit keeps TabSyn pending and does
+not authorize fits, tuning or final evaluation.
+
 [`GPU_TARGET_REFINEMENT.md`](GPU_TARGET_REFINEMENT.md) documents the separately
 bounded GPU target research feature, its finite training profiles, and the
 required source, runtime, artifact and resource evidence before fit admission.

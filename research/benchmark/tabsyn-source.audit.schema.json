@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_environment_guidance": {
+      "const": {
+        "installed_runtime_verified": false,
+        "python": "3.10",
+        "requirements_fully_version_pinned": false,
+        "requirements_sha256": "c4e7c5bd0cc34c2a1a0e39482e9399c69e13ccd7703b05371f68dd56e5ef0e33",
+        "torch_conda_example": "2.0.1/CUDA11.7"
+      }
+    },
+    "bibliography_entry": {
+      "const": "zhang2024mixed"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "default_config": {
+      "const": {
+        "diffusion": {
+          "batch_size": 4096,
+          "data_loader_workers": 4,
+          "early_stop_patience": 500,
+          "hidden_dimension": 1024,
+          "learning_rate": 0.001,
+          "maximum_epochs": 10001,
+          "weight_decay": 0
+        },
+        "sampling": {
+          "cli_steps_forwarded_to_sampler": false,
+          "num_steps": 50,
+          "rows": "training latent row count"
+        },
+        "vae": {
+          "attention_heads": 1,
+          "batch_size": 4096,
+          "beta_decay": 0.7,
+          "data_loader_workers": 4,
+          "epochs": 4000,
+          "factor": 32,
+          "learning_rate": 0.001,
+          "max_beta": 0.01,
+          "min_beta": 1e-05,
+          "token_dimension": 4,
+          "transformer_layers": 2,
+          "weight_decay": 0
+        }
+      }
+    },
+    "fit_command": {
+      "const": "python main.py --dataname DATASET --method vae --mode train; python main.py --dataname DATASET --method tabsyn --mode train"
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-tabsyn-source-admission-audit"
+    },
+    "license": {
+      "const": "Apache-2.0"
+    },
+    "license_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "TabSyn"
+    },
+    "method_status": {
+      "const": "source_audit_pending"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_objective": {
+      "const": {
+        "auditor_configurations": 36,
+        "auditor_grid": {
+          "gamma": [
+            0.0,
+            1.0
+          ],
+          "max_depth": [
+            5,
+            10,
+            20
+          ],
+          "min_child_weight": [
+            1,
+            10
+          ],
+          "n_estimators": [
+            10,
+            50,
+            100
+          ],
+          "nthread": [
+            -1
+          ],
+          "objective": [
+            "reg:linear"
+          ],
+          "tree_method": [
+            "gpu_hist"
+          ]
+        },
+        "auditor_grid_is_generator_search_space": false,
+        "candidate_regression_objective": "best_r2_scores.XGBRegressor.r2",
+        "direction": "maximize",
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "implementation": "eval/mle/mle.py::_evaluate_regression",
+        "implementation_sha256": "ad8f0e7ad45f4c9da1c7d4c1f1ee2d1989890558e509da94ef8db5d69dc1103a",
+        "native_values_cross_method_ranking": false,
+        "real_partition_for_future_tuning": "only frozen official-training-derived validation, staged under the author test-named path",
+        "selection_behavior": "select auditor parameters by internal synthetic validation R2, then refit and measure on real evaluation partition",
+        "shared_kpi_used_for_selection": false,
+        "status": "source_identified_not_frozen_for_tuning",
+        "synthetic_auditor_validation_rows": "floor(synthetic_row_count / 9); numpy random shuffle",
+        "target_transform": "log(clip(y, 1, 20000)) for auditor fit labels and real evaluation labels; internal synthetic validation labels remain untransformed",
+        "tuning_seed_policy": null
+      }
+    },
+    "native_tuning_complete": {
+      "const": false
+    },
+    "new_fits_started": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "remaining_admission_gaps": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 10,
+      "type": "array"
+    },
+    "reported_experiment_reproductions": {
+      "const": 0
+    },
+    "runtime_closure_verified": {
+      "const": false
+    },
+    "sample_command": {
+      "const": "python main.py --dataname DATASET --method tabsyn --mode sample --save_path OUTPUT"
+    },
+    "source_archive_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_file_count": {
+      "const": 96
+    },
+    "source_inventory": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "source_member_sha256": {
+      "additionalProperties": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "maxProperties": 96,
+      "minProperties": 96,
+      "type": "object"
+    },
+    "source_scope": {
+      "const": "96 source/documentation members only; skipped bytecode, images and dataset metadata not read"
+    },
+    "source_verification": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "upstream_commit": {
+      "const": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7"
+    },
+    "upstream_url": {
+      "const": "https://github.com/amazon-science/tabsyn"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "method",
+    "upstream_url",
+    "upstream_commit",
+    "bibliography_entry",
+    "license",
+    "license_sha256",
+    "source_archive_sha256",
+    "source_inventory",
+    "source_verification",
+    "source_file_count",
+    "source_member_sha256",
+    "source_scope",
+    "default_config",
+    "native_objective",
+    "author_environment_guidance",
+    "fit_command",
+    "sample_command",
+    "remaining_admission_gaps",
+    "method_status",
+    "matrix_admission",
+    "runtime_closure_verified",
+    "fit_sample_contract_verified",
+    "native_tuning_complete",
+    "reported_experiment_reproductions",
+    "new_fits_started",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "production_certified",
+    "counts_as_dope_win"
+  ],
+  "title": "TabSyn source-only audit; no runtime or campaign admission",
+  "type": "object"
+}
