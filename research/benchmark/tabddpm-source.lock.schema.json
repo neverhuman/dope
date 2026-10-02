@@ -203,6 +203,75 @@
       ],
       "type": "object"
     },
+    "executable_closure": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "resolved_path": {
+                "type": "string"
+              },
+              "symlink_target": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "resolved_path",
+              "symlink_target"
+            ],
+            "type": "object"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "cache_file_count": {
+          "type": "integer"
+        },
+        "cache_verifier_source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "current_executable_closure_verified": {
+          "const": true
+        },
+        "custody": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "historical_fit_executable_closure_verified": {
+          "const": false
+        }
+      },
+      "required": [
+        "aliases",
+        "cache_file_count",
+        "cache_verifier_source_sha256",
+        "current_executable_closure_verified",
+        "custody",
+        "historical_fit_executable_closure_verified"
+      ],
+      "type": "object"
+    },
     "final_campaign_admitted": {
       "const": false
     },
@@ -235,8 +304,8 @@
       "items": {
         "type": "string"
       },
-      "maxItems": 5,
-      "minItems": 5,
+      "maxItems": 7,
+      "minItems": 7,
       "type": "array"
     },
     "method": {
@@ -521,6 +590,7 @@
     "default_config",
     "default_source",
     "entry",
+    "executable_closure",
     "final_campaign_admitted",
     "fit_command",
     "fit_timeout_seconds",

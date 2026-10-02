@@ -196,6 +196,38 @@
     "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py",
     "sha256": "a494faa98f86eb6059cdba9050de0c8f401bc7229084a380e3d8dbfee44f345f"
   },
+  "executable_closure": {
+    "aliases": [
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python",
+        "resolved_path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/bin/python3.9",
+        "symlink_target": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/bin/python3.9"
+      },
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3",
+        "resolved_path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/bin/python3.9",
+        "symlink_target": "python"
+      },
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9",
+        "resolved_path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/bin/python3.9",
+        "symlink_target": "python"
+      },
+      {
+        "path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/lib64",
+        "resolved_path": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/lib",
+        "symlink_target": "lib"
+      }
+    ],
+    "cache_file_count": 17,
+    "cache_verifier_source_sha256": "0cbdd368e812f0ca8873bf75534b6bcadb1df1dbd87ad33fc26ddf4c839aafaf",
+    "current_executable_closure_verified": true,
+    "custody": {
+      "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/executable-closure-v2.lock.json",
+      "sha256": "9e796ebbcc3e168174d7206a695e22f952c0c1a976376c7bfffc0f6c0a1f1ea7"
+    },
+    "historical_fit_executable_closure_verified": false
+  },
   "execution": {
     "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/execution.lock.json",
     "sha256": "a05e684c05289ea1236c46f4f3a60f43b1e2db5dc98c7d15350c352099b7f474"
@@ -358,6 +390,8 @@
   "license_evidence": "https://github.com/yandex-research/tab-ddpm/blob/b476257dd460b778ba09eb97f7a51d6490fa17f8/LICENSE.md",
   "limitations": [
     "Author-core contract probe, not two reported-experiment reproductions, native tuning or a matched common-outcome benchmark.",
+    "Historical runtime lock omitted executable bytecode and directory aliases: fit-time executable closure is unverified. Current caches match pinned source; this cannot establish their historical bytes.",
+    "The original lib64-to-lib ABI alias and interpreter aliases are explicitly pinned; every additional source/runtime symlink is rejected.",
     "Regression only; classification/categorical and generic final-runner integration remain pending.",
     "Learned quantiles/discrete state are charged; no claim that preprocessing is free of source observations.",
     "Both artifacts exceed L3; copy, leakage, attacks, real-vs-real and production profile gates are not complete.",
@@ -386,7 +420,7 @@
     "sha256": "6ecc1b3dcbec64baee27f0cc83ec1e24ed935cabbc74f95fa299d79e57b1478f",
     "verified_file_count": 10774
   },
-  "publisher_source_sha256": "2fd71c1e051b589996acf147f1d2194ccf8bdebb71b06d23ae73f15e4ee270ca",
+  "publisher_source_sha256": "5e716f5145c66c02c7eb60f17297ee5347ecb5d48b810b3a86dac595a6050f0e",
   "release_safe_l3": null,
   "resume": {
     "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1.lock.json",
