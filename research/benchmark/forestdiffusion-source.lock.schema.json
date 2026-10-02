@@ -1,0 +1,1031 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_source_sha256": {
+      "minLength": 1,
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "artifact_policy": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "author_default_config": {
+      "additionalProperties": false,
+      "properties": {
+        "duplicate_K": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_depth": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "n_estimators": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "n_t": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "duplicate_K",
+        "max_depth",
+        "n_estimators",
+        "n_t"
+      ],
+      "type": "object"
+    },
+    "author_faithful_paper_dependency_reproduction": {
+      "const": false
+    },
+    "author_package_files": {
+      "additionalProperties": false,
+      "properties": {
+        "ForestDiffusion/__init__.py": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ForestDiffusion/diffusion_with_trees_class.py": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ForestDiffusion/utils/__init__.py": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ForestDiffusion/utils/diffusion.py": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ForestDiffusion/utils/utils_diffusion.py": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "LICENSE.txt": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "setup.py": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ForestDiffusion/__init__.py",
+        "ForestDiffusion/diffusion_with_trees_class.py",
+        "ForestDiffusion/utils/__init__.py",
+        "ForestDiffusion/utils/diffusion.py",
+        "ForestDiffusion/utils/utils_diffusion.py",
+        "LICENSE.txt",
+        "setup.py"
+      ],
+      "type": "object"
+    },
+    "cpu_native_search_space": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "duplicate_K": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "max_depth": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "n_estimators": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "n_t": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "duplicate_K",
+              "max_depth",
+              "n_estimators",
+              "n_t"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "type": "array"
+    },
+    "cpu_runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+          "type": "string"
+        },
+        "sha256": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "dependency_inventory": {
+      "additionalProperties": false,
+      "properties": {
+        "complete_runtime_reference": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+              "type": "string"
+            },
+            "sha256": {
+              "minLength": 1,
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "files": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sha256": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "complete_runtime_reference",
+        "files",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "environment": {
+      "additionalProperties": false,
+      "properties": {
+        "Jinja2": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "MarkupSafe": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "catboost": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "cloudpickle": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "contourpy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "cycler": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "filelock": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "fonttools": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "formulaic": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "fsspec": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "graphviz": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "interface_meta": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "joblib": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kiwisolver": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lightgbm": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "matplotlib": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mpmath": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "narwhals": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "networkx": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "numpy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nvidia-nccl-cu12": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "packaging": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pandas": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "patsy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pillow": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "plotly": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pyparsing": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "python-dateutil": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pytz": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "scikit-learn": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "scipy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "six": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "statsmodels": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sympy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "threadpoolctl": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "torch": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "typing_extensions": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "tzdata": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "wrapt": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "xgboost": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "Jinja2",
+        "MarkupSafe",
+        "catboost",
+        "cloudpickle",
+        "contourpy",
+        "cycler",
+        "filelock",
+        "fonttools",
+        "formulaic",
+        "fsspec",
+        "graphviz",
+        "interface_meta",
+        "joblib",
+        "kiwisolver",
+        "lightgbm",
+        "matplotlib",
+        "mpmath",
+        "narwhals",
+        "networkx",
+        "numpy",
+        "nvidia-nccl-cu12",
+        "packaging",
+        "pandas",
+        "patsy",
+        "pillow",
+        "plotly",
+        "pyparsing",
+        "python-dateutil",
+        "pytz",
+        "scikit-learn",
+        "scipy",
+        "six",
+        "statsmodels",
+        "sympy",
+        "threadpoolctl",
+        "torch",
+        "typing_extensions",
+        "tzdata",
+        "wrapt",
+        "xgboost"
+      ],
+      "type": "object"
+    },
+    "fit_seconds_cap": {
+      "const": 600
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-forestdiffusion-source-lock"
+    },
+    "full_matrix_admission": {
+      "const": false
+    },
+    "generated_contract_costs": {
+      "additionalProperties": false,
+      "properties": {
+        "fits": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "operations": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "elapsed_seconds": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "operation": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "path": {
+                    "minLength": 1,
+                    "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+                    "type": "string"
+                  },
+                  "peak_gpu_used_mib": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "sha256": {
+                    "minLength": 1,
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "elapsed_seconds",
+                  "operation",
+                  "path",
+                  "peak_gpu_used_mib",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "elapsed_seconds": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "operation": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "path": {
+                    "minLength": 1,
+                    "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+                    "type": "string"
+                  },
+                  "peak_gpu_used_mib": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "minLength": 1,
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "elapsed_seconds",
+                  "operation",
+                  "path",
+                  "peak_gpu_used_mib",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "maxItems": 14,
+          "minItems": 14,
+          "type": "array"
+        },
+        "scope": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "summed_operation_seconds": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "fits",
+        "operations",
+        "scope",
+        "summed_operation_seconds"
+      ],
+      "type": "object"
+    },
+    "generated_input_contracts": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "artifact_inventory": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "bytes": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "path": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "minLength": 1,
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "bytes",
+                        "path",
+                        "sha256"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "native_mean_verified": {
+                "const": true
+              },
+              "receipts": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "path": {
+                          "minLength": 1,
+                          "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "minLength": 1,
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "path",
+                        "sha256"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "maxItems": 5,
+                "minItems": 5,
+                "type": "array"
+              },
+              "row_removal_replay": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sample_replay": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sample_rows": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "status": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "task": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "trained_devices": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  ]
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "artifact_bytes",
+              "artifact_inventory",
+              "native_mean_verified",
+              "receipts",
+              "row_removal_replay",
+              "sample_replay",
+              "sample_rows",
+              "status",
+              "task",
+              "trained_devices"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "generation_process": {
+      "const": "flow"
+    },
+    "git_blob_verification": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+          "type": "string"
+        },
+        "sha256": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "gpu_native_search_space": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "duplicate_K": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "max_depth": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "n_estimators": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "n_t": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "duplicate_K",
+              "max_depth",
+              "n_estimators",
+              "n_t"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "gpu_runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+          "type": "string"
+        },
+        "sha256": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "gpu_vram_mib_cap": {
+      "const": 16384
+    },
+    "historical_admission_correction": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+          "type": "string"
+        },
+        "sha256": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "historical_aggregate_resource_admission_complete": {
+      "const": false
+    },
+    "implementation": {
+      "const": "original_author_generator_with_study_fit_sample_wrapper"
+    },
+    "independent_cpu_sample_and_initializer_checks": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+          "type": "string"
+        },
+        "sha256": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "independent_generator_implementation": {
+      "const": false
+    },
+    "license": {
+      "const": "MIT"
+    },
+    "license_evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "url": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "sha256",
+        "url"
+      ],
+      "type": "object"
+    },
+    "license_scope": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "method": {
+      "const": "ForestDiffusion/Forest-Flow"
+    },
+    "method_dataset_seconds_cap": {
+      "const": 43200
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "n_batch": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "native_metric_implementation": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "native_objective": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "direction": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "regression": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "shared_kpi_used_for_selection": {
+          "const": false
+        },
+        "tie_breaks": {
+          "items": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              }
+            ]
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "url": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "classification",
+        "direction",
+        "regression",
+        "sha256",
+        "shared_kpi_used_for_selection",
+        "tie_breaks",
+        "url"
+      ],
+      "type": "object"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "portable_interpreter": {
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "manifest": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "pattern": "^/mnt/fast-scratch/dope-benchmark/",
+              "type": "string"
+            },
+            "sha256": {
+              "minLength": 1,
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "files",
+        "manifest",
+        "version"
+      ],
+      "type": "object"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "reported_experiment_reproductions_claimed": {
+      "const": 0
+    },
+    "repository_root_experiment_code_license": {
+      "const": "unresolved_not_imported"
+    },
+    "resource_overrides": {
+      "additionalProperties": false,
+      "properties": {
+        "gpu_hist": {
+          "const": true
+        },
+        "n_jobs": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "gpu_hist",
+        "n_jobs"
+      ],
+      "type": "object"
+    },
+    "source_archive_sha256": {
+      "minLength": 1,
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "status": {
+      "const": "pilot_locked"
+    },
+    "supported_tasks": {
+      "items": {
+        "anyOf": [
+          {
+            "minLength": 1,
+            "type": "string"
+          }
+        ]
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "total_trial_cap_per_dataset": {
+      "const": 8
+    },
+    "track": {
+      "const": "common_numeric"
+    },
+    "upstream_commit": {
+      "const": "818ac3b9c8df7b7c763470c9a0691dacca8d8b37"
+    },
+    "upstream_url": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "adapter_source_sha256",
+    "artifact_policy",
+    "author_default_config",
+    "author_faithful_paper_dependency_reproduction",
+    "author_package_files",
+    "cpu_native_search_space",
+    "cpu_runtime",
+    "dependency_inventory",
+    "environment",
+    "fit_seconds_cap",
+    "formal_dp_claim",
+    "format",
+    "full_matrix_admission",
+    "generated_contract_costs",
+    "generated_input_contracts",
+    "generation_process",
+    "git_blob_verification",
+    "gpu_native_search_space",
+    "gpu_runtime",
+    "gpu_vram_mib_cap",
+    "historical_admission_correction",
+    "historical_aggregate_resource_admission_complete",
+    "implementation",
+    "independent_cpu_sample_and_initializer_checks",
+    "independent_generator_implementation",
+    "license",
+    "license_evidence",
+    "license_scope",
+    "method",
+    "method_dataset_seconds_cap",
+    "mfs_v2",
+    "n_batch",
+    "native_metric_implementation",
+    "native_objective",
+    "official_tests_opened",
+    "portable_interpreter",
+    "ptf_v1",
+    "release_safe",
+    "reported_experiment_reproductions_claimed",
+    "repository_root_experiment_code_license",
+    "resource_overrides",
+    "source_archive_sha256",
+    "status",
+    "supported_tasks",
+    "total_trial_cap_per_dataset",
+    "track",
+    "upstream_commit",
+    "upstream_url",
+    "version"
+  ],
+  "type": "object"
+}

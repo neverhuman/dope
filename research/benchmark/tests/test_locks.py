@@ -32,6 +32,19 @@ class LockTests(unittest.TestCase):
         self.assertTrue(all(row["transformation_sha256"] and row["source_archive_sha256"]
                             for row in lock["datasets"]))
 
+    def test_forest_pilot_lock_is_bound_without_full_admission(self):
+        methods = json.loads((ROOT / "methods.lock.json").read_text())
+        method = methods["methods"]["ForestDiffusion/Forest-Flow"]
+        source = ROOT / "forestdiffusion-source.lock.json"
+        self.assertEqual(method["status"], "pilot_locked")
+        self.assertEqual(method["source_lock_sha256"], hashlib.sha256(source.read_bytes()).hexdigest())
+        lock = json.loads(source.read_text())
+        self.assertEqual(method["adapter_sha256"], lock["adapter_source_sha256"])
+        self.assertEqual(method["dependency_or_container_digest"], lock["gpu_runtime"]["sha256"])
+        self.assertFalse(methods["complete"])
+        self.assertFalse(methods["frozen_for_final_evaluation"])
+        self.assertFalse(lock["full_matrix_admission"])
+
 
 if __name__ == "__main__":
     unittest.main()

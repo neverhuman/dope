@@ -159,3 +159,36 @@ The final public test remains closed until `admission.py` passes.
 GaussianCopula cost cell. It is not the seven-method pilot or a benchmark
 comparison. The runner charges the projection map in raw artifact bytes and
 archives DOPE compile sidecars separately as fit evidence.
+# ForestDiffusion original-package pilot contract
+
+`forestdiffusion-source.lock.json` pins the MIT Python package at upstream
+`818ac3b9c8df7b7c763470c9a0691dacca8d8b37`, the complete runtime inventory,
+portable interpreter, and the unchanged frozen GPU adapter. Repository-root
+experiment code has unresolved license coverage and is not imported. The study
+wrapper implements the author's mean ML efficacy over linear, AdaBoost, random
+forest and XGBoost auditors, each at seeds 0–4: macro F1 for binary classification
+and R² for regression, maximized with artifact bytes and configuration hash as
+tie breaks. Common retention never selects its configuration.
+
+The wrapper validates runtime/source/dependency bytes before initializing optional
+libraries and validates the complete artifact inventory before loading its locally
+produced pickle. All sampler, metadata and projection bytes are charged. Removing
+retained row containers passed exact original and serialized sample parity on
+generated binary/regression inputs. These contracts are not reported-experiment
+reproductions or an author-faithful paper dependency reproduction. Four generated
+CPU/GPU fits and all 14 contract operations are cost evidence. The earlier GPU
+probe's incomplete aggregate RAM admission remains explicit in the source lock.
+
+Regenerate and verify the rights-safe source lock using verified local scratch:
+
+```sh
+python3 -m research.benchmark.publish_forestdiffusion_source \
+  --schema research/benchmark/forestdiffusion-source.lock.schema.json
+python3 -m unittest research.benchmark.tests.test_forestdiffusion_adapter \
+  research.benchmark.tests.test_forestdiffusion_source -v
+```
+
+The method inventory records `pilot_locked`. Full campaign admission remains
+closed, official tests remain sealed, and MFS-v2, PTF-v1 and release-safe scores
+remain null. The historical CPU adapter/runtime and frozen pilot sources are
+retained unchanged on scratch.
