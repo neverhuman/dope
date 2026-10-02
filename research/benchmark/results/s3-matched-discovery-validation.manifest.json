@@ -6,7 +6,7 @@
     },
     "s3-matched-discovery-validation.json": {
       "bytes": 852097,
-      "sha256": "2cf13e7284bf1b8adb2992b9e40204266c969478bb716501f4f181243f1a2a36"
+      "sha256": "6039577f487e02ba8772df2c57ba26776684a9157310eb674c8db92860d60e11"
     },
     "s3-matched-discovery-validation.md": {
       "bytes": 13551,
@@ -2154,7 +2154,7 @@
   "ptf_v1": null,
   "publisher_sources": {
     "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
-    "publish_s3_matched.py": "75455b26f849b4dcc43175de899b96f40b7ab4df94812458d9dc0a41e922a27a",
+    "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a",
     "publish_s3_matched_figure.py": "395ee50a69c12df5f3c4cf68b5161306bbf5ea2db08ce6451ba23d2dfd83d68a",
     "publish_s3_matched_manifest.py": "975bb255be55dd1bd6dd08222757a4a00fd8d5d96b1a84806475a391bf008a2f",
     "score.py": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"

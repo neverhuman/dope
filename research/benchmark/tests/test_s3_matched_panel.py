@@ -7,7 +7,8 @@ import unittest
 from unittest.mock import patch
 
 from research.benchmark.publish_s3_matched import (
-    CONFIGS, SEEDS, SIZES, native_winner, schema, summarize, verify_cell, verify_frozen_sources,
+    CONFIGS, PINS, SEEDS, SIZES, native_winner, schema, summarize, verify_cell, verify_frozen_sources,
+    verify_native_fit,
 )
 from research.benchmark.manifest import digest
 from research.benchmark.score import sha256
@@ -75,6 +76,35 @@ class S3MatchedPanelTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'incomplete'):
                 verify_cell(Path(root), {'synthetic': True}, 'a'*64, {})
             read.assert_not_called()
+
+    def test_native_artifact_root_link_rejected_before_evidence_reads(self):
+        target = Path('target/s3-matched-tests')
+        target.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=target) as directory:
+            root = Path(directory).resolve()
+            retained = root / 'retained'
+            retained.mkdir()
+            model = retained / 'model.json'
+            model.write_text('{"fixture": true}\n')
+            artifact = root / 'artifact'
+            artifact.symlink_to(retained, target_is_directory=True)
+            job = {'synthetic': True}
+            receipt = {'job': job, 'round_sha256': PINS['native_fit'], 'status': 'ok',
+                       'validation_only': True, 'mfs_v2': None, 'ptf_v1': None,
+                       'evidence_files': {'artifact/model.json': sha256(model)},
+                       'artifact_inventory': [{'path': 'model.json', 'bytes': model.stat().st_size,
+                                               'sha256': sha256(model)}],
+                       'artifact_bytes': model.stat().st_size,
+                       'native_kpi': {'partition': 'validation', 'direction': 'maximize',
+                                      'objective': 'sdmetrics_mean_regression_r2', 'value': .5,
+                                      'components': {'LinearRegression': .5, 'MLPRegressor': .5}}}
+            path = root / 'receipt.json'
+            path.write_text(json.dumps(receipt))
+            with patch('research.benchmark.publish_s3_matched.BASE', root), patch(
+                    'research.benchmark.publish_s3_matched.evidence') as evidence:
+                with self.assertRaisesRegex(ValueError, 'artifact root must be an unlinked directory'):
+                    verify_native_fit(path, {'jobs': [job]}, sha256(path))
+                evidence.assert_not_called()
 
     def test_rehashed_cost_or_metric_receipt_cannot_replace_frozen_receipt(self):
         target = Path('target/s3-matched-tests')

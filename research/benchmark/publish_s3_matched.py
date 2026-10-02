@@ -173,6 +173,8 @@ def verify_frozen_sources(locks, refs):
 
 
 def artifact_inventory(path):
+    require(path.is_dir() and not path.is_symlink(),
+            'artifact root must be an unlinked directory')
     result = []
     for item in sorted(path.rglob('*')):
         require(not item.is_symlink(), 'artifact contains link')
@@ -190,8 +192,8 @@ def verify_native_fit(path, lock, expected_sha):
             and receipt['status'] == 'ok' and receipt['validation_only'] is True
             and receipt['mfs_v2'] is None and receipt['ptf_v1'] is None,
             'native fit identity changed')
-    evidence(path.parent, receipt)
     inventory = artifact_inventory(path.parent / 'artifact')
+    evidence(path.parent, receipt)
     require(inventory == sorted(receipt['artifact_inventory'], key=lambda r: r['path'])
             and sum(r['bytes'] for r in inventory) == receipt['artifact_bytes'],
             'native artifact accounting changed')
