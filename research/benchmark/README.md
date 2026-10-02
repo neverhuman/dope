@@ -378,7 +378,7 @@ Official tests remain sealed; MFS-v2/PTF-v1/release-safe remain null.
 
 ## Central native method inventory
 
-`methods.lock.json` binds the completed ARF, synthpop CART and TabPC source and
+`methods.lock.json` binds the completed ARF, synthpop CART, TabPC and ForestDiffusion source and
 native-validation evidence as `pilot_locked`. Their selection objectives are:
 
 | Method | Native validation objective | Pilot search |
@@ -386,6 +386,7 @@ native-validation evidence as `pilot_locked`. Their selection objectives are:
 | ARF | Maximize held-out FORDE mean log density | Four original and four refinement trials |
 | synthpop CART | Minimize author `utility.gen` CART pMSE | Four trials |
 | TabPC | Minimize author transformed validation NLL, with author early stopping | Eight trials |
+| ForestDiffusion | Maximize author mean ML efficacy across four models and five auditor seeds | Six CPU and two GPU trials |
 
 The entries pin adapter/source identities, configurations and existing pilot
 panels. Native values are never ranked across methods. Artifact-only sampling,
@@ -395,6 +396,17 @@ dependency is GPL-3.0-or-later. ARF's dependency digest and generic fit/sample
 commands remain null pending an executable inventory and final adapter. The R
 package lock and TabPC source/version lock do not establish complete current or
 historical executable closure.
+
+ForestDiffusion's native entry binds the existing study implementation to its
+adapter hash and the author metric reference. Its regression objective is mean
+R2; its binary objective is mean macro F1. Both average linear, AdaBoost, random
+forest and XGBoost auditors over seeds 0–4, using synthetic sample seed 101.
+The central tie-break names express the same existing bytes-then-configuration
+order. The published pilot panel and manifest are hash-bound; failed trials and
+unavailable native selections remain visible. The original MIT generator is
+used, while the author ML formula is implemented separately by the study.
+Repository-root experiment code with unresolved rights is not imported, and
+the paper dependency environment has not been reproduced.
 
 This reconciliation does not admit final jobs. Generic final runner integration,
 the remaining method audits and the complete five-lock set are pending. The
