@@ -1,4 +1,4 @@
-# Benchmark campaign status — 2026-10-01
+# Benchmark campaign status — 2026-10-02
 
 The final public-core and matched S3 comparisons are **not admitted**. The
 public and S3 test partitions have not been used for model selection or common
@@ -136,7 +136,8 @@ both from the committed JSON with
 ## Final admission still blocked
 
 The 29-method source inventory currently has six locked entries (DOPE,
-three compact baselines, CTGAN, and TVAE), 20 pending source audits, one pilot-only AIM entry,
+three compact baselines, CTGAN, and TVAE), six pilot-only entries (AIM, ARF,
+synthpop CART, TabPC, ForestDiffusion and TabDDPM), 15 pending source audits,
 and two unavailable entries (TabKDE and GEM-T). Unavailable methods contribute
 no DOPE win. The density KPI implementation now gives GaussianCopula,
 independent marginals, and Chow-Liu held-out validation mean log density;
@@ -147,6 +148,45 @@ track, public-core datasets, evaluator gates, budget lock, and exact final job
 matrix are not complete. `admission.py` therefore keeps sealed-test common
 evaluation closed. The six-fit pilot and this single-seed research survey are
 cost and validation evidence only.
+
+## Complete S3 matched confirmation validation
+
+[The matched confirmation JSON](results/s3-matched-confirmation-validation.json),
+[table](results/s3-matched-confirmation-validation.csv),
+[SVG](results/s3-matched-confirmation-validation.svg)/[PDF](results/s3-matched-confirmation-validation.pdf)
+and [manifest](results/s3-matched-confirmation-validation.manifest.json) record
+six disjoint confirmation lineages with the same bounded official-training-derived
+partitions for DOPE, CTGAN and TVAE. All 288 logical cells are accounted for:
+258 successful physical cells, 12 unavailable sample cells from two failed DOPE
+GPU admissions, and 18 default/native logical aliases with no additional compute.
+All four declared DOPE profiles remain visible; no production family is selected.
+The 22 successful DOPE fits charged 984–6,307 bytes including projection state.
+The retained CTGAN/TVAE configurations exceed the L3 cap and are unconstrained
+quality comparisons. Their original four-trial native efficacy searches and
+winners were verified; shared outcomes did not select them.
+
+For fit seed 11 and three sample seeds at 4n, the CatBoost median retention
+on `503_wind` is 0.996 for DOPE `features12_steps2048` (3,846 bytes) and
+0.802 for native-selected TVAE (471,140 bytes). On `1193_BNG_lowbwt`, the
+same DOPE profile is 0.970 (2,436 bytes), while native-selected TVAE is higher
+at 1.029 (293,868 bytes). These selected examples illustrate mixed outcomes;
+the complete table retains every configuration and failure. They are
+null-normalized utility estimates, without fit uncertainty or paired superiority.
+
+Successful DOPE fit entrypoints totaled 111.043 seconds on xbabe1/xbabe3.
+Dispatch, hash and admission overhead totaled 2,119.258 seconds, including
+130.203 seconds for the two failed admissions. The declared GPU fit ceiling
+was 14,400 seconds; the original frozen grid, fit deadlines and VRAM cap were
+preserved. Sampling and metric replays use xbabe2. Device-wide energy estimates
+include idle and do not provide full campaign or baseline-attributed energy.
+Original native tuning and earlier DOPE architecture research are separate costs.
+
+Both controllers closed with exit code zero. All successful sample/metric
+replays match, 5,085 declared source/input files were verified, and a pinned
+receipt lock rejects rewritten evidence before metric reads. Full current or
+historical executable closures are not certified. Official tests remain sealed;
+MFS-v2, PTF-v1, release-safe L3 and paired superiority remain null. This panel
+does not replace public-core paper analysis or the full campaign.
 
 ## Completed CTGAN/TVAE GPU comparison and DOPE readout repair
 

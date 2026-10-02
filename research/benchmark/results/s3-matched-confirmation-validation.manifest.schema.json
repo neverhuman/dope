@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "s3-matched-confirmation-validation.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-confirmation-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-confirmation-validation.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-confirmation-validation.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-confirmation-validation.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "s3-matched-confirmation-validation.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "s3-matched-confirmation-validation.csv",
+        "s3-matched-confirmation-validation.json",
+        "s3-matched-confirmation-validation.md",
+        "s3-matched-confirmation-validation.pdf",
+        "s3-matched-confirmation-validation.schema.json",
+        "s3-matched-confirmation-validation.svg"
+      ],
+      "type": "object"
+    },
+    "campaign_complete": {
+      "const": false
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-s3-matched-confirmation-publication-manifest"
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5243,
+      "minItems": 5243,
+      "type": "array"
+    },
+    "matrix": {
+      "additionalProperties": false,
+      "properties": {
+        "datasets": {
+          "type": "integer"
+        },
+        "fit_seed_count": {
+          "type": "integer"
+        },
+        "logical_cells": {
+          "type": "integer"
+        },
+        "logical_status_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "fit_unavailable": {
+              "type": "integer"
+            },
+            "ok": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "fit_unavailable",
+            "ok"
+          ],
+          "type": "object"
+        },
+        "planned_physical_cells": {
+          "type": "integer"
+        },
+        "sample_seed_count": {
+          "type": "integer"
+        },
+        "size_count": {
+          "type": "integer"
+        },
+        "successful_physical_cells": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "datasets",
+        "fit_seed_count",
+        "logical_cells",
+        "logical_status_counts",
+        "planned_physical_cells",
+        "sample_seed_count",
+        "size_count",
+        "successful_physical_cells"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "type": "null"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest.py": {
+          "type": "string"
+        },
+        "publish_s3_confirmation.py": {
+          "type": "string"
+        },
+        "publish_s3_confirmation_figure.py": {
+          "type": "string"
+        },
+        "publish_s3_confirmation_manifest.py": {
+          "type": "string"
+        },
+        "publish_s3_matched.py": {
+          "type": "string"
+        },
+        "score.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest.py",
+        "publish_s3_confirmation.py",
+        "publish_s3_confirmation_figure.py",
+        "publish_s3_confirmation_manifest.py",
+        "publish_s3_matched.py",
+        "score.py"
+      ],
+      "type": "object"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "s3_data_lock_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "scope": {
+      "const": "Single-fit-seed disjoint confirmation research, not public-core paired analysis, five-fit stability or certification. Training cohorts are bounded subsets of official S3 training partitions; native selection and these descriptive outcomes use training-derived validation. All four DOPE profiles retained; production family unselected."
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "campaign_complete",
+    "counts_as_dope_win",
+    "format",
+    "immutable_references",
+    "matrix",
+    "mfs_v2",
+    "official_tests_opened",
+    "paired_superiority",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe_l3",
+    "s3_data_lock_sha256",
+    "scope",
+    "version"
+  ],
+  "type": "object"
+}
