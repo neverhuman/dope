@@ -1,6 +1,8 @@
 import json
+import os
 import tempfile
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import patch
 
@@ -11,6 +13,16 @@ from research.benchmark.score import artifact_inventory, sha256
 
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+@contextmanager
+def generated_artifact_directory(path):
+    previous = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(previous)
 
 
 class RealTestUtilityTests(unittest.TestCase):
@@ -82,7 +94,8 @@ class RealTestUtilityTests(unittest.TestCase):
                                                "sample_sha256": sha256(sample)}))
                 samples[multiplier] = sample, receipt
             output = root / "utility.json"
-            with patch.object(real_test_utility, "assess", return_value={"admitted": True}), \
+            with generated_artifact_directory(root), \
+                 patch.object(real_test_utility, "assess", return_value={"admitted": True}), \
                  patch.object(real_test_utility, "ROOT", root):
                 altered = dict(manifest)
                 altered["source_row_hash"] = "other-source"

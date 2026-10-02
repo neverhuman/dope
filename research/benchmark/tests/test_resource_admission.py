@@ -1,6 +1,7 @@
 import copy
 import subprocess
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from research.benchmark import inventory_hosts, resource_admission
@@ -60,10 +61,13 @@ class ResourceAdmissionTests(unittest.TestCase):
 
     def test_failed_owner_query_never_becomes_empty_gpu_inventory(self):
         failed = subprocess.CalledProcessError(1, ["nvidia-smi"])
-        with patch.object(inventory_hosts, "command", side_effect=[
-                "0, test GPU, 24576, 24000, test-driver", failed]):
+        disk = SimpleNamespace(total=200_000_000_000, free=100_000_000_000)
+        with patch.object(inventory_hosts.shutil, "disk_usage", return_value=disk), \
+                patch.object(inventory_hosts, "command", side_effect=[
+                    "0, test GPU, 24576, 24000, test-driver", failed]) as query:
             with self.assertRaises(subprocess.CalledProcessError):
                 inventory_hosts.local()
+        self.assertEqual(query.call_count, 2)
 
 
 if __name__ == "__main__":
