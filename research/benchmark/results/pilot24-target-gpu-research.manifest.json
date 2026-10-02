@@ -1,0 +1,65 @@
+{
+  "artifacts": {
+    "pilot24-target-gpu-research.csv": {
+      "bytes": 5774,
+      "sha256": "58982fd41dacb049593f4efd158888910d1db6dfaecc7232996a6a04ae0b86c5"
+    },
+    "pilot24-target-gpu-research.json": {
+      "bytes": 1326463,
+      "sha256": "5a7605b2bbf3d46635c5d7bbeb4c922149bbd79e3bf75c6269cedd4637447dc3"
+    },
+    "pilot24-target-gpu-research.md": {
+      "bytes": 4458,
+      "sha256": "41dc739120964029080f65232d99da1a7b1a18cb7cad825735207c6b02144f89"
+    },
+    "pilot24-target-gpu-research.pdf": {
+      "bytes": 77589,
+      "sha256": "6daf174ae636881cea3ce0507fd9c24be0f7fb7bffe3a2b8bce3a1d6b6849556"
+    },
+    "pilot24-target-gpu-research.schema.json": {
+      "bytes": 63078,
+      "sha256": "f457eeee41cc06f8d3ef70a3b747d77eee832b2eef29790d1c9bbb3424327392"
+    },
+    "pilot24-target-gpu-research.svg": {
+      "bytes": 360917,
+      "sha256": "b33fb337201a72c41ccaf00a788ebd38449ea0e0b31945d292e3e87a02e3c6ea"
+    }
+  },
+  "format": "dope-target-gpu-research-publication-manifest",
+  "input_locks": {
+    "fit": {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/round.lock.json",
+      "sha256": "1897f312e68de13124c5ac78b73e0320c61c222ed8cfd119e8bb8a971e56a0c0"
+    },
+    "pack": {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-v1/round.lock.json",
+      "sha256": "238ddb0d9b9126442ea41d117943670dc9d9a6b95b1d230aa56cf35ddcee0304"
+    },
+    "packed": {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/round.lock.json",
+      "sha256": "89fb505a07991cfdcd4c8882252154fd6e068daf0b59d16b832de3c374654bc2"
+    },
+    "raw": {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/round.lock.json",
+      "sha256": "3fd6b707b9fabd78d408a3723ca4182e06eabb521e03eb2126c1ce5797ed903f"
+    },
+    "reference": {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/publication-inputs-v1.json",
+      "sha256": "2908181c30df8871bc58968d89df163bae770c80fc8c6a23f26e30fa0cfcaa9b"
+    }
+  },
+  "mfs_v2": null,
+  "new_gpu_fits": 24,
+  "new_validation_cells": 192,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "scope": "training_derived_validation_only",
+  "sources": {
+    "publish_target_research.py": "6bffc35bc2ed1d02e463844d5465c6bbf6f707bc4bc7ed7c47498a67c09959e0",
+    "publish_target_research_figure.py": "580e2632fe38f92bf0f3701b36528766528f965256648a70210c220f3d5a753e",
+    "target_research_receipts.py": "fdbbc362682a3472259f99feedc66ca953cef1d76f243ba509287bf3805ce96a"
+  },
+  "validation_receipt_index_sha256": "a145ddcfd5cb532cd02c0af3837ec6835e8b8040af43b4c59e4f004d8a5dfef4",
+  "version": 1
+}

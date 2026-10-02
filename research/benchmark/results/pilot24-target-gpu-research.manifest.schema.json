@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "dope-target-gpu-research-publication-manifest"
+    },
+    "version": {
+      "const": 1
+    },
+    "scope": {
+      "const": "training_derived_validation_only"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "new_gpu_fits": {
+      "const": 24
+    },
+    "new_validation_cells": {
+      "const": 192
+    },
+    "validation_receipt_index_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "pilot24-target-gpu-research.json": {
+          "type": "object",
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        },
+        "pilot24-target-gpu-research.schema.json": {
+          "type": "object",
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        },
+        "pilot24-target-gpu-research.csv": {
+          "type": "object",
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        },
+        "pilot24-target-gpu-research.md": {
+          "type": "object",
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        },
+        "pilot24-target-gpu-research.svg": {
+          "type": "object",
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        },
+        "pilot24-target-gpu-research.pdf": {
+          "type": "object",
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "pilot24-target-gpu-research.json",
+        "pilot24-target-gpu-research.schema.json",
+        "pilot24-target-gpu-research.csv",
+        "pilot24-target-gpu-research.md",
+        "pilot24-target-gpu-research.svg",
+        "pilot24-target-gpu-research.pdf"
+      ]
+    },
+    "sources": {
+      "type": "object",
+      "properties": {
+        "publish_target_research.py": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "target_research_receipts.py": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "publish_target_research_figure.py": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "publish_target_research.py",
+        "target_research_receipts.py",
+        "publish_target_research_figure.py"
+      ]
+    },
+    "input_locks": {
+      "type": "object",
+      "properties": {
+        "fit": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "raw": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "pack": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "packed": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "reference": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "fit",
+        "raw",
+        "pack",
+        "packed",
+        "reference"
+      ]
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "scope",
+    "official_tests_opened",
+    "production_certified",
+    "mfs_v2",
+    "ptf_v1",
+    "new_gpu_fits",
+    "new_validation_cells",
+    "validation_receipt_index_sha256",
+    "artifacts",
+    "sources",
+    "input_locks"
+  ],
+  "additionalProperties": false
+}
