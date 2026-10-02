@@ -1,0 +1,1134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adaptations": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "adapter": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "attempt_receipts": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "compute_charging": {
+                "type": "string"
+              },
+              "fit_entrypoint_seconds": {
+                "type": "number"
+              },
+              "fit_entrypoint_status": {
+                "type": "string"
+              },
+              "fit_operation": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "compute_charging",
+              "fit_entrypoint_seconds",
+              "fit_entrypoint_status",
+              "fit_operation",
+              "fit_seed",
+              "receipt",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "compute_charging": {
+                "type": "string"
+              },
+              "fit_entrypoint_seconds": {
+                "type": "integer"
+              },
+              "fit_entrypoint_status": {
+                "type": "string"
+              },
+              "fit_operation": {
+                "type": "null"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "compute_charging",
+              "fit_entrypoint_seconds",
+              "fit_entrypoint_status",
+              "fit_operation",
+              "fit_seed",
+              "receipt",
+              "status"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 9,
+      "minItems": 9,
+      "type": "array"
+    },
+    "author_default_source": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "author_native_catboost_config": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "author_objective_source": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "bibliography_entry": {
+      "type": "string"
+    },
+    "completion": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "configuration": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_size": {
+          "type": "integer"
+        },
+        "d_layers": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "lr": {
+          "type": "number"
+        },
+        "num_timesteps": {
+          "type": "integer"
+        },
+        "steps": {
+          "type": "integer"
+        },
+        "weight_decay": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "batch_size",
+        "d_layers",
+        "lr",
+        "num_timesteps",
+        "steps",
+        "weight_decay"
+      ],
+      "type": "object"
+    },
+    "costs": {
+      "additionalProperties": false,
+      "properties": {
+        "energy_joules": {
+          "type": "null"
+        },
+        "failed_fit_entrypoint_seconds": {
+          "type": "number"
+        },
+        "fit_entrypoint_seconds_including_failures": {
+          "type": "number"
+        },
+        "gpu_training_seconds": {
+          "type": "number"
+        },
+        "inherited_sample_operation_aliases": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "alias_path": {
+                "type": "string"
+              },
+              "physical_operation_path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "alias_path",
+              "physical_operation_path"
+            ],
+            "type": "object"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        "native_evaluation_seconds": {
+          "type": "number"
+        },
+        "physical_operations_including_four_failed_fit_entrypoints": {
+          "type": "integer"
+        },
+        "physical_sample_repeat_operations": {
+          "type": "integer"
+        },
+        "sample_repeat_entrypoint_seconds": {
+          "type": "number"
+        },
+        "successful_physical_operations": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "energy_joules",
+        "failed_fit_entrypoint_seconds",
+        "fit_entrypoint_seconds_including_failures",
+        "gpu_training_seconds",
+        "inherited_sample_operation_aliases",
+        "native_evaluation_seconds",
+        "physical_operations_including_four_failed_fit_entrypoints",
+        "physical_sample_repeat_operations",
+        "sample_repeat_entrypoint_seconds",
+        "successful_physical_operations"
+      ],
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "entry": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "execution": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "final_campaign_admitted": {
+      "const": false
+    },
+    "fit_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "fits": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_inventory": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bytes": {
+                      "type": "integer"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "bytes",
+                    "path",
+                    "sha256"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 4,
+                "minItems": 4,
+                "type": "array"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "fit_entrypoint_seconds": {
+                "type": "number"
+              },
+              "fit_reference": {
+                "additionalProperties": false,
+                "properties": {
+                  "new_fit_started": {
+                    "const": false
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "new_fit_started",
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "gpu": {
+                "type": "string"
+              },
+              "gpu_fit_seconds": {
+                "type": "number"
+              },
+              "host": {
+                "type": "string"
+              },
+              "native_validation_kpi": {
+                "additionalProperties": false,
+                "properties": {
+                  "components": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "r2": {
+                          "type": "number"
+                        },
+                        "sample_seed": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "r2",
+                        "sample_seed"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 5,
+                    "minItems": 5,
+                    "type": "array"
+                  },
+                  "direction": {
+                    "type": "string"
+                  },
+                  "mfs_v2": {
+                    "type": "null"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "official_tests_opened": {
+                    "const": false
+                  },
+                  "partition": {
+                    "const": "official_training_derived_validation"
+                  },
+                  "ptf_v1": {
+                    "type": "null"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "components",
+                  "direction",
+                  "mfs_v2",
+                  "name",
+                  "official_tests_opened",
+                  "partition",
+                  "ptf_v1",
+                  "value"
+                ],
+                "type": "object"
+              },
+              "peak_torch_allocated_bytes": {
+                "type": "integer"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "sample_replay_exact": {
+                "const": true
+              },
+              "within_l3_bytes": {
+                "const": false
+              }
+            },
+            "required": [
+              "artifact_inventory",
+              "charged_artifact_bytes",
+              "fit_entrypoint_seconds",
+              "fit_reference",
+              "fit_seed",
+              "gpu",
+              "gpu_fit_seconds",
+              "host",
+              "native_validation_kpi",
+              "peak_torch_allocated_bytes",
+              "receipt",
+              "sample_replay_exact",
+              "within_l3_bytes"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_inventory": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bytes": {
+                      "type": "integer"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "bytes",
+                    "path",
+                    "sha256"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 4,
+                "minItems": 4,
+                "type": "array"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "fit_entrypoint_seconds": {
+                "type": "number"
+              },
+              "fit_reference": {
+                "additionalProperties": false,
+                "properties": {
+                  "new_fit_started": {
+                    "const": true
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "new_fit_started",
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "gpu": {
+                "type": "string"
+              },
+              "gpu_fit_seconds": {
+                "type": "number"
+              },
+              "host": {
+                "type": "string"
+              },
+              "native_validation_kpi": {
+                "additionalProperties": false,
+                "properties": {
+                  "components": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "r2": {
+                          "type": "number"
+                        },
+                        "sample_seed": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "r2",
+                        "sample_seed"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 5,
+                    "minItems": 5,
+                    "type": "array"
+                  },
+                  "direction": {
+                    "type": "string"
+                  },
+                  "mfs_v2": {
+                    "type": "null"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "official_tests_opened": {
+                    "const": false
+                  },
+                  "partition": {
+                    "const": "official_training_derived_validation"
+                  },
+                  "ptf_v1": {
+                    "type": "null"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "components",
+                  "direction",
+                  "mfs_v2",
+                  "name",
+                  "official_tests_opened",
+                  "partition",
+                  "ptf_v1",
+                  "value"
+                ],
+                "type": "object"
+              },
+              "peak_torch_allocated_bytes": {
+                "type": "integer"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "sample_replay_exact": {
+                "const": true
+              },
+              "within_l3_bytes": {
+                "const": false
+              }
+            },
+            "required": [
+              "artifact_inventory",
+              "charged_artifact_bytes",
+              "fit_entrypoint_seconds",
+              "fit_reference",
+              "fit_seed",
+              "gpu",
+              "gpu_fit_seconds",
+              "host",
+              "native_validation_kpi",
+              "peak_torch_allocated_bytes",
+              "receipt",
+              "sample_replay_exact",
+              "within_l3_bytes"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-tabddpm-author-contract-publication"
+    },
+    "license_evidence": {
+      "type": "string"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "limits": {
+      "additionalProperties": false,
+      "properties": {
+        "gpu_vram_bytes": {
+          "type": "integer"
+        },
+        "neural_fit_seconds": {
+          "type": "integer"
+        },
+        "original_pilot_deadline_unchanged": {
+          "const": true
+        },
+        "repair_fit_seconds": {
+          "type": "integer"
+        },
+        "total_fit_entrypoint_seconds": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "gpu_vram_bytes",
+        "neural_fit_seconds",
+        "original_pilot_deadline_unchanged",
+        "repair_fit_seconds",
+        "total_fit_entrypoint_seconds"
+      ],
+      "type": "object"
+    },
+    "method": {
+      "type": "string"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_implementation": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "native_tuning_complete": {
+      "const": false
+    },
+    "new_fits_started": {
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publication_custody": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "verified_file_count": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "verified_file_count"
+      ],
+      "type": "object"
+    },
+    "publisher_source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "resume": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "round": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "runtime_python": {
+      "type": "string"
+    },
+    "runtime_python_variation": {
+      "type": "string"
+    },
+    "runtime_versions": {
+      "additionalProperties": false,
+      "properties": {
+        "catboost": {
+          "type": "string"
+        },
+        "category-encoders": {
+          "type": "string"
+        },
+        "dython": {
+          "type": "string"
+        },
+        "icecream": {
+          "type": "string"
+        },
+        "imbalanced-learn": {
+          "type": "string"
+        },
+        "libzero": {
+          "type": "string"
+        },
+        "numpy": {
+          "type": "string"
+        },
+        "optuna": {
+          "type": "string"
+        },
+        "pandas": {
+          "type": "string"
+        },
+        "pyarrow": {
+          "type": "string"
+        },
+        "rdt": {
+          "type": "string"
+        },
+        "rtdl": {
+          "type": "string"
+        },
+        "scikit-learn": {
+          "type": "string"
+        },
+        "scipy": {
+          "type": "string"
+        },
+        "setuptools": {
+          "type": "string"
+        },
+        "skorch": {
+          "type": "string"
+        },
+        "tomli": {
+          "type": "string"
+        },
+        "tomli-w": {
+          "type": "string"
+        },
+        "torch": {
+          "type": "string"
+        },
+        "tqdm": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "catboost",
+        "category-encoders",
+        "dython",
+        "icecream",
+        "imbalanced-learn",
+        "libzero",
+        "numpy",
+        "optuna",
+        "pandas",
+        "pyarrow",
+        "rdt",
+        "rtdl",
+        "scikit-learn",
+        "scipy",
+        "setuptools",
+        "skorch",
+        "tomli",
+        "tomli-w",
+        "torch",
+        "tqdm"
+      ],
+      "type": "object"
+    },
+    "sample_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "scope": {
+      "const": "Two-seed regression-only author-core contract probe using California numeric base settings on one S3 train-derived cohort; not native tuning, full benchmark, or certification. Sampling row count/batch size and train-only artifact wrapper are declared adaptations."
+    },
+    "source_archive_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_commit": {
+      "type": "string"
+    },
+    "source_license": {
+      "type": "string"
+    },
+    "source_license_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "track": {
+      "const": "common_numeric"
+    },
+    "version": {
+      "type": "integer"
+    },
+    "worker": {
+      "additionalProperties": false,
+      "properties": {
+        "cohort": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "projected_features": {
+              "type": "integer"
+            },
+            "stratum": {
+              "type": "string"
+            },
+            "train_rows": {
+              "type": "integer"
+            },
+            "train_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "validation_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "projected_features",
+            "stratum",
+            "train_rows",
+            "train_sha256",
+            "validation_sha256"
+          ],
+          "type": "object"
+        },
+        "files": {
+          "additionalProperties": false,
+          "properties": {
+            "projection.json": {
+              "type": "string"
+            },
+            "train.csv": {
+              "type": "string"
+            },
+            "validation.csv": {
+              "type": "string"
+            },
+            "worker-manifest.json": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "projection.json",
+            "train.csv",
+            "validation.csv",
+            "worker-manifest.json"
+          ],
+          "type": "object"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cohort",
+        "files",
+        "path"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "adaptations",
+    "adapter",
+    "attempt_receipts",
+    "author_default_source",
+    "author_native_catboost_config",
+    "author_objective_source",
+    "bibliography_entry",
+    "completion",
+    "configuration",
+    "costs",
+    "counts_as_dope_win",
+    "entry",
+    "execution",
+    "final_campaign_admitted",
+    "fit_seeds",
+    "fits",
+    "formal_dp_claim",
+    "format",
+    "license_evidence",
+    "limitations",
+    "limits",
+    "method",
+    "mfs_v2",
+    "native_implementation",
+    "native_tuning_complete",
+    "new_fits_started",
+    "official_tests_opened",
+    "production_certified",
+    "ptf_v1",
+    "publication_custody",
+    "publisher_source_sha256",
+    "release_safe_l3",
+    "resume",
+    "round",
+    "runtime",
+    "runtime_python",
+    "runtime_python_variation",
+    "runtime_versions",
+    "sample_seeds",
+    "scope",
+    "source_archive_sha256",
+    "source_commit",
+    "source_license",
+    "source_license_sha256",
+    "track",
+    "version",
+    "worker"
+  ],
+  "type": "object"
+}

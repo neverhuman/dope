@@ -1,0 +1,562 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adaptations": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "adapter": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "author_tuning_search_space": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_size": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "even_hidden_layers": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "hidden_width_assignment": {
+          "type": "string"
+        },
+        "hidden_width_powers_of_two": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "lr_loguniform": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "native_synthetic_rows_train_size_power_of_two": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "num_timesteps": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "steps": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        "weight_decay": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "batch_size",
+        "even_hidden_layers",
+        "hidden_width_assignment",
+        "hidden_width_powers_of_two",
+        "lr_loguniform",
+        "native_synthetic_rows_train_size_power_of_two",
+        "num_timesteps",
+        "steps",
+        "weight_decay"
+      ],
+      "type": "object"
+    },
+    "bounded_trial_grid_status": {
+      "type": "string"
+    },
+    "contract_fit_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "contract_publication": {
+      "type": "string"
+    },
+    "contract_publication_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "default_config": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_size": {
+          "type": "integer"
+        },
+        "d_layers": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "lr": {
+          "type": "number"
+        },
+        "num_timesteps": {
+          "type": "integer"
+        },
+        "steps": {
+          "type": "integer"
+        },
+        "weight_decay": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "batch_size",
+        "d_layers",
+        "lr",
+        "num_timesteps",
+        "steps",
+        "weight_decay"
+      ],
+      "type": "object"
+    },
+    "default_source": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "entry": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "final_campaign_admitted": {
+      "const": false
+    },
+    "fit_command": {
+      "type": "string"
+    },
+    "fit_timeout_seconds": {
+      "type": "integer"
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-tabddpm-author-source-audit"
+    },
+    "gpu_vram_cap_bytes": {
+      "type": "integer"
+    },
+    "independent_core_implementation": {
+      "const": false
+    },
+    "license_evidence": {
+      "type": "string"
+    },
+    "license_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "method": {
+      "type": "string"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_objective": {
+      "additionalProperties": false,
+      "properties": {
+        "direction": {
+          "type": "string"
+        },
+        "implementation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "metric_seed": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "native_values_cross_method_ranking": {
+          "const": false
+        },
+        "partition": {
+          "const": "validation"
+        },
+        "sample_seeds": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 5,
+          "minItems": 5,
+          "type": "array"
+        },
+        "shared_kpi_used_for_selection": {
+          "const": false
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tie_break_origin": {
+          "type": "string"
+        },
+        "tie_breaks": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "track": {
+          "const": "common_numeric"
+        }
+      },
+      "required": [
+        "direction",
+        "implementation_sha256",
+        "metric_seed",
+        "name",
+        "native_values_cross_method_ranking",
+        "partition",
+        "sample_seeds",
+        "shared_kpi_used_for_selection",
+        "source",
+        "source_sha256",
+        "status",
+        "tie_break_origin",
+        "tie_breaks",
+        "track"
+      ],
+      "type": "object"
+    },
+    "native_tuning_complete": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publication_custody": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "verified_file_count": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "verified_file_count"
+      ],
+      "type": "object"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "runtime_python": {
+      "type": "string"
+    },
+    "runtime_versions": {
+      "additionalProperties": false,
+      "properties": {
+        "catboost": {
+          "type": "string"
+        },
+        "category-encoders": {
+          "type": "string"
+        },
+        "dython": {
+          "type": "string"
+        },
+        "icecream": {
+          "type": "string"
+        },
+        "imbalanced-learn": {
+          "type": "string"
+        },
+        "libzero": {
+          "type": "string"
+        },
+        "numpy": {
+          "type": "string"
+        },
+        "optuna": {
+          "type": "string"
+        },
+        "pandas": {
+          "type": "string"
+        },
+        "pyarrow": {
+          "type": "string"
+        },
+        "rdt": {
+          "type": "string"
+        },
+        "rtdl": {
+          "type": "string"
+        },
+        "scikit-learn": {
+          "type": "string"
+        },
+        "scipy": {
+          "type": "string"
+        },
+        "setuptools": {
+          "type": "string"
+        },
+        "skorch": {
+          "type": "string"
+        },
+        "tomli": {
+          "type": "string"
+        },
+        "tomli-w": {
+          "type": "string"
+        },
+        "torch": {
+          "type": "string"
+        },
+        "tqdm": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "catboost",
+        "category-encoders",
+        "dython",
+        "icecream",
+        "imbalanced-learn",
+        "libzero",
+        "numpy",
+        "optuna",
+        "pandas",
+        "pyarrow",
+        "rdt",
+        "rtdl",
+        "scikit-learn",
+        "scipy",
+        "setuptools",
+        "skorch",
+        "tomli",
+        "tomli-w",
+        "torch",
+        "tqdm"
+      ],
+      "type": "object"
+    },
+    "sampling_command": {
+      "type": "string"
+    },
+    "source_archive": {
+      "type": "string"
+    },
+    "source_archive_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_license": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "supported_task": {
+      "type": "string"
+    },
+    "track": {
+      "const": "common_numeric"
+    },
+    "tuning_trials_per_method_dataset": {
+      "type": "integer"
+    },
+    "tuning_wall_time_hours_per_method_dataset": {
+      "type": "integer"
+    },
+    "two_reported_experiment_reproduction": {
+      "const": false
+    },
+    "upstream_commit": {
+      "type": "string"
+    },
+    "upstream_url": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer"
+    },
+    "worker_startup": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "adaptations",
+    "adapter",
+    "author_tuning_search_space",
+    "bounded_trial_grid_status",
+    "contract_fit_seeds",
+    "contract_publication",
+    "contract_publication_sha256",
+    "counts_as_dope_win",
+    "default_config",
+    "default_source",
+    "entry",
+    "final_campaign_admitted",
+    "fit_command",
+    "fit_timeout_seconds",
+    "formal_dp_claim",
+    "format",
+    "gpu_vram_cap_bytes",
+    "independent_core_implementation",
+    "license_evidence",
+    "license_sha256",
+    "limitations",
+    "method",
+    "mfs_v2",
+    "native_objective",
+    "native_tuning_complete",
+    "official_tests_opened",
+    "production_certified",
+    "ptf_v1",
+    "publication_custody",
+    "release_safe_l3",
+    "runtime",
+    "runtime_python",
+    "runtime_versions",
+    "sampling_command",
+    "source_archive",
+    "source_archive_sha256",
+    "source_license",
+    "status",
+    "supported_task",
+    "track",
+    "tuning_trials_per_method_dataset",
+    "tuning_wall_time_hours_per_method_dataset",
+    "two_reported_experiment_reproduction",
+    "upstream_commit",
+    "upstream_url",
+    "version",
+    "worker_startup"
+  ],
+  "type": "object"
+}

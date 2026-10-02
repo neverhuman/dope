@@ -282,3 +282,36 @@ establish paired superiority. All profiles and failed cells remain visible;
 sample min/max whiskers do not estimate fit uncertainty. Official tests remain
 sealed, and MFS-v2/PTF-v1/release-safe scores remain null pending the complete
 campaign and production gates.
+
+## Author TabDDPM contract evidence
+
+`tabddpm-source.lock.json` and `results/tabddpm-author-contract.json` record the
+original MIT author Trainer, diffusion and MLP implementation at commit
+`b476257dd460b778ba09eb97f7a51d6490fa17f8`. Two GPU fits use the author's
+California numeric base settings on the same 72-row, five-feature S3
+training-derived cohort. The train-only loader, tensor-only artifact export,
+sampling size/batch changes and Python patch variation are disclosed. This is
+a regression contract probe; native tuning, classification/categorical support
+and the generic final runner remain pending.
+
+The frozen native objective is mean validation CatBoost R2 over synthetic seeds
+0–4, as in the author's tuning script. Fit seeds 11/23 measured
+0.8035797920/0.7893576197 on that objective. These values are not ranked against
+other methods' native KPIs. Both fits replay sample seed 0 exactly. Charged
+artifacts are 500,946/500,979 bytes, including learned preprocessing and the
+projection; both exceed L3. Quantile/discrete preprocessing is learned state,
+and no claim that it contains no source observations is made.
+
+```sh
+python3 -m research.benchmark.publish_tabddpm_contract
+python3 -m unittest research.benchmark.tests.test_tabddpm_contract -v
+```
+
+Publication verifies a pinned custody lock covering all 10,774 original source,
+runtime, partition, receipt and artifact files before consuming results. Added
+runtime/author files and artifact directory links are rejected. Twenty physical
+operations include four failed fit entrypoints and 16 successful operations;
+three inherited sample-operation aliases are charged once. Total fit entrypoint
+time including failures is 818.082278 seconds under the frozen 1,200-second cap.
+Historical sources, failures and receipts remain immutable on scratch.
+Official tests remain sealed; MFS-v2/PTF-v1/release-safe remain null.
