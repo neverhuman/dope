@@ -1015,8 +1015,14 @@
       "group": "compact",
       "historical_fit_executable_closure_verified": false,
       "license": "Apache-2.0",
-      "license_evidence": "https://github.com/april-tools/tabpc/blob/a470848853cf2927ac5224272f2bff04c09d74bb/LICENSE",
+      "license_evidence": "https://github.com/april-tools/tabpc/blob/b821a47a9ca9f674f1083d1309b1e7e548657c0d/LICENSE",
       "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "native_dataset_overrides": {
+        "News": {
+          "num_units_2048_replaced_with": 1024,
+          "source": "scripts/experiment_likelihoods.py author News OOM adjustment"
+        }
+      },
       "native_objective": {
         "author_runtime_compatibility_source_sha256": "9af702885b5599f8bbe3890d3a45abf5a1f97ef41bcc3e5e5b9bf0e47b126e04",
         "checkpoint_selection": "author validation NLL early stopping",
@@ -1028,7 +1034,7 @@
         "native_values_cross_method_ranking": false,
         "partition": "validation",
         "shared_kpi_used_for_selection": false,
-        "source": "https://github.com/april-tools/tabpc/blob/a470848853cf2927ac5224272f2bff04c09d74bb/src/models/probabilistic_circuit.py",
+        "source": "https://github.com/april-tools/tabpc/blob/b821a47a9ca9f674f1083d1309b1e7e548657c0d/src/models/probabilistic_circuit.py",
         "source_sha256": "03fae5a18d5785b387cc20429843920c90b3c8d68e59e527b3e00cbc46f9a4d7",
         "status": "locked",
         "tie_break_origin": "study-prespecified protocol",
@@ -1037,7 +1043,7 @@
           "config_sha256_ascending"
         ]
       },
-      "note": "Pinned author TabPC and Cirkit with GPU fit and artifact-only sampling replay for generated regression/binary inputs; validation NLL and author early stopping select the native eight-trial pilot grid. Standard-library runtime checks precede dependency initialization, and errors omit source values. Training tensor/df_train removed with exact sample replay; preprocessing/projection/model files fully charged. Cirkit is GPL-3.0-or-later; the adapter is restricted research. The source audit and complete native/default pilot panel are bound below. Declared source/version inventory is not full current or historical executable-closure certification. Generic final runner, broader representation staging, final five locks and author-faithful paper environment remain pending; no reported-experiment reproduction, privacy/DP, production certification or DOPE-win claim.",
+      "note": "Pinned author TabPC and Cirkit with GPU fit and artifact-only sampling replay for generated regression/binary inputs; validation NLL and author early stopping select the native eight-trial pilot grid, including the frozen author News 2048-to-1024-unit adjustment. Standard-library runtime checks precede dependency initialization, and errors omit source values. Training tensor/df_train removed with exact sample replay; preprocessing/projection/model files fully charged. Cirkit is GPL-3.0-or-later; the adapter is restricted research. The source audit and complete native/default pilot panel are bound below. Declared source/version inventory is not full current or historical executable-closure certification. Generic final runner, broader representation staging, final five locks and author-faithful paper environment remain pending; no reported-experiment reproduction, privacy/DP, production certification or DOPE-win claim.",
       "pilot_evidence": [
         {
           "path": "research/benchmark/results/pilot24-tabpc-native.json",
@@ -1109,7 +1115,8 @@
           "num_units": 2048
         }
       ],
-      "upstream_commit": "a470848853cf2927ac5224272f2bff04c09d74bb",
+      "tuning_search_space_scope": "base grid; apply frozen native_dataset_overrides for named pilot datasets",
+      "upstream_commit": "b821a47a9ca9f674f1083d1309b1e7e548657c0d",
       "upstream_url": "https://github.com/april-tools/tabpc"
     },
     "TabPFGen": {
