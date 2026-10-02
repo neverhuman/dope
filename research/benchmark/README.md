@@ -192,3 +192,33 @@ The method inventory records `pilot_locked`. Full campaign admission remains
 closed, official tests remain sealed, and MFS-v2, PTF-v1 and release-safe scores
 remain null. The historical CPU adapter/runtime and frozen pilot sources are
 retained unchanged on scratch.
+
+## Complete ForestDiffusion native/common panel
+
+`results/pilot24-forestdiffusion-native.json` accounts for all 24 native attempts
+(six CPU and two GPU trials per dataset), all 12 physical sampling jobs and all
+108 logical default/selected sample cells. California's GPU author default and
+native winner share identical fit and sample receipts; aliases add no compute.
+Adult/News failures remain visible and contribute no DOPE wins. Successful
+generator artifacts charge every retained file, including the projection.
+
+The matched references keep fit seed 23, the same projected training/validation
+partitions, three sample seeds and n/4n sizes for DOPE q8, all four DOPE GPU
+research profiles, and default/native CTGAN/TVAE. Native tuning remains specific
+to each author's objective. All three shared utility auditors are reported.
+Sample min/max whiskers are not confidence intervals; this single-fit panel does
+not replace the earlier five-fit stability analysis or public-core paired tests.
+
+```sh
+python3 -m research.benchmark.publish_forestdiffusion_native \
+  --repo "$PWD" --output research/benchmark/results/pilot24-forestdiffusion-native.json \
+  --schema research/benchmark/results/pilot24-forestdiffusion-native.schema.json
+python3 -m research.benchmark.publish_forestdiffusion_native_figure \
+  research/benchmark/results/pilot24-forestdiffusion-native.json
+python3 -m research.benchmark.publish_forestdiffusion_manifest \
+  --schema research/benchmark/results/pilot24-forestdiffusion-native.manifest.schema.json
+```
+
+The publisher fails closed before the complete frozen matrix is receipted. The
+figure compares unconstrained common quality; the baseline artifacts exceed L3.
+Official tests remain sealed, and MFS-v2/PTF-v1/release-safe scores remain null.

@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "pilot24-forestdiffusion-native.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "pilot24-forestdiffusion-native.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "pilot24-forestdiffusion-native.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "pilot24-forestdiffusion-native.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "pilot24-forestdiffusion-native.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "pilot24-forestdiffusion-native.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "pilot24-forestdiffusion-native.csv",
+        "pilot24-forestdiffusion-native.json",
+        "pilot24-forestdiffusion-native.md",
+        "pilot24-forestdiffusion-native.pdf",
+        "pilot24-forestdiffusion-native.schema.json",
+        "pilot24-forestdiffusion-native.svg"
+      ],
+      "type": "object"
+    },
+    "campaign_complete": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-forestdiffusion-publication-manifest"
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 268,
+      "minItems": 268,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "matrix": {
+      "const": {
+        "logical_samples": 108,
+        "matched_prior_reference_cells": 120,
+        "native_attempts": 24,
+        "physical_samples": 12
+      }
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "forestdiffusion-source.lock.json": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "forestdiffusion_adapter.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "manifest.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "publish_forestdiffusion_manifest.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "publish_forestdiffusion_native.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "publish_forestdiffusion_native_figure.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "publish_forestdiffusion_source.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "publish_native_neural_fivefit.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "score.py": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "forestdiffusion-source.lock.json",
+        "forestdiffusion_adapter.py",
+        "manifest.py",
+        "publish_forestdiffusion_manifest.py",
+        "publish_forestdiffusion_native.py",
+        "publish_forestdiffusion_native_figure.py",
+        "publish_forestdiffusion_source.py",
+        "publish_native_neural_fivefit.py",
+        "score.py"
+      ],
+      "type": "object"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "scope": {
+      "const": "complete frozen single-fit validation pilot only"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "artifacts",
+    "campaign_complete",
+    "format",
+    "immutable_references",
+    "matrix",
+    "mfs_v2",
+    "official_tests_opened",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe",
+    "scope",
+    "version"
+  ],
+  "type": "object"
+}

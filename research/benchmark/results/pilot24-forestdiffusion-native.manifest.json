@@ -1,0 +1,1128 @@
+{
+  "artifacts": {
+    "pilot24-forestdiffusion-native.csv": {
+      "bytes": 16789,
+      "sha256": "1e4670adbba073caced34a4f3a283a9f50e84fe5a41228c792f838d1c2dc5805"
+    },
+    "pilot24-forestdiffusion-native.json": {
+      "bytes": 504861,
+      "sha256": "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"
+    },
+    "pilot24-forestdiffusion-native.md": {
+      "bytes": 3913,
+      "sha256": "f2d9c13c63b74c87ac82919a70804f17d15687100f6f5ad4310655e11b8c5147"
+    },
+    "pilot24-forestdiffusion-native.pdf": {
+      "bytes": 29863,
+      "sha256": "1e749ca1c72715183f988dac8dd76885d59cf3016be065621312204a4af6d475"
+    },
+    "pilot24-forestdiffusion-native.schema.json": {
+      "bytes": 160193,
+      "sha256": "2edc1312e2d00ad353ad7dfc7008fd742ba5f390307ec935703d928f70dfe344"
+    },
+    "pilot24-forestdiffusion-native.svg": {
+      "bytes": 73868,
+      "sha256": "a629e3598d933a07e8a189683951effe2a0534ddefd58a5829f788ed6e617df4"
+    }
+  },
+  "campaign_complete": false,
+  "format": "dope-forestdiffusion-publication-manifest",
+  "immutable_references": [
+    {
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/pilot24-target-gpu-research.json",
+      "sha256": "5a7605b2bbf3d46635c5d7bbeb4c922149bbd79e3bf75c6269cedd4637447dc3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/015bf7e85fa3d38d1cba967fb809c7a62ad308bb3f3e5a6e14fa6846e5303aa8/attempt-0001.json",
+      "sha256": "de434a11dd7b022c706bf8646bf1979ffaf73f105ceeeb79ce9d44837cdcefc9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/03693d46f5c8f8fae21ec496d93649010b46588dd6ab50dfa80afc9f93c90db2/attempt-0001.json",
+      "sha256": "4e5bc537442c93bd7472659f21a5d1465bf339269a35ae52ca680088f3d4c71d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/09c5474babe49676e322e1d59d4bd80546affd069d92561374a5aa9dc89cf3b8/attempt-0001.json",
+      "sha256": "4a29c57df7f9606f30f2338ac33b774faa73e8f2db84508b3f53cf74591436e9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/604d222fbf8bc6c59c0e86f6ebc849a85b7cf0be827ad952e2ab4d4d39057eaf/attempt-0001.json",
+      "sha256": "e8c499a68a978637e451171d2d28bd2885fbd07f8f0596102e9f1711eb21163d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/885e8713f4c6af8a5765f7de21864d920b561fa5d862f20f30e1d6616ee59fe3/attempt-0001.json",
+      "sha256": "a314c3f60851afb34a0b90138b5b0c27f0f8ce70843c2e75bc10f5311dab092e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/a3fbf4e20a7c90fc8bfb0f0b1f71c99b947e5d1610b2c0c3e016b575af4cd212/attempt-0001.json",
+      "sha256": "26d8ca6c5470956a73947ecd977fa3dac8af8aba729ed1aed6fe2f6bf9c72dbb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/cd391aa440075a214868798e5c0066585d4e182efbe7c59c4c11f0332457468b/attempt-0001.json",
+      "sha256": "07620f93f1078fe6af015eaccda311998422bc12286f56a6d20b6d458d6fb46f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/cfb1d0c50b9559d708fc1386c3fe9320e59d4da4a2d1fd9f63595c68e5e2bbf5/attempt-0001.json",
+      "sha256": "8e7cce65927f22c29dd9a5e2fa57dc9c67b08b69546409734aa05fca0c58e396"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/d39202368a2570dc97e9f050ba0837102fb547edb17bb4d0b0e2cf403b783217/attempt-0001.json",
+      "sha256": "b154501797fd250f87e27437bec2f0f4438e2e55e980d6079ecb6dc186e069c5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/dd859a0c74465c0334862675e44fae4d9f17cc2f77bdfe9920ca0a1802e9b038/attempt-0001.json",
+      "sha256": "487e3eac1749718942fbaad1b720d05bbcd0ec7d2b56858578e9939fa8fe2d4e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/e9b54d3fea3ff4490269fc3ec2b6d16cf1520c4fd2ae83596cdf4aa3bec4f253/attempt-0001.json",
+      "sha256": "737f585cb2f3dce9c4b0d70abb2851dc355af6d1006f76969d92f273b418ee80"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-validation-v2/cells/eb9653d752b7740c97e2176cca27d6f56b6616fe3bf2dca1518547eb93f45491/attempt-0001.json",
+      "sha256": "72a03f46bd66b7648a177833b98ac610b596b8437a4c1fe1520b4aaa72d2a894"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/1ac5b25cc85c3002972a66000342a3040440e5162e870478b779618fecf16e01/receipt.json",
+      "sha256": "dd3fdb76911e434c820ff933e2fc14cf7998aa8afe112bf3fd76fe071c46d154"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/1b2a6db4c25f61f1b90291f2d827a371d74f23fb71d9a674f668a7ba9407d8ab/receipt.json",
+      "sha256": "5416731a677df271aa915deab344d1894ea4941a175c75359c8c302ebec6a4c4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/5b5e88a2f22bb3d43908ef189dedf7a24ad90332eea43fd120e87d9efa04fb23/receipt.json",
+      "sha256": "3ce7804b89aee752304ddb27376df990b6040fea86f8ec728c53f4e825975ff4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/72d01f13ef30b32d6320a2d977ae8684796e6e72835e4456ef646f48020b022a/receipt.json",
+      "sha256": "e8043e7a4efc1aa7477faa6dc04671317bf1070fe8e08939e4e327484107b5f1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/7388c4fdaaa7f1957f5a74634c64828d99fbc6122cf836809fcd9058603c58a4/receipt.json",
+      "sha256": "0163bfea9bdd2338c1893b3ed307f9f8bf2642997424b27e0b4d154b949ba84b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/78b8ab6caf257a72b67fe8268374b6ceb8b2fc2c09d6023c94d52abf7d3976cc/receipt.json",
+      "sha256": "940ce1e8e836034e40b08906b359e9790d3cceca81c10eb420d496d3e10f713a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/8f8e95ce1bde758c63b1ae03835e15e7b5e09ce33e2cdf7561df52fa62b311bd/receipt.json",
+      "sha256": "5687aa4619291591558b4c15339cc1b6c590c8c0241f93ea502e7a385bb70cb5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/97e39f17a03d038b50050f42f6a6970236b77de0c71b12b2e3c24ac72204bf8d/receipt.json",
+      "sha256": "155eee81b9b7e9564b7c3146bba6bd0846baaba16f434dd13277e53f86ff01ba"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/9e569d16fd4f1f8d73a76cc03e85605b1d8d9c45dbc2cb1f46e21d87b13e4146/receipt.json",
+      "sha256": "9a95d4c05e58f66180e49a8c525a801e1e9f2bc21de8b55c8ff97f4056dd1b78"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/9f33eae431794f62b78e0e449136b799fda3c635dd97bb7034d8d58d365d0bbb/receipt.json",
+      "sha256": "970862dd13c186431e8769725abf5597e49ac5228b20a8286b693f18a117db60"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/a0b64391f79aa9fa641772d7bd0c64027f3b6875f85bc5492ed5e354e0f537c6/receipt.json",
+      "sha256": "02c8a5a2d640cbd2871a955d083056a6f4b74106e64f8c9167ed55ffac4d3f17"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/b2af2d157843cbd25beb047f52d53f520aa6ee704087cbb338f5ca2625e3ed44/receipt.json",
+      "sha256": "ff9b168a82ee662ae95c89fc4f15f8ddb422a74fc463c5f3e1aa13a9efdba096"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/b781d15fd4d3f6dfcdd14fa5cc114f89d8f0a306079933563c2d8005d39e6f96/receipt.json",
+      "sha256": "f8addb314075a2e98b574924fa441abf63d0be9fa412629045ffda4e3cbab926"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/be596aad0cc81ac6d8810a1d78b6a533a934112a21703fdfcc21bf0cc894bba5/receipt.json",
+      "sha256": "6713ebe693547da4d56d04f7e0b3deab26ce9247769f668dae43407be0808da4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/c2d8c0b42540eef817c30a22cd6815ec22c9bd8b71f94e85d3dd54fbffab1b7b/receipt.json",
+      "sha256": "547799eefa42fd7687e3609686b10bb0f199619375b8414d8450f94b37f2cb46"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/c99d5d54ebb46f5467ca1b7d4b78c87f27a40bbdb2457799e2768f99226de92e/receipt.json",
+      "sha256": "6fd23551b8a507706fd399b06d94cfd872c8fe856b8796275944df29a7ce6009"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/cda75f06ad9fe557e9dcf00f742fc81d1562cf201c3330192f9f5ba94c060da4/receipt.json",
+      "sha256": "8d88acb0b39d276372d0ab354bc03859d70e3ab111595138a9cb45935f216f1c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/d79f96077157df37287a84c460a71f47b828d07d1c2d1af51811d08c5d2097fd/receipt.json",
+      "sha256": "24d1da6a6dd23fa3f90d51d11d9f0de9bb7339a354e6d587f3b6a70432256b9c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/eb862b5d3cf99fd98c7ceaf6616fd6196f647f2486f077c7b94c528a6e215849/receipt.json",
+      "sha256": "d03a892a6b2c035834705671d948def6b1655da9a47388aa8d0a55d41a0e7f2d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/ed4c86420f85cd2707443515972df0bf7749dab8791b84ef777b4ea3eb976174/receipt.json",
+      "sha256": "cf91515ebd9d9db2c9c0f01f254357181c70b78bba7c8e5ab2c7b7a5c2c7cac8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/edfc3a02a1ded6ee4f5b6a2651065aeb844e62602cd7e89d517c3dc939bcee41/receipt.json",
+      "sha256": "afe8446e361cac23e33432d57e84d40405c2fa30517821b20f14090206596094"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/f0d066d17fa2a90b0851593685db757fd130a4120ff53f3cd69ae2a1e6191d62/receipt.json",
+      "sha256": "7a85bd29ebf971a3560dbdff25f04d591481847ed94d848825433b6d6138550b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/f3176007ec40eb726a702ab0b42f4275ee70c309dacb14fac3206b45c79002f4/receipt.json",
+      "sha256": "d0509c576969cb4b50dcca1562b859fb7cc92c7518590ed6dc4d648bdf5dc1fa"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/news-packed-validation-v1/cells/f5fcb03c5b21014d1df42b4b22be684950dd0ea6acad651c988b3bdffa57c14c/receipt.json",
+      "sha256": "f22c0f370270fdc238382d3368e3671b862a9ccc90a7b754cdcf72d88937ba53"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/0492ecaeed8f026fe087262a5bd1a9ba20b4b0ff296f067ac5819e4130d8c148/receipt.json",
+      "sha256": "0cb3dfaf87d35f99ea790901e0dd3ab5738f4759c4aeb07d8ebf8b3ae05e5a06"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/05bc81802ff45eb246c6ed8aab321891826f4364abd5d1ad38e70aed961c1b5f/receipt.json",
+      "sha256": "5ffd458201b4c11610128d7d5561ee4a226e17e53c6c249256ea4154fdfa00d6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/07e5f08ecd60cf0c4613910e81c8aa0bf6c2b9540a655023f8ca1f3b5c118cef/receipt.json",
+      "sha256": "84ef3d3fefa95438465799290e4c4c428ddb6c6702c542aeb9ac0a71d6ca040b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/0b14075aed24cccc35f7d4f6e9aa110c660985fff84d71ed3acdac9e0d53404c/receipt.json",
+      "sha256": "541a0852a159c7843bc2204b266c78fc62f90fcb3ca82932e51c9d164a1efaab"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/0e411710a3362928a21e0d85035b2f8fb95864337f785f6dd753d3e55928d466/receipt.json",
+      "sha256": "236c3682a37f6b84e538f12c57082c2bb3c420de88585fc1321da9fd8905fd0c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/10b30faa320fd775f024d92f4a814eef6df034eee1c84afb27839d50e815d7dc/receipt.json",
+      "sha256": "b40a7e55a28f972fcb3f886781c52330f4d8aacc78b7a21020f13541cd4968bd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/112988b6df30c96f424e151c43cfee81820713535e0a26449dfbc86d11e7273c/receipt.json",
+      "sha256": "e188ff5883aa36f4800fb9ee3c779cfc8ddb3d9a9927d9b60b0dd981a3d8be2d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/13c4ef443de40d496a4e19d177365db60ebecc710be465982b09879680616a8a/receipt.json",
+      "sha256": "825134196b6efefd50cab6af5eeb56ab389592a8bdb15548b03614553600a898"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/155e25385a9a854c2a525f57c010ffac5fff9cb4208cc2b2144766f0b19d6eb0/receipt.json",
+      "sha256": "bb12054e9f40a1c276f523c64730adb2b61a6cf0bee6e6ba389752d184fe7ecd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/342ad628f24ff1f06634bc2b21a06ada5f8d02fe6178d000ec2bd439cd516393/receipt.json",
+      "sha256": "c0a4f0db16b948aa5ba5c48396d39807e2036757dc26df57e5805d9be6d5c1b8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/3609099fbddb0b69f4771332e2e3edbdaf3996a58da630f2366b1cd5ce252285/receipt.json",
+      "sha256": "dc6c59eea79f8170b2cf50aaf96f8ec2633977b9194ce90bcb27edffc1469778"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/3c175ec8b405ebf75e25643e25921702f1552d7e2403c3d2efcf42ed34154977/receipt.json",
+      "sha256": "09c876677b52dc71e982cbb2edf60a2e046b73aa830b402ffbb3f88e913bb071"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/3cc8bee0b0460e4cd63494a9da62decaa75fe9bfa5b577ba7eca5a11e45e224a/receipt.json",
+      "sha256": "e440e3e9298b7e399c0b8d0f31de2eba779bf5ed225e941aeb2b857702a88f17"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/44d85c31aa0a66602c93cfeefb13ca7bdf1d0d4060932a7d9ccf5a804a429158/receipt.json",
+      "sha256": "20a8b5957a58505a783da271a5ee4a546ce80bef590fae72874f4681f37fa1fc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/475cd2e393ba6d1d4e3ee4c55789f5fe6aa42ebf2a81d6af4089372491afa88b/receipt.json",
+      "sha256": "b292191008b883c8e4366021b9e6b398815767b8f4e55d46a6c8a11d965d3caf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/48709bc3e95953eec731fa89d97a1f3a019a02953be8d1fef304545d6f736aa5/receipt.json",
+      "sha256": "a7e363cf78b22a4cc22a3eaf53cdf277dd640e87bd2f56a11cbb748c1a4c6e40"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/5a1c7c1f9b66cabbeb763508464086373e6a4bfec65840c61d44efa08ba2313a/receipt.json",
+      "sha256": "8a5dc9881f4492bb5a3a755285aee4fedd1707f615e55fefda3052d8e2151671"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/64583d7fe7f4944669a3f3c01efb16bbf3d0b6c3ce4e964175bb26c942a17718/receipt.json",
+      "sha256": "5b7cd0f09f2ae7e654b8554a30decf4becb0521641e3b04e4b6a2d47eb7f0ac3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/73475094e34663d8591037bc49a3fb549d98f7558dbf87084626aaeb04303b6e/receipt.json",
+      "sha256": "6864c85123ffec501e712d068f6c02a411a0acf0cf4fbbfe2ea3e48900d289b0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/770bb67722ab5cc8253a711c47d1baefa02450e3a3dda513aef93fd52df0ebf6/receipt.json",
+      "sha256": "ed59dd46dbd8e7324045860baa5637d8043ff74b8424edd6d9b9f9edd058e890"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/7973f88c280cba04b7e55be3b060d65a8227a041eb043b2c7d18466cd3872ee7/receipt.json",
+      "sha256": "5957ed51f9d8e75c80a0d874cd3301158e82e96251f63a36a222e66870ad2ee8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/7b192f791a7adc32f7c4769eccfb2e76e5a3d767b90e7d7ea9de312d13988dd4/receipt.json",
+      "sha256": "e7ba231488d0cf4ef79911e88256898f2e1a88aca68933ddb9a06bcb599719ac"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/7e0ff1915b59535f3ced7b684a9e171e3f60c6867b853c3885c050b805e342ac/receipt.json",
+      "sha256": "ef89a92937fb7b52dddd99c9f836212b048b45c3ba5a5979338aee5150ca8426"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/804c805cd36e19ef1ebfc490a35fa98a806f5faf0668413d9239492ca6c953d0/receipt.json",
+      "sha256": "c0c5df96069a47ab9bd7a54276c4334ada767ad56bd82660c746fcd688534d79"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/8301e80ecb17cd5409077326ea3b4c10eed6240d73811ba53151db3d66d85a7f/receipt.json",
+      "sha256": "dd292a720b489bca59e6ceb560439c398efb041aa4f48236325b74d9c687a3b4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/8beceaef3dfc87cef7c9d87284c10c1bd56e07274704e0886dece3bc264d8e3a/receipt.json",
+      "sha256": "6301d42e12f77aa399e0ab0033e5c0a32d8e24d97057feec6b09f882bd2cdf62"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/915846015b4065b4ba77e40e2025fe19db6581b5a68c0d08a7602de0e16d7ead/receipt.json",
+      "sha256": "397f560dd25e2d9bb2e5f702a715dfc6379a099db50cb1c587a164bd5de022fb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/970ecc11ec240f47d45903cf5ac14acde4b204e1dee8f8e9a4e934faaf938f01/receipt.json",
+      "sha256": "0a0e3668fc436b9813bf6e8b5887397f66e79cf525b1ee19f5275e6c282e0bde"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/aa7c6a85e9ddf0ac169fb0ae84a46c6834d761dc24aa10ec078415f853fd0d5a/receipt.json",
+      "sha256": "a55581628273514c874d65e4751ee5c8b6338e168d3573e3c50096b3eb048d7a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/b4156cfd92272c2f866f03520d2083de48f744f677564af51b00eb2cb64811ef/receipt.json",
+      "sha256": "98195ce2959350d0f957fde2d412d643374be2e4101b8c020ddf4a635f805adf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/b6dd807cdd3cf49bab74d4e352ef9bd8559828f46c2f59d22e2852f64f07531b/receipt.json",
+      "sha256": "7e6614451d2c9666258fe27edda62b6d1266478ea94a073a19a44bd4612cec84"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/b7f998a6d99266e905fe089f9964726909039320ab4937ceccc39b944a09969c/receipt.json",
+      "sha256": "0c614645ba7e1c466eee36a848255c4e0977a72a0b35c2f9979d29258f3bfc55"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/b94b51e24d89582ccbbdfac461fda62ee753e97eba7eeaf3f52a7593386da275/receipt.json",
+      "sha256": "2b0955f78342d02758cdd6021cb8b78410660bbe30c67e4f9fab705e2ca5cdb0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/c962ffeab8b17bccdfa8ad09aacfcf3f75bdd0434654a0687a3d20d2041f89d1/receipt.json",
+      "sha256": "ce424fb6502439f98c17975d5dfd60ce16edc9917570cc7b444ae259f47ee945"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/ca4281b18278d2600de378ae4bf39c800dde6b2436d38547a870b363857a743d/receipt.json",
+      "sha256": "5c34b3ccdda9cc70c8048a19db381eabc2228c4370c16470d1efdd33d27e8076"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/cae716348d6e9a652c554165cddaa03b7d32afb55942f90fbcc160389d723507/receipt.json",
+      "sha256": "dcf54846a5fef04b47dd06a814ea32833d5507b945aa79e07b94b9bcbe04320c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/d251fe91077dca67e9d51c70cd76029dcc30dea18fa821dfd4f445e4f7bf2641/receipt.json",
+      "sha256": "7a7df252caebb7bb04315d20d06b1cf379f7718b3b2f9bcb897e7b9330a41c19"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/d2879f6c40c2477d0d4e5f088272dc3e8438ca605f38060110ac937e17186dab/receipt.json",
+      "sha256": "7c639e92f09b9fa2d94d4b108e1ffee6b90f7e04ad54452ae48a771f963519a3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/d3e3872bdf53a349e2c623c5b6820bdc56eecd9f253541d6458a81842db2b1ea/receipt.json",
+      "sha256": "d379df53f57c6fe89336936e35cd4e8ef8cac38b7a3557bbd83eab38d117c701"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/d54a51d725aacb3749a0cba29d85fdc54f7f457446b847fbe07df470767ae461/receipt.json",
+      "sha256": "bec508589958be725be149b6e60cb1176eb2c878dac6f6289da1aa10d3c8fb03"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/d7a0b39a6dc78ddd536009f24cd474c8733cfef1ab5f87e3d7dd8c522aa9147e/receipt.json",
+      "sha256": "3bf004ef684e596a922f7b97d053670629493f7578d268b529e09a9f4ab7f5ae"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/d7c977fb0c62c415326f85dc076a502da105fc6782035200fd4b1392e8e42360/receipt.json",
+      "sha256": "8c2a3409c65b43f014bdf7282c65996177ef73f28cceb7e516d25950bd543dad"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/e2371842b9e9d663f52afea81fcb2224d7e82ba6caaebad4783a99ac5cc938c7/receipt.json",
+      "sha256": "c203f13da700fe980f0cba1865d1a31bbec2b60f86985ae0b340fd590f706db2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/e44ec87d74495c9426209989079353bbfc7e96ac6bfee95d837cf636695175fe/receipt.json",
+      "sha256": "bbe5e3aa8f09121f737dbd39277d33f8dff8f525ac9bb2f3e4e2c1fbd4afc8e0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/e4f42778c60a1e7e96f7aeac4c10f36678eb46dafbb16304977cec5e36261129/receipt.json",
+      "sha256": "4d419b640dbae807b35b3519a3df6a324b6ad982958dcfff87e358295a76f1a4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/ea88e19e5e1ab4f240e61463ca536d93d48758f9f513cb3bbd44129dcbb98b80/receipt.json",
+      "sha256": "f7c7e06f9d014d0650870e36beded2c2b09afb3b8e68bf90723584ddd0fb6f3c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/f19d4c0cce85e37a4a6c024d966d7a0a6ebd39cfd93cabb4ec0665d6127cb98f/receipt.json",
+      "sha256": "d22751ceddf249e3ec28a91a0fba405bc73773315ffe8d408aad14a8e736e978"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/validation-v2/cells/faa261b1437a7bc02e172be5f825748d20290d80681b6ebdaebd3ae1fe49be5d/receipt.json",
+      "sha256": "862700e976efcbc001732ece3adac5406e19f9610b778f7701fea6d778fb2b3a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-combined-native-v1/round.lock.json",
+      "sha256": "784d2a4cf7830a917e6533718d1b25f2e3b24f0f5ed2f48ccc9e3130c1117f98"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-combined-native-v1/selections/Adult.json",
+      "sha256": "d80e18294d2b0cfc06e2fee6f6a16b078884689bf9695bf2cea96f09f20f6dcf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-combined-native-v1/selections/California.json",
+      "sha256": "5c37f776d443ebd7d7786799bc33c3b188440fabacc6ba53547fbc4ea5d1683c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-combined-native-v1/selections/News.json",
+      "sha256": "268b67e44f9e973b03f6f0b00cd8c148e72628d1b45ad3b09957b3ffb43be005"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/009b034006ddd08dea2b764a38c6785ac8e850bc98b5dac46d2d6a1108c1d0f8/receipt.json",
+      "sha256": "b32a4915ec4fc1de70e669235d3f018e8258c765fd5143cea32ce7b97611cc5c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/00f9e3df5a6b08c2d4f3daedb924e115e6de1867765b0931097f6b771bc870d4/receipt.json",
+      "sha256": "5620b61bde30c521f7f107bfda6db7c041a0974f1d8fb3b8bcd4bbe5002c418b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/04fc083375d2c5d7f023ecccd0b171322dd787437435992faec41850985c9094/receipt.json",
+      "sha256": "b2fb9e50d487e9c88ac896d4fc6fa8d2d6964181af80ae916a3ada41fd5aa569"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/05fa771ba4f2ee79dede7bd266a66caa270cc672c31134e81ff3f998301bab27/receipt.json",
+      "sha256": "202e4ed757a34e3eb7535509188d899d4d53ad7c08b9d76b7e1010e1eeba4ce0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/06526e37c46f98adf1f6b209abea962a11c7ace8e952975a21afb62987996dc1/receipt.json",
+      "sha256": "221baeb03e3060992a66094c4f8815a4c6d891fc328f863a6debfca1c8bd25c0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/0d78a8227267693796251ed6499687c31142970c1e3549d5ea092c3a8f9fa472/receipt.json",
+      "sha256": "5d96f2c1e5ed8dcc4310619e4764f6e71528dbf14513243ca45c8b55ecc0bb1f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/0dcb1a241e526c69c34aa7a29b499d701ff0f4b8cecaf30a0995ba7c1b9f551a/receipt.json",
+      "sha256": "fa373d6854d7ede81d9a99ab93ce1502f4872cfa2433a2f39b61ed86e3210710"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/0e47dd6be2b4ea666de8a37e507520e3583f55b4cc48af28f66a8a4060046c8f/receipt.json",
+      "sha256": "91dab266816014be7ec9949755179e4332309b4a3626538c9aa6a3582b7652f8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/0e48793581b691bdc3621e14a96f48edc40e094244cdbad4c9c463c2f8e365e6/receipt.json",
+      "sha256": "84521918f24b4dfc65e493e549f4e96dd07fa17a2b16504e597adcaced6f3996"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/110a79da2f90e46e49476aa762a8d72b7329c0106599e9c4b622b12a39ea152d/receipt.json",
+      "sha256": "e1f97f87bf14e6fbc1239d9e91ded84b084ed6d68579aa738597b87cb500173b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/179cd829ba0fd4456aab73c150d92e1d7d4a4366954c02a99ede6ee972b0ae02/receipt.json",
+      "sha256": "7d966a5572ad48201798943b29e9f0684b42097edc2498628f2a18c2761e1998"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/17a7accd056dd683c5dabb88c476c97192a77c5a714f44cac9073adb75fb5a91/receipt.json",
+      "sha256": "5382805195c683a03c9c741899351dffc62ca894e0d57614a92e5a85710cce3d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/1917ba99c70b9a7ae42eb89ff0068131c3aae551281af49fcd853af49b7f4848/receipt.json",
+      "sha256": "eac0c1ae54e5b9ad69ea728cc0841f07f1e39bc99513b0f90e497fc90100c509"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/195d20f5e62cc6df161e418e91890b7ecaaac740f540e6212da11a479f289fb7/receipt.json",
+      "sha256": "ef7d17adddcb0deb3322fcff02048e4f78351399a5afbf58f69ec7d40181f012"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/1d24dd2f72c64971b1322bb53017712b21c8fa654db8585cbe764e9796b5f5a0/receipt.json",
+      "sha256": "b58248104c7f4ae6c063b3b4778c5264cde6bc09fcf86e4212fa682cad076575"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/1dddb918e1e2e219941f22615f69bf1e0757374be0917f7b20982e795ffd7aa6/receipt.json",
+      "sha256": "1faafd04a29935e07364ef143883aaa7d8cf14d69fe3af663c4880e9dcff9772"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/1de7b22f06b2e64b0d1a017be7f1d662e455290198b52cdbbaf73b717f429b89/receipt.json",
+      "sha256": "ed331ecfade9731079356e57e388ea8e45848aa0aed3999d760f5d562ef60659"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/1f4d7da0198710b7fc3f425b2b0ffe8c1df1ecaa6e214496a98df0d0df88409d/receipt.json",
+      "sha256": "a60e7fc000f30e58f11edcb4fc2dca490a83aac9c359ac1ccf272d0cc65c9ac5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/218609acd2867da3ea9f9f9101a186551ad65a6309826dbd49a75a0a913eee6d/receipt.json",
+      "sha256": "19f235143c364743879d7dd4c71e459127d14967a3a23cbfc13d9525bb6ce4aa"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/22b88a6018de1ab3d5b48da67cf5d9c3af55a6ddb362a5e8de0f95035d006348/receipt.json",
+      "sha256": "6768e992d856697dd4956ef4e22b7b12e2e1b80968ba38e4e32d6bcc3e0f6bb6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/262ae6d733ef40bb65e485e35d7211d497f2671adf0f95288e248c4218bcc38e/receipt.json",
+      "sha256": "af90663a7cc7eefba6088fc870fd69e3580f8fd4a8fdeb56fc7b70b9ff3fd401"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/26405f235465fa19524e073333b8ef3c8971cd7b4d97ae5184fa6e4cfca22b11/receipt.json",
+      "sha256": "02b1e9e1d0ffdc645bd70b8b45c238f6fa264fdeddac8cdad411b09a236718f9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/26d644a64eff51f316fd11596dd339e8404c5038b65b8826993f05cc920d1538/receipt.json",
+      "sha256": "8160643d94c4365710b802ab7c5e55dabb2b7aea9f6654ba346e8819b43c637b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/290b0866a22f4ea3e8b34dd5313d71a90bc1c502a2a9d38f9a1aac60f69285a1/receipt.json",
+      "sha256": "8899cbc24a5d6b901c4437749fca42a024aa57e65fc90a3c6d276480712b8d00"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/2b0b7f5911e856308494309ec595871990d212c3a2ef19e26492ba83a414a29d/receipt.json",
+      "sha256": "5d534466cd2ad2fad8ea0e3ec628ffea1fc21bcdecdf70e1c9e5398037b543c9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/2cf6375c5b051e91dd14374861a1f7c5b361dbb375bec4e234b8537cfa05fd79/receipt.json",
+      "sha256": "e590a6b2a8aa278ed038a902e78bff7759e5393084382f77ce6762a76199de4e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/2dddba9c5b0d8b98a7fa164ba43828bd7d408a935fbd156a941855382e50d0de/receipt.json",
+      "sha256": "5d3d3e2bb7cd77d29d08c28e68c8245c5f194041dde490162a54dd7e98278331"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/31dde3c186770b946cf18e55098d3ca298961e16534c41a124ccd3c0125b0b11/receipt.json",
+      "sha256": "b4fc442dc80c161f10f16475384dfe1bb7218eebe907947267b4441ea75f92d2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/332928b2594a055efd928ff275701e6cbcb71a6f4186c0633ef9111b3048705c/receipt.json",
+      "sha256": "25128650d4dac0923e3b126991b696441e7cc26f6c0c1b6b9e9c1527fcd6ca02"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/37bd3c357b8ac9de4de606466d0075cbeca86da749281cd1e934dfb2eea2d02f/receipt.json",
+      "sha256": "b7fff027b5be01133bb92c9caa1ec793110678e4a7716cb33f3d43cc4e2faf8d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/391d1d85820227122b61bb3effaa50bb2d545bdaf5e01f3356d43545a604a019/receipt.json",
+      "sha256": "ff94b9a6ee69ce16f625e09dc4da765cfa46cf18f9cc2ac029cac209189c44dd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/3a93011468c0f644246ae6fcf4f5e8234a2c9f86de977dfabff6cb5ae38cbf2e/receipt.json",
+      "sha256": "0ecab4549b167ea08e1219636caa03a131ac408777bbffb011f3f8a62f8b2e9c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/3f71ab0b4c7f1600e2ab55eaa47c04f0afaadfca1cf811a17a120aeb9cf4e17d/receipt.json",
+      "sha256": "3f16a637a353eb49ab44bd128f56ca8f5580d86b1a55990dae0d8b57993ef755"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/458ff44c3fad3cf7fb1eb81cedc4a2bf8baef95511afefd8e3b38a0cd0f67b4b/receipt.json",
+      "sha256": "6bcc4f231ff13f5552f8024b60d098199f8fef21eb01573c6e9ff1d5131c3aef"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/4946e443431ed8b6e8a1d65b904748efccb3d5357bb4a9dee7f3b502bb65b378/receipt.json",
+      "sha256": "b02d01662f870d6bfff811d517c07fd5b460aba17c7fed067ad09ef0c2bc30cf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/49d61595c1249a4d42a27086ac94cbeb2568f539faa60db0bcc81ac8a9f4eb16/receipt.json",
+      "sha256": "0d9411a1adb8e29c6bba3c1dcb5d7f813afa55b729e5316aba14ab793f319d9a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/4c7e68b1ac54c7c2cc0c6c7b4093c69e5151695223906ede3d2521de3842e37f/receipt.json",
+      "sha256": "71ead42d4d9d13b7417c7e01222aa2b8630902999a374e7226dbfa2903f1748f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/4f7641e7731505cb2c0842b7b39a2aaf45d86bab83367269422f897965c4ffd4/receipt.json",
+      "sha256": "774f6488fd46fbf6674d3f3d9a951d7a5c89426a702657fb6007d991243da5e4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/52cdbfaa0ca0157c2e8b746ffeb5acdab71b2a92c991ab2ad1fae7614b199ceb/receipt.json",
+      "sha256": "5b0988dc5ebe8d1e3fa823df0b4e79ce8f8ad14494607bde70a910bcfc51608d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/52ee4fc111c6f90242eee1fc3942796f3f595b4a39aa8b78840a99e7fb6584c3/receipt.json",
+      "sha256": "e40ffa861ad7e15c8d9e6485c9be8106bcdf075de09a2c906eb6eb627b115a6c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/5ad8061046e8a7d5eb71a8a4f4f1e822f85ab2da0a605d5f9cd1fd7e2bc08c8b/receipt.json",
+      "sha256": "6207b5b05a0ba9cc0b0ebe4d56870b8fe798a86029a7221fec29988095ae2832"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/5f0dcd079b28f0119049c4c7833595c1eded6c2fc030db0444f4cc9b37f65408/receipt.json",
+      "sha256": "9d08a48dcb78397885516f939bf1dbe0b67cdeeadf786a5d9c101de9f58d23ae"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/606703826e7a2574592d77006945570db53f8674c106c81634e55e61eab42c59/receipt.json",
+      "sha256": "09c8656e1535296cba11445ffa2b9d9f76475fc73133bd86d63ba574d7bd6f6a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/633a0355e8f777e071f18670c9317afd514481a754502e863b1ff8cd1c144dea/receipt.json",
+      "sha256": "5d97456cfd926975303d216fb3183b70453bcef93fd6ff6b3c828676119cba9b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/65f090c934f0b50a01b00ffcb7b5cbadc3bb707e371be782232d0d4f10b55fae/receipt.json",
+      "sha256": "a4dc38054afbb1676d40c2029f027c024e5f34dfebc1b4e2386b0f575bb8e001"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/6a0d4b87c35d1127dffeaa91a7d959f1cebf0c2fa577dc3a62a8514540f78774/receipt.json",
+      "sha256": "74794f4b673222a6576d10a1f1d7e1b60191078abaf5e04c5dde24b490f9ca87"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/6b73e565ba25b7dda978aa305c9731582f86f7d8c7b24fcf9ce27a16add03c6c/receipt.json",
+      "sha256": "acf3b61513ab9d7e25532aed9a255f427d00ac8d06957e468313731ad92791c2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/6b7ba259541152eb9e63d0b20cc8748fbe72b63e0599c54f1e1da7741fbcc239/receipt.json",
+      "sha256": "599723bbd8213939a1059be46f62eec5307da685baf94c1911e2e82ee772618d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/6f32fb6e9b0d5970d7b7c732f7591e650324ffb341963a73b717e34a493d865e/receipt.json",
+      "sha256": "6efeeb3da3bcb1947623fcc6a3d5efdcd6b218329e9696e2f023aa266551743e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/70fe55b254418eed70bca941689f8f9a68489641b85571ec1efad6944c015ff3/receipt.json",
+      "sha256": "980212840ee00467326882fa29d15e497916f7066ec53896d6cad23b0572f9ef"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/74148edb9e4afcb8debf8934d05bfb883011957006529a1d109c2e460525f10d/receipt.json",
+      "sha256": "4cf7c762ef1a9c89c1ebad98f72c2223e475aca00bb67a17ddbe26c3af5df5f2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/766ab64b943dde47bd280d7d8014b7931adee88b621145a86eac270ff3f575f0/receipt.json",
+      "sha256": "4e30836a539eee20bb1994c19ebaa86eba07b6f422ae3a46a5b6a0946fde1a32"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/82bbcd4992bb550a6f7d3b66ffa7c95f65c49ecad000752e097b4060a126dcd5/receipt.json",
+      "sha256": "6efea89d048dc680dd27fa66eef8e4cf6b5fedf5f1b03b8a904a1e2a99c361eb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/8ab37e38366b930eddbac0239b718db8b512f6be96716df03792fa6b543a4abd/receipt.json",
+      "sha256": "16cf3cff1d96d00504c62efb9a6bdb44c324f832a434a62d31bef5d070350ca5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/8cfe966514447b36db17c3a23ea69762e3660d2494e49d7c781711de7eb38ee3/receipt.json",
+      "sha256": "a5a33da94b317ead4c2447a5175ed4874d89ca14d46c5aa9ba367d5f37b7b22e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/8e984ddddaa34bf32f37d3159a6455148a82c82be0ee4b99c36f107b736a34f0/receipt.json",
+      "sha256": "7656ea4b7b5b4b72838f3e6dc118c1ee035fed03ce7e2bc0254024c8fb78d864"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/91256ecaf0efc1dd30836b287ee8d6465d95d11cc9dd34e3238d34d0857de02d/receipt.json",
+      "sha256": "8684547d3cc3962378846c8813d1392ec588b37ee3627f1610048d71e12810b3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/923edcd9fc9d5466387f6ae3ce114d5718ed5a43433733d90b1790cf3b34072e/receipt.json",
+      "sha256": "88ba9828dce3cbd84b0724e2f0a6d904bff2668904f60624395f4175080bd4d7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/94f642e3082766349eef33155fd1c15fd4dd454c2387c1b01d9e5a8f9b43a487/receipt.json",
+      "sha256": "9e23ddc26f6d951aafa61c7091c9b558210a881e33dfed5f15cc65699af4dc63"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/986ce76b33257bc4534a0a4b42a16d84c4386c3d40d5ec76b2dfc1a7493c9b5d/receipt.json",
+      "sha256": "9eb7fb3f96e2366e9817387deae21a915da29d378a688e2673439b38bfc43494"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/997b569a0db26ae33c2b1343763d979fcbbc5abe09bac4bbdcc22e034defc80b/receipt.json",
+      "sha256": "bb807b3714a32991e8060e9a9431515dae55c83df608fc440bf881944cb57f68"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/99ecffa0249690faa3b8d47d50acecabf2dbc649ec24a9a47bd77d4d87674385/receipt.json",
+      "sha256": "f21940784cc79b29e8ae28d396a9dd79689a258991c6253bb51d24ff66f68dcb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/9a00fe51fdc817436b8a603cc304842fd999f614ad69e5853709125c5a1c3b09/receipt.json",
+      "sha256": "9764e4596c026094e5f59efc26b2b1492ae181a7005d7d7ca7ba776f3f4ab1e5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a17f7ed5155d40618c11498300d1b190a62c67bf87bb4bcd7d06a14bd7b4dd0a/receipt.json",
+      "sha256": "b50ff31840d225333cfe0f3944d5c523cf69a1f614a8079a766b80e4a9e4a526"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a21cd1c0a1e913ecc88bfc6573533f06ba2ede4a4088e3b3ce9c2ac7fb6a768c/receipt.json",
+      "sha256": "3c5728c02e660ab3223f66b637ecf197570135d20afa458006e1293534bc00b3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a38f4a60bc0dcc3baaa79d4b9ebda27405d32e03a10e2c9294489e88806edac0/receipt.json",
+      "sha256": "b8e3446b0a21c804bee32744dbc3333d0113be91711ac36c4b13f4f1aff8e6bc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a3ab17a5c3852a0d72193bf223389aaf000521c58ad10c74bc8b23fb4237f626/receipt.json",
+      "sha256": "8597f53754e3593ad6309b9b240fff64c465437d67f709c5315dbc41839733e3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a4bbce014d0195587951622d8de5ab22dbbc073464d224dd1481086935c45821/receipt.json",
+      "sha256": "5908f4f761cd2f666d652b88b68b4ab2f97b25fe2b812088716734674e44171a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a4f7cecaa3c59a1c324498e1006c3988cab86bed86c6fdddd9e2fd41b204627e/receipt.json",
+      "sha256": "99f7982d8dfa6d8806da0c89596c8f862e469bbd70e132c0f7ddacc4dc01bef6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a5987425fab8c729d0d0f3c63224a5643d751b6bfa447c983cdd68de8ca0bd80/receipt.json",
+      "sha256": "34d4cbd525f57fab906a6d24723338b224459f9229ad7f479b7a5b712ed52c5d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a7583ec3d8fa3b5496d3b90229c63367cef224f9afd0b2df9a45135f4ce4592b/receipt.json",
+      "sha256": "81b00c6e835a23b500b7a5cb28f9dc2dd966db39d29e97000dd748ee39f3ffdf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/a872c2f3b2b020c619aa6e81ead81ff6d6b7a2c6694e0334569870b5d2c6beaf/receipt.json",
+      "sha256": "fdd68bb18a5c7001a0ef46c65a70f01b3377697e9c8d04e5dd06f7ab0f24a8f9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/aa52c0949a8014d8c0fb2b92691dfae78b2df2336b4c4450597859a5cbb34348/receipt.json",
+      "sha256": "3aa66a39afe9547104bfaf879c895a20e24ca8f147805b83f0bef26eeca67a38"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/ad438f66f241700b94d7ed34d1d801baac28b56553c80a565b011bbc47589b41/receipt.json",
+      "sha256": "ad2a0181c6988a544652459d75e38a3b51c2329d12d49d437235e3b6be4a041a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/adb554efde578452eb16a5d9b9b1cee0d376f8d5a30b69e447e07bb03ba4adec/receipt.json",
+      "sha256": "61cf61a1763ce55a8f788b568a3279326c3d34b3801d5a746929956520c13fa8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/ae65c99f96f54255c0ec8ab648fa134dda317dc843d71ca3b7137c25a8f5985d/receipt.json",
+      "sha256": "129713519bc0fcd5eb049930a84a8b3ece7a8a8544c93480964f0d7bf35f6ea2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/b231b6c3a25c0d1d96665c665149bec460c61b45ec5fbf38cdd21e081046597b/receipt.json",
+      "sha256": "5f70f5f2ffe02972aa2f843972b09d18e74a8678f1a1c1dd71dcaf3be11056b8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/b32bd6315b923dd3151d4e2a1f894995cd509cc8d14590811a7593e784c3c29c/receipt.json",
+      "sha256": "59978a1748acff553cb32038df84240212703cff110b2c61cd1fa0672e7e6eec"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/b3f819da0b8a6982dc48861a16942a748ef34eb8b618a9bf44d2b36804e67b62/receipt.json",
+      "sha256": "2cc2132d789bdbdf4d527e363f532011b31e2169793befaa30d48dd3a565da6a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/b8f90331477704b0586d23dc3d48adf849f7124693dcd95e56cb7f40c1fcb8c9/receipt.json",
+      "sha256": "d38a16dc158c6170e71a121f0a840835bfec1845e8171135a080d5f508f4d510"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/bc54aaf6862f1564f4b230973d9d1be3eee751c9226c7d4088391d292bfb53e9/receipt.json",
+      "sha256": "5edad802929ba25182755d0ac2af2e361687b79eb55557c130e520b42def20ec"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/c3373fb5d29cd0a20c0445a78f0a861446ca23dedea613ce3bf32fe24b27acb2/receipt.json",
+      "sha256": "8a27f0f5580684efbae5d9f979870f6856e274a14b15249f295f5f3cf0c235fd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/c378d64b923c800aafe18101945835723733c96e193064bfa1c1b4f8cc27cbca/receipt.json",
+      "sha256": "7ef6a3a9e47f85722fab9401eba7f9e88942e720ae719c1b289d282821bbd125"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/c39e5ab56f28c553d11bbd37390d408190380b79a38d31886bc5aa97219f2d18/receipt.json",
+      "sha256": "1608557cb1d8a0049ff9df0731d891f2ba176c4d952b245a2e17827aaf2d0b75"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/c61aed77aba03beedbbb066a5f8fa82c2b213e7eeba5f2dccdaa854895a0c8bb/receipt.json",
+      "sha256": "3ea9f84dffc8e263dbf0f51010d948ee8226a78f40cb122d66230e690e69036d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/c8a8fe2a5ac7fe285612fe2c8d78c55a1f52d84d4a57d9c632514f21b8619785/receipt.json",
+      "sha256": "7351017d4217e37959275c2309f7053369c618697ebaea44e71cb14a4a494600"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/cb760953278dbb05f0dbf8d1726ef9145c9c47979b40300ba7ebdba154b843ef/receipt.json",
+      "sha256": "5e8397f8cc2737d986c2141f4a2371041d654540c57e4f2a0230185cd8435c7c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/cd8fc631264d2a450cda76495790f08a37dc076b67ec29fbf79e883acbf8b3e6/receipt.json",
+      "sha256": "b0c8f04311491da1a026f8d6f0c52cab71284a6cc540c41a051d6264141d2eba"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/ce57e8cb2356997d90c34565633e3a66c60cd133d92106888e5e5bf47fe39a8b/receipt.json",
+      "sha256": "f728d2f81740493500024310bf802845d94964dd5c129a9e08af38212705eeb4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/d95477ef1ca2723a189e01509f288af1750419cb2ecafd131b02a165d35509ed/receipt.json",
+      "sha256": "4adff2aa279981aefaaee32154e588b2bfc9fc6456634d80dea0374206453bbf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/db47095269bc3e19f7eb5e8d9b0a75ccf5eb585d43b635abcb20b5d8edfe9c1b/receipt.json",
+      "sha256": "16f2da0f9c6e156ee4f99abdce1fc356dfdcc32dd60f8efde763781c2817cd22"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/dc271ddee7368547fcc7fe7663ca321733b1fe4b7e99404640901ea5fab76e7f/receipt.json",
+      "sha256": "096c8524230fc80c7f580bae7658983a4b8ff8442ed53bd2166f8bd4de5cf180"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/dcd506608a3c650961e362110a721c8e1bc71f79a1e6d4d6ae160b6e263e1eae/receipt.json",
+      "sha256": "88d4de341a3dc2ea5bfcf9c8355d3e30ea86f875cef7cbe25832ebe4a87bdf2e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/e1ef859edc03cdff7c205ebfe96351adbac54f32c8009c20d680b00d15c91818/receipt.json",
+      "sha256": "506e3f06be37eb918ed39c1210c213594dd326740ea5198eb502629ed6a4d187"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/e2324ac627d1761fbf0ec10f1e64ed900dfabc5f1f6432a4cd4e6f0fa379b712/receipt.json",
+      "sha256": "069c78a605eceb5eb2b9b3e091d6d07f0050e0d4c7727bb044853871c2cc1006"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/e2b89c5c1db50fc07fd90ea6cfc6769473fc1c61103e248a300989f5a02750f9/receipt.json",
+      "sha256": "eb897bb68917420c1b6cfdd255bfdd46ba8368111e55f120d287ec0408c83cf6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/e30c6da56695eab6165ad0fd17c70d387f05afd25f6828e5bbec1f355029fd5c/receipt.json",
+      "sha256": "edd56979d929ae7622d15decb739d69cd974d0b2fc5a41fa3ab821077c331a3d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/e93ea4647ed920f95540cc9e402fde3f9d7cd35fb39af83304ed140feb60f251/receipt.json",
+      "sha256": "8f92f17c402a29243349a152c6983d4d622c3c8e0394c85f6b7dc54d99abe2ea"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/efea270c5e86b74929f84472b4ff8326e638c875ca3c0b862fe6adb889a8a29c/receipt.json",
+      "sha256": "62cf0e58d40b90649924c084a3a5a4aee8107990d398cd1d43ff2b81df5bf2e6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/f2c56305ec47cc48d130a93fdf34142e5d8a74bcdb7312e7c416033bab72c74a/receipt.json",
+      "sha256": "e3a10065a40351f4370c39d10d10a7d89741a80f30dfb49d850082d453fe9430"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/f2d0d09798a10ec148c73935875cd15e993f6c3a46606af83c4fd0be54b155f3/receipt.json",
+      "sha256": "4a6e86fd05980c9433a9c21091e3b35865751cd9f9eb2bbde7be1078f92cdf35"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/f5821ac0fcdc149070f42a933db1e29efb9e08f237421aa3900cdea53dd1f31e/receipt.json",
+      "sha256": "793cfb97f7fce504505ef6d465be0f56fdd30977bace2720fde333ed44a4a2d8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/fab33c15e5b538dc1192cb51341bef39368794451d65916170a898ac93324d0b/receipt.json",
+      "sha256": "2d675a4f645dc18f93e377f2c63b3f1c9b392904aeb0c181dcc9bfa04efa45d9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/fac66a074f3a9cd21d61f0a725c7b9bfbb9ba70c7ab120f97c91cd340055389f/receipt.json",
+      "sha256": "cfcf648aebbecae7f3934cfe2360567cc5ffd9b135bdd14f27676f1d480aad47"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/fbeb17bf7076aa2ae616a7dbefe041dbf93a62337ee3553b7d0f498af01d3273/receipt.json",
+      "sha256": "ab5a5e1d582f4886520ad6b5ae3a282e523379b3f79aafdc2cb1cf847cfaa4f1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/fbf67442f3057fda50e1c18b0a7ddc73c48dc2fc7e19d2644081b7b75171c6bb/receipt.json",
+      "sha256": "42e7e68496cfff16d00ded629263343a7dc9af20568612c5479342cb04db3546"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/fd0d24254ad50932274dfbe23a715a6bf4a4a3b441e8e77862a2a1fbdf600982/receipt.json",
+      "sha256": "762fb9a4a386222bacc82c2680b9b325659ddaa34b095c202df7ad2e9937fe08"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/cells/ffbb789d4c7b0d3a227e4775a77b4ff68d2109add1e40766cf8a34839b9a57d6/receipt.json",
+      "sha256": "9a537c0a82658699b7df72dae96ede903ff260c711bd66348311c1c64215b869"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/completion.json",
+      "sha256": "35f11d5f62b856486d6c1a79e2994b7b9f277809d0e74b8883138053a76f15d6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/0ca986293b853e9f40da9766cf9a2b26f85fd24e507a32401e676bef889997af/receipt.json",
+      "sha256": "7f82806c3f3322db80a5dd5beda09498167762a4c74c03930693e323b3d30732"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/602850a098653156f33146ff437c665ba45691d973e6a346390384cec733773c/receipt.json",
+      "sha256": "40d5aa987d7ae2019bbfb3fa3de2cbeeac1353b1cb87bd44caa0a35a658df776"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/73833645f163f71c49e5e04267d855793f0e92626b817458e0d5f80a70395c11/receipt.json",
+      "sha256": "eb6e22f972e3677af98d270cbb194528ec727c97f1aa12282849359a8d422b93"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/74991deaedef7d8806e6b20b6ee6a11982395016d1dd5fe5678eeb4fa7d63865/receipt.json",
+      "sha256": "5394e01d6787d6f44626028e5e881de43cf29e20a3fd1626149dfb62cd617a11"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/7b506a42c741d3bb8425afd73ef28966acc6b2284379f0de0ee0555956367943/receipt.json",
+      "sha256": "61bc0df69622d788b314a54717f4bc7dd53dfc0271a6c3e7ed1be2161501c543"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/7e18c2407d0200a8461be002530797f63e3edfa2bfea982cd3373d3ea1185265/receipt.json",
+      "sha256": "8bd3688fcff59ef331d495ef35972feb0404e11f973bff44eab081be5862840a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/7e652be9305533bbbea5d9cba5490fb29a4f1bcfa5b32cdfe0b97683361b2740/receipt.json",
+      "sha256": "16cec29f83e5cc15e09671b24674340820e2e814328880cca581213884cff454"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/7f28d9e2a108106a097c335a32004d080fff2f7192f5dd689f846d43038b9034/receipt.json",
+      "sha256": "6a97fe2cbb77aeda1cd3f8e1c823f176e129323fa0b697288dc2ef18679b859f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/9d1e01d0e65915cb487c9d31066cda31154241945ea71f2c263c990942826b50/receipt.json",
+      "sha256": "3f95c92f03461096b37c2ddab0b47cd08b3f72301b86ec7218a7ae2ef74e6be7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/c35c458726c7ecb6a5431f656ec3c6aed125a5f8e00495f8b74689d430a54e65/receipt.json",
+      "sha256": "6a85ba38e37234020e7fef76d4475cc8b529f6b71e1e5105a98c014685662186"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/efed2b9987124170443841899a55e47c60729cfb91c3b14be10c728b07b46b36/receipt.json",
+      "sha256": "02d9c372892d6929a204f47dc8b64492c1c86c3f1e423824e7e29a571fec5902"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/physical/f91cd7688e949b52f20dd70c7c7e2b6608a2e9f7d8608d5de4610224f9e7ef87/receipt.json",
+      "sha256": "4265ee651594c2fd8736e096d0378b2ab3084ba3c9697d779023a50d4c1a9d5a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-common-validation-v1/round.lock.json",
+      "sha256": "06dfeb4047bd7edf2b188664313ee74436350ef047e37306c05752ddec4d3b90"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-gpu-native-v1/jobs/15e91ce54861a9dbed465841db718ec68915753552691f77d65bd999d157ff29/attempt-0001/receipt.json",
+      "sha256": "8728b41d0f88684e118c519fb1b590669eaa1d70e72fe6d60a2e72ab77c734ea"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-gpu-native-v1/jobs/2365c28f7e53908959ae9412898aae2756488387997d2a6522088c2d7d5cae75/attempt-0001/receipt.json",
+      "sha256": "28c52b3e77536daae5d69a20e82f0896c5d61b06715ff9b040bc9ed9e8886b23"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-gpu-native-v1/jobs/2e3759795f1d3482132456e91f9bce1067a9452bea7a0b194f30bf20f5ab2a76/attempt-0001/receipt.json",
+      "sha256": "2b99bd82638c2ed6ef8eafd15b0c669209d1818d0f05ea9995ac1ea3e833cfa9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-gpu-native-v1/jobs/400cbd8d1601c08ad4b0670cbe7fb80946808b2c164bcb174979e32713e7ac1d/attempt-0001/receipt.json",
+      "sha256": "b5cde51e7797fa1b4adc0a941edd6925d9c1794811a23c39d29076c23e85c793"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-gpu-native-v1/jobs/696253c33d2213885a5fb4b7b0eb81f7331f1aa2e12ceb3dee36b5671242576d/attempt-0001/receipt.json",
+      "sha256": "78402e7fcd533b674f9f04dfe36220e47ff006416c332b8425fde2b8acb82ff8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-gpu-native-v1/jobs/bf84221785a7a48a52f24d7347f03fa9a938eb3e04bce1c2e71fbaea7fd93c7e/attempt-0001/receipt.json",
+      "sha256": "678acf2f18fd1350df510ba054c17740cd3ec7627b64f3f1442a9342e8e20c79"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-gpu-native-v1/round.lock.json",
+      "sha256": "75a7d6ed753767007147143a8356dc7518ef0d67cc0e7222eab174b2bd230255"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/017e89899449653c889586c3dc3c2ab5b2fab70ea0d09ef44e431ba2e4484dec/attempt-0001/receipt.json",
+      "sha256": "d6f064201feedab5cdee5b9d24b0c458a3dcb35230c680128e383f68bd26ec02"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/1d3f9d49480b2770f8543c47fc4b377a1c9669364fcc57fcb6944355ab44872b/attempt-0001/receipt.json",
+      "sha256": "abdf97309937529cb06f6f25e51c834ffcceb8c515894081ab499273987bda5d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/2ade2c3cd6dfa4bcdd5d59fafc237343847506dd68da796587fc375772d2af82/attempt-0001/receipt.json",
+      "sha256": "7f33caba5cd64a4e950b6a9d62b71b35cea92c0061707ab3debd5f4f632647bb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/3f3b2aa51c2fc665f5e35f07877858f2fbc5d4c4a7a1f3f1d8c787cc851ef144/attempt-0001/receipt.json",
+      "sha256": "101230f8a8a158979e724c78f9271c4c9167427a5fb4554e86c298350f1149e4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/3f4cf4be1cda112813fcc4975f8f1253880e9d574a247d40af10f0e6b9e3162a/attempt-0001/receipt.json",
+      "sha256": "bfe54adb13c9d63f862dae3ecd79ee1574790fe2e3cb0ca8180cbb66e4e057d2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/5de5dfccb5ca602a80b6891d0f8c5c946199530e6525f873283066779588af68/attempt-0001/receipt.json",
+      "sha256": "d174c39242662ea053dcc106292942f65315c79efad89f33172170c1d1677a7c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/5f935685c3a5747fa55ee44fb5bc1d7665521c2513132dd9e5e6cc35724f1f9b/attempt-0001/receipt.json",
+      "sha256": "4acea3c8ef375016ce13a6a7670b09feed8e84e8e90d644f4584b2bcc56338b8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/606552e820bc500a27c696c38d58b1d785dddd0deb81a7b8e54d0d15d6cbccbd/attempt-0001/receipt.json",
+      "sha256": "1cc1c95cb9c7691cefebd4e3360c8e0bc9a5ee439220a0ba37a564d4655a5bd4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/8033988bdd08f1d2e25b6765f3f377a5bc883227ca2e38455e7b1cddd65ec7da/attempt-0001/receipt.json",
+      "sha256": "25fdf046afe811910080f96e73970a1e07ffbe258ea4d60e8d0224bdb02140ab"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/8909a05dab129d80a8fbd5369318555ef3adab93d55c8317e8d65c22c3ba6433/attempt-0001/receipt.json",
+      "sha256": "0b79db6332bba60b031092c49300b26badcde20251d4cd697137188419ed2dc0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/8cf57d6286a62d50c8a5515c7b81a6de160be442c6b41d0765c8dda5ba6fdf39/attempt-0001/receipt.json",
+      "sha256": "3418790dafdd8af4df949335933f2fddc9c1c82750e32f4bbad9793bf5bf4026"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/9899fb471dea19374a423bf734640ccce6f0657174df7e863e5fcda3fef11b1d/attempt-0001/receipt.json",
+      "sha256": "f7945662d43959d3946632c78a68c31c5945ed35191a388db28a5be27c51abb6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/a6545f57312ded8856d88da27e49bd6b552e8d367b7c8a5843bc5eec97abe541/attempt-0001/receipt.json",
+      "sha256": "ac5865e1000772bf7c16024b12de850311da8503be6588964a53a0403c384f1c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/ba66951387638f5b6259dd7b226089059d930a95e8b5cf8ce3676adca41dbca2/attempt-0001/receipt.json",
+      "sha256": "0a968b5a4c072456bb337bf658ddcc8425ef69a9f74452be500e99005135208e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/bf1cafbe3efe0546147dcdea80951ab7ad637ff05a9ca138cf5a7a3d79b03cb2/attempt-0001/receipt.json",
+      "sha256": "f53e530bb8b3422cb95a4a0b871a30c97491f4d0b975d69a05984fe9460ec601"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/cf0450a2c5c6b958fd25f7fbc54fcb49d33f3d50c3b73ed02ee5e4dc4da949dd/attempt-0001/receipt.json",
+      "sha256": "acff7c519d90d5eed9bd21fc7cf189624e098c36b9ccc3190f89b89ab7de894d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/e5ef01f0aebbae73add3b2d2730600d1bad1d748ccaad8d23af67e47d6ed493e/attempt-0001/receipt.json",
+      "sha256": "57822ca30d9f1825d2b23e6fa570f33e26f5b1ace09ba9f497433cc8721625fe"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/jobs/ffb2e557b4ef46d5036eea85ab1b7af03c0e111c45f397823fee3c6da56ea26b/attempt-0001/receipt.json",
+      "sha256": "dd8a8900ca32c990012699b6ece0fbc73140dc53f0b2f7de197c4033d09ef2de"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/forestdiffusion-native-v1/round.lock.json",
+      "sha256": "beb4dfe71edb1e03ecf96764410b63018cf91fdf3fd8cc858793038f6496a816"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/0897bd370d117be66f5af8475c3d8050f7e891af8c4ed95e08cdb7bd7297aea4.json",
+      "sha256": "182afc28fdcfe7859c25a52769c207fe5254a338cc66879e24ddff761b1a361e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/31d0c43e36b9fbedd50a46ac1a1289c4d5206f5916fe47e377f9e2baafa288bb.json",
+      "sha256": "f9d98c6113b41f75cfbf989d11f9cac1b2808534e100586839ac5ffa989fba9a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/3338b58ef77fc65f4a168bd2f2640f7b0c719e3dd314e00a65ada95228d1ff0a.json",
+      "sha256": "a9d146e38afecace2b0bb2930bdc21d4c17cbdab7fac6e5402dd9fb317dea4ad"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/3a2d6f322b96f8632e8e7b19b96d07bc7e07c68341da57faa06c277403d16b95.json",
+      "sha256": "650556ce7f5433da20fab584a7da505bcbaede3348e51007be55f4fed973deb9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/419369fb53fcf30c3c2ed4323c0686224a696c193194c54d0384e64f1634989d.json",
+      "sha256": "524a2eb5e3a032e3427ed9542a6fa7698c9bddbd2aca9e6d653fe96130a1a0e0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/4a6d7f5a9bdc4a6e7ebde760132835a9eac31adb76ea2ff1c35a246a3d83816d.json",
+      "sha256": "adedc63c2cf756be6834c8ee986bd3757287025ac2266b4479a6242f48300e45"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/54764244636f3bba519b1d6c961d48578a9e42919729533efe4d04503a930345.json",
+      "sha256": "453b25fd66bfb092eff74edd25f3e7610abf28a540cf100391d4e5750544012c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/5771d168892b540c682ad3ea6459c5a9c31eedc8d9faa4b7279d4731eafe0cce.json",
+      "sha256": "684fd948b7f41cf0804be10d776c5ebdddca64dbe928ecb1c7ec1162c9e39957"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/7c2ad98bc85912b714626aff6d6768a9672a6abcb0b34498358e3cc350772f55.json",
+      "sha256": "7ab8d250f930975ec3ab67d17b96fe1e4130201a872ac4ebc2be9aa591328dff"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/cc88e68171fd687c16caa885567d03ad9bf69d9e5c4d875a3b6c7c7564fdbb8d.json",
+      "sha256": "2b870bb929124313a571a53372ff3e06d76a38efc958a2da8c857b41b8489ad7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/d2c178920f7f441943deb03b379a0691d8f54dba22425582dfdaf127b89694de.json",
+      "sha256": "1dbba1f161d5d54784b2872bb2260f73a6d40a02b82ba095fa405aa2e3f97360"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/Adult/cells/fe6b37078097231c1b1d7206783f91121a71b86f9b497fed8be875276ed45ad6.json",
+      "sha256": "f360652d2f1f35b02aa0b2ee0d503be8e848734ac9e8e1bdb0572393f857dff9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/07a917f363e20cfc3bf64a6f2f1eeeb15d23323345229325c2db610db5307786.json",
+      "sha256": "5bd89e36e84311f0c3b9c6eb99d1a8d93bfceb717d0c035c047946e8202764ec"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/1fa1c24c04cf4278adfa52ca151b6503bb1594e0cf207a67295c56b5bbf2a61e.json",
+      "sha256": "8bc52e5ea18131f2013658fda9a713fc4a7c5217324def1a3b58354267af74e6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/233b41b751a608281deba62976381d31eefd60fc6ae02998761d25c82ee74668.json",
+      "sha256": "60c5e8644418c19d07b6fbc90b7ece27af861644450704662f971ce18ba9e87b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/2aea90000e10e049ad2fb4241c3bf4b087456ecf7bd70413181f413df6af74a8.json",
+      "sha256": "bfd7fc894556d38fb9021629a5d83bbd9dd6eac60264132c4a4511b101885ac0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/3651118403efeda4ff4100f08c7f72410c91213bc44e108aeb3ef7767190231d.json",
+      "sha256": "70c854a9c7829c92ef58c7a70454ad72f917fc395740364e1ec6dce2d5f83420"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/4547e58864abb9aa7729027c4eed49d117a9e9bbec6a37660d7686375202bf00.json",
+      "sha256": "40ac62fa977fdea3676ccf93df90da0658a45d9be143e7d9fb38d6c31151ded1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/4af436f3856d898e7ab2f82006a26589122b5d8071de49bea623067248111912.json",
+      "sha256": "9f8496abd48b025b2d405fd49d9ff66378f8cb60eba752a323b423d76f1aed58"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/7f00843b5d01f9356623e3d429163c01be3e6728052cdb443067799e2418fe10.json",
+      "sha256": "ac03bc31fb8fd0704ec95d7d81a89dd75975cfd9b9e4bea40624c7265f61ff6e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/954f1e19e61b883a793f1c56b1665b8946dfe846ede4866381276c548b1d45fc.json",
+      "sha256": "435313bc72485b1804d7b279bd95883b5e6d00e037cf8f77d5d06857b033ec0b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/a58f5af9aa2283cf4c34e3462691f1ddf86aaa487e7ed8a49bdd63d5ceb8d176.json",
+      "sha256": "a7f1342f1cfe10da61342a1470a9aee93a15aca55b5b260cacdef8c0c412afe0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/a5ce14968b2a57dc24c49a7fd9c10e58d76493b3902a496a3a8f4f7da53a44cf.json",
+      "sha256": "426976baa73b089f3cfd2fff46ecbac0c8a5d9a831b5d93a9241c14deaee6ec2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/a83d1978a368bb967066fe659a068970bae901ebeb63f84d9c767ddf1be3d2e8.json",
+      "sha256": "80577f8e9a5905475042388265d3862051326a9c6627900ac498794c48966970"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/b727e2c9232e37f70a6aaa47c847d64b8bf628ef861d967214f73bdfca2e3601.json",
+      "sha256": "5ad6471ebdc75b6c784d9ca5d3a6fed0fb3216ab7480dd68b9744d6d4b714e1a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/b9f7f9e59f508c68158554a45bd957c356c6e12bf5eaf9b44e06e6bad051f75c.json",
+      "sha256": "fe06a84e0edac8aabac129e95a0dd92ceac5deb2af1bf49e6f5416f1d94af10a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/cf73fe8ff9cb397effcc7e5efc283465b312f4392f3007750471543a613d964c.json",
+      "sha256": "50b1a465db0a6103f960fb15e73ea3563775ab4423222aa6b63f9b68a97154a2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/dd9973d86abef458f162816625a5fa740f232a2a5adc8bb7ddd6d7d9aaf35e78.json",
+      "sha256": "460a199a2ff6e4dc53b0c1a01c3c9f7a795a98cf74e35701fe87cebe980ba9d1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/ecd359e2e148562566dcd50472408111a9ed569a25dbcdf13033c0c3aac179a6.json",
+      "sha256": "83dbacd5a348e7481f38f4064f94b4942ceddc82ff380b5a1679039a0e3b0a6f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-metrics-v1/regression/cells/f1b9fe9045084d3e5c838b53ef36ee752726881033eeada5eed711ad8b4f7af3.json",
+      "sha256": "838cd764d9765f846d0d17f5c88f18bc0aad1cf4247fbfcc4ad58d16f3b691fc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/sdv-final-seed23-v1/Adult/jobs/4b38d1591b14d0e2b042ca3938a846d38fd17e62f18dfc5eac4b978daae22c66/attempt-0001/receipt.json",
+      "sha256": "06b58f3b1bca49ae4263825b3884bba51a31e9b8d724cc626cbc76236a45bc79"
+    }
+  ],
+  "matrix": {
+    "logical_samples": 108,
+    "matched_prior_reference_cells": 120,
+    "native_attempts": 24,
+    "physical_samples": 12
+  },
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "forestdiffusion-source.lock.json": "0ee58f0de8152cafdec498d3bc5dea74f0f63dd246a997ba9572b9fdbf275ad4",
+    "forestdiffusion_adapter.py": "1ff4688f85bdf1a79ce89f475a02d0d06766ff2aaa395ec9b97f9de7cbb137e5",
+    "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
+    "publish_forestdiffusion_manifest.py": "d9d3e575080f12580cdbcfa4aac444d15ba141ce30e3ddef44c5bd6760562e02",
+    "publish_forestdiffusion_native.py": "d9050c1622aaadde8fd5e156950b799c365078ce5b96865b27186167f63ddf51",
+    "publish_forestdiffusion_native_figure.py": "d5d3d37247cafb7cf97434af87b2ff9dbd8f2e37888dc44e5c74c89fc45cd5e8",
+    "publish_forestdiffusion_source.py": "c455626bd3ff8964ddc07b3c85ce97681ac4eef737430bd2589bb0fcc1b407d4",
+    "publish_native_neural_fivefit.py": "a05be2f39bb62603313072636508f98918e0c1e3829e8bbbd8f81ced15f315b5",
+    "score.py": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+  },
+  "release_safe": null,
+  "scope": "complete frozen single-fit validation pilot only",
+  "version": 1
+}
