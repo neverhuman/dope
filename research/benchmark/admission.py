@@ -4,14 +4,115 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+from collections import defaultdict
 from pathlib import Path
 
 from .fetch_jope import LIMIT
+from .manifest import digest
+from .runner import resolve_configuration
 from .score import CONTRACT, validate_contract
 
 
 LOCK_NAMES = ("methods.lock.json", "datasets.lock.json", "budget.lock.json",
               "method-dataset-matrix.lock.json", "evaluator.lock.json")
+SCRATCH_ROOT = Path("/mnt/fast-scratch/dope-benchmark")
+
+
+def frozen_set_digest(locks: dict) -> str:
+    """Bind all five payloads without a circular digest of their own binding."""
+    return digest({name: digest({key: value for key, value in locks[name].items()
+                                if key != "freeze_set_sha256"})
+                   for name in LOCK_NAMES})
+
+
+def hash_value(value: object) -> bool:
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+
+
+def final_set_blockers(locks: dict) -> list[str]:
+    blockers = []
+    binding = frozen_set_digest(locks)
+    if any(row.get("freeze_set_sha256") != binding for row in locks.values()):
+        blockers.append("final_lock_set:hash_binding_gap")
+    methods = locks["methods.lock.json"]["methods"]
+    datasets = {row["id"]: row for row in locks["datasets.lock.json"]["datasets"]}
+    metric_hash = locks["evaluator.lock.json"].get("metric_implementation_sha256")
+    valid_hashes = hash_value(metric_hash) and hash_value(locks["budget.lock.json"].get("pilot_receipts_sha256"))
+    for row in methods.values():
+        if row["status"] == "locked":
+            valid_hashes = valid_hashes and all(hash_value(row.get(key)) for key in ("source_sha256", "adapter_sha256"))
+            dependency = row.get("dependency_or_container_digest", "")
+            valid_hashes = valid_hashes and isinstance(dependency, str) and hash_value(dependency.removeprefix("sha256:"))
+            objective = row["native_objective"]
+            if objective["status"] == "locked":
+                valid_hashes = valid_hashes and hash_value(objective.get("implementation_sha256"))
+    for row in datasets.values():
+        valid_hashes = valid_hashes and all(hash_value(row.get(key)) for key in ("source_row_hash", "projection_sha256"))
+        valid_hashes = valid_hashes and all(hash_value(value) for value in row["split"]["hashes"].values())
+        valid_hashes = valid_hashes and all(hash_value(value) for value in row["projected_files"].values())
+    if not valid_hashes:
+        blockers.append("final_lock_set:invalid_sha256")
+    cells = locks["method-dataset-matrix.lock.json"]["cells"]
+    if {(row["method"], row["dataset"]) for row in cells} != {(method, dataset) for method in methods for dataset in datasets}:
+        blockers.append("method-dataset-matrix.lock.json:pair_coverage_gap")
+    groups = defaultdict(list)
+    lineages_match = True
+    for cell in cells:
+        if not cell["applicable"]:
+            continue
+        method = methods[cell["method"]]
+        dataset = datasets[cell["dataset"]]
+        expected = {"method_source_sha256": method["source_sha256"],
+                    "adapter_sha256": method["adapter_sha256"],
+                    "dependency_or_container_digest": method["dependency_or_container_digest"],
+                    "projection_sha256": dataset["projection_sha256"],
+                    "train_sha256": dataset["projected_files"]["train"],
+                    "validation_sha256": dataset["projected_files"]["validation"],
+                    "evaluator_sha256": metric_hash}
+        lineages_match = lineages_match and all(cell.get(key) == value for key, value in expected.items())
+        key = (cell["method"], cell["dataset"], cell["panel"], cell["track"], cell["tier"], cell.get("dp_epsilon"))
+        groups[key].append(cell)
+    if not lineages_match:
+        blockers.append("method-dataset-matrix.lock.json:lineage_binding_gap")
+    complete = True
+    for key, rows in groups.items():
+        method = methods[key[0]]
+        kinds = ("default", "tuned") if method["native_objective"]["status"] == "locked" else ("default",)
+        observed = [(row["configuration"]["kind"], row["fit_seed"]) for row in rows]
+        expected = {(kind, seed) for kind in kinds for seed in CONTRACT["fit_seeds"]}
+        complete = complete and len(observed) == len(expected) and set(observed) == expected
+        for kind in kinds:
+            # Each selected configuration and selection receipt is fixed across fit seeds.
+            complete = complete and len({digest(row["configuration"]) for row in rows
+                                         if row["configuration"]["kind"] == kind}) == 1
+        if method.get("group") == "dp":
+            epsilons = {other[5] for other in groups if other[:5] == key[:5]}
+            complete = complete and epsilons == {1, 4, 10}
+    if not complete:
+        blockers.append("method-dataset-matrix.lock.json:fit_schedule_gap")
+    selections_verified = True
+    for key, rows in groups.items():
+        dataset = datasets[key[1]]
+        if type(dataset.get("train_rows")) is not int or dataset["train_rows"] <= 0:
+            selections_verified = False
+            continue
+        # Reuse the runner's native-winner, attempt, byte and validation-lineage
+        # checks before authorizing evaluator access. These read selection and
+        # model receipts only; they never read a test partition or train a model.
+        unique = {(row["configuration"]["kind"], digest(row["configuration"])): row for row in rows}
+        for row in unique.values():
+            try:
+                resolve_configuration({"final": True, "method": key[0],
+                                       "configuration": row["configuration"],
+                                       **({"dp_epsilon": key[5]} if key[5] is not None else {})},
+                                      methods[key[0]], key[1], dataset["train_rows"], SCRATCH_ROOT,
+                                      dataset["projected_files"]["validation"])
+            except (KeyError, TypeError, ValueError, OSError):
+                selections_verified = False
+    if not selections_verified:
+        blockers.append("method-dataset-matrix.lock.json:native_selection_evidence_gap")
+    return blockers
 
 
 def assess(repo_root: Path, lock_root: Path) -> dict:
@@ -24,8 +125,11 @@ def assess(repo_root: Path, lock_root: Path) -> dict:
     for name in LOCK_NAMES:
         path = lock_root / name
         try:
-            locks[name] = json.loads(path.read_text())
-        except (FileNotFoundError, json.JSONDecodeError):
+            value = json.loads(path.read_text())
+            if not isinstance(value, dict):
+                raise ValueError("lock is not an object")
+            locks[name] = value
+        except (FileNotFoundError, json.JSONDecodeError, ValueError):
             blockers.append(f"{name}:missing_or_invalid")
     for name, lock in locks.items():
         if lock.get("complete") is not True or lock.get("frozen_for_final_evaluation") is not True:
@@ -78,7 +182,9 @@ def assess(repo_root: Path, lock_root: Path) -> dict:
         if (not cells or len({row.get("id") for row in applicable}) != len(applicable)
                 or any(not all(key in row for key in
                 ("dataset", "method", "panel", "track", "tier", "applicable"))
+                or type(row.get("applicable")) is not bool
                 or row.get("dataset") not in datasets or row.get("method") not in methods
+                or (row["applicable"] and row.get("track") != "common_numeric")
                 or (row["applicable"] and methods.get(row["method"], {}).get("status") != "locked")
                 or (row["applicable"] and not all(key in row for key in
                     ("id", "fit_seed", "sample_seeds", "size_multipliers", "worker_dir",
@@ -97,6 +203,11 @@ def assess(repo_root: Path, lock_root: Path) -> dict:
                 or (not row["applicable"] and not row.get("exclusion_reason"))
                 for row in cells)):
             blockers.append("method-dataset-matrix.lock.json:cell_gap")
+    if len(locks) == len(LOCK_NAMES):
+        try:
+            blockers.extend(final_set_blockers(locks))
+        except (KeyError, TypeError, ValueError):
+            blockers.append("final_lock_set:malformed_binding_or_schedule")
     return {"format": "dope-benchmark-admission", "version": 1,
             "admitted": not blockers, "blockers": sorted(blockers)}
 
