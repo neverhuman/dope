@@ -1,0 +1,458 @@
+{
+  "adaptations": [
+    "One S3 train-derived 72-row regression cohort, five projected features; not California benchmark rows.",
+    "Only fit rows enter preprocessing/training; official tests never staged.",
+    "Fit seeds11/23; author numeric base settings, feature width follows projected data.",
+    "Sample n rows with min(n,2000) batch, versus author52800 rows/batch8192.",
+    "Tensor-only weights and numeric quantile/discrete preprocessing arrays plus projection; no Python-object deserialization."
+  ],
+  "adapter": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/adapter.py",
+    "sha256": "470dce54b649a6d9a6a7676ba6f1433362d709002850bce07b31427e9b2a32cf"
+  },
+  "attempt_receipts": [
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 72.80230931006372,
+      "fit_entrypoint_status": "failed",
+      "fit_operation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v1/attempts/fit-seed-11/attempt-0002/fit.operation.json",
+        "sha256": "9e490c54dc2e2c364aa1b3c6e1285a30692a202411228cb897f050424cd7abb2"
+      },
+      "fit_seed": 11,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v1/attempts/fit-seed-11/attempt-0002/receipt.json",
+        "sha256": "4763d699983afe39fb9f70818d990373f65503a8a0c490f3275b2b40454ff094"
+      },
+      "status": "failed"
+    },
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 0,
+      "fit_entrypoint_status": "none_or_reused",
+      "fit_operation": null,
+      "fit_seed": 11,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v1/attempts/fit-seed-11/receipt.json",
+        "sha256": "d8d4a98c4b657897addc05f99d455bcd3e6c04443776138072b213f7a7a3db79"
+      },
+      "status": "blocked_or_failed"
+    },
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 72.32365608587861,
+      "fit_entrypoint_status": "failed",
+      "fit_operation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v1/attempts/fit-seed-23/attempt-0001/fit.operation.json",
+        "sha256": "36fc1f2946b654fec39f41a29f815a8699c7c82bca20f3ea7562dd443202de2c"
+      },
+      "fit_seed": 23,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v1/attempts/fit-seed-23/attempt-0001/receipt.json",
+        "sha256": "7e1e5f3b2fc63e835ffc6472c8ef3e205d3b0958d1f1034908c4b940fc68017e"
+      },
+      "status": "failed"
+    },
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 234.2063833400607,
+      "fit_entrypoint_status": "failed",
+      "fit_operation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v2/attempts/fit-seed-11/fit.operation.json",
+        "sha256": "1e7da8100b8c15ed310f45604b312e47ae6b887e3ad959a42de59fbad1f4b94b"
+      },
+      "fit_seed": 11,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v2/attempts/fit-seed-11/receipt.json",
+        "sha256": "264e23daaa6d0bf83c9de43d0aa7fc3d45afbb416f29331596c2e07c2a519b6c"
+      },
+      "status": "failed"
+    },
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 226.3005010774359,
+      "fit_entrypoint_status": "failed",
+      "fit_operation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v2/attempts/fit-seed-23/fit.operation.json",
+        "sha256": "6acee840b24e99c27d6b2070c267d36e571969a6f23a210a590e0ff5cc08db63"
+      },
+      "fit_seed": 23,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v2/attempts/fit-seed-23/receipt.json",
+        "sha256": "35082d93624c07210299f376c13d856cc734a607c0a32d7018a1dbe54382a9b8"
+      },
+      "status": "failed"
+    },
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 107.36617396958172,
+      "fit_entrypoint_status": "ok",
+      "fit_operation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/attempts/fit-seed-11/attempt-0002/fit.operation.json",
+        "sha256": "8d9dc6e165052389e7fbbafed9891ee897d4f840f0bdc7d44b462205f82221ec"
+      },
+      "fit_seed": 11,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/attempts/fit-seed-11/attempt-0002/receipt.json",
+        "sha256": "577293201cc38815cf279116b1127a7c8f4184bac93a6fc481455f17d17190da"
+      },
+      "status": "blocked_or_failed"
+    },
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 0,
+      "fit_entrypoint_status": "none_or_reused",
+      "fit_operation": null,
+      "fit_seed": 11,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/attempts/fit-seed-11/receipt.json",
+        "sha256": "acd19e87fb85fdd7718fdb392be628ae2f227d32c086baa2c3aec92700ea74d2"
+      },
+      "status": "blocked_or_failed"
+    },
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 0,
+      "fit_entrypoint_status": "none_or_reused",
+      "fit_operation": null,
+      "fit_seed": 11,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-11/receipt.json",
+        "sha256": "49cf674e11896b5fc4da6122bbfe157c620b768878a73f161b940e7333cfe8cf"
+      },
+      "status": "ok"
+    },
+    {
+      "compute_charging": "physical operation costs below; inherited successful fit counted once",
+      "fit_entrypoint_seconds": 105.08325421437621,
+      "fit_entrypoint_status": "ok",
+      "fit_operation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-23/fit.operation.json",
+        "sha256": "bdaae18cba6bd610a7e2305c6649dd28e13b1fbff0bd24c8680594cc52f7d497"
+      },
+      "fit_seed": 23,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-23/receipt.json",
+        "sha256": "e700e73f32c74369c3c7a93a0348533d1e654921b84c3952367ee91e9e6b6c05"
+      },
+      "status": "ok"
+    }
+  ],
+  "author_default_source": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabddpm-v1/source/exp/california/config.toml",
+    "sha256": "47fa5e3a33f17e31a9a3a7a986c4d189aa6de421185bf67340c6f851c5f68503"
+  },
+  "author_native_catboost_config": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabddpm-v1/source/tuned_models/catboost/california_cv.json",
+    "sha256": "0508cdc40c02386321976c9537fbe54a5f2b0fa0e8e7dde72a6d4d289ced862c"
+  },
+  "author_objective_source": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabddpm-v1/source/scripts/tune_ddpm.py",
+    "sha256": "61d47532e0419f22e93465a78b5aba222558f2d720509324f94b68fbf24684ba"
+  },
+  "bibliography_entry": "kotelnikov2023tabddpm",
+  "completion": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/completion-verification-v2.json",
+    "sha256": "0e9bc146d708b545b3741b2ad15a76b6e3f17d7b7ce35964087fd46a3edad5f1"
+  },
+  "configuration": {
+    "batch_size": 4096,
+    "d_layers": [
+      256,
+      256
+    ],
+    "lr": 0.001,
+    "num_timesteps": 1000,
+    "steps": 1000,
+    "weight_decay": 1e-05
+  },
+  "costs": {
+    "energy_joules": null,
+    "failed_fit_entrypoint_seconds": 605.632849813439,
+    "fit_entrypoint_seconds_including_failures": 818.0822779973969,
+    "gpu_training_seconds": 5.646651152521372,
+    "inherited_sample_operation_aliases": [
+      {
+        "alias_path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/attempts/fit-seed-11/attempt-0002/sample-2.operation.json",
+        "physical_operation_path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-11/sample-2.operation.json"
+      },
+      {
+        "alias_path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/attempts/fit-seed-11/attempt-0002/sample-0.operation.json",
+        "physical_operation_path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-11/sample-0.operation.json"
+      },
+      {
+        "alias_path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/attempts/fit-seed-11/attempt-0002/sample-1.operation.json",
+        "physical_operation_path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-11/sample-1.operation.json"
+      }
+    ],
+    "native_evaluation_seconds": 183.8542022621259,
+    "physical_operations_including_four_failed_fit_entrypoints": 20,
+    "physical_sample_repeat_operations": 12,
+    "sample_repeat_entrypoint_seconds": 1261.5691089658067,
+    "successful_physical_operations": 16
+  },
+  "counts_as_dope_win": false,
+  "entry": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py",
+    "sha256": "a494faa98f86eb6059cdba9050de0c8f401bc7229084a380e3d8dbfee44f345f"
+  },
+  "execution": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/execution.lock.json",
+    "sha256": "a05e684c05289ea1236c46f4f3a60f43b1e2db5dc98c7d15350c352099b7f474"
+  },
+  "final_campaign_admitted": false,
+  "fit_seeds": [
+    11,
+    23
+  ],
+  "fits": [
+    {
+      "artifact_inventory": [
+        {
+          "bytes": 1186,
+          "path": "inverse.npz",
+          "sha256": "f48a04b075c100e30ad6bbba7a2568ac292f1359c603299e292f81a17730bed3"
+        },
+        {
+          "bytes": 570,
+          "path": "model.json",
+          "sha256": "d9faa795ff7bc3066d7bc3f98ff3c004785bb22b3163283607f2ff013b974849"
+        },
+        {
+          "bytes": 972,
+          "path": "projection.json",
+          "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+        },
+        {
+          "bytes": 498218,
+          "path": "weights.npz",
+          "sha256": "738103f27a4117a6fef41d8ab6fb235344a1115157ba03cf17b306ac1cdc3133"
+        }
+      ],
+      "charged_artifact_bytes": 500946,
+      "fit_entrypoint_seconds": 107.36617396958172,
+      "fit_reference": {
+        "new_fit_started": false,
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/attempts/fit-seed-11/attempt-0002/fit.json",
+        "sha256": "654d731fdbd369f416f07802423072f83d0298fcc2cb99303ad8d29c08f9f31b"
+      },
+      "fit_seed": 11,
+      "gpu": "NVIDIA GeForce RTX 3090",
+      "gpu_fit_seconds": 2.816294456832111,
+      "host": "xbabe3",
+      "native_validation_kpi": {
+        "components": [
+          {
+            "r2": 0.7318395431864906,
+            "sample_seed": 0
+          },
+          {
+            "r2": 0.8614389950349072,
+            "sample_seed": 1
+          },
+          {
+            "r2": 0.7979885552078438,
+            "sample_seed": 2
+          },
+          {
+            "r2": 0.7762012640581236,
+            "sample_seed": 3
+          },
+          {
+            "r2": 0.8504306025735894,
+            "sample_seed": 4
+          }
+        ],
+        "direction": "maximize",
+        "mfs_v2": null,
+        "name": "author_five_synthetic_seed_validation_catboost_r2_mean",
+        "official_tests_opened": false,
+        "partition": "official_training_derived_validation",
+        "ptf_v1": null,
+        "value": 0.803579792012191
+      },
+      "peak_torch_allocated_bytes": 3397120,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-11/receipt.json",
+        "sha256": "49cf674e11896b5fc4da6122bbfe157c620b768878a73f161b940e7333cfe8cf"
+      },
+      "sample_replay_exact": true,
+      "within_l3_bytes": false
+    },
+    {
+      "artifact_inventory": [
+        {
+          "bytes": 1186,
+          "path": "inverse.npz",
+          "sha256": "f48a04b075c100e30ad6bbba7a2568ac292f1359c603299e292f81a17730bed3"
+        },
+        {
+          "bytes": 570,
+          "path": "model.json",
+          "sha256": "b68d00575c0b865cb6f8befc671f5c70165adf2ca69b0a540d80e226f2f17bdb"
+        },
+        {
+          "bytes": 972,
+          "path": "projection.json",
+          "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+        },
+        {
+          "bytes": 498251,
+          "path": "weights.npz",
+          "sha256": "e9822ab2fea1339497aa1339647a176c31ef122eb662051c166226395731798a"
+        }
+      ],
+      "charged_artifact_bytes": 500979,
+      "fit_entrypoint_seconds": 105.08325421437621,
+      "fit_reference": {
+        "new_fit_started": true,
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-23/fit.json",
+        "sha256": "3bf5ab7ce46c9498aad8b3c04c5593a0f3c6ae7ae13601741a104f43cdd98490"
+      },
+      "fit_seed": 23,
+      "gpu": "NVIDIA GeForce RTX 3090",
+      "gpu_fit_seconds": 2.830356695689261,
+      "host": "xbabe3",
+      "native_validation_kpi": {
+        "components": [
+          {
+            "r2": 0.7973972532986074,
+            "sample_seed": 0
+          },
+          {
+            "r2": 0.8518423749231664,
+            "sample_seed": 1
+          },
+          {
+            "r2": 0.8039633228018271,
+            "sample_seed": 2
+          },
+          {
+            "r2": 0.724628924617009,
+            "sample_seed": 3
+          },
+          {
+            "r2": 0.7689562228787381,
+            "sample_seed": 4
+          }
+        ],
+        "direction": "maximize",
+        "mfs_v2": null,
+        "name": "author_five_synthetic_seed_validation_catboost_r2_mean",
+        "official_tests_opened": false,
+        "partition": "official_training_derived_validation",
+        "ptf_v1": null,
+        "value": 0.7893576197038696
+      },
+      "peak_torch_allocated_bytes": 3397120,
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1/fit-seed-23/receipt.json",
+        "sha256": "e700e73f32c74369c3c7a93a0348533d1e654921b84c3952367ee91e9e6b6c05"
+      },
+      "sample_replay_exact": true,
+      "within_l3_bytes": false
+    }
+  ],
+  "formal_dp_claim": false,
+  "format": "dope-tabddpm-author-contract-publication",
+  "license_evidence": "https://github.com/yandex-research/tab-ddpm/blob/b476257dd460b778ba09eb97f7a51d6490fa17f8/LICENSE.md",
+  "limitations": [
+    "Author-core contract probe, not two reported-experiment reproductions, native tuning or a matched common-outcome benchmark.",
+    "Regression only; classification/categorical and generic final-runner integration remain pending.",
+    "Learned quantiles/discrete state are charged; no claim that preprocessing is free of source observations.",
+    "Both artifacts exceed L3; copy, leakage, attacks, real-vs-real and production profile gates are not complete.",
+    "Native values are not ranked across methods; no tuned configuration or winning fit seed selected."
+  ],
+  "limits": {
+    "gpu_vram_bytes": 17179869184,
+    "neural_fit_seconds": 600,
+    "original_pilot_deadline_unchanged": true,
+    "repair_fit_seconds": 250,
+    "total_fit_entrypoint_seconds": 1200
+  },
+  "method": "TabDDPM",
+  "mfs_v2": null,
+  "native_implementation": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/coordinator-retry-v1.py",
+    "sha256": "c3198ca6241a4e0185ffdbf393aca9f64b456a7b799c7acd84da9988f0d513f5"
+  },
+  "native_tuning_complete": false,
+  "new_fits_started": 0,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publication_custody": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/receipt-source.lock.json",
+    "sha256": "6ecc1b3dcbec64baee27f0cc83ec1e24ed935cabbc74f95fa299d79e57b1478f",
+    "verified_file_count": 10774
+  },
+  "publisher_source_sha256": "2fd71c1e051b589996acf147f1d2194ccf8bdebb71b06d23ae73f15e4ee270ca",
+  "release_safe_l3": null,
+  "resume": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/resume-v1.lock.json",
+    "sha256": "8f8d4d1c2f08b7792a250cfb623593bddba7847aa30a367e8811cfd10cfcceb3"
+  },
+  "round": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/round.lock.json",
+    "sha256": "c3c8a8dba2a2216543b138982960441f5bea2beaff4f66c3e6e0c393c6cd25a9"
+  },
+  "runtime": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/runtime.lock.json",
+    "sha256": "3741fa9f3001b15d75b284884d9ba146e353d1b31de2d76f15e689cbb337d3c8"
+  },
+  "runtime_python": "3.9.25",
+  "runtime_python_variation": "Author README3.9.7; interpreter patch updated to3.9.25, all directly specified author dependency versions unchanged. Contract probe must pass before comparison.",
+  "runtime_versions": {
+    "catboost": "1.0.3",
+    "category-encoders": "2.3.0",
+    "dython": "0.5.1",
+    "icecream": "2.1.2",
+    "imbalanced-learn": "0.7.0",
+    "libzero": "0.0.8",
+    "numpy": "1.21.4",
+    "optuna": "2.10.1",
+    "pandas": "1.3.4",
+    "pyarrow": "6.0.0",
+    "rdt": "0.6.4",
+    "rtdl": "0.0.9",
+    "scikit-learn": "1.0.2",
+    "scipy": "1.7.2",
+    "setuptools": "68.2.2",
+    "skorch": "0.11.0",
+    "tomli": "1.2.2",
+    "tomli-w": "0.4.0",
+    "torch": "1.10.1+cu111",
+    "tqdm": "4.62.3"
+  },
+  "sample_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "scope": "Two-seed regression-only author-core contract probe using California numeric base settings on one S3 train-derived cohort; not native tuning, full benchmark, or certification. Sampling row count/batch size and train-only artifact wrapper are declared adaptations.",
+  "source_archive_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
+  "source_commit": "b476257dd460b778ba09eb97f7a51d6490fa17f8",
+  "source_license": "MIT",
+  "source_license_sha256": "be701b4d15238cf3c2d730ead1b72868a99e397fe872da0e89e07ce50e68ca99",
+  "track": "common_numeric",
+  "version": 1,
+  "worker": {
+    "cohort": {
+      "id": "0d482c1dd7cc6592",
+      "projected_features": 5,
+      "stratum": "size0-width1",
+      "train_rows": 72,
+      "train_sha256": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+      "validation_sha256": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+    },
+    "files": {
+      "projection.json": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662",
+      "train.csv": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+      "validation.csv": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f",
+      "worker-manifest.json": "8c6e8ef3b3664ff5019c0d12e5218444eace893651e48737bc539c067dabef6c"
+    },
+    "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0d482c1dd7cc6592"
+  }
+}

@@ -708,14 +708,108 @@
       "upstream_url": "https://github.com/muellermarkus/tabcascade"
     },
     "TabDDPM": {
-      "default_config": null,
-      "dependency_or_container_digest": null,
-      "fit_command": null,
+      "adapter_sha256": "470dce54b649a6d9a6a7676ba6f1433362d709002850bce07b31427e9b2a32cf",
+      "bounded_trial_grid_status": "pending_before_tuning; author space recorded, no tuned configuration selected",
+      "default_config": {
+        "batch_size": 4096,
+        "d_layers": [
+          256,
+          256
+        ],
+        "lr": 0.001,
+        "num_timesteps": 1000,
+        "steps": 1000,
+        "weight_decay": 1e-05
+      },
+      "dependency_or_container_digest": "3741fa9f3001b15d75b284884d9ba146e353d1b31de2d76f15e689cbb337d3c8",
+      "entry_sha256": "a494faa98f86eb6059cdba9050de0c8f401bc7229084a380e3d8dbfee44f345f",
+      "fit_command": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9 -S /mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py fit VERIFIED_REQUEST",
+      "fit_timeout_seconds": 600,
       "group": "neural_flow",
-      "license": null,
-      "sampling_command": null,
-      "status": "source_audit_pending",
-      "tuning_search_space": null,
+      "license": "MIT",
+      "license_evidence": "https://github.com/yandex-research/tab-ddpm/blob/b476257dd460b778ba09eb97f7a51d6490fa17f8/LICENSE.md",
+      "license_sha256": "be701b4d15238cf3c2d730ead1b72868a99e397fe872da0e89e07ce50e68ca99",
+      "native_objective": {
+        "direction": "maximize",
+        "implementation_sha256": "c3198ca6241a4e0185ffdbf393aca9f64b456a7b799c7acd84da9988f0d513f5",
+        "metric_seed": 0,
+        "name": "author_five_synthetic_seed_validation_catboost_r2_mean",
+        "native_values_cross_method_ranking": false,
+        "partition": "validation",
+        "sample_seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "shared_kpi_used_for_selection": false,
+        "source": "https://github.com/yandex-research/tab-ddpm/blob/b476257dd460b778ba09eb97f7a51d6490fa17f8/scripts/tune_ddpm.py",
+        "source_sha256": "61d47532e0419f22e93465a78b5aba222558f2d720509324f94b68fbf24684ba",
+        "status": "locked",
+        "tie_break_origin": "study-prespecified protocol; not an author tie-break claim",
+        "tie_breaks": [
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
+        ],
+        "track": "common_numeric"
+      },
+      "note": "Original MIT Trainer/DDPM/MLP author core, frozen train-only numeric artifact wrapper; two-seed S3 contract complete, own five-synthetic-seed CatBoost validation efficacy. Python patch variation and sampling/staging adaptations disclosed. Both artifacts exceed L3. No native tuning, common-outcome comparison, reported-experiment reproduction or final runner admission. Native tuning/common matrix and final five locks remain pending. Historical frozen wrappers/receipts preserved.",
+      "runtime_lock": {
+        "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/runtime.lock.json",
+        "sha256": "3741fa9f3001b15d75b284884d9ba146e353d1b31de2d76f15e689cbb337d3c8"
+      },
+      "runtime_python": "3.9.25",
+      "sampling_command": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9 -S /mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py sample VERIFIED_REQUEST",
+      "source_archive": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabddpm-v1/source.tar.gz",
+      "source_archive_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
+      "source_lock": "research/benchmark/tabddpm-source.lock.json",
+      "source_lock_sha256": "aeea1a09d235b9d0b1ab39df457a8cf6b086bc8db6abea0526965c8eea97c51b",
+      "source_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
+      "status": "pilot_locked",
+      "supported_task": "regression",
+      "track": "common_numeric",
+      "tuning_search_space": {
+        "batch_size": [
+          256,
+          4096
+        ],
+        "even_hidden_layers": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "hidden_width_assignment": "separate first/middle/last choices; same middle width repeated",
+        "hidden_width_powers_of_two": [
+          128,
+          256,
+          512,
+          1024
+        ],
+        "lr_loguniform": [
+          1e-05,
+          0.003
+        ],
+        "native_synthetic_rows_train_size_power_of_two": [
+          -2,
+          -1,
+          0,
+          1
+        ],
+        "num_timesteps": [
+          100,
+          1000
+        ],
+        "steps": [
+          5000,
+          20000,
+          30000
+        ],
+        "weight_decay": [
+          0.0
+        ]
+      },
       "upstream_commit": "b476257dd460b778ba09eb97f7a51d6490fa17f8",
       "upstream_url": "https://github.com/yandex-research/tab-ddpm"
     },

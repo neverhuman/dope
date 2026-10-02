@@ -1,0 +1,175 @@
+{
+  "adaptations": [
+    "One S3 train-derived 72-row regression cohort, five projected features; not California benchmark rows.",
+    "Only fit rows enter preprocessing/training; official tests never staged.",
+    "Fit seeds11/23; author numeric base settings, feature width follows projected data.",
+    "Sample n rows with min(n,2000) batch, versus author52800 rows/batch8192.",
+    "Tensor-only weights and numeric quantile/discrete preprocessing arrays plus projection; no Python-object deserialization."
+  ],
+  "adapter": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/adapter.py",
+    "sha256": "470dce54b649a6d9a6a7676ba6f1433362d709002850bce07b31427e9b2a32cf"
+  },
+  "author_tuning_search_space": {
+    "batch_size": [
+      256,
+      4096
+    ],
+    "even_hidden_layers": [
+      2,
+      4,
+      6,
+      8
+    ],
+    "hidden_width_assignment": "separate first/middle/last choices; same middle width repeated",
+    "hidden_width_powers_of_two": [
+      128,
+      256,
+      512,
+      1024
+    ],
+    "lr_loguniform": [
+      1e-05,
+      0.003
+    ],
+    "native_synthetic_rows_train_size_power_of_two": [
+      -2,
+      -1,
+      0,
+      1
+    ],
+    "num_timesteps": [
+      100,
+      1000
+    ],
+    "steps": [
+      5000,
+      20000,
+      30000
+    ],
+    "weight_decay": [
+      0.0
+    ]
+  },
+  "bounded_trial_grid_status": "pending_before_tuning; author space recorded, no tuned configuration selected",
+  "contract_fit_seeds": [
+    11,
+    23
+  ],
+  "contract_publication": "research/benchmark/results/tabddpm-author-contract.json",
+  "contract_publication_sha256": "7e26cf09a946ba3f7ea0ee83efddcd5879a67a21dcb32b764cc3e5105aebe7c9",
+  "counts_as_dope_win": false,
+  "default_config": {
+    "batch_size": 4096,
+    "d_layers": [
+      256,
+      256
+    ],
+    "lr": 0.001,
+    "num_timesteps": 1000,
+    "steps": 1000,
+    "weight_decay": 1e-05
+  },
+  "default_source": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabddpm-v1/source/exp/california/config.toml",
+    "sha256": "47fa5e3a33f17e31a9a3a7a986c4d189aa6de421185bf67340c6f851c5f68503"
+  },
+  "entry": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py",
+    "sha256": "a494faa98f86eb6059cdba9050de0c8f401bc7229084a380e3d8dbfee44f345f"
+  },
+  "final_campaign_admitted": false,
+  "fit_command": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9 -S /mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py fit VERIFIED_REQUEST",
+  "fit_timeout_seconds": 600,
+  "formal_dp_claim": false,
+  "format": "dope-tabddpm-author-source-audit",
+  "gpu_vram_cap_bytes": 17179869184,
+  "independent_core_implementation": false,
+  "license_evidence": "https://github.com/yandex-research/tab-ddpm/blob/b476257dd460b778ba09eb97f7a51d6490fa17f8/LICENSE.md",
+  "license_sha256": "be701b4d15238cf3c2d730ead1b72868a99e397fe872da0e89e07ce50e68ca99",
+  "limitations": [
+    "Author-core contract probe, not two reported-experiment reproductions, native tuning or a matched common-outcome benchmark.",
+    "Regression only; classification/categorical and generic final-runner integration remain pending.",
+    "Learned quantiles/discrete state are charged; no claim that preprocessing is free of source observations.",
+    "Both artifacts exceed L3; copy, leakage, attacks, real-vs-real and production profile gates are not complete.",
+    "Native values are not ranked across methods; no tuned configuration or winning fit seed selected."
+  ],
+  "method": "TabDDPM",
+  "mfs_v2": null,
+  "native_objective": {
+    "direction": "maximize",
+    "implementation_sha256": "c3198ca6241a4e0185ffdbf393aca9f64b456a7b799c7acd84da9988f0d513f5",
+    "metric_seed": 0,
+    "name": "author_five_synthetic_seed_validation_catboost_r2_mean",
+    "native_values_cross_method_ranking": false,
+    "partition": "validation",
+    "sample_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "shared_kpi_used_for_selection": false,
+    "source": "https://github.com/yandex-research/tab-ddpm/blob/b476257dd460b778ba09eb97f7a51d6490fa17f8/scripts/tune_ddpm.py",
+    "source_sha256": "61d47532e0419f22e93465a78b5aba222558f2d720509324f94b68fbf24684ba",
+    "status": "locked",
+    "tie_break_origin": "study-prespecified protocol; not an author tie-break claim",
+    "tie_breaks": [
+      "artifact_bytes_ascending",
+      "config_sha256_ascending"
+    ],
+    "track": "common_numeric"
+  },
+  "native_tuning_complete": false,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publication_custody": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/receipt-source.lock.json",
+    "sha256": "6ecc1b3dcbec64baee27f0cc83ec1e24ed935cabbc74f95fa299d79e57b1478f",
+    "verified_file_count": 10774
+  },
+  "release_safe_l3": null,
+  "runtime": {
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/runtime.lock.json",
+    "sha256": "3741fa9f3001b15d75b284884d9ba146e353d1b31de2d76f15e689cbb337d3c8"
+  },
+  "runtime_python": "3.9.25",
+  "runtime_versions": {
+    "catboost": "1.0.3",
+    "category-encoders": "2.3.0",
+    "dython": "0.5.1",
+    "icecream": "2.1.2",
+    "imbalanced-learn": "0.7.0",
+    "libzero": "0.0.8",
+    "numpy": "1.21.4",
+    "optuna": "2.10.1",
+    "pandas": "1.3.4",
+    "pyarrow": "6.0.0",
+    "rdt": "0.6.4",
+    "rtdl": "0.0.9",
+    "scikit-learn": "1.0.2",
+    "scipy": "1.7.2",
+    "setuptools": "68.2.2",
+    "skorch": "0.11.0",
+    "tomli": "1.2.2",
+    "tomli-w": "0.4.0",
+    "torch": "1.10.1+cu111",
+    "tqdm": "4.62.3"
+  },
+  "sampling_command": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9 -S /mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py sample VERIFIED_REQUEST",
+  "source_archive": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabddpm-v1/source.tar.gz",
+  "source_archive_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
+  "source_license": "MIT",
+  "status": "pilot_locked",
+  "supported_task": "regression",
+  "track": "common_numeric",
+  "tuning_trials_per_method_dataset": 8,
+  "tuning_wall_time_hours_per_method_dataset": 12,
+  "two_reported_experiment_reproduction": false,
+  "upstream_commit": "b476257dd460b778ba09eb97f7a51d6490fa17f8",
+  "upstream_url": "https://github.com/yandex-research/tab-ddpm",
+  "version": 1,
+  "worker_startup": "isolated pinned Python with -S; frozen controller/entry/source/runtime checks before dependency imports"
+}
