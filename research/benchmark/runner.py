@@ -80,18 +80,24 @@ def reserve_scratch(root: Path, rows: int, columns: int) -> None:
 
 def check_numpy_runtime(entry: dict, final: bool = False) -> None:
     """Verify compact-method dependencies before any NumPy initializer runs."""
-    from importlib.metadata import distribution, version
-    if not final and entry["dependency_or_container_digest"] == f"numpy=={version('numpy')}":
+    from importlib.metadata import PackageNotFoundError, distribution, version
+    if type(final) is not bool:
+        raise ValueError("invalid final job flag")
+    try:
+        runtime_version = version("numpy")
+        installed = distribution("numpy")
+    except PackageNotFoundError:
+        raise ValueError("adapter dependency metadata unavailable") from None
+    if not final and entry["dependency_or_container_digest"] == f"numpy=={runtime_version}":
         return  # Historical validation receipts retain their version identity.
     path = Path(__file__).with_name("numpy-runtime.lock.json")
     if entry["dependency_or_container_digest"] != sha256(path):
         raise ValueError("adapter dependency digest changed")
     lock = json.loads(path.read_text())
     if (not isinstance(lock, dict) or lock.get("format") != "dope-numpy-runtime-lock"
-            or lock.get("versions") != {"numpy": version("numpy")}
+            or lock.get("versions") != {"numpy": runtime_version}
             or entry.get("dependency_versions") != lock["versions"]):
         raise ValueError("adapter dependency version changed")
-    installed = distribution("numpy")
     files = {}
     for name in ("numpy", "numpy.libs"):
         root = Path(installed.locate_file(name))
@@ -111,7 +117,10 @@ def check_numpy_runtime(entry: dict, final: bool = False) -> None:
 def native_evidence_path(value: str, scratch_root: Path) -> Path:
     """Reject table/evaluator paths, including symlinks, before reading bytes."""
     path = Path(value)
-    resolved = path.resolve()
+    try:
+        resolved = path.resolve()
+    except RuntimeError:
+        raise ValueError("native evidence path cannot be resolved") from None
     if (not resolved.is_relative_to(scratch_root.resolve())
             or "evaluator" in path.parts or "evaluator" in resolved.parts
             or path.suffix != ".json" or resolved.suffix != ".json"):
@@ -119,10 +128,21 @@ def native_evidence_path(value: str, scratch_root: Path) -> Path:
     return path
 
 
+def finite_number(value: object) -> bool:
+    if type(value) not in (int, float):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
+
+
 def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                           scratch_root: Path,
                           validation_sha256: str | None = None) -> tuple[dict, dict]:
     """Bind a final configuration to its validation selection and DP budget."""
+    if "final" in job and type(job["final"]) is not bool:
+        raise ValueError("invalid final job flag")
     choice = job.get("configuration")
     if choice is None:
         if job.get("final"):
@@ -180,7 +200,7 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
             if (not isinstance(trial_config, dict) or set(trial_config) != set(default)
                     or any(value != default[key] and value not in search.get(key, [])
                            for key, value in trial_config.items())
-                    or not isinstance(seconds, (int, float)) or not math.isfinite(seconds)
+                    or not finite_number(seconds)
                     or not 0 <= seconds <= 43200):
                 raise ValueError("invalid validation selection evidence")
             elapsed += seconds
@@ -226,7 +246,7 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
                     or metric.get("artifact_sha256") != trial.get("artifact_sha256")
                     or trial.get("artifact_sha256") != sha256(attempt_path.parent / "artifact/model.json")
                     or actual_inventory != inventory or charged != artifact_bytes
-                    or not isinstance(value, (int, float)) or not math.isfinite(value)
+                    or not finite_number(value)
                     or not isinstance(artifact_bytes, int) or artifact_bytes < 0):
                 raise ValueError("invalid native KPI receipt")
             successful.append((index, value, artifact_bytes, trial_config))
@@ -253,6 +273,8 @@ def resolve_configuration(job: dict, entry: dict, dataset: str, rows: int,
 
 
 def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
+    if "final" in job and type(job["final"]) is not bool:
+        raise ValueError("invalid final job flag")
     method = job["method"]
     entry = methods["methods"][method]
     if (entry["status"] not in ("locked", "pilot_locked")

@@ -114,7 +114,7 @@ def final_set_blockers(locks: dict) -> list[str]:
                                        **({"dp_epsilon": key[5]} if key[5] is not None else {})},
                                       methods[key[0]], key[1], dataset["train_rows"], SCRATCH_ROOT,
                                       dataset["projected_files"]["validation"])
-            except (KeyError, TypeError, ValueError, OSError):
+            except (KeyError, TypeError, ValueError, OSError, OverflowError):
                 selections_verified = False
     if not selections_verified:
         blockers.append("method-dataset-matrix.lock.json:native_selection_evidence_gap")

@@ -251,6 +251,16 @@ class AdmissionTests(unittest.TestCase):
                 self.write_locks(root, locks)
                 self.assertTrue(assess(ROOT, root)["admitted"])
 
+                loop = root / "loop.json"
+                loop.symlink_to(loop)
+                for cell in tuned:
+                    cell["configuration"].update(selection_path=str(loop), selection_sha256="0" * 64)
+                self.write_locks(root, locks)
+                self.assertIn("method-dataset-matrix.lock.json:native_selection_evidence_gap",
+                              assess(ROOT, root)["blockers"])
+                for cell in tuned:
+                    cell["configuration"].update(selection_path=str(selection), selection_sha256=sha256(selection))
+
                 # Rebind hashes so each malformed JSON object reaches its
                 # shape check instead of merely failing an earlier checksum.
                 pristine = {p: p.read_bytes() for p in (selection, attempt, metric)}
@@ -272,6 +282,29 @@ class AdmissionTests(unittest.TestCase):
                                   assess(ROOT, root)["blockers"])
                     for p, content in pristine.items():
                         p.write_bytes(content)
+                for cell in tuned:
+                    cell["configuration"]["selection_sha256"] = sha256(selection)
+                self.write_locks(root, locks)
+                payload = json.loads(selection.read_text())
+                for field in ("wall_seconds", "native_kpi"):
+                    payload["trials"][0][field] = 10**400
+                    if field == "native_kpi":
+                        measured = json.loads(pristine[metric])
+                        measured["value"] = 10**400
+                        metric.write_text(json.dumps(measured))
+                        payload["trials"][0]["metric_receipt_sha256"] = sha256(metric)
+                        attempt.write_text(json.dumps({k: v for k, v in payload["trials"][0].items()
+                            if k not in ("attempt_receipt_path", "attempt_receipt_sha256")}))
+                        payload["trials"][0]["attempt_receipt_sha256"] = sha256(attempt)
+                    selection.write_text(json.dumps(payload))
+                    for cell in tuned:
+                        cell["configuration"]["selection_sha256"] = sha256(selection)
+                    self.write_locks(root, locks)
+                    self.assertFalse(assess(ROOT, root)["admitted"])
+                    for p, content in pristine.items():
+                        p.write_bytes(content)
+                    payload = json.loads(pristine[selection])
+                selection.write_bytes(pristine[selection])
                 for cell in tuned:
                     cell["configuration"]["selection_sha256"] = sha256(selection)
                 self.write_locks(root, locks)
@@ -311,6 +344,9 @@ class AdmissionTests(unittest.TestCase):
                                  "dependency_or_container_digest": method["dependency_or_container_digest"]})
                 self.write_locks(root, locks)
                 self.assertTrue(assess(ROOT, root)["admitted"])
+                from importlib import metadata
+                with patch.object(metadata, "version", side_effect=metadata.PackageNotFoundError("numpy")):
+                    self.assertIn("methods.lock.json:compact_runtime_evidence_gap", assess(ROOT, root)["blockers"])
                 # Final execution passes the same dependency proof and reaches
                 # the deliberately absent worker manifest without fitting.
                 with patch.object(runner, "call_adapter", side_effect=AssertionError("fit forbidden")):
