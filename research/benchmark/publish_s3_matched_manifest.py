@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .publish_s3_matched import NAME, require, schema, summarize
+from .publish_s3_matched import NAME, build as build_report, require, schema, summarize
 from .score import sha256
 
 HERE = Path(__file__).parent
@@ -18,6 +18,7 @@ def build():
             'research claim or test seal changed')
     require(summarize(report['cells'], report['dataset_ids']) == report['summary'],
             'committed matrix reconciliation changed')
+    require(build_report() == report, 'publication differs from frozen measured evidence')
     for reference in report['immutable_references']:
         require(sha256(Path(reference['path'])) == reference['sha256'],
                 'immutable publication reference changed')

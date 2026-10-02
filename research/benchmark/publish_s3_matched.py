@@ -20,6 +20,8 @@ SDV = BASE / 's3-native-matched-validation-v1'
 NATIVE = BASE / 'neural-native-v1'
 HERE = Path(__file__).parent
 NAME = 's3-matched-discovery-validation'
+RECEIPT_LOCK = BASE / 's3-matched-publication-custody-v1/receipt-lock.json'
+RECEIPT_LOCK_SHA256 = '9b9113d026d8bb37a25f3f583b1f373b5911e261f6026006fcf010382ec4a00a'
 PINS = {
     'dope_fit': '82ce9806e166e7d0c5dcd7c0bd976c1d60691fca609e9cc0999b571d7cdd9316',
     'dope_validation': '1fa7ad41a2d6058cd080b882fdb74656dc7be40bb1badf3b6dcc1b36d785875d',
@@ -71,9 +73,11 @@ def sealed(row):
             'validation seal or claim changed')
 
 
-def verify_cell(root, job, lock_sha):
+def verify_cell(root, job, lock_sha, receipt_hashes):
     path = root / 'cells' / digest(job) / 'receipt.json'
     require(path.exists(), 'frozen matched validation matrix incomplete')
+    require(str(path) in receipt_hashes and sha256(safe(path)) == receipt_hashes[str(path)],
+            'frozen validation receipt changed')
     receipt = read(safe(path))
     require(receipt['job'] == job and receipt['round_sha256'] == lock_sha,
             'validation job identity changed')
@@ -91,6 +95,81 @@ def verify_cell(root, job, lock_sha):
         require(metrics['mfs_v2'] is None and metrics['gate_profile_complete'] is False
                 and metrics['rows']['synthetic'] == job['rows'], 'metric scope changed')
     return path, receipt, metrics
+
+
+def verify_frozen_sources(locks, refs):
+    """Hash frozen executable/input closures before consuming measured results."""
+    checked = {}
+
+    def check(path, expected, runtime=False, table=False, dependency=False, publish=True):
+        path = Path(path)
+        if table:
+            safe(path.parent)
+            require(path.name in ('train.csv', 'validation.csv') and not path.is_symlink(),
+                    'worker table outside validation scope')
+        elif dependency:
+            # Frozen library distributions include demo resources. Hash their
+            # bytes without parsing them; these are outside study partitions.
+            safe(path.parent)
+            require(path.resolve(strict=True).is_relative_to(NATIVE / 'deps')
+                    and not path.is_symlink(), 'dependency path outside frozen distribution')
+        elif runtime:
+            # The original frozen Torch runtime has this versioned cuDNN alias.
+            # Permit that same target only; its content digest remains locked.
+            cudnn_alias = (path.name == 'libcudnn.so'
+                           and path.resolve(strict=True) == path.with_name('libcudnn.so.9'))
+            require(path.suffix != '.csv' and 'evaluator' not in path.parts
+                    and 'evaluator' not in path.resolve(strict=True).parts
+                    and (not path.is_symlink() or cudnn_alias), 'runtime evidence outside source scope')
+        else:
+            safe(path)
+        if path in checked:
+            require(checked[path] == expected, 'frozen source identities disagree')
+        else:
+            require(sha256(path) == expected, 'frozen source or input changed')
+            checked[path] = expected
+        if publish:
+            require(str(path) not in refs or refs[str(path)] == expected,
+                    'publication reference identity changed')
+            refs[str(path)] = expected
+
+    fit, validation, native, samples = (locks[k] for k in (
+        'dope_fit', 'dope_validation', 'native_fit', 'native_validation'))
+    for root, lock in ((DOPE, fit), (DOPE / 'validation-v1', validation), (SDV, samples)):
+        for name, expected in lock['source_files'].items():
+            check(root / 'source' / name, expected)
+    package = BASE / 'pilot-24h/dope-target-refinement-v1/package'
+    manifest = package / 'package-manifest.json'
+    require(fit['package_manifest_sha256'] == validation['package_manifest_sha256']
+            == samples['metric_package_manifest_sha256'], 'metric package identities disagree')
+    check(manifest, fit['package_manifest_sha256'])
+    for name, expected in read(manifest)['files'].items():
+        check(package / name, expected)
+    check(package / 'research/benchmark/pilot_metrics.py', validation['metric_source_sha256'])
+    check(Path(fit['gpu_binary_path']), fit['gpu_binary_sha256'])
+    for name, expected in native['source_files'].items():
+        require(samples['native_source_files'][name] == expected, 'native source identities disagree')
+        check(NATIVE / 'package/research/benchmark' / name, expected)
+    for root, files in ((Path(validation['metric_dependency_root']), validation['metric_dependency_files']),
+                        (NATIVE / 'deps', native['dependency_files']),
+                        (NATIVE / 'deps', samples['dependency_files'])):
+        for name, expected in files.items():
+            check(root / name, expected, dependency=True, publish=False)
+    runtimes = list(fit['host_runtime_locks'].values()) + [{
+        'path': str(BASE / 's3-native-matched-runtime-v1/xbabe2/runtime.lock.json'),
+        'sha256': samples['runtime_sha256']}]
+    for runtime in runtimes:
+        check(runtime['path'], runtime['sha256'])
+        for package in read(runtime['path'])['packages'].values():
+            for name, expected in package['files'].items():
+                check(Path(package['root']) / name, expected, runtime=True, publish=False)
+    workers = list(fit['workers'].values()) + [job['worker'] for job in samples['jobs']]
+    for worker in workers:
+        root = Path(worker['path'])
+        require(not (root / 'test.csv').exists(), 'worker contains official test partition')
+        for name, expected in worker['files'].items():
+            check(root / name, expected, table=name.endswith('.csv'))
+    return len(checked)
 
 
 def artifact_inventory(path):
@@ -192,6 +271,13 @@ def build():
     for name, path in paths.items():
         require(sha256(safe(path)) == PINS[name], 'frozen input round changed')
     locks = {name: read(path) for name, path in paths.items()}
+    require(sha256(safe(RECEIPT_LOCK)) == RECEIPT_LOCK_SHA256, 'publication receipt lock changed')
+    receipt_lock = read(RECEIPT_LOCK)
+    receipt_hashes = receipt_lock['reference_hashes']
+    require(receipt_lock['physical_receipts'] == 270 and receipt_lock['logical_cells'] == 288,
+            'publication receipt coverage changed')
+    for path, expected in receipt_hashes.items():
+        require(sha256(safe(path)) == expected, 'frozen publication reference changed')
     dlock, slock, fitlock, native = (locks[n] for n in (
         'dope_validation', 'native_validation', 'dope_fit', 'native_fit'))
     require(dlock['fit_round_sha256'] == slock['s3_dope_fit_round_sha256'] == PINS['dope_fit']
@@ -199,7 +285,9 @@ def build():
             and dlock['metric_source_sha256'] == slock['metric_source_sha256'], 'comparison lineage differs')
     require(len(dlock['jobs']) == len(slock['logical_cells']) == 144 and len(slock['jobs']) == 126,
             'frozen matrix size changed')
-    refs = {str(p): sha256(p) for p in paths.values()}
+    refs = receipt_hashes | {str(p): sha256(p) for p in paths.values()}
+    refs[str(RECEIPT_LOCK)] = RECEIPT_LOCK_SHA256
+    source_closure_file_count = verify_frozen_sources(locks, refs)
     physical, fits, cells, operations, child_fits = {}, {}, [], [], {}
     continuation = DOPE / 'validation-capacity-repair-v3/execution.lock.json'
     continuation_pin = 'da9f6f5baee2cf334484e22d4e2f9a0550dbefb2aa275d2368e61682ddfc9306'
@@ -218,7 +306,7 @@ def build():
     refs[meter['path']] = meter['sha256']
     refs[str(meter_source)] = meter_lock['source_sha256']
     for job in dlock['jobs']:
-        path, receipt, metrics = verify_cell(DOPE / 'validation-v1', job, PINS['dope_validation'])
+        path, receipt, metrics = verify_cell(DOPE / 'validation-v1', job, PINS['dope_validation'], receipt_hashes)
         refs[str(path)] = sha256(path)
         if 'validation_execution_sha256' in receipt:
             require(receipt['validation_execution_sha256'] == continuation_pin, 'validation execution differs')
@@ -251,7 +339,7 @@ def build():
         operations.extend(receipt.get('operations', []))
     native_fits = {}
     for job in slock['jobs']:
-        path, receipt, metrics = verify_cell(SDV, job, PINS['native_validation'])
+        path, receipt, metrics = verify_cell(SDV, job, PINS['native_validation'], receipt_hashes)
         refs[str(path)] = sha256(path)
         require(digest(job) not in physical, 'physical sample identity duplicated')
         physical[digest(job)] = (job, receipt, metrics, path)
@@ -365,6 +453,9 @@ def build():
                              'projection-only utility cost', 'product and informative-lineage coverage',
                              'public-core full frozen final matrix'],
         'source_locks': PINS | {'metric_implementation_sha256': dlock['metric_source_sha256']},
+        'publication_integrity': {'receipt_lock_sha256': RECEIPT_LOCK_SHA256,
+                                  'receipt_anchor_commit': receipt_lock['anchor_publication_commit'],
+                                  'source_closure_verified_files': source_closure_file_count},
         'cost': cost, 'cells': cells, 'summary': summaries,
         'immutable_references': [{'path': p, 'sha256': h} for p, h in sorted(refs.items())],
         'citation_keys': ['xu2019modeling'],

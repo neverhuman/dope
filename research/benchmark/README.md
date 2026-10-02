@@ -270,7 +270,10 @@ python3 -m unittest research.benchmark.tests.test_s3_matched_panel -v
 
 Regeneration requires the immutable local scratch receipts. The publisher
 verifies the complete matrix, native winners, sample/metric replays, charged
-bytes and source/partition bindings before writing outputs. The manifest binds
+bytes and the full frozen source/runtime/binary/partition closures before
+writing outputs. A separately pinned receipt lock preserves the original
+published hashes; replacement receipts cannot acquire new accepted hashes.
+The manifest repeats the full evidence reconciliation before binding
 all tables, SVG/PDF figures, schemas and receipts. A separately locked capacity
 continuation retains the original pilot deadline and metric/sample sources.
 

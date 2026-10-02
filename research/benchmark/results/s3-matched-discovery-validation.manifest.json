@@ -5,8 +5,8 @@
       "sha256": "5d8bd2c7ee1b45ee8f6ff59c18157a2b8145314e10e70a9ab1ca97dffc9c7234"
     },
     "s3-matched-discovery-validation.json": {
-      "bytes": 821583,
-      "sha256": "d763d181fa8445260a3f39ebdf4f58761658cd5d8e95a19d4fdbe14262d4867b"
+      "bytes": 852097,
+      "sha256": "2cf13e7284bf1b8adb2992b9e40204266c969478bb716501f4f181243f1a2a36"
     },
     "s3-matched-discovery-validation.md": {
       "bytes": 13551,
@@ -17,8 +17,8 @@
       "sha256": "4e9c9e683712de385ea5bdf4caf7b3713263746ed2631415c8578ae62781ca80"
     },
     "s3-matched-discovery-validation.schema.json": {
-      "bytes": 77061,
-      "sha256": "3e4c1c4a952f9410f6e39922ebea0c97034a26a1d99f1d89102738f3f3de097f"
+      "bytes": 77616,
+      "sha256": "6b5fbda336a441e665e15f37d0d63e19b667c74c7049dcde0643bfb2ca38a3d8"
     },
     "s3-matched-discovery-validation.svg": {
       "bytes": 136669,
@@ -228,6 +228,18 @@
     {
       "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/round.lock.json",
       "sha256": "82ce9806e166e7d0c5dcd7c0bd976c1d60691fca609e9cc0999b571d7cdd9316"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/source/inventory_hosts.py",
+      "sha256": "9ba73a128a997bf17fe7704a8f4229d04e00a1b2e0b45ade2bda900bac4388af"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/source/resource_admission.py",
+      "sha256": "89ffca79be9c2c92ef5735ea9860f26d5ad86245be747123d7ae6a10179de6b9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/source/round.py",
+      "sha256": "b9c2f72e4d65d2c46e1486056d4025465687a61965a20ceb16a16aa8510f49dd"
     },
     {
       "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-capacity-repair-v3/execution.lock.json",
@@ -826,6 +838,18 @@
       "sha256": "1fa7ad41a2d6058cd080b882fdb74656dc7be40bb1badf3b6dcc1b36d785875d"
     },
     {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/source/evaluate.py",
+      "sha256": "848294ffc8b453f7d4c3fae31029393c4b0dddd61f606fc56cbea29a7afdc0fc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/source/inventory_hosts.py",
+      "sha256": "9ba73a128a997bf17fe7704a8f4229d04e00a1b2e0b45ade2bda900bac4388af"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/source/resource_admission.py",
+      "sha256": "89ffca79be9c2c92ef5735ea9860f26d5ad86245be747123d7ae6a10179de6b9"
+    },
+    {
       "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/00449c5c2c378891db9d4399781cfe46797121300c2812e65e7fe156d36b8d60/attempt-0001/receipt.json",
       "sha256": "e25071f93cb4c7f79c5726425c55bf9b579ce37e889919b02c684c0a5e4ef272"
     },
@@ -1018,6 +1042,42 @@
       "sha256": "67bab6fd08b4590912f6a346fb74741b2e918b2764d4274d6d1b37de1ff2bb0c"
     },
     {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/contract.json",
+      "sha256": "ccccf3deaa8f219ea6ce14d44296c5996579a55af98a5afddf0099d513f0f894"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/fetch_jope.py",
+      "sha256": "3264d390fb2e39450551165a3c30833cb093056a8478a0501c7b4082125d8fbf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/freeze_sdv_round.py",
+      "sha256": "f00942e3f6252a2295ae8e7cf172282f1f527e77dfc120780a3ae448f5ee89b4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/gpu_probe.py",
+      "sha256": "3a9a7762ce3ac7d68873fa8c3ec5c6ffc4d036b19a5507cd73f3573aa9e8d667"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/inventory_hosts.py",
+      "sha256": "73565ea6e5c510b67ac1133fd0bea74834a36132675c2c7a3f55146d5018d910"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/manifest.py",
+      "sha256": "77be48e26ce880e391c2c771161bbd5ffeb713963bcf1af53592c003dc1ce7c9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/score.py",
+      "sha256": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/sdv_adapter.py",
+      "sha256": "c6f4240ae5b9795672693e2d6d3908053e105885b7d34d659027772183fa541b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/package/research/benchmark/sdv_round.py",
+      "sha256": "290fd6bb86f9d8fa8f1ba3c45c1710fad08d33103707986eeac64a9f84060b79"
+    },
+    {
       "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/round.lock.json",
       "sha256": "5634d235eb8305436ca046867d96d09f562fabbd360892c580a7da3b9b811988"
     },
@@ -1068,6 +1128,386 @@
     {
       "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/a863cd42be4d05d4-TVAE.json",
       "sha256": "2fb89fec23b9d95400300cd2f7f5d5a0b140eec078489173a9354e3eaa941888"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-preflight-v1/bin/dope-kernel",
+      "sha256": "5d5ef250dbcf2296ad9f0b897b17c8c579258ff943dd161f58102cd3f5bb5a3f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/package-manifest.json",
+      "sha256": "7461fbdd852498e494dd4139ec3cecc5e9a4709545300f5aba39eaead37b7458"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/adapter_worker.py",
+      "sha256": "9329241ba716bdbe5de73eb63e50211dbde19f1979a3e4f101d50691bb85351a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/adapters.py",
+      "sha256": "2caa42b683277e93fffcb7483611c714e474f81338cf87246800bc5d854ffb8e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/admission.py",
+      "sha256": "351a2bea79d5518748ec84b87da052c53759b87e6b527bcc08a87ec83c5b1b39"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/aim-runtime.lock.json",
+      "sha256": "2f421e3ed1806a346aa08fc705710519fcf02422ddc055d6c2272fed0e7e327f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/aim_adapter.py",
+      "sha256": "b760827f7c4c871f1e2241f31219fcc769cdc42e52efd2a6b1e1d607d8eb50c1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/aim_probe.py",
+      "sha256": "fbdaf487948beb5f219166f16b11194a29bc0c6e7155191c2105eb1c67f3750c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/analysis.py",
+      "sha256": "2fc5dcab05c8b4b12eb67aa5c034884bec88d8c065890382f41f49b710f3c30c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/arf_combined_select.py",
+      "sha256": "113a805555276adf786a6af0cbaa001cddb9cbde9b066043edaaf8ab57414297"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/arf_native.py",
+      "sha256": "2e5f6373ca3b36019d82038712f16dce976d9f783f7dbc5444aec96b6c5e2f18"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/arf_round.py",
+      "sha256": "ca39ab58e922787f7248e6426f5eb0f111aa6823f468d6f6ebcf9c5a5dfef2f9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/arf_select.py",
+      "sha256": "64189bf98ada9f7b40cabbdf91771fde1ac6e7a07ada3ff498734cee371b3479"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/arf_short_source.py",
+      "sha256": "33841c6f7fc124055b43f17af7b15b1d699ab04f12bda701930e6205683b11b3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/audit_synthpop_cart.py",
+      "sha256": "8b33b0bc86ae0476a74c1ef644bced7cf8a3cbb88d061627d7bce03238ad43fd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/california_source.py",
+      "sha256": "03ad2dc327686fb6fceee1fcbd88476af824a06d9ce6158148037036f48f796a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/conditional_gpu_round.py",
+      "sha256": "64819755df1d7504ef634d40ddc948df6eb0153cc482571a9f48dacbe600b989"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/contract.json",
+      "sha256": "ccccf3deaa8f219ea6ce14d44296c5996579a55af98a5afddf0099d513f0f894"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/dispatch_gpu_round.py",
+      "sha256": "8d09ceb376a15a146a31216b4485e660e8253bdb455de62a396c794a626b67c6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/fetch_jope.py",
+      "sha256": "bd18295d6a38966899ea43f75d563f61a1f4cf00094ba0bf374921c1aae790ad"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/freeze_all_copula.py",
+      "sha256": "d731274fe49350b94fcd30a9e7253e37af1186be3ecc5b139e3cec81397afa86"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/freeze_all_native.py",
+      "sha256": "773e8405850eb40d53f068394f0dbc0b3a08e71e4f9ea3ab83bd493b1a7473f3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/freeze_native_round.py",
+      "sha256": "afe0951257b544f9fa813a1f70f85020d248a711302eede525af64e31b107ecb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/freeze_pilot_sdv.py",
+      "sha256": "5b36a4a3d95823240d3043c67aa46f21c48477f3de81f7c52f2105b0b8516238"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/freeze_sdv_round.py",
+      "sha256": "f00942e3f6252a2295ae8e7cf172282f1f527e77dfc120780a3ae448f5ee89b4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/full_queue.py",
+      "sha256": "7a9895eb3ef55cde1d5b890b252fbb59919386c449da8b29a813a87a052ab1a4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/gpu_probe.py",
+      "sha256": "e4928114294ff5fcfc761229772951b0a4aa72cce7752103849f0da1d33e72cd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/inventory_hosts.py",
+      "sha256": "9ba73a128a997bf17fe7704a8f4229d04e00a1b2e0b45ade2bda900bac4388af"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/manifest.py",
+      "sha256": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/methods.lock.json",
+      "sha256": "658c61522d9a5a710e1005600a6d81229654d6025610802337fd0e8c4fa1c2d2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/native_objective.py",
+      "sha256": "fb17475eaea1e330f0521c25d8db3148bce050aeac44ccbd6e32f000747ece8a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot-24h-datasets.lock.json",
+      "sha256": "02e41ec2aeb2c8b91346984881b7d6a0b8d744e1ad618f7905a54f4427ff120c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot-datasets.lock.json",
+      "sha256": "9c9b9fd6a7a26f1ed66369c9ca6e56b19037513de2ac556a4ae3df7f78f9b537"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot24_copula_metric_replay.py",
+      "sha256": "613c567064c9d81f583b5e4a687d6e69f24c3d0e3e89307c2f8b5101262c5503"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot24_copula_validate_v2.py",
+      "sha256": "71993d04f86aeae3c184670f6d0460db7c6b37df038b50c6b6a60ea6a175dec6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot24_interim.py",
+      "sha256": "9a7fd8d6b5570d96cb1d060094b00e7955a270add9b9359309f79dedebe0cebe"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot24_neural_comparison.py",
+      "sha256": "87857be7ea8df7f086b4d7fa0b8b6faff45e86546b3468c10a74ae3269eff716"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot_compact_supplement.py",
+      "sha256": "5d76392439bb34285b5d608400115f26f22e561463dd775bfe0475e223a7e39e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot_evaluate.py",
+      "sha256": "c7a024c392f0d5f48ec368a270002f944664570ed8f8b882cc275012ef6565d6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot_metrics.py",
+      "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot_queue.py",
+      "sha256": "9de72abcef92177db5dbca35eeda61b3d09c611510bb550fd8dd996c63924d09"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/pilot_report.py",
+      "sha256": "28466ab212e29d9c651f51e67e5816af5305777e1a863e1476eb165a0c2a7a3c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/prepare_s3.py",
+      "sha256": "55918a7d430b68f8cf2b7f5e4271fc534d1d51464ac0fe935308bae4b78bcb26"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/public_sources.py",
+      "sha256": "8ab5289941461fb3c447487c919220af6abba025a216192c8dc0d4e6e990d19e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_arf_combined.py",
+      "sha256": "56989587f89bf8ae31aac23264b309f1afd2b408330db64aba1afa8e5be7779e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_arf_matched.py",
+      "sha256": "2e9206056df96cd1607029f3c248e5e2d16a6d2ea8e1c69b577fa9ee356be137"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_arf_sample_matrix.py",
+      "sha256": "54eabe5bde927e1b276ce9dfdc25a253bc6be6d78c6ca05cfd82265b96e4acd4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_arf_short.py",
+      "sha256": "64d4596fc12422dd7db98431cb71852135e0d46920a48c1c91ff6a3c484e721e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_california_q10.py",
+      "sha256": "72be7783a9126210c67631d91c64aa73c46713fd1a6900fdcc31d7062c2711a5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_compact_matched.py",
+      "sha256": "aa559c9a5cfe62925d520b2b2c6ce230df78b9ccf60cfc5990b643fbe3214466"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_compact_native.py",
+      "sha256": "01d975bfacf7b65eacaa6848e9176c03ab442718cc78dcb26182ed9b453fa2a2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_conditional_validation.py",
+      "sha256": "8ab412f38d8d5ed0b5916c2b36ec768e7391065050e984004f84ff599986a871"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_copula.py",
+      "sha256": "13d269bc5f4d7d07c4b34ca49bec618dbb2bf13dc4fa29b9814b22c191e78a6d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_copula_pilot.py",
+      "sha256": "3d0b29a2ef233171b240c3ba84369c1f3b27ddd90c9e0b16c1f5b9204af0a201"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_dope_q8_fivefit.py",
+      "sha256": "8734e70b71749c62c2d5d71d2ede5e5b760ace18a085867e7017c9b0b5901501"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_dope_q8_fivefit_figure.py",
+      "sha256": "35a8e9d5e92bc1c115a122fa62de62e5fced4f6b16f9e6328a6cae4916430897"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_native_figure.py",
+      "sha256": "96582ef96c5895e58d8b43bc1433823987a8854d81b53bd0dc1c6c92e945a8f7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_native_neural_fivefit.py",
+      "sha256": "a05be2f39bb62603313072636508f98918e0c1e3829e8bbbd8f81ced15f315b5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_native_neural_fivefit_figure.py",
+      "sha256": "aa74e18c6c1e3ab27ad60ae63029a9f88d4589f364d41fc2784fffd2da15f979"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_news_autoreg_identity.py",
+      "sha256": "a4c417e8f7061d7c079e71d4e99d634209daa0c33c75b32430efc5f4c463a910"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_news_q10_fivefit.py",
+      "sha256": "6ebf383c6e482e07213482e7a1dd698eda1553b6106c5c11956cf4e3edd625ac"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_news_q10_fivefit_figure.py",
+      "sha256": "89324c839894e340f6d39719d73dc784f31c72c4ab5402ef8e2faf93e1232d7f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_news_q10_packed.py",
+      "sha256": "fc9ee3619797634da9095334589f7b5b870e3f63fe55cff9d4f0bc061d397876"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_result_manifest.py",
+      "sha256": "2dbb70722fbac8b2bee036c666544472d895a4562a51c9e45efce7678580ed6e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_s3_data.py",
+      "sha256": "40df8b94437edafde6b8a1cffaf16c998e20afde21fc8b8766436199dcdc4408"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_sdv_validation.py",
+      "sha256": "3a2bc6eaf358b5a7aa223d7afd89f9124773ce91b14faa7843a3a5dbaabf9310"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_synthpop_matched.py",
+      "sha256": "59daae6ba5d922f720198d195592a8b70371e263a577960ec85de3ffb2a9f33b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_synthpop_sample_matrix.py",
+      "sha256": "3a213988fb73fc0d857195be60ea098e8d5fd61d436f92f2ce788178f9b4c899"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_tabpc_native.py",
+      "sha256": "12f6391c5c5d314a886e4ae6a1249d4c28e2add686b290af0d45b743988d389b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_tabpc_native_figure.py",
+      "sha256": "8a372b36be9aad6dfe4f305266d3a649978da3e65583aad54aed6029d7b4de04"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/publish_validation_research.py",
+      "sha256": "f3a219349048e2d0b366bb1cc06f3a4bd7bfac59d8ca6f7e636f8149c522db01"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/real_test_utility.py",
+      "sha256": "1ce6e8b9c506230373ae1219326ad8e8f6a8a0d8b7a35e5b797548baf0a8c4b8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/refine_news_q10_projection.py",
+      "sha256": "22e2a8b2bb0ff3af9d0f998b0d10a6665fd75a75c26d1a9de35a6f22766a5620"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/refine_news_q10_projection_v2.py",
+      "sha256": "f71fab46919a69a326fda95e412cec9e9934c59a05f96c22198fe2a5abfb0d74"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/refine_projection.py",
+      "sha256": "61a7beadc3d931e9259e608f51f1c85a578811e7f0355837f9823cdd4e57a7c0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/reproduce_sdv.py",
+      "sha256": "3083bd7527947005279274b29f7875801fd5293e5fb0c2ca08aad4bb642a87f7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/runner.py",
+      "sha256": "f22353d8695bb448dca505b1d29044b10b3f3dc4ca6499e8781a48439d7c8f5f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/score.py",
+      "sha256": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/sdv-runtime.lock.json",
+      "sha256": "10f25f7f2d0f477867486d483e8efdda1bf49f058666c00db0c5ec5b8512087f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/sdv_adapter.py",
+      "sha256": "c6f4240ae5b9795672693e2d6d3908053e105885b7d34d659027772183fa541b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/sdv_round.py",
+      "sha256": "b9ed524845577bbe64a347d984c42432ea64b3d9f890c9ed906dd2f6bd6b31f6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/select_extension.py",
+      "sha256": "43bc8e423b3d3abd0dd86b2354ff70b6ef2d651bada64f4b2bb7039e7524b408"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/select_gpu_cohort.py",
+      "sha256": "edc32ba5f1bcdbf9512b8fbf017d0c441c43923e1e9441e946800d0b0a099ab5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/study-design.json",
+      "sha256": "5560a2d4e0c05c9a32f57815956ee2499be5145785441d85d5579a39439f8c04"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/synthpop-cart-source.lock.json",
+      "sha256": "25be1a102d56d0041b35104534e7d4ce52738819e92c8b4ebf1fedbabbcf87f6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/tabpc-source.lock.json",
+      "sha256": "9d979a9d5726d2f28495bf74b78f2c9ffa1b357e1d94d3ced72daaaefb221399"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/tabpc-source.lock.schema.json",
+      "sha256": "4c80bb67f02abc213d1530c4b00e80dd07a74629370d417fe74855d7ccc338f2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/tabpc_adapter.py",
+      "sha256": "6be5632771c9ab3527afd7b14e3b985b5007ea44d967ffeaab4a37e88870adbf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/tabpc_probe.py",
+      "sha256": "e633e0f107b143c680dc1b43b89dc0686ca384401ba31fbdb407f161fb7723ae"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/tune_copula.py",
+      "sha256": "1561979fb29848e24d4046d39a8258aaa2c44be986087b3c581c0ce8d1fd3976"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-refinement-v1/package/research/benchmark/tune_density.py",
+      "sha256": "1378099b447bc947b20f965ec80eb23a91ea5944aae6d8caee65e9658f1c8ed7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/xbabe1/runtime.lock.json",
+      "sha256": "e2d18b8017301d69f8c0e07aad8e2f2ed9721e0f55db78f57793c55a68796fea"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/xbabe3/runtime.lock.json",
+      "sha256": "b422a7bdf291d394b8277b73ebac90d96b3e180dfc3b423d71ae60098f46f8db"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-matched-publication-custody-v1/receipt-lock.json",
+      "sha256": "9b9113d026d8bb37a25f3f583b1f373b5911e261f6026006fcf010382ec4a00a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-runtime-v1/xbabe2/runtime.lock.json",
+      "sha256": "4baa0efce0716b165cfe3a1be35cc92c34691109ac835ead07ade36e1d16a7ef"
     },
     {
       "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/01988772e74d3073adb849b89e634566f7ead446884d2251536e5b11712c8533/receipt.json",
@@ -1578,6 +2018,114 @@
       "sha256": "c58a271c0d0555892596ab469005f2c625f325fa8edb9dabd3805509d1e5f298"
     },
     {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/source/evaluate.py",
+      "sha256": "b007c18d4708e60d8a4c6337cd9e071903ff8f187e188a3241a8c58941da97f9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/source/inventory_hosts.py",
+      "sha256": "9ba73a128a997bf17fe7704a8f4229d04e00a1b2e0b45ade2bda900bac4388af"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/source/resource_admission.py",
+      "sha256": "89ffca79be9c2c92ef5735ea9860f26d5ad86245be747123d7ae6a10179de6b9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0d482c1dd7cc6592/projection.json",
+      "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0d482c1dd7cc6592/train.csv",
+      "sha256": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0d482c1dd7cc6592/validation.csv",
+      "sha256": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0d482c1dd7cc6592/worker-manifest.json",
+      "sha256": "8c6e8ef3b3664ff5019c0d12e5218444eace893651e48737bc539c067dabef6c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0f86a714ec5f3ac6/projection.json",
+      "sha256": "f8231d30fd1a0632349f674862ac97d96793f72fd3e508d04f636df86e27a59c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0f86a714ec5f3ac6/train.csv",
+      "sha256": "4eb161c1097099a8fde2fa209031644b3d4b4bd691c2756127abb733f7e2e930"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0f86a714ec5f3ac6/validation.csv",
+      "sha256": "9e9ad37455322a79d3dc9d1bfa250927d52993f09b2c6d1667a5057b17861b57"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/0f86a714ec5f3ac6/worker-manifest.json",
+      "sha256": "04a3b7b16c0e1b0cbd7ed22681988e7f2082c8a83a73afc0b23f326d98f12c71"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/1a4456d1cc71a26a/projection.json",
+      "sha256": "fa760297ac4a85363b71499317f61cdad82bf73a38b7eb9731075cdab0e424f7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/1a4456d1cc71a26a/train.csv",
+      "sha256": "da12dce6a7daa3949c2dd5c4c17a0857553697c8b5cf35fed8e08596a3646afd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/1a4456d1cc71a26a/validation.csv",
+      "sha256": "756ca4fd1de0c57093ec647b68b897118e98c567ff0aaf3c0ebe5dc822aa9c65"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/1a4456d1cc71a26a/worker-manifest.json",
+      "sha256": "bd886520151ec5efe3ff39b9d7e5e7636704d8f89efc34d88b8c37995b605975"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/297b7688a045c583/projection.json",
+      "sha256": "1e0ec7dfa403ee53af6cd2090a9c5e2238af47a88d5d5a743cc90738860a6e6f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/297b7688a045c583/train.csv",
+      "sha256": "1a357cd0d1cf129bf2430ffee5aedcb4f97adbbc9e618c3a09ba74d37806a53b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/297b7688a045c583/validation.csv",
+      "sha256": "9ccc2d0785b0f8436eaab286a06832ee2cdf2c50d36ea4236e6f407f90edf565"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/297b7688a045c583/worker-manifest.json",
+      "sha256": "9c1221546d009dd6237009e772e9c77c496d77735d9b6f536ad68031d8b99fae"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/471f11cc2d38853a/projection.json",
+      "sha256": "18e9ae46bc5d6d0c9c14c910b31db3c6e1a963e855afd52c0be4d2a74b6c6d44"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/471f11cc2d38853a/train.csv",
+      "sha256": "8e5b45a9845c247c67f2ca190b47a02ae554cc83512b0edfb2f9fa322c8deab6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/471f11cc2d38853a/validation.csv",
+      "sha256": "f5b13fdf9c87b61c8883d15c39858bc93a44f5b8f25bb2cfceb5a9610879abc1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/471f11cc2d38853a/worker-manifest.json",
+      "sha256": "eca98cd07ce4053c3a3ab7a26a15f1d050ff40516b89833eb7ebcb572cf838f9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/a863cd42be4d05d4/projection.json",
+      "sha256": "7d1de67d72ca2193b2de96b4ee3a84db12a546defc52be4ec14c1a5a586b259d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/a863cd42be4d05d4/train.csv",
+      "sha256": "defc068c66613396d6a12b94070f5d1345e9d1062a77a98d2a5dd4423b2c240a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/a863cd42be4d05d4/validation.csv",
+      "sha256": "da7de3a943b039a039a48a7cca5d5f37f170f0f7af0cbc552c8fdf131fed3c8d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/a863cd42be4d05d4/worker-manifest.json",
+      "sha256": "245fdee1fefa51badf0f2cf7334a8eaeb60fde2ce0a94835d2da23e1f436bcb7"
+    },
+    {
       "path": "/mnt/fast-scratch/dope-benchmark/scratch-meter-v1/lock.json",
       "sha256": "330e76b6869c75c440a4478aed2ebb4c1ba549649a5034deba29e2d3ced82fce"
     },
@@ -1606,9 +2154,9 @@
   "ptf_v1": null,
   "publisher_sources": {
     "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
-    "publish_s3_matched.py": "ba999e28e553918b5b4f43b9302d3a102ef5d03b7b1602d21eb7bffc3f262350",
+    "publish_s3_matched.py": "75455b26f849b4dcc43175de899b96f40b7ab4df94812458d9dc0a41e922a27a",
     "publish_s3_matched_figure.py": "395ee50a69c12df5f3c4cf68b5161306bbf5ea2db08ce6451ba23d2dfd83d68a",
-    "publish_s3_matched_manifest.py": "bd3b6fd22387fc6cc5e440cab5a4c3c06748d817b2de7d068441d8a4c8129eda",
+    "publish_s3_matched_manifest.py": "975bb255be55dd1bd6dd08222757a4a00fd8d5d96b1a84806475a391bf008a2f",
     "score.py": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
   },
   "release_safe_l3": null,

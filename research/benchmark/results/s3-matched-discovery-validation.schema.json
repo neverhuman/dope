@@ -1787,8 +1787,8 @@
         ],
         "type": "object"
       },
-      "maxItems": 389,
-      "minItems": 389,
+      "maxItems": 526,
+      "minItems": 526,
       "type": "array"
     },
     "logical_sample_cells": {
@@ -1841,6 +1841,27 @@
     },
     "ptf_v1": {
       "type": "null"
+    },
+    "publication_integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "receipt_anchor_commit": {
+          "type": "string"
+        },
+        "receipt_lock_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source_closure_verified_files": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "receipt_anchor_commit",
+        "receipt_lock_sha256",
+        "source_closure_verified_files"
+      ],
+      "type": "object"
     },
     "release_safe_l3": {
       "type": "null"
@@ -2531,6 +2552,7 @@
     "planned_physical_sample_cells",
     "production_certified",
     "ptf_v1",
+    "publication_integrity",
     "release_safe_l3",
     "s3_data_lock_sha256",
     "sample_seeds",

@@ -145,8 +145,8 @@
         ],
         "type": "object"
       },
-      "maxItems": 389,
-      "minItems": 389,
+      "maxItems": 526,
+      "minItems": 526,
       "type": "array"
     },
     "matrix": {
