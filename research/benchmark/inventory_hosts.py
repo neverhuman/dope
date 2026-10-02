@@ -29,11 +29,8 @@ def local() -> dict:
         index, name, total, free, driver = (part.strip() for part in line.split(","))
         gpu.append({"index": int(index), "name": name, "memory_total_mib": int(total),
                     "memory_free_mib": int(free), "driver": driver})
-    try:
-        active = command(["nvidia-smi", "--query-compute-apps=pid,used_gpu_memory",
-                          "--format=csv,noheader,nounits"]).splitlines()
-    except subprocess.CalledProcessError:
-        active = []
+    active = command(["nvidia-smi", "--query-compute-apps=pid,used_gpu_memory",
+                      "--format=csv,noheader,nounits"]).splitlines()
     return {"host": socket.gethostname(), "observed_utc": datetime.now(timezone.utc).isoformat(),
             "cpu_count": os.cpu_count(), "allowed_cpus": sorted(os.sched_getaffinity(0)),
             "load_average": os.getloadavg(),
