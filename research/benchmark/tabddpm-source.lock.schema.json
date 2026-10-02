@@ -238,8 +238,11 @@
           "pattern": "^[0-9a-f]{64}$",
           "type": "string"
         },
-        "current_executable_closure_verified": {
+        "current_declared_inventories_verified": {
           "const": true
+        },
+        "current_executable_closure_verified": {
+          "const": false
         },
         "custody": {
           "additionalProperties": false,
@@ -260,15 +263,28 @@
         },
         "historical_fit_executable_closure_verified": {
           "const": false
+        },
+        "interpreter_library_file_count": {
+          "type": "integer"
+        },
+        "scope": {
+          "const": "author, environment and resolved interpreter-library inventories; system shared libraries and drivers not inventoried"
+        },
+        "verification_startup": {
+          "type": "string"
         }
       },
       "required": [
         "aliases",
         "cache_file_count",
         "cache_verifier_source_sha256",
+        "current_declared_inventories_verified",
         "current_executable_closure_verified",
         "custody",
-        "historical_fit_executable_closure_verified"
+        "historical_fit_executable_closure_verified",
+        "interpreter_library_file_count",
+        "scope",
+        "verification_startup"
       ],
       "type": "object"
     },
@@ -304,8 +320,8 @@
       "items": {
         "type": "string"
       },
-      "maxItems": 7,
-      "minItems": 7,
+      "maxItems": 8,
+      "minItems": 8,
       "type": "array"
     },
     "method": {

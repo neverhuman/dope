@@ -746,14 +746,18 @@
             "symlink_target": "lib"
           }
         ],
-        "cache_file_count": 17,
-        "cache_verifier_source_sha256": "0cbdd368e812f0ca8873bf75534b6bcadb1df1dbd87ad33fc26ddf4c839aafaf",
-        "current_executable_closure_verified": true,
+        "cache_file_count": 65,
+        "cache_verifier_source_sha256": "92268c54ca4d4585d817fd9a7d5a26e6064d772c4058c4edfc615fad44b308f3",
+        "current_declared_inventories_verified": true,
+        "current_executable_closure_verified": false,
         "custody": {
-          "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/executable-closure-v2.lock.json",
-          "sha256": "9e796ebbcc3e168174d7206a695e22f952c0c1a976376c7bfffc0f6c0a1f1ea7"
+          "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-publication-custody-v1/executable-closure-v3.lock.json",
+          "sha256": "26dca41a25f3143eefa4d68aeda4e6a8a957d06338a127cf3edc72eddca196e1"
         },
-        "historical_fit_executable_closure_verified": false
+        "historical_fit_executable_closure_verified": false,
+        "interpreter_library_file_count": 2228,
+        "scope": "author, environment and resolved interpreter-library inventories; system shared libraries and drivers not inventoried",
+        "verification_startup": "pinned interpreter libraries; -I -S -B and fresh empty pycache prefix"
       },
       "fit_command": "/mnt/fast-scratch/dope-benchmark/envs/tabddpm-py39/bin/python3.9 -S /mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/source/entry.py fit VERIFIED_REQUEST",
       "fit_timeout_seconds": 600,
@@ -786,7 +790,7 @@
         ],
         "track": "common_numeric"
       },
-      "note": "Original MIT Trainer/DDPM/MLP author core, frozen train-only numeric artifact wrapper; two-seed S3 contract complete, own five-synthetic-seed CatBoost validation efficacy. Python patch variation and sampling/staging adaptations disclosed. Both artifacts exceed L3. No native tuning, common-outcome comparison, reported-experiment reproduction or final runner admission. Native tuning/common matrix and final five locks remain pending. Historical frozen wrappers/receipts preserved. Historical fit-time executable closure is unverified: original locks omitted .pyc and directory aliases. A separate current custody supplement pins all aliases/caches and verifies cache/source code equivalence without executing dependencies. This does not retroactively certify the fits.",
+      "note": "Original MIT Trainer/DDPM/MLP author core, frozen train-only numeric artifact wrapper; two-seed S3 contract complete, own five-synthetic-seed CatBoost validation efficacy. Python patch variation and sampling/staging adaptations disclosed. Both artifacts exceed L3. No native tuning, common-outcome comparison, reported-experiment reproduction or final runner admission. Native tuning/common matrix and final five locks remain pending. Historical frozen wrappers/receipts preserved. Historical fit-time executable closure is unverified: original locks omitted .pyc and directory aliases. Separate current custody pins all declared aliases/caches and 2228 interpreter-library files before verification; all65 caches pass bit-preserving source/code equivalence. Helper bootstrap uses a fresh empty cache prefix and disables writes. System shared libraries/drivers are not inventoried; no complete current runtime or retroactive fit certification claim.",
       "runtime_lock": {
         "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-contract-v3/runtime.lock.json",
         "sha256": "3741fa9f3001b15d75b284884d9ba146e353d1b31de2d76f15e689cbb337d3c8"
@@ -796,7 +800,7 @@
       "source_archive": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabddpm-v1/source.tar.gz",
       "source_archive_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
       "source_lock": "research/benchmark/tabddpm-source.lock.json",
-      "source_lock_sha256": "2f6747a4828be439afb135f1077c3af5ba50aa39c728d686b3bee94902005eb8",
+      "source_lock_sha256": "8b71533e76dbbf9b603d9898b7008a043cc7442700531d933af6b4adb0adde73",
       "source_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
       "status": "pilot_locked",
       "supported_task": "regression",

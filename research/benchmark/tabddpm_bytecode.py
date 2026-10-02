@@ -5,6 +5,7 @@ import importlib.util
 import json
 import marshal
 from pathlib import Path
+import struct
 import sys
 import types
 
@@ -17,6 +18,10 @@ def canonical(value):
         return ('tuple', tuple(canonical(item) for item in value))
     if isinstance(value, frozenset):
         return ('frozenset', frozenset(canonical(item) for item in value))
+    if type(value) is float:
+        return ('float_bits', struct.pack('>d', value))
+    if type(value) is complex:
+        return ('complex_bits', struct.pack('>dd', value.real, value.imag))
     if type(value) in (type(None), bool, int, float, complex, str, bytes, type(Ellipsis)):
         return (type(value).__name__, value)
     raise ValueError('unsupported cache constant')

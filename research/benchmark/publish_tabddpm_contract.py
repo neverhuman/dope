@@ -6,6 +6,7 @@ import json
 import math
 from pathlib import Path
 import subprocess
+import tempfile
 import tomllib
 
 from .publish_s3_matched import artifact_inventory, require, schema
@@ -15,10 +16,11 @@ BASE = Path('/mnt/fast-scratch/dope-benchmark')
 ROOT = BASE / 'tabddpm-contract-v3'
 AUTHOR = BASE / 'method-source-audits/tabddpm-v1/source'
 ENV = BASE / 'envs/tabddpm-py39'
+INTERPRETER_LIB = BASE / 'envs/tabddpm-python39/cpython-3.9.25-linux-x86_64-gnu/lib'
 CUSTODY = BASE / 'tabddpm-publication-custody-v1/receipt-source.lock.json'
 CUSTODY_SHA256 = '6ecc1b3dcbec64baee27f0cc83ec1e24ed935cabbc74f95fa299d79e57b1478f'
-EXECUTABLE_CUSTODY = BASE / 'tabddpm-publication-custody-v1/executable-closure-v2.lock.json'
-EXECUTABLE_CUSTODY_SHA256 = '9e796ebbcc3e168174d7206a695e22f952c0c1a976376c7bfffc0f6c0a1f1ea7'
+EXECUTABLE_CUSTODY = BASE / 'tabddpm-publication-custody-v1/executable-closure-v3.lock.json'
+EXECUTABLE_CUSTODY_SHA256 = '26dca41a25f3143eefa4d68aeda4e6a8a957d06338a127cf3edc72eddca196e1'
 COMPLETION_SHA256 = '0e9bc146d708b545b3741b2ad15a76b6e3f17d7b7ce35964087fd46a3edad5f1'
 NAME = 'tabddpm-author-contract'
 
@@ -69,10 +71,9 @@ def native_value(row):
     return row['value']
 
 
-def verify_source_inventory(files, environment, author, aliases=None):
-    aliases = aliases or {}
+def verify_aliases(roots, aliases):
     seen_aliases = set()
-    for root in (environment, author):
+    for root in roots:
         require(root.is_dir() and not root.is_symlink() and root.resolve() == root,
                 'TabDDPM source root contains link')
         for path in root.rglob('*'):
@@ -83,6 +84,10 @@ def verify_source_inventory(files, environment, author, aliases=None):
                         'TabDDPM source inventory contains unpinned link')
                 seen_aliases.add(str(path))
     require(seen_aliases == set(aliases), 'TabDDPM pinned alias inventory changed')
+
+
+def verify_source_inventory(files, environment, author, aliases=None):
+    verify_aliases((environment, author), aliases or {})
     def runtime_file(path):
         return path.suffix in ('.py', '.pyc', '.pyo', '.so') or '.so.' in path.name
     expected = {p for p in files if Path(p).is_relative_to(environment) and runtime_file(Path(p))}
@@ -105,21 +110,51 @@ def verify_executable_closure(files):
     aliases = {r['path']: r for r in lock['aliases']}
     require(len(aliases) == len(lock['aliases']), 'duplicate TabDDPM source alias')
     augmented = dict(files)
+    library = lock['interpreter_library']
+    require(library['root'] == str(INTERPRETER_LIB), 'TabDDPM interpreter library root changed')
+    library_aliases = {r['path']: r for r in library['aliases']}
+    require(len(library_aliases) == len(library['aliases']), 'duplicate TabDDPM library alias')
+    verify_aliases((INTERPRETER_LIB,), library_aliases)
+    expected_library = {r['path'] for r in library['files']}
+    require(len(expected_library) == len(library['files'])
+            and expected_library == {str(p) for p in INTERPRETER_LIB.rglob('*') if p.is_file()},
+            'TabDDPM interpreter library inventory changed')
+    for row in library['files']:
+        path = Path(row['path'])
+        require(path.is_relative_to(INTERPRETER_LIB) and str(path) not in augmented
+                and path.stat().st_size == row['bytes'] and sha256(path) == row['sha256'],
+                'TabDDPM interpreter library changed')
+        augmented[str(path)] = row['sha256']
+    # lib/python39.zip is included if present; adding it changes the inventory.
+    cache_paths = set()
     for row in lock['caches']:
         path = Path(row['path'])
-        require(path.is_relative_to(ENV) or path.is_relative_to(AUTHOR),
+        require(path.is_relative_to(ENV) or path.is_relative_to(AUTHOR)
+                or path.is_relative_to(INTERPRETER_LIB),
                 'TabDDPM cache outside source scope')
         require(path.resolve(strict=True) == path and not path.is_symlink()
-                and str(path) not in augmented and path.stat().st_size == row['bytes']
+                and str(path) not in cache_paths and path.stat().st_size == row['bytes']
                 and sha256(path) == row['sha256']
-                and files.get(row['source_path']) == row['source_sha256'],
+                and augmented.get(str(path), row['sha256']) == row['sha256']
+                and augmented.get(row['source_path']) == row['source_sha256'],
                 'TabDDPM executable cache or source changed')
+        cache_paths.add(str(path))
         augmented[str(path)] = row['sha256']
+    require(cache_paths == {p for p in augmented if Path(p).suffix == '.pyc'
+                            and any(Path(p).is_relative_to(root)
+                                    for root in (ENV, AUTHOR, INTERPRETER_LIB))},
+            'TabDDPM executable cache inventory changed')
     verify_source_inventory(augmented, ENV, AUTHOR, aliases)
     helper = Path(__file__).with_name('tabddpm_bytecode.py')
-    completed = subprocess.run([str(ENV / 'bin/python3.9'), '-I', '-S', str(helper)],
-                               input=json.dumps(lock['caches']), text=True,
-                               capture_output=True, timeout=30, check=False)
+    cache_parent = Path('target/tabddpm-cache-verification')
+    cache_parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=cache_parent) as empty_cache:
+        # A fresh empty prefix plus -B prevents bootstrap from reading old caches
+        # before the helper has established their source equivalence.
+        completed = subprocess.run([str(ENV / 'bin/python3.9'), '-I', '-S', '-B', '-X',
+                                    'pycache_prefix=' + str(Path(empty_cache).resolve()), str(helper)],
+                                   input=json.dumps(lock['caches']), text=True,
+                                   capture_output=True, timeout=30, check=False)
     require(completed.returncode == 0, 'TabDDPM executable cache verification failed')
     result = json.loads(completed.stdout)
     expected = [{k: r[k] for k in ('path', 'sha256', 'source_path', 'source_sha256')}
@@ -128,7 +163,12 @@ def verify_executable_closure(files):
             'TabDDPM executable cache differs from pinned source')
     return augmented, {'custody': {'path': str(EXECUTABLE_CUSTODY), 'sha256': EXECUTABLE_CUSTODY_SHA256},
                        'cache_verifier_source_sha256': sha256(helper),
-                       'cache_file_count': len(expected), 'current_executable_closure_verified': True,
+                       'cache_file_count': len(expected),
+                       'interpreter_library_file_count': len(expected_library),
+                       'verification_startup': 'pinned interpreter libraries; -I -S -B and fresh empty pycache prefix',
+                       'scope': 'author, environment and resolved interpreter-library inventories; system shared libraries and drivers not inventoried',
+                       'current_declared_inventories_verified': True,
+                       'current_executable_closure_verified': False,
                        'historical_fit_executable_closure_verified': False,
                        'aliases': lock['aliases']}
 
@@ -315,6 +355,7 @@ def build():
                        'gpu_vram_bytes': 16 * 1024**3, 'original_pilot_deadline_unchanged': True},
             'limitations': ['Author-core contract probe, not two reported-experiment reproductions, native tuning or a matched common-outcome benchmark.',
                             'Historical runtime lock omitted executable bytecode and directory aliases: fit-time executable closure is unverified. Current caches match pinned source; this cannot establish their historical bytes.',
+                            'Publication verifies the resolved interpreter library tree before invoking its helper with an empty cache prefix. System shared libraries and drivers are not inventoried; no complete current runtime-closure claim.',
                             'The original lib64-to-lib ABI alias and interpreter aliases are explicitly pinned; every additional source/runtime symlink is rejected.',
                             'Regression only; classification/categorical and generic final-runner integration remain pending.',
                             'Learned quantiles/discrete state are charged; no claim that preprocessing is free of source observations.',

@@ -309,13 +309,19 @@ python3 -m unittest research.benchmark.tests.test_tabddpm_contract -v
 
 Publication verifies a pinned custody lock covering all 10,774 original source,
 runtime, partition, receipt and artifact files before consuming results. A
-separate immutable executable-custody supplement pins the 17 existing bytecode
-caches and checks their code against the pinned sources without executing either.
+separate immutable executable-custody supplement pins 65 existing bytecode
+caches (17 dependency and 48 interpreter caches) and checks their code against
+the pinned sources without executing either. The parent's hash/inventory checks
+cover all 2,228 resolved interpreter-library files, extension modules and archive
+search locations before invoking Python. An empty cache prefix with `-B` prevents
+bootstrap from reading old bytecode before equivalence verification.
 It pins the interpreter aliases and the original `lib64 -> lib` ABI alias; added
 or changed runtime/author links and executable caches are rejected. Historical
 fit-time executable closure remains unverified because the original locks omitted
 bytecode and directory aliases. Current equivalence cannot prove historical cache
-bytes. Artifact directory links are rejected. Twenty physical
+bytes. System shared libraries and drivers are outside the declared inventory;
+complete current runtime closure also remains unverified. Artifact directory
+links are rejected. Twenty physical
 operations include four failed fit entrypoints and 16 successful operations;
 three inherited sample-operation aliases are charged once. Total fit entrypoint
 time including failures is 818.082278 seconds under the frozen 1,200-second cap.
