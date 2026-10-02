@@ -327,3 +327,28 @@ three inherited sample-operation aliases are charged once. Total fit entrypoint
 time including failures is 818.082278 seconds under the frozen 1,200-second cap.
 Historical sources, failures and receipts remain immutable on scratch.
 Official tests remain sealed; MFS-v2/PTF-v1/release-safe remain null.
+
+## Central native method inventory
+
+`methods.lock.json` binds the completed ARF, synthpop CART and TabPC source and
+native-validation evidence as `pilot_locked`. Their selection objectives are:
+
+| Method | Native validation objective | Pilot search |
+| --- | --- | --- |
+| ARF | Maximize held-out FORDE mean log density | Four original and four refinement trials |
+| synthpop CART | Minimize author `utility.gen` CART pMSE | Four trials |
+| TabPC | Minimize author transformed validation NLL, with author early stopping | Eight trials |
+
+The entries pin adapter/source identities, configurations and existing pilot
+panels. Native values are never ranked across methods. Artifact-only sampling,
+charged learned state and source-rights limits remain explicit: synthpop uses a
+hash-pinned CRAN release, its sampler is GPL research code, and TabPC's Cirkit
+dependency is GPL-3.0-or-later. ARF's dependency digest and generic fit/sample
+commands remain null pending an executable inventory and final adapter. The R
+package lock and TabPC source/version lock do not establish complete current or
+historical executable closure.
+
+This reconciliation does not admit final jobs. Generic final runner integration,
+the remaining method audits and the complete five-lock set are pending. The
+central lock remains incomplete and unfrozen for final evaluation; official
+tests stay sealed and gated scores stay null.

@@ -46,19 +46,135 @@
       "upstream_url": "https://github.com/ryan112358/mbi"
     },
     "ARF": {
-      "default_config": null,
+      "adapter_sha256": "2e5f6373ca3b36019d82038712f16dce976d9f783f7dbc5444aec96b6c5e2f18",
+      "artifact_policy": "restricted_numeric_forde_factors_without_full_training_rows",
+      "default_config": {
+        "alpha": 0.0,
+        "max_iters": 10,
+        "min_node_size": 5,
+        "num_trees": 30
+      },
       "dependency_or_container_digest": null,
+      "final_runner_admission": "pending_generic_adapter_runtime_inventory_and_final_locks",
+      "fit_api": "arfpy.arf.arf(...).forde(dist=\"truncnorm\",oob=False,alpha=CONFIG.alpha)",
       "fit_command": null,
+      "fixed_pilot_settings": {
+        "delta": 0,
+        "dist": "truncnorm",
+        "early_stop": true,
+        "n_jobs": 16,
+        "oob": false
+      },
       "group": "compact",
       "license": "MIT",
       "license_evidence": "https://github.com/bips-hb/arfpy/blob/8b63c1b3999981125b4af2828ff52cba8e29169d/LICENSE",
       "license_sha256": "8f97b1e0e6c2a7c7b539e63e8a5c81c85d040556940a07b348596cd9674283ec",
-      "note": "Author-affiliated arfpy 0.1.1 source and license pinned. Source model stores x_real; artifact-only export, dependency lock, defaults/search space, and fit/sample validation remain pending.",
+      "native_objective": {
+        "direction": "maximize",
+        "implementation_role": "study_evaluation_of_author_FORDE_leaf_mixture_density",
+        "implementation_sha256": "2e5f6373ca3b36019d82038712f16dce976d9f783f7dbc5444aec96b6c5e2f18",
+        "name": "heldout_forde_mean_log_density",
+        "native_values_cross_method_ranking": false,
+        "partition": "validation",
+        "shared_kpi_used_for_selection": false,
+        "source": "https://github.com/bips-hb/arfpy/blob/8b63c1b3999981125b4af2828ff52cba8e29169d/arfpy/arf.py",
+        "source_sha256": "5d3be95f9589269b578abdb918ed5e54606fe793aa14dd8bbee011344db5de7f",
+        "status": "locked",
+        "tie_break_origin": "study-prespecified protocol",
+        "tie_breaks": [
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
+        ]
+      },
+      "note": "Pinned MIT author arfpy core with study native FORDE held-out log-density evaluator and artifact-only author FORGE reconstruction. Original four trials plus four bounded refinement trials were selected only by native validation likelihood; failed defaults remain visible. Numeric leaf parameters and projection are restricted research artifacts charged in full. Existing native/common pilot panels are bound below. A complete executable runtime inventory, generic final fit/sample commands and final five-lock admission remain pending; fit/sampling commands and dependency digest stay null. No reported-experiment reproduction, privacy/DP, production certification or DOPE-win claim.",
+      "pilot_evidence": [
+        {
+          "path": "research/benchmark/results/arf-combined-native-validation.json",
+          "sha256": "272b6db08b29666a80a929fb366aa58cddb77eb81726fb3eeb3b954ce2bbc94d"
+        },
+        {
+          "path": "research/benchmark/results/pilot24-arf-matched.json",
+          "sha256": "306167b77647b16ea980dbc5d3a26c1b3ed3ac2ee6d9aba112db95e7e57bab1e"
+        }
+      ],
+      "pilot_round_locks": [
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/arf-native-v1/round.lock.json",
+          "sha256": "c318ff88bc5295f864fc4d56ebe10c46134e867eb9aecb56a72680f4c70e5ccb"
+        },
+        {
+          "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/arf-native-short-v1/round.lock.json",
+          "sha256": "a74f758083ee0af73274236ada3dd2c82206964579d9e7850d6b1b28f527b3cb"
+        }
+      ],
+      "runtime_identity_scope": "declared pilot package versions; executable dependency closure not inventoried",
+      "runtime_versions": {
+        "numpy": "1.26.4",
+        "pandas": "2.1.4+dfsg",
+        "scikit-learn": "1.7.2",
+        "scipy": "1.16.3"
+      },
+      "sample_api": "research.benchmark.arf_native.load_sampler(ARTIFACT_DIR).forge(N)",
       "sampling_command": null,
       "source_archive": "/mnt/fast-scratch/dope-benchmark/source-snapshots/arfpy-8b63c1b.tar.gz",
       "source_sha256": "0c9012778cb5ffe0a006fc32b33ae4ed3f85689c6742253d95f91c10c42bd2aa",
-      "status": "source_audit_pending",
-      "tuning_search_space": null,
+      "status": "pilot_locked",
+      "track": "common_numeric",
+      "tuning_search_space": {
+        "combined_trial_cap": 8,
+        "original_trials": [
+          {
+            "alpha": 0.0,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 30
+          },
+          {
+            "alpha": 0.0,
+            "max_iters": 10,
+            "min_node_size": 10,
+            "num_trees": 30
+          },
+          {
+            "alpha": 0.5,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 30
+          },
+          {
+            "alpha": 0.5,
+            "max_iters": 10,
+            "min_node_size": 5,
+            "num_trees": 50
+          }
+        ],
+        "refinement_trials": [
+          {
+            "alpha": 0.0,
+            "max_iters": 1,
+            "min_node_size": 20,
+            "num_trees": 10
+          },
+          {
+            "alpha": 0.5,
+            "max_iters": 1,
+            "min_node_size": 40,
+            "num_trees": 10
+          },
+          {
+            "alpha": 0.5,
+            "max_iters": 1,
+            "min_node_size": 20,
+            "num_trees": 20
+          },
+          {
+            "alpha": 0.5,
+            "max_iters": 2,
+            "min_node_size": 20,
+            "num_trees": 10
+          }
+        ]
+      },
       "upstream_commit": "8b63c1b3999981125b4af2828ff52cba8e29169d",
       "upstream_url": "https://github.com/bips-hb/arfpy"
     },
@@ -880,18 +996,119 @@
       "upstream_url": "https://github.com/tabkde/tabkde-main"
     },
     "TabPC": {
-      "default_config": null,
-      "dependency_or_container_digest": null,
-      "fit_command": "python train_scripts/pc_sota.py --path DATASET --target-folder ARTIFACT",
+      "adapter_sha256": "6be5632771c9ab3527afd7b14e3b985b5007ea44d967ffeaab4a37e88870adbf",
+      "artifact_policy": "all learned preprocessors/circuit/weights/config/projection files charged; retained data.pkl is an empty metadata tensor, verified exact sample parity",
+      "current_executable_closure_verified": false,
+      "default_config": {
+        "batch_size": 256,
+        "epochs": 20,
+        "learning_rate": 0.05,
+        "num_units": 100
+      },
+      "dependency_licenses": {
+        "Cirkit": "GPL-3.0-or-later"
+      },
+      "dependency_or_container_digest": "7933365d4fca1b087063b18b27c4e01012a80e1b4242d00331b7ebd48e9e87e7",
+      "final_runner_admission": "pending_generic_adapter_and_final_locks",
+      "fit_api": "author ProbabilisticCircuit._train with external grouped train/validation tensors",
+      "fit_command": "python -m research.benchmark.tabpc_adapter FIT_REQUEST_JSON",
       "group": "compact",
+      "historical_fit_executable_closure_verified": false,
       "license": "Apache-2.0",
       "license_evidence": "https://github.com/april-tools/tabpc/blob/a470848853cf2927ac5224272f2bff04c09d74bb/LICENSE",
       "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-      "note": "Pinned source and cirkit gitlink cc02ed2964308a2e3d009ca71bb5548920d18891 inspected. News author-config compatibility fit was executable, but its checkpoint stores and reloads training tensor data.pkl. A releasable adapter must remove source-row dependence and be validated; exact upstream Torch 2.9.1 image and general data staging remain pending.",
-      "sampling_command": "article experiment sampling command and model export adapter pending",
-      "source_snapshot_sha256": "753d5c9f2dd79870e1c51b413e36a04d7fe123f8fcc3063209421ce510ab2c2d",
-      "status": "source_audit_pending",
-      "tuning_search_space": null,
+      "native_objective": {
+        "author_runtime_compatibility_source_sha256": "9af702885b5599f8bbe3890d3a45abf5a1f97ef41bcc3e5e5b9bf0e47b126e04",
+        "checkpoint_selection": "author validation NLL early stopping",
+        "checkpoint_selection_source_sha256": "40d4c3140119c796b1d756508dfc73f4eae0902fa838db278d56cd61f1c9de51",
+        "direction": "minimize",
+        "implementation": "ProbabilisticCircuit.compute_log_likelihood return mean_NLL",
+        "implementation_sha256": "6be5632771c9ab3527afd7b14e3b985b5007ea44d967ffeaab4a37e88870adbf",
+        "name": "author_transformed_validation_mean_nll",
+        "native_values_cross_method_ranking": false,
+        "partition": "validation",
+        "shared_kpi_used_for_selection": false,
+        "source": "https://github.com/april-tools/tabpc/blob/a470848853cf2927ac5224272f2bff04c09d74bb/src/models/probabilistic_circuit.py",
+        "source_sha256": "03fae5a18d5785b387cc20429843920c90b3c8d68e59e527b3e00cbc46f9a4d7",
+        "status": "locked",
+        "tie_break_origin": "study-prespecified protocol",
+        "tie_breaks": [
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
+        ]
+      },
+      "note": "Pinned author TabPC and Cirkit with GPU fit and artifact-only sampling replay for generated regression/binary inputs; validation NLL and author early stopping select the native eight-trial pilot grid. Standard-library runtime checks precede dependency initialization, and errors omit source values. Training tensor/df_train removed with exact sample replay; preprocessing/projection/model files fully charged. Cirkit is GPL-3.0-or-later; the adapter is restricted research. The source audit and complete native/default pilot panel are bound below. Declared source/version inventory is not full current or historical executable-closure certification. Generic final runner, broader representation staging, final five locks and author-faithful paper environment remain pending; no reported-experiment reproduction, privacy/DP, production certification or DOPE-win claim.",
+      "pilot_evidence": [
+        {
+          "path": "research/benchmark/results/pilot24-tabpc-native.json",
+          "sha256": "8ea6ca0d8e8e36f661d0ffcdb9b5227d35a62398655e666dae93e7c9bdbc187c"
+        }
+      ],
+      "runtime_dependency_source_file_count": 5465,
+      "runtime_identity_scope": "declared author/dependency sources and package versions; system libraries, drivers and historical cache closure not established",
+      "runtime_lock": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpc-v1/adapter-contract-v5/runtime.lock.json",
+        "sha256": "7933365d4fca1b087063b18b27c4e01012a80e1b4242d00331b7ebd48e9e87e7"
+      },
+      "runtime_python": "3.10.12",
+      "sample_api": "author ProbabilisticCircuit.generate (CPU memory-stat guard only)",
+      "sampling_command": "python -m research.benchmark.tabpc_adapter SAMPLE_REQUEST_JSON",
+      "source_lock": "research/benchmark/tabpc-source.lock.json",
+      "source_lock_sha256": "9d979a9d5726d2f28495bf74b78f2c9ffa1b357e1d94d3ced72daaaefb221399",
+      "source_sha256": "25569583dcf051ffca04b8ad219bcc53c04e0c74e01d39e9e77c5ac3b5e156ac",
+      "source_snapshot_sha256": "25569583dcf051ffca04b8ad219bcc53c04e0c74e01d39e9e77c5ac3b5e156ac",
+      "status": "pilot_locked",
+      "track": "common_numeric",
+      "tuning_search_space": [
+        {
+          "batch_size": 256,
+          "epochs": 20,
+          "learning_rate": 0.05,
+          "num_units": 100
+        },
+        {
+          "batch_size": 256,
+          "epochs": 150,
+          "learning_rate": 0.1,
+          "num_units": 128
+        },
+        {
+          "batch_size": 512,
+          "epochs": 150,
+          "learning_rate": 0.25,
+          "num_units": 128
+        },
+        {
+          "batch_size": 64,
+          "epochs": 150,
+          "learning_rate": 0.5,
+          "num_units": 128
+        },
+        {
+          "batch_size": 256,
+          "epochs": 150,
+          "learning_rate": 0.1,
+          "num_units": 512
+        },
+        {
+          "batch_size": 512,
+          "epochs": 150,
+          "learning_rate": 0.25,
+          "num_units": 512
+        },
+        {
+          "batch_size": 64,
+          "epochs": 150,
+          "learning_rate": 0.5,
+          "num_units": 512
+        },
+        {
+          "batch_size": 256,
+          "epochs": 150,
+          "learning_rate": 0.1,
+          "num_units": 2048
+        }
+      ],
       "upstream_commit": "a470848853cf2927ac5224272f2bff04c09d74bb",
       "upstream_url": "https://github.com/april-tools/tabpc"
     },
@@ -1006,16 +1223,86 @@
       "upstream_url": "https://github.com/neverhuman/dope"
     },
     "synthpop_CART": {
-      "default_config": null,
-      "dependency_or_container_digest": null,
-      "fit_command": null,
+      "adapter_sha256": "80ab24152b7093f54397a91cea0617bdfc8f50236946520c55cdf733f4bb3048",
+      "artifact_policy": "restricted_donor_values_and_fitted_rpart_models_charged_in_full",
+      "current_executable_closure_verified": false,
+      "default_config": {
+        "cp": 1e-08,
+        "minbucket": 5
+      },
+      "dependency_or_container_digest": "a96d501cf4fa21609c96e85fd61713131c2a3caa879cb0055e10030a8a77def7",
+      "final_runner_admission": "pending_generic_adapter_and_final_locks",
+      "fit_api": "synthpop::syn(data,method='cart',models=TRUE)",
+      "fit_command": "Rscript research/benchmark/synthpop_cart.R fit TRAIN VALID MODEL KPI SEED MINBUCKET CP",
       "group": "compact",
-      "license": null,
-      "sampling_command": null,
-      "status": "source_audit_pending",
-      "tuning_search_space": null,
+      "historical_fit_executable_closure_verified": false,
+      "license": "GPL-2.0-only OR GPL-3.0-only",
+      "license_evidence": "https://cran.r-project.org/package=synthpop",
+      "license_evidence_sha256": "a9bc3ea64c259c305c7c4a0cb3a6fc16c5e29030a2a1613547237bf1daebc0fe",
+      "license_evidence_source_member": "synthpop/DESCRIPTION",
+      "native_objective": {
+        "api": "synthpop::utility.gen(synthetic,validation,method='cart',resamp.method='none')$pMSE",
+        "direction": "minimize",
+        "implementation_sha256": "8a111232fd5f159040832e51fe5b46137d3b2bd785ff157394897176d1dd7277",
+        "implementation_source_sha256": "8a111232fd5f159040832e51fe5b46137d3b2bd785ff157394897176d1dd7277",
+        "name": "validation_cart_pMSE",
+        "native_values_cross_method_ranking": false,
+        "partition": "validation",
+        "shared_kpi_used_for_selection": false,
+        "source": "https://cran.r-project.org/package=synthpop",
+        "source_sha256": "8a111232fd5f159040832e51fe5b46137d3b2bd785ff157394897176d1dd7277",
+        "status": "locked",
+        "tie_break_origin": "study-prespecified protocol",
+        "tie_breaks": [
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
+        ]
+      },
+      "note": "Pinned CRAN synthpop 1.9-3 author CART fitting and utility.gen validation CART pMSE (minimize), four frozen trials per pilot dataset. The GPL research sampler follows author leaf-donor sampling; donor values/rpart state/projection are restricted and fully charged. Source audit and complete pilot panel are bound below. CRAN source release is pinned by archive/member hashes; no git commit is invented. Conda explicit package identity does not establish full current or historical executable closure. Generic final runner and final five-lock admission remain pending; no reported-experiment reproduction, privacy/DP, production certification or DOPE-win claim.",
+      "pilot_evidence": [
+        {
+          "path": "research/benchmark/results/pilot24-synthpop-matched.json",
+          "sha256": "54dbd80d4d5ff3ba387b897a21b9b201e1fbda52d812b2f250757135841808a7"
+        }
+      ],
+      "runtime_identity_scope": "Conda explicit package lock; installed executable files and historical closure not inventoried",
+      "runtime_lock": {
+        "path": "/mnt/fast-scratch/dope-benchmark/envs/synthpop-r44.explicit.txt",
+        "sha256": "a96d501cf4fa21609c96e85fd61713131c2a3caa879cb0055e10030a8a77def7"
+      },
+      "sample_api": "restricted_GPL_adapter_from_fitted_rpart_leaf_donors",
+      "sampling_command": "Rscript research/benchmark/synthpop_cart.R sample MODEL ROWS SEED OUTPUT",
+      "source_archive": "/mnt/fast-scratch/dope-benchmark/source-snapshots/synthpop_1.9-3.tar.gz",
+      "source_lock": "research/benchmark/synthpop-cart-source.lock.json",
+      "source_lock_sha256": "25be1a102d56d0041b35104534e7d4ce52738819e92c8b4ebf1fedbabbcf87f6",
+      "source_sha256": "65d4146e8ca5ac1236d42a89eec057291f57b1224645e958909f9539b9c54ff5",
+      "status": "pilot_locked",
+      "track": "common_numeric",
+      "tuning_search_space": [
+        {
+          "cp": 1e-08,
+          "minbucket": 5
+        },
+        {
+          "cp": 1e-08,
+          "minbucket": 10
+        },
+        {
+          "cp": 1e-08,
+          "minbucket": 20
+        },
+        {
+          "cp": 1e-05,
+          "minbucket": 10
+        }
+      ],
       "upstream_commit": null,
-      "upstream_url": null
+      "upstream_source_release": {
+        "package": "synthpop",
+        "repository": "CRAN",
+        "version": "1.9-3"
+      },
+      "upstream_url": "https://cran.r-project.org/package=synthpop"
     }
   },
   "version": 1
