@@ -1,0 +1,1618 @@
+{
+  "artifacts": {
+    "s3-matched-discovery-validation.csv": {
+      "bytes": 12447,
+      "sha256": "5d8bd2c7ee1b45ee8f6ff59c18157a2b8145314e10e70a9ab1ca97dffc9c7234"
+    },
+    "s3-matched-discovery-validation.json": {
+      "bytes": 821583,
+      "sha256": "d763d181fa8445260a3f39ebdf4f58761658cd5d8e95a19d4fdbe14262d4867b"
+    },
+    "s3-matched-discovery-validation.md": {
+      "bytes": 13551,
+      "sha256": "0d2a80504099f0ef7b48238331d09c92a25237e0cf2883df12fe66c200832a6a"
+    },
+    "s3-matched-discovery-validation.pdf": {
+      "bytes": 38122,
+      "sha256": "4e9c9e683712de385ea5bdf4caf7b3713263746ed2631415c8578ae62781ca80"
+    },
+    "s3-matched-discovery-validation.schema.json": {
+      "bytes": 77061,
+      "sha256": "3e4c1c4a952f9410f6e39922ebea0c97034a26a1d99f1d89102738f3f3de097f"
+    },
+    "s3-matched-discovery-validation.svg": {
+      "bytes": 136669,
+      "sha256": "51fc4e176d220539e37777a2d847bdf2d73dbb466490b19c3153a7da3903b2ab"
+    }
+  },
+  "campaign_complete": false,
+  "counts_as_dope_win": false,
+  "format": "dope-s3-matched-validation-publication-manifest",
+  "immutable_references": [
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/catalog/v1/catalog.jsonl",
+      "sha256": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/004f458cea8f885bb46ede98e1e601cc02fa494f6b1d4a42297cb3bc1a20ac79/receipt.json",
+      "sha256": "2a40c7ef82b16e78bc6c46d1c80fd556550ec7c7c60737d2ec99ed9fadef7e85"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/19c950e6b93123c2413f22a4754969cb54fc7dcf45771861783d9fc45378483f/receipt.json",
+      "sha256": "3f773b54e6d420278f929fc40d7722bd1d91dab5ed87e6e7a433d56c45d98750"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/1a8ba29f33ee3ea45b0d235de9236b53e6ab3be18379624f4608b2ce5f036c63/receipt.json",
+      "sha256": "6edd8d4cc6d3200cbac7882fb3fa618c8c53b4c2603751c87d60e9ed58f5d026"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/1a93c1578e07d2f79a13488ba5626352bd5a527a5a2d17910b0696ee33af2963/receipt.json",
+      "sha256": "7bdd2d220cc223eefd31b75bf19b6f8cf2c305e516849253d35d44d901205041"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/3146cb5d33ab4c6ba40f3678432b340cf6551a5e0f36ab5ffe78d8696daa54dc/receipt.json",
+      "sha256": "63cbf4fca0b331d8d93d45b2793a28882ca0f7e49f9217b44569cddeff715763"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/376d7cb2d86bddc5720a916c3f81d72e6da140f1043b23d6a458cf2be2dc3225/receipt.json",
+      "sha256": "3ca045a69b842831206269ac5fbf9c41150585a0a5f3ae0be92257d99b6172f7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/3e044d34ddae945cafa70d3fd3acc626279660258807ce3f34e6ba0ce254d5f6/receipt.json",
+      "sha256": "2a5768f04798e57d6c57b5ed6966355ef30482fef7a1cf7b6868d937e2b6f26f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/3e9c448c339b37ae19d71a7d38e7ee0043c4a725526df8f2afa9c39fd9e8ccf7/receipt.json",
+      "sha256": "7cc803cd115fd465b50d3732761962b8581412b103c12d518b2132ca8120fe4d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/3ff2eddc20a7a8f9e41a85fd1d106174578d0429649a403892a2b2cdf456a0b7/receipt.json",
+      "sha256": "c50ffd047233a40e965cef48bb6b556dd19f934046a38211015a4c0522728c29"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/4a0f6e7af995c8d56cd30d68f059b9a047b07fff32a31868b121ae5ae9b6a409/receipt.json",
+      "sha256": "fb3e01013750eda2c7c0ede17d35371d2b21ea84c016ba4b2f1ce1b7c119e9f1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/4a8141610145fcec561adf791c3c80199eca8f0e3e5a5916ac57d18b058d9739/receipt.json",
+      "sha256": "de1db08e118ea2aab135d2d48b96fa510aa746913e3705c916e30634e38ad1de"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/5dc31f90456d3abe34cbccf31dba1135f065bcf017a80e56b70bbd71fae2dc95/receipt.json",
+      "sha256": "339a9235d0e97454993dee30c787067e0f755ddaa9654ef72d851ea117332d5e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/750f8f9654808d6a78c38c1043a4276e1e5046740ffedac34f02b12b77cd009e/receipt.json",
+      "sha256": "c064fa883a1404d4f6a2b96be920fe19eeff57853e28158887c54c3d7e2e5c8b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/758f1820088aa9b9f1a1fc9bef3db8d7f6702a99aae55f05ca2d79121949e32b/receipt.json",
+      "sha256": "0e11fe9148ce768382ff846891f5af1f2e80890656a3752bd037ef007af01bdb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/7991e1b2a2256f44ecc5e2c16a18f8fe3b6834e9f0472cf19b72ab37217ad411/receipt.json",
+      "sha256": "507bb538063aa9caa760355db72f04bd1bcd191a74c12facf4ced4009a7e279a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/7e12f2583fd902a34145f0b842fb4b2405146f67a1e06aa32b2176acc252ef93/receipt.json",
+      "sha256": "1cf67816e5b65ca2609e205f6e7cb8c470278509150186dff8905d17efa42f7a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/8c484c788e34da806e6e2faa989b0eb4ae32ee3eeeda09de10a1d08762826308/receipt.json",
+      "sha256": "a9a688dcf084757866ea6e8601b67f95ad5ba9a0c437891c57013940b044019a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/9056ea85ce31f584c88034e6d7dae489fc29fc7169c19044bf36a6e0792609ba/receipt.json",
+      "sha256": "2782cc7996adecb1f30d4c7bb5b28ad97750d1915b7a5b2b28e878abb705df48"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/9c77c9ff7f17f6db23932b8dcaccb7565a8788a36abfc6d7fa2d8102df76d970/receipt.json",
+      "sha256": "f67cf7c87325c014c0c0710196762a8774f56a4a06479635920762fe9d27fbf0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/b65e782607e417dee6dff59a3ad7b07ce56e7247c2512a58c3d4084874104b6b/receipt.json",
+      "sha256": "a6fb553cec4601dbe18b35d5b8c4a6832151c9a91fd233c0ba67fbab75f39887"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/ba17e1e21e54268c8ad206d6b91b65621ec860f36b7c764428fffefbea81fdb0/receipt.json",
+      "sha256": "1141a13b427932801409c1ce878f6cdb5df2d9e9aaf6e73d9dff11dd14b53758"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/ca269256751dc8e42004e4984672d39557fff3f0c27176f3a218010d37467d95/receipt.json",
+      "sha256": "8d3266a1ab3368c943918637d73bd29b4861cbba72710e91998fe5ec7317d4e4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/f480372115b34093e05e7e7f7d7e2e85564f180d98da991e3366fd05d118d33b/receipt.json",
+      "sha256": "cc7a5686120eea4a6c5e19d02c97a7c7d0a2255ff3098d9434aafb7df798bce8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/dispatch/ffadde462dea804f8eefca78f0beb68be81b5cc5722ea91291d27350b97a9059/receipt.json",
+      "sha256": "7e09105d49fa083b5493adafe16d63889a5d01646dd25b08be0a4722dc8133b7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/1cfb96ad1b236685767f7f16b796f307e7e957e9bf62fe4a52b2b9ea13b84119/attempt-0001.json",
+      "sha256": "dc3f83e27dd92c67ffc623971b73367b853f51960302f845f71aef2eeb43a739"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/36a3b51d7c6eba305fef9245d18c39cd449177e4d0a0ded03244c455d99cc5fc/attempt-0001.json",
+      "sha256": "6a6aee34a3c3666114e09741cb6508eda6db5f709d6d245ab267fd53648edf4a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/3cf0a5ce05baa7b6913077a9f8e82ff7287414597da5b0a858deedaa969c0956/attempt-0001.json",
+      "sha256": "7673b0e8cc242d995a17f978701f0ffa8d2c9effb144a772c42b4045144064f6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/4fae0d39993e73a12bef133ef57c06a97fdf31e1ac234f442fc95281435eb6ec/attempt-0001.json",
+      "sha256": "2a409a923cd6f02334e280efceb1e54b6223270c9901bd578063a58cf6c28c42"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/51ea3b69307eb0e7b21c8680820ccca1c153f7a1da5f56ae8f9d2430ca7e88b7/attempt-0001.json",
+      "sha256": "f17537436a78629baa0b1da99bfcbe51fc5fbbe014c79ee068534916cf0e47da"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/57c70e918c3cf1d370e694a2f4051249558f3e042807d7180a5bc4dcc466e9a6/attempt-0001.json",
+      "sha256": "c68b4f90add22e4bf8c94198fba5146ef63e70d103455e80fa3376a983311f5d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/5cafd41dcaeab047a47709341562be36c21466ed49a085019fbf5b07b4f965d2/attempt-0001.json",
+      "sha256": "f5a2fc27e2af5717d7b6473bfab050c1ff8ac25b138f7daccc8d5765506f4696"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/6e875fb0cf6b44247f3d8b9422733b9341240968ffc5d71d37537ce7f3ac1a5c/attempt-0001.json",
+      "sha256": "5242b3415585c5e3687f0b495dec8e71748f2b7b1bdd488dba98a2984a154af5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/788620e4cad79338ab2d541b61ba073f3cca6fbc0f389bb9abbd4c3a357ba5a7/attempt-0001.json",
+      "sha256": "b76a11af832d8eded360c7f13bdb906fc16eb20f8445a833079eddb2bf156177"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/7914f3ab01e2c28f239c22600fc9442e308cd45e00d21ba291797a9f69a7e4b2/attempt-0001.json",
+      "sha256": "36270ffef9aa47d008fc66b64ae17e544efbd87b4b47051f3ba79a633600bf8d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/88035d429250396d281776c5e09fcd762f5326c36f938443bf6108b4a218351f/attempt-0001.json",
+      "sha256": "1f5f857bba10d3cc44f672581aced2bfab1fe31927498038d9b0fffaed405d3f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/9ae6f1fb6dd54a57ab40bcd4f082f39ea1841b85845d8dba67b8d0241f8eef48/attempt-0001.json",
+      "sha256": "586a39ed0823d31dee432e6a0036c624f1ee34932a4515ea0be753dda55c46b6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/a9c5fa332a89a379e8a90feb856968cac4cbff783afaab0a04a2f396be84f14c/attempt-0001.json",
+      "sha256": "20ed1415053fd677b1d6130e0359fbae113d0f14ad0f9f14069991f9967e7c8c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/b1dfee1d733ed3aa7d7a5d2842736bc5478761d7fccd8fe1ca62cd2c27842fc5/attempt-0001.json",
+      "sha256": "4645362ad673ec018dea74b41aa37101d7eb3f7d928e552577ad7bb2eee6ee8c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/b350c5620035390eebb6b7c990e223c76a4523b48493957ef42e5e6dd659b4cc/attempt-0001.json",
+      "sha256": "a2b2d2213f025f301f309e52077d6fd357e987ac181be9d59edd681232bed5a6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/baecb35b753200ef6fd209f07e8ca57f74bb02f27327144566b07e8c5e780981/attempt-0001.json",
+      "sha256": "f80ad72d9a0a4243bd60683e81f1bc2fa87f5c0e257754a9578839a375e0cd0a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/bb479166dd1aa0d8f5e4293c1db758b7d1024631f0dfe5b26cfda433c61c3473/attempt-0001.json",
+      "sha256": "884f5d3d132e439d85bb650b6883549ae546e0f96fcabc90fe30dbbe52fa4ad4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/c35628f4b47a0440dad97980f58a8c96924fe57e8428b83c1eb637fac5219d03/attempt-0001.json",
+      "sha256": "844061c9f64b27b891e5f0ee5d29f7e2b26cf6cad0332196ecd778d78239e990"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/cc59b2ad5fad8a4c082ecaae920f7c67dcdbf00e19f5764f8364126f8ee4fa3a/attempt-0001.json",
+      "sha256": "d23b16185561d007794aa1391492f22f35a321ddfe4e58edc8a1cf9fec17fda2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/ce3869a339dab620e033fd36c4ab77ca92dc0df626b590dae26c0eb098f28922/attempt-0001.json",
+      "sha256": "82c7d9643daf5103a576569fde470027be5ab699f4e6aacc1fb22d90ff1b4547"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/e20d8871c0fa3dde6ada01585efc6225ee9dbf961dc74be75b479e8f4b3c5983/attempt-0001.json",
+      "sha256": "960fe9062b1bf6a91ad3b2d2de57f11b768ed87a84991e21ba85d48d73fce4f5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/e89cff92e5eeba6d4110bacd54f015b2d6001a71fc499a2755f8fa8c68aff5cf/attempt-0001.json",
+      "sha256": "13beb966a4c6f8e08d76da0c79e9ab48d2f7ce4e7fe7ec8ecc2c93098e0fc2fb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/f2edc648f5623f77b7665ae93530e0f698989ce1dea084ca43d38edcf02e8f71/attempt-0001.json",
+      "sha256": "3dfb5814270623f29b3e2fe673b115218137311a79327883dcb0f14de2d9ab20"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/fd0e230d739addea3ecb4e338cac63f89d2f7c4f2f88ffdc5fda9e660afbff94/attempt-0001.json",
+      "sha256": "e1f155eeba779440352c965cb47bec4bf7c5977c02315513158a286998b4c357"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/round.lock.json",
+      "sha256": "82ce9806e166e7d0c5dcd7c0bd976c1d60691fca609e9cc0999b571d7cdd9316"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-capacity-repair-v3/execution.lock.json",
+      "sha256": "da9f6f5baee2cf334484e22d4e2f9a0550dbefb2aa275d2368e61682ddfc9306"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-capacity-repair-v3/source/evaluate.py",
+      "sha256": "97d75f9213c1038ef72dd8b79058feec37fccc7f7084ce6c5327618b12c17517"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-capacity-repair-v3/source/inventory_hosts.py",
+      "sha256": "9ba73a128a997bf17fe7704a8f4229d04e00a1b2e0b45ade2bda900bac4388af"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-capacity-repair-v3/source/resource_admission.py",
+      "sha256": "89ffca79be9c2c92ef5735ea9860f26d5ad86245be747123d7ae6a10179de6b9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/03384cd9e37e3a8e0b1a63820298e06fabc976f95df5bf7be0026050edfbb41f/receipt.json",
+      "sha256": "518e6a7e687251da02a465f7633fd44cccf786d5712dcb8a637c3e28cf202e92"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/037963fa205ce0ada6bc0ea9c7c3b645c1132117faf276d2bd6a71ea4644660d/receipt.json",
+      "sha256": "fa3499e279df5751ac3a816cc2790e71df66570cd57bf8b79c78480fb8115d0f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/041d6e53e57c0e2d8b0996720bb34e4d58bdfa3338035c490dd57b91e317c1cc/receipt.json",
+      "sha256": "b321caaab26326b72fbf268e488c45f57d51b3684dca515e8ef807ed2dcf2134"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/06c906b60ebcad7dfc1b97d911f74489df466fe557654e2e4d4d4bd21b4963b7/receipt.json",
+      "sha256": "f8500369d53c5e02bf625001320e43a3a375baab2418435b72a4586e90e6b0ec"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/098a55a79fd8e5ef3b110393c9cfe495d2a6cbf96b688ef54e91da549e5a76d3/receipt.json",
+      "sha256": "d5fdbfc185535560848873b2b1e23502b102a25314e6257667f7ca59359c734f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/0a4325e42a6dabace95d57450b912dc02c1f156fe3229f055017c8ca3a4db9b0/receipt.json",
+      "sha256": "d826f0337a2d07bcf3a3cce18b6a6528a2ff9caefab24bbd77329262e314208e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/1041bb4ea1ca129c3fd1d84c7f0c02959d9664357118e1616458bfd67beafdb1/receipt.json",
+      "sha256": "c0de7ba9bd2f480e1bff558dbc581c0fe40e3ca7f16231f92b150540bcadee99"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/12be8375a9a432a773be339a947c4f215dc21b3329266806fa534c2ef498bf7e/receipt.json",
+      "sha256": "229a09f1600abf10eaf4e1b78d8e66b8f7fd75b20b445ef197b458a5f5ceab2f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/13961456e1628f00f37f0793688caf2bdea4a6378a95881d5d78916972f73bf8/receipt.json",
+      "sha256": "3371734cb7361ea14bb510dd115029593994ffc83693143b93a38aefaaf556a8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/19f51346b02955b28afd1fba7c663fe55681175970b8f38d3a34b7deb7c21580/receipt.json",
+      "sha256": "09e9e4f44c70424b27ff0dab69e036868fa6bf079ba4d208393f806d362136f4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/1b1d2551876c384c6aa97069ec606849e7e5d22e060903b9196241fc92b88054/receipt.json",
+      "sha256": "051e4ede8e1d2c4afe0f49f5df1bc52a4052d76408459269611e26595d2b9415"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/1b32b86370ffb7b45d31c70cbdeb71968cfe1f5fa267132d1d157f3600c0227f/receipt.json",
+      "sha256": "468a7d73f8b0d86fd5c44896e132f661e219e5ea0c78eb9c4aba891cfbffffe3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/1b5e423e8b39ad2ea07077982c36c5580a99a1c187d58f67124c6590443edde0/receipt.json",
+      "sha256": "8ed371fb59b7e927f98c4686d337440ee8c105240e060dbf2ff93da35237090c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/1eff1e5991f66edc72f00bfe5b8f4e55f79e33beeecee3f63f123cbc8deb0931/receipt.json",
+      "sha256": "30a50d6f9220ec1f8bf0e48c2a5163401add6d1b10e6546869d2a50a795cddee"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/20e710ea857684bb73a25234a858b48335abc11c6b02a0eeb774bbb1d30dd09b/receipt.json",
+      "sha256": "d6dc8eabea524ae73b43724ca1162a452788f2ef49599745bb801f0824bad66b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/20f2fd51099bd2560631f672b3d4dfca9796a684256218470ad3e8c8fe2360e2/receipt.json",
+      "sha256": "b366417819cdcacbe675ee870a4fab177b397f8f557441d0e9b777b60900f3e3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/2447bddda34f073fb56e83cf4f7084f8e9cabe27333aa926d3a8be48df7ca178/receipt.json",
+      "sha256": "e1dbe86df972d506869c1f9d010a9e2004f1938609045ad4d7fb89b891b7a65c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/24efe28975f99334221807fa2e88ef317556de464a7aa376d8d66f8d989c0482/receipt.json",
+      "sha256": "9cf27711586ae4015012a725d8480ac61976b2490c7a040dfb93ad6a0c20b86e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/28ca42a84b1e0bf56f2b98c5decc21bc987b86dc7e6244ed266d217023946b7d/receipt.json",
+      "sha256": "e4828bc748cc9f9f2aacf5f8384d3306e12c125117356d38f7d51b6c8c8de483"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/2a6287f93af8f9fef4a645c03a9c62320bd28b78657da8646e5a249036388fb3/receipt.json",
+      "sha256": "e9aaafbde1276fbd022f4c5b961999aa9f685e623b9f0846762987313758429b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/2b35185af76cfbbdab8cf6c1a53ca1a83d20430b53365a82d52ddd71d95ad182/receipt.json",
+      "sha256": "35748b7c4192bef74ae99c008f4fd3703557c677d625c1fdc60930e8c4a9fc9d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/2bbda8427d3758cffee29c4e8dce32bf40b1032494e5ef0d58bdcb7f7b74706a/receipt.json",
+      "sha256": "a8a3867910cbf513d04f7d84f5827137532d546d1e10c4f7b582d5413808ebd7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/2c1486145d6730296c85d3c44e3a8df80b43b4b72e34473afd685f628b5beff3/receipt.json",
+      "sha256": "78145b8ded28f47fdbc771f62836bbfd3e70e30c89b9414ee83bd77d4b33b08a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/2c46f5e801732544d56a90de5cabd48ad5c6356e9853bf2e084297669638e8e5/receipt.json",
+      "sha256": "b77221ae3377034390994e5e4e21fa3c7019f1129864b454a437fb69a3bc6a46"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/2e8abcb0a741a3a26312848dad481d506d4c1b2a382683423b0a01f8afad0be9/receipt.json",
+      "sha256": "bff1399713aafe6dee768b2c9517d3a7cd0ab7a121b77c3e2f966fe27a9240a9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/2fd3d7c74a5fd793934109dfccd1a628228f0aa4ed8534e8d39ee09e2b5b5d78/receipt.json",
+      "sha256": "8c063d5cdc64e82d7813b316da4c20fec3f9be97820f772407a03b28dabac006"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/31c119cf30023aafacadcc3fe7586627ae9e1f2318f862d9338e958b557c40d9/receipt.json",
+      "sha256": "c89381f661b4408a911bcf85fc98aa864fdbddf34c6d2f4041cf4808e2b88652"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/349bc458e0078abcfd2078b2275705ca2cc55e49527f32df8633963d00524d00/receipt.json",
+      "sha256": "d930274dad02a0963390a90912a8d59d361f797e80f1c87ca3bd89469eebdfc9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/367a17aa0a70a492a24fc8c0a78cde12438ae837d2ea64a43f6791226b13af4c/receipt.json",
+      "sha256": "ae793b1284a816ef18da73a790aa70a0c199094d03f5ae6358284dc35422174e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/36cbd183c943d5fe47828015688654c4de4a9d2de53a147734b58aec4c7d584b/receipt.json",
+      "sha256": "feb5b1b3bf441b10ae633ba2fc58aae992d3d70895949fc325c5c9d343f55f41"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/37680d39dcb1cd8445dc5614f291139fdc2fc5aa23a84c3af41e398d077858cb/receipt.json",
+      "sha256": "343e5b98bb6098cc7849cc9c159ad2266abcc1a22f23f7ed6cc88e1c01342ac6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/39102a53d7bf287e327a25bb3c8e91f6308cfb919da076cfe24257bc9f499079/receipt.json",
+      "sha256": "d28157c8d263b34454f8765d7290198a1e6ba6ad8d5a8f44c1b9c37e2be49364"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/3d8da37996ec446d88b70dd7cfbba31c80b7ecc8c73e93587ba577a640386562/receipt.json",
+      "sha256": "73adf21540099367585081d659719cb2e790296069e78bb1cfc435bb61a75fe3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/3fabbc4ae5f1bf128f7e196c20205ecf59e2c5d6af870696e4e1eedfdf1c23ea/receipt.json",
+      "sha256": "6ccbf3a844f1e68c9fd797c579316fa113a40b3ed5c7473c014eafb7530eb6b0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/44ffb0891210eaae6a176e9a3f8ed6ed17bb76bc9344c59673fa9dff88bc6a65/receipt.json",
+      "sha256": "d8476455a64eb60c1b408db7e13363c46a066d82264ed0e49cfafeb1cadc6944"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/46a59b06af744f759bdb33f81be43dd626dc23f16d86db68f6e1c77ca36626c2/receipt.json",
+      "sha256": "4914987af395d34e549ce8e491ca98987e92929a97a8686b2dd0cf7ccd52b010"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/472ab6d59be8f2e9d72240dcef3c4c8bf11f88ed421a100759e7c7b93b376c44/receipt.json",
+      "sha256": "6eb4494034b0110cb5eb7459eb77a6aa0b4741585c1bb6fe20f237f000b2a1ca"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/482b1e5bafccb1cddc23d98567d4ca69db68796a146698dfc6c2239f62dfa3ec/receipt.json",
+      "sha256": "7ce7e6ba07975722ba82c612e6ebc91275b9daa75c857d1748ca626fe2c63fa8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/4a62d248756b23d28ace4a37cfe3a778026d40996aee5191d7ad7a70c659d031/receipt.json",
+      "sha256": "5f6fde8aa1fb463bca306608086d4a291817d7eab4526efd837b0db19a25c82e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/4db68d9aac131707e17bf112ac47b27bf83a611088d36d940bc3d921b654c4c6/receipt.json",
+      "sha256": "520286bd069a5a95f1ae34c0a1de3b33b71de698bcafa3030233f95a9bf8bf1f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/5068d5cd279c2502aceca0b1075ed630cd96ab62bfed4c0d6171254a4ff221c1/receipt.json",
+      "sha256": "ca29e8c721b835947fea50f75b36cefbd4551722446994298e0159bd3070f52e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/51d09cc08fe21b2392b4eaf7ce5d26a05794c4691b0e0e4b90ef242b5d2be93d/receipt.json",
+      "sha256": "dadc16202369f07149b8d231b4e63f85e6b16d0ded2b81950be5e4170f82a192"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/522e890195d61de9531d063eed65cb477174d35abaeb3fc65b3f7ca023dd49f1/receipt.json",
+      "sha256": "cb757ee47a8057b66dba84dab53d1868906bdc3763935643111cf73711f2eab2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/533c67407dfdf863b9054e31178449524a7fc96a80a00d3e8eb429357f954fc6/receipt.json",
+      "sha256": "8a8015711c91e28ac10aad9c6efb27fb6b3438289a55eba3ccea24cb10869a19"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/5702ea08854224f8ee9a2a0f91281e8e95e65de0ecc2d64b31e752a2145892ea/receipt.json",
+      "sha256": "f4d93b92af0cc766137c3d8b4f05d13b4f22b11964155fe31a31230e96911af3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/59ca91abeccc52cea963e748318e0c0d000e3b67fe879af3d3cd917b25b40086/receipt.json",
+      "sha256": "01cdafec22e2537238e64249980e538ba358478ab41a9e019e150b00a262ff1d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/5ee9973f98000b8fb377f0f047f154421d3d1e6edb9c2a6ca84223a49029dbbd/receipt.json",
+      "sha256": "171cd08d3d78952530cf7b5658d45b550f79f813c0dfffc26424413fa002afdb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/5ff0a70c9a22d71b13a48a48f7a238e787e72e0f33ab1628cf2577b533216f97/receipt.json",
+      "sha256": "d3a33e7f612598ffcb1bc31a3f1875f3196d838ad0d87d830d594b2037bfdf5d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/60a2b3f78276a1881dd0a62d383eb8772ec1617e93942b09b4c38bead7250c9e/receipt.json",
+      "sha256": "1b1f3d428f16c0b653c691da940bc3b3dec8d74c70b2f95a282db19b0751c440"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/62584955b57c01ecca32ac4a3088b22053adfd42885a2bfb7fbad245d8bcf3da/receipt.json",
+      "sha256": "ba2e170445b97b3e0d84ce57e5251318299da1e7120a0f16c8ad6a64885f5b91"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/6400780df04030307e058e29fb4d1cad61be05e891cf21c987809961308b621f/receipt.json",
+      "sha256": "b0db7c5ed02dca8e600d3cbc7a7edd57f2fab60edb3222e0ff64b680ea8d6ad4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/656f9c4ccfc213f1a9dfd7c7a39afe568c785db602fd14b60fd0ed717adecc1d/receipt.json",
+      "sha256": "d5551abb68dc9ecc0cd41388c2bb065a0ac74f91c9cc62fb85a81ee4ee8970c6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/678d5de0bad983b745e4989729e0b32627a88cf3aaa30e7fdec1286767d2756f/receipt.json",
+      "sha256": "f25c7606e37be635626fd0d69cdc8ddd5dfcd36a806230f9546f949ff3291e5b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/682d14e33092a57fe7dd70470d1f4ffcfa679a5b378e1b4894dff993061fafa8/receipt.json",
+      "sha256": "ba0e4028a954998826d5880115d315c970ae59714f02e9bd8bd831274653de76"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/6bfcee7c987d52cc61690439d71d6f15044049581fdc12056327007ac0344990/receipt.json",
+      "sha256": "23d9279244cf01074a0d5bfc8fb0444513ec1cdd3918c2ffcdde70b83862fdf5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/6d2d88d8795ead92ea46eff18ee35c473c7306f1b6ce9389a86f8de901a9f09f/receipt.json",
+      "sha256": "5abd301fd4d7d7eccca38b3eec12a8714ef686625e9429446fc9f314ba7ce773"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/6db476bf2986382ad4d2dd12eaf10707a9282c1622f20e1c1e58dd50e8251326/receipt.json",
+      "sha256": "f48f3defec09fc3a6c85e319c5048c29d8afd5fdef7a64b6e195382dd0b05a5d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/6eadd42ad8f2a87e19c1eb2cdafc127f5c26aa2d6c7367f1d73c33042be0b16d/receipt.json",
+      "sha256": "a485bd3b2b4a97a4aa7a904cc2559001cc7936f0a87af310ed242bf98904401b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/6eed71665342f34ba327a69911a15575e92c8a0fd8e9a5319e15dcce2d0054b2/receipt.json",
+      "sha256": "6afb1718017381bcc01d0ca613be8eabdf4170ca86c87aae2b77ffbf7d7a60ec"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/6fafefe526e1735d4d10f1cb73e46c037fd11b827f0889274aed76d8ebd5409b/receipt.json",
+      "sha256": "e8a0c0225915769f79b0d4e75aefc9f490baa270897557c1aab5fd6f3780e773"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/70e49c74814648c378a2e2b17aae1106362291171259d24a5ffc338b2436d304/receipt.json",
+      "sha256": "9afb65b33ac5b4ab203a20a2cfab446ba6f0560e549017d682f14cb8b36d8c60"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/7163b424398a7f403b396c22295943bf64a5af552a3b3c2977c64ac641347e45/receipt.json",
+      "sha256": "e5355f557c7fbb3cd4503b24c285565965b407714b8ef582f9a96466c79cfebe"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/75081b5e3a52211b73ff3c98ba311baaa28a3c2de2ab9ba544c34751bc862e53/receipt.json",
+      "sha256": "796ad5932b9ff4fb206fb1780acc434995e97da78de9474afd1ffce32e705dea"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/75b8b75b673f7f74a47f486dd895760fee9ed4b3e7afdc7dce11262ae8e9522d/receipt.json",
+      "sha256": "31b5e173c654955d7d1327b8c70e24d8cbbf6bddb83cda5011c3b47b3f5ef49d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/761ef57da207df8be9fcc3a709f5a9d9f16f2df0c5e772e9e73dc61cefd8274e/receipt.json",
+      "sha256": "422163cddc8dcf6013f097c74333e7c63bb93b50c2b6bdbe276b0c0353d8f693"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/76e40cea2760b056ac6197c7cc391d1175c77b56b2c28d6c71293a60477cd8c1/receipt.json",
+      "sha256": "339c02a9c5d679ba798b164db425c9200640eda0c22fd0deba85d2832b9b8ddc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/77b948d8949860763c69b2552d832225a6a82dd450850b59498d4652874d7215/receipt.json",
+      "sha256": "4906eda5a957b178fb6251fb506dcc72e189aa79ff011d9f20cc6d53368e13ae"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/793fc77a96406f5fd119373074b9b6417320f02b0785e5851c104685e99fe409/receipt.json",
+      "sha256": "c3aaa76b20fe3f5fa0f3870679a53ea24e15ae1dc340b44dd2ed8f773e5f51a7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/7c2b87a87eaa5a9bf848ec597a75ec709e172a7e5a74654822a94359b61ae10c/receipt.json",
+      "sha256": "7e1b5ea08795d6efad8aa0cce03d0412a363f7251bd1450b2087cd5fbf09a4d6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/7c69d50dac5d9529a5ed248d79b9a140b04bb04c2b569b156a3337ce801aca02/receipt.json",
+      "sha256": "96d46f769306e173258b3b55704fd54d7b00f0e5645e386e2e6ab8e146c41ab6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/7ee262b63231d556d0136e153e914499abb47d10847b40820b0b90ac20e7b833/receipt.json",
+      "sha256": "359271df22d5df0408a9ca5c4fb61a856c7a358b83b9692b9f8aca82050ee7d1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/8085b0ecc759f13ad473e9c2043b4ec51b40a79499af7b395aae6496aabcb751/receipt.json",
+      "sha256": "abdf79c7cb16b4b832025d30685ce277a1ae86cecd3f13efa6c69ac1bfe02c31"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/865c09a8756d0fcfce5a3a83567b12c17771314eda6f50f4a02374b53ac12fa2/receipt.json",
+      "sha256": "44ec3125d8e01a7f7c0ad5ee84456989f13771f93227c4bc0b34ad0c64d1da06"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/86f0f70138d0b867140a4aee2fcfa3743bb1753b23bb00598ce5b7d69949ae31/receipt.json",
+      "sha256": "ff3f306d88d17e8d8274f86a52fd9d976fd4a982f646e67882397a1eea21873a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/8732424ead31b66f778aec84cb25279f7ac494782efdcea9f502fead546006cd/receipt.json",
+      "sha256": "7cfa4e4c7e8d96f33180ad0fdcc5d3383dec217d829583b77a9be186d9ea6d9e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/89f0799dcb9d3712ac5ae83524e8ae2519bd68aad17803f270186d2d626ec17c/receipt.json",
+      "sha256": "29204052fc0eb20622a0b741fd2e18356917899d7e349e95480e93008787b78a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/8a3dfce918b51edc8a1138b8037e6458206f548d5ce8d17ca32646573f114aa7/receipt.json",
+      "sha256": "9df2f34bc7d9773c18c39615909a31c84f590ece2b23d18ec53fc2a0b8e8536c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/8c31e37c502bd9cdca12d6b420ebeb9ee9d59c30ce8550799ca5906bd2e63dd3/receipt.json",
+      "sha256": "948ff67e5192578d42ecd502491771d4f74c6fe73c39bec892dde3b595b326c4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/948b6b318b6d52c4db4ebdea600c2a98fcd6761ad032ee6fb90d7ef62f0dd80d/receipt.json",
+      "sha256": "90c11beff23bd7f76023ac1aa68cbd975d1ee4d227954812c9ae4352c693b3c0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/94b67efd10bdda46e27220bf983ec124c5cc0625e5dbeaf0868eac44cc4c9fc6/receipt.json",
+      "sha256": "a943d6c02f8d9aefdf297c1f41195a25e4712dfab7b4684fb594cf7e345987c9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/9aa94fd294c337ab3564baca85b27db43231cbed6baf9fbd2c9b86a8128498bd/receipt.json",
+      "sha256": "e7ff9e944262b469126f37dac65e4786a487e5a386207b5e8d5e814c90c73efb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/9b46204eb66646e7b41dfdc44de447b6f100331716cf3934f353f4408226011d/receipt.json",
+      "sha256": "ef0bc1d66e833cdc4b034263aed6164f582708c9638df2a3a8a61689b109154d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/9bfc9b0ee4b08135d92e2999eff8ce9b159b5f09552177c5e50f614cc9b100bc/receipt.json",
+      "sha256": "c01a727c52369eec379a0b0b5c6c417776c40a0a42323ac7084fb33997972a8a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/9c2119d490e402578f48e90d4307ae79b713e3ad801b69388ec77251a1c0af3c/receipt.json",
+      "sha256": "145bec05b3d21a21e31ffb8b71b79927f3b71165cf5fdf26bab7b03d31c39e69"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/9d7c2891d45926a7ff843328f439531c0bbe6e9c0c46c39b11a0aa2ab02c8b3c/receipt.json",
+      "sha256": "b7168992e58d0c3af633a56074574941c0abe26f9b59b930f58776034ac94d28"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/9e7371c1f883dd9c840430cb44b3c741912901ae9264bb8d45668d1c0e700212/receipt.json",
+      "sha256": "1fb4ee0b9e95025705df8efdc75c752c51c3b75f5ab14901962785d2fc141d56"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/9fee59db1e275d7744fede45fb2cebd3ea0c7032bed61b6728975cba97dc6f40/receipt.json",
+      "sha256": "c52b589447eb3a33388b40b9c18ba5d30cc600fb46867ad24ffa3df864822c82"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/a0592633c11ea301514fa9136a5a1a858ec004a467d7ad0bf51c306798cbd8c4/receipt.json",
+      "sha256": "9ff24fbf6a8fc81ddb3ea53da21d1e8c40e3b30d87e4679bccb96fed3c634349"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/a4cd19adcca6150c7319073e76b7df705b3f28748a7e97d4e592903197588d2e/receipt.json",
+      "sha256": "a05e2ba0a98013443e3c4c9b702a3ed55ac6c84a922345ec3d5f1e3bf5ddd3ea"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/a54d02000beb26ff08122421390be3dffef94473749011615bb9b22b6cd4727b/receipt.json",
+      "sha256": "d2b390d9a641386329f28c0e0de7e1738fbdfb22f296b395a41c02c8f7c92e6f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/a77c6017f8badafea5824044f83862b233899f7487ed7bdf237cc0c93f2e7b69/receipt.json",
+      "sha256": "bed5dc733d0dc56e8c3040bdf0a459fdfdb99f2a88d6abd78aaf00c2ea339a16"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/a8dc66dabef49b6c1b59ec891c6a201a395fbac2f9b73657f3f631f3e2aa0712/receipt.json",
+      "sha256": "9cdc4a03cbe3fc637b712488414ff0ab2a20ee2e5d1a389cce8b77c47c7b2cd7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/ac9690e1a615870fd44ef6b4e7ae9330bf72574ec1d6dcd3876587b840f53ac6/receipt.json",
+      "sha256": "093b728a2cfdf3de3828b85493d848e3ab318d2da7a4f3e599fd8f8ab6ad998d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/aeb5a77f98c980150978dba9b6026a993b243dba7203e5b7f1a3268293f390e6/receipt.json",
+      "sha256": "b04b37ff0c0418ce6868fe5955c6fd4205bd82631a812d71cb2e167b93d04afd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/b192dc4e3a75a9c34e1f744d7f4c38bd5603583bb5b20679cdf24d7810d552c0/receipt.json",
+      "sha256": "68612e60c44c08e4647d991ef0474b42f31f15bbce7b98c903258402f0e6ce78"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/b207c1ca03cad660d80d62a36b2229a6531ae4c98bfad6b951f60e674545ee3b/receipt.json",
+      "sha256": "dc358cf9835e8496805a51c1ca90c9232a0992552673a427d3ef141798fc0457"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/b2f695fc1a0a098fb7f323e10826ee6adecbafd7abf1132ac3e1bc562e431f77/receipt.json",
+      "sha256": "d1add845f20786f73207c69f4fbb66397f0a3aaad85f5f3f47e1055869579d96"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/b39c24e1a4530eba41ea216f615572b065f421bcea230b5eb5362de1abd18016/receipt.json",
+      "sha256": "a2eae0413e9577b82fb7dd85f33e6e93a7c827109b389ba24f8916981ba9e92e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/b873b8a7c95cf3e0172a1a6868e8d9c1d01c7f8bc9e28c250942240784a403f9/receipt.json",
+      "sha256": "09eafa71089bcc8feb68707ef2f487222ece55714deab4e036844b9e3065d8f0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/b94217c1baea47523d65daf19ccf607222ac294360b15ee0691679198de2eeaf/receipt.json",
+      "sha256": "608505b76ca6bd34c5cdfeb9670a9e72cab58e070439940dde538697a7f3b953"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/b9a78a2557a1af5c31191b8af5aa9a6cc911f88a7ed2bb37d2b84cc2822d4b84/receipt.json",
+      "sha256": "1e412080ce02be075bba445e9e5b724dab8bd7f5fb1433a0b8332b2c915969c0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/ba4f0e24f3f6f87f8991a67ace272a799e480aafbf09719f5013766e3c51fff4/receipt.json",
+      "sha256": "3eb73d604c07f975076527387380509d0c105b25cefbaa1407e6741bffe523f7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/bba4cca6c0f15493ed089c294fa4b894ee7bf155460f1b9cce50377ecc8e49f6/receipt.json",
+      "sha256": "57fcce6786689a33307f789e2e45f1d96b1f5a5baf6c8efd7470a5c90cc0d448"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/bce4b12541a1253598cf504c679cdd3cb2cf247c0edb94e8bdf06ee4a3c27db0/receipt.json",
+      "sha256": "34b50e1af0b03035b6641cfcec7b5a33168329a22fc2e097fbac28f15b1761e5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/bd3d45f18f8e702829580967b43affc6722b1a1adbd852f476bab67c7037695d/receipt.json",
+      "sha256": "08811461a4ae3ea2fbe987e761795b6c29025559768711853db7b9cb76988526"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/be1ab77450b15b021ae84e68480f0a162234521490c7a58a2cf7cb1a06db015a/receipt.json",
+      "sha256": "dce736c6337d9076d905d354ee1c557368c4e1eeb3fae1d9fd7fb7385436196a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c0182819a9249086083cff7955f62ded3abdd265e6b6a8a39c52da26d94e4970/receipt.json",
+      "sha256": "8c4cb45674e7c7c2d856325a7397e6ee382b523879a315e4c6be625a4ae10764"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c33b9cd3e3bce36d31749ae98b08c0e9daf8cf308b38cc927e074f7f5e08f311/receipt.json",
+      "sha256": "c5a0e8beda59383c2251e90c7c2272c298ae7ff50f2b9ab99ea1fcf20f86c9b6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c3db366536cab08f5d15e337f2ebe0e2c7805dad45327f2e36320cdaaae42652/receipt.json",
+      "sha256": "c6be2457e4ad2da65dc5c82eb1bf6951db68590be2040c3a41f97d0117f64cba"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c5c437354b4e52de3fe624548baa0f328e6589dd26be01eab67fd2a663193a2f/receipt.json",
+      "sha256": "c2ee00ee03c8fcdc159bf372b8b6247319f1d74c94f31541068eb9780e959bbc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c615bb04e49e5b90494b2c50f86b06707c80521269cfcc890162839c844b26b4/receipt.json",
+      "sha256": "d13d6c8c276604226cd26662a0326eca34cf614ef66f0456a56b1dfb9a4fceae"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c61683fe0733844057d14a583f119733a5afd3f113c01f7d223152f330c9ce93/receipt.json",
+      "sha256": "1fce04f21bf118e12d5da86f8cd1c6d3b39338e58a67b4b14981c4d529c707ca"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c6257654cfde5e647500a095a0b5956d7b7834eabc76e1f1a8576e01a73c3aba/receipt.json",
+      "sha256": "301f89707773c27fcacccaf7b92780607494841b2f3a755912ea4c91e26883ef"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c84dfb9b8059a0f26a7c8c3bea42fc2a493c8095fb3834e9f6e081673ecc803b/receipt.json",
+      "sha256": "df9bdd68ee463b72d161b0b9c7ae1337fdb9f52c3e5c847f41417266e6422308"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/c9c78cf0607ed6e8d1827804b83bae861a67a589ca5afaa11a0dccbfa75609a1/receipt.json",
+      "sha256": "a5739cf6cbd3705827e6c026144645c49c0d4bb7d457b5c50246cad5443ff086"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/ca2f79d6759ab21e535c3be8c1cb7c8b966aaf2206cd1208b26b3e69e9eb0964/receipt.json",
+      "sha256": "72d932d4ddcaa9082bac2b45351fc9f33f8b51d332264b2f8b9f37a2d05e3df4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/cc9ac39c41af647de039eaa94c9e7e8aecb84aaeb1c510f1ea1a820003107887/receipt.json",
+      "sha256": "b880acebcc8288f5bd20c28edf7c3ef2cc9d9d33f6a9ccb69094cc61f4cd13a8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/d00eaff79a1ea6d5250e206e49ce2356b5970646de0b1923569fcd69237b5e45/receipt.json",
+      "sha256": "13897540770fce6abae4c9dfb3031b121df01678d61d77e06ab66ef069d4a62d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/d15d4deade0fd42993d50ee85f5845b90a3b0d3ec88ce3ffb46402e8f5aa2272/receipt.json",
+      "sha256": "ef69762a1ae08a00e25b8c0883ffb364c442fe7ffe064e3c36c456bbb00e2d60"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/d371cc1472298684c0b4ed59fec11a58fd9cf358416dfef285a58bac25cfedd7/receipt.json",
+      "sha256": "2a2fa0a54197151c33df853132b6b3f72384a415040439d7bc641f406a308b90"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/d4cc0e51f7e17ebf49593ea9cc6868142de7f84839b7ccb935551d11c073f9b6/receipt.json",
+      "sha256": "3a40f31489e74e0ed7c47bf8b38ecc1649bc0b38cf9a8b4caff1a1e8b820994a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/d9d8bc8656d828e4c50410d7b0dc7fd18a42f1cf47193067f485a92ee7222df3/receipt.json",
+      "sha256": "6fd6c78628d81fd1085dd608c0bbd7f40d5816cfbe0778dfa25eb32d885245e8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/dad438998a922c065eafe504c226f864bea85903e7b0b851b2c24a1834e08d2e/receipt.json",
+      "sha256": "2ca2398df00c7021864f3419fdd2f57e540335e795d1c3d2eddbb485713592d1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/dae63b5d7507fb711e10485881b5973fc2cfbdf50d07e83d439ac7d3cd64de70/receipt.json",
+      "sha256": "937825616768dd4ddb5614f4434bd947beacaa315c710355bcbe87032f5a3f81"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/e1d58566997149dfced843ae09332ea26f0c374e96c445a3c5e3e9a8cb533fca/receipt.json",
+      "sha256": "13f4a4d26580e6c061802c3a4026412c6470d5a60db7c60e3f66cf6396788d6d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/e2e3c30f8e8ab3ed5d13c270b2b2ea4130eef58f99cd3386ec9e1d2bce1c4382/receipt.json",
+      "sha256": "e8ae6d79daf95f0529edd9eb92f1648c824dcd61d87712bf6f377a266a01828b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/e49a96812d01899c4724d1de5ece275e761b503610eef670b10b13cf0bbede6d/receipt.json",
+      "sha256": "31890cb1a265673fb318d38c455655eca6d83a719f34e032d612596bf79158e7"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/e7063f5a81280d45708040afcf3df07ff707ea3eb10f9b72ae53b171325266f6/receipt.json",
+      "sha256": "51553724f8410b8f8e04d5ccec381c7896dcbf90b4572a0a89091574ddd202e5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/ecd456cae9f930a9c730222ec013e8a7660506315fdd64cc190c3c8a4e26e43b/receipt.json",
+      "sha256": "d219148c371ad8fd112e1870affc0047c3085dad2306adf9137d52f57f1d4ddf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/edf63acd498f3bbea6ff6d172b7bab0adf0e41483416d9f03216794fce8a2ca4/receipt.json",
+      "sha256": "1fa158c284a93534114c197b17a7633639e0f5efc37fbaf6cb27e4a6f322354a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/ee059e3c636fb70a46b826668233d2afd57bdd1e07a694c256649a5ea9a5ac48/receipt.json",
+      "sha256": "a3ef3232d341ab5ee116d963dd4d8909b2565efc5e47c5dd34ac5409a23904d3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/f00cee0b213156daaa0c0912d720a58ef4e9e97da36610b51374b5db3942ec1c/receipt.json",
+      "sha256": "80320307f73ca045bb8972775feb04c37f5333ec915216753135563bcbc90900"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/f18e5a01242d09c3adc79517ec5e49a55fb7cddbe8c3c2c61ee4f9c4ed80e603/receipt.json",
+      "sha256": "c66dd42bc31e92cd32e4e7db009fc260c0b346070fcceed19d75ead89c2f61b8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/f18e98aa2e8c4c4e7215737dab39b6c0045ebbd17208c59267cc5bc9c07952bd/receipt.json",
+      "sha256": "90bfe1f1c4d5dfc23956ca328415e37311ec367749f5b0426fdb44c1c7c4129c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/f241d217212473b168d80dde5de79c70a749027cfcf31467d23ac5f33dc308e5/receipt.json",
+      "sha256": "ef7e3977573c41fa78991820d8955192948834b56a31ef9eed29ee9ee5ca1a0d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/f4a57430eadc6677aaf72e98c50251423456a242c674b99b81607dbe32fc021d/receipt.json",
+      "sha256": "7082ac496a42be985ac512e76259f0a50267914a909e54f741a6e4d1b115df68"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/f68df54fb877ab35a866854181e1e88a527f7849bf9dd40c2370b73892479a4d/receipt.json",
+      "sha256": "c4e2e43d18b2a09bc351698f7dcb670b9459b81634c2fd1aaa4563d62643eb05"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/f979d37c7e8c6ef4f2b8ccfd3c3f591e4116c1c7f7656eb20a00e3bffa56b1fa/receipt.json",
+      "sha256": "9849c9e3f19cad9e95442a2da912bf442ae5ed072826ba7b56189591ccdce6f8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/f9c20493624ed49a92cbda68578fb15bde29cfcc4b173c9a58c4615b274fbb39/receipt.json",
+      "sha256": "fc65cedac5b86ca3d0a20c35ab024d45487bc6616a0a554fa3a7eecafcdbdaaf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/fb6e64368938d89028fb6486d209208ecd38ffb08a74c8a6f8862883ddbc94a3/receipt.json",
+      "sha256": "7efba1bfdfc573f246582cab71961b114298f478ee226c9c5203b6d631117685"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/fc9d3d1eaa00f04d91eb40fb9ec5b7316bc7460df5a639e8ac65fb58029f4fef/receipt.json",
+      "sha256": "fca7d9f40331609792e05843bb6755e30acf094758ea72f3439a4fadd2439aa0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/fd9717749b95cef031f5d8442802dc50a7ff403d9594e80b6f0495a1adc6f479/receipt.json",
+      "sha256": "52cc2fdb26f09c9e804895b20cadb9081d8984f3264f470788bb1e639ec6fdc0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/fe0765b1858c0f110ea79de2e2f9c0446078370c86f3a624b9be9ded8c09b223/receipt.json",
+      "sha256": "343461a3c0beb418cea86a946cb4d59c97e7cffa4f35639abc3b8c299445c667"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/cells/ff08f95dc07eee91395dee9aea84f35e33e98ef5708373c35babec5f65f2bdfb/receipt.json",
+      "sha256": "08b1d5e49f448f258d7bb844a39a0e9a18b654415b7570c5c3d6df17b8de9093"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/validation-v1/round.lock.json",
+      "sha256": "1fa7ad41a2d6058cd080b882fdb74656dc7be40bb1badf3b6dcc1b36d785875d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/00449c5c2c378891db9d4399781cfe46797121300c2812e65e7fe156d36b8d60/attempt-0001/receipt.json",
+      "sha256": "e25071f93cb4c7f79c5726425c55bf9b579ce37e889919b02c684c0a5e4ef272"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/02a78d33bea48fc86452a07ff937034e5fff03667a2ac253c005bbed1f5cb107/attempt-0001/receipt.json",
+      "sha256": "100a71c34a22b4112d133ecbee91271ef4ffe47a563181af5d97305f991bcf0e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/083a9f5b6eeff2b9d90878a50c9de701dbb1fd509ad8b7f269971c978f5cbf00/attempt-0001/receipt.json",
+      "sha256": "658b6d2acbf436165eff297120bb0df8b9e72004ef1cfdd8e963d57f34eb8dac"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/08e88c705735dd0acc119f8adc1a791379424011af39484b8848c9a80f099555/attempt-0001/receipt.json",
+      "sha256": "92d3d51204515ba66fbf59a5d1f8b9e1de4ad41c7b206e37fefb8b8e67930971"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/0af8391f499c7ca18d462e5fc88af884d47795fce301659205e1936ae987d9dd/attempt-0001/receipt.json",
+      "sha256": "9e8fb3f12322df8073f574074cf7916be4956ce731a07b174306c9668ea46abe"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/0b06827eb2976e3b5d6244959dd6b13fbf9259225f62c49156e38f972e952cd8/attempt-0001/receipt.json",
+      "sha256": "9c3495a4672fee8520c6f57c4fce549e1488a84d80ec6635a156df934a4b8663"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/14b08dfdba8ee4debd87741d13b80d971704db20dadb80aca11733e85803b1bb/attempt-0001/receipt.json",
+      "sha256": "116d951c69e0edc00862e8b86f35090149f7c3d8e6e287d97f574419b3155985"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/1af437033dd76945e4cc60fbe9f9111cbdd383750a68f84989c14696250e42dc/attempt-0001/receipt.json",
+      "sha256": "e5da550986dc0063f5ee812c089071eb790aa775b1577132de416a7d0db1313e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/248bbdf9d57c7abbfa62696093462f5512a72cf3aa0dc0439a1cc38e50bb68a1/attempt-0001/receipt.json",
+      "sha256": "dd8d3fe0b293464eb31449ca61fa05c23b7fafc858d262384323363655b8502d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/297eb893267e92b15a79ccae843d14663dea343d6b9afb9cdafc032ac03edbb9/attempt-0001/receipt.json",
+      "sha256": "95183d46da6865206b538890b0d3d67985fea9a5f6f633cdc3c0ca5fa6dc205c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/2c2f6ad7c798f61336a46ed8758fda6f87a5f04af817816679efbcf4a4e3e495/attempt-0001/receipt.json",
+      "sha256": "756edcb432fe0c8d8f13c61fa5ab7224ede077e45567b743b7d6ec60b810dd93"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/3cd865ed3f95294594e913b1f015ce33bd87d90db4f05b2382bef687c23aa9af/attempt-0001/receipt.json",
+      "sha256": "1642565ff0e40f91c90b5bce7cd0009ea0fbb261fac541ae33c70afeaeeb4201"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/440420001791d99a2a10c6d616b1d51fa3229108039b51e07c3f89a97eea7289/attempt-0001/receipt.json",
+      "sha256": "48c39ea9542231dbea739acb6bed82aa7c2d49d313290f4530a7bf9e8b454ef2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/4551cafd16c181b30704dc0fb9564fade59ccfa32e7a1b31dda369f51092582b/attempt-0001/receipt.json",
+      "sha256": "77e0f3fd5ecf28d94a75abf99ffe6718d9d5fb692862fd9fd01480284e4a63c3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/5aee628f3493d9ac2fef31fa60981ec84d5b14fe2f180d19bac554d5a0848359/attempt-0001/receipt.json",
+      "sha256": "e9ea674ba5a7449715c8743d6de66653d8e58d18c59a1ddbc0268ea881d169b8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/60365e35e8938ab6e0bec7e3473253801d283747fbb3d0739831a85f971b84bd/attempt-0001/receipt.json",
+      "sha256": "3747c459069f605ac3d79f8e32aaeb330e66712f0f0aa6c432ffc33ded8690a1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/649d6ea2def09e75d03634eef90c61eb87a6667a7f65bff8144f85d3e6bda49d/attempt-0001/receipt.json",
+      "sha256": "160bb3bb54d7e43b35c25b3d3ce0b9bde97b7f79176cd618d6d4734635d5739a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/67faa88797ed38e5a97bf46ff1ac2b749aa1aea44711bc81da419239d323b89d/attempt-0001/receipt.json",
+      "sha256": "ea813d6a9ede6d9b475540b4c48d790538fd3c6f2f5be6305220955ddc1d9c1f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/70cb3cd1f35b5a692032e0657c9f220f43011f471ab66a32c70651e208ce0dad/attempt-0001/receipt.json",
+      "sha256": "af17df81b4e7c1a2eee40e4ef73718053705ec1857205a230ac69271d2521db5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/787e5dd08266aa10efb95aef333015b71ae971d469e0d87d60eaae5475e4ab64/attempt-0001/receipt.json",
+      "sha256": "461fc0f2ef1a09f148df8b84ce72f5c20ffe4a6b9aa4b81cb84b39bc839533b4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/78945e65e47a18e5060c727106e3906aa4014808d2b577c242df49974ff67668/attempt-0001/receipt.json",
+      "sha256": "d67370ac1da89ac6ed941e663c91e3321d3ec8e6314fd1ff73e637ee195cdf00"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/79f9bfd58d9394934beb144fd6e2a8a682a4c6dcd02d77623caaa035633e99ed/attempt-0001/receipt.json",
+      "sha256": "2bff5d86da37eccf6e4b316f783d8bbea6f99a5346093fd02d0419db7c50596f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/7b71500e5ba25aa0c098f6c9590202e9e129d6aa7332854d23fe660a2ccbf196/attempt-0001/receipt.json",
+      "sha256": "0b95db9dd3f1ff28532274c60a385935790761b4f6abfd4913e8e3c06696baeb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/808073df431cf3c087e51b63d39bafaf128cdcbc5512b53ab6bd49a277096c8c/attempt-0001/receipt.json",
+      "sha256": "22e91e49b5ca86591b57b098e15a2501c6679ebe9ff38250c3f65eede9b6dcd0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/80d0e5c080dbdf3519c7e116e0b6f095183324cc0554d4c7fbcb7111534e19bb/attempt-0001/receipt.json",
+      "sha256": "1c70d2866be94d3d0e84372e7443c06adb32dceafcc73020617e236238d721b9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/842fbe3e1cd7006334358a6b6557bffe1854e0169e3462b7e283f3d11f7408e2/attempt-0001/receipt.json",
+      "sha256": "ce5efa013932357689cafb80655989012a8a147ae893612319829b1a0f47c055"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/8a8ef8d0711fe776c161db79aed5b007c81a04ec6c15643590b54001757a1438/attempt-0001/receipt.json",
+      "sha256": "f06b7f9192c7d844eda8d88e7eaff54b9147f141d9b8a7a9ec46a8f8437b18e9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/8d25cc2730da112b75d566359760b9b30816f09b473ce03e69b3f2c3f5382564/attempt-0001/receipt.json",
+      "sha256": "cb796dc643d5cb5151f1bed0d78acddc409d16d6829dc04429d9a9790d7177ea"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/8d46b910b99c5f319f00da48a23d8d350ed96347d09ddfb2c1021c604aae0dc5/attempt-0001/receipt.json",
+      "sha256": "8ea76514808ccfd2b0e2195b18afe15ef3c15872bd18bdb562a07654049c04c6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/9d096ad62edfd5cc382c59340923f57a0fb64c168d2ef8681296a5f3e5bf89a3/attempt-0001/receipt.json",
+      "sha256": "c9b97e7157a49f54b91d21c893cfa1483e12158d3836472b9135ceae05fd8dd9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/9d7f5e958d87ab9f6b032f2f2e3aa627c4c9c972720dd55fa8a55abe23ae6c1f/attempt-0001/receipt.json",
+      "sha256": "c1ff33ef7019946acc91d4341fe78795c0750862b54ed9ddd5b5850ad848ee27"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/9f28e8a46ec603ea45f2582ed1b29e2e8e52322692642bde27dbe83cf5be1538/attempt-0001/receipt.json",
+      "sha256": "257bb060fc4a92a96a7c2f0b5f351ac03b00f27c2564ae863cc6cb70e723345f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/a34b829a26f8b00e0ebdc4d33d45e4be486473f69c148ad27ce186c649bd0d35/attempt-0001/receipt.json",
+      "sha256": "a90129b771a089016ac2bb4dfe41154794e24f2ddec49b91d3508235f26b7a2e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/a575686d65aebeb7bb26498d21f66171f91a6414b6bd0ae778b64cc048798937/attempt-0001/receipt.json",
+      "sha256": "7a0b7bd4541a9f7a25685a9b37881e5ae89497e53fbc9b3b0f50a3d320d3858f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/ac65687134d747e4765a3d488486b9b82313fbb1f4198db3eca57747e1e751ac/attempt-0001/receipt.json",
+      "sha256": "2c9c05d218c0b231e30f859f17148b954a3a766816c409676bc92a8a15e68083"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/bbf42bb15e249a576aebf4275a160068ccf0d856b63646e3bf1b064135422004/attempt-0001/receipt.json",
+      "sha256": "d532c6b6cd60d9726bab2cfcb726c6098f582d471063c6b60025af4ce041d295"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/be0d06c6a7225af09a6450bc88def57702a683d275557cfc0068f0957799d8f3/attempt-0001/receipt.json",
+      "sha256": "3ae3c485507b944aecbcc8ee38d5c8f189013d331780298e1d3d9e5dcd365199"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/be6f4613a1277128afc65969745b23c8674aa08488281c01744495c5604ad01d/attempt-0001/receipt.json",
+      "sha256": "650808baf5b32d76c64631a1815cc0e629e7f2f2be36afa35a09cc3b6f57f250"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/c881b09c62a79248bbf32437048fae40da280087c8cd169ff7306e4a10e42a6d/attempt-0001/receipt.json",
+      "sha256": "f3731b8540283fa521773872837128a1549071e3028c585578d8977541edbfca"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/d2d9593fe0194090a66f19a88b38e9a1045d4f0ff65ba9ab1cd0805006fa2a32/attempt-0001/receipt.json",
+      "sha256": "4ac50e46896d611a17e087624f79889fa99aae3bacba02ff43591c529314354c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/d985f5feb9adf8c31e601b176d5ad213431d45e048fc27adaa793c45c46612c3/attempt-0001/receipt.json",
+      "sha256": "13b3edc8822f5b17b4d7742deeffef50edc145856edcd1f4f35d9cb02f9168f4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/e005736801405ac0bb82197bca891750d77b52c6ca8b94d3c4fcd4dd4e374cc6/attempt-0001/receipt.json",
+      "sha256": "dd9e411bc215241f7859c07d459158df4ee57d038b306eb2b2174d2964a9cf44"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/e5f23c7f16b2d92087ff1d2699e330e55b42322086030b49ae8529512aaaa216/attempt-0001/receipt.json",
+      "sha256": "1c30a4af56f9714e3cf691eb71c3d6941bcc2817a275de407af2ee59efbf7a8b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/e93e8eca8e5dcd61cd48d17f9595852cf6b2c11c6c92545fc56d3340d7bd4c4d/attempt-0001/receipt.json",
+      "sha256": "3a80f0858946f77e56e7fa24eca0ee785d65c2b5e41dee553f7da9841b49b28c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/f0a06a15813de01921d715019ed413075f403622213bbb98f5a72ddccdd91a69/attempt-0001/receipt.json",
+      "sha256": "0c6bc6bf5674cb3c5bb35b8f221b792aaa3f61b8fbc29676c1829c1469177e3f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/f3df84b27ea314c9f82de165dabd3f88cca81706e5bf66dae6ad1fb6137a3900/attempt-0001/receipt.json",
+      "sha256": "fc1bd35f0e814a2072e937670fc23c87305d9d7dcb103d1e137a483b560e6f0b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/f4c35577c891aba37d493dd63eea4f058e13828e9bde0dcce839523b7486bacf/attempt-0001/receipt.json",
+      "sha256": "f795cc1e8803aa5a50c8d7470652222c55bbfc3333c7803f7e2d6ce3fc643841"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/ff85a077455570231b00927d93373b579602bc35c274b381a10ec39a75490aef/attempt-0001/receipt.json",
+      "sha256": "67bab6fd08b4590912f6a346fb74741b2e918b2764d4274d6d1b37de1ff2bb0c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/round.lock.json",
+      "sha256": "5634d235eb8305436ca046867d96d09f562fabbd360892c580a7da3b9b811988"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/0d482c1dd7cc6592-CTGAN.json",
+      "sha256": "35264f223b2261d907b5f21246d577aef8fdb921404bab226cba91e06a114242"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/0d482c1dd7cc6592-TVAE.json",
+      "sha256": "648a45c186a5b487f89597f08acb018dc7c82dafa17816726859ac4908c34fd5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/0f86a714ec5f3ac6-CTGAN.json",
+      "sha256": "f0a5c2a223e3d167c04396feaa7218977aa32c46b6a54b610139dbda165e53c0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/0f86a714ec5f3ac6-TVAE.json",
+      "sha256": "8e894f74372e1d98ad29192a7c905d0fb9fe2f34641e3581aa14f50fc46825b9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/1a4456d1cc71a26a-CTGAN.json",
+      "sha256": "6f18564d86b2abc714e79ccb3f70da49fb51ac877ec4dbe3755b926d51118dac"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/1a4456d1cc71a26a-TVAE.json",
+      "sha256": "0238a19933d79323df4e3cd743085795707f06b1968817a3bfd891ff12bb010e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/297b7688a045c583-CTGAN.json",
+      "sha256": "3a6f47d22fabc0c8dc0cc419e3fcb6678918adfa261dd18923ac71e4ee43af17"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/297b7688a045c583-TVAE.json",
+      "sha256": "b544f64e43aedd2c56b2ea34429e1d1c51c51f13c62d3242b787c0e5be4f638a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/471f11cc2d38853a-CTGAN.json",
+      "sha256": "1678b4930e86f05f1e50a33104ad873b03aae1d9dc6f3ac9cd5513c8dbe75df0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/471f11cc2d38853a-TVAE.json",
+      "sha256": "9de0b5dff5fa1b28d5051a95b0f24724d11d0c6e1e257dfabc1d1cafa2437671"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/a863cd42be4d05d4-CTGAN.json",
+      "sha256": "ebb7019aa4ede9773a11f16201c1e285ee163cb255f9d90c151502d116a665c1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/selections/a863cd42be4d05d4-TVAE.json",
+      "sha256": "2fb89fec23b9d95400300cd2f7f5d5a0b140eec078489173a9354e3eaa941888"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/01988772e74d3073adb849b89e634566f7ead446884d2251536e5b11712c8533/receipt.json",
+      "sha256": "d013cd0aacc962188aee6d5bc685996ca7707d89dda55fe235e6c436141a985c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/044e4022b24c372cbc7fae48d4e61b86a3784408a768e15097f61422867dab06/receipt.json",
+      "sha256": "6ad6cfb3b547a05cb61649ccfeecf609993ef0880aeb0d7f8349f5b5cc98c166"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/0516cf726526af0e241a3b6b4ce8209806ee56a8951091d6aaccc3df6babb9fb/receipt.json",
+      "sha256": "43422582f293170fc124f0a9d52e7bac74f18ad4913a187e04393e1a5e3a5e62"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/0adf87fe4b34efcde332f5c6a99bdd56c7217e8e322447071c71434cf6b35bea/receipt.json",
+      "sha256": "31e3e606868b55492f8de981b9682f5f73a277b77a549ee3958c4abf845f0608"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/0b9054a618aba298ebdc810cd6fca943c2cd81108cf66fe73f683e11af6326bd/receipt.json",
+      "sha256": "0d9cd41bf6a61a63ddf0193c3bf7dadc03785992b12e936404aeb84ef69d6d36"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/0e014fcc68bc366b9f36286d4a2d7cfa9bc675d7e1e34ddabccb9fe484d645bc/receipt.json",
+      "sha256": "540d7d838513120052eb2466c96fb9657eb009fddad2f519fed7dd74277f4b1c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/0e4a7b8ab16fcac82707cdcc33e48a8abaa2a152dc9ac11fb7cba8fef09415bb/receipt.json",
+      "sha256": "121b433b8083fba78a363c1caa7905d8c30e6bcbcd5b90b7efd892e3a31cb2d5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/1045b130f20755bedbf8b32c8eee72357d3e57555ec215ca333d51c79d83c16e/receipt.json",
+      "sha256": "bf9d46776cdccd8e300fc7caf2541b3e19b7bc9e9d8d4597db7bef12f93693b2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/11b5e1cce69702623e184e823c637339fd6536452a53c50bd1387a11e4f90585/receipt.json",
+      "sha256": "482a767571473e3bfd1fefbb3b7885246196a5eff97338b6c4161a6723cddc45"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/129f131198e3ca25b9268fd8c2aa22407db150d9fc5e20d561ff71100dd3842f/receipt.json",
+      "sha256": "f2be6a0db7b1aee90bdcccef5ebd9bd56ec61f65b00579820c1b553ca6f4adf4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/13242b64c359c0a441593c5ce3b82735ec8d8dc0694191517ff126c151979fa8/receipt.json",
+      "sha256": "50e48d68a264abb77b486ef70d3d53740cf5d25b9ef716995a5ae16ebba3922e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/1325bd679c9c6ac04b3dd1fdc6a06bd2fe97a6203b2663602edc31aabc60555f/receipt.json",
+      "sha256": "88118419e8a61939a07cb59ab4d86ac314ebcf8c9fbe68cffc2490743fac202e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/15928a2c76cc3f513c79e293307498cd30753d9793ed832a1fb42beef6aa2118/receipt.json",
+      "sha256": "5f10a4d0f8577c1f0fd7349971bd5298395bd73490e1b0d47467d94eac229f49"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/161556ec3589bb5748d3e107cf4e94b9b1d8b4ed1dc4f68e601805c7a8e45539/receipt.json",
+      "sha256": "fc50cc60c40af61402b87e623497fb7da680d23ee27f3ef2620bab925e6ae809"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/174634baa7e52ce9c4fc3a69807e4fcf8a387faca959601a7f2d1ba8927dabf4/receipt.json",
+      "sha256": "62fa2610de96f80f1573dd3a15b2cbd0dea3d597534a5a8b5e49122c0bf4f103"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/19c307dd5d220822de06c75259116909b7335e6b5038eb366254fa45a065a6f0/receipt.json",
+      "sha256": "2c1fcfd5751d03fac02a11f028f64cbcb9c57f8adf96ef9e50dcb6bd119ae114"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/1d80d29be213df6076955d03c3ef62bfd17ed660e572e59c5e07a18f010ee6d3/receipt.json",
+      "sha256": "0acb0ba9ce77bec60567b9e1650560b900d499972d4664ed85431b644bd694b8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/1e153a674e6514c38185eb89f61df16538e54d0484687da3bf4f84c90ba4842f/receipt.json",
+      "sha256": "4fc0864d5358e8d5f8cf73927dbc5262c249c15e6dc285d854502f64dc26cf9a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/220038229b54d3a3186bb5d83be27534db8dfb1121eddba0c7b48a882838d6f9/receipt.json",
+      "sha256": "c43faef9733b9299acf5121f1eb87cfb19f08211363127c9f27222d8052028df"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/2299ef290e39d0bdcafe71cea9e5d73130f17907ee930471afb596c6b190264f/receipt.json",
+      "sha256": "0be7fae85a0367b757681539e56e6462fc127c2f717a0bfb3f35e9be5a2526d3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/24026a9e10aa3afe14ad937fd235c5ad2812e7490105b89ec82a53d1d3803e05/receipt.json",
+      "sha256": "de24095683ca9d5a23a13c291a99426b30c7bbd5f2cb66507961905064a2d33f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/26638195767f5eb3cec03ed73b7e56171ea647201aed333f6b3babbb87e81071/receipt.json",
+      "sha256": "f8a36b2c17f0f05cc6347ac62ec3f0318da28ce96810a1b071b1c7d309166dcd"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/267519597b67937ad331f6ac1a478ba5e526172aea50b9cb371e6362d487a276/receipt.json",
+      "sha256": "f969d539da83d0815a443a6b80e72c0a2a9970730985fb56bbbb30bc539a4f19"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/290f3e8370c04bc8586aa6e47754c7a83d031d35e31d739774565e14075d152a/receipt.json",
+      "sha256": "548618d34c2ea4f8f415b4b59ecdb8e5a68b9e0a24f2a5843736a4b7fdef06c9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/29fdb7376d184d151860172f131a8d155be06745975ef97faf829ac261ed2cc7/receipt.json",
+      "sha256": "e9e36278ad5697e2a3af0d372e69f9f526cd3a8827159ac32e8bf3086689059e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/2f7b9586bd4936f52594551ff921ed6966c3a32662f27eccad4711ffc6927ae5/receipt.json",
+      "sha256": "0fd0e83922432c31e6a10b779d29a6b70f3f81ce29fe4939720b3a6cb5905e6d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/3365a0e30762d5103eb2b8bbdb7500ad881932179a429113f0c84916ce7abf8c/receipt.json",
+      "sha256": "2a3e5f1eedf6fc81e57e5006956e4afa75a8aacedaa6c422f6938fe8e35c2a55"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/33a7a5d0438cebf74825c6e49defde519824119a74d13f6029c7525ab9e7bb1d/receipt.json",
+      "sha256": "6dd1ed0c069d4cbdf94c268c0cee24158d3ccce7ac6ddb3b41349a274ffaf488"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/352e9177024ac472a139df5853aba601addc515cbad0b424af6d73fc0a2854be/receipt.json",
+      "sha256": "de15845121a3b44448874039d825ddb20281cc9a2f8bd1a022b8048f8711bf08"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/37b26de135a09aa77bd9cb317cc1bb0d8ca1e5d8f25b4e81bb5c5d780d3be766/receipt.json",
+      "sha256": "0f028090e9afcdd1e05b7e1b26e32967a5f8a00b17ab0b81d1beec1f0743d205"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/38821e28f8bb033d21dacdfc2fb4d661a113be227a36dfda4f896a4cd1b6d68f/receipt.json",
+      "sha256": "ec2f3be1048f20b062b7d39efdc12b9f92c91a3b04584b63be160d028e4e1bae"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/3882951c3aa1d61182a2e6c4eb89345f50dc90a5858a7155943d73b1e0ebcf94/receipt.json",
+      "sha256": "7cdddb5dadde73e06d2cec7a6f32c16e23c1af0b8342b3847341c7de647dbef8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/38c9fe774c9d112201e366645ff45d9e8642e113200ee28a6fd0d0224d5361f3/receipt.json",
+      "sha256": "75c6b69de8218f65394ab3f149e01735ae0f3bdc9e43e6476d54433169c48133"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/3a103caf0ad6920ca17196611013ffe0f67869b152d9147e21817cfc506ae099/receipt.json",
+      "sha256": "fd4576d02bae90ee0bfbdb55fa305309ef078599366a54291a619878461716d9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/3a23d0d7dcfa64b9fba7ed202d72b1630a651bd3568f6426d65ed8d4e2accf83/receipt.json",
+      "sha256": "b62b2341363177d8a7282ae1eb5ec80509cd5d206cbe4e6b5f5879025e36ae4e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/3de60405ead04b08c322f9148ed269686e2ba23bc385084d2fd74e66f7752d74/receipt.json",
+      "sha256": "17554764a1b6e7bfcb62022e8368f8d5bd54f7338b972348b3631eb9ae444b1e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/3ffd7f56519b401d32b36589ea94833f22acc0e591755eb7eaca7646eea2eec8/receipt.json",
+      "sha256": "3b413b31af86952edcf6043c0f31fde4b1ebbd49b077b0e2509cb266abeb7e0a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/42bca159e936d5dc23dd5a41d37ef75b66933c470d0183255da93c158940f976/receipt.json",
+      "sha256": "058c7026ea1cafeb8f11ded1c61b831aaf054a562ecef1f6a634692b5019b86e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/43bd98e1fc8456ea967a9765386e9097dfd1180a03aaf94610272649cf0a00f7/receipt.json",
+      "sha256": "6d91936c9723f244505319afe858e93704498b3faa3ac398eea3904b99dcd6d0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/45b5182b80a19144f51a713608731d2c3923932627ba55de0e44247e5dc0ac99/receipt.json",
+      "sha256": "ce9503d0c46c7042e7aea4f693e40394bb72bf35ac096ae7ca20250c226d1252"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/469b4ae27b42e41b3d03cfdb441835c2c290a64add2c003a9b11404c5e6c5ad7/receipt.json",
+      "sha256": "8636e3ca1481e9e5af6c67254023c5cb7f4aef3f329f6844ddd2aafe7d303b6e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/46b64943b29f5b0a3564ad7bd30dcd1bf38a2675e795148a7049f9c0cb371a0a/receipt.json",
+      "sha256": "2ebe801045acad8fcae7f5ad224d46d3192f322937aa5774edc29f4eeb869c86"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/49d71a36924f578c27f0b698eb773e07378ee06dabe4860b96ba9edaa295e92b/receipt.json",
+      "sha256": "5c33dcf4abe0a8e86c8aba48084cb4976947be9748672bf48c69cff4229c7eec"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/50b53c530cef73fc91a3e7836656b0bd464506ac5afbd756403b2c07d0871ea5/receipt.json",
+      "sha256": "b03947f6fdde983f4665a8e082f16cdc516a9345077be872f714f88bd8a427a9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/5170bfe4cd9e76a39b849779a74f41fa6d8dcbce2f22377d352a9d9e7f832451/receipt.json",
+      "sha256": "224e1eb138d9c05a01bc19a771c34db419241f548cab45fb90058eebbe28b51c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/519888c2b28afd69d3e3af5893a8bf6d937ea2d2eb4e8f1c8d915784004d6a6d/receipt.json",
+      "sha256": "f3c4d372da280c000b3989866e58e69edd336c7be47122858fbad9ea0d76d035"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/55c7fe88999ffb9b4d51db582282b4bd0741ec1cf54f61a03f661836660ecec1/receipt.json",
+      "sha256": "cc5734cf38618a1ebfa55ffb336764c92f75e23b1cc1ada0cdf100fddc22810a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/58cd449e4b5ec573f55f62868fbe9c25ced1272cc371818c488bcdbabb3f3d20/receipt.json",
+      "sha256": "df11349e967f9b201ec9849910ba40862f1d206e0bdd39200795e05eac0642e6"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/5d31e480bea73df70c76fdc11ddbb8ebe869d419232b988c901f8d5e92b94e25/receipt.json",
+      "sha256": "3c26827a75a7f4f62f903923c2690839cd4440dc8952b7a5c9c1ab5d3aa91ddc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/610671883c90f1d02f979b1a782fca3d6e48d72b0a949a65c618dd4829f72806/receipt.json",
+      "sha256": "ae5a7e7149d892d3d87d11551f1ed121560d1b78d776228f1c58d4da2ef05890"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/61cae99b957808c6f2986737893267ecae4a67a32abc6a6eed6857b218df6a81/receipt.json",
+      "sha256": "253a93c3e666a2bc6fc825ee2f9c66fd1c03dd21f68697d14e6f71d55aa92df4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/61db9925b29a14988c1de607b4450fe29cf633b3d3656f36543db6906834a25c/receipt.json",
+      "sha256": "c56e54ab4db04623a8e3c0fec9c5d719dbd41db242bfcd7820a03669eb699163"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/63fc06ad7b813bb1750370a9585e41bed5a00b48328024dfe3d6f768e58dd1e3/receipt.json",
+      "sha256": "d08a8ffd61a579830816cec58677851ba9e62ecdcc393eedbdc1e7e61bde5928"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/66b38dc8d54151f5fe7661e954ac9f09cbb2db2734bbc3522ecd5415dd55432f/receipt.json",
+      "sha256": "fc534142b4f17857544a0ba40ccf8f0cff817bd843efbaffb4d82cc126064c01"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/68f6abd65e9de3446544e1f82c243475d43ec9f89721edeb7c52592c4e65c8ea/receipt.json",
+      "sha256": "30eb95d206c53b43ed3d8c5093ba4d39defda62a3eedc35f9bc8d5021dadd9b5"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/69f37612ae9b20dd1c2a0ad3acb45da33257d9a39db2f671ffec61b9ad1da133/receipt.json",
+      "sha256": "31058998662da6c16403fafc9b5bec4aeb1588b34196e5ae9f04a6ab1d316996"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/6e59ab29a0c0f65cbd8125d8308efb1ebe99a36974a7d29a4a10adb7c839f16e/receipt.json",
+      "sha256": "8b51671dc588b199afef155d1afd98f4c3724be9aeccd3ec4cb7f97eca02d320"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/6fd2a0dbb73406c0263ff33b8aacca7e6dd5f986cda8c9063390ca66b0b9102c/receipt.json",
+      "sha256": "aed1129724001bb04a87f99c131393279a323a71e62e653f8f197e9ee831dce8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/708721ef3b67a88ae472394efbe037603b06bba397a32f8dcd3477bbd4d2ed2f/receipt.json",
+      "sha256": "58f92a1e4291c55b4dfd33653dd754817c2b3f83e2aa8560fae16d492861f29b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/70ae395548cb1380aea14f606526083374ee92413cb9462da12d8263388a5e54/receipt.json",
+      "sha256": "c1081b6c9b8228fc203e11d815b592168bfd6544c32b63ee4b8244e62523f90f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/743a70e4b8a003d7e081c7e3ef452d9092f3e45c3ffe5af0416e215b0954f3e3/receipt.json",
+      "sha256": "281cf9a7964d93b0cbeb20457139c4b25d202bb0ed67385bc6cca29aeaf07984"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/75e3d1207398484a2870c235f817d521db975077fb90c52cc3e5ebb0e6f9ec60/receipt.json",
+      "sha256": "fc2ec012994d4d4147acfd90393c0da43e32675a126e0cb3dae6e1c4e575257d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/7adbc2651718ea859664a5e6adb616b8c1ea6f6120acaed7c7cb0ec33f380c27/receipt.json",
+      "sha256": "be4053560dc06e8e7c5dcc7153d718d254b9ae95ea7868688510800ba7eec328"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/7bc49249f5a45beb17f3c293b16156093e57c8434cf1d37e69bd31ff2f3ecc5b/receipt.json",
+      "sha256": "9896ac8901485fd2c10f3d76ba4339691cb461e8bb9a06afddea9f906cba7739"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/7cd8175d33b67bb2ce2523c807c1d06ac896c6fcf333719039de69ff86e71f5d/receipt.json",
+      "sha256": "192b68836b18123f9e5a5b5ec920414fed21801ddd78476c8dfc5fbfd99972d0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/7cf391610d714188add09de4b9b7cae107308a469cf2995bd99ab6ee08ffe12f/receipt.json",
+      "sha256": "08ceb9011f6516815918966a428b10fd2d7de8ef99fbdaa7f495165dd6dbd727"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/7decb5904a4eb3d008a51c8e1a7e2e06796c6656a06ef56f791af64fa9602116/receipt.json",
+      "sha256": "dda0a2ee2da0650d69df9b296b7903a960700ada3a67d9ccbd6413fa36897d74"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/7ecd4192518cb70decbde574449634c853112ac73e57e26f82741cc7d35c72d7/receipt.json",
+      "sha256": "15e05eba080f19a47139eab6caa6541dd3cbabd53c2ee24645709e04e46587a0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/7f296393d3be7f927e45aa498349e83683d59533fad1bc6bb92011bf0e8461e4/receipt.json",
+      "sha256": "83a30efe9e4be1c9a9a6fd299e83eafbd6e7ea9aac80b37cce1f7bed9b80fbbf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/8cc3f1cdc4b588db8e8d37f0796f554f8c38e73a0fab0822660f86bbf13fcce6/receipt.json",
+      "sha256": "54c73aecd06a0a5ac3d6a5d3bfde4cada95b52539202f5b5852cd57dc7ed75b9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/8cfb9363348b42c94e163ec15607e34bfbc21fb87e619a5f5ab0a076f8f99201/receipt.json",
+      "sha256": "1b01199036e009b5dc34ce1f9820d0a569703bf9b294c81230ad4fe918f713b3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/9141d542e299cdaa017b7e802a650c270fed43b7cd0ff33b08d976a2e597fcc8/receipt.json",
+      "sha256": "910f3b92d19787a0e2273e17dbef8b8ccc1227222621b59b76ce698761723ff4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/92c22f7b6b5a04faf52ef3564d3bf8db664e31133a1359d24111e37c0c366a57/receipt.json",
+      "sha256": "6e1c01e5fc65627f78ec1d7b89d171d9d762a908dac55f249151662e501159ba"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/93b19d356776ae6c53032223cb51e8d12b3093004e4f2b7044d0ba3db73744ae/receipt.json",
+      "sha256": "852080054fce88449283bf46f0312f22ef31708ea7983d39e424539de5446d2e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/93faf6e8874666c119f71e7e8a1ecf947f8d31d31b9fda8828b9a920580ed4fc/receipt.json",
+      "sha256": "79964952bc8e23cde3783357af5e6df874126a959d663a2c47b83bedc62e2357"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/963690f9abcdcda60ddd932b6da0ed1bd0e5a8a4aabefcbcab9ea467dd9a802c/receipt.json",
+      "sha256": "f2a0aa2f747c0122bac80bb94a94a2e77b4952f78454916cfb445d0f7fa9954a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/970ca63b50b05c4827a300794e7650a313a38a83a5f8f60f333d65eda806eb1b/receipt.json",
+      "sha256": "205997b60e5b83b1997142db18a1982356fd803387116d986cd24a0845c7d94e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/9f03e9adf6a9418bf9016a6b45a04803d25819d822afef302ba15beb7103cc6d/receipt.json",
+      "sha256": "bdd26c9e54e30e8cc0967c2a5779b54d0f74a0d95e680cd5c9ccb6cdfaf0b463"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/a1c9c8640c49a7541b59df761f727a342b0711136ab074765705c75a9beedf3f/receipt.json",
+      "sha256": "933a5aa235b819174adc4c5345a1bdd49499c89df45e1afea9de5f95ebadf65e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/a1e98819f88713d9a8ca0253af12077cccaf43d96e78dc108a5dd031e07b9893/receipt.json",
+      "sha256": "7a9cf705c73d9e303247339b7bc2f06c15f178e84bbd717d10c86710b2297880"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/a5b371cddde2871aaf8e64f36d353d4cb00778614e8988483def0d338a0db2fe/receipt.json",
+      "sha256": "507c0771ac26b9dae8ff1a6ee933de7d153c638c230cb652d698f035c59afb94"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/a6034b3b26d7cda76e6c86f642f02d9c5dbbad9b5a43a990e1f3e8198a649d46/receipt.json",
+      "sha256": "43aa1781f47658852c1145065ba029611956a587454e693f0577c94206a29a75"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/a8dbae15795335e044bec1db7dce0991443f3046a32a45042a5dcd569bd83527/receipt.json",
+      "sha256": "98cdee04226eb3f184993078b659b1914b9d8c936cc77320e0eac053ad77bb45"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/a8df6a742a597b8630f3971b4bf551931fb55b02b013ab6ea3b417fffc1aa8a7/receipt.json",
+      "sha256": "1050ec9ce40be88c040908bd70613417170424436b901c0244dc20c03f429740"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/aacab60e0d2f0888c2bc122c73889fb765f66543ea745870f128509c8b55834f/receipt.json",
+      "sha256": "63d3873bc5eddf5367cee9826c37ae0f2a0baf721624aa702c77daa67f103f6d"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/ab0f9ec5ada64309db3d51e832cff032b4cf4a5a6f46550bb0fb800d1eae3bb1/receipt.json",
+      "sha256": "68f2bb4893addcfa27e1dc4093817317bb9f06675c206a3071d3105d2b539c9a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/ae25668b13ac175abbc303ccfc4d6aafc734b9c429adf38055e6db2e5f6f362a/receipt.json",
+      "sha256": "2798d9b3ff140b6b4ae812e4ec7145b3fcca4d3ac735d276eff8c04f68c99b49"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b099ba17ee5b0172ffdb051d0d57f61c545263eaa258791ad8ed5afcae16f752/receipt.json",
+      "sha256": "c9723380c0826cdd3f93591d97d29b61238a4a748e2a98a55ef77257b0f86f08"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b169679fae85272c0b9ecc58bf7c10403dc9bd864ccbe557bc631a93880c2749/receipt.json",
+      "sha256": "88aa699763b579dab1c7abfdc76968e8450912dfad610b6289bfb0f28c40c242"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b4b73b9e9017d1e6e4c86f2cc674355ebf64e1c2c30ac98f45b3528698e6b170/receipt.json",
+      "sha256": "8a0f6dd8cd56c9fd61b45f87d44c5259de807a2930a016bac099c0cd17c35c5f"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b60c13b6faf8684a5768018d15e403c5d6bb04c98e5d1640a9704edc76068518/receipt.json",
+      "sha256": "fa02f1ba15401d601f3f64e240b1842d71a3ca626d051d79f1c5d54a169016b4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b64040420b19a3f31cd8fd23d001c97034f5f4b3ec511b23f1078c701563e536/receipt.json",
+      "sha256": "86ca02312bd8648291d7e20d282c4a82ffe43a70dc0c536514f4f21dadeed8ed"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b6d51f777bdf29436ef0add44be9ef19f455818f76fcdc9036bfad58f152635c/receipt.json",
+      "sha256": "b6d3e965fc292075869eae549bb8f4707e6ef1a96f63d41b1b8e5e3313a410e2"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b7660abe3b2dffb3146615b4093f0ddceefbbf5e334dcaaac7985de25c903e67/receipt.json",
+      "sha256": "a0038811343de5c14b8a102d86de7774668a82ed3739b42e87432505a5533eed"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b7adeee31b7e84450d1598b3c708cea4a6cef34f3888de40dd610c55e4bf6146/receipt.json",
+      "sha256": "d42e37211b92586514bb6c051c254560487faf25614a9771abe3a9a2e14210e0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b8617f86dc9af19fa845fcc4f78440866949562799777b393d4d0530812e3a3d/receipt.json",
+      "sha256": "2039276ac61c38a09d2cea0ce3202733ad54f0972537e73f4c438cc85dc23160"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/b9c5bf8d360848f5296b3ded4ad1d4039b6d0f49aef1091615b82c6f5dd73c2c/receipt.json",
+      "sha256": "c0a4111a6106d57f111b58fbb1038b937d5a64ed0298ab06738a8b0ac7936b46"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/ba73fc1d1ea6c1601a260402a147d48fa96cc40408ce4b43f30cc9775236f6ca/receipt.json",
+      "sha256": "035755aba140d46ecc0a820a5bc823ffb9d6ad271fe66bc68247238bbb858ad3"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/c07e4699a44bb8c5b813c7a604e75fa5cf6753b977cddfecf9430867d5e3641f/receipt.json",
+      "sha256": "f8e1b5008ba290a1ac5a06157a580c642a72e0a14dbf91f2ba729c21614a879b"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/c186afbb9fe0ac673fe36092ce741701677e8e497d61453961d43bb2e519371f/receipt.json",
+      "sha256": "9dac4cfafb568e0cefff7c7a94b0702a8a47005d410ff805109aac2036e5edf1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/c494d8c77d206e3b28c442080a7d40519d3004f70dd63e189a0aeefa1eca6d3a/receipt.json",
+      "sha256": "ec909b281e074d39cc50253e213e55e3cfb5da832d9bee3f012b91c51b6816bc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/c5536089a13752c8f902d8ada4a9ddd87078ea9a7deb634c90946d0b4aea9afb/receipt.json",
+      "sha256": "a6be4f736e4ab2d412a1d69f56f36acc14fb6c4e23ba81ad9bf99dad4f658ab9"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/c91f8dda50b690e9d743b630d306015d7d4d004908be2cf77fd7480eff89bbed/receipt.json",
+      "sha256": "2dba2eea1e7d53286e79e6e773f6439d2cc7edf06443c30b360edaedf8bc615c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/ca2543fc4dc18b1a940dbc82fa09ce4a005f43fc49b110eed522c88625d76905/receipt.json",
+      "sha256": "b4be84f570d5fb9c9fb6234423a99200c0667dbcd7b560a05f92746f81e69060"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/d09e195f98d71f439ebf25839c0f8a72e4b7e44ffd57342f964bfa03a07b0501/receipt.json",
+      "sha256": "f94ccdec8987df16b8a0fa99729d129a2804cf9576285ed95dbaf7a207f7bf9e"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/d1f443e85adcb50d38348b14b50fcc4659aea70875afa223a92b4e752f4d59eb/receipt.json",
+      "sha256": "6672b247ccfb159cb09cac59dbb51f239246ba5a7d3f00b4fc42fce359ecbd02"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/d2a0ed11fb312478c1568bb6b74062cdf2c421a400d9dd9f1091538944e72a8f/receipt.json",
+      "sha256": "4f8d498b6f09185a8955ff17bdebd6f2201133f0c68f6da8063b246dd57fc3aa"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/d341b9470744adb8e360ec78219a9b0900f29232a1fff4e1502888054647419f/receipt.json",
+      "sha256": "13d1c4097da42bcaf07e1e836bb67c269c525e5885f8cf128f2d6fbf292406ca"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/d52cf2672be31b00b1f21ba3112912e293409312d01b32014eb480a388012aab/receipt.json",
+      "sha256": "ca7189d182535243c9849010adac7ecba879b86792219113d7ce96a26c95c1cf"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/d5cfbea15f54688b99588b97d44ff93b109d3b12a1aa05823b314ed7e8c0067b/receipt.json",
+      "sha256": "ea7b40fbfd9565ef6fb23d2a7f5c08038b5ce5a1aa340a021f30bb0139ba6345"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/d80614904f1b861a771fe7015ac0b83b2aec416f1300210e0ba7774a66286036/receipt.json",
+      "sha256": "5eb47fdd1461eed90baf39b039ae1f53f01a3b0706576106047c7254edf434b0"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/debc862a74dbc73f888f45bd6ec1c3d97a929cd8d835c77da27c08bb7298f923/receipt.json",
+      "sha256": "1a91d6ab16f7eb016f288ed706da8dfc2e60f38a18b6dac476abd4bd6d35e043"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/df128408ae189e8f59efdb759bd375e099c7d31e43643948df5f7504efd7e003/receipt.json",
+      "sha256": "2ae13d5ca1dcf1858dd7621094c9a5192d2c55db88996ea617ca482ad8b26464"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/e0d6bca9c4f9514be3f0b16c372b85daf519da6255016a2757baa6ae9e2c8993/receipt.json",
+      "sha256": "0a5942bc52d3234980f4b8f56e55219f223f7e487229a62479564b83dae7f030"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/e2825f0454377dd939df3fa618248e7ce81e25d3e897c45a4ac85952f37545f7/receipt.json",
+      "sha256": "41df8178c7332907e1eb7cd91075797059d034c5f5ee88337a72e62a0f211153"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/e51c8fc55e20a56a18b41a0f0581d1afab9bb4a64a26cfbc4157e0013a5c0594/receipt.json",
+      "sha256": "16f33e7ad82969b8723771182bce8e875efc0ffdf547b83249af1ec3527caa34"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/e8d61b2c06ea2ee83f070009c5456c3cbea667506cdaa312d9be50c5b9b8e900/receipt.json",
+      "sha256": "bbb118cca8185c6a990b5739676fdfceb53e7d3e2b8527d6a4fe0172ac5fd585"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/e97052c28989cd264e9daff740932c1697f2293be712ae8ed4b6c922f7fbeb94/receipt.json",
+      "sha256": "4ca4c6a3fa335b2af62990d9a08f7ac84155124a9d3a8d10c8f8092666b002ed"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/ead55e61a8d0af4e0da325daee1903187b151b564175651678190b05aba5b91f/receipt.json",
+      "sha256": "a5d812eebbc762d16d85e63c90ede4f5cb74db326e13f46ce9722a11dc333392"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/ebc4081429723b4db887d5c89682b875986f18537768af1ccbf2653079aad7fd/receipt.json",
+      "sha256": "21ff5721de2696b8961b2d43603a697ce3f095e1db87a0eaad03b391fb6ec9e1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/ecd415ea1c053a71ee4fcec3ea4089aae986c1eebdffaab88723b7b8834c4b42/receipt.json",
+      "sha256": "518375d1a13a307f33e38c3c780c61412915ca75341b11a58dddaae19b8cc91c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/efca2d0344db649a4963621600beda86450b10a3d5d5958e16aae3717ccaca82/receipt.json",
+      "sha256": "21c01ae7ce73ef38c8a65d0e67aaf4684ba5dd091cca1e56ddf6f5e7cc95c4ba"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/f60e803a57da21f1272799c585c6f2278eb670d78bf96085574ef2f831f1085f/receipt.json",
+      "sha256": "d2b340bfc5f144723bfe8ac5ddea84df65417dd62b82d2df6765d8e2afb28154"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/f7acb44c501e852d2a77c2aa8ce3876517aa96a55b8c9664625fb5602a6d7d5e/receipt.json",
+      "sha256": "8d3401e8f198101c8410d55540d3f905bfea6ed4be9deeef7fad5472fa5980f1"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/f83637f869befc5a4fc7c625ba67199a92e5497bad381071030fbee8bd670e32/receipt.json",
+      "sha256": "c1572e984b8835075e96bae6a24a5a057e2507f77f6db4602c6cf196f00b5efb"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/cells/fd1bbfab07d36537bf97076b0feef77056295497c904c38686bfafa25e93177f/receipt.json",
+      "sha256": "fcd2eceb07f527aae87ac41c52b4f03f797ff6ec99d440677c86d699e3a432e8"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-validation-v1/round.lock.json",
+      "sha256": "c58a271c0d0555892596ab469005f2c625f325fa8edb9dabd3805509d1e5f298"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/scratch-meter-v1/lock.json",
+      "sha256": "330e76b6869c75c440a4478aed2ebb4c1ba549649a5034deba29e2d3ced82fce"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/scratch-meter-v1/meter.py",
+      "sha256": "14651b817a9ede456cb5a8051b4fd93af6aac7033f5c7bebce8c1414a9cff9cb"
+    }
+  ],
+  "matrix": {
+    "datasets": 6,
+    "fit_seed_count": 1,
+    "logical_cells": 288,
+    "logical_status_counts": {
+      "fit_unavailable": 12,
+      "ok": 276
+    },
+    "planned_physical_cells": 270,
+    "sample_seed_count": 3,
+    "size_count": 2,
+    "successful_physical_cells": 258
+  },
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "paired_superiority": null,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
+    "publish_s3_matched.py": "ba999e28e553918b5b4f43b9302d3a102ef5d03b7b1602d21eb7bffc3f262350",
+    "publish_s3_matched_figure.py": "395ee50a69c12df5f3c4cf68b5161306bbf5ea2db08ce6451ba23d2dfd83d68a",
+    "publish_s3_matched_manifest.py": "bd3b6fd22387fc6cc5e440cab5a4c3c06748d817b2de7d068441d8a4c8129eda",
+    "score.py": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+  },
+  "release_safe_l3": null,
+  "s3_data_lock_sha256": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
+  "scope": "Single-fit-seed discovery research, not public-core paired analysis, five-fit stability, confirmation or certification. Training cohorts are bounded subsets of official S3 training partitions; native selection and these descriptive outcomes use training-derived validation. All four DOPE profiles retained; production family unselected.",
+  "version": 1
+}

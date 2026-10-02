@@ -241,3 +241,41 @@ python3 -m research.benchmark.publish_forestdiffusion_manifest \
 The publisher fails closed before the complete frozen matrix is receipted. The
 figure compares unconstrained common quality; the baseline artifacts exceed L3.
 Official tests remain sealed, and MFS-v2/PTF-v1/release-safe scores remain null.
+
+## Complete S3 matched discovery validation
+
+`results/s3-matched-discovery-validation.json` compares four frozen DOPE GPU
+research profiles with CTGAN and TVAE author defaults and native-selected
+configurations on six rights-cleared S3 regression lineages. Each method uses
+the same bounded official-training-derived fit/validation cohorts, fit seed 11,
+three sample seeds and n/4n sizes. The panel accounts for 288 logical cells:
+258 successful physical cells, 12 unavailable cells from two DOPE artifact-cap
+failures, and 18 additional logical cells sharing default/native sample receipts.
+Shared receipts add no compute. All retained artifact files and projections are
+charged; baseline quality is reported independently of the L3 byte cap.
+
+CTGAN/TVAE selections reproduce their frozen author-library native objective
+(mean LinearRegression/MLPRegressor validation R2), with bytes/configuration
+digest tie-breaks, across four original trials per method and dataset. Shared
+CatBoost, linear and MLP utility never selects those baseline configurations.
+Native KPI values remain descriptive and are not ranked across methods.
+
+```sh
+python3 -m research.benchmark.publish_s3_matched
+python3 -m research.benchmark.publish_s3_matched_figure \
+  research/benchmark/results/s3-matched-discovery-validation.json
+python3 -m research.benchmark.publish_s3_matched_manifest
+python3 -m unittest research.benchmark.tests.test_s3_matched_panel -v
+```
+
+Regeneration requires the immutable local scratch receipts. The publisher
+verifies the complete matrix, native winners, sample/metric replays, charged
+bytes and source/partition bindings before writing outputs. The manifest binds
+all tables, SVG/PDF figures, schemas and receipts. A separately locked capacity
+continuation retains the original pilot deadline and metric/sample sources.
+
+This single-fit discovery panel does not select a production DOPE family or
+establish paired superiority. All profiles and failed cells remain visible;
+sample min/max whiskers do not estimate fit uncertainty. Official tests remain
+sealed, and MFS-v2/PTF-v1/release-safe scores remain null pending the complete
+campaign and production gates.
