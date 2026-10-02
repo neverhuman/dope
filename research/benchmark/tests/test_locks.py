@@ -41,6 +41,22 @@ class LockTests(unittest.TestCase):
         lock = json.loads(source.read_text())
         self.assertEqual(method["adapter_sha256"], lock["adapter_source_sha256"])
         self.assertEqual(method["dependency_or_container_digest"], lock["gpu_runtime"]["sha256"])
+        objective = method["native_objective"]
+        self.assertEqual(objective["status"], "locked")
+        self.assertEqual(objective["implementation_sha256"],
+                         hashlib.sha256((ROOT / "forestdiffusion_adapter.py").read_bytes()).hexdigest())
+        for key in ("classification", "regression", "direction", "sha256", "url"):
+            self.assertEqual(objective[key], lock["native_objective"][key])
+        self.assertEqual(objective["source_sha256"], objective["sha256"])
+        self.assertEqual(objective["auditor_fit_seeds"], list(range(5)))
+        self.assertEqual(objective["native_sample_seed"], 101)
+        self.assertFalse(objective["native_values_cross_method_ranking"])
+        self.assertFalse(objective["shared_kpi_used_for_selection"])
+        self.assertEqual(objective["tie_breaks"],
+                         ["artifact_bytes_ascending", "config_sha256_ascending"])
+        for evidence in method["pilot_evidence"]:
+            path = ROOT.parents[1] / evidence["path"]
+            self.assertEqual(evidence["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
         self.assertFalse(methods["complete"])
         self.assertFalse(methods["frozen_for_final_evaluation"])
         self.assertFalse(lock["full_matrix_admission"])

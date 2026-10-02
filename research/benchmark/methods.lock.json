@@ -448,18 +448,45 @@
       "license_evidence": "https://github.com/SamsungSAILMontreal/ForestDiffusion/blob/818ac3b9c8df7b7c763470c9a0691dacca8d8b37/Python-Package/base-ForestDiffusion/LICENSE.txt",
       "license_sha256": "7a5d06dce31208b2378f0cd887ec4a387e73b242ef0104867626c47668aa62da",
       "native_objective": {
+        "auditor_fit_seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
         "classification": "mean_macro_f1_over_linear_adaboost_random_forest_xgboost_and_seeds0_to4",
         "direction": "maximize",
+        "implementation_role": "study_implemented_author_four_model_five_seed_formula",
+        "implementation_sha256": "1ff4688f85bdf1a79ce89f475a02d0d06766ff2aaa395ec9b97f9de7cbb137e5",
+        "name": "author_mean_ml_efficacy",
+        "native_sample_seed": 101,
+        "native_values_cross_method_ranking": false,
+        "partition": "validation",
         "regression": "mean_r2_over_linear_adaboost_random_forest_xgboost_and_seeds0_to4",
         "sha256": "a5e8b76c3b7dfe6323259f2fc80e93c792e495d4b419859f057653c318da976a",
         "shared_kpi_used_for_selection": false,
+        "source": "https://github.com/SamsungSAILMontreal/ForestDiffusion/blob/818ac3b9c8df7b7c763470c9a0691dacca8d8b37/metrics.py",
+        "source_sha256": "a5e8b76c3b7dfe6323259f2fc80e93c792e495d4b419859f057653c318da976a",
+        "status": "locked",
+        "tie_break_origin": "study-prespecified protocol",
         "tie_breaks": [
-          "smaller_charged_artifact_bytes",
-          "configuration_sha256"
+          "artifact_bytes_ascending",
+          "config_sha256_ascending"
         ],
         "url": "https://github.com/SamsungSAILMontreal/ForestDiffusion/blob/818ac3b9c8df7b7c763470c9a0691dacca8d8b37/metrics.py"
       },
       "note": "Original MIT Python generator, flow/common-numeric GPU wrapper; author four-model five-seed native ML formula independently implemented in study wrapper. Repository-root experiment code with unresolved rights is not imported. Full five-lock/job-matrix admission and author-faithful paper environment remain pending; earlier generated GPU probe aggregate reservation gap remains explicit. CPU historical adapter/runtime receipts remain immutable.",
+      "pilot_evidence": [
+        {
+          "path": "research/benchmark/results/pilot24-forestdiffusion-native.json",
+          "sha256": "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"
+        },
+        {
+          "path": "research/benchmark/results/pilot24-forestdiffusion-native.manifest.json",
+          "sha256": "9e21edb20f7acd5e44e981c9e3e4c3eed80e908fdf534cc160da7bf20014763b"
+        }
+      ],
       "sampling_command": "python -m research.benchmark.forestdiffusion_adapter sample --request VERIFIED_REQUEST --receipt RECEIPT",
       "source_lock": "research/benchmark/forestdiffusion-source.lock.json",
       "source_lock_sha256": "0ee58f0de8152cafdec498d3bc5dea74f0f63dd246a997ba9572b9fdbf275ad4",
