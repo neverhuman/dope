@@ -96,6 +96,10 @@ numbered request path. Arguments use the pinned Python path with `-I -S -B` and
 the declared cache prefix. The environment contains only the fixed PATH/locale,
 declared single library directory, empty CUDA visibility and one-thread limits;
 inherited loader, Python startup and credential environment is not copied.
+The library directory rejects both `:` and `;` separators and `$` dynamic
+tokens, retaining one literal directory. The loader recognizes both separators
+and expands dynamic tokens; an empty list entry selects the current directory
+([ld.so(8)](https://man7.org/linux/man-pages/man8/ld.so.8.html)).
 
 The coordinator supplies the original outer-attempt monotonic start, before
 guards or transport. Preparation checks the remaining budget after parsing.

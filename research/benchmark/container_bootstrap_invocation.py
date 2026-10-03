@@ -75,6 +75,7 @@ def prepare_invocation(proposal_bytes, proposal_sha256, *, batch_started_at):
         require(entry == root / 'source/entry.py')
         cache = path(proposal['empty_bytecode_cache'], scratch=True)
         library = path(proposal['native_library_directory'])
+        require(not any(c in str(library) for c in (';', '$')))
         expected_round = digest(proposal['round_sha256'])
         job = digest(proposal['job_sha256'])
         attempt = proposal['attempt']
