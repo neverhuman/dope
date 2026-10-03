@@ -711,3 +711,8 @@ records the bounded inspected provenance and an unrelated same-name candidate.
 Original executable source and a two-experiment independent reproduction remain
 unverified; its paper objective is identified without admitting tuning or jobs.
 This unavailable method contributes no DOPE win or win-denominator entry.
+
+The [compressed-member contract](CONTAINER_MEMBER_CONTRACT.md) verifies the
+complete encoded byte charge and independently frozen kernel/projection digests
+before returning immutable owned members. It admits no sampler, runtime or job;
+compressed-candidate validation still waits on predecessor closure and capacity.
