@@ -3,6 +3,8 @@ import copy
 import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -138,6 +140,38 @@ class NativeAccounting(unittest.TestCase):
         self.assertFalse(row['common_samples_complete'])
         self.assertEqual(row['operation_seconds'], 630)
 
+    def test_understated_transport_cost_rejected_for_success_and_timeout(self):
+        for index, mode in enumerate(('fit', 'native', 'sample')):
+            original = self.operations[index].copy()
+            self.operations[index]['elapsed_seconds'] = 0
+            self.put(mode + '.operation.json', self.operations[index])
+            self.refresh()
+            with self.subTest(mode=mode), self.assertRaisesRegex(ValueError, 'undercharges'):
+                self.call()
+            self.operations[index] = original
+            self.put(mode + '.operation.json', original)
+        self.operations[2].update(status='timeout', exit_code=1, elapsed_seconds=0)
+        self.put('sample.operation.json', self.operations[2])
+        monitor = m.read(self.parent / 'sample.monitor.json')
+        self.put('sample.monitor.json', monitor | {'status': 'timeout', 'exit_code': -15, 'elapsed_seconds': 601})
+        self.receipt['status'] = 'failed'
+        self.refresh()
+        with self.assertRaisesRegex(ValueError, 'undercharges'): self.call()
+
+    def test_invalid_failed_monitor_cost_rejected_and_clock_tolerance_never_undercharges(self):
+        self.operations[2].update(status='failed', exit_code=1)
+        self.put('sample.operation.json', self.operations[2])
+        monitor = m.read(self.parent / 'sample.monitor.json') | {'status': 'failed', 'exit_code': 1}
+        self.receipt['status'] = 'failed'
+        for value in (True, -1, float('nan'), float('inf')):
+            self.put('sample.monitor.json', monitor | {'elapsed_seconds': value})
+            self.refresh()
+            with self.subTest(value=value), self.assertRaises(ValueError): self.call()
+        measured = self.operations[2]['elapsed_seconds'] + m.ELAPSED_TOLERANCE_SECONDS / 2
+        self.put('sample.monitor.json', monitor | {'elapsed_seconds': measured})
+        self.refresh()
+        self.assertEqual(self.call()['operation_seconds'], 28 + measured)
+
     def test_success_rejects_failed_admission_quota_and_gpu_receipts(self):
         for mode, field, value in [('fit', 'gpu_process_observed', False), ('fit', 'peak_gpu_used_mib', 16385),
                                    ('native', 'peak_resident_bytes', 25 * 2**30), ('sample', 'elapsed_seconds', 601)]:
@@ -196,7 +230,8 @@ class NativeAccounting(unittest.TestCase):
         self.assertFalse(row['native_selection_eligible'])
 
     def test_deadline_unstarted_preserves_native_kpi_without_fake_cost(self):
-        (self.parent / 'sample.operation.json').unlink()
+        for suffix in ('.operation.json', '.monitor.json', '.worker.log', '.json', '.transport.log'):
+            (self.parent / ('sample' + suffix)).unlink()
         self.operations[2] = {'status': 'deadline_unstarted', 'new_operation_started': False, 'elapsed_seconds': 0}
         self.receipt['status'] = 'failed'
         self.refresh()
@@ -204,6 +239,13 @@ class NativeAccounting(unittest.TestCase):
         self.assertEqual(row['operation_seconds'], 28)
         self.assertTrue(row['native_selection_eligible'])
         self.assertFalse(row['common_samples_complete'])
+
+    def test_unstarted_operation_cannot_hide_execution_evidence(self):
+        (self.parent / 'sample.operation.json').unlink()
+        self.operations[2] = {'status': 'deadline_unstarted', 'new_operation_started': False, 'elapsed_seconds': 0}
+        self.receipt['status'] = 'failed'
+        self.refresh()
+        with self.assertRaisesRegex(ValueError, 'execution evidence'): self.call()
 
     def test_clean_closure_requires_the_actual_supervisor_format_and_all_jobs(self):
         row = self.call()
@@ -225,6 +267,44 @@ class NativeAccounting(unittest.TestCase):
             (self.root / name).write_text(json.dumps(values[name]))
         (self.root / 'coordinator.log').write_bytes(b'changed log')
         with self.assertRaises(ValueError): m.closure(self.root, lock, [row], {})
+
+    def test_extra_physical_attempt_rejected_even_with_complete_receipts(self):
+        row = self.call()
+        lock = self.lock | {'jobs': [self.job]}
+        extra = self.parent.parent / 'attempt-0002'
+        extra.mkdir()
+        (extra / 'receipt.json').write_text(json.dumps(self.receipt))
+        (extra / 'partial-model.pt').write_bytes(b'uncharged fixture')
+        with self.assertRaisesRegex(ValueError, 'physical attempt'): self.call()
+        with self.assertRaisesRegex(ValueError, 'unaccounted attempt'):
+            m.closure(self.root, lock, [row], {})
+
+    def test_orphan_job_directory_alias_or_file_rejected(self):
+        directory = self.root / 'attempts'
+        for kind in ('directory', 'alias', 'file'):
+            extra = directory / 'unexpected-job'
+            if kind == 'directory': extra.mkdir()
+            elif kind == 'alias': extra.symlink_to(self.parent.parent, target_is_directory=True)
+            else: extra.write_bytes(b'unaccounted fixture')
+            with self.subTest(kind=kind), self.assertRaisesRegex(ValueError, 'unexpected jobs'):
+                m.attempt_inventory(self.root, [self.job])
+            if kind == 'directory': extra.rmdir()
+            else: extra.unlink()
+        alias = self.parent.parent / 'attempt-alias'
+        alias.symlink_to(self.parent, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'unaccounted attempt'):
+            m.attempt_inventory(self.root, [self.job], complete=True)
+
+    def test_pending_job_inventory_allowed_only_for_preview(self):
+        extra_job = self.job | {'trial_index': 1}
+        m.attempt_inventory(self.root, [self.job, extra_job])
+        with self.assertRaisesRegex(ValueError, 'inventory'):
+            m.attempt_inventory(self.root, [self.job, extra_job], complete=True)
+        pending = self.root / 'attempts' / m.digest(extra_job)
+        pending.mkdir()
+        m.attempt_inventory(self.root, [self.job, extra_job])
+        with self.assertRaisesRegex(ValueError, 'unaccounted attempt'):
+            m.attempt_inventory(self.root, [self.job, extra_job], complete=True)
 
     def prior(self):
         path = self.parent / 'historical-receipt.json'
@@ -353,6 +433,31 @@ class NativeAccounting(unittest.TestCase):
             with patch('sys.dont_write_bytecode', True): reconcile.declared_runtime(lock, {})
             self.assertTrue((self.root / 'initialized').exists())
             self.assertEqual({p.name for p in source.iterdir()}, {'common.py'})
+
+    def test_optimized_interpreters_rejected_before_frozen_initializer(self):
+        source, lock = self.runtime_fixture()
+        code = """import json, sys
+from pathlib import Path
+from research.benchmark import reconcile_sdv_population as r
+r.ROOT = Path(sys.argv[1])
+r.ROUND_SHA = 'round'
+try:
+    r.declared_runtime(json.loads(sys.argv[2]), {})
+except ValueError as exc:
+    if str(exc) != 'native closure requires Python optimization disabled':
+        raise
+else:
+    raise RuntimeError('optimized runtime verification accepted')
+"""
+        (source / 'runtime-drift.pyc').write_bytes(b'uninventoried executable cache')
+        for flags, optimization in ((['-O'], ''), (['-OO'], ''), ([], '1'), ([], '2')):
+            environment = dict(os.environ, PYTHONOPTIMIZE=optimization)
+            result = subprocess.run([sys.executable, '-B', *flags, '-c', code, str(self.root), json.dumps(lock)],
+                                    cwd=Path(__file__).resolve().parents[3], env=environment,
+                                    capture_output=True, text=True, timeout=30)
+            with self.subTest(flags=flags, optimization=optimization):
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertFalse((self.root / 'initialized').exists())
 
 
 if __name__ == '__main__':

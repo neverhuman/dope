@@ -10,6 +10,7 @@ from .manifest import digest
 from .score import sha256
 
 PRIOR_ROUND_SHA = '5634d235eb8305436ca046867d96d09f562fabbd360892c580a7da3b9b811988'
+ELAPSED_TOLERANCE_SECONDS = 1e-6
 
 
 def require(condition, reason):
@@ -98,6 +99,9 @@ def operation(mode, row, parent, lock, base, refs):
     if row['new_operation_started'] is False:
         require(row['status'] == 'deadline_unstarted' and row['elapsed_seconds'] == 0,
                 'unstarted operation acquired compute or success')
+        require(not any((parent / (mode + suffix)).exists()
+                        for suffix in ('.operation.json', '.monitor.json', '.worker.log', '.json', '.transport.log')),
+                'unstarted operation contains execution evidence')
         return 0.0
     proof = parent / (mode + '.operation.json')
     require(read(proof) == row, 'native operation receipt differs')
@@ -128,6 +132,9 @@ def operation(mode, row, parent, lock, base, refs):
         return row['elapsed_seconds']
     monitor = read(monitor_path)
     claims(monitor)
+    require(finite(monitor['elapsed_seconds']) and monitor['elapsed_seconds'] >= 0
+            and row['elapsed_seconds'] + ELAPSED_TOLERANCE_SECONDS >= monitor['elapsed_seconds'],
+            'native transport elapsed time undercharges its monitor')
     require(monitor['operation'] == mode and monitor['round_sha256'] == lock['round_sha256']
             and monitor['host'] == row['host'] and monitor['foreign_processes_signaled'] is False
             and monitor['energy_attributable_to_job'] is None
@@ -143,7 +150,27 @@ def operation(mode, row, parent, lock, base, refs):
                 'native success lacks passing whole-operation quotas')
         if mode == 'fit':
             require(monitor['gpu_process_observed'] is True, 'native fit did not observe a GPU process')
-    return row['elapsed_seconds']
+    return max(row['elapsed_seconds'], monitor['elapsed_seconds'])
+
+
+def attempt_inventory(root, jobs, complete=False):
+    """This frozen round permits one physical attempt per expected job."""
+    root = Path(root)
+    directory = root / 'attempts'
+    expected = {digest(job) for job in jobs}
+    if not directory.exists():
+        require(not complete, 'native physical attempt inventory is incomplete')
+        return
+    safe(directory, root.parent)
+    entries = list(directory.iterdir())
+    require(all(not p.is_symlink() and p.is_dir() and p.name in expected for p in entries)
+            and (not complete or {p.name for p in entries} == expected),
+            'native physical attempt inventory contains omitted or unexpected jobs')
+    for entry in entries:
+        attempts = list(entry.iterdir())
+        require(all(not p.is_symlink() and p.is_dir() and p.name == 'attempt-0001' for p in attempts)
+                and (not complete or len(attempts) == 1),
+                'native physical attempt inventory contains an unaccounted attempt')
 
 
 def trial(job, root, lock, refs):
@@ -151,6 +178,11 @@ def trial(job, root, lock, refs):
     base = Path(root).parent
     key = digest(job)
     parent = Path(root) / 'attempts' / key / 'attempt-0001'
+    if parent.parent.exists():
+        require(not parent.parent.is_symlink()
+                and all(not p.is_symlink() and p.is_dir() and p.name == 'attempt-0001'
+                        for p in parent.parent.iterdir()),
+                'native job contains an unaccounted physical attempt')
     receipt_path = parent / 'receipt.json'
     if not receipt_path.exists():
         return None
@@ -312,6 +344,7 @@ def closure(root, lock, rows, refs):
     require(len(rows) == len(lock['jobs'])
             and {r['job_sha256'] for r in rows} == {digest(j) for j in lock['jobs']},
             'native matrix is incomplete or duplicated')
+    attempt_inventory(root, lock['jobs'], complete=True)
     completion = read(safe(root / 'completion.json', root.parent))
     end = read(safe(root / 'coordinator-exit.json', root.parent))
     claims(completion)

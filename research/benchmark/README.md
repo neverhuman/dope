@@ -558,7 +558,12 @@ charges; failed and timed-out operations retain elapsed compute. A valid native
 KPI remains eligible when a later sample phase fails, and its shared outcomes
 stay unavailable. No winner is frozen from a partially closed tuning group.
 Historical runtime closure is never upgraded by reuse. Closure requires bytecode
-writes disabled and rejects added caches before loading the frozen verifier.
+writes and Python optimization disabled before loading the frozen verifier.
+Transport time must cover monitor time within one microsecond; charged time is
+the greater measurement. This applies to failed operations too. Unstarted phases
+cannot contain execution evidence. The physical inventory permits only the
+frozen jobs with one attempt each; extra retries, orphan jobs and aliases block
+sealing. Added caches also block verifier loading.
 
 This tool hashes worker and sample files without parsing their rows and does
 not initialize ML libraries, fit generators, or open official tests. Its
