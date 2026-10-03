@@ -80,6 +80,8 @@ def once(path, value):
 
 
 def declared_runtime(lock, refs):
+    accounting.require(sys.flags.optimize == 0,
+                       'native closure requires Python optimization disabled')
     accounting.require(sys.dont_write_bytecode is True,
                        'native closure requires bytecode writes disabled')
     source_inventory(lock, refs)
@@ -115,6 +117,7 @@ def reconcile(seal=False):
     workers = {j['dataset']: j['worker'] for j in accounting.read(parent)['jobs']}
     accounting.require(len(workers) == 100, 'matched native dataset coverage changed')
     verified_lock = lock | {'round_sha256': ROUND_SHA}
+    accounting.attempt_inventory(ROOT, lock['jobs'])
     closed = [row for job in lock['jobs'] if (row := accounting.trial(job, ROOT, verified_lock, refs)) is not None]
     prior = [accounting.prior_trial(row, verified_lock, workers[row['dataset']], ROOT.parent, refs)
              for row in lock['prior_trials']]
