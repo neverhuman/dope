@@ -705,3 +705,9 @@ The [TabKDE source-rights receipt](TABKDE_SOURCE_RIGHTS.md) binds the already
 recorded original commit and selected rights scope. Execution rights and a
 licensed independent implementation with two reproductions remain unverified;
 this unavailable method contributes no DOPE win or win-denominator entry.
+
+The [GEM-T source/reproduction readiness receipt](GEMT_SOURCE_READINESS.md)
+records the bounded inspected provenance and an unrelated same-name candidate.
+Original executable source and a two-experiment independent reproduction remain
+unverified; its paper objective is identified without admitting tuning or jobs.
+This unavailable method contributes no DOPE win or win-denominator entry.

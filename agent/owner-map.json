@@ -62,6 +62,8 @@
     "research/benchmark/PATEGAN_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/TABPFGEN_SOURCE_READINESS.md": "external-evidence",
     "research/benchmark/TABKDE_SOURCE_RIGHTS.md": "external-evidence",
+    "research/benchmark/GEMT_SOURCE_READINESS.md": "external-evidence",
+    "research/benchmark/results/gemt-unavailable": "external-evidence",
     "research/benchmark/results/tabkde-unavailable": "external-evidence",
     "research/benchmark/results/tabpfgen-unavailable": "external-evidence",
     "research/benchmark/pategan-source.audit": "external-evidence",
