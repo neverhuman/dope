@@ -150,10 +150,13 @@ def sample(lock, native, kernel, rows, seed, output, start):
     native.verify_runtime(lock)
     remaining = 600 - (time.monotonic() - start)
     require(remaining > 0)
+    environment = {'PATH': '/usr/bin:/bin', 'LC_ALL': 'C',
+                   'LD_LIBRARY_PATH': lock['native_library_directory'], 'CUDA_VISIBLE_DEVICES': '',
+                   'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1'}
     with output.with_suffix('.log').open('x') as log:
         subprocess.run([lock['gpu_binary'], 'sample', '--kernel', str(kernel), '--rows', str(rows),
                         '--seed', str(seed), '--out', str(output)], cwd=output.parent,
-                       stdout=log, stderr=subprocess.STDOUT, check=True, timeout=remaining)
+                       stdout=log, stderr=subprocess.STDOUT, check=True, timeout=remaining, env=environment)
     safe(output, output.parent)
 
 

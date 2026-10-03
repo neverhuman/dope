@@ -42,7 +42,12 @@ Metric receipts remain separate. A successful batch records exact job, round,
 request, metric and container identities with the entire encoded charge. A
 replay mismatch prevents a successful batch receipt; partial evidence remains.
 The worker checks the native binary/library closure before each subprocess and
-passes its remaining 600-second batch budget to sampling. The outer coordinator
+uses an explicit sampler environment with the checked PATH/locale/library path,
+empty CUDA visibility and single-thread numeric-library limits. Unfrozen loader
+inputs such as LD_PRELOAD, LD_AUDIT and GLIBC_TUNABLES are not inherited. The
+future coordinator must also freeze a restricted interpreter/transport environment
+before process initialization. It passes its remaining 600-second batch budget
+to sampling. The outer coordinator
 must enforce that same deadline across bootstrap, transport, all guards,
 sampling and metrics, including partial or failed work.
 Expiry during final integrity checks prevents the successful batch write and
