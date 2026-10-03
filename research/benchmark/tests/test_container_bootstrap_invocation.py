@@ -101,6 +101,16 @@ class BootstrapInvocationControls(unittest.TestCase):
         self.proposal['attempt'] = 2
         self.rejected()
 
+    def test_library_separators_and_dynamic_tokens_rejected(self):
+        for value in ['/opaque/library;/opaque/other', '/opaque/library;',
+                      '/opaque/library;;/opaque/other', '/opaque/library;relative',
+                      '/opaque/library;../relative', '/opaque/library:/opaque/other',
+                      '/opaque/$ORIGIN', '/opaque/${ORIGIN}', '/opaque/$LIB',
+                      '/opaque/${LIB}', '/opaque/$PLATFORM', '/opaque/${PLATFORM}']:
+            with self.subTest(value=value):
+                self.proposal['native_library_directory'] = value
+                self.rejected()
+
     def test_path_escape_and_loader_path_lists_rejected(self):
         for field, value in [('root', '/outside'), ('entry', self.proposal['root'] + '/other.py'),
                              ('request', self.proposal['root'] + '/evaluator/request.json'),
