@@ -871,16 +871,99 @@
       "worker_sha256": "9329241ba716bdbe5de73eb63e50211dbde19f1979a3e4f101d50691bb85351a"
     },
     "TVineSynth": {
-      "default_config": null,
+      "default_config": {
+        "author_executable": {
+          "example_dimension": 27,
+          "fit_sample_rng_seed": 456,
+          "p_synth": 50,
+          "trunc_levels": [
+            1,
+            5,
+            10,
+            15,
+            20,
+            26
+          ],
+          "utility_classifier": "rand_forest",
+          "utility_rng_seed": 4562,
+          "vine_estimation": "par",
+          "vine_topology": "Cvine"
+        },
+        "campaign_default_contract_frozen": false,
+        "generate_synth_data": {
+          "p_synth": 1,
+          "t_lvl": "Inf",
+          "vine_estimation": "parametric",
+          "vine_estimation_effective_family_set": "all",
+          "vine_topology": "Cvine"
+        },
+        "generate_synth_data_all_truncs": {
+          "p_synth": 1,
+          "trunc_levels": "1:(d-1)",
+          "vine_estimation": "par",
+          "vine_estimation_effective_family_set": "parametric",
+          "vine_topology": "Cvine"
+        }
+      },
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "compact",
-      "license": null,
+      "license": "MIT",
+      "license_evidence": "https://github.com/ElisabethGriesbauer/T-Vine-Synth/blob/1fd98c90771ab849d7056bc8917e956c60afd951/LICENSE",
+      "license_sha256": "273f22745b7be9169d3adf27d331a6486694c6548a9ebb0239764511bc0de3ff",
+      "native_objective": {
+        "alpha": null,
+        "alpha_range": [
+          0,
+          1
+        ],
+        "campaign_seed_policy": null,
+        "direction": "maximize",
+        "formula": "alpha * normalized_privacy + (1-alpha) * normalized_utility",
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "metric_implementation_sha256": null,
+        "name": "author_weighted_normalized_privacy_utility",
+        "native_values_cross_method_ranking": false,
+        "normalization": null,
+        "paper_section": "Appendix E, page 28",
+        "partition_for_future_tuning": "official-training-derived validation only",
+        "privacy_option_selected": null,
+        "privacy_options": {
+          "MAB": {
+            "raw_direction": "minimize"
+          },
+          "MIA_privacy_gain": {
+            "raw_direction": "maximize"
+          }
+        },
+        "regression_utility_implementation_present": false,
+        "s3_regression_native_tuning_applicability": "inapplicable_to_released_classification_metric",
+        "sensitive_feature_policy": null,
+        "shared_kpi_used_for_selection": false,
+        "status": "source_identified_not_frozen_for_tuning",
+        "utility": {
+          "auc_input": "thresholded class labels; not predicted probabilities",
+          "classifier": "random_forest",
+          "classifier_contract_verified": false,
+          "reported_metric": "median AUC over 50 synthetic datasets",
+          "reported_task": "binary_classification",
+          "rf_tree_count_selection": "minimum mean OOB error among 100:2000 by 100",
+          "source": "src/evaluate_synth_data_testdata.R",
+          "source_sha256": "c54592818d72c8ae13ba4adc33a66c42ba8d36462cd3ac96bc066b8d8c0da6da"
+        }
+      },
+      "note": "Original MIT author source, 20 source/documentation Git blobs verified. Paper Appendix E defines a user-weighted normalized privacy-utility objective; weight, normalization, privacy metric, feature policy and generator search are unfrozen. Released utility code is binary classification only, so it supplies no native regression tuner. Runtime, pure-numeric adapter, fitted artifact extraction and privacy-attack gitlink remain pending. No new fit, matrix admission, formal DP, production or DOPE-win claim. Citation: griesbauer2025tvinesynth.",
       "sampling_command": null,
+      "source_audit": {
+        "path": "research/benchmark/tvinesynth-source.audit.json",
+        "sha256": "44dd39517dee0e88e4068c4240bc87d99349f2612ab916856cda3b982e2c3321"
+      },
+      "source_inventory_sha256": "93ab8e736540ded876404974a8feaf3bdd98b1c57d7ad4e2747b696dc3c783f7",
       "status": "source_audit_pending",
       "tuning_search_space": null,
-      "upstream_commit": null,
-      "upstream_url": null
+      "upstream_commit": "1fd98c90771ab849d7056bc8917e956c60afd951",
+      "upstream_url": "https://github.com/ElisabethGriesbauer/T-Vine-Synth"
     },
     "TabCascade": {
       "default_config": null,

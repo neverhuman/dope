@@ -1,0 +1,173 @@
+{
+  "author_environment_guidance": {
+    "R": "4.3.1",
+    "install_packages_sha256": "a23e3ee73981e4150915c05e85a6ad26350aa97a09e9c7c0cfc66ca8ff98f554",
+    "installed_runtime_verified": false,
+    "python": "3.10.13",
+    "r_dependency_versions_pinned": false
+  },
+  "bibliography_entry": "griesbauer2025tvinesynth",
+  "counts_as_dope_win": false,
+  "default_config": {
+    "author_executable": {
+      "example_dimension": 27,
+      "fit_sample_rng_seed": 456,
+      "p_synth": 50,
+      "trunc_levels": [
+        1,
+        5,
+        10,
+        15,
+        20,
+        26
+      ],
+      "utility_classifier": "rand_forest",
+      "utility_rng_seed": 4562,
+      "vine_estimation": "par",
+      "vine_topology": "Cvine"
+    },
+    "campaign_default_contract_frozen": false,
+    "generate_synth_data": {
+      "p_synth": 1,
+      "t_lvl": "Inf",
+      "vine_estimation": "parametric",
+      "vine_estimation_effective_family_set": "all",
+      "vine_topology": "Cvine"
+    },
+    "generate_synth_data_all_truncs": {
+      "p_synth": 1,
+      "trunc_levels": "1:(d-1)",
+      "vine_estimation": "par",
+      "vine_estimation_effective_family_set": "parametric",
+      "vine_topology": "Cvine"
+    }
+  },
+  "fit_sample_contract_verified": false,
+  "formal_dp_claim": false,
+  "format": "dope-tvinesynth-source-admission-audit",
+  "license": "MIT",
+  "license_sha256": "273f22745b7be9169d3adf27d331a6486694c6548a9ebb0239764511bc0de3ff",
+  "matrix_admission": false,
+  "method": "TVineSynth",
+  "method_status": "source_audit_pending",
+  "mfs_v2": null,
+  "native_objective": {
+    "alpha": null,
+    "alpha_range": [
+      0,
+      1
+    ],
+    "campaign_seed_policy": null,
+    "direction": "maximize",
+    "formula": "alpha * normalized_privacy + (1-alpha) * normalized_utility",
+    "generator_search_space": null,
+    "generator_tie_breaks": null,
+    "metric_implementation_sha256": null,
+    "name": "author_weighted_normalized_privacy_utility",
+    "native_values_cross_method_ranking": false,
+    "normalization": null,
+    "paper_section": "Appendix E, page 28",
+    "partition_for_future_tuning": "official-training-derived validation only",
+    "privacy_option_selected": null,
+    "privacy_options": {
+      "MAB": {
+        "raw_direction": "minimize"
+      },
+      "MIA_privacy_gain": {
+        "raw_direction": "maximize"
+      }
+    },
+    "regression_utility_implementation_present": false,
+    "s3_regression_native_tuning_applicability": "inapplicable_to_released_classification_metric",
+    "sensitive_feature_policy": null,
+    "shared_kpi_used_for_selection": false,
+    "status": "source_identified_not_frozen_for_tuning",
+    "utility": {
+      "auc_input": "thresholded class labels; not predicted probabilities",
+      "classifier": "random_forest",
+      "classifier_contract_verified": false,
+      "reported_metric": "median AUC over 50 synthetic datasets",
+      "reported_task": "binary_classification",
+      "rf_tree_count_selection": "minimum mean OOB error among 100:2000 by 100",
+      "source": "src/evaluate_synth_data_testdata.R",
+      "source_sha256": "c54592818d72c8ae13ba4adc33a66c42ba8d36462cd3ac96bc066b8d8c0da6da"
+    }
+  },
+  "native_source_followup": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tvinesynth-v1/native-followup-v2/source-native-proof.json",
+    "sha256": "be0a6c14b6c5cbe9c216dae56f27b86340b69dc34dee4f3adb1385d8d54425a5"
+  },
+  "native_tuning_complete": false,
+  "new_fits_started": 0,
+  "official_tests_opened": false,
+  "original_git_blob_verification_completed": true,
+  "paper": {
+    "bytes": 10262495,
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tvinesynth-v1/native-followup-v2/paper-2503.15972v1.pdf",
+    "sha256": "5310f4c14b9512ce765dd24f07a4937bb17d5868211eb0d462803d58595ac6e6",
+    "source_section": "Appendix E, page28; Section2.2, pages4-5",
+    "url": "https://arxiv.org/pdf/2503.15972v1"
+  },
+  "privacy_attack_gitlink": {
+    "commit": "c09269a89d00d5305361a7147443f25111778960",
+    "executed": false,
+    "path": "synthetic_data_release",
+    "runtime_verified": false,
+    "source_and_license_verified": false,
+    "upstream_url": "https://github.com/ElisabethGriesbauer/synthetic_data_release"
+  },
+  "production_certified": false,
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "remaining_admission_gaps": [
+    "freeze alpha, privacy metric, normalization, sensitive-feature policy, feature ordering, truncation grid, RNG and tie-breaks before tuning",
+    "released utility code is classification only; no author regression utility implementation is bound",
+    "empty factor_position selects no numeric columns in the released code; a pure-numeric adapter contract is unverified",
+    "single-fit function default parametric selects all pair-copula families, unlike executable par; retain distinct defaults",
+    "author returns samples rather than a fitted generator; verify owned model/marginal artifacts and artifact-only sampling",
+    "charge empirical margins, vine model and structure, metadata and projection in full",
+    "inventory full R and Python runtimes before dependency initialization",
+    "verify privacy-attack gitlink source, license and runtime before using author attacks",
+    "RF tree-count ties can return multiple choices; preserve and verify author behavior before tuning",
+    "author test-named evaluation paths must receive only official-training-derived validation during tuning",
+    "whole-operation resource caps and aggregate host admission remain required"
+  ],
+  "reported_experiment_reproductions": 0,
+  "runtime_closure_verified": false,
+  "source_file_count": 20,
+  "source_inventory": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tvinesynth-v1/preaudit.json",
+    "sha256": "93ab8e736540ded876404974a8feaf3bdd98b1c57d7ad4e2747b696dc3c783f7"
+  },
+  "source_member_sha256": {
+    ".gitmodules": "18f87b91d17ba92b2f35ebd15b01aaaa5a8e01a88b4e2d63ff61890da1ec49ba",
+    "AIA.sh": "85405cf2877cfed818e034c0820f0648fdc812183be3f6e38cc7cc13c91b5e1c",
+    "LICENSE": "273f22745b7be9169d3adf27d331a6486694c6548a9ebb0239764511bc0de3ff",
+    "MIA.sh": "9c4f3b2ea4bcb83e9ac1d05d6015ce5356405d13f8bb2d5de06f8f8dccf40b3d",
+    "README.md": "a97f1e53533ab2010dfc3c5244e4661c7599d35f6abde0c236fd7a1368bc8eed",
+    "attack_env.yml": "a3f5442812f08c43cf09515c44ca3901083c458b1fc2506c01ddc3f305d1a7a8",
+    "corr_plots_simulated_real_data.R": "2f4680c568d8fceea4919f6029240b46a4cdca35fa0bd658590b4f69ff2b478d",
+    "corr_plots_support2.R": "0e3e1208a91b31a96cc8ee297a8cbeb4b03935e2a84a46905d43fe0232f58473",
+    "executable.Rmd": "f4068692d8532bfc9865efa7dde4ba49982c98ceeec3350c9c0a390b762d0776",
+    "find_covariate_order.R": "4d6dbd64b6336218727af04225c8aef113afe2126cc6b485eeb300c1a791fb8e",
+    "install_packages.R": "a23e3ee73981e4150915c05e85a6ad26350aa97a09e9c7c0cfc66ca8ff98f554",
+    "main.sh": "13da45c23464cbb28adcc978147ea583fae36cf3a68c96e748775fddc79ee37c",
+    "preprocess_raw_support2.R": "72099d264203e5b028ded44e7c4148ee60d1069f2765e137fa981c396aefa39c",
+    "privpgd.yml": "b76a00831daf8c7778bbd015d3a10e94fe3e77a9e8866b5e0719bab00afdf593",
+    "read_save_attack_results.py": "1183c124d562db743769770af6e80db3d16ea1cbd3cb41d85a24a50e511382d6",
+    "simulate_real_data.R": "d80bdf53f44759f47683996210ea56363d5f219d2adb18d546428ac5c650c313",
+    "src/evaluate_synth_data_testdata.R": "c54592818d72c8ae13ba4adc33a66c42ba8d36462cd3ac96bc066b8d8c0da6da",
+    "src/generate_synth_data.R": "468608171015ac0d6b31ecd24c3f09341e7820719b065ebbe9d1eba90cb6fe17",
+    "src/making_tables.R": "b76d180e1e25162b25605dabf239c536d7bd99d129639194b3c213e9fdd9a7e9",
+    "synthdata_competitors_utility.py": "c3a6a3fae8c1fa90b1f9703f35b95950969f3d1e1a7f121d2e0fc75809f96e4b"
+  },
+  "source_or_dependency_executed": false,
+  "source_scope": "20 source/documentation members only; dataset and test members not opened",
+  "source_verification": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tvinesynth-v1/source-verification-v2/receipt.json",
+    "sha256": "9afab04dc75418e5c2f2c1177936ce24683e914d1e762e435297e96e788a6827"
+  },
+  "upstream_commit": "1fd98c90771ab849d7056bc8917e956c60afd951",
+  "upstream_url": "https://github.com/ElisabethGriesbauer/T-Vine-Synth",
+  "version": 1
+}
