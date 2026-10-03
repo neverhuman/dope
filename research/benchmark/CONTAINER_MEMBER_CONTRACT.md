@@ -8,7 +8,9 @@ results do not establish generation quality or a release-safe artifact.
 `research_container_members.decode_verified_members` prepares the next sampling
 contract. It receives immutable encoded bytes plus three externally frozen
 SHA256 values: the full container, original kernel and original projection.
-It checks the declared charge against the entire encoded length and the unchanged
+All three digest arguments require the exact builtin `str` type, preventing
+caller-defined comparison behavior. It checks the declared charge against the
+entire encoded length and the unchanged
 10,240-byte ceiling before bounded decoding. Internal header digests cannot
 replace the independently pinned original member identities. The result contains
 immutable owned model/projection bytes and the full encoded charge; it never

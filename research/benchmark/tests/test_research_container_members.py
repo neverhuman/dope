@@ -66,6 +66,17 @@ class MemberControls(unittest.TestCase):
                         m.decode_verified_members(self.blob, **dict(self.expected, **{name: value}))
                     decode.assert_not_called()
 
+    def test_digest_subclasses_cannot_override_identity_comparisons(self):
+        class Digest(str):
+            def __ne__(self, other):
+                return False
+
+        for name in ('artifact_sha256', 'model_sha256', 'projection_sha256'):
+            with self.subTest(name=name), patch.object(codec, 'decode') as decode:
+                with self.assertRaisesRegex(ValueError, '^research container frozen digest invalid$'):
+                    m.decode_verified_members(self.blob, **dict(self.expected, **{name: Digest('0' * 64)}))
+                decode.assert_not_called()
+
     def test_external_member_identities_cannot_be_replaced_by_header(self):
         for model, projection in [(self.model + b'change', self.projection),
                                   (self.model, self.projection + b'change')]:
