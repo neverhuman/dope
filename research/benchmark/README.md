@@ -4,6 +4,9 @@
 source-only compressed sampling worker, owned member inputs and exact replay
 controls. Its 32-batch validation preview remains unadmitted; live rounds and
 production scores are unchanged.
+`container_python_custody.py` checks the externally pinned interpreter/import
+inventories before a future worker startup. It starts no process and leaves full
+runtime closure and dispatch admission unverified.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
