@@ -136,6 +136,20 @@ class WorkerControls(unittest.TestCase):
                 self.freeze()
                 self.reject_before_initializer()
 
+    def test_equal_valued_request_cannot_substitute_an_unfrozen_digest(self):
+        self.lock['jobs'] = [json.loads(json.dumps(self.job))]
+        self.job['fit_seed'] = 11.0
+        self.assertEqual(self.job, self.lock['jobs'][0])
+        self.assertNotEqual(w.digest(self.job), w.digest(self.lock['jobs'][0]))
+        self.freeze()
+        self.reject_before_initializer()
+
+    def test_invalid_cpu_environment_rejects_before_any_runtime_initializer(self):
+        for change in ({'CUDA_VISIBLE_DEVICES': 'opaque-invalid-device'},
+                       {'LD_LIBRARY_PATH': 'opaque-invalid-library-directory'}):
+            with self.subTest(change=change), patch.dict(os.environ, change):
+                self.reject_before_initializer()
+
     def test_manifest_and_source_drift_never_initialize(self):
         with (self.root / 'round.lock.json').open('a') as stream:
             stream.write(' ')
@@ -276,6 +290,23 @@ def measure(train, validation, sample, task, seed):
             w.run(self.root, self.expected, self.request)
         self.assertFalse((self.out / 'batch.json').exists())
         self.assertEqual(len(list(self.out.glob('*.metric.json'))), 3)
+
+    def test_deadline_expiry_during_final_checks_prevents_success_batch(self):
+        clock = {'now': 0.0}
+        original_sha = w.sha
+        def checked_sha(path):
+            value = original_sha(path)
+            if Path(path) == self.request:
+                clock['now'] = 601.0
+            return value
+        def fake_sample(lock, native, kernel, rows, seed, output, start):
+            output.write_text(f'{rows}:{seed}')
+        with patch.object(w, 'sample', side_effect=fake_sample), patch.object(w, 'sha', side_effect=checked_sha), \
+             patch.object(w.time, 'monotonic', side_effect=lambda: clock['now']), \
+             self.assertRaisesRegex(TimeoutError, '^compressed research batch deadline exhausted$'):
+            w.run(self.root, self.expected, self.request)
+        self.assertFalse((self.out / 'batch.json').exists())
+        self.assertEqual(len(list(self.out.glob('*.metric.json'))), 6)
 
 
 if __name__ == '__main__':

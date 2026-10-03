@@ -23,6 +23,9 @@ must be proved by the coordinator and bound to the round; setting flags alone
 is not evidence. The request must live under its canonical complete job digest
 and distinct numbered attempt. Output directories require ownership by the
 worker user and mode 0700. Hosts are limited to xbabe1/2/3.
+Request membership uses the canonical complete job digest; equal-valued JSON
+numbers cannot substitute another retry identity. CPU environment checks precede
+all source helper loading and runtime initialization.
 
 The decoder checks externally frozen container, kernel and projection digests
 and charges the complete encoded artifact, including its header. Only verified
@@ -42,6 +45,8 @@ The worker checks the native binary/library closure before each subprocess and
 passes its remaining 600-second batch budget to sampling. The outer coordinator
 must enforce that same deadline across bootstrap, transport, all guards,
 sampling and metrics, including partial or failed work.
+Expiry during final integrity checks prevents the successful batch write and
+raises a fixed timeout error, preserving the completed partial metric evidence.
 
 Before dispatch, complete immutable SDV closure, honor queued density priority,
 freeze the real runtime/binary/library/metric inventories, worker and receipt
