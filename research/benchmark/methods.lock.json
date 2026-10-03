@@ -989,15 +989,40 @@
       "upstream_url": "https://github.com/SamsungSAILMontreal/ForestDiffusion"
     },
     "GEM-T": {
+      "counts_as_dope_win": false,
       "default_config": null,
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "compact",
+      "included_in_win_denominator": false,
       "license": null,
-      "note": "2026-09-30 availability check: arXiv 2509.17752 PDF has no code, GitHub, or repository link; exact-title and algorithm searches plus GitHub repository API queries returned no author implementation. Author contact or a separately labeled paper implementation validated on two reported experiments is required before comparison.",
+      "native_paper_objective": {
+        "direction": "maximize",
+        "generator_search_space": null,
+        "grouped_training_derived_validation_mapping_verified": false,
+        "metric_implementation_sha256": null,
+        "name": "equal_average_of_mean_per_column_and_mean_per_pair_statistical_similarity",
+        "paper_checkpoint_selection_uses_training_quality": true,
+        "shared_dope_kpi_used_for_selection": false,
+        "source_sections": [
+          "3.5.2",
+          "3.5.3"
+        ],
+        "status": "paper_identified_implementation_unverified_not_frozen_for_tuning",
+        "tie_breaks": null
+      },
+      "note": "Scoped current-campaign readiness: primary arxiv2509.17752v1 landing/body, three GitHub repository metadata queries (name100/5446, exactpaperID/title0), one unrelated same-name candidate inspected. Original-author executable/source rights unverified only within inspected scope; no exhaustive source-absence claim. Article terms do not establish executable license; candidate not accepted as author or independent method. Paper statistical quality selection identified, metric/defaults/grid/ties/groupedvalidation unfrozen. No verified independent implementation or2reported-experiment reproductions, no execution/DOPE win/denominator/native KPI substitution/formal DP/gated score. Runtime/fit-sample/safeartifact/fullbytes/seeds/replay/five-lock capacity admission pending. See GEMT_SOURCE_READINESS.md.",
       "sampling_command": null,
+      "source_verification": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/gem-t-v1/source-readiness-v2.json",
+        "sha256": "9a69a09cf0fe073dbd47436dcfff99d071d3e3018f0bc95517cb186ca6139252"
+      },
       "status": "unavailable",
       "tuning_search_space": null,
+      "unavailable_receipt": {
+        "path": "research/benchmark/results/gemt-unavailable.json",
+        "sha256": "f63080712249288da9ea61f0016dfe179f7839ddd039c7a1e60f265ae83bcbf9"
+      },
       "upstream_commit": null,
       "upstream_url": null
     },

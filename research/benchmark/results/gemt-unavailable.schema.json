@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_defaults_frozen": {
+      "const": false
+    },
+    "author_native_objective_scalar_grid_ties_frozen": {
+      "const": false
+    },
+    "bibliography_entry": {
+      "const": "li2025gem"
+    },
+    "candidate_name_collision": {
+      "const": {
+        "classified_as_verified_author_or_independent_method": false,
+        "commit": "9bc654075e211f36d5ccb282cac9f6cd500bb23b",
+        "commit_metadata_sha256": "a204b0ce98bd646c971b705ecdd0bb646ab87e1158a4a2bab0ece8bb7f8e5e63",
+        "metadata_sha256": "edd2502f6d1237c590ba316b34785170e4e90d29d13ae75360b8ec697addd3f8",
+        "readme_sha256": "c463e2776feb22f45266384db2ee5efe7055d702504a1222a80b63ec1a931402",
+        "reason": "repository metadata and selected README describe unrelated application/deployment; no connection to the paper or tabular-generator contract verified",
+        "repository": "lugsresdefala/GEM-T",
+        "tree": "a9c20f0e235bfcca84407da1a01fed730f9bc287",
+        "tree_entries": 8,
+        "tree_metadata_sha256": "511255a0486fc35f21158cbeaeba5d1ef39856c216f4c47c7c416858b519ee7a"
+      }
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "dataset_samples_weights_downloaded_or_read": {
+      "const": false
+    },
+    "dependency_runtime_verified": {
+      "const": false
+    },
+    "execution_admitted": {
+      "const": false
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-benchmark-unavailable-method"
+    },
+    "future_admission_requirements": {
+      "const": [
+        "verify original executable source provenance, execution rights, author defaults and runtime OR explicitly label a licensed independent implementation and reproduce two reported experiments before comparison",
+        "freeze exact author-native metric implementation, direction, grid and ties; verify training-derived grouped validation mapping without replacing the native objective with DOPE KPI",
+        "verify fit/sample, safe row-free generator artifact, complete model/preprocessing/projection byte charges, seeds and replay; admit through five real locks and fresh aggregate xbabe1/2/3 capacity"
+      ]
+    },
+    "included_in_win_denominator": {
+      "const": false
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "GEM-T"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_paper_objective": {
+      "const": {
+        "direction": "maximize",
+        "generator_search_space": null,
+        "grouped_training_derived_validation_mapping_verified": false,
+        "metric_implementation_sha256": null,
+        "name": "equal_average_of_mean_per_column_and_mean_per_pair_statistical_similarity",
+        "paper_checkpoint_selection_uses_training_quality": true,
+        "shared_dope_kpi_used_for_selection": false,
+        "source_sections": [
+          "3.5.2",
+          "3.5.3"
+        ],
+        "status": "paper_identified_implementation_unverified_not_frozen_for_tuning",
+        "tie_breaks": null
+      }
+    },
+    "new_fit_trials": {
+      "const": 0
+    },
+    "new_sample_cells": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paper_repository_links_in_cached_html": {
+      "const": [
+        "https://github.com/arXiv/html_feedback/issues",
+        "https://github.com/brucemiller/LaTeXML/wiki/Porting-LaTeX-packages-for-LaTeXML",
+        "https://github.com/brucemiller/LaTeXML/issues"
+      ]
+    },
+    "paper_url": {
+      "const": "https://arxiv.org/abs/2509.17752v1"
+    },
+    "primary_pages": {
+      "const": {
+        "paper-body.html": {
+          "bytes": 228675,
+          "sha256": "b9627dd007cf56904c890c9cd23cc00f2bbe49bc1c3badb34d28ac46f3d234fd",
+          "status": 200,
+          "url": "https://arxiv.org/html/2509.17752v1"
+        },
+        "paper-landing.html": {
+          "bytes": 43084,
+          "sha256": "201e51ddfeb2c0b4ee93f1d5768564b871a9cb46de605e9e29db2a60b6440707",
+          "status": 200,
+          "url": "https://arxiv.org/abs/2509.17752v1"
+        }
+      }
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "reason_codes": {
+      "const": [
+        "original_author_executable_and_source_rights_unverified_in_inspected_scope",
+        "independent_implementation_two_reported_experiments_not_reproduced"
+      ]
+    },
+    "release_safe": {
+      "const": null
+    },
+    "repository_queries": {
+      "const": [
+        {
+          "incomplete_results": false,
+          "private_file": "repository-search-1.json",
+          "query": "\"GEM-T\" in:name,description",
+          "returned_repository_count": 100,
+          "sha256": "e65c2685f3678cd09980e44ee76b794b581aa6a72cb773d3ae8e221378f25d1e",
+          "total_count": 5446
+        },
+        {
+          "incomplete_results": false,
+          "private_file": "repository-search-2.json",
+          "query": "\"2509.17752\"",
+          "returned_repository_count": 0,
+          "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+          "total_count": 0
+        },
+        {
+          "incomplete_results": false,
+          "private_file": "repository-search-3.json",
+          "query": "\"Generative Tabular Data via Fitting Moments\"",
+          "returned_repository_count": 0,
+          "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+          "total_count": 0
+        }
+      ]
+    },
+    "repository_search_scope": {
+      "const": {
+        "exhaustive": false,
+        "github_incomplete_results_flag_is_exhaustiveness_proof": false,
+        "name_query_pages_returned": 1,
+        "name_query_returned": 100,
+        "name_query_total": 5446
+      }
+    },
+    "reproduction": {
+      "const": {
+        "independent_implementation_verified": false,
+        "required_reported_experiments": 2,
+        "verified_reported_experiments": 0
+      }
+    },
+    "rights_evidence": {
+      "const": {
+        "article_license_notice": "CC BY-NC-ND 4.0",
+        "article_terms_establish_executable_source_license": false,
+        "global_author_source_absence_claim": false,
+        "original_author_executable_implementation_verified": false,
+        "original_source_license_verified": false,
+        "unrelated_candidate_license_used_as_method_rights_evidence": false
+      }
+    },
+    "safe_generator_artifact_full_bytes_and_seed_replay_verified": {
+      "const": false
+    },
+    "scope": {
+      "const": "arxiv2509.17752v1 primary landing/body, three GitHub repository metadata searches and one inspected unrelated same-name candidate; scoped current-campaign readiness, not exhaustive source absence"
+    },
+    "source_runtime_or_ml_code_executed": {
+      "const": false
+    },
+    "source_verification": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/gem-t-v1/source-readiness-v2.json",
+        "sha256": "9a69a09cf0fe073dbd47436dcfff99d071d3e3018f0bc95517cb186ca6139252"
+      }
+    },
+    "status": {
+      "const": "unavailable"
+    },
+    "superiority": {
+      "const": null
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "author_defaults_frozen",
+    "author_native_objective_scalar_grid_ties_frozen",
+    "bibliography_entry",
+    "candidate_name_collision",
+    "counts_as_dope_win",
+    "dataset_samples_weights_downloaded_or_read",
+    "dependency_runtime_verified",
+    "execution_admitted",
+    "fit_sample_contract_verified",
+    "formal_dp_claim",
+    "format",
+    "future_admission_requirements",
+    "included_in_win_denominator",
+    "matrix_admission",
+    "method",
+    "mfs_v2",
+    "native_paper_objective",
+    "new_fit_trials",
+    "new_sample_cells",
+    "official_tests_opened",
+    "paper_repository_links_in_cached_html",
+    "paper_url",
+    "primary_pages",
+    "production_certified",
+    "ptf_v1",
+    "reason_codes",
+    "release_safe",
+    "repository_queries",
+    "repository_search_scope",
+    "reproduction",
+    "rights_evidence",
+    "safe_generator_artifact_full_bytes_and_seed_replay_verified",
+    "scope",
+    "source_runtime_or_ml_code_executed",
+    "source_verification",
+    "status",
+    "superiority",
+    "version"
+  ],
+  "title": "GEM-T scoped source and reproduction readiness receipt",
+  "type": "object"
+}
