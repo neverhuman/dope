@@ -63,6 +63,8 @@
     "research/benchmark/PRIVBAYES_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/CTABGAN_PLUS_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/results/ctabgan-plus-unavailable": "external-evidence",
+    "research/benchmark/TAEGAN_SOURCE_AUDIT.md": "external-evidence",
+    "research/benchmark/results/taegan-unavailable": "external-evidence",
     "research/benchmark/results/privbayes-unavailable": "external-evidence",
     "research/benchmark/tvinesynth-source.audit": "external-evidence",
     "research/benchmark/TVINESYNTH_SOURCE_AUDIT.md": "external-evidence",

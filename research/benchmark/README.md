@@ -674,3 +674,8 @@ The [MST author-source audit](MST_SOURCE_AUDIT.md) pins licensed current-author
 MBI source, defaults and native marginal-error evidence. Runtime, reusable-model
 adaptation, artifact-only fit/sample and native selection bindings remain
 pending. MST stays `source_audit_pending`; no execution or formal DP is admitted.
+
+The [TAEGAN source availability audit](TAEGAN_SOURCE_AUDIT.md) binds
+the pinned author snapshot, inspected source-rights gap and withheld preprocessing
+and recovery steps. Its unavailable receipt admits no execution and contributes
+no DOPE win. Native selection requires rights, a complete pipeline and runtime first.

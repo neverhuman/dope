@@ -1,0 +1,127 @@
+{
+  "author_source_executed": false,
+  "bibliography_entry": "li2025taegan",
+  "bibliography_title_note": "Corrected local key retained; its preprint title differs from the published PMLR title. No paper result is treated as our reproduction.",
+  "commit_manifest": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/taegan-v1/commit.json",
+    "sha256": "4e136ec7c9dc4c5e64e24be833a239e3a7cab0c4a7f1b9c6ab5ca498dfaae0fc"
+  },
+  "counted_dope_wins": 0,
+  "counts_as_dope_win": false,
+  "dependency_runtime_verified": false,
+  "executed_fit_trials": 0,
+  "executed_sample_cells": 0,
+  "execution_admitted": false,
+  "fit_sample_contract_verified": false,
+  "formal_dp_claim": false,
+  "format": "dope-method-unavailable-receipt",
+  "full_repository_archive_downloaded": false,
+  "future_admission_evidence_required": [
+    "explicit rights grant covering the selected source snapshot and complete preprocessing/inverse-recovery pipeline, or a licensed separately labelled independent implementation reproducing two reported experiments",
+    "pinned complete executable/dependency rights and runtime closure plus artifact-only fit/sample, representation, charged bytes, seeds and replay contracts",
+    "author-native validation objective, direction, tie policy, generator grid and trial/time accounting frozen before selection; never substitute shared evaluator KPI"
+  ],
+  "github_detected_license": null,
+  "included_in_win_denominator": false,
+  "independent_implementation_admitted": false,
+  "license": null,
+  "license_endpoint": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/taegan-v1/license-endpoint-v1.json",
+    "sha256": "e5154f18f6814656c0ebeb1facea1cf188d0ff502f0ba20f14c8511c8c7b7ab5"
+  },
+  "license_endpoint_http_status": 404,
+  "license_grant_found_in_inspected_material": false,
+  "license_notice_paths_in_full_tree": [],
+  "matrix_admission": false,
+  "method": "TAEGAN",
+  "mfs_v2": null,
+  "native_objective": {
+    "generator_search_space": null,
+    "native_values_cross_method_ranking": false,
+    "selection_scalar": null,
+    "shared_kpi_used_for_selection": false,
+    "status": "not_admitted_due_to_source_rights_and_incomplete_pipeline",
+    "tie_breaks": null
+  },
+  "official_tests_opened": false,
+  "paired_superiority": null,
+  "pipeline_evidence": {
+    "complete_fit_sample_pipeline_verified": false,
+    "enterprise_preprocessing_and_inverse_withheld_by_readme": true,
+    "prepare_and_recover_ast_stubs": true,
+    "replacement_preprocessor_admitted": false
+  },
+  "production_certified": false,
+  "ptf_v1": null,
+  "public_author_code_copied": false,
+  "published_paper_landing": {
+    "links_original_author_repository": true,
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/taegan-v1/paper-landing.html",
+    "sha256": "a19f596449b5f2cf2d4fbd7a8560af0b54713336d30c43ec7ab3aae0d3ca17ff",
+    "title": "TAEGAN: Revisit GANs for Tabular Data Generation",
+    "url": "https://proceedings.mlr.press/v304/li26c.html"
+  },
+  "reason": "No source license/notice grant was found in the complete pinned tree or inspected README and four Python files. GitHub license metadata is null and the pinned license endpoint returns 404. The author README withholds enterprise preprocessing and inverse recovery; prepare/recover are AST-verified stubs. A complete rights-cleared fit/sample pipeline is not available for this study.",
+  "reason_code": "original_author_rights_and_pipeline_unverified",
+  "release_safe_l3": null,
+  "repository_metadata": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/taegan-v1/repository.json",
+    "sha256": "cb8b596100b32357e6c4f3ad724dc76ff45667e40f75d947c90db008f8055276"
+  },
+  "rights_inspection": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/taegan-v1/rights-inspection-v1.json",
+    "sha256": "d28d0d53740c5722ecd22f2840734ca12d623720cc0b095e1bd97dc941b0ffed"
+  },
+  "source_file_count": 5,
+  "source_files": {
+    "README.md": {
+      "bytes": 1875,
+      "git_blob": "996b0147ffe92e00f5dfcfbfd4b05a9157e17662",
+      "sha256": "1ddfdd17a360d7f16e7b5a2c67ef10bf9ce20e621f53d28000db738b6e81fd2a",
+      "url": "https://raw.githubusercontent.com/BetterdataLabs/taegan/19d17f65cfa52ad5d84c0845830ef7c418e4397a/README.md"
+    },
+    "dataset.py": {
+      "bytes": 4458,
+      "git_blob": "583c1e20ee6fc9e26994e9a47ec4aa8a32e27f2c",
+      "sha256": "5fffa74682f48386906c13c3daf013d07d274477f6ecb299051266a371321d32",
+      "url": "https://raw.githubusercontent.com/BetterdataLabs/taegan/19d17f65cfa52ad5d84c0845830ef7c418e4397a/dataset.py"
+    },
+    "networks.py": {
+      "bytes": 11788,
+      "git_blob": "8cf94836e0b28c853741979e65ace4f682d218ce",
+      "sha256": "6ee688d291721ac0fb8746be1d704aa9bea712ac1d8450c2bd56d697ca7307c2",
+      "url": "https://raw.githubusercontent.com/BetterdataLabs/taegan/19d17f65cfa52ad5d84c0845830ef7c418e4397a/networks.py"
+    },
+    "run.py": {
+      "bytes": 3212,
+      "git_blob": "a740b862218b693862996f9ae82e21173ac1b994",
+      "sha256": "355468f741e68036b5091195efc199017661eda80c262598e853b613a4416fc5",
+      "url": "https://raw.githubusercontent.com/BetterdataLabs/taegan/19d17f65cfa52ad5d84c0845830ef7c418e4397a/run.py"
+    },
+    "taegan.py": {
+      "bytes": 8082,
+      "git_blob": "94760b923f51a920c37c84e557296aa32940b246",
+      "sha256": "b93b098e72eb85d11b6847400355e5ac4f5ac928d946dd70028c4efeab0d311a",
+      "url": "https://raw.githubusercontent.com/BetterdataLabs/taegan/19d17f65cfa52ad5d84c0845830ef7c418e4397a/taegan.py"
+    }
+  },
+  "source_scope": "README and four Python source files only; demo rows, tensors, figures, bytecode and weights were not opened",
+  "source_tree_entries": 15,
+  "source_tree_truncated": false,
+  "source_verification": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/taegan-v1/source-verification-v1.json",
+    "sha256": "94038a1a896c549bbbb1b4eeaf1ea7178414f68020cc916f5690c719657569b0"
+  },
+  "source_version_kind": "original_author_git_commit",
+  "status": "unavailable",
+  "tree_manifest": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/taegan-v1/tree.json",
+    "sha256": "a534c3603227489e52afd30d4fbbb92560851a479257910faa846b7a6e5372c8"
+  },
+  "two_reported_experiments_reproduced": false,
+  "unavailable_cells_count_as_dope_wins": false,
+  "upstream_commit": "19d17f65cfa52ad5d84c0845830ef7c418e4397a",
+  "upstream_tree": "e73d2816839422afa1350cd0948ec2cb2f420c04",
+  "upstream_url": "https://github.com/BetterdataLabs/taegan",
+  "version": 1
+}
