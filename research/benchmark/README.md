@@ -572,3 +572,41 @@ not initialize ML libraries, fit generators, or open official tests. Its
 research receipts keep MFS-v2, PTF-v1, release-safe and superiority claims null.
 The source-only closure implementation does not publish a partial comparator
 panel or admit the final campaign.
+
+### Native retry and reuse preparation
+
+After immutable SDV native closure, `sdv_native_continuation` prepares the next
+retry/reuse inventory. Supply the receipt-lock digest recorded by that closure;
+the tool has no inferred or default digest. Keep its output on scratch or under
+the lane's `target/`:
+
+```sh
+python3 -B -m research.benchmark.sdv_native_continuation \
+  --receipt-lock-sha256 "$SDV_NATIVE_RECEIPT_SHA" \
+  > target/sdv-native-continuation-preview.json
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_sdv_native_continuation.py -v
+```
+
+The tool verifies the externally pinned receipt lock and every referenced file
+before reading native results. It requires the complete 704 new/96 historical
+trial ledger, clean stopped coordinator, frozen source and declared runtime,
+and all 100 matched workers. Twelve fully historical lineages are retained even
+though they have no new physical jobs. Native scores remain on the frozen
+SDMetrics mean regression R² objective; sampling failures do not invalidate an
+otherwise complete native result, and negative scores remain unclipped.
+
+Complete fits can be reused for native scoring; complete native results can
+be reused for later default/native-selected common sampling. These adapter
+stages run on CPU. A retry requiring a new fit still needs GPU admission.
+Retries preserve the original fit identity with a separate second attempt,
+charge the four original trials and both earlier failed attempts where present,
+and reserve at most 600 seconds each within eight attempts and 12 hours per
+method–dataset cell. The author default has first retry priority. Winners stay
+deferred until native retries close; shared outcomes cannot select them.
+
+This source-only preparation launches no work, changes no live frozen round,
+and certifies no speedup or runtime upgrade for historical trials. A new
+source-versioned execution lock, monitor, recognized-owner registry, aggregate
+CPU/GPU/RAM/scratch admission and respect for queued density reservations are
+still required. Official tests stay sealed and all gated claims remain null.
