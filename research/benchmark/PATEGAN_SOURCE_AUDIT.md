@@ -44,8 +44,17 @@ a safe row-free codec with full charged bytes, seeds, requested rows and replay.
 
 The original credit-data CLI fits MinMaxScaler before splitting all input rows;
 preprocessing and selection must be bound to training-derived partitions before
-execution. Labels in its classifier evaluator are rounded from the last column,
-so common-numeric regression applicability is unverified.
+execution. Selection and final classifier evaluation round column `data_dim-1`
+and use feature columns `:data_dim-1`; the mapping depends on the dataset path.
+For the executable default `random` path, `data_dim=10` remains the requested
+feature dimension while the generator appends a target, returning eleven columns.
+Selection and evaluation therefore round feature index9, use features0-8, and
+omit the appended target at index10. Only the `credit` branch resets `data_dim`
+to the table width, making `data_dim-1` its last column. This is a static dimension
+counterexample, established without executing author code or generating rows.
+The original source is preserved. An adapter using the appended target for the
+random default would change the audited native task; label mapping and
+common-numeric regression applicability remain unverified.
 
 Count all internal initializations and failed/timed-out cost, preserve the whole-
 phase600-second and eight-trial/twelve-hour cell caps, and audit privacy composition
