@@ -24,7 +24,7 @@ def path_identity(value):
     parts, current, aliases = list(requested.parts[1:]), Path('/'), []
     while parts:
         part = parts.pop(0)
-        if part in ('.', '..'):
+        if part in ('', '.', '..'):
             if part == '..':
                 current = current.parent
             continue
@@ -35,15 +35,14 @@ def path_identity(value):
             return {'path': value, 'missing_at': str(candidate), 'aliases': aliases, 'absent': True}
         if stat.S_ISLNK(info.st_mode):
             require(len(aliases) < 40)
-            target = str(candidate.readlink())
+            target = os.readlink(candidate)
             aliases.append({'path': str(candidate), 'target': target,
                             'mode': stat.S_IMODE(info.st_mode), 'uid': info.st_uid, 'gid': info.st_gid})
-            target_path = Path(target)
-            if target_path.is_absolute():
+            if target.startswith('/'):
                 current = Path('/')
-                parts = list(target_path.parts[1:]) + parts
+                parts = target.split('/')[1:] + parts
             else:
-                parts = list(target_path.parts) + parts
+                parts = target.split('/') + parts
         else:
             require(not parts or stat.S_ISDIR(info.st_mode))
             current = candidate
@@ -65,7 +64,7 @@ def directory_identity(value):
                 'file' if stat.S_ISREG(info.st_mode) else 'special')
         row = {'name': child.name, 'kind': kind}
         if kind == 'symlink':
-            row['target'] = str(child.readlink())
+            row['target'] = os.readlink(child)
         children.append(row)
     result['children'] = sorted(children, key=lambda row: row['name'])
     return result

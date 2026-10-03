@@ -243,6 +243,43 @@ class LoaderInputControls(unittest.TestCase):
         with patch.object(loader, 'directory_identity', side_effect=changed_directory):
             self.rejected()
 
+    def test_literal_selected_file_alias_drift_rejected(self):
+        self.alias.unlink(); self.alias.symlink_to('./provider.so')
+        self.assertEqual(os.readlink(self.alias), './provider.so')
+        self.rejected()
+
+    def test_literal_directory_child_alias_drift_rejected(self):
+        child = self.library / 'unselected-alias'; child.symlink_to('provider.so')
+        self.lock['directories'][str(self.directory_alias)] = loader.directory_identity(str(self.directory_alias))
+        self.freeze(); child.unlink(); child.symlink_to('./provider.so')
+        self.rejected()
+
+    def test_literal_absence_alias_drift_rejected(self):
+        self.absent.symlink_to('first-missing')
+        self.lock['absent'][str(self.absent)] = loader.path_identity(str(self.absent))
+        self.freeze(); self.absent.unlink(); self.absent.symlink_to('./first-missing')
+        self.rejected()
+
+    def test_trailing_separator_and_dot_target_rejected_like_filesystem(self):
+        for value in ('provider.so/', 'provider.so/.'):
+            with self.subTest(value=value):
+                self.alias.unlink(); self.alias.symlink_to(value)
+                with self.assertRaises(NotADirectoryError):
+                    self.alias.stat()
+                self.rejected()
+
+    def test_initial_literal_targets_are_preserved_in_snapshots(self):
+        self.alias.unlink(); self.alias.symlink_to('./provider.so')
+        identity = loader.path_identity(str(self.alias))
+        self.assertEqual(identity['aliases'][-1]['target'], './provider.so')
+        children = loader.directory_identity(str(self.library))['children']
+        self.assertEqual(next(row for row in children if row['name'] == self.alias.name)['target'], './provider.so')
+        path = str(self.directory_alias / self.alias.name)
+        self.lock['files'][path].update(loader.path_identity(path))
+        self.lock['directories'][str(self.directory_alias)] = loader.directory_identity(str(self.directory_alias))
+        self.freeze()
+        self.assertIs(self.verify()['selected_loader_inputs_verified'], True)
+
 
 if __name__ == '__main__':
     unittest.main()
