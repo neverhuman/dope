@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "archive_and_git_blob_verification_completed": {
+      "const": true
+    },
+    "author_environment_guidance": {
+      "const": {
+        "cuda": "11.7",
+        "environment_sha256": "d37365f76f442a991acb09d1de6de4f40cb01120d2f678a407befad8f2a397d8",
+        "installed_runtime_verified": false,
+        "python": "3.10",
+        "requirements_fully_version_pinned": false,
+        "torch": "2.0.1"
+      }
+    },
+    "bibliography_entry": {
+      "const": "shi2025tabdiff"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "default_config": {
+      "const": {
+        "author_toml": {
+          "data": {
+            "dequant_dist": "none",
+            "int_dequant_factor": 0
+          },
+          "diffusion_params": {
+            "cat_scheduler": "log_linear",
+            "edm_params": {
+              "net_conditioning": "sigma",
+              "precond": true,
+              "sigma_data": 1.0
+            },
+            "noise_dist": "uniform_t",
+            "noise_dist_params": {
+              "P_mean": -1.2,
+              "P_std": 1.2
+            },
+            "noise_schedule_params": {
+              "eps_max": 0.001,
+              "eps_min": 1e-05,
+              "k_init": -6.0,
+              "k_offset": 1.0,
+              "rho": 7,
+              "rho_init": 7.0,
+              "rho_offset": 5.0,
+              "sigma_max": 80,
+              "sigma_min": 0.002
+            },
+            "num_timesteps": 50,
+            "sampler_params": {
+              "second_order_correction": true,
+              "stochastic_sampler": true
+            },
+            "scheduler": "power_mean"
+          },
+          "sample": {
+            "batch_size": 10000
+          },
+          "train": {
+            "main": {
+              "batch_size": 4096,
+              "c_lambda": 1.0,
+              "check_val_every": 2000,
+              "closs_weight_schedule": "anneal",
+              "d_lambda": 1.0,
+              "ema_decay": 0.997,
+              "factor": 0.9,
+              "lr": 0.001,
+              "lr_scheduler": "reduce_lr_on_plateau",
+              "reduce_lr_patience": 50,
+              "steps": 8000,
+              "weight_decay": 0
+            }
+          },
+          "unimodmlp_params": {
+            "bias": true,
+            "d_token": 4,
+            "dim_t": 1024,
+            "factor": 32,
+            "n_head": 1,
+            "num_layers": 2,
+            "use_mlp": true
+          }
+        },
+        "checkpoint_selection": "minimum unweighted EMA training mixed loss after curr_epoch > 4000",
+        "cli": {
+          "deterministic": false,
+          "non_learnable_schedule": false,
+          "num_runs": 20,
+          "y_only": false
+        },
+        "data_loader_workers": 4,
+        "training_steps_mean_epochs": true
+      }
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-tabdiff-source-admission-audit"
+    },
+    "license": {
+      "const": "MIT"
+    },
+    "license_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "TabDiff"
+    },
+    "method_status": {
+      "const": "source_audit_pending"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_objective": {
+      "const": {
+        "auditor_grid_combinations": 36,
+        "auditor_implementation": "eval/mle/mle.py::_evaluate_regression",
+        "auditor_sha256": "7d1d87113590a93916551b377553c75c90c9acf4f807382c70c9dca3902bbac9",
+        "binary_classification_objective": {
+          "direction": "maximize",
+          "metric": "best_auroc_scores.XGBClassifier.roc_auc",
+          "source": "tabdiff/metrics.py::TabMetrics.evaluate_mle"
+        },
+        "candidate_regression_objective": "best_rmse_scores.XGBRegressor.RMSE",
+        "direction": "minimize",
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "generator_tuning_space_not_frozen": true,
+        "metric": "best_rmse_scores.XGBRegressor.RMSE",
+        "native_values_cross_method_ranking": false,
+        "path": "tabdiff/metrics.py::TabMetrics.evaluate_mle",
+        "real_partition_for_future_tuning": "official-training-derived validation only; official tests remain evaluator-only",
+        "selection_behavior": "choose XGB auditor configuration by synthetic or supplied validation RMSE, refit and report on real evaluation partition",
+        "sha256": "06bb3be588cdc7f18bdb9c535c52bd69045b020f1cb8a7ae076d94e589917f0f",
+        "shared_kpi_used_for_selection": false,
+        "status": "source_identified_not_frozen_for_tuning",
+        "target_transform": "log(clip(y,1,20000)) on training and real evaluation labels, validation labels untransformed",
+        "tuning_seed_policy": null
+      }
+    },
+    "native_tuning_complete": {
+      "const": false
+    },
+    "new_fits_started": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "remaining_admission_gaps": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 10,
+      "type": "array"
+    },
+    "reported_experiment_reproductions": {
+      "const": 0
+    },
+    "runtime_closure_verified": {
+      "const": false
+    },
+    "source_archive_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_file_count": {
+      "const": 27
+    },
+    "source_inventory": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "source_member_sha256": {
+      "additionalProperties": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "maxProperties": 27,
+      "minProperties": 27,
+      "type": "object"
+    },
+    "source_scope": {
+      "const": "27 source/documentation members only; skipped dataset metadata and images not opened"
+    },
+    "source_verification": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "upstream_commit": {
+      "const": "5ecdb3356261aea72716cc9a779f31d7ad083bf4"
+    },
+    "upstream_url": {
+      "const": "https://github.com/MinkaiXu/TabDiff"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "archive_and_git_blob_verification_completed",
+    "author_environment_guidance",
+    "bibliography_entry",
+    "counts_as_dope_win",
+    "default_config",
+    "fit_sample_contract_verified",
+    "format",
+    "license",
+    "license_sha256",
+    "matrix_admission",
+    "method",
+    "method_status",
+    "mfs_v2",
+    "native_objective",
+    "native_tuning_complete",
+    "new_fits_started",
+    "official_tests_opened",
+    "production_certified",
+    "ptf_v1",
+    "release_safe_l3",
+    "remaining_admission_gaps",
+    "reported_experiment_reproductions",
+    "runtime_closure_verified",
+    "source_archive_sha256",
+    "source_file_count",
+    "source_inventory",
+    "source_member_sha256",
+    "source_scope",
+    "source_verification",
+    "upstream_commit",
+    "upstream_url",
+    "version"
+  ],
+  "title": "TabDiff author source audit; runtime and campaign admission pending",
+  "type": "object"
+}
