@@ -2272,14 +2272,107 @@
       "upstream_url": "https://github.com/april-tools/tabpc"
     },
     "TabPFGen": {
+      "counts_as_dope_win": false,
       "default_config": null,
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "llm",
+      "included_in_win_denominator": false,
+      "independent_source_candidate": {
+        "README_disclaims_original_author_affiliation_and_strict_fidelity": true,
+        "constructor_defaults_are_independent_not_author_defaults": {
+          "device": "auto",
+          "n_sgld_steps": 1000,
+          "sgld_noise_scale": 0.01,
+          "sgld_step_size": 0.01
+        },
+        "implementation_kind": "author_disclaimed_independent_implementation",
+        "independent_regression_extension_is_not_verified_original_author_contract": true,
+        "license": "Apache-2.0",
+        "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "pretrained_weights_and_runtime_rights_verified": false,
+        "requirements": [
+          "numpy>=1.26.0",
+          "torch>=2.5.0",
+          "scikit-learn==1.5.2",
+          "matplotlib>=3.10.0",
+          "scipy>=1.15.0",
+          "tabpfn>=2.0.1",
+          "pandas>=2.2.0",
+          "seaborn>=0.12.0"
+        ],
+        "requires_TabPFN2_or_later_pretrained_models": true,
+        "selected_source_file_count": 8,
+        "selected_source_files": {
+          "LICENSE": {
+            "bytes": 11357,
+            "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+            "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+            "url": "https://raw.githubusercontent.com/sebhaan/TabPFGen/e51bf5dc8c850242592ec18bfc16d1a1c3d5150e/LICENSE"
+          },
+          "README.md": {
+            "bytes": 7870,
+            "git_blob": "b049f2b91124c91e8b69a8bc06c76b4848cd282b",
+            "sha256": "dd617a8347ea2833b76e417e0dc6abd60f3b21016d7f70fc8cb34f4666b5eeeb",
+            "url": "https://raw.githubusercontent.com/sebhaan/TabPFGen/e51bf5dc8c850242592ec18bfc16d1a1c3d5150e/README.md"
+          },
+          "pyproject.toml": {
+            "bytes": 291,
+            "git_blob": "abb26520e4bbf4c87492d0c140d5ae5cd136fd2b",
+            "sha256": "f830f4f1936c9127004d0d3b0f5ceae3e0a08fde497c186fea62168027446357",
+            "url": "https://raw.githubusercontent.com/sebhaan/TabPFGen/e51bf5dc8c850242592ec18bfc16d1a1c3d5150e/pyproject.toml"
+          },
+          "requirements.txt": {
+            "bytes": 123,
+            "git_blob": "aa883513ae19db148ec306be501d16836263382d",
+            "sha256": "672a4ae033ad568d775f6f7835a0e49cb98dbe7e4de0187dab4d135f1b065b9a",
+            "url": "https://raw.githubusercontent.com/sebhaan/TabPFGen/e51bf5dc8c850242592ec18bfc16d1a1c3d5150e/requirements.txt"
+          },
+          "setup.py": {
+            "bytes": 1160,
+            "git_blob": "704ff893aebcda1c9fecd38f87ccdd740f2a49d4",
+            "sha256": "df340e336411edb14b92f88c59f71926be11f3c8a093d9b1a47f9cbe2c095eff",
+            "url": "https://raw.githubusercontent.com/sebhaan/TabPFGen/e51bf5dc8c850242592ec18bfc16d1a1c3d5150e/setup.py"
+          },
+          "src/tabpfgen/__init__.py": {
+            "bytes": 254,
+            "git_blob": "99bcad9712287f16db473921bf82103cc3d76bc5",
+            "sha256": "f91060a5fe66c7cf7676264af23a739edc48693ef25052bacd3ba8be31ad3e0b",
+            "url": "https://raw.githubusercontent.com/sebhaan/TabPFGen/e51bf5dc8c850242592ec18bfc16d1a1c3d5150e/src/tabpfgen/__init__.py"
+          },
+          "src/tabpfgen/tabpfgen.py": {
+            "bytes": 20630,
+            "git_blob": "bc8a3a7de9461a961158ba936bc40da4049e35bd",
+            "sha256": "56a4c1d81b9bb4d4074bfc732a0eab14343bc7ba880f4f33cab1b67707526c42",
+            "url": "https://raw.githubusercontent.com/sebhaan/TabPFGen/e51bf5dc8c850242592ec18bfc16d1a1c3d5150e/src/tabpfgen/tabpfgen.py"
+          },
+          "src/tabpfgen/visuals.py": {
+            "bytes": 10876,
+            "git_blob": "4eb9b128532d6efcf133f54812f09b9f6ae42382",
+            "sha256": "189fc6c549791cd3f3f97601121ef6f9d25432fbaa2493cf837ffc3485f63cbd",
+            "url": "https://raw.githubusercontent.com/sebhaan/TabPFGen/e51bf5dc8c850242592ec18bfc16d1a1c3d5150e/src/tabpfgen/visuals.py"
+          }
+        },
+        "source_verification": {
+          "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabpfgen-v1/independent-source-verification-v1.json",
+          "sha256": "f6d0be708d3486339f49f6d2091e22637e307a037a58e97f1cd245a70093b478"
+        },
+        "tree_entries": 27,
+        "upstream_commit": "e51bf5dc8c850242592ec18bfc16d1a1c3d5150e",
+        "upstream_tree": "9f1b6867fa4381f613b55b872bfa8d6911b3f21d",
+        "upstream_url": "https://github.com/sebhaan/TabPFGen"
+      },
       "license": null,
+      "note": "Original-author executable unverified only within inspected paper/author-page provenance, no global absence claim. Available Apache2 sebhaan/TabPFGen explicitly independent, not author-affiliated or verified strict-fidelity. Its defaults/regression extension are not verified author contracts; 0/2 required reported experiments reproduced. Original-author license/default/commit/runtime remain unverified; independent candidate rights do not establish pretrained-weight/runtime rights. Sampling needs training arrays/TabPFN context; safe row-free artifact/fullbytes/seeds/replay and author-native objective/grid/ties pending. Unavailable for current campaign, excluded from DOPE wins and win denominator; no execution, formal DP or gated scores. See TABPFGEN_SOURCE_READINESS.md.",
+      "original_author_executable_implementation_verified": false,
+      "original_author_source_absence_claim": false,
       "sampling_command": null,
-      "status": "source_audit_pending",
+      "status": "unavailable",
       "tuning_search_space": null,
+      "unavailable_receipt": {
+        "path": "research/benchmark/results/tabpfgen-unavailable.json",
+        "sha256": "048b2e63b8d565533d3c3cc373a3b252273848cf67b822773c95e288a67da2e8"
+      },
       "upstream_commit": null,
       "upstream_url": null
     },

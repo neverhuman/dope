@@ -60,6 +60,8 @@
     "research/benchmark/TABBYFLOW_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/tabbyflow-source.audit": "external-evidence",
     "research/benchmark/PATEGAN_SOURCE_AUDIT.md": "external-evidence",
+    "research/benchmark/TABPFGEN_SOURCE_READINESS.md": "external-evidence",
+    "research/benchmark/results/tabpfgen-unavailable": "external-evidence",
     "research/benchmark/pategan-source.audit": "external-evidence",
     "research/benchmark/tabcascade-source.audit": "external-evidence",
     "research/benchmark/TABCASCADE_SOURCE_AUDIT.md": "external-evidence",

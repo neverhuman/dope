@@ -694,3 +694,9 @@ The [original PATE-GAN source audit](PATEGAN_SOURCE_AUDIT.md) distinguishes the
 author-lab BSD3 implementation from the later auditing project. Native logistic
 AUC selection, generated-array/row-free artifact, preprocessing/selection privacy,
 legacy runtime and fresh capacity gates remain pending; no execution or DP claim.
+
+The [TabPFGen source/reproduction readiness receipt](TABPFGEN_SOURCE_READINESS.md)
+records scoped unavailability for this campaign. The available Apache2 candidate
+is explicitly independent and has no verified two-experiment reproduction;
+original-author implementation/defaults and safe model-context artifacts remain
+unverified. It contributes no DOPE win or win-denominator entry.
