@@ -1,5 +1,10 @@
 # Offline generator benchmark (research only)
 
+[`CONTAINER_VALIDATION_WORKER.md`](CONTAINER_VALIDATION_WORKER.md) describes the
+source-only compressed sampling worker, owned member inputs and exact replay
+controls. Its 32-batch validation preview remains unadmitted; live rounds and
+production scores are unchanged.
+
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
 production KPI contract. A future contract change requires a new version.
