@@ -1452,15 +1452,223 @@
       "upstream_url": "https://github.com/ElisabethGriesbauer/T-Vine-Synth"
     },
     "TabCascade": {
-      "default_config": null,
+      "default_config": {
+        "campaign_default_contract_frozen": false,
+        "checkpoint_policy": "terminal EMA of jointly trained lowres and highres models",
+        "literal_api_defaults": {
+          "Discretizer_constructor": {
+            "adjust_means": false,
+            "k_max": 20,
+            "max_depth": 3,
+            "perc_obs": 0.03,
+            "seed": 42,
+            "use_R_version": false,
+            "variant": "dt"
+          },
+          "MLEScore_constructor": {
+            "boost_rounds": 200,
+            "max_obs": 100000
+          },
+          "constructor": {
+            "seed": 0
+          }
+        },
+        "paper_experiment_discretizer": "R disttree; author README identifies it explicitly",
+        "released_core_discretizer": "author Python disttree port",
+        "released_core_use_R_version": false,
+        "released_model_configurations": {
+          "model/config.yaml": {
+            "data": {
+              "adjust_means": false,
+              "batch_size": 4096,
+              "cat_encoding": null,
+              "encoder": "dt",
+              "k_max": 10,
+              "max_depth": 8
+            },
+            "highres": {
+              "model": {
+                "cat_emb_dim": 8,
+                "gamma_input_dim": 16,
+                "generation_batch_size": 4096,
+                "generation_steps": 200,
+                "mlp_emb_dim": 256,
+                "mlp_n_layers": 5,
+                "mlp_n_units": 394
+              },
+              "training": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "clip_grad": false,
+                "ema_decay": 0.999,
+                "lr": 0.002,
+                "num_steps_warmup": -1,
+                "weight_decay": 0
+              }
+            },
+            "lowres": {
+              "model": {
+                "cat_emb_dim": 16,
+                "cat_emb_init_sigma": 0.001,
+                "generation_batch_size": 4096,
+                "generation_steps": 200,
+                "mlp_act": "relu",
+                "mlp_emb_dim": 256,
+                "mlp_n_layers": 5,
+                "mlp_n_units": 664,
+                "normalize_by_entropy": true,
+                "sigma_data": 1.0,
+                "sigma_max": 100,
+                "sigma_min": 0,
+                "timewarp_variant": "logistic",
+                "timewarp_weight_low_noise": 3.0,
+                "variant": "cdtd"
+              },
+              "training": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "clip_grad": false,
+                "ema_decay": 0.999,
+                "log_steps": 100,
+                "lr": 0.001,
+                "num_steps_train": 30000,
+                "num_steps_warmup": 1000,
+                "patience": 10,
+                "scheduler": true,
+                "weight_decay": 0
+              }
+            },
+            "model_name": "tabcascade"
+          },
+          "model/config_gmm.yaml": {
+            "data": {
+              "adjust_means": true,
+              "batch_size": 4096,
+              "cat_encoding": null,
+              "encoder": "gmm",
+              "k_max": 30,
+              "max_depth": 8
+            },
+            "highres": {
+              "model": {
+                "cat_emb_dim": 8,
+                "gamma_input_dim": 16,
+                "generation_batch_size": 4096,
+                "generation_steps": 200,
+                "mlp_emb_dim": 256,
+                "mlp_n_layers": 5,
+                "mlp_n_units": 394
+              },
+              "training": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "clip_grad": false,
+                "ema_decay": 0.999,
+                "lr": 0.002,
+                "num_steps_warmup": -1,
+                "weight_decay": 0
+              }
+            },
+            "lowres": {
+              "model": {
+                "cat_emb_dim": 16,
+                "cat_emb_init_sigma": 0.001,
+                "generation_batch_size": 4096,
+                "generation_steps": 200,
+                "mlp_act": "relu",
+                "mlp_emb_dim": 256,
+                "mlp_n_layers": 5,
+                "mlp_n_units": 664,
+                "normalize_by_entropy": true,
+                "sigma_data": 1.0,
+                "sigma_max": 100,
+                "sigma_min": 0,
+                "timewarp_variant": "logistic",
+                "timewarp_weight_low_noise": 3.0,
+                "variant": "cdtd"
+              },
+              "training": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "clip_grad": false,
+                "ema_decay": 0.999,
+                "log_steps": 100,
+                "lr": 0.001,
+                "num_steps_train": 30000,
+                "num_steps_warmup": 1000,
+                "patience": 10,
+                "scheduler": true,
+                "weight_decay": 0
+              }
+            },
+            "model_name": "tabcascade"
+          }
+        },
+        "yaml_recording_parser": "yaml.safe_load; dependency-resolved configuration unverified"
+      },
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "neural_flow",
-      "license": null,
+      "license": "MIT",
+      "native_objective": {
+        "author_headline_emphasizes_detection_quality": true,
+        "direction": "maximize",
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "frozen_scalar_objective": null,
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "heldout_rows_for_selection": "official-training-derived validation only; never official tests",
+        "name": "author_lightgbm_detection_score",
+        "native_values_cross_method_ranking": false,
+        "nfold": 5,
+        "paper_boost_rounds": 500,
+        "released_boost_rounds": 200,
+        "score": "1 - (max(0.5, best mean cross-validation AUC) * 2 - 1)",
+        "selected_for_study_native_tuning": false,
+        "shared_kpi_used_for_selection": false,
+        "source": "evaluation/eval_detection.py::DetectionScore.estimate_score",
+        "source_sha256": "9d428325550eff28256034d3085a4ceffd01a8d582d9cf1b0c53c5d13474be35",
+        "status": "source_identified_not_frozen_for_tuning",
+        "unconditional_categorical_encoder_requires_zero_column_contract": true
+      },
+      "native_objective_frozen": false,
+      "native_tuning_complete": false,
       "sampling_command": null,
+      "source_audit": {
+        "path": "research/benchmark/tabcascade-source.audit.json",
+        "sha256": "c33832b5767a932e248b8b8917491a16d348ef4940856bcdab040e5ccd6438a4"
+      },
+      "source_contract_pending": [
+        "verify complete source/runtime/bytecode/import roots and selected third-party Python/R dependency rights before initializers",
+        "freeze current Python-port default and separate paper-faithful R configuration, label the track difference and verify equivalence before claims",
+        "bind grouped official-training-derived fit and validation partitions and fit every learned preprocessing step only on fit rows",
+        "freeze author native detection source/runtime,200-versus500 boosting iterations,seeds,search and ties, or mark tuning inapplicable; report separate MLE RMSE-gap MIN without cross-method native ranking",
+        "verify zero-categorical tensors and numeric-only metrics without fake features, including the over100000-row subsample path",
+        "freeze whole-process fit RNG initialization and sample seed wrapper; verify exact finite n/2n/4n/8n outputs and replay",
+        "verify safe artifact-only local loading and full model/config/group-statistics/preprocessing/projection bytes; exclude original rows from inference state",
+        "run copy/leakage/privacy and real-vs-real controls; missing-value generation must conform to the selected numeric representation",
+        "fresh aggregate owner admission on xbabe1/2/3,disjointCPU/RAM/scratch,whole-fit600s/16GiB GPU caps"
+      ],
       "status": "source_audit_pending",
-      "tuning_search_space": null,
-      "upstream_commit": null,
+      "tuning_search_space": {
+        "allowed_study_grid_frozen": false,
+        "declared_author_config_files": [
+          "model/config.yaml",
+          "model/config_gmm.yaml"
+        ],
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "generator_grid": null,
+        "source_identified": true
+      },
+      "upstream_commit": "22208aad2b209cdba8df3b61a1a261de46ecc994",
       "upstream_url": "https://github.com/muellermarkus/tabcascade"
     },
     "TabDDPM": {

@@ -658,3 +658,9 @@ released noise-schedule variants. It identifies the author absolute RMSE-gap
 objective, terminal EMA policy, zero-categorical assumptions and checkpoint
 row retention. Native scalar/search, safe inference artifacts and executable
 runtime remain unfrozen; CDTD stays `source_audit_pending`.
+
+The [TabCascade source audit](TABCASCADE_SOURCE_AUDIT.md) distinguishes the
+current author Python discretizer from the paper's R track and records native
+detection quality separately from regression efficacy. Paper/default boosting
+iterations differ; runtime, track equivalence, selection and artifact contracts
+remain unfrozen. TabCascade stays `source_audit_pending`; no job is admitted.
