@@ -684,3 +684,8 @@ The [DP-CTGAN author-source audit](DPCTGAN_SOURCE_AUDIT.md) binds the original
 paper-linked DP branch, source defaults and native classification efficacy.
 Source privacy ordering, stored training rows, older runtime and artifact/native
 selection gates remain pending. No formal DP, execution or scored result is admitted.
+
+The [TabbyFlow author-source audit](TABBYFLOW_SOURCE_AUDIT.md) binds the original
+EF-VFM release and native XGBoost RMSE/AUROC outcomes. Epoch/checkpoint/sampler,
+validation target-scale, original test-path and runtime/artifact gates remain
+pending. No execution, scored comparison or production claim is admitted.

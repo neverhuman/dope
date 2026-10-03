@@ -2267,16 +2267,140 @@
       "upstream_url": "https://github.com/amazon-science/tabsyn"
     },
     "TabbyFlow": {
-      "default_config": null,
+      "component_source_licenses": {
+        "eval/mle/tabular_dataload.py": {
+          "license": "Apache-2.0",
+          "notice": "Copyright 2020 The Google Research Authors; retained Apache-2.0 notice",
+          "source_sha256": "092d55ad5df6452f2c251876f836d24a3cace9e781edf9ee3d3e71039e80e52b"
+        }
+      },
+      "default_config": {
+        "author_reports_hyperparameter_launch_scripts_removed": true,
+        "campaign_default_contract_frozen": false,
+        "checkpoint_selection": "lowest rounded fresh training-loss sum after curr_epoch > 4000; separate regular/EMA checkpoint",
+        "compute_loss_split": "train_iter; fresh stochastic mixed_loss; each component rounded to four decimals",
+        "default_test_checkpoint": "first best_ema_model glob result",
+        "fixed_global_seed_when_deterministic_flag_set": 0,
+        "package": {
+          "dependencies": [
+            "torch>=2.0",
+            "torchdiffeq>=0.2.3",
+            "numpy>=1.24",
+            "pandas>=2.0",
+            "scipy>=1.10",
+            "scikit-learn>=1.2",
+            "category-encoders>=2.6",
+            "sdmetrics>=0.14",
+            "xgboost>=2.0",
+            "prdc>=0.2",
+            "plotly>=5.15",
+            "kaleido",
+            "Pillow>=10.0",
+            "openpyxl",
+            "wandb>=0.15",
+            "tqdm>=4.65",
+            "tomli>=2.0",
+            "tomli-w>=1.0",
+            "icecream>=2.1"
+          ],
+          "description": "Exponential Flow Velocity Field Model for tabular data generation",
+          "name": "ef-vfm",
+          "requires-python": ">=3.10",
+          "version": "0.1.0"
+        },
+        "paper_inference_wording": "as few as 25 steps; released sampler uses adaptive dopri5 rather than a fixed 25-step grid",
+        "paper_training_wording": "8000 iterations; executable source uses outer epochs",
+        "primary_cli_deterministic_flag_default": false,
+        "primary_cli_gpu": 0,
+        "released_configuration": {
+          "data": {
+            "dequant_dist": "none",
+            "int_dequant_factor": 0
+          },
+          "sample": {
+            "batch_size": 10000
+          },
+          "train": {
+            "main": {
+              "batch_size": 4096,
+              "c_lambda": 1.0,
+              "check_val_every": 2000,
+              "closs_weight_schedule": "anneal",
+              "d_lambda": 1.0,
+              "ema_decay": 0.997,
+              "factor": 0.9,
+              "lr": 0.001,
+              "lr_scheduler": "reduce_lr_on_plateau",
+              "max_grad_norm": 1.0,
+              "reduce_lr_patience": 50,
+              "steps": 8000,
+              "warmup_epochs": 100,
+              "weight_decay": 0
+            }
+          },
+          "unimodmlp_params": {
+            "activation": "gelu",
+            "bias": true,
+            "d_token": 4,
+            "dim_t": 1024,
+            "factor": 32,
+            "n_head": 1,
+            "num_layers": 2,
+            "use_mlp": true
+          }
+        },
+        "released_sampler": {
+          "atol": 1e-05,
+          "rtol": 1e-05,
+          "solver": "dopri5",
+          "time_interval": [
+            0.0,
+            0.999
+          ]
+        },
+        "training_steps_argument_semantics": "8000 outer epochs, each iterating all training batches; not 8000 optimizer updates"
+      },
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "neural_flow",
-      "license": null,
+      "license": "MIT AND Apache-2.0",
+      "license_evidence": "https://github.com/andresguzco/ef-vfm/blob/11fa189f0fd2b11070831b45830b5a6952a2e323/LICENCE",
+      "license_sha256": "99f990072d42602c8437f78c1e419fb9810fee97eb420e7ca0a6ad544c4c52e8",
+      "native_objective": {
+        "author_hyperparameter_launch_scripts_available": false,
+        "classification_outcome": "XGBClassifier AUROC maximize",
+        "direction": "minimize",
+        "evaluator_source_sha256": "d22b478ec4ca41edbc8dca27222142f7301a0a4b96679f85d2f8fa8a36ff297d",
+        "generator_search_space": null,
+        "implementation_source": "ef_vfm/metrics.py::TabMetrics.evaluate_mle; eval/mle/mle.py::_evaluate_regression",
+        "metric_source_sha256": "06bb3be588cdc7f18bdb9c535c52bd69045b020f1cb8a7ae076d94e589917f0f",
+        "name": "author_xgboost_regression_rmse",
+        "native_scalar_source_expression": "overall_scores['best_rmse_scores']['XGBRegressor']['RMSE'] if task_type == 'regression' else overall_scores['best_auroc_scores']['XGBClassifier']['roc_auc']",
+        "native_validation_target_transform_consistency_verified": false,
+        "native_values_cross_method_ranking": false,
+        "official_test_selection_allowed": false,
+        "shared_kpi_used_for_selection": false,
+        "status": "source_identified_not_frozen_for_tuning",
+        "target_transform_observation": "released regression evaluator log(clips) y_trains and y_test to [1,20000]; y_valid is not transformed before auditor parameter selection",
+        "tie_breaks": null
+      },
+      "note": "Original author EF-VFM source/configuration pinned with MIT root and Apache2 component. Author XGBoost regression RMSE MIN/classification AUROC MAX identified; target-transform consistency/domain and generator grid/ties remain pending. Executable8000 outer epochs, training-loss checkpoint after4000, adaptive dopri5 sampling and original test-split construction require explicit default/data contract. Runtime/third-party rights, safe row-free artifact/seed/replay/bytes, privacy and fresh capacity remain unverified. No execution/reproduction/win/scored result. See TABBYFLOW_SOURCE_AUDIT.md.",
+      "root_source_license": "MIT",
       "sampling_command": null,
+      "source_audit": {
+        "path": "research/benchmark/tabbyflow-source.audit.json",
+        "sha256": "4a537c272b2d457b8f7afb0259c4e0ac79f46d5986547237056c6a0448ca982a"
+      },
+      "source_verification": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabbyflow-v1/source-verification-v2.json",
+        "sha256": "afc41a0795cb087a718e2a0e08480878fea3e9a03812b761c466812590550e85"
+      },
+      "source_version_kind": "original_author_git_implementation_with_released_configuration",
       "status": "source_audit_pending",
       "tuning_search_space": null,
-      "upstream_commit": null,
-      "upstream_url": null
+      "upstream_commit": "11fa189f0fd2b11070831b45830b5a6952a2e323",
+      "upstream_tree": "387e0b6b11cb47cdbb0570ff13e55219b8dd9480",
+      "upstream_url": "https://github.com/andresguzco/ef-vfm"
     },
     "dope": {
       "adapter": "dope",
