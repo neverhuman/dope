@@ -10,9 +10,13 @@ def require(condition):
 
 
 def file_offset(segments, address, size):
-    candidates = [offset + address - start for kind, offset, start, count in segments
+    candidates = [offset + address - start for kind, offset, start, count, _ in segments
                   if kind == 1 and start <= address and address + size <= start + count]
     require(len(candidates) == 1)
+    for kind, offset, start, count, memory in segments:
+        if kind == 1 and max(start, address) < min(start + memory, address + size):
+            require(min(start + memory, address + size) <= start + count)
+            require(offset - start == candidates[0] - address)
     return candidates[0]
 
 
@@ -39,19 +43,19 @@ def inspect_elf_inputs(blob, expected_sha256):
                 '<IIQQQQQQ', blob, phoff + index * 56)
             require(offset + size <= len(blob) and address + memory <= (1 << 64))
             require(kind != 1 or size <= memory)
-            segments.append((kind, offset, address, size))
+            segments.append((kind, offset, address, size, memory))
         interpreters = [s for s in segments if s[0] == 3]
         dynamics = [s for s in segments if s[0] == 2]
         require(len(interpreters) <= 1 and len(dynamics) <= 1)
         interpreter = None
         if interpreters:
-            _, offset, _, size = interpreters[0]
+            _, offset, _, size, _ = interpreters[0]
             raw = blob[offset:offset + size]
             require(raw.startswith(b'/') and raw.endswith(b'\0') and b'\0' not in raw[:-1])
             interpreter = raw[:-1].decode('utf-8')
         entries = []
         if dynamics:
-            _, offset, address, size = dynamics[0]
+            _, offset, address, size, _ = dynamics[0]
             require(0 < size <= 4096 * 16 and size % 16 == 0)
             require(file_offset(segments, address, size) == offset)
             raw_entries = [struct.unpack_from('<qQ', blob, i)
