@@ -121,6 +121,30 @@ class ElfInputControls(unittest.TestCase):
         blob[64 + 3 * 56:64 + 4 * 56] = blob[64:64 + 56]
         self.rejected(blob)
 
+    def test_partial_string_table_conflicting_mapping_rejected(self):
+        blob = opaque_object(); struct.pack_into('<H', blob, 56, 4)
+        struct.pack_into('<IIQQQQQQ', blob, 232, 1, 4, 880, 0x400301, 0, 13, 13, 1)
+        blob[880:893] = b'libhidden.so\0'
+        self.rejected(blob)
+
+    def test_partial_dynamic_record_conflicting_mapping_rejected(self):
+        blob = opaque_object(); struct.pack_into('<H', blob, 56, 4)
+        struct.pack_into('<IIQQQQQQ', blob, 232, 1, 4, 896, 0x400220, 0, 16, 16, 1)
+        struct.pack_into('<qQ', blob, 896, 1, 14)
+        self.rejected(blob)
+
+    def test_partial_mapping_with_same_file_origin_is_consistent(self):
+        blob = opaque_object(); struct.pack_into('<H', blob, 56, 4)
+        struct.pack_into('<IIQQQQQQ', blob, 232, 1, 4, 769, 0x400301, 0, 13, 13, 1)
+        self.assertEqual(self.inspect(blob)['declarations']['needed'], ['libopaque.so'])
+
+    def test_partial_zero_fill_overlap_rejected(self):
+        for address, size in [(0x400301, 13), (0x400220, 16)]:
+            with self.subTest(address=address):
+                blob = opaque_object(); struct.pack_into('<H', blob, 56, 4)
+                struct.pack_into('<IIQQQQQQ', blob, 232, 1, 4, 880, address, 0, 0, size, 1)
+                self.rejected(blob)
+
     def test_missing_duplicate_or_unterminated_strings_rejected(self):
         blob = opaque_object(); struct.pack_into('<q', blob, 512, 999)
         self.rejected(blob)
