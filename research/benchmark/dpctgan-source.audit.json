@@ -1,0 +1,326 @@
+{
+  "author_default_facts": {
+    "campaign_default_contract_frozen": false,
+    "constructor": {
+      "batch_size": 500,
+      "betas": [
+        0.5,
+        0.99
+      ],
+      "clip_coeff": 0.1,
+      "cuda": true,
+      "discriminator_decay": 1e-06,
+      "discriminator_dim": [
+        256,
+        256
+      ],
+      "discriminator_lr": 0.0002,
+      "discriminator_steps": 1,
+      "embedding_dim": 128,
+      "epochs": 300,
+      "generator_decay": 1e-06,
+      "generator_dim": [
+        256,
+        256
+      ],
+      "generator_lr": 0.0002,
+      "log_frequency": true,
+      "pac": 10,
+      "sigma": 1,
+      "target_delta": 1e-05,
+      "target_epsilon": 3,
+      "verbose": false
+    },
+    "epochs_argument_limits_fit": false,
+    "fit_stopping": "author epsilon-accountant loop after whole epochs; epochs argument not used by fit",
+    "package_version": "0.4.3.dev2",
+    "python_requirement": ">=3.6,<3.9",
+    "requirements": [
+      "packaging",
+      "numpy>=1.18.0,<2",
+      "pandas>=1.1,<1.1.5",
+      "scikit-learn>=0.23,<1",
+      "torch>=1.4,<2",
+      "torchvision>=0.5.0,<1",
+      "rdt>=0.5.0.dev1,<0.6",
+      "matplotlib",
+      "xgboost"
+    ],
+    "transformer_max_clusters": 10,
+    "transformer_weight_threshold": 0.005
+  },
+  "author_source_executed": false,
+  "author_source_ref": "DP",
+  "bibliography_entry": "fang2022dp",
+  "component_source_licenses": {
+    "ctgan/rdp_accountant.py": {
+      "full_third_party_rights_closure_verified": false,
+      "license": "Apache-2.0",
+      "notice": "Copyright 2018 The TensorFlow Authors; Apache-2.0 notice retained in pinned source",
+      "source_sha256": "48223e05f87ace8f3758581a30c9df8d3400245214d342d99d0c42e1bdbba78b",
+      "source_url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/rdp_accountant.py"
+    }
+  },
+  "counts_as_dope_win": false,
+  "dependency_runtime_verified": false,
+  "execution_admitted": false,
+  "execution_gaps": [
+    "pin full interpreter/import-root/bytecode/library and third-party rights closure for declared older Python/NumPy/pandas/PyTorch/RDT requirements",
+    "freeze original-source representation and safe inference codec; categorical source sampler reads stored transformed rows, so no unlabelled raw-data artifact or silent sampler replacement",
+    "audit gradient-noise/update ordering, accountant equivalence, sampling rate, complete preprocessing/selection accounting and actual epsilon overshoot before any formal privacy claim",
+    "freeze author-native validation scalar/direction/ties/grid separately per fixed epsilon; regression has no verified author objective, use author default and mark tuning inapplicable",
+    "bind grouped official-training-derived fit/validation, full charged bytes, all seeds/replay/rows and external whole-phase600s timeout; epochs argument does not bound this fit",
+    "fresh aggregate study-owner CPU/RAM/scratch/GPU admission on xbabe1/2/3 only; never bypass live predecessor/reservation locks"
+  ],
+  "fit_sample_contract": {
+    "artifact_only_reload_verified": false,
+    "author_save_serializes_full_object_using_torch_pickle": true,
+    "categorical_generation_reads_transformed_training_rows": true,
+    "common_numeric_representation_frozen": false,
+    "explicit_fit_or_sample_seed_argument": false,
+    "finite_requested_rows_and_replay_verified": false,
+    "fit_mutates_model_and_returns_none": true,
+    "full_inference_bytes_charged": false,
+    "generator_sampling_explicit_eval_present": false,
+    "raw_training_rows_removed_from_inference_artifact_verified": false,
+    "safe_numeric_codec_verified": false,
+    "sample_inherited_from": "CTGANSynthesizer.sample",
+    "sampler_retains_transformed_training_data": true,
+    "verified": false,
+    "wrapper_must_bind_numpy_and_torch_seeds": true
+  },
+  "fit_sample_contract_verified": false,
+  "formal_dp_claim": false,
+  "format": "dope-author-source-admission-audit",
+  "independent_implementation": false,
+  "license": "MIT AND Apache-2.0",
+  "license_evidence": "https://github.com/juliecious/CTGAN/blob/4fb93e7727fbe400c28d642111347d9b517004d4/LICENSE",
+  "license_sha256": "9c44ed24f514fdbde5b2355cf39d102d7fddf89d0b5ec91415fa9fd9b5e693c6",
+  "matrix_admission": false,
+  "method": "DP-CTGAN",
+  "mfs_v2": null,
+  "native_objective": {
+    "author_native_regression_objective_found": false,
+    "direction": "maximize",
+    "epsilon_fixed_per_comparison_required": true,
+    "generator_search_space": null,
+    "implementation_source": "dp/utils.py::eval_dataset",
+    "name": "author_mean_classifier_auroc_and_auprc",
+    "native_values_cross_method_ranking": false,
+    "official_test_selection_allowed": false,
+    "outcomes": [
+      "mean_classifier_AUROC",
+      "mean_classifier_AUPRC"
+    ],
+    "regression_selection_policy": "author default only with native tuning inapplicable unless an author-grounded regression objective is separately verified and frozen before selection",
+    "selection_scalar": null,
+    "shared_kpi_used_for_selection": false,
+    "source_sha256": "6cf400ca79eeedbf1b696f54966794a33f854109abb6131f189916abdd2751e3",
+    "status": "source_identified_not_frozen_for_tuning",
+    "tie_breaks": null
+  },
+  "new_fit_trials": 0,
+  "new_sample_cells": 0,
+  "official_tests_opened": false,
+  "paper": {
+    "bibliography_entry": "fang2022dp",
+    "bytes": 429506,
+    "doi": "10.1007/978-3-031-09342-5_17",
+    "links_author_DP_branch": true,
+    "sha256": "25b6fd9c68f9a60be98281623ada783ade59f166e1c71e4d79a6f4af2fae085d",
+    "url": "https://ml-research.github.io/papers/fang2022dpctgan.pdf"
+  },
+  "privacy_source_observations": {
+    "epoch_end_accountant_may_overshoot_requested_epsilon": true,
+    "following_optimizerD_zero_grad_line": 177,
+    "formal_dp_claim": false,
+    "mechanism_and_runtime_accountant_equivalence_verified": false,
+    "noise_then_zero_grad_then_backward_then_step_ast_verified": true,
+    "per_parameter_noise_assignment_line": 135,
+    "preprocessing_and_selection_accounting_verified": false,
+    "source_noise_standard_deviation_argument": "(sigma * clip_coeff) ** 2",
+    "source_ordering_concern": "Author per-parameter noise is assigned to prior gradients before optimizerD.zero_grad/backward; this ordering does not establish a privatized discriminator update. Runtime/accountant/full preprocessing/selection audit required, no formal DP claim. No source patch executed."
+  },
+  "production_certified": false,
+  "ptf_v1": null,
+  "release_safe": null,
+  "root_source_license": "MIT",
+  "source_file_count": 27,
+  "source_files": {
+    "LICENSE": {
+      "bytes": 1077,
+      "git_blob": "f6f8213bcfc525df1b533a0dd4b06f05f9a14ea8",
+      "sha256": "9c44ed24f514fdbde5b2355cf39d102d7fddf89d0b5ec91415fa9fd9b5e693c6",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/LICENSE"
+    },
+    "README.md": {
+      "bytes": 5758,
+      "git_blob": "1c78236e3986f0c3499fbc9d2f44c7b1d6a1b04b",
+      "sha256": "2d116ed0de9b016ad151342c3bfc7f11e942d9291fc425792451ff710603335b",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/README.md"
+    },
+    "ctgan/__init__.py": {
+      "bytes": 548,
+      "git_blob": "4971d2a22585b441f5b43da6a8ddc3198f641caf",
+      "sha256": "27f1af7409ca70dc6aff82c064f9c7767ce0e824526d6ca4d842c33776548099",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/__init__.py"
+    },
+    "ctgan/__main__.py": {
+      "bytes": 4421,
+      "git_blob": "10de13da250b1a07f5f2678f843b8452275c746a",
+      "sha256": "6560da89ffe8681fda1e9d683751357310b596080abc5aa8f7c71c0209bdd9f3",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/__main__.py"
+    },
+    "ctgan/data.py": {
+      "bytes": 2351,
+      "git_blob": "3a01ebfb990dec7800d177e2897ef7a6d24c2ed0",
+      "sha256": "b33daac6631f39f5dbcb121cfbca78b1a4e08dcc05bff80d5549603b6e0b8b86",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/data.py"
+    },
+    "ctgan/data_sampler.py": {
+      "bytes": 6141,
+      "git_blob": "0036468aba67c1f27d8c40756a6a69823f9be3c5",
+      "sha256": "c530635e9948d845a2f8fb789b212edcea7d34569185f26c6e0923f7eadde207",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/data_sampler.py"
+    },
+    "ctgan/data_transformer.py": {
+      "bytes": 9613,
+      "git_blob": "f12701d37d867f3ea82fd020a8c7f1cd5633ca23",
+      "sha256": "c0dd130c985c367f93a7bbed813fd97cdb38692587a28c5e1dad7a26cf08d9ce",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/data_transformer.py"
+    },
+    "ctgan/demo.py": {
+      "bytes": 155,
+      "git_blob": "aab64a0b34af7b57e57c79f789dd70a07a40e865",
+      "sha256": "ea1b99e9ccbc4ad27dabcbcad1a7f8edbe926ce76f85eb5c0d3f07061cbc2cdf",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/demo.py"
+    },
+    "ctgan/rdp_accountant.py": {
+      "bytes": 9780,
+      "git_blob": "e9e17d2c2f5370f700dd2c122830295bd8255796",
+      "sha256": "48223e05f87ace8f3758581a30c9df8d3400245214d342d99d0c42e1bdbba78b",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/rdp_accountant.py"
+    },
+    "ctgan/synthesizers/__init__.py": {
+      "bytes": 448,
+      "git_blob": "e840555da0dbec53ba5de0919af1d9373bd49267",
+      "sha256": "a51c3f899baa7134adc9b2853bdb5276472cd57eef46caf69e6def192954375d",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/synthesizers/__init__.py"
+    },
+    "ctgan/synthesizers/adp_ctgan.py": {
+      "bytes": 6049,
+      "git_blob": "43edd4b36732895ce0a105acd17a9bc161281a8e",
+      "sha256": "1ff844b13e055673468ee59e27dfc08d28927604d6dc57870a7139b33dd74762",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/synthesizers/adp_ctgan.py"
+    },
+    "ctgan/synthesizers/base.py": {
+      "bytes": 544,
+      "git_blob": "c5e21b4e03151813bd786d604de6ddc2f7b2c806",
+      "sha256": "158c62e112147d1127690a70ff5ac0eee7d652b6621ba6041e685918a5d3ea72",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/synthesizers/base.py"
+    },
+    "ctgan/synthesizers/ctgan.py": {
+      "bytes": 18707,
+      "git_blob": "52ede0ee574962d24f82a901a25ee38650d9611f",
+      "sha256": "4c6ee74ac05ce4e795652092b84def9ebc388d6d71cdc364fc90a05ad2720ef5",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/synthesizers/ctgan.py"
+    },
+    "ctgan/synthesizers/dp_ctgan.py": {
+      "bytes": 10054,
+      "git_blob": "d240c36873397e4ee4cc3e9cfa7e8f017b3f5e3c",
+      "sha256": "4926750707c2b61d40d05a38c76c9cdeec982dcda3cc11d1766f65b66ab4db6c",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/synthesizers/dp_ctgan.py"
+    },
+    "ctgan/synthesizers/tvae.py": {
+      "bytes": 5393,
+      "git_blob": "1e5b6f6f718951427e844f0129e103d0029b71d9",
+      "sha256": "5b96a341de5d272362060b39e298f3cf2fa6675423211d21b70470be252ea98d",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/synthesizers/tvae.py"
+    },
+    "dp/adp.py": {
+      "bytes": 1506,
+      "git_blob": "322ffcb41d93259f82e8a0d753b14101a63a81aa",
+      "sha256": "c08ff140c5830963c23adf40233801bfb6444e7cea77c699cdbce6ff165776e1",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/adp.py"
+    },
+    "dp/adults.py": {
+      "bytes": 3064,
+      "git_blob": "918dd5103160be80efe315d582a82ee77cd3ee21",
+      "sha256": "5ddcd57a42b85f727592c06aa1d87cc2c9d53aab3efa333a92d38f61b48b6050",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/adults.py"
+    },
+    "dp/breast.py": {
+      "bytes": 2541,
+      "git_blob": "8903e5bca96e1e54e413954bf77c1cb304ac41f8",
+      "sha256": "69e275ed5c9d68fb12b2fb8f17a86c43e1651c32165a2adb2dfc55625cbbb12b",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/breast.py"
+    },
+    "dp/cardio.py": {
+      "bytes": 2485,
+      "git_blob": "262cd3524476d0072d6cf04309e441c55f953c8e",
+      "sha256": "d99e68f7e55550ceec597799f9735b8d633eb7f1ea2a2be606afc9056c1ef6a7",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/cardio.py"
+    },
+    "dp/cervical.py": {
+      "bytes": 2669,
+      "git_blob": "6add41ed7cb91ca529991ba3430c741638fae02a",
+      "sha256": "6116497b4083a655ae8052c0146e369b4d53aaf0eed8d7a6ee891d83556090cd",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/cervical.py"
+    },
+    "dp/covertype.py": {
+      "bytes": 3377,
+      "git_blob": "0aafee6cbd752329d768013907dbc5358e1b433e",
+      "sha256": "139e2a9428f06d0640502003745267c81dedd1f3d7952a3de418961116c83890",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/covertype.py"
+    },
+    "dp/creditcard.py": {
+      "bytes": 3138,
+      "git_blob": "23c30cfd674ca8e767324b543f107756b3bde905",
+      "sha256": "a3d877feb0651bef8ba2ea6103d8f884f5885e32c20cf4bf6dae4b6c487da875",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/creditcard.py"
+    },
+    "dp/ilpd.py": {
+      "bytes": 3434,
+      "git_blob": "8dd3816cc97e66d833347a50d8512b6145fd47fc",
+      "sha256": "ba915260b62aa1f3fe8b92639801c391714db79f57e4de5153f4e1c1ea8dda44",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/ilpd.py"
+    },
+    "dp/seizure.py": {
+      "bytes": 2704,
+      "git_blob": "60601a69b0f4fb30b778b735c10b59118bdb434c",
+      "sha256": "7f7934f0603b51beccc90e34bc0a1c6216910c0a61818102315b94340ac339e5",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/seizure.py"
+    },
+    "dp/utils.py": {
+      "bytes": 9240,
+      "git_blob": "7a81f93b7083ed4758a3f5f975d90f1d6c6ba02f",
+      "sha256": "6cf400ca79eeedbf1b696f54966794a33f854109abb6131f189916abdd2751e3",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/dp/utils.py"
+    },
+    "setup.cfg": {
+      "bytes": 1061,
+      "git_blob": "8e870001347e250839ed6b786d694da18b010204",
+      "sha256": "2b8121fe1a7051cd11b3d09e9df43502fa761ef20d6961fba72b786af4646a0a",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/setup.cfg"
+    },
+    "setup.py": {
+      "bytes": 2517,
+      "git_blob": "237815d36d8526bfeaced4dbb6ee00d220520d42",
+      "sha256": "431049916cab47984c4abd884b66b81b9951581338a08bedc51261ab607bf84f",
+      "url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/setup.py"
+    }
+  },
+  "source_scope": "selected license/readme/setup and ctgan/dp Python files; no data, notebooks, figures, bytecode or weights opened",
+  "source_verification": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/dp-ctgan-v1/source-verification-v2.json",
+    "sha256": "58471d4032f78c14755781151a47807a486587d82f86d92f115c0a91afc499c9"
+  },
+  "source_version_kind": "original_author_git_implementation_paper_linked_DP_branch",
+  "status": "source_audit_pending",
+  "superiority": null,
+  "two_reported_experiments_reproduced": false,
+  "upstream_commit": "4fb93e7727fbe400c28d642111347d9b517004d4",
+  "upstream_tree": "1ea8e4dcc8d42b0f6bf2c8874b151a3a6521d105",
+  "upstream_url": "https://github.com/juliecious/CTGAN",
+  "version": 1
+}
