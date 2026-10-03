@@ -178,6 +178,8 @@ private manifest before parsing it, then verifies its frozen parent manifests
 and cache-print transcripts. It rechecks each selected regular file's bytes,
 mode, owner and component-by-component alias chain. Candidate provider ELF
 declarations are replayed through the pinned inspector without loading them.
+Alias targets retain their literal text, including dot components and separators;
+a trailing slash or dot requires a directory as it does during filesystem lookup.
 Directory snapshots cover entry names, types and literal alias targets; they do
 not hash the contents of every child. Frozen absence records retain the first
 missing component and any aliases encountered before it. Added or changed
