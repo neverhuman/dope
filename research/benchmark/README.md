@@ -664,3 +664,8 @@ current author Python discretizer from the paper's R track and records native
 detection quality separately from regression efficacy. Paper/default boosting
 iterations differ; runtime, track equivalence, selection and artifact contracts
 remain unfrozen. TabCascade stays `source_audit_pending`; no job is admitted.
+
+The [CTAB-GAN+ source availability audit](CTABGAN_PLUS_SOURCE_AUDIT.md) binds
+the pinned author snapshot and inspected source-rights gap. Its explicit
+unavailable receipt admits no execution or formal DP claim and contributes
+no DOPE win. Native tuning requires rights and runtime admission first.
