@@ -51,6 +51,8 @@
     "research/benchmark/great-source.audit": "external-evidence",
     "research/benchmark/realtabformer-source.audit": "external-evidence",
     "research/benchmark/REALTABFORMER_SOURCE_AUDIT.md": "external-evidence",
+    "research/benchmark/cdtd-source.audit": "external-evidence",
+    "research/benchmark/CDTD_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/GREAT_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/tabdiff-source.audit": "external-evidence",
     "research/benchmark/TABDIFF_SOURCE_AUDIT.md": "external-evidence",

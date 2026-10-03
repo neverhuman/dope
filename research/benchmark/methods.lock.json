@@ -212,15 +212,314 @@
       "upstream_url": "https://github.com/bips-hb/arfpy"
     },
     "CDTD": {
-      "default_config": null,
+      "default_config": {
+        "campaign_default_contract_frozen": false,
+        "cli_train_keyword_values": {
+          "plot_figures": true,
+          "save_model": true
+        },
+        "common": {
+          "device": "cuda",
+          "eval_model_iter": 10,
+          "eval_sample_iter": 5,
+          "seed": 0,
+          "test_prop": 0.2,
+          "val_prop": 0.2
+        },
+        "explicit_cfg_path_required_for_cdtd": true,
+        "released_checkpoint_policy": "terminal model after all configured steps, with EMA copied into parameters",
+        "released_variants": {
+          "configs/cdtd/default_all.yaml": {
+            "data": {
+              "cat_encoding": null,
+              "cont_scaler": "quantile",
+              "dequant_data": false,
+              "drop_cont_missing": true,
+              "standardize_data": true
+            },
+            "model": {
+              "architecture": "tabddpm",
+              "calibrate_losses": true,
+              "cat_emb_init_sigma": 0.001,
+              "dim": 16,
+              "generation_steps": 200,
+              "mlp_emb_dim": 256,
+              "mlp_n_layers": 5,
+              "mlp_n_units": 796,
+              "sigma_data_cat": 1.0,
+              "sigma_data_cont": 1.0,
+              "sigma_max_cat": 100,
+              "sigma_max_cont": 80,
+              "sigma_min_cat": 0,
+              "sigma_min_cont": 0,
+              "timewarp_bins": 100,
+              "timewarp_decay": 0.0,
+              "timewarp_type": "all",
+              "timewarp_variant": "ours",
+              "timewarp_weight_low_noise": 3.0,
+              "use_cat_bias": true,
+              "use_fourier_features": false,
+              "y_cond": false
+            },
+            "model_name": "cdtd",
+            "optimizer": {
+              "args": {
+                "betas": [
+                  0.9,
+                  0.99
+                ],
+                "eps": "1e-8",
+                "lr": 0.001,
+                "weight_decay": 0
+              },
+              "ema_decay": 0.999,
+              "name": "adamw"
+            },
+            "training": {
+              "anneal_lr": true,
+              "batch_size": 4096,
+              "batch_size_eval": 4096,
+              "num_steps_lr_warmup": 1000,
+              "num_steps_train": 30000,
+              "ref_step": 1000,
+              "scheduler": "linear",
+              "steps_per_eval": 100,
+              "steps_per_logging": 100
+            }
+          },
+          "configs/cdtd/default_bytype.yaml": {
+            "data": {
+              "cat_encoding": null,
+              "cont_scaler": "quantile",
+              "dequant_data": false,
+              "drop_cont_missing": true,
+              "standardize_data": true
+            },
+            "model": {
+              "architecture": "tabddpm",
+              "calibrate_losses": true,
+              "cat_emb_init_sigma": 0.001,
+              "dim": 16,
+              "generation_steps": 200,
+              "mlp_emb_dim": 256,
+              "mlp_n_layers": 5,
+              "mlp_n_units": 796,
+              "sigma_data_cat": 1.0,
+              "sigma_data_cont": 1.0,
+              "sigma_max_cat": 100,
+              "sigma_max_cont": 80,
+              "sigma_min_cat": 0,
+              "sigma_min_cont": 0,
+              "timewarp_bins": 100,
+              "timewarp_decay": 0.0,
+              "timewarp_type": "bytype",
+              "timewarp_variant": "ours",
+              "timewarp_weight_low_noise": 3.0,
+              "use_cat_bias": true,
+              "use_fourier_features": false,
+              "y_cond": false
+            },
+            "model_name": "cdtd",
+            "optimizer": {
+              "args": {
+                "betas": [
+                  0.9,
+                  0.99
+                ],
+                "eps": "1e-8",
+                "lr": 0.001,
+                "weight_decay": 0
+              },
+              "ema_decay": 0.999,
+              "name": "adamw"
+            },
+            "training": {
+              "anneal_lr": true,
+              "batch_size": 4096,
+              "batch_size_eval": 4096,
+              "num_steps_lr_warmup": 1000,
+              "num_steps_train": 30000,
+              "ref_step": 1000,
+              "scheduler": "linear",
+              "steps_per_eval": 100,
+              "steps_per_logging": 100
+            }
+          },
+          "configs/cdtd/default_single.yaml": {
+            "data": {
+              "cat_encoding": null,
+              "cont_scaler": "quantile",
+              "dequant_data": false,
+              "drop_cont_missing": true,
+              "standardize_data": true
+            },
+            "model": {
+              "architecture": "tabddpm",
+              "calibrate_losses": true,
+              "cat_emb_init_sigma": 0.001,
+              "dim": 16,
+              "generation_steps": 200,
+              "mlp_emb_dim": 256,
+              "mlp_n_layers": 5,
+              "mlp_n_units": 796,
+              "sigma_data_cat": 1.0,
+              "sigma_data_cont": 1.0,
+              "sigma_max_cat": 100,
+              "sigma_max_cont": 80,
+              "sigma_min_cat": 0,
+              "sigma_min_cont": 0,
+              "timewarp_bins": 100,
+              "timewarp_decay": 0.0,
+              "timewarp_type": "single",
+              "timewarp_variant": "ours",
+              "timewarp_weight_low_noise": 3.0,
+              "use_cat_bias": true,
+              "use_fourier_features": false,
+              "y_cond": false
+            },
+            "model_name": "cdtd",
+            "optimizer": {
+              "args": {
+                "betas": [
+                  0.9,
+                  0.99
+                ],
+                "eps": "1e-8",
+                "lr": 0.001,
+                "weight_decay": 0
+              },
+              "ema_decay": 0.999,
+              "name": "adamw"
+            },
+            "training": {
+              "anneal_lr": true,
+              "batch_size": 4096,
+              "batch_size_eval": 4096,
+              "num_steps_lr_warmup": 1000,
+              "num_steps_train": 30000,
+              "ref_step": 1000,
+              "scheduler": "linear",
+              "steps_per_eval": 100,
+              "steps_per_logging": 100
+            }
+          }
+        },
+        "sample_keyword_defaults": {
+          "seed": null,
+          "verbose": false
+        },
+        "sample_rng_seed_zero_is_skipped_by_truthiness": true,
+        "train_keyword_defaults": {
+          "plot_figures": false,
+          "save_model": false
+        },
+        "validation_best_checkpoint_selection_present": false,
+        "yaml_recording_parser": "yaml.safe_load; OmegaConf runtime interpretation not verified"
+      },
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "neural_flow",
-      "license": null,
+      "license": "MIT",
+      "native_objective": {
+        "catboost_default_config_sha256": "c25e4833a887ec78c3a4a5d9c28a41a71f89bb042b894bbdb3c5b019434db40d",
+        "catboost_tuning_is_auditor_or_detection_tuning_not_generator_tuning": true,
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "frozen_scalar_objective": null,
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "heldout_rows_for_selection": "official-training-derived validation only; never official tests",
+        "model_average_weights": "equal weights across the three auditors",
+        "name": "author_regression_ml_efficiency_absolute_rmse_gap",
+        "native_values_cross_method_ranking": false,
+        "paper_direction": "minimize",
+        "paper_formula": "abs(Perf(Dgen, Dheldout) - Perf(Dtrain, Dheldout))",
+        "paper_metric": "absolute difference between synthetic-trained and real-trained model-averaged RMSE",
+        "released_auditor_seeds": [
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51
+        ],
+        "released_outputs": [
+          "rmse",
+          "r2"
+        ],
+        "released_outputs_include_real_and_synthetic_means": true,
+        "released_regression_auditors": [
+          "Ridge",
+          "RandomForestRegressor",
+          "CatBoostRegressor"
+        ],
+        "released_sample_seeds": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "released_synthetic_rows": "min(training rows, 50000)",
+        "released_target_scaler_fit": "StandardScaler fitted separately to the real or synthetic training labels for each evaluation",
+        "released_utility_returns_raw_metrics_not_absolute_gap_scalar": true,
+        "reported_bibliography_entry": "mueller2025continuous",
+        "shared_kpi_used_for_selection": false,
+        "source": "evaluation/eval_ml_efficiency.py::MLEfficiencyScores.compute_ml_eff_score/calculate_metrics",
+        "source_sha256": "e942e833a6b803aaf1805b885b64afe5851a69bb9847f38f13400876f063fafe",
+        "status": "source_identified_not_frozen_for_tuning"
+      },
+      "native_objective_frozen": false,
+      "native_tuning_complete": false,
       "sampling_command": null,
+      "source_audit": {
+        "path": "research/benchmark/cdtd-source.audit.json",
+        "sha256": "b1f5c9efc7eb11c391138848073a79fb537bc90af0465d56a872d6e25f0a432c"
+      },
+      "source_contract_pending": [
+        "inventory the complete executable runtime, bytecode, interpreter import roots and eager baseline imports before initializers",
+        "verify transitive dependency compatibility and all selected/vendored source rights",
+        "freeze a single author default variant and dependency-resolved configuration before validation selection",
+        "freeze native absolute RMSE gap scalar, auditor/target-scaling/aggregation/seeds/grid/ties or mark tuning inapplicable",
+        "bind grouped official-training-derived fit and validation rows; bypass raw named data/internal repartitioning and fit preprocessing only on fit rows",
+        "verify source-versioned zero-categorical handling and common-numeric fit/sample, without adding fake categorical columns",
+        "remove stored original rows from the inference artifact and verify safe local reload with complete byte accounting",
+        "verify finite exact row counts, sample sizes n/2n/4n/8n and deterministic seed replay",
+        "run copy/leakage/privacy and real-vs-real controls before gated claims",
+        "fresh aggregate owner admission on xbabe1/2/3, disjoint CPUs/RAM/scratch, whole-fit 600s and 16GiB GPU caps"
+      ],
       "status": "source_audit_pending",
-      "tuning_search_space": null,
-      "upstream_commit": null,
+      "tuning_search_space": {
+        "allowed_study_grid_frozen": false,
+        "declared_author_config_files": [
+          "configs/cdtd/ablation/ablation1.yaml",
+          "configs/cdtd/ablation/ablation2.yaml",
+          "configs/cdtd/ablation/ablation3.yaml",
+          "configs/cdtd/ablation/ablation4.yaml",
+          "configs/cdtd/default_all.yaml",
+          "configs/cdtd/default_bytype.yaml",
+          "configs/cdtd/default_single.yaml",
+          "configs/cdtd/hyperparameter_ablation/1000_sample_steps.yaml",
+          "configs/cdtd/hyperparameter_ablation/100_sample_steps.yaml",
+          "configs/cdtd/hyperparameter_ablation/32_dim.yaml",
+          "configs/cdtd/hyperparameter_ablation/500_sample_steps.yaml",
+          "configs/cdtd/hyperparameter_ablation/64_dim.yaml",
+          "configs/cdtd/hyperparameter_ablation/8_dim.yaml",
+          "configs/cdtd/hyperparameter_ablation/sigma_init_001.yaml",
+          "configs/cdtd/hyperparameter_ablation/sigma_init_01.yaml",
+          "configs/cdtd/hyperparameter_ablation/sigma_init_1.yaml",
+          "configs/cdtd/hyperparameter_ablation/weight_low_noise_1.yaml",
+          "configs/cdtd/hyperparameter_ablation/weight_low_noise_2.yaml",
+          "configs/cdtd/hyperparameter_ablation/weight_low_noise_4.yaml"
+        ],
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "generator_grid": null,
+        "source_identified": true
+      },
+      "upstream_commit": "673ff190e4baed651809db6b18174ecebe93bd11",
       "upstream_url": "https://github.com/muellermarkus/cdtd"
     },
     "CTAB-GAN+": {

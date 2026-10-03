@@ -652,3 +652,9 @@ author tabular implementation, literal defaults and bootstrap sensitivity
 checkpoint policy. Its utility API requires a caller-supplied auditor and
 returns predictions; the native scalar/search/default runtime remain unfrozen.
 It stays `source_audit_pending`; no model or campaign job is admitted.
+
+The [CDTD source audit](CDTD_SOURCE_AUDIT.md) binds the MIT author code and
+released noise-schedule variants. It identifies the author absolute RMSE-gap
+objective, terminal EMA policy, zero-categorical assumptions and checkpoint
+row retention. Native scalar/search, safe inference artifacts and executable
+runtime remain unfrozen; CDTD stays `source_audit_pending`.
