@@ -679,3 +679,8 @@ The [TAEGAN source availability audit](TAEGAN_SOURCE_AUDIT.md) binds
 the pinned author snapshot, inspected source-rights gap and withheld preprocessing
 and recovery steps. Its unavailable receipt admits no execution and contributes
 no DOPE win. Native selection requires rights, a complete pipeline and runtime first.
+
+The [DP-CTGAN author-source audit](DPCTGAN_SOURCE_AUDIT.md) binds the original
+paper-linked DP branch, source defaults and native classification efficacy.
+Source privacy ordering, stored training rows, older runtime and artifact/native
+selection gates remain pending. No formal DP, execution or scored result is admitted.

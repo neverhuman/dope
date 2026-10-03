@@ -766,16 +766,110 @@
       "upstream_url": "https://doi.org/10.1109/TIT.1968.1054142"
     },
     "DP-CTGAN": {
-      "default_config": null,
+      "author_source_ref": "DP",
+      "component_source_licenses": {
+        "ctgan/rdp_accountant.py": {
+          "full_third_party_rights_closure_verified": false,
+          "license": "Apache-2.0",
+          "notice": "Copyright 2018 The TensorFlow Authors; Apache-2.0 notice retained in pinned source",
+          "source_sha256": "48223e05f87ace8f3758581a30c9df8d3400245214d342d99d0c42e1bdbba78b",
+          "source_url": "https://raw.githubusercontent.com/juliecious/CTGAN/4fb93e7727fbe400c28d642111347d9b517004d4/ctgan/rdp_accountant.py"
+        }
+      },
+      "default_config": {
+        "campaign_default_contract_frozen": false,
+        "constructor": {
+          "batch_size": 500,
+          "betas": [
+            0.5,
+            0.99
+          ],
+          "clip_coeff": 0.1,
+          "cuda": true,
+          "discriminator_decay": 1e-06,
+          "discriminator_dim": [
+            256,
+            256
+          ],
+          "discriminator_lr": 0.0002,
+          "discriminator_steps": 1,
+          "embedding_dim": 128,
+          "epochs": 300,
+          "generator_decay": 1e-06,
+          "generator_dim": [
+            256,
+            256
+          ],
+          "generator_lr": 0.0002,
+          "log_frequency": true,
+          "pac": 10,
+          "sigma": 1,
+          "target_delta": 1e-05,
+          "target_epsilon": 3,
+          "verbose": false
+        },
+        "epochs_argument_limits_fit": false,
+        "fit_stopping": "author epsilon-accountant loop after whole epochs; epochs argument not used by fit",
+        "package_version": "0.4.3.dev2",
+        "python_requirement": ">=3.6,<3.9",
+        "requirements": [
+          "packaging",
+          "numpy>=1.18.0,<2",
+          "pandas>=1.1,<1.1.5",
+          "scikit-learn>=0.23,<1",
+          "torch>=1.4,<2",
+          "torchvision>=0.5.0,<1",
+          "rdt>=0.5.0.dev1,<0.6",
+          "matplotlib",
+          "xgboost"
+        ],
+        "transformer_max_clusters": 10,
+        "transformer_weight_threshold": 0.005
+      },
       "dependency_or_container_digest": null,
       "fit_command": null,
+      "formal_dp_claim": false,
       "group": "dp",
-      "license": null,
+      "license": "MIT AND Apache-2.0",
+      "license_evidence": "https://github.com/juliecious/CTGAN/blob/4fb93e7727fbe400c28d642111347d9b517004d4/LICENSE",
+      "license_sha256": "9c44ed24f514fdbde5b2355cf39d102d7fddf89d0b5ec91415fa9fd9b5e693c6",
+      "native_objective": {
+        "author_native_regression_objective_found": false,
+        "direction": "maximize",
+        "epsilon_fixed_per_comparison_required": true,
+        "generator_search_space": null,
+        "implementation_source": "dp/utils.py::eval_dataset",
+        "name": "author_mean_classifier_auroc_and_auprc",
+        "native_values_cross_method_ranking": false,
+        "official_test_selection_allowed": false,
+        "outcomes": [
+          "mean_classifier_AUROC",
+          "mean_classifier_AUPRC"
+        ],
+        "regression_selection_policy": "author default only with native tuning inapplicable unless an author-grounded regression objective is separately verified and frozen before selection",
+        "selection_scalar": null,
+        "shared_kpi_used_for_selection": false,
+        "source_sha256": "6cf400ca79eeedbf1b696f54966794a33f854109abb6131f189916abdd2751e3",
+        "status": "source_identified_not_frozen_for_tuning",
+        "tie_breaks": null
+      },
+      "note": "Original author paper-linked DP branch pinned; MIT root source and bundled Apache2 TensorFlow accountant notices bound. Native classifier-averaged AUROC/AUPRC MAX identified; scalar/grid/ties unfrozen, no verified regression native objective, regression defaults only/tuning inapplicable. Original noise/update ordering, epsilon overshoot, retained transformed rows, whole-object pickle, older runtime, representation/safe artifact/seed/replay/bytes/privacy and fresh capacity require audit. No execution, formal DP, reproduction, win or scored comparison. See DPCTGAN_SOURCE_AUDIT.md.",
+      "root_source_license": "MIT",
       "sampling_command": null,
+      "source_audit": {
+        "path": "research/benchmark/dpctgan-source.audit.json",
+        "sha256": "e822d0a7a53d3bc8beb191f1db07fafcc36da649a29cd178ebdf7ed43f66bf19"
+      },
+      "source_verification": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/dp-ctgan-v1/source-verification-v2.json",
+        "sha256": "58471d4032f78c14755781151a47807a486587d82f86d92f115c0a91afc499c9"
+      },
+      "source_version_kind": "original_author_git_implementation_paper_linked_DP_branch",
       "status": "source_audit_pending",
       "tuning_search_space": null,
-      "upstream_commit": null,
-      "upstream_url": null
+      "upstream_commit": "4fb93e7727fbe400c28d642111347d9b517004d4",
+      "upstream_tree": "1ea8e4dcc8d42b0f6bf2c8874b151a3a6521d105",
+      "upstream_url": "https://github.com/juliecious/CTGAN"
     },
     "ForestDiffusion/Forest-Flow": {
       "adapter_sha256": "1ff4688f85bdf1a79ce89f475a02d0d06766ff2aaa395ec9b97f9de7cbb137e5",
