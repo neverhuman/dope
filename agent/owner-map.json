@@ -49,6 +49,8 @@
     "research/benchmark/tabdiff-source.audit": "external-evidence",
     "research/benchmark/TABDIFF_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/PRIVBAYES_SOURCE_AUDIT.md": "external-evidence",
-    "research/benchmark/results/privbayes-unavailable": "external-evidence"
+    "research/benchmark/results/privbayes-unavailable": "external-evidence",
+    "research/benchmark/tvinesynth-source.audit": "external-evidence",
+    "research/benchmark/TVINESYNTH_SOURCE_AUDIT.md": "external-evidence"
   }
 }
