@@ -34,6 +34,7 @@
     "research/benchmark/sdv_native_accounting.py": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_sdv_native_accounting.py -v", "purpose": "verify native-only winner selection, immutable reuse, failed compute and artifact charges, complete closure and sealed tests"},
     "research/benchmark/reconcile_sdv_population.py": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_sdv_native_accounting.py -v", "purpose": "verify complete native trial identities and fail-closed coordinator closure without ML initialization"},
     "research/benchmark/tabdiff-source.audit": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only inventory and fail-closed final admission; validate audit JSON against its committed schema locally"},
+    "research/benchmark/results/privbayes-unavailable": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "preserve unavailable method dispatch and win exclusion; validate rights receipt against its committed schema locally"},
     "research/": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "verify offline benchmark manifest, gate, run, and analysis contracts"},
     "validation/requirements-v1.txt": {"command": "bash agent/check-python-v1-boundary.sh", "purpose": "verify pinned Python V1 compatibility graph"},
     "validation/": {"command": "just check", "purpose": "verify validation dependencies and fixtures"},
