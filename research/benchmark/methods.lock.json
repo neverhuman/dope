@@ -1256,12 +1256,12 @@
         "status": "source_identified_not_frozen_for_tuning",
         "tie_breaks": null
       },
-      "note": "Original author-lab BSD3 source pinned separately from later auditing repository. Native logistic-AUC initialization selection MAX and AUC/APR source outcomes identified; grouped validation/grid/ties and regression applicability/native objective remain unverified. Source returns generated array, not reloadable generator; default50 internal fits, epsilon-loop, pre-split full-table credit preprocessing/private-training selection composition, integer teacher binding, TensorFlow1.15/runtime, safe codec/bytes/seeds/replay and fresh capacity require audit. Paper PDF body hash/reproductions not verified. No execution/formal DP/win or scored comparison. See PATEGAN_SOURCE_AUDIT.md.",
+      "note": "Original author-lab BSD3 source pinned separately from later auditing repository. Native logistic-AUC initialization selection MAX and AUC/APR source outcomes identified; grouped validation/grid/ties and regression applicability/native objective remain unverified. Source returns generated array, not reloadable generator; default50 internal fits, epsilon-loop, pre-split full-table credit preprocessing/private-training selection composition, dataset-dependent label indexing (random default scores feature9, omits appended target10; credit scores last column), integer teacher binding, TensorFlow1.15/runtime, safe codec/bytes/seeds/replay and fresh capacity require audit. Paper PDF body hash/reproductions not verified. No execution/formal DP/win or scored comparison. See PATEGAN_SOURCE_AUDIT.md.",
       "sampling_command": null,
       "separate_auditing_project_url": "https://github.com/spalabucr/pategan-audit",
       "source_audit": {
         "path": "research/benchmark/pategan-source.audit.json",
-        "sha256": "9c3f8d357f9b74c880dd0ef833970cfa39dc1edcb6505e01367c518dae0bd13f"
+        "sha256": "e4c4b46b214ddd1df7cab174f449d5e5dee75b424df7ae01a5fbf0d1d8c12722"
       },
       "source_verification": {
         "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/pate-gan-v1/source-verification-v1.json",
