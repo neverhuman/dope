@@ -117,3 +117,28 @@ No new fit, sample, tuning trial or gated score follows from a proposal.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_bootstrap_invocation.py -v
 ```
+
+## ELF declaration inspection
+
+`container_elf_inputs.inspect_elf_inputs` parses owned bytes only after checking
+their external digest. Its supported profile is ELF64, little-endian x86-64
+executable/shared objects with fewer than 1,024 program headers and at most
+4,096 dynamic records. Malformed headers, truncated or ambiguous mappings,
+duplicate interpreter/dynamic segments and missing/unterminated strings reject
+with a fixed error. The dynamic table's virtual mapping must match its file
+offset. It records the declared interpreter, dependencies, loader
+paths, audits and filter/auxiliary libraries without opening or executing them.
+
+The inspector does not validate executable semantics or determine the libraries
+actually loaded. Dynamic token expansion, RPATH precedence, cache/default paths,
+preloads, hardware-capability directories and runtime `dlopen` inputs still need
+separately frozen resolution and file-custody evidence. No filesystem, system
+ELF closure, bootstrap/controller, transport, resource or job admission follows
+from extracting declarations. Success leaves loader resolution, full runtime
+closure and execution admission false and all gated scores null. The opaque
+controls initialize no candidate process or library; live rounds remain intact.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_elf_inputs.py -v
+```

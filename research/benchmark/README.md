@@ -10,6 +10,9 @@ runtime closure and dispatch admission unverified.
 `container_bootstrap_invocation.py` prepares restricted startup arguments and
 environment with an unchanged outer-attempt budget. Its immutable proposal starts
 no process and proves no filesystem, ELF, transport or capacity admission.
+`container_elf_inputs.py` extracts externally pinned ELF declarations from owned
+bytes without resolving or loading libraries. Its supported-profile inspection
+leaves executable closure and admission unverified.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
