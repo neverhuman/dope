@@ -1,0 +1,407 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_default_facts": {
+      "const": {
+        "MST_fit_returns": "reverse-compressed synthetic Dataset only",
+        "campaign_default_contract_frozen": false,
+        "cli_delta": 1e-09,
+        "cli_epsilon": 1.0,
+        "final_estimation_iters": 10000,
+        "jax_requirement": ">=0.9.0",
+        "package": "mbi",
+        "package_version": "2.0.0",
+        "python_requirement": ">=3.11",
+        "selection_estimation_iters": 2500,
+        "workload_degree": 2,
+        "workload_max_cells": 10000,
+        "workload_num_marginals": null
+      }
+    },
+    "author_source_executed": {
+      "const": false
+    },
+    "bibliography_entry": {
+      "const": "mckenna2021winning"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "dependency_runtime_verified": {
+      "const": false
+    },
+    "execution_admitted": {
+      "const": false
+    },
+    "execution_gaps": {
+      "const": [
+        "source-versioned minimal original-code adaptation exposing fitted model and domain-compression support state; do not persist synthetic fit output as a generator",
+        "bind official-training-derived grouped fit/validation and representation; native categorical and common-numeric tracks are separate",
+        "full interpreter/import-root/bytecode/library/source rights closure, including eager pandas import absent from direct package dependencies",
+        "safe artifact-only numeric model/support serialization, complete byte inventory and deterministic replay/privacy tests",
+        "freeze author-native objective implementation/direction/ties/allowed grid at fixed epsilon before tuning; otherwise author default with tuning inapplicable",
+        "fresh aggregate admitted CPU/RAM/scratch/time slots; do not bypass existing study-owner or predecessor closure locks",
+        "privacy accounting includes representation/preprocessing/selection; float-safe mechanism/runtime audit required before formal DP"
+      ]
+    },
+    "fit_sample_contract": {
+      "const": {
+        "artifact_only_reload_verified": false,
+        "common_numeric_representation_frozen": false,
+        "finite_requested_rows_and_replay_verified": false,
+        "fit_rng": "NumPy global RNG without explicit seed argument; wrapper must bind fit seed before author execution",
+        "full_inference_bytes_charged": false,
+        "no_original_training_rows_in_artifact_verified": false,
+        "required_original_source_adaptation_versioned": false,
+        "reusable_model_domain_compression_state_exposed": false,
+        "safe_numeric_codec_verified": false,
+        "sample_rng": "MarkovRandomField.synthetic_data and author reverse_data use NumPy global RNG; separate JAX extension has a different seed API",
+        "source_domain": "discrete finite categorical domains only",
+        "verified": false
+      }
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-author-source-admission-audit"
+    },
+    "independent_implementation": {
+      "const": false
+    },
+    "license": {
+      "const": "Apache-2.0"
+    },
+    "license_evidence": {
+      "const": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/LICENSE"
+    },
+    "license_sha256": {
+      "const": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "MST"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_objective": {
+      "const": {
+        "direction": "minimize",
+        "epsilon_fixed_per_comparison_required": true,
+        "formula": "mean over selected workload marginals of 0.5 * L1(reference_counts/reference_total - synthetic_counts/synthetic_total)",
+        "generator_search_space": null,
+        "name": "author_mean_synthetic_marginal_tv",
+        "native_values_cross_method_ranking": false,
+        "official_test_selection_allowed": false,
+        "selection_scalar": null,
+        "shared_kpi_used_for_selection": false,
+        "source": "mechanisms/mst.py::__main__",
+        "source_sha256": "9dbc75a14d7dbdab5d9a8a74fd31eb0cec28e0035115637b7e3e23f7add1e5c3",
+        "status": "source_identified_not_frozen_for_tuning",
+        "tie_breaks": null
+      }
+    },
+    "new_fit_trials": {
+      "const": 0
+    },
+    "new_sample_cells": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe": {
+      "const": null
+    },
+    "source_file_count": {
+      "const": 32
+    },
+    "source_files": {
+      "const": {
+        "CITATION.cff": {
+          "bytes": 1006,
+          "git_blob": "83e6b45ecdf4040e876ae21ed297493e2f1faff9",
+          "sha256": "15a225697c228f3c4039996f2b1057d17a45c2ecbbd4b3b7a287c97a0764ea18",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/CITATION.cff"
+        },
+        "LICENSE": {
+          "bytes": 11357,
+          "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/LICENSE"
+        },
+        "README.md": {
+          "bytes": 2634,
+          "git_blob": "d9760f6cd3e9a8022dfd10f133b07ac4b71864a7",
+          "sha256": "17de927ce1e199f169811e88c5611f68313b1e4ab2a570d82a698c1a88d1021b",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/README.md"
+        },
+        "mechanisms/cdp2adp.py": {
+          "bytes": 4115,
+          "git_blob": "9a2150ade0b9c3c2ee60b54760790895d76516b8",
+          "sha256": "6fc56098f6f8af0f43d68fb74a5d4c1d4ddb5a228d9ce1d976d26bca4233f3d8",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/mechanisms/cdp2adp.py"
+        },
+        "mechanisms/mst.py": {
+          "bytes": 7726,
+          "git_blob": "e2a7093dfdf98361839bdf1121279d851b3f7c0f",
+          "sha256": "9dbc75a14d7dbdab5d9a8a74fd31eb0cec28e0035115637b7e3e23f7add1e5c3",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/mechanisms/mst.py"
+        },
+        "pyproject.toml": {
+          "bytes": 1296,
+          "git_blob": "21b3a2ca719bd926f76199b698a3fe37b0f52408",
+          "sha256": "1ffdcc405383220b1a9c8466cb57b4c546c6b408771952e39875e3fe5534a8e7",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/pyproject.toml"
+        },
+        "src/mbi/__init__.py": {
+          "bytes": 2465,
+          "git_blob": "e30eeaef935b22f64b228b8f236a7189bafd87cb",
+          "sha256": "91ce40a43500d2989326043f2725e565d50c2ec17454c07dda67ff691aa5e706",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/__init__.py"
+        },
+        "src/mbi/_api.py": {
+          "bytes": 1830,
+          "git_blob": "f95706e421aa1be68e29ba4685abdc723bc8c46c",
+          "sha256": "773daab9df99dcc84e16662bf680f0fbdf9a62f061718103d44c4e026a621972",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/_api.py"
+        },
+        "src/mbi/_future.py": {
+          "bytes": 1148,
+          "git_blob": "f3d8c9c5c0622b59d2f3a9c49e447690da12183e",
+          "sha256": "da0aa75941b500c80a7372bf5ad1de7cd47ec473c498d4d2eabcf6309751be59",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/_future.py"
+        },
+        "src/mbi/_model_summary.py": {
+          "bytes": 9148,
+          "git_blob": "d4d1e23c99214ba54ce9a75455817709fea15c85",
+          "sha256": "9f495d2105cdf77479910039f0a8fb819aefe1a3cda02b1616766d54dbc27f2f",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/_model_summary.py"
+        },
+        "src/mbi/_serialization.py": {
+          "bytes": 2215,
+          "git_blob": "af3c45b20ef2b4f487914e7f648c59b147daaa40",
+          "sha256": "37da0868e1f1bb1e203c352c2b095e9cfaa2a0d01987c7791280df9eeecf6e1d",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/_serialization.py"
+        },
+        "src/mbi/approximate_oracles.py": {
+          "bytes": 15060,
+          "git_blob": "d8e18b8c3a930b8028788683f2dbaadf240eccd8",
+          "sha256": "e97f44d87ba33388381b50a170b2ef6dc4021ffdd4f78825cf21d22ed571fff1",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/approximate_oracles.py"
+        },
+        "src/mbi/callbacks.py": {
+          "bytes": 4185,
+          "git_blob": "435c761022b304dfcd33f94c500fb04c9e2e903f",
+          "sha256": "f3f8bd7e8c997811260a272e8845876e9d2bedd24b7f9678abb8c2d1265b4bfd",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/callbacks.py"
+        },
+        "src/mbi/clique_utils.py": {
+          "bytes": 4822,
+          "git_blob": "8726c889b56a417fd6613decec427679af9f6338",
+          "sha256": "5bd597a410b8a90caadb6e1c16811a7e351f7375a6153e3e6adf3bf3ebaf5249",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/clique_utils.py"
+        },
+        "src/mbi/clique_vector.py": {
+          "bytes": 9100,
+          "git_blob": "cbfcb06ee7a44423ffb70bacc13cb918383247be",
+          "sha256": "10923df00df394234e973d2084f5d8b7f35e36d82591691c14f1aa1a1541e900",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/clique_vector.py"
+        },
+        "src/mbi/constraint.py": {
+          "bytes": 3546,
+          "git_blob": "225476db261def04bd39fc1be425cf7a027925f0",
+          "sha256": "ac7a326368a80674516e375089cad0d748248fe86f6d26216164206da9434c8a",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/constraint.py"
+        },
+        "src/mbi/dataset.py": {
+          "bytes": 13589,
+          "git_blob": "c6ef477ef0dae2e95dbb0d7c0225f16750587422",
+          "sha256": "41188033c5db57aceac5382341a89ce2f33609314d123c2c5ae0b19e6fbcbfc3",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/dataset.py"
+        },
+        "src/mbi/domain.py": {
+          "bytes": 8459,
+          "git_blob": "3df2e86d998597409a2b16500f451350ca27be3e",
+          "sha256": "4fb4d19310bed12427e5eae892e4227c34d1a32ff5c23bd2afffa043ba02d705",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/domain.py"
+        },
+        "src/mbi/einsum.py": {
+          "bytes": 10278,
+          "git_blob": "5a854ba581d2b69b17a0bea1724f2a9649ca58eb",
+          "sha256": "5f62719a2f3edfdb555e9eabb99fc5aeaae1ee3688e1310c11a0199c3987e6b7",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/einsum.py"
+        },
+        "src/mbi/estimation.py": {
+          "bytes": 32098,
+          "git_blob": "2986f66f8b5606e9194a909c01d6e6beb27337d1",
+          "sha256": "a91e10423d9c88ba1214ea052ecf75bef3b3b4641ebc6d63ce15a9ded5657648",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/estimation.py"
+        },
+        "src/mbi/experimental/__init__.py": {
+          "bytes": 32,
+          "git_blob": "8e28fb54ef0b910ad20e2da0aab8eaba33aa8da6",
+          "sha256": "e13c50e9593be48ac1cf54755c2182dd3cf6c5a73a739399ceb08a2d4287dd58",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/experimental/__init__.py"
+        },
+        "src/mbi/extensions/__init__.py": {
+          "bytes": 495,
+          "git_blob": "5a07da77b4b59eaf10ab6354aa6464d2f48db553",
+          "sha256": "dfc0e905415e70478e989d022b048fffd204cce7fa3a0dbb4de4e2510edb12ec",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/extensions/__init__.py"
+        },
+        "src/mbi/extensions/message_passing.py": {
+          "bytes": 26646,
+          "git_blob": "343a18eb24ddd7ec8246dc0610147eab794ef21f",
+          "sha256": "180ff6d3dae96eea7d47623999daa2ced38655df013609b359fbab6e6ae905eb",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/extensions/message_passing.py"
+        },
+        "src/mbi/extensions/mixture_of_products.py": {
+          "bytes": 6022,
+          "git_blob": "c864721c46a06f4898ecfe155816e6a9e5837e97",
+          "sha256": "3eacfa9aeca8196e07bd1315310ccb5600d00839daafbd454aaba4afd8ff53c4",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/extensions/mixture_of_products.py"
+        },
+        "src/mbi/extensions/precompute_marginals.py": {
+          "bytes": 6244,
+          "git_blob": "e6d6cd7e3305959dc6a53565d239d5c46a47618e",
+          "sha256": "1cf370bb376f13fa4079e1fdf8f8966de77dc2b42e78a14e4b64a449a59702c1",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/extensions/precompute_marginals.py"
+        },
+        "src/mbi/extensions/reweighted_dataset.py": {
+          "bytes": 3319,
+          "git_blob": "0137d2578a38f140689110137be43b2ab111c099",
+          "sha256": "2a8ed7d487d2206546f5afe362e743b186f3b1cdcf220d3928e0ccc9b7e09066",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/extensions/reweighted_dataset.py"
+        },
+        "src/mbi/extensions/synthetic_data.py": {
+          "bytes": 16377,
+          "git_blob": "240a8dcc7e67a7b5afe5bd0e975b0fc125e06964",
+          "sha256": "a0fe46112ed31e694371d748d574f1c0ff15d1f7060f9795eb38230213e01ceb",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/extensions/synthetic_data.py"
+        },
+        "src/mbi/factor.py": {
+          "bytes": 11192,
+          "git_blob": "9dab233b3c6a85bb1ebc86b2dfcde07af9eda3d8",
+          "sha256": "076a94b89602c7c46d811c4c6b837503d2672727f926006d29525303d0779b77",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/factor.py"
+        },
+        "src/mbi/junction_tree.py": {
+          "bytes": 5060,
+          "git_blob": "d44ac1dc6fef53f19af6dfb70159762795de8f48",
+          "sha256": "7389b8629fd3ff55e1b034c33ef53e7a710b1b2c64a8ce31b328d792b4e38162",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/junction_tree.py"
+        },
+        "src/mbi/marginal_loss.py": {
+          "bytes": 13913,
+          "git_blob": "cee6ef9781113efc4536e14d9e2bdd07632b37b6",
+          "sha256": "b1d8a23d6255c3cd43a16d9ea9135aa1c61976d82c101d163d6bfe130bb6813c",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/marginal_loss.py"
+        },
+        "src/mbi/marginal_oracles.py": {
+          "bytes": 31560,
+          "git_blob": "9f6b76084d433fdbf526d7d4a5ea115b4abf1ae9",
+          "sha256": "98966f71adab29d1e6bb9b7307c4cdea34db8e04d7cb878e6fb4e9d161e8bc87",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/marginal_oracles.py"
+        },
+        "src/mbi/markov_random_field.py": {
+          "bytes": 7947,
+          "git_blob": "43a3776c7c0fb4f7e10e4ea6ac1213b47b9b6055",
+          "sha256": "396d93a12ed7633191b95771221c7ee3e06775a5be1a4acc322af0b1bcddb1c2",
+          "url": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/src/mbi/markov_random_field.py"
+        }
+      }
+    },
+    "source_scope": {
+      "const": "MST and privacy conversion source; MBI Python modules, package metadata, license/readme/citation only; embedded datasets/tests/docs/notebooks/weights not read"
+    },
+    "source_verification": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/mst-v1/source-verification-v1.json",
+        "sha256": "bdf88facd092657136e00064e2ee9976bf02bee88496751fd9e9d0553774fa9d"
+      }
+    },
+    "source_version_kind": {
+      "const": "current_author_git_implementation"
+    },
+    "status": {
+      "const": "source_audit_pending"
+    },
+    "superiority": {
+      "const": null
+    },
+    "tree_truncated": {
+      "const": false
+    },
+    "two_reported_experiments_reproduced": {
+      "const": false
+    },
+    "upstream_commit": {
+      "const": "e9d10d045247577db2d4742b15de325817b5bc59"
+    },
+    "upstream_tree": {
+      "const": "d5282faa75a378a472e73de8672dd4538ab9786b"
+    },
+    "upstream_url": {
+      "const": "https://github.com/ryan112358/mbi"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "author_default_facts",
+    "author_source_executed",
+    "bibliography_entry",
+    "counts_as_dope_win",
+    "dependency_runtime_verified",
+    "execution_admitted",
+    "execution_gaps",
+    "fit_sample_contract",
+    "fit_sample_contract_verified",
+    "formal_dp_claim",
+    "format",
+    "independent_implementation",
+    "license",
+    "license_evidence",
+    "license_sha256",
+    "matrix_admission",
+    "method",
+    "mfs_v2",
+    "native_objective",
+    "new_fit_trials",
+    "new_sample_cells",
+    "official_tests_opened",
+    "production_certified",
+    "ptf_v1",
+    "release_safe",
+    "source_file_count",
+    "source_files",
+    "source_scope",
+    "source_verification",
+    "source_version_kind",
+    "status",
+    "superiority",
+    "tree_truncated",
+    "two_reported_experiments_reproduced",
+    "upstream_commit",
+    "upstream_tree",
+    "upstream_url",
+    "version"
+  ],
+  "title": "MST author source audit; executable admission remains pending",
+  "type": "object"
+}

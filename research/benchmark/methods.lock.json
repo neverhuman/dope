@@ -1049,16 +1049,58 @@
       "upstream_url": "https://github.com/sdv-dev/Copulas"
     },
     "MST": {
-      "default_config": null,
+      "default_config": {
+        "MST_fit_returns": "reverse-compressed synthetic Dataset only",
+        "campaign_default_contract_frozen": false,
+        "cli_delta": 1e-09,
+        "cli_epsilon": 1.0,
+        "final_estimation_iters": 10000,
+        "jax_requirement": ">=0.9.0",
+        "package": "mbi",
+        "package_version": "2.0.0",
+        "python_requirement": ">=3.11",
+        "selection_estimation_iters": 2500,
+        "workload_degree": 2,
+        "workload_max_cells": 10000,
+        "workload_num_marginals": null
+      },
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "dp",
-      "license": null,
+      "license": "Apache-2.0",
+      "license_evidence": "https://github.com/ryan112358/mbi/blob/e9d10d045247577db2d4742b15de325817b5bc59/LICENSE",
+      "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "native_objective": {
+        "direction": "minimize",
+        "epsilon_fixed_per_comparison_required": true,
+        "formula": "mean over selected workload marginals of 0.5 * L1(reference_counts/reference_total - synthetic_counts/synthetic_total)",
+        "generator_search_space": null,
+        "name": "author_mean_synthetic_marginal_tv",
+        "native_values_cross_method_ranking": false,
+        "official_test_selection_allowed": false,
+        "selection_scalar": null,
+        "shared_kpi_used_for_selection": false,
+        "source": "mechanisms/mst.py::__main__",
+        "source_sha256": "9dbc75a14d7dbdab5d9a8a74fd31eb0cec28e0035115637b7e3e23f7add1e5c3",
+        "status": "source_identified_not_frozen_for_tuning",
+        "tie_breaks": null
+      },
+      "note": "Current-author MBI2.0 Apache2 source verified, not a reported-experiment reproduction. Native mean marginal TV minimized at fixed epsilon; no shared-KPI tuning. Reusable model/domain-support adaptation, full interpreter/dependency rights/runtime, safe numeric artifact-only fit/sample/seed/replay/representation/byte contracts and native scalar/grid/ties remain pending. No execution/admission/formal DP or scored comparison. See MST_SOURCE_AUDIT.md.",
       "sampling_command": null,
+      "source_audit": {
+        "path": "research/benchmark/mst-source.audit.json",
+        "sha256": "7e9b6dc6986ca5aa22b5afa91948ae3302fc498cf12b35460036949722bbf913"
+      },
+      "source_verification": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/mst-v1/source-verification-v1.json",
+        "sha256": "bdf88facd092657136e00064e2ee9976bf02bee88496751fd9e9d0553774fa9d"
+      },
+      "source_version_kind": "current_author_git_implementation",
       "status": "source_audit_pending",
       "tuning_search_space": null,
-      "upstream_commit": null,
-      "upstream_url": null
+      "upstream_commit": "e9d10d045247577db2d4742b15de325817b5bc59",
+      "upstream_tree": "d5282faa75a378a472e73de8672dd4538ab9786b",
+      "upstream_url": "https://github.com/ryan112358/mbi"
     },
     "PATE-GAN": {
       "default_config": null,
