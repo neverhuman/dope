@@ -1026,15 +1026,93 @@
       "upstream_url": "https://github.com/yandex-research/tab-ddpm"
     },
     "TabDiff": {
-      "default_config": null,
+      "default_config": {
+        "author_toml": {
+          "data": {
+            "dequant_dist": "none",
+            "int_dequant_factor": 0
+          },
+          "diffusion_params": {
+            "cat_scheduler": "log_linear",
+            "edm_params": {
+              "net_conditioning": "sigma",
+              "precond": true,
+              "sigma_data": 1.0
+            },
+            "noise_dist": "uniform_t",
+            "noise_dist_params": {
+              "P_mean": -1.2,
+              "P_std": 1.2
+            },
+            "noise_schedule_params": {
+              "eps_max": 0.001,
+              "eps_min": 1e-05,
+              "k_init": -6.0,
+              "k_offset": 1.0,
+              "rho": 7,
+              "rho_init": 7.0,
+              "rho_offset": 5.0,
+              "sigma_max": 80,
+              "sigma_min": 0.002
+            },
+            "num_timesteps": 50,
+            "sampler_params": {
+              "second_order_correction": true,
+              "stochastic_sampler": true
+            },
+            "scheduler": "power_mean"
+          },
+          "sample": {
+            "batch_size": 10000
+          },
+          "train": {
+            "main": {
+              "batch_size": 4096,
+              "c_lambda": 1.0,
+              "check_val_every": 2000,
+              "closs_weight_schedule": "anneal",
+              "d_lambda": 1.0,
+              "ema_decay": 0.997,
+              "factor": 0.9,
+              "lr": 0.001,
+              "lr_scheduler": "reduce_lr_on_plateau",
+              "reduce_lr_patience": 50,
+              "steps": 8000,
+              "weight_decay": 0
+            }
+          },
+          "unimodmlp_params": {
+            "bias": true,
+            "d_token": 4,
+            "dim_t": 1024,
+            "factor": 32,
+            "n_head": 1,
+            "num_layers": 2,
+            "use_mlp": true
+          }
+        },
+        "checkpoint_selection": "minimum unweighted EMA training mixed loss after curr_epoch > 4000",
+        "cli": {
+          "deterministic": false,
+          "non_learnable_schedule": false,
+          "num_runs": 20,
+          "y_only": false
+        },
+        "data_loader_workers": 4,
+        "training_steps_mean_epochs": true
+      },
       "dependency_or_container_digest": null,
       "fit_command": "python main.py --dataname DATASET --method tabdiff --mode train --gpu GPU --deterministic --no_wandb",
       "group": "neural_flow",
       "license": "MIT",
       "license_evidence": "https://github.com/MinkaiXu/TabDiff/blob/5ecdb3356261aea72716cc9a779f31d7ad083bf4/LICENSE",
       "license_sha256": "0ec2178fd0353f41dded18d337749e83a284155c5f760429170ea4029d4784b9",
-      "note": "Pinned source and license inspected. Default training config has 8000 steps; upstream train path reads files named real/test/val, so validation-only staging and artifact-only sampling adapter are required before dispatch.",
+      "note": "Author source-only audit verifies 27 original Git blobs, defaults and reported XGBoost RMSE regression objective (minimize). Runtime, target compatibility, seed mapping, fit/sample contract and native generator search space remain pending. No campaign admission or reproduction/production/DOPE-win claim. See TABDIFF_SOURCE_AUDIT.md.",
       "sampling_command": "python main.py --dataname DATASET --method tabdiff --mode test --num_samples_to_generate ROWS --ckpt_path ARTIFACT",
+      "source_audit": {
+        "path": "research/benchmark/tabdiff-source.audit.json",
+        "sha256": "c0d517a11a61d3931445610ab2b5b0be39744fd632194112332259bbc12d057d"
+      },
       "source_snapshot_sha256": "f4965fdc1ae1659154f0264e0dcc91812e1041dff1ba0a9a429bb4e9b3321bb7",
       "status": "source_audit_pending",
       "tuning_search_space": null,
