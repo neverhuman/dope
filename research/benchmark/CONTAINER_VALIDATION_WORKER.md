@@ -66,6 +66,10 @@ hermetic tests use opaque bytes and fake initializers/samplers only.
 `container_python_custody.verify_import_inputs` supplies a separate check for an
 already trusted coordinator before it starts the worker interpreter. External
 manifest digests bind the interpreter, its declared `/usr/bin/python3` alias,
+and the exact owned manifest bytes consumed by JSON parsing. Both manifests are
+read once into bytes, hashed and parsed from those buffers; a separate final
+rehash detects later path changes without substituting for that byte binding.
+The declared inputs include the
 absent ZIP import root, both package trees, standard library including bytecode
 and extension files, exact declared file aliases, empty cache and metric source.
 Added directory aliases and altered files fail with a fixed error. The function

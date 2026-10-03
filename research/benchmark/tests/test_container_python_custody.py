@@ -200,6 +200,42 @@ class ImportInputControls(unittest.TestCase):
         with patch.object(custody, 'sha', side_effect=changing_sha):
             self.rejected()
 
+    def reject_manifest_swap(self, auxiliary):
+        manifest = self.auxiliary if auxiliary else self.runtime
+        path = self.auxiliary_file if auxiliary else self.runtime_file
+        target = self.aux_site / 'opaque.py' if auxiliary else self.site / 'numpy/__init__.py'
+        name = 'opaque.py' if auxiliary else 'numpy/__init__.py'
+        frozen_bytes, expected = path.read_bytes(), sha(path)
+        target.write_bytes(b'opaque changed initializer, never executed')
+        alternate = dict(manifest, files={name: identity(target)})
+        alternate_bytes = json.dumps(alternate, sort_keys=True).encode()
+        metric_sha = sha(self.metric)
+        original_hash = hashlib.sha256
+        events = []
+        class SwapAfterHash:
+            def __init__(self, data=b''):
+                self.inner = original_hash(data)
+            def update(self, data):
+                self.inner.update(data)
+            def hexdigest(self):
+                result = self.inner.hexdigest()
+                if result == expected and not events:
+                    path.write_bytes(alternate_bytes)
+                    events.append('replaced_after_hash')
+                elif result == metric_sha and events:
+                    path.write_bytes(frozen_bytes)
+                    events.append('restored_before_final_hash')
+                return result
+        with patch.object(custody.hashlib, 'sha256', side_effect=SwapAfterHash):
+            self.rejected()
+        self.assertIn('replaced_after_hash', events)
+
+    def test_runtime_manifest_hash_parse_swap_rejected(self):
+        self.reject_manifest_swap(auxiliary=False)
+
+    def test_auxiliary_manifest_hash_parse_swap_rejected(self):
+        self.reject_manifest_swap(auxiliary=True)
+
 
 if __name__ == '__main__':
     unittest.main()
