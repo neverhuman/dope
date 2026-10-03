@@ -689,3 +689,8 @@ The [TabbyFlow author-source audit](TABBYFLOW_SOURCE_AUDIT.md) binds the origina
 EF-VFM release and native XGBoost RMSE/AUROC outcomes. Epoch/checkpoint/sampler,
 validation target-scale, original test-path and runtime/artifact gates remain
 pending. No execution, scored comparison or production claim is admitted.
+
+The [original PATE-GAN source audit](PATEGAN_SOURCE_AUDIT.md) distinguishes the
+author-lab BSD3 implementation from the later auditing project. Native logistic
+AUC selection, generated-array/row-free artifact, preprocessing/selection privacy,
+legacy runtime and fresh capacity gates remain pending; no execution or DP claim.

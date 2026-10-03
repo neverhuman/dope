@@ -1,0 +1,181 @@
+{
+  "author_default_facts": {
+    "campaign_default_contract_frozen": false,
+    "cli": {
+      "batch_size": 64,
+      "data_dim": 10,
+      "data_no": 10000,
+      "dataset": "random",
+      "delta": 1e-05,
+      "epsilon": 1.0,
+      "iterations": 50,
+      "k": 10,
+      "lamda": 1.0,
+      "n_s": 1,
+      "noise_rate": 1.0
+    },
+    "declared_tensorflow_version": "1.15.0",
+    "fit_stopping": "while epsilon_hat < epsilon; accountant checked after updates, external whole-phase deadline required",
+    "initialization_iterations": 50,
+    "k_cli_override_type": "float; generator uses range(k), integer binding must be validated before execution",
+    "k_default_literal_integer": 10,
+    "requirements": [
+      "numpy>=1.18.2",
+      "argparse>=1.1",
+      "pandas>=1.0.3",
+      "tensorflow==1.15.0",
+      "scikit-learn>=0.21.3",
+      "xgboost>=0.90"
+    ]
+  },
+  "author_source_executed": false,
+  "author_source_subdirectory": "alg/pategan",
+  "bibliography_entry": "jordon2019pate",
+  "counts_as_dope_win": false,
+  "dependency_runtime_verified": false,
+  "execution_admitted": false,
+  "execution_gaps": [
+    "pin full TensorFlow1.15 interpreter/import-root/bytecode/library/third-party runtime and rights closure; no replacement implementation masquerades as original source",
+    "provide a versioned minimal generator fit/sample adapter and safe artifact, not a saved synthetic table or returned real training array; account all generator/preprocessing/config/projection bytes and seeds/replay/finite requested rows",
+    "bind grouped official-training-derived fit/validation; original full-table credit preprocessing and private-training initialization selection are not an admitted validation protocol",
+    "freeze author-native logistic-AUC validation scalar/grid/ties at fixed epsilon; regression native objective/label handling applicability remain unverified, no DOPE KPI substitution",
+    "count all internal50 initializations, selection, failures/timeouts and privacy composition; enforce external600s whole-phase/eight-trial/twelve-hour cell limits without hiding internal training cost",
+    "verify mechanism/accountant, preprocessing/selection/restarts composition and actual spent epsilon before any formal DP claim; empirical privacy alone is not certification",
+    "fresh aggregate owner CPU/RAM/scratch/GPU admission only xbabe1/2/3, never competing GPU owners or active predecessor/reservation lock bypass"
+  ],
+  "fit_sample_contract": {
+    "all_fit_and_sample_seeds_bound": false,
+    "artifact_only_reload_verified": false,
+    "common_numeric_regression_applicability_verified": false,
+    "finite_requested_rows_and_replay_verified": false,
+    "framework_session_and_generator_parameters_exposed_as_safe_inference_artifact": false,
+    "full_inference_bytes_charged": false,
+    "generator_artifact_returned": false,
+    "original_classifier_evaluator_rounds_last_column_labels": true,
+    "original_experiment_returns_real_training_table": true,
+    "original_fit_function": "alg/pategan/pate_gan.py::pategan",
+    "original_fit_returns_generated_training_size_array_only": true,
+    "raw_training_rows_removed_from_inference_artifact_verified": false,
+    "real_training_table_as_generator_artifact_allowed": false,
+    "safe_numeric_codec_verified": false,
+    "verified": false
+  },
+  "fit_sample_contract_verified": false,
+  "formal_dp_claim": false,
+  "format": "dope-author-source-admission-audit",
+  "full_dependency_runtime_rights_closure_verified": false,
+  "independent_implementation": false,
+  "license": "BSD-3-Clause",
+  "license_evidence": "https://github.com/vanderschaarlab/mlforhealthlabpub/blob/75beead341138094f89c1315ec3d722030d047cb/LICENSE.md",
+  "license_sha256": "8ba27db6eabac57ac92656d3892550683f09f6bea357a7d531a8dd23c2e7dece",
+  "matrix_admission": false,
+  "method": "PATE-GAN",
+  "mfs_v2": null,
+  "native_objective": {
+    "author_native_regression_objective_found": false,
+    "author_reported_source_outcomes": [
+      "AUC",
+      "APR"
+    ],
+    "campaign_grouped_training_derived_validation_mapping_verified": false,
+    "direction": "maximize",
+    "generator_search_space": null,
+    "implementation_source": "alg/pategan/main_pategan_experiment.py::pategan_main; alg/pategan/utils.py::supervised_model_training",
+    "metric_source_sha256": "acf90442f9e7007173b12236fb0e74352244be21705207f920d8d2611ca8997d",
+    "name": "author_logistic_regression_auc_initialization_selection",
+    "native_values_cross_method_ranking": false,
+    "official_test_selection_allowed": false,
+    "regression_selection_policy": "author default only and native tuning inapplicable unless author-grounded regression objective and source applicability are verified and frozen before selection",
+    "selection_source_sha256": "832c20c536331b3e60d7ca4061ec9ba53967b4fcb95a5ea0e21c8d730fc747b3",
+    "shared_kpi_used_for_selection": false,
+    "source_selection_strict_greater_than_first_best": true,
+    "source_selection_uses_real_training_table": true,
+    "status": "source_identified_not_frozen_for_tuning",
+    "tie_breaks": null
+  },
+  "new_fit_trials": 0,
+  "new_sample_cells": 0,
+  "official_tests_opened": false,
+  "paper_reference": {
+    "bibliography_entry": "jordon2019pate",
+    "original_author_source_header_and_readme_match": true,
+    "paper_pdf_body_hash_verified": false,
+    "paper_reported_experiments_reproduced": false,
+    "primary_browser_challenge_observed": true,
+    "title": "PATE-GAN: Generating Synthetic Data with Differential Privacy Guarantees",
+    "url": "https://openreview.net/forum?id=S1zk9iRqF7"
+  },
+  "privacy_and_preprocessing_observations": {
+    "accountant_mechanism_equivalence_and_actual_epsilon_overshoot_verified": false,
+    "all_internal_initializations_and_failed_costs_must_be_counted": true,
+    "formal_composition_of_restarts_preprocessing_and_selection_verified": false,
+    "formal_dp_claim": false,
+    "original_credit_cli_fits_minmax_on_all_rows_before_split": true,
+    "original_initialization_selection_reads_private_real_training_table": true,
+    "training_only_preprocessing_before_validation_selection_verified": false
+  },
+  "production_certified": false,
+  "ptf_v1": null,
+  "release_safe": null,
+  "separate_auditing_project_is_original_author_implementation": false,
+  "separate_auditing_project_url": "https://github.com/spalabucr/pategan-audit",
+  "source_file_count": 7,
+  "source_files": {
+    "LICENSE.md": {
+      "bytes": 1736,
+      "git_blob": "94b4fbc05652dbb1194ea30001460085e70878fb",
+      "sha256": "8ba27db6eabac57ac92656d3892550683f09f6bea357a7d531a8dd23c2e7dece",
+      "url": "https://raw.githubusercontent.com/vanderschaarlab/mlforhealthlabpub/75beead341138094f89c1315ec3d722030d047cb/LICENSE.md"
+    },
+    "alg/pategan/README.md": {
+      "bytes": 2106,
+      "git_blob": "2cab0600a01c5983af4a54894684eeb16f2a0da3",
+      "sha256": "e231e2a7dbdc3887cded4b31641c6594c82612159488f0572357375a9d0bf62b",
+      "url": "https://raw.githubusercontent.com/vanderschaarlab/mlforhealthlabpub/75beead341138094f89c1315ec3d722030d047cb/alg/pategan/README.md"
+    },
+    "alg/pategan/data_generator.py": {
+      "bytes": 2127,
+      "git_blob": "479ec4b6b6abec00a3b00226ceadbf5b41ba6829",
+      "sha256": "e94f00b2ab843f73dff4d4c813f87cdee2b6d5242c73d2435ca9d6529656e76e",
+      "url": "https://raw.githubusercontent.com/vanderschaarlab/mlforhealthlabpub/75beead341138094f89c1315ec3d722030d047cb/alg/pategan/data_generator.py"
+    },
+    "alg/pategan/main_pategan_experiment.py": {
+      "bytes": 6268,
+      "git_blob": "a10593e2a61720c0103bd78c22a738d0cebd13b0",
+      "sha256": "832c20c536331b3e60d7ca4061ec9ba53967b4fcb95a5ea0e21c8d730fc747b3",
+      "url": "https://raw.githubusercontent.com/vanderschaarlab/mlforhealthlabpub/75beead341138094f89c1315ec3d722030d047cb/alg/pategan/main_pategan_experiment.py"
+    },
+    "alg/pategan/pate_gan.py": {
+      "bytes": 7421,
+      "git_blob": "fff43e9d944d54f2e0a562ef210a87aa4166650b",
+      "sha256": "e93c8819336fb878dc284e2184f5f9f4b659182fa88f4e67702e63c1f028b960",
+      "url": "https://raw.githubusercontent.com/vanderschaarlab/mlforhealthlabpub/75beead341138094f89c1315ec3d722030d047cb/alg/pategan/pate_gan.py"
+    },
+    "alg/pategan/requirements.txt": {
+      "bytes": 95,
+      "git_blob": "f245458b64d3fb75b9dd1052f1d66a9338e94f48",
+      "sha256": "9b55a0a9b05d91a066f7bbd0ddb26dcf7119cd8d6f3936cec312f29c68fc0457",
+      "url": "https://raw.githubusercontent.com/vanderschaarlab/mlforhealthlabpub/75beead341138094f89c1315ec3d722030d047cb/alg/pategan/requirements.txt"
+    },
+    "alg/pategan/utils.py": {
+      "bytes": 2896,
+      "git_blob": "8c2cb2bb80cb24f550f8a4bf1465a3ac557a82f7",
+      "sha256": "acf90442f9e7007173b12236fb0e74352244be21705207f920d8d2611ca8997d",
+      "url": "https://raw.githubusercontent.com/vanderschaarlab/mlforhealthlabpub/75beead341138094f89c1315ec3d722030d047cb/alg/pategan/utils.py"
+    }
+  },
+  "source_rights_scope": "root BSD-3-Clause unless an algorithm-specific notice overrides; selected PATE-GAN files have no overriding license notice; full third-party runtime closure pending",
+  "source_scope": "root license and all six selected PATE-GAN README/requirements/Python files; no dataset rows, notebooks, bytecode, generated tables or weights opened",
+  "source_verification": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/pate-gan-v1/source-verification-v1.json",
+    "sha256": "bd9edd3fc3b0095674fa5d5ceae2b984e9f48367bc313ef4c5d260288f3c4f94"
+  },
+  "source_version_kind": "original_author_lab_git_implementation",
+  "status": "source_audit_pending",
+  "superiority": null,
+  "two_reported_experiments_reproduced": false,
+  "upstream_commit": "75beead341138094f89c1315ec3d722030d047cb",
+  "upstream_tree": "9a58b2c448b87b9c26bf1fc25b05612fd9d183c7",
+  "upstream_url": "https://github.com/vanderschaarlab/mlforhealthlabpub",
+  "version": 1
+}
