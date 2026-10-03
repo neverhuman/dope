@@ -223,6 +223,28 @@ class WorkerControls(unittest.TestCase):
             w.sample(self.lock, native, self.original, 7, 101, self.out / 'new.csv', time.monotonic() - 601)
         invoke.assert_not_called()
 
+    def test_sampler_uses_explicit_checked_environment_without_inherited_loader_inputs(self):
+        self.lock['gpu_binary'] = '/opaque/frozen/native-binary'
+        self.freeze()
+        calls = []
+        expected_environment = {'PATH': '/usr/bin:/bin', 'LC_ALL': 'C',
+            'LD_LIBRARY_PATH': 'opaque-frozen-library-directory', 'CUDA_VISIBLE_DEVICES': '',
+            'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1'}
+        def fake_invoke(argv, **options):
+            self.assertEqual(options['env'], expected_environment)
+            self.assertGreater(options['timeout'], 0)
+            self.assertLessEqual(options['timeout'], 600)
+            self.assertEqual(Path(argv[3]).read_bytes(), self.model)
+            rows = argv[argv.index('--rows') + 1]
+            seed = argv[argv.index('--seed') + 1]
+            Path(argv[-1]).write_text(f'{rows}:{seed}')
+            calls.append(options['env'])
+        with patch.dict(os.environ, LD_PRELOAD='opaque-unfrozen-preload.so', LD_AUDIT='opaque-unfrozen-audit.so',
+                        GLIBC_TUNABLES='opaque-unfrozen-loader-option'), patch.object(w.subprocess, 'run', side_effect=fake_invoke):
+            w.run(self.root, self.expected, self.request)
+        self.assertEqual(len(calls), 13)
+        self.assertTrue((self.out / 'batch.json').exists())
+
     def test_sampler_consumes_owned_members_and_replays_all_six_cells(self):
         calls = []
         def fake_sample(lock, native, kernel, rows, seed, output, start):
