@@ -1,0 +1,501 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_declared_git_blob_matches": {
+      "const": true
+    },
+    "author_environment_guidance": {
+      "const": {
+        "declared_dependency_constraints": [
+          "dython>=0.7.12",
+          "einops>=0.8.2",
+          "ipykernel>=7.2.0",
+          "lightgbm>=4.6.0",
+          "matplotlib>=3.10.8",
+          "numpy>=2.4.4",
+          "omegaconf>=2.3.0",
+          "pandas[parquet]>=3.0.2",
+          "pathlib>=1.0.1",
+          "polars>=1.40.0",
+          "scikit-learn>=1.8.0",
+          "scipy>=1.17.1",
+          "sdmetrics>=0.25.0",
+          "seaborn>=0.13.2",
+          "torch>=2.11.0",
+          "torch-ema>=0.3",
+          "tqdm>=4.67.3"
+        ],
+        "installed_runtime_verified": false,
+        "package_version": "0.1.0",
+        "python_version_file": "3.11",
+        "requires_python": ">=3.11",
+        "runtime_and_vendored_rights_verified": false,
+        "uv_lock_sha256": "f6fd0136b7726f8c762f6cab338b9ad5f3fa0121a27666a2b757d989a1f2b571"
+      }
+    },
+    "author_source_executed": {
+      "const": false
+    },
+    "bibliography_entry": {
+      "const": "mueller2026cascaded"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "datasets_notebooks_images_weights_read": {
+      "const": false
+    },
+    "declared_source_bytes": {
+      "const": 641336
+    },
+    "declared_source_files": {
+      "const": 41
+    },
+    "default_config": {
+      "const": {
+        "campaign_default_contract_frozen": false,
+        "checkpoint_policy": "terminal EMA of jointly trained lowres and highres models",
+        "literal_api_defaults": {
+          "Discretizer_constructor": {
+            "adjust_means": false,
+            "k_max": 20,
+            "max_depth": 3,
+            "perc_obs": 0.03,
+            "seed": 42,
+            "use_R_version": false,
+            "variant": "dt"
+          },
+          "MLEScore_constructor": {
+            "boost_rounds": 200,
+            "max_obs": 100000
+          },
+          "constructor": {
+            "seed": 0
+          }
+        },
+        "paper_experiment_discretizer": "R disttree; author README identifies it explicitly",
+        "released_core_discretizer": "author Python disttree port",
+        "released_core_use_R_version": false,
+        "released_model_configurations": {
+          "model/config.yaml": {
+            "data": {
+              "adjust_means": false,
+              "batch_size": 4096,
+              "cat_encoding": null,
+              "encoder": "dt",
+              "k_max": 10,
+              "max_depth": 8
+            },
+            "highres": {
+              "model": {
+                "cat_emb_dim": 8,
+                "gamma_input_dim": 16,
+                "generation_batch_size": 4096,
+                "generation_steps": 200,
+                "mlp_emb_dim": 256,
+                "mlp_n_layers": 5,
+                "mlp_n_units": 394
+              },
+              "training": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "clip_grad": false,
+                "ema_decay": 0.999,
+                "lr": 0.002,
+                "num_steps_warmup": -1,
+                "weight_decay": 0
+              }
+            },
+            "lowres": {
+              "model": {
+                "cat_emb_dim": 16,
+                "cat_emb_init_sigma": 0.001,
+                "generation_batch_size": 4096,
+                "generation_steps": 200,
+                "mlp_act": "relu",
+                "mlp_emb_dim": 256,
+                "mlp_n_layers": 5,
+                "mlp_n_units": 664,
+                "normalize_by_entropy": true,
+                "sigma_data": 1.0,
+                "sigma_max": 100,
+                "sigma_min": 0,
+                "timewarp_variant": "logistic",
+                "timewarp_weight_low_noise": 3.0,
+                "variant": "cdtd"
+              },
+              "training": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "clip_grad": false,
+                "ema_decay": 0.999,
+                "log_steps": 100,
+                "lr": 0.001,
+                "num_steps_train": 30000,
+                "num_steps_warmup": 1000,
+                "patience": 10,
+                "scheduler": true,
+                "weight_decay": 0
+              }
+            },
+            "model_name": "tabcascade"
+          },
+          "model/config_gmm.yaml": {
+            "data": {
+              "adjust_means": true,
+              "batch_size": 4096,
+              "cat_encoding": null,
+              "encoder": "gmm",
+              "k_max": 30,
+              "max_depth": 8
+            },
+            "highres": {
+              "model": {
+                "cat_emb_dim": 8,
+                "gamma_input_dim": 16,
+                "generation_batch_size": 4096,
+                "generation_steps": 200,
+                "mlp_emb_dim": 256,
+                "mlp_n_layers": 5,
+                "mlp_n_units": 394
+              },
+              "training": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "clip_grad": false,
+                "ema_decay": 0.999,
+                "lr": 0.002,
+                "num_steps_warmup": -1,
+                "weight_decay": 0
+              }
+            },
+            "lowres": {
+              "model": {
+                "cat_emb_dim": 16,
+                "cat_emb_init_sigma": 0.001,
+                "generation_batch_size": 4096,
+                "generation_steps": 200,
+                "mlp_act": "relu",
+                "mlp_emb_dim": 256,
+                "mlp_n_layers": 5,
+                "mlp_n_units": 664,
+                "normalize_by_entropy": true,
+                "sigma_data": 1.0,
+                "sigma_max": 100,
+                "sigma_min": 0,
+                "timewarp_variant": "logistic",
+                "timewarp_weight_low_noise": 3.0,
+                "variant": "cdtd"
+              },
+              "training": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "clip_grad": false,
+                "ema_decay": 0.999,
+                "log_steps": 100,
+                "lr": 0.001,
+                "num_steps_train": 30000,
+                "num_steps_warmup": 1000,
+                "patience": 10,
+                "scheduler": true,
+                "weight_decay": 0
+              }
+            },
+            "model_name": "tabcascade"
+          }
+        },
+        "yaml_recording_parser": "yaml.safe_load; dependency-resolved configuration unverified"
+      }
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-tabcascade-source-admission-audit"
+    },
+    "full_repository_archive_downloaded": {
+      "const": false
+    },
+    "independent_implementation": {
+      "const": false
+    },
+    "license": {
+      "const": "MIT"
+    },
+    "license_sha256": {
+      "const": "4ed5fe2beac2bb091440a15714aa9cf57e779f4b6fcdd11fedb0799fcfeadb35"
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "TabCascade"
+    },
+    "method_status": {
+      "const": "source_audit_pending"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_objective": {
+      "const": {
+        "author_headline_emphasizes_detection_quality": true,
+        "direction": "maximize",
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "frozen_scalar_objective": null,
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "heldout_rows_for_selection": "official-training-derived validation only; never official tests",
+        "name": "author_lightgbm_detection_score",
+        "native_values_cross_method_ranking": false,
+        "nfold": 5,
+        "paper_boost_rounds": 500,
+        "released_boost_rounds": 200,
+        "score": "1 - (max(0.5, best mean cross-validation AUC) * 2 - 1)",
+        "selected_for_study_native_tuning": false,
+        "shared_kpi_used_for_selection": false,
+        "source": "evaluation/eval_detection.py::DetectionScore.estimate_score",
+        "source_sha256": "9d428325550eff28256034d3085a4ceffd01a8d582d9cf1b0c53c5d13474be35",
+        "status": "source_identified_not_frozen_for_tuning",
+        "unconditional_categorical_encoder_requires_zero_column_contract": true
+      }
+    },
+    "native_tuning_complete": {
+      "const": false
+    },
+    "new_fits_started": {
+      "const": 0
+    },
+    "new_samples_started": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "other_author_metric": {
+      "const": {
+        "auditor": "LightGBM",
+        "categorical_encoder_fits_real_train_synthetic_and_heldout_rows": true,
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "frozen_scalar_objective": null,
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "heldout_rows_for_selection": "official-training-derived validation only; never official tests",
+        "max_depth": 5,
+        "name": "author_lightgbm_absolute_rmse_gap",
+        "native_scalar_generator_grid_ties_frozen": false,
+        "native_values_cross_method_ranking": false,
+        "num_leaves": 31,
+        "paper_boost_rounds": 500,
+        "regression_direction": "minimize",
+        "regression_metric": "mle_abs_diff = abs(real-trained RMSE - synthetic-trained RMSE)",
+        "released_default_boost_rounds": 200,
+        "selected_for_study_native_tuning": false,
+        "shared_kpi_used_for_selection": false,
+        "source": "evaluation/eval_ml_efficiency.py::MLEScore.get_score",
+        "source_sha256": "0b8ddb57ddeb520ca999e7f02f109104499714c5463cea1a411e225cd30f9e5a",
+        "status": "source_identified_not_frozen_for_tuning",
+        "target_standardizer_fit_on_real_training_labels": true,
+        "zero_categorical_large_training_subsample_requires_contract": true
+      }
+    },
+    "paper": {
+      "const": {
+        "bibliography_entry": "mueller2026cascaded",
+        "bytes": 4014224,
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabcascade-v1/paper-2601.22816v3.pdf",
+        "sha256": "11acd8f2093a86d7c2686a2efd41b39554495870704db8424d73ffe572ddb166",
+        "url": "https://arxiv.org/pdf/2601.22816v3"
+      }
+    },
+    "pending_execution_gates": {
+      "const": [
+        "verify complete source/runtime/bytecode/import roots and selected third-party Python/R dependency rights before initializers",
+        "freeze current Python-port default and separate paper-faithful R configuration, label the track difference and verify equivalence before claims",
+        "bind grouped official-training-derived fit and validation partitions and fit every learned preprocessing step only on fit rows",
+        "freeze author native detection source/runtime,200-versus500 boosting iterations,seeds,search and ties, or mark tuning inapplicable; report separate MLE RMSE-gap MIN without cross-method native ranking",
+        "verify zero-categorical tensors and numeric-only metrics without fake features, including the over100000-row subsample path",
+        "freeze whole-process fit RNG initialization and sample seed wrapper; verify exact finite n/2n/4n/8n outputs and replay",
+        "verify safe artifact-only local loading and full model/config/group-statistics/preprocessing/projection bytes; exclude original rows from inference state",
+        "run copy/leakage/privacy and real-vs-real controls; missing-value generation must conform to the selected numeric representation",
+        "fresh aggregate owner admission on xbabe1/2/3,disjointCPU/RAM/scratch,whole-fit600s/16GiB GPU caps"
+      ]
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe": {
+      "const": null
+    },
+    "reported_experiments_reproduced": {
+      "const": false
+    },
+    "selected_source_is_complete_runtime_closure": {
+      "const": false
+    },
+    "source_commit": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabcascade-v1/commit.json",
+        "sha256": "03618b8f518f4bf77f51b1193de245b7caaa7a3a4394eafd635448970ee856f2"
+      }
+    },
+    "source_contract_observations": {
+      "const": {
+        "author_port_equivalence_measured_by_this_study": false,
+        "checkpoint_state_keys": [
+          "n_cat_cols",
+          "n_classes",
+          "proportions",
+          "z_means",
+          "z_stds",
+          "z_infl_groups",
+          "z_has_miss",
+          "lowres",
+          "highres"
+        ],
+        "core_checkpoint_omits_train_loader_and_original_partition_objects": true,
+        "core_sample_passes_seed_to_both_stage_samplers": true,
+        "core_sample_seed_is_constructor_state": true,
+        "core_train_has_no_explicit_fit_rng_initialization": true,
+        "core_training_uses_supplied_tensor_rows": true,
+        "safe_loader_verified": false,
+        "seed_replay_verified": false,
+        "two_reported_experiments_reproduced_by_this_study": false
+      }
+    },
+    "source_file_sha256": {
+      "const": {
+        ".python-version": "49a506dd32096b010d75205acf3430c9ae6c40351888129499e5a5e487126c93",
+        "LICENSE": "4ed5fe2beac2bb091440a15714aa9cf57e779f4b6fcdd11fedb0799fcfeadb35",
+        "README.md": "2e78d2fc14064194d64318cedf2a4fe38e963276811f41bd9aec1a40027e21ab",
+        "data/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "data/data_preprocess.py": "a6c5d8c08da9cae15ab2c2b50c2bc5c601600370f93123e9758d5cacf36ba6f3",
+        "data/data_utils.py": "4996d09ec50da0213d2e517099c6b3c7c669e343e37d94b9b2e81f5956a8b365",
+        "data/fast_dataloader.py": "fc85109c4a7280a11249507bcf9b02670d35a44ffb485a78c072ed90f3e7038d",
+        "disttree_R/README.md": "47998e2b1caec8753fa99514ebdcf29b98f56066aa6e6bcdfc3a91af3b027341",
+        "disttree_R/__init__.py": "87c3d69077b1b323427640c48d3b2c85b9b269799c53a5092c87f4df223f9dfe",
+        "disttree_R/distfamily.R": "fdd79960f868b8ff25299e56374ad44604f1fa1cdeb96abfa159c9779d507170",
+        "disttree_R/distfit.R": "afb459b0555a092d1cdb397a200165c530ecad17763b7af1d541bf105f9f06fd",
+        "disttree_R/disttree.R": "cd3105c521fb57a59af7d71196df54075f2a69c1a57809d231662273a64756cb",
+        "disttree_R/model.py": "a5e42b71934502fb29cc8d6b88a09e2564c2cf8a99ec557c6885ba9f4f33a1a7",
+        "disttree_python/__init__.py": "5cc4f6383fba0416cabf59f1a58ee6fe4082f2ded180bfe9415a68fef187ec5e",
+        "disttree_python/_distfit.py": "bc98bb95fb30cfc0dc44983ce4bd45645ab41f5d0b75838dd163cfa0498a2124",
+        "disttree_python/_family.py": "80b0bf2d4aaa7db08b06ff8aacbc30eb32fd400341642712a2b6518c545983e6",
+        "disttree_python/_split.py": "34b084498aa54683fdef85fb85c15b341c114360ff24ff7e88986bf733f39807",
+        "disttree_python/_tree.py": "0489456cc4c85a43296ae7c92cc87e489b693365688bc737d213d27bf40130d9",
+        "disttree_python/disttree.py": "574bc8e68b923a52ee190924d6a86b5d7fef6ed151061239c70c4abeae3e9055",
+        "evaluation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "evaluation/eval_alphaprecision.py": "ba76d9e5b2272345513ca10c3554af8350396fb13f6d0553512984a7352ab60b",
+        "evaluation/eval_dcr.py": "7f6d1c071823d88154e770ee8cf4b31957bc21123cc8f8baaa1ba259dae5e950",
+        "evaluation/eval_detection.py": "9d428325550eff28256034d3085a4ceffd01a8d582d9cf1b0c53c5d13474be35",
+        "evaluation/eval_mia.py": "2cf20ffa85be39f34ea48edee7c75b8deb940b525cf2656a33bf24672c0c3893",
+        "evaluation/eval_ml_efficiency.py": "0b8ddb57ddeb520ca999e7f02f109104499714c5463cea1a411e225cd30f9e5a",
+        "evaluation/eval_similarity.py": "b8fc993ef642b6851af12721b40ed3d067cbd26fdb8c45d3204bd7d1217b318f",
+        "model/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "model/config.yaml": "ade7580ffce3a440c93438f765c500b21e4e1307a35ec1b0832aa27ae90e2bd1",
+        "model/config_gmm.yaml": "ab81c3739cb876e1bddc7ef374212376c9bc6bc6a148f262e12baf45377f1eb3",
+        "model/highres/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "model/highres/model.py": "27b1621ad44fd14109fa13917eb64922b1a911cf5662fd32bb6841a891ba04b7",
+        "model/highres/utils.py": "a821f1103334870f4fc23cecfa2d02aa70b6cb26515a271c08c4a377225a9512",
+        "model/lowres/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "model/lowres/encoder.py": "059c3d111fc998402b53c1a1434437ccb8fffc0cab475d82a20e6609c7648de4",
+        "model/lowres/layers.py": "165cca6ba574e55d5425cf6ee6bb2e6bb53af05bdd0d687d090a5735ec6be8c1",
+        "model/lowres/model.py": "f2a4c4e5418a0da153008fafefe8f10f1cb5012ed56d6b02a0988086dd35ce06",
+        "model/lowres/utils.py": "d976154137ccf3c8c5a5dbcd348acf2b77a28d18720774e35699af7566e733d5",
+        "model/tabcascade.py": "ba9de16fc227355bdf758fc27f20fcb9acb1e0361e0d64ecb9f8dc0fba4f748e",
+        "model/utils.py": "a9e5e9546e267f0b670e17839d0625ea14d5d3c4b4eb051e454ada16d744724c",
+        "pyproject.toml": "5ce476fd0a6e90c384cc051995fcf64be007ac680d51675f5a4ba4bc3b08f9a0",
+        "uv.lock": "f6fd0136b7726f8c762f6cab338b9ad5f3fa0121a27666a2b757d989a1f2b571"
+      }
+    },
+    "source_root": {
+      "const": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabcascade-v1/declared"
+    },
+    "source_tree": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabcascade-v1/tree.json",
+        "sha256": "b8161aa7dee9678eedbc5d16920a442ff70881d9769f3079ea1fadf1ca52cf79",
+        "truncated": false
+      }
+    },
+    "source_verification": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabcascade-v1/source-verification-v1.json",
+        "sha256": "78699738d792d3641fdfbd80570b5ad606f3c13c6664287a14b947e14177ae24"
+      }
+    },
+    "superiority": {
+      "const": null
+    },
+    "upstream_commit": {
+      "const": "22208aad2b209cdba8df3b61a1a261de46ecc994"
+    },
+    "upstream_tree": {
+      "const": "2045df3f55eef73b6e28e43b98799735db067c13"
+    },
+    "upstream_url": {
+      "const": "https://github.com/muellermarkus/tabcascade"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "all_declared_git_blob_matches",
+    "author_environment_guidance",
+    "author_source_executed",
+    "bibliography_entry",
+    "counts_as_dope_win",
+    "datasets_notebooks_images_weights_read",
+    "declared_source_bytes",
+    "declared_source_files",
+    "default_config",
+    "fit_sample_contract_verified",
+    "formal_dp_claim",
+    "format",
+    "full_repository_archive_downloaded",
+    "independent_implementation",
+    "license",
+    "license_sha256",
+    "matrix_admission",
+    "method",
+    "method_status",
+    "mfs_v2",
+    "native_objective",
+    "native_tuning_complete",
+    "new_fits_started",
+    "new_samples_started",
+    "official_tests_opened",
+    "other_author_metric",
+    "paper",
+    "pending_execution_gates",
+    "ptf_v1",
+    "release_safe",
+    "reported_experiments_reproduced",
+    "selected_source_is_complete_runtime_closure",
+    "source_commit",
+    "source_contract_observations",
+    "source_file_sha256",
+    "source_root",
+    "source_tree",
+    "source_verification",
+    "superiority",
+    "upstream_commit",
+    "upstream_tree",
+    "upstream_url",
+    "version"
+  ],
+  "type": "object"
+}
