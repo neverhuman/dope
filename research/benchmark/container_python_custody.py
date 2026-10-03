@@ -1,6 +1,7 @@
 """Check frozen Python import inputs without starting the candidate interpreter."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 
@@ -70,7 +71,7 @@ def stdlib_tree(files, aliases):
         path = Path(name)
         require(path.is_relative_to(STDLIB) and path.is_symlink() and not path.is_dir())
         require(type(row) is dict and type(row.get('target')) is str and type(row.get('resolved')) is str)
-        require(str(path.readlink()) == row['target'] and str(path.resolve(strict=True)) == row['resolved'])
+        require(os.readlink(path) == row['target'] and str(path.resolve(strict=True)) == row['resolved'])
         require(sha(path) == frozen_digest(row.get('sha256')))
     for name, row in files.items():
         path = Path(name)
@@ -104,8 +105,9 @@ def verify_import_inputs(runtime_path, runtime_sha256, auxiliary_path, auxiliary
         unaliased(PYTHON)
         require(sha(PYTHON) == frozen_digest(runtime['python_sha256']))
         unaliased(PYTHON_ALIAS.parent)
-        require(PYTHON_ALIAS.is_symlink() and type(runtime['python_symlink']) is str)
-        require(str(PYTHON_ALIAS.readlink()) == runtime['python_symlink'])
+        require(PYTHON_ALIAS.is_symlink() and PYTHON_ALIAS.is_file()
+                and type(runtime['python_symlink']) is str)
+        require(os.readlink(PYTHON_ALIAS) == runtime['python_symlink'])
         require(PYTHON_ALIAS.resolve(strict=True) == PYTHON)
         require(not ABSENT_ZIP.exists() and not ABSENT_ZIP.is_symlink())
         cache = scratch(runtime['empty_bytecode_cache'])
