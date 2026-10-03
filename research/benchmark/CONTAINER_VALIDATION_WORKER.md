@@ -142,3 +142,31 @@ controls initialize no candidate process or library; live rounds remain intact.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_elf_inputs.py -v
 ```
+
+## Declared ELF file custody
+
+`container_system_custody.verify_declared_elf_inputs` binds the private declaration
+inventory to externally selected runtime and auxiliary manifest digests. The
+owned manifest bytes are hashed before parsing. It checks complete Python import
+trees and aliases, then derives the exact selected ELF members: the interpreter,
+package files ending in `.so` or containing `.so.` in the filename, and matching
+standard-library files. Omitted, duplicate or added inventory members reject.
+Each selected file is read into owned bytes, checked against its parent digest
+and replayed through the frozen ELF inspector. Canonical declaration comparison
+keeps JSON integer, float and boolean identities distinct. Complete import trees,
+aliases, manifests and inspector identity are checked again before success.
+
+The caller must already trust the coordinator, interpreter and all guard source
+before importing them. The returned receipt verifies declared files only; this
+filename selection does not establish all native executable inputs. It starts no
+candidate and neither resolves dependencies nor reads the loader cache, default
+search paths or runtime `dlopen` inputs. Actual system-library resolution and
+file inventories, bootstrap/transport/deadline/capacity proof, clean SDV closure,
+queued density priority and cross-host checks remain required. Runtime closure
+and execution admission stay false; all gated scores stay null. Existing locks,
+live rounds, native objectives and artifact/compute caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_system_custody.py -v
+```
