@@ -1,0 +1,344 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_declared_git_blob_matches": {
+      "const": true
+    },
+    "archive_links_or_special_members_accepted": {
+      "const": false
+    },
+    "author_environment_guidance": {
+      "const": {
+        "Trainer_processing_class_compatibility_verified": false,
+        "dependencies_fully_version_pinned": false,
+        "fsspec_requirements_and_pyproject_disagree": true,
+        "installed_runtime_verified": false,
+        "package_version": "0.0.14",
+        "pyproject_sha256": "498e4793eade322101184f2235632c305fb72873a4770ed0418ccbb6accbae9c",
+        "python_requires": ">=3.9",
+        "requirements_sha256": "7806f3e5529cc484d20c7aa7999b416d441b648ac63755167b777c86ef287a3e"
+      }
+    },
+    "author_source_executed": {
+      "const": false
+    },
+    "bibliography_entry": {
+      "const": "borisov2023great"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "datasets_notebooks_images_weights_read": {
+      "const": false
+    },
+    "declared_source_bytes": {
+      "const": 222912
+    },
+    "declared_source_files": {
+      "const": 29
+    },
+    "default_config": {
+      "const": {
+        "campaign_default_contract_frozen": false,
+        "constructor": {
+          "batch_size": 8,
+          "efficient_finetuning": "",
+          "epochs": 100,
+          "experiment_dir": "trainer_great",
+          "float_precision": null,
+          "lora_config": null,
+          "report_to": []
+        },
+        "fit": {
+          "column_names": null,
+          "conditional_col": null,
+          "eval_data": null,
+          "eval_every": null,
+          "eval_n_samples": 50,
+          "random_conditional_col": true,
+          "resume_from_checkpoint": false
+        },
+        "llm_argument_required": true,
+        "pretrained_checkpoint_selected": null,
+        "sample": {
+          "conditions": null,
+          "device": "auto",
+          "drop_nan": false,
+          "guided_sampling": false,
+          "k": 100,
+          "max_length": 100,
+          "random_feature_order": true,
+          "start_col": "",
+          "start_col_dist": null,
+          "temperature": 0.7
+        }
+      }
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-great-source-admission-audit"
+    },
+    "independent_implementation": {
+      "const": false
+    },
+    "license": {
+      "const": "MIT"
+    },
+    "license_sha256": {
+      "const": "8cca1b8d2a9b78541e2ed5a92b5133a87ba535a64565d2b8aee2f520dcf49f23"
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "GReaT"
+    },
+    "method_status": {
+      "const": "source_audit_pending"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_objective": {
+      "const": {
+        "aggregation": "arithmetic mean and population standard deviation over metric seeds",
+        "author_default_auditor": null,
+        "author_default_regression_scoring_callable": null,
+        "default_metric_seeds": [
+          512,
+          13,
+          23,
+          28,
+          21
+        ],
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "frozen_scalar_objective": null,
+        "future_real_test_data_argument": "official-training-derived validation only; never official tests during selection",
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "metric_direction_must_follow_selected_scoring_callable": true,
+        "missing_values_policy": "fillna(0) in real and synthetic frames",
+        "name": "author_ml_efficiency_interface",
+        "native_values_cross_method_ranking": false,
+        "normalize_default": false,
+        "preprocessing_fit_partition": "real_data argument; must be official-training-derived fit rows",
+        "released_direction_label": "maximize",
+        "reported_auditor_results_separate": true,
+        "reported_auditors": [
+          "LinearRegression",
+          "DecisionTreeRegressor",
+          "RandomForestRegressor"
+        ],
+        "reported_regression_direction": "minimize",
+        "reported_regression_metric": "mean_squared_error",
+        "required_caller_parameters": [
+          "model",
+          "metric"
+        ],
+        "shared_kpi_used_for_selection": false,
+        "source": "be_great/metrics/utility.py::MLEfficiency",
+        "source_sha256": "101ddee4b30d3659d483f10428ee8480dff31a285c0c0b534aa5d8f2196f4462",
+        "status": "source_identified_not_frozen_for_tuning",
+        "test_ratio_fallback": 0.2,
+        "use_proba_default": false
+      }
+    },
+    "native_tuning_complete": {
+      "const": false
+    },
+    "new_fits_started": {
+      "const": 0
+    },
+    "new_samples_started": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paper": {
+      "const": {
+        "bytes": 1210373,
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/great-v1/paper-2210.06280v2.pdf",
+        "sections": "Section4/Table1 and AppendixC; published regression MSE results are separate across auditors",
+        "sha256": "ac4d6bee7dcdefa50406beb1511ebfee6147182719f1a91c803ecd9da9151a2f",
+        "url": "https://arxiv.org/pdf/2210.06280v2"
+      }
+    },
+    "pending_execution_gates": {
+      "const": [
+        "choose and pin pretrained model/tokenizer revisions, licenses, complete bytes and provenance",
+        "isolate and inventory executable runtime, bytecode and resolved interpreter import roots before initializers",
+        "freeze author default configuration including required llm and training arguments",
+        "freeze a defensible native scalar/direction/auditor/seeds/grid/ties or mark tuning inapplicable",
+        "supply sealed train-derived fit/validation rows and prevent automatic study re-splitting",
+        "verify common-numeric and separate author-faithful representation contracts",
+        "verify fit/sample, complete finite row counts, n/2n/4n/8n schedules and deterministic seed replay",
+        "pin artifact-only local weights/tokenizer/config loading and include all state in byte accounting",
+        "run copy/leakage/privacy and real-vs-real controls before gated claims",
+        "fresh aggregate admission on xbabe1/2/3 with disjoint CPU/RAM/scratch and 600s/16GiB GPU caps"
+      ]
+    },
+    "pretrained_checkpoint_rights_and_lineage_verified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe": {
+      "const": null
+    },
+    "reported_experiments_reproduced": {
+      "const": false
+    },
+    "source_archive": {
+      "const": {
+        "bytes": 351531,
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/great-v1/author-source.tar.gz",
+        "sha256": "ce072fea32dbfebcee5c61f4454ae901fba26b7a54ae01caa4fe04f73b3d70a4"
+      }
+    },
+    "source_contract_observations": {
+      "const": {
+        "author_errors_and_logs_require_private_scratch_capture": true,
+        "constructor_llm_has_no_default": true,
+        "constructor_model_and_tokenizer_downloads_unpinned_revision": true,
+        "continuous_conditional_state": "stores every training value when selected column dtype equals float",
+        "dataframe_and_numpy_fit_inputs_supported_in_source": true,
+        "fit_feature_order_shuffled": true,
+        "fit_random_conditional_column_default": true,
+        "full_artifact_charge_required": [
+          "weights including any pretrained base needed by LoRA",
+          "tokenizer",
+          "model config",
+          "conditional state",
+          "column statistics",
+          "projection"
+        ],
+        "legacy_sampling_can_return_partial_rows_or_none": true,
+        "legacy_sampling_nan_rows_retained_by_default": true,
+        "live_quality_callback": "optional ColumnShapes visualization; no frozen ML efficacy checkpoint selector",
+        "loading_reconstructs_model_from_unpinned_llm_before_local_weights": true,
+        "safe_loader_and_round_trip_verified": false,
+        "sample_has_no_seed_argument": true,
+        "sample_seed_replay_verified": false,
+        "saved_config_contains_column_statistics_and_conditional_distribution": true,
+        "saved_tokenizer_and_base_model_config_self_contained": false
+      }
+    },
+    "source_file_sha256": {
+      "const": {
+        "LICENSE": "8cca1b8d2a9b78541e2ed5a92b5133a87ba535a64565d2b8aee2f520dcf49f23",
+        "README.md": "b4e40b73e8e0cab8b6064c1f93e8c1d58146fd7fcc06dcfca57e991d8e26d6ad",
+        "be_great/__init__.py": "646351494b2987471e18df8ee225c3e920cf96396a6a83ac674084b562c8186e",
+        "be_great/great.py": "58c12342f9fff0b1811ec08ed85e71803f4a06990cd56b43e33118b2800fd536",
+        "be_great/great_constrained.py": "ec747abd355fc93661c18e335c3e6223218169110ee1e9c85d5de21b77d8ecd7",
+        "be_great/great_dataset.py": "5a98ad598480af392667a1dba6bf625fb6a19f39eeb8429a93d957ba2da6490a",
+        "be_great/great_mock_datasets.py": "05af9ed53bbca11d67e6d66393c75d493e2e0a665a1b82798544ca311ff30fa8",
+        "be_great/great_start.py": "2f8b150c3fb9b46528335ca0b3ab09a21ddef66122c9c7e852d6e22a272d68f9",
+        "be_great/great_trainer.py": "b67afb0731c7161853390e0469fc9ff991cd66195c1ce0db6e29ef0f7d77deec",
+        "be_great/great_utils.py": "4622e2a911575f846235ce402994f9fee9477853024a9f7342b9ef955f2f7dd2",
+        "be_great/metrics/__init__.py": "abf422833487084bbe03a316da60fc5da946d633979bb4572d5c5bab38b10989",
+        "be_great/metrics/base.py": "dc73a71cf6aae43ab6b1d4e0f2116052650f34555eef57a8fa1da8f306b3be48",
+        "be_great/metrics/discriminator.py": "d7b008240f8738b22570ba2fc189e9f28aa9877ec53338854c242dc4257cce51",
+        "be_great/metrics/privacy.py": "69cb0ca2c7424db69b1f41ea075f6210185d9bcec76507ff2da125204b842273",
+        "be_great/metrics/statistical.py": "a8a1b32359da43902ff53a2e5e6e51cfbe305aa1074fe4ff1834e21873ec2ae1",
+        "be_great/metrics/utility.py": "101ddee4b30d3659d483f10428ee8480dff31a285c0c0b534aa5d8f2196f4462",
+        "docs/about.md": "5f2187dd2f2824664cb1498c4e0eacde6222c545d6c979a2d1e99a01928c9f71",
+        "docs/api-docs/README.md": "6938a20158572ebd9ca83237b43a984183af2f01af9533254c907490f4b00b7d",
+        "docs/api-docs/great.md": "d4daa206f3a8c8ac23dc7398a8203285736a30a48887f751bc166df20371a0c1",
+        "docs/api-docs/great_dataset.md": "e7a9ececfdc98a9e48229bc4a69e51c8c5db4c1a560c9895c4a0a66deb494813",
+        "docs/api-docs/great_start.md": "3ce1616d606f156aa825560ab7f3e54e2bd0e7e569ba21df88ae78e824f00ff4",
+        "docs/api-docs/great_trainer.md": "24fcc95aa5c8a350c2770efa96b2809cd068f1618fdd4c1ba977478061359856",
+        "docs/api-docs/great_utils.md": "5f6d9d4db091e6c3072124ee36f6e4087bd5041f79be824058d596554799a418",
+        "docs/api-docs/metrics.md": "83d3d00cdcd4f3e06f5726437e86b642be3f83c88a7e0523f270bb612af0d57e",
+        "docs/examples/README.md": "7a0c909ed2a3933a854a6f8a56536e52ae4b9bbbc8c0581c933d7deaf1c06195",
+        "docs/getting_started.md": "0f2daaa8904232cc913e9be3ebf680dba2087851bc0fac18856fae57f75efa76",
+        "docs/index.md": "ec5f121a599e180f87a65cc7298997809c801c71ff5bd04bd0f70ecd550b80a7",
+        "pyproject.toml": "498e4793eade322101184f2235632c305fb72873a4770ed0418ccbb6accbae9c",
+        "requirements.txt": "7806f3e5529cc484d20c7aa7999b416d441b648ac63755167b777c86ef287a3e"
+      }
+    },
+    "source_root": {
+      "const": "/mnt/fast-scratch/dope-benchmark/method-source-audits/great-v1/declared"
+    },
+    "source_tree": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/great-v1/tree.json",
+        "sha256": "aeb0549ada816310c29971e4a3c737c8fb68807e3a513a5b06b1497bacebe884",
+        "truncated": false
+      }
+    },
+    "source_verification": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/great-v1/source-verification-v1.json",
+        "sha256": "003f0978d24e7a13e72433ab3ea3a2d8cedd9422d00c4573ae13982198295d50"
+      }
+    },
+    "superiority": {
+      "const": null
+    },
+    "upstream_commit": {
+      "const": "616b2e74b396fa1f9c7ab4412b9928eec849159a"
+    },
+    "upstream_tree": {
+      "const": "e5993dda833ce67749c6fdf2a676c7512e6accd6"
+    },
+    "upstream_url": {
+      "const": "https://github.com/tabularis-ai/be_great"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "all_declared_git_blob_matches",
+    "archive_links_or_special_members_accepted",
+    "author_environment_guidance",
+    "author_source_executed",
+    "bibliography_entry",
+    "counts_as_dope_win",
+    "datasets_notebooks_images_weights_read",
+    "declared_source_bytes",
+    "declared_source_files",
+    "default_config",
+    "fit_sample_contract_verified",
+    "formal_dp_claim",
+    "format",
+    "independent_implementation",
+    "license",
+    "license_sha256",
+    "matrix_admission",
+    "method",
+    "method_status",
+    "mfs_v2",
+    "native_objective",
+    "native_tuning_complete",
+    "new_fits_started",
+    "new_samples_started",
+    "official_tests_opened",
+    "paper",
+    "pending_execution_gates",
+    "pretrained_checkpoint_rights_and_lineage_verified",
+    "ptf_v1",
+    "release_safe",
+    "reported_experiments_reproduced",
+    "source_archive",
+    "source_contract_observations",
+    "source_file_sha256",
+    "source_root",
+    "source_tree",
+    "source_verification",
+    "superiority",
+    "upstream_commit",
+    "upstream_tree",
+    "upstream_url",
+    "version"
+  ],
+  "type": "object"
+}
