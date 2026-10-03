@@ -47,6 +47,7 @@
     "research/benchmark/sdv_native_accounting.py": "external-evidence",
     "research/benchmark/reconcile_sdv_population.py": "external-evidence",
     "research/benchmark/sdv_native_continuation.py": "external-evidence",
+    "research/benchmark/sdv_cpu_reuse.py": "external-evidence",
     "research/benchmark/tabdiff-source.audit": "external-evidence",
     "research/benchmark/TABDIFF_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/PRIVBAYES_SOURCE_AUDIT.md": "external-evidence",
