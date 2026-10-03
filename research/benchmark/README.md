@@ -639,3 +639,10 @@ These controls use opaque fixtures without ML initialization or real data.
 This component has no launcher, admitted runtime, measured speedup or campaign
 results. It leaves the live SDV round and density wait gate unchanged. The
 source-versioned execution lock and monitor remain required before use.
+
+The [GReaT source audit](GREAT_SOURCE_AUDIT.md) binds the current MIT author
+implementation and identifies its defaults, required pretrained checkpoint,
+generic native ML utility API and artifact state. It verifies no runtime or
+fit/sample execution and leaves GReaT `source_audit_pending`. A complete author
+default, defensible native scalar or tuning-inapplicable receipt, weights and
+runtime custody remain required before admission.

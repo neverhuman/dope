@@ -597,16 +597,101 @@
       "upstream_url": null
     },
     "GReaT": {
-      "default_config": null,
+      "default_config": {
+        "campaign_default_contract_frozen": false,
+        "constructor": {
+          "batch_size": 8,
+          "efficient_finetuning": "",
+          "epochs": 100,
+          "experiment_dir": "trainer_great",
+          "float_precision": null,
+          "lora_config": null,
+          "report_to": []
+        },
+        "fit": {
+          "column_names": null,
+          "conditional_col": null,
+          "eval_data": null,
+          "eval_every": null,
+          "eval_n_samples": 50,
+          "random_conditional_col": true,
+          "resume_from_checkpoint": false
+        },
+        "llm_argument_required": true,
+        "pretrained_checkpoint_selected": null,
+        "sample": {
+          "conditions": null,
+          "device": "auto",
+          "drop_nan": false,
+          "guided_sampling": false,
+          "k": 100,
+          "max_length": 100,
+          "random_feature_order": true,
+          "start_col": "",
+          "start_col_dist": null,
+          "temperature": 0.7
+        }
+      },
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "llm",
-      "license": null,
+      "license": "MIT",
+      "native_objective": {
+        "aggregation": "arithmetic mean and population standard deviation over metric seeds",
+        "author_default_auditor": null,
+        "author_default_regression_scoring_callable": null,
+        "default_metric_seeds": [
+          512,
+          13,
+          23,
+          28,
+          21
+        ],
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "frozen_scalar_objective": null,
+        "future_real_test_data_argument": "official-training-derived validation only; never official tests during selection",
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "metric_direction_must_follow_selected_scoring_callable": true,
+        "missing_values_policy": "fillna(0) in real and synthetic frames",
+        "name": "author_ml_efficiency_interface",
+        "native_values_cross_method_ranking": false,
+        "normalize_default": false,
+        "preprocessing_fit_partition": "real_data argument; must be official-training-derived fit rows",
+        "released_direction_label": "maximize",
+        "reported_auditor_results_separate": true,
+        "reported_auditors": [
+          "LinearRegression",
+          "DecisionTreeRegressor",
+          "RandomForestRegressor"
+        ],
+        "reported_regression_direction": "minimize",
+        "reported_regression_metric": "mean_squared_error",
+        "required_caller_parameters": [
+          "model",
+          "metric"
+        ],
+        "shared_kpi_used_for_selection": false,
+        "source": "be_great/metrics/utility.py::MLEfficiency",
+        "source_sha256": "101ddee4b30d3659d483f10428ee8480dff31a285c0c0b534aa5d8f2196f4462",
+        "status": "source_identified_not_frozen_for_tuning",
+        "test_ratio_fallback": 0.2,
+        "use_proba_default": false
+      },
+      "note": "Verified MIT current author source only. Required pretrained llm has no constructor default; native utility requires a caller-selected auditor/metric and no scalar is frozen. Paper regression MSE must not inherit the generic maximize label. No runtime, safe artifact round trip, fit/sample or tuning admission; conditional training-value state, pretrained weights and tokenizer/config must be charged. Default-only fallback with tuning inapplicable if no defensible native objective can be frozen. Official tests sealed, gated claims null, no DOPE win.",
       "sampling_command": null,
+      "source_audit": {
+        "archive_sha256": "ce072fea32dbfebcee5c61f4454ae901fba26b7a54ae01caa4fe04f73b3d70a4",
+        "license_sha256": "8cca1b8d2a9b78541e2ed5a92b5133a87ba535a64565d2b8aee2f520dcf49f23",
+        "path": "research/benchmark/great-source.audit.json",
+        "sha256": "70b579312421db5a2d29d8ea17b8c205c981d9e30e9f2e67d673ffccfa7548ce",
+        "source_verification_path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/great-v1/source-verification-v1.json",
+        "source_verification_sha256": "003f0978d24e7a13e72433ab3ea3a2d8cedd9422d00c4573ae13982198295d50"
+      },
       "status": "source_audit_pending",
       "tuning_search_space": null,
-      "upstream_commit": null,
-      "upstream_url": null
+      "upstream_commit": "616b2e74b396fa1f9c7ab4412b9928eec849159a",
+      "upstream_url": "https://github.com/tabularis-ai/be_great"
     },
     "GaussianCopula": {
       "adapter": "GaussianCopula",
