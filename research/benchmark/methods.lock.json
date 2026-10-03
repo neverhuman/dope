@@ -1252,16 +1252,28 @@
       "upstream_url": "https://github.com/worldbank/REaLTabFormer"
     },
     "TAEGAN": {
+      "counts_as_dope_win": false,
       "default_config": null,
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "neural_flow",
       "license": null,
+      "note": "Pinned original author tree and inspected README/four Python sources contain no verified license grant; GitHub metadata null and license endpoint404. Author enterprise preprocessing/inverse recovery withheld; prepare/recover AST stubs. Unavailable for this study; no execution or DOPE win. Rights and complete pipeline required, or licensed independent implementation with two reported-experiment reproductions. See TAEGAN_SOURCE_AUDIT.md.",
       "sampling_command": null,
-      "status": "source_audit_pending",
+      "source_verification": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/taegan-v1/source-verification-v1.json",
+        "sha256": "94038a1a896c549bbbb1b4eeaf1ea7178414f68020cc916f5690c719657569b0"
+      },
+      "source_version_kind": "original_author_git_commit",
+      "status": "unavailable",
       "tuning_search_space": null,
-      "upstream_commit": null,
-      "upstream_url": null
+      "unavailable_receipt": {
+        "path": "research/benchmark/results/taegan-unavailable.json",
+        "sha256": "0933598ea6dae5d28c812d0645c26e45b81436573dce7c55a3ae63dfc8acb8ef"
+      },
+      "upstream_commit": "19d17f65cfa52ad5d84c0845830ef7c418e4397a",
+      "upstream_tree": "e73d2816839422afa1350cd0948ec2cb2f420c04",
+      "upstream_url": "https://github.com/BetterdataLabs/taegan"
     },
     "TVAE": {
       "adapter": "TVAE",
