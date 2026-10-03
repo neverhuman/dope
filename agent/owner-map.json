@@ -49,6 +49,8 @@
     "research/benchmark/sdv_native_continuation.py": "external-evidence",
     "research/benchmark/sdv_cpu_reuse.py": "external-evidence",
     "research/benchmark/great-source.audit": "external-evidence",
+    "research/benchmark/realtabformer-source.audit": "external-evidence",
+    "research/benchmark/REALTABFORMER_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/GREAT_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/tabdiff-source.audit": "external-evidence",
     "research/benchmark/TABDIFF_SOURCE_AUDIT.md": "external-evidence",

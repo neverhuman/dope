@@ -220,7 +220,7 @@
           "column statistics",
           "projection"
         ],
-        "legacy_sampling_can_return_partial_rows_or_none": true,
+        "legacy_sampling_can_return_partial_or_empty_table": true,
         "legacy_sampling_nan_rows_retained_by_default": true,
         "live_quality_callback": "optional ColumnShapes visualization; no frozen ML efficacy checkpoint selector",
         "loading_reconstructs_model_from_unpinned_llm_before_local_weights": true,

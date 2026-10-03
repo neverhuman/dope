@@ -646,3 +646,9 @@ generic native ML utility API and artifact state. It verifies no runtime or
 fit/sample execution and leaves GReaT `source_audit_pending`. A complete author
 default, defensible native scalar or tuning-inapplicable receipt, weights and
 runtime custody remain required before admission.
+
+The [REaLTabFormer source audit](REALTABFORMER_SOURCE_AUDIT.md) binds the MIT
+author tabular implementation, literal defaults and bootstrap sensitivity
+checkpoint policy. Its utility API requires a caller-supplied auditor and
+returns predictions; the native scalar/search/default runtime remain unfrozen.
+It stays `source_audit_pending`; no model or campaign job is admitted.

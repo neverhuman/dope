@@ -79,7 +79,7 @@ KPI cannot fill this gap.
    saved config includes that state; it must remain on restricted scratch.
 4. Establish common-numeric and separate author-faithful representations, fit
    seeds and sample seeds. `sample` has no seed argument. Its legacy path can
-   return fewer rows or no table after errors; default missing values also need
+   return partial or empty tables after errors; default missing values also need
    explicit generator-validity rejection. Verify all requested sizes and replay.
 5. Capture detailed author errors/logs only on scratch and emit typed public
    failures. Run row-copy, leakage, privacy and real-vs-real controls before
