@@ -523,16 +523,28 @@
       "upstream_url": "https://github.com/muellermarkus/cdtd"
     },
     "CTAB-GAN+": {
+      "counts_as_dope_win": false,
       "default_config": null,
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "neural_flow",
       "license": null,
+      "note": "Pinned original author tree and inspected README/six Python sources contain no source license grant; GitHub license metadata is null and pinned license endpoint returns404. External-code rights remain unverified despite article CC BY. Unavailable for this study; no author code execution, formal DP claim or DOPE win. A licensed independent implementation requires two reported-experiment reproductions. See CTABGAN_PLUS_SOURCE_AUDIT.md.",
       "sampling_command": null,
-      "status": "source_audit_pending",
+      "source_verification": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/ctabgan-plus-v1/source-verification-v1.json",
+        "sha256": "9e26e27a37de3dae6aa04650f87b385fdbb35abe3e73c250a2628af39543bad4"
+      },
+      "source_version_kind": "original_author_git_commit",
+      "status": "unavailable",
       "tuning_search_space": null,
-      "upstream_commit": null,
-      "upstream_url": null
+      "unavailable_receipt": {
+        "path": "research/benchmark/results/ctabgan-plus-unavailable.json",
+        "sha256": "1d1b203dc1557f115712e79484e5af176db1a7fca33ffd2af40d57dc4fee1579"
+      },
+      "upstream_commit": "6a6f90188cca3dac2c533fd5e8e7f20de074365b",
+      "upstream_tree": "f5a08d81b0309d6635bf1c7a646965a34913fa93",
+      "upstream_url": "https://github.com/Team-TUD/CTAB-GAN-Plus"
     },
     "CTGAN": {
       "adapter": "CTGAN",

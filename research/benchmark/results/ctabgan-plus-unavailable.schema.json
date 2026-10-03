@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_readme_dp_scope": {
+      "const": "released CTAB-GAN-Plus code is without differential privacy; README links a separate CTAB-GAN-Plus-DP repository"
+    },
+    "author_source_executed": {
+      "const": false
+    },
+    "bibliography_entry": {
+      "const": "zhao2024ctab"
+    },
+    "commit_manifest": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/ctabgan-plus-v1/commit.json",
+        "sha256": "e75f889b6d4a707ff6b9fffce926626434f1c3eb9f4f691f69f5e8406b0a60d6"
+      }
+    },
+    "counted_dope_wins": {
+      "const": 0
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "dependency_runtime_verified": {
+      "const": false
+    },
+    "executed_fit_trials": {
+      "const": 0
+    },
+    "executed_sample_cells": {
+      "const": 0
+    },
+    "execution_admitted": {
+      "const": false
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-method-unavailable-receipt"
+    },
+    "full_repository_archive_downloaded": {
+      "const": false
+    },
+    "future_admission_evidence_required": {
+      "const": [
+        "explicit source rights grant bound to this snapshot, or a licensed separately labelled independent implementation reproducing two reported experiments",
+        "pinned full executable/dependency rights and runtime closure plus artifact-only fit/sample, representation and replay contracts",
+        "author-native validation objective, direction, tie policy, generator grid and accounting frozen before selection; formal DP requires separately verified complete accounting"
+      ]
+    },
+    "github_detected_license": {
+      "const": null
+    },
+    "included_in_win_denominator": {
+      "const": false
+    },
+    "independent_implementation_admitted": {
+      "const": false
+    },
+    "license": {
+      "const": null
+    },
+    "license_endpoint": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/ctabgan-plus-v1/license-endpoint-v1.json",
+        "sha256": "5510c6ad099a84847181bec37107ebada6ba7d07840dcaf068f1dca7fedbb754"
+      }
+    },
+    "license_endpoint_http_status": {
+      "const": 404
+    },
+    "license_grant_found_in_inspected_material": {
+      "const": false
+    },
+    "license_notice_paths_in_full_tree": {
+      "const": []
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "CTAB-GAN+"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_objective": {
+      "const": {
+        "generator_search_space": null,
+        "native_values_cross_method_ranking": false,
+        "selection_scalar": null,
+        "shared_kpi_used_for_selection": false,
+        "status": "not_admitted_due_to_source_rights",
+        "tie_breaks": null
+      }
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "const": null
+    },
+    "paper": {
+      "const": {
+        "bibliography_entry": "zhao2024ctab",
+        "bytes": 1295108,
+        "doi": "10.3389/fdata.2023.1296508",
+        "license_scope": "CC BY applies to the published article; no inspected grant explicitly binds the external code snapshot",
+        "sha256": "191e94ea8a637ba492a2fa02892d05b0550d4ed83cbd44f7d49967ce3d0ee1da",
+        "url": "https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2023.1296508/pdf"
+      }
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "public_author_code_copied": {
+      "const": false
+    },
+    "reason": {
+      "const": "No source license/notice grant was found in the complete pinned author tree or its inspected README and six Python source files. GitHub license metadata is null and the pinned license endpoint returns 404. The article CC BY notice has not been verified as a grant covering this external code snapshot."
+    },
+    "reason_code": {
+      "const": "original_author_license_grant_unverified"
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "repository_metadata": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/ctabgan-plus-v1/repository.json",
+        "sha256": "c2aeb1016b9c3ffa4df1781c15d449a8449253b29ea4e8e6abe6590dc122f30d"
+      }
+    },
+    "rights_inspection": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/ctabgan-plus-v1/rights-inspection-v1.json",
+        "sha256": "c5e211f03f3d21c14b34696e0b4903639909d597c002034df0549069b7ca9962"
+      }
+    },
+    "source_file_count": {
+      "const": 7
+    },
+    "source_files": {
+      "const": {
+        "README.md": {
+          "bytes": 2756,
+          "git_blob": "a99c487f325f82997f63e1c56f7f0f57d0ee4fe5",
+          "sha256": "6eeac29c4d18626302f0d98f1191e7b75a15e538f1b2058a8fb52ddbe6b094dc",
+          "url": "https://raw.githubusercontent.com/Team-TUD/CTAB-GAN-Plus/6a6f90188cca3dac2c533fd5e8e7f20de074365b/README.md"
+        },
+        "model/ctabgan.py": {
+          "bytes": 2364,
+          "git_blob": "c92af4358ab85d3a80f94f0c1e5fb6dea1a51827",
+          "sha256": "bf3fb6a3e067c826e8221a8f65da852bd49fe5b6b67e71368a26b8f4ae441990",
+          "url": "https://raw.githubusercontent.com/Team-TUD/CTAB-GAN-Plus/6a6f90188cca3dac2c533fd5e8e7f20de074365b/model/ctabgan.py"
+        },
+        "model/eval/evaluation.py": {
+          "bytes": 9574,
+          "git_blob": "9708f1890124a95e079398f77d401ea658bc55aa",
+          "sha256": "6640f8e184a2bdd44ef8e2bea7d0ac031411e339db1b9ddf6f526c947e11e5ed",
+          "url": "https://raw.githubusercontent.com/Team-TUD/CTAB-GAN-Plus/6a6f90188cca3dac2c533fd5e8e7f20de074365b/model/eval/evaluation.py"
+        },
+        "model/pipeline/data_preparation.py": {
+          "bytes": 6279,
+          "git_blob": "70c684b4fff45254a7b499afa31aca74ae656468",
+          "sha256": "9bd8353ba60016cefe209310ea0658fae39631a99f7226506161a8a9bd7d454f",
+          "url": "https://raw.githubusercontent.com/Team-TUD/CTAB-GAN-Plus/6a6f90188cca3dac2c533fd5e8e7f20de074365b/model/pipeline/data_preparation.py"
+        },
+        "model/privacy_utils/rdp_accountant.py": {
+          "bytes": 8040,
+          "git_blob": "5e225cbb0994fa6b9e9726f38d873754bbfe82cf",
+          "sha256": "226196b7b0be8689beaf3a3a2f36b8f6750f09e83c84bbc89ea34d8d54e42da8",
+          "url": "https://raw.githubusercontent.com/Team-TUD/CTAB-GAN-Plus/6a6f90188cca3dac2c533fd5e8e7f20de074365b/model/privacy_utils/rdp_accountant.py"
+        },
+        "model/synthesizer/ctabgan_synthesizer.py": {
+          "bytes": 21711,
+          "git_blob": "592d297ba95f5187110aaa2aef777adb094dd9c6",
+          "sha256": "f7c1132c9b41438cedc1db41142f2db9467b971a3844b75aa2c170b12085560f",
+          "url": "https://raw.githubusercontent.com/Team-TUD/CTAB-GAN-Plus/6a6f90188cca3dac2c533fd5e8e7f20de074365b/model/synthesizer/ctabgan_synthesizer.py"
+        },
+        "model/synthesizer/transformer.py": {
+          "bytes": 18238,
+          "git_blob": "ddad92266dc6d8b47e9ea1f4b4528795b9126e7d",
+          "sha256": "c1fa863ec9657a7e38af8741adb89ca4478057c9772b1fdc451b6ea24efc1728",
+          "url": "https://raw.githubusercontent.com/Team-TUD/CTAB-GAN-Plus/6a6f90188cca3dac2c533fd5e8e7f20de074365b/model/synthesizer/transformer.py"
+        }
+      }
+    },
+    "source_scope": {
+      "const": "README and six Python source files only; datasets, notebooks, bytecode, images and weights were not opened"
+    },
+    "source_tree_entries": {
+      "const": 26
+    },
+    "source_tree_truncated": {
+      "const": false
+    },
+    "source_verification": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/ctabgan-plus-v1/source-verification-v1.json",
+        "sha256": "9e26e27a37de3dae6aa04650f87b385fdbb35abe3e73c250a2628af39543bad4"
+      }
+    },
+    "source_version_kind": {
+      "const": "original_author_git_commit"
+    },
+    "status": {
+      "const": "unavailable"
+    },
+    "tree_manifest": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/ctabgan-plus-v1/tree.json",
+        "sha256": "85966e3898ce3f424470e7cef2da7aa21bb6762603a2f125b77bf043084f0fd1"
+      }
+    },
+    "two_reported_experiments_reproduced": {
+      "const": false
+    },
+    "unavailable_cells_count_as_dope_wins": {
+      "const": false
+    },
+    "upstream_commit": {
+      "const": "6a6f90188cca3dac2c533fd5e8e7f20de074365b"
+    },
+    "upstream_tree": {
+      "const": "f5a08d81b0309d6635bf1c7a646965a34913fa93"
+    },
+    "upstream_url": {
+      "const": "https://github.com/Team-TUD/CTAB-GAN-Plus"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "author_readme_dp_scope",
+    "author_source_executed",
+    "bibliography_entry",
+    "commit_manifest",
+    "counted_dope_wins",
+    "counts_as_dope_win",
+    "dependency_runtime_verified",
+    "executed_fit_trials",
+    "executed_sample_cells",
+    "execution_admitted",
+    "fit_sample_contract_verified",
+    "formal_dp_claim",
+    "format",
+    "full_repository_archive_downloaded",
+    "future_admission_evidence_required",
+    "github_detected_license",
+    "included_in_win_denominator",
+    "independent_implementation_admitted",
+    "license",
+    "license_endpoint",
+    "license_endpoint_http_status",
+    "license_grant_found_in_inspected_material",
+    "license_notice_paths_in_full_tree",
+    "matrix_admission",
+    "method",
+    "mfs_v2",
+    "native_objective",
+    "official_tests_opened",
+    "paired_superiority",
+    "paper",
+    "production_certified",
+    "ptf_v1",
+    "public_author_code_copied",
+    "reason",
+    "reason_code",
+    "release_safe_l3",
+    "repository_metadata",
+    "rights_inspection",
+    "source_file_count",
+    "source_files",
+    "source_scope",
+    "source_tree_entries",
+    "source_tree_truncated",
+    "source_verification",
+    "source_version_kind",
+    "status",
+    "tree_manifest",
+    "two_reported_experiments_reproduced",
+    "unavailable_cells_count_as_dope_wins",
+    "upstream_commit",
+    "upstream_tree",
+    "upstream_url",
+    "version"
+  ],
+  "title": "CTAB-GAN+ current-study unavailable source-rights receipt; no benchmark win",
+  "type": "object"
+}
