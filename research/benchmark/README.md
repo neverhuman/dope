@@ -13,6 +13,9 @@ no process and proves no filesystem, ELF, transport or capacity admission.
 `container_elf_inputs.py` extracts externally pinned ELF declarations from owned
 bytes without resolving or loading libraries. Its supported-profile inspection
 leaves executable closure and admission unverified.
+`container_system_custody.py` binds the declared ELF inventory to frozen runtime
+manifests, verifies exact members and aliases, and replays owned-byte declarations.
+It proves selected file custody, with loader resolution and dispatch still unadmitted.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
