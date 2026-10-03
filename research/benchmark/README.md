@@ -610,3 +610,32 @@ and certifies no speedup or runtime upgrade for historical trials. A new
 source-versioned execution lock, monitor, recognized-owner registry, aggregate
 CPU/GPU/RAM/scratch admission and respect for queued density reservations are
 still required. Official tests stay sealed and all gated claims remain null.
+
+`sdv_cpu_reuse.cpu_reuse` supplies the CPU operation core for complete physical
+fits from SDV native-v2. It does not handle the 96 historical trials or perform
+admission. A future entry point must first verify closed predecessor custody
+and externally pinned fit/native receipts, verify the full runtime **before
+importing the adapter**, hide CUDA, set `LOKY_MAX_CPU_COUNT=1`, and acquire fresh
+disjoint CPU/RAM/scratch capacity under the owner registry. Its external monitor
+must charge all verification and imports within the 600-second whole-process
+limit. The core's elapsed timer includes its own source and artifact checks;
+preflight failures before callbacks are accounted by that external monitor.
+
+The core rejects changed source, job identity, worker files, model inventory
+or model/projection byte charges before adapter callbacks. Native reuse runs
+the unchanged validation SDMetrics objective with seed 1729, preserving
+negative R². Common sampling requires complete native evidence for that same
+fit, generates n/4n at seeds 101/211/307, and checks seed-101 replay against the
+native sample. It checks artifacts after callbacks and worker custody before
+writing a successful native or sample-batch receipt. Callback failures retain
+typed failure and elapsed-cost evidence; no new fit is called.
+
+```sh
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_sdv_cpu_reuse.py -v
+```
+
+These controls use opaque fixtures without ML initialization or real data.
+This component has no launcher, admitted runtime, measured speedup or campaign
+results. It leaves the live SDV round and density wait gate unchanged. The
+source-versioned execution lock and monitor remain required before use.
