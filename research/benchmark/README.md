@@ -531,3 +531,37 @@ separate from final per-cell parity. Bulk rows, samples, weights and detailed
 logs remain on scratch. Five fit seeds, full n/2n/4n/8n schedules, complete
 privacy attacks, projection-only utility cost, public-core paired analysis and
 five-lock final campaign admission remain required.
+
+### Frozen SDV population native closure
+
+`reconcile_sdv_population` verifies the frozen CTGAN/TVAE research ledger on
+the same 100 S3 workers. The matrix has 704 new trials and 96 immutable prior
+trials, with two earlier failed attempts charged separately. Author defaults
+and the four-configuration native grid remain fixed. Native selection uses
+the pinned mean SDMetrics LinearRegression/MLP regression R² only; byte count
+and configuration digest break ties. Negative native values remain visible.
+Sampling success and shared utility scores cannot change the native winner.
+
+Run the closure after the frozen coordinator and supervisor have exited:
+
+```sh
+python3 -B -m research.benchmark.reconcile_sdv_population
+python3 -B -m research.benchmark.reconcile_sdv_population --seal
+```
+
+The preview returns accounting without writing a seal. Sealing requires all
+704 new job identities, the 96 verified historical trials, a clean coordinator
+exit, stopped processes, frozen source and declared runtime inventories,
+passing operation admissions, whole-operation quota evidence and exact sample
+replay for successful sample phases. Failed fits retain partial artifact byte
+charges; failed and timed-out operations retain elapsed compute. A valid native
+KPI remains eligible when a later sample phase fails, and its shared outcomes
+stay unavailable. No winner is frozen from a partially closed tuning group.
+Historical runtime closure is never upgraded by reuse. Closure requires bytecode
+writes disabled and rejects added caches before loading the frozen verifier.
+
+This tool hashes worker and sample files without parsing their rows and does
+not initialize ML libraries, fit generators, or open official tests. Its
+research receipts keep MFS-v2, PTF-v1, release-safe and superiority claims null.
+The source-only closure implementation does not publish a partial comparator
+panel or admit the final campaign.
