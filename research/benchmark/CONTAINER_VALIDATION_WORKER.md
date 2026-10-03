@@ -73,7 +73,10 @@ The declared inputs include the
 absent ZIP import root, both package trees, standard library including bytecode
 and extension files, exact declared file aliases, empty cache and metric source.
 Added directory aliases and altered files fail with a fixed error. The function
-starts no process and imports no candidate dependency. It checks declared import
+compares interpreter and standard-library alias targets as literal text. The
+interpreter alias must resolve through the filesystem to a regular file; trailing
+slash or dot suffixes that require a directory reject, even when frozen literally.
+The checker starts no process and imports no candidate dependency. It checks declared import
 inputs only: system ELF/library closure, bootstrap source and controller custody,
 restricted startup environment, capacity and deadline enforcement still require
 separate evidence. Its successful receipt explicitly leaves full runtime closure

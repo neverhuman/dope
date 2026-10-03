@@ -3,6 +3,7 @@ from contextlib import ExitStack
 import builtins
 import hashlib
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -135,6 +136,43 @@ class ImportInputControls(unittest.TestCase):
         self.python_alias.unlink()
         self.python_alias.symlink_to('other')
         self.rejected()
+
+    def test_interpreter_literal_alias_dot_drift_rejected(self):
+        self.python_alias.unlink(); self.python_alias.symlink_to('./python3.12')
+        self.assertEqual(os.readlink(self.python_alias), './python3.12')
+        self.rejected()
+
+    def test_stdlib_literal_alias_dot_drift_rejected(self):
+        self.stdlib_alias.unlink(); self.stdlib_alias.symlink_to('./opaque.py')
+        self.assertEqual(os.readlink(self.stdlib_alias), './opaque.py')
+        self.rejected()
+
+    def test_interpreter_alias_directory_suffix_rejected(self):
+        for value in ('python3.12/', 'python3.12/.'):
+            with self.subTest(value=value):
+                self.python_alias.unlink(); self.python_alias.symlink_to(value)
+                with self.assertRaises(NotADirectoryError):
+                    self.python_alias.stat()
+                self.rejected()
+                self.runtime['python_symlink'] = value
+                self.freeze(); self.rejected()
+
+    def test_correctly_frozen_literal_dot_targets_succeed(self):
+        self.python_alias.unlink(); self.python_alias.symlink_to('./python3.12')
+        self.stdlib_alias.unlink(); self.stdlib_alias.symlink_to('./opaque.py')
+        self.runtime['python_symlink'] = './python3.12'
+        self.auxiliary['stdlib_aliases'][str(self.stdlib_alias)]['target'] = './opaque.py'
+        self.freeze()
+        self.assertIs(self.verify()['python_import_inputs_verified'], True)
+
+    def test_stdlib_directory_suffix_rejected_even_if_literal_is_frozen(self):
+        for value in ('opaque.py/', 'opaque.py/.'):
+            with self.subTest(value=value):
+                self.stdlib_alias.unlink(); self.stdlib_alias.symlink_to(value)
+                self.auxiliary['stdlib_aliases'][str(self.stdlib_alias)]['target'] = value
+                with self.assertRaises(NotADirectoryError):
+                    self.stdlib_alias.stat()
+                self.freeze(); self.rejected()
 
     def test_added_zip_and_broken_zip_alias_rejected(self):
         self.zip.write_bytes(b'uninventoried import root')
