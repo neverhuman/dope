@@ -70,6 +70,8 @@ def prepare(root, expected, request):
     require(lock['official_tests_opened'] is False and lock['gpu_operations_enabled'] is False)
     require(lock['global_family_selected'] is False and lock['gate_profile_complete'] is False)
     require(all(lock[k] is None for k in ('mfs_v2', 'ptf_v1', 'release_safe', 'superiority')))
+    require(os.environ.get('CUDA_VISIBLE_DEVICES') == '')
+    require(os.environ.get('LD_LIBRARY_PATH') == lock['native_library_directory'])
     source = safe(root / 'source', base)
     require(not any(p.is_symlink() for p in source.rglob('*')))
     require({str(p) for p in source.rglob('*') if p.is_file()} == set(lock['source_files']))
@@ -82,13 +84,15 @@ def prepare(root, expected, request):
     request_blob = request.read_bytes()
     req = json.loads(request_blob)
     job = req['job']
-    require(req['round_sha256'] == expected and job in lock['jobs'])
+    frozen_jobs = {digest(row) for row in lock['jobs']}
+    require(len(frozen_jobs) == len(lock['jobs']))
+    require(req['round_sha256'] == expected and digest(job) in frozen_jobs)
     require(re.fullmatch('attempt-[0-9]{4}', request.parent.name) is not None)
     require(request.parent.parent.name == digest(job))
     require(request.parent.parent.parent == root / 'attempts')
     require(request.parent.stat().st_uid == os.getuid() and request.parent.stat().st_mode & 0o777 == 0o700)
     require(job['final'] is False and job['track'] == 'common-numeric')
-    require(job['split'] == 'official_training_derived_validation' and job['fit_seed'] == 11)
+    require(job['split'] == 'official_training_derived_validation' and type(job['fit_seed']) is int and job['fit_seed'] == 11)
     require(job['sample_seeds'] == [101, 211, 307] and job['size_multipliers'] == [1, 4])
     require(all(type(v) is int for v in (*job['sample_seeds'], *job['size_multipliers'])))
     require(job['original_generator_binary_sha256'] == lock['gpu_binary_sha256'])
@@ -132,8 +136,6 @@ def prepare(root, expected, request):
     require(shared['metric_sha256'] == lock['metric_source_sha256'])
     native = load('native_runtime', source / 'native_runtime.py')
     require(native.verify_runtime(lock)['torch_library_directory'] == lock['native_library_directory'])
-    require(os.environ.get('CUDA_VISIBLE_DEVICES') == '')
-    require(os.environ.get('LD_LIBRARY_PATH') == lock['native_library_directory'])
     return lock, job, worker, original, members, shared, native, hashlib.sha256(request_blob).hexdigest()
 
 
@@ -209,13 +211,16 @@ def run(root, expected, request):
     require(sha(safe(kernel, out)) == job['expected_original_model_sha256'])
     require(sha(safe(projection, out)) == job['expected_original_projection_sha256'])
     require(sha(safe(request, Path(root).parent)) == request_hash)
+    elapsed = time.monotonic() - start
+    if elapsed >= 600:
+        raise TimeoutError('compressed research batch deadline exhausted')
     once(out / 'batch.json', {'job_sha256': digest(job), 'round_sha256': expected,
         'request_sha256': request_hash, 'metric_source_sha256': lock['metric_source_sha256'],
         'samples': samples, 'artifact_bytes': members.artifact_bytes,
         'artifact_sha256': members.artifact_sha256, 'original_kernel_replays_exact': True,
         'new_generator_fits_started': 0, 'native_selection_changed': False, 'global_family_selected': False,
         'official_tests_opened': False, 'gate_profile_complete': False, 'mfs_v2': None, 'ptf_v1': None,
-        'elapsed_seconds': time.monotonic() - start})
+        'elapsed_seconds': elapsed})
 
 
 if __name__ == '__main__':
