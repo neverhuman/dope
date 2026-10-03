@@ -669,3 +669,8 @@ The [CTAB-GAN+ source availability audit](CTABGAN_PLUS_SOURCE_AUDIT.md) binds
 the pinned author snapshot and inspected source-rights gap. Its explicit
 unavailable receipt admits no execution or formal DP claim and contributes
 no DOPE win. Native tuning requires rights and runtime admission first.
+
+The [MST author-source audit](MST_SOURCE_AUDIT.md) pins licensed current-author
+MBI source, defaults and native marginal-error evidence. Runtime, reusable-model
+adaptation, artifact-only fit/sample and native selection bindings remain
+pending. MST stays `source_audit_pending`; no execution or formal DP is admitted.
