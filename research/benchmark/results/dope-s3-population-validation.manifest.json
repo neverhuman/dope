@@ -1,0 +1,87 @@
+{
+  "all_frozen_cells_accounted": true,
+  "artifacts": {
+    "dope-s3-population-validation.csv": {
+      "bytes": 89245,
+      "sha256": "147afc49842685a03d6baa390effa65f21c45d6e67bd1fbe4dd503ab92ddb979"
+    },
+    "dope-s3-population-validation.json": {
+      "bytes": 7352232,
+      "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
+    },
+    "dope-s3-population-validation.md": {
+      "bytes": 1526,
+      "sha256": "64efeb9c3bc457f4d4a6e87094ace702972b4e2a47822fdecf817e22abb9c248"
+    },
+    "dope-s3-population-validation.pdf": {
+      "bytes": 42231,
+      "sha256": "e2c17d4d43c40500d1e3b197f32d7d7fef67703f63eda5d124323e7d2a57cc64"
+    },
+    "dope-s3-population-validation.schema.json": {
+      "bytes": 162950,
+      "sha256": "ca1f28dff2000906d52d2bbf7a4a77a137dd0f05b7364e6fe5693fac29b4b0ab"
+    },
+    "dope-s3-population-validation.svg": {
+      "bytes": 139501,
+      "sha256": "9291964754fb5070554ac77b3d8609829c856bfae8315c72a56195fac941ab01"
+    }
+  },
+  "campaign_complete": false,
+  "counts_as_dope_win": false,
+  "datasets": 100,
+  "format": "dope-s3-population-validation-publication-manifest",
+  "global_family_selected": false,
+  "immutable_references": [
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-validation-v1/round.lock.json",
+      "sha256": "8d6fb1b5a5a028acf45673feadd40e8a1dc29f9e27bb52f0bf246a20a0f009ac"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-validation-v1/receipt-lock-v1.json",
+      "sha256": "ecd88832cb9c8c0018bb55de67ded9c3eba0936eba541e799ded0def34e173bc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-validation-v1/reconciliation-v1.json",
+      "sha256": "51e48fb3227588c0a8b1e49a64b94c1dd8b391063f94411aa33fc6bdac96004a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-validation-v1/completion.json",
+      "sha256": "3c3e45bfb9c8497c552b24f60d7ac5e3efbaa0095071e4f7ebb1756637603fcc"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-validation-v1/coordinator-exit.json",
+      "sha256": "79d9bb50ea5d35865baddf1da053724596dd776b1179ec2b6574b1d175c93400"
+    }
+  ],
+  "logical_sample_cells": 2400,
+  "logical_status_counts": {
+    "fit_unavailable": 96,
+    "ok": 2304
+  },
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "paired_superiority": null,
+  "physical_sample_batches": 232,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
+    "publish_dope_population_fits.py": "bdb00519b4aac17b4b8689475848c48a049adc3ec7ec96e14d45c5b2f6b17821",
+    "publish_dope_population_validation.py": "0e9df2f7a02fc9aa78a07f91cba8272c43c98483ebe0b7d46d16a968689adbc0",
+    "publish_dope_population_validation_figure.py": "c875e1c1451cbad244b05070d850585b5a3c4c3663a6299b3a144078fce8b259",
+    "publish_dope_population_validation_manifest.py": "b3d901c75b3e718d9e0ecdef34afa7c9cbe8f803a909dbd1534626a59d7b0d0e",
+    "publish_s3_forest.py": "52bcb15744f12d5e77744be6d197356f86c6509be847a61d8d6e287aee7921b5",
+    "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a",
+    "score.py": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+  },
+  "release_safe_l3": null,
+  "scope": "All100 training-derived S3 validation lineages, four unchanged GPU research profiles, one fit seed; bounded training cohorts, no test certification",
+  "source_locks": {
+    "fit_receipts": "b0471a8936042b907c4481fb2b84e2205bedd2fbec7538bfd26d1f8d07d94461",
+    "metric": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+    "round": "8d6fb1b5a5a028acf45673feadd40e8a1dc29f9e27bb52f0bf246a20a0f009ac",
+    "validation_receipts": "ecd88832cb9c8c0018bb55de67ded9c3eba0936eba541e799ded0def34e173bc",
+    "validation_reconciliation": "51e48fb3227588c0a8b1e49a64b94c1dd8b391063f94411aa33fc6bdac96004a"
+  },
+  "version": 1
+}
