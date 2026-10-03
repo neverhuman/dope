@@ -7,6 +7,9 @@ production scores are unchanged.
 `container_python_custody.py` checks the externally pinned interpreter/import
 inventories before a future worker startup. It starts no process and leaves full
 runtime closure and dispatch admission unverified.
+`container_bootstrap_invocation.py` prepares restricted startup arguments and
+environment with an unchanged outer-attempt budget. Its immutable proposal starts
+no process and proves no filesystem, ELF, transport or capacity admission.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
