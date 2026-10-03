@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_native_objective_scalar_grid_ties_frozen": {
+      "const": false
+    },
+    "bibliography_entry": {
+      "const": "alishahi2026tabkde"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "dependency_runtime_verified": {
+      "const": false
+    },
+    "execution_admitted": {
+      "const": false
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-benchmark-unavailable-method"
+    },
+    "future_admission_requirements": {
+      "const": [
+        "verify execution/redistribution rights and full original author contract/runtime OR explicitly label a licensed independent implementation and reproduce two reported experiments under frozen identities before comparison",
+        "freeze supported-task author defaults and native validation objective/direction/grid/ties before selection; no substitution of DOPE KPI",
+        "charge full generator/preprocessing/config/projection bytes, verify safe reload/seeds/finite rows/replay, and admit under all five locks and fresh aggregate xbabe1/2/3 capacity"
+      ]
+    },
+    "included_in_win_denominator": {
+      "const": false
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "TabKDE"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "new_fit_trials": {
+      "const": 0
+    },
+    "new_sample_cells": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paper_url": {
+      "const": "https://arxiv.org/abs/2605.17642"
+    },
+    "previous_inventory_snapshot_bytes_reverified_in_this_receipt": {
+      "const": false
+    },
+    "previous_inventory_source_snapshot_sha256": {
+      "const": "640afb2fd5a0c482b54a250742655023b0f1c11adb9c44f7c20ce6661daf7b2f"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "reason_codes": {
+      "const": [
+        "original_source_execution_redistribution_grant_unverified",
+        "licensed_independent_implementation_two_reported_experiments_not_reproduced"
+      ]
+    },
+    "release_safe": {
+      "const": null
+    },
+    "reproduction": {
+      "const": {
+        "independent_implementation_admitted": false,
+        "required_reported_experiments": 2,
+        "verified_reported_experiments": 0
+      }
+    },
+    "restricted_rows_notebooks_bytecode_weights_read": {
+      "const": false
+    },
+    "rights_evidence": {
+      "const": {
+        "all_third_party_and_runtime_rights_verified": false,
+        "github_repository_license_metadata": null,
+        "license_copying_copyright_notice_file_in_full_pinned_tree_found": false,
+        "paper_or_baseline_license_implies_original_method_source_license": false,
+        "pinned_tree_truncated": false,
+        "root_or_selected_method_wide_license_grant_verified": false,
+        "selected_scope": "root README/requirements/environment/main and all thirteen method Python source files; excludes cached bytecode/notebook checkpoints/data/baseline source"
+      }
+    },
+    "scope": {
+      "const": "pinned original-author implementation inspected for this campaign; no verified source-wide execution/redistribution license grant in the inspected scope; no global absence or permanent unavailability claim"
+    },
+    "source_file_count": {
+      "const": 17
+    },
+    "source_files": {
+      "const": {
+        "README.md": {
+          "bytes": 3826,
+          "git_blob": "83a23421786125be010e38461ce284c2def68f0a",
+          "mode": "100644",
+          "sha256": "cb3c048fec86ad5f5a068d5e7fd2a5cff53c07224375c7268a86af8a795314e0"
+        },
+        "main.py": {
+          "bytes": 395,
+          "git_blob": "609bf214a0f4b64aaaa05d22d169c2b3c5ac34fd",
+          "mode": "100644",
+          "sha256": "a38a76279ddbf7874cc5788604a516da9864cdde548e463bc66138ac24e2da30"
+        },
+        "requirements.txt": {
+          "bytes": 193,
+          "git_blob": "87810d8f98720a6943c3201a9fadcd8bb48caa80",
+          "mode": "100644",
+          "sha256": "c4e7c5bd0cc34c2a1a0e39482e9399c69e13ccd7703b05371f68dd56e5ef0e33"
+        },
+        "tabkde.yml": {
+          "bytes": 5125,
+          "git_blob": "94c0367e19524a823612ad81c904a7246833d0f3",
+          "mode": "100644",
+          "sha256": "e810c7ee0f188d4ec9cbd622080930d76880690d91e7339d94140450bdec6763"
+        },
+        "tabkde/copula_diff_encoding/main.py": {
+          "bytes": 3691,
+          "git_blob": "9aaedabb6aa17c028b1fc6678ae70db2bcbec198",
+          "mode": "100644",
+          "sha256": "e10188871b1e69581a1a72f1054021a6f583a2a311c3301813359ad6dc300dd4"
+        },
+        "tabkde/copula_diff_encoding/model.py": {
+          "bytes": 8715,
+          "git_blob": "6b2692bee90c7c848ecf62f32f049b85def5a529",
+          "mode": "100644",
+          "sha256": "9be14e8d9d32e9055b76edcf2459181d2b09cbac8dbb754d418c0d7ec33574ed"
+        },
+        "tabkde/copula_encoding/main.py": {
+          "bytes": 4772,
+          "git_blob": "5f0c11b45c383b40817b709c56f4db914da1fd8b",
+          "mode": "100644",
+          "sha256": "9d2cb5f76e3217c3f0e0b72e60264984c4d792cf13be890a84d4ec11c3583be5"
+        },
+        "tabkde/copula_encoding/model.py": {
+          "bytes": 8715,
+          "git_blob": "6b2692bee90c7c848ecf62f32f049b85def5a529",
+          "mode": "100644",
+          "sha256": "9be14e8d9d32e9055b76edcf2459181d2b09cbac8dbb754d418c0d7ec33574ed"
+        },
+        "tabkde/diffusion_utils.py": {
+          "bytes": 6597,
+          "git_blob": "825eb289a48ea68641d9cb11d3c426a1ef279c80",
+          "mode": "100644",
+          "sha256": "e4749a2d229e569d7bd8ed089b00008d2f4e0f6e25135b80ec4e17193d48e643"
+        },
+        "tabkde/latent_utils.py": {
+          "bytes": 6806,
+          "git_blob": "25ac3e0dee3d907676ccb5d9f5bf626bb6cd6e84",
+          "mode": "100644",
+          "sha256": "e3ff0fa3af4d34ca4942c255dc13c88304d9035b58be26beb6596f73e7e7e3bc"
+        },
+        "tabkde/main.py": {
+          "bytes": 3220,
+          "git_blob": "58a0a4009ceccd35828ac2ad16e07feb7f3d0757",
+          "mode": "100644",
+          "sha256": "7cd4559507c8ff81404a41706a861d93a63b56cf490ab4851d232689297d8e62"
+        },
+        "tabkde/model.py": {
+          "bytes": 5339,
+          "git_blob": "9e1bf8cc114abe5a62b4c15b63a7f7d42f66ee1c",
+          "mode": "100644",
+          "sha256": "eee875ccdd9cae2ad4ce0b761fc5f73bdfb2b990856751ce88e5326fe24ec49e"
+        },
+        "tabkde/sample.py": {
+          "bytes": 9869,
+          "git_blob": "29ad84004118042757020212c6172561b150df52",
+          "mode": "100644",
+          "sha256": "107d5baa1a85a37a0c6b8d7b6dbff6e1f8a8ad953895414e7d6faebaf1ad1644"
+        },
+        "tabkde/tools.py": {
+          "bytes": 35715,
+          "git_blob": "6b2328256936dc706439bedd9c33fecfbe8d92b2",
+          "mode": "100644",
+          "sha256": "db42540f61aabdcfb23180f99d09be84bba45a214fa82f8c30b9146559bd8c2d"
+        },
+        "tabkde/tools_1.py": {
+          "bytes": 52198,
+          "git_blob": "04d181ccd3dc73b6839f340806e7e92722ae89be",
+          "mode": "100644",
+          "sha256": "1f051a7eeba946b5d5abebca705cce5d165664e3c294f1bee18e71ce3d28ad63"
+        },
+        "tabkde/vae/main.py": {
+          "bytes": 9966,
+          "git_blob": "925ba653fadc183ff467996ac7e71aed6668f17e",
+          "mode": "100644",
+          "sha256": "10c93bdb20c71af240565956c5245188a4705838edd2c264a82df29d06d7831e"
+        },
+        "tabkde/vae/model.py": {
+          "bytes": 13261,
+          "git_blob": "fbcb527b3a0b6172ebe8a7ef1c311f6e85753392",
+          "mode": "100644",
+          "sha256": "78c64b7fc70986e2908b3340f867c473a9d54e0deab3ab8e7a9abfd57d43699f"
+        }
+      }
+    },
+    "source_or_runtime_executed": {
+      "const": false
+    },
+    "source_verification": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabkde-v1/rights-scope-verification-v1.json",
+        "sha256": "3adb780c5942ef1bf8d2dbd315efb0c29fc6e693844c1efc9ec03af00d970b1b"
+      }
+    },
+    "status": {
+      "const": "unavailable"
+    },
+    "superiority": {
+      "const": null
+    },
+    "tree_entries": {
+      "const": 368
+    },
+    "upstream_commit": {
+      "const": "9d9e6cce0f8ecd97d8a10c52755b8c14482e028d"
+    },
+    "upstream_tree": {
+      "const": "3f44a8875e6dcb5cc1cb4d63d0e826442a19ee8b"
+    },
+    "upstream_url": {
+      "const": "https://github.com/tabkde/tabkde-main"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "author_native_objective_scalar_grid_ties_frozen",
+    "bibliography_entry",
+    "counts_as_dope_win",
+    "dependency_runtime_verified",
+    "execution_admitted",
+    "fit_sample_contract_verified",
+    "formal_dp_claim",
+    "format",
+    "future_admission_requirements",
+    "included_in_win_denominator",
+    "matrix_admission",
+    "method",
+    "mfs_v2",
+    "new_fit_trials",
+    "new_sample_cells",
+    "official_tests_opened",
+    "paper_url",
+    "previous_inventory_snapshot_bytes_reverified_in_this_receipt",
+    "previous_inventory_source_snapshot_sha256",
+    "production_certified",
+    "ptf_v1",
+    "reason_codes",
+    "release_safe",
+    "reproduction",
+    "restricted_rows_notebooks_bytecode_weights_read",
+    "rights_evidence",
+    "scope",
+    "source_file_count",
+    "source_files",
+    "source_or_runtime_executed",
+    "source_verification",
+    "status",
+    "superiority",
+    "tree_entries",
+    "upstream_commit",
+    "upstream_tree",
+    "upstream_url",
+    "version"
+  ],
+  "title": "TabKDE scoped source-rights unavailability receipt",
+  "type": "object"
+}
