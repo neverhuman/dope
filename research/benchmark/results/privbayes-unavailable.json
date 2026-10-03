@@ -1,0 +1,130 @@
+{
+  "alternate_implementation": {
+    "commit": "b969f618015d6313d03e109ad58aae2f8b12124d",
+    "comparison_admitted": false,
+    "license": "MIT",
+    "license_git_blob_sha": "e8da6e778eb99ebc61d703fe9ff25d3bd922fd52",
+    "license_sha256": "71f27f6f1bc7976f4cb3cf4327ce90be10a9d0c714c0c9a9b21f6efa4c278b0b",
+    "original_privbayes_author_implementation": false,
+    "two_reported_experiments_reproduced": false,
+    "upstream_url": "https://github.com/DataResponsibly/DataSynthesizer"
+  },
+  "archive_bytes": 1132757,
+  "bibliography_entry": "zhang2017privbayes",
+  "counted_dope_wins": 0,
+  "counts_as_dope_win": false,
+  "dependency_runtime_verified": false,
+  "executed_fit_trials": 0,
+  "executed_sample_cells": 0,
+  "execution_admitted": false,
+  "fit_sample_contract_verified": false,
+  "formal_dp_claim": false,
+  "format": "dope-method-unavailable-receipt",
+  "future_admission_evidence_required": [
+    "explicit original-source license/rights grant bound to the pinned release, or a licensed separately labelled implementation with two reported-experiment reproductions",
+    "pinned full executable/dependency runtime and verified artifact-only fit/sample contract",
+    "frozen native objective, representation, fixed-epsilon selection and formal privacy-accounting disposition"
+  ],
+  "historical_rights_receipt": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/privbayes-author-v1/rights-receipt.json",
+    "sha256": "1444404aeea44a94ec46d0d7332a9a6af37061cd5185f5ebc0e0a64524409884"
+  },
+  "included_in_win_denominator": false,
+  "license": null,
+  "license_grant_found_in_inspected_material": false,
+  "matrix_admission": false,
+  "method": "PrivBayes",
+  "mfs_v2": null,
+  "native_objective": {
+    "author_experiment_epsilon_values": [
+      0.05,
+      0.1,
+      0.2,
+      0.4,
+      0.8,
+      1.6
+    ],
+    "direction": "minimize",
+    "epsilon_fixed_per_comparison_required": true,
+    "formula": "for each k separately: mean over all k-column combinations of 0.5 * L1(normalized reference counts - normalized synthetic counts)",
+    "generator_search_space": null,
+    "native_values_cross_method_ranking": false,
+    "reported_metrics": [
+      "mean_two_way_marginal_TVD",
+      "mean_three_way_marginal_TVD"
+    ],
+    "reports_metrics_separately": true,
+    "selection_scalar": null,
+    "shared_kpi_used_for_selection": false,
+    "source_references": {
+      "code/main_marginal.cpp": "c5510a188e2c57f38ba093fe2645c004083fc58290a210f23819bd9efd2c32a7",
+      "code/tools.h": "d275b75973783efe2d9726498977c5c79b3989bb515bd870d4a8e4c028443688"
+    },
+    "status": "source_identified_not_frozen_for_tuning",
+    "tie_breaks": null
+  },
+  "official_tests_opened": false,
+  "paired_superiority": null,
+  "primary_pages_inspected": [
+    {
+      "body_sha256": "fc27f96631d9009a65dbb64802075d233a26106f4e005190804b0b5ed7cdc37f",
+      "http_status": 200,
+      "url": "https://sourceforge.net/projects/privbayes/"
+    },
+    {
+      "body_sha256": "765e8bec6a5ba781d9824c7dd1e9c2e77187c97b4627320868169dc171d58cba",
+      "http_status": 200,
+      "url": "https://sourceforge.net/projects/privbayes/files/"
+    },
+    {
+      "body_sha256": "10ff11cf6d8ca601435c5c1fbe483f2fb469c562c8e90bec81ce67f6f9478f74",
+      "http_status": 200,
+      "url": "https://privbayes.sourceforge.io/"
+    }
+  ],
+  "production_certified": false,
+  "project_website_resolved_url": "https://sourceforge.net/projects/privbayes/",
+  "ptf_v1": null,
+  "reason": "No code license grant was found in the pinned original release archive, its 13 source files, or the inspected author project pages. A licensed alternate is not admitted without the required two reported-experiment reproductions.",
+  "reason_code": "original_author_license_grant_unverified",
+  "release_date": "2017-02-18",
+  "release_name": "privbayes-new.zip",
+  "release_safe_l3": null,
+  "release_url": "https://downloads.sourceforge.net/project/privbayes/privbayes-new.zip",
+  "rights_followup": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/privbayes-author-v1/rights-followup-v1/followup.json",
+    "sha256": "79797c8b23f376dcab71ccf385e596620281aa76ad7d43f13efb7daf64a0da46"
+  },
+  "source_archive_sha256": "e8bbd028607f4a393015bb8068648c98786bf880589979a86cb6d2ca1799651e",
+  "source_file_count": 13,
+  "source_file_sha256": {
+    "code/main_marginal.cpp": "c5510a188e2c57f38ba093fe2645c004083fc58290a210f23819bd9efd2c32a7",
+    "code/main_svm.cpp": "6dfed38b2f15b92cdbd604ec856320c9a907c6ba3e79d37f3a24d7aa7f6f48e4",
+    "code/methods.cpp": "3a3c8ea242c0e23e4248fe9484f7712bd2651388e53e0774f83ccc96049b4ed4",
+    "code/methods.h": "37fb886fc719163dea026f25bb6234fe37775ebbd7560357d9a6c3f09ed38721",
+    "code/noise.cpp": "9e22ae0152a549b3140a3c94d4e61849ecf0b67510eda1e8291bf461cd2c1784",
+    "code/noise.h": "0847b731b87ac8f2d1a8085a923d72c45f67a844d015de996c74b10737f2702a",
+    "code/printer.cpp": "dd10e2b49be3e88ade596d3d2436957748c4297451a0638bd59c214f92f64875",
+    "code/printer.h": "dcf9f896967d0a8703cef5fadb3d21478149888ae7ef9d09520b5ba6a6e38652",
+    "code/table.cpp": "6e7b1747e868d34ca655ebee97e25a09544f27f64e9095ba3a4499176c8bb48d",
+    "code/table.h": "469311f08d79c24fa447893304ce191ecc163c92c8ca58c6fecce6b61bb3f117",
+    "code/tools.h": "d275b75973783efe2d9726498977c5c79b3989bb515bd870d4a8e4c028443688",
+    "code/translator.cpp": "22b16168b4ae631d4037dd9443e7a1e6f8357c827e6bff0cb7674fb5b650d400",
+    "code/translator.h": "e08465077906da7392f80ef0726a0e73ae234a88580f23d6c079778de99b3b4f"
+  },
+  "source_inventory": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/privbayes-author-v1/preaudit.json",
+    "sha256": "e8c13cc0085c6892368a107c21ae2857898192c3bc93181e8092a1ff2ac5400b"
+  },
+  "source_scope": "13 author C++ source/header files only; eight embedded dataset members were not opened",
+  "source_verification": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/privbayes-author-v1/source-rights-verification-v2.json",
+    "sha256": "7715b532e0cff6d6be5a01f79a3abdb4c4697e63fbb78e647676da8a8c476462"
+  },
+  "source_version_kind": "original_author_release_archive",
+  "status": "unavailable",
+  "unavailable_cells_count_as_dope_wins": false,
+  "upstream_commit": null,
+  "upstream_url": "https://sourceforge.net/projects/privbayes/files/",
+  "version": 1
+}

@@ -677,16 +677,27 @@
       "upstream_url": "https://github.com/spalabucr/pategan-audit"
     },
     "PrivBayes": {
+      "counts_as_dope_win": false,
       "default_config": null,
       "dependency_or_container_digest": null,
       "fit_command": null,
       "group": "compact",
       "license": null,
+      "note": "Pinned original 2017 author release contains no license/notice grant in its archive or 13 inspected C++ sources; inspected project pages also list none. Source rights remain unverified. MIT DataSynthesizer alternate is separately authored and lacks the required two reported-experiment reproductions. Unavailable for this study, excluded from DOPE wins; no author-code execution or formal DP claim. See PRIVBAYES_SOURCE_AUDIT.md.",
+      "release_date": "2017-02-18",
+      "release_name": "privbayes-new.zip",
+      "release_url": "https://downloads.sourceforge.net/project/privbayes/privbayes-new.zip",
       "sampling_command": null,
-      "status": "source_audit_pending",
+      "source_snapshot_sha256": "e8bbd028607f4a393015bb8068648c98786bf880589979a86cb6d2ca1799651e",
+      "source_version_kind": "original_author_release_archive",
+      "status": "unavailable",
       "tuning_search_space": null,
+      "unavailable_receipt": {
+        "path": "research/benchmark/results/privbayes-unavailable.json",
+        "sha256": "aa404d5f8bdd6b2292e78310b26bd05c0a274cf7e25d9dcad2918ef268077c1e"
+      },
       "upstream_commit": null,
-      "upstream_url": null
+      "upstream_url": "https://sourceforge.net/projects/privbayes/files/"
     },
     "REaLTabFormer": {
       "default_config": null,

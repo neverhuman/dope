@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "alternate_implementation": {
+      "const": {
+        "commit": "b969f618015d6313d03e109ad58aae2f8b12124d",
+        "comparison_admitted": false,
+        "license": "MIT",
+        "license_git_blob_sha": "e8da6e778eb99ebc61d703fe9ff25d3bd922fd52",
+        "license_sha256": "71f27f6f1bc7976f4cb3cf4327ce90be10a9d0c714c0c9a9b21f6efa4c278b0b",
+        "original_privbayes_author_implementation": false,
+        "two_reported_experiments_reproduced": false,
+        "upstream_url": "https://github.com/DataResponsibly/DataSynthesizer"
+      }
+    },
+    "archive_bytes": {
+      "const": 1132757
+    },
+    "bibliography_entry": {
+      "const": "zhang2017privbayes"
+    },
+    "counted_dope_wins": {
+      "const": 0
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "dependency_runtime_verified": {
+      "const": false
+    },
+    "executed_fit_trials": {
+      "const": 0
+    },
+    "executed_sample_cells": {
+      "const": 0
+    },
+    "execution_admitted": {
+      "const": false
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-method-unavailable-receipt"
+    },
+    "future_admission_evidence_required": {
+      "const": [
+        "explicit original-source license/rights grant bound to the pinned release, or a licensed separately labelled implementation with two reported-experiment reproductions",
+        "pinned full executable/dependency runtime and verified artifact-only fit/sample contract",
+        "frozen native objective, representation, fixed-epsilon selection and formal privacy-accounting disposition"
+      ]
+    },
+    "historical_rights_receipt": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "included_in_win_denominator": {
+      "const": false
+    },
+    "license": {
+      "const": null
+    },
+    "license_grant_found_in_inspected_material": {
+      "const": false
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "PrivBayes"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_objective": {
+      "const": {
+        "author_experiment_epsilon_values": [
+          0.05,
+          0.1,
+          0.2,
+          0.4,
+          0.8,
+          1.6
+        ],
+        "direction": "minimize",
+        "epsilon_fixed_per_comparison_required": true,
+        "formula": "for each k separately: mean over all k-column combinations of 0.5 * L1(normalized reference counts - normalized synthetic counts)",
+        "generator_search_space": null,
+        "native_values_cross_method_ranking": false,
+        "reported_metrics": [
+          "mean_two_way_marginal_TVD",
+          "mean_three_way_marginal_TVD"
+        ],
+        "reports_metrics_separately": true,
+        "selection_scalar": null,
+        "shared_kpi_used_for_selection": false,
+        "source_references": {
+          "code/main_marginal.cpp": "c5510a188e2c57f38ba093fe2645c004083fc58290a210f23819bd9efd2c32a7",
+          "code/tools.h": "d275b75973783efe2d9726498977c5c79b3989bb515bd870d4a8e4c028443688"
+        },
+        "status": "source_identified_not_frozen_for_tuning",
+        "tie_breaks": null
+      }
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "const": null
+    },
+    "primary_pages_inspected": {
+      "const": [
+        {
+          "body_sha256": "fc27f96631d9009a65dbb64802075d233a26106f4e005190804b0b5ed7cdc37f",
+          "http_status": 200,
+          "url": "https://sourceforge.net/projects/privbayes/"
+        },
+        {
+          "body_sha256": "765e8bec6a5ba781d9824c7dd1e9c2e77187c97b4627320868169dc171d58cba",
+          "http_status": 200,
+          "url": "https://sourceforge.net/projects/privbayes/files/"
+        },
+        {
+          "body_sha256": "10ff11cf6d8ca601435c5c1fbe483f2fb469c562c8e90bec81ce67f6f9478f74",
+          "http_status": 200,
+          "url": "https://privbayes.sourceforge.io/"
+        }
+      ]
+    },
+    "production_certified": {
+      "const": false
+    },
+    "project_website_resolved_url": {
+      "const": "https://sourceforge.net/projects/privbayes/"
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "reason": {
+      "const": "No code license grant was found in the pinned original release archive, its 13 source files, or the inspected author project pages. A licensed alternate is not admitted without the required two reported-experiment reproductions."
+    },
+    "reason_code": {
+      "const": "original_author_license_grant_unverified"
+    },
+    "release_date": {
+      "const": "2017-02-18"
+    },
+    "release_name": {
+      "const": "privbayes-new.zip"
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "release_url": {
+      "const": "https://downloads.sourceforge.net/project/privbayes/privbayes-new.zip"
+    },
+    "rights_followup": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "source_archive_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_file_count": {
+      "const": 13
+    },
+    "source_file_sha256": {
+      "additionalProperties": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "maxProperties": 13,
+      "minProperties": 13,
+      "type": "object"
+    },
+    "source_inventory": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "source_scope": {
+      "const": "13 author C++ source/header files only; eight embedded dataset members were not opened"
+    },
+    "source_verification": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "source_version_kind": {
+      "const": "original_author_release_archive"
+    },
+    "status": {
+      "const": "unavailable"
+    },
+    "unavailable_cells_count_as_dope_wins": {
+      "const": false
+    },
+    "upstream_commit": {
+      "const": null
+    },
+    "upstream_url": {
+      "const": "https://sourceforge.net/projects/privbayes/files/"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "alternate_implementation",
+    "archive_bytes",
+    "bibliography_entry",
+    "counted_dope_wins",
+    "counts_as_dope_win",
+    "dependency_runtime_verified",
+    "executed_fit_trials",
+    "executed_sample_cells",
+    "execution_admitted",
+    "fit_sample_contract_verified",
+    "formal_dp_claim",
+    "format",
+    "future_admission_evidence_required",
+    "historical_rights_receipt",
+    "included_in_win_denominator",
+    "license",
+    "license_grant_found_in_inspected_material",
+    "matrix_admission",
+    "method",
+    "mfs_v2",
+    "native_objective",
+    "official_tests_opened",
+    "paired_superiority",
+    "primary_pages_inspected",
+    "production_certified",
+    "project_website_resolved_url",
+    "ptf_v1",
+    "reason",
+    "reason_code",
+    "release_date",
+    "release_name",
+    "release_safe_l3",
+    "release_url",
+    "rights_followup",
+    "source_archive_sha256",
+    "source_file_count",
+    "source_file_sha256",
+    "source_inventory",
+    "source_scope",
+    "source_verification",
+    "source_version_kind",
+    "status",
+    "unavailable_cells_count_as_dope_wins",
+    "upstream_commit",
+    "upstream_url",
+    "version"
+  ],
+  "title": "PrivBayes current-study source rights unavailable receipt; no benchmark win",
+  "type": "object"
+}
