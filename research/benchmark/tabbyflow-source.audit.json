@@ -1,0 +1,332 @@
+{
+  "author_default_facts": {
+    "author_reports_hyperparameter_launch_scripts_removed": true,
+    "campaign_default_contract_frozen": false,
+    "checkpoint_selection": "lowest rounded fresh training-loss sum after curr_epoch > 4000; separate regular/EMA checkpoint",
+    "compute_loss_split": "train_iter; fresh stochastic mixed_loss; each component rounded to four decimals",
+    "default_test_checkpoint": "first best_ema_model glob result",
+    "fixed_global_seed_when_deterministic_flag_set": 0,
+    "package": {
+      "dependencies": [
+        "torch>=2.0",
+        "torchdiffeq>=0.2.3",
+        "numpy>=1.24",
+        "pandas>=2.0",
+        "scipy>=1.10",
+        "scikit-learn>=1.2",
+        "category-encoders>=2.6",
+        "sdmetrics>=0.14",
+        "xgboost>=2.0",
+        "prdc>=0.2",
+        "plotly>=5.15",
+        "kaleido",
+        "Pillow>=10.0",
+        "openpyxl",
+        "wandb>=0.15",
+        "tqdm>=4.65",
+        "tomli>=2.0",
+        "tomli-w>=1.0",
+        "icecream>=2.1"
+      ],
+      "description": "Exponential Flow Velocity Field Model for tabular data generation",
+      "name": "ef-vfm",
+      "requires-python": ">=3.10",
+      "version": "0.1.0"
+    },
+    "paper_inference_wording": "as few as 25 steps; released sampler uses adaptive dopri5 rather than a fixed 25-step grid",
+    "paper_training_wording": "8000 iterations; executable source uses outer epochs",
+    "primary_cli_deterministic_flag_default": false,
+    "primary_cli_gpu": 0,
+    "released_configuration": {
+      "data": {
+        "dequant_dist": "none",
+        "int_dequant_factor": 0
+      },
+      "sample": {
+        "batch_size": 10000
+      },
+      "train": {
+        "main": {
+          "batch_size": 4096,
+          "c_lambda": 1.0,
+          "check_val_every": 2000,
+          "closs_weight_schedule": "anneal",
+          "d_lambda": 1.0,
+          "ema_decay": 0.997,
+          "factor": 0.9,
+          "lr": 0.001,
+          "lr_scheduler": "reduce_lr_on_plateau",
+          "max_grad_norm": 1.0,
+          "reduce_lr_patience": 50,
+          "steps": 8000,
+          "warmup_epochs": 100,
+          "weight_decay": 0
+        }
+      },
+      "unimodmlp_params": {
+        "activation": "gelu",
+        "bias": true,
+        "d_token": 4,
+        "dim_t": 1024,
+        "factor": 32,
+        "n_head": 1,
+        "num_layers": 2,
+        "use_mlp": true
+      }
+    },
+    "released_sampler": {
+      "atol": 1e-05,
+      "rtol": 1e-05,
+      "solver": "dopri5",
+      "time_interval": [
+        0.0,
+        0.999
+      ]
+    },
+    "training_steps_argument_semantics": "8000 outer epochs, each iterating all training batches; not 8000 optimizer updates"
+  },
+  "author_source_executed": false,
+  "bibliography_entry": "guzmancordero2025exponential",
+  "component_source_licenses": {
+    "eval/mle/tabular_dataload.py": {
+      "license": "Apache-2.0",
+      "notice": "Copyright 2020 The Google Research Authors; retained Apache-2.0 notice",
+      "source_sha256": "092d55ad5df6452f2c251876f836d24a3cace9e781edf9ee3d3e71039e80e52b"
+    }
+  },
+  "counts_as_dope_win": false,
+  "dependency_runtime_verified": false,
+  "execution_admitted": false,
+  "execution_gaps": [
+    "pin full interpreter/import-root/bytecode/library and third-party rights/runtime closure; disable external tracking and ambient data access before dependency initialization",
+    "bind grouped training-derived fit/validation and remove or redirect all original test-split dataset construction/evaluation; official tests remain evaluator-only",
+    "resolve native regression validation-target transform consistency and target-domain applicability with an explicit version/label before metric execution or tuning; no silent repair or substitution of DOPE KPI",
+    "freeze author-native validation objective implementation, generator search grid/ties and any required reported-experiment reproduction for independent replacement; removed launch scripts are not an available search grid",
+    "bind author defaults including executable epoch semantics, checkpoint regular/EMA and adaptive sampler; charge all failed/timed-out trials under external whole-phase600s and per-cell eight trials/twelve hours",
+    "verify safe row-free inference codec including model/configuration/inverse transforms/projection and complete bytes, requested finite rows, five fit/three sample seeds and replay",
+    "fresh aggregate study-owner CPU/RAM/scratch/GPU admission only on xbabe1/2/3; never bypass active predecessor/reservation locks or foreign owners"
+  ],
+  "fit_sample_contract": {
+    "artifact_only_reload_verified": false,
+    "best_checkpoint_contains_vector_field_state_dict_only": true,
+    "common_numeric_representation_frozen": false,
+    "explicit_sample_seed_argument": false,
+    "finite_requested_rows_and_replay_verified": false,
+    "fit_calls_density_generation_evaluation_every_2000_outer_epochs": true,
+    "fit_constructs_train_and_test_split_datasets": true,
+    "fit_density_reads_training_real_table": true,
+    "full_inference_bytes_charged": false,
+    "inference_also_requires_config_and_dataset_inverse_transforms_and_info": true,
+    "official_test_paths_removed_or_mapped_to_training_derived_validation_verified": false,
+    "primary_fit_entry": "main.py --mode train -> ef_vfm.main.main -> Trainer.run_loop",
+    "primary_sample_entry": "main.py --mode test -> Trainer.test/report_test -> sample_synthetic",
+    "raw_training_rows_removed_from_inference_artifact_verified": false,
+    "safe_numeric_codec_verified": false,
+    "source_config_serialization": "pickle; not a safe campaign codec",
+    "verified": false,
+    "wrapper_must_bind_all_fit_and_sample_seeds": true
+  },
+  "fit_sample_contract_verified": false,
+  "formal_dp_claim": false,
+  "format": "dope-author-source-admission-audit",
+  "full_third_party_rights_closure_verified": false,
+  "independent_implementation": false,
+  "license": "MIT AND Apache-2.0",
+  "license_evidence": "https://github.com/andresguzco/ef-vfm/blob/11fa189f0fd2b11070831b45830b5a6952a2e323/LICENCE",
+  "license_sha256": "99f990072d42602c8437f78c1e419fb9810fee97eb420e7ca0a6ad544c4c52e8",
+  "matrix_admission": false,
+  "method": "TabbyFlow",
+  "mfs_v2": null,
+  "native_objective": {
+    "author_hyperparameter_launch_scripts_available": false,
+    "classification_outcome": "XGBClassifier AUROC maximize",
+    "direction": "minimize",
+    "evaluator_source_sha256": "d22b478ec4ca41edbc8dca27222142f7301a0a4b96679f85d2f8fa8a36ff297d",
+    "generator_search_space": null,
+    "implementation_source": "ef_vfm/metrics.py::TabMetrics.evaluate_mle; eval/mle/mle.py::_evaluate_regression",
+    "metric_source_sha256": "06bb3be588cdc7f18bdb9c535c52bd69045b020f1cb8a7ae076d94e589917f0f",
+    "name": "author_xgboost_regression_rmse",
+    "native_scalar_source_expression": "overall_scores['best_rmse_scores']['XGBRegressor']['RMSE'] if task_type == 'regression' else overall_scores['best_auroc_scores']['XGBClassifier']['roc_auc']",
+    "native_validation_target_transform_consistency_verified": false,
+    "native_values_cross_method_ranking": false,
+    "official_test_selection_allowed": false,
+    "shared_kpi_used_for_selection": false,
+    "status": "source_identified_not_frozen_for_tuning",
+    "target_transform_observation": "released regression evaluator log(clips) y_trains and y_test to [1,20000]; y_valid is not transformed before auditor parameter selection",
+    "tie_breaks": null
+  },
+  "new_fit_trials": 0,
+  "new_sample_cells": 0,
+  "official_tests_opened": false,
+  "paper": {
+    "bibliography_entry": "guzmancordero2025exponential",
+    "bytes": 424372,
+    "landing_url": "https://proceedings.mlr.press/v267/guzman-cordero25a.html",
+    "sha256": "f33a25ddb99d8241f1459af117fe71477c32031f508bfb1b8152e95e4ca278a3",
+    "url": "https://raw.githubusercontent.com/mlresearch/v267/main/assets/guzman-cordero25a/guzman-cordero25a.pdf"
+  },
+  "production_certified": false,
+  "ptf_v1": null,
+  "release_safe": null,
+  "root_source_license": "MIT",
+  "source_file_count": 24,
+  "source_files": {
+    "LICENCE": {
+      "bytes": 1071,
+      "git_blob": "421b2ef006d92669068729de1866b3dde6b3fd45",
+      "sha256": "99f990072d42602c8437f78c1e419fb9810fee97eb420e7ca0a6ad544c4c52e8",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/LICENCE"
+    },
+    "README.md": {
+      "bytes": 6376,
+      "git_blob": "ffe4e59cce3dd04f5d51853fb14ac71daa561843",
+      "sha256": "b4a7bb04890b2aeedb79bbeef333fe188831afba7079219617df4b7d536c9c12",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/README.md"
+    },
+    "download_dataset.py": {
+      "bytes": 2088,
+      "git_blob": "427dbbdc686039d81b03aa05d721d06c5b0dcd47",
+      "sha256": "e1e0a8f6e957d50f6f695505d2f70ddb2b6de6d29ea9fe7b5443d75a90583e17",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/download_dataset.py"
+    },
+    "ef_vfm/configs/ef_vfm_configs.toml": {
+      "bytes": 674,
+      "git_blob": "776e13b18bc6ba48c4bfca78fe10aaf3d84240a9",
+      "sha256": "677698232b3ea325b54527cccdc11c49fadb971129a77065e71d64aa7567ddb6",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/ef_vfm/configs/ef_vfm_configs.toml"
+    },
+    "ef_vfm/main.py": {
+      "bytes": 8114,
+      "git_blob": "377b534cbf380d2d65998e2dca77df89aadea20b",
+      "sha256": "ef8d4ca33c2449a45dba63ac78e9db171766c988d2b33a2c7193e11248e50adb",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/ef_vfm/main.py"
+    },
+    "ef_vfm/metrics.py": {
+      "bytes": 11367,
+      "git_blob": "4f104427533ac37610c92216b135fdeba3d181be",
+      "sha256": "06bb3be588cdc7f18bdb9c535c52bd69045b020f1cb8a7ae076d94e589917f0f",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/ef_vfm/metrics.py"
+    },
+    "ef_vfm/models/flow_model.py": {
+      "bytes": 7147,
+      "git_blob": "536d0cd1311210bac6bbc91dcc31d0612ca053b6",
+      "sha256": "c8cc21c332496413a1cc07e092366fdf564f50fbcd47dd99707791343d806aee",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/ef_vfm/models/flow_model.py"
+    },
+    "ef_vfm/modules/main_modules.py": {
+      "bytes": 3742,
+      "git_blob": "46dceb368af3302e55d5e448a2ffede4db122977",
+      "sha256": "ef050410b58f35880994532211e8ee726e8f46cce386e3ef412de8bf524657ae",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/ef_vfm/modules/main_modules.py"
+    },
+    "ef_vfm/modules/transformer.py": {
+      "bytes": 9475,
+      "git_blob": "98334864ad8befdc6e23fe5f64d5e50bf5907cee",
+      "sha256": "cfa666cf818dcb4b8c59810e1b41ecefbb14dd9acdb16d345e7d59bb6e183edc",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/ef_vfm/modules/transformer.py"
+    },
+    "ef_vfm/trainer.py": {
+      "bytes": 21672,
+      "git_blob": "4c52b64e919c85135df6630b2838ec8ea402baac",
+      "sha256": "fe14ad617d6433d9ef3a35959d9662447c91d349da379a8e047c86f4e40c235c",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/ef_vfm/trainer.py"
+    },
+    "eval/eval_quality.py": {
+      "bytes": 5089,
+      "git_blob": "c7f4f9409e5a207087ab59104d2f970a17341ba5",
+      "sha256": "3b9f7b0f57240cfe861935e9168e52f02ffb80ec228b48d09d10469bd9626430",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/eval/eval_quality.py"
+    },
+    "eval/mle/mle.py": {
+      "bytes": 27651,
+      "git_blob": "0cfb8766d1bf207b3abe48a1142f7ef436a6eae8",
+      "sha256": "d22b478ec4ca41edbc8dca27222142f7301a0a4b96679f85d2f8fa8a36ff297d",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/eval/mle/mle.py"
+    },
+    "eval/mle/tabular_dataload.py": {
+      "bytes": 3286,
+      "git_blob": "d5561f456cdc32ca553f00c01f1c4b868aef37cb",
+      "sha256": "092d55ad5df6452f2c251876f836d24a3cace9e781edf9ee3d3e71039e80e52b",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/eval/mle/tabular_dataload.py"
+    },
+    "eval/mle/tabular_transformer.py": {
+      "bytes": 3358,
+      "git_blob": "571e86a298d4b973484c7fd488819e86b5f14d30",
+      "sha256": "756d04737c8a09147135492faf3676181b9597659a25da16034534447f6169b2",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/eval/mle/tabular_transformer.py"
+    },
+    "eval/visualize_density.py": {
+      "bytes": 2785,
+      "git_blob": "d7ee36fac552e916bbb238796e2fb2af1ebe5d50",
+      "sha256": "e5564eae40da4c2960d5ff15ab5869c4a909500dc2811b111b4d7b5033db470e",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/eval/visualize_density.py"
+    },
+    "main.py": {
+      "bytes": 1885,
+      "git_blob": "30864194b14d60566efcbb2c997e95bc3351f49b",
+      "sha256": "a3600780b7f9cbc81d62d82b247ca92b2e090658c3eb24c88d85253a1f29fa07",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/main.py"
+    },
+    "process_dataset.py": {
+      "bytes": 16500,
+      "git_blob": "38004d944f5ebe15a1147df0bc9e0e1abdef3ed5",
+      "sha256": "896c8dbc59b51bc4165b985cdcb665be5e6856ba0171e42a31eeb11bc7fdaadb",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/process_dataset.py"
+    },
+    "pyproject.toml": {
+      "bytes": 1029,
+      "git_blob": "140792dca7f76208097acbf52bf60e3a56afcee2",
+      "sha256": "bc2d5c09fdbd3457c0f7cdd1a92c8e44ea3b2ff1316a2b718865fb7e8059da36",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/pyproject.toml"
+    },
+    "src/__init__.py": {
+      "bytes": 218,
+      "git_blob": "07d7a4057f36847f7accf4ca148d590d8b4fc80f",
+      "sha256": "9eb081650d6c073f1d7dfe6f8dd87d2748fd3f272dcea3d70d5f252b3adb9031",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/src/__init__.py"
+    },
+    "src/data.py": {
+      "bytes": 27777,
+      "git_blob": "c6906ba122d1ff276b7f475b7f6e7c3440580654",
+      "sha256": "4a0ac7eda23e3968df209b4e21700912a8642eb7db7952a6a4d21b606b8afaa7",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/src/data.py"
+    },
+    "src/env.py": {
+      "bytes": 1021,
+      "git_blob": "0b9dd619f31450414a9b31585aa58b9121834fbe",
+      "sha256": "a3a9452d30393fd374b732807d3206b13be087a3f18addda093a73e16400ddfc",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/src/env.py"
+    },
+    "src/metrics.py": {
+      "bytes": 5407,
+      "git_blob": "188a9be3f8e9d59b07688aa189a876660dbef7cd",
+      "sha256": "fb9a08b226a8d0c28d1d62b6d636dc0d129f5f94ffd96f4da9da22fd89c6b004",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/src/metrics.py"
+    },
+    "src/util.py": {
+      "bytes": 10140,
+      "git_blob": "e105c961803b3bf0f8282e673eed8e84eaaa3891",
+      "sha256": "0420fd21738f970688b3f4aa0a6fdb855390cd7d90618c6da2059716a342ab92",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/src/util.py"
+    },
+    "utils_train.py": {
+      "bytes": 6049,
+      "git_blob": "f00c40d190a763f011526ef4aa11e5e960ce2b7b",
+      "sha256": "9643a04f9c4efd88e9b9b54bcd12e44f9562c6bb65cfe068be13ebc284dadb3d",
+      "url": "https://raw.githubusercontent.com/andresguzco/ef-vfm/11fa189f0fd2b11070831b45830b5a6952a2e323/utils_train.py"
+    }
+  },
+  "source_scope": "selected license/readme/configuration/package and Python source files; no dataset metadata/rows, tests, notebooks, figures, bytecode or weights opened",
+  "source_verification": {
+    "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabbyflow-v1/source-verification-v2.json",
+    "sha256": "afc41a0795cb087a718e2a0e08480878fea3e9a03812b761c466812590550e85"
+  },
+  "source_version_kind": "original_author_git_implementation_with_released_configuration",
+  "status": "source_audit_pending",
+  "superiority": null,
+  "two_reported_experiments_reproduced": false,
+  "upstream_commit": "11fa189f0fd2b11070831b45830b5a6952a2e323",
+  "upstream_tree": "387e0b6b11cb47cdbb0570ff13e55219b8dd9480",
+  "upstream_url": "https://github.com/andresguzco/ef-vfm",
+  "version": 1
+}

@@ -57,6 +57,8 @@
     "research/benchmark/mst-source.audit": "external-evidence",
     "research/benchmark/DPCTGAN_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/dpctgan-source.audit": "external-evidence",
+    "research/benchmark/TABBYFLOW_SOURCE_AUDIT.md": "external-evidence",
+    "research/benchmark/tabbyflow-source.audit": "external-evidence",
     "research/benchmark/tabcascade-source.audit": "external-evidence",
     "research/benchmark/TABCASCADE_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/GREAT_SOURCE_AUDIT.md": "external-evidence",
