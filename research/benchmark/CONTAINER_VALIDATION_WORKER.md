@@ -62,3 +62,22 @@ coverage and full fit/sample replication still need measured evidence. This
 worker is a research wrapper, not a product wire format or release certificate.
 Official tests stay sealed; MFS-v2/PTF-v1/release/superiority remain null. The
 hermetic tests use opaque bytes and fake initializers/samplers only.
+
+`container_python_custody.verify_import_inputs` supplies a separate check for an
+already trusted coordinator before it starts the worker interpreter. External
+manifest digests bind the interpreter, its declared `/usr/bin/python3` alias,
+absent ZIP import root, both package trees, standard library including bytecode
+and extension files, exact declared file aliases, empty cache and metric source.
+Added directory aliases and altered files fail with a fixed error. The function
+starts no process and imports no candidate dependency. It checks declared import
+inputs only: system ELF/library closure, bootstrap source and controller custody,
+restricted startup environment, capacity and deadline enforcement still require
+separate evidence. Its successful receipt explicitly leaves full runtime closure
+and execution admission false, and all gated scores null. Existing frozen runtime
+manifests and live rounds remain unchanged. Stage any future bootstrap outside
+the worker's exact six-file source directory.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_python_custody.py -v
+```
