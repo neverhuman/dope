@@ -16,6 +16,10 @@ leaves executable closure and admission unverified.
 `container_system_custody.py` binds the declared ELF inventory to frozen runtime
 manifests, verifies exact members and aliases, and replays owned-byte declarations.
 It proves selected file custody, with loader resolution and dispatch still unadmitted.
+`container_loader_custody.py` rechecks an externally pinned proposal of candidate
+provider files, alias chains, cache/configuration files, directory entries and
+absence records. These snapshots leave actual provider selection, complete loader
+search, runtime closure and execution admission unverified.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen

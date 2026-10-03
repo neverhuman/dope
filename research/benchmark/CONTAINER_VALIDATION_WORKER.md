@@ -170,3 +170,41 @@ live rounds, native objectives and artifact/compute caps are unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_system_custody.py -v
 ```
+
+## Selected loader input snapshots
+
+`container_loader_custody.verify_loader_inputs` hashes the externally selected
+private manifest before parsing it, then verifies its frozen parent manifests
+and cache-print transcripts. It rechecks each selected regular file's bytes,
+mode, owner and component-by-component alias chain. Candidate provider ELF
+declarations are replayed through the pinned inspector without loading them.
+Directory snapshots cover entry names, types and literal alias targets; they do
+not hash the contents of every child. Frozen absence records retain the first
+missing component and any aliases encountered before it. Added or changed
+entries, retargeted aliases and changes to selected files reject. File hashes,
+snapshots, manifests, transcripts and inspector identity are rechecked before
+success. Errors contain no input paths, names or values.
+
+Call this from an already trusted coordinator after the separate Python and
+declared ELF file checks. All guard source and the coordinator's own import and
+interpreter closure must be trusted before importing these modules. The private
+proposal enumerates candidate files using package basenames, cache metadata and
+direct absolute dependency names. A cache listing records candidates, not the
+provider that the loader will choose. This checker verifies the selected
+snapshots; it does not establish that the proposed set includes every input.
+Actual RPATH/RUNPATH, cache/default-directory and hardware precedence, preload,
+audit/filter and runtime `dlopen` behavior remain unresolved. See
+[ldconfig(8)](https://man7.org/linux/man-pages/man8/ldconfig.8.html) and
+[ld.so(8)](https://man7.org/linux/man-pages/man8/ld.so.8.html).
+
+Success is a point-in-time custody check, not an atomic execution lease or a
+complete loader-resolution proof. No process, library, fit or sample is started.
+Cross-host identity, bootstrap/transport/deadline/capacity proof, clean SDV
+closure and density priority remain required before any dispatch. Actual loader
+selection, full runtime closure and execution admission stay false; all gated
+scores stay null. Existing locks, rounds, native objectives and caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_loader_custody.py -v
+```
