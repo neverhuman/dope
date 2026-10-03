@@ -51,6 +51,9 @@
     "research/benchmark/PRIVBAYES_SOURCE_AUDIT.md": "external-evidence",
     "research/benchmark/results/privbayes-unavailable": "external-evidence",
     "research/benchmark/tvinesynth-source.audit": "external-evidence",
-    "research/benchmark/TVINESYNTH_SOURCE_AUDIT.md": "external-evidence"
+    "research/benchmark/TVINESYNTH_SOURCE_AUDIT.md": "external-evidence",
+    "research/benchmark/research_container.py": "external-evidence",
+    "research/benchmark/publish_artifact_bytes": "external-evidence",
+    "research/benchmark/results/dope-artifact-byte-feasibility": "external-evidence"
   }
 }

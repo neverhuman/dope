@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_candidates_accounted": {
+      "const": true
+    },
+    "analysis_grid_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "byte_cap_satisfied_candidates": {
+      "type": "integer"
+    },
+    "candidate_count": {
+      "type": "integer"
+    },
+    "cells": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "byte_cap_satisfied": {
+            "const": true
+          },
+          "compression_level": {
+            "type": "integer"
+          },
+          "container_bytes": {
+            "type": "integer"
+          },
+          "container_header_bytes": {
+            "type": "integer"
+          },
+          "dataset": {
+            "type": "string"
+          },
+          "elapsed_seconds": {
+            "type": "number"
+          },
+          "encoding_replay_exact": {
+            "const": true
+          },
+          "exact_original_bytes_recovered": {
+            "const": true
+          },
+          "generator_admissible": {
+            "const": false
+          },
+          "mfs_v2": {
+            "type": "null"
+          },
+          "original_charged_bytes": {
+            "type": "integer"
+          },
+          "parent_job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "ptf_v1": {
+            "type": "null"
+          },
+          "raw_model_bytes": {
+            "type": "integer"
+          },
+          "raw_projection_bytes": {
+            "type": "integer"
+          },
+          "receipt": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "release_safe_l3": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "artifact_sha256",
+          "byte_cap_satisfied",
+          "compression_level",
+          "container_bytes",
+          "container_header_bytes",
+          "dataset",
+          "elapsed_seconds",
+          "encoding_replay_exact",
+          "exact_original_bytes_recovered",
+          "generator_admissible",
+          "mfs_v2",
+          "original_charged_bytes",
+          "parent_job_sha256",
+          "profile",
+          "ptf_v1",
+          "raw_model_bytes",
+          "raw_projection_bytes",
+          "receipt",
+          "release_safe_l3"
+        ],
+        "type": "object"
+      },
+      "maxItems": 32,
+      "minItems": 32,
+      "type": "array"
+    },
+    "codec_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "cost": {
+      "additionalProperties": false,
+      "properties": {
+        "byte_analysis_elapsed_seconds": {
+          "type": "number"
+        },
+        "host": {
+          "type": "string"
+        },
+        "new_gpu_fits": {
+          "type": "integer"
+        },
+        "parent_training_cost_reused_without_relabeling": {
+          "const": true
+        }
+      },
+      "required": [
+        "byte_analysis_elapsed_seconds",
+        "host",
+        "new_gpu_fits",
+        "parent_training_cost_reused_without_relabeling"
+      ],
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "datasets": {
+      "type": "integer"
+    },
+    "format": {
+      "const": "dope-owned-artifact-byte-feasibility-publication"
+    },
+    "generator_validation_complete": {
+      "const": false
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "parent_fit_cells": {
+      "type": "integer"
+    },
+    "parent_round_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "product_wire_format_supported": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "raw_parent_scores_rewritten": {
+      "const": false
+    },
+    "receipt_lock_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "scope": {
+      "const": "Lossless byte inspection of 16 already fitted over-cap artifacts; no generator sampling or quality evaluation"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "all_candidates_accounted",
+    "analysis_grid_sha256",
+    "byte_cap_satisfied_candidates",
+    "candidate_count",
+    "cells",
+    "codec_sha256",
+    "cost",
+    "counts_as_dope_win",
+    "datasets",
+    "format",
+    "generator_validation_complete",
+    "immutable_references",
+    "matrix_admission",
+    "mfs_v2",
+    "official_tests_opened",
+    "parent_fit_cells",
+    "parent_round_sha256",
+    "product_wire_format_supported",
+    "production_certified",
+    "ptf_v1",
+    "raw_parent_scores_rewritten",
+    "receipt_lock_sha256",
+    "release_safe_l3",
+    "scope",
+    "source_sha256",
+    "version"
+  ],
+  "type": "object"
+}
