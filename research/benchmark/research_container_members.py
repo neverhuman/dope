@@ -28,7 +28,7 @@ def decode_verified_members(blob: bytes, *, artifact_sha256: str,
             or not codec.HEADER.size <= artifact_bytes <= ARTIFACT_CAP):
         raise ValueError('research container charge invalid')
     for value in (artifact_sha256, model_sha256, projection_sha256):
-        if not isinstance(value, str) or re.fullmatch('[0-9a-f]{64}', value) is None:
+        if type(value) is not str or re.fullmatch('[0-9a-f]{64}', value) is None:
             raise ValueError('research container frozen digest invalid')
     if len(blob) != artifact_bytes or hashlib.sha256(blob).hexdigest() != artifact_sha256:
         raise ValueError('research container encoded identity changed')
