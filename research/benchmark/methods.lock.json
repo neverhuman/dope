@@ -2134,17 +2134,28 @@
       "upstream_url": "https://github.com/MinkaiXu/TabDiff"
     },
     "TabKDE": {
+      "counts_as_dope_win": false,
       "default_config": null,
       "dependency_or_container_digest": null,
       "fit_command": "python main.py --dataname DATASET --method TabKDE --mode train",
       "group": "compact",
+      "included_in_win_denominator": false,
       "license": null,
-      "note": "Pinned source archive contains no LICENSE/COPYING/pyproject license declaration or README license grant; redistribution/execution terms require author clarification.",
+      "note": "Recorded original-author commit pinned to complete368-entry tree and17selected source/rights files. Repository license metadata null; no notice file in pinned tree and no method-wide execution/redistribution grant verified in selected scope. Historical source archive hash preserved but its bytes not reverified here. Current campaign unavailable, no universal/permanent absence claim, no DOPE win/denominator. Usable source rights/full contracts OR licensed labelled independent implementation with2reported experiments required before comparison; runtime/native objectives/grid/codec/fullbytes/seeds/replay/capacity pending. No execution, formal DP or gated score. See TABKDE_SOURCE_RIGHTS.md.",
       "sampling_command": "python main.py --dataname DATASET --method TabKDE --mode sample",
       "source_snapshot_sha256": "640afb2fd5a0c482b54a250742655023b0f1c11adb9c44f7c20ce6661daf7b2f",
+      "source_verification": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabkde-v1/rights-scope-verification-v1.json",
+        "sha256": "3adb780c5942ef1bf8d2dbd315efb0c29fc6e693844c1efc9ec03af00d970b1b"
+      },
       "status": "unavailable",
       "tuning_search_space": null,
+      "unavailable_receipt": {
+        "path": "research/benchmark/results/tabkde-unavailable.json",
+        "sha256": "ce239521cc2c15c4246f38315e27dac5fc0891a510d6b24e6bf874febb570066"
+      },
       "upstream_commit": "9d9e6cce0f8ecd97d8a10c52755b8c14482e028d",
+      "upstream_tree": "3f44a8875e6dcb5cc1cb4d63d0e826442a19ee8b",
       "upstream_url": "https://github.com/tabkde/tabkde-main"
     },
     "TabPC": {

@@ -700,3 +700,8 @@ records scoped unavailability for this campaign. The available Apache2 candidate
 is explicitly independent and has no verified two-experiment reproduction;
 original-author implementation/defaults and safe model-context artifacts remain
 unverified. It contributes no DOPE win or win-denominator entry.
+
+The [TabKDE source-rights receipt](TABKDE_SOURCE_RIGHTS.md) binds the already
+recorded original commit and selected rights scope. Execution rights and a
+licensed independent implementation with two reproductions remain unverified;
+this unavailable method contributes no DOPE win or win-denominator entry.
