@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "dope-artifact-byte-feasibility.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-artifact-byte-feasibility.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-artifact-byte-feasibility.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-artifact-byte-feasibility.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-artifact-byte-feasibility.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-artifact-byte-feasibility.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "dope-artifact-byte-feasibility.csv",
+        "dope-artifact-byte-feasibility.json",
+        "dope-artifact-byte-feasibility.md",
+        "dope-artifact-byte-feasibility.pdf",
+        "dope-artifact-byte-feasibility.schema.json",
+        "dope-artifact-byte-feasibility.svg"
+      ],
+      "type": "object"
+    },
+    "campaign_complete": {
+      "const": false
+    },
+    "candidate_count": {
+      "type": "integer"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-artifact-byte-feasibility-manifest"
+    },
+    "generator_validation_complete": {
+      "const": false
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "parent_fit_cells": {
+      "type": "integer"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest.py": {
+          "type": "string"
+        },
+        "publish_artifact_bytes.py": {
+          "type": "string"
+        },
+        "publish_artifact_bytes_figure.py": {
+          "type": "string"
+        },
+        "publish_artifact_bytes_manifest.py": {
+          "type": "string"
+        },
+        "publish_s3_matched.py": {
+          "type": "string"
+        },
+        "research_container.py": {
+          "type": "string"
+        },
+        "score.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest.py",
+        "publish_artifact_bytes.py",
+        "publish_artifact_bytes_figure.py",
+        "publish_artifact_bytes_manifest.py",
+        "publish_s3_matched.py",
+        "research_container.py",
+        "score.py"
+      ],
+      "type": "object"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "campaign_complete",
+    "candidate_count",
+    "counts_as_dope_win",
+    "format",
+    "generator_validation_complete",
+    "immutable_references",
+    "mfs_v2",
+    "official_tests_opened",
+    "parent_fit_cells",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe_l3",
+    "version"
+  ],
+  "type": "object"
+}
