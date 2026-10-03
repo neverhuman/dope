@@ -1,0 +1,351 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_declared_git_blob_matches": {
+      "const": true
+    },
+    "archive_links_or_special_members_accepted": {
+      "const": false
+    },
+    "author_environment_guidance": {
+      "const": {
+        "Trainer_API_compatibility_verified": false,
+        "dependencies_fully_version_pinned": false,
+        "installed_runtime_verified": false,
+        "package_version": "0.2.4",
+        "pyproject_sha256": "60120439d590e50dedcd1275d853c09ca37e29ec1fef30ff1857fbe14b871cd1",
+        "python_requires": ">=3.8"
+      }
+    },
+    "author_source_executed": {
+      "const": false
+    },
+    "bibliography_entry": {
+      "const": "solatorio2023realtabformer"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "datasets_notebooks_images_weights_read": {
+      "const": false
+    },
+    "declared_source_bytes": {
+      "const": 188740
+    },
+    "declared_source_files": {
+      "const": 15
+    },
+    "default_config": {
+      "const": {
+        "campaign_default_contract_frozen": false,
+        "constructor": {
+          "batch_size": 8,
+          "checkpoints_dir": "rtf_checkpoints",
+          "early_stopping_patience": 5,
+          "early_stopping_threshold": 0,
+          "epochs": 1000,
+          "freeze_parent_model": true,
+          "full_save_dir": "rtf_full_save",
+          "mask_rate": 0,
+          "numeric_max_len": 10,
+          "numeric_nparts": 1,
+          "numeric_precision": 4,
+          "output_max_length": 512,
+          "parent_realtabformer_path": null,
+          "random_state": 1029,
+          "relational_config": null,
+          "samples_save_dir": "rtf_samples",
+          "tabular_config": null,
+          "train_size": 1
+        },
+        "default_tabular_config_expression": "GPT2Config(n_layer=6)",
+        "dependency_resolved_config_defaults_frozen": false,
+        "fit": {
+          "device": "cuda",
+          "distance": {
+            "executed": false,
+            "source_expression": "manhattan_distances"
+          },
+          "frac": 0.165,
+          "frac_max_data": 10000,
+          "full_sensitivity": false,
+          "gen_kwargs": null,
+          "gen_rounds": 3,
+          "in_df": null,
+          "join_on": null,
+          "load_from_best_mean_sensitivity": false,
+          "n_critic": 5,
+          "n_critic_stop": 2,
+          "num_bootstrap": 500,
+          "orig_samples_rounds": 5,
+          "qt_interval": 100,
+          "qt_interval_unique": 100,
+          "qt_max": 0.05,
+          "qt_max_default": 0.05,
+          "quantile": 0.95,
+          "resume_from_checkpoint": false,
+          "save_full_every_epoch": 5,
+          "sensitivity_max_col_nums": 20,
+          "sensitivity_orig_frac_multiple": 4,
+          "target_col": null,
+          "use_ks": false
+        },
+        "model_type_required": true,
+        "sample": {
+          "constrain_tokens_gen": true,
+          "continuous_empty_limit": 10,
+          "device": "cuda",
+          "forced_decoder_ids": null,
+          "gen_batch": 128,
+          "input_df": null,
+          "input_ids": null,
+          "input_unique_ids": null,
+          "n_samples": null,
+          "related_num": null,
+          "save_samples": false,
+          "seed_input": null,
+          "suppress_tokens": null,
+          "validator": null
+        },
+        "single_table_model_type": "tabular",
+        "training_gradient_accumulation_steps": 4
+      }
+    },
+    "fit_sample_contract_verified": {
+      "const": false
+    },
+    "formal_dp_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-realtabformer-source-admission-audit"
+    },
+    "independent_implementation": {
+      "const": false
+    },
+    "license": {
+      "const": "MIT"
+    },
+    "license_sha256": {
+      "const": "fb11fe9573168aa7f96555f0e7cafa8c9a8b44089646692626cf12fb95bf9db4"
+    },
+    "matrix_admission": {
+      "const": false
+    },
+    "method": {
+      "const": "REaLTabFormer"
+    },
+    "method_status": {
+      "const": "source_audit_pending"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_objective": {
+      "const": {
+        "author_checkpoint_policy": "default latest saved model with val_sensitivity below bootstrapped quantile threshold; closest-above fallback if no acceptable saved model; optional closest-to-bootstrap-mean policy is disabled by default",
+        "fallback_if_no_defensible_objective": "author default only; native tuning inapplicable; no substitution with shared KPI",
+        "frozen_scalar_objective": null,
+        "generator_search_space": null,
+        "generator_tie_breaks": null,
+        "matched_train_synthetic_rows_required": true,
+        "name": "author_ml_efficacy_and_sensitivity_policy",
+        "native_values_cross_method_ranking": false,
+        "released_metric_random_state": 1029,
+        "released_utility_returns_predictions_not_scalar": true,
+        "reported_bibliography_entry": "solatorio2023realtabformer",
+        "reported_regression_direction": "maximize",
+        "reported_regression_metric": "R2",
+        "required_caller_auditor": true,
+        "shared_kpi_used_for_selection": false,
+        "source": "src/realtabformer/rtf_analyze.py::SyntheticDataBench.get_ml_efficiency/measure_ml_efficiency",
+        "source_sha256": "824e5798b6214125fb71fa2d6c0cf14f090829ba59b08c7b9767d4b67512183f",
+        "status": "source_identified_not_frozen_for_tuning"
+      }
+    },
+    "native_tuning_complete": {
+      "const": false
+    },
+    "new_fits_started": {
+      "const": 0
+    },
+    "new_samples_started": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paper": {
+      "const": {
+        "bibliography_entry": "solatorio2023realtabformer",
+        "bytes": 2560261,
+        "datasets_models_or_official_tests_read": false,
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/realtabformer-v1/paper-2302.02041v1.pdf",
+        "sections": "Table1/Section4 and bootstrapped overfitting policy",
+        "sha256": "81e2604f10e1ff0f33932a26e85160c0ed4b97a874f781d981253e55d96e5114",
+        "url": "https://arxiv.org/pdf/2302.02041v1",
+        "utc": "2026-10-03T09:57:03.884777+00:00"
+      }
+    },
+    "pending_execution_gates": {
+      "const": [
+        "isolate and inventory executable runtime, bytecode and interpreter import roots before initializers",
+        "freeze dependency-resolved GPT2 defaults and complete single-table author default configuration",
+        "freeze defensible native metric/auditor/seeds/grid/ties or mark tuning inapplicable",
+        "bind official-training-derived fit/validation rows and group assignments to author bootstrap/internal split and preprocessing",
+        "verify common-numeric and separate author-faithful projection and numeric precision contracts",
+        "verify fit/sample finite row counts, n/2n/4n/8n sizes and seeded replay",
+        "verify safe artifact-only local loading and charge all required weights/config/vocabulary/transformation/projection files",
+        "run copy/leakage/privacy and real-vs-real controls before gated claims",
+        "fresh aggregate admission on xbabe1/2/3 with disjoint CPU/RAM/scratch, 600s fit timeout and 16GiB GPU caps"
+      ]
+    },
+    "prior_source_verification": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/realtabformer-v1/source-verification-v1.json",
+        "sha256": "bb065348082c9a0170922a67ba1004dc7e462bf60603a7a32f42fe2e61f87931"
+      }
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe": {
+      "const": null
+    },
+    "reported_experiments_reproduced": {
+      "const": false
+    },
+    "source_archive": {
+      "const": {
+        "bytes": 812403,
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/realtabformer-v1/author-source.tar.gz",
+        "sha256": "cacab76af35f104b210e0326a4c37ed2aae824663559b3eaa6a3da33aa69b4b5"
+      }
+    },
+    "source_contract_observations": {
+      "const": {
+        "author_errors_and_logs_require_private_scratch_capture": true,
+        "author_sensitive_checkpoint_policy_retained": true,
+        "bootstrap_and_internal_splits_use_supplied_training_data": true,
+        "constructor_model_type_has_no_default": true,
+        "continuous_empty_batch_limit_default": 10,
+        "dataframe_fit_input_supported_in_source": true,
+        "fit_constructor_random_state_default": 1029,
+        "fit_seeds_python_numpy_torch_when_random_state_truthy": true,
+        "full_artifact_charge_required": [
+          "weights",
+          "model config",
+          "learned vocabulary",
+          "transformation state",
+          "required auxiliary checkpoint files",
+          "projection"
+        ],
+        "numeric_precision_default": 4,
+        "safe_loader_and_round_trip_verified": false,
+        "sample_constrain_tokens_gen_default": true,
+        "sample_has_no_explicit_rng_seed_argument": true,
+        "sample_seed_input_is_row_conditioning_not_rng_seed": true,
+        "sample_seed_replay_verified": false,
+        "save_can_copy_auxiliary_checkpoint_directories": true,
+        "saved_state_includes_observed_vocabulary_and_transformations": true,
+        "tabular_model_weights_initialized_from_config_not_downloaded_pretrained": true
+      }
+    },
+    "source_file_sha256": {
+      "const": {
+        "LICENSE": "fb11fe9573168aa7f96555f0e7cafa8c9a8b44089646692626cf12fb95bf9db4",
+        "README.md": "c238a2e1cb561a53ca22411227cb4e67a5dd5dda0a5210b0f4b5afbd02c52a12",
+        "docs/index.rst": "61abcc785f95f327ae86282f9e34d617f2eafbd873f0571d15bb688827895c5b",
+        "pyproject.toml": "60120439d590e50dedcd1275d853c09ca37e29ec1fef30ff1857fbe14b871cd1",
+        "src/realtabformer/VERSION": "1725bfa6524c5265e7c171cf06568417d39b947fff49c242f03859479c82334b",
+        "src/realtabformer/__init__.py": "adfa731e08dbb9832e6fed4ac0b2a0b6894f7e713bea01e53d7cc9270771f4e5",
+        "src/realtabformer/__main__.py": "a0e0f0c7632a2faa7952d949997160ad4026e7e8dcddcb1e9a839c3ece35425c",
+        "src/realtabformer/data_utils.py": "10170edc57696bef69229689239bbde863d3480248f476f056d39e609e81c6f0",
+        "src/realtabformer/realtabformer.py": "f58cc803deb6987a7dd063f1fe92173f4f6515796e280e049f8927c06f849535",
+        "src/realtabformer/rtf_analyze.py": "824e5798b6214125fb71fa2d6c0cf14f090829ba59b08c7b9767d4b67512183f",
+        "src/realtabformer/rtf_datacollator.py": "11e3ccd2f02742597c0848407e40cd41984d96af6ed12a48bf9259d9e844e0a0",
+        "src/realtabformer/rtf_exceptions.py": "eb7e4bda97ee1eb5140603c484321c488571f20da04026df8f326f37fc65c25e",
+        "src/realtabformer/rtf_sampler.py": "01c88d699530d228effcf596cea810e0876f12f78ca3a8808c4de9088dd273e9",
+        "src/realtabformer/rtf_trainer.py": "0d13034e04554997bce0797a76172e3174dc23ce856e52316be80f05a9162869",
+        "src/realtabformer/rtf_validators.py": "ff2278702207942e7d4a0efec8b0f15bd0876606fe3fed72a561c708026d903b"
+      }
+    },
+    "source_root": {
+      "const": "/mnt/fast-scratch/dope-benchmark/method-source-audits/realtabformer-v1/declared-v2"
+    },
+    "source_tree": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/realtabformer-v1/tree.json",
+        "sha256": "e0a65e2f8b954ae5fb48d0ad87a5f9b490f7a7dde19fd2b936745c444f214d2d",
+        "truncated": false
+      }
+    },
+    "source_verification": {
+      "const": {
+        "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/realtabformer-v1/source-verification-v2.json",
+        "sha256": "cc017bbbd6353928e6323aff6540a77f73c949d667149067b9bf65cd1d75747b"
+      }
+    },
+    "superiority": {
+      "const": null
+    },
+    "upstream_commit": {
+      "const": "73f239643f9ea5abc877f685ce927e986302ac2d"
+    },
+    "upstream_tree": {
+      "const": "aa4431468f040fc485f82e7e15238c57eef05753"
+    },
+    "upstream_url": {
+      "const": "https://github.com/worldbank/REaLTabFormer"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "all_declared_git_blob_matches",
+    "archive_links_or_special_members_accepted",
+    "author_environment_guidance",
+    "author_source_executed",
+    "bibliography_entry",
+    "counts_as_dope_win",
+    "datasets_notebooks_images_weights_read",
+    "declared_source_bytes",
+    "declared_source_files",
+    "default_config",
+    "fit_sample_contract_verified",
+    "formal_dp_claim",
+    "format",
+    "independent_implementation",
+    "license",
+    "license_sha256",
+    "matrix_admission",
+    "method",
+    "method_status",
+    "mfs_v2",
+    "native_objective",
+    "native_tuning_complete",
+    "new_fits_started",
+    "new_samples_started",
+    "official_tests_opened",
+    "paper",
+    "pending_execution_gates",
+    "prior_source_verification",
+    "ptf_v1",
+    "release_safe",
+    "reported_experiments_reproduced",
+    "source_archive",
+    "source_contract_observations",
+    "source_file_sha256",
+    "source_root",
+    "source_tree",
+    "source_verification",
+    "superiority",
+    "upstream_commit",
+    "upstream_tree",
+    "upstream_url",
+    "version"
+  ],
+  "type": "object"
+}
