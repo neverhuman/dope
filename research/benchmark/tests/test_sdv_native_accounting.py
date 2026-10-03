@@ -215,8 +215,9 @@ class NativeAccounting(unittest.TestCase):
         with self.assertRaises(ValueError): self.call()
 
     def test_partial_failed_fit_still_charges_its_bytes_and_compute(self):
-        for mode in ('native', 'sample'):
-            (self.parent / (mode + '.operation.json')).unlink()
+        for path in self.parent.iterdir():
+            if path.is_file() and not path.name.startswith('fit.') and path.name != 'receipt.json':
+                path.unlink()
         self.operations[:] = [self.operations[0] | {'status': 'failed', 'exit_code': 1}]
         self.put('fit.operation.json', self.operations[0])
         monitor = m.read(self.parent / 'fit.monitor.json')
@@ -232,6 +233,10 @@ class NativeAccounting(unittest.TestCase):
     def test_deadline_unstarted_preserves_native_kpi_without_fake_cost(self):
         for suffix in ('.operation.json', '.monitor.json', '.worker.log', '.json', '.transport.log'):
             (self.parent / ('sample' + suffix)).unlink()
+        for row in self.lock['common_sample_schedule']:
+            for suffix in ('.csv', '.json'):
+                path = self.parent / (row['name'] + suffix)
+                if path.exists(): path.unlink()
         self.operations[2] = {'status': 'deadline_unstarted', 'new_operation_started': False, 'elapsed_seconds': 0}
         self.receipt['status'] = 'failed'
         self.refresh()
@@ -243,6 +248,36 @@ class NativeAccounting(unittest.TestCase):
     def test_unstarted_operation_cannot_hide_execution_evidence(self):
         (self.parent / 'sample.operation.json').unlink()
         self.operations[2] = {'status': 'deadline_unstarted', 'new_operation_started': False, 'elapsed_seconds': 0}
+        self.receipt['status'] = 'failed'
+        self.refresh()
+        with self.assertRaisesRegex(ValueError, 'execution evidence'): self.call()
+
+    def test_each_phase_owned_output_rejected_for_unstarted_operations(self):
+        outputs = {'fit': ['artifact/model.pt', 'artifact/projection.json'],
+                   'native': ['native-sample.csv'],
+                   'sample': [row['name'] + suffix for row in self.lock['common_sample_schedule']
+                              for suffix in ('.csv', '.json')]}
+        parent = self.base / 'unstarted-control'
+        parent.mkdir()
+        row = {'status': 'deadline_unstarted', 'new_operation_started': False, 'elapsed_seconds': 0}
+        for mode, names in outputs.items():
+            for name in names:
+                path = parent / name
+                path.parent.mkdir(exist_ok=True)
+                path.write_bytes(b'opaque execution output')
+                with self.subTest(mode=mode, name=name), self.assertRaisesRegex(ValueError, 'execution evidence'):
+                    m.operation(mode, row, parent, self.lock, self.base, {})
+                path.unlink()
+                if path.parent != parent: path.parent.rmdir()
+            (parent / (mode + '.request.json')).write_text('{}')
+            (parent / (mode + '.xbabe1.admission-0001.json')).write_text('{}')
+            self.assertEqual(m.operation(mode, row, parent, self.lock, self.base, {}), 0)
+
+    def test_omitted_later_phase_cannot_hide_execution_outputs(self):
+        for mode in ('native', 'sample'):
+            (self.parent / (mode + '.operation.json')).unlink()
+        self.operations[:] = [self.operations[0] | {'status': 'failed', 'exit_code': 1}]
+        self.put('fit.operation.json', self.operations[0])
         self.receipt['status'] = 'failed'
         self.refresh()
         with self.assertRaisesRegex(ValueError, 'execution evidence'): self.call()

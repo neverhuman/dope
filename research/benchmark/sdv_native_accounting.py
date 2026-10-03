@@ -93,15 +93,27 @@ def native_metric(metric, worker, objective, lock):
     return metric['value']
 
 
+def no_execution_evidence(mode, parent, lock):
+    names = [mode + suffix for suffix in
+             ('.operation.json', '.monitor.json', '.worker.log', '.json', '.transport.log')]
+    if mode == 'fit':
+        names.append('artifact')
+    elif mode == 'native':
+        names.append('native-sample.csv')
+    elif mode == 'sample':
+        names.extend(row['name'] + suffix for row in lock['common_sample_schedule']
+                     for suffix in ('.csv', '.json'))
+    require(not any((parent / name).exists() or (parent / name).is_symlink() for name in names),
+            'unstarted operation contains execution evidence')
+
+
 def operation(mode, row, parent, lock, base, refs):
     require(type(row['new_operation_started']) is bool and finite(row['elapsed_seconds'])
             and row['elapsed_seconds'] >= 0, 'native operation cost missing')
     if row['new_operation_started'] is False:
         require(row['status'] == 'deadline_unstarted' and row['elapsed_seconds'] == 0,
                 'unstarted operation acquired compute or success')
-        require(not any((parent / (mode + suffix)).exists()
-                        for suffix in ('.operation.json', '.monitor.json', '.worker.log', '.json', '.transport.log')),
-                'unstarted operation contains execution evidence')
+        no_execution_evidence(mode, parent, lock)
         return 0.0
     proof = parent / (mode + '.operation.json')
     require(read(proof) == row, 'native operation receipt differs')
@@ -209,6 +221,8 @@ def trial(job, root, lock, refs):
     require(1 <= len(operations) <= 3 and all(r['status'] == 'ok' for r in operations[:-1]),
             'native operation schedule continued after a failure')
     modes = ('fit', 'native', 'sample')[:len(operations)]
+    for mode in ('fit', 'native', 'sample')[len(operations):]:
+        no_execution_evidence(mode, parent, lock)
     require({p.name.removesuffix('.operation.json') for p in parent.glob('*.operation.json')}
             == {mode for mode, row in zip(modes, operations) if row['new_operation_started'] is True},
             'native operation accounting omitted a phase')

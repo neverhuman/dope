@@ -560,8 +560,10 @@ stay unavailable. No winner is frozen from a partially closed tuning group.
 Historical runtime closure is never upgraded by reuse. Closure requires bytecode
 writes and Python optimization disabled before loading the frozen verifier.
 Transport time must cover monitor time within one microsecond; charged time is
-the greater measurement. This applies to failed operations too. Unstarted phases
-cannot contain execution evidence. The physical inventory permits only the
+the greater measurement. This applies to failed operations too. Unstarted or
+omitted phases cannot contain execution evidence, including partial fit artifacts,
+native samples and scheduled sample CSV/JSON outputs. Prelaunch request and
+admission receipts remain allowed. The physical inventory permits only the
 frozen jobs with one attempt each; extra retries, orphan jobs and aliases block
 sealing. Added caches also block verifier loading.
 
