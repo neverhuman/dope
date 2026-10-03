@@ -85,3 +85,31 @@ the worker's exact six-file source directory.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_python_custody.py -v
 ```
+
+## Bootstrap invocation proposal
+
+`container_bootstrap_invocation.prepare_invocation` consumes owned proposal bytes
+bound by an external digest and prepares immutable interpreter arguments and an
+explicit environment. Proposals remain unadmitted. They retain the exact 600-second
+cap, sealed-test/null-claim flags, xbabe1/2/3 host scope, complete job digest and
+numbered request path. Arguments use the pinned Python path with `-I -S -B` and
+the declared cache prefix. The environment contains only the fixed PATH/locale,
+declared single library directory, empty CUDA visibility and one-thread limits;
+inherited loader, Python startup and credential environment is not copied.
+
+The coordinator supplies the original outer-attempt monotonic start, before
+guards or transport. Preparation checks the remaining budget after parsing.
+`remaining_seconds()` retains that original start and must be called again
+immediately before a future bounded operation; expiry at 600 seconds rejects.
+This contract starts no process, enforces no transport timeout itself, checks no
+filesystem ownership or ELF resolution, and supplies no predecessor or capacity
+proof. Those properties remain false on the plan. Actual dispatch still needs
+all separately frozen bootstrap/source/runtime/library/transport identities,
+SDV closure, density priority, fresh aggregate admission and whole-batch deadline
+enforcement. The worker independently verifies the real round and request.
+No new fit, sample, tuning trial or gated score follows from a proposal.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_bootstrap_invocation.py -v
+```
