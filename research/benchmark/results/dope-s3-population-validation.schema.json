@@ -1,0 +1,5312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_frozen_cells_accounted": {
+      "const": true
+    },
+    "cells": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": false
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": false
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": false
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": false
+              },
+              "c2st_auc": {
+                "type": "null"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "type": "null"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "null"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "type": "null"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "null"
+              },
+              "pair_correlation_fidelity": {
+                "type": "null"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "type": "null"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "type": "null"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "type": "null"
+              },
+              "validation_receipt": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": false
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": false
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": false
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": false
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": true
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": false
+                      },
+                      "low_signal_noninferior": {
+                        "const": false
+                      },
+                      "retention": {
+                        "type": "null"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "profile",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 2400,
+      "minItems": 2400,
+      "type": "array"
+    },
+    "cost": {
+      "additionalProperties": false,
+      "properties": {
+        "architecture_research_spend_separate_from_final_cell_parity": {
+          "const": true
+        },
+        "coordinator_wall_seconds": {
+          "type": "number"
+        },
+        "gpu_fit_cost_accounting": {
+          "additionalProperties": false,
+          "properties": {
+            "architecture_research_spend_separate_from_final_cell_parity": {
+              "const": true
+            },
+            "coordinator_wall_seconds": {
+              "type": "number"
+            },
+            "energy_attributable_to_job": {
+              "type": "null"
+            },
+            "host_operation_seconds": {
+              "additionalProperties": false,
+              "properties": {
+                "xbabe1": {
+                  "type": "number"
+                },
+                "xbabe2": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "xbabe1",
+                "xbabe2"
+              ],
+              "type": "object"
+            },
+            "new_fit_operation_seconds": {
+              "type": "number"
+            },
+            "peak_observed_device_used_mib": {
+              "type": "integer"
+            },
+            "prior_closed_fit_seconds": {
+              "type": "number"
+            },
+            "prior_wrapper_new_operation_transport_seconds": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "architecture_research_spend_separate_from_final_cell_parity",
+            "coordinator_wall_seconds",
+            "energy_attributable_to_job",
+            "host_operation_seconds",
+            "new_fit_operation_seconds",
+            "peak_observed_device_used_mib",
+            "prior_closed_fit_seconds",
+            "prior_wrapper_new_operation_transport_seconds"
+          ],
+          "type": "object"
+        },
+        "host": {
+          "type": "string"
+        },
+        "job_attributed_energy_joules": {
+          "type": "null"
+        },
+        "new_generator_fits": {
+          "type": "integer"
+        },
+        "new_gpu_fit_operation_seconds": {
+          "type": "number"
+        },
+        "new_tuning_trials": {
+          "type": "integer"
+        },
+        "shared_sampler_and_evaluator_seconds": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "architecture_research_spend_separate_from_final_cell_parity",
+        "coordinator_wall_seconds",
+        "gpu_fit_cost_accounting",
+        "host",
+        "job_attributed_energy_joules",
+        "new_generator_fits",
+        "new_gpu_fit_operation_seconds",
+        "new_tuning_trials",
+        "shared_sampler_and_evaluator_seconds"
+      ],
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "dataset_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100,
+      "minItems": 100,
+      "type": "array"
+    },
+    "datasets": {
+      "type": "integer"
+    },
+    "fit_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "type": "array"
+    },
+    "format": {
+      "const": "dope-s3-population-all-profile-validation-panel"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "global_family_selected": {
+      "const": false
+    },
+    "identical_artifact_worker_aliases_charge_once": {
+      "const": true
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "logical_sample_cells": {
+      "type": "integer"
+    },
+    "logical_status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "fit_unavailable": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "fit_unavailable",
+        "ok"
+      ],
+      "type": "object"
+    },
+    "metric_replay_dataset_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 20,
+      "type": "array"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "missing_evidence": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "type": "array"
+    },
+    "native_selection_changed": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "type": "null"
+    },
+    "physical_sample_batches": {
+      "type": "integer"
+    },
+    "physical_status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "ok": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ok"
+      ],
+      "type": "object"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "profile_panels": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "comparison_scope": {
+            "type": "string"
+          },
+          "lineage_status_counts": {
+            "additionalProperties": false,
+            "properties": {
+              "incomplete_or_unavailable": {
+                "type": "integer"
+              },
+              "ok": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "incomplete_or_unavailable",
+              "ok"
+            ],
+            "type": "object"
+          },
+          "lineages": {
+            "type": "integer"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "size_multiplier": {
+            "type": "integer"
+          },
+          "utility": {
+            "additionalProperties": false,
+            "properties": {
+              "catboost": {
+                "additionalProperties": false,
+                "properties": {
+                  "complete_informative_lineages": {
+                    "type": "integer"
+                  },
+                  "median_of_lineage_sample_medians": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "complete_informative_lineages",
+                  "median_of_lineage_sample_medians"
+                ],
+                "type": "object"
+              },
+              "linear": {
+                "additionalProperties": false,
+                "properties": {
+                  "complete_informative_lineages": {
+                    "type": "integer"
+                  },
+                  "median_of_lineage_sample_medians": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "complete_informative_lineages",
+                  "median_of_lineage_sample_medians"
+                ],
+                "type": "object"
+              },
+              "mlp": {
+                "additionalProperties": false,
+                "properties": {
+                  "complete_informative_lineages": {
+                    "type": "integer"
+                  },
+                  "median_of_lineage_sample_medians": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "complete_informative_lineages",
+                  "median_of_lineage_sample_medians"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "catboost",
+              "linear",
+              "mlp"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "comparison_scope",
+          "lineage_status_counts",
+          "lineages",
+          "profile",
+          "size_multiplier",
+          "utility"
+        ],
+        "type": "object"
+      },
+      "maxItems": 8,
+      "minItems": 8,
+      "type": "array"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "replay_policy": {
+      "type": "string"
+    },
+    "runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "declared_import_inventory_verified": {
+          "const": true
+        },
+        "historical_full_runtime_closure_upgraded": {
+          "const": false
+        },
+        "shared_versions": {
+          "additionalProperties": false,
+          "properties": {
+            "catboost": {
+              "type": "string"
+            },
+            "numpy": {
+              "type": "string"
+            },
+            "scikit-learn": {
+              "type": "string"
+            },
+            "scipy": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "catboost",
+            "numpy",
+            "scikit-learn",
+            "scipy"
+          ],
+          "type": "object"
+        },
+        "system_dynamic_library_closure_certified": {
+          "const": false
+        }
+      },
+      "required": [
+        "declared_import_inventory_verified",
+        "historical_full_runtime_closure_upgraded",
+        "shared_versions",
+        "system_dynamic_library_closure_certified"
+      ],
+      "type": "object"
+    },
+    "sample_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "scope": {
+      "const": "All100 training-derived S3 validation lineages, four unchanged GPU research profiles, one fit seed; bounded training cohorts, no test certification"
+    },
+    "sizes": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "fit_receipts": {
+          "type": "string"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "round": {
+          "type": "string"
+        },
+        "validation_receipts": {
+          "type": "string"
+        },
+        "validation_reconciliation": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "fit_receipts",
+        "metric",
+        "round",
+        "validation_receipts",
+        "validation_reconciliation"
+      ],
+      "type": "object"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "summary": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "fit_unavailable": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "fit_unavailable"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "sample_cells": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "statuses": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": true
+                      },
+                      "median_retention": {
+                        "type": "number"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "complete_informative_sample_group": {
+                        "const": false
+                      },
+                      "median_retention": {
+                        "type": "null"
+                      },
+                      "sample_retention_values": {
+                        "items": {
+                          "type": "null"
+                        },
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "complete_informative_sample_group",
+                      "median_retention",
+                      "sample_retention_values"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "charged_artifact_bytes",
+              "dataset",
+              "fit_seed",
+              "profile",
+              "sample_cells",
+              "size_multiplier",
+              "statuses",
+              "utility"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 800,
+      "minItems": 800,
+      "type": "array"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "all_frozen_cells_accounted",
+    "cells",
+    "cost",
+    "counts_as_dope_win",
+    "dataset_ids",
+    "datasets",
+    "fit_seeds",
+    "format",
+    "full_campaign_admitted",
+    "global_family_selected",
+    "identical_artifact_worker_aliases_charge_once",
+    "immutable_references",
+    "logical_sample_cells",
+    "logical_status_counts",
+    "metric_replay_dataset_ids",
+    "mfs_v2",
+    "missing_evidence",
+    "native_selection_changed",
+    "official_tests_opened",
+    "paired_superiority",
+    "physical_sample_batches",
+    "physical_status_counts",
+    "production_certified",
+    "profile_panels",
+    "ptf_v1",
+    "release_safe_l3",
+    "replay_policy",
+    "runtime",
+    "sample_seeds",
+    "scope",
+    "sizes",
+    "source_locks",
+    "source_sha256",
+    "summary",
+    "version"
+  ],
+  "type": "object"
+}

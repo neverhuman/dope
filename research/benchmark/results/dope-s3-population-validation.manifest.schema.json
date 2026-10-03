@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_frozen_cells_accounted": {
+      "const": true
+    },
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "dope-s3-population-validation.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-s3-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-s3-population-validation.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-s3-population-validation.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-s3-population-validation.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-s3-population-validation.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "dope-s3-population-validation.csv",
+        "dope-s3-population-validation.json",
+        "dope-s3-population-validation.md",
+        "dope-s3-population-validation.pdf",
+        "dope-s3-population-validation.schema.json",
+        "dope-s3-population-validation.svg"
+      ],
+      "type": "object"
+    },
+    "campaign_complete": {
+      "const": false
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "datasets": {
+      "type": "integer"
+    },
+    "format": {
+      "const": "dope-s3-population-validation-publication-manifest"
+    },
+    "global_family_selected": {
+      "const": false
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "logical_sample_cells": {
+      "type": "integer"
+    },
+    "logical_status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "fit_unavailable": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "fit_unavailable",
+        "ok"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "type": "null"
+    },
+    "physical_sample_batches": {
+      "type": "integer"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest.py": {
+          "type": "string"
+        },
+        "publish_dope_population_fits.py": {
+          "type": "string"
+        },
+        "publish_dope_population_validation.py": {
+          "type": "string"
+        },
+        "publish_dope_population_validation_figure.py": {
+          "type": "string"
+        },
+        "publish_dope_population_validation_manifest.py": {
+          "type": "string"
+        },
+        "publish_s3_forest.py": {
+          "type": "string"
+        },
+        "publish_s3_matched.py": {
+          "type": "string"
+        },
+        "score.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest.py",
+        "publish_dope_population_fits.py",
+        "publish_dope_population_validation.py",
+        "publish_dope_population_validation_figure.py",
+        "publish_dope_population_validation_manifest.py",
+        "publish_s3_forest.py",
+        "publish_s3_matched.py",
+        "score.py"
+      ],
+      "type": "object"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "scope": {
+      "const": "All100 training-derived S3 validation lineages, four unchanged GPU research profiles, one fit seed; bounded training cohorts, no test certification"
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "fit_receipts": {
+          "type": "string"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "round": {
+          "type": "string"
+        },
+        "validation_receipts": {
+          "type": "string"
+        },
+        "validation_reconciliation": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "fit_receipts",
+        "metric",
+        "round",
+        "validation_receipts",
+        "validation_reconciliation"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "all_frozen_cells_accounted",
+    "artifacts",
+    "campaign_complete",
+    "counts_as_dope_win",
+    "datasets",
+    "format",
+    "global_family_selected",
+    "immutable_references",
+    "logical_sample_cells",
+    "logical_status_counts",
+    "mfs_v2",
+    "official_tests_opened",
+    "paired_superiority",
+    "physical_sample_batches",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe_l3",
+    "scope",
+    "source_locks",
+    "version"
+  ],
+  "type": "object"
+}

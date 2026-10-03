@@ -486,3 +486,48 @@ The publisher verifies the externally pinned receipt lock before consuming
 fit records, rejects changed source/data/model/evidence inventories and
 reconciles every dataset/profile cell. Bulk artifacts and rows remain on
 scratch; committed outputs contain only rights-safe metadata and hashes.
+
+## Complete all100 DOPE GPU validation
+
+`results/dope-s3-population-validation.json` accounts for every sample cell
+from the four unchanged population research profiles: 2,400 logical cells,
+2,304 measured and 96 unavailable because their fitted generators exceeded
+10,240 bytes including projection. Identical generator and worker lineages
+share 232 physical six-sample batches; all 232 completed successfully.
+This is one fit seed (11), three sample seeds (101/211/307), and n/4n on
+bounded cohorts derived from the official S3 training partitions.
+Official tests remain sealed; no global family or production score is selected.
+
+The JSON retains per-cell copy/near-match counts, real-versus-real controls,
+fidelity diagnostics, null-normalized TSTR/TRTR retention and immutable receipt
+hashes. Dataset/profile medians require all three samples to be informative;
+missing or low-signal groups stay null. Tables and curves retain the denominator
+of 100 lineages, negative retention, and all four profiles. No fit uncertainty
+or paired superiority is inferred from sample repetitions. MFS-v2/PTF-v1,
+release-safe L3 and superiority remain null until their complete gates pass.
+The prior fit custody remains a separate historical publication.
+
+Regenerate from the externally frozen receipt and reconciliation anchors:
+
+```sh
+python3 -m research.benchmark.publish_dope_population_validation \
+  --receipt-sha256 ecd88832cb9c8c0018bb55de67ded9c3eba0936eba541e799ded0def34e173bc \
+  --reconciliation-sha256 51e48fb3227588c0a8b1e49a64b94c1dd8b391063f94411aa33fc6bdac96004a
+python3 -m research.benchmark.publish_dope_population_validation_figure \
+  research/benchmark/results/dope-s3-population-validation.json
+python3 -m research.benchmark.publish_dope_population_validation_manifest \
+  --receipt-sha256 ecd88832cb9c8c0018bb55de67ded9c3eba0936eba541e799ded0def34e173bc \
+  --reconciliation-sha256 51e48fb3227588c0a8b1e49a64b94c1dd8b391063f94411aa33fc6bdac96004a
+python3 -m unittest discover -s research/benchmark/tests \
+  -p test_dope_population_validation.py -v
+```
+
+Publication verifies the receipt-lock digest and complete referenced inventory
+before reading metrics. Declared interpreter/package and Rust sampler inventories
+are checked; complete system dynamic-library closure is not certified. Shared
+sampling/evaluation operations cost 3,826.696542 seconds; coordinator wall time
+was 10,178.424520 seconds. Prior GPU fit and repair costs remain explicit and
+separate from final per-cell parity. Bulk rows, samples, weights and detailed
+logs remain on scratch. Five fit seeds, full n/2n/4n/8n schedules, complete
+privacy attacks, projection-only utility cost, public-core paired analysis and
+five-lock final campaign admission remain required.
