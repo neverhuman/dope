@@ -570,7 +570,9 @@ one original whole-batch timer. It checks time before the first stage, after the
 Python/root stage, through the timed guards and after final metadata/source
 hashes. Initial/final helper paths must be unaliased regular files before hashing;
 final parent metadata repeats bounded regular admission. Fixed I/O rejection
-text never includes private input values.
+text never includes private input values. Proposal file I/O is outside timing-only
+exception handling; an I/O timeout is an integrity rejection even while the
+original batch budget remains available.
 
 The trusted caller must own every source and its complete interpreter/import
 closure before importing these helpers. Replaying recorded preparation stages
