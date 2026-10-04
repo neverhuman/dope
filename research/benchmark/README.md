@@ -50,6 +50,8 @@ remain unverified.
 `container_native_runtime_inventory.py` rechecks the full recorded original
 native file set, including paths outside the selected directory. This does not
 replay the recorded linker transcript or establish complete runtime closure.
+`container_startup.py` binds those original recorded stages and replays them on
+one original whole-batch timer. This remains an unadmitted startup preparation.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
