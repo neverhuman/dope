@@ -520,3 +520,36 @@ rounds/receipts stay unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_native_child_environment.py -v
 ```
+
+## Original recorded native runtime files
+
+`container_native_runtime_inventory.verify_native_runtime_inventory` rechecks
+all file paths in one owned original validation host-runtime inventory, including
+files outside the selected Torch directory. Its exact path set, resolved paths,
+integer byte counts and SHA-256 digests must match that original inventory and
+the host/binary identity of the separate restricted child proposal. A separate
+owned snapshot binds current literal aliases, ancestor identities and ownership;
+these are new point-in-time snapshots, not inferred original literal alias text.
+
+The helper owns bounded regular metadata and admits unaliased regular helper
+sources before hashing. It rechecks the proposed child environment and selected
+native directory, then checks every recorded native file twice. Final metadata
+and helper admission/hashes precede the final original whole-batch deadline.
+I/O errors are fixed no-value rejections; only trusted timing failures retain the
+fixed typed deadline error. No `ldd`, native executable, library or ML dependency
+is started or loaded. The recorded linker transcript is not replayed.
+
+Call only after a trusted coordinator owns all sources and the complete
+interpreter/import closure before imports. The caller must separately establish
+Python/root ELF, proposed filesystem and original native executable custody on
+that same original timer. This is recorded file custody, not proof of all dynamic
+loads, provider selection, an executed child's environment or system closure.
+Snapshots and stat/hash checks are not an atomic execution lease; later changes
+still require execution admission checks. Cross-host identity, transport, leases,
+capacity, predecessor/density priority and final campaign locks remain separate
+gates. Official tests stay sealed and all gated scores remain null.
+
+```sh
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_native_runtime_inventory.py -v
+```
