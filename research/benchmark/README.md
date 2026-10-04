@@ -788,3 +788,8 @@ owned code objects with verified source paths and fixed private package names.
 Repeated source membership and helper checks retain the original deadline.
 No initializer or namespace is installed; closed imports, runtime/lease/capacity
 and predecessor/density admission remain required before execution.
+
+The [static guard import plan](CONTAINER_VALIDATION_WORKER.md) records import
+declarations from matching owned source bytes and orders declared dependencies.
+It rejects unknown or cyclic guard dependencies without resolving a module or
+running an initializer. Actual imports, runtime and dispatch remain unadmitted.

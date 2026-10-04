@@ -692,3 +692,39 @@ receipts, live rounds, native objectives and artifact/compute caps are unchanged
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_module_bindings.py -v
 ```
+
+## Static import declarations and dependency order
+
+`container_import_declarations.prepare_import_declarations` pairs the proposed
+compiled descriptors with matching owned source bytes and inspects their static
+Python import declarations. Absolute imports must name one of the twelve fixed
+standard-library modules used by these guards. Relative imports must use the
+current `from . import guard_name` form within the fifteen-module inventory.
+Parent-relative imports, unknown modules, named relative modules and wildcard
+imports reject. Declared member names and local aliases remain explicit.
+
+The immutable plan records declarations and a deterministic dependency order
+with each declared guard dependency before its importer. All static declarations,
+including those nested in functions or conditional branches, participate; cycles
+reject. This is a declaration plan, not a trace of imports that actually execute,
+and it does not resolve standard-library members or detect every dynamic load.
+An eventual bootstrap still needs closed import handling and namespace checks.
+
+Four seed helpers and the complete interpreter/import closure must already be
+trusted before this helper is loaded. Source hashes alone do not attest loaded
+code. The original timer includes descriptor preparation, parsing, ordering,
+complete repeated source checks and final helper/manifest reads. Ordinary I/O
+errors use fixed integrity text; genuine trusted deadlines retain their typed
+error. No source or cache read substitutes for the owned compiled code.
+
+No guard initializer, namespace, dependency, loader or candidate process starts.
+Actual import resolution, initialization, runtime/system/transport/cross-host
+closure, atomic leases, fresh capacity, predecessor closure, density priority and
+final campaign locks remain separate requirements. Official tests stay sealed;
+all gated scores remain null and execution/full-runtime flags false. Historical
+receipts, live rounds, objectives and artifact/compute caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_import_declarations.py -v
+```
