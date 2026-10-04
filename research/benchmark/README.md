@@ -851,3 +851,23 @@ SVG/PDF figures, schemas and manifest from the committed JSON with
 require external digests before metric reads; publication replays complete
 source/runtime/worker, artifact inventory, native eligibility and cost custody.
 No generator is loaded and no official test is opened.
+
+### Complete density validation aggregation
+
+`density_validation_aggregate.aggregate(cells, expected_dataset_ids)` prepares
+descriptive utility tables from all 3,600 logical cells: 100 expected lineages,
+three density methods, default/native-selected configurations, three sample
+seeds and `n`/`4n` sizes. It rejects incomplete or duplicate matrices, substituted
+lineages, numeric identity aliases, inconsistent artifact charges and gated/win
+claims. Each informative lineage needs all three sample outcomes; missing
+evidence gives a null lineage median and retains the 100-lineage population
+denominator. Negative null-normalized retention remains unclipped.
+
+This is pure aggregation of supplied metadata. The future publisher must first
+verify externally frozen receipt/report hashes, complete 502-batch closure,
+source/runtime/worker custody, projection-inclusive bytes and unchanged native
+selection. No files or live workers are read by aggregation. Independent
+marginals and Chow-Liu retain study-reference labels; there is no reproduction
+claim, DOPE win, paired inference, formal privacy claim or production score.
+The current density queue continues unchanged; SDV v3 still requires Jepson's
+explicit approval.
