@@ -61,7 +61,10 @@ def replay_edges(objects, roots, files, transcript):
             queue.append(edge)
         elif edge['kind'] == 'interpreter':
             path = str(loader.absolute(edge['declared_value']))
-            enqueue(path)
+            require(path in files and files[path]['role'] in ('candidate-provider', 'interpreter'))
+            if path not in seen:
+                seen.add(path)
+                enqueue(path)
             edges.append(dict(edge, candidate_paths=[path]))
     while queue:
         edge = queue.popleft()
