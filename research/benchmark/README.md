@@ -33,6 +33,9 @@ It establishes no actual loader origin, search, provider choice or execution.
 library directory and preload absence to those snapshots, retaining the original
 outer timer and all unadmitted execution and null score fields.
 It proves neither actual cache construction nor loader search or execution.
+`container_bootstrap_filesystem.py` checks the proposed six-file source tree,
+owned request identity and empty cache before any startup. Its staged descriptor
+is unadmitted and supplies no final round or execution lease.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
