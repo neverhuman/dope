@@ -293,3 +293,37 @@ are unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_loader_configuration.py -v
 ```
+
+## Declared search-path projections
+
+`container_search_path_custody.verify_declared_search_paths` owns the external
+projection manifest before parsing it, checks its source identity and binds the
+exact configuration, selected-loader and root-declaration parents. It runs the
+configuration snapshot and ordered candidate catalog guards, then reconstructs
+every root and selected-provider RPATH/RUNPATH component in declaration order.
+The supported projection substitutes literal `$ORIGIN` (followed by slash or
+end) and `${ORIGIN}` tokens with the parent of the **declared pathname**, then
+normalizes that pathname. Braced tokens can have literal suffixes. It performs
+no alias resolution to determine origin. Empty, relative, unsupported dynamic
+or NUL components reject. Each projection must have a verified directory or
+absence snapshot in the selected/configuration parents; no unbound component
+can pass. Canonical comparisons preserve ordinal, boolean and numeric identities,
+including repeated components and their order. The component ceiling matches
+the bounded candidate catalog. Bodies, snapshots, parents and source are
+rechecked before returning counts. Errors reveal no input paths or values.
+
+This is a literal declaration projection rule, not actual glibc origin, library
+search order or provider selection. Call from an already trusted coordinator
+after Python and root ELF custody, with all guard source and interpreter/import
+closure trusted before import. Neither directory entry snapshots nor a declared
+path prove child library contents or complete default/hardware/preload/`dlopen`
+behavior. Point-in-time checks grant no atomic lease. Full runtime, cross-host,
+bootstrap, transport, deadline, capacity, clean SDV closure and density priority
+remain separate execution prerequisites. No library, process, fit or sample
+starts; official tests stay sealed, all gated scores stay null, and the frozen
+rounds, native objectives and caps remain unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_search_path_custody.py -v
+```
