@@ -820,6 +820,12 @@ caller-owned selections with the sixteen proposed guard references in a read-onl
 map. Repeated identity checks reject changes to the supplied registry; preparation
 never activates the overlay or runs real guards. Startup remains unadmitted.
 
+The [guard initialization plan](CONTAINER_VALIDATION_WORKER.md) binds owned code
+objects to those private module and namespace references in dependency order.
+It recompiles verified source bytes and compares executable metadata and nested
+constants, including floating-point sign bits. Preparation runs no initializer;
+live registry activation and complete execution admission remain prerequisites.
+
 
 The [complete CTGAN / TVAE native ledger](results/sdv-s3-population-native.md)
 accounts for all100 matched S3 lineages and 800 logical tuning trials, including
