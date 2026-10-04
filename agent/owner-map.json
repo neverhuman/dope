@@ -110,6 +110,7 @@
     "research/benchmark/container_registry_bindings.py": "external-evidence",
     "research/benchmark/container_private_registry.py": "external-evidence",
     "research/benchmark/container_guard_initialization.py": "external-evidence",
+    "research/benchmark/density_validation_aggregate.py": "external-evidence",
     "research/benchmark/CONTAINER_VALIDATION_WORKER.md": "external-evidence",
     "research/benchmark/CONTAINER_MEMBER_CONTRACT.md": "external-evidence",
     "research/benchmark/publish_artifact_bytes": "external-evidence",
