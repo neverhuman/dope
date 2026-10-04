@@ -99,6 +99,7 @@
     "research/benchmark/container_native_runtime_inventory.py": "external-evidence",
     "research/benchmark/container_startup.py": "external-evidence",
     "research/benchmark/container_guard_sources.py": "external-evidence",
+    "research/benchmark/container_owned_code.py": "external-evidence",
     "research/benchmark/CONTAINER_VALIDATION_WORKER.md": "external-evidence",
     "research/benchmark/CONTAINER_MEMBER_CONTRACT.md": "external-evidence",
     "research/benchmark/publish_artifact_bytes": "external-evidence",

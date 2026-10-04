@@ -776,3 +776,9 @@ checks the exact fifteen application guard files before imports and returns
 immutable owned source bytes on the original whole-batch timer. This source-only
 preparation admits no interpreter, runtime, sampler or dispatch; SDV closure,
 density priority and fresh capacity remain required.
+
+
+The [owned startup code preparation](CONTAINER_VALIDATION_WORKER.md) compiles
+verified guard source bytes without running initializers or reading cached
+bytecode. Compiler flags, source digests and the original deadline remain bound;
+this prepares no executable child, runtime certification or dispatch admission.
