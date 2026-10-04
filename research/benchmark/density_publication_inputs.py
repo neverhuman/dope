@@ -108,6 +108,7 @@ def claims(value):
     require(value['official_tests_opened'] is False
             and value['native_selection_changed'] is False
             and value['global_family_selected'] is False
+            and value.get('counts_as_dope_win', False) is False
             and type(value['new_generator_fits_started']) is int
             and value['new_generator_fits_started'] == 0
             and all(value[k] is None for k in ('mfs_v2', 'ptf_v1', 'release_safe', 'superiority')),

@@ -54,6 +54,10 @@ class MetadataControls(unittest.TestCase):
         jobs, batches = self.call()
         self.assertEqual((len(jobs), len(batches)), (502, 502))
 
+    def test_top_level_report_win_claim_rejected(self):
+        self.values[1]['counts_as_dope_win'] = True
+        with self.assertRaises(ValueError): self.call()
+
     def test_request_identity_uses_canonical_digest_not_python_equality(self):
         job = dict(fit_seed=11, final=False)
         key = m.digest_identity(job)
