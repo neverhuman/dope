@@ -553,3 +553,42 @@ gates. Official tests stay sealed and all gated scores remain null.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_native_runtime_inventory.py -v
 ```
+
+## Combined proposed startup custody
+
+`container_startup.verify_proposed_startup` binds the owned proposed filesystem,
+original native sampler and full recorded native inventory into one startup
+preparation. The selected inventory must reference that exact sampler metadata;
+the filesystem's predecessor proposal must match the sampler's original proposal.
+The separate native child proposal still changes only the library directory,
+under the child guard's canonical request and proposal checks.
+
+All three parent manifests are externally owned, bounded regular files. The
+helper owns their linked Python/root declarations and replays the Python/root
+ELF, proposed filesystem, original sampler and recorded native-file guards on
+one original whole-batch timer. It checks time before the first stage, after the
+Python/root stage, through the timed guards and after final metadata/source
+hashes. Initial/final helper paths must be unaliased regular files before hashing;
+final parent metadata repeats bounded regular admission. Fixed I/O rejection
+text never includes private input values.
+
+The trusted caller must own every source and its complete interpreter/import
+closure before importing these helpers. Replaying recorded preparation stages
+does not admit the staged worker or prove actual loader/provider selection,
+all possible dynamic loads, an executed child's environment or system closure.
+Point-in-time checks are not atomic leases. Cross-host identity, transport,
+capacity, predecessor/density priority and the five final campaign locks remain
+separate gates. No fit, sample, native executable/library or dependency initializer
+is started. Official tests remain sealed and all gated scores null.
+
+Opaque orchestration controls explicitly stub only the independently tested
+Python/root stage; the proposed filesystem, original native executable, child
+proposal and recorded native files run their real guards against fake files.
+The private preparation replay uses the actual recorded Python/root custody
+inputs, with no candidate imports or execution; it is separate preparation cost,
+not a benchmark outcome or independently reviewed private-data replay.
+
+```sh
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_startup.py -v
+```
