@@ -952,3 +952,22 @@ before the strict closure gate can accept them; complete runtime replay also
 remains required. The helpers return `publication_admitted: false`, acquire no
 lease, start no jobs, and provide no partial panel, score or historical runtime
 certification. Official tests stay sealed and SDV v3 remains unauthorized.
+
+
+The complete input gate now accepts `attempt_auxiliary_trees` only inside the
+externally pinned closure receipt lock, keyed by all 502 canonical physical job
+digests. Each entry lists exact relative directories and files with SHA256 and
+byte counts. Only the frozen worker's two empty runtime/cache directories and
+four known CatBoost log files under their three directory names are permitted.
+Missing/duplicate entries, unknown names, extra cache/temp contents, links,
+special files and auxiliary output on unstarted operations fail closed. All
+auxiliary file references are hashed before any report metric is parsed, and
+per-attempt/global tree inventories plus final reference rehashes remain strict.
+
+Original flat execution receipts are unchanged. Anchors without this additional
+inventory retain their original strict flat-tree behavior and reject the real
+round's auxiliary trees. Auxiliary log bytes are accounted separately from
+generator artifacts; every model/projection charge remains required. This adds
+closure accounting, not runtime certification, a new run, or publication
+admission. The live round is untouched; complete actor/receipt closure, metric,
+native-selection, cost and runtime replay remain prerequisites for a panel.
