@@ -903,3 +903,25 @@ recompute their losses, count validation CSV rows, initialize dependencies or
 certify a loaded runtime. The result remains `publication_admitted: false`;
 native selection, runtime and full cost replay are still required. No partial
 panel, production score, privacy certification or DOPE win is published.
+
+`density_native_replay.replay_native_metadata()` verifies the immutable native
+parent and original method-lock snapshot (`406ac543…`, from Git `f9b13657…`),
+whose bytes match both original density tuning rounds. It reconstructs their
+bounded grids and checks all 1,100 trial receipts, 300 method/lineage pairs and
+600 default/native-selected cells. Defaults are found by exact configuration;
+selection maximizes the method's validation log density, with the frozen
+charged-byte/configuration-digest/trial-index tie rules. It verifies declared
+projection-inclusive charges and trial-time totals against the eight-trial /
+12-hour cap. Common utility never selects a native winner.
+
+This reads saved native metadata and hashes source bytes without executing them.
+Historical selection records omit their validation hash, and older Copula trial
+identities omit source hashes. These omissions are counted explicitly; any
+present hash must agree, and every trial and metric must bind the original
+validation partition. No historical source-identity evidence is inferred.
+It does not recompute likelihood, verify every native runtime/worker/artifact
+file or admit publication. Those checks and density operation-cost replay remain
+required. Independent marginals and Chow-Liu keep study-reference labels without
+a reported-experiment reproduction claim; native KPI values are never ranked
+across methods. No new tuning, fits, samples, official-test access or SDV v3 run
+is launched.
