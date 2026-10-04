@@ -23,6 +23,10 @@ search, runtime closure and execution admission unverified.
 `container_loader_catalog.py` replays the frozen package-basename/cache candidate
 enumeration, including ordered root and recursive provider dependencies. It
 retains competing provider identities and establishes no actual loader choice.
+`container_loader_configuration.py` hashes selected configuration bytes before
+inspecting a bounded declaration profile, binds include file membership and
+checks the additional directory/absence snapshots named by those declarations.
+It proves neither actual cache construction nor loader search or execution.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
