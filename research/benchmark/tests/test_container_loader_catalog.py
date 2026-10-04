@@ -177,6 +177,35 @@ class CatalogControls(unittest.TestCase):
         self.assertEqual(edges[2], dict(roots[1], candidate_paths=[provider]))
         self.assertTrue(all(path in self.lock['files'] for edge in edges for path in edge['candidate_paths']))
 
+    def test_interpreter_also_needed_expands_once(self):
+        provider = str(self.directory_alias / self.alias.name)
+        edge = {'origin': {'path': str(self.root), 'sha256': fixture.sha(self.root)},
+                'kind': 'interpreter', 'ordinal': 0, 'declared_value': provider}
+        result = catalog.replay_edges(self.objects, [edge, dict(edge, kind='needed')],
+                                      self.lock['files'], self.stdout.read_bytes())
+        self.assertEqual(len(result), 3)
+        self.assertEqual(sum(row['origin']['path'] == provider for row in result), 1)
+
+    def test_repeated_interpreter_references_expand_once(self):
+        provider = str(self.directory_alias / self.alias.name)
+        first = {'origin': {'path': str(self.root), 'sha256': fixture.sha(self.root)},
+                 'kind': 'interpreter', 'ordinal': 0, 'declared_value': provider}
+        second = dict(first, origin={'path': str(self.bundle), 'sha256': fixture.sha(self.bundle)})
+        result = catalog.replay_edges(self.objects, [first, second],
+                                      self.lock['files'], self.stdout.read_bytes())
+        self.assertEqual(len(result), 3)
+        self.assertEqual([row['kind'] for row in result], ['interpreter', 'interpreter', 'needed'])
+
+    def test_interpreter_self_cycle_expands_once(self):
+        provider = str(self.directory_alias / self.alias.name)
+        edge = {'origin': {'path': str(self.root), 'sha256': fixture.sha(self.root)},
+                'kind': 'interpreter', 'ordinal': 0, 'declared_value': provider}
+        files = copy.deepcopy(self.lock['files'])
+        files[provider]['declarations']['declarations']['needed'] = [provider]
+        result = catalog.replay_edges(self.objects, [edge], files, self.stdout.read_bytes())
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[1]['candidate_paths'], [provider])
+
     def test_relative_dependency_path_and_dynamic_tokens_rejected(self):
         origin = {'path': str(self.root), 'sha256': fixture.sha(self.root)}
         for name in ('relative/provider.so', '$ORIGIN/provider.so', '/opaque/$LIB/provider.so'):

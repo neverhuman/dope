@@ -226,6 +226,9 @@ It preserves first occurrence order, requires every candidate file binding,
 seeds interpreter dependencies and replays recursive `DT_NEEDED` edges once per
 new provider path. Repeated paths
 terminate dependency cycles; an explicit edge ceiling bounds the traversal.
+Interpreter paths are marked visited before seeding their dependencies. Repeated
+interpreter records stay in the catalog, but a direct dependency or self-cycle
+cannot expand an interpreter's dependencies again.
 Canonical JSON comparisons preserve integer, float and boolean distinctions.
 Omitted, added, reordered or changed edges reject, as do unsupported audit,
 filter and auxiliary declarations, absent candidates and unbound provider files.
