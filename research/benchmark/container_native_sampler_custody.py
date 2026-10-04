@@ -51,6 +51,7 @@ def verify_sampler_declarations(sampler_path, sampler_sha256, *, batch_started_a
                    for module, key in ((elf, 'elf_helper_sha256'), (bootstrap, 'bootstrap_helper_sha256'))]
         helpers.append((python.unaliased(Path(__file__)), python.frozen_digest(lock['sampler_helper_sha256'])))
         for path, expected in helpers:
+            require(stat.S_ISREG(path.stat().st_mode))
             require(python.sha(path) == expected)
         proposal = owned_regular(lock['proposal_path'], lock['proposal_sha256'])
         proposal_blob = proposal[0].read_bytes()
