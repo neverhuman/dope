@@ -769,3 +769,10 @@ The [compressed-member contract](CONTAINER_MEMBER_CONTRACT.md) verifies the
 complete encoded byte charge and independently frozen kernel/projection digests
 before returning immutable owned members. It admits no sampler, runtime or job;
 compressed-candidate validation still waits on predecessor closure and capacity.
+
+
+The [compressed-worker startup source gate](CONTAINER_VALIDATION_WORKER.md)
+checks the exact fifteen application guard files before imports and returns
+immutable owned source bytes on the original whole-batch timer. This source-only
+preparation admits no interpreter, runtime, sampler or dispatch; SDV closure,
+density priority and fresh capacity remain required.

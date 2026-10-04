@@ -594,3 +594,34 @@ not a benchmark outcome or independently reviewed private-data replay.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_startup.py -v
 ```
+
+## Startup guard source bytes before imports
+
+`container_guard_sources.verify_startup_sources` reads the exact fifteen staged
+application guard files before any of their initializers run. An external
+manifest digest binds the inventory, each file's bytes/digest/owner/mode, and the
+already trusted checker's source identity. The directory must be owned, mode
+0700 and contain exactly those fifteen regular files; aliases, extra files or
+directories, writable shared files and special files reject before guarded reads.
+Manifest, checker and source reads are bounded. A second full source pass and
+final checker/manifest reads reject late drift on the original 600-second timer.
+Ordinary I/O errors remain fixed integrity errors; genuine timer exhaustion
+retains its fixed deadline error.
+
+Success returns a frozen `StartupSources` value with immutable `(name, bytes)`
+pairs. A future trusted bootstrap must import from those owned bytes; reopening
+pathnames later would abandon this input binding. The fifteen names cover the
+current relative-import closure of `container_startup`, checked separately by a
+source-only regression. This checker starts no interpreter, imports no staged
+source or dependency, and grants no dispatch permission. Its own source and
+complete interpreter/import closure must already be trusted before it is loaded;
+its self-file check alone does not establish what code was loaded. The remaining
+interpreter/system/loader, transport, cross-host, atomic lease, capacity,
+SDV-closure and density-priority evidence still requires separate admission.
+Official tests stay sealed, execution and full-runtime flags false, gated scores
+null. Existing live rounds, objectives, artifacts and failures remain unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_guard_sources.py -v
+```
