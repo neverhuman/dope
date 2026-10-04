@@ -919,7 +919,7 @@ L 503.341771 93.638906
    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle" x="432" y="336.6" transform="rotate(-0 432 336.6)">Same paired cells within each method · one fit seed · negative R² retained · no cross-method KPI ranking</text>
   </g>
   <g id="text_38">
-   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle" x="432" y="351" transform="rotate(-0 432 351)">Curve endpoints retain coverage gaps. Shared quality pending; official tests sealed; MFS-v2 / PTF-v1 null.</text>
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle" x="432" y="351" transform="rotate(-0 432 351)">Scheduling / infrastructure gaps imply no method failures. Shared quality pending; tests sealed; MFS-v2 / PTF-v1 null.</text>
   </g>
  </g>
  <defs>

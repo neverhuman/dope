@@ -516,8 +516,8 @@
       "items": {
         "type": "string"
       },
-      "maxItems": 6,
-      "minItems": 6,
+      "maxItems": 7,
+      "minItems": 7,
       "type": "array"
     },
     "logical_tuning_trials": {
@@ -525,6 +525,9 @@
     },
     "method_dataset_cells": {
       "type": "integer"
+    },
+    "method_failure_conclusions_drawn": {
+      "const": false
     },
     "mfs_v2": {
       "type": "null"
@@ -1054,8 +1057,44 @@
     "native_sample_seed": {
       "type": "integer"
     },
+    "new_outcome_class_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "infrastructure_interruption": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        },
+        "scheduling_cutoff": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "infrastructure_interruption",
+        "ok",
+        "scheduling_cutoff"
+      ],
+      "type": "object"
+    },
     "new_physical_attempts": {
       "type": "integer"
+    },
+    "new_scheduling_cutoff_reason_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "deadline_truncated": {
+          "type": "integer"
+        },
+        "deadline_unstarted": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "deadline_truncated",
+        "deadline_unstarted"
+      ],
+      "type": "object"
     },
     "new_terminal_operation_status_counts": {
       "additionalProperties": false,
@@ -1081,22 +1120,6 @@
       ],
       "type": "object"
     },
-    "new_trial_status_counts": {
-      "additionalProperties": false,
-      "properties": {
-        "failed": {
-          "type": "integer"
-        },
-        "ok": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "failed",
-        "ok"
-      ],
-      "type": "object"
-    },
     "official_tests_opened": {
       "const": false
     },
@@ -1113,6 +1136,9 @@
           "method": {
             "type": "string"
           },
+          "method_failure_inferred": {
+            "const": false
+          },
           "partial_artifact_bytes": {
             "type": "integer"
           },
@@ -1123,11 +1149,11 @@
             "pattern": "^[0-9a-f]{64}$",
             "type": "string"
           },
-          "source_job_sha256": {
-            "pattern": "^[0-9a-f]{64}$",
+          "receipt_status": {
             "type": "string"
           },
-          "status": {
+          "source_job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
             "type": "string"
           },
           "trial_index": {
@@ -1138,11 +1164,12 @@
           "dataset",
           "failed_operation_seconds",
           "method",
+          "method_failure_inferred",
           "partial_artifact_bytes",
           "receipt_path",
           "receipt_sha256",
+          "receipt_status",
           "source_job_sha256",
-          "status",
           "trial_index"
         ],
         "type": "object"
@@ -1181,6 +1208,22 @@
         "reconcile_sdv_population.py",
         "sdv_native_accounting.py",
         "sdv_native_continuation.py"
+      ],
+      "type": "object"
+    },
+    "raw_new_receipt_status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "failed": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "failed",
+        "ok"
       ],
       "type": "object"
     },
@@ -1334,254 +1377,8 @@
               "method": {
                 "type": "string"
               },
-              "native_kpi": {
-                "additionalProperties": false,
-                "properties": {
-                  "components": {
-                    "additionalProperties": false,
-                    "properties": {
-                      "LinearRegression": {
-                        "type": "number"
-                      },
-                      "MLPRegressor": {
-                        "type": "number"
-                      }
-                    },
-                    "required": [
-                      "LinearRegression",
-                      "MLPRegressor"
-                    ],
-                    "type": "object"
-                  },
-                  "direction": {
-                    "type": "string"
-                  },
-                  "implementation_sha256": {
-                    "pattern": "^[0-9a-f]{64}$",
-                    "type": "string"
-                  },
-                  "objective": {
-                    "type": "string"
-                  },
-                  "seed": {
-                    "type": "integer"
-                  },
-                  "validation_sha256": {
-                    "pattern": "^[0-9a-f]{64}$",
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "components",
-                  "direction",
-                  "implementation_sha256",
-                  "objective",
-                  "seed",
-                  "validation_sha256",
-                  "value"
-                ],
-                "type": "object"
-              },
-              "native_selection_eligible": {
-                "const": true
-              },
-              "operation_evidence": {
-                "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "elapsed_seconds": {
-                      "type": "number"
-                    },
-                    "energy_attributable_to_job": {
-                      "type": "null"
-                    },
-                    "gpu_process_observed": {
-                      "const": true
-                    },
-                    "host": {
-                      "type": "string"
-                    },
-                    "monitor_sha256": {
-                      "pattern": "^[0-9a-f]{64}$",
-                      "type": "string"
-                    },
-                    "new_operation_started": {
-                      "const": true
-                    },
-                    "peak_gpu_used_mib": {
-                      "type": "integer"
-                    },
-                    "peak_resident_bytes": {
-                      "type": "integer"
-                    },
-                    "phase": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "elapsed_seconds",
-                    "energy_attributable_to_job",
-                    "gpu_process_observed",
-                    "host",
-                    "monitor_sha256",
-                    "new_operation_started",
-                    "peak_gpu_used_mib",
-                    "peak_resident_bytes",
-                    "phase",
-                    "status"
-                  ],
-                  "type": "object"
-                },
-                "maxItems": 3,
-                "minItems": 3,
-                "type": "array"
-              },
-              "operation_seconds": {
-                "type": "number"
-              },
-              "receipt": {
-                "additionalProperties": false,
-                "properties": {
-                  "path": {
-                    "type": "string"
-                  },
-                  "sha256": {
-                    "pattern": "^[0-9a-f]{64}$",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "path",
-                  "sha256"
-                ],
-                "type": "object"
-              },
-              "status": {
-                "type": "string"
-              },
-              "terminal_operation_status": {
-                "type": "string"
-              },
-              "trial_index": {
-                "type": "integer"
-              }
-            },
-            "required": [
-              "artifact_bytes",
-              "common_samples_complete",
-              "complete_fitted_artifact",
-              "config",
-              "config_sha256",
-              "counts_as_dope_win",
-              "dataset",
-              "fit_seed",
-              "kind",
-              "method",
-              "native_kpi",
-              "native_selection_eligible",
-              "operation_evidence",
-              "operation_seconds",
-              "receipt",
-              "status",
-              "terminal_operation_status",
-              "trial_index"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "artifact_bytes": {
-                "type": "integer"
-              },
-              "common_samples_complete": {
-                "const": true
-              },
-              "complete_fitted_artifact": {
-                "const": true
-              },
-              "config": {
-                "additionalProperties": false,
-                "properties": {
-                  "batch_size": {
-                    "type": "integer"
-                  },
-                  "compress_dims": {
-                    "items": {
-                      "type": "integer"
-                    },
-                    "maxItems": 2,
-                    "minItems": 2,
-                    "type": "array"
-                  },
-                  "cuda": {
-                    "type": "null"
-                  },
-                  "decompress_dims": {
-                    "items": {
-                      "type": "integer"
-                    },
-                    "maxItems": 2,
-                    "minItems": 2,
-                    "type": "array"
-                  },
-                  "embedding_dim": {
-                    "type": "integer"
-                  },
-                  "enable_gpu": {
-                    "const": true
-                  },
-                  "epochs": {
-                    "type": "integer"
-                  },
-                  "l2scale": {
-                    "type": "number"
-                  },
-                  "loss_factor": {
-                    "type": "integer"
-                  },
-                  "verbose": {
-                    "const": false
-                  }
-                },
-                "required": [
-                  "batch_size",
-                  "compress_dims",
-                  "cuda",
-                  "decompress_dims",
-                  "embedding_dim",
-                  "enable_gpu",
-                  "epochs",
-                  "l2scale",
-                  "loss_factor",
-                  "verbose"
-                ],
-                "type": "object"
-              },
-              "config_sha256": {
-                "pattern": "^[0-9a-f]{64}$",
-                "type": "string"
-              },
-              "counts_as_dope_win": {
+              "method_failure_inferred": {
                 "const": false
-              },
-              "dataset": {
-                "type": "string"
-              },
-              "fit_seed": {
-                "type": "integer"
-              },
-              "kind": {
-                "type": "string"
-              },
-              "method": {
-                "type": "string"
               },
               "native_kpi": {
                 "additionalProperties": false,
@@ -1694,6 +1491,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -1711,11 +1514,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -1732,13 +1538,282 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
+              "trial_index"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_bytes": {
+                "type": "integer"
+              },
+              "common_samples_complete": {
+                "const": true
+              },
+              "complete_fitted_artifact": {
+                "const": true
+              },
+              "config": {
+                "additionalProperties": false,
+                "properties": {
+                  "batch_size": {
+                    "type": "integer"
+                  },
+                  "compress_dims": {
+                    "items": {
+                      "type": "integer"
+                    },
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  "cuda": {
+                    "type": "null"
+                  },
+                  "decompress_dims": {
+                    "items": {
+                      "type": "integer"
+                    },
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  "embedding_dim": {
+                    "type": "integer"
+                  },
+                  "enable_gpu": {
+                    "const": true
+                  },
+                  "epochs": {
+                    "type": "integer"
+                  },
+                  "l2scale": {
+                    "type": "number"
+                  },
+                  "loss_factor": {
+                    "type": "integer"
+                  },
+                  "verbose": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "batch_size",
+                  "compress_dims",
+                  "cuda",
+                  "decompress_dims",
+                  "embedding_dim",
+                  "enable_gpu",
+                  "epochs",
+                  "l2scale",
+                  "loss_factor",
+                  "verbose"
+                ],
+                "type": "object"
+              },
+              "config_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
+              },
+              "native_kpi": {
+                "additionalProperties": false,
+                "properties": {
+                  "components": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "LinearRegression": {
+                        "type": "number"
+                      },
+                      "MLPRegressor": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "LinearRegression",
+                      "MLPRegressor"
+                    ],
+                    "type": "object"
+                  },
+                  "direction": {
+                    "type": "string"
+                  },
+                  "implementation_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "objective": {
+                    "type": "string"
+                  },
+                  "seed": {
+                    "type": "integer"
+                  },
+                  "validation_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "components",
+                  "direction",
+                  "implementation_sha256",
+                  "objective",
+                  "seed",
+                  "validation_sha256",
+                  "value"
+                ],
+                "type": "object"
+              },
+              "native_selection_eligible": {
+                "const": true
+              },
+              "operation_evidence": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "elapsed_seconds": {
+                      "type": "number"
+                    },
+                    "energy_attributable_to_job": {
+                      "type": "null"
+                    },
+                    "gpu_process_observed": {
+                      "const": true
+                    },
+                    "host": {
+                      "type": "string"
+                    },
+                    "monitor_sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "new_operation_started": {
+                      "const": true
+                    },
+                    "peak_gpu_used_mib": {
+                      "type": "integer"
+                    },
+                    "peak_resident_bytes": {
+                      "type": "integer"
+                    },
+                    "phase": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "elapsed_seconds",
+                    "energy_attributable_to_job",
+                    "gpu_process_observed",
+                    "host",
+                    "monitor_sha256",
+                    "new_operation_started",
+                    "peak_gpu_used_mib",
+                    "peak_resident_bytes",
+                    "phase",
+                    "status"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "operation_seconds": {
+                "type": "number"
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "receipt_status": {
+                "type": "string"
+              },
+              "terminal_operation_status": {
+                "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
+              },
+              "trial_index": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_bytes",
+              "common_samples_complete",
+              "complete_fitted_artifact",
+              "config",
+              "config_sha256",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_seed",
+              "kind",
+              "method",
+              "method_failure_inferred",
+              "native_kpi",
+              "native_selection_eligible",
+              "operation_evidence",
+              "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
+              "receipt",
+              "receipt_status",
+              "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -1831,6 +1906,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "additionalProperties": false,
@@ -1996,6 +2074,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -2013,11 +2097,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -2034,13 +2121,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -2134,6 +2225,9 @@
               "method": {
                 "type": "string"
               },
+              "method_failure_inferred": {
+                "const": false
+              },
               "native_kpi": {
                 "type": "null"
               },
@@ -2196,6 +2290,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -2213,11 +2313,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -2234,13 +2337,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -2353,6 +2460,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "type": "null"
@@ -2470,6 +2580,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -2487,11 +2603,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -2508,13 +2627,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -2627,6 +2750,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "type": "null"
@@ -2690,6 +2816,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -2707,11 +2839,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -2728,13 +2863,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -2847,6 +2986,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "type": "null"
@@ -2911,6 +3053,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -2928,11 +3076,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -2949,13 +3100,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -3049,6 +3204,9 @@
               "method": {
                 "type": "string"
               },
+              "method_failure_inferred": {
+                "const": false
+              },
               "native_kpi": {
                 "type": "null"
               },
@@ -3112,6 +3270,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -3129,11 +3293,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -3150,13 +3317,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -3269,6 +3440,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "type": "null"
@@ -3385,6 +3559,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -3402,11 +3582,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -3423,13 +3606,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -3522,6 +3709,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "type": "null"
@@ -3638,6 +3828,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -3655,11 +3851,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -3676,13 +3875,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -3775,6 +3978,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "type": "null"
@@ -3892,6 +4098,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -3909,11 +4121,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -3930,13 +4145,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -4050,6 +4269,9 @@
               "method": {
                 "type": "string"
               },
+              "method_failure_inferred": {
+                "const": false
+              },
               "native_kpi": {
                 "type": "null"
               },
@@ -4113,6 +4335,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -4130,11 +4358,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -4151,13 +4382,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -4270,6 +4505,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "additionalProperties": false,
@@ -4381,6 +4619,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -4398,11 +4642,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "null"
               },
               "trial_index": {
                 "type": "integer"
@@ -4419,13 +4666,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -4519,6 +4770,9 @@
               "method": {
                 "type": "string"
               },
+              "method_failure_inferred": {
+                "const": false
+              },
               "native_kpi": {
                 "additionalProperties": false,
                 "properties": {
@@ -4629,6 +4883,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -4646,11 +4906,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "null"
               },
               "trial_index": {
                 "type": "integer"
@@ -4667,13 +4930,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -4786,6 +5053,9 @@
               },
               "method": {
                 "type": "string"
+              },
+              "method_failure_inferred": {
+                "const": false
               },
               "native_kpi": {
                 "additionalProperties": false,
@@ -4950,6 +5220,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -4967,11 +5243,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "integer"
               },
               "trial_index": {
                 "type": "integer"
@@ -4988,13 +5267,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -5088,6 +5371,9 @@
               "method": {
                 "type": "string"
               },
+              "method_failure_inferred": {
+                "const": false
+              },
               "native_kpi": {
                 "type": "null"
               },
@@ -5150,6 +5436,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -5167,11 +5459,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "null"
               },
               "trial_index": {
                 "type": "integer"
@@ -5188,13 +5483,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -5308,6 +5607,9 @@
               "method": {
                 "type": "string"
               },
+              "method_failure_inferred": {
+                "const": false
+              },
               "native_kpi": {
                 "type": "null"
               },
@@ -5370,6 +5672,12 @@
               "operation_seconds": {
                 "type": "number"
               },
+              "outcome_class": {
+                "type": "string"
+              },
+              "outcome_reason": {
+                "type": "string"
+              },
               "receipt": {
                 "additionalProperties": false,
                 "properties": {
@@ -5387,11 +5695,14 @@
                 ],
                 "type": "object"
               },
-              "status": {
+              "receipt_status": {
                 "type": "string"
               },
               "terminal_operation_status": {
                 "type": "string"
+              },
+              "terminal_timeout_seconds": {
+                "type": "null"
               },
               "trial_index": {
                 "type": "integer"
@@ -5408,13 +5719,17 @@
               "fit_seed",
               "kind",
               "method",
+              "method_failure_inferred",
               "native_kpi",
               "native_selection_eligible",
               "operation_evidence",
               "operation_seconds",
+              "outcome_class",
+              "outcome_reason",
               "receipt",
-              "status",
+              "receipt_status",
               "terminal_operation_status",
+              "terminal_timeout_seconds",
               "trial_index"
             ],
             "type": "object"
@@ -5489,20 +5804,23 @@
     "limitations",
     "logical_tuning_trials",
     "method_dataset_cells",
+    "method_failure_conclusions_drawn",
     "mfs_v2",
     "native_kpis_cross_ranked",
     "native_metric_seed",
     "native_objectives",
     "native_sample_seed",
+    "new_outcome_class_counts",
     "new_physical_attempts",
+    "new_scheduling_cutoff_reason_counts",
     "new_terminal_operation_status_counts",
-    "new_trial_status_counts",
     "official_tests_opened",
     "previous_failed_trials",
     "prior_trials_reused",
     "production_certified",
     "ptf_v1",
     "publisher_sources",
+    "raw_new_receipt_status_counts",
     "release_safe",
     "sampling_success_used_for_selection",
     "scope",

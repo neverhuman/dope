@@ -47,11 +47,31 @@ def native(row):
                                    'implementation_sha256', 'validation_sha256', 'seed')}
 
 
+def outcome(terminal):
+    """Separate scheduler/transport outcomes; never infer a method failure."""
+    status, limit = terminal['status'], terminal.get('timeout_seconds')
+    if status in ('ok', 'immutable_prior_reuse'):
+        return status, status
+    if status == 'deadline_unstarted':
+        return 'scheduling_cutoff', 'deadline_unstarted'
+    # The frozen coordinator uses min(600, remaining(round deadline)); its
+    # shortened final transport operation is an infrastructure cut-off.
+    if status == 'transport_or_prelaunch_failure' and type(limit) is int and 0 < limit < 600:
+        return 'scheduling_cutoff', 'deadline_truncated'
+    if status in ('transport_or_prelaunch_failure', 'foreign_gpu_owner_appeared'):
+        return 'infrastructure_interruption', status
+    return 'unclassified_unavailable', status
+
+
 def trial(row, terminal):
+    classification, reason = outcome(terminal)
     return {k: row[k] for k in ('dataset', 'method', 'trial_index', 'kind', 'fit_seed',
-        'status', 'config', 'artifact_bytes', 'complete_fitted_artifact',
+        'config', 'artifact_bytes', 'complete_fitted_artifact',
         'native_selection_eligible', 'common_samples_complete', 'operation_seconds')} | {
-        'config_sha256': digest(row['config']), 'terminal_operation_status': terminal,
+        'receipt_status': row['status'], 'outcome_class': classification,
+        'outcome_reason': reason, 'method_failure_inferred': False,
+        'config_sha256': digest(row['config']), 'terminal_operation_status': terminal['status'],
+        'terminal_timeout_seconds': terminal.get('timeout_seconds'),
         'receipt': {'path': row['receipt_path'], 'sha256': row['receipt_sha256']},
         'native_kpi': native(row), 'counts_as_dope_win': False}
 
@@ -120,18 +140,26 @@ def assemble(lock, report, terminals):
         'new_physical_attempts': 704, 'prior_trials_reused': 96,
         'all_frozen_cells_accounted': True, 'fit_seeds': [11],
         'native_sample_seed': 101, 'native_metric_seed': 1729,
-        'new_trial_status_counts': counts,
+        'raw_new_receipt_status_counts': counts,
+        'new_outcome_class_counts': dict(Counter(r['outcome_class'] for r in trials
+                                                   if r['kind'] == 'new_native_trial')),
+        'new_scheduling_cutoff_reason_counts': dict(Counter(r['outcome_reason'] for r in trials
+            if r['kind'] == 'new_native_trial' and r['outcome_class'] == 'scheduling_cutoff')),
+        'method_failure_conclusions_drawn': False,
         'new_terminal_operation_status_counts': dict(Counter(r['terminal_operation_status'] for r in trials
                                                                if r['kind'] == 'new_native_trial')),
         'cell_status_counts': dict(Counter(c['status'] for c in cells)),
         'trials': trials, 'cells': cells, 'within_method_summaries': summaries,
         'previous_failed_trials': [{k: r[k] for k in ('dataset', 'method', 'trial_index',
-            'source_job_sha256', 'receipt_path', 'receipt_sha256', 'status',
-            'failed_operation_seconds', 'partial_artifact_bytes')} for r in report['previous_failed_trials']],
+            'source_job_sha256', 'receipt_path', 'receipt_sha256',
+            'failed_operation_seconds', 'partial_artifact_bytes')} | {
+            'receipt_status': r['status'], 'method_failure_inferred': False}
+            for r in report['previous_failed_trials']],
         'cost': report['cost'], 'native_objectives': lock['native_objectives'],
         'limitations': ['One fit seed; no fit uncertainty or paired superiority analysis',
             'Native R2 values are unclipped and never ranked across methods',
-            'Failed and unstarted trials remain in every coverage denominator',
+            'Scheduling cut-offs and infrastructure interruptions remain in every coverage denominator',
+            'Raw failed receipt status is not a method-failure classification',
             'Native eligibility survives a later common-sampling failure',
             'Artifact bytes include projection; unconstrained baselines have no L3 release claim',
             'Historical reused evidence retains its original runtime limitations'], **GATES}
@@ -193,7 +221,9 @@ def build(receipt_sha256, report_sha256):
                 'peak_gpu_used_mib': receipt['fit']['peak_device_used_mib'],
                 'gpu_process_observed': None, 'monitor_sha256': None,
                 'energy_attributable_to_job': None}]
-        terminals[(row['dataset'], row['method'], row['trial_index'])] = terminal
+        terminals[(row['dataset'], row['method'], row['trial_index'])] = {
+            'status': terminal, 'timeout_seconds': receipt['operations'][-1].get('timeout_seconds')
+            if row['kind'] == 'new_native_trial' else None}
         operations[(row['dataset'], row['method'], row['trial_index'])] = phases
     result = assemble(lock, report, terminals)
     for row in result['trials']:
@@ -241,7 +271,12 @@ def markdown(report):
     lines += ['', 'Medians use the same paired cells within each method; native KPIs are not cross-method ranks.', '',
         'New attempt terminal statuses: ' + ', '.join(f'{k}: {v}' for k, v in
                                                       sorted(report['new_terminal_operation_status_counts'].items())) + '.', '',
-        'Failed/unstarted attempts and two earlier failed trials remain in JSON and cost accounting.',
+        'Scheduling outcomes: ' + ', '.join(f'{k}: {v}' for k, v in
+                                             sorted(report['new_outcome_class_counts'].items())) + '.',
+        'The 524 unstarted and one deadline-truncated attempt are scheduling cut-offs (infrastructure),',
+        'separate from the 154 successful attempts and 25 earlier infrastructure interruptions.',
+        'Immutable raw receipt statuses and two previous-round failed attempts remain in cost accounting.',
+        'No method-failure or method-quality conclusion is drawn from scheduling or infrastructure outcomes.',
         'Official tests remain sealed. Shared validation quality is pending; MFS-v2, PTF-v1,',
         'release-safe status and superiority are null. No DOPE win or production certification is claimed.', '',
         'Regenerate using `python3 -B -m research.benchmark.publish_sdv_population_native` with',

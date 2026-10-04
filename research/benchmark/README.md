@@ -827,8 +827,11 @@ accounts for all100 matched S3 lineages and 800 logical tuning trials, including
 frozen study mean of author-library LR and MLP regression efficacy, with
 projection-inclusive artifact bytes and configuration digest tie-breaks.
 35 CTGAN and 34 TVAE cells have native selections; 65 and 66 remain unavailable.
-524 deadline-unstarted attempts, 16 transport/prelaunch failures, ten foreign-GPU
-owner deferrals and two earlier failed trials remain visible. This is a complete
+524 deadline-unstarted attempts and one deadline-truncated attempt are scheduling
+cut-offs (infrastructure), separate from 154 successful attempts and 25 earlier
+infrastructure interruptions (15 transport/prelaunch, ten foreign-GPU owners).
+Two previous-round failed attempts remain charged. Raw failed receipt statuses
+never imply method failure; no method conclusions follow from these outcomes. This is a complete
 accounting ledger with one fit seed; shared quality and production claims remain
 unmeasured. Native KPIs are never ranked across methods.
 

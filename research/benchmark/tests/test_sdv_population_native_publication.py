@@ -24,8 +24,9 @@ class PublicationControls(unittest.TestCase):
             'new_operation_seconds': 7040.0, 'prior_native_trial_wall_seconds': 960.0,
             'previous_failed_operation_seconds': 601.0, 'coordinator_wall_seconds': 9000.0,
             'energy_attributable_to_job': None}
-        self.terminals = {(r['dataset'], r['method'], r['trial_index']):
-            'ok' if r['kind'] == 'new_native_trial' else 'immutable_prior_reuse'
+        self.terminals = {(r['dataset'], r['method'], r['trial_index']): {
+            'status': 'ok' if r['kind'] == 'new_native_trial' else 'immutable_prior_reuse',
+            'timeout_seconds': 600 if r['kind'] == 'new_native_trial' else None}
             for r in self.report['trials']}
         self.select()
 
@@ -51,7 +52,7 @@ class PublicationControls(unittest.TestCase):
         r = self.report['trials'][96]
         r.update(status='failed', native_kpi=None, native_selection_eligible=False,
                  common_samples_complete=False, complete_fitted_artifact=False, artifact_bytes=0)
-        self.terminals[(r['dataset'], r['method'], r['trial_index'])] = 'deadline_unstarted'
+        self.terminals[(r['dataset'], r['method'], r['trial_index'])] = {'status': 'deadline_unstarted'}
         self.report['new_trial_status_counts'] = {'ok': 703, 'failed': 1}
         self.select()
         out = self.call()
@@ -64,7 +65,8 @@ class PublicationControls(unittest.TestCase):
         r = self.report['trials'][96]
         r.update(status='failed', common_samples_complete=False)
         self.report['new_trial_status_counts'] = {'ok': 703, 'failed': 1}
-        self.terminals[(r['dataset'], r['method'], r['trial_index'])] = 'transport_or_prelaunch_failure'
+        self.terminals[(r['dataset'], r['method'], r['trial_index'])] = {
+            'status': 'transport_or_prelaunch_failure', 'timeout_seconds': 600}
         self.select()
         self.assertEqual(self.call()['cell_status_counts'], {'selected': 200})
 
@@ -153,6 +155,35 @@ class PublicationControls(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'digest differs'):
                     manifest.generate(Path(temp), 'a'*64)
                 render.assert_not_called()
+
+    def test_round_deadline_cutoff_is_not_method_failure(self):
+        row = self.report['trials'][96]
+        row.update(status='failed', common_samples_complete=False)
+        self.report['new_trial_status_counts'] = {'ok': 703, 'failed': 1}
+        self.terminals[(row['dataset'], row['method'], row['trial_index'])] = {
+            'status': 'transport_or_prelaunch_failure', 'timeout_seconds': 39}
+        self.select()
+        result = self.call()
+        public = next(r for r in result['trials'] if (r['dataset'], r['method'], r['trial_index']) ==
+                      (row['dataset'], row['method'], row['trial_index']))
+        self.assertEqual(public['receipt_status'], 'failed')
+        self.assertEqual(public['outcome_class'], 'scheduling_cutoff')
+        self.assertEqual(public['outcome_reason'], 'deadline_truncated')
+        self.assertFalse(public['method_failure_inferred'])
+        self.assertTrue(public['native_selection_eligible'])
+        self.assertEqual(result['new_scheduling_cutoff_reason_counts'], {'deadline_truncated': 1})
+
+    def test_earlier_infrastructure_separate_from_unstarted_schedule(self):
+        self.assertEqual(m.outcome({'status': 'transport_or_prelaunch_failure', 'timeout_seconds': 600}),
+                         ('infrastructure_interruption', 'transport_or_prelaunch_failure'))
+        self.assertEqual(m.outcome({'status': 'foreign_gpu_owner_appeared', 'timeout_seconds': 600}),
+                         ('infrastructure_interruption', 'foreign_gpu_owner_appeared'))
+        self.assertEqual(m.outcome({'status': 'deadline_unstarted'}),
+                         ('scheduling_cutoff', 'deadline_unstarted'))
+
+    def test_unknown_unavailability_not_inferred_as_method_failure(self):
+        self.assertEqual(m.outcome({'status': 'opaque_unknown', 'timeout_seconds': 600}),
+                         ('unclassified_unavailable', 'opaque_unknown'))
 
 
 if __name__ == '__main__':
