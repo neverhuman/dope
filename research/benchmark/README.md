@@ -814,3 +814,8 @@ package-name exclusion in a caller-owned dictionary before preparation and after
 final custody. Sixteen additions retain the prepared module identities and order;
 no registry write or real initializer runs. Atomic installation and actual startup
 remain separate admission requirements.
+
+The [private registry overlay](CONTAINER_VALIDATION_WORKER.md) combines copied
+caller-owned selections with the sixteen proposed guard references in a read-only
+map. Repeated identity checks reject changes to the supplied registry; preparation
+never activates the overlay or runs real guards. Startup remains unadmitted.
