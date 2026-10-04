@@ -29,6 +29,9 @@ checks the additional directory/absence snapshots named by those declarations.
 `container_search_path_custody.py` reconstructs ordered root/provider declared
 path components and binds their literal pathname projections to those snapshots.
 It establishes no actual loader origin, search, provider choice or execution.
+`container_loader_environment.py` binds the restricted invocation's declared
+library directory and preload absence to those snapshots, retaining the original
+outer timer and all unadmitted execution and null score fields.
 It proves neither actual cache construction nor loader search or execution.
 
 This package does not enter the Rust production binary or alter its release decision.
