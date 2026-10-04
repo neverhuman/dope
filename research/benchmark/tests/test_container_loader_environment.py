@@ -141,6 +141,17 @@ class EnvironmentControls(unittest.TestCase):
             with self.subTest(now=now), self.assertRaisesRegex(TimeoutError, '^compressed bootstrap batch deadline exhausted$'):
                 self.verify(now=now)
 
+    def test_io_timeouts_reject_without_input_text_or_deadline_misclassification(self):
+        for module, name in [(environment.search.catalog.loader.system, 'owned_manifest'),
+                             (environment.search, 'verify_declared_search_paths')]:
+            with self.subTest(name=name), patch.object(module, name, side_effect=TimeoutError('opaque private input')):
+                self.rejected()
+
+    def test_deadline_timeout_text_is_sanitized(self):
+        with patch.object(environment.bootstrap, 'prepare_invocation', side_effect=TimeoutError('opaque clock input')), \
+                self.assertRaisesRegex(TimeoutError, '^compressed bootstrap batch deadline exhausted$'):
+            self.verify()
+
     def test_deadline_rechecked_after_final_snapshot_verification(self):
         calls = []
         original = environment.search.verify_declared_search_paths

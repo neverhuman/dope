@@ -7,6 +7,17 @@ from . import container_search_path_custody as search
 PRELOAD = '/etc/ld.so.preload'
 
 
+class _DeadlineExhausted(Exception):
+    pass
+
+
+def deadline_call(action):
+    try:
+        return action()
+    except TimeoutError:
+        raise _DeadlineExhausted() from None
+
+
 def require(condition):
     if not condition:
         raise ValueError('compressed loader environment rejected')
@@ -35,7 +46,7 @@ def verify_proposed_environment(environment_path, environment_sha256, *, batch_s
         proposal = system.owned_manifest(lock['proposal_path'], lock['proposal_sha256'])
         # The restricted plan is derived before inspecting any loader files.
         blob = proposal[0].read_bytes()
-        plan = bootstrap.prepare_invocation(blob, proposal[1], batch_started_at=batch_started_at)
+        plan = deadline_call(lambda: bootstrap.prepare_invocation(blob, proposal[1], batch_started_at=batch_started_at))
         require(system.canonical(list(plan.environment)) == system.canonical(lock['environment']))
         projection = system.owned_manifest(lock['projection_path'], lock['projection_sha256'])
         search.verify_declared_search_paths(str(projection[0]), projection[1])
@@ -50,7 +61,7 @@ def verify_proposed_environment(environment_path, environment_sha256, *, batch_s
             require(system.python.sha(system.python.unaliased(path)) == expected)
         for path, expected in helpers:
             require(system.python.sha(path) == expected)
-        remaining = plan.remaining_seconds()
+        remaining = deadline_call(plan.remaining_seconds)
         return {'format': 'dope-compressed-proposed-loader-environment-custody', 'version': 1,
                 'environment_sha256': manifest[1], 'proposal_sha256': proposal[1],
                 'restricted_environment_entries_verified': len(plan.environment),
@@ -60,7 +71,7 @@ def verify_proposed_environment(environment_path, environment_sha256, *, batch_s
                 'full_runtime_closure_certified': False, 'execution_admitted': False,
                 'candidate_processes_started': 0, 'official_tests_opened': False,
                 'mfs_v2': None, 'ptf_v1': None, 'release_safe': None, 'superiority': None}
-    except TimeoutError:
-        raise
+    except _DeadlineExhausted:
+        raise TimeoutError('compressed bootstrap batch deadline exhausted') from None
     except (OSError, KeyError, TypeError, ValueError, RuntimeError):
         raise ValueError('compressed loader environment rejected') from None

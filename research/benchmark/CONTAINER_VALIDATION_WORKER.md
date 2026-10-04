@@ -342,8 +342,10 @@ chain before and after these bindings; source, proposal and parent bytes are
 rechecked before success. The caller's original outer timer is used throughout,
 including a final deadline check after the integrity reads; it is never reset.
 Deadline exhaustion remains a typed `TimeoutError`. Other errors contain no
-input values. Opaque controls route preload to a fake missing file and use no
-real loader, candidate interpreter or library.
+input values. Only the two bootstrap clock calls classify deadline exhaustion;
+I/O timeouts reject with the fixed generic error and never publish their original
+text. Clock timeout text is normalized as well. Opaque controls route preload
+to a fake missing file and use no real loader, candidate interpreter or library.
 
 The receipt verifies a proposed environment and selected snapshots. It does not
 prove that a future process actually uses this environment, which libraries it
