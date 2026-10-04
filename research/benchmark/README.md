@@ -20,6 +20,9 @@ It proves selected file custody, with loader resolution and dispatch still unadm
 provider files, alias chains, cache/configuration files, directory entries and
 absence records. These snapshots leave actual provider selection, complete loader
 search, runtime closure and execution admission unverified.
+`container_loader_catalog.py` replays the frozen package-basename/cache candidate
+enumeration, including ordered root and recursive provider dependencies. It
+retains competing provider identities and establishes no actual loader choice.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen

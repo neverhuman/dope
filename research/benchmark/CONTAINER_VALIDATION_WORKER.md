@@ -213,3 +213,38 @@ scores stay null. Existing locks, rounds, native objectives and caps are unchang
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_loader_custody.py -v
 ```
+
+## Ordered candidate catalog replay
+
+`container_loader_catalog.verify_candidate_catalog` checks the selected loader
+snapshots, hashes root ELF bytes and replays their declarations through the pinned
+inspector. It derives the ordered root dependency, interpreter and search-path
+records and compares them with the bound unresolved catalog. Cache-print bytes
+are hashed before decoding. The fixed enumeration policy combines package
+basenames, the transcript's x86-64 cache entries and direct absolute names.
+It preserves first occurrence order, requires every candidate file binding,
+seeds interpreter dependencies and replays recursive `DT_NEEDED` edges once per
+new provider path. Repeated paths
+terminate dependency cycles; an explicit edge ceiling bounds the traversal.
+Canonical JSON comparisons preserve integer, float and boolean distinctions.
+Omitted, added, reordered or changed edges reject, as do unsupported audit,
+filter and auxiliary declarations, absent candidates and unbound provider files.
+Root bytes, manifests, transcripts and selected snapshots are rechecked before
+success. Errors contain no input paths, names or values.
+
+Call from a trusted coordinator after the separate Python and root ELF inventory
+checks; all guard source and the coordinator's interpreter/import closure must
+already be trusted. Catalog order is the frozen enumeration policy, not glibc
+search order. The receipt counts edges with distinct resolved file identities,
+including identical bytes at different paths, without
+selecting a provider. RPATH/RUNPATH and hardware precedence, complete default
+search, preload, runtime `dlopen` and actual provider selection remain unresolved.
+This starts no library, process, fit or sample and grants no execution lease.
+Cross-host, bootstrap, transport, deadline, capacity, clean SDV closure and density
+priority proofs remain required. Gated scores remain null and existing rounds,
+native objectives and resource caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_loader_catalog.py -v
+```
