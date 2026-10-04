@@ -728,3 +728,44 @@ receipts, live rounds, objectives and artifact/compute caps are unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_import_declarations.py -v
 ```
+
+## Proposed import hook and empty guard namespaces
+
+`container_import_hook.prepare_import_hook` prepares an import callback and
+empty private namespaces for the declared fifteen guards. It copies the supplied
+twelve-module reference dictionary before parent work, validates exact builtin
+keys/module types and name metadata, and retains the references in a read-only
+map. Supplied references and all five seed helpers must already be owned under
+the caller's complete interpreter/import closure. Names and self-file hashes do
+not attest the identity or loaded code of a standard-library module.
+
+Callbacks accept only the owned guard namespace dictionary itself, with its
+verified name/package/file metadata. A matching copy cannot impersonate it.
+Absolute requests must match that guard's declared module/member rows; members
+must already be present in the supplied module dictionary. Relative requests
+must match declared guard members and return the owned package with the same
+prepared guard references. Exact builtin request types are required; wildcard,
+unknown, parent-relative and undeclared requests reject. No callback delegates to
+the normal importer, source/cache lookup or a dynamic module member getter.
+
+Preparation and later callbacks retain the original outer start. Repeated parent
+custody and final regular helper/manifest checks precede preparation success;
+callbacks check the original deadline before work and before returning a
+reference. Source I/O failures are fixed integrity errors and genuine trusted
+deadlines retain their typed error. Read-only maps own reference selections;
+the referenced modules and the intentionally empty namespaces are mutable
+objects, so this snapshot is not an atomic lease or a loaded-code proof.
+
+Preparation never executes guard code, populates builtins, installs `sys.modules`
+or loads a standard-library dependency. The package has no search path. A future
+initializer must use the owned code/descriptors, wire this exact callback into
+its restricted builtins, honor declared dependency order and separately establish
+namespace exclusion, actual initialization/import resolution and all runtime,
+system, transport, cross-host, lease, capacity, predecessor/density and final
+campaign gates. No candidate process or fit/sample starts; official tests stay
+sealed and all gated scores remain null. Historical rounds and caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_import_hook.py -v
+```
