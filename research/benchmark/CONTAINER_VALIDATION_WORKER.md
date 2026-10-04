@@ -902,3 +902,35 @@ caps and failure receipts remain unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_private_registry.py -v
 ```
+
+## Owned guard initialization plan
+
+`container_guard_initialization.prepare_guard_initialization` binds fifteen
+initialization instructions to the owned code objects, exact private module
+references, read-only namespace views, and declared dependency order. It repeats
+source verification, recompiles the owned bytes with assertions retained and
+inherited flags disabled, and compares all executable metadata and nested code
+constants. Floating-point and complex constants preserve their sign bits.
+No cache is deserialized and no compiled guard body is executed.
+
+Final checks repeat ten seed-helper hashes, full source and manifest custody,
+module metadata, package and builtin references, original-registry selections,
+and the original 600-second deadline. Changed executable objects, import rows,
+dependency order or late references reject with fixed errors. Referenced modules
+and namespace views remain mutable; this plan is point-in-time preparation,
+not loaded-code attestation or an atomic lease. All ten helpers and complete
+interpreter, builtin and standard-library identity are caller-owned prerequisites.
+
+An executor must separately admit live registry activation: standard-library
+decorators such as `dataclass` can consult the live module registry, so a private
+overlay alone does not make their initialization safe or runnable. This API
+provides no executor, installs no live entries, and invokes no initializer or
+candidate process. Full runtime, transport, lease, capacity, predecessor, density
+priority and campaign gates remain required. Official tests remain sealed and
+MFS-v2, PTF-v1, release and superiority remain null. SDV v3 remains pending
+Jepson's explicit approval.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_guard_initialization.py -v
+```
