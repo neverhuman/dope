@@ -868,3 +868,37 @@ rounds, tuning objectives, budgets and artifact caps are unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_registry_bindings.py -v
 ```
+
+## Owned private registry overlay
+
+`container_private_registry.prepare_private_registry` copies the supplied
+caller-owned registry selections before parent preparation, then combines them
+with the prepared package and fifteen guard references in a new private dictionary.
+It returns a read-only map and the original preparation descriptors. The supplied
+registry is never written, replaced or activated. Reference copies retain object
+identity; they do not initialize or reload modules.
+
+Final checks cover the complete source inventory, nine regular helper hashes,
+the frozen manifest, private namespace metadata and builtin/package references,
+private-name exclusion, and the supplied registry's exact key set and original
+value identities. Addition, removal or replacement of an unrelated registry entry
+also rejects, without undoing foreign changes. Exact builtin registry and key types
+are checked before comparisons. All work retains the original 600-second start,
+including the last deadline check; ordinary I/O errors are fixed integrity errors
+and genuine trusted deadlines retain their typed error.
+
+All nine seed helpers, complete interpreter/import closure, and every supplied
+registry/builtin/stdlib reference must already be caller-owned. Read-only maps
+protect reference selections, while referenced module objects remain mutable.
+Repeated checks are point-in-time evidence, not atomic exclusion or loaded-code
+attestation. Actual activation, real initialization/import resolution, runtime/
+system/loader/transport/cross-host closure, leases, fresh capacity, predecessor
+closure, density priority and final campaign admission remain separate gates.
+No live guard registration or candidate/fit/sample process starts; official tests
+stay sealed and all gated scores remain null. Historical rounds, native objectives,
+caps and failure receipts remain unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_private_registry.py -v
+```
