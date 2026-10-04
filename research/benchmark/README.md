@@ -888,3 +888,18 @@ replay native selection, every metric and control, runtime inventories and cost
 accounting before calling the aggregation helper. Declared runtime files are
 hashed here; historical runtime closure limitations remain in force. No partial
 density panel is published, no live round is changed, and no SDV rerun is launched.
+
+`density_metric_replay.replay_closed_metrics(receipt_sha256, report_sha256)`
+uses that complete input gate before reading saved metrics. It binds the frozen
+evaluator source and dependency-version declaration, all three utility auditors,
+the six `n`/`4n` sample cells, exact sample repetition and prescribed metric
+repetition. It rechecks finite losses, informative/low-signal controls,
+unclipped retention arithmetic (absolute/relative tolerance `1e-12`), copy and
+real-vs-real counts, and logical metric pointers from the same hash-owned JSON
+bytes. Raw non-success outcomes retain their status and yield no logical metric.
+
+This replays stored arithmetic and repetition evidence; it does not refit auditors,
+recompute their losses, count validation CSV rows, initialize dependencies or
+certify a loaded runtime. The result remains `publication_admitted: false`;
+native selection, runtime and full cost replay are still required. No partial
+panel, production score, privacy certification or DOPE win is published.
