@@ -1,0 +1,72 @@
+{
+  "all_frozen_cells_accounted": true,
+  "artifacts": {
+    "sdv-s3-population-native.csv": {
+      "bytes": 15718,
+      "sha256": "0fc17f60e7dcd56642f3739e0f27358ecc5408436839528d1967282ac9ecdcd2"
+    },
+    "sdv-s3-population-native.json": {
+      "bytes": 1999305,
+      "sha256": "b5bfec508e722c3720426b89c1167b24eade4d23490ae2b148f930f5cb30c98a"
+    },
+    "sdv-s3-population-native.md": {
+      "bytes": 1246,
+      "sha256": "1642fba09d9f5521b7e97e55726f6e336a09c8062aa9452b3a9170e8e1146f5a"
+    },
+    "sdv-s3-population-native.pdf": {
+      "bytes": 25867,
+      "sha256": "f55e54d126ae5ce31ccffc33afd0999aff02d8fcab334d73b782fb67052ffbab"
+    },
+    "sdv-s3-population-native.schema.json": {
+      "bytes": 169667,
+      "sha256": "a8ff16e7fb94625e6e03635ab7cf014c5a518a23ec9d43e32a01dd4340265035"
+    },
+    "sdv-s3-population-native.svg": {
+      "bytes": 33845,
+      "sha256": "a2c273040f676a34a51ce81889176cef603c3513ee43a1e88c40052da8488add"
+    }
+  },
+  "counts_as_dope_win": false,
+  "format": "dope-sdv-population-native-publication-manifest",
+  "full_campaign_admitted": false,
+  "historical_runtime_closure_upgraded": false,
+  "immutable_references": [
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/sdv-s3-population-native-v2/round.lock.json",
+      "sha256": "bf93cf99d730403956bd8730b61f456c4d22ae77a4280ba48ef0090238d792ed"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/sdv-s3-population-native-v2/receipt-lock-v1.json",
+      "sha256": "f49440e4c66ef9c71452d3c969fe6637ec8908086fc317e75ca83d165b715c8c"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/sdv-s3-population-native-v2/reconciliation-v1.json",
+      "sha256": "c6ab816ec7890aa2d22aa7e77c1ee22c7e086e2b46cacae79c5d9b2b1cf40266"
+    }
+  ],
+  "mfs_v2": null,
+  "native_kpis_cross_ranked": false,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a",
+    "publish_sdv_population_native.py": "4fce8150ec13cf103eaa7169f04896afa7baa652ca13d071d99656a0544e931a",
+    "publish_sdv_population_native_figure.py": "3638d5f864c38761e183e7903df8271d42f1de1eb6e123ace086d75326640524",
+    "publish_sdv_population_native_manifest.py": "a28d12f233d8f96ec0ff00647692d963fdca2fb5d27765ad57dda5c3ffda9d88",
+    "reconcile_sdv_population.py": "8cf9e9bdfca537a65c0c49a1567c110f31f339c52a57a370015b6391dda038bd",
+    "sdv_native_accounting.py": "75563a0c29f091e4ddfe04c13489f7b948c5283554999a1656da3942740478df",
+    "sdv_native_continuation.py": "cecf2e5ce3d02cf4db1acdd015ada79d873399c8fdacdc456b57a7e20556b61c"
+  },
+  "release_safe": null,
+  "sampling_success_used_for_selection": false,
+  "shared_kpi_used_for_selection": false,
+  "shared_validation_evaluation_complete": false,
+  "source_locks": {
+    "receipts": "f49440e4c66ef9c71452d3c969fe6637ec8908086fc317e75ca83d165b715c8c",
+    "reconciliation": "c6ab816ec7890aa2d22aa7e77c1ee22c7e086e2b46cacae79c5d9b2b1cf40266",
+    "round": "bf93cf99d730403956bd8730b61f456c4d22ae77a4280ba48ef0090238d792ed"
+  },
+  "superiority": null,
+  "version": 1
+}
