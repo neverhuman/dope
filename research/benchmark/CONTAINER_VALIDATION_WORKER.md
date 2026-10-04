@@ -363,3 +363,38 @@ unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_loader_environment.py -v
 ```
+
+## Proposed bootstrap filesystem custody
+
+`container_bootstrap_filesystem.verify_proposed_filesystem` owns an externally
+pinned filesystem manifest and its selected environment parent. It verifies the
+restricted invocation and selected loader snapshots before inspecting proposed
+startup files. Exactly the six frozen regular source files must exist; added
+files, directories and aliases fail. The request is a regular file below its
+canonical complete job digest and numbered attempt, in a caller-owned 0700
+directory. Its externally frozen bytes are hashed before JSON is decoded. The
+request's canonical job digest must match the owned unadmitted descriptor and
+invocation, so integer and floating-point seed identities cannot be substituted.
+The declared bytecode cache must exist, have no aliases and be empty.
+
+The guard repeats the environment check, all proposed file identities, descriptor
+and manifest hashes, and the original caller deadline before returning a receipt.
+Only trusted timing calls preserve a fixed typed deadline error; I/O failures
+produce a fixed rejection without input text. The caller must already trust all
+guard/coordinator sources and their complete interpreter/import closure before
+importing this module, and separately verify Python and root ELF custody.
+
+A staged `round-proposal.json` is metadata, not the final `round.lock.json` the
+worker requires. This guard neither executes sources nor admits a final round,
+request, atomic lease or process. The file snapshots do not prove actual loader
+provider search, runtime closure, cross-host transport, predecessor closure,
+density priority or resource capacity. Revalidation at dispatch and an atomic
+execution lease remain necessary. Existing locked rounds and native objectives
+are unchanged; official tests remain sealed and all gated scores null.
+
+Focused controls use only opaque files and validated parent fixtures:
+
+```sh
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_bootstrap_filesystem.py -v
+```
