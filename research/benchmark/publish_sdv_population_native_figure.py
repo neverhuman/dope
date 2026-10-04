@@ -32,7 +32,7 @@ def render(report, kind):
             ax.legend(fontsize=9)
         fig.suptitle('CTGAN / TVAE native selection: complete bounded research ledger', fontweight='bold')
         fig.text(.5, .065, 'Same paired cells within each method · one fit seed · negative R² retained · no cross-method KPI ranking', ha='center', fontsize=9)
-        fig.text(.5, .025, 'Curve endpoints retain coverage gaps. Shared quality pending; official tests sealed; MFS-v2 / PTF-v1 null.', ha='center', fontsize=9)
+        fig.text(.5, .025, 'Scheduling / infrastructure gaps imply no method failures. Shared quality pending; tests sealed; MFS-v2 / PTF-v1 null.', ha='center', fontsize=9)
         fig.tight_layout(rect=(0, .11, 1, .95))
         out = io.BytesIO()
         metadata = {'Date': None, 'Creator': 'DOPE benchmark'} if kind == 'svg' else {

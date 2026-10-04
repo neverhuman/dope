@@ -6,24 +6,24 @@
       "sha256": "0fc17f60e7dcd56642f3739e0f27358ecc5408436839528d1967282ac9ecdcd2"
     },
     "sdv-s3-population-native.json": {
-      "bytes": 1999305,
-      "sha256": "b5bfec508e722c3720426b89c1167b24eade4d23490ae2b148f930f5cb30c98a"
+      "bytes": 2138403,
+      "sha256": "635fd4273886d59691356b85d2fad58eae596ef74a48dc0bfb5bffee653bacc3"
     },
     "sdv-s3-population-native.md": {
-      "bytes": 1246,
-      "sha256": "1642fba09d9f5521b7e97e55726f6e336a09c8062aa9452b3a9170e8e1146f5a"
+      "bytes": 1620,
+      "sha256": "3a9291f4a18f320ae2c7593bdb8f8b519651aa7f574981b0887e3385ff5da5b6"
     },
     "sdv-s3-population-native.pdf": {
-      "bytes": 25867,
-      "sha256": "f55e54d126ae5ce31ccffc33afd0999aff02d8fcab334d73b782fb67052ffbab"
+      "bytes": 25694,
+      "sha256": "817d02a49da848a4c63fc076c330d582c267a3017e98d675299ffc219f1eb490"
     },
     "sdv-s3-population-native.schema.json": {
-      "bytes": 169667,
-      "sha256": "a8ff16e7fb94625e6e03635ab7cf014c5a518a23ec9d43e32a01dd4340265035"
+      "bytes": 179557,
+      "sha256": "5eb322083359c73ce3bbedc3634578fb95d15fe43bd6593d6e186d3ebc378a32"
     },
     "sdv-s3-population-native.svg": {
-      "bytes": 33845,
-      "sha256": "a2c273040f676a34a51ce81889176cef603c3513ee43a1e88c40052da8488add"
+      "bytes": 33857,
+      "sha256": "adc4d706bfa5822d4ba2ffe50d5f43ebbe57ee25a05fb594fa10e4b2932f26e3"
     }
   },
   "counts_as_dope_win": false,
@@ -51,8 +51,8 @@
   "ptf_v1": null,
   "publisher_sources": {
     "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a",
-    "publish_sdv_population_native.py": "4fce8150ec13cf103eaa7169f04896afa7baa652ca13d071d99656a0544e931a",
-    "publish_sdv_population_native_figure.py": "3638d5f864c38761e183e7903df8271d42f1de1eb6e123ace086d75326640524",
+    "publish_sdv_population_native.py": "5958242f0f697c5242fe0f4ae1d53e71f832318ee3c5df97c3fdae4f7f3be597",
+    "publish_sdv_population_native_figure.py": "e5821e32fb5b9a1e8f85c1b3a4be5d4411071db488f9b57f4a6892cbb3788f66",
     "publish_sdv_population_native_manifest.py": "a28d12f233d8f96ec0ff00647692d963fdca2fb5d27765ad57dda5c3ffda9d88",
     "reconcile_sdv_population.py": "8cf9e9bdfca537a65c0c49a1567c110f31f339c52a57a370015b6391dda038bd",
     "sdv_native_accounting.py": "75563a0c29f091e4ddfe04c13489f7b948c5283554999a1656da3942740478df",

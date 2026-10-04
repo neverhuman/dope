@@ -14,7 +14,11 @@ Medians use the same paired cells within each method; native KPIs are not cross-
 
 New attempt terminal statuses: deadline_unstarted: 524, foreign_gpu_owner_appeared: 10, ok: 154, transport_or_prelaunch_failure: 16.
 
-Failed/unstarted attempts and two earlier failed trials remain in JSON and cost accounting.
+Scheduling outcomes: infrastructure_interruption: 25, ok: 154, scheduling_cutoff: 525.
+The 524 unstarted and one deadline-truncated attempt are scheduling cut-offs (infrastructure),
+separate from the 154 successful attempts and 25 earlier infrastructure interruptions.
+Immutable raw receipt statuses and two previous-round failed attempts remain in cost accounting.
+No method-failure or method-quality conclusion is drawn from scheduling or infrastructure outcomes.
 Official tests remain sealed. Shared validation quality is pending; MFS-v2, PTF-v1,
 release-safe status and superiority are null. No DOPE win or production certification is claimed.
 
