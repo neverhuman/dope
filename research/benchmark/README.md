@@ -782,3 +782,9 @@ The [owned startup code preparation](CONTAINER_VALIDATION_WORKER.md) compiles
 verified guard source bytes without running initializers or reading cached
 bytecode. Compiler flags, source digests and the original deadline remain bound;
 this prepares no executable child, runtime certification or dispatch admission.
+
+The [proposed guard module bindings](CONTAINER_VALIDATION_WORKER.md) pair those
+owned code objects with verified source paths and fixed private package names.
+Repeated source membership and helper checks retain the original deadline.
+No initializer or namespace is installed; closed imports, runtime/lease/capacity
+and predecessor/density admission remain required before execution.

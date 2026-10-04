@@ -658,3 +658,37 @@ The live rounds, native objectives, historical failures and caps are unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_owned_code.py -v
 ```
+
+## Proposed module names and source paths
+
+`container_module_bindings.prepare_module_bindings` binds the owned compiled
+guard code objects to their verified `__file__` paths and a fixed private package
+name. Each immutable descriptor contains the code, qualified name, package, file
+path and source digest. The externally bound source manifest supplies the exact
+owned directory; filenames come from the fixed fifteen-file inventory. It reads
+no cached bytecode and does not substitute reopened source for compiled code.
+
+The helper runs compilation and repeated complete source custody on the same
+original timer. Bytes after compilation must still match the compiled source
+digests. Complete membership, ownership, mode and regular unaliased source checks
+repeat after descriptor construction; compiler, binding helper and manifest
+checks precede the final deadline check. Ordinary I/O timeouts are fixed integrity
+rejections, while trusted original deadline failures retain their typed error.
+All three seed helpers and their complete interpreter/import closure must already
+be trusted before imports; a self-file hash is not loaded-code evidence.
+
+These are proposed descriptors: no staged initializer runs, no module namespace
+is installed, and no loader or candidate process starts. A future closed bootstrap
+must use these exact code objects and names, supply the verified file bindings,
+reject namespace collisions and prevent ordinary import/source/cache fallback.
+The source paths are point-in-time snapshots, not an atomic execution lease.
+Actual initialization, interpreter/system/loader and transport closure, fresh
+capacity, cross-host identity, leases, SDV closure, density priority and final
+campaign admission remain separate requirements. Official tests stay sealed;
+all gated scores remain null, execution and full-runtime flags false. Historical
+receipts, live rounds, native objectives and artifact/compute caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_module_bindings.py -v
+```
