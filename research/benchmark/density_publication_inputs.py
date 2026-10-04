@@ -86,14 +86,17 @@ def verify_refs(refs):
         require(h.hexdigest() == expected, 'frozen evidence changed')
 
 
-def exact_tree(root, files):
-    """Reject added empty directories, aliases and special files as well as files."""
+def exact_tree(root, files, declared_directories=()):
+    """Require exact files/declared dirs; reject extra empty dirs, aliases and specials."""
     root = safe(root)
     expected = {safe(p) for p in files}
     require(root.is_dir() and all(p.is_relative_to(root) and p != root for p in expected),
             'invalid evidence tree')
-    directories = {parent for p in expected for parent in p.parents
-                   if parent != root and parent.is_relative_to(root)}
+    declared = {safe(p) for p in declared_directories}
+    require(all(p.is_dir() and p != root and p.is_relative_to(root) for p in declared),
+            'invalid declared evidence directory')
+    directories = declared | {parent for p in expected | declared for parent in p.parents
+                              if parent != root and parent.is_relative_to(root)}
     actual_files, actual_directories = set(), set()
     for p in root.rglob('*'):
         require(not p.is_symlink(), 'aliased evidence tree')
@@ -102,6 +105,46 @@ def exact_tree(root, files):
         (actual_directories if stat.S_ISDIR(mode) else actual_files).add(p)
     require(actual_files == expected and actual_directories == directories,
             'evidence tree inventory changed')
+
+
+AUXILIARY_DIRECTORIES = {'runtime-temp', 'sampler.empty-cache', 'catboost_info',
+                         'catboost_info/tmp', 'catboost_info/learn'}
+AUXILIARY_FILES = {'catboost_info/time_left.tsv', 'catboost_info/learn_error.tsv',
+                   'catboost_info/catboost_training.json', 'catboost_info/learn/events.out.tfevents'}
+
+
+def attempt_tree(out, receipt, refs, declaration):
+    """Verify a separately anchored auxiliary tree; original receipts stay unchanged."""
+    out = safe(out)
+    require(type(declaration) is dict and set(declaration) == {'files', 'directories'},
+            'auxiliary attempt declaration differs')
+    rows, dirs = declaration['files'], declaration['directories']
+    operation = receipt['operation']
+    require(operation is None or (type(operation) is dict
+            and type(operation.get('new_operation_started')) is bool), 'invalid execution declaration')
+    started = operation is not None and operation['new_operation_started']
+    require(started or (not rows and not dirs), 'unstarted auxiliary execution output')
+    require(type(rows) is list and type(dirs) is list
+            and all(type(d) is str and d in AUXILIARY_DIRECTORIES for d in dirs)
+            and len(set(dirs)) == len(dirs), 'auxiliary directory inventory differs')
+    require(all(type(row) is dict and set(row) == {'path', 'sha256', 'bytes'}
+                and type(row['path']) is str and row['path'] in AUXILIARY_FILES for row in rows)
+            and len({row['path'] for row in rows}) == len(rows), 'auxiliary file inventory differs')
+    files = [out / 'receipt.json', *(out / n for n in receipt['evidence_files'])]
+    directories = {out / d for d in dirs}
+    total = 0
+    for row in rows:
+        p = out / row['path']
+        require(type(row['bytes']) is int and row['bytes'] >= 0
+                and refs.get(str(p)) == row['sha256']
+                and len(owned(p, row['sha256'])) == row['bytes'], 'auxiliary bytes unbound')
+        files.append(p)
+        total += row['bytes']
+    parents = {parent for p in set(files) | directories for parent in p.parents
+               if parent != out and parent.is_relative_to(out)}
+    require(parents.issubset(directories), 'auxiliary parent directory missing')
+    exact_tree(out, files, directories)
+    return files, directories, total
 
 
 def claims(value):
@@ -224,8 +267,11 @@ def load_closed_inputs(receipt_sha256, report_sha256):
             and report['native_reconciliation_sha256'] == NATIVE_REPORT,
             'density report native anchors differ')
     jobs, batches = closed_metadata(lock, report, completion, end)
+    auxiliary = anchor.get('attempt_auxiliary_trees', {})
+    require(type(auxiliary) is dict and ('attempt_auxiliary_trees' not in anchor
+            or set(auxiliary) == set(jobs)), 'auxiliary physical coverage differs')
     exact_tree(ROOT / 'source', lock['source_files'])
-    attempt_files = []
+    attempt_files, attempt_directories, auxiliary_bytes = [], set(), 0
     for key, job in jobs.items():
         out = ROOT / 'attempts' / key / 'attempt-0001'
         receipt = read(out / 'receipt.json', batches[key]['receipt_sha256'])
@@ -236,7 +282,12 @@ def load_closed_inputs(receipt_sha256, report_sha256):
         for name, h in receipt['evidence_files'].items():
             require(Path(name).name == name and refs.get(str(out / name)) == h,
                     'density receipt evidence differs')
-        exact_tree(out, files)
+        if auxiliary:
+            files, directories, byte_count = attempt_tree(out, receipt, refs, auxiliary[key])
+            attempt_directories.update(directories)
+            auxiliary_bytes += byte_count
+        else:
+            exact_tree(out, files)
         attempt_files.extend(files)
         worker = Path(job['worker']['path'])
         require(all(refs.get(str(worker / n)) == h for n, h in job['worker']['files'].items()),
@@ -254,10 +305,12 @@ def load_closed_inputs(receipt_sha256, report_sha256):
                 and job['artifact_bytes'] == sum(r['bytes'] for r in inventory),
                 'density projection charge differs')
         exact_tree(artifact, [artifact / r['path'] for r in inventory])
-    exact_tree(ROOT / 'attempts', attempt_files)
+    exact_tree(ROOT / 'attempts', attempt_files, attempt_directories)
     verify_refs(refs)
     verify_refs(native_anchor['refs'])
     return {'lock': lock, 'report': report, 'native_report': native,
             'receipt_sha256': receipt_sha256, 'report_sha256': report_sha256,
             'publication_admitted': False, 'full_runtime_closure_claimed': False,
-            'metric_native_and_cost_replay_required': True}
+            'metric_native_and_cost_replay_required': True,
+            'auxiliary_bytes': auxiliary_bytes, 'original_receipts_changed': False,
+            'auxiliary_bytes_included_in_generator_charge': False}
