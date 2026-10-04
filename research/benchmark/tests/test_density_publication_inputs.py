@@ -1,4 +1,5 @@
 """Opaque closure and file-custody controls; no live benchmark input is read."""
+import copy
 import hashlib
 import json
 import os
@@ -278,7 +279,8 @@ class FileControls(unittest.TestCase):
             out = self.root / 'attempts' / key / 'attempt-0001'
             h = put_json(out / 'request.json', dict(round_sha256=round_sha, job=job))
             receipt_sha = put_json(out / 'receipt.json', dict(round_sha256=round_sha, job=job,
-                status='ok', evidence_files={'request.json': h}, official_tests_opened=False,
+                status='ok', operation=dict(new_operation_started=True),
+                evidence_files={'request.json': h}, official_tests_opened=False,
                 native_selection_changed=False, global_family_selected=False,
                 new_generator_fits_started=0, mfs_v2=None, ptf_v1=None,
                 release_safe=None, superiority=None))
@@ -303,6 +305,116 @@ class FileControls(unittest.TestCase):
             self.assertFalse(result['publication_admitted'])
             self.assertTrue(result['metric_native_and_cost_replay_required'])
             self.assertFalse(result['full_runtime_closure_claimed'])
+
+            original_receipts = dict(receipts)
+            auxiliary = {}
+            for job in lock['jobs']:
+                key = m.digest_identity(job)
+                out = self.root / 'attempts' / key / 'attempt-0001'
+                for name in m.AUXILIARY_DIRECTORIES:
+                    (out / name).mkdir(parents=True, exist_ok=True)
+                rows = [dict(path=name, bytes=10, sha256=put(out / name, b'opaque log'))
+                        for name in sorted(m.AUXILIARY_FILES)]
+                auxiliary[key] = dict(files=rows, directories=sorted(m.AUXILIARY_DIRECTORIES))
+            # Old flat anchors remain strict; auxiliary files/dirs require a new
+            # separate anchor while every original receipt stays byte-identical.
+            with self.assertRaisesRegex(ValueError, 'tree inventory'):
+                m.load_closed_inputs(receipt_sha, report_sha)
+            anchor['attempt_auxiliary_trees'] = auxiliary
+            receipt_sha = self.put(self.root / 'receipt-lock-v1.json', json.dumps(anchor).encode())
+            result = m.load_closed_inputs(receipt_sha, report_sha)
+            self.assertEqual(result['auxiliary_bytes'], 502 * 40)
+            self.assertFalse(result['original_receipts_changed'])
+            self.assertFalse(result['auxiliary_bytes_included_in_generator_charge'])
+            for key, expected in original_receipts.items():
+                self.assertEqual(hashlib.sha256((self.root / 'attempts' / key / 'attempt-0001' /
+                                               'receipt.json').read_bytes()).hexdigest(), expected)
+            first = next(iter(auxiliary))
+            declaration = auxiliary.pop(first)
+            h = self.put(self.root / 'receipt-lock-v1.json', json.dumps(anchor).encode())
+            with self.assertRaisesRegex(ValueError, 'physical coverage'): m.load_closed_inputs(h, report_sha)
+            auxiliary[first] = declaration
+            receipt_sha = self.put(self.root / 'receipt-lock-v1.json', json.dumps(anchor).encode())
+            extra = self.root / 'attempts' / first / 'attempt-0001' / 'runtime-temp' / 'extra'
+            extra.mkdir()
+            with self.assertRaisesRegex(ValueError, 'tree inventory'):
+                m.load_closed_inputs(receipt_sha, report_sha)
+            extra.rmdir()
+            log = self.root / 'attempts' / first / 'attempt-0001' / declaration['files'][0]['path']
+            log.write_bytes(b'changed')
+            with patch.object(m, 'bound_json', wraps=m.bound_json) as read:
+                with self.assertRaisesRegex(ValueError, 'frozen evidence changed'):
+                    m.load_closed_inputs(receipt_sha, report_sha)
+                self.assertEqual(read.call_count, 1)
+
+
+class AuxiliaryControls(unittest.TestCase):
+ def setUp(self):
+  self.tmp=tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[3] / 'target');self.addCleanup(self.tmp.cleanup)
+  self.base=Path(self.tmp.name).resolve();self.out=self.base/'attempt';self.out.mkdir()
+  p=patch.object(m,'BASE',self.base);p.start();self.addCleanup(p.stop)
+  self.refs={};self.receipt=dict(operation=dict(new_operation_started=True),evidence_files={})
+  self.put('receipt.json',b'opaque receipt')
+  self.receipt['evidence_files']['request.json']=self.put('request.json',b'opaque request')
+  for name in sorted(m.AUXILIARY_DIRECTORIES):(self.out/name).mkdir(parents=True,exist_ok=True)
+  files=[]
+  for name in sorted(m.AUXILIARY_FILES):
+   h=self.put(name,b'opaque log');files.append(dict(path=name,sha256=h,bytes=10))
+  self.d=dict(files=files,directories=sorted(m.AUXILIARY_DIRECTORIES))
+ def put(self,name,data):
+  p=self.out/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+  h=hashlib.sha256(data).hexdigest();self.refs[str(p)]=h;return h
+ def call(self):return m.attempt_tree(self.out,self.receipt,self.refs,self.d)
+ def test_explicit_complete_tree(self):
+  r=self.call();self.assertEqual((len(r[0])-2,len(r[1]),r[2]),(4,5,40))
+ def test_absent_auxiliary_on_unstarted(self):
+  self.receipt['operation']=None
+  with self.assertRaises(ValueError):self.call()
+ def test_empty_unstarted_tree_is_accepted(self):
+  for row in self.d['files']:(self.out/row['path']).unlink()
+  for name in sorted(self.d['directories'],key=lambda x:len(Path(x).parts),reverse=True):(self.out/name).rmdir()
+  self.receipt['operation']=None;self.d=dict(files=[],directories=[])
+  r=self.call();self.assertEqual((len(r[0])-2,r[2]),(0,0))
+ def test_unknown_directory_and_file_declarations(self):
+  original=copy.deepcopy(self.d)
+  for value in ('added','catboost_info/../added','/absolute'):
+   self.d=copy.deepcopy(original);self.d['directories'].append(value)
+   with self.subTest(value=value),self.assertRaises(ValueError):self.call()
+  self.d=copy.deepcopy(original);self.d['files'][0]['path']='runtime-temp/unknown.bin'
+  with self.assertRaises(ValueError):self.call()
+ def test_added_empty_dirs_cache_files_and_logs(self):
+  for name in ('extra/','sampler.empty-cache/extra','runtime-temp/extra','catboost_info/extra'):
+   p=self.out/name
+   if name.endswith('/'):p.mkdir()
+   else:p.write_bytes(b'opaque extra')
+   with self.subTest(name=name),self.assertRaises(ValueError):self.call()
+   if p.is_dir():p.rmdir()
+   else:p.unlink()
+ def test_parent_missing_and_duplicate_directory(self):
+  old=self.d['directories'][:]
+  self.d['directories'].remove('catboost_info/learn')
+  with self.assertRaises(ValueError):self.call()
+  self.d['directories']=old+['catboost_info/learn']
+  with self.assertRaises(ValueError):self.call()
+ def test_bytes_hash_and_reference_binding(self):
+  for key,value in (('bytes',True),('bytes',10.),('bytes',11),('sha256','e'*64)):
+   old=self.d['files'][0][key];self.d['files'][0][key]=value
+   with self.subTest(key=key),self.assertRaises(ValueError):self.call()
+   self.d['files'][0][key]=old
+  p=self.out/self.d['files'][0]['path'];p.write_bytes(b'changed')
+  with self.assertRaises(ValueError):self.call()
+ def test_alias_and_special_entry(self):
+  p=self.out/'catboost_info'/'alias';p.symlink_to(self.out,target_is_directory=True)
+  with self.assertRaises(ValueError):self.call()
+  p.unlink();os.mkfifo(p)
+  with self.assertRaises(ValueError):self.call()
+ def test_duplicate_file_and_derived_path_type(self):
+  self.d['files'].append(dict(self.d['files'][0]))
+  with self.assertRaises(ValueError):self.call()
+  self.d['files'].pop()
+  class Derived(str):pass
+  self.d['files'][0]['path']=Derived(self.d['files'][0]['path'])
+  with self.assertRaises(ValueError):self.call()
 
 
 if __name__ == '__main__':
