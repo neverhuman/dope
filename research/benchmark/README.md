@@ -798,3 +798,8 @@ The [proposed import hook](CONTAINER_VALIDATION_WORKER.md) matches each guard's
 declared requests to copied preowned references and empty private namespaces.
 It performs no normal import search or initializer execution; module identity,
 actual initialization and runtime/dispatch admission remain separate gates.
+
+The [proposed builtin bindings](CONTAINER_VALIDATION_WORKER.md) copy a fixed
+selection of caller-owned references and substitute the prepared import hook.
+Dependency-ordered instructions leave namespaces empty; builtin identity,
+actual binding/initialization and runtime/dispatch admission remain separate.
