@@ -625,3 +625,36 @@ null. Existing live rounds, objectives, artifacts and failures remain unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_guard_sources.py -v
 ```
+
+## Compiled guard code preparation
+
+`container_owned_code.prepare_startup_code` consumes the source gate's immutable
+owned bytes and compiles the fifteen modules without running their initializers.
+An external compiler-source digest is checked against a regular unaliased owned
+file before and after preparation. Both seed helpers and their complete
+interpreter/import closure must already be trusted before importing this module;
+self-file hashes do not establish loaded-code identity.
+
+Compilation uses explicit `flags=0`, `dont_inherit=True`, and `optimize=0`:
+inherited future flags and optimization cannot alter assertions. Fixed logical
+filenames avoid including private paths in code provenance. No `.pyc` or source
+pathname is reopened as a substitute for the verified source bytes. The result
+contains immutable tuples of code objects and source digests in the current
+trusted interpreter. It is not a serialized cache or portable runtime artifact.
+Later source-path changes cannot replace those owned inputs; this property does
+not establish an atomic lease for their later initialization.
+
+The original outer start covers source custody, all compilation and final
+compiler/manifest checks. Genuine source-gate deadline errors retain their typed
+error; ordinary I/O and syntax errors are fixed integrity rejections. Remaining
+time is checked before and after each compilation and before success. Initializing
+the modules, supplying their `__file__` bindings, proving interpreter/system/loader
+and transport closure, fresh capacity, SDV closure and density priority still need
+separate bootstrap and admission evidence. Execution stays false, initializers
+and candidate processes are zero, official tests sealed, and gated scores null.
+The live rounds, native objectives, historical failures and caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_owned_code.py -v
+```
