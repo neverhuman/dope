@@ -40,8 +40,9 @@ def verify_proposed_filesystem(filesystem_path, filesystem_sha256, *, batch_star
         environment.deadline_call(lambda: environment.verify_proposed_environment(
             str(parent[0]), parent[1], batch_started_at=batch_started_at))
         proposal = system.owned_manifest(parent[2]['proposal_path'], parent[2]['proposal_sha256'])
+        proposal_blob = proposal[0].read_bytes()
         plan = environment.deadline_call(lambda: environment.bootstrap.prepare_invocation(
-            proposal[0].read_bytes(), proposal[1], batch_started_at=batch_started_at))
+            proposal_blob, proposal[1], batch_started_at=batch_started_at))
         root = python.scratch(proposal[2]['root'])
         descriptor = system.owned_manifest(str(root / 'round-proposal.json'), proposal[2]['round_sha256'])
         require(descriptor[2]['format'] == 'dope-unadmitted-bootstrap-round-proposal')
@@ -70,6 +71,7 @@ def verify_proposed_filesystem(filesystem_path, filesystem_sha256, *, batch_star
             python.unaliased(request)
             require(stat.S_ISREG(request.stat().st_mode))
             python.file_identity(request, lock['request_file'])
+            python.unaliased(cache)
             require(cache.is_dir() and not list(cache.iterdir()))
 
         inspect_files()

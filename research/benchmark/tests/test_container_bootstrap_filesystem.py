@@ -204,6 +204,34 @@ class FilesystemControls(unittest.TestCase):
                 self.assertRaisesRegex(TimeoutError, '^compressed bootstrap batch deadline exhausted$'):
             filesystem.verify_proposed_filesystem(str(self.manifest), self.digest, batch_started_at=100.0)
 
+    def test_cache_alias_after_final_parent_check_rejects(self):
+        original = filesystem.environment.verify_proposed_environment
+        alternative = self.root / 'alternative-empty-cache'; alternative.mkdir()
+        calls = []
+        def mutate(*args, **kwargs):
+            result = original(*args, **kwargs); calls.append(True)
+            if len(calls) == 2:
+                self.cache.rmdir(); self.cache.symlink_to(alternative)
+            return result
+        with patch.object(filesystem.environment, 'verify_proposed_environment', side_effect=mutate):
+            self.rejected()
+        self.assertEqual(len(calls), 2)
+
+    def test_io_timeout_during_plan_proposal_read_is_not_a_deadline(self):
+        original = Path.read_bytes
+        reads = []
+        def fail(path):
+            if path == self.f.proposal_path:
+                reads.append(True)
+                # Parent verification reads twice, ownership reads once, then
+                # the pure invocation plan consumes the fourth owned read.
+                if len(reads) == 4:
+                    raise TimeoutError('opaque private proposal I/O')
+            return original(path)
+        with patch.object(Path, 'read_bytes', fail):
+            self.rejected()
+        self.assertEqual(len(reads), 4)
+
     def test_claims_and_exact_inventory_identities_reject(self):
         old = copy.deepcopy(self.lock)
         for key, value in [('version', 1.0), ('candidate_processes_started', False),
