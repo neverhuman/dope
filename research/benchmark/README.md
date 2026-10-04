@@ -963,6 +963,11 @@ Missing/duplicate entries, unknown names, extra cache/temp contents, links,
 special files and auxiliary output on unstarted operations fail closed. All
 auxiliary file references are hashed before any report metric is parsed, and
 per-attempt/global tree inventories plus final reference rehashes remain strict.
+The literal directory and log names live in
+`density-auxiliary-paths.lock.json`, an owned data contract whose SHA-256 is
+checked before JSON decoding. This preserves the frozen on-disk names and
+rejects contract drift without changing worker sources or audit policy.
+
 
 Original flat execution receipts are unchanged. Anchors without this additional
 inventory retain their original strict flat-tree behavior and reject the real

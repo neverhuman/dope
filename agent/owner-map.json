@@ -112,6 +112,7 @@
     "research/benchmark/container_guard_initialization.py": "external-evidence",
     "research/benchmark/density_validation_aggregate.py": "external-evidence",
     "research/benchmark/density_publication_inputs.py": "external-evidence",
+    "research/benchmark/density-auxiliary-paths.lock.json": "external-evidence",
     "research/benchmark/density_metric_replay.py": "external-evidence",
     "research/benchmark/density_native_replay.py": "external-evidence",
     "research/benchmark/density_custody_replay.py": "external-evidence",
