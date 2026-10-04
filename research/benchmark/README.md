@@ -47,6 +47,9 @@ remain separate gates; see the worker custody contract.
 the original native directory and selected preload absence record. It verifies
 only proposed environment declarations; actual child/runtime/lease/admission
 remain unverified.
+`container_native_runtime_inventory.py` rechecks the full recorded original
+native file set, including paths outside the selected directory. This does not
+replay the recorded linker transcript or establish complete runtime closure.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
