@@ -769,3 +769,36 @@ sealed and all gated scores remain null. Historical rounds and caps are unchange
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_import_hook.py -v
 ```
+
+## Proposed builtin reference bindings
+
+`container_builtin_bindings.prepare_builtin_bindings` selects a fixed set of
+32 caller-owned builtin references and replaces the normal importer with the
+prepared guard import hook. It copies these selections before parent work and
+returns a read-only 33-entry map with binding instructions in declared dependency
+order for the fifteen empty namespaces. It does not insert `__builtins__` into
+any namespace, install a module or run a guard initializer.
+
+The fixed selection covers the static builtin name candidates in the frozen
+guard sources and class setup. It excludes `open`, `exec`, `eval`, `compile` and
+the caller's normal importer. This is a reference-selection policy, not a proof
+of every later name resolution or a sandbox: referenced objects remain mutable
+where their types permit mutation, and supplied standard-library objects retain
+their own behavior. Exact module/name metadata and self-file hashes do not attest
+loaded builtin identity. All six seed helpers, complete interpreter/import
+closure and supplied builtin/standard-library references must already be owned
+by the caller.
+
+Selection, parent preparation, final regular helper/manifest rehashes and later
+hook callbacks retain the original 600-second start. Ordinary source I/O errors
+stay fixed integrity errors and genuine trusted deadlines stay typed. Future
+namespace exclusion, actual binding/initialization, import/runtime/system/
+transport/cross-host/lease/capacity/predecessor/density/final admission remain
+separate gates. No fit/sample/candidate process starts; official tests remain
+sealed, execution/runtime flags false and gated scores null. Historical rounds,
+receipts, native objectives and artifact/compute caps remain unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_builtin_bindings.py -v
+```
