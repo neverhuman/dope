@@ -802,3 +802,35 @@ receipts, native objectives and artifact/compute caps remain unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_builtin_bindings.py -v
 ```
+
+## Private namespace builtin binding
+
+`container_namespace_bindings.prepare_guard_namespaces` binds the prepared
+read-only builtin map only into newly created private guard dictionaries. It
+requires exact module types, the empty metadata key set, verified builtin-string
+name/package/file metadata, empty loader/spec/cache/doc fields, original package
+reference identity and declared binding order. Existing builtin bindings or extra
+keys reject before overwrite. Complete source custody, regular helper/manifest
+rehashes and repeated metadata/reference checks precede success on the original
+600-second start. Later hook callbacks retain that same start.
+
+On failed preparation, it removes only its own builtin-map bindings from the new
+dictionaries. It does not remove a preexisting or substituted binding, roll back
+unrelated metadata changes or claim an atomic lease. These dictionaries remain
+mutable snapshots. All seven seed helpers, complete interpreter/import closure
+and supplied builtin/stdlib references must already be caller-owned; metadata
+and self-file hashes do not attest loaded code or reference identity.
+
+Binding changes the new private dictionaries, but installs nothing in the live
+module registry and runs no guard initializer. Its receipt reports private
+builtin binding as true while initialization, module installation, actual import
+resolution, runtime and execution admission remain false. Actual registry
+exclusion/installation, initialization and all runtime/system/transport/cross-
+host/lease/capacity/predecessor/density/final campaign gates remain separate. No
+fit/sample/candidate process starts; official tests sealed and gated scores null.
+Historical receipts, rounds, objectives and artifact/compute caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_namespace_bindings.py -v
+```

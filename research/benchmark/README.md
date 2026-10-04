@@ -803,3 +803,8 @@ The [proposed builtin bindings](CONTAINER_VALIDATION_WORKER.md) copy a fixed
 selection of caller-owned references and substitute the prepared import hook.
 Dependency-ordered instructions leave namespaces empty; builtin identity,
 actual binding/initialization and runtime/dispatch admission remain separate.
+
+The [private namespace binding](CONTAINER_VALIDATION_WORKER.md) places that
+read-only builtin map in new guard dictionaries with exact metadata checks and
+cleanup of its own bindings on failure. It installs no live registry entry and
+runs no real initializer; actual startup and dispatch remain unadmitted.
