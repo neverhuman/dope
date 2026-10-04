@@ -793,3 +793,8 @@ The [static guard import plan](CONTAINER_VALIDATION_WORKER.md) records import
 declarations from matching owned source bytes and orders declared dependencies.
 It rejects unknown or cyclic guard dependencies without resolving a module or
 running an initializer. Actual imports, runtime and dispatch remain unadmitted.
+
+The [proposed import hook](CONTAINER_VALIDATION_WORKER.md) matches each guard's
+declared requests to copied preowned references and empty private namespaces.
+It performs no normal import search or initializer execution; module identity,
+actual initialization and runtime/dispatch admission remain separate gates.
