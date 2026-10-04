@@ -961,7 +961,8 @@ byte counts. Only the frozen worker's two empty runtime/cache directories and
 four known CatBoost log files under their three directory names are permitted.
 Missing/duplicate entries, unknown names, extra cache/temp contents, links,
 special files and auxiliary output on unstarted operations fail closed. All
-auxiliary file references are hashed before any report metric is parsed, and
+auxiliary file declarations are bound to the reference map and hashed before
+either native or validation report JSON is decoded, and
 per-attempt/global tree inventories plus final reference rehashes remain strict.
 The literal directory and log names live in
 `density-auxiliary-paths.lock.json`, an owned data contract whose SHA-256 is
