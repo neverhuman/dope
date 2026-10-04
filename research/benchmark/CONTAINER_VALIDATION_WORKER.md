@@ -376,6 +376,9 @@ directory. Its externally frozen bytes are hashed before JSON is decoded. The
 request's canonical job digest must match the owned unadmitted descriptor and
 invocation, so integer and floating-point seed identities cannot be substituted.
 The declared bytecode cache must exist, have no aliases and be empty.
+Each inspection rechecks all cache path aliases, including after final parent
+verification. Proposal I/O occurs outside the pure timing-call wrapper, so an
+I/O timeout cannot become deadline exhaustion.
 
 The guard repeats the environment check, all proposed file identities, descriptor
 and manifest hashes, and the original caller deadline before returning a receipt.
