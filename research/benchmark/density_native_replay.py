@@ -33,7 +33,7 @@ def number(v):
 def replay_native_metadata():
     """Verify supplied native metadata from fixed external anchors.
 
-    The legacy method snapshot matches both original round hashes. No common
+    The historical method snapshot matches both original round hashes. No common
     utility participates in selection. Full native reference/runtime/worker/
     artifact custody remains a separate final publication prerequisite.
     """
@@ -79,8 +79,8 @@ def replay_native_metadata():
                 for c in cells.values())
             and all(type(t['trial_index']) is int for t in trials.values()), 'native numeric identities differ')
     seen, costs, used_trials = set(), [], set()
-    legacy_selections_without_validation_hash = 0
-    legacy_trials_without_source_identity = 0
+    historical_selections_without_validation_hash = 0
+    historical_trials_without_source_identity = 0
     for name, lock_sha, method_key in ROUNDS:
         lock = read(BASE / name / 'round.lock.json', lock_sha)
         require(lock[method_key] == METHOD_SHA and lock['validation_only'] is True, 'original method lock differs')
@@ -124,7 +124,7 @@ def replay_native_metadata():
                 require(selection['validation_sha256'] == job['validation_sha256'],
                         'native selection partition differs')
             else:
-                legacy_selections_without_validation_hash += 1
+                historical_selections_without_validation_hash += 1
             rows, cell_costs = [], []
             for index, trial in enumerate(selection['trials']):
                 trial_key = dataset, method, index
@@ -152,7 +152,7 @@ def replay_native_metadata():
                     else:
                         require(method == 'GaussianCopula', 'native trial source identity missing')
                 if any(field not in proof for field in ('native_objective_sha256', 'adapter_sha256')):
-                    legacy_trials_without_source_identity += 1
+                    historical_trials_without_source_identity += 1
                 inventory = raw['artifact_inventory']
                 require(len(inventory) == 2 and {r['path'] for r in inventory} ==
                         {'model.json', 'projection.json'}
@@ -212,8 +212,8 @@ def replay_native_metadata():
         consumed_metadata_refs=len(consumed), consumed_metadata_refs_sha256=identity(consumed),
         native_receipt_lock_sha256=owned.NATIVE, native_report_sha256=owned.NATIVE_REPORT,
         original_methods_sha256=METHOD_SHA, unchanged_native_choices=True,
-        legacy_selections_without_validation_hash=legacy_selections_without_validation_hash,
-        legacy_trials_without_source_identity=legacy_trials_without_source_identity,
+        historical_selections_without_validation_hash=historical_selections_without_validation_hash,
+        historical_trials_without_source_identity=historical_trials_without_source_identity,
         full_native_reference_inventory_verified=False, runtime_worker_artifact_replay_required=True,
         native_likelihood_recomputed=False, new_generator_fits_started=0, native_selection_changed=False,
         official_tests_opened=False, sdv_v3_launched=False, publication_admitted=False,

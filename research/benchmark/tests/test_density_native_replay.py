@@ -137,8 +137,8 @@ class NativeControls(unittest.TestCase):
         self.assertTrue(result['unchanged_native_choices'])
         self.assertFalse(result['publication_admitted'])
         self.assertTrue(result['runtime_worker_artifact_replay_required'])
-        self.assertEqual(result['legacy_selections_without_validation_hash'], 300)
-        self.assertEqual(result['legacy_trials_without_source_identity'], 700)
+        self.assertEqual(result['historical_selections_without_validation_hash'], 300)
+        self.assertEqual(result['historical_trials_without_source_identity'], 700)
 
     def test_historical_optional_hashes_reject_conflicts(self):
         path, selection = self.selections[0]
@@ -147,7 +147,7 @@ class NativeControls(unittest.TestCase):
         for cell in self.cells:
             if cell['selection_receipt_path'] == str(path): cell['selection_receipt_sha256'] = h
         self.save()
-        self.assertEqual(self.call()['legacy_selections_without_validation_hash'], 299)
+        self.assertEqual(self.call()['historical_selections_without_validation_hash'], 299)
         selection['validation_sha256'] = 'e'*64
         h = self.put_json(path, selection)
         for cell in self.cells:
