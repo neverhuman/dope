@@ -114,6 +114,7 @@
     "research/benchmark/density_publication_inputs.py": "external-evidence",
     "research/benchmark/density_metric_replay.py": "external-evidence",
     "research/benchmark/density_native_replay.py": "external-evidence",
+    "research/benchmark/density_custody_replay.py": "external-evidence",
     "research/benchmark/CONTAINER_VALIDATION_WORKER.md": "external-evidence",
     "research/benchmark/CONTAINER_MEMBER_CONTRACT.md": "external-evidence",
     "research/benchmark/publish_artifact_bytes": "external-evidence",
