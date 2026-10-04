@@ -819,3 +819,26 @@ The [private registry overlay](CONTAINER_VALIDATION_WORKER.md) combines copied
 caller-owned selections with the sixteen proposed guard references in a read-only
 map. Repeated identity checks reject changes to the supplied registry; preparation
 never activates the overlay or runs real guards. Startup remains unadmitted.
+
+
+The [complete CTGAN / TVAE native ledger](results/sdv-s3-population-native.md)
+accounts for all100 matched S3 lineages and 800 logical tuning trials, including
+704 new attempts and 96 immutable historical reuses. Native selection uses the
+frozen study mean of author-library LR and MLP regression efficacy, with
+projection-inclusive artifact bytes and configuration digest tie-breaks.
+35 CTGAN and 34 TVAE cells have native selections; 65 and 66 remain unavailable.
+524 deadline-unstarted attempts, 16 transport/prelaunch failures, ten foreign-GPU
+owner deferrals and two earlier failed trials remain visible. This is a complete
+accounting ledger with one fit seed; shared quality and production claims remain
+unmeasured. Native KPIs are never ranked across methods.
+
+Regenerate the result from scratch custody with
+`python3 -B -m research.benchmark.publish_sdv_population_native
+--receipt-lock-sha256 <receipts> --reconciliation-sha256 <reconciliation>` using
+the frozen anchors in the committed manifest. Regenerate its CSV, Markdown,
+SVG/PDF figures, schemas and manifest from the committed JSON with
+`python3 -B -m research.benchmark.publish_sdv_population_native_manifest
+--publication-sha256 <publication JSON digest from manifest>`. Both entry points
+require external digests before metric reads; publication replays complete
+source/runtime/worker, artifact inventory, native eligibility and cost custody.
+No generator is loaded and no official test is opened.

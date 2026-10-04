@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_frozen_cells_accounted": {
+      "const": true
+    },
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "sdv-s3-population-native.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-s3-population-native.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-s3-population-native.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-s3-population-native.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-s3-population-native.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-s3-population-native.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "sdv-s3-population-native.csv",
+        "sdv-s3-population-native.json",
+        "sdv-s3-population-native.md",
+        "sdv-s3-population-native.pdf",
+        "sdv-s3-population-native.schema.json",
+        "sdv-s3-population-native.svg"
+      ],
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-sdv-population-native-publication-manifest"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "historical_runtime_closure_upgraded": {
+      "const": false
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_kpis_cross_ranked": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "publish_s3_matched.py": {
+          "type": "string"
+        },
+        "publish_sdv_population_native.py": {
+          "type": "string"
+        },
+        "publish_sdv_population_native_figure.py": {
+          "type": "string"
+        },
+        "publish_sdv_population_native_manifest.py": {
+          "type": "string"
+        },
+        "reconcile_sdv_population.py": {
+          "type": "string"
+        },
+        "sdv_native_accounting.py": {
+          "type": "string"
+        },
+        "sdv_native_continuation.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "publish_s3_matched.py",
+        "publish_sdv_population_native.py",
+        "publish_sdv_population_native_figure.py",
+        "publish_sdv_population_native_manifest.py",
+        "reconcile_sdv_population.py",
+        "sdv_native_accounting.py",
+        "sdv_native_continuation.py"
+      ],
+      "type": "object"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "sampling_success_used_for_selection": {
+      "const": false
+    },
+    "shared_kpi_used_for_selection": {
+      "const": false
+    },
+    "shared_validation_evaluation_complete": {
+      "const": false
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "receipts": {
+          "type": "string"
+        },
+        "reconciliation": {
+          "type": "string"
+        },
+        "round": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "receipts",
+        "reconciliation",
+        "round"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "all_frozen_cells_accounted",
+    "artifacts",
+    "counts_as_dope_win",
+    "format",
+    "full_campaign_admitted",
+    "historical_runtime_closure_upgraded",
+    "immutable_references",
+    "mfs_v2",
+    "native_kpis_cross_ranked",
+    "official_tests_opened",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe",
+    "sampling_success_used_for_selection",
+    "shared_kpi_used_for_selection",
+    "shared_validation_evaluation_complete",
+    "source_locks",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}
