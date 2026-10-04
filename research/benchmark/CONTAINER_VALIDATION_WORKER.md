@@ -327,3 +327,37 @@ rounds, native objectives and caps remain unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_search_path_custody.py -v
 ```
+
+## Proposed loader environment snapshots
+
+`container_loader_environment.verify_proposed_environment` owns the external
+environment proposal and the bootstrap/search helper identities before deriving
+the restricted invocation. Its exact seven-entry environment must match the
+frozen declaration before loader files are inspected. This supplies the planned
+empty CUDA, fixed PATH/locale/thread values and single library directory without
+copying inherited startup or credential variables. The declared library directory
+must be a verified directory snapshot and `/etc/ld.so.preload` must have a verified
+absence record. The frozen declared-search-path guard checks the complete parent
+chain before and after these bindings; source, proposal and parent bytes are
+rechecked before success. The caller's original outer timer is used throughout,
+including a final deadline check after the integrity reads; it is never reset.
+Deadline exhaustion remains a typed `TimeoutError`. Other errors contain no
+input values. Opaque controls route preload to a fake missing file and use no
+real loader, candidate interpreter or library.
+
+The receipt verifies a proposed environment and selected snapshots. It does not
+prove that a future process actually uses this environment, which libraries it
+loads, child library contents, full hardware/default/cache/`dlopen` behavior, or
+runtime closure. The caller must trust all guard source and its interpreter/import
+closure before import and separately verify Python/root ELF custody. Bootstrap
+entry/request/cache filesystem identities, transport, cross-host identity, actual
+outer deadline enforcement, capacity, clean SDV closure and density priority
+remain execution requirements. Point-in-time checks grant no atomic lease and
+start no candidate process, library, fit or sample. Official tests stay sealed,
+all gated scores stay null, and existing rounds, native objectives and caps are
+unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_loader_environment.py -v
+```
