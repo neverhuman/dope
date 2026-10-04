@@ -482,3 +482,41 @@ artifact-byte accounting stay unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_native_library_custody.py -v
 ```
+
+## Proposed native child environment
+
+`container_native_child_environment.verify_native_child_environment` binds a
+separate, restricted child proposal to the original selected native directory.
+The predecessor proposal and its metadata remain unchanged. Every proposal field
+except `native_library_directory` must match the original canonical JSON identity,
+and the replacement directory must match the externally owned original library
+inventory. Canonical request/job/round identity is checked with the frozen native
+metadata; numeric or boolean changes do not match by Python value equality.
+
+The pure invocation supplies empty CUDA visibility, fixed PATH/locale/thread
+limits and the single declared directory. Its environment entries must exactly
+match the owned declaration. A separately owned selected-loader absence record
+binds `/etc/ld.so.preload`; its current identity is checked before and after the
+selected original-library guard, and again after final metadata/source hashes.
+All helper sources and metadata paths require unaliased regular-file admission
+before hashing; metadata is bounded to 16 MiB. The original whole-batch timer is
+never reset and is checked after final integrity work.
+
+Call only after the trusted coordinator establishes all sources and complete
+interpreter/import closure before imports. The caller must separately establish
+Python/root ELF, the proposed filesystem and original native executable custody
+on that same timer. This helper rechecks selected native-library files itself;
+it does not perform those separate prerequisites or start a process. Other
+native inventory files, actual loader/provider selection, an executed child's
+environment, cross-host identity, transport, atomic leases, resource capacity,
+predecessor/density priority and final campaign locks remain separate gates.
+
+The receipt describes a proposed environment and point-in-time snapshots, not an
+execution lease or measured generation. Official tests stay sealed; all gated
+scores remain null. Native tuning objectives, artifact accounting and historical
+rounds/receipts stay unchanged.
+
+```sh
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_native_child_environment.py -v
+```
