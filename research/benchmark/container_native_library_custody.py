@@ -33,6 +33,7 @@ def verify_native_library_directory(library_path, library_sha256, *, batch_start
                    for module, key in ((loader, 'loader_helper_sha256'), (sampler, 'sampler_helper_sha256'))]
         helpers.append((python.unaliased(Path(__file__)), python.frozen_digest(lock['library_helper_sha256'])))
         for path, expected in helpers:
+            require(stat.S_ISREG(path.stat().st_mode))
             require(python.sha(path) == expected)
         native = sampler.owned_regular(lock['sampler_path'], lock['sampler_sha256'])
         proposal = sampler.owned_regular(native[2]['proposal_path'], native[2]['proposal_sha256'])

@@ -430,6 +430,10 @@ interpreter/import closure before import, and separately establish proposed
 filesystem, Python/root ELF and child library/environment custody. Metadata
 files are limited to 16 MiB; this is separate from the generator artifact cap.
 
+Both native guards admit initial helper paths as unaliased regular files before
+hashing, rejecting FIFOs and directories without opening them. This repeats the
+final helper admission and does not establish an atomic file lease.
+
 The sampler needs its actual frozen native library directory; the earlier staged
 planning directory is no substitute for that binding. Final execution locks,
 transport, atomic leases, predecessor/density priority and capacity remain
@@ -457,7 +461,8 @@ The caller must establish all guard/coordinator sources and complete
 interpreter/import closure before importing this helper. On the same original
 whole-batch timer it must separately verify Python/root ELF, proposed filesystem
 and native executable custody. This helper owns bounded regular parent metadata,
-pins its own/loader/sampler helpers, derives a pure restricted plan, and checks
+admits its own/loader/sampler helpers as unaliased regular files before their
+initial hashes, derives a pure restricted plan, and checks
 the directory and selected file identities twice. It rechecks bounded regular
 parents, unaliased regular helpers and the original deadline before its receipt.
 I/O errors have fixed no-value rejection text; only trusted timing calls retain

@@ -198,6 +198,30 @@ class NativeLibraryControls(unittest.TestCase):
                 return result
             with patch.object(library.loader, 'directory_identity', side_effect=alias): self.rejected()
 
+    def test_initial_helper_special_files_reject_before_open(self):
+        for module, key in ((library.loader, 'loader_helper_sha256'),
+                            (library.sampler, 'sampler_helper_sha256'),
+                            (library, 'library_helper_sha256')):
+            for kind in ('fifo', 'directory'):
+                with self.subTest(helper=key, kind=kind):
+                    helper = self.base / ('initial-' + key + '-' + kind + '.py')
+                    helper.write_bytes(Path(module.__file__).read_bytes())
+                    prior = self.lock[key]
+                    self.lock[key] = fixture.sha(helper); self.freeze()
+                    with patch.object(module, '__file__', str(helper)):
+                        self.verify()
+                        helper.unlink()
+                        if kind == 'fifo': os.mkfifo(helper)
+                        else: helper.mkdir()
+                        original = Path.open
+                        def guarded(path, *args, **kwargs):
+                            if path == helper: self.fail('initial nonregular helper opened')
+                            return original(path, *args, **kwargs)
+                        with patch.object(Path, 'open', guarded): self.rejected()
+                    if kind == 'fifo': helper.unlink()
+                    else: helper.rmdir()
+                    self.lock[key] = prior; self.freeze(); self.verify()
+
     def test_original_and_final_timer(self):
         with patch.object(library.sampler.bootstrap.time, 'monotonic', return_value=700.0), \
                 self.assertRaisesRegex(TimeoutError, '^compressed bootstrap batch deadline exhausted$'):
