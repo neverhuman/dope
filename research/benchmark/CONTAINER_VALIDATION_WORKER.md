@@ -440,3 +440,40 @@ tests remain sealed, original failures stay visible and all gated scores null.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_native_sampler_custody.py -v
 ```
+
+## Original native Torch library directory
+
+`container_native_library_custody.verify_native_library_directory` binds one
+selected original native-library directory to the owned sampler metadata,
+original validation round and that round's host-runtime inventory. The host
+label and binary identity must agree with the restricted proposed request.
+All selected directory children must be recorded files or file aliases; each
+recorded path, resolved path, exact byte count and file hash must agree with the
+historical inventory. A separate owned snapshot records current literal alias
+targets and directory membership, including ancestor aliases and ownership.
+It does not infer original literal alias text from normalized legacy records.
+
+The caller must establish all guard/coordinator sources and complete
+interpreter/import closure before importing this helper. On the same original
+whole-batch timer it must separately verify Python/root ELF, proposed filesystem
+and native executable custody. This helper owns bounded regular parent metadata,
+pins its own/loader/sampler helpers, derives a pure restricted plan, and checks
+the directory and selected file identities twice. It rechecks bounded regular
+parents, unaliased regular helpers and the original deadline before its receipt.
+I/O errors have fixed no-value rejection text; only trusted timing calls retain
+the fixed typed deadline error. No loader, executable or candidate dependency
+is initialized.
+
+This is point-in-time selected-directory/file custody. It does not establish
+complete native dependency inventories, actual loader/provider selection, the
+child's executable environment, cross-host identity, runtime closure, transport,
+atomic leases, resource capacity or predecessor/density priority. The historical
+runtime inventory's other files and observed `ldd` transcript are not replayed
+by this helper. Final execution locks remain required; official tests stay
+sealed and all gated scores null. Native objectives, old rounds/failures and
+artifact-byte accounting stay unchanged.
+
+```sh
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_native_library_custody.py -v
+```

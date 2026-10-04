@@ -94,6 +94,7 @@
     "research/benchmark/container_loader_environment.py": "external-evidence",
     "research/benchmark/container_bootstrap_filesystem.py": "external-evidence",
     "research/benchmark/container_native_sampler_custody.py": "external-evidence",
+    "research/benchmark/container_native_library_custody.py": "external-evidence",
     "research/benchmark/CONTAINER_VALIDATION_WORKER.md": "external-evidence",
     "research/benchmark/CONTAINER_MEMBER_CONTRACT.md": "external-evidence",
     "research/benchmark/publish_artifact_bytes": "external-evidence",

@@ -39,6 +39,10 @@ is unadmitted and supplies no final round or execution lease.
 `container_native_sampler_custody.py` adds the separate sampler executable root,
 binding its owned ELF declarations to the original fit binary and proposed job.
 Actual child library/provider resolution and execution remain unverified.
+`container_native_library_custody.py` checks the original native directory's
+selected files and literal alias snapshots against owned historical records.
+Actual provider selection, child environment, runtime and execution admission
+remain separate gates; see the worker custody contract.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
