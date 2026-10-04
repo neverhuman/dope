@@ -808,3 +808,9 @@ The [private namespace binding](CONTAINER_VALIDATION_WORKER.md) places that
 read-only builtin map in new guard dictionaries with exact metadata checks and
 cleanup of its own bindings on failure. It installs no live registry entry and
 runs no real initializer; actual startup and dispatch remain unadmitted.
+
+The [proposed registry additions](CONTAINER_VALIDATION_WORKER.md) check private
+package-name exclusion in a caller-owned dictionary before preparation and after
+final custody. Sixteen additions retain the prepared module identities and order;
+no registry write or real initializer runs. Atomic installation and actual startup
+remain separate admission requirements.

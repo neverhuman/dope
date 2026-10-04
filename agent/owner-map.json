@@ -105,6 +105,7 @@
     "research/benchmark/container_import_hook.py": "external-evidence",
     "research/benchmark/container_builtin_bindings.py": "external-evidence",
     "research/benchmark/container_namespace_bindings.py": "external-evidence",
+    "research/benchmark/container_registry_bindings.py": "external-evidence",
     "research/benchmark/CONTAINER_VALIDATION_WORKER.md": "external-evidence",
     "research/benchmark/CONTAINER_MEMBER_CONTRACT.md": "external-evidence",
     "research/benchmark/publish_artifact_bytes": "external-evidence",

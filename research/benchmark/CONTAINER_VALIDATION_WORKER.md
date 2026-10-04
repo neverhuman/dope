@@ -834,3 +834,37 @@ Historical receipts, rounds, objectives and artifact/compute caps are unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_namespace_bindings.py -v
 ```
+
+## Proposed registry additions
+
+`container_registry_bindings.prepare_registry_bindings` checks a caller-owned
+exact builtin dictionary for the fixed private package name and every descendant
+name before parent preparation. All keys must be exact builtin strings before
+comparison or prefix checks. It returns the package followed by fifteen prepared
+guard references in frozen dependency order, with the original registry reference.
+It writes no registry entry and executes no real guard initializer.
+
+Preparation retains the original 600-second start for parent work, complete source
+custody, eight final regular helper hashes, the frozen manifest, exact private
+namespace metadata and reference checks, the final exclusion snapshot and the
+last deadline check. Ordinary I/O failures have fixed integrity messages; genuine
+trusted deadlines keep their typed error. Unknown occupied descendants reject
+rather than being omitted from the plan. Foreign registry entries are never
+removed or replaced, including when late collisions reject preparation.
+
+All eight seed helpers, the complete interpreter/import closure and supplied
+registry, builtin and standard-library references must already be caller-owned.
+Metadata and file hashes do not attest loaded-code identity. The returned registry
+and modules remain mutable objects; repeated exclusion checks are point-in-time
+snapshots, not atomic reservations or permission to install later. A later installer
+must independently establish exclusion and preserve the exact prepared references.
+Actual initialization/import resolution, interpreter/system/loader/transport and
+cross-host closure, leases, capacity, predecessor closure, density priority and
+final campaign admission remain separate requirements. No candidate or fit/sample
+starts. Official tests stay sealed and gated scores remain null. Historical frozen
+rounds, tuning objectives, budgets and artifact caps are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_registry_bindings.py -v
+```
