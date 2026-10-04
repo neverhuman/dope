@@ -122,23 +122,43 @@ AUXILIARY_DIRECTORIES, AUXILIARY_FILES = auxiliary_paths(
     Path(__file__).with_name('density-auxiliary-paths.lock.json').read_bytes())
 
 
-def attempt_tree(out, receipt, refs, declaration):
-    """Verify a separately anchored auxiliary tree; original receipts stay unchanged."""
-    out = safe(out)
+def auxiliary_inventory(declaration):
     require(type(declaration) is dict and set(declaration) == {'files', 'directories'},
             'auxiliary attempt declaration differs')
     rows, dirs = declaration['files'], declaration['directories']
-    operation = receipt['operation']
-    require(operation is None or (type(operation) is dict
-            and type(operation.get('new_operation_started')) is bool), 'invalid execution declaration')
-    started = operation is not None and operation['new_operation_started']
-    require(started or (not rows and not dirs), 'unstarted auxiliary execution output')
     require(type(rows) is list and type(dirs) is list
             and all(type(d) is str and d in AUXILIARY_DIRECTORIES for d in dirs)
             and len(set(dirs)) == len(dirs), 'auxiliary directory inventory differs')
     require(all(type(row) is dict and set(row) == {'path', 'sha256', 'bytes'}
                 and type(row['path']) is str and row['path'] in AUXILIARY_FILES for row in rows)
             and len({row['path'] for row in rows}) == len(rows), 'auxiliary file inventory differs')
+    return rows, dirs
+
+
+def verify_auxiliary_refs(auxiliary, refs):
+    """Reject missing auxiliary bindings before reading any report or metric JSON."""
+    require(type(auxiliary) is dict and type(refs) is dict,
+            'auxiliary physical coverage differs')
+    for key, declaration in auxiliary.items():
+        digest_string(key)
+        rows, _ = auxiliary_inventory(declaration)
+        out = ROOT / 'attempts' / key / 'attempt-0001'
+        for row in rows:
+            p = out / row['path']
+            require(type(row['bytes']) is int and row['bytes'] >= 0
+                    and refs.get(str(p)) == row['sha256']
+                    and len(owned(p, row['sha256'])) == row['bytes'], 'auxiliary bytes unbound')
+
+
+def attempt_tree(out, receipt, refs, declaration):
+    """Verify a separately anchored auxiliary tree; original receipts stay unchanged."""
+    out = safe(out)
+    rows, dirs = auxiliary_inventory(declaration)
+    operation = receipt['operation']
+    require(operation is None or (type(operation) is dict
+            and type(operation.get('new_operation_started')) is bool), 'invalid execution declaration')
+    started = operation is not None and operation['new_operation_started']
+    require(started or (not rows and not dirs), 'unstarted auxiliary execution output')
     files = [out / 'receipt.json', *(out / n for n in receipt['evidence_files'])]
     directories = {out / d for d in dirs}
     total = 0
@@ -248,6 +268,8 @@ def load_closed_inputs(receipt_sha256, report_sha256):
             and anchor['mfs_v2'] is None and anchor['ptf_v1'] is None,
             'density external anchors differ')
     refs = anchor['refs']
+    auxiliary = anchor.get('attempt_auxiliary_trees', {})
+    verify_auxiliary_refs(auxiliary, refs)
     verify_refs(refs)  # Includes all metric evidence; no metric JSON is parsed yet.
     def read(path, expected=None):
         path = str(path)
@@ -276,7 +298,6 @@ def load_closed_inputs(receipt_sha256, report_sha256):
             and report['native_reconciliation_sha256'] == NATIVE_REPORT,
             'density report native anchors differ')
     jobs, batches = closed_metadata(lock, report, completion, end)
-    auxiliary = anchor.get('attempt_auxiliary_trees', {})
     require(type(auxiliary) is dict and ('attempt_auxiliary_trees' not in anchor
             or set(auxiliary) == set(jobs)), 'auxiliary physical coverage differs')
     exact_tree(ROOT / 'source', lock['source_files'])
