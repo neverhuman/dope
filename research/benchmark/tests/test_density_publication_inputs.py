@@ -161,6 +161,27 @@ class FileControls(unittest.TestCase):
                 with self.assertRaises(ValueError): m.load_closed_inputs(a, b)
             read.assert_not_called()
 
+    def test_missing_auxiliary_reference_rejected_before_other_json_reads(self):
+        key = 'a' * 64
+        out = self.root / 'attempts' / key / 'attempt-0001'
+        name = 'catboost_info/learn_error.tsv'
+        h = self.put(out / name, b'opaque log')
+        other = self.root / 'opaque.json'
+        other_h = self.put(other, b'{"opaque":true}')
+        for refs, declared_sha in (({str(other): other_h}, h),
+                                   ({str(other): other_h, str(out / name): h}, 'c' * 64)):
+            anchor = dict(round_sha256=m.ROUND, reconciliation_sha256='b' * 64,
+                native_receipt_lock_sha256=m.NATIVE, official_tests_opened=False,
+                mfs_v2=None, ptf_v1=None, refs=refs,
+                attempt_auxiliary_trees={key: dict(directories=['catboost_info'],
+                    files=[dict(path=name, sha256=declared_sha, bytes=10)])})
+            receipt_sha = self.put(self.root / 'receipt-lock-v1.json', json.dumps(anchor).encode())
+            with patch.object(m, 'bound_json', wraps=m.bound_json) as read:
+                with self.assertRaisesRegex(ValueError, 'auxiliary bytes unbound'):
+                    m.load_closed_inputs(receipt_sha, 'b' * 64)
+                self.assertEqual(read.call_count, 1)
+                self.assertEqual(read.call_args.args[0], self.root / 'receipt-lock-v1.json')
+
     def test_owned_bytes_are_the_parsed_bytes(self):
         path = self.root / 'control.json'
         h = self.put(path, b'{"owned":true}')
