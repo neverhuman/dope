@@ -43,6 +43,10 @@ Actual child library/provider resolution and execution remain unverified.
 selected files and literal alias snapshots against owned historical records.
 Actual provider selection, child environment, runtime and execution admission
 remain separate gates; see the worker custody contract.
+`container_native_child_environment.py` binds a separate restricted proposal to
+the original native directory and selected preload absence record. It verifies
+only proposed environment declarations; actual child/runtime/lease/admission
+remain unverified.
 
 This package does not enter the Rust production binary or alter its release decision.
 `contract.json` pins a generator-only gate profile and the SHA-256 of the frozen
