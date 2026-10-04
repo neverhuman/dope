@@ -871,3 +871,20 @@ marginals and Chow-Liu retain study-reference labels; there is no reproduction
 claim, DOPE win, paired inference, formal privacy claim or production score.
 The current density queue continues unchanged; SDV v3 still requires Jepson's
 explicit approval.
+
+`density_publication_inputs.load_closed_inputs(receipt_sha256, report_sha256)`
+checks both externally frozen digests before report parsing. It hashes the same
+owned bytes it parses, rejects duplicate/nonfinite JSON, verifies the receipt's
+declared file references and native parent, and requires complete 502-batch /
+3,600-cell closure with stopped actors. Requests use canonical job digests,
+including JSON numeric types. Frozen logical native cells remain unchanged.
+Source, worker, artifact and attempt trees reject extra files, empty directories,
+links and special entries; artifact charges include model and projection bytes.
+
+This read-only input gate returns `publication_admitted: false`. It does not
+execute frozen verifiers or generators, reinterpret raw failures, certify a
+loaded runtime or acquire an atomic lease. The final publisher must separately
+replay native selection, every metric and control, runtime inventories and cost
+accounting before calling the aggregation helper. Declared runtime files are
+hashed here; historical runtime closure limitations remain in force. No partial
+density panel is published, no live round is changed, and no SDV rerun is launched.
