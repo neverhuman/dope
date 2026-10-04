@@ -416,7 +416,10 @@ The selected executable must be a regular unaliased file with the frozen exact
 byte count and hash. Only owned bytes reach the ELF declaration inspector, whose
 result must exactly reproduce the frozen declaration record. Parents, executable
 bytes and helpers are checked again before the original final deadline and
-receipt. Proposal I/O is outside timing-only exception handling; unsupported
+receipt. Final metadata checks repeat regular-file and size admission before
+hashing; final helper checks repeat unaliased regular-file admission, including
+all parent components. Late aliases or nonregular replacements are rejected
+before reading them. Proposal I/O is outside timing-only exception handling; unsupported
 metadata, I/O and integrity failures have fixed no-value errors.
 
 This proves selected native file/declaration custody and recorded metadata

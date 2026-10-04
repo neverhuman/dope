@@ -200,6 +200,63 @@ class NativeSamplerControls(unittest.TestCase):
                            ('execution_admitted', 0), ('loader_resolution_verified', True), ('ptf_v1', .99)]:
             self.lock = copy.deepcopy(old); self.lock[key] = value; self.freeze(); self.rejected()
 
+    def test_final_helper_and_parent_aliases_same_bytes_reject(self):
+        for module, key in ((sampler.elf, 'elf_helper_sha256'),
+                            (sampler.bootstrap, 'bootstrap_helper_sha256'),
+                            (sampler, 'sampler_helper_sha256')):
+            for parent_alias in (False, True):
+                with self.subTest(module=key, parent_alias=parent_alias):
+                    root = self.base / (key + str(parent_alias)); root.mkdir()
+                    helper = root / 'helper.py'; helper.write_bytes(Path(module.__file__).read_bytes())
+                    other = self.base / (root.name + '-other'); other.mkdir()
+                    (other / 'helper.py').write_bytes(helper.read_bytes())
+                    prior = self.lock[key]; self.lock[key] = sha(helper); self.freeze()
+                    with patch.object(module, '__file__', str(helper)):
+                        self.verify()
+                        original = sampler.elf.inspect_elf_inputs
+                        def changed(*args):
+                            result = original(*args)
+                            if parent_alias:
+                                helper.unlink(); root.rmdir(); root.symlink_to(other, target_is_directory=True)
+                            else:
+                                helper.unlink(); helper.symlink_to(other / 'helper.py')
+                            return result
+                        with patch.object(sampler.elf, 'inspect_elf_inputs', side_effect=changed): self.rejected()
+                    self.lock[key] = prior; self.freeze(); self.verify()
+
+    def test_final_metadata_fifo_rejects_before_hash(self):
+        for path in (self.manifest, self.proposal_path, self.request, self.fit_path):
+            with self.subTest(path=path.name):
+                original = sampler.elf.inspect_elf_inputs
+                original_sha = sampler.system.python.sha; blob = path.read_bytes()
+                def changed(*args):
+                    result = original(*args); path.unlink(); os.mkfifo(path); return result
+                def guarded(p):
+                    if p == path: self.fail('late nonregular metadata hash attempted')
+                    return original_sha(p)
+                with patch.object(sampler.elf, 'inspect_elf_inputs', side_effect=changed), \
+                        patch.object(sampler.system.python, 'sha', side_effect=guarded): self.rejected()
+                path.unlink(); path.write_bytes(blob); self.verify()
+
+    def test_final_helper_fifo_rejects_before_hash(self):
+        for module, key in ((sampler.elf, 'elf_helper_sha256'),
+                            (sampler.bootstrap, 'bootstrap_helper_sha256'),
+                            (sampler, 'sampler_helper_sha256')):
+            with self.subTest(module=key):
+                helper = self.base / (key + '-regular.py'); helper.write_bytes(Path(module.__file__).read_bytes())
+                prior = self.lock[key]; self.lock[key] = sha(helper); self.freeze()
+                with patch.object(module, '__file__', str(helper)):
+                    self.verify()
+                    original = sampler.elf.inspect_elf_inputs; original_sha = sampler.system.python.sha
+                    def changed(*args):
+                        result = original(*args); helper.unlink(); os.mkfifo(helper); return result
+                    def guarded(path):
+                        if path == helper and not path.is_file(): self.fail('late nonregular helper hash attempted')
+                        return original_sha(path)
+                    with patch.object(sampler.elf, 'inspect_elf_inputs', side_effect=changed), \
+                            patch.object(sampler.system.python, 'sha', side_effect=guarded): self.rejected()
+                self.lock[key] = prior; self.freeze(); self.verify()
+
 
 if __name__ == '__main__':
     unittest.main()

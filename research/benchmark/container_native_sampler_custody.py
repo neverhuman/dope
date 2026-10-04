@@ -76,11 +76,15 @@ def verify_sampler_declarations(sampler_path, sampler_sha256, *, batch_started_a
         declarations = elf.inspect_elf_inputs(blob, expected)
         require(system.canonical(declarations) == system.canonical(lock['declarations']))
         for path, frozen, _ in (manifest, proposal, request, fit):
-            require(python.sha(python.unaliased(path)) == frozen)
+            python.unaliased(path)
+            require(stat.S_ISREG(path.stat().st_mode) and path.stat().st_size <= 16 * 1024 * 1024)
+            require(python.sha(path) == frozen)
         python.unaliased(binary)
         require(stat.S_ISREG(binary.stat().st_mode) and binary.stat().st_size == lock['binary_bytes'])
         require(python.sha(binary) == expected)
         for path, frozen in helpers:
+            python.unaliased(path)
+            require(stat.S_ISREG(path.stat().st_mode))
             require(python.sha(path) == frozen)
         remaining = clock_call(plan.remaining_seconds)
         return {'format': 'dope-compressed-native-sampler-elf-custody', 'version': 1,
