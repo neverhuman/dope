@@ -251,3 +251,45 @@ native objectives and resource caps are unchanged.
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_loader_catalog.py -v
 ```
+
+## Selected configuration declarations and directory snapshots
+
+`container_loader_configuration.inspect_configuration` checks builtin byte and
+digest identities before decoding a bounded ASCII profile: absolute canonical
+directory declarations and fixed-parent includes with literal/star filename
+patterns. Comments, blank lines, source line numbers and repeated declarations
+are preserved appropriately. Unknown directives, multiple path arguments,
+dynamic tokens, relative/noncanonical paths, escaping, unsupported glob syntax,
+non-ASCII input and NUL reject. The profile accepts at most 1 MiB and 4,096
+records. It is deliberately a declaration inspector, not a complete `ldconfig`
+configuration parser, and opens no declared path.
+
+`verify_configuration_inputs` first owns an externally selected private manifest,
+pins the inspector file and verifies its frozen selected-loader parent. Every
+selected configuration body is hashed before inspection, and its exact records
+must agree with the manifest. It follows the supported includes against selected
+directory entry snapshots, respecting leading-dot filename matching. Every
+matching body must be selected; every selected body must be reachable from the
+declared configuration root. Each configuration path is expanded once for
+membership, with a bounded queue; this does not reproduce cache construction or
+its handling of repeated includes. Additional directory/absence records must
+cover exactly the declared directories absent from the parent snapshots, and
+their names, types, literal aliases, mode and owner are checked. Records, source,
+parents and snapshots are rechecked before success. Errors reveal no input values.
+
+As with the other custody guards, call from an already trusted coordinator after
+the separate Python/root ELF checks and trust all guard source before importing
+it. Directory snapshots cover names/types/alias targets, not every child's
+bytes. Configuration records do not prove that the loader cache was constructed
+from these inputs or establish actual RPATH/RUNPATH, cache/default-directory,
+hardware, preload or `dlopen` behavior. Actual selection, complete search/runtime
+closure, cross-host identity, bootstrap/transport/deadline/capacity, predecessor
+and density priority remain separate requirements. This starts no candidate,
+library, fit or sample and grants no atomic execution lease. Official tests stay
+sealed; gated scores remain null; existing rounds, native objectives and caps
+are unchanged.
+
+```bash
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_loader_configuration.py -v
+```
