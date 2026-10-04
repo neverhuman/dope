@@ -925,3 +925,30 @@ required. Independent marginals and Chow-Liu keep study-reference labels without
 a reported-experiment reproduction claim; native KPI values are never ranked
 across methods. No new tuning, fits, samples, official-test access or SDV v3 run
 is launched.
+
+
+`density_custody_replay.replay_native_files()` first requires the owned native
+selection replay, then hashes all native receipt-lock references. It verifies
+100 five-file worker inventories and their manifests, training/validation hash
+bindings, all 1,100 trial artifact inventories, and the 600 default/native cells
+that reference 502 distinct selected artifacts. Every charge includes actual
+model and projection bytes; worker/artifact trees reject added entries and links.
+CSV rows and model contents are never parsed, and frozen code is never initialized.
+
+`replay_closed_costs(receipt_sha256, report_sha256)` requires the complete owned
+closure gate before replaying canonical requests, execution markers, operation
+records, worker timers, runtime reference declarations and admitted resource
+requests. It charges measured outer operation time once; inner worker time is a
+lower bound, not an additional cost. The frozen worker cap remains 600 seconds
+(or the shorter remaining deadline). Measured shutdown/receipt overhead remains
+charged, and raw timeout, memory and post-metric outcomes are preserved. Unstarted
+cells require zero cost and no execution output. Prior native fitting cost is
+reported once without multiplication by logical sample reuse; total comparisons
+use absolute `1e-9` / relative `1e-12` tolerance.
+
+This is unadmitted replay preparation. The real round's generated auxiliary
+attempt directories/logs still need separately anchored inventory accounting
+before the strict closure gate can accept them; complete runtime replay also
+remains required. The helpers return `publication_admitted: false`, acquire no
+lease, start no jobs, and provide no partial panel, score or historical runtime
+certification. Official tests stay sealed and SDV v3 remains unauthorized.
