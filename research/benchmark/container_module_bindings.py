@@ -50,7 +50,7 @@ def prepare_module_bindings(manifest_path, manifest_sha256, compiler_sha256,
 
     Return immutable descriptors, not imported modules. A future closed bootstrap
     must install these exact code objects, names and __file__ bindings; it must
-    separately prevent ordinary import/cache fallback and namespace collisions.
+    separately prevent ordinary imports, cached bytecode loading and namespace collisions.
     """
     sources = compiler.sources
     try:
