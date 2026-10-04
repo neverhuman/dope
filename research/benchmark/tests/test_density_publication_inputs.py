@@ -348,6 +348,23 @@ class FileControls(unittest.TestCase):
                 self.assertEqual(read.call_count, 1)
 
 
+class AuxiliaryPathContractControls(unittest.TestCase):
+    def test_immutable_names_and_counts(self):
+        path = Path(m.__file__).with_name('density-auxiliary-paths.lock.json')
+        dirs, files = m.auxiliary_paths(path.read_bytes())
+        self.assertEqual((len(dirs), len(files)), (5, 4))
+        self.assertIn('runtime-temp', dirs)
+        self.assertIn('sampler.empty-cache', dirs)
+        self.assertEqual((dirs, files), (m.AUXILIARY_DIRECTORIES, m.AUXILIARY_FILES))
+
+    def test_changed_contract_rejected_before_json_decode(self):
+        with patch.object(m.json, 'loads') as parse:
+            for data in (b'{}', b'{"directories":[],"files":[]}', b'\xff'):
+                with self.assertRaisesRegex(ValueError, 'path contract changed'):
+                    m.auxiliary_paths(data)
+            parse.assert_not_called()
+
+
 class AuxiliaryControls(unittest.TestCase):
  def setUp(self):
   self.tmp=tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[3] / 'target');self.addCleanup(self.tmp.cleanup)

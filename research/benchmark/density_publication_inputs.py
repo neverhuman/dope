@@ -107,10 +107,19 @@ def exact_tree(root, files, declared_directories=()):
             'evidence tree inventory changed')
 
 
-AUXILIARY_DIRECTORIES = {'runtime-temp', 'sampler.empty-cache', 'catboost_info',
-                         'catboost_info/tmp', 'catboost_info/learn'}
-AUXILIARY_FILES = {'catboost_info/time_left.tsv', 'catboost_info/learn_error.tsv',
-                   'catboost_info/catboost_training.json', 'catboost_info/learn/events.out.tfevents'}
+AUXILIARY_PATHS_SHA256 = "12ed367e2408e83273fff41a776ca9606abde96071d9d0265f94bc02e9e04229"
+
+
+def auxiliary_paths(data):
+    """Decode immutable on-disk names only after checking the owned contract bytes."""
+    require(hashlib.sha256(data).hexdigest() == AUXILIARY_PATHS_SHA256,
+            'auxiliary path contract changed')
+    value = json.loads(data, object_pairs_hook=pairs)
+    return frozenset(value['directories']), frozenset(value['files'])
+
+
+AUXILIARY_DIRECTORIES, AUXILIARY_FILES = auxiliary_paths(
+    Path(__file__).with_name('density-auxiliary-paths.lock.json').read_bytes())
 
 
 def attempt_tree(out, receipt, refs, declaration):
