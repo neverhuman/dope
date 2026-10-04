@@ -401,3 +401,39 @@ Focused controls use only opaque files and validated parent fixtures:
 python3 -B -m unittest discover -s research/benchmark/tests \
   -p test_container_bootstrap_filesystem.py -v
 ```
+
+## Native sampler executable declarations
+
+`container_native_sampler_custody.verify_sampler_declarations` adds the separate
+native sampler executable root omitted by the Python interpreter/package/stdlib
+inventory. It owns bounded regular metadata files before decoding them, pins its
+inspector/bootstrap/guard helpers, and derives the restricted proposal on the
+original caller timer. The owned request's canonical job digest must match the
+proposal and external manifest. Its original generator binary and recorded
+product-source map must match the owned original GPU fit round.
+
+The selected executable must be a regular unaliased file with the frozen exact
+byte count and hash. Only owned bytes reach the ELF declaration inspector, whose
+result must exactly reproduce the frozen declaration record. Parents, executable
+bytes and helpers are checked again before the original final deadline and
+receipt. Proposal I/O is outside timing-only exception handling; unsupported
+metadata, I/O and integrity failures have fixed no-value errors.
+
+This proves selected native file/declaration custody and recorded metadata
+identity. It does not rebuild product sources, independently replay parent fits,
+verify interpreter/provider/library resolution or certify runtime closure. The
+caller must already trust all guard/coordinator sources and their complete
+interpreter/import closure before import, and separately establish proposed
+filesystem, Python/root ELF and child library/environment custody. Metadata
+files are limited to 16 MiB; this is separate from the generator artifact cap.
+
+The sampler needs its actual frozen native library directory; the earlier staged
+planning directory is no substitute for that binding. Final execution locks,
+transport, atomic leases, predecessor/density priority and capacity remain
+unadmitted. No native executable/library, fit or sample is started. Official
+tests remain sealed, original failures stay visible and all gated scores null.
+
+```sh
+python3 -B -m unittest discover -s research/benchmark/tests \
+  -p test_container_native_sampler_custody.py -v
+```
