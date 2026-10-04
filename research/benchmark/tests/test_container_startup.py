@@ -154,6 +154,17 @@ class StartupControls(unittest.TestCase):
             return original(path)
         with patch.object(Path,'read_bytes',timeout):self.rejected()
 
+    def test_proposal_read_io_timeout_is_integrity_rejection(self):
+        original=Path.read_bytes;calls=[]
+        def timed_out(path):
+            if path==self.inv.f.proposal_path:
+                calls.append(True)
+                if len(calls)==2:raise TimeoutError('opaque proposal I/O timeout')
+            return original(path)
+        self.verify()
+        with patch.object(Path,'read_bytes',timed_out):self.rejected()
+        self.assertEqual(calls,[True,True])
+
     def test_final_parent_fifo_rejects_before_open(self):
         original=startup.inventory.verify_native_runtime_inventory
         parents=(self.manifest,self.fs.manifest,self.native.manifest,self.inv.manifest,self.inv.f.manifest,

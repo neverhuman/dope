@@ -56,8 +56,9 @@ def verify_proposed_startup(startup_path, startup_sha256, *, batch_started_at):
         runtime = sampler.owned_regular(declarations[2]['runtime_path'], declarations[2]['runtime_sha256'])
         auxiliary = sampler.owned_regular(declarations[2]['auxiliary_path'], declarations[2]['auxiliary_sha256'])
         proposal = sampler.owned_regular(child[2]['proposal_path'], child[2]['proposal_sha256'])
+        proposal_blob = proposal[0].read_bytes()
         plan = sampler.clock_call(lambda: sampler.bootstrap.prepare_invocation(
-            proposal[0].read_bytes(), proposal[1], batch_started_at=batch_started_at))
+            proposal_blob, proposal[1], batch_started_at=batch_started_at))
         sampler.clock_call(plan.remaining_seconds)
         roots = system.verify_declared_elf_inputs(str(declarations[0]), declarations[1],
             str(runtime[0]), runtime[1], str(auxiliary[0]), auxiliary[1])
