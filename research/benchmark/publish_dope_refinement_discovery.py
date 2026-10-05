@@ -111,14 +111,14 @@ def validate_matrix(cells, datasets):
                     'artifact rejection hidden')
 
 
-def paired(groups):
+def paired(groups, profiles=PROFILES):
     """Descriptive paired medians; no tests, ranks, selection or win claims."""
     lookup = {(g['dataset'], g['method'], g['configuration'], g['size_multiplier']): g for g in groups}
     datasets = sorted({g['dataset'] for g in groups})
     references = [('DOPE', 'features12_steps2048'), ('GaussianCopula', 'native_selected'),
                   ('Chow-Liu', 'native_selected'), ('independent_marginals', 'native_selected')]
     rows = []
-    for profile in PROFILES:
+    for profile in profiles:
         for method, configuration in references:
             for size in SIZES:
                 for auditor in AUDITORS:
