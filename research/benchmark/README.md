@@ -1061,3 +1061,20 @@ CPU slot under aggregate capacity, and enforce 600 seconds for the entire batch.
 CUDA is hidden before runtime initialization; final rehashes precede the success
 deadline check. Each artifact charge includes its projection. This source does
 not admit a full campaign, an SDV v3 rerun, sealed tests, or a gated score.
+
+### Bounded target refinement progress
+
+The [closed progress batch](results/dope-target-refinement-progress.md) contains
+three GPU fits on one training-derived S3 discovery lineage and all18 declared
+validation cells, with two distinct artifacts. It retains the recorded
+infrastructure interruption and its separately queued attempt2. Twenty unstarted
+fits continue on freshly admitted xbabe1/2/3 capacity; xbabe0 remains excluded.
+The full24-fit discovery is pending. This snapshot selects no global family and
+admits no production, release or superiority score. Matched references retain
+their original default/native likelihood selections.
+
+Rebuild JSON/CSV/Markdown with `python3 -B -m research.benchmark.publish_dope_refinement_progress`.
+Regenerate SVG/PDF from the committed report with
+`python3 -B -m research.benchmark.publish_dope_refinement_progress_figure`.
+Bulk artifacts, samples, runtime inventories and detailed logs remain on scratch;
+the public manifest pins every published output and its immutable receipt lock.

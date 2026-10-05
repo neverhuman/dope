@@ -1,0 +1,1466 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_gpu_hosts": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "baseline_native_selection_changed": {
+      "const": false
+    },
+    "baseline_selected_by_common_utility": {
+      "const": false
+    },
+    "cells": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "c2st_auc": {
+            "type": "number"
+          },
+          "charged_artifact_bytes": {
+            "type": "integer"
+          },
+          "configuration": {
+            "type": "string"
+          },
+          "copy_counts": {
+            "additionalProperties": false,
+            "properties": {
+              "exact": {
+                "type": "integer"
+              },
+              "near": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "exact",
+              "near"
+            ],
+            "type": "object"
+          },
+          "dataset": {
+            "type": "string"
+          },
+          "fit_receipt_sha256": {
+            "type": "string"
+          },
+          "fit_seed": {
+            "type": "integer"
+          },
+          "marginal_ks_mean": {
+            "type": "number"
+          },
+          "method": {
+            "type": "string"
+          },
+          "mfs_v2": {
+            "type": "null"
+          },
+          "pair_correlation_fidelity": {
+            "type": "number"
+          },
+          "projection_bytes_included": {
+            "const": true
+          },
+          "ptf_v1": {
+            "type": "null"
+          },
+          "real_vs_real_control_counts": {
+            "additionalProperties": false,
+            "properties": {
+              "exact": {
+                "type": "integer"
+              },
+              "near": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "exact",
+              "near"
+            ],
+            "type": "object"
+          },
+          "release_safe": {
+            "type": "null"
+          },
+          "sample_seed": {
+            "type": "integer"
+          },
+          "size_multiplier": {
+            "type": "integer"
+          },
+          "utility": {
+            "additionalProperties": false,
+            "properties": {
+              "catboost": {
+                "additionalProperties": false,
+                "properties": {
+                  "informative": {
+                    "const": true
+                  },
+                  "low_signal_noninferior": {
+                    "type": "null"
+                  },
+                  "retention": {
+                    "type": "number"
+                  },
+                  "trtr_loss": {
+                    "type": "number"
+                  },
+                  "tstr_loss": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "informative",
+                  "low_signal_noninferior",
+                  "retention",
+                  "trtr_loss",
+                  "tstr_loss"
+                ],
+                "type": "object"
+              },
+              "linear": {
+                "additionalProperties": false,
+                "properties": {
+                  "informative": {
+                    "const": true
+                  },
+                  "low_signal_noninferior": {
+                    "type": "null"
+                  },
+                  "retention": {
+                    "type": "number"
+                  },
+                  "trtr_loss": {
+                    "type": "number"
+                  },
+                  "tstr_loss": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "informative",
+                  "low_signal_noninferior",
+                  "retention",
+                  "trtr_loss",
+                  "tstr_loss"
+                ],
+                "type": "object"
+              },
+              "mlp": {
+                "additionalProperties": false,
+                "properties": {
+                  "informative": {
+                    "const": true
+                  },
+                  "low_signal_noninferior": {
+                    "type": "null"
+                  },
+                  "retention": {
+                    "type": "number"
+                  },
+                  "trtr_loss": {
+                    "type": "number"
+                  },
+                  "tstr_loss": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "informative",
+                  "low_signal_noninferior",
+                  "retention",
+                  "trtr_loss",
+                  "tstr_loss"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "catboost",
+              "linear",
+              "mlp"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "c2st_auc",
+          "charged_artifact_bytes",
+          "configuration",
+          "copy_counts",
+          "dataset",
+          "fit_receipt_sha256",
+          "fit_seed",
+          "marginal_ks_mean",
+          "method",
+          "mfs_v2",
+          "pair_correlation_fidelity",
+          "projection_bytes_included",
+          "ptf_v1",
+          "real_vs_real_control_counts",
+          "release_safe",
+          "sample_seed",
+          "size_multiplier",
+          "utility"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "closed_successful_fits_at_snapshot": {
+      "const": 3
+    },
+    "conservative_operation_seconds_bound": {
+      "type": "number"
+    },
+    "fit_attempts": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attempt": {
+                "type": "integer"
+              },
+              "charged_artifact_bytes": {
+                "type": "null"
+              },
+              "configuration": {
+                "type": "string"
+              },
+              "elapsed_seconds": {
+                "type": "number"
+              },
+              "energy_attributable_to_job": {
+                "type": "null"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "foreign_processes_signaled": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": false
+              },
+              "host": {
+                "type": "string"
+              },
+              "job_sha256": {
+                "type": "string"
+              },
+              "model_bytes": {
+                "type": "null"
+              },
+              "operation_seconds": {
+                "type": "number"
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "peak_gpu_used_mib": {
+                "type": "integer"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "receipt_sha256": {
+                "type": "string"
+              },
+              "runtime_sha256": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "attempt",
+              "charged_artifact_bytes",
+              "configuration",
+              "elapsed_seconds",
+              "energy_attributable_to_job",
+              "fit_seed",
+              "foreign_processes_signaled",
+              "gpu_target_operator_verified",
+              "host",
+              "job_sha256",
+              "model_bytes",
+              "operation_seconds",
+              "outcome_class",
+              "peak_gpu_used_mib",
+              "projection_bytes",
+              "receipt_sha256",
+              "runtime_sha256",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attempt": {
+                "type": "integer"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "configuration": {
+                "type": "string"
+              },
+              "elapsed_seconds": {
+                "type": "number"
+              },
+              "energy_attributable_to_job": {
+                "type": "null"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "foreign_processes_signaled": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": true
+              },
+              "host": {
+                "type": "string"
+              },
+              "job_sha256": {
+                "type": "string"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "operation_seconds": {
+                "type": "number"
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "peak_gpu_used_mib": {
+                "type": "integer"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "receipt_sha256": {
+                "type": "string"
+              },
+              "runtime_sha256": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "attempt",
+              "charged_artifact_bytes",
+              "configuration",
+              "elapsed_seconds",
+              "energy_attributable_to_job",
+              "fit_seed",
+              "foreign_processes_signaled",
+              "gpu_target_operator_verified",
+              "host",
+              "job_sha256",
+              "model_bytes",
+              "operation_seconds",
+              "outcome_class",
+              "peak_gpu_used_mib",
+              "projection_bytes",
+              "receipt_sha256",
+              "runtime_sha256",
+              "status"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "type": "array"
+    },
+    "fit_compute_ceiling_seconds": {
+      "type": "integer"
+    },
+    "format": {
+      "const": "dope-target-refinement-progress"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "full_discovery_complete": {
+      "const": false
+    },
+    "global_family_selected": {
+      "const": false
+    },
+    "infrastructure_retry_queued": {
+      "const": 1
+    },
+    "matched_reference_cells": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_bytes": {
+                "type": "integer"
+              },
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "configuration": {
+                "type": "string"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_attempt_receipt_path": {
+                "type": "string"
+              },
+              "fit_attempt_receipt_sha256": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "implementation_kind": {
+                "type": "string"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "native_objective": {
+                "additionalProperties": false,
+                "properties": {
+                  "direction": {
+                    "type": "string"
+                  },
+                  "implementation_sha256": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "partition": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "tie_breaks": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "track": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "direction",
+                  "implementation_sha256",
+                  "name",
+                  "partition",
+                  "status",
+                  "tie_breaks",
+                  "track"
+                ],
+                "type": "object"
+              },
+              "native_validation_kpi": {
+                "type": "number"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_evidence": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "selected_trial_index": {
+                "type": "integer"
+              },
+              "selection_receipt_path": {
+                "type": "string"
+              },
+              "selection_receipt_sha256": {
+                "type": "string"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt_sha256": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_bytes",
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "configuration",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_attempt_receipt_path",
+              "fit_attempt_receipt_sha256",
+              "fit_seed",
+              "implementation_kind",
+              "marginal_ks_mean",
+              "method",
+              "mfs_v2",
+              "native_objective",
+              "native_validation_kpi",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_evidence",
+              "sample_seed",
+              "selected_trial_index",
+              "selection_receipt_path",
+              "selection_receipt_sha256",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt_sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_bytes": {
+                "type": "integer"
+              },
+              "artifact_within_l3_cap": {
+                "const": false
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "configuration": {
+                "type": "string"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_attempt_receipt_path": {
+                "type": "string"
+              },
+              "fit_attempt_receipt_sha256": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "implementation_kind": {
+                "type": "string"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "native_objective": {
+                "additionalProperties": false,
+                "properties": {
+                  "direction": {
+                    "type": "string"
+                  },
+                  "implementation_sha256": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "partition": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "tie_breaks": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "track": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "direction",
+                  "implementation_sha256",
+                  "name",
+                  "partition",
+                  "status",
+                  "tie_breaks",
+                  "track"
+                ],
+                "type": "object"
+              },
+              "native_validation_kpi": {
+                "type": "number"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_evidence": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "selected_trial_index": {
+                "type": "integer"
+              },
+              "selection_receipt_path": {
+                "type": "string"
+              },
+              "selection_receipt_sha256": {
+                "type": "string"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt_sha256": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_bytes",
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "configuration",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_attempt_receipt_path",
+              "fit_attempt_receipt_sha256",
+              "fit_seed",
+              "implementation_kind",
+              "marginal_ks_mean",
+              "method",
+              "mfs_v2",
+              "native_objective",
+              "native_validation_kpi",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_evidence",
+              "sample_seed",
+              "selected_trial_index",
+              "selection_receipt_path",
+              "selection_receipt_sha256",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt_sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_within_l3_cap": {
+                "const": true
+              },
+              "c2st_auc": {
+                "type": "number"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "configuration": {
+                "type": "string"
+              },
+              "copy_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "marginal_ks_mean": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "metric_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "metric_path": {
+                    "type": "string"
+                  },
+                  "metric_replay": {
+                    "type": "string"
+                  },
+                  "metric_sha256": {
+                    "type": "string"
+                  },
+                  "sample_replay": {
+                    "type": "string"
+                  },
+                  "sample_seed": {
+                    "type": "integer"
+                  },
+                  "sample_sha256": {
+                    "type": "string"
+                  },
+                  "size_multiplier": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "metric_path",
+                  "metric_replay",
+                  "metric_sha256",
+                  "sample_replay",
+                  "sample_seed",
+                  "sample_sha256",
+                  "size_multiplier"
+                ],
+                "type": "object"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "null_loss": {
+                "type": "number"
+              },
+              "pair_correlation_fidelity": {
+                "type": "number"
+              },
+              "paired_superiority": {
+                "type": "null"
+              },
+              "physical_job_sha256": {
+                "type": "string"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "real_vs_real_control_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "exact": {
+                    "type": "integer"
+                  },
+                  "near": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "exact",
+                  "near"
+                ],
+                "type": "object"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "sample_seed": {
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "utility": {
+                "additionalProperties": false,
+                "properties": {
+                  "catboost": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "linear": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  },
+                  "mlp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "informative": {
+                        "const": true
+                      },
+                      "low_signal_noninferior": {
+                        "type": "null"
+                      },
+                      "retention": {
+                        "type": "number"
+                      },
+                      "trtr_loss": {
+                        "type": "number"
+                      },
+                      "tstr_loss": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "informative",
+                      "low_signal_noninferior",
+                      "retention",
+                      "trtr_loss",
+                      "tstr_loss"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "catboost",
+                  "linear",
+                  "mlp"
+                ],
+                "type": "object"
+              },
+              "validation_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "artifact_within_l3_cap",
+              "c2st_auc",
+              "charged_artifact_bytes",
+              "configuration",
+              "copy_counts",
+              "counts_as_dope_win",
+              "dataset",
+              "fit_receipt",
+              "fit_seed",
+              "marginal_ks_mean",
+              "method",
+              "metric_receipt",
+              "mfs_v2",
+              "null_loss",
+              "pair_correlation_fidelity",
+              "paired_superiority",
+              "physical_job_sha256",
+              "ptf_v1",
+              "real_vs_real_control_counts",
+              "release_safe_l3",
+              "sample_seed",
+              "size_multiplier",
+              "status",
+              "utility",
+              "validation_receipt"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "type": "array"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "original_attempts_preserved": {
+      "const": true
+    },
+    "original_infrastructure_interrupted_attempts": {
+      "const": 1
+    },
+    "original_interruption_is_method_failure": {
+      "const": false
+    },
+    "original_job_identities_preserved": {
+      "const": true
+    },
+    "physical_validation_batches": {
+      "const": 2
+    },
+    "planned_discovery_fits": {
+      "const": 24
+    },
+    "prior_operation_seconds": {
+      "type": "number"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "sdv_v3_launched": {
+      "const": false
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "continuation_round": {
+          "type": "string"
+        },
+        "matched_reference": {
+          "type": "string"
+        },
+        "progress_receipts": {
+          "type": "string"
+        },
+        "progress_round": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "continuation_round",
+        "matched_reference",
+        "progress_receipts",
+        "progress_round"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "unstarted_fits_carried_forward": {
+      "const": 20
+    },
+    "validation_seconds": {
+      "type": "number"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "allowed_gpu_hosts",
+    "baseline_native_selection_changed",
+    "baseline_selected_by_common_utility",
+    "cells",
+    "closed_successful_fits_at_snapshot",
+    "conservative_operation_seconds_bound",
+    "fit_attempts",
+    "fit_compute_ceiling_seconds",
+    "format",
+    "full_campaign_admitted",
+    "full_discovery_complete",
+    "global_family_selected",
+    "infrastructure_retry_queued",
+    "matched_reference_cells",
+    "mfs_v2",
+    "official_tests_opened",
+    "original_attempts_preserved",
+    "original_infrastructure_interrupted_attempts",
+    "original_interruption_is_method_failure",
+    "original_job_identities_preserved",
+    "physical_validation_batches",
+    "planned_discovery_fits",
+    "prior_operation_seconds",
+    "ptf_v1",
+    "release_safe",
+    "scope",
+    "sdv_v3_launched",
+    "source_locks",
+    "superiority",
+    "unstarted_fits_carried_forward",
+    "validation_seconds",
+    "version"
+  ],
+  "type": "object"
+}
