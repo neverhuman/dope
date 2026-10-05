@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_confirmation_fit_cells_accounted": {
+      "const": true,
+      "type": "boolean"
+    },
+    "confirmation_complete": {
+      "const": true,
+      "type": "boolean"
+    },
+    "files": {
+      "additionalProperties": false,
+      "properties": {
+        "dope-target-refinement-confirmation.csv": {
+          "type": "string"
+        },
+        "dope-target-refinement-confirmation.json": {
+          "type": "string"
+        },
+        "dope-target-refinement-confirmation.md": {
+          "type": "string"
+        },
+        "dope-target-refinement-confirmation.pdf": {
+          "type": "string"
+        },
+        "dope-target-refinement-confirmation.schema.json": {
+          "type": "string"
+        },
+        "dope-target-refinement-confirmation.svg": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "dope-target-refinement-confirmation.csv",
+        "dope-target-refinement-confirmation.json",
+        "dope-target-refinement-confirmation.md",
+        "dope-target-refinement-confirmation.pdf",
+        "dope-target-refinement-confirmation.schema.json",
+        "dope-target-refinement-confirmation.svg"
+      ],
+      "type": "object"
+    },
+    "fit_receipt_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "type": "string"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false,
+      "type": "boolean"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "raw_rows_samples_weights_or_detailed_logs_committed": {
+      "const": false,
+      "type": "boolean"
+    },
+    "receipt_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "source_files": {
+      "additionalProperties": false,
+      "properties": {
+        "publish_dope_refinement_confirmation.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_confirmation_figure.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_confirmation_manifest.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "publish_dope_refinement_confirmation.py",
+        "publish_dope_refinement_confirmation_figure.py",
+        "publish_dope_refinement_confirmation_manifest.py"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "all_confirmation_fit_cells_accounted",
+    "confirmation_complete",
+    "files",
+    "fit_receipt_lock",
+    "format",
+    "mfs_v2",
+    "official_tests_opened",
+    "ptf_v1",
+    "raw_rows_samples_weights_or_detailed_logs_committed",
+    "receipt_lock",
+    "release_safe",
+    "source_files",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}

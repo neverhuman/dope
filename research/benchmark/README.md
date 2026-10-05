@@ -1114,3 +1114,21 @@ SDV supplies 486 measured cells and 1,914 explicitly sample-unavailable cells, w
 Per-cell JSON records all auditors, copy/near-match and real controls, native KPI values, charged model+projection bytes, costs and missing reasons. The manifest points to immutable scratch receipt/reconciliation/auxiliary hashes. Official tests remain sealed; MFS-v2/PTF-v1/release/superiority stay null. No SDV v3, global family selection or final-campaign admission is claimed. Citation keys: `xu2019modeling`, `patki2016synthetic`.
 
 Regenerate with `python3 -B -m research.benchmark.publish_sdv_matched --output-dir <new-directory>`, then the figure/manifest entry points with `--results-dir <directory>`. Frozen scratch anchors are required for the publisher; figure/table replay uses committed metrics only.
+
+### Disjoint GPU refinement confirmation
+
+[`results/dope-target-refinement-confirmation.md`](results/dope-target-refinement-confirmation.md)
+reports the completed two-profile, six-lineage confirmation panel: 12 GPU fits
+and all 72 validation sample cells, plus 360 unchanged matched default/native
+density and earlier DOPE reference cells. The confirmation lineages are disjoint
+from discovery and both profiles were frozen before new confirmation metrics.
+Every reference uses the same worker view and its own frozen selection objective.
+Sample seeds reduce within lineage before dataset summaries and descriptive pairs.
+
+Each artifact has an exact sampler control at n/seed101 and a separate exact
+metric control at 4n/seed101 (12 cells per kind). Each kind has 60 cells not
+repeated; 48 cells have neither repetition. All 72 cells were measured. Costs include all fits,
+model and projection bytes, validation and separate scheduler wall. This small
+research panel establishes neither the public-core headline nor global family
+selection, final five-fit coverage, superiority or certification. Official tests
+remain sealed and MFS-v2/PTF-v1/release/superiority remain null.

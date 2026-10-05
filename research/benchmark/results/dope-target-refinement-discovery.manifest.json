@@ -24,7 +24,7 @@
   },
   "release_safe": null,
   "source_files": {
-    "publish_dope_refinement_discovery.py": "96664eb3307dd05350c7388dbe61bbcba6c5f5db40814601c7bb16630d76a87c",
+    "publish_dope_refinement_discovery.py": "86205d65e65774a14de1838002828c9581db4009c0122df3d5f056103c68fa57",
     "publish_dope_refinement_discovery_figure.py": "9c8d925fa1690647c39640661f82bf043dc2f8d7f349ee4aa449de482e3c8d0b",
     "publish_dope_refinement_discovery_manifest.py": "0c9c050ad44c73cd421f4f32c67db573706eec9f47595eae4267dcacbf02c51a"
   },

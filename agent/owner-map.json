@@ -146,6 +146,9 @@
     "research/benchmark/tests/test_arf_native_selection.py": "external-evidence",
     "research/benchmark/publish_dope_refinement_discovery.py": "external-evidence",
     "research/benchmark/publish_dope_refinement_discovery_figure.py": "external-evidence",
-    "research/benchmark/publish_dope_refinement_discovery_manifest.py": "external-evidence"
+    "research/benchmark/publish_dope_refinement_discovery_manifest.py": "external-evidence",
+    "research/benchmark/publish_dope_refinement_confirmation.py": "external-evidence",
+    "research/benchmark/publish_dope_refinement_confirmation_figure.py": "external-evidence",
+    "research/benchmark/publish_dope_refinement_confirmation_manifest.py": "external-evidence"
   }
 }
