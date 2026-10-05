@@ -1,0 +1,46 @@
+{
+  "artifacts": {
+    "arf-s3-population-native.csv": {
+      "bytes": 9151,
+      "sha256": "a2de72ee76a668a6bb7399f901c5c92e68f3c0960ca4989379e28ab58ed6187c"
+    },
+    "arf-s3-population-native.json": {
+      "bytes": 1472035,
+      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+    },
+    "arf-s3-population-native.md": {
+      "bytes": 1625,
+      "sha256": "5318d7e0964ef9f476955c164594c172e9eed50f6207cece6d7a73ebaa450b04"
+    },
+    "arf-s3-population-native.schema.json": {
+      "bytes": 17385,
+      "sha256": "d665fe62f6818bd0f8f59b14a61b7321529df51888c6a21179d7e8358f3ba7b9"
+    }
+  },
+  "counts_as_dope_win": false,
+  "format": "dope-arf-native-publication-manifest",
+  "full_campaign_admitted": false,
+  "mfs_v2": null,
+  "native_values_aggregated_across_datasets": false,
+  "native_values_ranked_across_methods": false,
+  "official_tests_opened": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "arf-native-paths.lock.json": "cb74bea53a5ca97a9ef8e969afd577c6ffaa6455f3a3655d6cc0d09457a0c29e",
+    "arf_native_selection.py": "fdb77971422c5714a1be4cad31cef243033fd727f166104d7f8a004f6fb64844",
+    "arf_runtime_guard.py": "163328e0130f8d23ea5df5f63b2a2340e9e7361145190fbdb63e97889cec2df7",
+    "publish_arf_population_native.py": "8e1b2a05824fc20e958185865028b5b8ee5c7c7dd82d1275201bbe77363fea96",
+    "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a"
+  },
+  "release_safe": null,
+  "shared_outcomes_used_for_selection": false,
+  "shared_validation_evaluation_complete": false,
+  "source_locks": {
+    "receipts": "238a19ea24694348b0cb6acd43b5203ac75989ee6ac5c714ef86c32ff040e61d",
+    "reconciliation": "af722bff624b2b5cad37eb10a314767dcbd2b00b085c44114f8ef398de9c3850",
+    "round": "610c1ba0db58fe380350936f55c5e2e754cd09190616d7b56a6f9311d0d5133c"
+  },
+  "superiority": null,
+  "system_dynamic_library_closure_certified": false,
+  "version": 1
+}

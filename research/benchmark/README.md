@@ -1139,3 +1139,27 @@ model and projection bytes, validation and separate scheduler wall. This small
 research panel establishes neither the public-core headline nor global family
 selection, final five-fit coverage, superiority or certification. Official tests
 remain sealed and MFS-v2/PTF-v1/release/superiority remain null.
+
+## Complete ARF native population ledger
+
+The [ARF native ledger](results/arf-s3-population-native.md) accounts for all
+800 fits on the same 100 bounded S3 training-derived lineages. The unchanged
+author ARF implementation (citation key `watson2023adversarial`) is selected by
+held-out FORDE mean log-density from a study implementation of its leaf mixture,
+with the frozen eight-trial grid and byte/configuration tie-breaks. Native values
+are shown per lineage without aggregation or cross-method ranking. Projection
+bytes, every attempt and host costs remain visible. Shared ARF sampling and
+MFS-v2/PTF-v1 gates are pending; no DOPE win follows from fit or byte status.
+
+Regenerate from immutable scratch:
+
+```sh
+python3 -B -m research.benchmark.publish_arf_population_native \
+  --receipt-lock-sha256 238a19ea24694348b0cb6acd43b5203ac75989ee6ac5c714ef86c32ff040e61d \
+  --reconciliation-sha256 af722bff624b2b5cad37eb10a314767dcbd2b00b085c44114f8ef398de9c3850
+```
+
+Regenerate committed tables and schemas using `--from-json <publication.json>
+--publication-sha256 <manifest artifact digest> --output-directory target/arf-native-replay`.
+Official tests stay sealed; no new fit or sampling operation is started by
+either publisher mode.
