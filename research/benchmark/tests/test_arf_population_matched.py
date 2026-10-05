@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from research.benchmark import publish_arf_population_matched as pub
+from research.benchmark.tests.arf_matched_fixture import closed_fixture
 
 
 def rows():
@@ -103,6 +104,47 @@ class MatchedARFControls(unittest.TestCase):
                 with self.assertRaises(ValueError):pub.validate_report(bad)
             bad=copy.deepcopy(report);bad['source_locks']['native_receipts']='0'*64
             with self.assertRaises(ValueError):pub.validate_report(bad)
+
+    def test_complete_builder_refuses_uncovered_transitive_sample_before_metric_decode(self):
+        directory=Path.cwd()/'target';directory.mkdir(exist_ok=True)
+        with TemporaryDirectory(dir=directory) as tmp,closed_fixture(Path(tmp),rows(),references(rows())) as (run,leaf,decoded):
+            result=run()
+            group=next(g for g in result['lineage_groups'] if g['dataset']==result['datasets'][0]
+                       and g['method']=='ARF' and g['configuration']=='author_default' and g['size_multiplier']==1)
+            self.assertEqual(len(result['cells']),1200)
+            self.assertAlmostEqual(group['utility']['catboost']['median_retention'],.6)
+            with self.assertRaisesRegex(ValueError,'transitive parent evidence'):
+                run(omitted_leaf=leaf,mutate_leaf=True)
+            self.assertEqual(decoded,[])
+
+    def test_complete_builder_binds_metric_receipt_sample_and_replay_to_cell(self):
+        directory=Path.cwd()/'target';directory.mkdir(exist_ok=True)
+        changes=[lambda r:r['cells'][0].update(sample_evidence=copy.deepcopy(r['cells'][2]['sample_evidence'])),
+            lambda r:r['cells'][0]['sample_evidence'].update(sample_seed=307),
+            lambda r:r['cells'][0].update(validation_receipt_sha256='0'*64),
+            lambda r:r['cells'][0]['sample_evidence'].update(sample_sha256='0'*64),
+            lambda r:r['cells'][3]['sample_evidence'].update(metric_replay='not_repeated')]
+        with TemporaryDirectory(dir=directory) as tmp,closed_fixture(Path(tmp),rows(),references(rows())) as (run,leaf,decoded):
+            for index,change in enumerate(changes):
+                with self.subTest(case=index),self.assertRaises(ValueError):run(change)
+                # The last control reaches earlier valid cells before its n4 replay cell.
+                if index<4:self.assertEqual(decoded,[])
+
+    def test_complete_builder_does_not_replace_noncanonical_input_fit_seed(self):
+        directory=Path.cwd()/'target';directory.mkdir(exist_ok=True)
+        with TemporaryDirectory(dir=directory) as tmp,closed_fixture(Path(tmp),rows(),references(rows())) as (run,leaf,decoded):
+            for seed in [11.0,12,True]:
+                with self.subTest(seed=seed),self.assertRaisesRegex(ValueError,'input common seed'):
+                    run(lambda r:r['cells'][0].update(fit_seed=seed))
+                self.assertEqual(decoded,[])
+
+    def test_complete_builder_cross_checks_original_sampling_fit_seed(self):
+        directory=Path.cwd()/'target';directory.mkdir(exist_ok=True)
+        for seed in [11.0,12]:
+            with self.subTest(seed=seed),TemporaryDirectory(dir=directory) as tmp:
+                with closed_fixture(Path(tmp),rows(),references(rows()),sampling_fit_seed=seed) as (run,leaf,decoded):
+                    with self.assertRaisesRegex(ValueError,'physical common lineage'):run()
+                    self.assertEqual(decoded,[])
 
     def test_frozen_reference_digests_are_exact_builtin_valid_identities(self):
         for p in [pub.SAMPLE_ROUND,pub.NATIVE_RECEIPTS,pub.NATIVE_REPORT,pub.NATIVE_PUBLICATION,pub.DOPE_PUBLICATION]:pub.guard.digest(p)

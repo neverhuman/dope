@@ -1229,7 +1229,7 @@ native/default sampling and common-validation matrix, actual coordinator closure
 external receipt/reconciliation/recursive-output digests, and the unchanged
 800-fit FORDE native ledger. It verifies matched worker identities and preserves
 all unavailable outcomes and full model/projection charges before comparing the
-three fixed DOPE research profiles. The publisher refuses a partial live round.
+three fixed DOPE research profiles. The publisher refuses a partial live round. Parent receipt references must be consistently covered by the authenticated inventory. Each logical metric is bound to its exact frozen sample, physical job, closed receipt and replay identity; input fit seeds are checked before constructing output cells.
 
 The renderer and manifest generator replay descriptive dataset pairs from the
 committed report. Sample seeds reduce within lineage first; availability cohorts

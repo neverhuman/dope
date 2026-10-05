@@ -170,6 +170,7 @@
     "research/benchmark/publish_arf_population_matched_figure.py": "external-evidence",
     "research/benchmark/publish_arf_population_matched_manifest.py": "external-evidence",
     "research/benchmark/tests/test_arf_population_matched.py": "external-evidence",
+    "research/benchmark/tests/arf_matched_fixture.py": "external-evidence",
     "research/benchmark/results/arf-matched-population-validation": "external-evidence"
   }
 }

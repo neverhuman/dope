@@ -106,6 +106,76 @@ def closed(root, lock, anchor, expected, physical_jobs, logical_cells):
     return actual
 
 
+def parent_references(anchor, refs):
+    """Require every pinned parent leaf in the already authenticated flat map."""
+    pending = [anchor]; visited = set()
+    while pending:
+        parent = pending.pop()
+        for path, pin in parent['refs'].items():
+            guard.require(refs.get(path) == pin, 'transitive parent evidence absent or inconsistent')
+            if Path(path).name == 'receipt-lock-v1.json' and path not in visited:
+                visited.add(path); pending.append(native.bound(path, pin))
+
+
+def common_sample(row, specification, jobs, sampling_batches, refs, lock, round_pin):
+    """Bind a logical cell to its physical receipt and exact frozen sample."""
+    guard.require(type(row['fit_seed']) is int and row['fit_seed'] == 11
+        and type(row['sample_seed']) is int and type(row['size_multiplier']) is int,
+        'input common seed identity differs')
+    guard.require(digest({k: row[k] for k in specification}) == digest(specification),
+                  'logical common cell differs from frozen schedule')
+    key = specification['physical_job_sha256']; sample = row['sample_evidence']
+    if key is None:
+        guard.require(row['status'] == 'sampling_unavailable' and sample is None
+            and row['validation_receipt_sha256'] is None, 'unavailable sample acquired metric evidence')
+        return None
+    job = jobs[key]; original = sampling_batches[row['sampling_job_sha256']]
+    guard.require(type(job['fit_seed']) is int and job['fit_seed'] == row['fit_seed']
+        and type(original['job']['fit_seed']) is int and original['job']['fit_seed'] == row['fit_seed']
+        and job['method'] == 'ARF' and job['final'] is False and job['track'] == 'common-numeric'
+        and job['dataset'] == row['dataset'] and job['sampling_job_sha256'] == row['sampling_job_sha256']
+        and job['artifact_bytes'] == row['charged_artifact_bytes']
+        and digest(job['worker']) == digest(original['job']['worker'])
+        and digest(job['frozen_samples']) == digest(original['samples'])
+        and job['sampling_receipt_path'] == original['receipt_path']
+        and job['sampling_receipt_sha256'] == original['receipt_sha256'], 'physical common lineage differs')
+    out = ROOT / 'attempts' / key / 'attempt-0001'; path = out / 'receipt.json'
+    guard.require(refs[str(path)] == row['validation_receipt_sha256'], 'validation receipt identity differs')
+    receipt = native.bound(path, row['validation_receipt_sha256'])
+    guard.require(digest(receipt['job']) == key and receipt['round_sha256'] == round_pin
+        and receipt['status'] == row['status'], 'closed validation receipt differs')
+    if row['status'] != 'ok':
+        guard.require(sample is None, 'failed validation acquired metric evidence'); return None
+    files = receipt['evidence_files']; batch_path = out / 'batch.json'
+    guard.require(refs[str(batch_path)] == files['batch.json'], 'metric batch anchor differs')
+    batch = native.bound(batch_path, files['batch.json'])
+    guard.require(batch['job_sha256'] == key and batch['metric_source_sha256'] == lock['metric_source_sha256']
+        and len(batch['samples']) == 6 and type(job['metric_replay_required']) is bool,
+        'frozen metric batch differs')
+    records = {(s['size_multiplier'], s['sample_seed']): s for s in batch['samples']}
+    guard.require(len(records) == 6 and set(records) == {(n, s) for n in dope.SIZES for s in dope.SEEDS}
+        and all(type(s['size_multiplier']) is int and type(s['sample_seed']) is int for s in batch['samples']),
+        'metric batch sample identities differ')
+    identity = row['size_multiplier'], row['sample_seed']; record = records[identity]
+    frozen = {(s['size_multiplier'], s['sample_seed']): s for s in job['frozen_samples']}[identity]
+    guard.require(digest({k: record[k] for k in frozen}) == digest(frozen), 'frozen sample identity differs')
+    name = f'n{identity[0]}-seed{identity[1]}.metric.json'; metric_path = out / name
+    guard.require(record['metric_file'] == name and refs[str(metric_path)] == files[name] == record['metric_sha256']
+        and digest({k: v for k, v in sample.items() if k != 'metrics'})
+        == digest(dict(record, metric_path=str(metric_path))), 'logical metric evidence differs')
+    repeated = job['metric_replay_required'] and identity == (4, 101)
+    guard.require(record['metric_replay'] == ('exact' if repeated else 'not_repeated'), 'metric replay identity differs')
+    metric = native.bound(metric_path, record['metric_sha256'])
+    guard.require(digest(sample['metrics']) == digest(metric), 'embedded metric evidence differs')
+    if repeated:
+        replay_path = out / f'n{identity[0]}-seed{identity[1]}.metric-replay.json'
+        guard.require(refs[str(replay_path)] == files[replay_path.name], 'metric replay anchor differs')
+        replay = native.bound(replay_path, files[replay_path.name])
+        guard.require(digest({k: v for k, v in replay.items() if k != 'metric_seconds'})
+            == digest({k: v for k, v in metric.items() if k != 'metric_seconds'}), 'metric replay differs')
+    return metric
+
+
 def build(receipt_pin, report_pin, auxiliary_pin):
     guard.require((ROOT / 'receipt-lock-v1.json').is_file(), 'complete common matrix not yet closed')
     anchor = native.bound(ROOT / 'receipt-lock-v1.json', receipt_pin)
@@ -114,6 +184,7 @@ def build(receipt_pin, report_pin, auxiliary_pin):
     # Verify every transitive receipt, input and executable before decoding metrics.
     refs = {}
     for path, pin in anchor['refs'].items(): dope.fits.checked(path, pin, refs)
+    parent_references(anchor, refs)
     lock = native.bound(ROOT / 'round.lock.json', anchor['round_sha256'])
     for path, pin in refs.items():
         if Path(path).name == 'round.lock.json':
@@ -127,6 +198,7 @@ def build(receipt_pin, report_pin, auxiliary_pin):
         'common round acquired admission or selection')
     runtime = shared_inventory(lock, {})
     sampling_anchor = native.bound(SAMPLING / 'receipt-lock-v1.json', lock['sampling_receipt_lock_sha256'])
+    parent_references(sampling_anchor, refs)
     sample_lock = native.bound(SAMPLING / 'round.lock.json', SAMPLE_ROUND)
     sample_report = native.bound(SAMPLING / 'reconciliation-v1.json', sampling_anchor['reconciliation_sha256'])
     guard.require(sampling_anchor['complete_sampling_matrix'] is True
@@ -140,6 +212,10 @@ def build(receipt_pin, report_pin, auxiliary_pin):
     guard.require(digest(original) == digest(committed), 'frozen native winners changed')
     native_cells = {r['dataset']: r for r in original['cells']}
     sampling_jobs = {digest(j): j for j in sample_lock['jobs']}
+    sampling_batches = {r['job_sha256']: r for r in sample_report['physical_batches_evidence']}
+    guard.require(set(sampling_batches) == set(sampling_jobs), 'original sampling batch coverage differs')
+    for key, row in sampling_batches.items():
+        guard.require(digest(row['job']) == key, 'original sampling batch identity differs')
     worker_views = {j['dataset']: j['worker'] for j in sample_lock['jobs']}
     fit_rows = dope.fits.bound(dope.fits.ROOT / 'reconciliation-v1.json', dope.fits.REPORT)['fit_cells']
     guard.require(all(digest(r['original_fit_job']['worker']) == digest(worker_views[r['dataset']])
@@ -164,24 +240,29 @@ def build(receipt_pin, report_pin, auxiliary_pin):
         and report['native_selection_changed'] is False and report['official_tests_opened'] is False
         and all(report[k] is None for k in ('mfs_v2', 'ptf_v1', 'release_safe', 'superiority')),
         'complete common outcomes required')
+    jobs = {digest(j): j for j in lock['jobs']}
+    specifications = {(c['dataset'], c['configuration'], c['size_multiplier'], c['sample_seed']): c
+                      for c in lock['logical_cells']}
+    guard.require(len(jobs) == len(lock['jobs']) and len(specifications) == len(lock['logical_cells']) == 1200,
+                  'frozen physical or logical job identities differ')
     cells = []
     for row in report['cells']:
+        specification = specifications[row['dataset'], row['configuration'], row['size_multiplier'], row['sample_seed']]
         selection = native_cells[row['dataset']]
         selected_key = selection['author_default_job_sha256' if row['configuration'] == 'author_default' else 'selected_job_sha256']
         guard.require(row['fit_job_sha256'] == selected_key, 'common metrics changed native selection')
         sample_job = sampling_jobs[row['sampling_job_sha256']]
         guard.require(sample_job['fit_job_sha256'] == selected_key
             and sample_job['artifact_bytes'] == row['charged_artifact_bytes'], 'common artifact identity differs')
-        sample = row['sample_evidence']; metric = None
-        if sample:
-            guard.require(refs[sample['metric_path']] == sample['metric_sha256'], 'metric absent from frozen anchor')
-            metric = native.bound(sample['metric_path'], sample['metric_sha256'])
+        metric = common_sample(row, specification, jobs, sampling_batches, refs, lock, anchor['round_sha256'])
+        sample = row['sample_evidence']
+        if metric is not None:
             dope.metric_check(metric, sample_job['worker'], row['size_multiplier'], lock['metric_source_sha256'])
             guard.require(metric['dependencies'] == runtime['expected_versions']
                 and all(type(metric[k]) in (int, float) and math.isfinite(metric[k]) and 0 <= metric[k] <= 1
                         for k in ('marginal_ks_mean', 'pair_correlation_fidelity', 'c2st_auc')),
                 'metric dependencies or fidelity differ')
-        cells.append(dict(dataset=row['dataset'], method='ARF', configuration=row['configuration'], fit_seed=11,
+        cells.append(dict(dataset=row['dataset'], method='ARF', configuration=row['configuration'], fit_seed=row['fit_seed'],
             sample_seed=row['sample_seed'], size_multiplier=row['size_multiplier'], status=row['status'],
             unavailable_reason=row['unavailable_reason'] if row['status'] == 'ok' else row['unavailable_reason'] or row['status'],
             charged_artifact_bytes=row['charged_artifact_bytes'], projection_bytes_included=True,
