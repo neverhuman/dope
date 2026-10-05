@@ -155,6 +155,11 @@
     "research/benchmark/publish_arf_population_native.py": "external-evidence",
     "research/benchmark/tests/test_arf_population_native.py": "external-evidence",
     "research/benchmark/results/arf-s3-population-native": "external-evidence",
-    "research/benchmark/arf-native-paths.lock.json": "external-evidence"
+    "research/benchmark/arf-native-paths.lock.json": "external-evidence",
+    "research/benchmark/publish_dope_refinement_fits.py": "external-evidence",
+    "research/benchmark/publish_dope_refinement_fits_figure.py": "external-evidence",
+    "research/benchmark/publish_dope_refinement_fits_manifest.py": "external-evidence",
+    "research/benchmark/tests/test_dope_refinement_fits.py": "external-evidence",
+    "research/benchmark/results/dope-target-refinement-population-fits": "external-evidence"
   }
 }

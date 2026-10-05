@@ -1163,3 +1163,26 @@ Regenerate committed tables and schemas using `--from-json <publication.json>
 --publication-sha256 <manifest artifact digest> --output-directory target/arf-native-replay`.
 Official tests stay sealed; no new fit or sampling operation is started by
 either publisher mode.
+
+### Complete population refinement training
+
+The [200-cell refinement training ledger](results/dope-target-refinement-population-fits.md)
+accounts for two previously declared GPU profiles over all 100 bounded S3
+training-derived lineages. It retains 136 OK cells (112 new plus 24 immutable
+prior successes), 61 transport/prelaunch infrastructure failures, one foreign
+GPU owner rejection and two charged byte-cap failures. Infrastructure and
+artifact gates are reported separately; neither supplies a DOPE win. Model
+and complete projection bytes are charged. Whole prior discovery/confirmation
+costs remain separate from the new operations and earlier architecture research.
+
+This ledger establishes training custody only. Shared validation, native
+baseline comparisons, final five-fit coverage and privacy certification remain
+separate work. Official tests stay sealed; global family selection is false
+and MFS-v2/PTF-v1/release/superiority remain null.
+
+Regenerate from immutable scratch with `python3 -B -m
+research.benchmark.publish_dope_refinement_fits --results-dir <directory>`,
+then run `publish_dope_refinement_fits_figure <directory>/dope-target-refinement-population-fits.json`
+and `publish_dope_refinement_fits_manifest --results-dir <directory>`.
+The publisher rejects rewritten receipt anchors, added source aliases or
+directories, omitted projection charges and incomplete profile coverage.

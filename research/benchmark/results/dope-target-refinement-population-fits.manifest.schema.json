@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "dope-target-refinement-population-fits.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-fits.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-fits.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-fits.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-fits.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-fits.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "dope-target-refinement-population-fits.csv",
+        "dope-target-refinement-population-fits.json",
+        "dope-target-refinement-population-fits.md",
+        "dope-target-refinement-population-fits.pdf",
+        "dope-target-refinement-population-fits.schema.json",
+        "dope-target-refinement-population-fits.svg"
+      ],
+      "type": "object"
+    },
+    "closed_fit_cells": {
+      "type": "integer"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-refinement-population-fit-publication-manifest"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "global_family_selected": {
+      "const": false
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "arf_runtime_guard.py": {
+          "type": "string"
+        },
+        "manifest.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_fits.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_fits_figure.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_fits_manifest.py": {
+          "type": "string"
+        },
+        "publish_s3_matched.py": {
+          "type": "string"
+        },
+        "score.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "arf_runtime_guard.py",
+        "manifest.py",
+        "publish_dope_refinement_fits.py",
+        "publish_dope_refinement_fits_figure.py",
+        "publish_dope_refinement_fits_manifest.py",
+        "publish_s3_matched.py",
+        "score.py"
+      ],
+      "type": "object"
+    },
+    "raw_rows_samples_weights_or_detailed_logs_committed": {
+      "const": false
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "s3_data_lock_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "charged_artifact_cap": {
+          "type": "integer"
+        },
+        "foreign_gpu_owner_appeared": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        },
+        "transport_or_prelaunch_failure": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "charged_artifact_cap",
+        "foreign_gpu_owner_appeared",
+        "ok",
+        "transport_or_prelaunch_failure"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "closed_fit_cells",
+    "counts_as_dope_win",
+    "format",
+    "full_campaign_admitted",
+    "global_family_selected",
+    "immutable_references",
+    "mfs_v2",
+    "official_tests_opened",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "raw_rows_samples_weights_or_detailed_logs_committed",
+    "release_safe",
+    "s3_data_lock_sha256",
+    "status_counts",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}
