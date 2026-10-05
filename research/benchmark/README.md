@@ -1046,3 +1046,18 @@ projection bytes against L3, and rechecks aggregate CPU/RAM/scratch/GPU owners.
 Only quiet xbabe1/2/3 capacity is eligible. All trials and cost remain visible;
 official tests stay sealed and gated scores stay null until their evidence is
 complete. Prior frozen rounds and published benchmark values are unchanged.
+
+## Shared evaluation of existing CTGAN/TVAE samples
+
+`sdv_frozen_sample_validation.py` measures immutable native-v2 samples with the
+same linear, CatBoost and MLP auditors used by the matched S3 DOPE panel. It
+imports no SDV model implementation, loads no weights, and starts no generator
+fits or sampling. The frozen native winner and author default remain bound to
+the complete predecessor ledger; unavailable samples remain unavailable.
+
+A caller must freeze the full logical matrix, pin the closed receipt lock before
+reading metrics, verify source/data/artifact/sample inventories, admit a disjoint
+CPU slot under aggregate capacity, and enforce 600 seconds for the entire batch.
+CUDA is hidden before runtime initialization; final rehashes precede the success
+deadline check. Each artifact charge includes its projection. This source does
+not admit a full campaign, an SDV v3 rerun, sealed tests, or a gated score.
