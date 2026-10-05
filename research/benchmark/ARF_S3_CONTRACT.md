@@ -101,3 +101,31 @@ healthy DOPE refinement queue, admit only quiet xbabe1/2/3 CPU slots, keep the
 200,000,000,000-byte scratch ceiling, and account for every failure and timeout.
 No SDV rerun is authorized by this preparation. MFS-v2, PTF-v1, release and
 superiority claims remain null.
+
+## Next-round request and native selection boundary
+
+`arf_fit_request.run` prepares the next research dispatcher boundary. A frozen
+round and externally pinned request digest are required. Requests match frozen
+canonical JSON job digests, so seed `11.0` cannot substitute for seed `11`.
+CPU environment is checked before loading any source provider. The worker binds
+adapter/native/guard sources and exact five-file worker partitions, rejects
+unsupported projected widths, and writes only under its canonical job attempt.
+The 600-second request and round deadlines are checked again after final rehashes.
+
+`arf_native_selection.select` accepts one accounted receipt per frozen trial,
+with at most eight trials and 12 hours of charged method–dataset time. It selects
+only held-out FORDE mean log density, with artifact bytes and configuration digest
+as the frozen tie breaks. Scheduling cutoffs stay distinct from timeouts,
+infrastructure interruptions and method errors. A cutoff marks the search
+incomplete; it cannot establish the best configuration over the whole grid.
+Native values are never ranked against another method's native values.
+
+These primitives do not freeze a round, verify a receipt-lock, grant capacity,
+spawn a process, fold retries, sample a model, or open final evaluation. The outer
+dispatcher must verify interpreter/source/runtime/transport before invocation,
+reserve fresh aggregate capacity, enforce a hard process timeout and cell budget,
+and preserve every attempt and hash-bound receipt before selecting or publishing.
+No real S3 fit is admitted by this source preparation. The pending 100-lineage
+proposal remains unfrozen behind the current DOPE continuation and validation
+closure; its 24 width-incompatible planned cells are adapter-scope unavailability,
+with no DOPE win. Official tests and all gated scores remain sealed/null.

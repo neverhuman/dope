@@ -139,6 +139,10 @@
     "research/benchmark/sdv_matched_aggregate.py": "external-evidence",
     "research/benchmark/tests/test_sdv_matched_aggregate.py": "external-evidence",
     "research/benchmark/tests/test_sdv_matched_publication.py": "external-evidence",
-    "research/benchmark/results/sdv-matched-population-validation": "external-evidence"
+    "research/benchmark/results/sdv-matched-population-validation": "external-evidence",
+    "research/benchmark/arf_fit_request.py": "external-evidence",
+    "research/benchmark/arf_native_selection.py": "external-evidence",
+    "research/benchmark/tests/test_arf_fit_request.py": "external-evidence",
+    "research/benchmark/tests/test_arf_native_selection.py": "external-evidence"
   }
 }
