@@ -1,5 +1,10 @@
 # Offline generator benchmark (research only)
 
+[`ARF_S3_CONTRACT.md`](ARF_S3_CONTRACT.md) records the guarded ARF fit/sample
+contract, native FORDE density objective and measured synthetic serialization
+probe. It prepares the next matched S3 baseline; it admits no real dataset fit
+or official test access.
+
 [`CONTAINER_VALIDATION_WORKER.md`](CONTAINER_VALIDATION_WORKER.md) describes the
 source-only compressed sampling worker, owned member inputs and exact replay
 controls. Its 32-batch validation preview remains unadmitted; live rounds and
