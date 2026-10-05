@@ -1,0 +1,453 @@
+{
+  "artifacts": {
+    "density-matched-retention-1n.pdf": {
+      "bytes": 37693,
+      "sha256": "b7caae3fb76641dde0035c87e7bb1e8dddd5a24c64828596a690e57bc494d90c"
+    },
+    "density-matched-retention-1n.svg": {
+      "bytes": 189346,
+      "sha256": "52ba61ae6f4cec9df30cbcf7034fad9211f22906d8bf56c158c7921a1c20f235"
+    },
+    "density-matched-retention-4n.pdf": {
+      "bytes": 37149,
+      "sha256": "4903923729549071346689bac6ba81903782c356c2aa9a5474a64b71e6fdf400"
+    },
+    "density-matched-retention-4n.svg": {
+      "bytes": 188829,
+      "sha256": "26f41ccdc0b6753f5b3b85208159a2e1afe823552764c4879f6f32ddad0ab667"
+    }
+  },
+  "datasets": 100,
+  "logical_cells": 6000,
+  "matplotlib_version": "3.10.8",
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "plotted_counts": [
+    {
+      "auditor": "catboost",
+      "configuration": "features12_steps512",
+      "informative_lineages": 97,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "features12_steps2048",
+      "informative_lineages": 97,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "features24_steps512",
+      "informative_lineages": 93,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "features24_steps2048",
+      "informative_lineages": 93,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "default",
+      "informative_lineages": 99,
+      "method": "GaussianCopula",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "native_selected",
+      "informative_lineages": 99,
+      "method": "GaussianCopula",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "default",
+      "informative_lineages": 99,
+      "method": "independent_marginals",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "native_selected",
+      "informative_lineages": 99,
+      "method": "independent_marginals",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "default",
+      "informative_lineages": 99,
+      "method": "Chow-Liu",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "native_selected",
+      "informative_lineages": 99,
+      "method": "Chow-Liu",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "features12_steps512",
+      "informative_lineages": 92,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "features12_steps2048",
+      "informative_lineages": 92,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "features24_steps512",
+      "informative_lineages": 88,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "features24_steps2048",
+      "informative_lineages": 88,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "default",
+      "informative_lineages": 94,
+      "method": "GaussianCopula",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "native_selected",
+      "informative_lineages": 94,
+      "method": "GaussianCopula",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "default",
+      "informative_lineages": 94,
+      "method": "independent_marginals",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "native_selected",
+      "informative_lineages": 94,
+      "method": "independent_marginals",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "default",
+      "informative_lineages": 94,
+      "method": "Chow-Liu",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "linear",
+      "configuration": "native_selected",
+      "informative_lineages": 94,
+      "method": "Chow-Liu",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "features12_steps512",
+      "informative_lineages": 75,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "features12_steps2048",
+      "informative_lineages": 75,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "features24_steps512",
+      "informative_lineages": 72,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "features24_steps2048",
+      "informative_lineages": 72,
+      "method": "DOPE",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "default",
+      "informative_lineages": 76,
+      "method": "GaussianCopula",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "native_selected",
+      "informative_lineages": 76,
+      "method": "GaussianCopula",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "default",
+      "informative_lineages": 76,
+      "method": "independent_marginals",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "native_selected",
+      "informative_lineages": 76,
+      "method": "independent_marginals",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "default",
+      "informative_lineages": 76,
+      "method": "Chow-Liu",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "native_selected",
+      "informative_lineages": 76,
+      "method": "Chow-Liu",
+      "size_multiplier": 1
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "features12_steps512",
+      "informative_lineages": 97,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "features12_steps2048",
+      "informative_lineages": 97,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "features24_steps512",
+      "informative_lineages": 93,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "features24_steps2048",
+      "informative_lineages": 93,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "default",
+      "informative_lineages": 99,
+      "method": "GaussianCopula",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "native_selected",
+      "informative_lineages": 99,
+      "method": "GaussianCopula",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "default",
+      "informative_lineages": 99,
+      "method": "independent_marginals",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "native_selected",
+      "informative_lineages": 99,
+      "method": "independent_marginals",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "default",
+      "informative_lineages": 99,
+      "method": "Chow-Liu",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "catboost",
+      "configuration": "native_selected",
+      "informative_lineages": 99,
+      "method": "Chow-Liu",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "features12_steps512",
+      "informative_lineages": 92,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "features12_steps2048",
+      "informative_lineages": 92,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "features24_steps512",
+      "informative_lineages": 88,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "features24_steps2048",
+      "informative_lineages": 88,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "default",
+      "informative_lineages": 94,
+      "method": "GaussianCopula",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "native_selected",
+      "informative_lineages": 94,
+      "method": "GaussianCopula",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "default",
+      "informative_lineages": 94,
+      "method": "independent_marginals",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "native_selected",
+      "informative_lineages": 94,
+      "method": "independent_marginals",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "default",
+      "informative_lineages": 94,
+      "method": "Chow-Liu",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "linear",
+      "configuration": "native_selected",
+      "informative_lineages": 94,
+      "method": "Chow-Liu",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "features12_steps512",
+      "informative_lineages": 75,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "features12_steps2048",
+      "informative_lineages": 75,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "features24_steps512",
+      "informative_lineages": 72,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "features24_steps2048",
+      "informative_lineages": 72,
+      "method": "DOPE",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "default",
+      "informative_lineages": 76,
+      "method": "GaussianCopula",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "native_selected",
+      "informative_lineages": 76,
+      "method": "GaussianCopula",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "default",
+      "informative_lineages": 76,
+      "method": "independent_marginals",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "native_selected",
+      "informative_lineages": 76,
+      "method": "independent_marginals",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "default",
+      "informative_lineages": 76,
+      "method": "Chow-Liu",
+      "size_multiplier": 4
+    },
+    {
+      "auditor": "mlp",
+      "configuration": "native_selected",
+      "informative_lineages": 76,
+      "method": "Chow-Liu",
+      "size_multiplier": 4
+    }
+  ],
+  "production_certified": false,
+  "ptf_v1": null,
+  "release_safe": null,
+  "report_sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a",
+  "source_sha256": "73e8132b0956fe4268f6a7d36604956ab05dd70af520ec2ad7821458e523ead5",
+  "superiority": null
+}

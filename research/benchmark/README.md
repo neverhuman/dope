@@ -977,3 +977,45 @@ generator artifacts; every model/projection charge remains required. This adds
 closure accounting, not runtime certification, a new run, or publication
 admission. The live round is untouched; complete actor/receipt closure, metric,
 native-selection, cost and runtime replay remain prerequisites for a panel.
+
+## Complete matched density and DOPE regression validation
+
+`results/density-matched-population-validation.json` accounts for all 6,000
+logical cells on 100 rights-cleared S3 regression lineages: four unchanged DOPE
+GPU research profiles and GaussianCopula, independent marginals, and Chow-Liu,
+each with default and native-selected configurations. The same five numeric
+training/validation files match on every lineage. Native baselines retain their
+frozen held-out likelihood choices; common retention never selects a baseline.
+Native KPI values are reported separately, without ranking different native metrics.
+
+This is a descriptive research panel: one fit seed, three sample seeds, and
+`n`/`4n` samples. All 5,904 successful cells and 96 unavailable DOPE fit cells
+remain visible. Informative denominators, projection-inclusive artifact bytes,
+copy and real-vs-real controls, runtime declaration limits, and measured costs
+are retained. The 144 dataset-paired comparisons report median differences on
+complete common lineages; they make no significance or superiority claim.
+All MFS-v2/PTF-v1, release-safe L3, and superiority scores remain null. The
+public-core headline and full five-seed campaign are still outstanding.
+
+Regenerate the full report from frozen scratch evidence, without fitting or
+initializing a frozen generator:
+
+```sh
+python3 -B -m research.benchmark.publish_density_matched \
+  --receipt-sha256 b2f5964cf40d047d63dc5698c42c2370d945384f5f9567d6809d0959f4f4d81b \
+  --reconciliation-sha256 b72a1a7cc2c9298e9eb0cd1c774a995561a1ea7e51f39e269c4789532096cb09 \
+  --output-dir target/density-matched-replay
+MPLCONFIGDIR="$PWD/target/mpl-density-matched" python3 -B -m research.benchmark.publish_density_matched_figure \
+  --report target/density-matched-replay/density-matched-population-validation.json \
+  --sha256 5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a \
+  --output target/density-matched-replay/figures
+```
+
+Output directories use exclusive creation, preserving earlier evidence. Tables
+and figures also regenerate from the committed JSON with its external digest;
+SVG and PDF byte replay is recorded in the publication qualification receipt.
+The manifest binds all public artifacts, renderer source, immutable scratch
+receipt and reconciliation hashes. Bulk rows, samples, models, and detailed
+logs remain on scratch; no official test rows were opened. Bibliography keys
+from the corrected local reference file: `patki2016synthetic` and
+`chow1968approximating`. These citations do not imply author-experiment reproduction.
