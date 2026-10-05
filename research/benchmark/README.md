@@ -1078,3 +1078,13 @@ Regenerate SVG/PDF from the committed report with
 `python3 -B -m research.benchmark.publish_dope_refinement_progress_figure`.
 Bulk artifacts, samples, runtime inventories and detailed logs remain on scratch;
 the public manifest pins every published output and its immutable receipt lock.
+
+## Matched neural S3 validation
+
+[The complete neural/DOPE panel](results/sdv-matched-population-validation.md) accounts for 4,800 logical cells across all 100 rights-cleared S3 lineages: four unchanged DOPE GPU profiles and original default/native-selected CTGAN/TVAE. CTGAN/TVAE maximize their frozen native regression efficacy KPI; common retention never selects their configurations. Only existing sealed samples are scored.
+
+SDV supplies 486 measured cells and 1,914 explicitly sample-unavailable cells, with 81/400 configuration bindings available. Its 704 new native attempts retain 154 successes, 524 deadline-unstarted plus 1 deadline-truncated scheduling cutoffs, and 25 infrastructure interruptions. Those cutoffs do not establish method failures. At 4n CatBoost, the fixed DOPE 12/2048 profile and native baselines have 21 complete paired informative lineages; medians 0.953366 (DOPE), −0.0812588 (CTGAN), 0.669033 (TVAE). These descriptive results use one fit seed and an availability-limited subset.
+
+Per-cell JSON records all auditors, copy/near-match and real controls, native KPI values, charged model+projection bytes, costs and missing reasons. The manifest points to immutable scratch receipt/reconciliation/auxiliary hashes. Official tests remain sealed; MFS-v2/PTF-v1/release/superiority stay null. No SDV v3, global family selection or final-campaign admission is claimed. Citation keys: `xu2019modeling`, `patki2016synthetic`.
+
+Regenerate with `python3 -B -m research.benchmark.publish_sdv_matched --output-dir <new-directory>`, then the figure/manifest entry points with `--results-dir <directory>`. Frozen scratch anchors are required for the publisher; figure/table replay uses committed metrics only.

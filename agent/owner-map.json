@@ -129,6 +129,13 @@
     "research/benchmark/publish_dope_refinement_progress.py": "external-evidence",
     "research/benchmark/publish_dope_refinement_progress_figure.py": "external-evidence",
     "research/benchmark/tests/test_dope_refinement_progress.py": "external-evidence",
-    "research/benchmark/results/dope-target-refinement-progress": "external-evidence"
+    "research/benchmark/results/dope-target-refinement-progress": "external-evidence",
+    "research/benchmark/publish_sdv_matched.py": "external-evidence",
+    "research/benchmark/publish_sdv_matched_figure.py": "external-evidence",
+    "research/benchmark/publish_sdv_matched_manifest.py": "external-evidence",
+    "research/benchmark/sdv_matched_aggregate.py": "external-evidence",
+    "research/benchmark/tests/test_sdv_matched_aggregate.py": "external-evidence",
+    "research/benchmark/tests/test_sdv_matched_publication.py": "external-evidence",
+    "research/benchmark/results/sdv-matched-population-validation": "external-evidence"
   }
 }
