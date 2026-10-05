@@ -79,6 +79,38 @@ mod tests {
     }
 
     #[test]
+    fn compact_research_target_dimensions_round_trip_without_widening_codec() {
+        for (inputs, width) in [(12, 16), (16, 16), (12, 8), (24, 8)] {
+            let target = Target::CompactNeuralResidual {
+                intercept: 0.25,
+                logistic: false,
+                linear_terms: vec![],
+                hidden_features: (0..inputs).collect(),
+                hidden_width: width,
+                input_weights: vec![0.125; inputs as usize * usize::from(width)],
+                hidden_biases: vec![0.125; usize::from(width)],
+                output_weights: vec![0.25; usize::from(width)],
+            };
+            let encoded = encode_target(&target);
+            let decoded = decode_target(&encoded, 24).unwrap();
+            assert_eq!(encode_target(&decoded), encoded);
+        }
+        for width in [0, 17, 32] {
+            let target = Target::CompactNeuralResidual {
+                intercept: 0.25,
+                logistic: false,
+                linear_terms: vec![],
+                hidden_features: vec![0],
+                hidden_width: width,
+                input_weights: vec![0.125; usize::from(width)],
+                hidden_biases: vec![0.125; usize::from(width)],
+                output_weights: vec![0.25; usize::from(width)],
+            };
+            assert!(decode_target(&encode_target(&target), 24).is_err());
+        }
+    }
+
+    #[test]
     fn section_accounting_reconciles_exact_encoded_length() {
         let encoded = encode_kernel(&kernel()).unwrap();
         let accounting = account_artifact(&encoded).unwrap();

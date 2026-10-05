@@ -1019,3 +1019,30 @@ receipt and reconciliation hashes. Bulk rows, samples, models, and detailed
 logs remain on scratch; no official test rows were opened. Bibliography keys
 from the corrected local reference file: `patki2016synthetic` and
 `chow1968approximating`. These citations do not imply author-experiment reproduction.
+
+## Bounded GPU target refinement profiles
+
+The research compiler additionally accepts the following explicit profiles:
+
+| Profile | Selected inputs, at most | Hidden units | Optimizer steps |
+|---|---:|---:|---:|
+| `features12_steps8192` | 12 | 16 | 8192 |
+| `features16_steps8192` | 16 | 16 | 8192 |
+| `features12_width8_steps8192` | 12 | 8 | 8192 |
+| `features24_width8_steps8192` | 24 | 8 | 8192 |
+
+These settings change the compact target learner's input basis, optimization
+length, or hidden width. Its target-weight and structural-penalty CLI values do
+not affect this particular target trainer and cannot define a meaningful sweep.
+The original four profiles retain their exact dimensions and steps. Profile
+contracts run in the CPU test lane, including actual target payload round trips
+and rejection above the existing 16-unit codec limit.
+
+This source preparation does not admit execution or select a final family.
+A research round must freeze its discovery/confirmation cohorts, candidate
+grid, source/binary/runtime hashes, sample schedule and compute ceiling before
+launch. Each fit retains the 600-second and 16-GiB limits, charges model plus
+projection bytes against L3, and rechecks aggregate CPU/RAM/scratch/GPU owners.
+Only quiet xbabe1/2/3 capacity is eligible. All trials and cost remain visible;
+official tests stay sealed and gated scores stay null until their evidence is
+complete. Prior frozen rounds and published benchmark values are unchanged.

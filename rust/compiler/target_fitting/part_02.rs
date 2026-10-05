@@ -1,14 +1,18 @@
 
-#[cfg(feature = "gpu-research-training")]
+#[cfg(any(test, feature = "gpu-research-training"))]
 fn bounded_research_training_settings(profile: &str) -> Result<(usize, usize, usize)> {
-    let (features, steps) = match profile {
-        "features12_steps512" => (12, 512),
-        "features12_steps2048" => (12, 2048),
-        "features24_steps512" => (24, 512),
-        "features24_steps2048" => (24, 2048),
+    let (features, width, steps) = match profile {
+        "features12_steps512" => (12, 16, 512),
+        "features12_steps2048" => (12, 16, 2048),
+        "features24_steps512" => (24, 16, 512),
+        "features24_steps2048" => (24, 16, 2048),
+        "features12_steps8192" => (12, 16, 8192),
+        "features16_steps8192" => (16, 16, 8192),
+        "features12_width8_steps8192" => (12, 8, 8192),
+        "features24_width8_steps8192" => (24, 8, 8192),
         _ => return Err(DopeError::Unsupported("unknown bounded GPU research profile".into())),
     };
-    Ok((features, 16, steps))
+    Ok((features, width, steps))
 }
 
 #[cfg(feature = "gpu-training")]
@@ -24,7 +28,7 @@ fn compact_neural_training_settings(feature_count: usize) -> Result<(usize, usiz
     Ok((12, feature_count.min(12).clamp(4, 12), 96))
 }
 
-#[cfg(all(test, feature = "gpu-research-training"))]
+#[cfg(test)]
 mod bounded_research_training_tests {
     use super::*;
 
@@ -41,6 +45,27 @@ mod bounded_research_training_tests {
             assert!(limit <= 24 && width <= 16);
         }
         assert!(bounded_research_training_settings("features48_steps99999").is_err());
+    }
+
+    #[test]
+    fn refinement_profiles_fit_existing_target_codec_dimensions() {
+        for (profile, expected) in [
+            ("features12_steps8192", (12, 16, 8192)),
+            ("features16_steps8192", (16, 16, 8192)),
+            ("features12_width8_steps8192", (12, 8, 8192)),
+            ("features24_width8_steps8192", (24, 8, 8192)),
+        ] {
+            let observed = bounded_research_training_settings(profile).unwrap();
+            assert_eq!(observed, expected);
+            assert!(observed.0 <= 24 && observed.1 <= 16 && observed.2 <= 8192);
+        }
+        for profile in [
+            "features12_width32_steps8192",
+            "features12_width64_steps8192",
+            "features12_steps8192 ",
+        ] {
+            assert!(bounded_research_training_settings(profile).is_err());
+        }
     }
 }
 
