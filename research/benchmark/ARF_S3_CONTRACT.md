@@ -11,8 +11,8 @@ The MIT author source is `bips-hb/arfpy` commit
 `8b63c1b3999981125b4af2828ff52cba8e29169d`. Its source archive hash is
 `0c9012778cb5ffe0a006fc32b33ae4ed3f85689c6742253d95f91c10c42bd2aa`.
 The immutable source stays on scratch. Its ARF, FORDE and FORGE code is used
-without modification. The existing `arf_native.py` density evaluator is also
-unchanged, hash `2e5f6373ca3b36019d82038712f16dce976d9f783f7dbc5444aec96b6c5e2f18`.
+without modification. The first three-column probe used the study `arf_native.py` density evaluator
+at hash `2e5f6373ca3b36019d82038712f16dce976d9f783f7dbc5444aec96b6c5e2f18`.
 
 Select ARF configurations by training-derived validation mean log density of the
 author's FORDE mixture, maximizing with the already frozen artifact-byte then
@@ -125,7 +125,65 @@ spawn a process, fold retries, sample a model, or open final evaluation. The out
 dispatcher must verify interpreter/source/runtime/transport before invocation,
 reserve fresh aggregate capacity, enforce a hard process timeout and cell budget,
 and preserve every attempt and hash-bound receipt before selecting or publishing.
-No real S3 fit is admitted by this source preparation. The pending 100-lineage
-proposal remains unfrozen behind the current DOPE continuation and validation
-closure; its 24 width-incompatible planned cells are adapter-scope unavailability,
-with no DOPE win. Official tests and all gated scores remain sealed/null.
+No real S3 fit is admitted by this source preparation. The original 100-lineage proposal remains unfrozen; its 24 width-incompatible
+planned cells retain their historical adapter-scope status, with no DOPE win.
+The new single-column contract below can support a separately frozen successor
+proposal; it does not rewrite those earlier cells or admit real fits. Official tests and all gated scores remain sealed/null.
+
+## Categorical-only and single-column contract repair
+
+The original author can fit a nonempty single column. Its FORDE implementation
+returns an empty continuous-parameter DataFrame without column headers when all
+variables are categorical. The study density evaluator previously indexed that
+empty table as though continuous parameters were present. It now evaluates the
+existing categorical probability factors in that case and rejects absent
+continuous factors when a continuous variable exists. The density formula,
+zero-probability floor, native direction, search grid and tie breaks are unchanged.
+The numeric adapter now accepts one or more columns in both fit and sample.
+The author code, runtime guard, providers and historical receipts are unchanged.
+
+A separately frozen synthetic v2 operation declares four fits: original author
+and guarded adapter on one continuous and one binary categorical column. Each
+case uses 128 training and 64 validation rows, the same configuration described
+above, fit seed 11, three sample seeds, and samples of 128 and 512 rows. All four
+fits succeeded. Serialized author factor files and held-out density values match
+exactly between direct and guarded fits. All 12 sample cells match direct FORGE,
+two factor replays, and the guarded sample entry point byte for byte.
+
+The operation took 91.252959 seconds with a 600-second
+outer hard limit, fresh sixteen-core admission on xbabe2, and measured peak
+resident memory 261275648 bytes. Artifact charges include all six
+files; continuous and categorical fixtures charged 4402 and 1648 bytes respectively.
+These are synthetic API checks, not real dataset quality or L3 certification.
+Complete system dynamic-library closure and a real S3 round remain unadmitted.
+
+Failures are retained: the original univariate v1 operation started two fits and
+failed in the study density evaluator after 10.987937 seconds. Its continuous
+case had already matched original FORGE; the categorical failure is not author
+unavailability. The first v2 launcher selected an old helper path and stopped
+before dependencies or fits (4.140890 seconds). The corrected launcher has a
+separate attempt receipt and does not replace either failed receipt.
+
+All private evidence stays under
+`/mnt/fast-scratch/dope-benchmark/arf-univariate-author-contract-v2`.
+
+| Evidence | SHA-256 |
+| --- | --- |
+| New runtime preparation | `c56f26732be1112d051b96d87c004898b7218b4c6b514b45964877db4c203a2a` |
+| Synthetic contract | `538626e6d38a6c89b147a84dc1a5790b98565160b455906be4e5fc8a12073ea1` |
+| Frozen operation source inventory | `130c65751764b28f5a46eafe6a039514542e3fb826772a2c504a66281a689f0f` |
+| Successful four-fit proof | `d41d9268231281ff9bc545342029cfaa95922441f35e2478b64795b4f6709364` |
+| Corrected outer actual exit | `5f35e032c61f980dd274cc1da10cfb379ea1d7cd9ebfd819a348e125d9983466` |
+
+Focused analytic controls cover the one-variable categorical mass, the product
+of categorical masses, absent continuous factors, continuous and categorical
+one-column preprocessing, and empty-column rejection. Run them alongside the
+pre-initialization contract controls:
+
+```sh
+python3 -B -m unittest research.benchmark.tests.test_arf_native research.benchmark.tests.test_arf_contract -v
+```
+
+A real successor round still requires new source/runtime/job/worker identities,
+fresh aggregate capacity and its own attempt ledger. No real S3 or official test
+rows were used; no SDV rerun was launched. All gated scores remain null.
