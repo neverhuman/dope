@@ -22,20 +22,20 @@
       "sha256": "b7caae3fb76641dde0035c87e7bb1e8dddd5a24c64828596a690e57bc494d90c"
     },
     "figures/density-matched-retention-1n.svg": {
-      "bytes": 189346,
-      "sha256": "52ba61ae6f4cec9df30cbcf7034fad9211f22906d8bf56c158c7921a1c20f235"
+      "bytes": 187675,
+      "sha256": "b6a01e56655a0c1335cf806966a5e1b0330353527a8c127ea76d8cc8f98340e1"
     },
     "figures/density-matched-retention-4n.pdf": {
       "bytes": 37149,
       "sha256": "4903923729549071346689bac6ba81903782c356c2aa9a5474a64b71e6fdf400"
     },
     "figures/density-matched-retention-4n.svg": {
-      "bytes": 188829,
-      "sha256": "26f41ccdc0b6753f5b3b85208159a2e1afe823552764c4879f6f32ddad0ab667"
+      "bytes": 187158,
+      "sha256": "ecf46335838719e5290ca86f58fe7cff1d5a8dbd5a8dd7d5bdf6f2fa671201b1"
     },
     "figures/figures-manifest.json": {
       "bytes": 11406,
-      "sha256": "fd8ea55b257a9ebacc0bd339d1dc3aa00981c53573ec578da3c70e7cfb74e629"
+      "sha256": "2c77facbf87c8f149cb83d56963c8f688c00630a2337fa047f4193a0887efaee"
     },
     "figures/figures-manifest.schema.json": {
       "bytes": 3825,
@@ -52,7 +52,7 @@
   "datasets": 100,
   "density_logical_cells": 3600,
   "density_physical_batches": 502,
-  "figure_receipt_sha256": "fd8ea55b257a9ebacc0bd339d1dc3aa00981c53573ec578da3c70e7cfb74e629",
+  "figure_receipt_sha256": "2c77facbf87c8f149cb83d56963c8f688c00630a2337fa047f4193a0887efaee",
   "fit_seeds": [
     11
   ],
@@ -87,7 +87,7 @@
     "density_native_replay.py": "221106a4de250b0cfa9d5406427af7f7c2318d536b04938d12fce52e51395072",
     "density_publication_inputs.py": "424bbf06aab09b1657ab778ace1fafe2ae97a7fbe80af846ddd5e368255f86fe",
     "publish_density_matched.py": "2cb02b171399d8298c6f11b36b4d8fd50fffc6a52fef27df09a6c1958419e635",
-    "publish_density_matched_figure.py": "73e8132b0956fe4268f6a7d36604956ab05dd70af520ec2ad7821458e523ead5",
+    "publish_density_matched_figure.py": "ad9bc39ede4beb56106e9eae214d3eff2c35ee6168ad5a37aa66c3049ccc989c",
     "publish_density_matched_manifest.py": "5db88553b570b97ecd102a5c99ba03a429b69091749072853b484f2ca036b6b3",
     "publish_dope_population_fits.py": "bdb00519b4aac17b4b8689475848c48a049adc3ec7ec96e14d45c5b2f6b17821",
     "publish_dope_population_validation.py": "0e9df2f7a02fc9aa78a07f91cba8272c43c98483ebe0b7d46d16a968689adbc0",
