@@ -1,10 +1,67 @@
-# Benchmark campaign status — 2026-10-02
+# Benchmark campaign status — 2026-10-05
 
 The final public-core and matched S3 comparisons are **not admitted**. The
 public and S3 test partitions have not been used for model selection or common
 outcome evaluation. Production PTF-v1 and generator MFS-v2 are null. This file
 records validation-only research and the remaining admission work; it is not a
-release or paper result.
+release or completed public-core paper comparison.
+
+## Completed matched research benchmarks
+
+Two complete receipt-accounting panels now compare DOPE with native-selected
+methods on the same rights-cleared S3 worker views. These views are bounded
+to 72–800 official-training-derived rows per lineage; they do not represent
+full official training partitions or official-test results. DOPE's fixed
+`features12_steps2048` reference is shown below. Every frozen DOPE profile,
+baseline default, native selection and unavailable cell remains in the linked
+reports. No global DOPE family has been selected.
+
+| Native-selected comparator | Complete informative paired lineages | DOPE median retention | Comparator median retention |
+| --- | ---: | ---: | ---: |
+| GaussianCopula | 97 | 0.939876 | 0.655681 |
+| Chow–Liu, study implementation | 97 | 0.939876 | 0.585986 |
+| Independent marginals, study implementation | 97 | 0.939876 | −0.011971 |
+| CTGAN | 21 | 0.953366 | −0.081259 |
+| TVAE | 21 | 0.953366 | 0.669033 |
+
+These are dataset medians of three sample-seed CatBoost null-normalized
+retention values at `4n`, using fit seed 11 and training-derived validation.
+Negative values are retained. The density and neural rows use different
+availability subsets; their values must not be combined into one ranking.
+Other auditors and `n` outcomes are in the complete reports. This descriptive
+median is not the production PTF-v1 formula or a paired superiority decision.
+
+- [Density report](results/density-matched-population-validation.json),
+  [table](results/density-matched-population-validation.csv) and
+  [figure](results/density-matched-population-validation.svg): all 6,000 logical
+  cells accounted for, 5,904 measured and 96 DOPE cells unavailable. Each
+  baseline selected its own held-out density objective.
+- [CTGAN/TVAE report](results/sdv-matched-population-validation.json),
+  [table](results/sdv-matched-population-validation.csv) and
+  [figure](results/sdv-matched-population-validation.svg): all 4,800 logical
+  cells accounted for, including 486 measured baseline cells and 1,914
+  unavailable baseline cells. Baselines selected their own frozen synthetic-data
+  ML efficacy objective. Scheduling affected availability, so this subset
+  cannot establish an overall method conclusion.
+- [Disjoint GPU refinement confirmation](results/dope-target-refinement-confirmation.json),
+  [table](results/dope-target-refinement-confirmation.csv) and
+  [figure](results/dope-target-refinement-confirmation.svg): 12 successful GPU
+  fits, 72 measured cells and 360 unchanged reference cells on six lineages
+  disjoint from discovery. At `4n`, CatBoost median retention is 0.939543 for
+  the prior DOPE reference, 0.937693 for the full-width 8,192-step profile and
+  0.949384 for the narrow 8,192-step profile. Combined discovery/confirmation
+  fit operations total 859.788 seconds within the declared 21,600-second
+  research ceiling; earlier architecture research and admission waiting are
+  separate costs. Both profiles remain research candidates.
+
+The sealed SDV native-v2 ledger contains 154 successful trials, 525 scheduling
+cutoffs (524 unstarted, one truncated) and 25 infrastructure interruptions.
+Those cutoffs are not method failures. A new SDV fit round requires Jepson's
+explicit authorization; none is admitted by this publication. All shared
+comparisons retain byte charges, copy checks, real-vs-real controls, failed
+cells and immutable receipt hashes. MFS-v2, PTF-v1, release-safe results and
+superiority remain null. The public-core headline, five-fit final schedules
+and full evaluator gates are unfinished.
 
 ## Rights-cleared S3 data
 
@@ -137,8 +194,10 @@ both from the committed JSON with
 
 The 29-method source inventory currently has six locked entries (DOPE,
 three compact baselines, CTGAN, and TVAE), six pilot-only entries (AIM, ARF,
-synthpop CART, TabPC, ForestDiffusion and TabDDPM), 15 pending source audits,
-and two unavailable entries (TabKDE and GEM-T). Unavailable methods contribute
+synthpop CART, TabPC, ForestDiffusion and TabDDPM), 11 entries with pending
+execution readiness, and six unavailable entries (CTAB-GAN+, GEM-T, TaEGAN,
+PrivBayes, TabKDE and TabPFGen). Source audits alone do not admit execution.
+Unavailable methods contribute
 no DOPE win. The density KPI implementation now gives GaussianCopula,
 independent marginals, and Chow-Liu held-out validation mean log density;
 final tuned selection checks that a frozen native objective actually chose

@@ -79,10 +79,17 @@ test partition. Final evaluation is disabled until the data manifest, method
 source/config lock, budget lock, and method–dataset matrix are frozen. Missing
 privacy, utility, or attack evidence is a failed gate with a null MFS-v2 score.
 
-`RESULTS_STATUS.md` records the 2026-10-01 rights-cleared S3 preparation,
-DOPE GPU refinement, and native-tuned CTGAN/TVAE validation comparison.
+`RESULTS_STATUS.md` records the completed rights-cleared S3 matched density,
+CTGAN/TVAE and disjoint DOPE GPU refinement validation panels.
 Its published JSON, tables, and figures live in
 `results/`; the final comparison remains blocked by admission.
+`gpu_refinement_bootstrap.py` checks an externally supplied round digest,
+the execution identity and exact flat source inventory before importing any
+frozen helper. It executes the same source buffers that passed those checks.
+The proposed all-lineage refinement retains two profiles, reuses 24 completed
+fits and declares 176 new fits; its private preparation remains unadmitted.
+The startup check proves source custody only. Host capacity, native providers,
+whole-attempt deadlines and the five final campaign locks remain separate gates.
 The compact native likelihood study freezes its twelve-dataset, two-method
 matrix with `freeze_native_round`, runs `tune_density` on training-derived
 worker partitions, and publishes validated trial receipts with
