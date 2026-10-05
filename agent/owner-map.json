@@ -123,6 +123,8 @@
     "research/benchmark/CONTAINER_VALIDATION_WORKER.md": "external-evidence",
     "research/benchmark/CONTAINER_MEMBER_CONTRACT.md": "external-evidence",
     "research/benchmark/publish_artifact_bytes": "external-evidence",
-    "research/benchmark/results/dope-artifact-byte-feasibility": "external-evidence"
+    "research/benchmark/results/dope-artifact-byte-feasibility": "external-evidence",
+    "research/benchmark/sdv_frozen_sample_validation.py": "external-evidence",
+    "research/benchmark/tests/test_sdv_frozen_sample_validation.py": "external-evidence"
   }
 }
