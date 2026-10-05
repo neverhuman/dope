@@ -44,9 +44,18 @@ def checked(path, expected, refs):
     refs[str(p)] = expected
 
 
+SCRATCH_DIRECTORIES = frozenset(('catboost_info', 'runtime-temp'))
+
+
 def flat(root, files):
     root = safe(root)
-    guard.require({p.name for p in root.iterdir()} == set(files), 'flat inventory differs')
+    names = []
+    for entry in root.iterdir():
+        info = entry.lstat()
+        if stat.S_ISDIR(info.st_mode) and entry.name in SCRATCH_DIRECTORIES:
+            continue
+        names.append(entry.name)
+    guard.require(set(names) == set(files), 'flat inventory differs')
     for name, pin in files.items():
         guard.require(type(name) is str and Path(name).name == name and name not in ('', '.', '..'),
                       'invalid flat member')

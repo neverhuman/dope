@@ -1,0 +1,564 @@
+\documentclass[journal]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{url}
+\makeatletter
+\g@addto@macro{\UrlBreaks}{\do\/\do\_\do\-}
+\makeatother
+\usepackage{microtype}
+\usepackage{flushend}
+
+\begin{document}
+
+\title{A 10{,}240-Byte Generator, Scored After It Is Selected}
+
+\author{The DOPE Project}
+
+\markboth{The DOPE Project}%
+{A 10,240-Byte Generator}
+
+\maketitle
+
+\begin{abstract}
+DOPE's measured generator on this panel is a compact residual network:
+at most 12 inputs, one hidden layer of width 16 with $\tanh$ units, and a
+refit linear readout. AdamW trains the hidden basis for 2{,}048 steps at
+learning rate $0.002$. The shipped network has no embedding layer.
+Each method is selected on its own objective. The shared measurements are
+null-normalized retention at four times the fit size, and the bytes charged
+to the artifact. On 97 informative PMLB regression lineages, the displayed
+DOPE profile has median CatBoost retention $0.939876$ against $0.655681$
+for a native-selected Gaussian copula, $0.585986$ for a study Chow--Liu
+tree, and $-0.011971$ for study independent marginals. Ninety-eight of 100
+DOPE artifacts are within the 10{,}240-byte cap; 62, 31, and 94 of the three
+comparators are. A separate 21-lineage block compares DOPE with native-selected
+CTGAN and TVAE. Every successful CTGAN and TVAE artifact in that ledger
+exceeds the cap. Master Fitness v2 stays null: the six components and the
+hard-gate map are not all present. Official tests remain sealed. No paired
+superiority claim is made. Appendix~\ref{app:2048} lists every one of the 100
+lineages. A separate 8{,}192-step budget on the same partitions is reported
+in Appendix~\ref{app:8192} and is not adopted as the displayed model.
+BeyondArena is a separate 142-family corpus in the dataset bucket. It is not
+pooled with these 100 lineages. Five of twelve locked families were fit.
+Seven did not prepare, and none of the five has a retention score.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Synthetic tabular data, compact generator, retention, artifact bytes.
+\end{IEEEkeywords}
+
+\section{Introduction}
+A generator paper usually reports the metric that was also used to pick the
+configuration. CTGAN and TVAE were introduced with a conditional generator
+and a variational autoencoder, and later libraries score them with downstream
+predictive efficacy~\cite{xu2019ctgan}. The Synthetic Data Vault fits
+Gaussian-copula models inside that family~\cite{patki2016sdv}. Adversarial
+random forests select a density through their forest density
+estimator~\cite{watson2023arf}. Diffusion and CART synthesizers bring other
+objectives~\cite{kotelnikov2023tabddpm,nowok2016synthpop}. Those native numbers
+live on different scales.
+
+The comparison here separates selection from the common measurement. DOPE,
+the Gaussian copula, CTGAN, and TVAE keep the objectives published for those
+methods. Chow--Liu and independent marginals are study implementations of the
+published ideas, not the authors' packages~\cite{chow1968dependence}. After
+selection, every retained artifact is measured by the same retention formula
+and by the bytes required to sample from it. The pre-registered common scalar,
+Master Fitness v2 (MFS-v2), is defined in Section~\ref{sec:scores}. It is
+emitted only when every hard gate passes. On this panel the scalar is null
+for every method.
+
+The decision the measurements can support is narrower than ``which generator
+is best.'' It is whether a network small enough to ship under a 10{,}240-byte
+cap still preserves downstream regression utility on real validation rows.
+Fig.~\ref{fig:bytes} is that comparison. TabDDPM and synthpop CART are cited
+and have not been run on this panel. An unexecuted method is not a win for
+DOPE.
+
+\section{The network that was trained}
+\label{sec:model}
+The displayed profile is \path{features12_steps2048}. It is a compact neural
+residual, not a GAN, a diffusion model, or a transformer. The training code
+selects at most 12 screened inputs. A hidden layer of width 16 maps those
+inputs through $\tanh$. AdamW, learning rate $0.002$, runs for 2{,}048 steps
+on the regression mean-squared error, with gradient clipping at $5$. The
+hidden weights and biases from that fit are kept. The intercept, the linear
+skip coefficients, and the hidden readout are then refit by the same
+regularized solver used for the native linear candidates, on the frozen
+$\tanh$ features. Coefficients whose absolute value is below $10^{-5}$ are
+dropped from the skip. For a selected input vector $x_S$ the shipped predictor is
+\begin{equation}
+\label{eq:residual}
+h_j = \tanh\!\left(b_j + w_j^{\top} x_S\right),
+\quad
+\hat{y} = a + \beta^{\top} x_S + v^{\top} h .
+\end{equation}
+Sampling adds the noise model stored in the artifact. The codec accepts
+hidden width 8 or 16 at the input counts used here and rejects widths 0, 17,
+and 32. There is no embedding table in \eqref{eq:residual}. A separate
+dataset-action router uses a vector of dimension
+$856 + 24\times(128+10) = 4{,}168$. That vector does not generate the rows
+in this paper.
+
+The profile is a pre-registered reference. Compile-time search records the
+proxy $0.45u + 0.25d + 0.30j$ and then keeps the candidate with the smallest
+normalized gate shortfall, then the smallest artifact, then the lowest
+candidate id. Every such compile is marked
+\path{production_evidence_unmeasured}. No global DOPE family has been
+selected, so the shared retention below was not allowed to choose the profile.
+
+Other DOPE shapes exist and are not this result. Micro-TVAEs use latent and
+hidden widths $4/16$, $8/24$, and $12/32$. TinyMAT uses widths 16 and 24.
+Joint TVAE, masked-transformer, and TabSyn candidates use latent width 32 and
+hidden width 128. A direct-rank TabDDPM candidate is a research comparator
+with no claim on the 10{,}240-byte tier. The published fits did not retain a
+per-step loss series, so this paper does not show a training curve.
+
+On six confirmation lineages, disjoint from the discovery set, two longer
+profiles were already measured at $4n$. CatBoost median retention is
+$0.939543$ for the reference above, $0.937693$ for a width-16 profile trained
+for 8{,}192 steps, and $0.949384$ for a width-8 profile trained for 8{,}192
+steps. That is a six-lineage ablation. It does not replace the reference.
+
+\section{Two scores}
+\label{sec:scores}
+Let $L_{\mathrm{null}}$, $L_{\mathrm{real}}$, and $L_{\mathrm{synthetic}}$ be
+the auditor's loss on real validation rows when that auditor is trained on a
+null baseline, on real fit rows, and on synthetic rows. Retention is
+\begin{equation}
+\label{eq:retention}
+\frac{L_{\mathrm{null}}-L_{\mathrm{synthetic}}}{L_{\mathrm{null}}-L_{\mathrm{real}}} .
+\end{equation}
+A value of $1$ means the synthetic-trained auditor matched the real-trained
+auditor. A value above $1$ means it beat the real-trained auditor. A negative
+value means it did worse than the null. The denominator is the real model's
+improvement over the null; when that improvement is negligible the lineage is
+not informative and is omitted from the median. The three auditors are
+CatBoost~\cite{prokhorenkova2018catboost}, ordinary linear regression, and an
+MLP. Each reported median is the median across lineages of the median of
+three sample seeds.
+
+MFS-v2 is a different object. With component $c_i\in[0,1]$, weight $w_i>0$,
+$\epsilon=10^{-6}$, and $W=\sum_i w_i$,
+\begin{equation}
+\label{eq:mfs}
+\mathrm{MFS\text{-}v2}
+= 100\exp\!\left(\frac{1}{W}\sum_i w_i\ln(\epsilon+c_i)\right)
+\end{equation}
+when the hard-gate map is non-empty, every hard gate passed, and every
+positive-weight component is finite and inside $[0,1]$. Otherwise the scalar
+is null. The weights are utility transfer $0.30$, driver fidelity $0.20$,
+distribution fidelity $0.20$, structure fidelity $0.15$, coverage realism
+$0.10$, and compactness $0.05$. Privacy's soft weight is zero, so a privacy
+failure removes the score through a gate and does not move \eqref{eq:mfs}
+directly. Utility transfer inside \eqref{eq:mfs} is a clamped one-sided 95\%
+lower bound on gold retention. It is not the median of \eqref{eq:retention}.
+Compactness is $\mathrm{clamp}(1 - \mathrm{bytes}/10240,\, 0,\, 1)$. Crossing
+10{,}240 bytes fails the byte gate, so the scalar stays null.
+
+Table~\ref{tab:illustration} applies \eqref{eq:mfs} to six invented components
+$(0.90, 0.80, 0.85, 0.70, 0.75, 0.95)$. The resulting $82.40$ is arithmetic,
+not a measurement. The second row is the same components with the byte gate
+failed. The implementation returns null. No artifact in this paper has a
+measured MFS-v2 value.
+
+\begin{table}[t]
+\caption{Illustration of \eqref{eq:mfs}. These components are not measurements.}
+\label{tab:illustration}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Gate map & Scalar \\
+\midrule
+All six gates passed & $82.40$ \\
+Byte gate failed & null \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Protocol}
+The panel is the rights-cleared PMLB regression collection~\cite{olson2017pmlb,romano2021pmlb}.
+Of 104 MIT-licensed entries, four were excluded because a source row appeared
+in both the official training and official test partitions. The remaining 100
+use a grouped 80/20 fit and validation cut of the official training rows, seed
+1729. Fit tables contain 72 to 800 rows. They are catalog coresets. Worker
+directories contain no official test file. Official tests stay sealed, and
+final evaluation is not authorized.
+
+Fit seed 11 and sample seeds 101, 211, and 307 are the population actually
+measured. Sizes $n$ and $4n$ are both stored; the tables below are $4n$.
+Native objectives are not ranked across methods. The Gaussian copula row is
+Copulas 0.14.1 \texttt{Gaussian\-Multivariate}, selected by held-out mean log
+density. CTGAN and TVAE are the author implementation, selected by the mean of
+linear and MLP regression $R^{2}$ on validation rows~\cite{xu2019ctgan}. ARF's
+author \texttt{arfpy} core has closed its FORDE log-density fits and has not
+yet been sampled on this shared schedule~\cite{watson2023arf}. Chow--Liu uses
+eight bins and Laplace smoothing $1.0$ in study code. Independent marginals
+are a study reference with no author package.
+
+\section{Retention and bytes}
+\label{sec:results}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/retention-bytes.pdf}
+\caption{CatBoost retention at $4n$ against charged artifact bytes. The dashed
+line is the 10{,}240-byte cap. The left panel is the density block. The right
+panel is the 21 lineages on which native-selected CTGAN, native-selected TVAE,
+and the DOPE reference all have an informative CatBoost median. The panels are
+not one ranking.}
+\label{fig:bytes}
+\end{figure*}
+
+Fig.~\ref{fig:bytes} plots one point per method and lineage. DOPE sits to the
+left of the cap and near retention $1$. Independent marginals are also small
+and sit near retention $0$. The Gaussian copula and the study Chow--Liu tree
+spread across the cap. CTGAN and TVAE sit between about $10^{5}$ and
+$10^{6}$ bytes.
+
+Table~\ref{tab:density} is the paired density block. The CatBoost column
+repeats the medians already published for this profile. Linear and MLP come
+from the same paired records. The Gaussian copula is close to DOPE under the
+linear auditor ($0.989300$ versus $0.994046$) and farther under CatBoost and
+the MLP. The study tree and the independent marginals stay below DOPE on all
+three auditors. Lineage counts differ because a lineage is omitted when that
+auditor's real-versus-null gap is not informative. Median dataset-level
+differences are positive and the pre-registered paired test has not been run,
+so the comparison is inconclusive.
+
+\begin{table}[t]
+\caption{Density block at $4n$, fit seed 11. Medians of per-lineage
+three-seed medians. Study code is marked.}
+\label{tab:density}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Auditor & Comparator & $n$ & DOPE & Other \\
+\midrule
+CatBoost & Gaussian copula & 97 & 0.939876 & 0.655681 \\
+CatBoost & Chow--Liu, study & 97 & 0.939876 & 0.585986 \\
+CatBoost & Indep.\ marginals, study & 97 & 0.939876 & $-0.011971$ \\
+Linear & Gaussian copula & 92 & 0.994046 & 0.989300 \\
+Linear & Chow--Liu, study & 92 & 0.994046 & 0.661218 \\
+Linear & Indep.\ marginals, study & 92 & 0.994046 & 0.002056 \\
+MLP & Gaussian copula & 75 & 1.061123 & 0.927569 \\
+MLP & Chow--Liu, study & 75 & 1.061123 & 0.691645 \\
+MLP & Indep.\ marginals, study & 75 & 1.061123 & $-0.027881$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:bytes} counts artifacts at or under 10{,}240 charged bytes.
+Two of 100 DOPE artifacts exceed the cap (the largest is 22{,}233 bytes).
+Independent marginals pass the cap more often than the Chow--Liu study tree
+and still have retention near zero. Smallness alone is not the result.
+
+\begin{table}[t]
+\caption{Charged bytes at $4n$. Density methods use 100 lineages. CTGAN and
+TVAE use the 22 native-selected artifacts that produced a size-$4$ sample,
+which is a wider set than the 21 informative retention lineages.}
+\label{tab:bytes}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Method & Median bytes & Within cap \\
+\midrule
+DOPE reference & 1{,}895.5 & 98/100 \\
+Gaussian copula & 5{,}464.5 & 62/100 \\
+Chow--Liu, study & 29{,}865 & 31/100 \\
+Indep.\ marginals, study & 2{,}549.5 & 94/100 \\
+CTGAN & 741{,}834 & 0/22 \\
+TVAE & 317{,}141.5 & 0/22 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:neural} is the neural block. It is not pooled with
+Table~\ref{tab:density}. DOPE's CatBoost median on these 21 lineages is
+$0.953366$, CTGAN's is $-0.081259$, and TVAE's is $0.669033$. The same
+direction appears for the linear auditor and the MLP, on 21 and 19 lineages.
+The ledger also records 525 scheduling cutoffs for the CTGAN/TVAE search.
+Those cutoffs are unfinished work, not method failures, and they are why this
+block cannot support a method-wide conclusion.
+
+\begin{table}[!b]
+\caption{Neural block at $4n$. CTGAN and TVAE are native-selected author
+code. This lineage set is not the density block.}
+\label{tab:neural}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Auditor & Comparator & $n$ & DOPE & Other \\
+\midrule
+CatBoost & CTGAN & 21 & 0.953366 & $-0.081259$ \\
+CatBoost & TVAE & 21 & 0.953366 & 0.669033 \\
+Linear & CTGAN & 21 & 0.998972 & $-0.033499$ \\
+Linear & TVAE & 21 & 0.998972 & 0.795925 \\
+MLP & CTGAN & 19 & 1.025597 & $-0.148653$ \\
+MLP & TVAE & 19 & 1.025597 & 0.752792 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{samepage}
+One shared lineage goes the other way. On \path{1193_BNG_lowbwt},
+native-selected TVAE retention is $1.029$ at 293{,}868 bytes and the DOPE
+reference is $0.970$ at 2{,}436 bytes. On \path{503_wind} the same DOPE
+profile is $0.996$ at 3{,}846 bytes and TVAE is $0.802$ at 471{,}140 bytes.
+\end{samepage}
+
+\section{The common scalar}
+Table~\ref{tab:score} is the MFS-v2 column required by Section~\ref{sec:scores}.
+No method has a complete component vector and a fully passed hard-gate map on
+this panel, so every scalar is null. Copying a retention number or a zero into
+this column would publish a value the contract refuses to emit. PTF-v1 is
+also null. Release-safe certification is null. The 100 lineages do not meet
+the production requirement of at least 30 informative groups under the final
+profile gate, and the five admission locks are not frozen.
+
+\begin{table}[t]
+\caption{MFS-v2 after native selection. Null means the scalar was not emitted.}
+\label{tab:score}
+\centering
+\scriptsize
+\begin{tabular}{@{}lc@{}}
+\toprule
+Method & MFS-v2 \\
+\midrule
+DOPE reference & null \\
+Gaussian copula & null \\
+CTGAN & null \\
+TVAE & null \\
+ARF & null \\
+TabDDPM & null \\
+synthpop CART & null \\
+Chow--Liu, study code & null \\
+Indep.\ marginals, study code & null \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Every lineage, not only the median}
+\label{sec:every}
+Table~\ref{tab:density} is the median of Appendix~\ref{app:2048}. That appendix
+has one row for each of the 100 rights-cleared lineages: the PMLB name, the
+fit-row count, the feature count, the size-$4n$ byte charge, the L3 flag, and
+the three-seed median retention at $n$ and at $4n$. A blank cell is an
+unavailable fit or an auditor that is not informative on all three sample
+seeds. It is not a zero. Two displayed-profile fits are unavailable,
+\path{4544_GeographicalOriginalofMusic} and \path{588_fri_c4_1000_100}.
+\path{678_visualizing_environmental} has a fit whose CatBoost group is not
+informative on all three seeds. The CatBoost median therefore uses 97
+lineages, and the byte count uses 100.
+
+Fig.~\ref{fig:every} plots those medians against charged bytes for CatBoost.
+The same drawing for the linear auditor and the MLP is in the figure
+directory. The frame is $[-1.5, 1.6]$. Points outside it remain in the
+appendix; the panel title counts them. The dashed line is $\log_{10}(10240)$.
+Fig.~\ref{fig:pairs} is the paired difference, displayed profile minus each
+native-selected density comparator, with the lineage name on the axis. The
+frame is $[-1.5, 1.5]$ for the same reason. These figures are descriptive.
+They are not a paired superiority test.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/s3-retention-bytes-catboost.pdf}
+\caption{CatBoost retention against charged bytes for every informative
+lineage of \texttt{features12\_steps2048} and the native-selected density
+comparators. The neural block is not on this figure.}
+\label{fig:every}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/s3-retention-bytes-linear.pdf}
+\caption{Linear retention against charged bytes, same lineages and frame as
+Fig.~\ref{fig:every}.}
+\label{fig:linear}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/s3-retention-bytes-mlp.pdf}
+\caption{MLP retention against charged bytes, same lineages and frame as
+Fig.~\ref{fig:every}.}
+\label{fig:mlp}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth,height=0.92\textheight,keepaspectratio]{figures/s3-paired-differences.pdf}
+\caption{Paired CatBoost difference at $4n$. Each bar is one informative
+lineage. Differences outside $[-1.5, 1.5]$ are counted in the panel title
+and listed in Appendix~\ref{app:2048}.}
+\label{fig:pairs}
+\end{figure*}
+
+\section{Eight thousand steps on the same partitions}
+\label{sec:steps}
+\path{features12_steps8192} is the same residual with four times as many
+AdamW steps. It was already fit in the closed expansion round. Of the 100
+lineages, 68 have a successful fit. Thirty failed before the fit started
+because of transport or prelaunch, one failed because a foreign GPU owner
+appeared, and one failed the charged-artifact cap. Sample evaluation of that
+round has 408 measured cells and 192 fit-unavailable cells for this profile.
+Sixty-eight of the 69 artifacts with a byte charge are within 10{,}240 bytes.
+The largest charged artifact is 19{,}041 bytes.
+
+On the lineages where both budgets have a complete three-seed group, the
+CatBoost medians are $0.925519$ at 2{,}048 steps and $0.970348$ at 8{,}192
+steps (68 lineages; median paired difference $0.034349$). The linear medians
+are $0.990163$ and $0.986519$ (64 lineages; median paired difference
+$-0.000283$). The MLP medians are $1.065260$ and $1.056573$ (52 lineages;
+median paired difference $0.004514$). The extra steps are a budget check.
+They do not replace \path{features12_steps2048} as the displayed model, and
+they are not a superiority test. Appendix~\ref{app:8192} lists all 100.
+
+The scored fits did not retain a per-step loss. A logged replay of both
+budgets, written to a new directory and not substituted for those artifacts,
+records the AdamW training loss and the training-derived validation loss at
+every step. The curves are the hidden-basis objective, before the closed-form
+readout refit. All 100 lineages finished both budgets, and every recorded
+loss is finite. The median training loss starts at $0.321246$. It ends at
+$0.002745$ after 2{,}048 steps and at $0.000763$ after 8{,}192 steps. The
+median validation loss starts at $0.270883$ and ends at $0.004433$ and
+$0.001813$. Figure~\ref{fig:loss2048} and Figure~\ref{fig:loss8192} draw the
+median and the band from the 10th to the 90th percentile. \path{losses.png}
+is not that series. The lower hidden-basis loss at 8{,}192 steps does not
+replace the displayed profile.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.82\textwidth]{figures/s3-loss-steps2048.pdf}
+\caption{AdamW hidden-basis loss at 2{,}048 steps. The line is the median of 100 lineages. The band is the 10th to the 90th percentile, before the readout refit.}
+\label{fig:loss2048}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.82\textwidth]{figures/s3-loss-steps8192.pdf}
+\caption{AdamW hidden-basis loss at 8{,}192 steps, same 100 lineages and same band. This budget is not the displayed model.}
+\label{fig:loss8192}
+\end{figure*}
+
+\section{BeyondArena is a separate corpus}
+\label{sec:beyond}
+{\raggedright
+BeyondArena is the pinned TabArena/BeyondArena snapshot
+\path{2ecfe882ccfb814fc27c4de10a64ceefd5d7655c} in
+\path{s3://veox-jopedime-datasets-use2/benchmarks/BeyondArena/}.\par}
+The index lists 142 source families, 19{,}676{,}576 rows, and 3{,}722 official
+folds. The task mix is 73 binary, 44 regression, and 25 multiclass. The split
+regimes are 103 IID, 21 temporal, and 18 grouped. Every family is stored once
+under \path{raw/BeyondArena/} at that revision. The research prefix
+\path{research/BeyondArena/} holds later experiment handoffs, not a second copy
+of the tables. Appendix~\ref{app:beyond} names all 142.
+
+The fit lock takes at most 12 binary or regression families whose recorded
+license is a redistribution grant, labels each with the published split
+regime, and round-robins IID, grouped, and temporal in hash order of the
+source-family id. Multiclass families and licenses without that grant stay
+out. None of the 12 is one of the 100 PMLB lineages.
+{\raggedright
+The locked names are
+\path{airfoil_self_noise},
+\path{early_learning_predictors},
+\path{lending_club},
+\path{heart_disease_va_long_beach},
+\path{musk},
+\path{kick},
+\path{qsar_biodeg},
+\path{telemonitoring_parkinsons_biomedical_voice_measurements},
+\path{hotel_booking_demand},
+\path{wine_world_cost},
+\path{video_transcoding_time_prediction},
+and \path{garments_worker_productivity}.\par}
+Official fold 0 of repeat 0 is the fit source. An 80/20 grouped cut of that
+official training fold, seed 1729, supplies the fit and the validation loss.
+The official test rows stay in the evaluator directory. Four families,
+\path{early_learning_predictors}, \path{lending_club}, \path{kick}, and
+\path{wine_world_cost}, exceed the 2{,}000-feature projection cap.
+\path{lending_club} still does after 14 all-missing training columns are
+dropped. \path{heart_disease_va_long_beach}, \path{qsar_biodeg}, and
+\path{hotel_booking_demand} have an identical source row on both sides of the
+official fold, the same overlap rule that excluded four PMLB lineages.
+The other five families completed both budgets. Every artifact is inside the
+10{,}240-byte cap. Table~\ref{tab:beyond} records the charged bytes and the
+final hidden-basis validation loss. No retention auditor was run on this
+block, so it has no retention column, and it is not pooled with the 100 or
+with the 21-lineage neural block. \eqref{eq:mfs} stays null.
+
+\begin{table}[t]
+\caption{BeyondArena families that prepared. Bytes are the charged artifact. The loss is the final AdamW hidden-basis validation loss, before the readout refit.}
+\label{tab:beyond}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+family & fit rows & 2{,}048 B & 8{,}192 B & val 2{,}048 & val 8{,}192\\
+\midrule
+airfoil\_self\_noise & 802 & 804 & 818 & 0.0101 & 0.0045\\
+musk & 3{,}738 & 9{,}273 & 9{,}350 & 0.1456 & 0.0903\\
+telemonitoring & 257 & 1{,}852 & 1{,}890 & 0.0333 & 0.0190\\
+video\_transcoding & 35{,}918 & 5{,}054 & 5{,}071 & 0.0025 & 0.0020\\
+garments\_productivity & 939 & 2{,}317 & 2{,}372 & 0.0277 & 0.0251\\
+\bottomrule
+\end{tabular}
+\normalsize
+\end{table}
+
+\section{What this panel does not establish}
+The fits use coresets of 72--800 rows, one fit seed, and a training-derived
+validation cut. They do not establish behavior on the full tables used by
+TabDDPM, a five-seed campaign, production PTF-v1, or a release decision.
+ARF sampling and the TabDDPM run on these 100 lineages are still ahead.
+A closed refinement-validation round accounts for 1{,}200 logical cells, 816
+measured and 384 unavailable, and it likewise leaves \eqref{eq:mfs} null.
+Its public report is not yet issued: each measured sample directory contains
+two unlisted scratch directories, so the receipt inventory check fails closed.
+Nothing in that failure opens an official test or assigns a fitness score.
+
+When a later round measures the six components, Table~\ref{tab:score} is the
+column to fill, and only through the implementation of \eqref{eq:mfs}. A
+paired interval can be added only after the protocol's paired test is
+computed. Until then the public statement is the one in the abstract: the
+residual is specified, retention and bytes are measured on the blocks above,
+and the common scalar is null.
+
+\section*{Ledger}
+The medians, lineage counts, byte ranges, and null flags are the 5 October
+2026 entries in \path{research/benchmark/RESULTS_STATUS.md}, taken from the
+density-matched and SDV-matched population validation files and from
+\path{research/benchmark/results/s3-lineage-record.json}. Fitness weights are
+\path{production/kpi-contract.json}. The displayed profile remains
+\path{features12_steps2048}.
+
+\onecolumn
+\appendices
+\section{Displayed profile, all 100 lineages}
+\label{app:2048}
+\input{generated/s3-2048-lineages.tex}
+
+\section{Sufficiency budget, all 100 lineages}
+\label{app:8192}
+\input{generated/s3-8192-lineages.tex}
+
+\section{BeyondArena families in the dataset bucket}
+\label{app:beyond}
+\input{generated/beyondarena-inventory.tex}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

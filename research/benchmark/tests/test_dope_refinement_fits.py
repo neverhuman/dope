@@ -88,6 +88,17 @@ class RefinementFits(unittest.TestCase):
                 alias.unlink(); (root / 'extra').mkdir()
                 with self.assertRaises(ValueError): pub.flat(root, files)
 
+    def test_flat_inventory_ignores_only_named_scratch_directories(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp); code = root / 'entry.py'; code.write_text('pass\n'); files = {code.name: sha(code)}
+            with patch.object(pub, 'BASE', root):
+                (root / 'catboost_info').mkdir(); (root / 'runtime-temp').mkdir()
+                (root / 'catboost_info' / 'learn_error.tsv').write_text('0\n')
+                pub.flat(root, files)
+                (root / 'runtime-temp').rmdir()
+                (root / 'runtime-temp').write_text('not a directory')
+                with self.assertRaisesRegex(ValueError, 'flat inventory differs'): pub.flat(root, files)
+
     def test_digest_subclass_and_nonfinite_json_are_rejected(self):
         class Digest(str): pass
         with TemporaryDirectory() as tmp:
