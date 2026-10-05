@@ -9,6 +9,9 @@ shorten repeated locked checks. Local builds reuse their worktree target.
 `just security` scans secrets, dependencies, workflow syntax, and writes an
 SPDX SBOM. `just score` regenerates Python boundary evidence, then runs the
 full pinned Jankurai audit; `diff-audit` is only a faster local aid.
+The audit workflow caches uv downloads in its disposable LAN guest. Audit
+dependencies use the pinned uv installer and V1 version constraints; cache
+restoration never replaces fresh boundary tests or changes the job quota.
 `just fast-audit` writes a changed-source advisory under `target/jankurai/`;
 its partial scope can produce boundary or release false positives and never
 supersedes the clean full gate.
