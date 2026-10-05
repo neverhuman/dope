@@ -1186,3 +1186,38 @@ then run `publish_dope_refinement_fits_figure <directory>/dope-target-refinement
 and `publish_dope_refinement_fits_manifest --results-dir <directory>`.
 The publisher rejects rewritten receipt anchors, added source aliases or
 directories, omitted projection charges and incomplete profile coverage.
+
+### Complete population refinement common validation
+
+The [matched refinement panel](results/dope-target-refinement-population-validation.md)
+accounts for both previously frozen deeper DOPE GPU profiles across all 100
+bounded S3 training-derived lineages: 1,200 logical cells at n/4n, one fit seed
+and three sample seeds. It binds the complete training ledger above, 112 new
+physical validation batches and 144 immutable prior validation cells. Every
+unavailable cell retains its infrastructure or artifact reason and contributes
+no DOPE win. The unchanged 6,000-cell density panel supplies the fixed earlier
+DOPE profile and default/native baselines. Baselines retain their own held-out
+density objectives; common retention never selects their configurations.
+
+The publication retains all three auditors, charged model/projection bytes,
+copy/near-match and real controls, exact sampler/metric control coverage,
+separate training and validation costs, all cell hashes and descriptive pairs.
+Sample seeds reduce within lineage before dataset medians. Each pair can have a
+different informative cohort; no cross-row rank or superiority inference follows.
+Chow-Liu and independent marginals remain labeled study implementations.
+The reference quality outcomes include author artifacts above the L3 cap;
+they establish no release-safe L3 comparison. Availability limits each pair,
+including DOPE infrastructure and byte-gate exclusions, so these subsets
+cannot establish population-wide superiority.
+Global family selection, final five-fit coverage, complete privacy/profile
+coverage and official public-core analysis remain unfinished. Official tests
+stay sealed; MFS-v2/PTF-v1/release/superiority remain null.
+
+Regenerate with `python3 -B -m research.benchmark.publish_dope_refinement_population
+--receipt-lock-sha256 <manifest receipts digest> --reconciliation-sha256
+<manifest reconciliation digest> --results-dir <directory>`, then the `_figure`
+and `_manifest` entry points. All immutable receipt, source, runtime, worker,
+model and sampling inventories are checked before metric decoding. Offline
+`--from-json <publication> --publication-sha256 <manifest artifact digest>`
+regenerates tables and schemas; descriptive aggregates are independently reduced
+from committed per-cell results and the hash-bound reference panel.
