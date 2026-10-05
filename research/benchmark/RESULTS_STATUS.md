@@ -658,3 +658,14 @@ five-fit or public-core paired analysis. [The complete report](results/pilot24-t
 receipt hashes. Original learned bytes are preserved through the sampling
 runtime metadata repair; no new common-validation fits or tuning occurred.
 Official tests remain sealed; MFS-v2/PTF-v1 and release-safe status remain null.
+
+## Closed ARF native search
+
+[The complete ARF native ledger](results/arf-s3-population-native.md) retains
+800/800 successful fits: eight frozen configurations on each of the 100 bounded
+S3 lineages, one fit seed (11). Native winners maximize held-out FORDE density,
+independently of DOPE's KPI or shared retention. Default and selected artifacts
+include projection charges. These are completed native fits, not a shared
+quality comparison; ARF sampling, five-fit uncertainty and generator gates
+remain pending. Native density values are not aggregated across datasets or
+ranked against another method. No production score or DOPE win is inferred.

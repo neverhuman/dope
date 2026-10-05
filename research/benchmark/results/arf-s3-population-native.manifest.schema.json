@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "arf-s3-population-native.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-s3-population-native.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-s3-population-native.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-s3-population-native.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "arf-s3-population-native.csv",
+        "arf-s3-population-native.json",
+        "arf-s3-population-native.md",
+        "arf-s3-population-native.schema.json"
+      ],
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-arf-native-publication-manifest"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_values_aggregated_across_datasets": {
+      "const": false
+    },
+    "native_values_ranked_across_methods": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "arf-native-paths.lock.json": {
+          "type": "string"
+        },
+        "arf_native_selection.py": {
+          "type": "string"
+        },
+        "arf_runtime_guard.py": {
+          "type": "string"
+        },
+        "publish_arf_population_native.py": {
+          "type": "string"
+        },
+        "publish_s3_matched.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "arf-native-paths.lock.json",
+        "arf_native_selection.py",
+        "arf_runtime_guard.py",
+        "publish_arf_population_native.py",
+        "publish_s3_matched.py"
+      ],
+      "type": "object"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "shared_outcomes_used_for_selection": {
+      "const": false
+    },
+    "shared_validation_evaluation_complete": {
+      "const": false
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "receipts": {
+          "type": "string"
+        },
+        "reconciliation": {
+          "type": "string"
+        },
+        "round": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "receipts",
+        "reconciliation",
+        "round"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "system_dynamic_library_closure_certified": {
+      "const": false
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "counts_as_dope_win",
+    "format",
+    "full_campaign_admitted",
+    "mfs_v2",
+    "native_values_aggregated_across_datasets",
+    "native_values_ranked_across_methods",
+    "official_tests_opened",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe",
+    "shared_outcomes_used_for_selection",
+    "shared_validation_evaluation_complete",
+    "source_locks",
+    "superiority",
+    "system_dynamic_library_closure_certified",
+    "version"
+  ],
+  "type": "object"
+}

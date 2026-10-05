@@ -1,0 +1,8 @@
+{
+  "directory_must_be_empty": true,
+  "format": "dope-arf-native-path-contract",
+  "origin_coordinator_sha256": "d38406ec7aff2d67e54ccd8b3f9202f454eecaf9948b4fee48782a5620c346e1",
+  "origin_round_sha256": "610c1ba0db58fe380350936f55c5e2e754cd09190616d7b56a6f9311d0d5133c",
+  "runtime_directory": "runtime-temp",
+  "version": 1
+}
