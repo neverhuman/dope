@@ -31,7 +31,7 @@ def numeric(data):
         rows = [[float(v) for v in row] for row in csv.reader(io.StringIO(data.decode()))]
     except (UnicodeError, ValueError, csv.Error):
         raise ValueError('invalid common-numeric input') from None
-    check(len(rows) >= 2 and len(rows[0]) >= 2
+    check(len(rows) >= 2 and len(rows[0]) >= 1
           and all(len(r) == len(rows[0]) for r in rows)
           and all(math.isfinite(v) and 0 <= v <= 1 for r in rows for v in r),
           'invalid common-numeric input')
@@ -149,7 +149,7 @@ def sample(*, runtime_path, runtime_sha256, base, artifact, expected_inventory,
     columns = metadata['names']
     check(metadata['format'] == 'dope-arf-forge-factors-v1' and metadata['source_rows_required'] is False
           and metadata['restricted_research_artifact'] is True
-          and type(columns) is list and len(columns) >= 2
+          and type(columns) is list and len(columns) >= 1
           and columns == [f'c{i}' for i in range(len(columns))]
           and type(metadata['num_trees']) is int and 1 <= metadata['num_trees'] <= 100
           and metadata['dist'] == 'truncnorm'

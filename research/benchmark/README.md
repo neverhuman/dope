@@ -2,7 +2,8 @@
 
 [`ARF_S3_CONTRACT.md`](ARF_S3_CONTRACT.md) records the guarded ARF fit/sample
 contract, native FORDE density objective and measured synthetic serialization
-probe. It prepares the next matched S3 baseline; it admits no real dataset fit
+probes, including exact original-versus-guarded replay on single continuous
+and categorical columns. It prepares the next matched S3 baseline; it admits no real dataset fit
 or official test access.
 
 [`CONTAINER_VALIDATION_WORKER.md`](CONTAINER_VALIDATION_WORKER.md) describes the

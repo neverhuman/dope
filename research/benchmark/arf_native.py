@@ -22,7 +22,7 @@ def prepare_frames(train, validation):
     import numpy as np
     import pandas as pd
 
-    if train.shape[1] != validation.shape[1] or train.shape[1] < 2:
+    if train.shape[1] != validation.shape[1] or train.shape[1] < 1:
         raise ValueError("ARF training/validation width mismatch")
     if not np.isfinite(train).all() or not np.isfinite(validation).all():
         raise ValueError("ARF input is nonfinite")
@@ -72,8 +72,12 @@ def heldout_mean_log_density(model, validation) -> float:
 
     coverage = model.bnds.drop_duplicates(["tree", "nodeid"]).set_index(
         ["tree", "nodeid"])["cvg"].to_dict()
-    continuous = {(int(tree), int(node), name): row for (tree, node, name), row in
-                  model.params.set_index(["tree", "nodeid", "variable"]).iterrows()}
+    continuous = {}
+    if len(model.params.columns):
+        continuous = {(int(tree), int(node), name): row for (tree, node, name), row in
+                      model.params.set_index(["tree", "nodeid", "variable"]).iterrows()}
+    elif not all(bool(model.factor_cols[name]) for name in names):
+        raise ValueError("ARF continuous factors are absent")
     categories = {}
     for row in model.class_probs.itertuples(index=False):
         key = (int(row.tree), int(row.nodeid), row.variable)
