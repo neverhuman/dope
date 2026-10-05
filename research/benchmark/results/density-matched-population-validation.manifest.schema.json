@@ -1,0 +1,474 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_frozen_cells_accounted": {
+      "const": true
+    },
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "density-matched-population-validation.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "density-matched-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "density-matched-population-validation.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "density-matched-population-validation.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "figures/density-matched-retention-1n.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "figures/density-matched-retention-1n.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "figures/density-matched-retention-4n.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "figures/density-matched-retention-4n.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "figures/figures-manifest.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "figures/figures-manifest.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "density-matched-population-validation.csv",
+        "density-matched-population-validation.json",
+        "density-matched-population-validation.md",
+        "density-matched-population-validation.schema.json",
+        "figures/density-matched-retention-1n.pdf",
+        "figures/density-matched-retention-1n.svg",
+        "figures/density-matched-retention-4n.pdf",
+        "figures/density-matched-retention-4n.svg",
+        "figures/figures-manifest.json",
+        "figures/figures-manifest.schema.json"
+      ],
+      "type": "object"
+    },
+    "bibliography": {
+      "type": "string"
+    },
+    "citation_keys": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "common_utility_used_for_baseline_selection": {
+      "const": false
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "datasets": {
+      "type": "integer"
+    },
+    "density_logical_cells": {
+      "type": "integer"
+    },
+    "density_physical_batches": {
+      "type": "integer"
+    },
+    "figure_receipt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "fit_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "type": "array"
+    },
+    "format": {
+      "const": "dope-density-matched-population-validation-manifest"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "global_family_selected": {
+      "const": false
+    },
+    "historical_full_runtime_closure_upgraded": {
+      "const": false
+    },
+    "immutable_receipt_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "immutable_reconciliation": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "logical_cells": {
+      "type": "integer"
+    },
+    "logical_status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "fit_unavailable": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "fit_unavailable",
+        "ok"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_kpis_never_ranked_across_methods": {
+      "const": true
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "type": "null"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "density_custody_replay.py": {
+          "type": "string"
+        },
+        "density_declared_runtime_replay.py": {
+          "type": "string"
+        },
+        "density_matched_aggregate.py": {
+          "type": "string"
+        },
+        "density_metric_replay.py": {
+          "type": "string"
+        },
+        "density_native_replay.py": {
+          "type": "string"
+        },
+        "density_publication_inputs.py": {
+          "type": "string"
+        },
+        "publish_density_matched.py": {
+          "type": "string"
+        },
+        "publish_density_matched_figure.py": {
+          "type": "string"
+        },
+        "publish_density_matched_manifest.py": {
+          "type": "string"
+        },
+        "publish_dope_population_fits.py": {
+          "type": "string"
+        },
+        "publish_dope_population_validation.py": {
+          "type": "string"
+        },
+        "publish_s3_matched.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "density_custody_replay.py",
+        "density_declared_runtime_replay.py",
+        "density_matched_aggregate.py",
+        "density_metric_replay.py",
+        "density_native_replay.py",
+        "density_publication_inputs.py",
+        "publish_density_matched.py",
+        "publish_density_matched_figure.py",
+        "publish_density_matched_manifest.py",
+        "publish_dope_population_fits.py",
+        "publish_dope_population_validation.py",
+        "publish_s3_matched.py"
+      ],
+      "type": "object"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "sample_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "scope": {
+      "const": "100 matched S3 lineages; fixed four DOPE GPU research profiles versus default/native-selected density methods; descriptive validation only"
+    },
+    "sizes": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "density_receipts": {
+          "type": "string"
+        },
+        "density_report": {
+          "type": "string"
+        },
+        "density_round": {
+          "type": "string"
+        },
+        "dope_receipts": {
+          "type": "string"
+        },
+        "dope_report": {
+          "type": "string"
+        },
+        "dope_round": {
+          "type": "string"
+        },
+        "native_receipts": {
+          "type": "string"
+        },
+        "native_report": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "density_receipts",
+        "density_report",
+        "density_round",
+        "dope_receipts",
+        "dope_report",
+        "dope_round",
+        "native_receipts",
+        "native_report"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "all_frozen_cells_accounted",
+    "artifacts",
+    "bibliography",
+    "citation_keys",
+    "common_utility_used_for_baseline_selection",
+    "counts_as_dope_win",
+    "datasets",
+    "density_logical_cells",
+    "density_physical_batches",
+    "figure_receipt_sha256",
+    "fit_seeds",
+    "format",
+    "full_campaign_admitted",
+    "global_family_selected",
+    "historical_full_runtime_closure_upgraded",
+    "immutable_receipt_lock",
+    "immutable_reconciliation",
+    "logical_cells",
+    "logical_status_counts",
+    "mfs_v2",
+    "native_kpis_never_ranked_across_methods",
+    "official_tests_opened",
+    "paired_superiority",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe_l3",
+    "sample_seeds",
+    "scope",
+    "sizes",
+    "source_locks",
+    "version"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "density-matched-retention-1n.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "density-matched-retention-1n.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "density-matched-retention-4n.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "density-matched-retention-4n.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "density-matched-retention-1n.pdf",
+        "density-matched-retention-1n.svg",
+        "density-matched-retention-4n.pdf",
+        "density-matched-retention-4n.svg"
+      ],
+      "type": "object"
+    },
+    "datasets": {
+      "type": "integer"
+    },
+    "logical_cells": {
+      "type": "integer"
+    },
+    "matplotlib_version": {
+      "type": "string"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "plotted_counts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "auditor": {
+            "type": "string"
+          },
+          "configuration": {
+            "type": "string"
+          },
+          "informative_lineages": {
+            "type": "integer"
+          },
+          "method": {
+            "type": "string"
+          },
+          "size_multiplier": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "auditor",
+          "configuration",
+          "informative_lineages",
+          "method",
+          "size_multiplier"
+        ],
+        "type": "object"
+      },
+      "maxItems": 60,
+      "minItems": 60,
+      "type": "array"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "report_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "superiority": {
+      "type": "null"
+    }
+  },
+  "required": [
+    "artifacts",
+    "datasets",
+    "logical_cells",
+    "matplotlib_version",
+    "mfs_v2",
+    "official_tests_opened",
+    "plotted_counts",
+    "production_certified",
+    "ptf_v1",
+    "release_safe",
+    "report_sha256",
+    "source_sha256",
+    "superiority"
+  ],
+  "type": "object"
+}

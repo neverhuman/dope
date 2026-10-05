@@ -1,0 +1,118 @@
+{
+  "all_frozen_cells_accounted": true,
+  "artifacts": {
+    "density-matched-population-validation.csv": {
+      "bytes": 244231,
+      "sha256": "ebba43590b9943120225114232d2d30ac773fd349558aa3b6ea162a61cd439fa"
+    },
+    "density-matched-population-validation.json": {
+      "bytes": 21794615,
+      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+    },
+    "density-matched-population-validation.md": {
+      "bytes": 2830,
+      "sha256": "2e2d002170d2a00b00620b72ead38445c216e58f667356657ff852751ad2bc07"
+    },
+    "density-matched-population-validation.schema.json": {
+      "bytes": 445016,
+      "sha256": "08ac5e4eb95e4273d42453a738fd54b8d76befb31eb785bd717834964478ac86"
+    },
+    "figures/density-matched-retention-1n.pdf": {
+      "bytes": 37693,
+      "sha256": "b7caae3fb76641dde0035c87e7bb1e8dddd5a24c64828596a690e57bc494d90c"
+    },
+    "figures/density-matched-retention-1n.svg": {
+      "bytes": 189346,
+      "sha256": "52ba61ae6f4cec9df30cbcf7034fad9211f22906d8bf56c158c7921a1c20f235"
+    },
+    "figures/density-matched-retention-4n.pdf": {
+      "bytes": 37149,
+      "sha256": "4903923729549071346689bac6ba81903782c356c2aa9a5474a64b71e6fdf400"
+    },
+    "figures/density-matched-retention-4n.svg": {
+      "bytes": 188829,
+      "sha256": "26f41ccdc0b6753f5b3b85208159a2e1afe823552764c4879f6f32ddad0ab667"
+    },
+    "figures/figures-manifest.json": {
+      "bytes": 11406,
+      "sha256": "fd8ea55b257a9ebacc0bd339d1dc3aa00981c53573ec578da3c70e7cfb74e629"
+    },
+    "figures/figures-manifest.schema.json": {
+      "bytes": 3825,
+      "sha256": "00383b1e0108e9af51140d852f0a3fb276824fe03d798351e378cf51fae2c830"
+    }
+  },
+  "bibliography": "DOPE_SYNTH_REFERENCES.bib",
+  "citation_keys": [
+    "patki2016synthetic",
+    "chow1968approximating"
+  ],
+  "common_utility_used_for_baseline_selection": false,
+  "counts_as_dope_win": false,
+  "datasets": 100,
+  "density_logical_cells": 3600,
+  "density_physical_batches": 502,
+  "figure_receipt_sha256": "fd8ea55b257a9ebacc0bd339d1dc3aa00981c53573ec578da3c70e7cfb74e629",
+  "fit_seeds": [
+    11
+  ],
+  "format": "dope-density-matched-population-validation-manifest",
+  "full_campaign_admitted": false,
+  "global_family_selected": false,
+  "historical_full_runtime_closure_upgraded": false,
+  "immutable_receipt_lock": {
+    "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-shared-validation-v1/receipt-lock-v1.json",
+    "sha256": "b2f5964cf40d047d63dc5698c42c2370d945384f5f9567d6809d0959f4f4d81b"
+  },
+  "immutable_reconciliation": {
+    "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-shared-validation-v1/reconciliation-v1.json",
+    "sha256": "b72a1a7cc2c9298e9eb0cd1c774a995561a1ea7e51f39e269c4789532096cb09"
+  },
+  "logical_cells": 6000,
+  "logical_status_counts": {
+    "fit_unavailable": 96,
+    "ok": 5904
+  },
+  "mfs_v2": null,
+  "native_kpis_never_ranked_across_methods": true,
+  "official_tests_opened": false,
+  "paired_superiority": null,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "density_custody_replay.py": "64ec73a8a4e2595915d72168e5242d37476cbb017398f8164360cf80809e3713",
+    "density_declared_runtime_replay.py": "5ee765dcdc1ccaf8587162fb8f88e54ff127a8ca01e5efa0ee2bc93f9ef25d47",
+    "density_matched_aggregate.py": "2eabc836d4c459a3451feb8f5dffc9b60efa8dea253a6051b7e6c6695121436b",
+    "density_metric_replay.py": "849a424265cce364b3348f6a467a1053c2557763d4b35625227ac7be6a7114fb",
+    "density_native_replay.py": "221106a4de250b0cfa9d5406427af7f7c2318d536b04938d12fce52e51395072",
+    "density_publication_inputs.py": "424bbf06aab09b1657ab778ace1fafe2ae97a7fbe80af846ddd5e368255f86fe",
+    "publish_density_matched.py": "2cb02b171399d8298c6f11b36b4d8fd50fffc6a52fef27df09a6c1958419e635",
+    "publish_density_matched_figure.py": "73e8132b0956fe4268f6a7d36604956ab05dd70af520ec2ad7821458e523ead5",
+    "publish_density_matched_manifest.py": "5db88553b570b97ecd102a5c99ba03a429b69091749072853b484f2ca036b6b3",
+    "publish_dope_population_fits.py": "bdb00519b4aac17b4b8689475848c48a049adc3ec7ec96e14d45c5b2f6b17821",
+    "publish_dope_population_validation.py": "0e9df2f7a02fc9aa78a07f91cba8272c43c98483ebe0b7d46d16a968689adbc0",
+    "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a"
+  },
+  "release_safe_l3": null,
+  "sample_seeds": [
+    101,
+    211,
+    307
+  ],
+  "scope": "100 matched S3 lineages; fixed four DOPE GPU research profiles versus default/native-selected density methods; descriptive validation only",
+  "sizes": [
+    1,
+    4
+  ],
+  "source_locks": {
+    "density_receipts": "b2f5964cf40d047d63dc5698c42c2370d945384f5f9567d6809d0959f4f4d81b",
+    "density_report": "b72a1a7cc2c9298e9eb0cd1c774a995561a1ea7e51f39e269c4789532096cb09",
+    "density_round": "bbbc5039bb1f569652fd04617030a0e6caa6258a2a0f8efe0e467552d72914e6",
+    "dope_receipts": "ecd88832cb9c8c0018bb55de67ded9c3eba0936eba541e799ded0def34e173bc",
+    "dope_report": "51e48fb3227588c0a8b1e49a64b94c1dd8b391063f94411aa33fc6bdac96004a",
+    "dope_round": "8d6fb1b5a5a028acf45673feadd40e8a1dc29f9e27bb52f0bf246a20a0f009ac",
+    "native_receipts": "902c68d8ffd4ef7a8ed93539947ddb7496d0c14438f7a4a0c52631d51834f6f5",
+    "native_report": "efe8f169dbf8e1b7a68b44406ced32d910a2809f09682539facd24c86ac67187"
+  },
+  "version": 1
+}
