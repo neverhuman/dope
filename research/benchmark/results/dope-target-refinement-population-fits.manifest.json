@@ -1,0 +1,79 @@
+{
+  "artifacts": {
+    "dope-target-refinement-population-fits.csv": {
+      "bytes": 22731,
+      "sha256": "d2cf5df1fc493a811c4688397514d2264263a4a6ef833e59204eb95c9ebeada3"
+    },
+    "dope-target-refinement-population-fits.json": {
+      "bytes": 273775,
+      "sha256": "ec330be7103ee9b63440f4e3b1b26c31592695ef2f27988b1fd73ff97a0fd91e"
+    },
+    "dope-target-refinement-population-fits.md": {
+      "bytes": 1046,
+      "sha256": "93990e3098e57a6e1b38c7468c9e4470a3a6c5da8111ca2c6973fefad55f2cd1"
+    },
+    "dope-target-refinement-population-fits.pdf": {
+      "bytes": 23265,
+      "sha256": "9d665a12d602496de61f2ce6baaab95abb78605d83dd12a79424e74ee7cd71e6"
+    },
+    "dope-target-refinement-population-fits.schema.json": {
+      "bytes": 37246,
+      "sha256": "01299c22cefb2bfd5d7524459a6f566c6d5e066c19f83505a9b6e545a1e95eb9"
+    },
+    "dope-target-refinement-population-fits.svg": {
+      "bytes": 18074,
+      "sha256": "fa4d1216b4595346c0d19ed2cfe903116cca2e84eefc03cdfae3fa00f8b04a36"
+    }
+  },
+  "closed_fit_cells": 200,
+  "counts_as_dope_win": false,
+  "format": "dope-refinement-population-fit-publication-manifest",
+  "full_campaign_admitted": false,
+  "global_family_selected": false,
+  "immutable_references": [
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-refinement-expansion-v2/round.lock.json",
+      "sha256": "fe53444eeb3b485f895473a27101d93fb515c9dfbe3ee72d50d71417fef487d4"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-refinement-expansion-v2/receipt-lock-v1.json",
+      "sha256": "179d005ddbc883099f41bb243026748b3d4508171734745c0bed80b3d4356c88"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-refinement-expansion-v2/reconciliation-v1.json",
+      "sha256": "e65806dc58a6f92072307b0821fe4345e22914b968cde563500fb1219f7bc295"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-refinement-expansion-v2/completion.json",
+      "sha256": "1c0d7534442fa6651d4dcbe3b151863d5ab644bbf076b8a6f474108eea41f62a"
+    },
+    {
+      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-refinement-expansion-v2/coordinator-exit.json",
+      "sha256": "7032472dd03f79887b465a0dc2d5533d2abb998ed22ccae4c1cff680ca5e408b"
+    }
+  ],
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "arf_runtime_guard.py": "163328e0130f8d23ea5df5f63b2a2340e9e7361145190fbdb63e97889cec2df7",
+    "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
+    "publish_dope_refinement_fits.py": "e77c72f2b6daf4dab743809d35a977dba847463616130c91251dd3d2a6a0d01c",
+    "publish_dope_refinement_fits_figure.py": "67a14d05b73c4021e4c21d36af3eefb852835cf1896c25d7d5c3aa81714338fb",
+    "publish_dope_refinement_fits_manifest.py": "06fc6a1a073bc0298a9e9ad3650f1903da4b0672f7f9d173ecbdc26452e56bf7",
+    "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a",
+    "score.py": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+  },
+  "raw_rows_samples_weights_or_detailed_logs_committed": false,
+  "release_safe": null,
+  "s3_data_lock_sha256": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
+  "status_counts": {
+    "charged_artifact_cap": 2,
+    "foreign_gpu_owner_appeared": 1,
+    "ok": 136,
+    "transport_or_prelaunch_failure": 61
+  },
+  "superiority": null,
+  "version": 1
+}

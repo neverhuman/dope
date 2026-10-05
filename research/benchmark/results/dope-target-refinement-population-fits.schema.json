@@ -1,0 +1,1333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "cells": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_gate_failed": {
+                "const": false
+              },
+              "charged_artifact_bytes": {
+                "type": "null"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "counts_as_method_failure": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "fit_receipt_written": {
+                "const": false
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "full_campaign_admitted": {
+                "const": false
+              },
+              "global_family_selected": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": false
+              },
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {
+                  "xbabe1": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "xbabe1"
+                ],
+                "type": "object"
+              },
+              "immutable_prior_fit_reused": {
+                "const": false
+              },
+              "kind": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "model_bytes": {
+                "type": "null"
+              },
+              "new_operation_seconds": {
+                "type": "number"
+              },
+              "official_tests_opened": {
+                "const": false
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "production_certified": {
+                "const": false
+              },
+              "profile": {
+                "type": "string"
+              },
+              "projection_bytes": {
+                "type": "null"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "release_safe": {
+                "type": "null"
+              },
+              "status": {
+                "type": "string"
+              },
+              "superiority": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "artifact_gate_failed",
+              "charged_artifact_bytes",
+              "counts_as_dope_win",
+              "counts_as_method_failure",
+              "dataset",
+              "fit_job_sha256",
+              "fit_receipt_written",
+              "fit_seed",
+              "full_campaign_admitted",
+              "global_family_selected",
+              "gpu_target_operator_verified",
+              "host_operation_seconds",
+              "immutable_prior_fit_reused",
+              "kind",
+              "method",
+              "mfs_v2",
+              "model_bytes",
+              "new_operation_seconds",
+              "official_tests_opened",
+              "outcome_class",
+              "production_certified",
+              "profile",
+              "projection_bytes",
+              "ptf_v1",
+              "receipt",
+              "release_safe",
+              "status",
+              "superiority"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_gate_failed": {
+                "const": false
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "counts_as_method_failure": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "fit_receipt_written": {
+                "const": true
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "full_campaign_admitted": {
+                "const": false
+              },
+              "global_family_selected": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": true
+              },
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {
+                  "xbabe2": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "xbabe2"
+                ],
+                "type": "object"
+              },
+              "immutable_prior_fit_reused": {
+                "const": false
+              },
+              "kind": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "new_operation_seconds": {
+                "type": "number"
+              },
+              "official_tests_opened": {
+                "const": false
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "production_certified": {
+                "const": false
+              },
+              "profile": {
+                "type": "string"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "release_safe": {
+                "type": "null"
+              },
+              "status": {
+                "type": "string"
+              },
+              "superiority": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "artifact_gate_failed",
+              "charged_artifact_bytes",
+              "counts_as_dope_win",
+              "counts_as_method_failure",
+              "dataset",
+              "fit_job_sha256",
+              "fit_receipt_written",
+              "fit_seed",
+              "full_campaign_admitted",
+              "global_family_selected",
+              "gpu_target_operator_verified",
+              "host_operation_seconds",
+              "immutable_prior_fit_reused",
+              "kind",
+              "method",
+              "mfs_v2",
+              "model_bytes",
+              "new_operation_seconds",
+              "official_tests_opened",
+              "outcome_class",
+              "production_certified",
+              "profile",
+              "projection_bytes",
+              "ptf_v1",
+              "receipt",
+              "release_safe",
+              "status",
+              "superiority"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_gate_failed": {
+                "const": false
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "counts_as_method_failure": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "fit_receipt_written": {
+                "const": true
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "full_campaign_admitted": {
+                "const": false
+              },
+              "global_family_selected": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": true
+              },
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {
+                  "xbabe3": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "xbabe3"
+                ],
+                "type": "object"
+              },
+              "immutable_prior_fit_reused": {
+                "const": false
+              },
+              "kind": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "new_operation_seconds": {
+                "type": "number"
+              },
+              "official_tests_opened": {
+                "const": false
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "production_certified": {
+                "const": false
+              },
+              "profile": {
+                "type": "string"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "release_safe": {
+                "type": "null"
+              },
+              "status": {
+                "type": "string"
+              },
+              "superiority": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "artifact_gate_failed",
+              "charged_artifact_bytes",
+              "counts_as_dope_win",
+              "counts_as_method_failure",
+              "dataset",
+              "fit_job_sha256",
+              "fit_receipt_written",
+              "fit_seed",
+              "full_campaign_admitted",
+              "global_family_selected",
+              "gpu_target_operator_verified",
+              "host_operation_seconds",
+              "immutable_prior_fit_reused",
+              "kind",
+              "method",
+              "mfs_v2",
+              "model_bytes",
+              "new_operation_seconds",
+              "official_tests_opened",
+              "outcome_class",
+              "production_certified",
+              "profile",
+              "projection_bytes",
+              "ptf_v1",
+              "receipt",
+              "release_safe",
+              "status",
+              "superiority"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_gate_failed": {
+                "const": false
+              },
+              "charged_artifact_bytes": {
+                "type": "null"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "counts_as_method_failure": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "fit_receipt_written": {
+                "const": true
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "full_campaign_admitted": {
+                "const": false
+              },
+              "global_family_selected": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": false
+              },
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {
+                  "xbabe2": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "xbabe2"
+                ],
+                "type": "object"
+              },
+              "immutable_prior_fit_reused": {
+                "const": false
+              },
+              "kind": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "model_bytes": {
+                "type": "null"
+              },
+              "new_operation_seconds": {
+                "type": "number"
+              },
+              "official_tests_opened": {
+                "const": false
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "production_certified": {
+                "const": false
+              },
+              "profile": {
+                "type": "string"
+              },
+              "projection_bytes": {
+                "type": "null"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "release_safe": {
+                "type": "null"
+              },
+              "status": {
+                "type": "string"
+              },
+              "superiority": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "artifact_gate_failed",
+              "charged_artifact_bytes",
+              "counts_as_dope_win",
+              "counts_as_method_failure",
+              "dataset",
+              "fit_job_sha256",
+              "fit_receipt_written",
+              "fit_seed",
+              "full_campaign_admitted",
+              "global_family_selected",
+              "gpu_target_operator_verified",
+              "host_operation_seconds",
+              "immutable_prior_fit_reused",
+              "kind",
+              "method",
+              "mfs_v2",
+              "model_bytes",
+              "new_operation_seconds",
+              "official_tests_opened",
+              "outcome_class",
+              "production_certified",
+              "profile",
+              "projection_bytes",
+              "ptf_v1",
+              "receipt",
+              "release_safe",
+              "status",
+              "superiority"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_gate_failed": {
+                "const": true
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "counts_as_method_failure": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "fit_receipt_written": {
+                "const": true
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "full_campaign_admitted": {
+                "const": false
+              },
+              "global_family_selected": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": false
+              },
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {
+                  "xbabe2": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "xbabe2"
+                ],
+                "type": "object"
+              },
+              "immutable_prior_fit_reused": {
+                "const": false
+              },
+              "kind": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "new_operation_seconds": {
+                "type": "number"
+              },
+              "official_tests_opened": {
+                "const": false
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "production_certified": {
+                "const": false
+              },
+              "profile": {
+                "type": "string"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "release_safe": {
+                "type": "null"
+              },
+              "status": {
+                "type": "string"
+              },
+              "superiority": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "artifact_gate_failed",
+              "charged_artifact_bytes",
+              "counts_as_dope_win",
+              "counts_as_method_failure",
+              "dataset",
+              "fit_job_sha256",
+              "fit_receipt_written",
+              "fit_seed",
+              "full_campaign_admitted",
+              "global_family_selected",
+              "gpu_target_operator_verified",
+              "host_operation_seconds",
+              "immutable_prior_fit_reused",
+              "kind",
+              "method",
+              "mfs_v2",
+              "model_bytes",
+              "new_operation_seconds",
+              "official_tests_opened",
+              "outcome_class",
+              "production_certified",
+              "profile",
+              "projection_bytes",
+              "ptf_v1",
+              "receipt",
+              "release_safe",
+              "status",
+              "superiority"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_gate_failed": {
+                "const": true
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "counts_as_method_failure": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "fit_receipt_written": {
+                "const": true
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "full_campaign_admitted": {
+                "const": false
+              },
+              "global_family_selected": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": false
+              },
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {
+                  "xbabe3": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "xbabe3"
+                ],
+                "type": "object"
+              },
+              "immutable_prior_fit_reused": {
+                "const": false
+              },
+              "kind": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "new_operation_seconds": {
+                "type": "number"
+              },
+              "official_tests_opened": {
+                "const": false
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "production_certified": {
+                "const": false
+              },
+              "profile": {
+                "type": "string"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "release_safe": {
+                "type": "null"
+              },
+              "status": {
+                "type": "string"
+              },
+              "superiority": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "artifact_gate_failed",
+              "charged_artifact_bytes",
+              "counts_as_dope_win",
+              "counts_as_method_failure",
+              "dataset",
+              "fit_job_sha256",
+              "fit_receipt_written",
+              "fit_seed",
+              "full_campaign_admitted",
+              "global_family_selected",
+              "gpu_target_operator_verified",
+              "host_operation_seconds",
+              "immutable_prior_fit_reused",
+              "kind",
+              "method",
+              "mfs_v2",
+              "model_bytes",
+              "new_operation_seconds",
+              "official_tests_opened",
+              "outcome_class",
+              "production_certified",
+              "profile",
+              "projection_bytes",
+              "ptf_v1",
+              "receipt",
+              "release_safe",
+              "status",
+              "superiority"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_gate_failed": {
+                "const": false
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "counts_as_dope_win": {
+                "const": false
+              },
+              "counts_as_method_failure": {
+                "const": false
+              },
+              "dataset": {
+                "type": "string"
+              },
+              "fit_job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "fit_receipt_written": {
+                "const": true
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "full_campaign_admitted": {
+                "const": false
+              },
+              "global_family_selected": {
+                "const": false
+              },
+              "gpu_target_operator_verified": {
+                "const": true
+              },
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {},
+                "required": [],
+                "type": "object"
+              },
+              "immutable_prior_fit_reused": {
+                "const": true
+              },
+              "kind": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "new_operation_seconds": {
+                "type": "integer"
+              },
+              "official_tests_opened": {
+                "const": false
+              },
+              "outcome_class": {
+                "type": "string"
+              },
+              "production_certified": {
+                "const": false
+              },
+              "profile": {
+                "type": "string"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "release_safe": {
+                "type": "null"
+              },
+              "status": {
+                "type": "string"
+              },
+              "superiority": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "artifact_gate_failed",
+              "charged_artifact_bytes",
+              "counts_as_dope_win",
+              "counts_as_method_failure",
+              "dataset",
+              "fit_job_sha256",
+              "fit_receipt_written",
+              "fit_seed",
+              "full_campaign_admitted",
+              "global_family_selected",
+              "gpu_target_operator_verified",
+              "host_operation_seconds",
+              "immutable_prior_fit_reused",
+              "kind",
+              "method",
+              "mfs_v2",
+              "model_bytes",
+              "new_operation_seconds",
+              "official_tests_opened",
+              "outcome_class",
+              "production_certified",
+              "profile",
+              "projection_bytes",
+              "ptf_v1",
+              "receipt",
+              "release_safe",
+              "status",
+              "superiority"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 200,
+      "minItems": 200,
+      "type": "array"
+    },
+    "closed_fit_cells": {
+      "type": "integer"
+    },
+    "cost": {
+      "additionalProperties": false,
+      "properties": {
+        "cumulative_bounded_refinement_operation_seconds": {
+          "type": "number"
+        },
+        "earlier_architecture_research_spend_separate_from_final_cell_parity": {
+          "const": true
+        },
+        "energy_attributable_to_job": {
+          "type": "null"
+        },
+        "host_operation_seconds": {
+          "additionalProperties": false,
+          "properties": {
+            "xbabe1": {
+              "type": "number"
+            },
+            "xbabe2": {
+              "type": "number"
+            },
+            "xbabe3": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "xbabe1",
+            "xbabe2",
+            "xbabe3"
+          ],
+          "type": "object"
+        },
+        "new_operation_seconds": {
+          "type": "number"
+        },
+        "prior_whole_discovery_confirmation_operation_seconds": {
+          "type": "number"
+        },
+        "scheduler_wall_seconds": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "cumulative_bounded_refinement_operation_seconds",
+        "earlier_architecture_research_spend_separate_from_final_cell_parity",
+        "energy_attributable_to_job",
+        "host_operation_seconds",
+        "new_operation_seconds",
+        "prior_whole_discovery_confirmation_operation_seconds",
+        "scheduler_wall_seconds"
+      ],
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "dataset_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100,
+      "minItems": 100,
+      "type": "array"
+    },
+    "format": {
+      "const": "dope-refinement-population-fit-publication"
+    },
+    "frozen_reference_files_verified": {
+      "type": "integer"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "global_family_selected": {
+      "const": false
+    },
+    "immutable_prior_fit_cells": {
+      "type": "integer"
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "new_fit_cells": {
+      "type": "integer"
+    },
+    "new_ok_fits": {
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "privacy_attack_coverage_complete": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "receipt_lock_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "reconciliation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "s3_data_lock_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "scope": {
+      "const": "Complete bounded official-training-derived 100-lineage/two-profile research training; no quality selection."
+    },
+    "shared_validation_complete": {
+      "const": false
+    },
+    "source_round_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "charged_artifact_cap": {
+          "type": "integer"
+        },
+        "foreign_gpu_owner_appeared": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        },
+        "transport_or_prelaunch_failure": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "charged_artifact_cap",
+        "foreign_gpu_owner_appeared",
+        "ok",
+        "transport_or_prelaunch_failure"
+      ],
+      "type": "object"
+    },
+    "summary": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "closed": {
+                "type": "integer"
+              },
+              "new_operation_seconds": {
+                "type": "number"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "charged_artifact_cap": {
+                    "type": "integer"
+                  },
+                  "foreign_gpu_owner_appeared": {
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "type": "integer"
+                  },
+                  "transport_or_prelaunch_failure": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "charged_artifact_cap",
+                  "foreign_gpu_owner_appeared",
+                  "ok",
+                  "transport_or_prelaunch_failure"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "closed",
+              "new_operation_seconds",
+              "profile",
+              "status_counts"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "closed": {
+                "type": "integer"
+              },
+              "new_operation_seconds": {
+                "type": "number"
+              },
+              "profile": {
+                "type": "string"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "charged_artifact_cap": {
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "type": "integer"
+                  },
+                  "transport_or_prelaunch_failure": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "charged_artifact_cap",
+                  "ok",
+                  "transport_or_prelaunch_failure"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "closed",
+              "new_operation_seconds",
+              "profile",
+              "status_counts"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "system_dynamic_library_closure_certified": {
+      "const": false
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "cells",
+    "closed_fit_cells",
+    "cost",
+    "counts_as_dope_win",
+    "dataset_ids",
+    "format",
+    "frozen_reference_files_verified",
+    "full_campaign_admitted",
+    "global_family_selected",
+    "immutable_prior_fit_cells",
+    "immutable_references",
+    "mfs_v2",
+    "new_fit_cells",
+    "new_ok_fits",
+    "official_tests_opened",
+    "privacy_attack_coverage_complete",
+    "production_certified",
+    "ptf_v1",
+    "receipt_lock_sha256",
+    "reconciliation_sha256",
+    "release_safe",
+    "s3_data_lock_sha256",
+    "scope",
+    "shared_validation_complete",
+    "source_round_sha256",
+    "source_sha256",
+    "status_counts",
+    "summary",
+    "superiority",
+    "system_dynamic_library_closure_certified",
+    "version"
+  ],
+  "type": "object"
+}
