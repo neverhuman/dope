@@ -1,4 +1,3 @@
-
 #[cfg(any(test, feature = "gpu-research-training"))]
 fn bounded_research_training_settings(profile: &str) -> Result<(usize, usize, usize)> {
     let (features, width, steps) = match profile {
@@ -135,7 +134,8 @@ fn fit_compact_neural_target(
         let mut optimizer = tch::nn::AdamW::default()
             .build(&store, 2e-3)
             .map_err(|error| DopeError::Data(format!("neural candidate optimizer: {error}")))?;
-        for _ in 0..optimizer_steps {
+        let mut loss_log = open_research_loss_log(table, logistic, &selected, completed, device)?;
+        for step in 0..optimizer_steps {
             let prediction = forward(&x);
             let loss = if logistic {
                 prediction.binary_cross_entropy_with_logits::<&tch::Tensor>(
@@ -147,7 +147,35 @@ fn fit_compact_neural_target(
             } else {
                 prediction.mse_loss(&y, tch::Reduction::Mean)
             };
+            let train_loss = loss_log.as_ref().map(|_| loss.detach().double_value(&[]));
             optimizer.backward_step_clip(&loss, 5.0);
+            if let Some((file, vx, vy)) = loss_log.as_mut() {
+                let validation_loss = tch::no_grad(|| {
+                    let prediction = forward(vx);
+                    let held = if logistic {
+                        prediction.binary_cross_entropy_with_logits::<&tch::Tensor>(
+                            vy,
+                            None,
+                            None,
+                            tch::Reduction::Mean,
+                        )
+                    } else {
+                        prediction.mse_loss(vy, tch::Reduction::Mean)
+                    };
+                    held.double_value(&[])
+                });
+                use std::io::Write;
+                file.write_all(
+                    research_loss_record(step, train_loss.expect("train loss"), validation_loss)
+                        .as_bytes(),
+                )
+                .map_err(|error| DopeError::Data(format!("research loss log: {error}")))?;
+            }
+        }
+        if let Some((file, _, _)) = loss_log.as_mut() {
+            use std::io::Write;
+            file.flush()
+                .map_err(|error| DopeError::Data(format!("research loss log: {error}")))?;
         }
         let hidden_biases = tensor_values(
             hidden.bs.as_ref().expect("linear bias").shallow_clone(),

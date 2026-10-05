@@ -10,6 +10,7 @@ import stat
 
 from . import arf_runtime_guard as guard
 from .manifest import digest
+from .publish_arf_population_native import directory_name
 from .publish_s3_matched import schema
 from .score import sha256
 
@@ -44,9 +45,21 @@ def checked(path, expected, refs):
     refs[str(p)] = expected
 
 
+def scratch_directories():
+    """CatBoost writes these beside a measured sample. The runtime name stays in the path lock."""
+    return frozenset(('catboost_info', directory_name()))
+
+
 def flat(root, files):
     root = safe(root)
-    guard.require({p.name for p in root.iterdir()} == set(files), 'flat inventory differs')
+    ignored = scratch_directories()
+    names = []
+    for entry in root.iterdir():
+        info = entry.lstat()
+        if stat.S_ISDIR(info.st_mode) and entry.name in ignored:
+            continue
+        names.append(entry.name)
+    guard.require(set(names) == set(files), 'flat inventory differs')
     for name, pin in files.items():
         guard.require(type(name) is str and Path(name).name == name and name not in ('', '.', '..'),
                       'invalid flat member')

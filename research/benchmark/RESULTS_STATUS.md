@@ -1,5 +1,9 @@
 # Benchmark campaign status — 2026-10-05
 
+The readable argument, method citations, and scoreboard are the IEEE draft
+in [docs/whitepaper](../../docs/whitepaper/README.md). Numbers in that draft
+are taken from this ledger. A null fitness score stays null.
+
 The final public-core and matched S3 comparisons are **not admitted**. The
 public and S3 test partitions have not been used for model selection or common
 outcome evaluation. Production PTF-v1 and generator MFS-v2 are null. This file
@@ -28,8 +32,45 @@ These are dataset medians of three sample-seed CatBoost null-normalized
 retention values at `4n`, using fit seed 11 and training-derived validation.
 Negative values are retained. The density and neural rows use different
 availability subsets; their values must not be combined into one ranking.
-Other auditors and `n` outcomes are in the complete reports. This descriptive
-median is not the production PTF-v1 formula or a paired superiority decision.
+The same `paired_descriptive` records, still with `counts_as_dope_win` false
+and `paired_superiority` null, give the other two auditors at `4n` for
+`features12_steps2048` against each native-selected comparator.
+
+| Auditor | Comparator | Paired lineages | DOPE median | Comparator median |
+| --- | --- | ---: | ---: | ---: |
+| linear | GaussianCopula | 92 | 0.994046 | 0.989300 |
+| linear | Chow–Liu, study implementation | 92 | 0.994046 | 0.661218 |
+| linear | Independent marginals, study implementation | 92 | 0.994046 | 0.002056 |
+| MLP | GaussianCopula | 75 | 1.061123 | 0.927569 |
+| MLP | Chow–Liu, study implementation | 75 | 1.061123 | 0.691645 |
+| MLP | Independent marginals, study implementation | 75 | 1.061123 | −0.027881 |
+| linear | CTGAN | 21 | 0.998972 | −0.033499 |
+| MLP | CTGAN | 19 | 1.025597 | −0.148653 |
+| linear | TVAE | 21 | 0.998972 | 0.795925 |
+| MLP | TVAE | 19 | 1.025597 | 0.752792 |
+
+Charged artifact bytes at `4n` for the density summary, one row per lineage,
+are: DOPE `features12_steps2048` median 1,895.5 (range 758–22,233; 98 of 100
+at or under 10,240 bytes); GaussianCopula median 5,464.5 (892–833,439; 62 of
+100); Chow–Liu median 29,865 (3,348–2,035,888; 31 of 100); independent
+marginals median 2,549.5 (862–36,672; 94 of 100). On the neural ledger, every
+native-selected size-4 CTGAN artifact with a successful sample (22) and every
+such TVAE artifact (22) exceeds 10,240 bytes. CTGAN ranges 528,075–1,428,695
+(median 741,834). TVAE ranges 157,578–741,659 (median 317,141.5). The 22-artifact
+byte count is not the 21-lineage informative retention count.
+
+Other `n` outcomes remain in the complete reports. These descriptive medians
+are not the production PTF-v1 formula or a paired superiority decision.
+
+The refinement validation round
+`dope-s3-refinement-expansion-validation-v2` closed at 2026-10-05T21:20:22Z
+with 1,200 logical cells, 816 ok and 384 fit-unavailable (366 transport or
+prelaunch, 12 charged artifact cap, 6 foreign GPU owner). MFS-v2, PTF-v1,
+release-safe L3, and superiority are null, and official tests stayed closed.
+Publication of that reconciliation is blocked because each of the 816 sample
+directories contains the unlisted directories `catboost_info` and
+`runtime-temp`, so the flat receipt inventory does not match. Those directories
+are not evidence files and were not deleted.
 
 - [Density report](results/density-matched-population-validation.json),
   [table](results/density-matched-population-validation.csv) and
@@ -62,6 +103,53 @@ comparisons retain byte charges, copy checks, real-vs-real controls, failed
 cells and immutable receipt hashes. MFS-v2, PTF-v1, release-safe results and
 superiority remain null. The public-core headline, five-fit final schedules
 and full evaluator gates are unfinished.
+
+## All-lineage record and the 8192-step budget
+
+`results/s3-lineage-record.json` has one row for each of the 100 lineages at
+`features12_steps2048` and, separately, at `features12_steps8192`. The
+displayed profile is still `features12_steps2048`. The 8192-step round is not
+adopted as the displayed model. On the closed expansion validation, that
+profile has 408 measured sample cells and 192 fit-unavailable cells: 68
+lineages with a successful fit, 30 transport or prelaunch failures, one
+foreign-GPU-owner failure, and one charged-artifact-cap failure. Where both
+budgets have a complete three-seed group, the CatBoost medians are 0.925519
+(2,048 steps) and 0.970348 (8,192 steps) on 68 lineages. Linear is 0.990163
+and 0.986519 on 64. MLP is 1.065260 and 1.056573 on 52. These are descriptive.
+`paired_superiority` stays null. MFS-v2 stays null.
+
+A logged replay on 2026-10-05 fit both profiles again on all 100 prepared
+workers and kept every AdamW step. It did not replace the scored artifacts
+and did not open an official test file. All 200 fits returned status ok.
+Median hidden-basis training loss starts at 0.321246 and ends at 0.002745
+after 2,048 steps and 0.000763 after 8,192 steps. Median validation loss
+starts at 0.270883 and ends at 0.004433 and 0.001813. The curves are the
+loss before the closed-form readout refit. The 8,192-step profile stays
+unadopted.
+
+## BeyondArena in the dataset bucket
+
+BeyondArena is not one of the 3,859 catalog rows. The pinned snapshot is
+TabArena/BeyondArena revision `2ecfe882ccfb814fc27c4de10a64ceefd5d7655c` at
+`s3://veox-jopedime-datasets-use2/benchmarks/BeyondArena/2ecfe882ccfb814fc27c4de10a64ceefd5d7655c/`.
+The index lists 142 families, 19,676,576 rows, and 3,722 verified official
+folds: 73 binary, 44 regression, 25 multiclass; 103 IID, 21 temporal, and 18
+grouped. Raw tables are under `raw/BeyondArena/` at the same revision.
+`research/BeyondArena/` is a later experiment prefix, not a second table copy.
+`results/beyondarena-s3-inventory.json` names every family.
+`results/beyondarena-panel.lock.json` version 2 locks 12 rights-cleared binary
+or regression families and sets `pooled_with_s3_100` false. An earlier
+three-name lock that pointed at Adult, California, and News was replaced
+before any BeyondArena fit. Official fold 0 of repeat 0 was then cut 80/20
+on the training side only, seed 1729. Four families exceed the 2,000-feature
+projection cap: `early_learning_predictors`, `lending_club` (after dropping
+14 all-missing training columns), `kick`, and `wine_world_cost`. Three have
+an identical source row on both sides of the official fold:
+`heart_disease_va_long_beach`, `qsar_biodeg`, and `hotel_booking_demand`.
+The other five completed both profiles. Charged bytes at 2,048 steps are
+804, 9,273, 1,852, 5,054, and 2,317, all within 10,240. At 8,192 steps they
+are 818, 9,350, 1,890, 5,071, and 2,372, also within the cap. No retention
+auditor was run. MFS-v2 stays null. The block is not pooled with the 100.
 
 ## Rights-cleared S3 data
 
