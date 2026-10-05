@@ -1,9 +1,3 @@
-
-#[cfg(any(test, feature = "gpu-training"))]
-fn research_loss_record(step: usize, train: f64, validation: f64) -> String {
-    format!("{step}\t{train:.8}\t{validation:.8}\n")
-}
-
 #[cfg(any(test, feature = "gpu-research-training"))]
 fn bounded_research_training_settings(profile: &str) -> Result<(usize, usize, usize)> {
     let (features, width, steps) = match profile {
@@ -50,18 +44,6 @@ mod bounded_research_training_tests {
             assert!(limit <= 24 && width <= 16);
         }
         assert!(bounded_research_training_settings("features48_steps99999").is_err());
-    }
-
-    #[test]
-    fn research_loss_record_is_one_tsv_row() {
-        assert_eq!(
-            research_loss_record(0, 1.0, 0.5),
-            "0\t1.00000000\t0.50000000\n"
-        );
-        assert_eq!(
-            research_loss_record(2047, 0.25, 0.125),
-            "2047\t0.25000000\t0.12500000\n"
-        );
     }
 
     #[test]
@@ -152,71 +134,7 @@ fn fit_compact_neural_target(
         let mut optimizer = tch::nn::AdamW::default()
             .build(&store, 2e-3)
             .map_err(|error| DopeError::Data(format!("neural candidate optimizer: {error}")))?;
-        let mut loss_log = match std::env::var("DOPE_RESEARCH_LOSS_LOG") {
-            Ok(path) => Some(
-                std::fs::File::create(&path).map_err(|error| {
-                    DopeError::Data(format!("research loss log: {error}"))
-                })?,
-            ),
-            Err(std::env::VarError::NotPresent) => None,
-            Err(std::env::VarError::NotUnicode(_)) => {
-                return Err(DopeError::Unsupported(
-                    "research loss log path is not Unicode".into(),
-                ));
-            }
-        };
-        let validation = if loss_log.is_some() {
-            let path = match std::env::var("DOPE_RESEARCH_VALIDATION_CSV") {
-                Ok(path) => path,
-                Err(std::env::VarError::NotPresent) => {
-                    return Err(DopeError::Unsupported(
-                        "research loss log requires a validation CSV".into(),
-                    ));
-                }
-                Err(std::env::VarError::NotUnicode(_)) => {
-                    return Err(DopeError::Unsupported(
-                        "research validation path is not Unicode".into(),
-                    ));
-                }
-            };
-            let task = if logistic { Task::Binary } else { Task::Regression };
-            let held_out = Table::read_csv(Path::new(&path), task)?;
-            if held_out.features != table.features || held_out.rows == 0 {
-                return Err(DopeError::Data(
-                    "research validation width differs from the fit table".into(),
-                ));
-            }
-            let fallbacks = selected
-                .iter()
-                .map(|&feature| {
-                    let mut observed: Vec<f32> = completed[feature]
-                        .iter()
-                        .copied()
-                        .filter(|item| item.is_finite())
-                        .collect();
-                    observed.sort_by(f32::total_cmp);
-                    quantile(&observed, 0.5)
-                })
-                .collect::<Vec<_>>();
-            let mut rows = Vec::with_capacity(held_out.rows * selected.len());
-            let mut targets = Vec::with_capacity(held_out.rows);
-            for row in 0..held_out.rows {
-                for (index, &feature) in selected.iter().enumerate() {
-                    let value = held_out.columns[feature][row];
-                    rows.push(if value.is_finite() { value } else { fallbacks[index] });
-                }
-                targets.push(held_out.target[row]);
-            }
-            let vx = tch::Tensor::from_slice(&rows)
-                .view([held_out.rows as i64, selected.len() as i64])
-                .to_device(device);
-            let vy = tch::Tensor::from_slice(&targets)
-                .view([held_out.rows as i64, 1])
-                .to_device(device);
-            Some((vx, vy))
-        } else {
-            None
-        };
+        let mut loss_log = open_research_loss_log(table, logistic, &selected, completed, device)?;
         for step in 0..optimizer_steps {
             let prediction = forward(&x);
             let loss = if logistic {
@@ -229,16 +147,9 @@ fn fit_compact_neural_target(
             } else {
                 prediction.mse_loss(&y, tch::Reduction::Mean)
             };
-            let train_loss = if loss_log.is_some() {
-                Some(loss.detach().double_value(&[]))
-            } else {
-                None
-            };
+            let train_loss = loss_log.as_ref().map(|_| loss.detach().double_value(&[]));
             optimizer.backward_step_clip(&loss, 5.0);
-            if let Some(file) = loss_log.as_mut() {
-                let (vx, vy) = validation
-                    .as_ref()
-                    .ok_or_else(|| DopeError::Data("research validation tensor missing".into()))?;
+            if let Some((file, vx, vy)) = loss_log.as_mut() {
                 let validation_loss = tch::no_grad(|| {
                     let prediction = forward(vx);
                     let held = if logistic {
@@ -261,7 +172,7 @@ fn fit_compact_neural_target(
                 .map_err(|error| DopeError::Data(format!("research loss log: {error}")))?;
             }
         }
-        if let Some(file) = loss_log.as_mut() {
+        if let Some((file, _, _)) = loss_log.as_mut() {
             use std::io::Write;
             file.flush()
                 .map_err(|error| DopeError::Data(format!("research loss log: {error}")))?;
