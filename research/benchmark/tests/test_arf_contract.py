@@ -16,7 +16,8 @@ from research.benchmark import arf_adapter as adapter
 
 class Guard(unittest.TestCase):
     def setUp(self):
-        base = Path('target/arf-guard-controls').resolve(); base.mkdir(exist_ok=True)
+        base = Path(__file__).resolve().parents[3] / 'target/arf-guard-controls'
+        base.mkdir(parents=True, exist_ok=True)
         self.temporary = tempfile.TemporaryDirectory(dir=base); self.addCleanup(self.temporary.cleanup)
         self.base = Path(self.temporary.name)
         prefix = self.base / 'python312'; python = prefix / 'bin/python3.12'
@@ -183,6 +184,19 @@ class Guard(unittest.TestCase):
     def test_different_executing_adapter_rejected_before_initializer(self):
         kwargs=self.fit_request()
         with patch.object(adapter,'__file__',str(self.base/'inventory.json')):self.rejected_before_import('fit',kwargs)
+
+
+class FixturePathTests(unittest.TestCase):
+    def test_fixture_root_does_not_depend_on_working_directory(self):
+        target=Path(__file__).resolve().parents[3]/'target';target.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=target,prefix='arf-cwd-control-') as directory:
+            cwd=Path.cwd()
+            try:
+                os.chdir(directory)
+                outcome=Guard('test_valid_owned_runtime_declaration').run()
+                self.assertTrue(outcome.wasSuccessful(),outcome.errors+outcome.failures)
+                self.assertFalse((Path(directory)/'target').exists())
+            finally:os.chdir(cwd)
 
 
 if __name__=='__main__':unittest.main()
