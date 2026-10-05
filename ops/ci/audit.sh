@@ -13,7 +13,9 @@ case "${1:-run}" in
 import json
 assert json.load(open("research/benchmark/sdv-runtime.lock.json"))["catboost"] == "1.2.10"
 PY
-    target/ci-python/bin/python -m pip install 'catboost==1.2.10' 'jsonschema==4.26.0'
+    ci_require_command uv
+    uv pip install --python target/ci-python/bin/python \
+      --constraint validation/requirements-v1.txt 'catboost==1.2.10' 'jsonschema==4.26.0'
     bash agent/check-benchmark-boundary.sh
     ;;
   verify)

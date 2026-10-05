@@ -29,6 +29,14 @@ jobs:
       - uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
         with:
           version: 0.11.28
+          enable-cache: true
+          cache-local-path: target/uv-cache
+          cache-suffix: dope-audit-lan-py312-v1
+          cache-dependency-glob: |
+            validation/requirements-v1.txt
+            research/benchmark/sdv-runtime.lock.json
+            ops/ci/audit.sh
+          prune-cache: false
       - name: Fresh Python V1 boundary receipt
         run: bash ops/ci/audit.sh prepare
       - name: Proof routing, copy review, and Rust witness
