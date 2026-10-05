@@ -125,6 +125,10 @@
     "research/benchmark/publish_artifact_bytes": "external-evidence",
     "research/benchmark/results/dope-artifact-byte-feasibility": "external-evidence",
     "research/benchmark/sdv_frozen_sample_validation.py": "external-evidence",
-    "research/benchmark/tests/test_sdv_frozen_sample_validation.py": "external-evidence"
+    "research/benchmark/tests/test_sdv_frozen_sample_validation.py": "external-evidence",
+    "research/benchmark/publish_dope_refinement_progress.py": "external-evidence",
+    "research/benchmark/publish_dope_refinement_progress_figure.py": "external-evidence",
+    "research/benchmark/tests/test_dope_refinement_progress.py": "external-evidence",
+    "research/benchmark/results/dope-target-refinement-progress": "external-evidence"
   }
 }

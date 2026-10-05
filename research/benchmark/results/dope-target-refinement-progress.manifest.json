@@ -1,0 +1,19 @@
+{
+  "continuation_round_sha256": "57baef5e717c9229871b11056c094f12033bfad9d81590755fc1a1b6f7604768",
+  "files": {
+    "dope-target-refinement-progress.csv": "74f5be0251075f932ef942a9aaead117d0de299ccab9f494d81035d738343646",
+    "dope-target-refinement-progress.json": "4b617c02d7bf93aa9bc7a35f34beb8ffb96f00f21bd96c2c28488251d7565e61",
+    "dope-target-refinement-progress.md": "3898928bdd68d8e6ef1184f619df6069659368cddc0a9c881e101b0426094db6",
+    "dope-target-refinement-progress.pdf": "ec855da9b94cadd7c91489332a36e26b35220e7bba95e9b0feef83ecf61688e1",
+    "dope-target-refinement-progress.schema.json": "9a8182c786b3a512439969ccf5eb2e1f7afabf927d31778abe2733f3c08617f1",
+    "dope-target-refinement-progress.svg": "b3ea6a19b6d8de9a9b3470b4dbe61eb9624a2e64b8dfbdeb4c4b0189525e208c"
+  },
+  "format": "dope-rights-safe-refinement-progress-manifest",
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "progress_receipt_lock_sha256": "0b4de737276bcf81536261627bed565c8d0deab6bff21e2c1f02245f5d1f6cda",
+  "ptf_v1": null,
+  "publication_full_matrix_complete": false,
+  "raw_rows_samples_weights_or_detailed_logs_committed": false,
+  "version": 1
+}

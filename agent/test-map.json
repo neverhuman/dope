@@ -98,6 +98,10 @@
     "research/": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "verify offline benchmark manifest, gate, run, and analysis contracts"},
     "validation/requirements-v1.txt": {"command": "bash agent/check-python-v1-boundary.sh", "purpose": "verify pinned Python V1 compatibility graph"},
     "validation/": {"command": "just check", "purpose": "verify validation dependencies and fixtures"},
-    "launch_tuner_tui.sh": {"command": "bash -n launch_tuner_tui.sh", "purpose": "verify launcher syntax"}
+    "launch_tuner_tui.sh": {"command": "bash -n launch_tuner_tui.sh", "purpose": "verify launcher syntax"},
+    "research/benchmark/publish_dope_refinement_progress.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"},
+    "research/benchmark/publish_dope_refinement_progress_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"},
+    "research/benchmark/tests/test_dope_refinement_progress.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"},
+    "research/benchmark/results/dope-target-refinement-progress": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"}
   }
 }

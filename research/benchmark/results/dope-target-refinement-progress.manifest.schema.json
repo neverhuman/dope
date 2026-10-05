@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "continuation_round_sha256": {
+      "type": "string"
+    },
+    "files": {
+      "additionalProperties": false,
+      "properties": {
+        "dope-target-refinement-progress.csv": {
+          "type": "string"
+        },
+        "dope-target-refinement-progress.json": {
+          "type": "string"
+        },
+        "dope-target-refinement-progress.md": {
+          "type": "string"
+        },
+        "dope-target-refinement-progress.pdf": {
+          "type": "string"
+        },
+        "dope-target-refinement-progress.schema.json": {
+          "type": "string"
+        },
+        "dope-target-refinement-progress.svg": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "dope-target-refinement-progress.csv",
+        "dope-target-refinement-progress.json",
+        "dope-target-refinement-progress.md",
+        "dope-target-refinement-progress.pdf",
+        "dope-target-refinement-progress.schema.json",
+        "dope-target-refinement-progress.svg"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "type": "string"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "progress_receipt_lock_sha256": {
+      "type": "string"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publication_full_matrix_complete": {
+      "const": false
+    },
+    "raw_rows_samples_weights_or_detailed_logs_committed": {
+      "const": false
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "continuation_round_sha256",
+    "files",
+    "format",
+    "mfs_v2",
+    "official_tests_opened",
+    "progress_receipt_lock_sha256",
+    "ptf_v1",
+    "publication_full_matrix_complete",
+    "raw_rows_samples_weights_or_detailed_logs_committed",
+    "version"
+  ],
+  "type": "object"
+}
