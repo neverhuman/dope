@@ -1,0 +1,112 @@
+{
+  "artifacts": {
+    "sdv-matched-population-validation.csv": {
+      "bytes": 160099,
+      "sha256": "52c912a5e79bdf30f5ca588fc3eae7085ccb098fb4d2f6bab1ec1c3e74cc0723"
+    },
+    "sdv-matched-population-validation.json": {
+      "bytes": 13567823,
+      "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+    },
+    "sdv-matched-population-validation.md": {
+      "bytes": 2767,
+      "sha256": "57511b5c67d2060fb026fab7f26c1c0e4ec6f1f756f8768c69a39fa6e2ecf360"
+    },
+    "sdv-matched-population-validation.pdf": {
+      "bytes": 22027,
+      "sha256": "c7ff59fb4bc8c64282a5c07f06e9a43e702d59e915dabef9195ddb98ea89d056"
+    },
+    "sdv-matched-population-validation.schema.json": {
+      "bytes": 352272,
+      "sha256": "6287f7726b1da6557fa53660f451b9a6beac08ee15c72b2d53b762878b633659"
+    },
+    "sdv-matched-population-validation.svg": {
+      "bytes": 31798,
+      "sha256": "d6f5509822409872854471240b02d551c9b244d7dee01cdc3e872d602d0b5efd"
+    }
+  },
+  "bibliography": "DOPE_SYNTH_REFERENCES.bib",
+  "citation_keys": [
+    "xu2019modeling",
+    "patki2016synthetic"
+  ],
+  "counts_as_dope_win": false,
+  "datasets": 100,
+  "fit_seeds": [
+    11
+  ],
+  "format": "dope-sdv-matched-validation-publication-manifest",
+  "full_campaign_admitted": false,
+  "immutable_auxiliary_inventory": {
+    "path": "/mnt/fast-scratch/dope-benchmark/sdv-s3-population-shared-validation-v1/matched-auxiliary.lock-v1.json",
+    "sha256": "47d4d737921d5aafbf553cd5527d4b15801d0c273786b3c08f47f36a4640ec12"
+  },
+  "immutable_receipt_lock": {
+    "path": "/mnt/fast-scratch/dope-benchmark/sdv-s3-population-shared-validation-v1/receipt-lock-v1.json",
+    "sha256": "3635a59fb18f8654a872eb6c5c88c995d11eecd50ffc00b0da14a2acdd871766"
+  },
+  "immutable_reconciliation": {
+    "path": "/mnt/fast-scratch/dope-benchmark/sdv-s3-population-shared-validation-v1/reconciliation-v1.json",
+    "sha256": "12bf30223ddafe760d6f97222f81de708ce2c6e48d0d25c994f24943ca0f4075"
+  },
+  "logical_cells": 4800,
+  "method_conclusions_from_scheduling_cutoffs": false,
+  "mfs_v2": null,
+  "native_kpis_never_ranked_across_methods": true,
+  "new_generator_fits_started": 0,
+  "new_samples_generated": 0,
+  "official_tests_opened": false,
+  "original_sdv_native_classes": {
+    "infrastructure_interruption": 25,
+    "ok": 154,
+    "scheduling_cutoff": 525
+  },
+  "original_sdv_scheduling_cutoff_reasons": {
+    "deadline_truncated": 1,
+    "deadline_unstarted": 524
+  },
+  "paired_superiority": null,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "density_declared_runtime_replay.py": "5ee765dcdc1ccaf8587162fb8f88e54ff127a8ca01e5efa0ee2bc93f9ef25d47",
+    "density_metric_replay.py": "849a424265cce364b3348f6a467a1053c2557763d4b35625227ac7be6a7114fb",
+    "density_publication_inputs.py": "424bbf06aab09b1657ab778ace1fafe2ae97a7fbe80af846ddd5e368255f86fe",
+    "publish_sdv_matched.py": "7a6c6bfd95f279a734807a4a1b3d4b5195bf981cfcb42e2ea81dd105f95dae8d",
+    "publish_sdv_matched_figure.py": "4986fdf4843a6427c00c6d6fe710bb3ca6dde8f8fa4a076ffd02b27cd6a60f0f",
+    "publish_sdv_matched_manifest.py": "87061da81c3fbc8ad57509c9161d68365c4336707b5e52d099f6deb98e629d0b",
+    "publish_sdv_population_native.py": "5958242f0f697c5242fe0f4ae1d53e71f832318ee3c5df97c3fdae4f7f3be597",
+    "reconcile_sdv_population.py": "8cf9e9bdfca537a65c0c49a1567c110f31f339c52a57a370015b6391dda038bd",
+    "sdv_matched_aggregate.py": "09137d36bbda35311b928542a84ae7f15f525e996bfef13ec3c61087e86bf89b",
+    "sdv_native_accounting.py": "75563a0c29f091e4ddfe04c13489f7b948c5283554999a1656da3942740478df",
+    "sdv_native_continuation.py": "cecf2e5ce3d02cf4db1acdd015ada79d873399c8fdacdc456b57a7e20556b61c"
+  },
+  "release_safe_l3": null,
+  "sample_seeds": [
+    101,
+    211,
+    307
+  ],
+  "scope": "100 S3 lineages fully accounted; four fixed DOPE profiles versus original author-default/native-selected CTGAN and TVAE. Only existing samples are evaluated. Descriptive validation; one fit seed.",
+  "sdv_available_configuration_bindings": 81,
+  "sdv_measured_logical_cells": 486,
+  "sdv_physical_batches": 78,
+  "sdv_sample_unavailable_logical_cells": 1914,
+  "sdv_unavailable_configuration_bindings": 319,
+  "sdv_v3_launched": false,
+  "shared_kpi_used_for_selection": false,
+  "sizes": [
+    1,
+    4
+  ],
+  "source_locks": {
+    "native_receipts": "f49440e4c66ef9c71452d3c969fe6637ec8908086fc317e75ca83d165b715c8c",
+    "native_report": "c6ab816ec7890aa2d22aa7e77c1ee22c7e086e2b46cacae79c5d9b2b1cf40266",
+    "sdv_shared_receipts": "3635a59fb18f8654a872eb6c5c88c995d11eecd50ffc00b0da14a2acdd871766",
+    "sdv_shared_report": "12bf30223ddafe760d6f97222f81de708ce2c6e48d0d25c994f24943ca0f4075",
+    "sdv_shared_round": "fa9ebc88488e45ba8bc9edcaf9584554dba84c01024cf7cfce5a7d70690ff10f",
+    "shared_auxiliary_inventory": "47d4d737921d5aafbf553cd5527d4b15801d0c273786b3c08f47f36a4640ec12",
+    "unchanged_matched_reference": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+  },
+  "version": 1
+}

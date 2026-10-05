@@ -1,0 +1,444 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "sdv-matched-population-validation.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-matched-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-matched-population-validation.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-matched-population-validation.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-matched-population-validation.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "sdv-matched-population-validation.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "sdv-matched-population-validation.csv",
+        "sdv-matched-population-validation.json",
+        "sdv-matched-population-validation.md",
+        "sdv-matched-population-validation.pdf",
+        "sdv-matched-population-validation.schema.json",
+        "sdv-matched-population-validation.svg"
+      ],
+      "type": "object"
+    },
+    "bibliography": {
+      "type": "string"
+    },
+    "citation_keys": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "datasets": {
+      "type": "integer"
+    },
+    "fit_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "type": "array"
+    },
+    "format": {
+      "const": "dope-sdv-matched-validation-publication-manifest"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "immutable_auxiliary_inventory": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "immutable_receipt_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "immutable_reconciliation": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "logical_cells": {
+      "type": "integer"
+    },
+    "method_conclusions_from_scheduling_cutoffs": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_kpis_never_ranked_across_methods": {
+      "const": true
+    },
+    "new_generator_fits_started": {
+      "type": "integer"
+    },
+    "new_samples_generated": {
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "original_sdv_native_classes": {
+      "additionalProperties": false,
+      "properties": {
+        "infrastructure_interruption": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        },
+        "scheduling_cutoff": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "infrastructure_interruption",
+        "ok",
+        "scheduling_cutoff"
+      ],
+      "type": "object"
+    },
+    "original_sdv_scheduling_cutoff_reasons": {
+      "additionalProperties": false,
+      "properties": {
+        "deadline_truncated": {
+          "type": "integer"
+        },
+        "deadline_unstarted": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "deadline_truncated",
+        "deadline_unstarted"
+      ],
+      "type": "object"
+    },
+    "paired_superiority": {
+      "type": "null"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "density_declared_runtime_replay.py": {
+          "type": "string"
+        },
+        "density_metric_replay.py": {
+          "type": "string"
+        },
+        "density_publication_inputs.py": {
+          "type": "string"
+        },
+        "publish_sdv_matched.py": {
+          "type": "string"
+        },
+        "publish_sdv_matched_figure.py": {
+          "type": "string"
+        },
+        "publish_sdv_matched_manifest.py": {
+          "type": "string"
+        },
+        "publish_sdv_population_native.py": {
+          "type": "string"
+        },
+        "reconcile_sdv_population.py": {
+          "type": "string"
+        },
+        "sdv_matched_aggregate.py": {
+          "type": "string"
+        },
+        "sdv_native_accounting.py": {
+          "type": "string"
+        },
+        "sdv_native_continuation.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "density_declared_runtime_replay.py",
+        "density_metric_replay.py",
+        "density_publication_inputs.py",
+        "publish_sdv_matched.py",
+        "publish_sdv_matched_figure.py",
+        "publish_sdv_matched_manifest.py",
+        "publish_sdv_population_native.py",
+        "reconcile_sdv_population.py",
+        "sdv_matched_aggregate.py",
+        "sdv_native_accounting.py",
+        "sdv_native_continuation.py"
+      ],
+      "type": "object"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "sample_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "scope": {
+      "const": "100 S3 lineages fully accounted; four fixed DOPE profiles versus original author-default/native-selected CTGAN and TVAE. Only existing samples are evaluated. Descriptive validation; one fit seed."
+    },
+    "sdv_available_configuration_bindings": {
+      "type": "integer"
+    },
+    "sdv_measured_logical_cells": {
+      "type": "integer"
+    },
+    "sdv_physical_batches": {
+      "type": "integer"
+    },
+    "sdv_sample_unavailable_logical_cells": {
+      "type": "integer"
+    },
+    "sdv_unavailable_configuration_bindings": {
+      "type": "integer"
+    },
+    "sdv_v3_launched": {
+      "const": false
+    },
+    "shared_kpi_used_for_selection": {
+      "const": false
+    },
+    "sizes": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "native_receipts": {
+          "type": "string"
+        },
+        "native_report": {
+          "type": "string"
+        },
+        "sdv_shared_receipts": {
+          "type": "string"
+        },
+        "sdv_shared_report": {
+          "type": "string"
+        },
+        "sdv_shared_round": {
+          "type": "string"
+        },
+        "shared_auxiliary_inventory": {
+          "type": "string"
+        },
+        "unchanged_matched_reference": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "native_receipts",
+        "native_report",
+        "sdv_shared_receipts",
+        "sdv_shared_report",
+        "sdv_shared_round",
+        "shared_auxiliary_inventory",
+        "unchanged_matched_reference"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "bibliography",
+    "citation_keys",
+    "counts_as_dope_win",
+    "datasets",
+    "fit_seeds",
+    "format",
+    "full_campaign_admitted",
+    "immutable_auxiliary_inventory",
+    "immutable_receipt_lock",
+    "immutable_reconciliation",
+    "logical_cells",
+    "method_conclusions_from_scheduling_cutoffs",
+    "mfs_v2",
+    "native_kpis_never_ranked_across_methods",
+    "new_generator_fits_started",
+    "new_samples_generated",
+    "official_tests_opened",
+    "original_sdv_native_classes",
+    "original_sdv_scheduling_cutoff_reasons",
+    "paired_superiority",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe_l3",
+    "sample_seeds",
+    "scope",
+    "sdv_available_configuration_bindings",
+    "sdv_measured_logical_cells",
+    "sdv_physical_batches",
+    "sdv_sample_unavailable_logical_cells",
+    "sdv_unavailable_configuration_bindings",
+    "sdv_v3_launched",
+    "shared_kpi_used_for_selection",
+    "sizes",
+    "source_locks",
+    "version"
+  ],
+  "type": "object"
+}
