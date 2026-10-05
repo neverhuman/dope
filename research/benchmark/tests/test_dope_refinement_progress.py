@@ -24,6 +24,13 @@ class RefinementProgress(unittest.TestCase):
         self.file.write_text('{"status":"changed"}')
         with self.assertRaises(ValueError): publish.bound(self.file, self.expected)
 
+    def test_unverified_parse_bytes_rejected(self):
+        # The on-disk receipt matches its pin; a different parse-buffer must
+        # still reject. This exposes hashing one read and parsing another.
+        from unittest.mock import patch
+        with patch.object(Path, 'read_bytes', return_value=b'{"status":"unverified"}'):
+            with self.assertRaises(ValueError): publish.bound(self.file, self.expected)
+
     def test_digest_subclass_rejected(self):
         class Digest(str):
             def __eq__(self, value): return True

@@ -32,10 +32,12 @@ def bound(path, expected):
     path = Path(path)
     if (type(expected) is not str or len(expected) != 64
             or not all(c in '0123456789abcdef' for c in expected)
-            or not path.is_file() or any(p.is_symlink() for p in (path, *path.parents))
-            or sha(path) != expected):
+            or not path.is_file() or any(p.is_symlink() for p in (path, *path.parents))):
         raise ValueError('frozen publication evidence changed')
-    return json.loads(path.read_bytes())
+    data = path.read_bytes()
+    if hashlib.sha256(data).hexdigest() != expected:
+        raise ValueError('frozen publication evidence changed')
+    return json.loads(data)
 
 
 def verify_sources(lock):
