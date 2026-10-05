@@ -1221,3 +1221,18 @@ model and sampling inventories are checked before metric decoding. Offline
 `--from-json <publication> --publication-sha256 <manifest artifact digest>`
 regenerates tables and schemas; descriptive aggregates are independently reduced
 from committed per-cell results and the hash-bound reference panel.
+
+### ARF population common panel preparation
+
+`publish_arf_population_matched` requires the complete frozen 1,200-cell ARF
+native/default sampling and common-validation matrix, actual coordinator closure,
+external receipt/reconciliation/recursive-output digests, and the unchanged
+800-fit FORDE native ledger. It verifies matched worker identities and preserves
+all unavailable outcomes and full model/projection charges before comparing the
+three fixed DOPE research profiles. The publisher refuses a partial live round.
+
+The renderer and manifest generator replay descriptive dataset pairs from the
+committed report. Sample seeds reduce within lineage first; availability cohorts
+remain explicit. This preparation publishes no ARF common numbers or final
+configuration selection. Official tests stay sealed, and MFS-v2/PTF-v1,
+release-safe L3 and superiority claims stay null until their required gates pass.
