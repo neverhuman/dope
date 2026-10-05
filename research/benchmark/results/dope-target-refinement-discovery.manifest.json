@@ -1,0 +1,33 @@
+{
+  "all_discovery_fit_cells_accounted": true,
+  "confirmation_complete": false,
+  "files": {
+    "dope-target-refinement-discovery.csv": "e5c3c8d7e4ec4262df079c2805729a282ca978344e73fac30a0dc08385e0d4f7",
+    "dope-target-refinement-discovery.json": "e0c9cd641ff4975126c0ecd3942315299ba14835b9fdad25df5f10d693b47bc4",
+    "dope-target-refinement-discovery.md": "f40e1b084f6334a3450d9295ea2e6f7e35864c42be777944e9f709e3749e43a7",
+    "dope-target-refinement-discovery.pdf": "490fb1a6f45031179dc9ff456d385dc120e1b10df411ceffc0f69799b4e23dac",
+    "dope-target-refinement-discovery.schema.json": "4f62bbdb4d0b301c569929c8f707af21ce8dbeb8f478ea8d5d89affbd4ea06ad",
+    "dope-target-refinement-discovery.svg": "aa04cc6c394c9b41f0eb6074309ad85b6b4400e5848da0e26a04c7bae88c9f17"
+  },
+  "fit_receipt_lock": {
+    "path": "/mnt/fast-scratch/dope-benchmark/dope-target-refinement-continuation-v3/receipt-lock-v1.json",
+    "sha256": "9c2f0272f2691442c25f86d63ef437d1848e4cd78085d5f048f98cf61d5ab36e"
+  },
+  "format": "dope-rights-safe-refinement-discovery-manifest",
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "ptf_v1": null,
+  "raw_rows_samples_weights_or_detailed_logs_committed": false,
+  "receipt_lock": {
+    "path": "/mnt/fast-scratch/dope-benchmark/dope-target-refinement-validation-v2/receipt-lock-v1.json",
+    "sha256": "cd1909d34b81225a214361972c1b5ac4e79e7e6da24525b9945e7b37b4debd3b"
+  },
+  "release_safe": null,
+  "source_files": {
+    "publish_dope_refinement_discovery.py": "96664eb3307dd05350c7388dbe61bbcba6c5f5db40814601c7bb16630d76a87c",
+    "publish_dope_refinement_discovery_figure.py": "9c8d925fa1690647c39640661f82bf043dc2f8d7f349ee4aa449de482e3c8d0b",
+    "publish_dope_refinement_discovery_manifest.py": "0c9c050ad44c73cd421f4f32c67db573706eec9f47595eae4267dcacbf02c51a"
+  },
+  "superiority": null,
+  "version": 1
+}

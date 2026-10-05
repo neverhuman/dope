@@ -1,0 +1,149 @@
+{
+  "$id": "dope-target-refinement-discovery.manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_discovery_fit_cells_accounted": {
+      "const": true
+    },
+    "confirmation_complete": {
+      "const": false
+    },
+    "files": {
+      "additionalProperties": false,
+      "properties": {
+        "dope-target-refinement-discovery.csv": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "dope-target-refinement-discovery.json": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "dope-target-refinement-discovery.md": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "dope-target-refinement-discovery.pdf": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "dope-target-refinement-discovery.schema.json": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "dope-target-refinement-discovery.svg": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dope-target-refinement-discovery.csv",
+        "dope-target-refinement-discovery.json",
+        "dope-target-refinement-discovery.md",
+        "dope-target-refinement-discovery.pdf",
+        "dope-target-refinement-discovery.schema.json",
+        "dope-target-refinement-discovery.svg"
+      ],
+      "type": "object"
+    },
+    "fit_receipt_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "dope-rights-safe-refinement-discovery-manifest"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "raw_rows_samples_weights_or_detailed_logs_committed": {
+      "const": false
+    },
+    "receipt_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "source_files": {
+      "additionalProperties": false,
+      "properties": {
+        "publish_dope_refinement_discovery.py": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "publish_dope_refinement_discovery_figure.py": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "publish_dope_refinement_discovery_manifest.py": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "publish_dope_refinement_discovery.py",
+        "publish_dope_refinement_discovery_figure.py",
+        "publish_dope_refinement_discovery_manifest.py"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "all_discovery_fit_cells_accounted",
+    "confirmation_complete",
+    "files",
+    "fit_receipt_lock",
+    "format",
+    "mfs_v2",
+    "official_tests_opened",
+    "ptf_v1",
+    "raw_rows_samples_weights_or_detailed_logs_committed",
+    "receipt_lock",
+    "release_safe",
+    "source_files",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}

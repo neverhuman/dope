@@ -1084,6 +1084,26 @@ Regenerate SVG/PDF from the committed report with
 Bulk artifacts, samples, runtime inventories and detailed logs remain on scratch;
 the public manifest pins every published output and its immutable receipt lock.
 
+### Completed bounded refinement discovery
+
+The [complete discovery panel](results/dope-target-refinement-discovery.md)
+supersedes the pending status of the historical progress snapshot above.
+All 24 fit cells on six stratified S3 lineages are accounted: 23 successes and
+one charged artifact rejection. All 25 attempt receipts include the original
+infrastructure interruption and successful retry. Validation closed 15 distinct
+artifact batches: 138 measured and six fit-unavailable logical cells at n/4n.
+
+The deeper profiles did not improve the descriptive 4n CatBoost median over
+the existing 12/2048 profile on this discovery subset. Per-lineage seed medians,
+availability denominators, paired differences, charged model/projection bytes,
+copy controls and operation costs remain visible. Comparators retain their own
+native likelihood selections. Disjoint confirmation and global family selection
+remain pending; official tests are sealed and all gated scores stay null.
+
+Regenerate with `python3 -B -m research.benchmark.publish_dope_refinement_discovery`,
+then the corresponding `_figure` and `_manifest` modules. The immutable scratch
+receipt locks are rehashed before metrics are read and again before publication.
+
 ## Matched neural S3 validation
 
 [The complete neural/DOPE panel](results/sdv-matched-population-validation.md) accounts for 4,800 logical cells across all 100 rights-cleared S3 lineages: four unchanged DOPE GPU profiles and original default/native-selected CTGAN/TVAE. CTGAN/TVAE maximize their frozen native regression efficacy KPI; common retention never selects their configurations. Only existing sealed samples are scored.
