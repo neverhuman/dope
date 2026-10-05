@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "dope-target-refinement-population-validation.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-validation.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-validation.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-validation.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-validation.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "dope-target-refinement-population-validation.csv",
+        "dope-target-refinement-population-validation.json",
+        "dope-target-refinement-population-validation.md",
+        "dope-target-refinement-population-validation.pdf",
+        "dope-target-refinement-population-validation.schema.json",
+        "dope-target-refinement-population-validation.svg"
+      ],
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "fit_ledger_reference": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "dope-complete-refinement-population-publication-manifest"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "global_family_selected": {
+      "const": false
+    },
+    "logical_validation_cells": {
+      "type": "integer"
+    },
+    "matched_reference": {
+      "additionalProperties": false,
+      "properties": {
+        "logical_cells": {
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "logical_cells",
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "arf_runtime_guard.py": {
+          "type": "string"
+        },
+        "manifest.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_discovery.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_fits.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_population.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_population_figure.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_population_manifest.py": {
+          "type": "string"
+        },
+        "publish_s3_forest.py": {
+          "type": "string"
+        },
+        "publish_s3_matched.py": {
+          "type": "string"
+        },
+        "score.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "arf_runtime_guard.py",
+        "manifest.py",
+        "publish_dope_refinement_discovery.py",
+        "publish_dope_refinement_fits.py",
+        "publish_dope_refinement_population.py",
+        "publish_dope_refinement_population_figure.py",
+        "publish_dope_refinement_population_manifest.py",
+        "publish_s3_forest.py",
+        "publish_s3_matched.py",
+        "score.py"
+      ],
+      "type": "object"
+    },
+    "raw_rows_samples_weights_or_detailed_logs_committed": {
+      "const": false
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_auxiliary": {
+          "type": "string"
+        },
+        "density_reference": {
+          "type": "string"
+        },
+        "receipts": {
+          "type": "string"
+        },
+        "reconciliation": {
+          "type": "string"
+        },
+        "round": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "batch_auxiliary",
+        "density_reference",
+        "receipts",
+        "reconciliation",
+        "round"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "counts_as_dope_win",
+    "fit_ledger_reference",
+    "format",
+    "full_campaign_admitted",
+    "global_family_selected",
+    "logical_validation_cells",
+    "matched_reference",
+    "mfs_v2",
+    "official_tests_opened",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "raw_rows_samples_weights_or_detailed_logs_committed",
+    "release_safe",
+    "source_locks",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}
