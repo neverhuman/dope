@@ -76,6 +76,11 @@ def render(report_path, expected_sha256, output):
             metadata = {'Date': None} if extension == 'svg' else {'CreationDate': None, 'ModDate': None}
             fig.savefig(path, format=extension, metadata=metadata)
             blob = path.read_bytes()
+            if extension == 'svg':
+                # Matplotlib emits trailing spaces in multiline path attributes.
+                # Canonical whitespace keeps generated Git text reproducible.
+                blob = b'\n'.join(line.rstrip() for line in blob.splitlines()) + b'\n'
+                path.write_bytes(blob)
             artifacts[path.name] = {'bytes': len(blob), 'sha256': hashlib.sha256(blob).hexdigest()}
         plt.close(fig)
     manifest = dict(report_sha256=expected_sha256, datasets=100, logical_cells=6000,
