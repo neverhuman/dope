@@ -69,6 +69,78 @@ mod bounded_research_training_tests {
 }
 
 
+#[cfg(any(test, feature = "gpu-training"))]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ResearchTargetDevice {
+    Cuda,
+    Cpu,
+}
+
+#[cfg(any(test, feature = "gpu-research-training"))]
+fn parse_research_target_device(
+    requested: Option<&std::ffi::OsStr>,
+    cuda_visible: Option<&std::ffi::OsStr>,
+) -> Result<ResearchTargetDevice> {
+    match requested.and_then(std::ffi::OsStr::to_str) {
+        None if requested.is_none() => Ok(ResearchTargetDevice::Cuda),
+        Some("cuda") => Ok(ResearchTargetDevice::Cuda),
+        Some("cpu") if cuda_visible == Some(std::ffi::OsStr::new("")) => {
+            Ok(ResearchTargetDevice::Cpu)
+        }
+        Some("cpu") => Err(DopeError::Unsupported(
+            "CPU research training requires empty CUDA_VISIBLE_DEVICES".into(),
+        )),
+        _ => Err(DopeError::Unsupported("unknown research target device".into())),
+    }
+}
+
+#[cfg(test)]
+mod research_target_device_tests {
+    use super::*;
+    use std::ffi::OsStr;
+
+    #[test]
+    fn cuda_default_and_cpu_visibility_are_explicit() {
+        assert_eq!(parse_research_target_device(None, None).unwrap(), ResearchTargetDevice::Cuda);
+        assert_eq!(parse_research_target_device(Some(OsStr::new("cuda")), None).unwrap(), ResearchTargetDevice::Cuda);
+        assert_eq!(parse_research_target_device(Some(OsStr::new("cpu")), Some(OsStr::new(""))).unwrap(), ResearchTargetDevice::Cpu);
+        for visible in [None, Some(OsStr::new("0")), Some(OsStr::new("-1"))] {
+            assert!(parse_research_target_device(Some(OsStr::new("cpu")), visible).is_err());
+        }
+        for requested in ["", "CPU", "cpu ", "auto"] {
+            assert!(parse_research_target_device(Some(OsStr::new(requested)), Some(OsStr::new(""))).is_err());
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn malformed_device_or_visibility_is_rejected() {
+        use std::os::unix::ffi::OsStrExt;
+        let invalid = OsStr::from_bytes(&[0xff]);
+        assert!(parse_research_target_device(Some(invalid), Some(OsStr::new(""))).is_err());
+        assert!(parse_research_target_device(Some(OsStr::new("cpu")), Some(invalid)).is_err());
+    }
+}
+
+#[cfg(feature = "gpu-training")]
+fn compact_neural_training_device() -> Result<ResearchTargetDevice> {
+    #[cfg(feature = "gpu-research-training")]
+    {
+        let requested = std::env::var_os("DOPE_RESEARCH_TARGET_DEVICE");
+        let visible = std::env::var_os("CUDA_VISIBLE_DEVICES");
+        parse_research_target_device(requested.as_deref(), visible.as_deref())
+    }
+    #[cfg(not(feature = "gpu-research-training"))]
+    {
+        if std::env::var_os("DOPE_RESEARCH_TARGET_DEVICE").is_some() {
+            return Err(DopeError::Unsupported(
+                "research device selection requires gpu-research-training".into(),
+            ));
+        }
+        Ok(ResearchTargetDevice::Cuda)
+    }
+}
+
 #[cfg(feature = "gpu-training")]
 fn fit_compact_neural_target(
     table: &Table,
@@ -78,17 +150,33 @@ fn fit_compact_neural_target(
 ) -> Result<Target> {
     use tch::nn::{Module, OptimizerConfig};
 
-    if !tch::Cuda::is_available() {
-        return Err(DopeError::Unsupported(
-            "frozen neural candidate requires CUDA libtorch training".into(),
-        ));
-    }
-    if std::env::var("CUBLAS_WORKSPACE_CONFIG").as_deref() != Ok(":4096:8") {
-        return Err(DopeError::Unsupported(
-            "frozen neural candidate requires CUBLAS_WORKSPACE_CONFIG=:4096:8".into(),
-        ));
-    }
-    crate::libtorch::with_seeded_libtorch(seed, || {
+    let training_device = compact_neural_training_device()?;
+    let device = match training_device {
+        ResearchTargetDevice::Cuda => {
+            if !tch::Cuda::is_available() {
+                return Err(DopeError::Unsupported(
+                    "frozen neural candidate requires CUDA libtorch training".into(),
+                ));
+            }
+            if std::env::var("CUBLAS_WORKSPACE_CONFIG").as_deref() != Ok(":4096:8") {
+                return Err(DopeError::Unsupported(
+                    "frozen neural candidate requires CUBLAS_WORKSPACE_CONFIG=:4096:8".into(),
+                ));
+            }
+            tch::Device::Cuda(0)
+        }
+        ResearchTargetDevice::Cpu => {
+            if std::env::var("DOPE_RESEARCH_TARGET_PROFILE").as_deref()
+                != Ok("features12_steps2048")
+            {
+                return Err(DopeError::Unsupported(
+                    "CPU research training requires features12_steps2048".into(),
+                ));
+            }
+            tch::Device::Cpu
+        }
+    };
+    let train = || {
         let (feature_limit, hidden_width, optimizer_steps) =
             compact_neural_training_settings(screen.len())?;
         let selected = screen
@@ -102,7 +190,6 @@ fn fit_compact_neural_target(
                 rows.push(completed[feature][row]);
             }
         }
-        let device = tch::Device::Cuda(0);
         let x = tch::Tensor::from_slice(&rows)
             .view([table.rows as i64, selected.len() as i64])
             .to_device(device);
@@ -226,7 +313,16 @@ fn fit_compact_neural_target(
             hidden_biases,
             output_weights: output_weights.to_vec(),
         })
-    })
+    };
+    match training_device {
+        ResearchTargetDevice::Cuda => crate::libtorch::with_seeded_libtorch(seed, train),
+        #[cfg(feature = "gpu-research-training")]
+        ResearchTargetDevice::Cpu => crate::libtorch::with_seeded_cpu_libtorch(seed, train),
+        #[cfg(not(feature = "gpu-research-training"))]
+        ResearchTargetDevice::Cpu => Err(DopeError::Unsupported(
+            "CPU research training requires gpu-research-training".into(),
+        )),
+    }
 }
 
 #[cfg(not(feature = "gpu-training"))]
@@ -236,6 +332,11 @@ fn fit_compact_neural_target(
     screen: &[(usize, f32)],
     _seed: u64,
 ) -> Result<Target> {
+    if std::env::var_os("DOPE_RESEARCH_TARGET_DEVICE").is_some() {
+        return Err(DopeError::Unsupported(
+            "research device selection requires gpu-research-training".into(),
+        ));
+    }
     Ok(fit_compact_neural_target_native(table, completed, screen))
 }
 

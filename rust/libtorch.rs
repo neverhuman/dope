@@ -95,9 +95,52 @@ pub(crate) fn with_seeded_libtorch<T>(
     })
 }
 
+/// CPU research training shares the process-wide RNG lock with CUDA fits.
+/// Torch manual_seed may query accelerator availability internally; this
+/// helper makes no explicit CUDA API calls and all caller tensors use CPU.
+#[cfg(feature = "gpu-research-training")]
+pub(crate) fn with_seeded_cpu_libtorch<T>(
+    seed: u64,
+    operation: impl FnOnce() -> Result<T>,
+) -> Result<T> {
+    if std::env::var_os("CUDA_VISIBLE_DEVICES").as_deref() != Some(std::ffi::OsStr::new("")) {
+        return Err(DopeError::Unsupported(
+            "CPU research training requires empty CUDA_VISIBLE_DEVICES".into(),
+        ));
+    }
+    let _guard = SEEDED_LIBTORCH
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    LAST_GPU_PEAK_MEMORY_BYTES.set(None);
+    tch::manual_seed(seed as i64);
+    operation()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(feature = "gpu-research-training")]
+    #[test]
+    fn cpu_seed_replay_and_dispersion_use_cpu_tensors() {
+        let draw = |seed| {
+            with_seeded_cpu_libtorch(seed, || {
+                let values = tch::Tensor::randn([32], (tch::Kind::Float, tch::Device::Cpu));
+                assert_eq!(values.device(), tch::Device::Cpu);
+                Vec::<f32>::try_from(values).map_err(|error| DopeError::Data(error.to_string()))
+            })
+            .unwrap()
+        };
+        let first = draw(23);
+        assert_eq!(first, draw(23));
+        assert_ne!(first, draw(37));
+        assert_eq!(take_last_gpu_peak_memory_bytes(), None);
+        let failed = std::panic::catch_unwind(|| {
+            let _ = with_seeded_cpu_libtorch::<()>(23, || panic!("CPU fixture failure"));
+        });
+        assert!(failed.is_err());
+        assert_eq!(with_seeded_cpu_libtorch(23, || Ok(11)).unwrap(), 11);
+    }
 
     #[test]
     fn seeded_lock_recovers_after_a_panicking_cell() {

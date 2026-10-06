@@ -20,6 +20,48 @@ fn text(path: &Path) -> String {
     path.to_string_lossy().into_owned()
 }
 
+#[cfg(not(feature = "gpu-training"))]
+#[test]
+fn explicit_cpu_research_request_cannot_fall_back_to_native_fixed_weights() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("target/cli-cpu-research-rejection")
+        .join(std::process::id().to_string());
+    fs::create_dir_all(&root).unwrap();
+    let train = (0..64)
+        .map(|row| {
+            let x = row as f64 / 63.0;
+            format!("{x},{},{}\n", x * x, 0.2 + 0.5 * x)
+        })
+        .collect::<String>();
+    fs::write(root.join("train.csv"), train).unwrap();
+    let out = root.join("candidate.dpk");
+    let output = Command::new(env!("CARGO_BIN_EXE_dope-kernel"))
+        .env("DOPE_RESEARCH_TARGET_DEVICE", "cpu")
+        .env("DOPE_RESEARCH_TARGET_PROFILE", "features12_steps2048")
+        .env("CUDA_VISIBLE_DEVICES", "")
+        .args([
+            "compile",
+            "--dataset-dir",
+            &text(&root),
+            "--task",
+            "regression",
+            "--out",
+            &text(&out),
+            "--candidate",
+            "compact_neural_residual_symbolic",
+            "--seed",
+            "23",
+        ])
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    assert!(!out.exists());
+    assert!(
+        String::from_utf8_lossy(&output.stderr)
+            .contains("research device selection requires gpu-research-training")
+    );
+}
+
 fn qualified_router(root: &Path) -> (std::path::PathBuf, std::path::PathBuf) {
     let hidden = 128;
     let sketch = 856;
