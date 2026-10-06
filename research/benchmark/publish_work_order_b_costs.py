@@ -13,20 +13,26 @@ import hashlib
 import io
 import json
 import math
+import subprocess
 from pathlib import Path
 
-INPUT_PINS = {'measured-costs.json': '721beb8c5afd36dd74ff6930ba7146d599c4010abd99dcad46363b3fc6524d0a', 'component-gaps.json': '81012524ebff8f752f18238e81386d2ccda30f4d4baed07cb143c2177907e700', 'source-proof.json': 'a569b5b9d8a9b54d736a8944e71bdbe136c4f2daf48a1376176ebf39380de3d3'}
+REPAIR_BASELINE_PINS = {'measured-costs.json': '721beb8c5afd36dd74ff6930ba7146d599c4010abd99dcad46363b3fc6524d0a', 'component-gaps.json': '81012524ebff8f752f18238e81386d2ccda30f4d4baed07cb143c2177907e700', 'source-proof.json': 'a569b5b9d8a9b54d736a8944e71bdbe136c4f2daf48a1376176ebf39380de3d3'}
+INPUT_PINS = {'measured-costs.json': 'f017da01be0df7024a7da1837b9ff0dba44961c0f55ca6e458758b0b9942e312', 'component-gaps.json': 'c8dea10c6ebbf9e4099dfff59c9c70e302936c257b997b6e2d5ceca6a9d6ac36', 'source-proof.json': 'ecc92768307727867e8063b01626555b5b883836f90752ee927923455466cdda'}
+COMMITTED_SOURCE_REVISION = '466250c727dc7907a00d176d49a8475737a9757f'
+PRODUCTION_CONTRACT_SHA = "d04a2672ed25e92baeb89bec51ea5ccddb04165701cb44d2e1d53ca32f6e219b"
 HERE = Path(__file__).resolve().parent
 SCRATCH = Path('/mnt/fast-scratch/dope-benchmark')
 COMPONENT_NAMES = ('utility_transfer', 'driver_fidelity', 'distribution_fidelity',
                    'structure_fidelity', 'coverage_realism', 'compactness')
 HARD_GATE_NAMES = (
-    'attribute_inference_advantage_max', 'calibration_degradation_max', 'driver_agreement_min',
+    'across_seed_validation_loss_stddev_max', 'attribute_inference_advantage_max',
+    'calibration_degradation_max', 'driver_agreement_min',
     'exact_copies_max', 'feature_importance_min_informative_features',
     'feature_importance_spearman_min', 'feature_importance_top_k_jaccard_min',
     'joint_fidelity_min', 'membership_auc_max', 'near_copies_max',
     'nominal_95_coverage_max', 'nominal_95_coverage_min', 'ptf_v1_min',
-    'query_p95_normalized_error_max', 'rare_tail_subgroup_retention_min', 'type_i_error_max')
+    'query_p95_normalized_error_max', 'rare_tail_subgroup_retention_min', 'type_i_error_max',
+    'validation_training_regret_upper_max')
 
 
 def require(condition, reason):
@@ -127,6 +133,49 @@ def aggregate(rows):
     return result
 
 
+def production_gate_names(repo=None):
+    repo = Path(repo) if repo is not None else HERE.parents[1]
+    contract = bound(repo / 'production/kpi-contract.json', PRODUCTION_CONTRACT_SHA, repo)
+    names = tuple(sorted(set(contract['release_gates']) | {'exact_copies_max', 'near_copies_max'}))
+    require(names == HARD_GATE_NAMES, 'production hard gate contract coverage changed')
+    return names
+
+
+def historical_sdv_attempts(reports):
+    report = reports['sdv-s3-population-native.json']
+    current = {trial['receipt']['sha256'] for trial in report['trials']}
+    rows, seen = [], set()
+    for trial in report['previous_failed_trials']:
+        pin = trial['receipt_sha256']
+        require(type(pin) is str and len(pin) == 64 and all(c in '0123456789abcdef' for c in pin)
+                and pin not in current and pin not in seen, 'historical SDV receipt overlap')
+        seen.add(pin)
+        require(trial['method_failure_inferred'] is False and trial['receipt_status'] == 'failed',
+                'historical SDV interruption relabeled as method failure')
+        rows.append(dict(method=trial['method'], phase='historical_infrastructure_interruption',
+            receipt_sha256=pin, source_job_sha256=trial['source_job_sha256'],
+            operation_wall_seconds=number(trial['failed_operation_seconds']),
+            status=trial['receipt_status'], native_outcome_class='infrastructure_interruption',
+            method_failure_inferred=False, partial_artifact_bytes=count(trial['partial_artifact_bytes']),
+            source='sdv-s3-population-native.json'))
+    return sorted(rows, key=lambda row: row['receipt_sha256'])
+
+
+def verify_committed_sources(repo, proof):
+    revision = proof['committed_source_revision']
+    require(revision == COMMITTED_SOURCE_REVISION, 'committed source revision changed')
+    refs = proof['public_source_reports'] + proof['source_code_and_contract']
+    for ref in refs:
+        path = Path(ref['path'])
+        require(not path.is_absolute() and '..' not in path.parts
+                and (repo / path).resolve().is_relative_to(repo.resolve()), 'source contract path changed')
+    for ref in refs:
+        result = subprocess.run(['git', '-C', str(repo), 'show', revision + ':' + ref['path']],
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        require(result.returncode == 0 and hashlib.sha256(result.stdout).hexdigest() == ref['sha256'],
+                'committed source snapshot digest changed')
+
+
 def validate_costs(costs):
     require(all(costs[key] is None for key in ('mfs_v2', 'ptf_v1', 'release_safe', 'superiority')),
             'cost acquired score claim')
@@ -164,6 +213,10 @@ def validate_costs(costs):
                 number(row[field], nullable=True)
     for value in costs['historical_prior_costs'].values():
         number(value)
+    for row in costs['historical_prior_attempts']:
+        number(row['operation_wall_seconds']); count(row['partial_artifact_bytes'])
+        require(row['native_outcome_class'] == 'infrastructure_interruption'
+                and row['method_failure_inferred'] is False, 'historical interruption acquired method claim')
 
 
 def scratch_operations(reports, proof, scratch):
@@ -227,7 +280,7 @@ def scratch_operations(reports, proof, scratch):
     return rows, receipt_sets
 
 
-def verify_run_costs(costs, reports):
+def run_costs_from_reports(reports):
     population = reports['dope-s3-population-gpu-fits.json']['cost']
     refinement = reports['dope-target-refinement-population-fits.json']['cost']
     specifications = {
@@ -250,32 +303,43 @@ def verify_run_costs(costs, reports):
             reports['sdv-matched-population-validation.json']['cost']['shared_metric_operation_seconds'], {
                 'scheduler_wall_seconds': reports['sdv-matched-population-validation.json']['cost']['shared_coordinator_wall_seconds']}),
         'density_shared_validation_v1': ('density-matched-population-validation.json',
-            reports['density-matched-population-validation.json']['cost']['density']['operation_seconds'], {})
+            reports['density-matched-population-validation.json']['cost']['density']['operation_seconds'], {}),
+        'forest_shared_validation_v1': ('s3-matched-forest-confirmation-validation.json',
+            reports['s3-matched-forest-confirmation-validation.json']['cost']['forest_shared_evaluator_seconds'], {
+                'host': reports['s3-matched-forest-confirmation-validation.json']['cost']['shared_evaluator_host'],
+                'phase_attribution_unavailable': True})
     }
-    require({row['identity'] for row in costs['runs']} == set(specifications),
+    rows = []
+    for identity, (name, seconds, fields) in specifications.items():
+        method = ('CTGAN+TVAE' if identity == 'sdv_shared_validation_v1'
+                  else 'density_methods_combined' if identity == 'density_shared_validation_v1'
+                  else 'Forest-Flow' if identity == 'forest_shared_validation_v1' else 'DOPE')
+        phase = ('fit_wrapper' if identity in ('dope_population_research_v2', 'dope_refinement_expansion_v2')
+                 else 'shared_evaluator_combined' if identity == 'forest_shared_validation_v1'
+                 else 'sample_and_evaluate_combined')
+        if identity == 'dope_population_validation_v1':
+            fields = dict(fields, host=reports[name]['cost']['host'])
+        elif identity == 'sdv_shared_validation_v1':
+            fields = dict(fields, phase_attribution_unavailable=True)
+        elif identity == 'density_shared_validation_v1':
+            fields = dict(fields, method_attribution_unavailable=False)
+        rows.append(dict(identity=identity, method=method, phase=phase,
+                         operation_wall_seconds=seconds, source=name, **fields))
+    return rows
+
+
+def verify_run_costs(costs, reports):
+    expected = {row['identity']: row for row in run_costs_from_reports(reports)}
+    require(len(costs['runs']) == len(expected) and {row['identity'] for row in costs['runs']} == set(expected),
             'measured run coverage changed')
     for row in costs['runs']:
-        source, seconds, fields = specifications[row['identity']]
-        method = ('CTGAN+TVAE' if row['identity'] == 'sdv_shared_validation_v1'
-                  else 'density_methods_combined' if row['identity'] == 'density_shared_validation_v1'
-                  else 'DOPE')
-        phase = ('fit_wrapper' if row['identity'] in ('dope_population_research_v2',
-                 'dope_refinement_expansion_v2') else 'sample_and_evaluate_combined')
-        if row['identity'] == 'dope_population_validation_v1':
-            fields = dict(fields, host=reports[source]['cost']['host'])
-        require(row['source'] == source
-                and row['method'] == method and row['phase'] == phase
-                and canonical(row['operation_wall_seconds']) == canonical(seconds)
-                and all(canonical(row[name]) == canonical(value) for name, value in fields.items()),
-                'measured run source or cost changed')
-        expected_fields = {'identity', 'method', 'phase', 'operation_wall_seconds', 'source', *fields}
-        unavailable_field = {'sdv_shared_validation_v1': 'phase_attribution_unavailable',
-                             'density_shared_validation_v1': 'method_attribution_unavailable'}.get(row['identity'])
-        if unavailable_field:
-            expected_fields.add(unavailable_field)
-            require(row.get(unavailable_field) is (unavailable_field == 'phase_attribution_unavailable'),
-                    'run phase attribution claim changed')
-        require(set(row) == expected_fields, 'unsupported measured run provenance field')
+        reference = expected[row['identity']]
+        require(set(row) == set(reference), 'unsupported measured run provenance field')
+        require(canonical(row) == canonical(reference), 'measured run source or cost changed')
+    require(canonical(costs['historical_prior_attempts']) == canonical(historical_sdv_attempts(reports)),
+            'historical SDV receipt or cost changed')
+    population = reports['dope-s3-population-gpu-fits.json']['cost']
+    refinement = reports['dope-target-refinement-population-fits.json']['cost']
     expected_prior = {
         'dope_closed_fit_seconds': population['prior_closed_fit_seconds'],
         'dope_prior_wrapper_transport_seconds': population['prior_wrapper_new_operation_transport_seconds'],
@@ -285,6 +349,11 @@ def verify_run_costs(costs, reports):
 
 
 def verify_sources(repo, costs, gaps, proof, scratch):
+    validate_proof(proof)
+    verify_committed_sources(repo, proof)
+    require(proof['public_source_reports'] == [dict(path='research/benchmark/results/' + name, sha256=pin)
+            for name, pin in sorted(costs['source_reports_sha256'].items())],
+            'committed report coverage or provenance changed')
     reports = {name: bound(repo / 'research/benchmark/results' / name, pin, repo)
                for name, pin in costs['source_reports_sha256'].items()}
     for ref in proof['source_code_and_contract']:
@@ -292,7 +361,9 @@ def verify_sources(repo, costs, gaps, proof, scratch):
         require(path.resolve().is_relative_to(repo.resolve()) and path.is_file()
                 and not any(p.is_symlink() for p in (path, *path.parents))
                 and hashlib.sha256(path.read_bytes()).hexdigest() == ref['sha256'], 'source contract path or digest changed')
-    validate_proof(proof)
+    require(gaps['production_contract_sha256'] == PRODUCTION_CONTRACT_SHA, 'production contract provenance changed')
+    require(tuple(row['name'] for row in gaps['hard_gates']) == production_gate_names(repo),
+            'production hard gate coverage changed')
     verify_run_costs(costs, reports)
     scratch_rows, counts = scratch_operations(reports, proof, scratch)
     rows = []
@@ -366,7 +437,7 @@ def validate_gaps(gaps):
         require(gaps[key] is None, 'component scalar or hard gate claim changed')
     require(tuple(row['name'] for row in gaps['components']) == COMPONENT_NAMES,
             'component coverage or identity changed')
-    require(tuple(row['name'] for row in gaps['hard_gates']) == HARD_GATE_NAMES,
+    require(tuple(row['name'] for row in gaps['hard_gates']) == production_gate_names(),
             'hard gate coverage or identity changed')
     for component in gaps['components']:
         require(component['score'] is None, 'aggregate component score is not evidenced')
@@ -379,6 +450,7 @@ def validate_gaps(gaps):
 
 
 def validate_proof(proof):
+    require(proof.get('committed_source_revision') == COMMITTED_SOURCE_REVISION, 'committed source revision changed')
     for key in ('mfs_v2', 'ptf_v1', 'release_safe', 'superiority',
                 'attributed_energy_joules', 'hardware_models', 'historical_co_tenant'):
         require(key in proof and proof[key] is None, 'source proof acquired unsupported claim')
@@ -402,6 +474,12 @@ def cost_tables(costs):
         accounting = 'alias_of_density_phase_rows_do_not_add' if row['identity'] == 'density_shared_validation_v1' else 'separate_run_aggregate'
         writer.writerow(['run', row['method'], row['phase'], row['operation_wall_seconds'], '', '', accounting])
         lines.append(f"| {row['identity']} | {row['method']} | {row['phase']} | {row['operation_wall_seconds']:.6f} | {accounting} |")
+    lines += ['', '| Historical interruption | Method | Operation seconds | Accounting |',
+              '|---|---|---:|---|']
+    for row in costs['historical_prior_attempts']:
+        writer.writerow(['historical_attempt', row['method'], row['phase'], row['operation_wall_seconds'],
+                         '', '', 'separate_prior_receipt_not_in_704_attempts'])
+        lines.append(f"| {row['receipt_sha256']} | {row['method']} | {row['operation_wall_seconds']:.6f} | separate prior receipt |")
     lines += ['', 'Prior pilot costs remain separate; no historical grand total is reported. Scheduling cutoffs retain their native outcome class and are not method failures. Whole-device VRAM observations are not process VRAM or attributed energy.', '',
               'Historical co-tenancy is unknown. Future shared GPU claims require clock-bound receipt observations; historical omissions cannot establish exclusive use.', '']
     lines += ['Missing evidence:'] + ['- ' + reason for reason in costs['missing_evidence']] + ['']
@@ -441,9 +519,36 @@ def projections(costs, gaps, proof):
     return result
 
 
-def publish(repo, inputs, output, scratch=SCRATCH):
+def repair_metadata(costs, gaps, proof, reports, repo):
+    """Reconstruct repaired fields; original physical phase metadata stays bound."""
+    costs['runs'] = run_costs_from_reports(reports)
+    costs['historical_prior_attempts'] = historical_sdv_attempts(reports)
+    costs['run_accounting'] = {row['identity']: 'alias_of_density_phase_rows_do_not_add'
+        if row['identity'] == 'density_shared_validation_v1' else 'separate_run_aggregate' for row in costs['runs']}
+    gaps['hard_gates'] = [dict(name=name, status='not_evidenced', passed=None)
+                          for name in production_gate_names(repo)]
+    proof['committed_source_revision'] = COMMITTED_SOURCE_REVISION
+    verify_committed_sources(repo, proof)
+    validate_costs(costs); validate_gaps(gaps); validate_proof(proof); verify_run_costs(costs, reports)
+    return costs, gaps, proof
+
+
+def derive_repaired_inputs(repo, baseline):
+    """Repair frozen fields from bound public metadata; publish replays all scratch phases."""
+    costs, gaps, proof = [bound(baseline / name, REPAIR_BASELINE_PINS[name], baseline)
+                          for name in ('measured-costs.json', 'component-gaps.json', 'source-proof.json')]
+    reports = {name: bound(repo / 'research/benchmark/results' / name, pin, repo)
+               for name, pin in costs['source_reports_sha256'].items()}
+    return repair_metadata(costs, gaps, proof, reports, repo)
+
+
+def publish(repo, inputs, output, scratch=SCRATCH, derive_from=None):
     costs, gaps, proof = [bound(inputs / name, INPUT_PINS[name], inputs)
                           for name in ('measured-costs.json', 'component-gaps.json', 'source-proof.json')]
+    if derive_from is not None:
+        derived = derive_repaired_inputs(repo, derive_from)
+        require(all(encode(a) == encode(b) for a, b in zip(derived, (costs, gaps, proof))),
+                'repaired input derivation changed')
     validate_costs(costs); validate_gaps(gaps)
     receipt_counts = verify_sources(repo, costs, gaps, proof, scratch)
     files = projections(costs, gaps, proof)
@@ -472,8 +577,9 @@ def main():
     parser.add_argument('--repo', type=Path, required=True)
     parser.add_argument('--inputs', type=Path, default=HERE / 'results' / 'work-order-b-costs-v1')
     parser.add_argument('--output', type=Path, default=HERE / 'results' / 'work-order-b-costs-v1')
+    parser.add_argument('--derive-from', type=Path, help='Optional frozen prior snapshot; reconstructed inputs must match the new pins')
     args = parser.parse_args()
-    manifest = publish(args.repo, args.inputs, args.output)
+    manifest = publish(args.repo, args.inputs, args.output, derive_from=args.derive_from)
     print(json.dumps(dict(artifacts=len(manifest['artifacts']), original_receipts_verified=manifest['original_receipts_verified']), sort_keys=True))
 
 

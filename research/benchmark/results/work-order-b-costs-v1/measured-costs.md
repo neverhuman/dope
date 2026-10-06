@@ -31,6 +31,12 @@ Phase receipts are deduplicated physical operations. Wall seconds include wrappe
 | dope_refinement_expansion_validation_v2 | DOPE | sample_and_evaluate_combined | 5213.128865 | separate_run_aggregate |
 | sdv_shared_validation_v1 | CTGAN+TVAE | sample_and_evaluate_combined | 856.923647 | separate_run_aggregate |
 | density_shared_validation_v1 | density_methods_combined | sample_and_evaluate_combined | 14986.641128 | alias_of_density_phase_rows_do_not_add |
+| forest_shared_validation_v1 | Forest-Flow | shared_evaluator_combined | 228.732251 | separate_run_aggregate |
+
+| Historical interruption | Method | Operation seconds | Accounting |
+|---|---|---:|---|
+| 25e42657582eef8fa5e8bf7df210eeb8a5be0bc18c6a8d3da9f99b1fbac45ac6 | CTGAN | 195.733249 | separate prior receipt |
+| a6ff74eda71dfceedf11cee6ed1986203cacaf95cf751717e395acd2c1cd220c | CTGAN | 427.965393 | separate prior receipt |
 
 Prior pilot costs remain separate; no historical grand total is reported. Scheduling cutoffs retain their native outcome class and are not method failures. Whole-device VRAM observations are not process VRAM or attributed energy.
 

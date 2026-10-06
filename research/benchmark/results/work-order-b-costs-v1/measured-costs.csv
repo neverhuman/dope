@@ -23,3 +23,6 @@ run,DOPE,fit_wrapper,3427.7003517001867,,,separate_run_aggregate
 run,DOPE,sample_and_evaluate_combined,5213.128864934901,,,separate_run_aggregate
 run,CTGAN+TVAE,sample_and_evaluate_combined,856.9236472246703,,,separate_run_aggregate
 run,density_methods_combined,sample_and_evaluate_combined,14986.641127711162,,,alias_of_density_phase_rows_do_not_add
+run,Forest-Flow,shared_evaluator_combined,228.73225121363066,,,separate_run_aggregate
+historical_attempt,CTGAN,historical_infrastructure_interruption,195.73324919189326,,,separate_prior_receipt_not_in_704_attempts
+historical_attempt,CTGAN,historical_infrastructure_interruption,427.9653931008652,,,separate_prior_receipt_not_in_704_attempts

@@ -1,5 +1,31 @@
 {
   "format": "dope-measured-cost-aggregates",
+  "historical_prior_attempts": [
+    {
+      "method": "CTGAN",
+      "method_failure_inferred": false,
+      "native_outcome_class": "infrastructure_interruption",
+      "operation_wall_seconds": 195.73324919189326,
+      "partial_artifact_bytes": 0,
+      "phase": "historical_infrastructure_interruption",
+      "receipt_sha256": "25e42657582eef8fa5e8bf7df210eeb8a5be0bc18c6a8d3da9f99b1fbac45ac6",
+      "source": "sdv-s3-population-native.json",
+      "source_job_sha256": "955166ae26949a089029c20a57de763f52b20757ba475433e972475c1b3f24ea",
+      "status": "failed"
+    },
+    {
+      "method": "CTGAN",
+      "method_failure_inferred": false,
+      "native_outcome_class": "infrastructure_interruption",
+      "operation_wall_seconds": 427.9653931008652,
+      "partial_artifact_bytes": 0,
+      "phase": "historical_infrastructure_interruption",
+      "receipt_sha256": "a6ff74eda71dfceedf11cee6ed1986203cacaf95cf751717e395acd2c1cd220c",
+      "source": "sdv-s3-population-native.json",
+      "source_job_sha256": "2bae8842cc15be59fbc21beeafa63b6ed12af99b9b42cdc908e597db114d401e",
+      "status": "failed"
+    }
+  ],
   "historical_prior_costs": {
     "dope_closed_fit_seconds": 226.02740479726344,
     "dope_discovery_confirmation_seconds": 859.7875888752751,
@@ -494,6 +520,7 @@
     "dope_population_validation_v1": "separate_run_aggregate",
     "dope_refinement_expansion_v2": "separate_run_aggregate",
     "dope_refinement_expansion_validation_v2": "separate_run_aggregate",
+    "forest_shared_validation_v1": "separate_run_aggregate",
     "sdv_shared_validation_v1": "separate_run_aggregate"
   },
   "runs": [
@@ -556,6 +583,15 @@
       "operation_wall_seconds": 14986.641127711162,
       "phase": "sample_and_evaluate_combined",
       "source": "density-matched-population-validation.json"
+    },
+    {
+      "host": "xbabe2",
+      "identity": "forest_shared_validation_v1",
+      "method": "Forest-Flow",
+      "operation_wall_seconds": 228.73225121363066,
+      "phase": "shared_evaluator_combined",
+      "phase_attribution_unavailable": true,
+      "source": "s3-matched-forest-confirmation-validation.json"
     }
   ],
   "scope": "Closed validation research receipts; no equal total research-spend claim",
