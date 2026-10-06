@@ -1,0 +1,10 @@
+{
+  "beyond_evaluator_test_csv": 5,
+  "beyond_worker_test_csv": 0,
+  "beyond_workers": 5,
+  "note": "File-name counts only. Test file contents were not read.",
+  "s3_train_csv": 100,
+  "s3_validation_csv": 100,
+  "s3_worker_test_csv": 0,
+  "s3_workers": 100
+}
