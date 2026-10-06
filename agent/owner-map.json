@@ -176,6 +176,9 @@
     "research/benchmark/tests/test_tabsyn_contract.py": "external-evidence",
     "research/benchmark/tabsyn-adapter.LICENSE": "external-evidence",
     "research/benchmark/tabsyn-adapter.NOTICE": "external-evidence",
-    "research/benchmark/tabsyn_adapter.py.license": "external-evidence"
+    "research/benchmark/tabsyn_adapter.py.license": "external-evidence",
+    "research/benchmark/verify_paper_numbers.py": "external-evidence",
+    "research/benchmark/tests/test_verify_paper_numbers.py": "external-evidence",
+    "research/benchmark/tests/test_paper_log.py": "external-evidence"
   }
 }
