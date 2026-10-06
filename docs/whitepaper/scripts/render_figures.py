@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Three IEEE figures from panel-stats.json, the lineage record, and loss TSVs.
+"""Four IEEE figures from panel-stats.json, the lineage record, and loss TSVs.
 
 Type 42 serif fonts. Lineage-bootstrap intervals only. No per-seed whiskers.
 """
@@ -107,7 +107,7 @@ def _sha256(path):
 
 
 def _write_hashes():
-    names = ("retention-bytes.pdf", "paired-cdf.pdf", "loss-curves.pdf")
+    names = ("retention-bytes.pdf", "retention-bars.pdf", "paired-cdf.pdf", "loss-curves.pdf")
     payload = {
         "format": "dope-paper-figure-hashes",
         "pdf_sha256": {name: _sha256(FIG / name) for name in names},
@@ -311,6 +311,97 @@ def draw_loss():
     return path
 
 
+# Same colors as the density marks, plus the two neural generators.
+BAR_STYLE = {
+    "DOPE": ("DOPE", "#0072B2"),
+    "GaussianCopula": ("Gaussian\ncopula", "#E69F00"),
+    "Chow-Liu": ("Chow-Liu", "#009E73"),
+    "independent_marginals": ("Independent\nmarginals", "#D55E00"),
+    "TVAE": ("TVAE", "#56B4E9"),
+    "CTGAN": ("CTGAN", "#CC79A7"),
+}
+
+
+def _median_label(value):
+    """Match sig3 on the retention scale so the bar text agrees with the tables."""
+    if abs(value) >= 0.01:
+        return f"{value:.3f}"
+    return f"{value:.3g}"
+
+
+def _paired_bars(block, baseline_keys):
+    """One DOPE bar plus each baseline, on that block's paired CatBoost lineages."""
+    anchor_key = baseline_keys[0]
+    anchor = block["pairs"][anchor_key]
+    rows = [("DOPE", anchor["dope_median"], anchor["dope_lo"], anchor["dope_hi"])]
+    for key in baseline_keys:
+        pair = block["pairs"][key]
+        if int(pair["n"]) != int(anchor["n"]):
+            raise SystemExit(f"{key} paired count {pair['n']} != {anchor['n']}")
+        if abs(pair["dope_median"] - anchor["dope_median"]) > 5e-12:
+            raise SystemExit(f"{key} DOPE median does not match {anchor_key}")
+        rows.append((key, pair["other_median"], pair["other_lo"], pair["other_hi"]))
+    rows.sort(key=lambda item: item[1], reverse=True)
+    return rows, int(anchor["n"])
+
+
+def draw_retention_bars(stats, dest=None):
+    """CatBoost retention medians. Density and neural blocks stay unpooled."""
+    panels = (
+        (
+            _paired_bars(
+                stats["blocks"]["density"]["catboost"],
+                ("GaussianCopula", "Chow-Liu", "independent_marginals"),
+            ),
+            "Density block",
+        ),
+        (
+            _paired_bars(stats["blocks"]["neural"]["catboost"], ("CTGAN", "TVAE")),
+            "Neural block",
+        ),
+    )
+    figure, axes = plt.subplots(1, 2, figsize=(7.16, 2.95), sharey=True)
+    for axis, ((rows, count), title) in zip(axes, panels):
+        positions = np.arange(len(rows))
+        medians = [row[1] for row in rows]
+        lowers = [row[1] - row[2] for row in rows]
+        uppers = [row[3] - row[1] for row in rows]
+        colors = [BAR_STYLE[row[0]][1] for row in rows]
+        axis.bar(positions, medians, width=0.72, color=colors, edgecolor="none", zorder=2)
+        axis.errorbar(
+            positions,
+            medians,
+            yerr=[lowers, uppers],
+            fmt="none",
+            ecolor="#222222",
+            elinewidth=0.7,
+            capsize=2.4,
+            capthick=0.7,
+            zorder=3,
+        )
+        axis.axhline(0, color="#333333", linewidth=0.6, zorder=1)
+        for xpos, row in zip(positions, rows):
+            median, lo, hi = row[1], row[2], row[3]
+            label = _median_label(median)
+            if median >= 0:
+                axis.text(xpos, hi + 0.025, label, ha="center", va="bottom", color="#1a1a1a")
+            else:
+                axis.text(xpos, lo - 0.025, label, ha="center", va="top", color="#1a1a1a")
+        axis.set_xticks(positions)
+        axis.set_xticklabels([BAR_STYLE[row[0]][0] for row in rows])
+        axis.set_title(f"{title}, {count} lineages")
+        axis.yaxis.grid(True, linewidth=0.4, color="#E0E0E0", zorder=0)
+        axis.set_axisbelow(True)
+        axis.spines["top"].set_visible(False)
+        axis.spines["right"].set_visible(False)
+    axes[0].set_ylabel("CatBoost retention (dimensionless)")
+    axes[0].set_ylim(-0.42, 1.22)
+    figure.tight_layout(pad=0.45)
+    path = Path(dest) if dest is not None else FIG / "retention-bars.pdf"
+    _save(figure, path)
+    return path
+
+
 def _check():
     stats = load_json(GEN / "panel-stats.json")
     record = load_json(RESULTS / "s3-lineage-record.json")
@@ -318,6 +409,7 @@ def _check():
     with tempfile.TemporaryDirectory() as tmp:
         fresh = {
             "retention-bytes.pdf": draw_retention(record, stats, Path(tmp) / "retention-bytes.pdf"),
+            "retention-bars.pdf": draw_retention_bars(stats, Path(tmp) / "retention-bars.pdf"),
             "paired-cdf.pdf": draw_paired(stats, Path(tmp) / "paired-cdf.pdf"),
         }
         for name, path in fresh.items():
@@ -338,7 +430,7 @@ def main():
         return
     stats = load_json(GEN / "panel-stats.json")
     record = load_json(RESULTS / "s3-lineage-record.json")
-    paths = [draw_retention(record, stats), draw_paired(stats), draw_loss()]
+    paths = [draw_retention(record, stats), draw_retention_bars(stats), draw_paired(stats), draw_loss()]
     _write_hashes()
     print("\n".join(str(path) for path in paths if path))
 

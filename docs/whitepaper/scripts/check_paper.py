@@ -10,6 +10,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Loaded by file path from the benchmark suite, which does not put this
+# directory on sys.path.
+_SCRIPTS = Path(__file__).resolve().parent
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
 from public_hardware import banned_hits
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +25,7 @@ FIGURES = (
     ROOT / "dope-mfs-anonymous.pdf",
     ROOT / "supplement.pdf",
     ROOT / "figures" / "retention-bytes.pdf",
+    ROOT / "figures" / "retention-bars.pdf",
     ROOT / "figures" / "paired-cdf.pdf",
     ROOT / "figures" / "loss-curves.pdf",
 )

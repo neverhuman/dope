@@ -87,7 +87,7 @@ from that artifact (Section~\ref{sec:method}, Fig.~\ref{fig:arch},
 does not use the $4{,}168$-dimensional router.
 \item Retention and charged bytes on the validation panel, with
 lineage-bootstrap intervals, and the algebra of a retention value
-(Fig.~\ref{fig:bytes}).
+(Fig.~\ref{fig:bars}, Fig.~\ref{fig:bytes}).
 \item Paired tests inside unpooled blocks: the density block, the neural
 block, and the $\NForestCb$-lineage Forest-Flow confirmation, including the
 linear non-separation and the Forest-Flow lead (Fig.~\ref{fig:pairs}).
@@ -101,8 +101,7 @@ variance is \FitSeedVariance. The full ablation grid is \FullAblationGrid.
 The fits use one fit seed, 11, and coresets of \CoreMin\ to \CoreMax\ rows.
 Official tests stay sealed. MFS-v2 is null. PTF-v1, the release KPI whose
 hard gates include joint fidelity, membership and attribute attacks, copy
-checks, and feature-importance agreement on a sealed holdout, is null. The
-repository does not expand those three letters. A release at the
+checks, and feature-importance agreement on a sealed holdout, is null. A release at the
 10{,}240-byte tier is a separate claim from the byte cap, and it is not
 made here. BeyondArena, a separate family-fit check outside this PMLB
 panel, is not pooled with the density, neural, or Forest-Flow blocks. An
@@ -160,12 +159,15 @@ Bayesian signed-rank procedure is not computed.
 \section{Method}
 \label{sec:method}
 \subsection{Displayed generator}
-The displayed profile is \texttt{features12\_\allowbreak{}steps2048}. It is a compact
-neural residual, not a GAN, a diffusion model, or a transformer.
-Fig.~\ref{fig:arch} is the pipeline. Training screens at most 12 inputs. A
-hidden layer of width 16 maps them through $\tanh$. AdamW, learning rate
-$0.002$, runs for 2{,}048 steps on the regression mean-squared error, with
-gradient clipping at $5$. The hidden weights and biases are then frozen.
+The displayed profile is the generator this paper reports. Its configuration
+id is \texttt{features12\_\allowbreak{}steps2048}: at most 12 screened inputs,
+a hidden width of 16, a $\tanh$ activation, 2{,}048 AdamW steps at learning
+rate $0.002$, a refit readout, and no embedding. It is a compact neural
+residual, not a GAN, a diffusion model, or a transformer.
+Fig.~\ref{fig:arch} is the pipeline. Training screens the inputs, maps them
+through the width-16 $\tanh$ layer, and runs AdamW on the regression
+mean-squared error, with gradient clipping at $5$. The hidden weights and
+biases are then frozen.
 The intercept, the linear skip, and the hidden readout are refit on those
 frozen features. Coefficients whose absolute value is below $10^{-5}$ are
 dropped from the skip. For a selected input vector $x_S$,
@@ -187,6 +189,7 @@ Chow--Liu tree, a triangular autoregression, a sparse Gaussian copula, a
 factor model, a truncated vine, or a two-component mixture. This paper does
 not treat the displayed artifacts as one dependence family.
 
+Training fits the residual. Sampling draws a row from the stored artifact.
 Training, not sampling, screens inputs by absolute rank correlation with
 the target and keeps at most 12. The artifact stores a marginal and a
 transform for each feature, the selected dependence, the residual, a noise
@@ -216,7 +219,7 @@ profile is not selected, clamps the hidden width from \ProductionWidthLo\ to
 result. Other shapes exist and are not this measurement: micro-TVAEs, TinyMAT,
 joint TVAE, a masked transformer, and a TabSyn candidate. A direct-rank
 TabDDPM candidate is a research comparator with no claim on the
-10{,}240-byte tier. The scored campaign did not store a per-step loss. A
+10{,}240-byte tier. The scored runs did not store a per-step loss. A
 later logged replay did. The supplement plots that replay. The
 replay files are not substituted for the scored artifacts, and a lower
 hidden-basis loss at 8{,}192 steps does not replace the displayed profile.
@@ -390,6 +393,23 @@ $\DiffGaussCb$ is not $\MedDopeCb$ minus $\MedGaussCb$.
 \input{generated/headline-table.tex}
 \end{table*}
 
+Fig.~\ref{fig:bars} shows the level of that shared utility under CatBoost.
+Retention is the fraction of a real-trained auditor's improvement over a
+null that an auditor trained on synthetic rows recovers. Higher is better.
+The value is not MFS-v2. MFS-v2 stays null on every method. Each bar is
+the median on the paired lineages in that block, with the lineage-bootstrap
+interval. The two panels are not pooled. Forest-Flow is a separate
+$\NForestCb$-lineage block. Its CatBoost median is higher than the paired
+DOPE median on that block, the Holm test is not significant, and that
+block is not drawn here.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/retention-bars.pdf}
+\caption{CatBoost retention at $4n$. Higher is better. Each bar is the paired-lineage median and its lineage-bootstrap interval. Density uses $\NDopeCb$ lineages. The neural panel uses $\NNeuCb$ and is not pooled. Forest-Flow, $\NForestCb$ lineages, is higher on its own block and is omitted.}
+\label{fig:bars}
+\end{figure*}
+
 \subsection{Density block}
 Fig.~\ref{fig:bytes} plots retention against $\log_{10}$ charged bytes for
 the three auditors. Circles are DOPE, squares the Gaussian copula,
@@ -421,7 +441,7 @@ On the $\FriedmanNCb$ lineages common to all four methods, the Friedman
 $p$-value is $\FriedmanPCb$ and the critical difference is $\FriedmanCdCb$.
 All six CatBoost pairs exceed that difference. Fig.~\ref{fig:pairs} shows
 the sorted paired differences with the same four marks. The horizontal
-axis is the retention difference. The bar is the critical difference.
+axis is the retention difference. The segment is the critical difference.
 
 \begin{table*}[t]
 \caption{Density block at $4n$. W/T/L counts lineages.}
@@ -435,7 +455,7 @@ axis is the retention difference. The bar is the critical difference.
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/paired-cdf.pdf}
-\caption{CatBoost paired differences, sorted, and the Nemenyi scale. Rank 1 is the higher retention. The bar length is the critical difference.}
+\caption{CatBoost paired differences, sorted, and the Nemenyi scale. Rank 1 is the higher retention. The segment length is the critical difference.}
 \label{fig:pairs}
 \end{figure*}
 
@@ -644,7 +664,7 @@ omitted. They are not counted as failures of a finished fit.
 
 \paragraph{External.}
 These fits do not establish behavior on the full tables used by the
-diffusion papers, on a five-seed campaign, or on the official test.
+diffusion papers, on five fit seeds, or on the official test.
 Generalization past seed $\SplitSeed$ is \FitSeedVariance. Forest-Flow's
 byte comparison uses $\NForestCb$ lineages and the hash-checked fit files.
 BeyondArena is a separate fit check. It is not a retention panel, and it is
