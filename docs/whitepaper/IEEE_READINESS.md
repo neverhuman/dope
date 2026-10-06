@@ -34,7 +34,7 @@ Jepson decisions, applied here:
 
 - Class stays `\documentclass[journal]{IEEEtran}`. Conference mode is not the target.
 - Length budget is about 14 pages excluding the supplement. The 100-row lineage tables move to a supplementary PDF.
-- Author block stays `The DOPE Project`.
+- Author block is Jepson Taylor and Alton Alexander, NEVERHUMAN Research. The anonymous PDF withholds that byline.
 
 ## Gap list
 

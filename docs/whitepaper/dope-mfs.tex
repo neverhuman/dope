@@ -17,48 +17,62 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \emergencystretch=3em
+\usepackage{etoolbox}
+\makeatletter
+% Journal mode keeps the abstract in the first column. Place the stored
+% abstract in the full-width title box so it spans both columns.
+\apptocmd{\@maketitle}{%
+  \par\addvspace{\medskipamount}%
+  \@IEEEtitleabstractindextextbox{\@IEEEtitleabstractindextext}%
+  \par\addvspace{\smallskipamount}%
+}{}{\errmessage{dope-mfs: spanning abstract was not attached}}
+\makeatother
 
 \begin{document}
 \input{generated/numbers.tex}
 
 \title{Regression Utility of a 10{,}240-Byte Tabular Generator}
 
-\author{The DOPE Project}
+\author{Jepson~Taylor and Alton~Alexander%
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.~Taylor and A.~Alexander are with NEVERHUMAN Research.}}
 
-\markboth{The DOPE Project}%
+\markboth{Taylor and Alexander}%
 {Regression Utility of a 10240-Byte Tabular Generator}
 
-\maketitle
-
+\IEEEtitleabstractindextext{%
 \begin{abstract}
-How much of a real-trained regressor's improvement over a null is recovered
-by an auditor trained on rows from a generator under 10{,}240 bytes?
-Profile \texttt{features12\_\allowbreak{}steps2048} is a compact residual:
-at most 12 screened inputs, width-16 $\tanh$, a refit readout, and 2{,}048
-AdamW steps at learning rate $0.002$, with no embedding. It is not a GAN,
-a diffusion model, or a transformer. The population is $\PreparedN$
-prepared PMLB regression lineages, a grouped 80/20 cut of the official
-training rows, seed $\SplitSeed$, fit seed 11, and synthetic size $4n$.
-The names include simulated physics and simulated dynamics. On $\NDopeCb$
-informative lineages the CatBoost median is $\MedDopeCb$ (95\%
-lineage-bootstrap interval $\LoDopeCb$ to $\HiDopeCb$) against a Gaussian
-copula, Chow--Liu, and independent marginals. Holm-adjusted Wilcoxon tests
-separate these three comparisons. Against the copula the record is
-\WtlGaussCb\ wins/ties/losses. The linear auditor does not separate DOPE
-from the copula (\WtlLinGauss); the interval contains zero, and this is not
-an equivalence test. Unpooled blocks compare CTGAN and TVAE on $\NNeuCb$
-lineages and Forest-Flow on $\NForestCb$ lineages (\WtlForestCb, $\ForestByteLo$
-to $\ForestByteHi$ bytes). $\DopeWithinCap$ artifacts are inside the cap,
-and two are over it. Official tests were not opened. TabSyn is
-\TabSynResult, the 100-lineage TabDDPM publication is \TabDDPMResult, and
-the full Forest-Flow publication is \ForestPublication. Fit-seed variance
-is \FitSeedVariance. Release scores are null. The distance ledger is not
-differential privacy or HIPAA de-identification.
+This paper measures how much of a real-trained regressor's improvement
+over a null is recovered by an auditor trained on synthetic rows. The
+generator stays under a 10{,}240-byte artifact. It is a compact residual,
+not a GAN, a diffusion model, or a transformer: at most 12 screened
+inputs, a width-16 $\tanh$ layer, a refit readout, and 2{,}048 AdamW
+steps at learning rate $0.002$, with no embedding. The configuration id
+is \texttt{features12\_\allowbreak{}steps2048}. The panel is $\PreparedN$
+prepared PMLB regression lineages, including simulated physics and
+simulated dynamics, with a grouped 80/20 cut of the official training
+rows, seed $\SplitSeed$, fit seed 11, and synthetic size $4n$. On
+$\NDopeCb$ informative lineages the CatBoost median retention is
+$\MedDopeCb$ (95\% lineage-bootstrap interval $\LoDopeCb$ to
+$\HiDopeCb$). Holm-adjusted Wilcoxon tests separate this generator from
+a Gaussian copula, a Chow--Liu tree, and independent marginals. Against
+the copula the record is \WtlGaussCb\ wins, ties, and losses. The linear
+auditor does not separate the two (\WtlLinGauss). That interval contains
+zero, and the result is not an equivalence test. Unpooled blocks compare
+CTGAN and TVAE on $\NNeuCb$ lineages and Forest-Flow on $\NForestCb$
+lineages (\WtlForestCb; $\ForestByteLo$ to $\ForestByteHi$ bytes).
+$\DopeWithinCap$ artifacts are inside the cap, and two are over it.
+Official tests were not opened. TabSyn is \TabSynResult, the 100-lineage
+TabDDPM publication is \TabDDPMResult, and the full Forest-Flow
+publication is \ForestPublication. Fit-seed variance is \FitSeedVariance.
+Release scores are null. The distance ledger is not differential privacy
+or HIPAA de-identification.
 \end{abstract}
 
 \begin{IEEEkeywords}
 Synthetic tabular data, retention, artifact bytes, paired tests.
-\end{IEEEkeywords}
+\end{IEEEkeywords}}
+
+\maketitle
 
 \section{Introduction}
 A generator paper often reports the metric that also selected the

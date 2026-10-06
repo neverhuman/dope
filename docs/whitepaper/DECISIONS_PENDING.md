@@ -1,21 +1,21 @@
 # Pending paper decisions
 
-Neither decision is selected on this branch. The source author line stays
-`The DOPE Project`. `docs/whitepaper/dope-mfs.tex` still says official tests
-stay sealed and final evaluation is not authorized. This file does not read
-`test.csv` and does not invent replacement values.
+The byline is selected. Official tests stay sealed and final evaluation is
+not authorized. This file does not read `test.csv` and does not invent
+replacement values.
 
 ## Author byline
 
+Jepson Taylor and Alton Alexander, NEVERHUMAN Research. The running header
+is Taylor and Alexander. `docs/whitepaper/scripts/build_pdf.sh` writes the
+anonymous PDF by substituting that byline and `\markboth{Taylor and Alexander}`
+only, then deletes the temporary tex. The method name DOPE in the prose is
+the generator name in both PDFs.
+
 | Build | File | Byline and running header | Body |
 | --- | --- | --- | --- |
-| Current | `docs/whitepaper/dope-mfs.pdf` | The DOPE Project | Unchanged manuscript |
+| Journal | `docs/whitepaper/dope-mfs.pdf` | Jepson Taylor and Alton Alexander, NEVERHUMAN Research | Unchanged manuscript |
 | Alternate | `docs/whitepaper/dope-mfs-anonymous.pdf` | Anonymous | Same sentences and the same `generated/numbers.tex` macros |
-
-Both are 8 letter pages. `docs/whitepaper/scripts/build_pdf.sh` writes the
-alternate PDF by substituting only `\author{The DOPE Project}` and
-`\markboth{The DOPE Project}` during the build, then deletes the temporary
-tex. The method name DOPE in the prose is the generator name in both PDFs.
 
 ## Sealed test split
 

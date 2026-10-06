@@ -3,26 +3,39 @@
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{graphicx}
+\usepackage{etoolbox}
+\makeatletter
+\apptocmd{\@maketitle}{%
+  \par\addvspace{\medskipamount}%
+  \@IEEEtitleabstractindextextbox{\@IEEEtitleabstractindextext}%
+  \par\addvspace{\smallskipamount}%
+}{}{\errmessage{dope-supplement: spanning abstract was not attached}}
+\makeatother
 
 \begin{document}
+\input{generated/numbers.tex}
 
 \title{Supplement: Lineage Tables for the 10{,}240-Byte Generator}
 
-\author{The DOPE Project}
+\author{Jepson~Taylor and Alton~Alexander%
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.~Taylor and A.~Alexander are with NEVERHUMAN Research.}}
 
-\maketitle
-\input{generated/numbers.tex}
+\markboth{Taylor and Alexander}%
+{Supplement: Lineage Tables for the 10240-Byte Generator}
 
+\IEEEtitleabstractindextext{%
 \begin{abstract}
 Lineage-level retention and byte charges for the displayed profile, the
-8{,}192-step sufficiency budget, and the \BeyondInventory{} BeyondArena family names.
-These tables are the rows behind the medians in the main paper. A blank
-retention is an unavailable fit or an auditor that is not informative on
-all three sample seeds. It is not a zero. A lineage with no charged bytes
-and no retention is omitted. BeyondArena is not pooled with
-the PMLB panel. The release-score rows are arithmetic on invented components.
-They are not measurements on these lineages.
-\end{abstract}
+8{,}192-step sufficiency budget, and the \BeyondInventory{} BeyondArena
+family names. These tables are the rows behind the medians in the main
+paper. A blank retention is an unavailable fit or an auditor that is not
+informative on all three sample seeds. It is not a zero. A lineage with
+no charged bytes and no retention is omitted. BeyondArena is not pooled
+with the PMLB panel. The release-score rows are arithmetic on invented
+components. They are not measurements on these lineages.
+\end{abstract}}
+
+\maketitle
 
 \onecolumn
 \appendices
