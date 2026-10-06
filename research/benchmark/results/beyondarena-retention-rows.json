@@ -1,0 +1,498 @@
+{
+  "accepted_cells": 0,
+  "blocks": [
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "DOPE",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "DOPE",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "DOPE",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "GaussianCopula",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "GaussianCopula",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "GaussianCopula",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "Chow-Liu",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "Chow-Liu",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "Chow-Liu",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "independent_marginals",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "independent_marginals",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "independent_marginals",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "CTGAN",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "CTGAN",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "CTGAN",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "TVAE",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "TVAE",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "TVAE",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "ARF",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "ARF",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "ARF",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "Forest-Flow",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "Forest-Flow",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "Forest-Flow",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "TabSyn",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "TabSyn",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "TabSyn",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "TabDDPM",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "TabDDPM",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "TabDDPM",
+      "n": null,
+      "task": "binary_classification",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "DOPE",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "DOPE",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "DOPE",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "GaussianCopula",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "GaussianCopula",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "GaussianCopula",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "Chow-Liu",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "Chow-Liu",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "Chow-Liu",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "independent_marginals",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "independent_marginals",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "independent_marginals",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "CTGAN",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "CTGAN",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "CTGAN",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "TVAE",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "TVAE",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "TVAE",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "ARF",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "ARF",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "ARF",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "Forest-Flow",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "Forest-Flow",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "Forest-Flow",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "TabSyn",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "TabSyn",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "TabSyn",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "catboost",
+      "median_retention": "not measured",
+      "method": "TabDDPM",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "linear",
+      "median_retention": "not measured",
+      "method": "TabDDPM",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    },
+    {
+      "auditor": "mlp",
+      "median_retention": "not measured",
+      "method": "TabDDPM",
+      "n": null,
+      "task": "regression",
+      "wins_ties_losses": "not measured"
+    }
+  ],
+  "configuration": "features12_steps2048",
+  "fold": "inner_validation",
+  "format": "dope-beyondarena-retention-rows",
+  "median_rule": "not measured until the manuscript generator reads a complete block",
+  "mfs_v2": null,
+  "official_pmlb_tests_opened": false,
+  "pooled_with_s3_100": false,
+  "ptf_v1": null,
+  "receipt": "absent",
+  "release_safe": null,
+  "selected_count": 73,
+  "superiority": null,
+  "version": 1
+}

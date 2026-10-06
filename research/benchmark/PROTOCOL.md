@@ -50,11 +50,15 @@ CTR23 tasks. Require a defined target, 500–100,000 rows, 1–2,000 input
 features, recorded redistribution rights, and deduplication. Sort eligible
 official task IDs by SHA-256 and take the first ten per task. Record shortfall.
 
-The BeyondArena panel is also separate. Select at most 12 rights-cleared,
-previously unscored binary or regression source families by official task-ID
-hash across IID, grouped, and temporal strata. Use official auditable folds;
-workers receive training and validation only. Never pool this panel with the
-public-core headline. The JopeDime robustness panel is separate. The pinned catalog hash is
+The BeyondArena panel is also separate. Version 3 of
+`results/beyondarena-panel.lock.json` selects every rights-cleared binary or
+regression family that is not already one of the PMLB 100. That eligible set
+is 73 families. The earlier cap of 12 is the historical prepare only: five
+DOPE fits finished and no retention auditor ran. Wave 1 scores the inner
+validation cut of the official training fold. The official outer fold is not
+authorized. Workers receive training and validation only. Never pool this
+panel with the public-core headline or with the PMLB 100. A missing retention
+receipt stays the words "not measured." The JopeDime robustness panel is separate. The pinned catalog hash is
 `ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120`.
 It has 104 regression entries with recorded MIT evidence. The 3,755 entries
 with unknown license status are ineligible for publication. Blob and dataset

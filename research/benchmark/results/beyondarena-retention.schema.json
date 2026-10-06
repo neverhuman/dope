@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BeyondArena wave-1 retention receipt",
+  "description": "Cell records only. A median in this file is rejected by the publisher.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "fold",
+    "configuration",
+    "pooled_with_s3_100",
+    "official_pmlb_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe",
+    "superiority",
+    "cells"
+  ],
+  "properties": {
+    "format": {"const": "dope-beyondarena-retention-receipt"},
+    "version": {"const": 1},
+    "fold": {"const": "inner_validation"},
+    "configuration": {"const": "features12_steps2048"},
+    "pooled_with_s3_100": {"const": false},
+    "pooled_with_public_headline": {"const": false},
+    "official_pmlb_tests_opened": {"const": false},
+    "mfs_v2": {"type": "null"},
+    "ptf_v1": {"type": "null"},
+    "release_safe": {"type": "null"},
+    "superiority": {"type": "null"},
+    "cells": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/cell"}
+    }
+  },
+  "$defs": {
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "task", "method", "auditor", "status", "retention"],
+      "properties": {
+        "family": {"type": "string", "minLength": 1},
+        "task": {"enum": ["binary_classification", "regression"]},
+        "method": {
+          "enum": [
+            "DOPE",
+            "GaussianCopula",
+            "Chow-Liu",
+            "independent_marginals",
+            "CTGAN",
+            "TVAE",
+            "ARF",
+            "Forest-Flow",
+            "TabSyn",
+            "TabDDPM"
+          ]
+        },
+        "auditor": {"enum": ["catboost", "linear", "mlp"]},
+        "status": {"enum": ["ok", "unavailable", "uninformative"]},
+        "retention": {"type": ["number", "null"]}
+      }
+    }
+  }
+}
