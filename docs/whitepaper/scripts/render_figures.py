@@ -181,9 +181,9 @@ def draw_paired(stats, dest=None):
         axis.scatter(values, np.arange(1, values.size + 1), s=14, c=color, marker=marker, linewidths=0)
         axis.axvline(0, color="#333333", linewidth=0.6)
         axis.set_xlim(-1.5, 1.5)
-        axis.set_xlabel("DOPE minus comparator")
+        axis.set_xlabel("retention difference (dimensionless)")
         if column == 0:
-            axis.set_ylabel("lineages, sorted")
+            axis.set_ylabel("sorted lineage index")
         lo, hi = pairs[key]["lo"], pairs[key]["hi"]
         outside = int(np.sum((values < -1.5) | (values > 1.5)))
         axis.set_title(f"{label}\nmedian {pairs[key]['median_difference']:.3f} [{lo:.3f}, {hi:.3f}] ({outside} outside)")

@@ -135,3 +135,9 @@ Each item from the original verdict has one status.
 | Sealed official test | blocked-on-decision | The receipt flag stays closed. Scoring the official test is not a writing change. |
 
 No item is open-W. The experiments that would change the recommendation are the B-lane receipts and the three decisions above.
+
+## IEEE figure pass
+
+Read on the merged PDFs at `2016fb8`, then checked again after the axis-label edit. Grayscale renders of `fig:arch`, `fig:bytes`, `fig:pairs`, and the supplement loss curves keep each series distinct. The pipeline is black rules on a white ground at column width. The retention figure uses circles, squares, triangles, and diamonds, and the loss figure uses a solid line and a dashed line. Type 3 count remains 0. Fonts in the span figures are set so 8.1 pt stays at least 8 pt at the 7.16 in placement.
+
+The paired-difference axis previously said "DOPE minus comparator" and did not name the unit. It now says "retention difference (dimensionless)", and the vertical axis says "sorted lineage index". The density section names the four marks. The supplement names the solid and dashed loss lines. The numbers printed in the paired-figure titles match `density-table.tex`: 0.224 [0.149, 0.290], 0.337 [0.282, 0.451], and 0.956 [0.918, 0.980]. `just paper-check` on `2016fb8` passed before this edit. Venue, byline, and the sealed test are unchanged.

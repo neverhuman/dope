@@ -2,7 +2,7 @@
   "format": "dope-paper-figure-hashes",
   "pdf_sha256": {
     "loss-curves.pdf": "73883588acb82aeb1fb8b8755ca5186e23267ab7aaf19be8477425a8eee02f00",
-    "paired-cdf.pdf": "c7a56b4c867f2afd173970092c23336a77352b4d7c48ea1bf5f843493a888042",
+    "paired-cdf.pdf": "95ac96004fcbea159730aa95e42345e325ee38394c1c2c8b144b760831e965c2",
     "retention-bytes.pdf": "4c6fb964d0d5d71fa9f08d4f08d19ab08f734ed43faf0554800597313d7dd636"
   }
 }

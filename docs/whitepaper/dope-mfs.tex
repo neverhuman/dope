@@ -347,8 +347,10 @@ median with a small $p$-value still includes lineage losses.
 
 \subsection{Density block}
 Fig.~\ref{fig:bytes} plots retention against $\log_{10}$ charged bytes for
-the three auditors. The open markers are each method's own median and
-lineage-bootstrap interval on the lineages that method completed. The table
+the three auditors. Circles are DOPE, squares the Gaussian copula,
+triangles Chow--Liu, and diamonds the independent marginals. Filled
+marks are lineages. Open marks are that method's median and its
+lineage-bootstrap interval on the lineages it completed. The table
 intervals are the paired subsets. For CatBoost those two DOPE sets coincide.
 Paired differences outside $[-1.5, 1.5]$ are counted in the panel title and
 omitted from that frame. The retention axis stops at $1.6$. The dashed line is the cap. Neural and Forest-Flow artifacts are
@@ -373,7 +375,8 @@ the MLP.
 On the $\FriedmanNCb$ lineages common to all four methods, the Friedman
 $p$-value is $\FriedmanPCb$ and the critical difference is $\FriedmanCdCb$.
 All six CatBoost pairs exceed that difference. Fig.~\ref{fig:pairs} shows
-the sorted paired differences. The bar is the critical difference.
+the sorted paired differences with the same four marks. The horizontal
+axis is the retention difference. The bar is the critical difference.
 
 \begin{table*}[t]
 \caption{Density block at $4n$. W/T/L counts lineages.}
