@@ -1,0 +1,253 @@
+{
+  "access_disclosure": "Metadata JSON documents, including historical native scalars, decoded after body hashes; only lifecycle, timing, resources and inventory fields used",
+  "arf_source_lock_hashes": {
+    "batch_auxiliary": "fbc3596f62480e3b69b68263d0cadd459910d0fad093d1ffcc127dec92a094ce",
+    "native_receipts": "238a19ea24694348b0cb6acd43b5203ac75989ee6ac5c714ef86c32ff040e61d",
+    "native_reconciliation": "af722bff624b2b5cad37eb10a314767dcbd2b00b085c44114f8ef398de9c3850",
+    "receipts": "172875365cd22716c04b8859ae72379bb88eb1b976680f69dc497493f5e324b2",
+    "reconciliation": "bb68953bf349ca4107f7fb6578fc77cac6a62c39e0530947ca182b1ca6600b1c",
+    "round": "ee43afacaf324386b29cabbda5d8195a8777c75db2a4da297d7b7ff50a620716",
+    "sampling_receipts": "2fe4c5f9bd1287902e0802e1bb973475e3132b84c50d32c133572289e33202fc",
+    "sampling_round": "bf17d9c4b2d76736036dec82adfd98447e94f66fd8d7bb56675d4e8245012777"
+  },
+  "forest_index_verified_files": 140,
+  "forest_index_verified_set_sha256": "a5e2875fe1bdc849a263bfc76d32aea3d09ffc37614e724f5029213b1a171d70",
+  "format": "work-order-b-item6-cost-source-proof",
+  "new_scientific_jobs": 0,
+  "official_tests_rows_models_samples_opened": false,
+  "original_cost_scratch_receipt_custody": {
+    "density_native": {
+      "anchor": {
+        "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-native-custody-v1/receipt-lock-v1.json",
+        "sha256": "902c68d8ffd4ef7a8ed93539947ddb7496d0c14438f7a4a0c52631d51834f6f5"
+      },
+      "original_receipt_count": 1100,
+      "original_receipt_selector": "Bound reconciliation trial/batch receipts",
+      "original_receipt_set_sha256": "5bb22ce830bae9f79f6896b1b4a22918987af82908b377fb7d7093ffd71437ed",
+      "phase_timing_scope": "Original operation metadata; model/data bytes are never decoded",
+      "reconciliation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-native-custody-v1/reconciliation-v1.json",
+        "sha256": "efe8f169dbf8e1b7a68b44406ced32d910a2809f09682539facd24c86ac67187"
+      }
+    },
+    "density_shared": {
+      "anchor": {
+        "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-shared-validation-v1/receipt-lock-v1.json",
+        "sha256": "b2f5964cf40d047d63dc5698c42c2370d945384f5f9567d6809d0959f4f4d81b"
+      },
+      "original_receipt_count": 502,
+      "original_receipt_selector": "Bound reconciliation trial/batch receipts",
+      "original_receipt_set_sha256": "7d5eae5bea2d82bd52f07c9bf638812b904d7f0d1324f75e788b63028edbbc07",
+      "phase_timing_scope": "Original operation metadata; model/data bytes are never decoded",
+      "reconciliation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-shared-validation-v1/reconciliation-v1.json",
+        "sha256": "b72a1a7cc2c9298e9eb0cd1c774a995561a1ea7e51f39e269c4789532096cb09"
+      }
+    },
+    "forest_native": {
+      "anchor": {
+        "path": "/mnt/fast-scratch/dope-benchmark/forest-s3-native-v1/receipt-lock-v1.json",
+        "sha256": "b9be26c9a9c76c1829ca09309873993ffafb10d959b1489abc95f79aa5075e1f"
+      },
+      "original_receipt_count": 12,
+      "original_receipt_selector": "Bound public native_attempts[].receipt",
+      "original_receipt_set_sha256": "e654968193ef86cd6fec03bb337d308b101698c15765cd2072bb25f124de8b27",
+      "phase_timing_scope": "Original operation metadata; model/data bytes are never decoded"
+    }
+  },
+  "preparer": {
+    "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/work-order-b-compute-cost-report-item6-v1/final-v1/prepare_report.py",
+    "sha256": "77d44a55a29eaa3bfedaacbd8dc33849d9fd42e14cbbda9bee8c71d0386dcb86"
+  },
+  "publisher": {
+    "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/publish_work_order_b_costs.py",
+    "sha256": "d90e275318b8eb766fb340334103060de8aeb3c81f65728e28314b2da4f34e01"
+  },
+  "sources": [
+    {
+      "bytes": 19519,
+      "id": "published_cost_core",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/work-order-b-costs-v1/measured-costs.json",
+      "sha256": "f017da01be0df7024a7da1837b9ff0dba44961c0f55ca6e458758b0b9942e312"
+    },
+    {
+      "bytes": 5421,
+      "id": "published_source_proof",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/work-order-b-costs-v1/source-proof.json",
+      "sha256": "ecc92768307727867e8063b01626555b5b883836f90752ee927923455466cdda"
+    },
+    {
+      "bytes": 1472035,
+      "id": "arf-s3-population-native.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/arf-s3-population-native.json",
+      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+    },
+    {
+      "bytes": 21794615,
+      "id": "density-matched-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/density-matched-population-validation.json",
+      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+    },
+    {
+      "bytes": 461259,
+      "id": "dope-s3-population-gpu-fits.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-s3-population-gpu-fits.json",
+      "sha256": "df4a370ba66a595f665bf2f45d8a183dde9955b6ab65d7c28df0ec8ae24d4c21"
+    },
+    {
+      "bytes": 7352232,
+      "id": "dope-s3-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-s3-population-validation.json",
+      "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
+    },
+    {
+      "bytes": 273775,
+      "id": "dope-target-refinement-population-fits.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-target-refinement-population-fits.json",
+      "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
+    },
+    {
+      "bytes": 3901636,
+      "id": "dope-target-refinement-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-target-refinement-population-validation.json",
+      "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+    },
+    {
+      "bytes": 1237153,
+      "id": "s3-matched-forest-confirmation-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/s3-matched-forest-confirmation-validation.json",
+      "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
+    },
+    {
+      "bytes": 13567823,
+      "id": "sdv-matched-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/sdv-matched-population-validation.json",
+      "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+    },
+    {
+      "bytes": 2138403,
+      "id": "sdv-s3-population-native.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/sdv-s3-population-native.json",
+      "sha256": "635fd4273886d59691356b85d2fad58eae596ef74a48dc0bfb5bffee653bacc3"
+    },
+    {
+      "bytes": 6807387,
+      "id": "arf_matched",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/arf-matched-population-validation.json",
+      "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
+    },
+    {
+      "bytes": 2356,
+      "id": "arf_closed_rounds",
+      "path": "/home/ubuntu/dope/target/work-order-b-root-readiness-v1/arf-199-final-closure-root-verification.v1.json",
+      "sha256": "ffbc3ff399a79aadda049e2b6283bc12fab94f6a1666da4d21d53f202f105864"
+    },
+    {
+      "bytes": 289,
+      "id": "arf_arf_native_closure_0",
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-population-native-v3/completion.json",
+      "sha256": "ef5c4b8e2ca386df722710f25015e3935ec1afb90e27c4172cae1697212ec134"
+    },
+    {
+      "bytes": 397,
+      "id": "arf_arf_native_closure_1",
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-population-native-v3/coordinator-exit.json",
+      "sha256": "23435b3cc55b442ef4bb5e6bc52cf35aa443ffd9681bbb267daa9d318632d159"
+    },
+    {
+      "bytes": 308,
+      "id": "arf_arf_sampling_closure_0",
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-population-sampling-v1/completion.json",
+      "sha256": "0796e59e96bb058ea7845264858491e07f2e75d9c06da219c11332c7a2640b1b"
+    },
+    {
+      "bytes": 323,
+      "id": "arf_arf_sampling_closure_1",
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-population-sampling-v1/coordinator-exit.json",
+      "sha256": "ad0bf2a1195d23f3d72bf88eca568e2ca4b0c99110c4c896fcb3575e888f7fb3"
+    },
+    {
+      "bytes": 308,
+      "id": "arf_arf_common_validation_closure_0",
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-population-shared-validation-v1/completion.json",
+      "sha256": "061fd53af186de8c3c5230a8d256474d5faa0187aec3de00539f844d6880a797"
+    },
+    {
+      "bytes": 323,
+      "id": "arf_arf_common_validation_closure_1",
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-population-shared-validation-v1/coordinator-exit.json",
+      "sha256": "1c04cd3b8346837b3df46045f6571dbd80426d93d88ce984902173c8c9c9c5d4"
+    },
+    {
+      "bytes": 70411,
+      "id": "forest_prefix20_index",
+      "path": "/home/ubuntu/dope/target/work-order-b-root-readiness-v1/forest-prefix20-primary-scalar-custody.v1.json",
+      "sha256": "2cb2069d0166c3823b73bbca2e3bcb6e8b6f058feff4e77d840cc3d57ede76b2"
+    },
+    {
+      "bytes": 4510,
+      "id": "forest_negative22",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/terminal-job22-unavailable.v15.json",
+      "sha256": "5cf7510273665a6461e6fd2b071a8633de216584cb65eddbc1cdbd03ef3a065a"
+    },
+    {
+      "bytes": 404,
+      "id": "forest22_prior_operation",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/3f9fc9c82d4f7f17ef9f21da4563364f0ef2dd631fb29df79bd4296f3b1cc50c.json",
+      "sha256": "3f9fc9c82d4f7f17ef9f21da4563364f0ef2dd631fb29df79bd4296f3b1cc50c"
+    },
+    {
+      "bytes": 404,
+      "id": "forest22_operation",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/cdc59a5ac0ffa69dc302e1630ce29994f47b4ff3d934f118ce25e2cfe9f6f2a2.json",
+      "sha256": "cdc59a5ac0ffa69dc302e1630ce29994f47b4ff3d934f118ce25e2cfe9f6f2a2"
+    },
+    {
+      "bytes": 422,
+      "id": "forest22_watchdog",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/9b64c272682073db14fed8f349977fac3b04ab863a6f48ff0f2d6bf90f7a7a91.json",
+      "sha256": "9b64c272682073db14fed8f349977fac3b04ab863a6f48ff0f2d6bf90f7a7a91"
+    },
+    {
+      "bytes": 171,
+      "id": "forest22_terminal",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/627e5aca54fa11a38dc0bb4334c7771e91075dee6153d555b447d22e2461e8cc.json",
+      "sha256": "627e5aca54fa11a38dc0bb4334c7771e91075dee6153d555b447d22e2461e8cc"
+    },
+    {
+      "bytes": 4179,
+      "id": "forest22_absence",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/4566d218754657f1a1e270306ad81fd82f6f73442772fdd1d7ce39aed1f928ea.json",
+      "sha256": "4566d218754657f1a1e270306ad81fd82f6f73442772fdd1d7ce39aed1f928ea"
+    },
+    {
+      "bytes": 10337,
+      "id": "tabsyn_prefix25",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-xbabe1-real-owner-v1/readonly-custody/20261006T140948/queue.actual-census.json",
+      "sha256": "c518920f44813e05cf68071eb13ee6ad7101370a20919c76e25a5e28e6f04e2b"
+    },
+    {
+      "bytes": 3783,
+      "id": "tabsyn_source_packet",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-xbabe1-real-owner-v1/metrics-peer-registration.20261006T141016.json",
+      "sha256": "5bb61c0e64d3350808294c480c85d9fcd27c66148df624d3ba7223d5fb1fd20a"
+    },
+    {
+      "bytes": 25080,
+      "id": "td14_idle_closed",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/TD14-owned-idle-handoff.closed.actual.v15.json",
+      "sha256": "162729b152be1528a7cf69e773ee90034ba52eee930903d30e6e6a5f3ce6ae2f"
+    }
+  ],
+  "tabsyn_declared_source_hashes": {
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_controller_v1.py": "f5ef5f996e20a5bc6f6f510bbc6fce61338dc360da7f1b269c2c95cedbb53386",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_entry_v1.py": "5d5ac24fc6e816edef007a3218b2556a4153dcfa395a415875057ef84303d25d",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_entry_v2.py": "5c69a932c9125ba59d38ed4b6140973c12c88c3f2f55a66f68cbd76840c1f5a4",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_population_v2.py": "e052cbb95fc22ebb0c90f574366556fa0ecdce2bdfa983bd5b8b6a7c031afe14",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/tabsyn_native_target.captured.py": "584a1a07320c53d343ee119e5dcb9fc65ca49e19bf8c151e3375d9a05e2c69a7"
+  },
+  "tabsyn_mirrored_verified_files": 11,
+  "tabsyn_mirrored_verified_set_sha256": "edc9c7857d1e9315208634d4265ed8e336b4ea6132fa5153162be91f008c2b7c",
+  "version": 1
+}

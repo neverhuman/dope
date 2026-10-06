@@ -205,6 +205,8 @@
     "research/benchmark/expanded-validation-metrics.NOTICE": "external-evidence",
     "research/benchmark/tabsyn_owned_lifecycle.py": "external-evidence",
     "research/benchmark/tests/test_tabsyn_owned_lifecycle.py": "external-evidence",
-    "research/benchmark/tabsyn-one-qualification.owner-addendum.json": "external-evidence"
+    "research/benchmark/tabsyn-one-qualification.owner-addendum.json": "external-evidence",
+    "research/benchmark/results/work-order-b-compute-costs-v2": "external-evidence",
+    "research/benchmark/tests/test_work_order_b_compute_costs.py": "external-evidence"
   }
 }

@@ -1189,6 +1189,13 @@ python3 -B -m research.benchmark.publish_arf_population_matched_manifest \
 
 `results/work-order-b-costs-v1/` records measured closed research costs from immutable receipts and the exact missing evidence for all six MFS-v2 components and hard gates. Physical aliases are charged once; historical shared-GPU timing and hardware remain unknown where receipts omitted them. Scheduling cutoffs carry no method-failure conclusion. MFS-v2, PTF-v1, release-safe and superiority remain null.
 
+[`results/work-order-b-compute-costs-v2/`](results/work-order-b-compute-costs-v2/README.md)
+adds completed ARF sampling and measurement, Forest's completed prefix and
+infrastructure attempts, and a frozen TabSyn fit checkpoint. Operation and
+scheduler times, artifact inventories and missing resource evidence are reported
+separately. Reproduce its CSV and schema with the directory's stdlib `render.py`;
+the report remains partial and all certification scores remain null.
+
 Reproduce the tables and schemas with `python3 -B -m research.benchmark.publish_work_order_b_costs --repo "$PWD" --output target/work-order-b-costs-replay-v1`. Original scratch receipts are needed for full receipt verification; the committed manifest binds their hashes.
 
 ## Complete ARF native population ledger
