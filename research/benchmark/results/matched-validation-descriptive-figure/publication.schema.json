@@ -1,0 +1,702 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "aggregation": {
+      "type": "string"
+    },
+    "baseline_configuration": {
+      "type": "string"
+    },
+    "cohorts": {
+      "additionalProperties": false,
+      "properties": {
+        "catboost_size1": {
+          "additionalProperties": false,
+          "properties": {
+            "datasets": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 97,
+              "minItems": 97,
+              "type": "array"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "datasets",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "catboost_size4": {
+          "additionalProperties": false,
+          "properties": {
+            "datasets": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 97,
+              "minItems": 97,
+              "type": "array"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "datasets",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "linear_size1": {
+          "additionalProperties": false,
+          "properties": {
+            "datasets": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 92,
+              "minItems": 92,
+              "type": "array"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "datasets",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "linear_size4": {
+          "additionalProperties": false,
+          "properties": {
+            "datasets": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 92,
+              "minItems": 92,
+              "type": "array"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "datasets",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "mlp_size1": {
+          "additionalProperties": false,
+          "properties": {
+            "datasets": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 75,
+              "minItems": 75,
+              "type": "array"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "datasets",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "mlp_size4": {
+          "additionalProperties": false,
+          "properties": {
+            "datasets": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 75,
+              "minItems": 75,
+              "type": "array"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "datasets",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "catboost_size1",
+        "catboost_size4",
+        "linear_size1",
+        "linear_size4",
+        "mlp_size1",
+        "mlp_size4"
+      ],
+      "type": "object"
+    },
+    "complete_neural_comparison": {
+      "const": false
+    },
+    "confidence_interval_measured": {
+      "const": false
+    },
+    "dope_configuration": {
+      "type": "string"
+    },
+    "format": {
+      "const": "matched-validation-descriptive-figure-v1"
+    },
+    "full_five_fit_seed_coverage": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_selection_changed": {
+      "const": false
+    },
+    "native_values_ranked_across_methods": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_significance_measured": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "raw_mse_comparison_across_datasets": {
+      "const": false
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "rows": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "auditor": {
+                "type": "string"
+              },
+              "cohort_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "configuration": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "informative_matched_lineages": {
+                "type": "integer"
+              },
+              "maximum_charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "median_charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "median_null_normalized_tstr_trtr_retention": {
+                "type": "number"
+              },
+              "median_paired_dope_minus_method": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "sample_seeds": {
+                "type": "string"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "auditor",
+              "cohort_sha256",
+              "configuration",
+              "fit_seed",
+              "informative_matched_lineages",
+              "maximum_charged_artifact_bytes",
+              "median_charged_artifact_bytes",
+              "median_null_normalized_tstr_trtr_retention",
+              "median_paired_dope_minus_method",
+              "method",
+              "sample_seeds",
+              "size_multiplier"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "auditor": {
+                "type": "string"
+              },
+              "cohort_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "configuration": {
+                "type": "string"
+              },
+              "fit_seed": {
+                "type": "integer"
+              },
+              "informative_matched_lineages": {
+                "type": "integer"
+              },
+              "maximum_charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "median_charged_artifact_bytes": {
+                "type": "number"
+              },
+              "median_null_normalized_tstr_trtr_retention": {
+                "type": "number"
+              },
+              "median_paired_dope_minus_method": {
+                "type": "number"
+              },
+              "method": {
+                "type": "string"
+              },
+              "sample_seeds": {
+                "type": "string"
+              },
+              "size_multiplier": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "auditor",
+              "cohort_sha256",
+              "configuration",
+              "fit_seed",
+              "informative_matched_lineages",
+              "maximum_charged_artifact_bytes",
+              "median_charged_artifact_bytes",
+              "median_null_normalized_tstr_trtr_retention",
+              "median_paired_dope_minus_method",
+              "method",
+              "sample_seeds",
+              "size_multiplier"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 30,
+      "minItems": 30,
+      "type": "array"
+    },
+    "scientific_execution": {
+      "const": false
+    },
+    "scope": {
+      "const": "Previously measured official-training-derived validation; unconstrained artifacts; one fit seed."
+    },
+    "source_csv": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "source_group_coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "ARF": {
+          "additionalProperties": false,
+          "properties": {
+            "1": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {},
+                  "maxItems": 0,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            },
+            "4": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {},
+                  "maxItems": 0,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "1",
+            "4"
+          ],
+          "type": "object"
+        },
+        "Chow-Liu": {
+          "additionalProperties": false,
+          "properties": {
+            "1": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {},
+                  "maxItems": 0,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            },
+            "4": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {},
+                  "maxItems": 0,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "1",
+            "4"
+          ],
+          "type": "object"
+        },
+        "DOPE": {
+          "additionalProperties": false,
+          "properties": {
+            "1": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            },
+            "4": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "1",
+            "4"
+          ],
+          "type": "object"
+        },
+        "GaussianCopula": {
+          "additionalProperties": false,
+          "properties": {
+            "1": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {},
+                  "maxItems": 0,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            },
+            "4": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {},
+                  "maxItems": 0,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "1",
+            "4"
+          ],
+          "type": "object"
+        },
+        "independent_marginals": {
+          "additionalProperties": false,
+          "properties": {
+            "1": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {},
+                  "maxItems": 0,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            },
+            "4": {
+              "additionalProperties": false,
+              "properties": {
+                "complete_three_sample_groups": {
+                  "type": "integer"
+                },
+                "incomplete_datasets": {
+                  "items": {},
+                  "maxItems": 0,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "planned_groups": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "complete_three_sample_groups",
+                "incomplete_datasets",
+                "planned_groups"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "1",
+            "4"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "ARF",
+        "Chow-Liu",
+        "DOPE",
+        "GaussianCopula",
+        "independent_marginals"
+      ],
+      "type": "object"
+    },
+    "source_panels": {
+      "additionalProperties": false,
+      "properties": {
+        "arf-matched-population-validation.json": {
+          "type": "string"
+        },
+        "density-matched-population-validation.json": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "arf-matched-population-validation.json",
+        "density-matched-population-validation.json"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "aggregation",
+    "baseline_configuration",
+    "cohorts",
+    "complete_neural_comparison",
+    "confidence_interval_measured",
+    "dope_configuration",
+    "format",
+    "full_five_fit_seed_coverage",
+    "mfs_v2",
+    "native_selection_changed",
+    "native_values_ranked_across_methods",
+    "official_tests_opened",
+    "paired_significance_measured",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sha256",
+    "raw_mse_comparison_across_datasets",
+    "release_safe",
+    "rows",
+    "scientific_execution",
+    "scope",
+    "source_csv",
+    "source_group_coverage",
+    "source_panels",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}

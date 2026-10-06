@@ -1,0 +1,17 @@
+{
+  "font_sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+  "freetype_version": "2.6.1",
+  "matplotlib_version": "3.10.8",
+  "outputs": {
+    "measured-validation-utility-4n.pdf": {
+      "bytes": 22594,
+      "sha256": "e232e13eb89eb1add101e4831273fdad2499099d56ef8aa4f2d6e93649429e76"
+    },
+    "measured-validation-utility-4n.svg": {
+      "bytes": 95287,
+      "sha256": "de31d748afd1a2cf633d0c9817291e9cc145ec7f756e1956165d51f89c2bef59"
+    }
+  },
+  "publisher_sha256": "0cf7aa6df7818041778fbb8ec070e68860558cd96f147e70da05d0dd59f99c0c",
+  "source_csv_sha256": "51dc00cf85cc5160cf4f496a2357722f5c6116297b084ad3271bdbac475982a6"
+}

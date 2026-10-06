@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "font_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "freetype_version": {
+      "type": "string"
+    },
+    "matplotlib_version": {
+      "type": "string"
+    },
+    "outputs": {
+      "additionalProperties": false,
+      "properties": {
+        "measured-validation-utility-4n.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "measured-validation-utility-4n.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "measured-validation-utility-4n.pdf",
+        "measured-validation-utility-4n.svg"
+      ],
+      "type": "object"
+    },
+    "publisher_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_csv_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "font_sha256",
+    "freetype_version",
+    "matplotlib_version",
+    "outputs",
+    "publisher_sha256",
+    "source_csv_sha256"
+  ],
+  "type": "object"
+}
