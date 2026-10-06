@@ -121,7 +121,8 @@ class MatchedARFControls(unittest.TestCase):
             physical_metric_receipts=accounting, physical_sampling_receipts=copy.deepcopy(accounting),
             physical_metric_status_counts={'ok': 199}, sample_status_counts={'ok': 199},
             scheduler_wall_seconds_evidence=dict(sample=0, metric=0),
-            cost=dict(sample_operation_seconds=0, metric_operation_seconds=0,
+            cost=dict(native_fit=copy.deepcopy(pub.frozen_native_cost()),
+                sample_operation_seconds=0, metric_operation_seconds=0,
                 sample_scheduler_wall_seconds=0, metric_scheduler_wall_seconds=0),
             source_locks=dict(sampling_round=pub.SAMPLE_ROUND,native_receipts=pub.NATIVE_RECEIPTS,native_reconciliation=pub.NATIVE_REPORT),**pub.GATES)
         with patch.object(pub,'reference_cells',return_value=ref):
@@ -147,6 +148,14 @@ class MatchedARFControls(unittest.TestCase):
                 lambda v:v['physical_metric_receipts'][0].update(status='timeout')]:
                 bad=copy.deepcopy(report);change(bad)
                 with self.assertRaises(ValueError):pub.validate_report(bad)
+            for change in [dict(operation_seconds=-17, scheduler_wall_seconds=-19),
+                dict(operation_seconds=True, scheduler_wall_seconds=True),
+                dict(operation_seconds=12345, scheduler_wall_seconds=67890),
+                dict(operation_seconds=float('nan'), scheduler_wall_seconds=0),
+                dict(operation_seconds=0, scheduler_wall_seconds=float('inf')),
+                dict(operation_seconds=0), dict(report['cost']['native_fit'], extra_seconds=0)]:
+                bad=copy.deepcopy(report);bad['cost']['native_fit']=change
+                with self.subTest(native_cost=change),self.assertRaises(ValueError):pub.validate_report(bad)
             bad=copy.deepcopy(report);bad['cells'][0]['validation_receipt_sha256']=None
             with self.assertRaisesRegex(ValueError,'metric outcome lacks'):pub.validate_report(bad)
 

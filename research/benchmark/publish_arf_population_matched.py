@@ -503,6 +503,16 @@ def public_accounting(records, expected_count):
     return dict(Counter(r['status'] for r in records)), sum(r['operation_seconds'] for r in records)
 
 
+def frozen_native_cost():
+    directory = Path(native.__file__).with_name('results')
+    publication = guard.bound(directory / (native.NAME + '.json'), NATIVE_PUBLICATION, directory)
+    cost = publication['cost']
+    guard.require(type(cost) is dict and set(cost) == {'operation_seconds', 'scheduler_wall_seconds'},
+                  'frozen native cost fields differ')
+    for value in cost.values(): seconds(value)
+    return cost
+
+
 def validate_report(report):
     ids = complete_matrix(report['cells'])
     guard.require(report['datasets'] == ids and count(report['logical_validation_cells']) == 1200
@@ -513,6 +523,13 @@ def validate_report(report):
         and report['dope_reference']['sha256'] == DOPE_PUBLICATION
         and report['release_safe_l3_comparison_complete'] is False
         and all(report[k] is v for k, v in GATES.items()), 'committed common scope differs')
+    native_cost = report['cost']['native_fit']
+    guard.require(type(native_cost) is dict
+        and set(native_cost) == {'operation_seconds', 'scheduler_wall_seconds'},
+        'public native cost fields differ')
+    for value in native_cost.values(): seconds(value)
+    guard.require(digest(native_cost) == digest(frozen_native_cost()),
+                  'public native cost differs from frozen native publication')
     guard.require(dict(Counter(c['status'] for c in report['cells'])) == status_counts(report['logical_status_counts']),
                   'logical outcome counts differ')
     metric_counts, metric_seconds = public_accounting(report['physical_metric_receipts'], report['physical_metric_batches'])
