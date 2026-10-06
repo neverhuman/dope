@@ -1,0 +1,495 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attributed_energy_joules": {
+      "type": "null"
+    },
+    "committed_source_revision": {
+      "const": "c4672e7ffa29f0bd88f1c04d8a83bd6d2a828b12"
+    },
+    "format": {
+      "const": "dope-cost-component-source-proof"
+    },
+    "hardware_models": {
+      "type": "null"
+    },
+    "historical_co_tenant": {
+      "type": "null"
+    },
+    "logical_aliases_charged_again": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "new_metric_jobs_started": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "new_training_or_samples_started": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "physical_operation_metadata_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "physical_operations": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "preparation_source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "private_preparation_sha256": {
+      "additionalProperties": false,
+      "properties": {
+        "work-order-b-compute-ledger-v1/compact-measured-costs-v1.json": {
+          "const": "a6a0081fc88fd94237967c71927ac5498525940db01668d637970e991c3cbf76"
+        },
+        "work-order-b-compute-ledger-v1/ledger-preparation-v4.json": {
+          "const": "fdb9754c28cbf784052e9358f6583a6bb1939db7417a3ede3df071de09d89520"
+        },
+        "work-order-b-mfs-gaps-v1/component-gaps.json": {
+          "const": "f4762a2f938eba4a9f219b5a1902b50a432d57ade477392891ccc0ab91c3b4b2"
+        }
+      },
+      "required": [
+        "work-order-b-compute-ledger-v1/compact-measured-costs-v1.json",
+        "work-order-b-compute-ledger-v1/ledger-preparation-v4.json",
+        "work-order-b-mfs-gaps-v1/component-gaps.json"
+      ],
+      "type": "object"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "public_source_reports": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/arf-s3-population-native.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/density-matched-population-validation.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/dope-s3-population-gpu-fits.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/dope-s3-population-validation.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/dope-target-refinement-population-fits.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/dope-target-refinement-population-validation.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/s3-matched-forest-confirmation-validation.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/sdv-matched-population-validation.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "research/benchmark/results/sdv-s3-population-native.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 9,
+      "minItems": 9,
+      "type": "array"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "scratch_custody": {
+      "additionalProperties": false,
+      "properties": {
+        "density_native": {
+          "additionalProperties": false,
+          "properties": {
+            "anchor": {
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "const": "/mnt/fast-scratch/dope-benchmark/density-s3-population-native-custody-v1/receipt-lock-v1.json"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "type": "object"
+            },
+            "original_receipt_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "original_receipt_selector": {
+              "const": "Bound reconciliation trial/batch receipts"
+            },
+            "original_receipt_set_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "phase_timing_scope": {
+              "const": "Original operation metadata; model/data bytes are never decoded"
+            },
+            "reconciliation": {
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "const": "/mnt/fast-scratch/dope-benchmark/density-s3-population-native-custody-v1/reconciliation-v1.json"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "anchor",
+            "original_receipt_count",
+            "original_receipt_selector",
+            "original_receipt_set_sha256",
+            "phase_timing_scope",
+            "reconciliation"
+          ],
+          "type": "object"
+        },
+        "density_shared": {
+          "additionalProperties": false,
+          "properties": {
+            "anchor": {
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "const": "/mnt/fast-scratch/dope-benchmark/density-s3-population-shared-validation-v1/receipt-lock-v1.json"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "type": "object"
+            },
+            "original_receipt_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "original_receipt_selector": {
+              "const": "Bound reconciliation trial/batch receipts"
+            },
+            "original_receipt_set_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "phase_timing_scope": {
+              "const": "Original operation metadata; model/data bytes are never decoded"
+            },
+            "reconciliation": {
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "const": "/mnt/fast-scratch/dope-benchmark/density-s3-population-shared-validation-v1/reconciliation-v1.json"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "anchor",
+            "original_receipt_count",
+            "original_receipt_selector",
+            "original_receipt_set_sha256",
+            "phase_timing_scope",
+            "reconciliation"
+          ],
+          "type": "object"
+        },
+        "forest_native": {
+          "additionalProperties": false,
+          "properties": {
+            "anchor": {
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "const": "/mnt/fast-scratch/dope-benchmark/forest-s3-native-v1/receipt-lock-v1.json"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "type": "object"
+            },
+            "original_receipt_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "original_receipt_selector": {
+              "const": "Bound public native_attempts[].receipt"
+            },
+            "original_receipt_set_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "phase_timing_scope": {
+              "const": "Original operation metadata; model/data bytes are never decoded"
+            }
+          },
+          "required": [
+            "anchor",
+            "original_receipt_count",
+            "original_receipt_selector",
+            "original_receipt_set_sha256",
+            "phase_timing_scope"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "density_native",
+        "density_shared",
+        "forest_native"
+      ],
+      "type": "object"
+    },
+    "shared_gpu_cost": {
+      "const": "Historical flags absent; future claims require clock-bound observations"
+    },
+    "source_code_and_contract": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "production/kpi-contract.json"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "const": "rust/certification/privacy_attacks/finalize_certification.rs"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "attributed_energy_joules",
+    "committed_source_revision",
+    "format",
+    "hardware_models",
+    "historical_co_tenant",
+    "logical_aliases_charged_again",
+    "mfs_v2",
+    "new_metric_jobs_started",
+    "new_training_or_samples_started",
+    "official_tests_opened",
+    "physical_operation_metadata_sha256",
+    "physical_operations",
+    "preparation_source_sha256",
+    "private_preparation_sha256",
+    "ptf_v1",
+    "public_source_reports",
+    "release_safe",
+    "scratch_custody",
+    "shared_gpu_cost",
+    "source_code_and_contract",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}

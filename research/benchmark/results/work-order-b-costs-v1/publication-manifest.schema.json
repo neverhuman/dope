@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "component-gaps.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "component-gaps.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "component-gaps.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "component-gaps.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "measured-costs.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "measured-costs.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "measured-costs.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "measured-costs.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "source-proof.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "source-proof.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "component-gaps.csv",
+        "component-gaps.json",
+        "component-gaps.md",
+        "component-gaps.schema.json",
+        "measured-costs.csv",
+        "measured-costs.json",
+        "measured-costs.md",
+        "measured-costs.schema.json",
+        "source-proof.json",
+        "source-proof.schema.json"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "dope-cost-component-publication-manifest"
+    },
+    "input_sha256": {
+      "additionalProperties": false,
+      "properties": {
+        "component-gaps.json": {
+          "const": "81012524ebff8f752f18238e81386d2ccda30f4d4baed07cb143c2177907e700"
+        },
+        "measured-costs.json": {
+          "const": "721beb8c5afd36dd74ff6930ba7146d599c4010abd99dcad46363b3fc6524d0a"
+        },
+        "source-proof.json": {
+          "const": "a569b5b9d8a9b54d736a8944e71bdbe136c4f2daf48a1376176ebf39380de3d3"
+        }
+      },
+      "required": [
+        "component-gaps.json",
+        "measured-costs.json",
+        "source-proof.json"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "new_metric_jobs_started": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "new_training_or_samples_started": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "original_receipts_verified": {
+      "additionalProperties": false,
+      "properties": {
+        "density_native": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "density_shared": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "forest_native": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "density_native",
+        "density_shared",
+        "forest_native"
+      ],
+      "type": "object"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "format",
+    "input_sha256",
+    "mfs_v2",
+    "new_metric_jobs_started",
+    "new_training_or_samples_started",
+    "official_tests_opened",
+    "original_receipts_verified",
+    "ptf_v1",
+    "publisher_sha256",
+    "release_safe",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}

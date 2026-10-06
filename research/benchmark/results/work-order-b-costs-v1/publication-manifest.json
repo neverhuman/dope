@@ -1,0 +1,64 @@
+{
+  "artifacts": {
+    "component-gaps.csv": {
+      "bytes": 960,
+      "sha256": "a3d87ba902b52bebe342026c4f891c21966b97c456568ea4364cf42e3ffc599a"
+    },
+    "component-gaps.json": {
+      "bytes": 4992,
+      "sha256": "81012524ebff8f752f18238e81386d2ccda30f4d4baed07cb143c2177907e700"
+    },
+    "component-gaps.md": {
+      "bytes": 1838,
+      "sha256": "d830edf8b6933e609001b7ed161e557505c60f448db52c81009d3cf4b928b719"
+    },
+    "component-gaps.schema.json": {
+      "bytes": 16821,
+      "sha256": "0c8623a7233e700111005b921046b23479edc641b60f404eefec0a8b3e8b903c"
+    },
+    "measured-costs.csv": {
+      "bytes": 2029,
+      "sha256": "45582a1bfd307fd94075a0544111d65c7e1c97d39fb5f52b9e05a31c15537358"
+    },
+    "measured-costs.json": {
+      "bytes": 18011,
+      "sha256": "721beb8c5afd36dd74ff6930ba7146d599c4010abd99dcad46363b3fc6524d0a"
+    },
+    "measured-costs.md": {
+      "bytes": 2832,
+      "sha256": "141839311f668c8dfd5c5215dfe6de40123e3de9df593b14150d640310eb6f1f"
+    },
+    "measured-costs.schema.json": {
+      "bytes": 74790,
+      "sha256": "79aea3cab82e9dc01d711f2804d38dd064ad49e4d7c3e750abb7cb674e878ea8"
+    },
+    "source-proof.json": {
+      "bytes": 5421,
+      "sha256": "a569b5b9d8a9b54d736a8944e71bdbe136c4f2daf48a1376176ebf39380de3d3"
+    },
+    "source-proof.schema.json": {
+      "bytes": 14138,
+      "sha256": "5dc03834000edafc192b429cd2e31050a2a8f90c35424043b590cbd8a7ad4f93"
+    }
+  },
+  "format": "dope-cost-component-publication-manifest",
+  "input_sha256": {
+    "component-gaps.json": "81012524ebff8f752f18238e81386d2ccda30f4d4baed07cb143c2177907e700",
+    "measured-costs.json": "721beb8c5afd36dd74ff6930ba7146d599c4010abd99dcad46363b3fc6524d0a",
+    "source-proof.json": "a569b5b9d8a9b54d736a8944e71bdbe136c4f2daf48a1376176ebf39380de3d3"
+  },
+  "mfs_v2": null,
+  "new_metric_jobs_started": 0,
+  "new_training_or_samples_started": 0,
+  "official_tests_opened": false,
+  "original_receipts_verified": {
+    "density_native": 1100,
+    "density_shared": 502,
+    "forest_native": 12
+  },
+  "ptf_v1": null,
+  "publisher_sha256": "67ed710e2704560a1fde96bbb86b4188af154f1d850f09c99e1998d560648734",
+  "release_safe": null,
+  "superiority": null,
+  "version": 1
+}

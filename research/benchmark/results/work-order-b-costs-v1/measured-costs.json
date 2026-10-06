@@ -1,0 +1,575 @@
+{
+  "format": "dope-measured-cost-aggregates",
+  "historical_prior_costs": {
+    "dope_closed_fit_seconds": 226.02740479726344,
+    "dope_discovery_confirmation_seconds": 859.7875888752751,
+    "dope_prior_wrapper_transport_seconds": 76.67627994180657
+  },
+  "historical_prior_costs_additive": false,
+  "mfs_v2": null,
+  "missing_evidence": [
+    "Exact hardware model fields absent from these public historical receipts",
+    "No separate sample/evaluator timing for combined legacy operations",
+    "No job-attributed energy; VRAM values are observed whole-device usage",
+    "Historical co_tenant flags absent; unknown is not exclusive GPU use",
+    "Forest phase RAM/VRAM monitors and density historical host/RAM fields await incorporation",
+    "Earlier architecture research may overlap old pilot costs; no summed historical total"
+  ],
+  "ptf_v1": null,
+  "release_safe": null,
+  "rows": [
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 800,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe2"
+      ],
+      "method": "ARF",
+      "native_outcome_class_counts": {
+        "ok": 800
+      },
+      "new_phase_operations_started": 800,
+      "operation_wall_seconds": 14412.990775787272,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": 857714688,
+      "phase": "fit_and_native_wrapper",
+      "ram_observed_operations": 800,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 800
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 352,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "CTGAN",
+      "native_outcome_class_counts": {
+        "infrastructure_interruption": 14,
+        "ok": 77,
+        "scheduling_cutoff": 261
+      },
+      "new_phase_operations_started": 92,
+      "operation_wall_seconds": 19194.9334435286,
+      "peak_device_used_mib": 2400,
+      "peak_ram_bytes": 1633439744,
+      "phase": "fit",
+      "ram_observed_operations": 85,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "deadline_unstarted": 260,
+        "foreign_gpu_owner_appeared": 3,
+        "ok": 82,
+        "transport_or_prelaunch_failure": 7
+      },
+      "vram_observed_operations": 85
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 48,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1",
+        "xbabe2",
+        "xbabe3"
+      ],
+      "method": "CTGAN",
+      "native_outcome_class_counts": {
+        "immutable_prior_reuse": 48
+      },
+      "new_phase_operations_started": 0,
+      "operation_wall_seconds": 2485.7692185724154,
+      "peak_device_used_mib": 634,
+      "peak_ram_bytes": null,
+      "phase": "historical_trial",
+      "ram_observed_operations": 0,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 48
+      },
+      "vram_observed_operations": 48
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 82,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "CTGAN",
+      "native_outcome_class_counts": {
+        "infrastructure_interruption": 4,
+        "ok": 77,
+        "scheduling_cutoff": 1
+      },
+      "new_phase_operations_started": 82,
+      "operation_wall_seconds": 15005.237298236229,
+      "peak_device_used_mib": 1789,
+      "peak_ram_bytes": 831766528,
+      "phase": "native",
+      "ram_observed_operations": 79,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "foreign_gpu_owner_appeared": 1,
+        "ok": 78,
+        "transport_or_prelaunch_failure": 3
+      },
+      "vram_observed_operations": 79
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 78,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "CTGAN",
+      "native_outcome_class_counts": {
+        "ok": 77,
+        "scheduling_cutoff": 1
+      },
+      "new_phase_operations_started": 78,
+      "operation_wall_seconds": 14556.921795098577,
+      "peak_device_used_mib": 875,
+      "peak_ram_bytes": 812085248,
+      "phase": "sample",
+      "ram_observed_operations": 77,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 77,
+        "transport_or_prelaunch_failure": 1
+      },
+      "vram_observed_operations": 77
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 600,
+      "gpu_model": null,
+      "hosts": [],
+      "method": "Chow-Liu",
+      "native_outcome_class_counts": {
+        "historical": 600
+      },
+      "new_phase_operations_started": 0,
+      "operation_wall_seconds": 116.90722798998468,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": null,
+      "phase": "historical_fit_native",
+      "ram_observed_operations": 0,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 600
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 175,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe2"
+      ],
+      "method": "Chow-Liu",
+      "native_outcome_class_counts": {
+        "ok": 175
+      },
+      "new_phase_operations_started": 175,
+      "operation_wall_seconds": 3445.465798494406,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": 451723264,
+      "phase": "sample_and_evaluate_combined",
+      "ram_observed_operations": 175,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 175
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 12,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "Forest-Flow",
+      "native_outcome_class_counts": {
+        "ok": 12
+      },
+      "new_phase_operations_started": 12,
+      "operation_wall_seconds": 2543.9154105568305,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": null,
+      "phase": "fit",
+      "ram_observed_operations": 0,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 12
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 12,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "Forest-Flow",
+      "native_outcome_class_counts": {
+        "ok": 12
+      },
+      "new_phase_operations_started": 12,
+      "operation_wall_seconds": 1925.9786696927622,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": null,
+      "phase": "native",
+      "ram_observed_operations": 0,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 12
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 12,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "Forest-Flow",
+      "native_outcome_class_counts": {
+        "ok": 12
+      },
+      "new_phase_operations_started": 12,
+      "operation_wall_seconds": 4331.598716865294,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": null,
+      "phase": "sample",
+      "ram_observed_operations": 0,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 12
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 200,
+      "gpu_model": null,
+      "hosts": [],
+      "method": "GaussianCopula",
+      "native_outcome_class_counts": {
+        "historical": 200
+      },
+      "new_phase_operations_started": 0,
+      "operation_wall_seconds": 697.5825526514091,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": null,
+      "phase": "historical_fit_native",
+      "ram_observed_operations": 0,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 200
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 162,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe2"
+      ],
+      "method": "GaussianCopula",
+      "native_outcome_class_counts": {
+        "ok": 162
+      },
+      "new_phase_operations_started": 162,
+      "operation_wall_seconds": 8266.579277195735,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": 408309760,
+      "phase": "sample_and_evaluate_combined",
+      "ram_observed_operations": 162,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 162
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 352,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "TVAE",
+      "native_outcome_class_counts": {
+        "infrastructure_interruption": 11,
+        "ok": 77,
+        "scheduling_cutoff": 264
+      },
+      "new_phase_operations_started": 88,
+      "operation_wall_seconds": 17819.189344965154,
+      "peak_device_used_mib": 1075,
+      "peak_ram_bytes": 1375186944,
+      "phase": "fit",
+      "ram_observed_operations": 84,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "deadline_unstarted": 264,
+        "foreign_gpu_owner_appeared": 1,
+        "ok": 83,
+        "transport_or_prelaunch_failure": 4
+      },
+      "vram_observed_operations": 84
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 48,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1",
+        "xbabe2",
+        "xbabe3"
+      ],
+      "method": "TVAE",
+      "native_outcome_class_counts": {
+        "immutable_prior_reuse": 48
+      },
+      "new_phase_operations_started": 0,
+      "operation_wall_seconds": 1901.893978240434,
+      "peak_device_used_mib": 602,
+      "peak_ram_bytes": null,
+      "phase": "historical_trial",
+      "ram_observed_operations": 0,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 48
+      },
+      "vram_observed_operations": 48
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 83,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "TVAE",
+      "native_outcome_class_counts": {
+        "infrastructure_interruption": 6,
+        "ok": 77
+      },
+      "new_phase_operations_started": 83,
+      "operation_wall_seconds": 15227.4037365478,
+      "peak_device_used_mib": 1789,
+      "peak_ram_bytes": 815767552,
+      "phase": "native",
+      "ram_observed_operations": 82,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "foreign_gpu_owner_appeared": 4,
+        "ok": 78,
+        "transport_or_prelaunch_failure": 1
+      },
+      "vram_observed_operations": 82
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 78,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "TVAE",
+      "native_outcome_class_counts": {
+        "infrastructure_interruption": 1,
+        "ok": 77
+      },
+      "new_phase_operations_started": 78,
+      "operation_wall_seconds": 14457.68230767292,
+      "peak_device_used_mib": 875,
+      "peak_ram_bytes": 793264128,
+      "phase": "sample",
+      "ram_observed_operations": 78,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "foreign_gpu_owner_appeared": 1,
+        "ok": 77
+      },
+      "vram_observed_operations": 78
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 300,
+      "gpu_model": null,
+      "hosts": [],
+      "method": "independent_marginals",
+      "native_outcome_class_counts": {
+        "historical": 300
+      },
+      "new_phase_operations_started": 0,
+      "operation_wall_seconds": 51.77024520840496,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": null,
+      "phase": "historical_fit_native",
+      "ram_observed_operations": 0,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 300
+      },
+      "vram_observed_operations": 0
+    },
+    {
+      "attributed_energy_joules": null,
+      "co_tenant": null,
+      "cpu_model": null,
+      "distinct_phase_receipts": 165,
+      "gpu_model": null,
+      "hosts": [
+        "xbabe2"
+      ],
+      "method": "independent_marginals",
+      "native_outcome_class_counts": {
+        "ok": 165
+      },
+      "new_phase_operations_started": 165,
+      "operation_wall_seconds": 3274.596052021021,
+      "peak_device_used_mib": null,
+      "peak_ram_bytes": 435462144,
+      "phase": "sample_and_evaluate_combined",
+      "ram_observed_operations": 165,
+      "shared_gpu_timing": "not_recorded_in_historical_publication",
+      "status_counts": {
+        "ok": 165
+      },
+      "vram_observed_operations": 0
+    }
+  ],
+  "run_accounting": {
+    "density_shared_validation_v1": "alias_of_density_phase_rows_do_not_add",
+    "dope_population_research_v2": "separate_run_aggregate",
+    "dope_population_validation_v1": "separate_run_aggregate",
+    "dope_refinement_expansion_v2": "separate_run_aggregate",
+    "dope_refinement_expansion_validation_v2": "separate_run_aggregate",
+    "sdv_shared_validation_v1": "separate_run_aggregate"
+  },
+  "runs": [
+    {
+      "host_operation_seconds": {
+        "xbabe1": 1760.775001832284,
+        "xbabe2": 1360.2606038847007
+      },
+      "identity": "dope_population_research_v2",
+      "method": "DOPE",
+      "operation_wall_seconds": 3121.0356057169847,
+      "peak_device_used_mib": 1067,
+      "phase": "fit_wrapper",
+      "scheduler_wall_seconds": 6372.402748367982,
+      "source": "dope-s3-population-gpu-fits.json"
+    },
+    {
+      "host": "xbabe2",
+      "identity": "dope_population_validation_v1",
+      "method": "DOPE",
+      "operation_wall_seconds": 3826.6965422253124,
+      "phase": "sample_and_evaluate_combined",
+      "scheduler_wall_seconds": 10178.424520049943,
+      "source": "dope-s3-population-validation.json"
+    },
+    {
+      "host_operation_seconds": {
+        "xbabe1": 446.9886174881831,
+        "xbabe2": 1436.2978990890551,
+        "xbabe3": 1544.4138351229485
+      },
+      "identity": "dope_refinement_expansion_v2",
+      "method": "DOPE",
+      "operation_wall_seconds": 3427.7003517001867,
+      "phase": "fit_wrapper",
+      "scheduler_wall_seconds": 7087.086610445054,
+      "source": "dope-target-refinement-population-fits.json"
+    },
+    {
+      "identity": "dope_refinement_expansion_validation_v2",
+      "method": "DOPE",
+      "operation_wall_seconds": 5213.128864934901,
+      "phase": "sample_and_evaluate_combined",
+      "scheduler_wall_seconds": 6771.94695363706,
+      "source": "dope-target-refinement-population-validation.json"
+    },
+    {
+      "identity": "sdv_shared_validation_v1",
+      "method": "CTGAN+TVAE",
+      "operation_wall_seconds": 856.9236472246703,
+      "phase": "sample_and_evaluate_combined",
+      "phase_attribution_unavailable": true,
+      "scheduler_wall_seconds": 2175.5859187280294,
+      "source": "sdv-matched-population-validation.json"
+    },
+    {
+      "identity": "density_shared_validation_v1",
+      "method": "density_methods_combined",
+      "method_attribution_unavailable": false,
+      "operation_wall_seconds": 14986.641127711162,
+      "phase": "sample_and_evaluate_combined",
+      "source": "density-matched-population-validation.json"
+    }
+  ],
+  "scope": "Closed validation research receipts; no equal total research-spend claim",
+  "source_reports_sha256": {
+    "arf-s3-population-native.json": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e",
+    "density-matched-population-validation.json": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a",
+    "dope-s3-population-gpu-fits.json": "df4a370ba66a595f665bf2f45d8a183dde9955b6ab65d7c28df0ec8ae24d4c21",
+    "dope-s3-population-validation.json": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4",
+    "dope-target-refinement-population-fits.json": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194",
+    "dope-target-refinement-population-validation.json": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602",
+    "s3-matched-forest-confirmation-validation.json": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f",
+    "sdv-matched-population-validation.json": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e",
+    "sdv-s3-population-native.json": "635fd4273886d59691356b85d2fad58eae596ef74a48dc0bfb5bffee653bacc3"
+  },
+  "superiority": null,
+  "version": 1
+}

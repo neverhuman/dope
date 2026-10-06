@@ -1,0 +1,2496 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "dope-measured-cost-aggregates"
+    },
+    "historical_prior_costs": {
+      "additionalProperties": false,
+      "properties": {
+        "dope_closed_fit_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "dope_discovery_confirmation_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "dope_prior_wrapper_transport_seconds": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "dope_closed_fit_seconds",
+        "dope_discovery_confirmation_seconds",
+        "dope_prior_wrapper_transport_seconds"
+      ],
+      "type": "object"
+    },
+    "historical_prior_costs_additive": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "missing_evidence": {
+      "items": {
+        "anyOf": [
+          {
+            "const": "Exact hardware model fields absent from these public historical receipts"
+          },
+          {
+            "const": "No separate sample/evaluator timing for combined legacy operations"
+          },
+          {
+            "const": "No job-attributed energy; VRAM values are observed whole-device usage"
+          },
+          {
+            "const": "Historical co_tenant flags absent; unknown is not exclusive GPU use"
+          },
+          {
+            "const": "Forest phase RAM/VRAM monitors and density historical host/RAM fields await incorporation"
+          },
+          {
+            "const": "Earlier architecture research may overlap old pilot costs; no summed historical total"
+          }
+        ]
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "type": "array"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "rows": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe2"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "ARF"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "fit_and_native_wrapper"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "CTGAN"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "infrastructure_interruption": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "scheduling_cutoff": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "infrastructure_interruption",
+                  "ok",
+                  "scheduling_cutoff"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "fit"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "deadline_unstarted": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "foreign_gpu_owner_appeared": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "transport_or_prelaunch_failure": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "deadline_unstarted",
+                  "foreign_gpu_owner_appeared",
+                  "ok",
+                  "transport_or_prelaunch_failure"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "const": "xbabe1"
+                    },
+                    {
+                      "const": "xbabe2"
+                    },
+                    {
+                      "const": "xbabe3"
+                    }
+                  ]
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "method": {
+                "const": "CTGAN"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "immutable_prior_reuse": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "immutable_prior_reuse"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "peak_ram_bytes": {
+                "type": "null"
+              },
+              "phase": {
+                "const": "historical_trial"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "CTGAN"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "infrastructure_interruption": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "scheduling_cutoff": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "infrastructure_interruption",
+                  "ok",
+                  "scheduling_cutoff"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "native"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "foreign_gpu_owner_appeared": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "transport_or_prelaunch_failure": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "foreign_gpu_owner_appeared",
+                  "ok",
+                  "transport_or_prelaunch_failure"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "CTGAN"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "scheduling_cutoff": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok",
+                  "scheduling_cutoff"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "sample"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "transport_or_prelaunch_failure": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok",
+                  "transport_or_prelaunch_failure"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {},
+                "maxItems": 0,
+                "minItems": 0,
+                "type": "array"
+              },
+              "method": {
+                "const": "Chow-Liu"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "historical": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "historical"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "type": "null"
+              },
+              "phase": {
+                "const": "historical_fit_native"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe2"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "Chow-Liu"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "sample_and_evaluate_combined"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "Forest-Flow"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "type": "null"
+              },
+              "phase": {
+                "const": "fit"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "Forest-Flow"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "type": "null"
+              },
+              "phase": {
+                "const": "native"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "Forest-Flow"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "type": "null"
+              },
+              "phase": {
+                "const": "sample"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {},
+                "maxItems": 0,
+                "minItems": 0,
+                "type": "array"
+              },
+              "method": {
+                "const": "GaussianCopula"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "historical": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "historical"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "type": "null"
+              },
+              "phase": {
+                "const": "historical_fit_native"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe2"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "GaussianCopula"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "sample_and_evaluate_combined"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "TVAE"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "infrastructure_interruption": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "scheduling_cutoff": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "infrastructure_interruption",
+                  "ok",
+                  "scheduling_cutoff"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "fit"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "deadline_unstarted": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "foreign_gpu_owner_appeared": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "transport_or_prelaunch_failure": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "deadline_unstarted",
+                  "foreign_gpu_owner_appeared",
+                  "ok",
+                  "transport_or_prelaunch_failure"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "const": "xbabe1"
+                    },
+                    {
+                      "const": "xbabe2"
+                    },
+                    {
+                      "const": "xbabe3"
+                    }
+                  ]
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "method": {
+                "const": "TVAE"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "immutable_prior_reuse": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "immutable_prior_reuse"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "peak_ram_bytes": {
+                "type": "null"
+              },
+              "phase": {
+                "const": "historical_trial"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "TVAE"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "infrastructure_interruption": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "infrastructure_interruption",
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "native"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "foreign_gpu_owner_appeared": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "transport_or_prelaunch_failure": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "foreign_gpu_owner_appeared",
+                  "ok",
+                  "transport_or_prelaunch_failure"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe1"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "TVAE"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "infrastructure_interruption": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "infrastructure_interruption",
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "sample"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "foreign_gpu_owner_appeared": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "foreign_gpu_owner_appeared",
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {},
+                "maxItems": 0,
+                "minItems": 0,
+                "type": "array"
+              },
+              "method": {
+                "const": "independent_marginals"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "historical": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "historical"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "type": "null"
+              },
+              "phase": {
+                "const": "historical_fit_native"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attributed_energy_joules": {
+                "type": "null"
+              },
+              "co_tenant": {
+                "type": "null"
+              },
+              "cpu_model": {
+                "type": "null"
+              },
+              "distinct_phase_receipts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "gpu_model": {
+                "type": "null"
+              },
+              "hosts": {
+                "items": {
+                  "const": "xbabe2"
+                },
+                "maxItems": 1,
+                "minItems": 1,
+                "type": "array"
+              },
+              "method": {
+                "const": "independent_marginals"
+              },
+              "native_outcome_class_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "new_phase_operations_started": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "type": "null"
+              },
+              "peak_ram_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "sample_and_evaluate_combined"
+              },
+              "ram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "shared_gpu_timing": {
+                "const": "not_recorded_in_historical_publication"
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "type": "object"
+              },
+              "vram_observed_operations": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "attributed_energy_joules",
+              "co_tenant",
+              "cpu_model",
+              "distinct_phase_receipts",
+              "gpu_model",
+              "hosts",
+              "method",
+              "native_outcome_class_counts",
+              "new_phase_operations_started",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "peak_ram_bytes",
+              "phase",
+              "ram_observed_operations",
+              "shared_gpu_timing",
+              "status_counts",
+              "vram_observed_operations"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 18,
+      "minItems": 18,
+      "type": "array"
+    },
+    "run_accounting": {
+      "additionalProperties": false,
+      "properties": {
+        "density_shared_validation_v1": {
+          "const": "alias_of_density_phase_rows_do_not_add"
+        },
+        "dope_population_research_v2": {
+          "const": "separate_run_aggregate"
+        },
+        "dope_population_validation_v1": {
+          "const": "separate_run_aggregate"
+        },
+        "dope_refinement_expansion_v2": {
+          "const": "separate_run_aggregate"
+        },
+        "dope_refinement_expansion_validation_v2": {
+          "const": "separate_run_aggregate"
+        },
+        "sdv_shared_validation_v1": {
+          "const": "separate_run_aggregate"
+        }
+      },
+      "required": [
+        "density_shared_validation_v1",
+        "dope_population_research_v2",
+        "dope_population_validation_v1",
+        "dope_refinement_expansion_v2",
+        "dope_refinement_expansion_validation_v2",
+        "sdv_shared_validation_v1"
+      ],
+      "type": "object"
+    },
+    "runs": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {
+                  "xbabe1": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "xbabe2": {
+                    "minimum": 0,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "xbabe1",
+                  "xbabe2"
+                ],
+                "type": "object"
+              },
+              "identity": {
+                "const": "dope_population_research_v2"
+              },
+              "method": {
+                "const": "DOPE"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "peak_device_used_mib": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "phase": {
+                "const": "fit_wrapper"
+              },
+              "scheduler_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "source": {
+                "const": "dope-s3-population-gpu-fits.json"
+              }
+            },
+            "required": [
+              "host_operation_seconds",
+              "identity",
+              "method",
+              "operation_wall_seconds",
+              "peak_device_used_mib",
+              "phase",
+              "scheduler_wall_seconds",
+              "source"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "host": {
+                "const": "xbabe2"
+              },
+              "identity": {
+                "const": "dope_population_validation_v1"
+              },
+              "method": {
+                "const": "DOPE"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "phase": {
+                "const": "sample_and_evaluate_combined"
+              },
+              "scheduler_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "source": {
+                "const": "dope-s3-population-validation.json"
+              }
+            },
+            "required": [
+              "host",
+              "identity",
+              "method",
+              "operation_wall_seconds",
+              "phase",
+              "scheduler_wall_seconds",
+              "source"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "host_operation_seconds": {
+                "additionalProperties": false,
+                "properties": {
+                  "xbabe1": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "xbabe2": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "xbabe3": {
+                    "minimum": 0,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "xbabe1",
+                  "xbabe2",
+                  "xbabe3"
+                ],
+                "type": "object"
+              },
+              "identity": {
+                "const": "dope_refinement_expansion_v2"
+              },
+              "method": {
+                "const": "DOPE"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "phase": {
+                "const": "fit_wrapper"
+              },
+              "scheduler_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "source": {
+                "const": "dope-target-refinement-population-fits.json"
+              }
+            },
+            "required": [
+              "host_operation_seconds",
+              "identity",
+              "method",
+              "operation_wall_seconds",
+              "phase",
+              "scheduler_wall_seconds",
+              "source"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "identity": {
+                "const": "dope_refinement_expansion_validation_v2"
+              },
+              "method": {
+                "const": "DOPE"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "phase": {
+                "const": "sample_and_evaluate_combined"
+              },
+              "scheduler_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "source": {
+                "const": "dope-target-refinement-population-validation.json"
+              }
+            },
+            "required": [
+              "identity",
+              "method",
+              "operation_wall_seconds",
+              "phase",
+              "scheduler_wall_seconds",
+              "source"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "identity": {
+                "const": "sdv_shared_validation_v1"
+              },
+              "method": {
+                "const": "CTGAN+TVAE"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "phase": {
+                "const": "sample_and_evaluate_combined"
+              },
+              "phase_attribution_unavailable": {
+                "const": true
+              },
+              "scheduler_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "source": {
+                "const": "sdv-matched-population-validation.json"
+              }
+            },
+            "required": [
+              "identity",
+              "method",
+              "operation_wall_seconds",
+              "phase",
+              "phase_attribution_unavailable",
+              "scheduler_wall_seconds",
+              "source"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "identity": {
+                "const": "density_shared_validation_v1"
+              },
+              "method": {
+                "const": "density_methods_combined"
+              },
+              "method_attribution_unavailable": {
+                "const": false
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "phase": {
+                "const": "sample_and_evaluate_combined"
+              },
+              "source": {
+                "const": "density-matched-population-validation.json"
+              }
+            },
+            "required": [
+              "identity",
+              "method",
+              "method_attribution_unavailable",
+              "operation_wall_seconds",
+              "phase",
+              "source"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "type": "array"
+    },
+    "scope": {
+      "const": "Closed validation research receipts; no equal total research-spend claim"
+    },
+    "source_reports_sha256": {
+      "additionalProperties": false,
+      "properties": {
+        "arf-s3-population-native.json": {
+          "const": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+        },
+        "density-matched-population-validation.json": {
+          "const": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+        },
+        "dope-s3-population-gpu-fits.json": {
+          "const": "df4a370ba66a595f665bf2f45d8a183dde9955b6ab65d7c28df0ec8ae24d4c21"
+        },
+        "dope-s3-population-validation.json": {
+          "const": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
+        },
+        "dope-target-refinement-population-fits.json": {
+          "const": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
+        },
+        "dope-target-refinement-population-validation.json": {
+          "const": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+        },
+        "s3-matched-forest-confirmation-validation.json": {
+          "const": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
+        },
+        "sdv-matched-population-validation.json": {
+          "const": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+        },
+        "sdv-s3-population-native.json": {
+          "const": "635fd4273886d59691356b85d2fad58eae596ef74a48dc0bfb5bffee653bacc3"
+        }
+      },
+      "required": [
+        "arf-s3-population-native.json",
+        "density-matched-population-validation.json",
+        "dope-s3-population-gpu-fits.json",
+        "dope-s3-population-validation.json",
+        "dope-target-refinement-population-fits.json",
+        "dope-target-refinement-population-validation.json",
+        "s3-matched-forest-confirmation-validation.json",
+        "sdv-matched-population-validation.json",
+        "sdv-s3-population-native.json"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "format",
+    "historical_prior_costs",
+    "historical_prior_costs_additive",
+    "mfs_v2",
+    "missing_evidence",
+    "ptf_v1",
+    "release_safe",
+    "rows",
+    "run_accounting",
+    "runs",
+    "scope",
+    "source_reports_sha256",
+    "superiority",
+    "version"
+  ],
+  "type": "object"
+}

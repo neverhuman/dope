@@ -1,0 +1,159 @@
+{
+  "byte_charge_source_result": {
+    "path": "research/benchmark/results/dope-target-refinement-population-fits.json",
+    "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
+  },
+  "cap_failed_charges": 2,
+  "compactness_formula": "clamp(1 - fullychargedgeneratorbytes/10240,0,1); charged model+projection, no effective byte understatement",
+  "component_formula_source_sha256": "9bea2aa33be911bc1ca1b2ecfd125535aea0bfa187cb48f573499f09e2f73da6",
+  "components": [
+    {
+      "known_fit_values": 0,
+      "missing_reason": "Missing the minimum one-sided 95% lower retention bound across required dataset profiles, five fit seeds and sample schedules. Research medians do not provide this component.",
+      "name": "utility_transfer",
+      "score": null
+    },
+    {
+      "known_fit_values": 0,
+      "missing_reason": "Missing feature importance Spearman rank agreement and top-k Jaccard agreement for the required auditors.",
+      "name": "driver_fidelity",
+      "score": null
+    },
+    {
+      "known_fit_values": 0,
+      "missing_reason": "Missing marginal W1, sliced Wasserstein and multibandwidth MMD results. KS alone does not provide this component.",
+      "name": "distribution_fidelity",
+      "score": null
+    },
+    {
+      "known_fit_values": 0,
+      "missing_reason": "Missing the production dependence fidelity calculation and required repetitions. Pairwise correlation alone is insufficient.",
+      "name": "structure_fidelity",
+      "score": null
+    },
+    {
+      "known_fit_values": 0,
+      "missing_reason": "Missing the production PRDC precision, recall, density and coverage calculations for n and 4n and required repetitions.",
+      "name": "coverage_realism",
+      "score": null
+    },
+    {
+      "known_fit_values": 138,
+      "missing_reason": "62 fits have no measured artifact charge. Per-fit compactness values lack the required profile and repeat coverage for an aggregate.",
+      "name": "compactness",
+      "score": null
+    }
+  ],
+  "fit_cells": 200,
+  "format": "dope-mfs-component-gap-aggregates",
+  "hard_gate_passed": null,
+  "hard_gates": [
+    {
+      "name": "attribute_inference_advantage_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "calibration_degradation_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "driver_agreement_min",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "exact_copies_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "feature_importance_min_informative_features",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "feature_importance_spearman_min",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "feature_importance_top_k_jaccard_min",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "joint_fidelity_min",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "membership_auc_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "near_copies_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "nominal_95_coverage_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "nominal_95_coverage_min",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "ptf_v1_min",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "query_p95_normalized_error_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "rare_tail_subgroup_retention_min",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "type_i_error_max",
+      "passed": null,
+      "status": "not_evidenced"
+    }
+  ],
+  "measured_charges": 138,
+  "mfs_v2": null,
+  "missing_global_gates": [
+    "Five matching final admission locks",
+    "Required dataset and product profile coverage",
+    "Full five-fit-seed x n/2n/4n/8n matrix",
+    "Membership and attribute inference attacks",
+    "Required real-versus-real and replay controls",
+    "Authorized sealed official-test evaluator closure",
+    "Preregistered paired analysis"
+  ],
+  "new_metric_jobs_started": 0,
+  "official_tests_opened": false,
+  "production_certified": false,
+  "production_contract_sha256": "d04a2672ed25e92baeb89bec51ea5ccddb04165701cb44d2e1d53ca32f6e219b",
+  "ptf_v1": null,
+  "release_safe": null,
+  "scalar_formula_changed": false,
+  "scope": "Component evidence gaps from committed validation-only refinement; no new data, metrics, fits or test access",
+  "source_result": {
+    "path": "research/benchmark/results/dope-target-refinement-population-validation.json",
+    "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+  },
+  "successful_charges": 136,
+  "superiority": null,
+  "unmeasured_charges": 62,
+  "version": 1
+}
