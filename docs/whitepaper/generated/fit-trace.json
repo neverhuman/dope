@@ -1,0 +1,50 @@
+{
+  "beyond": {
+    "failed": 7,
+    "families": 12,
+    "feature_range": 4,
+    "inventory": 142,
+    "official_test_opened_by_optimizer": false,
+    "overlap": 3,
+    "prepared": 5,
+    "revision": "2ecfe882ccfb814fc27c4de10a64ceefd5d7655c"
+  },
+  "forest": {
+    "fit_count": 12,
+    "fit_seconds_sum": 953.4443792356178,
+    "operation_seconds_sum": 8801.492797114886,
+    "selected_byte_max": 1085155062,
+    "selected_byte_min": 115202253,
+    "selected_n": 6
+  },
+  "loss_medians": {
+    "features12_steps2048": {
+      "final_train": 0.002744945,
+      "final_validation": 0.004432735,
+      "n": 100,
+      "step0_train": 0.321245565,
+      "step0_validation": 0.27088316
+    },
+    "features12_steps8192": {
+      "final_train": 0.000763045,
+      "final_validation": 0.00181273,
+      "n": 100,
+      "step0_train": 0.321245565,
+      "step0_validation": 0.27088316
+    }
+  },
+  "replay_median_seconds": {
+    "features12_steps2048": 4.559,
+    "features12_steps8192": 14.4275
+  },
+  "watch": {
+    "closed": 799,
+    "count_utc": "2026-10-05T17:10:37.297569+00:00",
+    "new_generator_fits_started": 0,
+    "ok": 799,
+    "planned": 800,
+    "records": 626,
+    "terminal_exit_code": 0,
+    "terminal_phase": "actual_reconciliation_exit"
+  }
+}

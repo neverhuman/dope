@@ -1,0 +1,39 @@
+{
+  "seed": 20261005,
+  "draws": 10000,
+  "stride_note": "band evaluated every 8 steps and linearly filled",
+  "profiles": {
+    "features12_steps2048": {
+      "lineages": 100,
+      "steps": 2048,
+      "step0_train": 0.321245565,
+      "step0_train_lo": 0.231447445,
+      "step0_train_hi": 0.35249269,
+      "step0_validation": 0.27088316,
+      "step0_validation_lo": 0.22144262,
+      "step0_validation_hi": 0.31136483,
+      "final_train": 0.002744945,
+      "final_train_lo": 0.00235709,
+      "final_train_hi": 0.00439681,
+      "final_validation": 0.004432735,
+      "final_validation_lo": 0.00323362,
+      "final_validation_hi": 0.00706093
+    },
+    "features12_steps8192": {
+      "lineages": 100,
+      "steps": 8192,
+      "step0_train": 0.321245565,
+      "step0_train_lo": 0.23145969,
+      "step0_train_hi": 0.35249269,
+      "step0_validation": 0.27088316,
+      "step0_validation_lo": 0.22641814,
+      "step0_validation_hi": 0.31136483,
+      "final_train": 0.000763045,
+      "final_train_lo": 0.000386525,
+      "final_train_hi": 0.00104896,
+      "final_validation": 0.00181273,
+      "final_validation_lo": 0.00124752,
+      "final_validation_hi": 0.00297478
+    }
+  }
+}

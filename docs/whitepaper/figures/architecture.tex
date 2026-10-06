@@ -1,0 +1,20 @@
+\begin{tikzpicture}[
+  font=\scriptsize,
+  node distance=1.6mm and 3mm,
+  box/.style={draw, align=center, inner sep=2pt, text width=8.2cm, minimum height=6mm},
+  arr/.style={-latex, line width=0.45pt}
+]
+\node[box] (fit) {Official training rows only. Seed 1729, grouped 80/20. Official test is not an input.};
+\node[box, below=of fit] (screen) {Screen at most 12 inputs};
+\node[box, below=of screen] (hidden) {Width 16, $\tanh(b_j + w_j^{\top} x_S)$\\AdamW, 2{,}048 steps, learning rate 0.002, MSE};
+\node[box, below=of hidden] (readout) {Refit $a$, $\beta$, and $v$ on the frozen $\tanh$ features};
+\node[box, below=of readout] (art) {Charged artifact, cap 10{,}240 bytes};
+\node[box, below=of art] (aud) {CatBoost, linear, and MLP trained on synthetic rows, scored on real validation rows};
+\node[box, below=of aud] (score) {Retention and charged bytes. MFS-v2 only if every hard gate passes.};
+\draw[arr] (fit) -- (screen);
+\draw[arr] (screen) -- (hidden);
+\draw[arr] (hidden) -- (readout);
+\draw[arr] (readout) -- (art);
+\draw[arr] (art) -- (aud);
+\draw[arr] (aud) -- (score);
+\end{tikzpicture}
