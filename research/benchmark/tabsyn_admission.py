@@ -22,7 +22,7 @@ LEASE = '/home/ubuntu/dope-scratch-x3/.gpu-fit.lock'
 
 
 class _VerifiedGuardLoader(SourceFileLoader):
-    """Initialize only captured, verified source; never load a disk/cache fallback."""
+    """Compile the captured, verified source buffer for module initialization."""
 
     def __init__(self, path, body):
         super().__init__('tabsyn_operation_guard', str(path))
