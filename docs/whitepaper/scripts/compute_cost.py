@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Reduce existing fit and sample receipts to a committed compute-cost ledger.
+"""Reduce fit and sample receipts to the committed compute-cost ledger.
 
-Scratch receipts are read only when this script runs. The paper build reads
-the committed JSON and does not invent a missing timer, host, or device.
-Official test files are not opened.
+When scratch is mounted, refresh the committed receipt bundle from those
+files. The cost JSON is always reduced from that bundle, including in CI,
+where scratch is absent. A missing bundle is an error. The reducer does not
+invent a missing timer, host, or device. Official test files are not opened.
 """
 
 from __future__ import annotations
@@ -15,7 +16,9 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 RESULTS = REPO / "research" / "benchmark" / "results"
-OUT = REPO / "docs" / "whitepaper" / "generated" / "compute-cost.json"
+GENERATED = REPO / "docs" / "whitepaper" / "generated"
+OUT = GENERATED / "compute-cost.json"
+RECEIPTS = GENERATED / "compute-cost-receipts.json"
 SCRATCH = Path("/mnt/fast-scratch/dope-benchmark")
 
 
@@ -135,7 +138,15 @@ def _finish(row, fit_walls, sample_walls, attempt_walls, rams, vrams, gpu_second
     return row
 
 
-def _density_methods():
+def _int_or_none(value):
+    return value if isinstance(value, int) else None
+
+
+def _host(value):
+    return value if isinstance(value, str) else None
+
+
+def _collect_density():
     ledger = _load(RESULTS / "density-matched-population-validation.json")
     wanted = {
         "DOPE": "features12_steps2048",
@@ -143,15 +154,10 @@ def _density_methods():
         "Chow-Liu": "native_selected",
         "independent_marginals": "native_selected",
     }
-    grouped = {name: _blank(name) for name in wanted}
-    seen = {name: set() for name in wanted}
-    seen_hours = set()
-    fit_walls = {name: [] for name in wanted}
-    attempt_walls = {name: [] for name in wanted}
-    rams = {name: [] for name in wanted}
-    vrams = {name: [] for name in wanted}
-    gpu_seconds = {name: [] for name in wanted}
-    observations = {name: [] for name in wanted}
+    dope = []
+    seen = set()
+    attempts = {name: [] for name in wanted if name != "DOPE"}
+    seen_attempts = {name: set() for name in attempts}
     for cell in ledger["cells"]:
         config = wanted.get(cell.get("method"))
         if config is None:
@@ -161,12 +167,12 @@ def _density_methods():
         if cell.get("status") != "ok":
             continue
         if cell["method"] == "DOPE":
-            path = cell["fit_receipt"]["path"]
-            if path in seen["DOPE"]:
+            receipt_path = cell["fit_receipt"]["path"]
+            if receipt_path in seen:
                 continue
-            seen["DOPE"].add(path)
-            directory = Path(path).parent
-            receipt = _load(path)
+            seen.add(receipt_path)
+            directory = Path(receipt_path).parent
+            receipt = _load(receipt_path)
             if receipt.get("official_tests_opened"):
                 raise ValueError("DOPE fit receipt opened an official test")
             if (directory / "fit.json").is_file():
@@ -182,53 +188,75 @@ def _density_methods():
             if fitted.get("official_tests_opened"):
                 raise ValueError("DOPE fit.json opened an official test")
             if not isinstance(fitted.get("elapsed_seconds"), (int, float)):
-                grouped["DOPE"]["notes"].append("a displayed fit has no elapsed_seconds")
                 continue
-            wall = float(fitted["elapsed_seconds"])
-            fit_walls["DOPE"].append(wall)
-            host = fitted.get("host") if isinstance(fitted.get("host"), str) else None
-            observations["DOPE"].append((host, _gpu_name(fitted, admission_dir, host)))
-            if isinstance(fitted.get("peak_resident_bytes"), int):
-                rams["DOPE"].append(fitted["peak_resident_bytes"])
-            if isinstance(fitted.get("peak_gpu_used_mib"), int):
-                vrams["DOPE"].append(fitted["peak_gpu_used_mib"])
-            if fitted.get("gpu_process_observed") is True and str(fitted_path) not in seen_hours:
-                seen_hours.add(str(fitted_path))
-                gpu_seconds["DOPE"].append(wall)
+            host = _host(fitted.get("host"))
+            dope.append({
+                "fit_path": str(fitted_path),
+                "elapsed_seconds": float(fitted["elapsed_seconds"]),
+                "host": host,
+                "gpu": _gpu_name(fitted, admission_dir, host),
+                "peak_resident_bytes": _int_or_none(fitted.get("peak_resident_bytes")),
+                "peak_gpu_used_mib": _int_or_none(fitted.get("peak_gpu_used_mib")),
+                "gpu_process_observed": fitted.get("gpu_process_observed") is True,
+            })
         else:
-            path = cell.get("fit_attempt_receipt_path")
-            if not isinstance(path, str) or path in seen[cell["method"]]:
+            attempt_path = cell.get("fit_attempt_receipt_path")
+            name = cell["method"]
+            if not isinstance(attempt_path, str) or attempt_path in seen_attempts[name]:
                 continue
-            seen[cell["method"]].add(path)
-            attempt = _load(path)
+            seen_attempts[name].add(attempt_path)
+            attempt = _load(attempt_path)
             if not isinstance(attempt.get("wall_seconds"), (int, float)):
                 continue
-            attempt_walls[cell["method"]].append(float(attempt["wall_seconds"]))
-    grouped["DOPE"]["fit_field"] = "fit.json elapsed_seconds"
-    grouped["DOPE"]["notes"] = [
+            attempts[name].append(float(attempt["wall_seconds"]))
+    return {"dope": dope, "attempts": attempts}
+
+
+def _reduce_dope(records):
+    row = _blank("DOPE")
+    row["fit_field"] = "fit.json elapsed_seconds"
+    row["notes"] = [
         "sample wall is not a separate elapsed_seconds field",
         "gpu hours count each physical fit.json once",
     ]
-    _assign_gpu(grouped["DOPE"], observations["DOPE"])
-    _finish(
-        grouped["DOPE"], fit_walls["DOPE"], [], [], rams["DOPE"], vrams["DOPE"],
-        gpu_seconds["DOPE"], "unique fit.json elapsed_seconds",
+    _assign_gpu(row, [(item.get("host"), item.get("gpu")) for item in records])
+    seen_hours = set()
+    gpu_seconds = []
+    for item in records:
+        if item.get("gpu_process_observed") is True and item["fit_path"] not in seen_hours:
+            seen_hours.add(item["fit_path"])
+            gpu_seconds.append(float(item["elapsed_seconds"]))
+    return _finish(
+        row,
+        [float(item["elapsed_seconds"]) for item in records],
+        [],
+        [],
+        [item["peak_resident_bytes"] for item in records if isinstance(item.get("peak_resident_bytes"), int)],
+        [item["peak_gpu_used_mib"] for item in records if isinstance(item.get("peak_gpu_used_mib"), int)],
+        gpu_seconds,
+        "unique fit.json elapsed_seconds",
     )
-    for name in ("GaussianCopula", "Chow-Liu", "independent_marginals"):
-        grouped[name]["attempt_field"] = "attempt.json wall_seconds"
-        grouped[name]["notes"] = ["one attempt wall_seconds is not split into fit and sample"]
-        _assign_gpu(grouped[name], [])
-        _finish(grouped[name], [], [], attempt_walls[name], [], [], [], None)
-    return grouped
 
 
-def _neural():
-    ledger = _load(RESULTS / "sdv-matched-population-validation.json")
-    rows = {name: _blank(name) for name in ("CTGAN", "TVAE")}
-    bags = {
-        name: {"fit": [], "sample": [], "ram": [], "vram": [], "gpu_s": [], "obs": []}
-        for name in rows
+def _reduce_attempt(name, walls):
+    row = _blank(name)
+    row["attempt_field"] = "attempt.json wall_seconds"
+    row["notes"] = ["one attempt wall_seconds is not split into fit and sample"]
+    _assign_gpu(row, [])
+    return _finish(row, [], [], [float(value) for value in walls], [], [], [], None)
+
+
+def _monitor_record(monitor):
+    return {
+        "peak_resident_bytes": _int_or_none(monitor.get("peak_resident_bytes")),
+        "peak_gpu_used_mib": _int_or_none(monitor.get("peak_gpu_used_mib")),
+        "gpu_process_observed": monitor.get("gpu_process_observed") is True,
     }
+
+
+def _collect_neural():
+    ledger = _load(RESULTS / "sdv-matched-population-validation.json")
+    rows = {name: [] for name in ("CTGAN", "TVAE")}
     seen = {name: set() for name in rows}
     for cell in ledger["cells"]:
         name = cell.get("method")
@@ -254,44 +282,52 @@ def _neural():
             raise ValueError(f"{name} fit operation has no elapsed_seconds")
         if not isinstance(sample_op.get("elapsed_seconds"), (int, float)):
             raise ValueError(f"{name} sample operation has no elapsed_seconds")
-        fit_wall = float(fit_op["elapsed_seconds"])
-        sample_wall = float(sample_op["elapsed_seconds"])
-        bags[name]["fit"].append(fit_wall)
-        bags[name]["sample"].append(sample_wall)
-        host = fitted.get("host") if isinstance(fitted.get("host"), str) else fit_op.get("host")
-        if not isinstance(host, str):
-            host = None
-        bags[name]["obs"].append((host, _gpu_name(fitted, directory, host)))
+        host = _host(fitted.get("host")) or _host(fit_op.get("host"))
+        monitors = []
         for monitor_name in ("fit.monitor.json", "sample.monitor.json"):
-            monitor = _load(directory / monitor_name)
+            monitors.append(_monitor_record(_load(directory / monitor_name)))
+        rows[name].append({
+            "fit_seconds": float(fit_op["elapsed_seconds"]),
+            "sample_seconds": float(sample_op["elapsed_seconds"]),
+            "host": host,
+            "gpu": _gpu_name(fitted, directory, host),
+            "monitors": monitors,
+        })
+    return rows
+
+
+def _reduce_neural(name, records):
+    row = _blank(name)
+    row["fit_field"] = "fit.operation.json elapsed_seconds"
+    row["sample_field"] = "sample.operation.json elapsed_seconds"
+    _assign_gpu(row, [(item.get("host"), item.get("gpu")) for item in records])
+    rams, vrams, gpu_seconds = [], [], []
+    for item in records:
+        for monitor, role in zip(item["monitors"], ("fit", "sample")):
             if isinstance(monitor.get("peak_resident_bytes"), int):
-                bags[name]["ram"].append(monitor["peak_resident_bytes"])
+                rams.append(monitor["peak_resident_bytes"])
             if isinstance(monitor.get("peak_gpu_used_mib"), int):
-                bags[name]["vram"].append(monitor["peak_gpu_used_mib"])
+                vrams.append(monitor["peak_gpu_used_mib"])
             observed = monitor.get("gpu_process_observed") is True or (
                 isinstance(monitor.get("peak_gpu_used_mib"), int) and monitor["peak_gpu_used_mib"] > 0
             )
             if observed:
-                bags[name]["gpu_s"].append(fit_wall if monitor_name.startswith("fit") else sample_wall)
-        rows[name]["fit_field"] = "fit.operation.json elapsed_seconds"
-        rows[name]["sample_field"] = "sample.operation.json elapsed_seconds"
-    for name, row in rows.items():
-        bag = bags[name]
-        _assign_gpu(row, bag["obs"])
-        _finish(
-            row, bag["fit"], bag["sample"], [], bag["ram"], bag["vram"], bag["gpu_s"],
-            "fit.operation.json and sample.operation.json elapsed_seconds",
-        )
-    return rows
+                gpu_seconds.append(item["fit_seconds"] if role == "fit" else item["sample_seconds"])
+    return _finish(
+        row,
+        [item["fit_seconds"] for item in records],
+        [item["sample_seconds"] for item in records],
+        [],
+        rams,
+        vrams,
+        gpu_seconds,
+        "fit.operation.json and sample.operation.json elapsed_seconds",
+    )
 
 
-def _forest(expected_cost):
+def _collect_forest():
     ledger = _load(RESULTS / "s3-matched-forest-confirmation-validation.json")
-    row = _blank("Forest-Flow")
-    fit_walls, sample_walls, rams, vrams, gpu_seconds = [], [], [], [], []
-    observations = []
-    fit_core = []
-    operation_sum = 0.0
+    attempts = []
     for attempt in ledger["native_attempts"]:
         directory = Path(attempt["receipt"]["path"]).parent
         receipt = _load(directory / "receipt.json")
@@ -304,42 +340,65 @@ def _forest(expected_cost):
             raise ValueError("Forest-Flow fit operation has no elapsed_seconds")
         if not isinstance(sample_op.get("elapsed_seconds"), (int, float)):
             raise ValueError("Forest-Flow sample operation has no elapsed_seconds")
-        fit_walls.append(float(fit_op["elapsed_seconds"]))
-        sample_walls.append(float(sample_op["elapsed_seconds"]))
-        fit_core.append(float(fitted["fit_seconds"]))
+        if not isinstance(fitted.get("fit_seconds"), (int, float)):
+            raise ValueError("Forest-Flow fit.json has no fit_seconds")
+        host = _host(fitted.get("host")) or _host(fit_op.get("host"))
+        operations = []
         for operation in receipt.get("operations") or []:
             if operation.get("new_operation_started") and isinstance(operation.get("elapsed_seconds"), (int, float)):
-                operation_sum += float(operation["elapsed_seconds"])
-                gpu_seconds.append(float(operation["elapsed_seconds"]))
-        host = fitted.get("host") if isinstance(fitted.get("host"), str) else fit_op.get("host")
-        if not isinstance(host, str):
-            host = None
-        observations.append((host, _gpu_name(fitted, directory, host)))
-        for monitor_name in ("fit.monitor.json", "sample.monitor.json", "native.monitor.json"):
-            monitor = _load(directory / monitor_name)
-            if isinstance(monitor.get("peak_resident_bytes"), int):
-                rams.append(monitor["peak_resident_bytes"])
-            if isinstance(monitor.get("peak_gpu_used_mib"), int):
-                vrams.append(monitor["peak_gpu_used_mib"])
+                operations.append(float(operation["elapsed_seconds"]))
+        monitors = [
+            _monitor_record(_load(directory / name))
+            for name in ("fit.monitor.json", "sample.monitor.json", "native.monitor.json")
+        ]
+        attempts.append({
+            "fit_seconds": float(fitted["fit_seconds"]),
+            "fit_op_seconds": float(fit_op["elapsed_seconds"]),
+            "sample_op_seconds": float(sample_op["elapsed_seconds"]),
+            "host": host,
+            "gpu": _gpu_name(fitted, directory, host),
+            "operations": operations,
+            "monitors": monitors,
+        })
+    return attempts
+
+
+def _reduce_forest(attempts, expected_cost):
+    row = _blank("Forest-Flow")
     row["fit_field"] = "fit.operation.json elapsed_seconds"
     row["sample_field"] = "sample.operation.json elapsed_seconds"
     row["notes"] = [
         "twelve native-grid fits, not only the six selected artifacts",
         "gpu hours sum receipt operations with new_operation_started",
     ]
-    _assign_gpu(row, observations)
-    _finish(
-        row, fit_walls, sample_walls, [], rams, vrams, gpu_seconds,
+    _assign_gpu(row, [(item.get("host"), item.get("gpu")) for item in attempts])
+    rams, vrams, gpu_seconds = [], [], []
+    for item in attempts:
+        gpu_seconds.extend(float(value) for value in item["operations"])
+        for monitor in item["monitors"]:
+            if isinstance(monitor.get("peak_resident_bytes"), int):
+                rams.append(monitor["peak_resident_bytes"])
+            if isinstance(monitor.get("peak_gpu_used_mib"), int):
+                vrams.append(monitor["peak_gpu_used_mib"])
+    finished = _finish(
+        row,
+        [item["fit_op_seconds"] for item in attempts],
+        [item["sample_op_seconds"] for item in attempts],
+        [],
+        rams,
+        vrams,
+        gpu_seconds,
         "receipt operations with new_operation_started",
     )
-    core_sum = sum(fit_core)
+    core_sum = sum(item["fit_seconds"] for item in attempts)
+    operation_sum = sum(gpu_seconds)
     if abs(core_sum - float(expected_cost["forest_fit_core_seconds"])) > 1e-6:
         raise ValueError("Forest-Flow fit_seconds sum disagrees with the committed cost")
     if abs(operation_sum - float(expected_cost["forest_fit_native_sample_operation_seconds"])) > 1e-4:
         raise ValueError("Forest-Flow operation sum disagrees with the committed cost")
     if not vrams or max(vrams) != int(expected_cost["forest_peak_gpu_used_mib"]):
         raise ValueError("Forest-Flow peak VRAM disagrees with the committed cost")
-    return row
+    return finished
 
 
 def _arf():
@@ -389,26 +448,57 @@ def _arf():
     return row
 
 
-def build():
-    if not SCRATCH.is_dir():
-        if OUT.is_file():
-            print("scratch absent; committed compute-cost.json kept")
-            return 0
-        raise FileNotFoundError("compute receipts are not mounted and compute-cost.json is missing")
-    density = _density_methods()
-    neural = _neural()
+def _dump(path, payload):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
+def _load_bundle():
+    if not RECEIPTS.is_file():
+        raise FileNotFoundError(
+            "scratch is not mounted and committed compute-cost receipts are missing"
+        )
+    bundle = json.loads(RECEIPTS.read_text())
+    if bundle.get("format") != "dope-paper-compute-cost-receipts" or bundle.get("version") != 1:
+        raise ValueError("compute-cost receipts bundle is not the required format")
+    if bundle.get("official_tests_opened"):
+        raise ValueError("compute-cost receipts opened an official test")
+    return bundle
+
+
+def _methods_from_bundle(bundle):
     forest_ledger = _load(RESULTS / "s3-matched-forest-confirmation-validation.json")
-    forest = _forest(forest_ledger["cost"])
-    methods = {
-        "DOPE": density["DOPE"],
-        "GaussianCopula": density["GaussianCopula"],
-        "Chow-Liu": density["Chow-Liu"],
-        "independent_marginals": density["independent_marginals"],
-        "CTGAN": neural["CTGAN"],
-        "TVAE": neural["TVAE"],
-        "Forest-Flow": forest,
+    density = bundle["density"]
+    neural = bundle["neural"]
+    return {
+        "DOPE": _reduce_dope(density["dope"]),
+        "GaussianCopula": _reduce_attempt("GaussianCopula", density["attempts"]["GaussianCopula"]),
+        "Chow-Liu": _reduce_attempt("Chow-Liu", density["attempts"]["Chow-Liu"]),
+        "independent_marginals": _reduce_attempt(
+            "independent_marginals", density["attempts"]["independent_marginals"]
+        ),
+        "CTGAN": _reduce_neural("CTGAN", neural["CTGAN"]),
+        "TVAE": _reduce_neural("TVAE", neural["TVAE"]),
+        "Forest-Flow": _reduce_forest(bundle["forest"], forest_ledger["cost"]),
         "ARF": _arf(),
     }
+
+
+def build():
+    if SCRATCH.is_dir():
+        bundle = {
+            "format": "dope-paper-compute-cost-receipts",
+            "version": 1,
+            "official_tests_opened": False,
+            "density": _collect_density(),
+            "neural": _collect_neural(),
+            "forest": _collect_forest(),
+        }
+        _dump(RECEIPTS, bundle)
+    else:
+        bundle = _load_bundle()
+        print("scratch absent; reducing committed compute-cost receipts")
+    methods = _methods_from_bundle(bundle)
     for row in methods.values():
         row["cpu_model"] = None
         row["cpu_hours"] = None

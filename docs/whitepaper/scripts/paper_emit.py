@@ -8,6 +8,8 @@ number.
 from __future__ import annotations
 
 import json
+import re
+from pathlib import Path
 
 
 def _fit_trace(out):
@@ -108,7 +110,22 @@ def _gpu_label(name):
     return name
 
 
-def _hardware(row):
+# Journal builds keep the receipt host. The anonymous build renews the
+# public macros to these labels. An unknown host is an error, not a leak.
+_ANON_HOST = {
+    "xbabe1": "GPU host A",
+    "xbabe2": "GPU host B",
+    "xbabe3": "GPU host C",
+}
+
+
+def _anon_host(host):
+    if host not in _ANON_HOST:
+        raise ValueError(f"no anonymous label for host {host}")
+    return _ANON_HOST[host]
+
+
+def _hardware(row, rename=None):
     hosts = list(row.get("hosts") or [])
     by_host = row.get("gpu_by_host") or {}
     if not hosts:
@@ -117,10 +134,11 @@ def _hardware(row):
     order = []
     for host in hosts:
         label = _gpu_label(by_host.get(host))
+        shown = rename(host) if rename else host
         if label not in members:
             members[label] = []
             order.append(label)
-        members[label].append(host)
+        members[label].append(shown)
     parts = []
     for label in order:
         joined = ", ".join(members[label])
@@ -179,6 +197,26 @@ def _span_cell(median_name, lo_name, hi_name):
     return f"\\{median_name} (\\{lo_name}--\\{hi_name})"
 
 
+def _architecture_commands(command):
+    """Displayed-generator constants, read from the fitter and the data lock."""
+    root = Path(__file__).resolve().parents[3]
+    rust = (root / "rust/compiler/target_fitting/part_02.rs").read_text()
+    shape = re.search(r'"features12_steps2048" => \(12, (\d+), (\d+)\)', rust)
+    rate = re.search(r"\.build\(&store, ([0-9.eE+-]+)\)", rust)
+    lock = (root / "research/benchmark/results/s3-data.lock.json").read_text()
+    split = re.search(r"official_test_grouped_training_(\d+)_(\d+)", lock)
+    if shape is None or rate is None or split is None:
+        raise ValueError("architecture source constants are missing")
+    steps = f"{int(shape.group(2)):,}".replace(",", "{,}")
+    return [
+        command("ArchSplitMajor", split.group(1)),
+        command("ArchSplitMinor", split.group(2)),
+        command("ArchWidth", shape.group(1)),
+        command("ArchSteps", steps),
+        command("ArchLr", f"{float(rate.group(1)):.3f}"),
+    ]
+
+
 def _write_compute_cost(out, lines, command):
     document = _load_generated(out, "compute-cost.json")
     if document.get("missing_field") != "not recorded":
@@ -210,6 +248,7 @@ def _write_compute_cost(out, lines, command):
     for label, key, prefix, byte_cell in measured:
         row = methods[key]
         lines.append(command(f"{prefix}Hardware", _hardware(row)))
+        lines.append(command(f"{prefix}HardwareAnon", _hardware(row, _anon_host)))
         fit = _time_cell(lines, command, prefix, "Fit", row["fit_median_seconds"], row["fit_max_seconds"])
         sample = _time_cell(lines, command, prefix, "Samp", row["sample_median_seconds"], row["sample_max_seconds"])
         memory = _memory_cell(lines, command, prefix, row["peak_ram_bytes"], row["peak_vram_mib"])
@@ -230,6 +269,7 @@ def _write_compute_cost(out, lines, command):
         ))
         arf_bytes = _span_cell("ArfByteMedian", "ArfByteLo", "ArfByteHi")
     lines.append(command("ArfHardware", _hardware(arf)))
+    lines.append(command("ArfHardwareAnon", _hardware(arf, _anon_host)))
     rows.append(
         "ARF & \\NotRecorded & \\NotRecorded & \\NotRecorded & \\ArfHardware & \\NotRecorded & "
         f"{arf_bytes} \\\\"
@@ -584,6 +624,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     beyond = side.get("beyond") or {}
     lines.append(command("BeyondElapseA", _elapsed(_median_elapsed(beyond, "steps2048"), tex_bytes)))
     lines.append(command("BeyondElapseB", _elapsed(_median_elapsed(beyond, "steps8192"), tex_bytes)))
+    lines.extend(_architecture_commands(command))
     _write_compute_cost(out, lines, command)
     _write_availability(out)
     (out / "numbers.tex").write_text("".join(lines))

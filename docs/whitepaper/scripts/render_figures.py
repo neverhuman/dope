@@ -17,6 +17,20 @@ os.environ.setdefault("SOURCE_DATE_EPOCH", "1760000000")
 import matplotlib
 
 matplotlib.use("Agg")
+from matplotlib import font_manager
+# TrueType only. TeX Gyre Termes is OpenType/CFF, and fonttype 42 then
+# makes pdffonts warn that the font type does not match the embedded file.
+_LIBERATION = Path("/usr/share/fonts/truetype/liberation")
+for _face in (
+    "LiberationSerif-Regular.ttf",
+    "LiberationSerif-Bold.ttf",
+    "LiberationSerif-Italic.ttf",
+    "LiberationSerif-BoldItalic.ttf",
+):
+    _font_path = _LIBERATION / _face
+    if not _font_path.is_file():
+        raise SystemExit(f"figure font is missing: {_font_path}")
+    font_manager.fontManager.addfont(str(_font_path))
 # Composed at 7.16in and placed at \textwidth (516pt). TeX reads that
 # PDF as 517.45pt, so 8.1pt here remains at least 8pt after placement.
 FONT_PT = 8.1
@@ -24,7 +38,7 @@ matplotlib.rcParams.update({
     "pdf.fonttype": 42,
     "ps.fonttype": 42,
     "font.family": "serif",
-    "font.serif": ["TeX Gyre Termes", "Nimbus Roman", "Liberation Serif"],
+    "font.serif": ["Liberation Serif"],
     "font.size": FONT_PT,
     "axes.labelsize": FONT_PT,
     "axes.titlesize": FONT_PT,
