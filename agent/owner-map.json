@@ -165,6 +165,17 @@
     "research/benchmark/publish_dope_refinement_population_figure.py": "external-evidence",
     "research/benchmark/publish_dope_refinement_population_manifest.py": "external-evidence",
     "research/benchmark/tests/test_dope_refinement_population.py": "external-evidence",
-    "research/benchmark/results/dope-target-refinement-population-validation": "external-evidence"
+    "research/benchmark/results/dope-target-refinement-population-validation": "external-evidence",
+    "research/benchmark/tabsyn_adapter.py": "external-evidence",
+    "research/benchmark/tabsyn_runtime_guard.py": "external-evidence",
+    "research/benchmark/tabsyn_generated_contract.py": "external-evidence",
+    "research/benchmark/tabsyn-native-grid.proposal.json": "external-evidence",
+    "research/benchmark/requirements-tabsyn.in": "external-evidence",
+    "research/benchmark/requirements-tabsyn.lock.txt": "external-evidence",
+    "research/benchmark/TABSYN_RUNTIME_CONTRACT.md": "external-evidence",
+    "research/benchmark/tests/test_tabsyn_contract.py": "external-evidence",
+    "research/benchmark/tabsyn-adapter.LICENSE": "external-evidence",
+    "research/benchmark/tabsyn-adapter.NOTICE": "external-evidence",
+    "research/benchmark/tabsyn_adapter.py.license": "external-evidence"
   }
 }

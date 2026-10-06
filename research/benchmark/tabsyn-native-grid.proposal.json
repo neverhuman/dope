@@ -1,0 +1,159 @@
+{
+  "artifact_policy": "Charge full-model/encoder/decoder/diffusion tensor safetensors, learned quantile transform arrays, latent-derived mean, projection and model manifest; no unsafe object serialization, no training rows/latent row matrix needed at sample replay.",
+  "author_commit": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7",
+  "author_source_audit_sha256": "3beee41a43bb75d34954197e9d043a1a095b11b33abc6ec275e457cc3235d904",
+  "checkpoint_policy": "Preserve categorical-only validation objective (numeric weight zero), scheduler/beta rules, final-epoch encoder/decoder export and diffusion best-training-loss checkpoint; numeric empty CE defined as zero.",
+  "configs": [
+    {
+      "attention_heads": 1,
+      "batch_size": 4096,
+      "config_sha256": "99437e7e73d657db925acf5c191a094587e41acf5ec1820d613a0ef50ff2ab59",
+      "diffusion_epochs": 10001,
+      "diffusion_hidden_dimension": 1024,
+      "diffusion_lr": 0.001,
+      "factor": 32,
+      "lambd": 0.7,
+      "max_beta": 0.01,
+      "min_beta": 1e-05,
+      "sampling_steps": 50,
+      "token_dimension": 4,
+      "transformer_layers": 2,
+      "vae_epochs": 4000,
+      "vae_lr": 0.001,
+      "weight_decay": 0
+    },
+    {
+      "attention_heads": 1,
+      "batch_size": 4096,
+      "config_sha256": "c473f07cc90b0b27d2b3e398999c32900954d29394ac34bc147c11875213fb41",
+      "diffusion_epochs": 10001,
+      "diffusion_hidden_dimension": 1024,
+      "diffusion_lr": 0.001,
+      "factor": 32,
+      "lambd": 0.7,
+      "max_beta": 0.001,
+      "min_beta": 1e-05,
+      "sampling_steps": 50,
+      "token_dimension": 4,
+      "transformer_layers": 2,
+      "vae_epochs": 4000,
+      "vae_lr": 0.001,
+      "weight_decay": 0
+    }
+  ],
+  "execution_admitted": false,
+  "fit_adaptations": [
+    "Empty categorical CE/accuracy set to zero; numeric MSE/KL unchanged.",
+    "No categorical token is passed for the numeric-only joint representation.",
+    "Author categorical-only validation objective remains zero for numeric inputs; first full-model checkpoint, final encoder/decoder export preserved.",
+    "DataLoader num_workers=0 to preserve isolated worker/no subprocess contract; batch/shuffle rules retained.",
+    "Direct author sampler receives explicit rows/device and50steps, bypassing the fixed-row author CLI.",
+    "Safe tensor weights and numeric quantile/latent-mean state replace pickle/full latent rows; exact seeded generated replay required."
+  ],
+  "fit_failure_policy": "Whole-fit timeout or VRAM excess => visible charged partial failure, no checkpoint sample or native-selection eligibility.",
+  "fit_seed": 11,
+  "format": "dope-tabsyn-campaign-defined-native-grid-proposal",
+  "generator_grid_provenance": "Campaign-defined two-value max_beta grid, author-exposed CLI parameter; no upstream generator grid exists in audited source; not an author-search reproduction.",
+  "initial_trial_limit": 2,
+  "maximum_cell_elapsed_seconds": 43200,
+  "maximum_estimated_gpu_bytes": 17179869184,
+  "maximum_trials_per_cell": 8,
+  "maximum_whole_fit_seconds": 600,
+  "mfs_v2": null,
+  "native_objective": {
+    "auditor_configurations": 36,
+    "auditor_grid": {
+      "gamma": [
+        0.0,
+        1.0
+      ],
+      "max_depth": [
+        5,
+        10,
+        20
+      ],
+      "min_child_weight": [
+        1,
+        10
+      ],
+      "n_estimators": [
+        10,
+        50,
+        100
+      ],
+      "nthread": [
+        -1
+      ],
+      "objective": [
+        "reg:linear"
+      ],
+      "tree_method": [
+        "gpu_hist"
+      ]
+    },
+    "auditor_grid_is_generator_search_space": false,
+    "candidate_regression_objective": "best_r2_scores.XGBRegressor.r2",
+    "direction": "maximize",
+    "generator_search_space": {
+      "max_beta": [
+        0.01,
+        0.001
+      ]
+    },
+    "generator_tie_breaks": [
+      "artifact_bytes_ascending",
+      "config_sha256_ascending"
+    ],
+    "implementation": "eval/mle/mle.py::_evaluate_regression",
+    "implementation_sha256": "ad8f0e7ad45f4c9da1c7d4c1f1ee2d1989890558e509da94ef8db5d69dc1103a",
+    "native_values_cross_method_ranking": false,
+    "real_partition_for_future_tuning": "only frozen official-training-derived validation, staged under the author test-named path",
+    "selection_behavior": "select auditor parameters by internal synthetic validation R2, then refit and measure on real evaluation partition",
+    "shared_kpi_used_for_selection": false,
+    "status": "proposed_pending_generated_contract",
+    "synthetic_auditor_validation_rows": "floor(synthetic_row_count / 9); numpy random shuffle",
+    "target_transform": "log(clip(y, 1, 20000)) for auditor fit labels and real evaluation labels; internal synthetic validation labels remain untransformed",
+    "tuning_seed_policy": {
+      "cpu_threads": "Author nthread=-1 retained; bounded by assigned sixteen-core CPU affinity.",
+      "numpy_before_author_internal_shuffle": 11,
+      "xgboost_default_random_state": 0
+    }
+  },
+  "native_partition": "Only frozen official-training-derived validation; author test-named path contains validation, never official test.",
+  "native_sampling": {
+    "rows": "n frozen fit rows",
+    "seed": 101,
+    "steps": 50
+  },
+  "native_tie_breaks": [
+    "artifact_bytes_ascending",
+    "config_sha256_ascending"
+  ],
+  "new_fits_started": 0,
+  "official_tests_opened": false,
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "sample_seeds": [
+    101,
+    211,
+    307
+  ],
+  "shared_validation_sizes": [
+    1,
+    4
+  ],
+  "source_implementations": {
+    "eval/mle/mle.py": "ad8f0e7ad45f4c9da1c7d4c1f1ee2d1989890558e509da94ef8db5d69dc1103a",
+    "src/data.py": "d84572d91be1b2126ef8f77aec6a432d8346746025df825073537788eb412a45",
+    "tabsyn/diffusion_utils.py": "e81b4b106ba2441c4164224d63653179457f226862d74014ede15056bbc5f8a1",
+    "tabsyn/main.py": "9cd1ccfe50c108296ed92e04c00d1e74a14a84589674431366dda596a303129d",
+    "tabsyn/model.py": "932c8b295dc5d8d1eccb8255e630b6f9cdbd17fd61136932d7a93b1dd43011ad",
+    "tabsyn/vae/main.py": "428a360364ab60cd084f31dadbcc2d52bde939edaa9d596539c451ce674692aa",
+    "tabsyn/vae/model.py": "78c64b7fc70986e2908b3340f867c473a9d54e0deab3ab8e7a9abfd57d43699f",
+    "utils.py": "ee9953c7a563670db0c01514b4874c172151865b622d5458c330337fbdbd0a03"
+  },
+  "source_scope": "Numeric-only regression compatibility contract for the S3 projected panel; no full mixed-type contract admitted.",
+  "superiority": null,
+  "target_information_policy": "Require finite nonconstant log(clip(validation target,1,20000)); uninformative native targets retain default with tuning-inapplicable receipt; no native winner.",
+  "version": 1
+}
