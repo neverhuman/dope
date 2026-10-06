@@ -1144,6 +1144,21 @@ research panel establishes neither the public-core headline nor global family
 selection, final five-fit coverage, superiority or certification. Official tests
 remain sealed and MFS-v2/PTF-v1/release/superiority remain null.
 
+### ARF population common panel preparation
+
+`publish_arf_population_matched` requires the complete frozen 1,200-cell ARF
+native/default sampling and common-validation matrix, actual coordinator closure,
+external receipt/reconciliation/recursive-output digests, and the unchanged
+800-fit FORDE native ledger. It verifies matched worker identities and preserves
+all unavailable outcomes and full model/projection charges before comparing the
+three fixed DOPE research profiles. The publisher refuses a partial live round. Parent receipt references must be consistently covered by the authenticated inventory. Each logical metric is bound to its exact frozen sample, physical job, closed receipt and replay identity; input fit seeds are checked before constructing output cells.
+
+The renderer and manifest generator replay descriptive dataset pairs from the
+committed report. Sample seeds reduce within lineage first; availability cohorts
+remain explicit. This preparation publishes no ARF common numbers or final
+configuration selection. Official tests stay sealed, and MFS-v2/PTF-v1,
+release-safe L3 and superiority claims stay null until their required gates pass.
+
 ## Complete ARF native population ledger
 
 The [ARF native ledger](results/arf-s3-population-native.md) accounts for all
