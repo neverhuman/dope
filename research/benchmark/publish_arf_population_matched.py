@@ -411,6 +411,7 @@ def historical_source_body(path, pin):
     guard.require((before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns)
         == (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns)
         == (current.st_dev, current.st_ino, current.st_size, current.st_mtime_ns)
+        and after.st_nlink == current.st_nlink == 1
         and hashlib.sha256(raw).hexdigest() == pin, 'historical source body changed')
     return raw
 
@@ -424,6 +425,8 @@ def verify_historical_projection(binding):
     historical_source_body(HISTORICAL_ROUND, HISTORICAL_ROUND_SHA)
     for name, pin in HISTORICAL_FILES.items():
         raw = historical_source_body(HISTORICAL_SOURCE / name, pin)
+        guard.require(historical_source_body(HISTORICAL_PROJECTION / name, pin) == raw,
+                      'historical source projection drifted')
         row = binding['files'][name]
         guard.require(row == dict(origin=str(HISTORICAL_SOURCE / name), copy=str(HISTORICAL_PROJECTION / name),
             bytes=len(raw), sha256=pin), 'historical source copy binding changed')
