@@ -13,8 +13,9 @@ cargo test --locked
 python3 -m venv --system-site-packages target/ci-python
 bash ops/ci/install-python-v1.sh target/ci-python/bin/python
 PYTHONPATH=src target/ci-python/bin/python -m pytest -q tests
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_checkpoint_index -q
 ci_require_command uv
+uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'jsonschema==4.26.0'
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_checkpoint_index -q
 cd validation/external
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --locked --extra xgboost --extra lightgbm
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --offline --locked --extra xgboost --extra lightgbm
