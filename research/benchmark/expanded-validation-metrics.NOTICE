@@ -1,0 +1,17 @@
+Expanded validation diagnostics reuse the training-derived numerical research
+implementation qualified in the Work Order B generated controls.
+
+Alpha precision and beta recall follow the unembedded equations in Synthcity
+(vanderschaarlab/synthcity, commit 23f322fe381326ed01c41b13d469a06e38cce545),
+licensed under Apache-2.0. The original complete license and source buffers
+are preserved as opaque .txt test fixtures.
+
+The optional DOMIAS result applies the isolated density-ratio equation from
+vanderschaarlab/DOMIAS, commit 9527dab320f9d41372e1f67e0d5c2b80becfdd61,
+licensed under MIT. Its original complete license and source buffer are also
+preserved. It does not run or claim reproduction of the author's complete
+training-inclusive attack executable.
+
+Fixtures are used only to extract reference equations in generated-array tests.
+Author pipeline modules are never imported. Fixture hashes, sizes, commits and
+source URLs are listed in fixtures/expanded-validation-metrics/author-source-pins.json.

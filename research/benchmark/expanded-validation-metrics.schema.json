@@ -1,0 +1,613 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Training-derived expanded validation diagnostics",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "fidelity",
+    "alpha_beta",
+    "detection",
+    "privacy",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "superiority"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-expanded-validation-diagnostics"
+    },
+    "version": {
+      "const": 1
+    },
+    "fidelity": {
+      "$ref": "#/$defs/fidelity"
+    },
+    "alpha_beta": {
+      "$ref": "#/$defs/alpha_beta"
+    },
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catboost",
+        "logistic"
+      ],
+      "properties": {
+        "catboost": {
+          "$ref": "#/$defs/c2st"
+        },
+        "logistic": {
+          "$ref": "#/$defs/c2st"
+        }
+      }
+    },
+    "privacy": {
+      "$ref": "#/$defs/privacy"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "superiority": {
+      "type": "null"
+    }
+  },
+  "$defs": {
+    "unavailable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "value"
+      ],
+      "properties": {
+        "status": {
+          "const": "unavailable"
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]+$",
+          "maxLength": 100
+        },
+        "value": {
+          "type": "null"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows",
+        "mean",
+        "median",
+        "p05",
+        "p95"
+      ],
+      "properties": {
+        "rows": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mean": {
+          "type": "number",
+          "minimum": 0
+        },
+        "median": {
+          "type": "number",
+          "minimum": 0
+        },
+        "p05": {
+          "type": "number",
+          "minimum": 0
+        },
+        "p95": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "fidelity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "marginals",
+        "pairwise_pearson_eligibility",
+        "pairwise_pearson_difference",
+        "categorical_contingency_tv",
+        "mixed_type_dependence"
+      ],
+      "properties": {
+        "marginals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "column_index",
+              "kind",
+              "metric",
+              "value"
+            ],
+            "properties": {
+              "column_index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "kind": {
+                "enum": [
+                  "continuous",
+                  "categorical"
+                ]
+              },
+              "metric": {
+                "enum": [
+                  "ks_statistic",
+                  "total_variation"
+                ]
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "pairwise_pearson_eligibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "total_pairs",
+            "eligible_continuous_pairs",
+            "excluded_constant_pairs",
+            "measured_pairs",
+            "mixed_pairs",
+            "categorical_pairs"
+          ],
+          "properties": {
+            "total_pairs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "eligible_continuous_pairs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "excluded_constant_pairs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "measured_pairs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "mixed_pairs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "categorical_pairs": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "pairwise_pearson_difference": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/unavailable"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value",
+                "excluded_constant_pairs"
+              ],
+              "properties": {
+                "status": {
+                  "const": "ok"
+                },
+                "value": {
+                  "$ref": "#/$defs/summary"
+                },
+                "excluded_constant_pairs": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          ]
+        },
+        "categorical_contingency_tv": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/unavailable"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value"
+              ],
+              "properties": {
+                "status": {
+                  "const": "ok"
+                },
+                "value": {
+                  "$ref": "#/$defs/summary"
+                }
+              }
+            }
+          ]
+        },
+        "mixed_type_dependence": {
+          "$ref": "#/$defs/unavailable"
+        }
+      }
+    },
+    "alpha_beta": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/unavailable"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "value",
+            "equal_subsample_rows",
+            "variant",
+            "alpha_grid",
+            "precision_curve",
+            "recall_curve"
+          ],
+          "properties": {
+            "status": {
+              "const": "ok"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "alpha_precision",
+                "beta_recall"
+              ],
+              "properties": {
+                "alpha_precision": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "beta_recall": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            },
+            "equal_subsample_rows": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 800
+            },
+            "variant": {
+              "const": "unembedded_pinned_synthcity_equations"
+            },
+            "alpha_grid": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "minItems": 30,
+              "maxItems": 30
+            },
+            "precision_curve": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "minItems": 30,
+              "maxItems": 30
+            },
+            "recall_curve": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "minItems": 30,
+              "maxItems": 30
+            }
+          }
+        }
+      ]
+    },
+    "c2st": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/unavailable"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "value",
+            "fold_aucs",
+            "pooled_oof_auc",
+            "folds",
+            "rows_per_class",
+            "auditor",
+            "duplicate_group_leakage"
+          ],
+          "properties": {
+            "status": {
+              "const": "ok"
+            },
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "fold_aucs": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "minItems": 5,
+              "maxItems": 5
+            },
+            "pooled_oof_auc": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "folds": {
+              "const": 5
+            },
+            "rows_per_class": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 800
+            },
+            "auditor": {
+              "enum": [
+                "catboost",
+                "logistic"
+              ]
+            },
+            "duplicate_group_leakage": {
+              "const": false
+            }
+          }
+        }
+      ]
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "empirical_only",
+        "formal_dp",
+        "hipaa_deidentification",
+        "attack_query_weighting",
+        "kde_reference_weighting",
+        "unique_query_group_counts",
+        "dcr_fit",
+        "dcr_validation",
+        "full_reference_counts",
+        "share_closer_to_train",
+        "balanced_reference_rows",
+        "balanced_share_closer_to_train",
+        "nndr_fit",
+        "distance_mia",
+        "domias_kde"
+      ],
+      "properties": {
+        "empirical_only": {
+          "const": true
+        },
+        "formal_dp": {
+          "const": false
+        },
+        "hipaa_deidentification": {
+          "const": false
+        },
+        "attack_query_weighting": {
+          "const": "uniform_unique_projected_row_groups"
+        },
+        "kde_reference_weighting": {
+          "const": "remaining_disjoint_real_rows"
+        },
+        "unique_query_group_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fit",
+            "validation"
+          ],
+          "properties": {
+            "fit": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "validation": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "dcr_fit": {
+          "$ref": "#/$defs/summary"
+        },
+        "dcr_validation": {
+          "$ref": "#/$defs/summary"
+        },
+        "full_reference_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fit",
+            "validation"
+          ],
+          "properties": {
+            "fit": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "validation": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "share_closer_to_train": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "balanced_reference_rows": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "balanced_share_closer_to_train": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "nndr_fit": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/unavailable"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value",
+                "undefined_zero_second_distance_rows"
+              ],
+              "properties": {
+                "status": {
+                  "const": "ok"
+                },
+                "value": {
+                  "$ref": "#/$defs/summary"
+                },
+                "undefined_zero_second_distance_rows": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          ]
+        },
+        "distance_mia": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/unavailable"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value",
+                "member_queries",
+                "nonmember_queries"
+              ],
+              "properties": {
+                "status": {
+                  "const": "ok"
+                },
+                "value": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "member_queries": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "nonmember_queries": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          ]
+        },
+        "domias_kde": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/unavailable"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value",
+                "member_queries",
+                "nonmember_queries",
+                "reference_rows",
+                "variant"
+              ],
+              "properties": {
+                "status": {
+                  "const": "ok"
+                },
+                "value": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "member_queries": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "nonmember_queries": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "reference_rows": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "variant": {
+                  "const": "isolated_author_kde_equation_scott_bandwidth"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
