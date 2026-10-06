@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 import subprocess
 import sys
@@ -67,13 +69,33 @@ def main() -> int:
             failures.append("macros used but not defined in numbers.tex: " + ", ".join(missing))
     else:
         failures.append("generated/numbers.tex is missing")
+    if NUMBERS.exists() and "\\newcommand{\\FigWidth}{7.16in}" not in NUMBERS.read_text():
+        failures.append("FigWidth is not 7.16in")
+    hash_path = ROOT / "generated" / "figure-hashes.json"
+    recorded_hashes = {}
+    if hash_path.is_file():
+        recorded_hashes = json.loads(hash_path.read_text()).get("pdf_sha256") or {}
+    else:
+        failures.append("generated/figure-hashes.json is missing")
     for path in FIGURES:
         if not path.exists():
             failures.append(f"missing figure {path.name}")
             continue
         listed = subprocess.check_output(["pdffonts", str(path)], text=True, errors="replace")
+        # pdffonts writes a font-type mismatch on stderr. Type 3 is a stdout row.
         if "Type 3" in listed:
             failures.append(f"Type 3 font in {path.name}")
+        if path.parent.name == "figures":
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if recorded_hashes.get(path.name) != digest:
+                failures.append(f"{path.name} does not match figure-hashes.json")
+            info = subprocess.check_output(["pdfinfo", str(path)], text=True, errors="replace")
+            width = None
+            for line in info.splitlines():
+                if line.startswith("Page size:"):
+                    width = float(line.split()[2]) / 72.0
+            if width is None or abs(width - 7.16) > 0.02:
+                failures.append(f"{path.name} width is not 7.16in")
     for log in LOGS:
         if not log.is_file():
             failures.append(f"missing build log {log}")

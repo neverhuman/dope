@@ -1,20 +1,19 @@
 \begin{tikzpicture}[
-  font=\scriptsize,
-  node distance=1.6mm and 3mm,
-  box/.style={draw, align=center, inner sep=2pt, text width=8.2cm, minimum height=6mm},
-  arr/.style={-latex, line width=0.45pt}
+  font=\footnotesize,
+  node distance=1.15mm,
+  box/.style={draw, align=center, inner sep=1.4pt, outer sep=0pt, line width=0.4pt,
+              text width=\dimexpr\columnwidth-4.2pt\relax},
+  arr/.style={-latex, line width=0.4pt}
 ]
-\node[box] (fit) {Official training rows only. Seed 1729, grouped 80/20. Official test is not an input.};
-\node[box, below=of fit] (screen) {Screen at most 12 inputs};
-\node[box, below=of screen] (hidden) {Width 16, $\tanh(b_j + w_j^{\top} x_S)$\\AdamW, 2{,}048 steps, learning rate 0.002, MSE};
-\node[box, below=of hidden] (readout) {Refit $a$, $\beta$, and $v$ on the frozen $\tanh$ features};
-\node[box, below=of readout] (art) {Charged artifact, cap 10{,}240 bytes};
-\node[box, below=of art] (aud) {CatBoost, linear, and MLP trained on synthetic rows, scored on real validation rows};
-\node[box, below=of aud] (score) {Retention and charged bytes. MFS-v2 only if every hard gate passes.};
-\draw[arr] (fit) -- (screen);
-\draw[arr] (screen) -- (hidden);
-\draw[arr] (hidden) -- (readout);
-\draw[arr] (readout) -- (art);
-\draw[arr] (art) -- (aud);
-\draw[arr] (aud) -- (score);
+\node[box] (fit) {Official training rows. Grouped 80/20 split. Official test is not an input.};
+\node[box, below=of fit] (gen) {Residual generator. At most 12 inputs, width 16, $\tanh$. AdamW, 2{,}048 steps, learning rate 0.002.};
+\node[box, below=of gen] (read) {Refit readout $a$, $\beta$, and $v$ on the frozen $\tanh$ features.};
+\node[box, below=of read] (sel) {Selection on each method's native objective. Not the shared retention.};
+\node[box, below=of sel] (meas) {Common measurement on validation rows. Auditors: CatBoost, linear, and MLP.};
+\node[box, below=of meas] (score) {Retention and charged bytes. MFS-v2 only if every hard gate passes.};
+\draw[arr] (fit) -- (gen);
+\draw[arr] (gen) -- (read);
+\draw[arr] (read) -- (sel);
+\draw[arr] (sel) -- (meas);
+\draw[arr] (meas) -- (score);
 \end{tikzpicture}

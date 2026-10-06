@@ -40,29 +40,40 @@ the PMLB panel. Master Fitness v2 is not in these tables.
 The journal reports the median hidden-basis loss. The curves below are
 the logged replay of both step budgets, before the readout refit. The
 8{,}192-step panel is not the displayed model. The band is a 95\%
-lineage-bootstrap interval.
+lineage-bootstrap interval. All $\ReplayN$ lineages finished. Median
+training loss starts at $\LossTrainStart$ and ends at $\LossTrainEndA$
+and $\LossTrainEndB$. Median validation loss starts at $\LossValStart$
+and ends at $\LossValEndA$ and $\LossValEndB$. Where both budgets have a
+complete three-seed group, the linear medians are $\MedSufALin$ and
+$\MedSufBLin$ ($\NSufLin$ lineages; difference $\DiffSufLin$). The MLP
+medians are $\MedSufAMlp$ and $\MedSufBMlp$ ($\NSufMlp$ lineages;
+difference $\DiffSufMlp$).
 \begin{center}
-\includegraphics[width=0.98\textwidth]{figures/loss-curves.pdf}
+\includegraphics[width=\textwidth]{figures/loss-curves.pdf}
 \end{center}
 
 \section{Reproducibility}
-Regenerate the tables, the three figure PDFs, and the journal PDF with
-\texttt{just paper} from the commit that contains these files. The
-generator reads the committed validation ledgers, the hash-checked
-Forest-Flow \texttt{fit.json} files, the logged-replay receipts, and the
-ARF watch log. It does not open an official test file. The catalog hash
-is \CatalogSha. The grouped training split uses seed $\SplitSeed$. The
-measured fit seed is 11, and the sample seeds are 101, 211, and 307.
-\texttt{python3 research/benchmark/verify\_paper\_numbers.py} exits
-nonzero when a displayed macro disagrees with those files. Hardware for
-the Forest-Flow confirmation fits was the GPU host named in the fit
-files. Replay and BeyondArena wall times are the receipt field
-\texttt{elapsed\_seconds}. Placeholder cells for TabSyn, a full TabDDPM
-panel, the production privacy-attack panel, fit-seed variance, and the
-full ablation grid stay the words ``not measured'' until those runs
-exist. The journal fidelity table is a separate empirical ledger on the
-grouped validation split. It is not that production panel, and it is not
-differential privacy or HIPAA de-identification.
+\input{generated/availability.tex}
+
+Peak RAM in the compute table is resident bytes, shown in mebibytes to
+one decimal, and peak VRAM is \texttt{peak\_gpu\_used\_mib}. The hardware
+cell drops a leading NVIDIA GeForce prefix. GPU hours sum walls on which
+the receipt recorded a GPU process, and each DOPE fit file is counted
+once. CPU hours stay \NotRecorded\ where the receipt has no separate CPU
+timer. The logged replay medians \ReplayMedA\ and \ReplayMedB\ are not
+the scored campaign (\CampaignElapsed). Forest-Flow medians use the
+\ForestTimeN\ native-grid operation walls. Its bytes are the
+$\NForestCb$ selected artifacts. \ForestFitCore\ sums
+\texttt{fit\_seconds} and \ForestSampleOp\ sums receipt operations.
+Neither sum is that median. Whole-device energy is not job energy.
+Gaussian copula, Chow--Liu, and independent-marginal attempts store one
+unsplit \texttt{wall\_seconds}. Medians are \GaussAttemptMed,
+\ChowAttemptMed, and \IndAttemptMed. Maxima are \GaussAttemptMax,
+\ChowAttemptMax, and \IndAttemptMax. BeyondArena medians remain
+\BeyondElapseA\ and \BeyondElapseB. Reading the journal threshold
+counts from top to bottom, CatBoost is \NThrLowCb, \NThrMidCb,
+\NThrHighCb; linear is \NThrLowLin, \NThrMidLin, \NThrHighLin; and the
+MLP is \NThrLowMlp, \NThrMidMlp, \NThrHighMlp.
 
 \section{Fit coresets}
 \label{app:coreset}

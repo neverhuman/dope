@@ -1,0 +1,276 @@
+{
+  "format": "dope-paper-compute-cost",
+  "methods": {
+    "ARF": {
+      "artifact_bytes": {
+        "field": "selected_charged_bytes",
+        "max": 34331533,
+        "median": 1627718.5,
+        "min": 21658,
+        "n": 100
+      },
+      "attempt_field": null,
+      "attempt_max_seconds": null,
+      "attempt_median_seconds": null,
+      "attempt_n": 0,
+      "cpu_hours": null,
+      "cpu_model": null,
+      "fit_field": null,
+      "fit_max_seconds": null,
+      "fit_median_seconds": null,
+      "fit_n": 0,
+      "gpu_by_host": {
+        "xbabe2": null
+      },
+      "gpu_hour_scope": null,
+      "gpu_hours": null,
+      "gpu_seconds": null,
+      "host_fits": {
+        "xbabe2": 800
+      },
+      "hosts": [
+        "xbabe2"
+      ],
+      "method": "ARF",
+      "notes": [
+        "fit and sample elapsed_seconds are absent",
+        "operation_seconds is not a fit or sample elapsed_seconds",
+        "peak_resident_bytes_including_coordinator is not job peak RAM",
+        "shared validation sampling is pending"
+      ],
+      "peak_ram_bytes": null,
+      "peak_vram_mib": null,
+      "sample_field": null,
+      "sample_max_seconds": null,
+      "sample_median_seconds": null,
+      "sample_n": 0
+    },
+    "CTGAN": {
+      "attempt_field": null,
+      "attempt_max_seconds": null,
+      "attempt_median_seconds": null,
+      "attempt_n": 0,
+      "cpu_hours": null,
+      "cpu_model": null,
+      "fit_field": "fit.operation.json elapsed_seconds",
+      "fit_max_seconds": 268.0864162321668,
+      "fit_median_seconds": 213.51195661898237,
+      "fit_n": 22,
+      "gpu_by_host": {
+        "xbabe1": "NVIDIA GeForce RTX 4090"
+      },
+      "gpu_hour_scope": "fit.operation.json and sample.operation.json elapsed_seconds",
+      "gpu_hours": 2.5184187431782874,
+      "gpu_seconds": 9066.307475441834,
+      "host_fits": {
+        "xbabe1": 22
+      },
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "CTGAN",
+      "notes": [],
+      "peak_ram_bytes": 1633439744,
+      "peak_vram_mib": 1101,
+      "sample_field": "sample.operation.json elapsed_seconds",
+      "sample_max_seconds": 197.03907940885983,
+      "sample_median_seconds": 186.66045461944304,
+      "sample_n": 22
+    },
+    "Chow-Liu": {
+      "attempt_field": "attempt.json wall_seconds",
+      "attempt_max_seconds": 1.2862971019931138,
+      "attempt_median_seconds": 0.1675617863656953,
+      "attempt_n": 100,
+      "cpu_hours": null,
+      "cpu_model": null,
+      "fit_field": null,
+      "fit_max_seconds": null,
+      "fit_median_seconds": null,
+      "fit_n": 0,
+      "gpu_by_host": {},
+      "gpu_hour_scope": null,
+      "gpu_hours": null,
+      "gpu_seconds": null,
+      "host_fits": {},
+      "hosts": [],
+      "method": "Chow-Liu",
+      "notes": [
+        "one attempt wall_seconds is not split into fit and sample"
+      ],
+      "peak_ram_bytes": null,
+      "peak_vram_mib": null,
+      "sample_field": null,
+      "sample_max_seconds": null,
+      "sample_median_seconds": null,
+      "sample_n": 0
+    },
+    "DOPE": {
+      "attempt_field": null,
+      "attempt_max_seconds": null,
+      "attempt_median_seconds": null,
+      "attempt_n": 0,
+      "cpu_hours": null,
+      "cpu_model": null,
+      "fit_field": "fit.json elapsed_seconds",
+      "fit_max_seconds": 13.544416504912078,
+      "fit_median_seconds": 7.246650408953428,
+      "fit_n": 98,
+      "gpu_by_host": {
+        "xbabe1": "NVIDIA GeForce RTX 4090",
+        "xbabe2": "NVIDIA GeForce RTX 3090",
+        "xbabe3": "NVIDIA GeForce RTX 3090"
+      },
+      "gpu_hour_scope": "unique fit.json elapsed_seconds",
+      "gpu_hours": 0.1930914144694624,
+      "gpu_seconds": 695.1290920900647,
+      "host_fits": {
+        "xbabe1": 13,
+        "xbabe2": 79,
+        "xbabe3": 6
+      },
+      "hosts": [
+        "xbabe1",
+        "xbabe2",
+        "xbabe3"
+      ],
+      "method": "DOPE",
+      "notes": [
+        "gpu hours count each physical fit.json once",
+        "sample wall is not a separate elapsed_seconds field"
+      ],
+      "peak_ram_bytes": 965443584,
+      "peak_vram_mib": 1067,
+      "sample_field": null,
+      "sample_max_seconds": null,
+      "sample_median_seconds": null,
+      "sample_n": 0
+    },
+    "Forest-Flow": {
+      "attempt_field": null,
+      "attempt_max_seconds": null,
+      "attempt_median_seconds": null,
+      "attempt_n": 0,
+      "cpu_hours": null,
+      "cpu_model": null,
+      "fit_field": "fit.operation.json elapsed_seconds",
+      "fit_max_seconds": 380.64785095187835,
+      "fit_median_seconds": 185.89461066003423,
+      "fit_n": 12,
+      "gpu_by_host": {
+        "xbabe1": "NVIDIA GeForce RTX 4090"
+      },
+      "gpu_hour_scope": "receipt operations with new_operation_started",
+      "gpu_hours": 2.444859110309691,
+      "gpu_seconds": 8801.492797114886,
+      "host_fits": {
+        "xbabe1": 12
+      },
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "Forest-Flow",
+      "notes": [
+        "gpu hours sum receipt operations with new_operation_started",
+        "twelve native-grid fits, not only the six selected artifacts"
+      ],
+      "peak_ram_bytes": 6408880128,
+      "peak_vram_mib": 3181,
+      "sample_field": "sample.operation.json elapsed_seconds",
+      "sample_max_seconds": 511.67633390193805,
+      "sample_median_seconds": 342.372947678552,
+      "sample_n": 12
+    },
+    "GaussianCopula": {
+      "attempt_field": "attempt.json wall_seconds",
+      "attempt_max_seconds": 39.87831652909517,
+      "attempt_median_seconds": 1.7095870584016666,
+      "attempt_n": 100,
+      "cpu_hours": null,
+      "cpu_model": null,
+      "fit_field": null,
+      "fit_max_seconds": null,
+      "fit_median_seconds": null,
+      "fit_n": 0,
+      "gpu_by_host": {},
+      "gpu_hour_scope": null,
+      "gpu_hours": null,
+      "gpu_seconds": null,
+      "host_fits": {},
+      "hosts": [],
+      "method": "GaussianCopula",
+      "notes": [
+        "one attempt wall_seconds is not split into fit and sample"
+      ],
+      "peak_ram_bytes": null,
+      "peak_vram_mib": null,
+      "sample_field": null,
+      "sample_max_seconds": null,
+      "sample_median_seconds": null,
+      "sample_n": 0
+    },
+    "TVAE": {
+      "attempt_field": null,
+      "attempt_max_seconds": null,
+      "attempt_median_seconds": null,
+      "attempt_n": 0,
+      "cpu_hours": null,
+      "cpu_model": null,
+      "fit_field": "fit.operation.json elapsed_seconds",
+      "fit_max_seconds": 253.226724534994,
+      "fit_median_seconds": 214.19936239009257,
+      "fit_n": 22,
+      "gpu_by_host": {
+        "xbabe1": "NVIDIA GeForce RTX 4090"
+      },
+      "gpu_hour_scope": "fit.operation.json and sample.operation.json elapsed_seconds",
+      "gpu_hours": 2.45059008880596,
+      "gpu_seconds": 8822.124319701456,
+      "host_fits": {
+        "xbabe1": 22
+      },
+      "hosts": [
+        "xbabe1"
+      ],
+      "method": "TVAE",
+      "notes": [],
+      "peak_ram_bytes": 1313812480,
+      "peak_vram_mib": 1069,
+      "sample_field": "sample.operation.json elapsed_seconds",
+      "sample_max_seconds": 196.5870361670386,
+      "sample_median_seconds": 186.0501497319201,
+      "sample_n": 22
+    },
+    "independent_marginals": {
+      "attempt_field": "attempt.json wall_seconds",
+      "attempt_max_seconds": 0.42881091800518334,
+      "attempt_median_seconds": 0.1617620411561802,
+      "attempt_n": 100,
+      "cpu_hours": null,
+      "cpu_model": null,
+      "fit_field": null,
+      "fit_max_seconds": null,
+      "fit_median_seconds": null,
+      "fit_n": 0,
+      "gpu_by_host": {},
+      "gpu_hour_scope": null,
+      "gpu_hours": null,
+      "gpu_seconds": null,
+      "host_fits": {},
+      "hosts": [],
+      "method": "independent_marginals",
+      "notes": [
+        "one attempt wall_seconds is not split into fit and sample"
+      ],
+      "peak_ram_bytes": null,
+      "peak_vram_mib": null,
+      "sample_field": null,
+      "sample_max_seconds": null,
+      "sample_median_seconds": null,
+      "sample_n": 0
+    }
+  },
+  "missing_field": "not recorded",
+  "official_tests_opened": false,
+  "version": 1
+}
