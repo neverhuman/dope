@@ -292,7 +292,7 @@ def build(receipt_pin, report_pin, auxiliary_pin):
     committed = guard.bound(native_path, NATIVE_PUBLICATION, native_path.parent)
     guard.require(digest(original) == digest(committed), 'frozen native winners changed')
     native_cells = {r['dataset']: r for r in original['cells']}
-    sampling_jobs, sampling_batches = sampling_receipts(sample_lock, sample_report, refs)
+    sampling_jobs, sampling_batches = sampling_receipts(sample_lock, sample_report, sampling_anchor['refs'])
     worker_views = {j['dataset']: j['worker'] for j in sample_lock['jobs']}
     fit_rows = dope.fits.bound(dope.fits.ROOT / 'reconciliation-v1.json', dope.fits.REPORT)['fit_cells']
     guard.require(all(digest(r['original_fit_job']['worker']) == digest(worker_views[r['dataset']])

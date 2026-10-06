@@ -84,13 +84,15 @@ def closed_fixture(base, input_rows, reference_rows, sampling_fit_seed=11, sampl
     elif sampling_mutation == 'receipt_digest':
         sampling_batches[0]['receipt_sha256'] = '0' * 64
     else:
-        assert sampling_mutation is None
+        assert sampling_mutation in (None, 'original_anchor_sample_omission')
     sample_report = dict(complete_sampling_matrix=True, logical_sample_cells=1200,
         physical_batches_evidence=sampling_batches, physical_status_counts={'ok': 199},
         new_operation_seconds=0, coordinator_wall_seconds=0)
     sample_report_pin = record(sampling / 'reconciliation-v1.json', sample_report)
     sample_anchor = dict(complete_sampling_matrix=True, round_sha256=sample_round,
         reconciliation_sha256=sample_report_pin, refs=dict(refs))
+    if sampling_mutation == 'original_anchor_sample_omission':
+        sample_anchor['refs'].pop(sampling_batches[0]['samples'][0]['sample_path'])
     sample_anchor_pin = record(sampling / 'receipt-lock-v1.json', sample_anchor)
     metric_source = 'a' * 64; common_jobs = []
     for original in sampling_batches:

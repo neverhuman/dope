@@ -175,6 +175,9 @@ class MatchedARFControls(unittest.TestCase):
     def test_original_sample_omitted_from_both_inventories_rejects_before_metrics(self):
         self.assert_original_sampling_rejected('omitted_both_sample')
 
+    def test_original_sample_omitted_from_original_inventory_rejects_before_metrics(self):
+        self.assert_original_sampling_rejected('original_anchor_sample_omission')
+
     def test_original_sample_digest_must_match_authenticated_batch(self):
         self.assert_original_sampling_rejected('sample_digest')
 
