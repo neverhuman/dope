@@ -122,7 +122,16 @@ The benchmark scratch ceiling is 200,000,000,000 bytes under
 fits below this ceiling and the host has adequate free memory and filesystem
 space. Stream generated rows into evaluation after the shared evaluator is
 locked; retain hashes, byte inventories, and immutable failed attempts while
-keeping bulk rows, fits, weights, samples, and logs outside Git and `/`.
+keeping bulk rows, fits, weights, samples, and logs outside Git and `/` except
+for a storage root covered by the documented owner capacity amendment below.
+
+The owner-authorized [xbabe3 local capacity amendment](LOCAL_CAPACITY_AMENDMENT.md)
+adds a separate local storage root for the TabDDPM and Forest-Flow continuations
+and TabSyn population work. Its aggregate ceiling is also 200,000,000,000 bytes;
+admission counts that root's actual bytes and full active/requested reservations
+against its own filesystem. Existing fast-scratch evidence stays in place.
+The amendment supplies storage authorization, while each operation still needs
+fresh host admission and its frozen scientific/runtime/evidence contracts.
 
 The generator thresholds in `contract.json` are exact. Feature-importance
 Spearman and top-k Jaccard apply only with at least three measured informative

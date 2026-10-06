@@ -1,5 +1,9 @@
 # Offline generator benchmark (research only)
 
+[`LOCAL_CAPACITY_AMENDMENT.md`](LOCAL_CAPACITY_AMENDMENT.md) records the owner's
+separate 200 GB xbabe3 local scratch authorization, its immutable receipt and
+unchanged operation budgets. It grants no scientific or final-test admission.
+
 [`ARF_S3_CONTRACT.md`](ARF_S3_CONTRACT.md) records the guarded ARF fit/sample
 contract, native FORDE density objective and measured synthetic serialization
 probes, including exact original-versus-guarded replay on single continuous

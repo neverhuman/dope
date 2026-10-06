@@ -1,0 +1,82 @@
+{
+  "admission_rules": {
+    "completed_ok_case_refits_allowed": false,
+    "cpu_slots_disjoint_16_cores": true,
+    "foreign_process_signals_allowed": false,
+    "gpu_foreign_owner_check_before_each_launch": true,
+    "gpu_process_cap_bytes": 17179869184,
+    "hosts": [
+      "xbabe1",
+      "xbabe2",
+      "xbabe3"
+    ],
+    "maximum_study_cpu_slots": 4,
+    "neural_fit_cap_seconds": 600,
+    "one_gpu_fit_per_host": true,
+    "prior_failed_trial_and_cost_carry_required": true,
+    "tuning_cell_wall_cap_seconds": 43200,
+    "tuning_trials_per_cell_max": 8,
+    "xbabe0_allowed": false,
+    "yield_to_jope_dltrain_or_hyperion": true
+  },
+  "amended_campaigns": [
+    "TabDDPM population continuation",
+    "Forest-Flow population continuation",
+    "TabSyn 100-lineage native/default"
+  ],
+  "ceiling_bytes": 200000000000,
+  "ceiling_scope": "aggregate new scratch root on xbabe3 local filesystem, counting new artifacts and full active/requested local reservations",
+  "du_semantics": [
+    "--apparent-size",
+    "--count-links",
+    "--summarize",
+    "--bytes"
+  ],
+  "execution_order": [
+    "TabDDPM and Forest-Flow continuations",
+    "TabSyn100 queue with shared GPU fit lease"
+  ],
+  "filesystem": {
+    "device": 66306,
+    "disk_usage_bytes": {
+      "free": 467526873088,
+      "total": 982240026624,
+      "used": 504705630208
+    },
+    "mount": {
+      "fstype": "ext4",
+      "maj:min": "259:2",
+      "options": "rw,relatime",
+      "source": "/dev/nvme1n1p2",
+      "target": "/"
+    },
+    "root_inode": 17208287,
+    "root_uid": 1000
+  },
+  "forest_new_large_artifacts_storage_policy": "hash and charge all bytes; retain only on xbabe3 local disk within its ceiling",
+  "format": "dope-owner-local-filesystem-capacity-amendment",
+  "full_campaign_admitted": false,
+  "host": "xbabe3",
+  "mfs_v2": null,
+  "new_scratch_root": "/home/ubuntu/dope-scratch-x3",
+  "official_tests_opened": false,
+  "old_xbabe2_fast_scratch_budget_separate": {
+    "ceiling_bytes": 200000000000,
+    "existing_artifacts_moved_or_deleted": false,
+    "permitted_new_contents": "hashes, byte counts, small summaries only",
+    "root": "/mnt/fast-scratch/dope-benchmark",
+    "shared_sshfs_alias_is_not_xbabe3_local_disk": true
+  },
+  "owner": "ENG:watcher",
+  "owner_note_time": "2026-10-05 21:09 MT",
+  "owner_ruling_verbatim": "[OWNER ENG:watcher 9:09pm MT, not typed by Jepson] Owner ruling on the 200 GB storage cap, plus your next work order (B lane only: baselines/harness/campaign; don't touch docs/whitepaper/, that's the paper lane). xbabe3's GPU is idle right now and nothing is running there, so let's get the baselines moving again.\n\nRULING: the 200 GB scratch ceiling is a resource-admission control, not a scientific property, and it's tied to xbabe2 /mnt/fast-scratch (96G free, which xbabe3 sshfs-mounts). I'm authorizing a documented capacity amendment: the TabDDPM and Forest-Flow continuations (and the TabSyn run below) write their fit/sample artifacts to a NEW scratch root on xbabe3's LOCAL disk (/ has about 434G free), e.g. /home/ubuntu/dope-scratch-x3/<campaign>, with its own 200 GB ceiling and the same admission checks against THAT filesystem. Record the amendment (reason, new root, ceiling, owner ENG:watcher, timestamp) in the campaign receipts/manifest so the paper can cite it. Do NOT delete or move anything already in /mnt/fast-scratch/dope-benchmark (pilot-24h etc. stay put), and keep only hashes, byte counts and small summaries on fast-scratch. Forest-Flow artifacts are 0.1-1 GB each, so measure bytes+SHA-256 and keep them only on xbabe3 local.\n",
+  "projection_and_model_bytes_charged": true,
+  "ptf_v1": null,
+  "reason": "Resume benchmark continuations on a separate local filesystem with available capacity; resource admission amendment only; scientific objectives, evidence and gates unchanged.",
+  "recorded_utc": "2026-10-06T03:12:29.579657+00:00",
+  "release_safe": null,
+  "scientific_configuration_changed_by_amendment": false,
+  "shared_gpu_fit_lease_path": "/home/ubuntu/dope-scratch-x3/.gpu-fit.lock",
+  "superiority": null,
+  "version": 1
+}
