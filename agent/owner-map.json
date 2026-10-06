@@ -165,6 +165,9 @@
     "research/benchmark/publish_dope_refinement_population_figure.py": "external-evidence",
     "research/benchmark/publish_dope_refinement_population_manifest.py": "external-evidence",
     "research/benchmark/tests/test_dope_refinement_population.py": "external-evidence",
-    "research/benchmark/results/dope-target-refinement-population-validation": "external-evidence"
+    "research/benchmark/results/dope-target-refinement-population-validation": "external-evidence",
+    "research/benchmark/verify_paper_numbers.py": "external-evidence",
+    "research/benchmark/tests/test_verify_paper_numbers.py": "external-evidence",
+    "research/benchmark/tests/test_paper_log.py": "external-evidence"
   }
 }
