@@ -18,7 +18,8 @@ Lineage-level retention and byte charges for the displayed profile, the
 8{,}192-step sufficiency budget, and the \BeyondInventory{} BeyondArena family names.
 These tables are the rows behind the medians in the main paper. A blank
 retention is an unavailable fit or an auditor that is not informative on
-all three sample seeds. It is not a zero. BeyondArena is not pooled with
+all three sample seeds. It is not a zero. A lineage with no charged bytes
+and no retention is omitted. BeyondArena is not pooled with
 the PMLB panel. The release-score rows are arithmetic on invented components.
 They are not measurements on these lineages.
 \end{abstract}
@@ -29,7 +30,7 @@ They are not measurements on these lineages.
 \label{app:2048}
 \input{generated/s3-2048-lineages.tex}
 
-\section{Sufficiency budget, all 100 lineages}
+\section{Sufficiency budget}
 \label{app:8192}
 \input{generated/s3-8192-lineages.tex}
 
@@ -57,10 +58,11 @@ difference $\DiffSufMlp$).
 \section{Release score that was not emitted}
 \label{app:score}
 Equation~(3) of the journal is a gated geometric mean. No artifact in the
-journal has a measured value. Table~\ref{tab:score} is that null column.
-Copying a retention number into it would publish a value the contract
-refuses to emit. Table~\ref{tab:illustration} applies the printed formula
-to invented components $(0.90, 0.80, 0.85, 0.70, 0.75, 0.95)$. The first
+journal has a measured value, so this supplement does not print a column
+of nulls. Copying a retention number into that scalar would publish a
+value the contract refuses to emit. Table~\ref{tab:illustration} applies
+the printed formula to invented components
+$(0.90, 0.80, 0.85, 0.70, 0.75, 0.95)$. The first
 scalar is that formula rounded to two decimals. The all-ones row keeps the
 $\epsilon=10^{-6}$ offset, which is why the result is not exactly $100$.
 The zero-compactness row uses the same invented components with the
@@ -68,30 +70,6 @@ compactness term set to $0$, the value of $\mathrm{clamp}(1 -
 \mathrm{bytes}/10240, 0, 1)$ at $10{,}240$ bytes. A failed byte gate is a
 different outcome: the implementation returns null and does not emit the
 formula. None of these rows was measured.
-
-\begin{table}[t]
-\caption{MFS-v2 after native selection. Null means not emitted.}
-\label{tab:score}
-\centering
-\scriptsize
-\begin{tabular}{@{}lc@{}}
-\toprule
-Method & MFS-v2 \\
-\midrule
-DOPE reference & null \\
-Gaussian copula & null \\
-CTGAN & null \\
-TVAE & null \\
-Forest-Flow & null \\
-ARF & null \\
-TabDDPM & null \\
-TabSyn & \TabSynPanel \\
-synthpop CART & null \\
-Chow--Liu & null \\
-Independent marginals & null \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \begin{table}[t]
 \caption{Invented applications of the journal's score formula. Not a measurement.}
@@ -115,12 +93,11 @@ Byte gate failed & null \\
 
 Peak RAM in the compute table is resident bytes, shown in mebibytes to
 one decimal, and peak VRAM is \texttt{peak\_gpu\_used\_mib}. The hardware
-cell names the GPU models recorded on the fit receipts. A missing model
-stays ``GPU model not recorded.'' A row with no recorded machine stays
-``host not recorded.'' The cell does not name a machine. GPU hours sum
-walls on which the receipt recorded a GPU process, and each DOPE fit file
-is counted once. CPU hours stay \NotRecorded\ where the receipt has no separate CPU
-timer. The logged replay medians \ReplayMedA\ and \ReplayMedB\ are not
+cell names the GPU models recorded on the fit receipts and does not name
+a machine. GPU hours sum walls on which the receipt recorded a GPU
+process, and each DOPE fit file is counted once. Receipts with no fit
+timer are omitted from that table. CPU hours are omitted as well: no
+receipt stores a separate CPU timer. The logged replay medians \ReplayMedA\ and \ReplayMedB\ are not
 the scored campaign (\CampaignElapsed). Forest-Flow medians use the
 \ForestTimeN\ native-grid operation walls. Its bytes are the
 $\NForestCb$ selected artifacts. \ForestFitCore\ sums

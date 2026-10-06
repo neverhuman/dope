@@ -277,7 +277,7 @@ cap is a failed gate, not a retention of zero.
 No artifact in this paper has a measured MFS-v2 value. Copying a retention
 number into that scalar would publish a value the contract refuses to emit.
 The supplement applies \eqref{eq:mfs} to invented components, including a
-zero compactness term, and lists the null column.
+zero compactness term.
 Those rows are arithmetic, not measurements.
 
 \section{Experimental Setup}
@@ -348,19 +348,20 @@ Section~\ref{sec:scope}, and they do not authorize a release at the
 10{,}240-byte tier. MFS-v2 and PTF-v1 stay null.
 
 \subsection{Compute}
-Table~\ref{tab:cost} is receipt wall-clock and charged bytes.
-Fit and sample columns are \texttt{elapsed\_seconds} when the receipt
-stores that timer. A timer, device, or byte field the receipt
-does not store is \NotRecorded. The hardware cell names the GPU models
-recorded on the receipts. It does not name a machine. CPU model is
-\NotRecorded\ on every row. The TabSyn cost row is \TabSynPanel. The
-TabDDPM cost row is \TabDDPMPanel.
-The supplement
-states the replay walls, the Forest-Flow sums, and the unsplit density
-attempt timers.
+Table~\ref{tab:cost} lists fit time, peak memory, the GPU models, GPU
+hours, and charged bytes for receipts that store a fit timer.
+Sample-timer medians (maxima) are \CtganSampMed\ (\CtganSampMax) for
+CTGAN, \TvaeSampMed\ (\TvaeSampMax) for TVAE, and \ForestSampMed\
+(\ForestSampMax) for Forest-Flow. The DOPE receipt stores no sample
+timer. No receipt stores a separate CPU timer. Gaussian copula,
+Chow--Liu, independent marginals, and ARF have no fit timer, so they
+are omitted; their byte medians are in Table~\ref{tab:bytes}. ARF
+receipts do not record a GPU model. TabSyn and TabDDPM costs are
+\TabSynPanel\ and \TabDDPMPanel. The supplement states the replay
+walls, the Forest-Flow sums, and the unsplit density attempt timers.
 
 \begin{table*}[t]
-\caption{Compute and artifact cost. Missing receipt fields are not recorded.}
+\caption{Fit time, memory, GPU, and charged bytes where a fit timer was stored.}
 \label{tab:cost}
 \centering
 \scriptsize
@@ -544,9 +545,9 @@ $\ForestByteLo$ to $\ForestByteHi$ bytes (median $\ForestByteMedian$)
 against a DOPE median of $\DopeForestByteMedian$ on the same lineages.
 MFS-v2 on this block is null.
 
-Table~\ref{tab:publication} is a different ledger: the published
-matched-population receipt for ARF, TabDDPM, TabSyn, and Forest-Flow.
-Rows are the displayed profile at $4n$. A missing file is not measured.
+Table~\ref{tab:publication} is the published matched-population receipt
+for ARF at $4n$ on the displayed profile. TabDDPM, TabSyn, and the full
+Forest-Flow publication have no receipt file, so they are omitted.
 
 \begin{table*}[t]
 \caption{Forest-Flow confirmation at $4n$, CatBoost. Not pooled.}
@@ -557,7 +558,7 @@ Rows are the displayed profile at $4n$. A missing file is not measured.
 \end{table*}
 
 \begin{table}[t]
-\caption{Published matched receipts at $4n$, CatBoost.}
+\caption{Published ARF matched receipts at $4n$, CatBoost.}
 \label{tab:publication}
 \centering
 \scriptsize
@@ -567,7 +568,7 @@ Rows are the displayed profile at $4n$. A missing file is not measured.
 
 \subsection{Release score}
 The scalar in \eqref{eq:mfs} is null for every method in this paper.
-The supplement lists that column and the invented arithmetic.
+The supplement shows the invented arithmetic.
 The evaluation locks for a final test were not frozen.
 
 \subsection{BeyondArena}

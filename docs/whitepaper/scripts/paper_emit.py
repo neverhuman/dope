@@ -188,16 +188,24 @@ def _memory_cell(lines, command, prefix, ram_bytes, vram_mib):
     return f"{left} / {right}"
 
 
-def _hour_cell(lines, command, prefix, cpu_hours, gpu_hours):
-    if cpu_hours is None and gpu_hours is None:
-        return r"\NotRecorded"
-    cpu_name = f"{prefix}CpuHours"
+def _gpu_hour_cell(lines, command, prefix, gpu_hours):
     gpu_name = f"{prefix}GpuHours"
-    lines.append(command(cpu_name, _recorded_hours(cpu_hours)))
     lines.append(command(gpu_name, _recorded_hours(gpu_hours)))
-    left = r"\NotRecorded" if cpu_hours is None else f"\\{cpu_name}"
-    right = r"\NotRecorded" if gpu_hours is None else f"\\{gpu_name}"
-    return f"{left}, {right}"
+    return f"\\{gpu_name}"
+
+
+def _cost_row_is_measured(row):
+    """A cost row needs a fit timer, both memory peaks, and GPU hours."""
+    return all(
+        row.get(key) is not None
+        for key in (
+            "fit_median_seconds",
+            "fit_max_seconds",
+            "peak_ram_bytes",
+            "peak_vram_mib",
+            "gpu_hours",
+        )
+    )
 
 
 def _span_cell(median_name, lo_name, hi_name):
@@ -231,7 +239,31 @@ def _architecture_commands(command):
     ]
 
 
-def _write_compute_cost(out, lines, command):
+def _arf_byte_commands(lines, command, arf, tex_bytes):
+    """ARF byte span. The within-cap count is used only when the span decides it."""
+    artifact = arf.get("artifact_bytes") or {}
+    minimum = artifact.get("min")
+    maximum = artifact.get("max")
+    count = artifact.get("n")
+    median = artifact.get("median")
+    if artifact.get("field") != "selected_charged_bytes" or None in (minimum, maximum, count, median):
+        raise ValueError("ARF charged-byte span is missing")
+    if type(count) is not int or count <= 0:
+        raise ValueError("ARF charged-byte count is empty")
+    cap = 10240
+    if minimum > cap:
+        within = 0
+    elif maximum <= cap:
+        within = count
+    else:
+        raise ValueError("ARF within-cap count is not determined by the byte span")
+    lines.append(command("ArfByteLo", f"{int(minimum):,}".replace(",", "{,}")))
+    lines.append(command("ArfByteHi", f"{int(maximum):,}".replace(",", "{,}")))
+    lines.append(command("ArfByteMedian", _byte_median(median, tex_bytes)))
+    return f"ARF & {_byte_median(median, tex_bytes)} & {within}/{count} \\\\"
+
+
+def _write_compute_cost(out, lines, command, tex_bytes):
     document = _load_generated(out, "compute-cost.json")
     if document.get("missing_field") != "not recorded":
         raise ValueError("compute-cost missing_field is not the required phrase")
@@ -261,57 +293,40 @@ def _write_compute_cost(out, lines, command):
     )
     for label, key, prefix, byte_cell in measured:
         row = methods[key]
+        if not _cost_row_is_measured(row):
+            continue
         sentence = _hardware_sentence(row)
         lines.append(command(f"{prefix}Hardware", sentence))
         lines.append(command(f"{prefix}HardwareAnon", sentence))
         fit = _time_cell(lines, command, prefix, "Fit", row["fit_median_seconds"], row["fit_max_seconds"])
-        sample = _time_cell(lines, command, prefix, "Samp", row["sample_median_seconds"], row["sample_max_seconds"])
+        _time_cell(lines, command, prefix, "Samp", row["sample_median_seconds"], row["sample_max_seconds"])
         memory = _memory_cell(lines, command, prefix, row["peak_ram_bytes"], row["peak_vram_mib"])
-        hours = _hour_cell(lines, command, prefix, row["cpu_hours"], row["gpu_hours"])
+        hours = _gpu_hour_cell(lines, command, prefix, row["gpu_hours"])
         rows.append(
-            f"{label} & {fit} & {sample} & {memory} & \\{prefix}Hardware & {hours} & {byte_cell} \\\\"
+            f"{label} & {fit} & {memory} & \\{prefix}Hardware & {hours} & {byte_cell} \\\\"
         )
-    arf = methods["ARF"]
-    artifact = arf.get("artifact_bytes") or {}
-    if artifact.get("min") is None or artifact.get("field") != "selected_charged_bytes":
-        arf_bytes = r"\NotRecorded"
-    else:
-        lines.append(command("ArfByteLo", f"{int(artifact['min']):,}".replace(",", "{,}")))
-        lines.append(command("ArfByteHi", f"{int(artifact['max']):,}".replace(",", "{,}")))
-        lines.append(command(
-            "ArfByteMedian",
-            _byte_median(artifact["median"], lambda number: f"{int(round(number)):,}".replace(",", "{,}")),
-        ))
-        arf_bytes = _span_cell("ArfByteMedian", "ArfByteLo", "ArfByteHi")
-    arf_sentence = _hardware_sentence(arf)
-    lines.append(command("ArfHardware", arf_sentence))
-    lines.append(command("ArfHardwareAnon", arf_sentence))
-    rows.append(
-        "ARF & \\NotRecorded & \\NotRecorded & \\NotRecorded & \\ArfHardware & \\NotRecorded & "
-        f"{arf_bytes} \\\\"
-    )
-    for label, macro in (("TabSyn", "TabSynPanel"), ("TabDDPM", "TabDDPMPanel")):
-        cell = f"\\{macro}"
-        rows.append(f"{label} & {cell} & {cell} & {cell} & {cell} & {cell} & {cell} \\\\")
+    if not rows:
+        raise ValueError("compute-cost table has no measured fit row")
+    arf_bytes = _arf_byte_commands(lines, command, methods["ARF"], tex_bytes)
     columns = (
         "@{}"
-        ">{\\raggedright\\arraybackslash}p{1.05in}"
-        ">{\\raggedright\\arraybackslash}p{0.82in}"
-        ">{\\raggedright\\arraybackslash}p{0.82in}"
-        ">{\\raggedright\\arraybackslash}p{0.78in}"
-        ">{\\raggedright\\arraybackslash}p{1.55in}"
-        ">{\\raggedright\\arraybackslash}p{0.72in}"
-        ">{\\raggedright\\arraybackslash}p{1.15in}@{}"
+        ">{\\raggedright\\arraybackslash}p{1.15in}"
+        ">{\\raggedright\\arraybackslash}p{0.95in}"
+        ">{\\raggedright\\arraybackslash}p{0.95in}"
+        ">{\\raggedright\\arraybackslash}p{1.7in}"
+        ">{\\raggedright\\arraybackslash}p{0.55in}"
+        ">{\\raggedright\\arraybackslash}p{1.35in}@{}"
     )
     table = (
         "\\begin{tabular}{" + columns + "}\n"
         "\\toprule\n"
-        "Method & Fit s & Sample s & RAM / VRAM & Hardware & CPU h, GPU h & Bytes \\\\\n"
+        "Method & Fit s & RAM / VRAM & Hardware & GPU h & Bytes \\\\\n"
         "\\midrule\n"
         + "\n".join(rows)
         + "\n\\bottomrule\n\\end{tabular}\n"
     )
     (out / "compute-cost-table.tex").write_text(table)
+    return arf_bytes
 
 
 def _license_bits(entry):
@@ -367,10 +382,10 @@ def _write_availability(out):
         "The catalog hash is \\CatalogSha. The grouped training split uses seed $\\SplitSeed$. "
         "The measured fit seed is 11, and the sample seeds are 101, 211, and 307. "
         "\\texttt{python3 research/benchmark/verify\\_paper\\_numbers.py} exits nonzero when a "
-        "displayed macro disagrees with those ledgers. Placeholder cells for TabSyn, a full "
-        "TabDDPM panel, the pre-specified privacy-attack panel, fit-seed variance, and the full "
-        "ablation grid stay the words ``not measured'' until those runs exist. A receipt field "
-        "that was not stored is ``not recorded.'' The journal fidelity table is a separate "
+        "displayed macro disagrees with those ledgers. TabSyn, a full TabDDPM panel, the "
+        "pre-specified privacy-attack panel, fit-seed variance, and the full ablation grid are "
+        "named in the prose and omitted from the tables until those runs exist. The journal "
+        "fidelity table is a separate "
         "empirical ledger on the grouped validation split. It is not the pre-specified privacy-attack "
         "panel, and it is not differential privacy or HIPAA de-identification.\n\n"
         "PMLB is MIT. Every dataset entry in the data lock records SPDX MIT and the note that "
@@ -684,7 +699,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     lines.append(command("BeyondElapseA", _elapsed(_median_elapsed(beyond, "steps2048"), tex_bytes)))
     lines.append(command("BeyondElapseB", _elapsed(_median_elapsed(beyond, "steps8192"), tex_bytes)))
     lines.extend(_architecture_commands(command))
-    _write_compute_cost(out, lines, command)
+    byte_rows.append(_write_compute_cost(out, lines, command, tex_bytes))
     _write_availability(out)
     (out / "numbers.tex").write_text("".join(lines))
     (out / "byte-table.tex").write_text(

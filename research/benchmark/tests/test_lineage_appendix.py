@@ -5,6 +5,7 @@ from research.benchmark.publish_lineage_appendix import (
     displayed_columns,
     group_retention,
     lineage_record,
+    measured_lineage,
     panel_median,
 )
 
@@ -61,6 +62,31 @@ class LineageAppendix(unittest.TestCase):
         self.assertEqual(getter(row), "fail")
         row["sizes"]["4"]["artifact_within_l3_cap"] = None
         self.assertEqual(getter(row), "---")
+
+    def test_lineage_without_a_measurement_is_omitted(self):
+        def sizes(bytes_value, within, retention):
+            utility = {
+                auditor: {"median_retention": retention}
+                for auditor in ("catboost", "linear", "mlp")
+            }
+            group = {
+                "charged_artifact_bytes": bytes_value,
+                "artifact_within_l3_cap": within,
+                "utility": utility,
+            }
+            return {"1": group, "4": group}
+
+        columns = displayed_columns()
+        empty = {
+            "dataset": "aa", "display_name": "alpha", "fit_rows": 10, "features": 2,
+            "sizes": sizes(None, None, None),
+        }
+        charged = {
+            "dataset": "bb", "display_name": "beta", "fit_rows": 10, "features": 2,
+            "sizes": sizes(19019, False, None),
+        }
+        self.assertFalse(measured_lineage(empty, columns))
+        self.assertTrue(measured_lineage(charged, columns))
 
     def test_cap_flag_cannot_disagree_with_bytes(self):
         with self.assertRaises(ValueError):
