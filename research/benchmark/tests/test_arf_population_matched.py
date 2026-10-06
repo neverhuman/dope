@@ -2,6 +2,7 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -419,6 +420,12 @@ class MatchedARFControls(unittest.TestCase):
                 self.assertFalse(binding['source_files_executed']);self.assertFalse(binding['source_cache_bodies_read'])
                 self.assertEqual((cache/'fixture.pyc').read_bytes(),b'generated cache never read')
                 self.assertEqual(binding,pub.project_historical_sources(round_path,round_pin,files,refs))
+                pub.verify_historical_projection(binding)
+                alias=root/'outside-projection-alias.py'
+                os.link(projection/'manifest.py',alias)
+                with self.assertRaisesRegex(ValueError,'historical source body type or size'):
+                    pub.verify_historical_projection(binding)
+                alias.unlink()
                 pub.verify_historical_projection(binding)
                 (projection/'extra.py').write_bytes(b'generated extra')
                 with self.assertRaisesRegex(ValueError,'extra member'):
