@@ -207,13 +207,13 @@
       "additionalProperties": false,
       "properties": {
         "component-gaps.json": {
-          "const": "81012524ebff8f752f18238e81386d2ccda30f4d4baed07cb143c2177907e700"
+          "const": "c8dea10c6ebbf9e4099dfff59c9c70e302936c257b997b6e2d5ceca6a9d6ac36"
         },
         "measured-costs.json": {
-          "const": "721beb8c5afd36dd74ff6930ba7146d599c4010abd99dcad46363b3fc6524d0a"
+          "const": "f017da01be0df7024a7da1837b9ff0dba44961c0f55ca6e458758b0b9942e312"
         },
         "source-proof.json": {
-          "const": "a569b5b9d8a9b54d736a8944e71bdbe136c4f2daf48a1376176ebf39380de3d3"
+          "const": "ecc92768307727867e8063b01626555b5b883836f90752ee927923455466cdda"
         }
       },
       "required": [

@@ -206,6 +206,26 @@
             "additionalProperties": false,
             "properties": {
               "name": {
+                "const": "across_seed_validation_loss_stddev_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
                 "const": "attribute_inference_advantage_max"
               },
               "passed": {
@@ -521,11 +541,31 @@
               "status"
             ],
             "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "validation_training_regret_upper_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
           }
         ]
       },
-      "maxItems": 16,
-      "minItems": 16,
+      "maxItems": 18,
+      "minItems": 18,
       "type": "array"
     },
     "measured_charges": {

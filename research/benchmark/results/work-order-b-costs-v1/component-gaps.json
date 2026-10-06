@@ -49,6 +49,11 @@
   "hard_gate_passed": null,
   "hard_gates": [
     {
+      "name": "across_seed_validation_loss_stddev_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
       "name": "attribute_inference_advantage_max",
       "passed": null,
       "status": "not_evidenced"
@@ -125,6 +130,11 @@
     },
     {
       "name": "type_i_error_max",
+      "passed": null,
+      "status": "not_evidenced"
+    },
+    {
+      "name": "validation_training_regret_upper_max",
       "passed": null,
       "status": "not_evidenced"
     }

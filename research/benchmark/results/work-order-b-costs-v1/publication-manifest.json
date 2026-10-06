@@ -5,47 +5,47 @@
       "sha256": "a3d87ba902b52bebe342026c4f891c21966b97c456568ea4364cf42e3ffc599a"
     },
     "component-gaps.json": {
-      "bytes": 4992,
-      "sha256": "81012524ebff8f752f18238e81386d2ccda30f4d4baed07cb143c2177907e700"
+      "bytes": 5236,
+      "sha256": "c8dea10c6ebbf9e4099dfff59c9c70e302936c257b997b6e2d5ceca6a9d6ac36"
     },
     "component-gaps.md": {
       "bytes": 1838,
       "sha256": "d830edf8b6933e609001b7ed161e557505c60f448db52c81009d3cf4b928b719"
     },
     "component-gaps.schema.json": {
-      "bytes": 16821,
-      "sha256": "0c8623a7233e700111005b921046b23479edc641b60f404eefec0a8b3e8b903c"
+      "bytes": 17847,
+      "sha256": "f96531721098c4309d85fc95b04a5bdb81425f103782c9aba61d39b8068bf39d"
     },
     "measured-costs.csv": {
-      "bytes": 2029,
-      "sha256": "45582a1bfd307fd94075a0544111d65c7e1c97d39fb5f52b9e05a31c15537358"
+      "bytes": 2370,
+      "sha256": "1eb1119d72f7d8515ba83509ae486e65740997a9a8e3c5bf2b9d9f1f64413848"
     },
     "measured-costs.json": {
-      "bytes": 18011,
-      "sha256": "721beb8c5afd36dd74ff6930ba7146d599c4010abd99dcad46363b3fc6524d0a"
+      "bytes": 19519,
+      "sha256": "f017da01be0df7024a7da1837b9ff0dba44961c0f55ca6e458758b0b9942e312"
     },
     "measured-costs.md": {
-      "bytes": 2832,
-      "sha256": "141839311f668c8dfd5c5215dfe6de40123e3de9df593b14150d640310eb6f1f"
+      "bytes": 3264,
+      "sha256": "78e3bc237a633a40b54e95ceb815ddce67ff05e139dd38a71d78b4cfd972923b"
     },
     "measured-costs.schema.json": {
-      "bytes": 74790,
-      "sha256": "79aea3cab82e9dc01d711f2804d38dd064ad49e4d7c3e750abb7cb674e878ea8"
+      "bytes": 77507,
+      "sha256": "d86df299d0454cf5f9955d8e31f0500ef5f4e4bd7658cef1b532fa829d669ebb"
     },
     "source-proof.json": {
       "bytes": 5421,
-      "sha256": "a569b5b9d8a9b54d736a8944e71bdbe136c4f2daf48a1376176ebf39380de3d3"
+      "sha256": "ecc92768307727867e8063b01626555b5b883836f90752ee927923455466cdda"
     },
     "source-proof.schema.json": {
       "bytes": 14138,
-      "sha256": "5dc03834000edafc192b429cd2e31050a2a8f90c35424043b590cbd8a7ad4f93"
+      "sha256": "058261fc1a0224c5279a25efd90dba8b416841c9120d41c2c8c47c5f62ebb2af"
     }
   },
   "format": "dope-cost-component-publication-manifest",
   "input_sha256": {
-    "component-gaps.json": "81012524ebff8f752f18238e81386d2ccda30f4d4baed07cb143c2177907e700",
-    "measured-costs.json": "721beb8c5afd36dd74ff6930ba7146d599c4010abd99dcad46363b3fc6524d0a",
-    "source-proof.json": "a569b5b9d8a9b54d736a8944e71bdbe136c4f2daf48a1376176ebf39380de3d3"
+    "component-gaps.json": "c8dea10c6ebbf9e4099dfff59c9c70e302936c257b997b6e2d5ceca6a9d6ac36",
+    "measured-costs.json": "f017da01be0df7024a7da1837b9ff0dba44961c0f55ca6e458758b0b9942e312",
+    "source-proof.json": "ecc92768307727867e8063b01626555b5b883836f90752ee927923455466cdda"
   },
   "mfs_v2": null,
   "new_metric_jobs_started": 0,
@@ -57,7 +57,7 @@
     "forest_native": 12
   },
   "ptf_v1": null,
-  "publisher_sha256": "67ed710e2704560a1fde96bbb86b4188af154f1d850f09c99e1998d560648734",
+  "publisher_sha256": "d90e275318b8eb766fb340334103060de8aeb3c81f65728e28314b2da4f34e01",
   "release_safe": null,
   "superiority": null,
   "version": 1

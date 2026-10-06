@@ -5,6 +5,63 @@
     "format": {
       "const": "dope-measured-cost-aggregates"
     },
+    "historical_prior_attempts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "const": "CTGAN"
+          },
+          "method_failure_inferred": {
+            "const": false
+          },
+          "native_outcome_class": {
+            "const": "infrastructure_interruption"
+          },
+          "operation_wall_seconds": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "partial_artifact_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "phase": {
+            "const": "historical_infrastructure_interruption"
+          },
+          "receipt_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "source": {
+            "const": "sdv-s3-population-native.json"
+          },
+          "source_job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "status": {
+            "const": "failed"
+          }
+        },
+        "required": [
+          "method",
+          "method_failure_inferred",
+          "native_outcome_class",
+          "operation_wall_seconds",
+          "partial_artifact_bytes",
+          "phase",
+          "receipt_sha256",
+          "source",
+          "source_job_sha256",
+          "status"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
     "historical_prior_costs": {
       "additionalProperties": false,
       "properties": {
@@ -2139,6 +2196,9 @@
         "dope_refinement_expansion_validation_v2": {
           "const": "separate_run_aggregate"
         },
+        "forest_shared_validation_v1": {
+          "const": "separate_run_aggregate"
+        },
         "sdv_shared_validation_v1": {
           "const": "separate_run_aggregate"
         }
@@ -2149,6 +2209,7 @@
         "dope_population_validation_v1",
         "dope_refinement_expansion_v2",
         "dope_refinement_expansion_validation_v2",
+        "forest_shared_validation_v1",
         "sdv_shared_validation_v1"
       ],
       "type": "object"
@@ -2414,11 +2475,48 @@
               "source"
             ],
             "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "host": {
+                "const": "xbabe2"
+              },
+              "identity": {
+                "const": "forest_shared_validation_v1"
+              },
+              "method": {
+                "const": "Forest-Flow"
+              },
+              "operation_wall_seconds": {
+                "minimum": 0,
+                "type": "number"
+              },
+              "phase": {
+                "const": "shared_evaluator_combined"
+              },
+              "phase_attribution_unavailable": {
+                "const": true
+              },
+              "source": {
+                "const": "s3-matched-forest-confirmation-validation.json"
+              }
+            },
+            "required": [
+              "host",
+              "identity",
+              "method",
+              "operation_wall_seconds",
+              "phase",
+              "phase_attribution_unavailable",
+              "source"
+            ],
+            "type": "object"
           }
         ]
       },
-      "maxItems": 6,
-      "minItems": 6,
+      "maxItems": 7,
+      "minItems": 7,
       "type": "array"
     },
     "scope": {
@@ -2478,6 +2576,7 @@
   },
   "required": [
     "format",
+    "historical_prior_attempts",
     "historical_prior_costs",
     "historical_prior_costs_additive",
     "mfs_v2",

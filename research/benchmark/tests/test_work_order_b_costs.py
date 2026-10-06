@@ -218,5 +218,76 @@ class Controls(unittest.TestCase):
                     p.aggregate([dict(base, **change)])
 
 
+    def test_production_regret_and_seed_stability_coverage(self):
+        contract = p.bound(p.HERE.parents[1] / 'production/kpi-contract.json', p.PRODUCTION_CONTRACT_SHA, p.HERE.parents[1])
+        expected = set(contract['release_gates']) | {'exact_copies_max', 'near_copies_max'}
+        self.assertEqual({g['name'] for g in self.gaps['hard_gates']}, expected)
+        self.assertEqual(len(expected), 18)
+        for name in ('validation_training_regret_upper_max', 'across_seed_validation_loss_stddev_max'):
+            gaps = copy.deepcopy(self.gaps)
+            gaps['hard_gates'] = [g for g in gaps['hard_gates'] if g['name'] != name]
+            with self.assertRaisesRegex(ValueError, 'hard gate coverage'):
+                p.validate_gaps(gaps)
+
+    def test_gate_validator_does_not_follow_incomplete_mirrored_tuple(self):
+        with patch.object(p, 'HARD_GATE_NAMES', tuple(n for n in p.HARD_GATE_NAMES if n != 'validation_training_regret_upper_max')):
+            with self.assertRaisesRegex(ValueError, 'production hard gate contract coverage'):
+                p.validate_gaps(self.gaps)
+
+    def test_forest_evaluator_remains_separate_combined_run(self):
+        run = next(r for r in self.costs['runs'] if r['identity'] == 'forest_shared_validation_v1')
+        cost = self.reports[run['source']]['cost']
+        self.assertEqual(run['host'], cost['shared_evaluator_host'])
+        self.assertEqual(run['operation_wall_seconds'], cost['forest_shared_evaluator_seconds'])
+        self.assertEqual(run['phase'], 'shared_evaluator_combined')
+        self.assertTrue(run['phase_attribution_unavailable'])
+        costs = copy.deepcopy(self.costs); costs['runs'] = [r for r in costs['runs'] if r['identity'] != run['identity']]
+        with self.assertRaisesRegex(ValueError, 'run coverage'):
+            p.verify_run_costs(costs, self.reports)
+
+    def test_two_prior_sdv_receipts_stay_separate_from_800_trial_rows(self):
+        report = self.reports['sdv-s3-population-native.json']
+        rows = self.costs['historical_prior_attempts']
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(len(report['trials']), 800)
+        self.assertFalse({r['receipt_sha256'] for r in rows} & {r['receipt']['sha256'] for r in report['trials']})
+        self.assertAlmostEqual(sum(r['operation_wall_seconds'] for r in rows), 623.6986422927584)
+        self.assertTrue(all(r['native_outcome_class'] == 'infrastructure_interruption' and r['method_failure_inferred'] is False for r in rows))
+        costs = copy.deepcopy(self.costs); costs['historical_prior_attempts'][0]['operation_wall_seconds'] += 1
+        with self.assertRaisesRegex(ValueError, 'historical SDV receipt or cost'):
+            p.verify_run_costs(costs, self.reports)
+
+    def test_prior_sdv_overlap_or_method_failure_rejects(self):
+        for change in ('overlap', 'method_failure'):
+            reports = copy.deepcopy(self.reports)
+            row = reports['sdv-s3-population-native.json']['previous_failed_trials'][0]
+            if change == 'overlap': row['receipt_sha256'] = reports['sdv-s3-population-native.json']['trials'][0]['receipt']['sha256']
+            else: row['method_failure_inferred'] = True
+            with self.assertRaisesRegex(ValueError, 'historical SDV'):
+                p.historical_sdv_attempts(reports)
+
+    def test_actual_committed_snapshot_contains_all_pinned_bytes(self):
+        p.verify_committed_sources(p.HERE.parents[1], self.proof)
+        proof = copy.deepcopy(self.proof); proof['committed_source_revision'] = 'c4672e7ffa29f0bd88f1c04d8a83bd6d2a828b12'
+        with self.assertRaisesRegex(ValueError, 'committed source revision'):
+            p.verify_committed_sources(p.HERE.parents[1], proof)
+        proof = copy.deepcopy(self.proof); proof['public_source_reports'][0]['sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'snapshot digest'):
+            p.verify_committed_sources(p.HERE.parents[1], proof)
+
+
+    def test_repaired_inputs_are_reproduced_from_frozen_baseline(self):
+        costs, gaps, proof = copy.deepcopy((self.costs, self.gaps, self.proof))
+        costs['runs'] = [r for r in costs['runs'] if r['identity'] != 'forest_shared_validation_v1']
+        costs['historical_prior_attempts'] = []
+        gaps['hard_gates'] = [g for g in gaps['hard_gates'] if g['name'] not in {
+            'validation_training_regret_upper_max', 'across_seed_validation_loss_stddev_max'}]
+        proof['committed_source_revision'] = 'c4672e7ffa29f0bd88f1c04d8a83bd6d2a828b12'
+        first = p.repair_metadata(*copy.deepcopy((costs, gaps, proof)), self.reports, p.HERE.parents[1])
+        second = p.repair_metadata(*copy.deepcopy((costs, gaps, proof)), self.reports, p.HERE.parents[1])
+        self.assertEqual([p.encode(v) for v in first], [p.encode(v) for v in second])
+        self.assertEqual([p.encode(v) for v in first], [p.encode(v) for v in (self.costs, self.gaps, self.proof)])
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
