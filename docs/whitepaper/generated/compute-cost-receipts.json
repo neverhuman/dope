@@ -311,883 +311,883 @@
     "dope": [
       {
         "elapsed_seconds": 11.290735177928582,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/6f5aff6b77e0677a31a54b2f6c6a3eff5410c39e1f46f8f74c80105ae5930705/attempt-0001/fit.json",
+        "fit_path": "cc42b316fcf18fceea6848c10632cea2444371c56d62b2abf767d9ffea0745c8",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888950784
       },
       {
         "elapsed_seconds": 10.3375233868137,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v1/attempts/873409a7f5bc3307942048537fd4c3e46378b374f779a0a189da97ec4ee89650/attempt-0001/fit.json",
+        "fit_path": "feecd9feec563b3cca0a4b13779634aae162be1be08bb8417d1cd83a8615d94f",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": true,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 1067,
         "peak_resident_bytes": 822571008
       },
       {
         "elapsed_seconds": 6.658093283185735,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/99b00de0649fb5959a14ecb74f944d26a70f6bceb6107b689d6d4aee6941afd1/attempt-0001/fit.json",
+        "fit_path": "df00ba56afd171c61b95c5403dcba9ff0571e8192f0773b63dac163e8d5ed889",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 881987584
       },
       {
         "elapsed_seconds": 8.044143059989437,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/dabafc8435b018e0077bee62975858025c9fd2b52db9847aa5ca1282d6d546fa/attempt-0001/fit.json",
+        "fit_path": "28ea63a45f4dece069861bd2c6a4a12f503ca1f9096bba0d58c034c002ef557a",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904105984
       },
       {
         "elapsed_seconds": 10.978726638481021,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/7a1e8b987e9074426fad168f02ac6fff29eb9f48ae05a063190f3bda0035f55f/attempt-0001/fit.json",
+        "fit_path": "ecab94faab3a38dd91ea2e258637b57d1c6ca713f1c2379a704b48393952882a",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": true,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 1067,
         "peak_resident_bytes": 820932608
       },
       {
         "elapsed_seconds": 10.818882625550032,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/e1fbebb3d862e3b59c22e00023921b61a3d156ffaab1d1b94d4db5fb4d362773/attempt-0001/fit.json",
+        "fit_path": "a1bdcc8b68a00f01441035a770f14a6bb09a786661ff410408902d213cc70ef3",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": true,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 1067,
         "peak_resident_bytes": 820506624
       },
       {
         "elapsed_seconds": 10.306662023067474,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/86f59d81b671f83a3a1536bd4725d38cf923ade476c949e0f250117fa9df9f21/attempt-0001/fit.json",
+        "fit_path": "9ff3b24463afadb1a1af10a38a88988118f8915ad19080d00f6210caa46d8111",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": true,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 1067,
         "peak_resident_bytes": 811102208
       },
       {
         "elapsed_seconds": 7.281413955846801,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/254add872c1fec117ca99d21bebd5434b623a4d5ecbd0c3a58d84a6a245ab31f/attempt-0001/fit.json",
+        "fit_path": "116d454e6e139c04c54f1cac79a7ef13b152ee0c956c77245bbd619bbe69627d",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888819712
       },
       {
         "elapsed_seconds": 8.603254997869954,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/9e470ba221d3664f2d9a969c98ea48b72879f2b517d1c1cb33c7c30699c4f873/attempt-0001/fit.json",
+        "fit_path": "ddf0a6dfd1a212e90bc1723c79559fa6c0defffee69954c72a639435112a14bd",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888877056
       },
       {
         "elapsed_seconds": 4.100877306424081,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/e89cff92e5eeba6d4110bacd54f015b2d6001a71fc499a2755f8fa8c68aff5cf/attempt-0001.json",
+        "fit_path": "f6168e51ba1f2882ed11bf6f48addb375b83c0f16260e6fd844e5658842af84a",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": false,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "peak_gpu_used_mib": 440,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 7.103372775949538,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/dd8b26203d5f9e1b425bf8ab58a2c557a10a9c189f4e8933ace69898b099fd49/attempt-0001/fit.json",
+        "fit_path": "a75d1d3c463b80a9ea4ca5108512693aa0220dcfd3486bc0986e710b204ebc92",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904327168
       },
       {
         "elapsed_seconds": 6.160052511841059,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/36a3b51d7c6eba305fef9245d18c39cd449177e4d0a0ded03244c455d99cc5fc/attempt-0001.json",
+        "fit_path": "452dc5d90e28c550ea8fe05529da1f16703f887f5635c7e3ae951053a1c62003",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": false,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "peak_gpu_used_mib": 440,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 12.527161524165422,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/9d4ebf23fd340cea1f69146d8dcdbf956e85c69f0998f4d2998a92057ddf78be/attempt-0001/fit.json",
+        "fit_path": "6fc3620d67f20a6a131ec87f99def4eac6ab0d56f2851685f5bc2bec8237ad60",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903950336
       },
       {
         "elapsed_seconds": 8.95253152307123,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/6f4e8e71b265d80b145999a0ef5edca1f247ec7fc3f8c78b56086d6f465d035d/attempt-0001/fit.json",
+        "fit_path": "0272eb108e094013af1e3887b55a9a24e406d1ad68e0aba6ef3356070c6965af",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888967168
       },
       {
         "elapsed_seconds": 7.117658843984827,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/b02818ece74090965c50195d197017a068b3640078175712850a38fd9ffc5cb2/attempt-0001/fit.json",
+        "fit_path": "6bc167fc6dfd6708b55d7539f40189c296f07b3a1a9412d45823bd93915f2e54",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 886034432
       },
       {
         "elapsed_seconds": 6.160070865415037,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/6e875fb0cf6b44247f3d8b9422733b9341240968ffc5d71d37537ce7f3ac1a5c/attempt-0001.json",
+        "fit_path": "aeea94c347f19afe43d95519f6084101a043482dec03ca549a87cf9b1be0fd98",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": false,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 596,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 6.68967898003757,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/3fb8ddcb6dc3f810ca857a60c60895b71d9bea9b1a9e52da334e119b7dfa36ca/attempt-0001/fit.json",
+        "fit_path": "dcefb6dc400eb36119fd5cae9048f266494e9242ee3d44223c54785f392f1e66",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888602624
       },
       {
         "elapsed_seconds": 7.841559197055176,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/9016e2c27fddd8cb2434ab209f7d59ea1b8ee33220f60654b6317514018b2b37/attempt-0001/fit.json",
+        "fit_path": "0c2d7df9f4a3dfd083494b6716a8a6f399f66c80ed7ea322101f73c9d71fe481",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903958528
       },
       {
         "elapsed_seconds": 6.743825046112761,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/948d81256156ba1893cd183cad08b823e36950c98e32c2b56a29e87061cbf459/attempt-0001/fit.json",
+        "fit_path": "32f0e6f8d8d012ebe3fc68dd4f449ffc4d85d0e99d27d95536d0432a52ff3255",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888647680
       },
       {
         "elapsed_seconds": 11.176140702329576,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/c344d59665a8e0c28310d9c4076acfee056d785b584455c805009f43e16b0d5b/attempt-0001/fit.json",
+        "fit_path": "418cbe2ca3e3b6c801dd5bdc0808b5231176b85919916ecf22dd88631fdd3b84",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": true,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 1067,
         "peak_resident_bytes": 820776960
       },
       {
         "elapsed_seconds": 7.660354775842279,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/ff09db8fe190d82fbb097db1675bd8fd6b25ab3192dd0ed3854a22eca4a66ffd/attempt-0001/fit.json",
+        "fit_path": "377c2468772323b6df4ef7a174185ae2f8b6b02cb28492e2c3ee18171fb8f1b4",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888684544
       },
       {
         "elapsed_seconds": 6.1585299372673035,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/fd0e230d739addea3ecb4e338cac63f89d2f7c4f2f88ffdc5fda9e660afbff94/attempt-0001.json",
+        "fit_path": "06d353b109c8b01e0f8894e40f6284d6d1ab22d22de62429e4fd225a76d3de53",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": false,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 596,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 8.03276193793863,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/31e06cd9e5a5936050d289fa42355b8e0a0bc9791e723e97715780308fde18d3/attempt-0001/fit.json",
+        "fit_path": "7ab61d0ce6a7e0f2914569442e211c1c55f533b85fecc8c5dfad346a5a13bcc4",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888561664
       },
       {
         "elapsed_seconds": 11.465531415073201,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/a28a1cedb2b3faf0cae90bb372f63bc59dc799cab02dafeae8f2d29aaf7e2b4f/attempt-0001/fit.json",
+        "fit_path": "2d17b2fb9b72b58eed7fd53f500865b61c1f3a4513a42fc7c6fdf13fa58526fd",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889864192
       },
       {
         "elapsed_seconds": 8.319381057983264,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/bbdb6e715ab3497ce8a2e9f0724fddb43bbfbcab302a204289e2cd6d519c74b7/attempt-0001/fit.json",
+        "fit_path": "b84dcf4c3ba8f3349ef973f325dec838e3c63ea76425cc5e16fa06f6d9213205",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904065024
       },
       {
         "elapsed_seconds": 7.265853286953643,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/05aa3a9b4e4b602b8c6a6e22960902fbe33c4fc628e4f04bc08c2d40ebbf9424/attempt-0001/fit.json",
+        "fit_path": "f778f44ea0881e15bfdaa389094b8fc19c98b9075659aa3ea9d62b5b2a15de18",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889155584
       },
       {
         "elapsed_seconds": 7.780009916983545,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/75d0fa06ff51b6a6c24dce4b7d4897582d2cc01bb3ebb582bb77d63a42c2ffe4/attempt-0001/fit.json",
+        "fit_path": "c5b834174c03286a70808e426a3e32c612ded092621a67961134fb554af12a01",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889008128
       },
       {
         "elapsed_seconds": 7.843590701930225,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/2d8175c709931a461d97223af314364f93c27653cad693d5e9ab338b94214e33/attempt-0001/fit.json",
+        "fit_path": "07b79c4f1fef1efed5fc0777a45470d33d4ba241df7071e3ff4cf1f9fade14cc",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903917568
       },
       {
         "elapsed_seconds": 8.94998846296221,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/6883e8da68b8392ee5e73deca7661d731ee08297d2847f6fe44845eb5ae92af0/attempt-0001/fit.json",
+        "fit_path": "e1f1f21c4a193756ec406e6d20c1dc98ea366ae84607b9065b4bbc44c7fcb261",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888983552
       },
       {
         "elapsed_seconds": 6.169769247993827,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-confirmation-v1/fits/7a0bcc4c41e3d9530a8f66edd1c83861fac20b6740570ef35a7c3a86c823af66/attempt-0001.json",
+        "fit_path": "d98b88b643fbd10ddf71d05cbf5cd165cb2b3df890418f6f69a090227e9cf21a",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": false,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 596,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 6.161081272177398,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/4fae0d39993e73a12bef133ef57c06a97fdf31e1ac234f442fc95281435eb6ec/attempt-0001.json",
+        "fit_path": "207f6b818569340269bab4966148bd5e6164fb54ffabee6c1e6fa16023e41523",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": false,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "peak_gpu_used_mib": 440,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 6.180680227465928,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-confirmation-v1/fits/1f55e06562591218cfc1e7ff0d94023480158013777080f2d70bf02db8e9c1c6/attempt-0001.json",
+        "fit_path": "d3a749fe17f96609da5ac9dc4850e76747e983954502561560ecc8dc7dcfebea",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": false,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 596,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 7.607484214939177,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/73e4a7430cb0c92cdc59491bb4814123166cd46c225c7c9954f08a97e6f7dbae/attempt-0001/fit.json",
+        "fit_path": "54046f46799d5cf73f3920db1ff408b0fcf360892657c4c8bccddad44219e0ea",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904400896
       },
       {
         "elapsed_seconds": 7.5262848529964685,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/32d5fb999954230a7c0bc9bfa2dabf27202db77c79f4a791444771b7a84e86a5/attempt-0001/fit.json",
+        "fit_path": "c9dd66b79f77cdba42d17e416609c59e28fef66e4479e2fc46f1eaf7fe87739e",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903880704
       },
       {
         "elapsed_seconds": 13.544416504912078,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/02ad9ebc3c4eefc59ce5367e74f2e6faa001f438bea04cfd47acc557a7dc183c/attempt-0001/fit.json",
+        "fit_path": "d1bdf184fcb16bde41fd340271831d7c437492e49f6935a647783a1e8d2e6539",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": true,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 1067,
         "peak_resident_bytes": 820334592
       },
       {
         "elapsed_seconds": 7.5562494290061295,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/a0021745272a81eae87bfe4064362bf3118f5f45beaeb581a512d8092150a6dc/attempt-0001/fit.json",
+        "fit_path": "6cb5740e0cd79f66ef13585e20fa0f70c949a0e596fe15086a5bb9a2312dbddb",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904294400
       },
       {
         "elapsed_seconds": 7.227447530953214,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/92eb48f9d707fe64c1ac2c519f4bf693bb8e0e20a0570e2da36ec789d223cf3b/attempt-0001/fit.json",
+        "fit_path": "d393987436fbdce6e6c23d857d0f47e94ec8ee9172aa463a0e77cd09f49e0ebb",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888709120
       },
       {
         "elapsed_seconds": 13.024488155031577,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/73ee40fb7aeb8881b503040c86832b31c2c50f6d932f17e433bf421530376ae2/attempt-0001/fit.json",
+        "fit_path": "9a3421bc4f225be193548ea7605ad65f4931810d14bec70dee1e32c9daf7bee2",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 965443584
       },
       {
         "elapsed_seconds": 8.17666132398881,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/f7bdbc2f7c666bc72c3f28a4163b41724d277a421eb443dd518e57769be7aa1c/attempt-0001/fit.json",
+        "fit_path": "b0cc40f4d8a710924054e3dfc79831387c80900aaf04b4fbaa9e40131aa4cae9",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 918241280
       },
       {
         "elapsed_seconds": 6.157491442747414,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-confirmation-v1/fits/69f9086dd8d8632a56700c22a34749347fc01b307d619952b948918a83007b9e/attempt-0001.json",
+        "fit_path": "1c7068b20863a73262b24ada9897c1a9bdce9d3e72e76d1508d9509bb3f7b298",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": false,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "peak_gpu_used_mib": 440,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 10.016902403207496,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/29dfc71a5802228998fcdbbd26190b97070681e2cb6656fb8e047ee4ca66aca7/attempt-0001/fit.json",
+        "fit_path": "1c58bd14a61f31083a060a0c8767ed6bf24abc161fb3e500ecd1e69d13a736d8",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 918302720
       },
       {
         "elapsed_seconds": 7.145984111120924,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/fa1efdb97ce26c487b8b5a06f8c7b3b69b488dc632df92eaa36cd4cc49548aba/attempt-0001/fit.json",
+        "fit_path": "0fad7cb0812591ce0010125eb373a241dd1616081961bc546fbf1b008b22cd34",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 882151424
       },
       {
         "elapsed_seconds": 7.710045577958226,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/9bdc3ea21f31cf71f692e28f70c1f314231902c1e611b596422fb7f546cac96c/attempt-0001/fit.json",
+        "fit_path": "82fca0fd5eee2d0ba1b1d7492bb30896a6b3b73cf70982453fd71946c4f46a36",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888602624
       },
       {
         "elapsed_seconds": 6.423881616909057,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/932c2c84f5fe324b58a5037e0d8f9e5c020f4cf25c7f7b795fd52d674a7bbc9c/attempt-0001/fit.json",
+        "fit_path": "139b2306a4b1cba04b40bec449348ef1d5226730ab2c4cf9f85113ba6bd846e0",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888610816
       },
       {
         "elapsed_seconds": 6.762511007022113,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/b66dc28521137ab269a89c6323df3c806e0866b3fb425927046c71a5d420da21/attempt-0001/fit.json",
+        "fit_path": "46aa85e00e8b9c9f37e2e02c3cb8fd7f965310f6058578090a37853d1ea89ef2",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903991296
       },
       {
         "elapsed_seconds": 7.484364796895534,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/5c7a79d120bd4ac4be25eaa2516b71f04d06e74c0177d6b052132db7648985fc/attempt-0001/fit.json",
+        "fit_path": "ff8689caf2dab9516f1586445b6470544ee95eef7b6ea13afbd5f6b4e0dc8737",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889262080
       },
       {
         "elapsed_seconds": 7.2111057040747255,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/5e1c5d9dc45a790e8133971620da9ad3359ea135e535d9f3f35c23aaf07d42d4/attempt-0001/fit.json",
+        "fit_path": "5bd8832f567c3174dfbc8052245fc074b69296ecda7ab070318cebf0be712fd5",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903843840
       },
       {
         "elapsed_seconds": 11.83253841707483,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/1259e34b7d45a141a3b044317eb1e101539990745ab5d9a8274134206fe10916/attempt-0001/fit.json",
+        "fit_path": "4e6b03aa75a94972d88a926e055a15ab25a3606ba01ad5c9a828844812d99af0",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888418304
       },
       {
         "elapsed_seconds": 7.8919907480012625,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/9130d69ba0b3d20253fac13f94376448b897fce7d9d31d5ad724e9f2fec6b8c9/attempt-0001/fit.json",
+        "fit_path": "d6ba37b721cb4c463bfb619321624766d41e4ebca377a4eae008170417f1615a",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888717312
       },
       {
         "elapsed_seconds": 7.135792704997584,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/3f5545e30cc53e3e973b191205125b223a5d21c7028fd782e2e08487389d6282/attempt-0001/fit.json",
+        "fit_path": "747f6c93d422954a7898620a293b04a9450e0ffe0840cb97d3576f14291c4be6",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 902979584
       },
       {
         "elapsed_seconds": 7.835849343799055,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/f5abea6b8601ea2f7b40156fdcaa46b224f09745b43eb5281f265a8991dfb509/attempt-0001/fit.json",
+        "fit_path": "c8051a98cdd29f07720fea67a1817edcede8d05f5097b60fd8140795705ae5e9",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888557568
       },
       {
         "elapsed_seconds": 7.0871571758762,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/a5aae6dac7c685ea4d907624d3dd83a97598a6518f33fe19627231a8b37263ce/attempt-0001/fit.json",
+        "fit_path": "93bd14c023a3b7a64c623063634aa9491bdd03b63c888afc0d312fa315192ca6",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903032832
       },
       {
         "elapsed_seconds": 8.42314181686379,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/4301df6b732bd1ce729a1db5285d42347f8fdcf62eb89a72d5925c2f42105c9a/attempt-0001/fit.json",
+        "fit_path": "c9f563abdc32ad53e75d56390e8bb75d653cb7c527c773f3a31661ef9c2e874d",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888733696
       },
       {
         "elapsed_seconds": 7.417685081018135,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/52159f316ef4beec0a111e11a6afba0c8d331a6874b46696d6ec3e36061a0c17/attempt-0001/fit.json",
+        "fit_path": "f9885885b303edb13d7a77b66256edf1a57a295133c3a5d898c625ec4af840af",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903884800
       },
       {
         "elapsed_seconds": 6.166809465736151,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-confirmation-v1/fits/01fe4a42e9239aee8778ae8320fafd8124d10886edd2b8bd0d521f30accdd9c3/attempt-0001.json",
+        "fit_path": "47872f06d5a73832335bd26b5a11b22ba6406ea2aec03c6dc9ecd607798fee0a",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": false,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "peak_gpu_used_mib": 440,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 7.215080060064793,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/c3de91d1f5bf800147aed53c76a94d1331f9e4178d08d82be19cc8fc49f20208/attempt-0001/fit.json",
+        "fit_path": "00356175fb825e066aef73ec6ec7e04a2df14f6d4453269e3bf035cb262bee2d",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888619008
       },
       {
         "elapsed_seconds": 8.907460642047226,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/74c148a96d11cbe2eca3f344681a5b51ef687347e9e3b53b98eaecb8afd3fae2/attempt-0001/fit.json",
+        "fit_path": "c5f7e816df81cf1557b191f18aae5a871f34982ee69b81aa2a4ab7b1de78baac",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889548800
       },
       {
         "elapsed_seconds": 9.92003215989098,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/8faa5adc52fbc9773fa931679cc72aa9f65dde78fb3e55ea989b7f1e5373fa28/attempt-0001/fit.json",
+        "fit_path": "200f688db8a9b60fa3cb40ff753b2110bc426ab51960aa0856be497fe154d484",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903954432
       },
       {
         "elapsed_seconds": 7.435642635915428,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/49b995c4dc4817c96613b80f7531bbb0322f9013bba216d6740f5a1808645860/attempt-0001/fit.json",
+        "fit_path": "17ac0a1641cd37314d1dc82cde5c7ef98a311478d5f0fca3921fdd00e8ddc8d9",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904146944
       },
       {
         "elapsed_seconds": 7.370694072917104,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/f96323dd04b1d1660b2abd0875a4168872226463875a6f1ca0539d06633186fa/attempt-0001/fit.json",
+        "fit_path": "74c9ae95f6f0673230e35dbd6c3ca3a18f2161bbd8c8699bb0eebb793ac4d97d",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 937336832
       },
       {
         "elapsed_seconds": 11.195110092870891,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/6d892b4f356523ebd86bc2bde899d0858eee84ac79a8404b75ea6bbb1d2f7a87/attempt-0001/fit.json",
+        "fit_path": "de052eb307afb78e469674166dbc93bd7e6d94f0a8b70f27bc7364e97206fc41",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": true,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 1067,
         "peak_resident_bytes": 820178944
       },
       {
         "elapsed_seconds": 4.094970004633069,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-discovery-v1/fits/e20d8871c0fa3dde6ada01585efc6225ee9dbf961dc74be75b479e8f4b3c5983/attempt-0001.json",
+        "fit_path": "f8775128cdfe97133d6f4e2024a0f88ab88bc5e0efb3ac4c77a5634bcb896117",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": false,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 596,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 7.697524037910625,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/8ff5ae95b7109494a8380c8bc3a4a5c2256ee74f73ab77c8f609107254ec289f/attempt-0001/fit.json",
+        "fit_path": "a6103ba0db1742d7ce79a01fa5b1373b9582573c72058e89e2c46af2cf14a754",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889503744
       },
       {
         "elapsed_seconds": 7.4463872199412435,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/d27739ae162a0c06e7e1bf3093e1baf66d36cfe88479d6f3ee4ba41b5b9d1eba/attempt-0001/fit.json",
+        "fit_path": "89c47ec919244575b0c81c684ef972532cfccc2c648b4589ba9cdbc93c2036b7",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889016320
       },
       {
         "elapsed_seconds": 7.202591109089553,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/4449b0fdc0557dfb6c449639f2268d6d15035bf66fcb84df7dc8297f8fd40f72/attempt-0001/fit.json",
+        "fit_path": "a600be3c96c298eb31b6b3c244b0d4427d78fab4ce9d02262c4850b4e1e07f25",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904036352
       },
       {
         "elapsed_seconds": 7.353341954993084,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/d487b1316dee32abf0b3653adc5d068468e49f3d7dc6531cfff342f34e545038/attempt-0001/fit.json",
+        "fit_path": "4f5ef12d8142c59ae6a454ad996b517337975fd365ae38228419915b3a408c5f",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888942592
       },
       {
         "elapsed_seconds": 7.110709937987849,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/4facfe12132471e87297f787c2c3ce27884d1d533fd026c0100f71efc89bf92c/attempt-0001/fit.json",
+        "fit_path": "362b2748ead95fa2b2a9f0b538c78109027a7dfd89ac3265378c20af104b9983",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889745408
       },
       {
         "elapsed_seconds": 7.199900215957314,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/0766c4d8b77a2f479464246d4d027aa0032b932ff2e242124993500a9a11662d/attempt-0001/fit.json",
+        "fit_path": "82e1b354a6e409712b07c3e089dd37d8b8aa0e8d85d89c02500206b6757c1cfa",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904114176
       },
       {
         "elapsed_seconds": 7.3129026119131595,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/a0fc9dc3f38fa5e2d2b650b37729194d191c156a3f4313b799d75ae23eb7dec8/attempt-0001/fit.json",
+        "fit_path": "b09fa7e39d031b43f48c584393fe1690c9802519bfdd97498a22bb087930fde7",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889970688
       },
       {
         "elapsed_seconds": 7.669656526995823,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/8abdc28bc2af6d85ebee26da35719eeb2253256328a8181f601fd6a0deb9595e/attempt-0001/fit.json",
+        "fit_path": "5a964d12953e70112f55b16c9ba43e4fc079428ad086a16cee740986d460a764",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904486912
       },
       {
         "elapsed_seconds": 7.430866799782962,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/632bcc7f2ae2a8c5c2579da3d3ce626b8501c48824c5fd09d62471d8d453cb58/attempt-0001/fit.json",
+        "fit_path": "9a12e7f26e1f8d6c77b87f52805b73b01135610ce581ed44837d9ed1e808aced",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904003584
       },
       {
         "elapsed_seconds": 6.910886266967282,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/543d39fe3433427e09aa89538bedcf363bdcf8a5f98d5018fc6b9bb4013885d3/attempt-0001/fit.json",
+        "fit_path": "5722bef79630fbc3961018571f867c0517f820ec68eccd1694af8dd72ed15aff",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 889884672
       },
       {
         "elapsed_seconds": 6.476772136054933,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/2671dc67734977e55a52146c62ba6ed6ff642c6cca0f6649f4bd8d5cfde3b97e/attempt-0001/fit.json",
+        "fit_path": "1039ffe2ee0a235479855d1dbd9401d6418e443b840fcf926345f5d0c4354958",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888999936
       },
       {
         "elapsed_seconds": 7.037100039189681,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/cfba7c9c724f5c5ae485fbb50e4d911783f8c5d6089af5c26c4e8c10940af429/attempt-0001/fit.json",
+        "fit_path": "dcfad0ddef5304d99c0b1481b2607b7ca5d3d692d2872b9d694f57003ec30aaf",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904065024
       },
       {
         "elapsed_seconds": 6.8957590740174055,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/472892a948cb593768ab1ba03fb33c4b2ad71d059619e2642e3cce0c40ccc086/attempt-0001/fit.json",
+        "fit_path": "9aa73291610c3c2d631e9a0fce2c4edf5bb9b4840e6c21bb31c55cb4a509b00a",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904077312
       },
       {
         "elapsed_seconds": 6.892097617033869,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/2bedc0ec1614bcd51ff9f84dfc3b568c0a96f389724cab67ffdb777bb9dfcbf0/attempt-0001/fit.json",
+        "fit_path": "f4a411df966debf150a202aa9541ad75aa7dd7cde9979aa438565db51f542d52",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904048640
       },
       {
         "elapsed_seconds": 6.902282953960821,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/d49d4415e426f4565f407cb9bce91a587f23cf21b6d053c427d7bf15be8dc443/attempt-0001/fit.json",
+        "fit_path": "7de3aaf7ef1b333f0055451e9fb19c6fc7ea0749f00ed96607a017ce8e042236",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904228864
       },
       {
         "elapsed_seconds": 6.870015088934451,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/e208ab77597f2e0f6f571770d1a522657876a5935b502a90f0c2ddc0b808b6f6/attempt-0001/fit.json",
+        "fit_path": "d704f63d0fc753fa268ca8793c8bd14b6b94ebfc59a0c23b4ff178089a8e3f8c",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888414208
       },
       {
         "elapsed_seconds": 6.885425997897983,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/07e50e259d98dcfe4ecf4d199454e0edc5f06e870c7e74b6b83178e5dace6643/attempt-0001/fit.json",
+        "fit_path": "a91244f91b2c345614b7cf8424de9195adfb5d6bba448bdb9f53cc4906d841dc",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888725504
       },
       {
         "elapsed_seconds": 6.488377867033705,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/64ba9d17911dd9613b672c1eafbb759239f7fec494a437979797e0c16b512cda/attempt-0001/fit.json",
+        "fit_path": "ae26242b6b5eacbe614ee6cbcf168e369e91402ff7a2d9c5f12fed1103949864",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 902778880
       },
       {
         "elapsed_seconds": 6.581236009951681,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/6892b38a6bd6a14a64ce86eb49acc98722bf7b90123d01e07597132302fe3c1a/attempt-0001/fit.json",
+        "fit_path": "66d3ee3cfda2d38fda2bb0f25acb43ec670bff1def8af1bab97e2156d308aead",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903921664
       },
       {
         "elapsed_seconds": 11.733109117951244,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/4c4be01a6497461ec0f8a4eacbaa87449a9a10a0877507cdbc138e235f4b3029/attempt-0001/fit.json",
+        "fit_path": "c1aa43e037250f13bc10736a8e3a694b384d8c184032c8e75ba70807dec284d1",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888508416
       },
       {
         "elapsed_seconds": 8.901110814185813,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/7fd7f561512b8c0c1701adc7ebb47436ac7fda2721129223e74af6710cc9ad6d/attempt-0001/fit.json",
+        "fit_path": "63bdc3071152f0b45f7fd8366820e0daba4d60f1da6e9b2b265eedce456dc9f4",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 902897664
       },
       {
         "elapsed_seconds": 8.59411225700751,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/32aebd39449203ae0c5c5fc41a26eac44fe21be6000bcadcdf31c3443034ef1e/attempt-0001/fit.json",
+        "fit_path": "8e49377625108fe3e4a5029552381bc127dabdaa369f5ac1b91a580d20efb88a",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 903913472
       },
       {
         "elapsed_seconds": 6.995484949089587,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/e2a6d46e1baea7af04f7783d61ebe13d8cb531add6482de6370100c2e9a28bab/attempt-0001/fit.json",
+        "fit_path": "2ee747f6c46963b0bd34979b81f302ea52847591eeb83e7cddc1b525773c75b8",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888922112
       },
       {
         "elapsed_seconds": 6.94579331506975,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/c37b6534adcfb226da9cf7dee18dc19ae477d3b43ea42b2785722a6c31fbf0a4/attempt-0001/fit.json",
+        "fit_path": "b843cbcdd5d394ba198858d9a38b6fb3627f23aa737a20d80cfa85967fa3a600",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 888672256
       },
       {
         "elapsed_seconds": 6.8438426670618355,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/aa84170eb6b9360ba96070f40b43b5a11ff607dcbb7e0b7860fccec1c3282600/attempt-0001/fit.json",
+        "fit_path": "3f895fec1602d6506cd9ec27731298e187efa53bf587f00ea69012218ae8587c",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 890,
         "peak_resident_bytes": 904175616
       },
       {
         "elapsed_seconds": 6.811249322956428,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/8ae4e17bdcbfe6918851424d4c2593d87c47f576022d9cf1314b581aaa79cb79/attempt-0001/fit.json",
+        "fit_path": "844fa2732cbb3f3914d1b9d2985289f5fd47b2e0183b108fb60d3b4a801b347f",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 903852032
       },
       {
         "elapsed_seconds": 8.557929107919335,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/9d2c08dedf2bd63a6de37056d4b2170cb201e50cd795b96f39343ee533efebe9/attempt-0001/fit.json",
+        "fit_path": "7a86bf9c9a83bd69b61f9649f72e72f8e98aaeab8544e48608be02f715ea8935",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 889221120
       },
       {
         "elapsed_seconds": 6.161335040815175,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-confirmation-v1/fits/1dd2255e4e7518932911c6dde59273179e23c1b4d91335971650ba29482d4c7b/attempt-0001.json",
+        "fit_path": "d6cfd6ad4bcded43c0a0be8148436f1724511f05a106285dcd2033e71589ef57",
         "gpu": "NVIDIA GeForce RTX 4090",
         "gpu_process_observed": false,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_gpu_used_mib": 596,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 7.013234987854958,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/7f58a8ebf5d7bd77f903eaf35fe603027bc3108a3c4c15b7848d69898f12ebb7/attempt-0001/fit.json",
+        "fit_path": "b94dfc899a73cc620ee4bd8bc739368cda22ae84a131c7459d7ef3069d15be93",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 888709120
       },
       {
         "elapsed_seconds": 6.953231546096504,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/9d9ba79159ba02dbf97272e312afd7bf4dbcc379def7402886e7fd6dc3c45dd4/attempt-0001/fit.json",
+        "fit_path": "310d662b56c1731b99c7015f4236c65db1d22092f39b9ef420c9a8157886d106",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 904056832
       },
       {
         "elapsed_seconds": 6.972406364046037,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/6c688201d4c497c398b7af19668f0d63359c65c20e514a3428e457cd096c9a35/attempt-0001/fit.json",
+        "fit_path": "fc7f4c61fb7a7b7e8aedddafbb4854c2e7befb93c652ca8a09836e4b38b49f99",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 904204288
       },
       {
         "elapsed_seconds": 6.175776685588062,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/gpu-target-s3-confirmation-v1/fits/0b258dc5634d95ae1a15684a1a178c2fd2cb61779b754136edf994c3c1fe922b/attempt-0001.json",
+        "fit_path": "cfc004be5777799e879f366aeff04a69928ab35829a7122b57edb378bd24f96d",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": false,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "peak_gpu_used_mib": 440,
         "peak_resident_bytes": null
       },
       {
         "elapsed_seconds": 6.939180431887507,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/9b92d04696a5c884aca15112895c92336485bb29a9ebf8a11e9353b5de68c874/attempt-0001/fit.json",
+        "fit_path": "f127f92a07499ca58ee6dae2d5fccda8079c4da77c8b55deee217af892630719",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 904380416
       },
       {
         "elapsed_seconds": 6.910651694051921,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/59d227c7bb2ff187c30b2405ea426d21ac9d4c5ab5b65be46c66a179189f6895/attempt-0001/fit.json",
+        "fit_path": "64a9281a51add035248aa0d38aab6cf512ca2117ffa3f7990a29233230000421",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 903831552
       },
       {
         "elapsed_seconds": 6.829818517901003,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/235f7b5a8878c07571425ec4d44cf327ae4f4f68ad8195826880fa748e1f9518/attempt-0001/fit.json",
+        "fit_path": "9f0ba894f617ec3423046d2d65dfb9428dddcd4301917f731fd9e3a78607d347",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 909930496
       },
       {
         "elapsed_seconds": 6.889266053913161,
-        "fit_path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-research-v2/attempts/8c9e86e246ad29649309111203a5ba7b36f76319aea955ee2907abe5592675a2/attempt-0001/fit.json",
+        "fit_path": "8a48fbf033ccc49155d932272f63b4f6483ba834a3a23c567dcab3d381b684f9",
         "gpu": "NVIDIA GeForce RTX 3090",
         "gpu_process_observed": true,
-        "host": "xbabe2",
+        "host": "fit-machine-2",
         "peak_gpu_used_mib": 891,
         "peak_resident_bytes": 889249792
       }
@@ -1198,7 +1198,7 @@
       "fit_op_seconds": 211.12341582914814,
       "fit_seconds": 75.5199281424284,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1227,7 +1227,7 @@
       "fit_op_seconds": 136.02064679493196,
       "fit_seconds": 12.904880984686315,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1256,7 +1256,7 @@
       "fit_op_seconds": 380.64785095187835,
       "fit_seconds": 212.45939748734236,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1285,7 +1285,7 @@
       "fit_op_seconds": 160.66580549092032,
       "fit_seconds": 34.358810840174556,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1314,7 +1314,7 @@
       "fit_op_seconds": 271.4808658610564,
       "fit_seconds": 144.35206287167966,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1343,7 +1343,7 @@
       "fit_op_seconds": 144.98311116197146,
       "fit_seconds": 9.278049263171852,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1372,7 +1372,7 @@
       "fit_op_seconds": 261.6771771879867,
       "fit_seconds": 130.8374718464911,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1401,7 +1401,7 @@
       "fit_op_seconds": 134.64278274285607,
       "fit_seconds": 14.787041541188955,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1430,7 +1430,7 @@
       "fit_op_seconds": 236.6580953891389,
       "fit_seconds": 109.48027895297855,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1459,7 +1459,7 @@
       "fit_op_seconds": 133.0366949508898,
       "fit_seconds": 11.875553420744836,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1488,7 +1488,7 @@
       "fit_op_seconds": 326.8926035130862,
       "fit_seconds": 174.39667988661677,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1517,7 +1517,7 @@
       "fit_op_seconds": 146.0863606829662,
       "fit_seconds": 23.194223998114467,
       "gpu": "NVIDIA GeForce RTX 4090",
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "monitors": [
         {
           "gpu_process_observed": false,
@@ -1549,7 +1549,7 @@
       {
         "fit_seconds": 243.99578416487202,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1567,7 +1567,7 @@
       {
         "fit_seconds": 204.50248960405588,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1585,7 +1585,7 @@
       {
         "fit_seconds": 213.07066599605605,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1603,7 +1603,7 @@
       {
         "fit_seconds": 207.2093097458128,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1621,7 +1621,7 @@
       {
         "fit_seconds": 262.1922445569653,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1639,7 +1639,7 @@
       {
         "fit_seconds": 263.42132083908655,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1657,7 +1657,7 @@
       {
         "fit_seconds": 203.18134348490275,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1675,7 +1675,7 @@
       {
         "fit_seconds": 207.73644359293394,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1693,7 +1693,7 @@
       {
         "fit_seconds": 226.25708623509854,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1711,7 +1711,7 @@
       {
         "fit_seconds": 207.30743213999085,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1729,7 +1729,7 @@
       {
         "fit_seconds": 213.95324724190868,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1747,7 +1747,7 @@
       {
         "fit_seconds": 243.69858517800458,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1765,7 +1765,7 @@
       {
         "fit_seconds": 196.91872988292016,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1783,7 +1783,7 @@
       {
         "fit_seconds": 248.10061871493235,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1801,7 +1801,7 @@
       {
         "fit_seconds": 202.37627965281717,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1819,7 +1819,7 @@
       {
         "fit_seconds": 203.17888960707933,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1837,7 +1837,7 @@
       {
         "fit_seconds": 226.69599662395194,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1855,7 +1855,7 @@
       {
         "fit_seconds": 244.9321751371026,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1873,7 +1873,7 @@
       {
         "fit_seconds": 240.26071158400737,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1891,7 +1891,7 @@
       {
         "fit_seconds": 207.54525046399795,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1909,7 +1909,7 @@
       {
         "fit_seconds": 203.86513342591934,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1927,7 +1927,7 @@
       {
         "fit_seconds": 268.0864162321668,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1947,7 +1947,7 @@
       {
         "fit_seconds": 221.05658642179333,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1965,7 +1965,7 @@
       {
         "fit_seconds": 199.7384014511481,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -1983,7 +1983,7 @@
       {
         "fit_seconds": 197.70959904999472,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2001,7 +2001,7 @@
       {
         "fit_seconds": 213.40221432200633,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2019,7 +2019,7 @@
       {
         "fit_seconds": 242.487641149899,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2037,7 +2037,7 @@
       {
         "fit_seconds": 222.10715805110522,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2055,7 +2055,7 @@
       {
         "fit_seconds": 201.22902534902096,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2073,7 +2073,7 @@
       {
         "fit_seconds": 220.70113736810163,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2091,7 +2091,7 @@
       {
         "fit_seconds": 212.53880766802467,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2109,7 +2109,7 @@
       {
         "fit_seconds": 196.0692296300549,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2127,7 +2127,7 @@
       {
         "fit_seconds": 206.77531800908037,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2145,7 +2145,7 @@
       {
         "fit_seconds": 214.99651045817882,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2163,7 +2163,7 @@
       {
         "fit_seconds": 193.86387166497298,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2181,7 +2181,7 @@
       {
         "fit_seconds": 216.69731605192646,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2199,7 +2199,7 @@
       {
         "fit_seconds": 201.6764620859176,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2217,7 +2217,7 @@
       {
         "fit_seconds": 225.46827626996674,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2235,7 +2235,7 @@
       {
         "fit_seconds": 220.31006247201003,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2253,7 +2253,7 @@
       {
         "fit_seconds": 220.80293258698657,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2271,7 +2271,7 @@
       {
         "fit_seconds": 210.68320062104613,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2289,7 +2289,7 @@
       {
         "fit_seconds": 253.226724534994,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2307,7 +2307,7 @@
       {
         "fit_seconds": 193.47154748509638,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,
@@ -2325,7 +2325,7 @@
       {
         "fit_seconds": 226.66682883212343,
         "gpu": "NVIDIA GeForce RTX 4090",
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "monitors": [
           {
             "gpu_process_observed": true,

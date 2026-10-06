@@ -407,6 +407,24 @@ def write_evidence(evidence):
     (GENERATED / "fit-trace.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
+def check_banned_tokens():
+    """Fail when manuscript sources name a private machine or a local path."""
+    scripts = PAPER / "scripts"
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from public_hardware import banned_hits
+
+    failures = []
+    paths = [TEX, SUPPLEMENT, *sorted(GENERATED.glob("*.tex"))]
+    for path in paths:
+        if not path.is_file():
+            continue
+        hits = banned_hits(path.read_text(errors="replace"))
+        if hits:
+            failures.append(f"{path.name} contains a private token: {hits[0]}")
+    return failures
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--write-evidence", action="store_true")
@@ -447,6 +465,7 @@ def main(argv=None):
     else:
         failures.append("supplement.tex is missing")
     failures.extend(check_inventory_caption())
+    failures.extend(check_banned_tokens())
     if failures:
         print("\n".join(failures))
         return 1

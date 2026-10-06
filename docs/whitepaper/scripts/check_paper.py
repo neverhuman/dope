@@ -10,6 +10,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from public_hardware import banned_hits
+
 ROOT = Path(__file__).resolve().parents[1]
 TEX = ROOT / "dope-mfs.tex"
 NUMBERS = ROOT / "generated" / "numbers.tex"
@@ -96,6 +98,31 @@ def main() -> int:
                     width = float(line.split()[2]) / 72.0
             if width is None or abs(width - 7.16) > 0.02:
                 failures.append(f"{path.name} width is not 7.16in")
+    manuscript_texts = [TEX, ROOT / "supplement.tex"]
+    manuscript_texts.extend(sorted((ROOT / "generated").glob("*.tex")))
+    for path in manuscript_texts:
+        if not path.is_file():
+            failures.append(f"missing manuscript text {path.name}")
+            continue
+        hits = banned_hits(path.read_text(errors="replace"))
+        if hits:
+            failures.append(f"{path.name} contains a private token: {hits[0]}")
+    for path in FIGURES[:3]:
+        if not path.exists():
+            continue
+        try:
+            extracted = subprocess.check_output(
+                ["pdftotext", str(path), "-"], text=True, errors="replace"
+            )
+        except FileNotFoundError:
+            failures.append("pdftotext is not installed")
+            break
+        except subprocess.CalledProcessError as exc:
+            failures.append(f"pdftotext failed for {path.name}: {exc.returncode}")
+            continue
+        hits = banned_hits(extracted)
+        if hits:
+            failures.append(f"{path.name} text contains a private token: {hits[0]}")
     for log in LOGS:
         if not log.is_file():
             failures.append(f"missing build log {log}")

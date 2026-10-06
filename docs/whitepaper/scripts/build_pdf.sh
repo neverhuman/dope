@@ -27,23 +27,6 @@ for old, new in pairs:
     if src.count(old) != 1:
         raise SystemExit("author marker is not unique: " + old)
     src = src.replace(old, new, 1)
-anchor = "\\input{generated/numbers.tex}\n"
-if src.count(anchor) != 1:
-    raise SystemExit("numbers input is not unique")
-renew = "".join(
-    f"\\renewcommand{{\\{name}}}{{\\{name}Anon}}\n"
-    for name in (
-        "DopeHardware",
-        "GaussHardware",
-        "ChowHardware",
-        "IndHardware",
-        "CtganHardware",
-        "TvaeHardware",
-        "ForestHardware",
-        "ArfHardware",
-    )
-)
-src = src.replace(anchor, anchor + renew, 1)
 Path("dope-mfs-anonymous.tex").write_text(src)
 PY
 build_one dope-mfs-anonymous

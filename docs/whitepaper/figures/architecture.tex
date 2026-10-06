@@ -10,7 +10,7 @@
 \node[box, below=of gen] (read) {Refit readout $a$, $\beta$, and $v$ on the frozen $\tanh$ features.};
 \node[box, below=of read] (sel) {Selection on each method's native objective. Not the shared retention.};
 \node[box, below=of sel] (meas) {Common measurement on validation rows. Auditors: CatBoost, linear, and MLP.};
-\node[box, below=of meas] (score) {Retention and charged bytes. MFS-v2 only if every hard gate passes.};
+\node[box, below=of meas] (score) {Retention and charged bytes.};
 \draw[arr] (fit) -- (gen);
 \draw[arr] (gen) -- (read);
 \draw[arr] (read) -- (sel);

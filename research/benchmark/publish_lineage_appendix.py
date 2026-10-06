@@ -282,7 +282,7 @@ def displayed_columns():
         ("feat.", lambda row: "---" if row["features"] is None else str(row["features"])),
         ("bytes", lambda row: "---" if size_group(row, 4)["charged_artifact_bytes"] is None
             else f"{size_group(row, 4)['charged_artifact_bytes']:,}"),
-        ("L3", lambda row: {True: "pass", False: "fail"}.get(
+        ("cap", lambda row: {True: "pass", False: "fail"}.get(
             size_group(row, 4)["artifact_within_l3_cap"], "---")),
         ("CB $n$", lambda row: _tex_num(size_group(row, 1)["utility"]["catboost"]["median_retention"])),
         ("CB $4n$", lambda row: _tex_num(size_group(row, 4)["utility"]["catboost"]["median_retention"])),
@@ -459,9 +459,8 @@ def main():
         record["sufficiency_profile_status_counts"] = sufficiency["status_counts"]
         write_longtable(
             args.table_dir / "s3-8192-lineages.tex",
-            "Every rights-cleared lineage at the pre-registered sufficiency budget "
-            "features12\\_steps8192. This profile is not adopted as the displayed model. "
-            "A blank retention means the three-seed group is not informative or the fit is unavailable.",
+            "Sufficiency budget, all 100 lineages. The cap column is charged bytes "
+            "at or under 10{,}240. It is not a release certificate.",
             sufficiency["rows"],
             displayed_columns(),
         )
@@ -476,9 +475,8 @@ def main():
     write_difference_strip(args.figure_dir / "s3-paired-differences.pdf", record["rows"], comparators)
     write_longtable(
         args.table_dir / "s3-2048-lineages.tex",
-        "Every rights-cleared lineage at the displayed profile features12\\_steps2048. "
-        "A blank retention means the three-seed group is not informative or the fit is unavailable. "
-        "Bytes and the L3 flag are the size-$4n$ charge. MFS-v2 is not in this table.",
+        "Displayed profile, all 100 lineages. The cap column is charged bytes "
+        "at or under 10{,}240. It is not a release certificate.",
         record["rows"],
         displayed_columns(),
     )

@@ -12,7 +12,7 @@
   },
   "scanned_results_contain_official_test_opened_true": false,
   "s3_prepared_workers": {
-    "directory": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker",
+    "directory": "redacted:267aeb5bb2e8f0cc",
     "exists": true,
     "worker_directories": 100,
     "test_csv": 0,
@@ -25,7 +25,7 @@
     },
     "worker_manifest_json": 100,
     "one_worker_manifest": {
-      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/02a45777900441ce/worker-manifest.json",
+      "path": "redacted:a18d23200833e828",
       "keys": [
         "dataset_id",
         "projected_hashes",
@@ -109,7 +109,7 @@
     "frozen_before_beyondarena_fit": true,
     "selection_rule": "binary or regression, recorded redistribution license, stratum from the BeyondArena split regime, not already one of the 100 PMLB lineages; SHA-256 of source_family_id; round-robin iid, grouped, temporal so each existing stratum is covered; at most 12",
     "prepare_summary": {
-      "path": "/mnt/fast-scratch/dope-benchmark/beyondarena-prepared-v1/prepare-summary.json",
+      "path": "redacted:f5ec17693bc75c59",
       "families": 12,
       "prepared": 5,
       "failed": 7,
@@ -205,7 +205,7 @@
         "exclusion_reason": "overlapping source row across partitions",
         "has_split": false,
         "files": [
-          "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-data.lock.json"
+          "redacted:baf79b18356854e0"
         ]
       },
       {
@@ -214,7 +214,7 @@
         "exclusion_reason": "overlapping source row across partitions",
         "has_split": false,
         "files": [
-          "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-data.lock.json"
+          "redacted:baf79b18356854e0"
         ]
       },
       {
@@ -223,7 +223,7 @@
         "exclusion_reason": "overlapping source row across partitions",
         "has_split": false,
         "files": [
-          "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-data.lock.json"
+          "redacted:baf79b18356854e0"
         ]
       },
       {
@@ -232,11 +232,11 @@
         "exclusion_reason": "overlapping source row across partitions",
         "has_split": false,
         "files": [
-          "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-data.lock.json"
+          "redacted:baf79b18356854e0"
         ]
       }
     ],
-    "exclusion_rule_file": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/manifest.py",
+    "exclusion_rule_file": "redacted:57b8aa18e2e899c0",
     "exclusion_rule_text": "overlapping source row across partitions",
     "lock_eligible_entries": 104,
     "lock_prepared": 100,
@@ -247,27 +247,27 @@
     "value": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120",
     "opened_file_hits": [
       {
-        "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-data.lock.json",
+        "path": "redacted:baf79b18356854e0",
         "present": true
       },
       {
-        "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/study-design.json",
+        "path": "redacted:067e083290761245",
         "present": true
       },
       {
-        "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/PROTOCOL.md",
+        "path": "redacted:ee88c0836b819b9e",
         "present": true
       },
       {
-        "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/RESULTS_STATUS.md",
+        "path": "redacted:c754b90c3fb69e64",
         "present": true
       },
       {
-        "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/fetch_jope.py",
+        "path": "redacted:ba12e900f7025e93",
         "present": true
       },
       {
-        "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-matched-confirmation-validation.manifest.json",
+        "path": "redacted:eb74685a79dfda50",
         "present": true
       }
     ],
@@ -285,10 +285,10 @@
       }
     ],
     "statement_locations": [
-      "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-data.lock.json",
-      "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/PROTOCOL.md",
-      "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/RESULTS_STATUS.md",
-      "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/study-design.json"
+      "redacted:baf79b18356854e0",
+      "redacted:ee88c0836b819b9e",
+      "redacted:c754b90c3fb69e64",
+      "redacted:067e083290761245"
     ],
     "study_design_eligible_regression_count_at_catalog_freeze": 104,
     "study_design_unknown_license_count_excluded": 3755
@@ -383,7 +383,7 @@
           "ok": 98
         },
         "host_operation_seconds_by_host": {
-          "xbabe1": {
+          "fit-machine-1": {
             "n": 6,
             "median": 11.413036691956222,
             "min": 10.636284339008853,
@@ -394,7 +394,7 @@
             ],
             "n_zero": 0
           },
-          "xbabe2": {
+          "fit-machine-2": {
             "n": 81,
             "median": 7.4772994050290436,
             "min": 6.526127909077331,
@@ -406,8 +406,8 @@
           }
         },
         "host_cell_counts": {
-          "xbabe2": 81,
-          "xbabe1": 6
+          "fit-machine-2": 81,
+          "fit-machine-1": 6
         },
         "empty_host_dicts_by_status": {
           "ok": 13
@@ -819,7 +819,7 @@
       "markdown_cost": {
         "forest_fit_core_seconds": 953.4443792356178,
         "forest_fit_native_sample_operation_seconds": 8801.492797114886,
-        "forest_gpu_host": "xbabe1"
+        "forest_gpu_host": "fit-machine-1"
       },
       "native_attempts_fit_core_seconds": {
         "n": 12,
@@ -855,155 +855,155 @@
   },
   "sources": [
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results",
+      "path": "redacted:a24d71f0ed0504fa",
       "field": "non-schema *.json substring count of official_tests_opened/official_test_opened true"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-lineage-record.json",
+      "path": "redacted:a68cb83900b2ab9b",
       "field": "official_tests_opened"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/density-matched-population-validation.json",
+      "path": "redacted:0e9506a1521e090b",
       "field": "official_tests_opened"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/sdv-s3-population-native.json",
+      "path": "redacted:286ea445d79e3405",
       "field": "official_tests_opened"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/sdv-matched-population-validation.json",
+      "path": "redacted:9b2f03a00cfd9b12",
       "field": "official_tests_opened"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/beyondarena-panel.lock.json",
+      "path": "redacted:65ceb5dabef92536",
       "field": "official_tests_opened"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker",
+      "path": "redacted:267aeb5bb2e8f0cc",
       "field": "worker directory listing and csv/manifest names; test.csv not opened"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker/02a45777900441ce/worker-manifest.json",
+      "path": "redacted:a18d23200833e828",
       "field": "dataset_id, train_rows, projection_sha256, projected_hashes, split_hashes; no seed"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/beyondarena-panel.lock.json",
+      "path": "redacted:65ceb5dabef92536",
       "field": "datasets.name, exclusion_reason_counts, official_tests_opened, frozen_before_beyondarena_fit, selection_rule, selected_count, eligible_count, bucket_family_count"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/beyondarena-prepared-v1/prepare-summary.json",
+      "path": "redacted:f5ec17693bc75c59",
       "field": "families, prepared, failed, official_test_opened_by_optimizer, results"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/beyondarena-prepared-v1/worker",
+      "path": "redacted:822187ae7dbdff35",
       "field": "worker directory names and test.csv count; contents not opened"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/beyondarena-prepared-v1/evaluator",
+      "path": "redacted:2a856b991edea7e5",
       "field": "evaluator directory names and test.csv count; contents not opened"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-data.lock.json",
+      "path": "redacted:baf79b18356854e0",
       "field": "catalog_sha256, eligible_entries, prepared, excluded_after_checks, unknown_rights_excluded, entries.id, entries.status, entries.exclusion_reason, entries.license, entries.split"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/manifest.py",
+      "path": "redacted:57b8aa18e2e899c0",
       "field": "check_nonoverlap ValueError overlapping source row across partitions"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/PROTOCOL.md",
+      "path": "redacted:ee88c0836b819b9e",
       "field": "Reject overlaps across partitions; recorded MIT evidence; catalog sha256"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/RESULTS_STATUS.md",
+      "path": "redacted:c754b90c3fb69e64",
       "field": "MIT evidence; four identical source-row exclusions; catalog sha256"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark",
+      "path": "redacted:38a3529b2f2787af",
       "field": "text search for four PMLB overlap lineage ids"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-data.lock.json",
+      "path": "redacted:baf79b18356854e0",
       "field": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/study-design.json",
+      "path": "redacted:067e083290761245",
       "field": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/PROTOCOL.md",
+      "path": "redacted:ee88c0836b819b9e",
       "field": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/RESULTS_STATUS.md",
+      "path": "redacted:c754b90c3fb69e64",
       "field": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/fetch_jope.py",
+      "path": "redacted:ba12e900f7025e93",
       "field": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-matched-confirmation-validation.manifest.json",
+      "path": "redacted:eb74685a79dfda50",
       "field": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/study-design.json",
+      "path": "redacted:067e083290761245",
       "field": "jopedime_supplement.catalog_sha256, eligible_regression_count_at_catalog_freeze, unknown_license_count_excluded"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-lineage-record.json",
+      "path": "redacted:a68cb83900b2ab9b",
       "field": "displayed_profile, rows.fit_rows, rows.features, rows.sizes.4.artifact_within_l3_cap, rows.sizes.4.charged_artifact_bytes, rows.dataset, rows.display_name"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/dope-s3-population-gpu-fits.json",
+      "path": "redacted:51810d6f84fbb7fa",
       "field": "cells.profile, cells.status, cells.new_operation_seconds, cells.host_operation_seconds, summary; elapsed_seconds/operation_seconds/fit_seconds absent"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/dope-artifact-byte-feasibility.json",
+      "path": "redacted:9ac63f516419cedc",
       "field": "cells.profile features12_steps2048 elapsed_seconds"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/pilot24-target-gpu-research.json",
+      "path": "redacted:e1c23be524a800f1",
       "field": "official_tests_opened, eligible_cells.profile, eligible_cells.dataset, eligible_cells.operations.elapsed_seconds"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-loss-log-v1",
+      "path": "redacted:329a480b480206c3",
       "field": "receipt.json profile, elapsed_seconds, official_tests_opened, status, replaces_scored_artifact"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/density-matched-population-validation.json",
+      "path": "redacted:0e9506a1521e090b",
       "field": "cells.method, cost.density.operation_seconds, cost.density.prior_native_trial_operation_seconds"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/sdv-s3-population-native.json",
+      "path": "redacted:286ea445d79e3405",
       "field": "trials.method, trials.operation_seconds, trials.outcome_class, trials.operation_evidence.elapsed_seconds, trials.operation_evidence.phase, trials.operation_evidence.status"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/sdv-matched-population-validation.json",
+      "path": "redacted:9b2f03a00cfd9b12",
       "field": "cells.method, sdv_validation_batches.operation.elapsed_seconds"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "path": "redacted:b535ef9bf677a4c9",
       "field": "fit_seconds"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/sdv-native-validation.json",
+      "path": "redacted:80ef3c43f1568076",
       "field": "fit_seconds"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/gpu-native-20261001.manifest.json",
+      "path": "redacted:ca77a7138e32db80",
       "field": "fit_seconds"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-matched-forest-confirmation-validation.md",
+      "path": "redacted:57cae70a0488690c",
       "field": "Cost.forest_fit_core_seconds, Cost.forest_fit_native_sample_operation_seconds, Cost.forest_gpu_host"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/s3-matched-forest-confirmation-validation.json",
+      "path": "redacted:d28ce7d1928fca7a",
       "field": "native_attempts.fit_core_seconds; exact elapsed_seconds/operation_seconds/fit_seconds absent"
     },
     {
-      "path": "/home/ubuntu/dope/.agent/worktrees/paper-ieee-w1/research/benchmark/results/pilot24-forestdiffusion-native.json",
+      "path": "redacted:1bdebf0766461c58",
       "field": "format, official_tests_opened, fit_attempts.elapsed_seconds"
     }
   ]
