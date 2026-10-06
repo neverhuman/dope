@@ -14,5 +14,23 @@ build_one() {
 }
 build_one dope-mfs
 build_one supplement
+# Author decision is unpicked. This second PDF changes only the byline and
+# the running header. The source dope-mfs.tex stays on The DOPE Project.
+python3 - << 'PY'
+from pathlib import Path
+src = Path("dope-mfs.tex").read_text()
+pairs = (
+    ("\\author{The DOPE Project}", "\\author{Anonymous}"),
+    ("\\markboth{The DOPE Project}%", "\\markboth{Anonymous}%"),
+)
+for old, new in pairs:
+    if src.count(old) != 1:
+        raise SystemExit("author marker is not unique: " + old)
+    src = src.replace(old, new, 1)
+Path("dope-mfs-anonymous.tex").write_text(src)
+PY
+build_one dope-mfs-anonymous
+rm -f dope-mfs-anonymous.tex
 pdfinfo dope-mfs.pdf | awk '/Pages|Page size/'
+pdfinfo dope-mfs-anonymous.pdf | awk '/Pages|Page size/'
 pdfinfo supplement.pdf | awk '/Pages|Page size/'

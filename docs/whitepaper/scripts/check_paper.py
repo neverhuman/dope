@@ -13,6 +13,7 @@ TEX = ROOT / "dope-mfs.tex"
 NUMBERS = ROOT / "generated" / "numbers.tex"
 FIGURES = (
     ROOT / "dope-mfs.pdf",
+    ROOT / "dope-mfs-anonymous.pdf",
     ROOT / "supplement.pdf",
     ROOT / "figures" / "retention-bytes.pdf",
     ROOT / "figures" / "paired-cdf.pdf",
@@ -24,7 +25,11 @@ RAW_DECIMAL = re.compile(r"(?<![\w.\\])\d+\.\d{4,}(?![\w])")
 MACRO_DEF = re.compile(r"\\(?:newcommand|renewcommand)\*?\{\\(\w+)\}")
 MACRO_USE = re.compile(r"\\([A-Z][A-Za-z]+)")
 # Final logs from the latexmk run. A first pass reports undefined references on purpose.
-LOGS = (Path("/tmp/dope-mfs-3.log"), Path("/tmp/supplement-3.log"))
+LOGS = (
+    Path("/tmp/dope-mfs-3.log"),
+    Path("/tmp/dope-mfs-anonymous-3.log"),
+    Path("/tmp/supplement-3.log"),
+)
 LOG_HITS = ("Warning", "undefined", "Undefined", "Overfull", "Underfull")
 
 
