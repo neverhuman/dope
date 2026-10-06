@@ -206,6 +206,10 @@
     "research/benchmark/DOPE_ABLATIONS.md": {
       "command": "just check",
       "purpose": "verify the bounded research profile parser and existing artifact codec; generated native training and GPU parity remain separately admitted evidence"
+    },
+    "research/benchmark/results/work-order-b-cost-closure-delta-v3": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-cost-closure-delta-v3/render.py --check",
+      "purpose": "verify pinned closure cost JSON before decoding, exact table/schema/manifest replay, phase counts, custody exclusion and unknown parent exits without scientific execution"
     }
   }
 }
