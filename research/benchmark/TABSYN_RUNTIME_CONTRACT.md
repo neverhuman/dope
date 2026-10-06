@@ -7,9 +7,13 @@ keeps its original scope. This preparation covers numeric regression only.
 The adapted training-loop code carries Apache-2.0 attribution in its
 [license sidecar](tabsyn_adapter.py.license), with the exact audited
 [license](tabsyn-adapter.LICENSE) and [notice](tabsyn-adapter.NOTICE) preserved.
-It does not admit the benchmark matrix, a GPU runtime, native tuning, mixed
+This historical preparation does not admit the benchmark matrix, a GPU runtime, native tuning, mixed
 categories, or a reproduction of the paper's reported experiments. Official
 tests stay sealed; MFS-v2, PTF-v1, release-safe L3 and superiority remain null.
+The separate [numeric operation contract](TABSYN_NUMERIC_ADMISSION.md)
+defines the new conditional fit/sample/native interface. Its externally
+anchored guard and actual CUDA qualifications remain required; generated
+CPU evidence does not satisfy them.
 
 The existing xbabe3 preparation provides Python 3.10.19, PyTorch 2.0.1/CUDA
 11.7, NumPy 1.24.4, pandas 1.5.3, SciPy 1.10.1, sklearn 1.2.2 and XGBoost
@@ -61,9 +65,10 @@ with diffusion stopping after 500 epochs without improvement. The whole fit
 ceiling is 600 seconds across preprocessing, both stages and export; a failed
 fit retains partial files and cannot produce an eligible completion manifest.
 The GPU ceiling remains 16 GiB and requires a future process watchdog. The
-current public fit entry admits only an explicitly generated CPU fixture with
-two epochs per stage. Real fits and GPU sampling reject. The native evaluator
-rejects the current unadmitted runtime before dependency initialization.
+default public fit entry admits only an explicitly generated CPU fixture with
+two epochs per stage. Real fits, GPU samples and native evaluation require the
+separate operation grant and measured qualification closure. Without those,
+they reject before numerical dependency initialization.
 
 [The generator proposal](tabsyn-native-grid.proposal.json) retains the default
 beta 0.01 and proposes 0.001 through the author-exposed parameter. This is a
@@ -80,7 +85,7 @@ bytes and configuration hash. Native values cannot rank different methods.
 Focused opaque tests run with:
 
 ```sh
-python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v
+python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v
 ```
 
 [The generated contract](tabsyn_generated_contract.py) checks the original
