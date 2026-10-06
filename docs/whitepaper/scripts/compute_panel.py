@@ -121,6 +121,9 @@ def paired_test(left, right, rng, family_size):
         "other_median": None,
         "other_lo": None,
         "other_hi": None,
+        "wins": int(np.sum(diff > 0)) if diff.size else 0,
+        "ties": int(np.sum(diff == 0)) if diff.size else 0,
+        "losses": int(np.sum(diff < 0)) if diff.size else 0,
     }
     if diff.size == 0:
         return result
@@ -435,14 +438,53 @@ def write_density_table(density):
                 f"{sig3(pair['dope_median'])} [{sig3(pair['dope_lo'])}, {sig3(pair['dope_hi'])}] & "
                 f"{sig3(pair['other_median'])} [{sig3(pair['other_lo'])}, {sig3(pair['other_hi'])}] & "
                 f"{sig3(pair['median_difference'])} [{sig3(pair['lo'])}, {sig3(pair['hi'])}] & "
+                f"{pair['wins']}/{pair['ties']}/{pair['losses']} & "
                 f"${tex_p(pair['holm_p'])}$ \\\\"
             )
     body = "\n".join(rows)
     (OUT / "density-table.tex").write_text(
-        "\\begin{tabular}{@{}llrrrrr@{}}\n\\toprule\n"
-        "Auditor & Comparator & $n$ & DOPE & Other & Difference & Holm $p$ \\\\\n"
+        "\\begin{tabular}{@{}llrrrrrr@{}}\n\\toprule\n"
+        "Auditor & Comparator & $n$ & DOPE & Other & Difference & W/T/L & Holm $p$ \\\\\n"
         "\\midrule\n"
         f"{body}\n\\bottomrule\n\\end{{tabular}}\n"
+    )
+
+
+def write_headline_table(blocks):
+    """One row per block and auditor: the tuned baseline with the highest paired median."""
+    specs = (
+        ("density", "Density", DENSITY_COMPARATORS, {
+            "GaussianCopula": "Gaussian copula",
+            "Chow-Liu": "Chow--Liu",
+            "independent_marginals": "Indep.\\ marginals",
+        }),
+        ("neural", "Neural", ("CTGAN", "TVAE"), {"CTGAN": "CTGAN", "TVAE": "TVAE"}),
+        ("forest", "Forest", ("Forest-Flow",), {"Forest-Flow": "Forest-Flow"}),
+    )
+    auditor_labels = {"catboost": "CatBoost", "linear": "Linear", "mlp": "MLP"}
+    rows = []
+    for block_id, label, comparators, names in specs:
+        block = blocks[block_id]
+        for auditor in AUDITORS:
+            ranked = []
+            for comparator in comparators:
+                pair = block[auditor]["pairs"][comparator]
+                if not pair["n"] or pair["other_median"] is None:
+                    continue
+                ranked.append((pair["other_median"], comparator, pair))
+            if not ranked:
+                continue
+            ranked.sort(key=lambda item: (item[0], item[1]))
+            _median, comparator, pair = ranked[-1]
+            rows.append(
+                f"{label} & {auditor_labels[auditor]} & {names[comparator]} & {pair['n']} & "
+                f"{sig3(pair['median_difference'])} [{sig3(pair['lo'])}, {sig3(pair['hi'])}] & "
+                f"{pair['wins']}/{pair['ties']}/{pair['losses']} & ${tex_p(pair['holm_p'])}$ \\\\"
+            )
+    (OUT / "headline-table.tex").write_text(
+        "\\begin{tabular}{@{}lllrllr@{}}\n\\toprule\n"
+        "Block & Auditor & Baseline & $n$ & Difference & W/T/L & Holm $p$ \\\\\n"
+        "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n"
     )
 
 
@@ -460,11 +502,13 @@ def write_neural_table(neural):
                 f"{labels[auditor]} & {labels[comparator]} & {pair['n']} & "
                 f"{sig3(pair['dope_median'])} [{sig3(pair['dope_lo'])}, {sig3(pair['dope_hi'])}] & "
                 f"{sig3(pair['other_median'])} [{sig3(pair['other_lo'])}, {sig3(pair['other_hi'])}] & "
-                f"{sig3(pair['median_difference'])} & ${tex_p(pair['holm_p'])}$ \\\\"
+                f"{sig3(pair['median_difference'])} [{sig3(pair['lo'])}, {sig3(pair['hi'])}] & "
+                f"{pair['wins']}/{pair['ties']}/{pair['losses']} & "
+                f"${tex_p(pair['holm_p'])}$ \\\\"
             )
     (OUT / "neural-table.tex").write_text(
-        "\\begin{tabular}{@{}llrrrrr@{}}\n\\toprule\n"
-        "Auditor & Comparator & $n$ & DOPE & Other & Difference & Holm $p$ \\\\\n"
+        "\\begin{tabular}{@{}llrrrrrr@{}}\n\\toprule\n"
+        "Auditor & Comparator & $n$ & DOPE & Other & Difference & W/T/L & Holm $p$ \\\\\n"
         "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n"
     )
 
@@ -720,6 +764,8 @@ def main():
             "holm_family_forest": "Forest-Flow native_selected, size 4, six-lineage confirmation, not pooled",
             "friedman": "Nemenyi CD uses Demsar q_alpha 2.569 for four methods at alpha 0.05",
             "superiority": "Retention tests do not authorize PTF-v1, MFS-v2, or release-safe L3",
+            "wins": "lineage counts of positive, zero, and negative paired differences, DOPE minus the baseline",
+            "strongest_baseline": "highest paired median retention inside the block and auditor; blocks are not pooled",
         },
     }
     payload["sidecars"] = collect_sidecars(record, neural_doc, forest_doc, forest_bytes)
@@ -729,6 +775,7 @@ def main():
     write_density_table(density)
     write_neural_table(neural)
     write_forest_table(forest_doc)
+    write_headline_table(payload["blocks"])
     print(json.dumps({
         "anchors_ok": not failures,
         "failures": failures,

@@ -54,10 +54,12 @@ Gaussian copula is already in the density block. It is not a missing floor.
 
 ## What this paper is allowed to say
 
-DOPE's CatBoost retention on the density block is higher than the three
-density comparators under the pre-registered descriptive tests, and the
-linear auditor does not separate it from the Gaussian copula. Forest-Flow
-on six lineages reaches similar CatBoost retention at about five orders of
-magnitude more bytes. CTGAN and TVAE do not match that retention in their
-own block and do not sit under the 10,240-byte cap in the successful size-4
-artifacts. None of those sentences is an MFS-v2 score.
+DOPE's CatBoost median on the density block is higher than the three
+density comparators under the descriptive tests, and the lineage record
+against the Gaussian copula is not a sweep. The linear auditor does not
+separate DOPE from that copula. Forest-Flow on six lineages is ahead of
+DOPE on CatBoost and on the MLP. The byte charge is about five orders of
+magnitude larger. CTGAN and TVAE have lower medians in their own block, and
+DOPE still loses lineages against TVAE. Successful size-4 CTGAN and TVAE
+artifacts do not sit under the 10,240-byte cap. None of those sentences is
+an MFS-v2 score. The counts are the generated wins/ties/losses macros.

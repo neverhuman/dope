@@ -14,7 +14,7 @@ rebuilds those macros from the committed ledgers. `just paper` also redraws
 the figures and both PDFs when the local replay scratch is mounted.
 `just paper-check` is the CI diff. The three figures are Type 42 TeX Gyre
 Termes at 7.16 in. Forest-Flow is its own six-lineage block. The built
-journal PDF is 8 letter pages. The supplement is 6 pages and holds the
+journal PDF is 9 letter pages. The supplement is 6 pages and holds the
 100-row tables. TabSyn, 100-lineage TabDDPM, privacy attacks, fit-seed
 variance, and the full ablation grid stay the words "not measured."
 The third-pass build log is clean of overfull boxes, underfull boxes,
@@ -40,7 +40,7 @@ Jepson decisions, applied here:
 
 | # | Reviewer question | Evidence on `52b187b` | Owner | This pass |
 | --- | --- | --- | --- | --- |
-| 1 | IEEEtran conference mode and a proceedings page cap | `journal`, letter, 14 pages. IEEEtran does not set a page cap. A six-page conference cap is a different venue. | Jepson | Journal class. Measured PDF is 8 letter pages, including the appendix after the bibliography. Supplement is 6 pages. |
+| 1 | IEEEtran conference mode and a proceedings page cap | `journal`, letter, 14 pages. IEEEtran does not set a page cap. A six-page conference cap is a different venue. | Jepson | Journal class. Measured PDF is 9 letter pages, including the appendix after the bibliography. Supplement is 6 pages. |
 | 2 | Strongest tabular generators, each with the same documented tuning budget | Executed on the 100-lineage density panel: DOPE `features12_steps2048` (one pre-registered profile), Copulas 0.14.1 Gaussian copula, study Chow–Liu, study independent marginals. Separate neural block: native-selected CTGAN and TVAE. Forest-Flow has a 6-lineage confirmation ledger. TabSyn is source-audit only. TabDDPM is pilot-locked, not on the 100. The ARF watch log is not a retention panel. `methods.lock.json` has `complete: false` and `frozen_for_final_evaluation: false`. | B for new fits; W for the Forest-Flow block already measured | Top scientific gap. Fair-tuning plan is below and is not dispatched. The PDF contains the 6-lineage Forest-Flow block. `BASELINE_GAP.md` lists the missing cells. The manuscript says those methods are not measured. |
 | 3 | Did an optimizer or a selector see an official test? | Protocol text says seed 1729, grouped 80/20 of official training rows, workers have no official test file, final evaluation unauthorized. Ledger field `official_tests_opened` is present and false on the lineage record. The proof table is regenerated into `generated/provenance.json` from listings and locks. | W writes the paragraph and table; B must not open tests to fill baselines | Pass, once the proof table is in the paper |
 | 4 | Significance tests and confidence intervals | Paper says the pre-registered paired test has not been run. No interval on any median. Figures have no CI. | W, from committed paired records, no new fits | Emitted by `compute_panel.py`: lineage-bootstrap intervals, two-sided Wilcoxon, one-sided sign test, Holm within each family, matched-pairs rank-biserial, Friedman and Nemenyi on the density methods. The linear auditor does not separate DOPE from the Gaussian copula. |
