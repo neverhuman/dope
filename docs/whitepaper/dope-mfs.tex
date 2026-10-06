@@ -89,7 +89,7 @@ The decision those columns can support is narrow. It is whether a network
 small enough to ship under a 10{,}240-byte cap still preserves downstream
 regression utility on held-out validation rows. It is not a declaration that
 one generator is best, and it is not a certification score. Master Fitness
-v2 (MFS-v2), a gated geometric score, is defined in Section~\ref{sec:method}.
+v2 (MFS-v2), a gated geometric score, is defined in Section~\ref{sec:kpi}.
 It is null on every method here, because the six components and the hard-gate
 map are not all present.
 
@@ -246,7 +246,45 @@ The full width-and-step grid is \FullAblationGrid.
 \label{fig:arch}
 \end{figure}
 
-\subsection{Retention and MFS-v2}
+\subsection{A fixed encoding of the columns}
+\label{sec:encoding}
+The displayed generator and the dataset encoding both reduce a table to a
+fixed set of columns. The budgets differ, and both budgets belong to the
+current method.
+
+Training screens columns by absolute rank correlation with the target and
+keeps at most 12. Those columns are the support $x_S$ in
+\eqref{eq:residual}. The artifact stores their positions in the training
+table. That screen is what keeps the residual inside the byte cap. It is a
+weak dataset key. A column the target does not rank is dropped, and a
+permutation of the remaining columns changes the stored positions.
+
+The encoding an index can store is the sketch the router already consumes.
+\texttt{embed-dataset} min-max normalizes each training column onto the unit
+interval, leaves a missing entry missing, and does not read the official
+test. Each column becomes twelve content summaries: a missing rate, moments,
+quantiles, a unique-value share, a tail ratio, and the absolute association
+with the target. Columns are sorted by those summaries, variance first, then by the
+rest of the summary, then by the sorted observations. A permutation of columns or of rows does
+not move the vector. The sketch keeps the first 64 columns in that order and
+pads a shorter table with zeros. Absolute correlations among the kept
+columns collapse to one six-number distribution, so the width does not grow
+with the square of the column count. A ten-number header records the task,
+the log row count, the log column count, and the shape of the target. The
+width of that sketch is 856.
+
+The $4{,}168$-dimensional vector appends 24 candidate states from one router
+bundle onto that sketch. A second bundle moves the same table. An index
+stores the 856-wide sketch. The longer vector is a route from one bundle.
+
+A neighbor found with the sketch is still fit with the displayed
+profile. The artifact is still charged in bytes, and it still faces the
+release score in Section~\ref{sec:kpi}.
+The sketch is not a seventh fitness component. A router action that names a
+retention or a failure probability is a prediction from the bundle. It does
+not enter \eqref{eq:mfs}.
+
+\subsection{Retention}
 Let $L_{\mathrm{null}}$, $L_{\mathrm{real}}$, and
 $L_{\mathrm{synthetic}}$ be the auditor's loss on held-out validation rows
 when that auditor is trained on a null baseline, on real fit rows, and on
@@ -274,7 +312,19 @@ scores. Intervals below are percentile lineage-bootstrap intervals,
 10{,}000 resamples of lineages, with the three seeds kept inside the lineage
 median. They are not per-seed whiskers.
 
-MFS-v2 is a different object. With component $c_i\in[0,1]$, weight $w_i>0$,
+\subsection{The release score}
+\label{sec:kpi}
+The decision this project is built to make is whether an artifact may ship.
+Retention is the measurement this paper can finish. It is the shared column
+after each method has been selected on its own objective. A high retention
+means an auditor trained on synthetic rows recovered the improvement that
+the same auditor obtained from real fit rows. That can be true of an
+artifact that is too large to ship, that misses the joint distribution,
+that copies training rows, or that moves the features a later model relies
+on. The release score exists so those failures are not traded against a
+utility median.
+
+MFS-v2 is that score. With component $c_i\in[0,1]$, weight $w_i>0$,
 $\epsilon=10^{-6}$, and $W=\sum_i w_i$,
 \begin{equation}
 \label{eq:mfs}
@@ -283,19 +333,49 @@ $\epsilon=10^{-6}$, and $W=\sum_i w_i$,
 \end{equation}
 when the hard-gate map is non-empty, every hard gate passed, and every
 positive-weight component is finite and inside $[0,1]$. Otherwise the scalar
-is null. The weights are utility transfer $0.30$, driver fidelity $0.20$,
+is null. The mean is geometric. A component near zero pulls the product
+down. A component that is missing, or that falls outside $[0,1]$, removes
+the score rather than publishing a small number. An empty gate map, or any
+failed hard gate, does the same. Privacy has soft weight zero. A membership
+failure, an attribute failure, or a copied row is a gate. Utility cannot
+offset it. The weights are utility transfer $0.30$, driver fidelity $0.20$,
 distribution fidelity $0.20$, structure fidelity $0.15$, coverage realism
-$0.10$, and compactness $0.05$. A privacy failure removes the score through
-a gate. Utility transfer inside \eqref{eq:mfs} is a clamped one-sided lower
-bound, not the median of \eqref{eq:retention}. Compactness is
-$\mathrm{clamp}(1 - \mathrm{bytes}/10240,\, 0,\, 1)$. Crossing 10{,}240
-bytes fails the byte gate, so the scalar stays null. An artifact over the
-cap is a failed gate, not a retention of zero.
-No artifact in this paper has a measured MFS-v2 value. Copying a retention
-number into that scalar would publish a value the contract refuses to emit.
-The supplement applies \eqref{eq:mfs} to invented components, including a
-zero compactness term.
-Those rows are arithmetic, not measurements.
+$0.10$, and compactness $0.05$.
+
+The six components ask six different questions.
+Utility transfer is a one-sided lower bound on retention, clamped into
+$[0,1]$. It is the bound inside \eqref{eq:mfs}, and it is distinct from the
+median of \eqref{eq:retention} in the figures below.
+Driver fidelity is an equal mixture of feature-importance rank agreement and
+top-feature-set overlap between the real table and the synthetic table.
+Distribution fidelity is half the minimum marginal fidelity, plus a quarter
+of the sliced-Wasserstein fidelity and a quarter of the maximum mean
+discrepancy fidelity.
+Structure fidelity is the minimum dependence fidelity.
+Coverage realism, on a fixed embedding of holdout rows, is $0.25$ precision,
+$0.25$ recall, $0.20$ density capped at $1$, and $0.30$ coverage.
+Compactness is $\mathrm{clamp}(1 - \mathrm{bytes}/10240,\, 0,\, 1)$. An
+artifact past $10{,}240$ bytes fails the byte gate, and the scalar stays
+null. Crossing the cap is a failed gate, distinct from a retention of zero.
+
+PTF-v1 is the other release KPI. Its hard gates include joint fidelity,
+membership and attribute attacks, copy checks, and feature-importance
+agreement on a sealed holdout. It is null here, as is MFS-v2. Compile-time
+search records the proxy $0.45u + 0.25d + 0.30j$ and then keeps the
+candidate with the smallest gate shortfall, then the smallest artifact.
+That record withholds a release certificate. The proxy is not
+\eqref{eq:mfs}.
+
+No artifact in this paper has a measured MFS-v2 value. Emitting one requires
+the six components, a non-empty hard-gate map that passed, both the size-$n$
+and size-$4n$ artifacts, real-versus-real controls, artifact-only sampling,
+and locked metric implementations. A retention win does not supply those
+inputs. Copying a retention number into \eqref{eq:mfs} would publish a value
+the contract refuses to emit. The supplement applies \eqref{eq:mfs} to
+invented components, including a zero compactness term. Those rows are
+arithmetic. They show the shape of the product. They are not a score for any
+method in the tables. Baselines stay on their native objectives. The shared
+columns in this paper stay retention and charged bytes.
 
 \section{Experimental Setup}
 \label{sec:setup}
@@ -685,8 +765,8 @@ BeyondArena is a separate fit check. It is not a retention panel, and it is
 not pooled with the density block.
 
 \paragraph{Construct.}
-Retention is the reported utility. It is not the MFS-v2 scalar, which stays
-null. The linear auditor does not separate DOPE from the Gaussian copula,
+Retention is the reported utility. The release score in
+Section~\ref{sec:kpi} stays null. The linear auditor does not separate DOPE from the Gaussian copula,
 and that result is not an equivalence. Shipping this artifact is not the
 same experiment as shipping the compact predictor itself. The panel does
 not contain that control, so it does not show that a recipient needs the

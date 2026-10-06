@@ -329,6 +329,12 @@ def protocol_tokens():
     _must_contain(root / "rust/embedding/part_01.rs", "ACTION_EMBEDDING_SKETCH_WIDTH: usize = 856", failures)
     _must_contain(root / "rust/embedding/part_01.rs", "ACTION_EMBEDDING_HIDDEN_WIDTH: usize = 128", failures)
     _must_contain(root / "rust/router/part_01.rs", "ROUTER_OUTPUTS: usize = 10", failures)
+    _must_contain(root / "rust/router/part_01.rs", "MAX_PAIRWISE_FEATURES: usize = 64", failures)
+    _must_contain(
+        root / "rust/fitness_metrics.rs",
+        "coverage_realism: 0.25 * precision",
+        failures,
+    )
     _must_contain(root / "rust/compiler/neural_candidates/part_02.rs", "0.45 * utility + 0.25 * driver_agreement + 0.30 * proxy_joint_fidelity", failures)
     _must_contain(root / "research/benchmark/methods.lock.json", '"dependency_version": "copulas==0.14.1"', failures)
     _must_contain(root / "research/benchmark/tests/test_chow_liu.py", '"bins": 8, "laplace_alpha": 1.0', failures)
@@ -343,7 +349,7 @@ def protocol_tokens():
     if failures:
         raise ValueError("; ".join(failures))
     tokens = {
-        "1", "2", "3", "4", "5", "6", "8", "10", "12", "16", "24", "80", "100", "128", "856",
+        "1", "2", "3", "4", "5", "6", "8", "10", "12", "16", "24", "64", "80", "100", "128", "856",
         "2048", "4168", "8192", "10000", "10240",
         "0.002", "0.01", "0.05", "0.10", "0.15", "0.20", "0.25", "0.30", "0.45",
         "0.70", "0.75", "0.80", "0.85", "0.90", "0.95", "1.0", "1.5", "1.6", "2.569",
