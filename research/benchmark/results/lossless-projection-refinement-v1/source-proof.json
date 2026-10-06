@@ -1,0 +1,35 @@
+{
+  "actual_wait_receipt_sha256": "2bae768a8c674f0ab8eb09dbd65821d1123239b60b2b372f0bc213dc137ca673",
+  "byte_report_sha256": "55fa76befc22e6b4f8019be73c7613362d2eda874e0c2d27531ca19096fa014b",
+  "enabled_request_sha256": "9b9e6104693f62a854d7cafc0193b2ba73497438f40e1c030574b5810fa0e0a7",
+  "format": "DOPECR01-byte-diagnostic-source-proof",
+  "generated_controls_result_sha256": "78876f244aac191edaeab37c62a9fe4135230f91eafced1d68a719bf3f765c43",
+  "generated_controls_wait_receipt_sha256": "f79635ae1288b6553fa4aa2cce5e71fd0ed3d949a32c991c8d27941dde8ad15f",
+  "private_reference_manifest_sha256": "7a7c2f4dab0763a0b0f0804048bfe87c5ead05c1804945e6555240a77f205091",
+  "producer_sources": [
+    {
+      "bytes": 11108,
+      "role": "byte_probe_encoder",
+      "sha256": "1a67aa54438f80079cb2d64ce093568f7045e8a656a6fdd44982c6493a517861"
+    },
+    {
+      "bytes": 1732,
+      "role": "research_container_encoder_decoder",
+      "sha256": "abd9f16bca49129a4f546a8b6c7477c4db9c2a1744d540d3884712ff3ebcf22e"
+    },
+    {
+      "bytes": 1721,
+      "role": "research_container_member_verifier",
+      "sha256": "0440788ccbff47790260c652d2104131dafc8e772e302e299a0ea1fa678f8f3e"
+    },
+    {
+      "bytes": 7067,
+      "role": "generated_opaque_control_source",
+      "sha256": "341e56772327a2e0ee1cfd8f2c01dd718b126fbae3b58e0281ba53c33c2e8c71"
+    }
+  ],
+  "raw_member_bodies_not_reread_for_publication": true,
+  "runtime_certification_claimed": false,
+  "source_bytes_exactly_verified": true,
+  "version": 1
+}

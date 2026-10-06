@@ -1,0 +1,532 @@
+{
+  "$id": "seed11-byte-cap-diagnostics.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Exact version1 snapshot schema. Every field is required, extra properties are rejected, and all declared claims and pinned measurements are fixed. Another report requires a new explicit version.",
+  "properties": {
+    "claims": {
+      "additionalProperties": false,
+      "properties": {
+        "GPU_operations": {
+          "const": 0,
+          "type": "integer"
+        },
+        "L3_production_certification": {
+          "const": null,
+          "type": "null"
+        },
+        "MFS_v2": {
+          "const": null,
+          "type": "null"
+        },
+        "PTF_v1": {
+          "const": null,
+          "type": "null"
+        },
+        "counts_as_dope_win": {
+          "const": false,
+          "type": "boolean"
+        },
+        "generator_validation_complete": {
+          "const": false,
+          "type": "boolean"
+        },
+        "generator_validity_measured": {
+          "const": false,
+          "type": "boolean"
+        },
+        "historical_raw_charge_failures_preserved": {
+          "const": true,
+          "type": "boolean"
+        },
+        "new_fits": {
+          "const": 0,
+          "type": "integer"
+        },
+        "new_samples": {
+          "const": 0,
+          "type": "integer"
+        },
+        "official_tests_opened": {
+          "const": false,
+          "type": "boolean"
+        },
+        "release_safe": {
+          "const": null,
+          "type": "null"
+        },
+        "sample_parity_measured": {
+          "const": false,
+          "type": "boolean"
+        },
+        "superiority": {
+          "const": null,
+          "type": "null"
+        }
+      },
+      "required": [
+        "GPU_operations",
+        "L3_production_certification",
+        "MFS_v2",
+        "PTF_v1",
+        "counts_as_dope_win",
+        "generator_validation_complete",
+        "generator_validity_measured",
+        "historical_raw_charge_failures_preserved",
+        "new_fits",
+        "new_samples",
+        "official_tests_opened",
+        "release_safe",
+        "sample_parity_measured",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "container": {
+      "additionalProperties": false,
+      "properties": {
+        "compression": {
+          "const": "zlib",
+          "type": "string"
+        },
+        "compression_level": {
+          "const": 9,
+          "type": "integer"
+        },
+        "decoded_total_cap_bytes": {
+          "const": 65536,
+          "type": "integer"
+        },
+        "header_bytes": {
+          "const": 80,
+          "type": "integer"
+        },
+        "production_DPK3_2_or_v1_codec": {
+          "const": false,
+          "type": "boolean"
+        },
+        "research_format": {
+          "const": "DOPECR01",
+          "type": "string"
+        },
+        "whole_container_cap_bytes": {
+          "const": 10240,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "compression",
+        "compression_level",
+        "decoded_total_cap_bytes",
+        "header_bytes",
+        "production_DPK3_2_or_v1_codec",
+        "research_format",
+        "whole_container_cap_bytes"
+      ],
+      "type": "object"
+    },
+    "diagnostics": {
+      "items": false,
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_sha256": {
+              "const": "7806cf2dffbe59a785808a0c75a58746dcc9e1f0a6bab8e646de11ca74946088",
+              "type": "string"
+            },
+            "byte_cap_satisfied": {
+              "const": true,
+              "type": "boolean"
+            },
+            "charged_artifact_bytes": {
+              "const": 7644,
+              "type": "integer"
+            },
+            "compressed_payload_bytes": {
+              "const": 7564,
+              "type": "integer"
+            },
+            "container_header_bytes": {
+              "const": 80,
+              "type": "integer"
+            },
+            "encoding_replay_exact": {
+              "const": true,
+              "type": "boolean"
+            },
+            "exact_original_bytes_recovered": {
+              "const": true,
+              "type": "boolean"
+            },
+            "existing_member_verifier_passed": {
+              "const": true,
+              "type": "boolean"
+            },
+            "lineage": {
+              "const": "654566a1f91408aa",
+              "type": "string"
+            },
+            "model_sha256": {
+              "const": "df92988f0c3e6749761accc1e013b26ca30153086bbb91e8cec39d2ad8aacd78",
+              "type": "string"
+            },
+            "parent_job_sha256": {
+              "const": "00d2332eff942ed7974edabb1b1217be7eca93f688737f5066c33b041019a7c6",
+              "type": "string"
+            },
+            "parent_operation_exit_code": {
+              "const": 1,
+              "type": "integer"
+            },
+            "parent_status": {
+              "const": "charged_artifact_cap",
+              "type": "string"
+            },
+            "projection_sha256": {
+              "const": "9f7cb6916d4277964f4a47593ea86fc760fd92350a00597405bee5ad0134c2fb",
+              "type": "string"
+            },
+            "raw_charged_artifact_bytes": {
+              "const": 22233,
+              "type": "integer"
+            },
+            "raw_model_bytes": {
+              "const": 6256,
+              "type": "integer"
+            },
+            "raw_projection_bytes": {
+              "const": 15977,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "artifact_sha256",
+            "byte_cap_satisfied",
+            "charged_artifact_bytes",
+            "compressed_payload_bytes",
+            "container_header_bytes",
+            "encoding_replay_exact",
+            "exact_original_bytes_recovered",
+            "existing_member_verifier_passed",
+            "lineage",
+            "model_sha256",
+            "parent_job_sha256",
+            "parent_operation_exit_code",
+            "parent_status",
+            "projection_sha256",
+            "raw_charged_artifact_bytes",
+            "raw_model_bytes",
+            "raw_projection_bytes"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_sha256": {
+              "const": "6aa01b395abf49d8749a41550940e4db26c69365d6370b62808b4da32f31fd92",
+              "type": "string"
+            },
+            "byte_cap_satisfied": {
+              "const": true,
+              "type": "boolean"
+            },
+            "charged_artifact_bytes": {
+              "const": 5275,
+              "type": "integer"
+            },
+            "compressed_payload_bytes": {
+              "const": 5195,
+              "type": "integer"
+            },
+            "container_header_bytes": {
+              "const": 80,
+              "type": "integer"
+            },
+            "encoding_replay_exact": {
+              "const": true,
+              "type": "boolean"
+            },
+            "exact_original_bytes_recovered": {
+              "const": true,
+              "type": "boolean"
+            },
+            "existing_member_verifier_passed": {
+              "const": true,
+              "type": "boolean"
+            },
+            "lineage": {
+              "const": "a32a69e7c701eb14",
+              "type": "string"
+            },
+            "model_sha256": {
+              "const": "f4b5ca5011f053ca5c7c07f00125af1e5af3243b2b6efdece10b095f53188264",
+              "type": "string"
+            },
+            "parent_job_sha256": {
+              "const": "18e768d644508c21f7c7eea621a25d5092a5fe2a49010ec6ed1f0c9dadf44c39",
+              "type": "string"
+            },
+            "parent_operation_exit_code": {
+              "const": 1,
+              "type": "integer"
+            },
+            "parent_status": {
+              "const": "charged_artifact_cap",
+              "type": "string"
+            },
+            "projection_sha256": {
+              "const": "5a3ed14bace491d4fed6bbceae6099914ea04c0d5c48627016a319db600157af",
+              "type": "string"
+            },
+            "raw_charged_artifact_bytes": {
+              "const": 19019,
+              "type": "integer"
+            },
+            "raw_model_bytes": {
+              "const": 5243,
+              "type": "integer"
+            },
+            "raw_projection_bytes": {
+              "const": 13776,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "artifact_sha256",
+            "byte_cap_satisfied",
+            "charged_artifact_bytes",
+            "compressed_payload_bytes",
+            "container_header_bytes",
+            "encoding_replay_exact",
+            "exact_original_bytes_recovered",
+            "existing_member_verifier_passed",
+            "lineage",
+            "model_sha256",
+            "parent_job_sha256",
+            "parent_operation_exit_code",
+            "parent_status",
+            "projection_sha256",
+            "raw_charged_artifact_bytes",
+            "raw_model_bytes",
+            "raw_projection_bytes"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "array"
+    },
+    "fit_seed": {
+      "const": 11,
+      "type": "integer"
+    },
+    "format": {
+      "const": "DOPECR01-seed11-byte-cap-research-diagnostics",
+      "type": "string"
+    },
+    "measurements": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_Popen_wait_exit_code": {
+          "const": 0,
+          "type": "integer"
+        },
+        "byte_probe_elapsed_seconds": {
+          "const": 0.1563430861569941,
+          "type": "number"
+        },
+        "declared_CPU_cores": {
+          "const": 1,
+          "type": "integer"
+        },
+        "generated_control_elapsed_seconds": {
+          "const": 0.05812098504975438,
+          "type": "number"
+        },
+        "generated_control_peak_RSS_bytes": {
+          "const": 16777216,
+          "type": "integer"
+        },
+        "generated_controls_actual_exit_code": {
+          "const": 0,
+          "type": "integer"
+        },
+        "generated_opaque_controls_passed": {
+          "const": 27,
+          "type": "integer"
+        },
+        "peak_RSS_bytes": {
+          "const": 26173440,
+          "type": "integer"
+        },
+        "whole_wrapper_seconds": {
+          "const": 0.20322466967627406,
+          "type": "number"
+        }
+      },
+      "required": [
+        "actual_Popen_wait_exit_code",
+        "byte_probe_elapsed_seconds",
+        "declared_CPU_cores",
+        "generated_control_elapsed_seconds",
+        "generated_control_peak_RSS_bytes",
+        "generated_controls_actual_exit_code",
+        "generated_opaque_controls_passed",
+        "peak_RSS_bytes",
+        "whole_wrapper_seconds"
+      ],
+      "type": "object"
+    },
+    "profile": {
+      "const": "features12_steps2048",
+      "type": "string"
+    },
+    "scope": {
+      "const": "two_historical_seed11_byte_only_diagnostics",
+      "type": "string"
+    },
+    "source_proof": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "const": 1510,
+          "type": "integer"
+        },
+        "path": {
+          "const": "source-proof.json",
+          "type": "string"
+        },
+        "sha256": {
+          "const": "de671abcad028ff418d718a58f4d8b9124b62b892d913c5e405ab75df6a216cc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "claims",
+    "container",
+    "diagnostics",
+    "fit_seed",
+    "format",
+    "measurements",
+    "profile",
+    "scope",
+    "source_proof",
+    "version"
+  ],
+  "title": "Frozen two-pair seed11 byte-only research report",
+  "type": "object",
+  "$defs": {
+    "sourceProof": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "actual_wait_receipt_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byte_report_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "enabled_request_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "generated_controls_result_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "generated_controls_wait_receipt_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "private_reference_manifest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "format": {
+          "type": "string",
+          "const": "DOPECR01-byte-diagnostic-source-proof"
+        },
+        "version": {
+          "type": "integer",
+          "const": 1
+        },
+        "raw_member_bodies_not_reread_for_publication": {
+          "type": "boolean",
+          "const": true
+        },
+        "runtime_certification_claimed": {
+          "type": "boolean",
+          "const": false
+        },
+        "source_bytes_exactly_verified": {
+          "type": "boolean",
+          "const": true
+        },
+        "producer_sources": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "byte_probe_encoder",
+                  "research_container_encoder_decoder",
+                  "research_container_member_verifier",
+                  "generated_opaque_control_source"
+                ]
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "role",
+              "bytes",
+              "sha256"
+            ]
+          }
+        }
+      },
+      "required": [
+        "actual_wait_receipt_sha256",
+        "byte_report_sha256",
+        "enabled_request_sha256",
+        "format",
+        "generated_controls_result_sha256",
+        "generated_controls_wait_receipt_sha256",
+        "private_reference_manifest_sha256",
+        "producer_sources",
+        "raw_member_bodies_not_reread_for_publication",
+        "runtime_certification_claimed",
+        "source_bytes_exactly_verified",
+        "version"
+      ]
+    }
+  }
+}
