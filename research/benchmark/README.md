@@ -1221,3 +1221,43 @@ model and sampling inventories are checked before metric decoding. Offline
 `--from-json <publication> --publication-sha256 <manifest artifact digest>`
 regenerates tables and schemas; descriptive aggregates are independently reduced
 from committed per-cell results and the hash-bound reference panel.
+
+
+## Expanded fidelity, detection and empirical privacy diagnostics
+
+`expanded_validation_metrics.evaluate(fit, validation, synthetic, column_kinds)`
+accepts finite common-numeric projections. The caller must verify frozen sample,
+partition, projection, source and runtime receipts before decoding those arrays;
+this numerical module provides no file loader or campaign execution admission.
+Fit and validation must be disjoint after projection. Official test rows stay
+sealed. Explicit kinds describe the frozen representation, including categorical
+indicator columns; they do not restore omitted author-native categories.
+
+The report adds per-column KS or categorical TV, continuous-pair Pearson
+difference, categorical-pair contingency TV, unembedded Synthcity alpha precision
+and beta recall, and five-fold grouped CatBoost/logistic C2ST AUC. Identical
+projected rows stay in one detection fold across both classes. Mixed-type
+dependence and constant Pearson pairs are explicitly unavailable/excluded.
+
+Privacy includes RMS nearest-neighbor distance to fit and validation, balanced
+reference controls, NNDR with explicit undefined zero-second-neighbor counts,
+and a distance membership attack with uniformly weighted unique query groups.
+The optional author DOMIAS density-ratio equation uses a disjoint validation
+reference and Scott-bandwidth KDE; categorical or singular inputs yield null.
+These are empirical attacks, with no formal DP or HIPAA claim.
+
+Detection and alpha/beta use deterministic equal subsets of at most 800 rows.
+Privacy samples at most 800 synthetic/query groups while full DCR references
+retain all fit/validation rows; their reference counts are reported alongside
+the balanced comparison. Distance-based metrics use the already-frozen numeric
+scale. Caller-owned real-vs-real control receipts remain required for later
+gated analysis. No new method selection, tuning, real-data metric result or
+composite score is established by this source/fixture change.
+
+Validate reports with `expanded-validation-metrics.schema.json`; absent or
+inapplicable evidence has `status: unavailable` and `value: null`. MFS-v2, PTF-v1,
+release-safe L3 and superiority remain null. Test with:
+
+```sh
+python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v
+```

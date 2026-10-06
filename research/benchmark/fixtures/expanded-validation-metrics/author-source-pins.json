@@ -1,0 +1,48 @@
+{
+  "candidate_execution": false,
+  "files": [
+    {
+      "bytes": 11357,
+      "commit": "23f322fe381326ed01c41b13d469a06e38cce545",
+      "path": "LICENSE",
+      "repository": "synthcity",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "source_url": "https://raw.githubusercontent.com/vanderschaarlab/synthcity/23f322fe381326ed01c41b13d469a06e38cce545/LICENSE"
+    },
+    {
+      "bytes": 29711,
+      "commit": "23f322fe381326ed01c41b13d469a06e38cce545",
+      "path": "src/synthcity/metrics/eval_statistical.py",
+      "repository": "synthcity",
+      "sha256": "623ee83c6f0f1873c94cd1243e26b36e4941850915e5b5c2c943954cd8018e7d",
+      "source_url": "https://raw.githubusercontent.com/vanderschaarlab/synthcity/23f322fe381326ed01c41b13d469a06e38cce545/src/synthcity/metrics/eval_statistical.py"
+    },
+    {
+      "bytes": 20447,
+      "commit": "23f322fe381326ed01c41b13d469a06e38cce545",
+      "path": "src/synthcity/metrics/eval_privacy.py",
+      "repository": "synthcity",
+      "sha256": "ced59beed704c79e76430a53e74d857d5561699b47f204f1cc9d43ff9e99fde5",
+      "source_url": "https://raw.githubusercontent.com/vanderschaarlab/synthcity/23f322fe381326ed01c41b13d469a06e38cce545/src/synthcity/metrics/eval_privacy.py"
+    },
+    {
+      "bytes": 1082,
+      "commit": "9527dab320f9d41372e1f67e0d5c2b80becfdd61",
+      "path": "LICENSE",
+      "repository": "DOMIAS",
+      "sha256": "37b9816925dafe641104cc5db1dd80ddfc7c8f531bebe197811cc84fc492a4e3",
+      "source_url": "https://raw.githubusercontent.com/vanderschaarlab/DOMIAS/9527dab320f9d41372e1f67e0d5c2b80becfdd61/LICENSE"
+    },
+    {
+      "bytes": 11927,
+      "commit": "9527dab320f9d41372e1f67e0d5c2b80becfdd61",
+      "path": "src/domias/evaluator.py",
+      "repository": "DOMIAS",
+      "sha256": "d455600f448f8cf072def8dd8790b22c95f6316a69626311a35adfbc0d7b5f8c",
+      "source_url": "https://raw.githubusercontent.com/vanderschaarlab/DOMIAS/9527dab320f9d41372e1f67e0d5c2b80becfdd61/src/domias/evaluator.py"
+    }
+  ],
+  "format": "dope-metric-author-source-custody",
+  "official_tests_opened": false,
+  "version": 1
+}
