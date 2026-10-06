@@ -159,8 +159,8 @@ class Guardian:
                         'parent_pid': row['parent_pid']})
                 else:
                     # pidfd anchors PID ownership; UID/start-tick changes reject.
-                    old = self.known[key]['row']
-                    assert row['uid'] == old['uid'] and row['start_ticks'] == old['start_ticks']
+                    captured = self.known[key]['row']
+                    assert row['uid'] == captured['uid'] and row['start_ticks'] == captured['start_ticks']
                 del pending[pid]; progress = True
         return self.known
 
