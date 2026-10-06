@@ -1,6 +1,6 @@
 """Numeric TabSyn wrapper; author models and sampler stay byte-identical.
 
-The whole fit includes preprocessing, both full author epoch budgets and safe
+The whole fit includes preprocessing, both declared epoch budgets and safe
 export. Generated controls may explicitly request two epochs per stage. A
 deadline never converts partial training into an eligible model.
 """
@@ -26,7 +26,7 @@ def check_deadline(deadline):
         raise TimeoutError('whole fit deadline exceeded')
 
 
-def validate_config(config, fixture=False):
+def validate_config(config, fixture=False, epoch_budget=None):
     require(type(config) is dict and set(config) == {'max_beta', 'min_beta', 'lambd',
         'vae_epochs', 'diffusion_epochs', 'batch_size', 'token_dimension',
         'transformer_layers', 'attention_heads', 'factor', 'diffusion_hidden_dimension',
@@ -49,8 +49,14 @@ def validate_config(config, fixture=False):
             and config['diffusion_hidden_dimension'] == 1024 and config['vae_lr'] == .001
             and config['diffusion_lr'] == .001 and config['weight_decay'] == 0
             and config['sampling_steps'] == 50, 'TabSyn author-supported configuration differs')
-    require(config['vae_epochs'] == (2 if fixture else 4000)
-            and config['diffusion_epochs'] == (2 if fixture else 10001),
+    epochs = epoch_budget or dict(vae_epochs=2 if fixture else 4000,
+                                  diffusion_epochs=2 if fixture else 10001)
+    require(type(epochs) is dict and set(epochs)=={'vae_epochs','diffusion_epochs'}
+            and all(type(epochs[k]) is int and 0<epochs[k]<=limit for k,limit in
+                    [('vae_epochs',4000),('diffusion_epochs',10001)]),
+            'TabSyn declared epoch budget differs')
+    require(config['vae_epochs'] == epochs['vae_epochs']
+            and config['diffusion_epochs'] == epochs['diffusion_epochs'],
             'TabSyn author epoch budget differs')
 
 
@@ -73,30 +79,47 @@ def numeric_loss(x, reconstructed, mu, logvar):
 
 def fit(train, validation, projection_bytes, output, config, *, seed=11,
         device='cpu', timeout_seconds=600, generated_fixture=False,
-        runtime_path, runtime_sha256, code_path, code_sha256):
+        runtime_path, runtime_sha256, code_path, code_sha256, admission=None):
     require(type(seed) is int and seed == 11 and type(timeout_seconds) is int
             and 0 < timeout_seconds <= 600, 'TabSyn fit seed or deadline differs')
     require(type(generated_fixture) is bool and type(projection_bytes) is bytes,
             'TabSyn fit declaration differs')
-    validate_config(config, generated_fixture)
-    require(generated_fixture and device == 'cpu',
+    require((admission is None and generated_fixture and device=='cpu')
+            or (admission is not None and not generated_fixture and device=='cuda:0'),
             'TabSyn benchmark execution needs independent request and GPU admission')
     started = time.monotonic()
     deadline = started+timeout_seconds
     verify_runtime(runtime_path, runtime_sha256, code_path, code_sha256)
+    operation = None
+    if admission is not None:
+        from research.benchmark.tabsyn_admission import verify_operation
+        operation = verify_operation(admission,'fit',config['config_sha256'],
+            runtime_sha256,code_path,code_sha256)
+        deadline = min(deadline,operation['deadline_monotonic'])
+    if operation:
+        require(hashlib.sha256(projection_bytes).hexdigest()==operation['projection_sha256'],
+                'TabSyn admitted TRAIN projection differs')
+    validate_config(config,generated_fixture,operation['epoch_budget'] if operation else None)
     check_deadline(deadline)
     import numpy as np
+    require(isinstance(train, np.ndarray) and isinstance(validation, np.ndarray)
+            and train.ndim == validation.ndim == 2 and train.shape[1] == validation.shape[1]
+            and train.shape[0] >= 9 and validation.shape[0] >= 2 and train.shape[1] >= 2
+            and np.isfinite(train).all() and np.isfinite(validation).all(),
+            'TabSyn numeric input contract differs')
+    if operation:
+        require(hashlib.sha256(train.astype(np.float64).tobytes(order='C')).hexdigest()
+                    == operation['joint_train_sha256']
+                and hashlib.sha256(validation.astype(np.float64).tobytes(order='C')).hexdigest()
+                    == operation['joint_validation_sha256']
+                and hashlib.sha256(projection_bytes).hexdigest()==operation['projection_sha256'],
+                'TabSyn admitted TRAIN or validation input differs')
     import torch
     from torch.utils.data import DataLoader
     from sklearn.preprocessing import QuantileTransformer
     from safetensors.torch import save_file
     from tabsyn.vae.model import Model_VAE, Encoder_model, Decoder_model
     from tabsyn.model import MLPDiffusion, Model
-    require(isinstance(train, np.ndarray) and isinstance(validation, np.ndarray)
-            and train.ndim == validation.ndim == 2 and train.shape[1] == validation.shape[1]
-            and train.shape[0] >= 9 and validation.shape[0] >= 2 and train.shape[1] >= 2
-            and np.isfinite(train).all() and np.isfinite(validation).all(),
-            'TabSyn numeric input contract differs')
     root = Path(output)
     root.mkdir(parents=True, exist_ok=False)
     seed_all(seed)
@@ -197,10 +220,16 @@ def fit(train, validation, projection_bytes, output, config, *, seed=11,
     receipt = dict(format='dope-tabsyn-numeric-artifact', version=1, seed=seed,
         rows=len(train), columns=train.shape[1], config=config, generated_fixture=generated_fixture,
         source_commit=AUTHOR_COMMIT, runtime_sha256=runtime_sha256, code_sha256=code_sha256,
-        complete=True, execution_admitted=False,
+        complete=True, execution_admitted=operation is not None,
+        operation_admission_sha256=admission['operation_sha256'] if operation else None,
+        declared_epoch_budget=operation['epoch_budget'] if operation else None,
+        author_epoch_baseline=dict(vae_epochs=4000,diffusion_epochs=10001),
         vae_selected_epoch=selected_epoch, encoder_decoder_export='final_epoch',
         completed_vae_epochs=config['vae_epochs'], completed_diffusion_epochs=completed_diffusion_epochs,
-        diffusion_selected_epoch=diffusion_selected_epoch, numeric_empty_ce=0,
+        diffusion_selected_epoch=diffusion_selected_epoch,
+        diffusion_stopping_reason=('declared_epoch_budget_complete' if completed_diffusion_epochs==config['diffusion_epochs']
+                                   else 'author_patience_500'),
+        diffusion_patience_at_exit=patience, numeric_empty_ce=0,
         original_numeric_weight_in_validation=0, data_loader_workers=0,
         data_loader_adaptation='zero workers for isolated worker/no subprocess contract',
         whole_fit_elapsed_seconds=time.monotonic()-started, peak_allocated_vram_bytes=peak,
@@ -208,27 +237,47 @@ def fit(train, validation, projection_bytes, output, config, *, seed=11,
     check_deadline(deadline)
     (root/'model.json').write_text(json.dumps(receipt, indent=2, sort_keys=True)+'\n')
     try:
+        if operation:
+            artifact_inventory(root)
+            verify_runtime(runtime_path,runtime_sha256,code_path,code_sha256)
+            final = verify_operation(admission,'fit',config['config_sha256'],
+                runtime_sha256,code_path,code_sha256,phase='final_integrity')
+            require(final['deadline_monotonic']==operation['deadline_monotonic'],
+                    'TabSyn fit final deadline identity differs')
         check_deadline(deadline)
-    except TimeoutError:
+    except BaseException:
         (root/'model.json').unlink()
         raise
     return receipt
 
 
 def sample(artifact, rows, seed, expected_inventory, *, device='cpu',
-           runtime_path, runtime_sha256, code_path, code_sha256):
+           runtime_path, runtime_sha256, code_path, code_sha256, admission=None):
     require(type(rows) is int and 0 < rows <= 10_000_000 and type(seed) is int and seed in [101, 211, 307],
             'TabSyn sample identity differs')
     verify_runtime(runtime_path, runtime_sha256, code_path, code_sha256)
-    require(device == 'cpu', 'TabSyn GPU sampling needs independent admission')
+    require((admission is None and device=='cpu') or (admission is not None and device=='cuda:0'),
+            'TabSyn GPU sampling needs independent admission')
     require(artifact_inventory(artifact) == expected_inventory, 'TabSyn artifact custody differs')
     root = Path(artifact)
     info = json.loads((root/'model.json').read_text())
     require(info['complete'] is True and info['source_commit'] == AUTHOR_COMMIT
             and info['runtime_sha256'] == runtime_sha256 and info['code_sha256'] == code_sha256
-            and info['generated_fixture'] is True and info['execution_admitted'] is False,
+            and info['generated_fixture'] is (admission is None)
+            and info['execution_admitted'] is (admission is not None),
             'TabSyn artifact lineage or completion differs')
-    validate_config(info['config'], fixture=True)
+    operation = None
+    if admission is not None:
+        from research.benchmark.tabsyn_admission import verify_operation
+        operation = verify_operation(admission,'sample',info['config']['config_sha256'],
+            runtime_sha256,code_path,code_sha256)
+        require(any(type(item.get('rows')) is int and type(item.get('seed')) is int
+                    and item['rows']==rows and item['seed']==seed for item in operation['samples']),
+                'TabSyn admitted sample request differs')
+        require(info['declared_epoch_budget']==operation['epoch_budget'],
+                'TabSyn sample epoch lineage differs')
+    validate_config(info['config'],fixture=admission is None,
+                    epoch_budget=operation['epoch_budget'] if operation else None)
     require(rows in [info['rows']*m for m in [1, 2, 4, 8]], 'TabSyn sample row multiplier differs')
     import numpy as np
     import torch
@@ -260,6 +309,14 @@ def sample(artifact, rows, seed, expected_inventory, *, device='cpu',
     result = normalizer.inverse_transform(numeric.cpu().numpy())
     require(result.shape == (rows, info['columns']) and np.isfinite(result).all(),
             'TabSyn sample shape or finiteness differs')
+    if operation:
+        require(artifact_inventory(root)==expected_inventory,'TabSyn sample final artifact changed')
+        verify_runtime(runtime_path,runtime_sha256,code_path,code_sha256)
+        final=verify_operation(admission,'sample',info['config']['config_sha256'],
+            runtime_sha256,code_path,code_sha256,phase='final_integrity')
+        require(final['deadline_monotonic']==operation['deadline_monotonic'],
+                'TabSyn sample final deadline identity differs')
+        check_deadline(operation['deadline_monotonic'])
     return result
 
 
@@ -284,27 +341,71 @@ def artifact_inventory(artifact):
 
 
 def native_objective(synthetic, validation, metadata, seed=11, *,
-                     runtime_path, runtime_sha256, code_path, code_sha256):
-    """Call the immutable author's evaluator, preserving its label behavior."""
+                     train_projection_bytes=None, train_projection_sha256=None,
+                     validation_provenance=None, worker_sha256=None,
+                     runtime_path, runtime_sha256, code_path, code_sha256,
+                     config_sha256=None, admission=None):
+    """Immutable author KPI in TRAIN-projection-clipped source target units."""
     require(type(seed) is int and seed == 11, 'TabSyn native seed differs')
+    require(admission is not None, 'TabSyn native GPU evaluator needs independent admission')
     lock = verify_runtime(runtime_path, runtime_sha256, code_path, code_sha256)
-    require(lock['gpu_runtime_closure_certified'] is True and lock['execution_admitted'] is True,
-            'TabSyn native GPU evaluator needs independent admission')
-    import numpy as np
-    from eval.mle.mle import _evaluate_regression
+    from research.benchmark.tabsyn_admission import verify_operation
+    operation = verify_operation(admission,'native',config_sha256,runtime_sha256,code_path,code_sha256)
+    require(worker_sha256==operation['worker_sha256']
+            and train_projection_sha256==operation['projection_sha256']
+            and hashlib.sha256(json.dumps(metadata,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+                == operation['native_metadata_sha256'], 'TabSyn native admitted input identity differs')
+    from research.benchmark.tabsyn_native_target import (target_state, inverse_matrix_targets,
+        check_validation_partition, validation_groups_informative, uninformative_receipt, TRACK)
+    check_validation_partition(validation_provenance, worker_sha256, train_projection_sha256)
+    state = target_state(train_projection_bytes, train_projection_sha256)
     require(metadata['task_type'] == 'regression' and len(metadata['target_col_idx']) == 1,
             'TabSyn native target metadata differs')
-    transformed = np.log(np.clip(validation[:, metadata['target_col_idx'][0]], 1, 20000))
-    require(len(transformed) >= 2 and np.isfinite(transformed).all(),
-            'TabSyn native validation contract differs')
-    if np.unique(transformed).size < 2:
-        return dict(status='tuning_inapplicable_uninformative_author_target', native_value=None)
+    index = metadata['target_col_idx'][0]
+    native_synthetic = inverse_matrix_targets(synthetic, index, state)
+    native_validation = inverse_matrix_targets(validation, index, state)
+    import numpy as np
+    require(hashlib.sha256(validation.astype(np.float64).tobytes(order='C')).hexdigest()
+                == operation['joint_validation_sha256']
+            and hashlib.sha256(synthetic.astype(np.float64).tobytes(order='C')).hexdigest()
+                == operation['joint_synthetic_sha256'], 'TabSyn native admitted matrix differs')
+    def finish(result):
+        # Rehash original projected inputs and provider/code custody before every
+        # success or inapplicable result. The outer runner also checks written
+        # output hashes and actual owned exit inside this same absolute deadline.
+        require(hashlib.sha256(validation.astype(np.float64).tobytes(order='C')).hexdigest()
+                    == operation['joint_validation_sha256']
+                and hashlib.sha256(synthetic.astype(np.float64).tobytes(order='C')).hexdigest()
+                    == operation['joint_synthetic_sha256']
+                and hashlib.sha256(train_projection_bytes).hexdigest()==train_projection_sha256,
+                'TabSyn native final input custody differs')
+        verify_runtime(runtime_path,runtime_sha256,code_path,code_sha256)
+        final=verify_operation(admission,'native',config_sha256,runtime_sha256,code_path,code_sha256,
+                               phase='final_integrity')
+        require(final['deadline_monotonic']==operation['deadline_monotonic'],
+                'TabSyn native final deadline identity differs')
+        check_deadline(operation['deadline_monotonic'])
+        return result
+    if not validation_groups_informative(validation_provenance):
+        return finish(uninformative_receipt('insufficient_unique_projected_validation_row_groups'))
+    # feat_transform casts regression labels to float32 before author clipping.
+    labels = np.log(np.clip(native_validation[:, index].astype(np.float32), 1, 20000))
+    require(len(labels) >= 2 and np.isfinite(labels).all(), 'TabSyn native validation contract differs')
+    if np.unique(labels).size < 2:
+        return finish(uninformative_receipt('constant_float32_author_log_clipped_validation_target'))
+    if len(native_synthetic) // 9 < 2:
+        return finish(uninformative_receipt('insufficient_author_synthetic_validation_rows'))
+    from eval.mle.mle import _evaluate_regression
     seed_all(seed)
-    best_r2, _ = _evaluate_regression(synthetic, validation, metadata)
+    # The author keeps internal synthetic validation labels raw. Do not repair
+    # that behavior or use real validation to choose auditor hyperparameters.
+    best_r2, _ = _evaluate_regression(native_synthetic, native_validation, metadata)
     value = float(next(r['r2'] for r in best_r2 if r['name'] == 'XGBRegressor'))
     require(math.isfinite(value), 'TabSyn native objective nonfinite')
-    return dict(status='ok', native_value=value, objective='best_r2_scores.XGBRegressor.r2',
-                direction='maximize', source_transform='log_clip_fit_and_real_raw_synthetic_validation')
+    return finish(dict(status='ok', native_value=value, objective='best_r2_scores.XGBRegressor.r2',
+        direction='maximize', native_track=TRACK,
+        source_transform='inverse_frozen_TRAIN_projection_then_immutable_author_transform',
+        outside_fit_extrema_reconstructed=False, common_projection_units_changed=False))
 
 
 def select_native(trials):

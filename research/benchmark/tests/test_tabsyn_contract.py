@@ -277,39 +277,72 @@ class Contract(unittest.TestCase):
         with self.assertRaises(TimeoutError):
             adapter.check_deadline(0)
 
-    def test_native_dispatch_keeps_author_arrays_and_uses_r2(self):
-        # This is an interface seam with a fake evaluator, not GPU evidence.
+    def native_inputs(self, synthetic, validation, limits=(2,500), groups=3):
+        from research.benchmark import tabsyn_admission
         import numpy as np
-        synthetic = np.array([[2., .2], [3., .3]])
-        validation = np.array([[2., .4], [4., .5]])
-        metadata = dict(task_type='regression', target_col_idx=[0])
-        seen = []
-        def evaluate(train, heldout, info):
-            seen.append((train, heldout, info))
-            return [dict(name='XGBRegressor', r2=-.25)], [dict(name='XGBRegressor', r2=99)]
-        admitted = dict(gpu_runtime_closure_certified=True, execution_admitted=True)
-        with patch.object(adapter, 'verify_runtime', return_value=admitted), \
-                patch.object(adapter, 'seed_all') as seed, \
-                patch.dict(sys.modules, {'eval.mle.mle': SimpleNamespace(_evaluate_regression=evaluate)}):
-            result = adapter.native_objective(synthetic, validation, metadata,
-                runtime_path=None, runtime_sha256=None, code_path=None, code_sha256=None)
-        self.assertIs(seen[0][0], synthetic)
-        self.assertIs(seen[0][1], validation)
-        self.assertIs(seen[0][2], metadata)
-        self.assertEqual(result['native_value'], -.25)
-        seed.assert_called_once_with(11)
+        projection=json.dumps(dict(version=1,task='regression',fit_partition='train',
+            numeric_rule='train_minmax_clip_0_1',target_map=dict(min=limits[0],max=limits[1]))).encode()
+        pin=hashlib.sha256(projection).hexdigest();metadata=dict(task_type='regression',target_col_idx=[0])
+        op=dict(worker_sha256='a'*64,projection_sha256=pin,
+            native_metadata_sha256=hashlib.sha256(json.dumps(metadata,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
+            joint_validation_sha256=hashlib.sha256(validation.astype(np.float64).tobytes(order='C')).hexdigest(),
+            joint_synthetic_sha256=hashlib.sha256(synthetic.astype(np.float64).tobytes(order='C')).hexdigest(),
+            deadline_monotonic=__import__('time').monotonic()+100)
+        kwargs=dict(train_projection_bytes=projection,train_projection_sha256=pin,worker_sha256='a'*64,
+            validation_provenance=dict(partition='official_training_derived_validation',official_tests_opened=False,
+                worker_sha256='a'*64,projection_sha256=pin,unique_projected_row_groups=groups),
+            config_sha256='b'*64,admission={'operation_path':'generated','operation_sha256':'c'*64},
+            runtime_path=None,runtime_sha256=None,code_path=None,code_sha256=None)
+        return tabsyn_admission,metadata,op,kwargs
 
-    def test_uninformative_author_target_does_not_select_native_winner(self):
+    def test_native_dispatch_uses_TRAIN_inverse_copy_and_author_r2(self):
         import numpy as np
-        admitted = dict(gpu_runtime_closure_certified=True, execution_admitted=True)
-        evaluator = SimpleNamespace(_evaluate_regression=lambda *args: self.fail('uninformative evaluation'))
-        with patch.object(adapter, 'verify_runtime', return_value=admitted), \
-                patch.dict(sys.modules, {'eval.mle.mle': evaluator}):
-            result = adapter.native_objective(np.ones((18, 2)), np.zeros((3, 2)),
-                dict(task_type='regression', target_col_idx=[0]), runtime_path=None,
-                runtime_sha256=None, code_path=None, code_sha256=None)
-        self.assertIsNone(result['native_value'])
-        self.assertEqual(result['status'], 'tuning_inapplicable_uninformative_author_target')
+        synthetic=np.column_stack((np.linspace(0,1,24),np.full(24,.2)))
+        validation=np.array([[0.,.4],[.5,.5],[1.,.6]])
+        boundary,metadata,op,kwargs=self.native_inputs(synthetic,validation);seen=[]
+        def evaluate(train,heldout,info):
+            seen.append((train.copy(),heldout.copy(),info))
+            return [dict(name='XGBRegressor',r2=-.25)],[dict(name='XGBRegressor',r2=99)]
+        with patch.object(adapter,'verify_runtime',return_value=dict(execution_admitted=False)), \
+                patch.object(boundary,'verify_operation',return_value=op),patch.object(adapter,'seed_all') as seed, \
+                patch.dict(sys.modules,{'eval.mle.mle':SimpleNamespace(_evaluate_regression=evaluate)}):
+            result=adapter.native_objective(synthetic,validation,metadata,**kwargs)
+        np.testing.assert_array_equal(seen[0][0][:,0],2+synthetic[:,0]*498)
+        np.testing.assert_array_equal(seen[0][1][:,0],[2,251,500])
+        np.testing.assert_array_equal(synthetic[:,0],np.linspace(0,1,24))
+        self.assertEqual(result['native_value'],-.25);seed.assert_called_once_with(11)
+
+    def test_uninformative_author_target_retains_default_without_auditor(self):
+        import numpy as np
+        synthetic=np.ones((18,2));validation=np.zeros((3,2))
+        boundary,metadata,op,kwargs=self.native_inputs(synthetic,validation,limits=(-5,-1))
+        evaluator=SimpleNamespace(_evaluate_regression=lambda *args:self.fail('uninformative evaluation'))
+        with patch.object(adapter,'verify_runtime',return_value={}),patch.object(boundary,'verify_operation',return_value=op), \
+                patch.dict(sys.modules,{'eval.mle.mle':evaluator}):
+            result=adapter.native_objective(synthetic,validation,metadata,**kwargs)
+        self.assertIsNone(result['native_value']);self.assertTrue(result['default_retained'])
+        self.assertIsNone(result['native_winner']);self.assertFalse(result['common_projection_units_changed'])
+
+    def test_uninformative_groups_still_require_exact_matrix_custody(self):
+        import numpy as np
+        synthetic=np.ones((18,2));validation=np.zeros((3,2))
+        boundary,metadata,op,kwargs=self.native_inputs(synthetic,validation,groups=1)
+        validation[0,0]=.5
+        with patch.object(adapter,'verify_runtime',return_value={}),patch.object(boundary,'verify_operation',return_value=op), \
+                self.assertRaises(ValueError):adapter.native_objective(synthetic,validation,metadata,**kwargs)
+
+    def test_native_final_rehash_cannot_extend_whole_operation_deadline(self):
+        import numpy as np
+        synthetic=np.ones((18,2));validation=np.zeros((3,2))
+        boundary,metadata,op,kwargs=self.native_inputs(synthetic,validation,limits=(-5,-1))
+        op['deadline_monotonic']=__import__('time').monotonic()+.01;calls=[]
+        def verify(*args):
+            calls.append(1)
+            if len(calls)==2:__import__('time').sleep(.02)
+            return {}
+        with patch.object(adapter,'verify_runtime',side_effect=verify),patch.object(boundary,'verify_operation',return_value=op), \
+                self.assertRaises(TimeoutError):adapter.native_objective(synthetic,validation,metadata,**kwargs)
+        self.assertEqual(len(calls),2)
 
 
 if __name__ == '__main__':
