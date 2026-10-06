@@ -6,7 +6,7 @@
     },
     "dope-target-refinement-population-fits.json": {
       "bytes": 273775,
-      "sha256": "ec330be7103ee9b63440f4e3b1b26c31592695ef2f27988b1fd73ff97a0fd91e"
+      "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
     },
     "dope-target-refinement-population-fits.md": {
       "bytes": 1046,
@@ -59,7 +59,7 @@
   "publisher_sources": {
     "arf_runtime_guard.py": "163328e0130f8d23ea5df5f63b2a2340e9e7361145190fbdb63e97889cec2df7",
     "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
-    "publish_dope_refinement_fits.py": "e77c72f2b6daf4dab743809d35a977dba847463616130c91251dd3d2a6a0d01c",
+    "publish_dope_refinement_fits.py": "560a4f3a5331c895adea9bbe54eb26b3c8ef25cc5d82460cb6cfce94fb199827",
     "publish_dope_refinement_fits_figure.py": "67a14d05b73c4021e4c21d36af3eefb852835cf1896c25d7d5c3aa81714338fb",
     "publish_dope_refinement_fits_manifest.py": "06fc6a1a073bc0298a9e9ad3650f1903da4b0672f7f9d173ecbdc26452e56bf7",
     "publish_s3_matched.py": "b6dc53c2bcc65efcdc90ceb39569005fe39a934d55bd6f1211ce26db2cb1a81a",

@@ -5,8 +5,8 @@
       "sha256": "c963b2796483c99c6db74240cc431ada54a4e6b0cd7da5e2a7d543378f026daf"
     },
     "dope-target-refinement-population-validation.json": {
-      "bytes": 3901730,
-      "sha256": "f36b952f360edeb9cb1bc777aa886efbb4a7c7d4dbe2979d33d1d6da831d3240"
+      "bytes": 3901636,
+      "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
     },
     "dope-target-refinement-population-validation.md": {
       "bytes": 2776,
@@ -27,8 +27,8 @@
   },
   "counts_as_dope_win": false,
   "fit_ledger_reference": {
-    "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-target-refinement-population-fits.json",
-    "sha256": "ec330be7103ee9b63440f4e3b1b26c31592695ef2f27988b1fd73ff97a0fd91e"
+    "path": "research/benchmark/results/dope-target-refinement-population-fits.json",
+    "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
   },
   "format": "dope-complete-refinement-population-publication-manifest",
   "full_campaign_admitted": false,
@@ -36,7 +36,7 @@
   "logical_validation_cells": 1200,
   "matched_reference": {
     "logical_cells": 6000,
-    "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/density-matched-population-validation.json",
+    "path": "research/benchmark/results/density-matched-population-validation.json",
     "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
   },
   "mfs_v2": null,
@@ -47,8 +47,8 @@
     "arf_runtime_guard.py": "163328e0130f8d23ea5df5f63b2a2340e9e7361145190fbdb63e97889cec2df7",
     "manifest.py": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
     "publish_dope_refinement_discovery.py": "86205d65e65774a14de1838002828c9581db4009c0122df3d5f056103c68fa57",
-    "publish_dope_refinement_fits.py": "e77c72f2b6daf4dab743809d35a977dba847463616130c91251dd3d2a6a0d01c",
-    "publish_dope_refinement_population.py": "12440493b84f2c88e5859897aab79949c5679923f2556bb9ee802452671793b6",
+    "publish_dope_refinement_fits.py": "560a4f3a5331c895adea9bbe54eb26b3c8ef25cc5d82460cb6cfce94fb199827",
+    "publish_dope_refinement_population.py": "66eb7031c68fb42ff894c7f755a7f4931452e652039b627c832ee5248cb7156a",
     "publish_dope_refinement_population_figure.py": "b724985643e5dc97e8ce936b484d65befbc168529db0bb7754e9a5fe5fe33e9a",
     "publish_dope_refinement_population_manifest.py": "2bcdcbc30f576bba03e3a2e78463839cd03f4ecc2fadf49cbc80fce3f0cc819a",
     "publish_s3_forest.py": "52bcb15744f12d5e77744be6d197356f86c6509be847a61d8d6e287aee7921b5",
