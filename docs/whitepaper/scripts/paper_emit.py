@@ -101,6 +101,10 @@ def _threshold_sentence(series, sig3):
     return "The threshold table is the record of that check."
 
 
+def _wtl(pair):
+    return f"{int(pair['wins'])}/{int(pair['ties'])}/{int(pair['losses'])}"
+
+
 def emit(payload, out, sig3, tex_p, tex_bytes, command):
     density = payload["blocks"]["density"]["catboost"]
     linear = payload["blocks"]["density"]["linear"]
@@ -170,6 +174,15 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
         command("HiForestCb", sig3(forest["pairs"]["Forest-Flow"]["other_hi"])),
         command("MedDopeForestCb", sig3(forest["pairs"]["Forest-Flow"]["dope_median"])),
         command("NForestCb", str(forest["pairs"]["Forest-Flow"]["n"])),
+        command("WtlGaussCb", _wtl(density["pairs"]["GaussianCopula"])),
+        command("WtlLinGauss", _wtl(linear["pairs"]["GaussianCopula"])),
+        command("WtlMlpGauss", _wtl(payload["blocks"]["density"]["mlp"]["pairs"]["GaussianCopula"])),
+        command("WtlTvaeCb", _wtl(neural["pairs"]["TVAE"])),
+        command("WtlTvaeLin", _wtl(payload["blocks"]["neural"]["linear"]["pairs"]["TVAE"])),
+        command("WtlTvaeMlp", _wtl(payload["blocks"]["neural"]["mlp"]["pairs"]["TVAE"])),
+        command("WtlForestCb", _wtl(forest["pairs"]["Forest-Flow"])),
+        command("WtlForestLin", _wtl(payload["blocks"]["forest"]["linear"]["pairs"]["Forest-Flow"])),
+        command("WtlForestMlp", _wtl(payload["blocks"]["forest"]["mlp"]["pairs"]["Forest-Flow"])),
         command("ForestByteLo", tex_bytes(payload["forest_bytes"]["min"])),
         command("ForestByteHi", tex_bytes(payload["forest_bytes"]["max"])),
         command("ForestByteMedian", _byte_median(side.get("forest_byte_median"), tex_bytes)),

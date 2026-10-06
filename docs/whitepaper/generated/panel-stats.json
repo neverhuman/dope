@@ -188,6 +188,7 @@
             "hi": 0.45144352750781447,
             "holm_p": 4.846244703593662e-16,
             "lo": 0.2822924025029211,
+            "losses": 3,
             "median_difference": 0.337038109790491,
             "n": 97,
             "other_hi": 0.636723503608519,
@@ -196,8 +197,10 @@
             "rank_biserial": 0.9781190826846202,
             "sign_holm_p": 6.723354210115574e-24,
             "sign_p": 9.604791728736534e-25,
+            "ties": 0,
             "wilcoxon_p": 6.057805879492078e-17,
-            "wilcoxon_statistic": 52.0
+            "wilcoxon_statistic": 52.0,
+            "wins": 94
           },
           "GaussianCopula": {
             "differences": [
@@ -307,6 +310,7 @@
             "hi": 0.2898059173088992,
             "holm_p": 1.3487629706662152e-13,
             "lo": 0.14903956407306995,
+            "losses": 11,
             "median_difference": 0.22368623255905395,
             "n": 97,
             "other_hi": 0.802948715045455,
@@ -315,8 +319,10 @@
             "rank_biserial": 0.8901746265516516,
             "sign_holm_p": 2.151365287624325e-15,
             "sign_p": 7.171217625414416e-16,
+            "ties": 0,
             "wilcoxon_p": 2.6975259413324303e-14,
-            "wilcoxon_statistic": 261.0
+            "wilcoxon_statistic": 261.0,
+            "wins": 86
           },
           "independent_marginals": {
             "differences": [
@@ -426,6 +432,7 @@
             "hi": 0.9802561014669279,
             "holm_p": 1.1668179169513577e-16,
             "lo": 0.9179670696656923,
+            "losses": 1,
             "median_difference": 0.9556282284264905,
             "n": 97,
             "other_hi": -0.006485623581926826,
@@ -434,8 +441,10 @@
             "rank_biserial": 0.9991584262571008,
             "sign_holm_p": 4.947735597546186e-27,
             "sign_p": 6.184669496932733e-28,
+            "ties": 0,
             "wilcoxon_p": 1.2964643521681752e-17,
-            "wilcoxon_statistic": 2.0
+            "wilcoxon_statistic": 2.0,
+            "wins": 96
           }
         }
       },
@@ -615,6 +624,7 @@
             "hi": 0.4248169159016487,
             "holm_p": 7.1186242437372e-15,
             "lo": 0.24381803553218462,
+            "losses": 6,
             "median_difference": 0.3398793667827359,
             "n": 92,
             "other_hi": 0.7379337740643862,
@@ -623,8 +633,10 @@
             "rank_biserial": 0.9611968209443665,
             "sign_holm_p": 6.180989981079422e-19,
             "sign_p": 1.5452474952698554e-19,
+            "ties": 0,
             "wilcoxon_p": 1.1864373739562e-15,
-            "wilcoxon_statistic": 83.0
+            "wilcoxon_statistic": 83.0,
+            "wins": 86
           },
           "GaussianCopula": {
             "differences": [
@@ -729,6 +741,7 @@
             "hi": 0.011920647296214781,
             "holm_p": 0.37255255982270896,
             "lo": -0.0043796287216112395,
+            "losses": 43,
             "median_difference": 0.003657966047288297,
             "n": 92,
             "other_hi": 0.9940013483727079,
@@ -737,8 +750,10 @@
             "rank_biserial": 0.10705937353903694,
             "sign_holm_p": 0.3012061388480754,
             "sign_p": 0.3012061388480754,
+            "ties": 0,
             "wilcoxon_p": 0.37255255982270896,
-            "wilcoxon_statistic": 1910.0
+            "wilcoxon_statistic": 1910.0,
+            "wins": 49
           },
           "independent_marginals": {
             "differences": [
@@ -843,6 +858,7 @@
             "hi": 1.0013330756338983,
             "holm_p": 5.704847118127468e-16,
             "lo": 0.974948644300728,
+            "losses": 0,
             "median_difference": 0.9879020533538112,
             "n": 92,
             "other_hi": 0.005825370265473167,
@@ -851,8 +867,10 @@
             "rank_biserial": 1.0,
             "sign_holm_p": 1.8175355256292112e-27,
             "sign_p": 2.0194839173657902e-28,
+            "ties": 0,
             "wilcoxon_p": 8.149781597324954e-17,
-            "wilcoxon_statistic": 0.0
+            "wilcoxon_statistic": 0.0,
+            "wins": 92
           }
         }
       },
@@ -1020,6 +1038,7 @@
             "hi": 0.6511023253741064,
             "holm_p": 2.1121491669280634e-13,
             "lo": 0.3502609805594512,
+            "losses": 1,
             "median_difference": 0.530132524425045,
             "n": 75,
             "other_hi": 0.7538819522783026,
@@ -1028,8 +1047,10 @@
             "rank_biserial": 0.9964912280701754,
             "sign_holm_p": 1.0058516248644817e-20,
             "sign_p": 2.0117032497289633e-21,
+            "ties": 0,
             "wilcoxon_p": 6.460610479036269e-14,
-            "wilcoxon_statistic": 5.0
+            "wilcoxon_statistic": 5.0,
+            "wins": 74
           },
           "GaussianCopula": {
             "differences": [
@@ -1117,6 +1138,7 @@
             "hi": 0.22753506143488877,
             "holm_p": 4.957342970599658e-11,
             "lo": 0.1278323969263757,
+            "losses": 10,
             "median_difference": 0.18498419527258836,
             "n": 75,
             "other_hi": 0.9534031276842538,
@@ -1125,8 +1147,10 @@
             "rank_biserial": 0.8870175438596491,
             "sign_holm_p": 5.154208808246549e-11,
             "sign_p": 2.5771044041232744e-11,
+            "ties": 0,
             "wilcoxon_p": 2.478671485299829e-11,
-            "wilcoxon_statistic": 161.0
+            "wilcoxon_statistic": 161.0,
+            "wins": 65
           },
           "independent_marginals": {
             "differences": [
@@ -1214,6 +1238,7 @@
             "hi": 1.179351540483221,
             "holm_p": 2.1121491669280634e-13,
             "lo": 1.0472674228361516,
+            "losses": 0,
             "median_difference": 1.1042754729786288,
             "n": 75,
             "other_hi": -0.012867583873731402,
@@ -1222,8 +1247,10 @@
             "rank_biserial": 1.0,
             "sign_holm_p": 1.5881867761018131e-22,
             "sign_p": 2.6469779601696886e-23,
+            "ties": 0,
             "wilcoxon_p": 5.2803729173201584e-14,
-            "wilcoxon_statistic": 0.0
+            "wilcoxon_statistic": 0.0,
+            "wins": 75
           }
         }
       }
@@ -1263,6 +1290,7 @@
             "hi": 0.008044854438134685,
             "holm_p": 0.375,
             "lo": -0.3079476794733069,
+            "losses": 5,
             "median_difference": -0.026883548899613585,
             "n": 6,
             "other_hi": 1.0260194441895623,
@@ -1271,8 +1299,10 @@
             "rank_biserial": -0.7142857142857143,
             "sign_holm_p": 1.0,
             "sign_p": 0.984375,
+            "ties": 0,
             "wilcoxon_p": 0.15625,
-            "wilcoxon_statistic": 3.0
+            "wilcoxon_statistic": 3.0,
+            "wins": 1
           }
         }
       },
@@ -1309,6 +1339,7 @@
             "hi": 0.30161212575857343,
             "holm_p": 0.8125,
             "lo": -0.2599475702252124,
+            "losses": 2,
             "median_difference": 0.011518090047013207,
             "n": 5,
             "other_hi": 1.000716316692228,
@@ -1317,8 +1348,10 @@
             "rank_biserial": 0.2,
             "sign_holm_p": 1.0,
             "sign_p": 0.5,
+            "ties": 0,
             "wilcoxon_p": 0.8125,
-            "wilcoxon_statistic": 6.0
+            "wilcoxon_statistic": 6.0,
+            "wins": 3
           }
         }
       },
@@ -1354,6 +1387,7 @@
             "hi": -0.010203456201608119,
             "holm_p": 0.375,
             "lo": -0.22746262716743293,
+            "losses": 4,
             "median_difference": -0.031731022854153745,
             "n": 4,
             "other_hi": 1.4675588868142693,
@@ -1362,8 +1396,10 @@
             "rank_biserial": -1.0,
             "sign_holm_p": 1.0,
             "sign_p": 1.0,
+            "ties": 0,
             "wilcoxon_p": 0.125,
-            "wilcoxon_statistic": 0.0
+            "wilcoxon_statistic": 0.0,
+            "wins": 0
           }
         }
       }
@@ -1424,6 +1460,7 @@
             "hi": 1.1497828289389598,
             "holm_p": 5.7220458984375e-06,
             "lo": 0.7020003107757864,
+            "losses": 0,
             "median_difference": 0.8806615225928393,
             "n": 21,
             "other_hi": 0.10297671030430716,
@@ -1432,8 +1469,10 @@
             "rank_biserial": 1.0,
             "sign_holm_p": 2.86102294921875e-06,
             "sign_p": 4.76837158203125e-07,
+            "ties": 0,
             "wilcoxon_p": 9.5367431640625e-07,
-            "wilcoxon_statistic": 0.0
+            "wilcoxon_statistic": 0.0,
+            "wins": 21
           },
           "TVAE": {
             "differences": [
@@ -1467,6 +1506,7 @@
             "hi": 0.4309178892529399,
             "holm_p": 0.00015735626220703125,
             "lo": 0.08679764762976072,
+            "losses": 2,
             "median_difference": 0.2361100729563903,
             "n": 21,
             "other_hi": 0.7872314986566679,
@@ -1475,8 +1515,10 @@
             "rank_biserial": 0.8701298701298701,
             "sign_holm_p": 0.00022125244140625,
             "sign_p": 0.000110626220703125,
+            "ties": 0,
             "wilcoxon_p": 0.00013065338134765625,
-            "wilcoxon_statistic": 15.0
+            "wilcoxon_statistic": 15.0,
+            "wins": 19
           }
         }
       },
@@ -1535,6 +1577,7 @@
             "hi": 1.2359743672457841,
             "holm_p": 5.7220458984375e-06,
             "lo": 0.9161335625749027,
+            "losses": 0,
             "median_difference": 1.0485133961871764,
             "n": 21,
             "other_hi": 0.08006903692884101,
@@ -1543,8 +1586,10 @@
             "rank_biserial": 1.0,
             "sign_holm_p": 2.86102294921875e-06,
             "sign_p": 4.76837158203125e-07,
+            "ties": 0,
             "wilcoxon_p": 9.5367431640625e-07,
-            "wilcoxon_statistic": 0.0
+            "wilcoxon_statistic": 0.0,
+            "wins": 21
           },
           "TVAE": {
             "differences": [
@@ -1578,6 +1623,7 @@
             "hi": 0.4102513887884053,
             "holm_p": 0.00015735626220703125,
             "lo": 0.16589245274238684,
+            "losses": 1,
             "median_difference": 0.26293590860918825,
             "n": 21,
             "other_hi": 0.8667624268875969,
@@ -1586,8 +1632,10 @@
             "rank_biserial": 0.9047619047619048,
             "sign_holm_p": 3.147125244140625e-05,
             "sign_p": 1.049041748046875e-05,
+            "ties": 0,
             "wilcoxon_p": 5.245208740234375e-05,
-            "wilcoxon_statistic": 11.0
+            "wilcoxon_statistic": 11.0,
+            "wins": 20
           }
         }
       },
@@ -1644,6 +1692,7 @@
             "hi": 2.0295982678552607,
             "holm_p": 1.52587890625e-05,
             "lo": 0.8768809700822459,
+            "losses": 0,
             "median_difference": 1.0788316649329146,
             "n": 19,
             "other_hi": 0.0830441696673039,
@@ -1652,8 +1701,10 @@
             "rank_biserial": 1.0,
             "sign_holm_p": 7.62939453125e-06,
             "sign_p": 1.9073486328125e-06,
+            "ties": 0,
             "wilcoxon_p": 3.814697265625e-06,
-            "wilcoxon_statistic": 0.0
+            "wilcoxon_statistic": 0.0,
+            "wins": 19
           },
           "TVAE": {
             "differences": [
@@ -1685,6 +1736,7 @@
             "hi": 0.7335012479256061,
             "holm_p": 0.00015735626220703125,
             "lo": 0.15314695930373567,
+            "losses": 2,
             "median_difference": 0.2842270795183106,
             "n": 19,
             "other_hi": 0.8516955384692092,
@@ -1693,8 +1745,10 @@
             "rank_biserial": 0.9263157894736842,
             "sign_holm_p": 0.0003643035888671875,
             "sign_p": 0.0003643035888671875,
+            "ties": 0,
             "wilcoxon_p": 7.2479248046875e-05,
-            "wilcoxon_statistic": 7.0
+            "wilcoxon_statistic": 7.0,
+            "wins": 17
           }
         }
       }
@@ -1826,7 +1880,9 @@
     "holm_family_forest": "Forest-Flow native_selected, size 4, six-lineage confirmation, not pooled",
     "holm_family_neural": "CTGAN and TVAE times auditors, size 4, not pooled with density",
     "interval": "percentile lineage bootstrap of the median; three sample seeds stay inside each lineage median",
-    "superiority": "Retention tests do not authorize PTF-v1, MFS-v2, or release-safe L3"
+    "strongest_baseline": "highest paired median retention inside the block and auditor; blocks are not pooled",
+    "superiority": "Retention tests do not authorize PTF-v1, MFS-v2, or release-safe L3",
+    "wins": "lineage counts of positive, zero, and negative paired differences, DOPE minus the baseline"
   },
   "official_tests_opened": {
     "density": false,

@@ -34,11 +34,18 @@ comparison that does not separate DOPE from the Gaussian copula. Pooling
 the neural and Forest-Flow blocks into the 97-lineage median would be a
 sample-size error.
 
-Resolved. `compute_panel.py` emits lineage-bootstrap intervals, two-sided
-Wilcoxon tests, one-sided sign tests, Holm adjustments inside each family,
-matched-pairs rank-biserial correlations, and a Friedman test with a Nemenyi
-critical difference on the four density methods. The text states the linear
-non-separation and forbids pooling.
+Resolved for the tests that were already in the draft, and extended for the
+lineage counts a reviewer can still demand. `compute_panel.py` emits
+lineage-bootstrap intervals, two-sided Wilcoxon tests, one-sided sign tests,
+Holm adjustments inside each family, matched-pairs rank-biserial
+correlations, and a Friedman test with a Nemenyi critical difference on the
+four density methods. The same pairs now carry wins, ties, and losses.
+Table `tab:headline` keeps only the strongest tuned baseline in each block
+and auditor. The text states the linear non-separation, the CatBoost losses
+against the Gaussian copula, the neural losses against TVAE, and the
+Forest-Flow block where DOPE is behind on CatBoost (1/0/5) and on the MLP
+(0/0/4). It forbids pooling. Calling that Forest-Flow result "similar
+retention" was an over-claim and is removed.
 
 ## Leakage
 
@@ -92,7 +99,7 @@ appendix follows the bibliography. The 100-row tables are in the
 supplement. The logged-replay figure replaces the claim that the scored
 campaign has no training curve.
 
-`dope-mfs.pdf` is 8 letter pages. `supplement.pdf` is 6 letter pages.
+`dope-mfs.pdf` is 9 letter pages. `supplement.pdf` is 6 letter pages.
 The third-pass logs have no overfull box, underfull box, undefined
 reference, or float-too-large warning. `check_paper.py` reads
 `/tmp/dope-mfs-3.log` and `/tmp/supplement-3.log` and fails if any of
