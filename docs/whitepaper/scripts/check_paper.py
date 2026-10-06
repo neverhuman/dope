@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail if the paper types a measured decimal by hand, a figure embeds a Type 3 font, or the third-pass build log has a box, float, or undefined-reference warning."""
+"""Fail if the paper types a measured decimal by hand, a built PDF embeds a Type 3 font, or the final build log contains a warning, an undefined reference, or an overfull or underfull box."""
 
 from __future__ import annotations
 
@@ -12,6 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TEX = ROOT / "dope-mfs.tex"
 NUMBERS = ROOT / "generated" / "numbers.tex"
 FIGURES = (
+    ROOT / "dope-mfs.pdf",
+    ROOT / "supplement.pdf",
     ROOT / "figures" / "retention-bytes.pdf",
     ROOT / "figures" / "paired-cdf.pdf",
     ROOT / "figures" / "loss-curves.pdf",
@@ -21,21 +23,18 @@ FIGURES = (
 RAW_DECIMAL = re.compile(r"(?<![\w.\\])\d+\.\d{4,}(?![\w])")
 MACRO_DEF = re.compile(r"\\(?:newcommand|renewcommand)\*?\{\\(\w+)\}")
 MACRO_USE = re.compile(r"\\([A-Z][A-Za-z]+)")
-# Third-pass logs only. A first pass reports undefined references on purpose.
+# Final logs from the latexmk run. A first pass reports undefined references on purpose.
 LOGS = (Path("/tmp/dope-mfs-3.log"), Path("/tmp/supplement-3.log"))
-LATEX_WARNING = re.compile(
-    r"^(?:Overfull \\[hv]box|Underfull \\[hv]box"
-    r"|LaTeX Warning: Float too large"
-    r"|LaTeX Warning: Reference .+ undefined"
-    r"|LaTeX Warning: Citation .+ undefined"
-    r"|LaTeX Warning: There were undefined references"
-    r"|! Undefined control sequence)"
-)
+LOG_HITS = ("Warning", "undefined", "Undefined", "Overfull", "Underfull")
 
 
 def latex_warnings(text: str) -> list[str]:
     """Lines a submission log must not contain."""
-    return [line.strip() for line in text.splitlines() if LATEX_WARNING.match(line)]
+    hits = []
+    for line in text.splitlines():
+        if any(token in line for token in LOG_HITS):
+            hits.append(line.strip())
+    return hits
 
 
 def strip_comments(text: str) -> str:

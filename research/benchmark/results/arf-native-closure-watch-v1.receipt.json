@@ -1,0 +1,16 @@
+{
+  "bytes": 178370,
+  "sha256": "6fb28882ab5004580540c617fe413e10473f99ef96fcde6ef5d2f1b1bf7da06d",
+  "source": "/home/ubuntu/dope/.agent/worktrees/integration/target/arf-native-closure-watch-v1.log",
+  "source_note": "SHA-256 of the native ARF closure watch log at actual_reconciliation_exit on 2026-10-05. The verifier reads this receipt and does not open the log.",
+  "watch": {
+    "closed": 799,
+    "count_utc": "2026-10-05T17:10:37.297569+00:00",
+    "new_generator_fits_started": 0,
+    "ok": 799,
+    "planned": 800,
+    "records": 626,
+    "terminal_exit_code": 0,
+    "terminal_phase": "actual_reconciliation_exit"
+  }
+}

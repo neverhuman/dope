@@ -28,10 +28,10 @@ Numbers below are the generated macros, traced by
   sum of `fit_seconds` over the twelve confirmation `fit.json` files. The
   confirmation JSON's shared-evaluator seconds are not that sum and are not
   reported.
-- ARF is not a retention result. The watch log
-  `.agent/worktrees/integration/target/arf-native-closure-watch-v1.log`
-  last counted 799 closed and 799 ok out of 800 planned, then a sealing
-  record and exit 0. That is not a scored utility panel.
+- ARF is not a retention result. The committed receipt
+  `research/benchmark/results/arf-native-closure-watch-v1.receipt.json`
+  records 799 closed and 799 ok out of 800 planned, then exit 0.
+  That is not a scored utility panel.
 
 ## Missing strong methods
 

@@ -1,8 +1,10 @@
 """Paper-number tracing rejects a drifted watch log and an untraced decimal."""
 
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
-from research.benchmark.verify_paper_numbers import parse_watch, untraced_numbers
+from research.benchmark.verify_paper_numbers import REPO, main, parse_watch, untraced_numbers
 
 
 class VerifyPaperNumbers(unittest.TestCase):
@@ -28,6 +30,28 @@ class VerifyPaperNumbers(unittest.TestCase):
         # The input line is skipped. A decimal on the next line is still visible.
         missing = untraced_numbers(tex, set())
         self.assertEqual(missing, ["0.12345"])
+
+    def test_verifier_opens_only_committed_repo_files(self):
+        opened = []
+        real_open = Path.open
+
+        def tracking_open(path, *args, **kwargs):
+            opened.append(Path(path))
+            return real_open(path, *args, **kwargs)
+
+        with patch.object(Path, "open", tracking_open):
+            status = main([])
+        self.assertEqual(status, 0)
+        self.assertTrue(opened)
+        repo = REPO.resolve()
+        for path in opened:
+            resolved = path.resolve()
+            try:
+                relative = resolved.relative_to(repo)
+            except ValueError:
+                self.fail(f"opened a path outside the repo: {path}")
+            self.assertNotIn(".agent", relative.parts, path)
+            self.assertNotIn("target", relative.parts, path)
 
 
 if __name__ == "__main__":
