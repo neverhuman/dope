@@ -14,14 +14,19 @@ build_one() {
 }
 build_one dope-mfs
 build_one supplement
-# Author decision is unpicked. This second PDF changes only the byline and
-# the running header. The source dope-mfs.tex stays on The DOPE Project.
+# The anonymous PDF changes only the byline and the running header.
+# The source dope-mfs.tex keeps Jepson Taylor and Alton Alexander.
 python3 - << 'PY'
 from pathlib import Path
 src = Path("dope-mfs.tex").read_text()
 pairs = (
-    ("\\author{The DOPE Project}", "\\author{Anonymous}"),
-    ("\\markboth{The DOPE Project}%", "\\markboth{Anonymous}%"),
+    (
+        "\\author{Jepson~Taylor and Alton~Alexander%\n"
+        "\\IEEEcompsocitemizethanks{\\IEEEcompsocthanksitem J.~Taylor and A.~Alexander are with NEVERHUMAN Research.}}",
+        "\\author{Anonymous%\n"
+        "\\IEEEcompsocitemizethanks{\\IEEEcompsocthanksitem Affiliation withheld for review.}}",
+    ),
+    ("\\markboth{Taylor and Alexander}%", "\\markboth{Anonymous}%"),
 )
 for old, new in pairs:
     if src.count(old) != 1:
