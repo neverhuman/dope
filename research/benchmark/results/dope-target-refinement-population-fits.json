@@ -7111,7 +7111,7 @@
   "scope": "Complete bounded official-training-derived 100-lineage/two-profile research training; no quality selection.",
   "shared_validation_complete": false,
   "source_round_sha256": "fe53444eeb3b485f895473a27101d93fb515c9dfbe3ee72d50d71417fef487d4",
-  "source_sha256": "e77c72f2b6daf4dab743809d35a977dba847463616130c91251dd3d2a6a0d01c",
+  "source_sha256": "560a4f3a5331c895adea9bbe54eb26b3c8ef25cc5d82460cb6cfce94fb199827",
   "status_counts": {
     "charged_artifact_cap": 2,
     "foreign_gpu_owner_appeared": 1,

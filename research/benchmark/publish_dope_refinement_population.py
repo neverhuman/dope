@@ -17,12 +17,18 @@ BASE = fits.BASE
 ROOT = BASE / 'dope-s3-refinement-expansion-validation-v2'
 ROUND = 'b0198ffc65524d3616d9f0f062e9a6e49345b0eb4db7dfa7f727bd1612e75545'
 REFERENCE = '5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a'
-FIT_PUBLICATION = 'ec330be7103ee9b63440f4e3b1b26c31592695ef2f27988b1fd73ff97a0fd91e'
+FIT_PUBLICATION = '803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194'
 AUXILIARY = '64e0ada86999b04ee3a2a050817d1d12ed2342604e5d9120f690df6e4fb2e269'
 AUX_PATH = BASE / 'dope-s3-refinement-expansion-validation-publication-preparation-v1/batch-auxiliary.lock.json'
 NAME = 'dope-target-refinement-population-validation'
 SEEDS = (101, 211, 307)
 SIZES = (1, 4)
+
+
+def result_name(filename):
+    """Store a repo-relative result path so another checkout rebuilds the same bytes."""
+    path = Path(__file__).resolve().with_name('results') / filename
+    return path.relative_to(Path(__file__).resolve().parents[2]).as_posix()
 
 
 def metric_check(value, worker, size, implementation):
@@ -199,13 +205,13 @@ def build(receipt_pin, report_pin):
         scope='100 bounded official-training-derived S3 lineages; declared two-profile research, fit11/three sample seeds/n+4n. Baselines selected only by frozen native objectives.',
         datasets=ids, logical_validation_cells=1200, physical_validation_batches=112,
         logical_status_counts=report['logical_status_counts'], physical_status_counts=report['physical_status_counts'],
-        immutable_validation_cells_reused=144, cells=cells, matched_reference=dict(path=str(reference_path), sha256=REFERENCE, logical_cells=6000),
+        immutable_validation_cells_reused=144, cells=cells, matched_reference=dict(path=result_name(reference_path.name), sha256=REFERENCE, logical_cells=6000),
         sample_replay_controls=dict(exact=sum(bool(c['sample_evidence']) and c['sample_evidence']['sample_replay'] == 'exact' for c in cells),
             not_repeated=sum(bool(c['sample_evidence']) and c['sample_evidence']['sample_replay'] == 'not_repeated' for c in cells)),
         metric_replay_controls=dict(exact=sum(bool(c['sample_evidence']) and c['sample_evidence']['metric_replay'] == 'exact' for c in cells),
             not_repeated=sum(bool(c['sample_evidence']) and c['sample_evidence']['metric_replay'] == 'not_repeated' for c in cells)),
         lineage_groups=groups, summary=panels, paired_descriptive=paired(groups, fits.PROFILES),
-        fit_ledger_reference=dict(path=str(ledger_path), sha256=FIT_PUBLICATION),
+        fit_ledger_reference=dict(path=result_name(ledger_path.name), sha256=FIT_PUBLICATION),
         fit_cost=ledger['cost'], validation_operation_seconds=report['new_operation_seconds'],
         validation_scheduler_wall_seconds=report['coordinator_wall_seconds'],
         source_locks=dict(round=ROUND, receipts=receipt_pin, reconciliation=report_pin, density_reference=REFERENCE,

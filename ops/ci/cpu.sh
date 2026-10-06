@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+root=$PWD
 source ops/ci/lib.sh
 ci_require_command cargo
 ci_require_command python3
@@ -17,3 +18,6 @@ cd validation/external
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --locked --extra xgboost --extra lightgbm
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --offline --locked --extra xgboost --extra lightgbm
 PYTHONPATH=. ../../target/external-venv/bin/python -m unittest discover -s tests -v
+cd "$root"
+# A publisher edit that leaves the committed fit ledger stale fails before campaign publication.
+PYTHONPATH=. python3 -m unittest research.benchmark.tests.test_dope_refinement_fits.RefinementFits.test_committed_fit_ledger_tracks_publisher -v

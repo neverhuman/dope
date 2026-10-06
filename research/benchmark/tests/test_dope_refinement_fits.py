@@ -153,6 +153,29 @@ class RefinementFits(unittest.TestCase):
             with patch.object(pub, 'BASE', base), self.assertRaisesRegex(ValueError, '^projection charge omitted$'):
                 pub.cell(row, refs)
 
+    def test_committed_fit_ledger_tracks_publisher(self):
+        script = Path(pub.__file__)
+        root = script.with_name('results')
+        ledger = root / (pub.NAME + '.json')
+        report = json.loads(ledger.read_text())
+        digest = sha(script)
+        self.assertEqual(report['source_sha256'], digest)
+        manifest = json.loads((root / (pub.NAME + '.manifest.json')).read_text())
+        self.assertEqual(manifest['publisher_sources'][script.name], digest)
+        self.assertEqual(manifest['artifacts'][ledger.name]['sha256'], sha(ledger))
+        self.assertEqual(manifest['artifacts'][ledger.name]['bytes'], ledger.stat().st_size)
+        from research.benchmark import publish_dope_refinement_population as population
+        self.assertEqual(population.FIT_PUBLICATION, sha(ledger))
+        validation = json.loads((root / (population.NAME + '.json')).read_text())
+        population_manifest = json.loads((root / (population.NAME + '.manifest.json')).read_text())
+        self.assertEqual(validation['fit_ledger_reference']['sha256'], sha(ledger))
+        self.assertEqual(population_manifest['fit_ledger_reference']['sha256'], sha(ledger))
+        self.assertEqual(population_manifest['publisher_sources'][script.name], digest)
+        self.assertEqual(validation['source_sha256'], sha(Path(population.__file__)))
+        self.assertEqual(validation['fit_ledger_reference']['path'], 'research/benchmark/results/' + ledger.name)
+        self.assertEqual(validation['matched_reference']['path'],
+                         'research/benchmark/results/density-matched-population-validation.json')
+
     def test_table_roundtrip_keeps_failures_and_null_scope(self):
         rows = matrix(); report = dict(cells=rows, summary=pub.summarize(rows), new_ok_fits=176, **pub.GATES,
             cost=dict(new_operation_seconds=200, prior_whole_discovery_confirmation_operation_seconds=10,
