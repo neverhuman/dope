@@ -1,6 +1,9 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/tabsyn_validation_inputs.py": "external-evidence",
+    "research/benchmark/tests/test_tabsyn_validation_inputs.py": "external-evidence",
+
     "research/benchmark/DOPE_CPU_RESEARCH.md": "external-evidence",
     "research/benchmark/LOCAL_CAPACITY_AMENDMENT.md": "external-evidence",
     "research/benchmark/results/campaign-local-capacity-amendment": "external-evidence",

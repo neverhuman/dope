@@ -1,6 +1,9 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/tabsyn_validation_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v", "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"},
+    "research/benchmark/tests/test_tabsyn_validation_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v", "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"},
+
     "research/benchmark/results/campaign-local-capacity-amendment-xbabe2": {"command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment-xbabe2.json research/benchmark/results/campaign-local-capacity-amendment-xbabe2.schema.json", "purpose": "validate the separate owner-authorized xbabe2 local100GB root, carried budgets, sealed tests and null claims; fresh per-fit admission remains required"},
     "research/benchmark/DOPE_CPU_RESEARCH.md": {"command": "just check", "purpose": "verify explicit research-device parsing, ordinary-build rejection before fixed-hidden fallback, and Rust compiler compatibility; actual CPU libtorch training needs separate runtime qualification"},
     "research/benchmark/LOCAL_CAPACITY_AMENDMENT.md": {"command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment.json research/benchmark/results/campaign-local-capacity-amendment.schema.json", "purpose": "validate the byte-exact owner resource amendment, separate storage ceilings, unchanged operation budgets and null claims without admitting scientific execution"},

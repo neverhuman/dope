@@ -1340,3 +1340,21 @@ With the immutable publisher custody available, regenerate JSON/schema/CSV and
 the research note using `python3 -B -m research.benchmark.publish_tabsyn_native_audit`.
 Run `python3 -B -m unittest research.benchmark.tests.test_tabsyn_native_audit -v`
 for the opaque controls and committed publication checks.
+
+### TabSyn shared validation input preparation
+
+`tabsyn_validation_inputs.prepare` verifies a frozen metadata snapshot and
+constructs shared-evaluator input recipes only for admitted sample operations.
+It binds each sample to its original scaled default fit, TRAIN-derived validation
+and TRAIN-only numeric kind map, actual process exit, deadline and charged model
+plus projection bytes. Raw exit zero cannot admit a monitoring-unavailable cell.
+All 600 logical cells remain accounted for; newer samples require a new snapshot.
+
+The frozen TabSyn writers already serialize the target last. The preparation
+retains that common order and declares the synthetic CSV's single header row;
+headerless original TRAIN/validation bytes remain unchanged. An external admitted
+CPU worker must verify runtime, physical input hashes and shape, perform the
+declared header removal, and call the existing expanded diagnostics and utility
+auditors. This module does not execute metrics, decode rows, load models, select
+a native winner or grant a compute slot. Historical parent exit and gated scores
+remain null. Private paths in input recipes stay on scratch, outside publication.
