@@ -27,6 +27,17 @@ def references(cells):
 
 
 class MatchedARFControls(unittest.TestCase):
+    def test_publisher_replay_accepts_only_the_exact_frozen_historical_report(self):
+        report = json.loads(Path(pub.__file__).with_name('results').joinpath(pub.NAME + '.json').read_bytes())
+        pub.validate_publisher_identity(report)
+        self.assertEqual(report['source_sha256'], pub.HISTORICAL_PUBLISHER_SHA)
+        for change in (lambda r: r.update(source_sha256='0' * 64),
+                       lambda r: r.update(logical_validation_cells=1199),
+                       lambda r: r['cells'][0].update(charged_artifact_bytes=1)):
+            altered = copy.deepcopy(report); change(altered)
+            with self.assertRaisesRegex(ValueError, 'publication producing source differs'):
+                pub.validate_publisher_identity(altered)
+
     def test_sampling_directory_comes_from_verified_source_declaration(self):
         with TemporaryDirectory() as directory:
             root = Path(directory); out = root / 'attempt'; out.mkdir()
@@ -379,5 +390,67 @@ class MatchedARFControls(unittest.TestCase):
     def test_frozen_reference_digests_are_exact_builtin_valid_identities(self):
         for p in [pub.SAMPLE_ROUND,pub.NATIVE_RECEIPTS,pub.NATIVE_REPORT,pub.NATIVE_PUBLICATION,pub.DOPE_PUBLICATION]:pub.guard.digest(p)
 
+
+
+    def test_authenticated_historical_source_projection_preserves_origin_and_exact_coverage(self):
+        directory=Path.cwd()/'target';directory.mkdir(exist_ok=True)
+        with TemporaryDirectory(dir=directory) as tmp:
+            root=Path(tmp);round_path=root/'historical/round.lock.json'
+            origin=round_path.parent/'package/research/benchmark';origin.mkdir(parents=True)
+            for name in pub.HISTORICAL_FILES:
+                (origin/name).write_text('raise AssertionError("generated source must never execute")\n')
+            cache=origin/'__pycache__';cache.mkdir();(cache/'fixture.pyc').write_bytes(b'generated cache never read')
+            files={name:hashlib.sha256((origin/name).read_bytes()).hexdigest() for name in pub.HISTORICAL_FILES}
+            round_path.write_text(json.dumps(dict(source_files=files)))
+            round_pin=hashlib.sha256(round_path.read_bytes()).hexdigest()
+            refs={str(round_path):round_pin,**{str(origin/name):pin for name,pin in files.items()}}
+            projection=root/'projection'
+            with patch.multiple(pub,HISTORICAL_ROUND=round_path,HISTORICAL_ROUND_SHA=round_pin,
+                HISTORICAL_SOURCE=origin,HISTORICAL_PROJECTION=projection,HISTORICAL_FILES=files),patch.object(pub.native,'BASE',root):
+                missing=dict(refs);missing.pop(str(origin/'manifest.py'))
+                with self.assertRaisesRegex(ValueError,'authenticated historical source origin'):
+                    pub.project_historical_sources(round_path,round_pin,files,missing)
+                self.assertFalse(projection.exists())
+                with self.assertRaisesRegex(ValueError,'authenticated historical source origin'):
+                    pub.project_historical_sources(round_path,'0'*64,files,refs)
+                self.assertFalse(projection.exists())
+                binding=pub.flat_round_sources(round_path,files,round_pin,refs)
+                self.assertEqual(set(p.name for p in projection.iterdir()),set(files))
+                self.assertFalse(binding['source_files_executed']);self.assertFalse(binding['source_cache_bodies_read'])
+                self.assertEqual((cache/'fixture.pyc').read_bytes(),b'generated cache never read')
+                self.assertEqual(binding,pub.project_historical_sources(round_path,round_pin,files,refs))
+                pub.verify_historical_projection(binding)
+                (projection/'extra.py').write_bytes(b'generated extra')
+                with self.assertRaisesRegex(ValueError,'extra member'):
+                    pub.project_historical_sources(round_path,round_pin,files,refs)
+                with self.assertRaisesRegex(ValueError,'flat inventory'):
+                    pub.verify_historical_projection(binding)
+                (projection/'extra.py').unlink()
+                for path in [origin/'manifest.py',projection/'manifest.py']:
+                    raw=path.read_bytes();path.write_bytes(b'changed generated body')
+                    with self.assertRaises(ValueError):pub.verify_historical_projection(binding)
+                    path.write_bytes(raw)
+                path=projection/'manifest.py';raw=path.read_bytes();path.unlink();path.symlink_to(origin/'manifest.py')
+                with self.assertRaisesRegex(ValueError,'runtime path not owned'):
+                    pub.project_historical_sources(round_path,round_pin,files,refs)
+                path.unlink();path.write_bytes(raw)
+                with self.assertRaisesRegex(ValueError,'authenticated historical source origin'):
+                    pub.flat_round_sources(root/'other/round.lock.json',files,round_pin,refs)
+                pub.verify_historical_projection(binding)
+
+    def test_source_key_formats_reject_mixed_nested_and_nonbuiltin_aliases(self):
+        directory=Path.cwd()/'target';directory.mkdir(exist_ok=True)
+        with TemporaryDirectory(dir=directory) as tmp:
+            root=Path(tmp);source=root/'source';source.mkdir()
+            path=source/'fixture.py';path.write_bytes(b'# generated source\n')
+            pin=hashlib.sha256(path.read_bytes()).hexdigest();files={str(path):pin}
+            with patch.object(pub.native,'BASE',root):
+                self.assertIsNone(pub.flat_round_sources(root/'round.lock.json',files,'a'*64,{}))
+                class StringAlias(str):pass
+                for bad in [{**files,'flat.py':pin},{str(source/'nested/fixture.py'):pin},
+                            {str(source)+'/./fixture.py':pin},{str(source)+'//fixture.py':pin},
+                            {'nested\\fixture.py':pin},{StringAlias(str(path)):pin},{path:pin}]:
+                    with self.subTest(keys=list(bad)),self.assertRaises(ValueError):
+                        pub.flat_round_sources(root/'round.lock.json',bad,'a'*64,{})
 
 if __name__=='__main__':unittest.main(verbosity=2)

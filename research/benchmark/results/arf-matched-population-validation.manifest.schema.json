@@ -1,0 +1,367 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "arf-matched-population-validation.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-matched-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-matched-population-validation.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-matched-population-validation.pdf": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-matched-population-validation.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-matched-population-validation.svg": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "arf-matched-population-validation.csv",
+        "arf-matched-population-validation.json",
+        "arf-matched-population-validation.md",
+        "arf-matched-population-validation.pdf",
+        "arf-matched-population-validation.schema.json",
+        "arf-matched-population-validation.svg"
+      ],
+      "type": "object"
+    },
+    "cost": {
+      "additionalProperties": false,
+      "properties": {
+        "metric_operation_seconds": {
+          "type": "number"
+        },
+        "metric_scheduler_wall_seconds": {
+          "type": "number"
+        },
+        "native_fit": {
+          "additionalProperties": false,
+          "properties": {
+            "operation_seconds": {
+              "type": "number"
+            },
+            "scheduler_wall_seconds": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "operation_seconds",
+            "scheduler_wall_seconds"
+          ],
+          "type": "object"
+        },
+        "sample_operation_seconds": {
+          "type": "number"
+        },
+        "sample_scheduler_wall_seconds": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "metric_operation_seconds",
+        "metric_scheduler_wall_seconds",
+        "native_fit",
+        "sample_operation_seconds",
+        "sample_scheduler_wall_seconds"
+      ],
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "dope_reference": {
+      "additionalProperties": false,
+      "properties": {
+        "earlier_density_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "logical_cells": {
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "earlier_density_sha256",
+        "logical_cells",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "final_five_fit_coverage_complete": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-original-arf-matched-population-publication-manifest"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "global_configuration_tuned_or_selected": {
+      "const": false
+    },
+    "global_family_selected": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_reference": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "native_selection_changed": {
+      "const": false
+    },
+    "native_values_ranked_across_methods": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "privacy_attack_coverage_complete": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sources": {
+      "additionalProperties": false,
+      "properties": {
+        "arf_native_selection.py": {
+          "type": "string"
+        },
+        "arf_runtime_guard.py": {
+          "type": "string"
+        },
+        "publish_arf_population_matched.py": {
+          "type": "string"
+        },
+        "publish_arf_population_matched_figure.py": {
+          "type": "string"
+        },
+        "publish_arf_population_matched_manifest.py": {
+          "type": "string"
+        },
+        "publish_arf_population_native.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_discovery.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_fits.py": {
+          "type": "string"
+        },
+        "publish_dope_refinement_population.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "arf_native_selection.py",
+        "arf_runtime_guard.py",
+        "publish_arf_population_matched.py",
+        "publish_arf_population_matched_figure.py",
+        "publish_arf_population_matched_manifest.py",
+        "publish_arf_population_native.py",
+        "publish_dope_refinement_discovery.py",
+        "publish_dope_refinement_fits.py",
+        "publish_dope_refinement_population.py"
+      ],
+      "type": "object"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "release_safe_l3_comparison_complete": {
+      "const": false
+    },
+    "source_locks": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_auxiliary": {
+          "type": "string"
+        },
+        "native_receipts": {
+          "type": "string"
+        },
+        "native_reconciliation": {
+          "type": "string"
+        },
+        "receipts": {
+          "type": "string"
+        },
+        "reconciliation": {
+          "type": "string"
+        },
+        "round": {
+          "type": "string"
+        },
+        "sampling_receipts": {
+          "type": "string"
+        },
+        "sampling_round": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "batch_auxiliary",
+        "native_receipts",
+        "native_reconciliation",
+        "receipts",
+        "reconciliation",
+        "round",
+        "sampling_receipts",
+        "sampling_round"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "system_dynamic_library_closure_certified": {
+      "const": false
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "artifacts",
+    "cost",
+    "counts_as_dope_win",
+    "dope_reference",
+    "final_five_fit_coverage_complete",
+    "format",
+    "full_campaign_admitted",
+    "global_configuration_tuned_or_selected",
+    "global_family_selected",
+    "mfs_v2",
+    "native_reference",
+    "native_selection_changed",
+    "native_values_ranked_across_methods",
+    "official_tests_opened",
+    "privacy_attack_coverage_complete",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sources",
+    "release_safe",
+    "release_safe_l3_comparison_complete",
+    "source_locks",
+    "superiority",
+    "system_dynamic_library_closure_certified",
+    "version"
+  ],
+  "type": "object"
+}

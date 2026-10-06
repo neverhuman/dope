@@ -7,6 +7,8 @@ import io
 import hashlib
 import json
 import math
+import os
+import stat
 from pathlib import Path
 import statistics
 
@@ -18,6 +20,21 @@ from .publish_dope_refinement_discovery import summaries
 from .publish_s3_forest import shared_inventory
 
 BASE = native.BASE
+HISTORICAL_ROUND = BASE / 'neural-native-v1/round.lock.json'
+HISTORICAL_ROUND_SHA = '5634d235eb8305436ca046867d96d09f562fabbd360892c580a7da3b9b811988'
+HISTORICAL_SOURCE = HISTORICAL_ROUND.parent / 'package/research/benchmark'
+HISTORICAL_PROJECTION = BASE / 'target-arf-neural-source-projection-v1'
+HISTORICAL_FILES = {
+    'contract.json': 'ccccf3deaa8f219ea6ce14d44296c5996579a55af98a5afddf0099d513f0f894',
+    'fetch_jope.py': '3264d390fb2e39450551165a3c30833cb093056a8478a0501c7b4082125d8fbf',
+    'freeze_sdv_round.py': 'f00942e3f6252a2295ae8e7cf172282f1f527e77dfc120780a3ae448f5ee89b4',
+    'gpu_probe.py': '3a9a7762ce3ac7d68873fa8c3ec5c6ffc4d036b19a5507cd73f3573aa9e8d667',
+    'inventory_hosts.py': '73565ea6e5c510b67ac1133fd0bea74834a36132675c2c7a3f55146d5018d910',
+    'manifest.py': '77be48e26ce880e391c2c771161bbd5ffeb713963bcf1af53592c003dc1ce7c9',
+    'score.py': '3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968',
+    'sdv_adapter.py': 'c6f4240ae5b9795672693e2d6d3908053e105885b7d34d659027772183fa541b',
+    'sdv_round.py': '290fd6bb86f9d8fa8f1ba3c45c1710fad08d33103707986eeac64a9f84060b79',
+}
 ROOT = BASE / 'arf-s3-population-shared-validation-v1'
 SAMPLING = BASE / 'arf-s3-population-sampling-v1'
 SAMPLE_ROUND = 'bf17d9c4b2d76736036dec82adfd98447e94f66fd8d7bb56675d4e8245012777'
@@ -26,6 +43,8 @@ NATIVE_REPORT = 'af722bff624b2b5cad37eb10a314767dcbd2b00b085c44114f8ef398de9c385
 NATIVE_PUBLICATION = '3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e'
 DOPE_PUBLICATION = 'c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602'
 NAME = 'arf-matched-population-validation'
+HISTORICAL_PUBLISHER_SHA = '7ba486e01ded70cae07192fb7545340cfb3f6feb07089a72e168a3de1054fa05'
+HISTORICAL_PUBLICATION_SHA = 'c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7'
 CONFIGS = ('author_default', 'native_selected')
 PROFILES = ('features12_steps2048', *dope.fits.PROFILES)
 GATES = dict(dope.fits.GATES, native_selection_changed=False, native_values_ranked_across_methods=False,
@@ -161,6 +180,25 @@ def closure_accounting(root, refs, report, records, cost_key):
         and seconds(report[cost_key]) == amount and seconds(report['coordinator_wall_seconds']) == wall,
         'closed physical status or cost accounting differs')
     return amount, wall
+
+
+def publication_anchor(receipt_pin, name, parent_receipt_pin):
+    """Select a root-pinned immutable extension without changing historical evidence."""
+    guard.require(name in ('receipt-lock-v1.json', 'receipt-lock-v2.json'), 'receipt anchor name differs')
+    anchor = native.bound(ROOT / name, receipt_pin)
+    if name == 'receipt-lock-v2.json':
+        guard.digest(parent_receipt_pin)
+        parent_path = ROOT / 'receipt-lock-v1.json'
+        parent = native.bound(parent_path, parent_receipt_pin)
+        guard.require(type(anchor['version']) is int and anchor['version'] == 2
+            and anchor['parent_receipt_lock_path'] == str(parent_path)
+            and anchor['parent_receipt_lock_sha256'] == parent_receipt_pin
+            and anchor['refs'].get(str(parent_path)) == parent_receipt_pin
+            and all(anchor['refs'].get(p) == h for p, h in parent['refs'].items())
+            and digest({k: v for k, v in anchor.items() if k in parent and k not in ('version', 'refs')})
+            == digest({k: v for k, v in parent.items() if k not in ('version', 'refs')}),
+            'immutable original receipt anchor changed')
+    return anchor
 
 
 def parent_references(anchor, refs):
@@ -358,9 +396,93 @@ def decode_metric(binding):
     return metric
 
 
-def build(receipt_pin, report_pin, auxiliary_pin):
+def historical_source_body(path, pin):
+    """Read one authenticated regular source body; never import or execute it."""
+    path = native.safe(path)
+    guard.digest(pin)
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    with os.fdopen(fd, 'rb') as stream:
+        before = os.fstat(stream.fileno())
+        guard.require(stat.S_ISREG(before.st_mode) and before.st_nlink == 1
+            and 0 < before.st_size <= 1 << 20, 'historical source body type or size differs')
+        raw = stream.read((1 << 20) + 1)
+        after = os.fstat(stream.fileno())
+    current = path.lstat()
+    guard.require((before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns)
+        == (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns)
+        == (current.st_dev, current.st_ino, current.st_size, current.st_mtime_ns)
+        and hashlib.sha256(raw).hexdigest() == pin, 'historical source body changed')
+    return raw
+
+
+def verify_historical_projection(binding):
+    guard.require(type(binding) is dict and binding['round'] == str(HISTORICAL_ROUND)
+        and binding['round_sha256'] == HISTORICAL_ROUND_SHA
+        and binding['origin_root'] == str(HISTORICAL_SOURCE)
+        and binding['projection_root'] == str(HISTORICAL_PROJECTION)
+        and set(binding['files']) == set(HISTORICAL_FILES), 'historical copy binding differs')
+    historical_source_body(HISTORICAL_ROUND, HISTORICAL_ROUND_SHA)
+    for name, pin in HISTORICAL_FILES.items():
+        raw = historical_source_body(HISTORICAL_SOURCE / name, pin)
+        row = binding['files'][name]
+        guard.require(row == dict(origin=str(HISTORICAL_SOURCE / name), copy=str(HISTORICAL_PROJECTION / name),
+            bytes=len(raw), sha256=pin), 'historical source copy binding changed')
+    native.flat(HISTORICAL_PROJECTION, {name: dict(bytes=row['bytes'], sha256=row['sha256'])
+                                 for name, row in binding['files'].items()})
+
+
+def project_historical_sources(round_path, round_pin, files, refs):
+    guard.require(Path(round_path) == HISTORICAL_ROUND and round_pin == HISTORICAL_ROUND_SHA
+        and type(files) is dict and files == HISTORICAL_FILES
+        and refs.get(str(HISTORICAL_ROUND)) == HISTORICAL_ROUND_SHA
+        and all(refs.get(str(HISTORICAL_SOURCE / name)) == pin for name, pin in HISTORICAL_FILES.items()),
+        'exact authenticated historical source origin required')
+    historical_source_body(HISTORICAL_ROUND, HISTORICAL_ROUND_SHA)
+    bodies = {name: historical_source_body(HISTORICAL_SOURCE / name, pin) for name, pin in HISTORICAL_FILES.items()}
+    native.safe(HISTORICAL_PROJECTION.parent)
+    if not HISTORICAL_PROJECTION.exists(): HISTORICAL_PROJECTION.mkdir(mode=0o700)
+    native.safe(HISTORICAL_PROJECTION)
+    guard.require(HISTORICAL_PROJECTION.is_dir() and not set(p.name for p in HISTORICAL_PROJECTION.iterdir())
+        - set(HISTORICAL_FILES), 'historical projection acquired an extra member')
+    binding = dict(round=str(HISTORICAL_ROUND), round_sha256=HISTORICAL_ROUND_SHA,
+        origin_root=str(HISTORICAL_SOURCE), projection_root=str(HISTORICAL_PROJECTION),
+        source_files_executed=False, source_cache_bodies_read=False, files={})
+    for name, raw in bodies.items():
+        destination = HISTORICAL_PROJECTION / name
+        if not destination.exists():
+            fd = os.open(destination, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+            with os.fdopen(fd, 'wb') as stream: stream.write(raw)
+        guard.require(historical_source_body(destination, HISTORICAL_FILES[name]) == raw,
+                      'historical source projection drifted')
+        binding['files'][name] = dict(origin=str(HISTORICAL_SOURCE / name), copy=str(destination),
+                                     bytes=len(raw), sha256=HISTORICAL_FILES[name])
+    verify_historical_projection(binding)
+    return binding
+
+
+def flat_round_sources(round_path, files, round_pin, refs):
+    """Authenticate exact current roots or the explicitly bound historical origin."""
+    source = Path(round_path).parent / 'source'
+    guard.require(type(files) is dict and bool(files)
+        and all(type(key) is str for key in files), 'source key format differs')
+    keys = list(files)
+    paths = [Path(key) for key in keys]
+    flat = all(key not in ('', '.', '..') and key == path.name
+        and '/' not in key and '\\' not in key for key, path in zip(keys, paths))
+    absolute = all(path.is_absolute() and str(path) == key and path.parent == source
+        and path.name not in ('', '.', '..') and '\\' not in key
+        for key, path in zip(keys, paths))
+    guard.require(flat or absolute, 'source root differs')
+    normalized = {path.name: files[key] for key, path in zip(keys, paths)}
+    guard.require(len(normalized) == len(files), 'duplicate source basename')
+    if flat: return project_historical_sources(round_path, round_pin, normalized, refs)
+    native.flat(source, normalized)
+    return None
+
+
+def build(receipt_pin, report_pin, auxiliary_pin, receipt_lock_name="receipt-lock-v1.json", parent_receipt_pin=None, historical_binding_output=None):
     guard.require((ROOT / 'receipt-lock-v1.json').is_file(), 'complete common matrix not yet closed')
-    anchor = native.bound(ROOT / 'receipt-lock-v1.json', receipt_pin)
+    anchor = publication_anchor(receipt_pin, receipt_lock_name, parent_receipt_pin)
     guard.require(anchor['complete_matrix'] is True and anchor['reconciliation_sha256'] == report_pin,
                   'closed common receipt digest differs')
     # Verify every transitive receipt, input and executable before decoding metrics.
@@ -368,13 +490,19 @@ def build(receipt_pin, report_pin, auxiliary_pin):
     for path, pin in anchor['refs'].items(): dope.fits.checked(path, pin, refs)
     parent_references(anchor, refs)
     lock = native.bound(ROOT / 'round.lock.json', anchor['round_sha256'])
+    projections = []
     for path, pin in refs.items():
         if Path(path).name == 'round.lock.json':
             parent = native.bound(path, pin)
             if 'source_files' in parent:
-                source = Path(path).parent / 'source'
-                guard.require(all(Path(p).parent == source for p in parent['source_files']), 'source root differs')
-                native.flat(source, {Path(p).name: h for p, h in parent['source_files'].items()})
+                projection = flat_round_sources(path, parent['source_files'], pin, refs)
+                if projection is not None: projections.append(projection)
+    guard.require(len(projections) == int(str(HISTORICAL_ROUND) in refs)
+        and (not projections or historical_binding_output is not None),
+        'exact historical source binding output required')
+    if projections:
+        projection_body = json.dumps(projections[0], sort_keys=True, indent=2, allow_nan=False)+'\n'
+        with Path(historical_binding_output).open('x') as stream: stream.write(projection_body)
     guard.require(lock['gpu_operations_enabled'] is False and lock['official_tests_opened'] is False
         and lock['full_campaign_admitted'] is False and lock['native_selection_changed'] is False,
         'common round acquired admission or selection')
@@ -442,6 +570,7 @@ def build(receipt_pin, report_pin, auxiliary_pin):
         bindings.append((row, selected_key, sample_job, selection, binding))
     guard.require(seen == set(specifications) and dict(Counter(r['status'] for r in report['cells']))
                   == status_counts(report['logical_status_counts']), 'complete logical status accounting differs')
+    for projection in projections: verify_historical_projection(projection)
     cells = []
     for row, selected_key, sample_job, selection, binding in bindings:
         metric = decode_metric(binding)
@@ -470,6 +599,9 @@ def build(receipt_pin, report_pin, auxiliary_pin):
     ids = complete_matrix(cells); references = reference_cells(ids)
     groups, panels = summaries(cells + references)
     for path, pin in refs.items(): dope.fits.checked(path, pin, {})
+    for projection in projections: verify_historical_projection(projection)
+    if projections:
+        guard.require(Path(historical_binding_output).read_text() == projection_body, 'historical copy proof changed')
     return dict(format='dope-complete-original-arf-matched-population-validation', version=1,
         source_sha256=dope.fits.sha256(Path(__file__)), s3_data_lock_sha256=dope.fits.DATA,
         scope='100 bounded official-training-derived S3 views; one fit seed, three sample seeds, n/4n. ARF default and held-out FORDE native winner remain frozen.',
@@ -513,11 +645,22 @@ def frozen_native_cost():
     return cost
 
 
+def validate_publisher_identity(report):
+    pin = report['source_sha256']
+    guard.digest(pin)
+    if pin == dope.fits.sha256(Path(__file__)):
+        return
+    body = (json.dumps(report, sort_keys=True, indent=2, allow_nan=False) + '\n').encode()
+    guard.require(pin == HISTORICAL_PUBLISHER_SHA
+        and hashlib.sha256(body).hexdigest() == HISTORICAL_PUBLICATION_SHA,
+        'publication producing source differs')
+
+
 def validate_report(report):
+    validate_publisher_identity(report)
     ids = complete_matrix(report['cells'])
     guard.require(report['datasets'] == ids and count(report['logical_validation_cells']) == 1200
         and count(report['physical_sampling_batches']) == 199 and count(report['physical_metric_batches']) <= 199
-        and report['source_sha256'] == dope.fits.sha256(Path(__file__))
         and report['s3_data_lock_sha256'] == dope.fits.DATA
         and report['native_selection_reference']['sha256'] == NATIVE_PUBLICATION
         and report['dope_reference']['sha256'] == DOPE_PUBLICATION
@@ -607,6 +750,9 @@ def markdown(report):
 def main():
     parser = argparse.ArgumentParser(); parser.add_argument('--receipt-lock-sha256'); parser.add_argument('--reconciliation-sha256')
     parser.add_argument('--batch-auxiliary-sha256'); parser.add_argument('--from-json', type=Path)
+    parser.add_argument('--receipt-lock-name', choices=('receipt-lock-v1.json','receipt-lock-v2.json'), default='receipt-lock-v1.json')
+    parser.add_argument('--parent-receipt-lock-sha256')
+    parser.add_argument('--historical-source-binding-output', type=Path)
     parser.add_argument('--publication-sha256'); parser.add_argument('--output-directory', type=Path, default=Path(__file__).with_name('results'))
     args = parser.parse_args()
     if args.from_json:
@@ -614,7 +760,7 @@ def main():
         guard.require(hashlib.sha256(body).hexdigest() == args.publication_sha256, 'committed publication changed')
         report = guard.decode(body); validate_report(report)
     else:
-        report = build(args.receipt_lock_sha256, args.reconciliation_sha256, args.batch_auxiliary_sha256)
+        report = build(args.receipt_lock_sha256, args.reconciliation_sha256, args.batch_auxiliary_sha256, args.receipt_lock_name, args.parent_receipt_lock_sha256, args.historical_source_binding_output)
         validate_report(report)
     from .publish_s3_matched import schema
     args.output_directory.mkdir(parents=True, exist_ok=True)
