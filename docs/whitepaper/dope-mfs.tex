@@ -131,8 +131,9 @@ prediction~\cite{snoke2018utility,raab2018practical}. Alpha-precision,
 beta-recall, SDMetrics, and synthcity are the usual fidelity
 reports~\cite{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}.
 The fidelity results add alpha-precision, beta-recall, a
-distance-to-closest-record share, and a DOMIAS AUC. ARF is absent because shared
-validation sampling is still pending. The production privacy-attack panel
+distance-to-closest-record share, and a DOMIAS AUC. ARF is not in that
+fidelity table. The displayed-profile publication median is \ArfResult.
+The production privacy-attack panel
 remains \PrivacyAttackPanel. Nothing in those fields is a formal privacy
 guarantee or a HIPAA de-identification claim.
 
@@ -283,7 +284,8 @@ of linear and MLP regression $R^{2}$ on validation rows. Chow--Liu uses eight
 bins and Laplace smoothing $1.0$ in study code. Independent marginals are a
 study reference. The ARF watch log's last count is $\ArfWatchClosed$ closed
 and $\ArfWatchOk$ ok out of $\ArfWatchPlanned$ planned, then a sealing record.
-That log is not a retention panel, and ARF was not sampled on this schedule.
+That log is not a retention panel. The displayed-profile ARF publication
+median is \ArfResult.
 Forest-Flow on $\NForestCb$ lineages uses the
 author regression objective on its frozen grid. Native objectives are not
 ranked across methods.
@@ -444,7 +446,8 @@ block is the neural lineages only. Holm families are 12 and 8, separate
 from retention. Higher DCR share and DOMIAS AUC sit nearer the fit view
 and are not a quality win. DOMIAS stays near one half. The density DCR
 contrast against independent marginals clears Holm in that worse
-direction. ARF awaits shared validation sampling. The production
+direction. The displayed-profile ARF publication median is \ArfResult.
+The production
 privacy-attack panel remains \PrivacyAttackPanel. This is not
 differential privacy or HIPAA de-identification.
 
@@ -490,8 +493,8 @@ against a DOPE median of $\DopeForestByteMedian$ on the same lineages.
 MFS-v2 on this block is null.
 
 Table~\ref{tab:publication} is a different ledger: the published
-matched-population receipt for TabDDPM, TabSyn, and Forest-Flow. A missing
-file is not measured.
+matched-population receipt for ARF, TabDDPM, TabSyn, and Forest-Flow.
+Rows are the displayed profile at $4n$. A missing file is not measured.
 
 \begin{table*}[t]
 \caption{Forest-Flow confirmation at $4n$, CatBoost. Not pooled.}
@@ -506,6 +509,7 @@ file is not measured.
 \label{tab:publication}
 \centering
 \scriptsize
+\setlength{\tabcolsep}{3pt}
 \input{generated/publication-rows.tex}
 \end{table}
 

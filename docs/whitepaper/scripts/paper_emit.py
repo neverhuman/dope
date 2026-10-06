@@ -512,6 +512,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
         command("TabSynResult", _publication_phrase("TabSyn")),
         command("TabDDPMResult", _publication_phrase("TabDDPM")),
         command("ForestPublication", _publication_phrase("Forest-Flow")),
+        command("ArfResult", _publication_phrase("ARF")),
         command("PrivacyAttackPanel", "not measured"),
         command("FitSeedVariance", "not measured"),
         command("FullAblationGrid", "not measured"),
