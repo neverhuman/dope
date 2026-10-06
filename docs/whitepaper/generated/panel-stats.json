@@ -1816,7 +1816,8 @@
   "forest_bytes": {
     "max": 1085155062,
     "min": 115202253,
-    "n": 6
+    "n": 6,
+    "within": 0
   },
   "format": "dope-paper-panel-stats",
   "notes": {
