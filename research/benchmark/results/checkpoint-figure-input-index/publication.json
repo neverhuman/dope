@@ -1,0 +1,206 @@
+{
+  "all_requested_methods_covered": false,
+  "artifact_payload_bytes_read": 0,
+  "artifact_tables": {
+    "checkpoints.csv": {
+      "bytes": 3192355,
+      "sha256": "8f06fa4152596f181e2d9d5d1cbc75f3dc34dc0a001d6eba84dce55e7edf5297"
+    },
+    "figure-kpis.csv": {
+      "bytes": 1301194,
+      "sha256": "51dc00cf85cc5160cf4f496a2357722f5c6116297b084ad3271bdbac475982a6"
+    },
+    "forest-key-errors.csv": {
+      "bytes": 27607,
+      "sha256": "819bc6875eaeaf7bb2bbf824ca856b8c94b12bccfe0067a8fff063019c863921"
+    },
+    "tabddpm-current-operation-receipts.csv": {
+      "bytes": 27168,
+      "sha256": "228217e3f16ebba20ade9fe8d21577dd2811cee68ba6d320cab51ecbbc09e37e"
+    },
+    "tabddpm-historical-v8-checkpoints.csv": {
+      "bytes": 95463,
+      "sha256": "4c6c624033b2aea9ae558992c20a3ea3aa1f5612dddf0d1ecf5831c6690f09b9"
+    }
+  },
+  "checkpoint_aliases_are_additional_compute": false,
+  "checkpoint_coverage": {
+    "ARF": 800,
+    "Chow-Liu": 200,
+    "DOPE": 492,
+    "GaussianCopula": 200,
+    "TabSyn": 100,
+    "independent_marginals": 200
+  },
+  "checkpoint_records": 1992,
+  "complete_benchmark_matrix": false,
+  "complete_three_sample_groups": 3408,
+  "current_bulk_hashes_reverified": false,
+  "figure_groups": 3600,
+  "forest_coverage": {
+    "artifact_payloads_read": 0,
+    "coverage": {
+      "common_mse_n_seed101_locally_hash_verified": 11,
+      "common_scalar_checkpoints": 11,
+      "common_scalar_schedule_records": 62,
+      "full_cells": 25,
+      "historically_disposed_model_checkpoints": 16,
+      "lifecycle_incomplete": 12,
+      "native_error_loss_measured": 0,
+      "native_r2_full_cells": 9,
+      "native_r2_locally_hash_verified": 14,
+      "recorded_artifact_files": 99,
+      "recorded_historically_disposed_charge_bytes": 4195212494,
+      "recorded_models": 33,
+      "recorded_other_model_charge_bytes": 2695086946,
+      "unstarted": 163,
+      "whole_physical_cells": 200
+    },
+    "current_artifact_hash_remeasured": false,
+    "format": "Forest-Flow-checkpoint-key-error-coverage",
+    "inventory_ref": {
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoints.frozen-v24.v3.json",
+      "sha256": "ea5d6c70e4f560749575c5d8bb2de9eb3c879aa81e66ca7ed42aed716c523728"
+    },
+    "job36": "raw fit worker0/watchdog1 remains permanently incomplete; no later phase and no quality upgrade",
+    "key_error_csv": {
+      "bytes": 27645,
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoint-key-errors.frozen-v24.v1.csv",
+      "sha256": "a8304a407337594bbdcc0c1ec3d089b99f4238705aaa00932fce0c8035e39e4b"
+    },
+    "metric_equation_source": {
+      "local_path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3/source/pilot_metrics.py",
+      "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+      "source_inspected_without_import": true
+    },
+    "native_and_common_are_distinct": true,
+    "new_evaluations": 0,
+    "remote_operations": 0,
+    "scientific_imports": 0,
+    "unavailable_scalar_reason": "Old0\u201315 native and common bodies not retained locally;16\u201317 common bodies and21 native/common bodies also not retained in this readset. Their immutable digest and closure metadata remain referenced. Missing quantities stay null.",
+    "units": "native author mean R\u00b2 is a maximize score, not an error loss; common TSTR/TRTR losses are frozen regression MSE by predictor and sample schedule"
+  },
+  "forest_error_scope": "Separate n/seed101 descriptive fragment; not the 4n/three-sample-seed schedule.",
+  "format": "checkpoint-and-figure-input-publication-v1",
+  "full_five_fit_seed_coverage": false,
+  "inputs_lock_sha256": "813ffe564d44995566c055f3dc3d2505d25ebf0f6178d0dfe2454414aa6999b2",
+  "key_error_measured_records": 1273,
+  "loss_units": "TSTR/TRTR mean squared error in each frozen numeric target representation; no cross-dataset raw-MSE ranking.",
+  "mfs_v2": null,
+  "native_objective_units": "Method-specific objectives; never ranked across methods.",
+  "native_selection_changed": false,
+  "native_values_ranked_across_methods": false,
+  "official_tests_opened": false,
+  "panel_pooling_authorized": false,
+  "physical_checkpoint_identities": 1894,
+  "private_inputs": {
+    "checkpoint_actual_receipt": {
+      "bytes": 1479,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/actual.receipt.json",
+      "sha256": "3f6620dbf6d48b4b3a3d5ca28505da5f5a7227a60aebf4da2b320dfd96e41946"
+    },
+    "checkpoint_index": {
+      "bytes": 15137552,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/checkpoints.json",
+      "sha256": "a9dccced93d2be2bc44be76c8f99b14ce3435d823c333969b5f28b9577b4c67b"
+    },
+    "forest_coverage": {
+      "bytes": 2123,
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/checkpoint-key-errors.coverage.receipt.v1.json",
+      "sha256": "708990f2a615520078300825fcdc8f42ddd051654d116716dc8924457a7edcfd"
+    },
+    "forest_key_errors": {
+      "bytes": 27645,
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoint-key-errors.frozen-v24.v1.csv",
+      "sha256": "a8304a407337594bbdcc0c1ec3d089b99f4238705aaa00932fce0c8035e39e4b"
+    },
+    "metadata_readset": {
+      "bytes": 887520,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/metadata-readset.json",
+      "sha256": "4df012a79e2edcc07f803e3d5e7ffc71b66322d08e0cb02ebe63fd14875f07ce"
+    },
+    "tabddpm_actual_validation": {
+      "bytes": 9716,
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-index.actual-validation.receipt.v1.json",
+      "sha256": "7121cfc48209981b8252cd598d1d662df6b09d5c2c475366da3b719864fe5c2a"
+    },
+    "tabddpm_current_operations": {
+      "bytes": 27189,
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.current-operation-receipts.v1.csv",
+      "sha256": "d3a30086cc37783055c21188ddafeb00d710c376e8df7fc2c88c3e6fe7e07a92"
+    },
+    "tabddpm_historical_checkpoints": {
+      "bytes": 95507,
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.historical-v8-recorded-provider-checkpoints.v1.csv",
+      "sha256": "98d414d4262d431e0a1f8cafad7f45d12939fdfdcc8e95ae0f96f38ec1ae64eb"
+    },
+    "tabddpm_partial_index": {
+      "bytes": 151314,
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-metadata.partial.v1.json",
+      "sha256": "066b62908eb05d16381e88bd0ab58166c8a363e968df24721c4a13c92c43996f"
+    }
+  },
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sha256": "ddf57425a3af63990f542de1d07c51046b41cbfdd904a3afca96b030f5bd5d86",
+  "release_safe": null,
+  "remaining_methods": [
+    "TabDDPM inventory pending; full comparison incomplete",
+    "TabSyn shared metrics incomplete",
+    "Forest-Flow full panel incomplete"
+  ],
+  "scientific_execution": false,
+  "scope": "Recorded checkpoints and previously measured official-training-derived validation utility only.",
+  "source_publications": {
+    "arf-matched-population-validation.json": {
+      "path": "research/benchmark/results/arf-matched-population-validation.json",
+      "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
+    },
+    "arf-s3-population-native.json": {
+      "path": "research/benchmark/results/arf-s3-population-native.json",
+      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+    },
+    "density-matched-population-validation.json": {
+      "path": "research/benchmark/results/density-matched-population-validation.json",
+      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+    },
+    "dope-s3-population-validation.json": {
+      "path": "research/benchmark/results/dope-s3-population-validation.json",
+      "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
+    },
+    "dope-target-refinement-population-fits.json": {
+      "path": "research/benchmark/results/dope-target-refinement-population-fits.json",
+      "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
+    },
+    "dope-target-refinement-population-validation.json": {
+      "path": "research/benchmark/results/dope-target-refinement-population-validation.json",
+      "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+    },
+    "tabsyn-default100-native-audit.json": {
+      "path": "research/benchmark/results/tabsyn-default100-native-audit.json",
+      "sha256": "be455dfc3b9caf15db72646e8c07aa3c5c17cf49df46c8906ddff25d2c3dcac9"
+    },
+    "tabsyn-default100-scaled-cuda-fits.json": {
+      "path": "research/benchmark/results/tabsyn-default100-scaled-cuda-fits.json",
+      "sha256": "cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272"
+    }
+  },
+  "superiority": null,
+  "tabddpm_coverage": {
+    "aggregate_units": {
+      "fit_providers": 63,
+      "full_campaign_complete": false,
+      "matched_complete_batches": 21,
+      "native_complete": 49,
+      "units_are_distinct": true
+    },
+    "current_model_hash_remeasured": false,
+    "current_operation_records": 20,
+    "current_provider_inventory_complete": false,
+    "historical_checkpoint_records": 43,
+    "native_scores_are_error_losses": false,
+    "no_new_scientific_work": true,
+    "precise_gap": "Current TD14 custody binds63/49/21 counts and20 operation bodies. Its exact current plan2bb62890 and roundcfa86976 are referenced, but their full bodies are not in the inspected TD14 custody directory. The available locally hash-bound artifact inventory is historical v8 (43 providers), so this index does not individually inventory/reconcile all63 current providers. No absence elsewhere is claimed."
+  },
+  "version": 1
+}

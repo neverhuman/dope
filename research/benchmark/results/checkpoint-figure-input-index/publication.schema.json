@@ -1,0 +1,874 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_requested_methods_covered": {
+      "const": false
+    },
+    "artifact_payload_bytes_read": {
+      "type": "integer"
+    },
+    "artifact_tables": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoints.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "figure-kpis.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "forest-key-errors.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm-current-operation-receipts.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm-historical-v8-checkpoints.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "checkpoints.csv",
+        "figure-kpis.csv",
+        "forest-key-errors.csv",
+        "tabddpm-current-operation-receipts.csv",
+        "tabddpm-historical-v8-checkpoints.csv"
+      ],
+      "type": "object"
+    },
+    "checkpoint_aliases_are_additional_compute": {
+      "const": false
+    },
+    "checkpoint_coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "ARF": {
+          "type": "integer"
+        },
+        "Chow-Liu": {
+          "type": "integer"
+        },
+        "DOPE": {
+          "type": "integer"
+        },
+        "GaussianCopula": {
+          "type": "integer"
+        },
+        "TabSyn": {
+          "type": "integer"
+        },
+        "independent_marginals": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ARF",
+        "Chow-Liu",
+        "DOPE",
+        "GaussianCopula",
+        "TabSyn",
+        "independent_marginals"
+      ],
+      "type": "object"
+    },
+    "checkpoint_records": {
+      "type": "integer"
+    },
+    "complete_benchmark_matrix": {
+      "const": false
+    },
+    "complete_three_sample_groups": {
+      "type": "integer"
+    },
+    "current_bulk_hashes_reverified": {
+      "const": false
+    },
+    "figure_groups": {
+      "type": "integer"
+    },
+    "forest_coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_payloads_read": {
+          "type": "integer"
+        },
+        "coverage": {
+          "additionalProperties": false,
+          "properties": {
+            "common_mse_n_seed101_locally_hash_verified": {
+              "type": "integer"
+            },
+            "common_scalar_checkpoints": {
+              "type": "integer"
+            },
+            "common_scalar_schedule_records": {
+              "type": "integer"
+            },
+            "full_cells": {
+              "type": "integer"
+            },
+            "historically_disposed_model_checkpoints": {
+              "type": "integer"
+            },
+            "lifecycle_incomplete": {
+              "type": "integer"
+            },
+            "native_error_loss_measured": {
+              "type": "integer"
+            },
+            "native_r2_full_cells": {
+              "type": "integer"
+            },
+            "native_r2_locally_hash_verified": {
+              "type": "integer"
+            },
+            "recorded_artifact_files": {
+              "type": "integer"
+            },
+            "recorded_historically_disposed_charge_bytes": {
+              "type": "integer"
+            },
+            "recorded_models": {
+              "type": "integer"
+            },
+            "recorded_other_model_charge_bytes": {
+              "type": "integer"
+            },
+            "unstarted": {
+              "type": "integer"
+            },
+            "whole_physical_cells": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "common_mse_n_seed101_locally_hash_verified",
+            "common_scalar_checkpoints",
+            "common_scalar_schedule_records",
+            "full_cells",
+            "historically_disposed_model_checkpoints",
+            "lifecycle_incomplete",
+            "native_error_loss_measured",
+            "native_r2_full_cells",
+            "native_r2_locally_hash_verified",
+            "recorded_artifact_files",
+            "recorded_historically_disposed_charge_bytes",
+            "recorded_models",
+            "recorded_other_model_charge_bytes",
+            "unstarted",
+            "whole_physical_cells"
+          ],
+          "type": "object"
+        },
+        "current_artifact_hash_remeasured": {
+          "const": false
+        },
+        "format": {
+          "const": "Forest-Flow-checkpoint-key-error-coverage"
+        },
+        "inventory_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "job36": {
+          "type": "string"
+        },
+        "key_error_csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "metric_equation_source": {
+          "additionalProperties": false,
+          "properties": {
+            "local_path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "source_inspected_without_import": {
+              "const": true
+            }
+          },
+          "required": [
+            "local_path",
+            "sha256",
+            "source_inspected_without_import"
+          ],
+          "type": "object"
+        },
+        "native_and_common_are_distinct": {
+          "const": true
+        },
+        "new_evaluations": {
+          "type": "integer"
+        },
+        "remote_operations": {
+          "type": "integer"
+        },
+        "scientific_imports": {
+          "type": "integer"
+        },
+        "unavailable_scalar_reason": {
+          "type": "string"
+        },
+        "units": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_payloads_read",
+        "coverage",
+        "current_artifact_hash_remeasured",
+        "format",
+        "inventory_ref",
+        "job36",
+        "key_error_csv",
+        "metric_equation_source",
+        "native_and_common_are_distinct",
+        "new_evaluations",
+        "remote_operations",
+        "scientific_imports",
+        "unavailable_scalar_reason",
+        "units"
+      ],
+      "type": "object"
+    },
+    "forest_error_scope": {
+      "type": "string"
+    },
+    "format": {
+      "const": "checkpoint-and-figure-input-publication-v1"
+    },
+    "full_five_fit_seed_coverage": {
+      "const": false
+    },
+    "inputs_lock_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "key_error_measured_records": {
+      "type": "integer"
+    },
+    "loss_units": {
+      "type": "string"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_objective_units": {
+      "type": "string"
+    },
+    "native_selection_changed": {
+      "const": false
+    },
+    "native_values_ranked_across_methods": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "panel_pooling_authorized": {
+      "const": false
+    },
+    "physical_checkpoint_identities": {
+      "type": "integer"
+    },
+    "private_inputs": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_actual_receipt": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "checkpoint_index": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "forest_coverage": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "forest_key_errors": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "metadata_readset": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_actual_validation": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_operations": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_historical_checkpoints": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_partial_index": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "checkpoint_actual_receipt",
+        "checkpoint_index",
+        "forest_coverage",
+        "forest_key_errors",
+        "metadata_readset",
+        "tabddpm_actual_validation",
+        "tabddpm_current_operations",
+        "tabddpm_historical_checkpoints",
+        "tabddpm_partial_index"
+      ],
+      "type": "object"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "remaining_methods": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "scientific_execution": {
+      "const": false
+    },
+    "scope": {
+      "const": "Recorded checkpoints and previously measured official-training-derived validation utility only."
+    },
+    "source_publications": {
+      "additionalProperties": false,
+      "properties": {
+        "arf-matched-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "arf-s3-population-native.json": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "density-matched-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-s3-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-fits.json": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "dope-target-refinement-population-validation.json": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabsyn-default100-native-audit.json": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabsyn-default100-scaled-cuda-fits.json": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "arf-matched-population-validation.json",
+        "arf-s3-population-native.json",
+        "density-matched-population-validation.json",
+        "dope-s3-population-validation.json",
+        "dope-target-refinement-population-fits.json",
+        "dope-target-refinement-population-validation.json",
+        "tabsyn-default100-native-audit.json",
+        "tabsyn-default100-scaled-cuda-fits.json"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "tabddpm_coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregate_units": {
+          "additionalProperties": false,
+          "properties": {
+            "fit_providers": {
+              "type": "integer"
+            },
+            "full_campaign_complete": {
+              "const": false
+            },
+            "matched_complete_batches": {
+              "type": "integer"
+            },
+            "native_complete": {
+              "type": "integer"
+            },
+            "units_are_distinct": {
+              "const": true
+            }
+          },
+          "required": [
+            "fit_providers",
+            "full_campaign_complete",
+            "matched_complete_batches",
+            "native_complete",
+            "units_are_distinct"
+          ],
+          "type": "object"
+        },
+        "current_model_hash_remeasured": {
+          "const": false
+        },
+        "current_operation_records": {
+          "type": "integer"
+        },
+        "current_provider_inventory_complete": {
+          "const": false
+        },
+        "historical_checkpoint_records": {
+          "type": "integer"
+        },
+        "native_scores_are_error_losses": {
+          "const": false
+        },
+        "no_new_scientific_work": {
+          "const": true
+        },
+        "precise_gap": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "aggregate_units",
+        "current_model_hash_remeasured",
+        "current_operation_records",
+        "current_provider_inventory_complete",
+        "historical_checkpoint_records",
+        "native_scores_are_error_losses",
+        "no_new_scientific_work",
+        "precise_gap"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "all_requested_methods_covered",
+    "artifact_payload_bytes_read",
+    "artifact_tables",
+    "checkpoint_aliases_are_additional_compute",
+    "checkpoint_coverage",
+    "checkpoint_records",
+    "complete_benchmark_matrix",
+    "complete_three_sample_groups",
+    "current_bulk_hashes_reverified",
+    "figure_groups",
+    "forest_coverage",
+    "forest_error_scope",
+    "format",
+    "full_five_fit_seed_coverage",
+    "inputs_lock_sha256",
+    "key_error_measured_records",
+    "loss_units",
+    "mfs_v2",
+    "native_objective_units",
+    "native_selection_changed",
+    "native_values_ranked_across_methods",
+    "official_tests_opened",
+    "panel_pooling_authorized",
+    "physical_checkpoint_identities",
+    "private_inputs",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sha256",
+    "release_safe",
+    "remaining_methods",
+    "scientific_execution",
+    "scope",
+    "source_publications",
+    "superiority",
+    "tabddpm_coverage",
+    "version"
+  ],
+  "type": "object"
+}
