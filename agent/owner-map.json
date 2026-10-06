@@ -198,6 +198,9 @@
     "research/benchmark/expanded-validation-metrics.schema.json": "external-evidence",
     "research/benchmark/tests/test_expanded_validation_metrics.py": "external-evidence",
     "research/benchmark/fixtures/expanded-validation-metrics": "external-evidence",
-    "research/benchmark/expanded-validation-metrics.NOTICE": "external-evidence"
+    "research/benchmark/expanded-validation-metrics.NOTICE": "external-evidence",
+    "research/benchmark/tabsyn_owned_lifecycle.py": "external-evidence",
+    "research/benchmark/tests/test_tabsyn_owned_lifecycle.py": "external-evidence",
+    "research/benchmark/tabsyn-one-qualification.owner-addendum.json": "external-evidence"
   }
 }

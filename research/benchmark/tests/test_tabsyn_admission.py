@@ -99,6 +99,47 @@ class Admission(unittest.TestCase):
         self.freeze();result=self.verify();self.assertEqual(result['epoch_budget'],self.scope['epoch_budget'])
         self.assertEqual(self.leases,[33])
 
+    def owner_one(self):
+        policy=ROOT/'research/benchmark/tabsyn-one-qualification.owner-addendum.json'
+        self.scope['operational_qualification_policy']=dict(path=str(policy),sha256=sha(policy))
+        self.qual.update(format='dope-tabsyn-owner-one-generated-CUDA-closure-v1',
+            input_receipt_refs=[{}],root_actual_exit_refs=[{}],
+            operational_qualification_policy_sha256=admission.OWNER_ONE_POLICY_SHA256)
+
+    def test_one_cuda_closure_requires_exact_owner_policy_and_source_binding(self):
+        self.owner_one();self.freeze();self.assertEqual(self.verify()['mode'],'fit')
+        self.assertEqual(self.leases,[33])
+
+    def test_one_closure_without_owner_policy_rejected_before_guard_initializer(self):
+        self.qual.update(input_receipt_refs=[{}],root_actual_exit_refs=[{}]);self.freeze()
+        self.guard.write_text('raise AssertionError("initializer executed")\n')
+        with self.assertRaises(ValueError):self.verify()
+        self.assertEqual(self.leases,[])
+
+    def test_changed_owner_policy_or_receipt_binding_rejected(self):
+        for kind in ('policy_digest','policy_bytes','receipt_policy','receipt_source'):
+            with self.subTest(kind=kind):
+                self.owner_one();self.freeze()
+                if kind=='policy_digest':
+                    self.scope['operational_qualification_policy']['sha256']='0'*64
+                elif kind=='policy_bytes':
+                    policy=self.directory/'changed-policy.json'
+                    policy.write_bytes(b'{}\n')
+                    self.scope['operational_qualification_policy']['path']=str(policy)
+                elif kind=='receipt_policy':
+                    self.qual['operational_qualification_policy_sha256']='0'*64
+                else:
+                    self.qual['source_binding_sha256']='0'*64
+                self.scope['generated_cuda_qualification']['sha256']=write(self.q,self.qual)
+                self.code_pin=write(self.code,self.manifest)
+                with self.assertRaises(ValueError):self.verify()
+        self.assertEqual(self.leases,[])
+
+    def test_owner_one_keeps_native_36_plus_4_and_actual_exit_gates(self):
+        self.owner_one();self.native['auditor_configurations']=35;self.freeze()
+        with self.assertRaises(ValueError):self.verify('native')
+        self.assertEqual(self.leases,[])
+
     def test_mock_cuda_receipt_cannot_admit_real_operation(self):
         self.qual['format']='dope-tabsyn-generated-mock-controls';self.freeze()
         self.guard.write_text('raise AssertionError("initializer executed")\n')

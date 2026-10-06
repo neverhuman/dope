@@ -19,6 +19,7 @@ UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --locked --extra xgboo
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --offline --locked --extra xgboost --extra lightgbm
 PYTHONPATH=. ../../target/external-venv/bin/python -m unittest discover -s tests -v
 cd "$root"
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -q
 # A publisher edit that leaves the committed fit ledger stale fails before campaign publication.
 PYTHONPATH=. python3 -m unittest research.benchmark.tests.test_dope_refinement_fits.RefinementFits.test_committed_fit_ledger_tracks_publisher -v
 python3 research/benchmark/verify_paper_numbers.py
