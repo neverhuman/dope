@@ -47,7 +47,8 @@ def closed_fixture(base, input_rows, reference_rows, sampling_fit_seed=11, sampl
         native_cells.append(dict(dataset=dataset, author_default_job_sha256=keys[0], selected_job_sha256=keys[-1],
             default_native_kpi={'fixture': True}, selected_native_kpi={'fixture': True}))
     assert len(sample_jobs) == 199
-    native_report = dict(cells=native_cells, native_objective={'fixture': True}, cost={'operation_seconds': 0})
+    native_report = dict(cells=native_cells, native_objective={'fixture': True},
+                         cost={'operation_seconds': 0, 'scheduler_wall_seconds': 0})
     fit_root = base / 'dope-fit'
     fit_pin = record(fit_root / 'reconciliation-v1.json', dict(fit_cells=[
         dict(dataset=d, original_fit_job={'worker': w}) for d, w in workers.items() for _ in pub.dope.fits.PROFILES]))
