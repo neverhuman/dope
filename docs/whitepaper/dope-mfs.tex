@@ -2,6 +2,7 @@
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{booktabs}
+\usepackage{array}
 \usepackage{graphicx}
 \usepackage{url}
 \makeatletter
@@ -304,39 +305,23 @@ paired-superiority rule, which also requires a frozen evaluator and a
 gate-pass analysis. PTF-v1, MFS-v2, and release-safe L3 stay null.
 
 \subsection{Compute}
-Table~\ref{tab:cost} is wall time taken from receipts, plus the Forest-Flow
-artifact byte span. The logged replay is
-a fresh hidden-basis run of both step budgets. It is not the elapsed time of
-the original scored campaign, which is \CampaignElapsed\ on the displayed
-cells. Forest-Flow fit time is the sum of \texttt{fit\_seconds} over the
-$\ForestGpuFits$ hash-checked \texttt{fit.json} files. The sample row is the
-sum of elapsed times in the receipt stored beside each of those files. A
-shared-evaluator total in the confirmation JSON is not that sum, so it is
-not reported. The confirmation's whole-device energy estimate includes idle
-draw and is not reported as job energy. BeyondArena times are the median
-\texttt{elapsed\_seconds} of the $\BeyondPrepared$ prepared receipts.
+Table~\ref{tab:cost} is receipt wall-clock and charged bytes.
+Fit and sample columns are \texttt{elapsed\_seconds} when the receipt
+stores that timer. A timer, host, device, or byte field the receipt
+does not store is \NotRecorded. CPU model is \NotRecorded\ on every
+row. TabSyn is \TabSynPanel. A full TabDDPM panel is \TabDDPMPanel.
+The supplement
+states the replay walls, the Forest-Flow sums, and the unsplit density
+attempt timers.
 
-\begin{table}[t]
-\caption{Seconds, except the artifact rows.}
+\begin{table*}[t]
+\caption{Compute and artifact cost. Missing receipt fields are not recorded.}
 \label{tab:cost}
 \centering
 \scriptsize
-\begin{tabular}{@{}lr@{}}
-\toprule
-Item & Amount \\
-\midrule
-Replay, 2{,}048 steps, median & \ReplayMedA \\
-Replay, 8{,}192 steps, median & \ReplayMedB \\
-Forest-Flow fit core & \ForestFitCore \\
-Forest-Flow sample and auditors & \ForestSampleOp \\
-Forest-Flow artifact low & \ForestByteLo \\
-Forest-Flow artifact high & \ForestByteHi \\
-BeyondArena fits, 2{,}048, median & \BeyondElapseA \\
-BeyondArena fits, 8{,}192, median & \BeyondElapseB \\
-Original displayed campaign & \CampaignElapsed \\
-\bottomrule
-\end{tabular}
-\end{table}
+\setlength{\tabcolsep}{1.5pt}
+\input{generated/compute-cost-table.tex}
+\end{table*}
 
 \section{Results}
 \label{sec:results}
@@ -558,32 +543,20 @@ $\BeyondInventory$ families.
 \section{Ablations}
 \label{sec:ablation}
 \texttt{features12\_\allowbreak{}steps8192} is the same residual with four times as many
-AdamW steps. It is a budget check, not the displayed model. On the lineages
-where both budgets have a complete three-seed group, the CatBoost medians
-are $\MedSufACb$ at 2{,}048 steps and $\MedSufBCb$ at 8{,}192 steps
-($\NSufCb$ lineages; median paired difference $\DiffSufCb$). The linear
-medians are $\MedSufALin$ and $\MedSufBLin$ ($\NSufLin$ lineages;
-difference $\DiffSufLin$). The MLP medians are $\MedSufAMlp$ and
-$\MedSufBMlp$ ($\NSufMlp$ lineages; difference $\DiffSufMlp$). The supplement
-lists all $\PreparedN$ lineages at both budgets. A blank cell is an
-unavailable fit or an auditor that is not informative. It is not a zero.
-
-The scored fits did not keep a per-step series. The supplement plots the
-logged replay. It is not a substitute for the scored artifacts. All
-$\ReplayN$ lineages finished. Median training loss starts at
-$\LossTrainStart$ and ends at $\LossTrainEndA$ and $\LossTrainEndB$.
-Median validation loss starts at $\LossValStart$ and ends at
-$\LossValEndA$ and $\LossValEndB$. The lower loss at 8{,}192 steps does
-not replace the displayed profile.
+AdamW steps. It is a budget check, not the displayed model. Where both
+budgets have a complete three-seed group, the CatBoost median paired
+difference is $\DiffSufCb$ ($\NSufCb$ lineages). The supplement gives the
+linear and MLP differences and lists all $\PreparedN$ lineages. A blank
+cell is an unavailable fit or an auditor that is not informative. It is
+not a zero. The scored fits did not keep a per-step series. The supplement
+plots the logged replay. It is not a substitute for the scored artifacts.
+The lower loss at 8{,}192 steps does not replace the displayed profile.
 
 The primary informativeness threshold is $0.01$ times the absolute null
-loss. Table~\ref{tab:threshold} lists the CatBoost median by threshold and,
-under it, the informative counts for all three auditors. Reading that
-lower tabular from top to bottom, CatBoost is \NThrLowCb, \NThrMidCb,
-\NThrHighCb; linear is \NThrLowLin, \NThrMidLin, \NThrHighLin; and the
-MLP is \NThrLowMlp, \NThrMidMlp, \NThrHighMlp. The middle row is the
-$0.01$ rule behind the retention tables. \ThrSentence\ Fit-seed variance
-across seeds other than $11$ is \FitSeedVariance.
+loss. Table~\ref{tab:threshold} lists the CatBoost median by threshold and
+the informative counts. The middle row is the $0.01$ rule behind the
+retention tables. \ThrSentence\ Fit-seed variance across seeds other than
+$11$ is \FitSeedVariance.
 
 \begin{table}[t]
 \caption{Informativeness threshold and auditor counts.}
@@ -596,20 +569,14 @@ across seeds other than $11$ is \FitSeedVariance.
 \end{table}
 
 \section{Discussion}
-The measurements support a limited statement. The displayed residual,
-median $\DopeByteMedian$ bytes, has CatBoost retention $\MedDopeCb$.
-CatBoost and the MLP separate it from the three density comparators. The
-linear auditor does not. Forest-Flow, on $\NForestCb$ lineages, is ahead
-on CatBoost (\WtlForestCb) and the MLP (\WtlForestMlp). CTGAN and TVAE do
-not match that retention, and their successful size-$4$ artifacts miss the
-cap. None of this is an MFS-v2 score, a PTF-v1 result, or a release-safe
-certification. A small Wilcoxon $p$-value does not flip that null. The
-8{,}192-step budget moves the CatBoost median by $\DiffSufCb$ and is not
-the displayed model. BeyondArena fits $\BeyondPrepared$ further families
-inside the cap and does not show retention. TabSyn, a $\PreparedN$-lineage
-TabDDPM panel, and an equal tuning budget are not measured. Fit-seed
-variance is \FitSeedVariance. Table~\ref{tab:fidelity} is an empirical
-ledger, not that production privacy-attack panel.
+CTGAN and TVAE do not match the CatBoost retention, and their successful
+size-$4$ artifacts miss the cap. None of these comparisons is an MFS-v2
+score, a PTF-v1 result, or a release-safe certification. A small Wilcoxon
+$p$-value does not flip that null. The 8{,}192-step budget moves the
+CatBoost median by $\DiffSufCb$ and is not the displayed model. BeyondArena
+fits $\BeyondPrepared$ further families inside the cap and does not show
+retention. TabSyn, a $\PreparedN$-lineage TabDDPM panel, and an equal tuning
+budget are not measured. Fit-seed variance is \FitSeedVariance.
 
 \section{Threats to Validity}
 \label{sec:threats}

@@ -61,6 +61,276 @@ def _elapsed(value, tex_bytes):
     return f"{number:.3g}"
 
 
+def _recorded_seconds(value):
+    if value is None:
+        return "not recorded"
+    return _elapsed(value, lambda number: f"{number:,.1f}".replace(",", "{,}"))
+
+
+def _recorded_hours(value):
+    if value is None:
+        return "not recorded"
+    number = float(value)
+    if number >= 1:
+        return f"{number:.2f}"
+    return f"{number:.3f}"
+
+
+def _recorded_mib(value):
+    """Resident bytes shown in MiB to one decimal. The JSON keeps the raw bytes."""
+    if value is None:
+        return "not recorded"
+    return f"{float(value) / (1024 * 1024):.1f}"
+
+
+def _tex_text(value):
+    replacements = {
+        "\\": r"\textbackslash{}",
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+    }
+    return "".join(replacements.get(char, char) for char in str(value))
+
+
+def _gpu_label(name):
+    if not isinstance(name, str) or not name:
+        return None
+    prefix = "NVIDIA GeForce "
+    if name.startswith(prefix):
+        return name[len(prefix):]
+    return name
+
+
+def _hardware(row):
+    hosts = list(row.get("hosts") or [])
+    by_host = row.get("gpu_by_host") or {}
+    if not hosts:
+        return "host not recorded"
+    members = {}
+    order = []
+    for host in hosts:
+        label = _gpu_label(by_host.get(host))
+        if label not in members:
+            members[label] = []
+            order.append(label)
+        members[label].append(host)
+    parts = []
+    for label in order:
+        joined = ", ".join(members[label])
+        if label:
+            parts.append(f"{joined} {_tex_text(label)}")
+        else:
+            parts.append(f"{joined}, GPU not recorded")
+    return "; ".join(parts)
+
+
+def _load_generated(out, name):
+    path = out / name
+    if not path.is_file():
+        raise FileNotFoundError(f"{name} is missing; run the paper extract before emit")
+    document = json.loads(path.read_text())
+    if document.get("official_tests_opened"):
+        raise ValueError(f"{name} opened an official test")
+    return document
+
+
+def _time_cell(lines, command, prefix, stem, median, maximum):
+    if median is None:
+        return r"\NotRecorded"
+    med_name = f"{prefix}{stem}Med"
+    max_name = f"{prefix}{stem}Max"
+    lines.append(command(med_name, _recorded_seconds(median)))
+    lines.append(command(max_name, _recorded_seconds(maximum)))
+    return f"\\{med_name} (\\{max_name})"
+
+
+def _memory_cell(lines, command, prefix, ram_bytes, vram_mib):
+    if ram_bytes is None and vram_mib is None:
+        return r"\NotRecorded"
+    ram_name = f"{prefix}PeakRam"
+    vram_name = f"{prefix}PeakVram"
+    lines.append(command(ram_name, _recorded_mib(ram_bytes)))
+    lines.append(command(vram_name, "not recorded" if vram_mib is None else str(int(vram_mib))))
+    left = r"\NotRecorded" if ram_bytes is None else f"\\{ram_name}"
+    right = r"\NotRecorded" if vram_mib is None else f"\\{vram_name}"
+    return f"{left} / {right}"
+
+
+def _hour_cell(lines, command, prefix, cpu_hours, gpu_hours):
+    if cpu_hours is None and gpu_hours is None:
+        return r"\NotRecorded"
+    cpu_name = f"{prefix}CpuHours"
+    gpu_name = f"{prefix}GpuHours"
+    lines.append(command(cpu_name, _recorded_hours(cpu_hours)))
+    lines.append(command(gpu_name, _recorded_hours(gpu_hours)))
+    left = r"\NotRecorded" if cpu_hours is None else f"\\{cpu_name}"
+    right = r"\NotRecorded" if gpu_hours is None else f"\\{gpu_name}"
+    return f"{left}, {right}"
+
+
+def _span_cell(median_name, lo_name, hi_name):
+    return f"\\{median_name} (\\{lo_name}--\\{hi_name})"
+
+
+def _write_compute_cost(out, lines, command):
+    document = _load_generated(out, "compute-cost.json")
+    if document.get("missing_field") != "not recorded":
+        raise ValueError("compute-cost missing_field is not the required phrase")
+    methods = document["methods"]
+    lines.append(command("NotRecorded", "not recorded"))
+    lines.append(command("FigWidth", "7.16in"))
+    lines.append(command("ForestTimeN", str(int(methods["Forest-Flow"]["fit_n"]))))
+    for key, prefix in (
+        ("GaussianCopula", "Gauss"),
+        ("Chow-Liu", "Chow"),
+        ("independent_marginals", "Ind"),
+    ):
+        row = methods[key]
+        if row.get("attempt_median_seconds") is None:
+            raise ValueError(f"{key} attempt wall_seconds was not recorded")
+        lines.append(command(f"{prefix}AttemptMed", _recorded_seconds(row["attempt_median_seconds"])))
+        lines.append(command(f"{prefix}AttemptMax", _recorded_seconds(row["attempt_max_seconds"])))
+    rows = []
+    measured = (
+        ("DOPE", "DOPE", "Dope", _span_cell("DopeByteMedian", "DopeByteLo", "DopeByteHi")),
+        ("Gaussian copula", "GaussianCopula", "Gauss", _span_cell("GaussByteMedian", "GaussByteLo", "GaussByteHi")),
+        ("Chow--Liu, study", "Chow-Liu", "Chow", _span_cell("ChowByteMedian", "ChowByteLo", "ChowByteHi")),
+        ("Indep.\\ marginals", "independent_marginals", "Ind", _span_cell("IndByteMedian", "IndByteLo", "IndByteHi")),
+        ("CTGAN", "CTGAN", "Ctgan", _span_cell("CtganByteMedian", "CtganByteLo", "CtganByteHi")),
+        ("TVAE", "TVAE", "Tvae", _span_cell("TvaeByteMedian", "TvaeByteLo", "TvaeByteHi")),
+        ("Forest-Flow", "Forest-Flow", "Forest", _span_cell("ForestByteMedian", "ForestByteLo", "ForestByteHi")),
+    )
+    for label, key, prefix, byte_cell in measured:
+        row = methods[key]
+        lines.append(command(f"{prefix}Hardware", _hardware(row)))
+        fit = _time_cell(lines, command, prefix, "Fit", row["fit_median_seconds"], row["fit_max_seconds"])
+        sample = _time_cell(lines, command, prefix, "Samp", row["sample_median_seconds"], row["sample_max_seconds"])
+        memory = _memory_cell(lines, command, prefix, row["peak_ram_bytes"], row["peak_vram_mib"])
+        hours = _hour_cell(lines, command, prefix, row["cpu_hours"], row["gpu_hours"])
+        rows.append(
+            f"{label} & {fit} & {sample} & {memory} & \\{prefix}Hardware & {hours} & {byte_cell} \\\\"
+        )
+    arf = methods["ARF"]
+    artifact = arf.get("artifact_bytes") or {}
+    if artifact.get("min") is None or artifact.get("field") != "selected_charged_bytes":
+        arf_bytes = r"\NotRecorded"
+    else:
+        lines.append(command("ArfByteLo", f"{int(artifact['min']):,}".replace(",", "{,}")))
+        lines.append(command("ArfByteHi", f"{int(artifact['max']):,}".replace(",", "{,}")))
+        lines.append(command(
+            "ArfByteMedian",
+            _byte_median(artifact["median"], lambda number: f"{int(round(number)):,}".replace(",", "{,}")),
+        ))
+        arf_bytes = _span_cell("ArfByteMedian", "ArfByteLo", "ArfByteHi")
+    lines.append(command("ArfHardware", _hardware(arf)))
+    rows.append(
+        "ARF & \\NotRecorded & \\NotRecorded & \\NotRecorded & \\ArfHardware & \\NotRecorded & "
+        f"{arf_bytes} \\\\"
+    )
+    for label, macro in (("TabSyn", "TabSynPanel"), ("TabDDPM", "TabDDPMPanel")):
+        cell = f"\\{macro}"
+        rows.append(f"{label} & {cell} & {cell} & {cell} & {cell} & {cell} & {cell} \\\\")
+    columns = (
+        "@{}"
+        ">{\\raggedright\\arraybackslash}p{1.05in}"
+        ">{\\raggedright\\arraybackslash}p{0.82in}"
+        ">{\\raggedright\\arraybackslash}p{0.82in}"
+        ">{\\raggedright\\arraybackslash}p{0.78in}"
+        ">{\\raggedright\\arraybackslash}p{1.55in}"
+        ">{\\raggedright\\arraybackslash}p{0.72in}"
+        ">{\\raggedright\\arraybackslash}p{1.15in}@{}"
+    )
+    table = (
+        "\\begin{tabular}{" + columns + "}\n"
+        "\\toprule\n"
+        "Method & Fit s & Sample s & RAM / VRAM & Hardware & CPU h, GPU h & Bytes \\\\\n"
+        "\\midrule\n"
+        + "\n".join(rows)
+        + "\n\\bottomrule\n\\end{tabular}\n"
+    )
+    (out / "compute-cost-table.tex").write_text(table)
+
+
+def _license_bits(entry):
+    if not entry or not entry.get("name"):
+        return None
+    bits = [_tex_text(entry["name"])]
+    if entry.get("licensor"):
+        bits.append("licensor " + _tex_text(entry["licensor"]))
+    if entry.get("licensed_work"):
+        bits.append("licensed work " + _tex_text(entry["licensed_work"]))
+    if entry.get("copyright"):
+        bits.append(_tex_text(entry["copyright"]).rstrip("."))
+    return ", ".join(bits)
+
+
+def _write_availability(out):
+    licenses = _load_generated(out, "licenses.json")
+    methods = licenses["methods"]
+    pmlb = licenses["pmlb"]
+    if pmlb.get("spdx") != "MIT" or pmlb.get("note") != "source_license: MIT (PMLB)":
+        raise ValueError("PMLB lock record is not MIT")
+    repository = licenses["repository"]
+    if repository.get("name") != "MIT License":
+        raise ValueError("repository license heading is not MIT License")
+    ctgan = _license_bits(methods["CTGAN"])
+    tvae = _license_bits(methods["TVAE"])
+    if ctgan is None or ctgan != tvae:
+        raise ValueError("CTGAN and TVAE LICENSE reads disagree")
+    copulas = _license_bits(methods["GaussianCopula"])
+    tabsyn = _license_bits(methods["TabSyn"])
+    tabddpm = _license_bits(methods["TabDDPM"])
+    forest = _license_bits(methods["ForestDiffusion/Forest-Flow"])
+    arf = _license_bits(methods["ARF"])
+    study = _license_bits(repository)
+    for label, bits in (
+        ("Copulas", copulas),
+        ("TabSyn", tabsyn),
+        ("TabDDPM", tabddpm),
+        ("Forest-Diffusion", forest),
+        ("ARF", arf),
+    ):
+        if not bits:
+            raise ValueError(f"{label} LICENSE heading was not read")
+    sdv = licenses.get("sdv") or {}
+    if sdv.get("name"):
+        raise ValueError("SDV license was filled without a pinned LICENSE file")
+    paragraph = (
+        "Regenerate every \\texttt{generated/} file, the figure PDFs, and both manuscript PDFs "
+        "with \\texttt{just paper} from the commit that contains these files. That recipe reads "
+        "the committed validation ledgers. When the benchmark scratch is mounted it also rereads "
+        "the fit receipts and the pinned LICENSE files. The PDF build reads the committed extracts "
+        "and does not invent a missing timer or license. It does not open an official test file. "
+        "The catalog hash is \\CatalogSha. The grouped training split uses seed $\\SplitSeed$. "
+        "The measured fit seed is 11, and the sample seeds are 101, 211, and 307. "
+        "\\texttt{python3 research/benchmark/verify\\_paper\\_numbers.py} exits nonzero when a "
+        "displayed macro disagrees with those ledgers. Placeholder cells for TabSyn, a full "
+        "TabDDPM panel, the production privacy-attack panel, fit-seed variance, and the full "
+        "ablation grid stay the words ``not measured'' until those runs exist. A receipt field "
+        "that was not stored is ``not recorded.'' The journal fidelity table is a separate "
+        "empirical ledger on the grouped validation split. It is not the production privacy-attack "
+        "panel, and it is not differential privacy or HIPAA de-identification.\n\n"
+        "PMLB is MIT. Every dataset entry in the data lock records SPDX MIT and the note that "
+        "the source license is MIT (PMLB). "
+        f"CTGAN and TVAE share one pinned LICENSE file: {ctgan}. "
+        f"The Gaussian copula uses the pinned Copulas LICENSE: {copulas}. "
+        f"TabSyn is {tabsyn}. "
+        f"TabDDPM is {tabddpm}. "
+        f"Forest-Diffusion is {forest}. "
+        f"ARF is {arf}. "
+        f"Chow--Liu and the independent marginals are study code under this repository's license: {study}. "
+        "The SDV repository LICENSE is not in the pinned snapshot, so that license is not recorded.\n"
+    )
+    (out / "availability.tex").write_text(paragraph)
+
+
 def _byte_median(value, tex_bytes):
     if value is None:
         return "---"
@@ -224,6 +494,8 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
             "TVAE": "Tvae",
         }[key]
         lines.append(command(f"{macro}ByteMedian", _byte_median(pack["median"], tex_bytes)))
+        lines.append(command(f"{macro}ByteLo", tex_bytes(pack["lo"])))
+        lines.append(command(f"{macro}ByteHi", tex_bytes(pack["hi"])))
         lines.append(command(f"{macro}Within", _ratio(pack)))
     for label, _key in order:
         item = shown[label]
@@ -312,6 +584,8 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     beyond = side.get("beyond") or {}
     lines.append(command("BeyondElapseA", _elapsed(_median_elapsed(beyond, "steps2048"), tex_bytes)))
     lines.append(command("BeyondElapseB", _elapsed(_median_elapsed(beyond, "steps8192"), tex_bytes)))
+    _write_compute_cost(out, lines, command)
+    _write_availability(out)
     (out / "numbers.tex").write_text("".join(lines))
     (out / "byte-table.tex").write_text(
         "\\begin{tabular}{@{}lrr@{}}\n\\toprule\n"

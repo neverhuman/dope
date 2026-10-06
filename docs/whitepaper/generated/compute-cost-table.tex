@@ -1,0 +1,16 @@
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.05in}>{\raggedright\arraybackslash}p{0.82in}>{\raggedright\arraybackslash}p{0.82in}>{\raggedright\arraybackslash}p{0.78in}>{\raggedright\arraybackslash}p{1.55in}>{\raggedright\arraybackslash}p{0.72in}>{\raggedright\arraybackslash}p{1.15in}@{}}
+\toprule
+Method & Fit s & Sample s & RAM / VRAM & Hardware & CPU h, GPU h & Bytes \\
+\midrule
+DOPE & \DopeFitMed (\DopeFitMax) & \NotRecorded & \DopePeakRam / \DopePeakVram & \DopeHardware & \NotRecorded, \DopeGpuHours & \DopeByteMedian (\DopeByteLo--\DopeByteHi) \\
+Gaussian copula & \NotRecorded & \NotRecorded & \NotRecorded & \GaussHardware & \NotRecorded & \GaussByteMedian (\GaussByteLo--\GaussByteHi) \\
+Chow--Liu, study & \NotRecorded & \NotRecorded & \NotRecorded & \ChowHardware & \NotRecorded & \ChowByteMedian (\ChowByteLo--\ChowByteHi) \\
+Indep.\ marginals & \NotRecorded & \NotRecorded & \NotRecorded & \IndHardware & \NotRecorded & \IndByteMedian (\IndByteLo--\IndByteHi) \\
+CTGAN & \CtganFitMed (\CtganFitMax) & \CtganSampMed (\CtganSampMax) & \CtganPeakRam / \CtganPeakVram & \CtganHardware & \NotRecorded, \CtganGpuHours & \CtganByteMedian (\CtganByteLo--\CtganByteHi) \\
+TVAE & \TvaeFitMed (\TvaeFitMax) & \TvaeSampMed (\TvaeSampMax) & \TvaePeakRam / \TvaePeakVram & \TvaeHardware & \NotRecorded, \TvaeGpuHours & \TvaeByteMedian (\TvaeByteLo--\TvaeByteHi) \\
+Forest-Flow & \ForestFitMed (\ForestFitMax) & \ForestSampMed (\ForestSampMax) & \ForestPeakRam / \ForestPeakVram & \ForestHardware & \NotRecorded, \ForestGpuHours & \ForestByteMedian (\ForestByteLo--\ForestByteHi) \\
+ARF & \NotRecorded & \NotRecorded & \NotRecorded & \ArfHardware & \NotRecorded & \ArfByteMedian (\ArfByteLo--\ArfByteHi) \\
+TabSyn & \TabSynPanel & \TabSynPanel & \TabSynPanel & \TabSynPanel & \TabSynPanel & \TabSynPanel \\
+TabDDPM & \TabDDPMPanel & \TabDDPMPanel & \TabDDPMPanel & \TabDDPMPanel & \TabDDPMPanel & \TabDDPMPanel \\
+\bottomrule
+\end{tabular}
