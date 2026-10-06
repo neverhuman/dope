@@ -1,0 +1,106 @@
+{
+  "families": [
+    {
+      "fit_rows": 802,
+      "name": "airfoil_self_noise",
+      "steps2048": {
+        "bytes": 804,
+        "elapsed_seconds": 5.003,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.0101122,
+        "within_l3_cap": true
+      },
+      "steps8192": {
+        "bytes": 818,
+        "elapsed_seconds": 14.009,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.00448131,
+        "within_l3_cap": true
+      }
+    },
+    {
+      "fit_rows": 939,
+      "name": "garments_worker_productivity",
+      "steps2048": {
+        "bytes": 2317,
+        "elapsed_seconds": 5.004,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.02769869,
+        "within_l3_cap": true
+      },
+      "steps8192": {
+        "bytes": 2372,
+        "elapsed_seconds": 14.008,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.02506073,
+        "within_l3_cap": true
+      }
+    },
+    {
+      "fit_rows": 3738,
+      "name": "musk",
+      "steps2048": {
+        "bytes": 9273,
+        "elapsed_seconds": 5.003,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.14556482,
+        "within_l3_cap": true
+      },
+      "steps8192": {
+        "bytes": 9350,
+        "elapsed_seconds": 16.01,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.09034843,
+        "within_l3_cap": true
+      }
+    },
+    {
+      "fit_rows": 257,
+      "name": "telemonitoring_parkinsons_biomedical_voice_measurements",
+      "steps2048": {
+        "bytes": 1852,
+        "elapsed_seconds": 5.003,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.03325408,
+        "within_l3_cap": true
+      },
+      "steps8192": {
+        "bytes": 1890,
+        "elapsed_seconds": 14.006,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.01904907,
+        "within_l3_cap": true
+      }
+    },
+    {
+      "fit_rows": 35918,
+      "name": "video_transcoding_time_prediction",
+      "steps2048": {
+        "bytes": 5054,
+        "elapsed_seconds": 7.004,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.00246513,
+        "within_l3_cap": true
+      },
+      "steps8192": {
+        "bytes": 5071,
+        "elapsed_seconds": 19.011,
+        "official_test_opened": false,
+        "status": "ok",
+        "validation_loss": 0.00195244,
+        "within_l3_cap": true
+      }
+    }
+  ],
+  "source": "beyondarena-prepared-v1/fits receipt.json, report.json, and the final loss.tsv row",
+  "validation_column": "third TSV field, the hidden-basis validation loss"
+}
