@@ -1,0 +1,31 @@
+{
+  "foreign_preemption_authorized": false,
+  "format": "dope-tabsyn-owner-operational-qualification-amendment",
+  "gpu_vram_cap_bytes": 17179869184,
+  "historical_failures_costs_and_trials_retained": true,
+  "historical_q1d3_assertion_clause": "unknown",
+  "maximum_lineage_seconds": 43200,
+  "maximum_trials_per_lineage": 8,
+  "maximum_whole_operation_seconds": 600,
+  "mfs_v2": null,
+  "native_author_KPI_and_36_plus_4_auditors_unchanged": true,
+  "owner": "ENG:watcher",
+  "owner_order_received_utc": "2026-10-06T08:36:00Z",
+  "permitted_hosts": [
+    "xbabe1",
+    "xbabe2",
+    "xbabe3"
+  ],
+  "production_certification_authorized": false,
+  "ptf_v1": null,
+  "reason": "Time-box process-guard repair and admit the research population after one actual guarded CUDA qualification.",
+  "required_actual_CUDA_fit_sample_exit_and_provider_evidence": true,
+  "required_actual_generated_CUDA_closures": 1,
+  "scope": "work-order-B-tabsyn-scaled-100-lineage-research",
+  "sealed_official_tests_opened": false,
+  "superseded_required_actual_generated_CUDA_closures": 2,
+  "version": 1,
+  "xbabe3_GPU_priority": [
+    "JopeDime"
+  ]
+}

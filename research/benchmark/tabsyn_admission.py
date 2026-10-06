@@ -19,6 +19,7 @@ from research.benchmark.tabsyn_runtime_guard import bound, require, safe
 
 AUTHOR = 'cb5ac0f74ec36ee88e7a974a393dfbef50d42da7'
 LEASE = '/home/ubuntu/dope-scratch-x3/.gpu-fit.lock'
+OWNER_ONE_POLICY_SHA256 = '3b5e46786727a6f09938ea4276c37070fae63824c7b1e6ff5b0ea8be88012f94'
 
 
 class _VerifiedGuardLoader(SourceFileLoader):
@@ -71,13 +72,30 @@ def source_binding(code):
     selected['source_files']={k:v['sha256'] for k,v in code['inventory']['files'].items()}
     scope=code['numeric_population_scope']
     selected['epoch_policy']={k:scope[k] for k in ('epoch_budget','epoch_policy_sha256','diffusion_author_patience','config_sha256')}
+    if 'operational_qualification_policy' in scope:
+        selected['operational_qualification_policy_sha256'] = scope['operational_qualification_policy']['sha256']
     return hashlib.sha256(json.dumps(selected,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 
 
 def qualification(scope, runtime_sha256, mode, code):
+    count = 2
+    qualification_format = 'dope-tabsyn-epoch-policy-generated-CUDA-two-replay-closure'
+    policy_ref = scope.get('operational_qualification_policy')
+    if policy_ref is not None:
+        require(type(policy_ref) is dict and type(policy_ref.get('sha256')) is str
+                and policy_ref['sha256'] == OWNER_ONE_POLICY_SHA256,
+                'TabSyn owner qualification amendment differs')
+        policy = bound(policy_ref['path'], OWNER_ONE_POLICY_SHA256)
+        require(policy['format'] == 'dope-tabsyn-owner-operational-qualification-amendment'
+                and policy['scope'] == 'work-order-B-tabsyn-scaled-100-lineage-research'
+                and type(policy['required_actual_generated_CUDA_closures']) is int
+                and policy['required_actual_generated_CUDA_closures'] == 1,
+                'TabSyn owner qualification amendment differs')
+        count = 1
+        qualification_format = 'dope-tabsyn-owner-one-generated-CUDA-closure-v1'
     ref = scope['generated_cuda_qualification']
     q = bound(ref['path'], ref['sha256'])
-    require(q['format'] == 'dope-tabsyn-epoch-policy-generated-CUDA-two-replay-closure'
+    require(q['format'] == qualification_format
             and q['status'] == 'declared_epoch_fit_sample_replay_verified'
             and q['epoch_policy_sha256']==scope['epoch_policy_sha256']
             and q['epoch_budget']==scope['epoch_budget']
@@ -93,10 +111,14 @@ def qualification(scope, runtime_sha256, mode, code):
             and q['real_fits_started'] == 0
             and q['scope'] == 'numeric_generated_CUDA_only',
             'TabSyn actual generated CUDA qualification missing')
-    # The reviewed guard revalidates the referenced two receipts, their actual
+    if policy_ref is not None:
+        require(type(q.get('operational_qualification_policy_sha256')) is str
+                and q['operational_qualification_policy_sha256'] == OWNER_ONE_POLICY_SHA256,
+                'TabSyn generated owner qualification binding differs')
+    # The reviewed guard revalidates the referenced receipts, their actual
     # exit proofs, source-bound qualifier, candidate bytes and mapped providers.
     require(type(q['input_receipt_refs']) is list and type(q['root_actual_exit_refs']) is list
-            and len(q['input_receipt_refs']) == len(q['root_actual_exit_refs']) == 2,
+            and len(q['input_receipt_refs']) == len(q['root_actual_exit_refs']) == count,
             'TabSyn generated replay closure differs')
     if mode == 'native':
         ref = scope['native_cuda_qualification']
