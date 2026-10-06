@@ -1,0 +1,13 @@
+SPDX-FileCopyrightText: Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+SPDX-FileCopyrightText: 2026 Dope contributors
+SPDX-License-Identifier: Apache-2.0
+
+This numeric adapter adapts the TabSyn training loops from amazon-science/tabsyn
+commit cb5ac0f74ec36ee88e7a974a393dfbef50d42da7. The associated license and
+original notice are preserved in tabsyn-adapter.LICENSE and tabsyn-adapter.NOTICE.
+
+Changes: numeric-only empty-category loss, explicit configuration and deadline
+checks, isolated zero-worker loaders, safe artifact serialization and inventory,
+seeded repeated direct sampling, guarded original native-evaluator dispatch,
+and rejection of unadmitted real/GPU execution. Author model definitions and
+sampler implementations are imported from separately pinned original source.

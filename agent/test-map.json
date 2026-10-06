@@ -1,6 +1,17 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/tabsyn-adapter.LICENSE": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"},
+    "research/benchmark/tabsyn-adapter.NOTICE": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"},
+    "research/benchmark/tabsyn_adapter.py.license": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"},
+    "research/benchmark/tabsyn_adapter.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
+    "research/benchmark/tabsyn_runtime_guard.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
+    "research/benchmark/tabsyn_generated_contract.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
+    "research/benchmark/tabsyn-native-grid.proposal.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
+    "research/benchmark/requirements-tabsyn.in": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
+    "research/benchmark/requirements-tabsyn.lock.txt": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
+    "research/benchmark/TABSYN_RUNTIME_CONTRACT.md": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
+    "research/benchmark/tests/test_tabsyn_contract.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
     "AGENTS.md": {"command": "just fast", "purpose": "verify repository guidance"},
     "README.md": {"command": "just fast", "purpose": "verify onboarding guidance"},
     "CHANGELOG.md": {"command": "just fast", "purpose": "verify release change record"},
