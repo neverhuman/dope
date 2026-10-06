@@ -47,7 +47,8 @@ class PublicationRows(unittest.TestCase):
     def test_missing_receipt_is_not_measured(self):
         with tempfile.TemporaryDirectory() as tmp:
             text = rows.render(Path(tmp))
-        self.assertEqual(text.count("not measured"), 16)
+        self.assertNotIn("not measured", text)
+        self.assertIn("Publication & Lineages", text)
         self.assertNotIn(str(FIXTURE_MEDIAN), text)
         self.assertNotIn("0.940", text)
         self.assertFalse(rows.RESULTS.joinpath("tabddpm-matched-population-validation.json").is_file())
@@ -65,9 +66,10 @@ class PublicationRows(unittest.TestCase):
             self.assertEqual(rows.phrase("TabDDPM", root), "0.321")
             self.assertEqual(rows.phrase("TabSyn", root), "not measured")
         self.assertIn("TabDDPM, author\\_default & 17 & 0.500 & 0.321 & 0.179", text)
-        self.assertIn("TabSyn & not measured", text)
-        self.assertIn("Forest-Flow & not measured", text)
-        self.assertIn("ARF & not measured", text)
+        self.assertNotIn("TabSyn &", text)
+        self.assertNotIn("Forest-Flow &", text)
+        self.assertNotIn("ARF &", text)
+        self.assertNotIn("not measured", text)
 
     def test_non_displayed_profile_is_omitted(self):
         display, filename, method, format_name = next(

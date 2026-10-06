@@ -49,8 +49,8 @@ experiments optional for a claim of standing against those generators.
    publication are `\TabSynResult`, `\TabDDPMResult`, and
    `\ForestPublication`. Each expands to "not measured" until a
    matched-population receipt in the ARF publication schema is on
-   disk. Table `tab:publication` repeats that sentence as a row. The
-   cost rows `\TabSynPanel` and `\TabDDPMPanel` are a different claim
+   disk. Table `tab:publication` omits a method that has no receipt file.
+   The cost macros `\TabSynPanel` and `\TabDDPMPanel` are a different claim
    and also stay "not measured"; a later utility receipt must not be
    copied into them. The measured subsets are real and narrower:
    Table `tab:density` (copula, Chow–Liu, independent marginals),
@@ -121,7 +121,7 @@ Each item from the original verdict has one status.
 | SOTA baselines | blocked-on-B-lane | `\TabSynResult`, `\TabDDPMResult`, `\ForestPublication`. Cost rows `\TabSynPanel` and `\TabDDPMPanel` stay "not measured" as well. Measured subsets: `tab:density`, `tab:neural`, `tab:forest`. |
 | Fidelity, utility, privacy, and detection metrics | blocked-on-B-lane | `\PrivacyAttackPanel`. Utility is the retention tables. Grouped-validation fidelity and empirical DOMIAS/DCR are `tab:fidelity`. Those rows do not fill the attack panel and are not DP or HIPAA. |
 | CIs, paired tests, Holm, effect sizes | closed | Results, `tab:headline`, `tab:density`, `fig:pairs`. Rank-biserial correlation is the effect size. Families are not pooled. Linear Holm against the copula is 0.373 and the interval contains 0. |
-| Number regeneration | closed | `just paper-check`, `verify_paper_numbers.py`, and `scripts/publication_rows.py`. Table `tab:publication` is generated. A missing receipt prints "not measured". A receipt that fails the ARF publication schema fails the build. |
+| Number regeneration | closed | `just paper-check`, `verify_paper_numbers.py`, and `scripts/publication_rows.py`. Table `tab:publication` is generated. A missing receipt is omitted. A receipt that fails the ARF publication schema fails the build. |
 | Split provenance and leakage | closed | Method and `tab:provenance`. The official test is not an input to training, selection, or the reported numbers. Opening that seal is the decision row below. |
 | Ablations | blocked-on-B-lane | `\FullAblationGrid` and `\FitSeedVariance`. Section Ablations is the 8,192-step sufficiency budget only. |
 | Figures | closed | `fig:arch`, `fig:bytes`, `fig:pairs`, and supplement `figures/loss-curves.pdf`. Figure width is 7.16 in. Type 3 count is 0. |

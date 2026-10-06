@@ -245,6 +245,26 @@ def _tex_name(value):
     return str(value).replace("_", r"\_").replace("&", r"\&")
 
 
+def measured_lineage(row, columns):
+    """True when the row has a charged byte count or a retention."""
+    return any(getter(row) != "---" for _, getter in columns[4:])
+
+
+def lineage_caption(kind, rows, columns):
+    shown = sum(1 for row in rows if measured_lineage(row, columns))
+    omitted = len(rows) - shown
+    cap = (
+        "The cap column is charged bytes at or under 10{,}240. "
+        "It is not a release certificate."
+    )
+    if omitted:
+        return (
+            f"{kind}. {shown} lineages have a charged byte count or a retention. "
+            f"{omitted} lineages have neither and are omitted. {cap}"
+        )
+    return f"{kind}, all {len(rows)} lineages. {cap}"
+
+
 def write_longtable(path, caption, rows, columns):
     """columns is a list of (heading, callable(row) -> tex cell)."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -457,12 +477,12 @@ def main():
             row["features"] = source.get("features")
         record["sufficiency_rows"] = sufficiency["rows"]
         record["sufficiency_profile_status_counts"] = sufficiency["status_counts"]
+        columns = displayed_columns()
         write_longtable(
             args.table_dir / "s3-8192-lineages.tex",
-            "Sufficiency budget, all 100 lineages. The cap column is charged bytes "
-            "at or under 10{,}240. It is not a release certificate.",
-            sufficiency["rows"],
-            displayed_columns(),
+            lineage_caption("Sufficiency budget", sufficiency["rows"], columns),
+            [row for row in sufficiency["rows"] if measured_lineage(row, columns)],
+            columns,
         )
     args.out_json.parent.mkdir(parents=True, exist_ok=True)
     args.out_json.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
@@ -473,12 +493,12 @@ def main():
     write_auditor_figures(args.figure_dir, "s3-retention-bytes", record["rows"], comparators,
                           "features12_steps2048")
     write_difference_strip(args.figure_dir / "s3-paired-differences.pdf", record["rows"], comparators)
+    columns = displayed_columns()
     write_longtable(
         args.table_dir / "s3-2048-lineages.tex",
-        "Displayed profile, all 100 lineages. The cap column is charged bytes "
-        "at or under 10{,}240. It is not a release certificate.",
-        record["rows"],
-        displayed_columns(),
+        lineage_caption("Displayed profile", record["rows"], columns),
+        [row for row in record["rows"] if measured_lineage(row, columns)],
+        columns,
     )
     print(json.dumps({
         "lineages": len(record["rows"]),

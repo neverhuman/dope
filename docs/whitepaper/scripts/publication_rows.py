@@ -194,11 +194,11 @@ def _row(display, configuration, lineages, dope, receipt, difference):
 
 
 def rows_for(display, results_dir=RESULTS):
-    """One LaTeX row per size-4 CatBoost pair, or one not-measured row."""
+    """One LaTeX row per size-4 CatBoost pair. A missing receipt adds no row."""
     _display, filename, method, format_name = _spec(display)
     path = locate(results_dir, filename)
     if path is None:
-        return [_row(display, None, NOT_MEASURED, NOT_MEASURED, NOT_MEASURED, NOT_MEASURED)]
+        return []
     lines = []
     for row in load_publication(path, method, format_name):
         lines.append(_row(
