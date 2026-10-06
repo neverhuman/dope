@@ -27,6 +27,25 @@ def references(cells):
 
 
 class MatchedARFControls(unittest.TestCase):
+    def test_sampling_directory_comes_from_verified_source_declaration(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory); out = root / 'attempt'; out.mkdir()
+            (out / 'cache-area').mkdir(); (out / 'unexpected-area').mkdir()
+            record = out / 'opaque.json'; record.write_text('{}')
+            inventory = {str(record): dict(bytes=2, sha256=hashlib.sha256(record.read_bytes()).hexdigest())}
+            source = root / 'source' / 'coordinator.py'; source.parent.mkdir()
+            source.write_text("cache_directory = out / 'cache-area'\nenv = {'TMPDIR': str(cache_directory)}\n")
+            refs = {str(source): hashlib.sha256(source.read_bytes()).hexdigest()}
+            with patch.object(pub, 'SAMPLING', root), patch.object(pub, 'BASE', root):
+                self.assertEqual(pub.sampling_directories(out, refs), [str(out / 'cache-area')])
+                with self.assertRaises(ValueError):
+                    pub.guard.inventory(out, inventory, root, pub.sampling_directories(out, refs))
+                (out / 'unexpected-area').rmdir()
+                pub.guard.inventory(out, inventory, root, pub.sampling_directories(out, refs))
+                refs[str(source)] = '0' * 64
+                with self.assertRaisesRegex(ValueError, 'source anchor'):
+                    pub.sampling_directories(out, refs)
+
     def test_complete_grid_rejects_missing_duplicate_and_float_alias_cells(self):
         r=rows(); self.assertEqual(len(pub.complete_matrix(r)),100)
         for value in (r[:-1],r[:-1]+[r[0]]):
@@ -143,8 +162,24 @@ class MatchedARFControls(unittest.TestCase):
         for seed in [11.0,12]:
             with self.subTest(seed=seed),TemporaryDirectory(dir=directory) as tmp:
                 with closed_fixture(Path(tmp),rows(),references(rows()),sampling_fit_seed=seed) as (run,leaf,decoded):
-                    with self.assertRaisesRegex(ValueError,'physical common lineage'):run()
+                    with self.assertRaisesRegex(ValueError,'original sampling receipt anchor'):run()
                     self.assertEqual(decoded,[])
+
+    def assert_original_sampling_rejected(self, mutation):
+        directory=Path.cwd()/'target';directory.mkdir(exist_ok=True)
+        with TemporaryDirectory(dir=directory) as tmp:
+            with closed_fixture(Path(tmp),rows(),references(rows()),sampling_mutation=mutation) as (run,leaf,decoded):
+                with self.assertRaises(ValueError):run()
+                self.assertEqual(decoded,[])
+
+    def test_original_sample_omitted_from_both_inventories_rejects_before_metrics(self):
+        self.assert_original_sampling_rejected('omitted_both_sample')
+
+    def test_original_sample_digest_must_match_authenticated_batch(self):
+        self.assert_original_sampling_rejected('sample_digest')
+
+    def test_original_receipt_digest_must_match_authenticated_file(self):
+        self.assert_original_sampling_rejected('receipt_digest')
 
     def test_frozen_reference_digests_are_exact_builtin_valid_identities(self):
         for p in [pub.SAMPLE_ROUND,pub.NATIVE_RECEIPTS,pub.NATIVE_REPORT,pub.NATIVE_PUBLICATION,pub.DOPE_PUBLICATION]:pub.guard.digest(p)

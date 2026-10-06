@@ -10,7 +10,7 @@ from research.benchmark import publish_arf_population_matched as pub
 
 
 @contextmanager
-def closed_fixture(base, input_rows, reference_rows, sampling_fit_seed=11):
+def closed_fixture(base, input_rows, reference_rows, sampling_fit_seed=11, sampling_mutation=None):
     root, sampling = base / 'common', base / 'sampling'
     root.mkdir(); sampling.mkdir(); refs = {}
 
@@ -31,7 +31,7 @@ def closed_fixture(base, input_rows, reference_rows, sampling_fit_seed=11):
     for number in range(100):
         dataset = f'{number:016x}'; worker_path = base / 'workers' / dataset
         h = record(worker_path / 'worker-metadata.json', dict(fixture_dataset=dataset))
-        worker = dict(path=str(worker_path), files={'worker-metadata.json': h}, train_rows=2)
+        worker = dict(path=str(worker_path), files={'worker-metadata.json': h}, train_rows=2, projected_features=1)
         workers[dataset] = worker; keys = []
         for configuration in range(1 if number == 0 else 2):
             key = pub.digest(dict(fixture_dataset=dataset, fixture_configuration=configuration)); keys.append(key)
@@ -57,14 +57,34 @@ def closed_fixture(base, input_rows, reference_rows, sampling_fit_seed=11):
         key = pub.digest(job); out = sampling / 'attempts' / key / 'attempt-0001'; samples = []
         for size in pub.dope.SIZES:
             for seed in pub.dope.SEEDS:
-                path = out / f'n{size}-seed{seed}.sample-metadata.json'
+                path = out / f'n{size}-seed{seed}.csv'
                 pin = record(path, dict(fixture=True, size_multiplier=size, sample_seed=seed))
                 samples.append(dict(sample_file=path.name, sample_path=str(path), sample_sha256=pin,
                     sample_seed=seed, size_multiplier=size, rows=2*size, columns=2,
                     sample_replay='exact' if (size, seed) == (1, 101) else 'not_repeated'))
-        receipt = out / 'receipt.json'; pin = record(receipt, dict(job=job, status='ok', round_sha256=sample_round))
+        files = {s['sample_file']: s['sample_sha256'] for s in samples}
+        replay = out / 'n1-seed101.repeat.csv'
+        replay.write_bytes((out / 'n1-seed101.csv').read_bytes())
+        refs[str(replay)] = files[replay.name] = hashlib.sha256(replay.read_bytes()).hexdigest()
+        batch = dict(job_sha256=key, round_sha256=sample_round, status='ok',
+            artifact_bytes=job['artifact_bytes'], projection_bytes_included=True,
+            samples=[{k: v for k, v in s.items() if k != 'sample_path'} for s in samples])
+        files['sample-batch.json'] = record(out / 'sample-batch.json', batch)
+        receipt = out / 'receipt.json'; pin = record(receipt, dict(job=job, job_sha256=key,
+            status='ok', round_sha256=sample_round, result=batch, evidence_files=files,
+            official_tests_opened=False, new_generator_fits_started=0, native_selection_changed=False,
+            mfs_v2=None, ptf_v1=None, release_safe=None, superiority=None))
         sampling_batches.append(dict(job=job, job_sha256=key, samples=samples, status='ok',
-            receipt_path=str(receipt), receipt_sha256=pin))
+            receipt_path=str(receipt), receipt_sha256=pin, artifact_bytes=job['artifact_bytes']))
+    if sampling_mutation == 'omitted_both_sample':
+        path = sampling_batches[0]['samples'][0]['sample_path']; refs.pop(path)
+        Path(path).write_text('{"fixture_changed_after_pin": true}\n')
+    elif sampling_mutation == 'sample_digest':
+        sampling_batches[0]['samples'][0]['sample_sha256'] = '0' * 64
+    elif sampling_mutation == 'receipt_digest':
+        sampling_batches[0]['receipt_sha256'] = '0' * 64
+    else:
+        assert sampling_mutation is None
     sample_report = dict(complete_sampling_matrix=True, logical_sample_cells=1200,
         physical_batches_evidence=sampling_batches, physical_status_counts={'ok': 199},
         new_operation_seconds=0, coordinator_wall_seconds=0)

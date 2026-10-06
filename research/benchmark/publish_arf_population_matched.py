@@ -1,5 +1,6 @@
 """Publish complete native/default ARF common outcomes after actual closure."""
 import argparse
+import ast
 from collections import Counter
 import csv
 import io
@@ -117,6 +118,86 @@ def parent_references(anchor, refs):
                 visited.add(path); pending.append(native.bound(path, pin))
 
 
+def sampling_directories(out, refs):
+    """Replay the verified original coordinator's literal TMPDIR declaration."""
+    if not any(p.is_dir() for p in out.iterdir()): return []
+    source = guard.safe(SAMPLING / 'source' / 'coordinator.py', BASE)
+    guard.require(refs.get(str(source)) == guard.hash_file(source), 'sampling directory source anchor differs')
+    nodes = list(ast.walk(ast.parse(source.read_bytes())))
+    variables = [value.args[0].id for node in nodes if isinstance(node, ast.Dict)
+        for key, value in zip(node.keys, node.values)
+        if isinstance(key, ast.Constant) and key.value == 'TMPDIR'
+        and isinstance(value, ast.Call) and isinstance(value.func, ast.Name) and value.func.id == 'str'
+        and len(value.args) == 1 and isinstance(value.args[0], ast.Name)]
+    names = [node.value.right.value for node in nodes if isinstance(node, ast.Assign)
+        and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+        and node.targets[0].id in variables and isinstance(node.value, ast.BinOp)
+        and isinstance(node.value.op, ast.Div) and isinstance(node.value.left, ast.Name)
+        and node.value.left.id == 'out' and isinstance(node.value.right, ast.Constant)]
+    guard.require(len(variables) == len(names) == 1 and type(names[0]) is str
+        and Path(names[0]).name == names[0] and names[0] not in ('', '.', '..'),
+        'sampling directory declaration differs')
+    return [str(out / names[0])] if (out / names[0]).exists() else []
+
+
+def sampling_records(original, receipt, job, key, refs):
+    """Authenticate the original batch and every declared generated sample."""
+    out = SAMPLING / 'attempts' / key / 'attempt-0001'
+    files = receipt['evidence_files']; inventory = dict(files, **{'receipt.json': original['receipt_sha256']})
+    guard.require(all(Path(name).name == name and refs.get(str(out / name)) == pin
+                      for name, pin in inventory.items()), 'original sampling output anchor differs')
+    directories = sampling_directories(out, refs)
+    guard.inventory(out, {str(out / n): dict(sha256=h, bytes=(out / n).stat().st_size)
+                         for n, h in inventory.items()}, BASE, directories)
+    if original['status'] != 'ok':
+        guard.require(original['samples'] == [], 'failed sampling acquired successful records'); return
+    batch = native.bound(out / 'sample-batch.json', files['sample-batch.json'])
+    guard.require(batch['job_sha256'] == key and batch['round_sha256'] == SAMPLE_ROUND
+        and batch['status'] == 'ok' and batch['artifact_bytes'] == job['artifact_bytes']
+        and batch['projection_bytes_included'] is True
+        and digest(batch) == digest(receipt['result']), 'original sample batch differs')
+    records = original['samples']; identities = {(s['size_multiplier'], s['sample_seed']) for s in records}
+    guard.require(len(records) == 6 and identities == {(n, s) for n in dope.SIZES for s in dope.SEEDS}
+        and all(type(s['size_multiplier']) is int and type(s['sample_seed']) is int for s in records)
+        and digest([{k: v for k, v in s.items() if k != 'sample_path'} for s in records])
+        == digest(batch['samples']), 'original sample records differ')
+    for sample in records:
+        size, seed = sample['size_multiplier'], sample['sample_seed']
+        path = out / f'n{size}-seed{seed}.csv'
+        guard.require(sample['sample_file'] == path.name and sample['sample_path'] == str(path)
+            and refs.get(str(path)) == files.get(path.name) == sample['sample_sha256']
+            and type(sample['rows']) is int and sample['rows'] == job['worker']['train_rows'] * size
+            and type(sample['columns']) is int and sample['columns'] == job['worker']['projected_features'] + 1
+            and sample['sample_replay'] == ('exact' if (size, seed) == (1, 101) else 'not_repeated'),
+            'original generated sample identity differs')
+        if sample['sample_replay'] == 'exact':
+            replay = out / 'n1-seed101.repeat.csv'
+            guard.require(refs.get(str(replay)) == files.get(replay.name) == sample['sample_sha256'],
+                          'original sampling replay differs')
+
+
+def sampling_receipts(sample_lock, sample_report, refs):
+    """Bind upstream reconciliation declarations before any metric decoding."""
+    jobs = {digest(j): j for j in sample_lock['jobs']}
+    rows = sample_report['physical_batches_evidence']; batches = {r['job_sha256']: r for r in rows}
+    guard.require(len(jobs) == len(sample_lock['jobs']) == len(rows) == len(batches) == 199
+        and set(batches) == set(jobs), 'original sampling batch coverage differs')
+    for key, row in batches.items():
+        job = jobs[key]; path = SAMPLING / 'attempts' / key / 'attempt-0001' / 'receipt.json'
+        guard.require(digest(row['job']) == key and type(job['fit_seed']) is int and job['fit_seed'] == 11
+            and row['receipt_path'] == str(path) and refs.get(str(path)) == row['receipt_sha256']
+            and row['artifact_bytes'] == job['artifact_bytes'], 'original sampling receipt anchor differs')
+        receipt = native.bound(path, row['receipt_sha256'])
+        guard.require(digest(receipt['job']) == key == receipt['job_sha256']
+            and receipt['round_sha256'] == SAMPLE_ROUND and receipt['status'] == row['status']
+            and receipt['official_tests_opened'] is False and receipt['new_generator_fits_started'] == 0
+            and receipt['native_selection_changed'] is False
+            and all(receipt[k] is None for k in ('mfs_v2', 'ptf_v1', 'release_safe', 'superiority')),
+            'original sampling receipt lineage differs')
+        sampling_records(row, receipt, job, key, refs)
+    return jobs, batches
+
+
 def common_sample(row, specification, jobs, sampling_batches, refs, lock, round_pin):
     """Bind a logical cell to its physical receipt and exact frozen sample."""
     guard.require(type(row['fit_seed']) is int and row['fit_seed'] == 11
@@ -211,11 +292,7 @@ def build(receipt_pin, report_pin, auxiliary_pin):
     committed = guard.bound(native_path, NATIVE_PUBLICATION, native_path.parent)
     guard.require(digest(original) == digest(committed), 'frozen native winners changed')
     native_cells = {r['dataset']: r for r in original['cells']}
-    sampling_jobs = {digest(j): j for j in sample_lock['jobs']}
-    sampling_batches = {r['job_sha256']: r for r in sample_report['physical_batches_evidence']}
-    guard.require(set(sampling_batches) == set(sampling_jobs), 'original sampling batch coverage differs')
-    for key, row in sampling_batches.items():
-        guard.require(digest(row['job']) == key, 'original sampling batch identity differs')
+    sampling_jobs, sampling_batches = sampling_receipts(sample_lock, sample_report, refs)
     worker_views = {j['dataset']: j['worker'] for j in sample_lock['jobs']}
     fit_rows = dope.fits.bound(dope.fits.ROOT / 'reconciliation-v1.json', dope.fits.REPORT)['fit_cells']
     guard.require(all(digest(r['original_fit_job']['worker']) == digest(worker_views[r['dataset']])
