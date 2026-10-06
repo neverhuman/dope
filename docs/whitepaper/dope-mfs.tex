@@ -41,10 +41,12 @@ CatBoost median is $\MedDopeCb$ (95\% lineage-bootstrap interval
 $\LoDopeCb$ to $\HiDopeCb$), against $\MedGaussCb$ for a native-selected
 Gaussian copula, $\MedChowCb$ for a study Chow--Liu tree, and $\MedIndCb$
 for study independent marginals. Holm-adjusted Wilcoxon tests separate
-these three CatBoost comparisons. The linear auditor does not separate
-DOPE from the Gaussian copula. An unpooled $\NNeuCb$-lineage block compares
-CTGAN and TVAE. An unpooled $\NForestCb$-lineage Forest-Flow block reaches
-similar CatBoost retention at $\ForestByteLo$ to $\ForestByteHi$ bytes.
+these three CatBoost comparisons. The CatBoost record against the copula
+is \WtlGaussCb\ wins/ties/losses. The linear auditor does not separate
+DOPE from the Gaussian copula (\WtlLinGauss). An unpooled
+$\NNeuCb$-lineage block compares CTGAN and TVAE. An unpooled
+$\NForestCb$-lineage Forest-Flow block is ahead on CatBoost
+(\WtlForestCb) at $\ForestByteLo$ to $\ForestByteHi$ bytes.
 $\DopeWithinCap$ displayed DOPE artifacts sit inside the 10{,}240-byte cap.
 Official tests were not opened. Master Fitness v2 is null. TabSyn, a
 100-lineage TabDDPM panel, privacy attacks, fit-seed variance, and the full
@@ -329,6 +331,23 @@ Original displayed campaign & \CampaignElapsed \\
 
 \section{Results}
 \label{sec:results}
+Table~\ref{tab:headline} keeps, for each block and auditor, the tuned
+baseline with the highest paired median retention. The difference is DOPE
+minus that baseline. Its interval is the paired lineage bootstrap already
+used in the block tables. W/T/L counts lineages with a positive, zero, or
+negative difference. Holm $p$ is the adjustment inside that block's existing
+family. It is not a new family, and the blocks are not pooled. A positive
+median with a small $p$-value still includes lineage losses.
+
+\begin{table*}[t]
+\caption{Strongest tuned baseline at $4n$. W/T/L counts lineages. Holm stays inside the block.}
+\label{tab:headline}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\input{generated/headline-table.tex}
+\end{table*}
+
 \subsection{Density block}
 Fig.~\ref{fig:bytes} plots retention against $\log_{10}$ charged bytes for
 the three auditors. The open markers are each method's own median and
@@ -351,6 +370,9 @@ median paired differences are positive against the Gaussian copula
 Chow--Liu tree, and the study independent marginals. The Holm-adjusted
 $p$-values are $\HolmGaussCb$, $\HolmChowCb$, and $\HolmIndCb$. The
 rank-biserial correlations are $\RGaussCb$, $\RChowCb$, and $\RIndCb$.
+The Gaussian copula is the strongest density baseline. Wins, ties, and
+losses against it are \WtlGaussCb\ under CatBoost and \WtlMlpGauss\ under
+the MLP.
 On the $\FriedmanNCb$ lineages common to all four methods, the Friedman
 $p$-value is $\FriedmanPCb$ and the critical difference is $\FriedmanCdCb$.
 All six CatBoost pairs exceed that difference. Fig.~\ref{fig:pairs} shows
@@ -358,7 +380,7 @@ the sorted paired differences and that critical-difference scale. The bar is
 a scale drawn from rank 1. It is not a bracket around one pair.
 
 \begin{table*}[t]
-\caption{Density block at $4n$. Paired medians and Holm $p$-values.}
+\caption{Density block at $4n$. W/T/L counts lineages.}
 \label{tab:density}
 \centering
 \scriptsize
@@ -374,6 +396,7 @@ a scale drawn from rank 1. It is not a bracket around one pair.
 \end{figure*}
 
 The linear auditor does not separate DOPE from the Gaussian copula. The
+lineage record is \WtlLinGauss. The
 average ranks are $\RankDopeLin$ and $\RankGaussLin$, against a critical
 difference of $\FriedmanCdLin$. The Holm $p$-value is $\HolmLinGauss$, the
 median paired difference is $\DiffLinGauss$ with interval
@@ -412,15 +435,18 @@ description. DOMIAS, distance-to-closest-record, and alpha-precision are
 Table~\ref{tab:neural} is not pooled with Table~\ref{tab:density}. On the
 $\NNeuCb$ CatBoost lineages, DOPE's median is $\MedDopeNeuCb$ (interval
 $\LoDopeNeuCb$ to $\HiDopeNeuCb$), CTGAN's is $\MedCtganCb$, and TVAE's is
-$\MedTvaeCb$. The same direction appears for the linear auditor and, on a
-smaller common set, for the MLP. Every successful CTGAN and TVAE artifact
+$\MedTvaeCb$. TVAE is the stronger neural baseline on each auditor.
+Wins, ties, and losses against TVAE are \WtlTvaeCb\ under CatBoost,
+\WtlTvaeLin\ under the linear auditor, and \WtlTvaeMlp\ under the MLP.
+The median favors DOPE, and DOPE still loses lineages in each row.
+Every successful CTGAN and TVAE artifact
 in this byte count is over the cap ($\CtganWithin$ and $\TvaeWithin$). The
 native ledger records scheduling cutoffs for the unfinished search. Those
 cutoffs are unfinished work, not method failures, and they are why this
 block cannot support a method-wide conclusion.
 
 \begin{table*}[t]
-\caption{Neural block at $4n$. Not the density lineage set.}
+\caption{Neural block at $4n$, not pooled. W/T/L counts lineages.}
 \label{tab:neural}
 \centering
 \scriptsize
@@ -435,9 +461,13 @@ median is $\MedForestCb$ (interval $\LoForestCb$ to $\HiForestCb$) and the
 paired DOPE median is $\MedDopeForestCb$. Charged Forest-Flow artifacts run
 from $\ForestByteLo$ to $\ForestByteHi$ bytes, with median
 $\ForestByteMedian$, against a DOPE median of $\DopeForestByteMedian$ bytes
-on the same six lineages. The utility sits in the same region as DOPE. The
-byte charge is about five orders of magnitude larger. One row of the table
-has higher DOPE retention than Forest-Flow. With $\NForestCb$ lineages this
+on the same six lineages. DOPE is higher on one CatBoost lineage and lower
+on the other five (wins/ties/losses \WtlForestCb). The linear record is
+\WtlForestLin. The MLP record is \WtlForestMlp: DOPE is lower on every
+paired lineage. The within-block Holm tests are not significant at this
+count, so the loss counts are the descriptive record and not a certified
+Forest-Flow win either. This block is not a DOPE win. The byte charge is about five
+orders of magnitude larger. With $\NForestCb$ lineages this
 block does not support a method-wide ranking. The default and
 native-selected Forest-Flow charges are the same selection, recorded once.
 MFS-v2 on this block is null. The campaign is not marked complete.
@@ -557,8 +587,9 @@ displayed residual, charged at a median of $\DopeByteMedian$ bytes, recovers
 a CatBoost median retention of $\MedDopeCb$ and is separated from the three
 density comparators under that auditor and under the MLP. It is not
 separated from the Gaussian copula under the linear auditor. Forest-Flow, on
-$\NForestCb$ confirmation lineages, reaches similar CatBoost retention at a
-byte charge five orders of magnitude larger. CTGAN and TVAE, on their own
+$\NForestCb$ confirmation lineages, is ahead on CatBoost (\WtlForestCb) and
+on the MLP (\WtlForestMlp), at a byte charge five orders of magnitude larger.
+CTGAN and TVAE, on their own
 $\NNeuCb$-lineage block, do not match that retention and do not fit under the cap
 in the successful size-$4$ artifacts. None of those statements is an MFS-v2
 score, a PTF-v1 result, or a release-safe certification. The production
@@ -620,8 +651,9 @@ $\NDopeCb$ validation lineages its CatBoost retention is $\MedDopeCb$
 fall inside the cap. Paired tests separate it from the Gaussian
 copula, a study Chow--Liu tree, and study independent marginals under
 CatBoost, and they do not separate it from the Gaussian copula under the
-linear auditor. Forest-Flow reaches similar CatBoost retention only at a far larger byte
-charge, on $\NForestCb$ lineages. The common certification scalar is null, the
+linear auditor. Forest-Flow is ahead on CatBoost (\WtlForestCb), and DOPE
+wins none of the MLP lineages (\WtlForestMlp), at a far larger byte
+charge on $\NForestCb$ lineages. The common certification scalar is null, the
 official tests are sealed, and the generators that were not run are not
 measured.
 
