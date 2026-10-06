@@ -1320,3 +1320,23 @@ release-safe L3 and superiority remain null. Test with:
 ```sh
 python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v
 ```
+
+### TabSyn default native audit
+
+The [100-lineage native ledger](results/tabsyn-default100-native-audit.md)
+records 77 admitted but uninformative author targets, 14 audit-monitoring
+unavailable cases, and nine input-monitoring unavailable cases. All 91 physical
+workers exited zero; monitoring failures remain unavailable. No native winner
+or numerical native KPI is inferred, and defaults remain retained for the 77
+admitted cases. The documented CPU hist auditor variant preserves the author
+objective and target transform; it does not reproduce the GPU hist runtime.
+
+The publisher verifies frozen receipt and source buffers before decoding,
+keeps the 68 earlier infrastructure failures and their measured costs separate,
+and charges existing models plus projection bytes. Sampling and common metrics
+are separate phases. Official tests stay sealed; gated scores remain null.
+
+With the immutable publisher custody available, regenerate JSON/schema/CSV and
+the research note using `python3 -B -m research.benchmark.publish_tabsyn_native_audit`.
+Run `python3 -B -m unittest research.benchmark.tests.test_tabsyn_native_audit -v`
+for the opaque controls and committed publication checks.

@@ -1,0 +1,1722 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actual_parent_kernel_exit": {
+      "type": "null"
+    },
+    "actual_parent_kernel_exit_observed": {
+      "const": false
+    },
+    "author_commit": {
+      "const": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7"
+    },
+    "author_gpu_hist_reproduction": {
+      "const": false
+    },
+    "cells": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "actual_XGB_fit_calls": {
+                "const": 0
+              },
+              "actual_worker_exit": {
+                "type": "integer"
+              },
+              "auditor_calls": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "config_sha256": {
+                "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+              },
+              "dataset_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "deadline_rechecked": {
+                "const": true
+              },
+              "default_retained_by_native_audit": {
+                "const": true
+              },
+              "fit_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "const": 11
+              },
+              "lineage_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "logical_closure": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "measured_whole_seconds": {
+                "type": "number"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "native_Popen": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_exit": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_input_status": {
+                "type": "string"
+              },
+              "native_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_result_admitted": {
+                "const": true
+              },
+              "native_value": {
+                "const": null
+              },
+              "native_winner": {
+                "const": null
+              },
+              "original_lineage_deadline_unix_seconds": {
+                "type": "number"
+              },
+              "original_lineage_started_unix_seconds": {
+                "type": "number"
+              },
+              "owned_signal_calls": {
+                "type": "integer"
+              },
+              "physical_completion": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "physical_csv_readback": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "physical_native_attempt": {
+                "type": "integer"
+              },
+              "prior_failed_native_attempts": {
+                "type": "integer"
+              },
+              "prior_failed_native_receipts": {
+                "additionalProperties": false,
+                "properties": {
+                  "Popen_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "actual_worker_exit": {
+                    "type": "integer"
+                  },
+                  "deadline_rechecked": {
+                    "const": true
+                  },
+                  "exit_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "failure_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "lineage_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "owned_termination_reason": {
+                    "type": "null"
+                  },
+                  "request_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "safe_stderr_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "whole_operation_seconds": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "Popen_ref",
+                  "actual_worker_exit",
+                  "deadline_rechecked",
+                  "exit_ref",
+                  "failure_ref",
+                  "lineage_sha256",
+                  "owned_termination_reason",
+                  "request_ref",
+                  "safe_stderr_ref",
+                  "whole_operation_seconds"
+                ],
+                "type": "object"
+              },
+              "prior_failed_native_whole_seconds": {
+                "type": "number"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "actual_XGB_fit_calls",
+              "actual_worker_exit",
+              "auditor_calls",
+              "charged_artifact_bytes",
+              "config_sha256",
+              "dataset_id",
+              "deadline_rechecked",
+              "default_retained_by_native_audit",
+              "fit_request",
+              "fit_seed",
+              "lineage_sha256",
+              "logical_closure",
+              "measured_whole_seconds",
+              "model_bytes",
+              "native_Popen",
+              "native_exit",
+              "native_input_status",
+              "native_request",
+              "native_result_admitted",
+              "native_value",
+              "native_winner",
+              "original_lineage_deadline_unix_seconds",
+              "original_lineage_started_unix_seconds",
+              "owned_signal_calls",
+              "physical_completion",
+              "physical_csv_readback",
+              "physical_native_attempt",
+              "prior_failed_native_attempts",
+              "prior_failed_native_receipts",
+              "prior_failed_native_whole_seconds",
+              "projection_bytes",
+              "reason",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "actual_XGB_fit_calls": {
+                "const": 0
+              },
+              "actual_worker_exit": {
+                "type": "integer"
+              },
+              "auditor_calls": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "config_sha256": {
+                "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+              },
+              "dataset_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "deadline_rechecked": {
+                "const": false
+              },
+              "default_retained_by_native_audit": {
+                "const": false
+              },
+              "fit_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "const": 11
+              },
+              "lineage_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "logical_closure": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "measured_whole_seconds": {
+                "type": "number"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "native_Popen": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_exit": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_input_status": {
+                "type": "string"
+              },
+              "native_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_result_admitted": {
+                "const": false
+              },
+              "native_value": {
+                "const": null
+              },
+              "native_winner": {
+                "const": null
+              },
+              "original_lineage_deadline_unix_seconds": {
+                "type": "number"
+              },
+              "original_lineage_started_unix_seconds": {
+                "type": "number"
+              },
+              "owned_signal_calls": {
+                "type": "integer"
+              },
+              "physical_completion": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "physical_csv_readback": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "physical_native_attempt": {
+                "type": "integer"
+              },
+              "prior_failed_native_attempts": {
+                "type": "integer"
+              },
+              "prior_failed_native_receipts": {
+                "additionalProperties": false,
+                "properties": {
+                  "Popen_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "actual_worker_exit": {
+                    "type": "integer"
+                  },
+                  "deadline_rechecked": {
+                    "const": true
+                  },
+                  "exit_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "failure_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "lineage_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "owned_termination_reason": {
+                    "type": "null"
+                  },
+                  "request_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "safe_stderr_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "whole_operation_seconds": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "Popen_ref",
+                  "actual_worker_exit",
+                  "deadline_rechecked",
+                  "exit_ref",
+                  "failure_ref",
+                  "lineage_sha256",
+                  "owned_termination_reason",
+                  "request_ref",
+                  "safe_stderr_ref",
+                  "whole_operation_seconds"
+                ],
+                "type": "object"
+              },
+              "prior_failed_native_whole_seconds": {
+                "type": "number"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "actual_XGB_fit_calls",
+              "actual_worker_exit",
+              "auditor_calls",
+              "charged_artifact_bytes",
+              "config_sha256",
+              "dataset_id",
+              "deadline_rechecked",
+              "default_retained_by_native_audit",
+              "fit_request",
+              "fit_seed",
+              "lineage_sha256",
+              "logical_closure",
+              "measured_whole_seconds",
+              "model_bytes",
+              "native_Popen",
+              "native_exit",
+              "native_input_status",
+              "native_request",
+              "native_result_admitted",
+              "native_value",
+              "native_winner",
+              "original_lineage_deadline_unix_seconds",
+              "original_lineage_started_unix_seconds",
+              "owned_signal_calls",
+              "physical_completion",
+              "physical_csv_readback",
+              "physical_native_attempt",
+              "prior_failed_native_attempts",
+              "prior_failed_native_receipts",
+              "prior_failed_native_whole_seconds",
+              "projection_bytes",
+              "reason",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "actual_XGB_fit_calls": {
+                "const": 0
+              },
+              "actual_worker_exit": {
+                "type": "null"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "config_sha256": {
+                "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+              },
+              "dataset_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "default_retained_by_native_audit": {
+                "const": false
+              },
+              "fit_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "const": 11
+              },
+              "lineage_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "logical_closure": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "measured_whole_seconds": {
+                "type": "integer"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "native_input_status": {
+                "type": "string"
+              },
+              "native_result_admitted": {
+                "const": false
+              },
+              "native_value": {
+                "const": null
+              },
+              "native_winner": {
+                "const": null
+              },
+              "original_lineage_deadline_unix_seconds": {
+                "type": "number"
+              },
+              "original_lineage_started_unix_seconds": {
+                "type": "number"
+              },
+              "physical_native_attempt": {
+                "type": "null"
+              },
+              "prior_failed_native_attempts": {
+                "type": "integer"
+              },
+              "prior_failed_native_whole_seconds": {
+                "type": "integer"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "actual_XGB_fit_calls",
+              "actual_worker_exit",
+              "charged_artifact_bytes",
+              "config_sha256",
+              "dataset_id",
+              "default_retained_by_native_audit",
+              "fit_request",
+              "fit_seed",
+              "lineage_sha256",
+              "logical_closure",
+              "measured_whole_seconds",
+              "model_bytes",
+              "native_input_status",
+              "native_result_admitted",
+              "native_value",
+              "native_winner",
+              "original_lineage_deadline_unix_seconds",
+              "original_lineage_started_unix_seconds",
+              "physical_native_attempt",
+              "prior_failed_native_attempts",
+              "prior_failed_native_whole_seconds",
+              "projection_bytes",
+              "reason",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "actual_XGB_fit_calls": {
+                "const": 0
+              },
+              "actual_worker_exit": {
+                "type": "integer"
+              },
+              "auditor_calls": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "config_sha256": {
+                "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+              },
+              "dataset_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "deadline_rechecked": {
+                "const": true
+              },
+              "default_retained_by_native_audit": {
+                "const": true
+              },
+              "fit_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "const": 11
+              },
+              "lineage_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "logical_closure": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "measured_whole_seconds": {
+                "type": "number"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "native_Popen": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_exit": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_input_status": {
+                "type": "string"
+              },
+              "native_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_result_admitted": {
+                "const": true
+              },
+              "native_value": {
+                "const": null
+              },
+              "native_winner": {
+                "const": null
+              },
+              "original_lineage_deadline_unix_seconds": {
+                "type": "number"
+              },
+              "original_lineage_started_unix_seconds": {
+                "type": "number"
+              },
+              "owned_signal_calls": {
+                "type": "integer"
+              },
+              "physical_completion": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "physical_csv_readback": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "physical_native_attempt": {
+                "type": "integer"
+              },
+              "prior_failed_native_attempts": {
+                "type": "integer"
+              },
+              "prior_failed_native_whole_seconds": {
+                "type": "integer"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "actual_XGB_fit_calls",
+              "actual_worker_exit",
+              "auditor_calls",
+              "charged_artifact_bytes",
+              "config_sha256",
+              "dataset_id",
+              "deadline_rechecked",
+              "default_retained_by_native_audit",
+              "fit_request",
+              "fit_seed",
+              "lineage_sha256",
+              "logical_closure",
+              "measured_whole_seconds",
+              "model_bytes",
+              "native_Popen",
+              "native_exit",
+              "native_input_status",
+              "native_request",
+              "native_result_admitted",
+              "native_value",
+              "native_winner",
+              "original_lineage_deadline_unix_seconds",
+              "original_lineage_started_unix_seconds",
+              "owned_signal_calls",
+              "physical_completion",
+              "physical_csv_readback",
+              "physical_native_attempt",
+              "prior_failed_native_attempts",
+              "prior_failed_native_whole_seconds",
+              "projection_bytes",
+              "reason",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "actual_XGB_fit_calls": {
+                "const": 0
+              },
+              "actual_worker_exit": {
+                "type": "integer"
+              },
+              "auditor_calls": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "config_sha256": {
+                "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+              },
+              "dataset_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "deadline_rechecked": {
+                "const": false
+              },
+              "default_retained_by_native_audit": {
+                "const": false
+              },
+              "fit_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "const": 11
+              },
+              "lineage_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "logical_closure": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "measured_whole_seconds": {
+                "type": "number"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "native_Popen": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_exit": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_input_status": {
+                "type": "string"
+              },
+              "native_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "native_result_admitted": {
+                "const": false
+              },
+              "native_value": {
+                "const": null
+              },
+              "native_winner": {
+                "const": null
+              },
+              "original_lineage_deadline_unix_seconds": {
+                "type": "number"
+              },
+              "original_lineage_started_unix_seconds": {
+                "type": "number"
+              },
+              "owned_signal_calls": {
+                "type": "integer"
+              },
+              "physical_completion": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "physical_csv_readback": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "physical_native_attempt": {
+                "type": "integer"
+              },
+              "prior_failed_native_attempts": {
+                "type": "integer"
+              },
+              "prior_failed_native_whole_seconds": {
+                "type": "integer"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "actual_XGB_fit_calls",
+              "actual_worker_exit",
+              "auditor_calls",
+              "charged_artifact_bytes",
+              "config_sha256",
+              "dataset_id",
+              "deadline_rechecked",
+              "default_retained_by_native_audit",
+              "fit_request",
+              "fit_seed",
+              "lineage_sha256",
+              "logical_closure",
+              "measured_whole_seconds",
+              "model_bytes",
+              "native_Popen",
+              "native_exit",
+              "native_input_status",
+              "native_request",
+              "native_result_admitted",
+              "native_value",
+              "native_winner",
+              "original_lineage_deadline_unix_seconds",
+              "original_lineage_started_unix_seconds",
+              "owned_signal_calls",
+              "physical_completion",
+              "physical_csv_readback",
+              "physical_native_attempt",
+              "prior_failed_native_attempts",
+              "prior_failed_native_whole_seconds",
+              "projection_bytes",
+              "reason",
+              "status"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 100,
+      "minItems": 100,
+      "type": "array"
+    },
+    "common_validation": {
+      "const": null
+    },
+    "common_validation_complete": {
+      "const": false
+    },
+    "config_sha256": {
+      "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "current_bulk_model_hashes_reverified": {
+      "const": false
+    },
+    "fit_seed": {
+      "const": 11
+    },
+    "format": {
+      "const": "tabsyn-default100-native-audit-publication"
+    },
+    "full_runtime_hardware_certified": {
+      "const": false
+    },
+    "generator_tuned_winner_claimed": {
+      "const": false
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "input_custody_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "method": {
+      "const": "TabSyn"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_audit_ledger_complete": {
+      "const": true
+    },
+    "native_backend": {
+      "const": "cpu_hist"
+    },
+    "native_objective": {
+      "type": "string"
+    },
+    "native_selection_complete": {
+      "const": false
+    },
+    "native_value": {
+      "const": null
+    },
+    "native_winner": {
+      "const": null
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "const": null
+    },
+    "partition": {
+      "const": "official_training_derived_validation"
+    },
+    "privacy": {
+      "const": null
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "publisher_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "scope": {
+      "const": "Closed default-only native audit; not a native-tuned winner or common quality panel"
+    },
+    "source_files": {
+      "additionalProperties": false,
+      "properties": {
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v6/owner_CPU_native_audit_only_v6.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v6/owner_real_CPU_native_entry_v6.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v6r2/owner_CPU_native_audit_only_v6r2.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v8/owner_CPU_native_audit_only_v8.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v9/owner_CPU_native_CSV_readback_v9.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v9/owner_real_CPU_native_CSV_entry_v9.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-first-v4/owner_CPU_native_input_first_v4r4.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-first-v5/owner_CPU_native_input_first_v5.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-input-retry-v7/owner_CPU_native_input_retry_v7.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-cpu-sample-feasibility-v1/owner_real_CPU_sample_controller_v1.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-cpu-sample-feasibility-v1/owner_real_CPU_sample_entry_v1.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts-cpu-sample-feasibility-v2-4n/owner_real_CPU_sample_controller_v2.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_controller_v1.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_entry_v1.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_entry_v2.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_population_v2.py": {
+          "type": "string"
+        },
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/tabsyn_native_target.captured.py": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v6/owner_CPU_native_audit_only_v6.py",
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v6/owner_real_CPU_native_entry_v6.py",
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v6r2/owner_CPU_native_audit_only_v6r2.py",
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v8/owner_CPU_native_audit_only_v8.py",
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v9/owner_CPU_native_CSV_readback_v9.py",
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-audit-v9/owner_real_CPU_native_CSV_entry_v9.py",
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-first-v4/owner_CPU_native_input_first_v4r4.py",
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-first-v5/owner_CPU_native_input_first_v5.py",
+        "/home/ubuntu/dope-scratch-x1/ts-CPU-native-input-retry-v7/owner_CPU_native_input_retry_v7.py",
+        "/home/ubuntu/dope-scratch-x1/ts-cpu-sample-feasibility-v1/owner_real_CPU_sample_controller_v1.py",
+        "/home/ubuntu/dope-scratch-x1/ts-cpu-sample-feasibility-v1/owner_real_CPU_sample_entry_v1.py",
+        "/home/ubuntu/dope-scratch-x1/ts-cpu-sample-feasibility-v2-4n/owner_real_CPU_sample_controller_v2.py",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_controller_v1.py",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_entry_v1.py",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_entry_v2.py",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_population_v2.py",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/tabsyn_native_target.captured.py"
+      ],
+      "type": "object"
+    },
+    "summary": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_XGB_fit_calls": {
+          "type": "integer"
+        },
+        "charged_model_and_projection_bytes": {
+          "type": "integer"
+        },
+        "generator_tuning_trials": {
+          "type": "integer"
+        },
+        "informative_native_objectives": {
+          "type": "integer"
+        },
+        "logical_lineages_closed": {
+          "type": "integer"
+        },
+        "measured_current_native_whole_seconds": {
+          "type": "number"
+        },
+        "native_objective_inapplicable": {
+          "type": "integer"
+        },
+        "physical_workers_exit_zero": {
+          "type": "integer"
+        },
+        "prior_failed_native_attempts": {
+          "type": "integer"
+        },
+        "prior_failed_native_whole_seconds": {
+          "type": "number"
+        },
+        "status_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "native_audit_admitted": {
+              "type": "integer"
+            },
+            "native_audit_unavailable": {
+              "type": "integer"
+            },
+            "native_input_unavailable": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "native_audit_admitted",
+            "native_audit_unavailable",
+            "native_input_unavailable"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "actual_XGB_fit_calls",
+        "charged_model_and_projection_bytes",
+        "generator_tuning_trials",
+        "informative_native_objectives",
+        "logical_lineages_closed",
+        "measured_current_native_whole_seconds",
+        "native_objective_inapplicable",
+        "physical_workers_exit_zero",
+        "prior_failed_native_attempts",
+        "prior_failed_native_whole_seconds",
+        "status_counts"
+      ],
+      "type": "object"
+    },
+    "track": {
+      "const": "scaled_200_vae_1000_diffusion"
+    },
+    "verified_receipt_buffers": {
+      "type": "integer"
+    },
+    "verified_source_buffers": {
+      "type": "integer"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "actual_parent_kernel_exit",
+    "actual_parent_kernel_exit_observed",
+    "author_commit",
+    "author_gpu_hist_reproduction",
+    "cells",
+    "common_validation",
+    "common_validation_complete",
+    "config_sha256",
+    "counts_as_dope_win",
+    "current_bulk_model_hashes_reverified",
+    "fit_seed",
+    "format",
+    "full_runtime_hardware_certified",
+    "generator_tuned_winner_claimed",
+    "immutable_references",
+    "input_custody_lock",
+    "method",
+    "mfs_v2",
+    "native_audit_ledger_complete",
+    "native_backend",
+    "native_objective",
+    "native_selection_complete",
+    "native_value",
+    "native_winner",
+    "official_tests_opened",
+    "paired_superiority",
+    "partition",
+    "privacy",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sha256",
+    "release_safe_l3",
+    "scope",
+    "source_files",
+    "summary",
+    "track",
+    "verified_receipt_buffers",
+    "verified_source_buffers",
+    "version"
+  ],
+  "type": "object"
+}
