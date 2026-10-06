@@ -7,6 +7,13 @@
     "research/benchmark/publish_checkpoint_index.py": "external-evidence",
     "research/benchmark/tests/test_checkpoint_index.py": "external-evidence",
     "research/benchmark/results/checkpoint-figure-input-index/": "external-evidence",
+    "research/benchmark/results/work-order-b-tabsyn-input-readiness-v1": "external-evidence",
+    "research/benchmark/tests/test_tabsyn_metric_operation_positive.py": "external-evidence",
+    "research/benchmark/tabsyn_metric_operation_inputs.py": "external-evidence",
+    "research/benchmark/tabsyn_closed143_inputs.py": "external-evidence",
+    "research/benchmark/tests/test_tabsyn_metric_operation_inputs.py": "external-evidence",
+    "research/benchmark/tests/test_tabsyn_closed143_inputs.py": "external-evidence",
+
     "research/benchmark/tabsyn_validation_inputs.py": "external-evidence",
     "research/benchmark/tests/test_tabsyn_validation_inputs.py": "external-evidence",
 

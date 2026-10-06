@@ -1358,3 +1358,32 @@ declared header removal, and call the existing expanded diagnostics and utility
 auditors. This module does not execute metrics, decode rows, load models, select
 a native winner or grant a compute slot. Historical parent exit and gated scores
 remain null. Private paths in input recipes stay on scratch, outside publication.
+
+### TabSyn operation receipt bridge
+
+`tabsyn_metric_operation_inputs.prepare_operation` additionally authenticates
+scientific fit Popen, completion and actual exit receipts, both captured fit
+receipt formats, all fit/sample source buffers and the shared evaluator source.
+It joins the sample runtime to the original fit, verifies TRAIN-only kind rules,
+and gives each disabled recipe a canonical, type-sensitive job digest. Missing
+metadata remains unavailable; integrity errors reject preparation. The caller
+must supply externally frozen snapshot and source references.
+
+`tabsyn_closed143_inputs.prepare_recipe` binds the 143 retained recipes to their
+reconstructed operation plans using a frozen metadata custody map. It preserves
+95 newer CPU and 48 retained GPU admissions, 39 unavailable outcomes and 418
+unstarted cells. The custody reader accepts only captured metadata/source
+references and rehashes each local copy. The recipes retain the writers' target
+last order and single synthetic header row, with no second column permutation.
+
+These functions prepare metadata. A separately admitted worker must verify the
+physical numeric/model/projection bytes, runtime providers, current capacity and
+deadline before imports and again before success. They leave the historical
+parent exit and all gated scores null. They do not change the held expanded
+metric worker, its frozen source identity, or any live round.
+
+Run the generated receipt controls with:
+
+```sh
+python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v
+```
