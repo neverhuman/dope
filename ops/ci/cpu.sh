@@ -22,7 +22,7 @@ cd "$root"
 # A publisher edit that leaves the committed fit ledger stale fails before campaign publication.
 PYTHONPATH=. python3 -m unittest research.benchmark.tests.test_dope_refinement_fits.RefinementFits.test_committed_fit_ledger_tracks_publisher -v
 python3 research/benchmark/verify_paper_numbers.py
-python3 docs/whitepaper/scripts/compute_panel.py
+target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py
 git diff --exit-code -- docs/whitepaper/generated/fit-trace.json docs/whitepaper/generated/panel-stats.json docs/whitepaper/generated/numbers.tex docs/whitepaper/generated/density-table.tex docs/whitepaper/generated/neural-table.tex docs/whitepaper/generated/forest-table.tex docs/whitepaper/generated/byte-table.tex docs/whitepaper/generated/threshold-table.tex docs/whitepaper/generated/beyond-fit.tex docs/whitepaper/generated/provenance-table.tex
 python3 -B -m unittest research.benchmark.tests.test_verify_paper_numbers research.benchmark.tests.test_paper_log
 bash docs/whitepaper/scripts/build_pdf.sh
