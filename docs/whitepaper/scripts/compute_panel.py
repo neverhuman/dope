@@ -706,7 +706,12 @@ def main():
         "threshold_robustness": robustness,
         "fidelity": fidelity,
         "bytes": {"DOPE": byte_summary(record["rows"], rng)},
-        "forest_bytes": {"min": min(forest_bytes) if forest_bytes else None, "max": max(forest_bytes) if forest_bytes else None, "n": len(forest_bytes)},
+        "forest_bytes": {
+            "min": min(forest_bytes) if forest_bytes else None,
+            "max": max(forest_bytes) if forest_bytes else None,
+            "n": len(forest_bytes),
+            "within": sum(1 for amount in forest_bytes if amount <= BYTE_CAP),
+        },
         "anchor_failures": failures,
         "notes": {
             "interval": "percentile lineage bootstrap of the median; three sample seeds stay inside each lineage median",

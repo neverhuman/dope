@@ -296,7 +296,8 @@ paired-superiority rule, which also requires a frozen evaluator and a
 gate-pass analysis. PTF-v1, MFS-v2, and release-safe L3 stay null.
 
 \subsection{Compute}
-Table~\ref{tab:cost} is wall time taken from receipts. The logged replay is
+Table~\ref{tab:cost} is wall time taken from receipts, plus the Forest-Flow
+artifact byte span. The logged replay is
 a fresh hidden-basis run of both step budgets. It is not the elapsed time of
 the original scored campaign, which is \CampaignElapsed\ on the displayed
 cells. Forest-Flow fit time is the sum of \texttt{fit\_seconds} over the
@@ -308,18 +309,20 @@ draw and is not reported as job energy. BeyondArena times are the median
 \texttt{elapsed\_seconds} of the $\BeyondPrepared$ prepared receipts.
 
 \begin{table}[t]
-\caption{Receipt wall time. Replay is not the original campaign.}
+\caption{Seconds, except the artifact rows.}
 \label{tab:cost}
 \centering
 \scriptsize
 \begin{tabular}{@{}lr@{}}
 \toprule
-Item & Seconds \\
+Item & Amount \\
 \midrule
 Replay, 2{,}048 steps, median & \ReplayMedA \\
 Replay, 8{,}192 steps, median & \ReplayMedB \\
 Forest-Flow fit core & \ForestFitCore \\
 Forest-Flow sample and auditors & \ForestSampleOp \\
+Forest-Flow artifact low & \ForestByteLo \\
+Forest-Flow artifact high & \ForestByteHi \\
 BeyondArena fits, 2{,}048, median & \BeyondElapseA \\
 BeyondArena fits, 8{,}192, median & \BeyondElapseB \\
 Original displayed campaign & \CampaignElapsed \\
@@ -392,7 +395,7 @@ the study tree and still sit near retention zero. Smallness alone is not
 the result. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi.
 
 \begin{table}[t]
-\caption{Charged bytes at $4n$. Neural rows are successful size-4 artifacts.}
+\caption{Charged bytes at $4n$. Forest-Flow is not pooled.}
 \label{tab:bytes}
 \centering
 \scriptsize

@@ -217,6 +217,13 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
         byte_rows.append(
             f"{label} & {_byte_median(item['median'], tex_bytes)} & {item['within']}/{item['n']} \\\\"
         )
+    forest_bytes = payload["forest_bytes"]
+    if forest_bytes.get("n"):
+        byte_rows.append(
+            "Forest-Flow & "
+            f"{_byte_median(side.get('forest_byte_median'), tex_bytes)} & "
+            f"{forest_bytes['within']}/{forest_bytes['n']} \\\\"
+        )
     misses = side["over_cap"]
     if len(misses) >= 1:
         lines.append(command("MissA", _breakable(misses[0]["name"])))
