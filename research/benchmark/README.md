@@ -1144,7 +1144,7 @@ research panel establishes neither the public-core headline nor global family
 selection, final five-fit coverage, superiority or certification. Official tests
 remain sealed and MFS-v2/PTF-v1/release/superiority remain null.
 
-### ARF population common panel preparation
+### Complete ARF matched population validation
 
 `publish_arf_population_matched` requires the complete frozen 1,200-cell ARF
 native/default sampling and common-validation matrix, actual coordinator closure,
@@ -1153,11 +1153,37 @@ external receipt/reconciliation/recursive-output digests, and the unchanged
 all unavailable outcomes and full model/projection charges before comparing the
 three fixed DOPE research profiles. The publisher refuses a partial live round. Parent receipt references must be consistently covered by the authenticated inventory. Each logical metric is bound to its exact frozen sample, physical job, closed receipt and replay identity; input fit seeds are checked before constructing output cells.
 
-The renderer and manifest generator replay descriptive dataset pairs from the
-committed report. Sample seeds reduce within lineage first; availability cohorts
-remain explicit. This preparation publishes no ARF common numbers or final
-configuration selection. Official tests stay sealed, and MFS-v2/PTF-v1,
+The [complete matched panel](results/arf-matched-population-validation.md)
+accounts for all 1,200 logical validation cells. The renderer and manifest
+generator replay descriptive dataset pairs from the committed report. Sample
+seeds reduce within lineage first; availability cohorts remain explicit. At 4n
+with CatBoost, the features12_steps2048 comparison has 97 informative paired
+lineages: median retention is 0.939876353161328 for DOPE and
+0.8255067785547131 for native-selected ARF, with median paired difference
+0.09541472594147016. These are one-fit-seed validation results; wider DOPE
+profiles have different availability cohorts and do not select a global winner.
+Official tests stay sealed, and MFS-v2/PTF-v1,
 release-safe L3 and superiority claims stay null until their required gates pass.
+
+The immutable v2 receipt anchor extends v1 without rewriting its references.
+The publisher authenticates the nine historical neural source bodies against
+their original round and receipt hashes, projects those exact bodies into an
+isolated source inventory, and rechecks both origin and projection before metric
+decoding and after aggregation. Historical source code and caches are not
+executed by this projection.
+
+Regenerate the committed outputs:
+
+```sh
+python3 -B -m research.benchmark.publish_arf_population_matched \
+  --from-json research/benchmark/results/arf-matched-population-validation.json \
+  --publication-sha256 c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7 \
+  --output-directory target/arf-matched-replay
+python3 -B -m research.benchmark.publish_arf_population_matched_figure \
+  target/arf-matched-replay/arf-matched-population-validation.json
+python3 -B -m research.benchmark.publish_arf_population_matched_manifest \
+  target/arf-matched-replay
+```
 
 ### Work Order B measured cost and missing-component ledger
 
@@ -1173,8 +1199,9 @@ author ARF implementation (citation key `watson2023adversarial`) is selected by
 held-out FORDE mean log-density from a study implementation of its leaf mixture,
 with the frozen eight-trial grid and byte/configuration tie-breaks. Native values
 are shown per lineage without aggregation or cross-method ranking. Projection
-bytes, every attempt and host costs remain visible. Shared ARF sampling and
-MFS-v2/PTF-v1 gates are pending; no DOPE win follows from fit or byte status.
+bytes, every attempt and host costs remain visible. The complete shared sampling
+and validation panel is linked above. MFS-v2/PTF-v1 gates remain pending; no DOPE
+win follows from fit or byte status.
 
 Regenerate from immutable scratch:
 

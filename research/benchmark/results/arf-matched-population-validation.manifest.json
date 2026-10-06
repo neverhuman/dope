@@ -1,0 +1,86 @@
+{
+  "artifacts": {
+    "arf-matched-population-validation.csv": {
+      "bytes": 110081,
+      "sha256": "c017013420d136a9ef44a0959e17885b77a184d8080b847bf1c5c103b271f7f8"
+    },
+    "arf-matched-population-validation.json": {
+      "bytes": 6807387,
+      "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
+    },
+    "arf-matched-population-validation.md": {
+      "bytes": 1646,
+      "sha256": "e4d36e2580b433373414fbd873a997d2acba5464f55563490c2424634e63f172"
+    },
+    "arf-matched-population-validation.pdf": {
+      "bytes": 25296,
+      "sha256": "a95d843895957978a2a47e2817e6b675c663011e3b72bb6c5747a6aab5cd6d05"
+    },
+    "arf-matched-population-validation.schema.json": {
+      "bytes": 269809,
+      "sha256": "e3b54f7310f7913ee89f73d27581a4f6893fde0a8cc43719e9e1b1a4ec09c33b"
+    },
+    "arf-matched-population-validation.svg": {
+      "bytes": 22119,
+      "sha256": "6dcf76baf75cf18ca426904dd08f83868a2afe9b3abaee7284ad5a89cfb7a177"
+    }
+  },
+  "cost": {
+    "metric_operation_seconds": 16043.791480447631,
+    "metric_scheduler_wall_seconds": 22902.048802402103,
+    "native_fit": {
+      "operation_seconds": 14412.990775787272,
+      "scheduler_wall_seconds": 21699.87253475492
+    },
+    "sample_operation_seconds": 9901.332472571172,
+    "sample_scheduler_wall_seconds": 14568.632655557012
+  },
+  "counts_as_dope_win": false,
+  "dope_reference": {
+    "earlier_density_sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a",
+    "logical_cells": 1800,
+    "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+  },
+  "final_five_fit_coverage_complete": false,
+  "format": "dope-original-arf-matched-population-publication-manifest",
+  "full_campaign_admitted": false,
+  "global_configuration_tuned_or_selected": false,
+  "global_family_selected": false,
+  "mfs_v2": null,
+  "native_reference": {
+    "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/arf-s3-population-native.json",
+    "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+  },
+  "native_selection_changed": false,
+  "native_values_ranked_across_methods": false,
+  "official_tests_opened": false,
+  "privacy_attack_coverage_complete": false,
+  "production_certified": false,
+  "ptf_v1": null,
+  "publisher_sources": {
+    "arf_native_selection.py": "fdb77971422c5714a1be4cad31cef243033fd727f166104d7f8a004f6fb64844",
+    "arf_runtime_guard.py": "163328e0130f8d23ea5df5f63b2a2340e9e7361145190fbdb63e97889cec2df7",
+    "publish_arf_population_matched.py": "0cf91572ff39d8c5dab1f58834102c28f2eef97eef9ec116e4b0dcbd8ff76c58",
+    "publish_arf_population_matched_figure.py": "da32a00bece4f85966bc406beaf7084da0ce33f438459ecf239328cf82473b41",
+    "publish_arf_population_matched_manifest.py": "fa42e1c7812b15ec62df15846a0f8bffc8a0f6c4d04c46f7e9c290df6c97dc6e",
+    "publish_arf_population_native.py": "8e1b2a05824fc20e958185865028b5b8ee5c7c7dd82d1275201bbe77363fea96",
+    "publish_dope_refinement_discovery.py": "86205d65e65774a14de1838002828c9581db4009c0122df3d5f056103c68fa57",
+    "publish_dope_refinement_fits.py": "560a4f3a5331c895adea9bbe54eb26b3c8ef25cc5d82460cb6cfce94fb199827",
+    "publish_dope_refinement_population.py": "66eb7031c68fb42ff894c7f755a7f4931452e652039b627c832ee5248cb7156a"
+  },
+  "release_safe": null,
+  "release_safe_l3_comparison_complete": false,
+  "source_locks": {
+    "batch_auxiliary": "fbc3596f62480e3b69b68263d0cadd459910d0fad093d1ffcc127dec92a094ce",
+    "native_receipts": "238a19ea24694348b0cb6acd43b5203ac75989ee6ac5c714ef86c32ff040e61d",
+    "native_reconciliation": "af722bff624b2b5cad37eb10a314767dcbd2b00b085c44114f8ef398de9c3850",
+    "receipts": "172875365cd22716c04b8859ae72379bb88eb1b976680f69dc497493f5e324b2",
+    "reconciliation": "bb68953bf349ca4107f7fb6578fc77cac6a62c39e0530947ca182b1ca6600b1c",
+    "round": "ee43afacaf324386b29cabbda5d8195a8777c75db2a4da297d7b7ff50a620716",
+    "sampling_receipts": "2fe4c5f9bd1287902e0802e1bb973475e3132b84c50d32c133572289e33202fc",
+    "sampling_round": "bf17d9c4b2d76736036dec82adfd98447e94f66fd8d7bb56675d4e8245012777"
+  },
+  "superiority": null,
+  "system_dynamic_library_closure_certified": false,
+  "version": 1
+}
