@@ -415,6 +415,13 @@ def _wtl(pair):
     return f"{int(pair['wins'])}/{int(pair['ties'])}/{int(pair['losses'])}"
 
 
+def _publication_phrase(display):
+    """Receipt median from the B-lane publication, or ``not measured``."""
+    from publication_rows import phrase
+
+    return phrase(display)
+
+
 def emit(payload, out, sig3, tex_p, tex_bytes, command):
     density = payload["blocks"]["density"]["catboost"]
     linear = payload["blocks"]["density"]["linear"]
@@ -502,6 +509,9 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
         command("DopeByteLo", tex_bytes(side.get("dope_byte_min"))),
         command("TabSynPanel", "not measured"),
         command("TabDDPMPanel", "not measured"),
+        command("TabSynResult", _publication_phrase("TabSyn")),
+        command("TabDDPMResult", _publication_phrase("TabDDPM")),
+        command("ForestPublication", _publication_phrase("Forest-Flow")),
         command("PrivacyAttackPanel", "not measured"),
         command("FitSeedVariance", "not measured"),
         command("FullAblationGrid", "not measured"),

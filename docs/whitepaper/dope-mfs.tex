@@ -49,9 +49,11 @@ $\NNeuCb$-lineage block compares CTGAN and TVAE. An unpooled
 $\NForestCb$-lineage Forest-Flow block is ahead on CatBoost
 (\WtlForestCb) at $\ForestByteLo$ to $\ForestByteHi$ bytes.
 $\DopeWithinCap$ displayed DOPE artifacts sit inside the 10{,}240-byte cap.
-Official tests were not opened. Master Fitness v2 is null. TabSyn, a
-100-lineage TabDDPM panel, the production privacy-attack panel, fit-seed
-variance, and the full ablation grid are not measured.
+Official tests were not opened. Master Fitness v2 is null. The TabSyn
+publication is \TabSynResult. The 100-lineage TabDDPM publication is
+\TabDDPMResult. The full Forest-Flow publication is \ForestPublication.
+The production privacy-attack panel is \PrivacyAttackPanel. Fit-seed
+variance is \FitSeedVariance. The full ablation grid is \FullAblationGrid.
 Grouped-validation fidelity and an empirical distance ledger are reported.
 They are not differential privacy or HIPAA de-identification.
 \end{abstract}
@@ -87,10 +89,14 @@ lineage-bootstrap intervals (Fig.~\ref{fig:bytes}).
 \item Paired Wilcoxon tests with Holm correction, rank-biserial
 correlations, and a Friedman--Nemenyi diagram on the common lineage set
 (Fig.~\ref{fig:pairs}).
-\item A separate six-lineage Forest-Flow block, not pooled with the
-density block.
-\item An explicit account of what this panel does not measure, including
-MFS-v2 (Section~\ref{sec:threats}).
+\item A separate $\NForestCb$-lineage Forest-Flow block, not pooled with the
+density block and not the full publication (\ForestPublication).
+\item What this panel does not measure: TabSyn (\TabSynResult), the
+100-lineage TabDDPM publication (\TabDDPMResult), the full Forest-Flow
+publication (\ForestPublication), the privacy-attack panel
+(\PrivacyAttackPanel), fit-seed variance (\FitSeedVariance), the full
+ablation grid (\FullAblationGrid), and MFS-v2
+(Section~\ref{sec:threats}).
 \end{enumerate}
 An unexecuted method is not a win for DOPE. Density, neural, Forest-Flow,
 and BeyondArena blocks are not pooled.
@@ -305,7 +311,8 @@ Table~\ref{tab:cost} is receipt wall-clock and charged bytes.
 Fit and sample columns are \texttt{elapsed\_seconds} when the receipt
 stores that timer. A timer, host, device, or byte field the receipt
 does not store is \NotRecorded. CPU model is \NotRecorded\ on every
-row. TabSyn is \TabSynPanel. A full TabDDPM panel is \TabDDPMPanel.
+row. The TabSyn cost row is \TabSynPanel. The TabDDPM cost row is
+\TabDDPMPanel.
 The supplement
 states the replay walls, the Forest-Flow sums, and the unsplit density
 attempt timers.
@@ -479,6 +486,10 @@ $\ForestByteLo$ to $\ForestByteHi$ bytes (median $\ForestByteMedian$)
 against a DOPE median of $\DopeForestByteMedian$ on the same lineages.
 MFS-v2 on this block is null.
 
+Table~\ref{tab:publication} is a different ledger: the published
+matched-population receipt for TabDDPM, TabSyn, and Forest-Flow. A missing
+file is not measured.
+
 \begin{table*}[t]
 \caption{Forest-Flow confirmation at $4n$, CatBoost. Not pooled.}
 \label{tab:forest}
@@ -487,13 +498,22 @@ MFS-v2 on this block is null.
 \input{generated/forest-table.tex}
 \end{table*}
 
+\begin{table}[t]
+\caption{Published matched receipts at $4n$, CatBoost.}
+\label{tab:publication}
+\centering
+\scriptsize
+\input{generated/publication-rows.tex}
+\end{table}
+
 \subsection{MFS-v2 column}
 Table~\ref{tab:score} is the scalar required by \eqref{eq:mfs}. No method
 has a complete component vector and a fully passed hard-gate map, so every
 entry is null. Copying a retention number into this column would publish a
 value the contract refuses to emit. PTF-v1 is null. Release-safe
 certification is null. The admission locks are not frozen.
-TabSyn is \TabSynPanel. TabDDPM on this 100-lineage panel is \TabDDPMPanel.
+The published TabSyn receipt median is \TabSynResult. The published
+TabDDPM receipt median is \TabDDPMResult.
 
 \begin{table}[t]
 \caption{MFS-v2 after native selection. Null means not emitted.}
@@ -571,14 +591,18 @@ score, a PTF-v1 result, or a release-safe certification. A small Wilcoxon
 $p$-value does not flip that null. The 8{,}192-step budget moves the
 CatBoost median by $\DiffSufCb$ and is not the displayed model. BeyondArena
 fits $\BeyondPrepared$ further families inside the cap and does not show
-retention. TabSyn, a $\PreparedN$-lineage TabDDPM panel, and an equal tuning
-budget are not measured. Fit-seed variance is \FitSeedVariance.
+retention. The TabSyn publication is \TabSynResult. A $\PreparedN$-lineage
+TabDDPM publication is \TabDDPMResult. The full Forest-Flow publication is
+\ForestPublication. An equal tuning budget is not measured. Fit-seed
+variance is \FitSeedVariance.
 
 \section{Threats to Validity}
 \label{sec:threats}
 \paragraph{Internal.}
-The fits use coresets of \CoreMin\ to \CoreMax\ rows, one fit seed, and a
-training-derived validation cut of the official training rows. The
+The fits use coresets of \CoreMin\ to \CoreMax\ rows, fit seed $11$ only,
+and a training-derived validation cut of the official training rows. The
+scored retention panel is regression only. Other tasks are not a result
+of these tables. The
 supplement records the draw. The official test was not an input to
 training, selection, or the numbers in this paper. The informativeness rule
 drops a negligible real-versus-null gap. \ThrSentence\ Incomplete groups
@@ -607,13 +631,19 @@ superiority test. Density, neural, Forest-Flow, and BeyondArena stay
 unpooled. A small retention $p$-value does not flip the null scalar.
 
 \section{Conclusion}
-On $\NDopeCb$ validation lineages, \texttt{features12\_steps2048} has
+On $\NDopeCb$ regression lineages and fit seed $11$, generator
+\texttt{features12\_\allowbreak{}steps2048} has
 CatBoost retention $\MedDopeCb$ (interval $\LoDopeCb$ to $\HiDopeCb$)
 and $\DopeWithinCap$ artifacts inside the cap. CatBoost separates it
 from the density comparators; the linear auditor does not separate it
-from the Gaussian copula. Forest-Flow is ahead on CatBoost
-(\WtlForestCb) and the MLP (\WtlForestMlp). The certification scalar
-is null, official tests stay sealed, and unrun generators are not measured.
+from the Gaussian copula. The $\NForestCb$-lineage Forest-Flow block
+leads on CatBoost (\WtlForestCb) and the MLP (\WtlForestMlp). Those
+counts are not a certified win. The full Forest-Flow publication is
+\ForestPublication. The TabSyn publication is \TabSynResult. The
+100-lineage TabDDPM publication is \TabDDPMResult. The privacy-attack
+panel is \PrivacyAttackPanel. Fit-seed variance is \FitSeedVariance.
+The full ablation grid is \FullAblationGrid. The certification scalar
+is null and official tests stay sealed.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references,generated/related}
