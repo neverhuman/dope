@@ -59,16 +59,17 @@ eXpress.
 Resolved for the numbers the verifier covers. `just paper` rewrites the
 evidence file, the macros, the figures, and the PDF. `verify_paper_numbers.py`
 exits nonzero on a mismatched macro or an untraced token in `dope-mfs.tex`.
-Forest-Flow bytes and `fit_seconds` come from hash-checked `fit.json` files.
-The shared-evaluator seconds in the confirmation JSON are not that sum, and
-the cost table no longer reports them. Replay medians come from receipt
-`elapsed_seconds`. Loss point medians come from the logged TSV files.
-Bootstrap bands are produced by `render_figures.py` with a fixed seed; the
-verifier checks the point medians, not every stride of the band.
+Forest-Flow bytes and fit totals come from the committed confirmation
+ledger. The shared-evaluator seconds in that JSON are not the fit sum, and
+the cost table does not report them. Replay medians and loss point medians
+come from the committed replay and loss ledgers. The ARF count comes from
+`arf-native-closure-watch-v1.receipt.json`, which records the log's SHA-256
+and does not require the log to be present. Bootstrap bands are produced by
+`render_figures.py` with a fixed seed; the verifier checks the point
+medians, not every stride of the band.
 
-Out of scope: a second machine without `/mnt/fast-scratch/dope-benchmark`
-and the ARF watch log cannot rerun the verifier. The committed
-`fit-trace.json` is the reduction those files produced.
+The verifier reads those committed files. It does not open scratch
+directories, the watch log, or a path outside the checkout.
 
 ## Over-claiming
 

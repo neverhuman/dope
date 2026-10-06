@@ -28,8 +28,15 @@ if [[ -n "${JANKURAI_COMPARISON_BASE:-}" ]]; then
     }
   fi
   if ! git rev-parse --verify "${comparison_base}^{commit}" >/dev/null 2>&1; then
-    echo "Explicit Jankurai comparison base is unavailable: $comparison_base" >&2
-    exit 1
+    # A force-with-lease push reports the previous tip in github.event.before.
+    # That object is not in the new history. Compare against main instead.
+    requested="$comparison_base"
+    if git fetch --no-tags origin main && comparison_base="$(git merge-base HEAD FETCH_HEAD)"; then
+      echo "Jankurai comparison base ${requested} is not in this clone; using merge-base ${comparison_base}"
+    else
+      echo "Explicit Jankurai comparison base is unavailable: ${requested}" >&2
+      exit 1
+    fi
   fi
   if [[ "$(git rev-parse "${comparison_base}^{commit}")" == "$(git rev-parse HEAD)" ]]; then
     echo "Explicit Jankurai comparison base equals HEAD" >&2

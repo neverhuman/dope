@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
-"""Trace manuscript numbers to fit.json files, receipts, and the ARF watch log.
+"""Trace manuscript numbers to committed receipts and ledgers.
 
-Reads those inputs and does not rewrite them. ``--write-evidence`` stores the
-reduction in docs/whitepaper/generated/fit-trace.json so the table generator
-can format it. A later run with no flag exits nonzero when a macro, a
-hand-typed token, or that evidence file disagrees. Retention medians stay in
-the committed validation ledgers; this script checks the Forest-Flow byte
-charges in those ledgers against hash-checked fit.json files.
+Reads repo-relative files only. It does not open the ARF watch log, scratch
+fit directories, or any path outside this checkout, including ``.agent/`` and
+``target/``. ``--write-evidence`` stores the reduction in
+docs/whitepaper/generated/fit-trace.json. A later run with no flag exits
+nonzero when a macro, a hand-typed token, or that evidence file disagrees.
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import re
-import statistics
 import sys
 from pathlib import Path
 
@@ -25,12 +22,12 @@ RESULTS = REPO / "research" / "benchmark" / "results"
 PAPER = REPO / "docs" / "whitepaper"
 GENERATED = PAPER / "generated"
 TEX = PAPER / "dope-mfs.tex"
-WATCH_LOG = Path(
-    "/home/ubuntu/dope/.agent/worktrees/integration/target/arf-native-closure-watch-v1.log"
-)
-SCRATCH = Path("/mnt/fast-scratch/dope-benchmark")
-LOSS_ROOT = SCRATCH / "dope-s3-loss-log-v1" / "replay"
-BEYOND_PREPARE = SCRATCH / "beyondarena-prepared-v1" / "prepare-summary.json"
+WATCH_RECEIPT = RESULTS / "arf-native-closure-watch-v1.receipt.json"
+FOREST_LEDGER = RESULTS / "s3-matched-forest-confirmation-validation.json"
+LOSS_CURVES = GENERATED / "loss-curves.json"
+REPLAY_COST = GENERATED / "replay-cost.json"
+PROVENANCE = GENERATED / "provenance.json"
+INVENTORY = RESULTS / "beyondarena-s3-inventory.json"
 TOKEN = re.compile(r"\d+(?:\{,\}\d{3})+|\d+\.\d+|\d+")
 CITE = re.compile(r"\\cite[tp]?\{[^{}]*\}")
 
@@ -56,31 +53,31 @@ def parse_watch(text):
     }
 
 
-def _paths(document):
-    found = []
-
-    def walk(node):
-        if isinstance(node, dict):
-            path = node.get("path")
-            if isinstance(path, str) and path.endswith("fit.json"):
-                found.append(node)
-            for value in node.values():
-                walk(value)
-        elif isinstance(node, list):
-            for value in node:
-                walk(value)
-
-    walk(document)
-    return found
+def load_watch():
+    """Reduced watch facts. The source path is recorded and not opened."""
+    receipt = json.loads(WATCH_RECEIPT.read_text())
+    digest = str(receipt.get("sha256") or "")
+    source = receipt.get("source")
+    if len(digest) != 64 or any(character not in "0123456789abcdef" for character in digest):
+        raise ValueError("watch receipt sha256 is not 64 hex characters")
+    if not isinstance(source, str) or not source:
+        raise ValueError("watch receipt has no source")
+    watch = receipt["watch"]
+    return {
+        "closed": int(watch["closed"]),
+        "ok": int(watch["ok"]),
+        "planned": int(watch["planned"]),
+        "count_utc": watch.get("count_utc"),
+        "terminal_phase": watch.get("terminal_phase"),
+        "terminal_exit_code": watch.get("terminal_exit_code"),
+        "new_generator_fits_started": int(watch.get("new_generator_fits_started") or 0),
+        "records": int(watch["records"]),
+    }
 
 
 def forest_fits():
-    manifest = json.loads(
-        (RESULTS / "s3-matched-forest-confirmation-validation.manifest.json").read_text()
-    )
-    ledger = json.loads(
-        (RESULTS / "s3-matched-forest-confirmation-validation.json").read_text()
-    )
+    """Byte bounds and fit totals from the committed confirmation ledger."""
+    ledger = json.loads(FOREST_LEDGER.read_text())
     selected = []
     for row in ledger["summary"]:
         if (
@@ -90,41 +87,13 @@ def forest_fits():
             and isinstance(row.get("charged_artifact_bytes"), int)
         ):
             selected.append(row["charged_artifact_bytes"])
-    fits = []
-    for ref in _paths(manifest):
-        raw = Path(ref["path"]).read_bytes()
-        digest = hashlib.sha256(raw).hexdigest()
-        if digest != ref["sha256"]:
-            raise ValueError(f"fit.json hash mismatch: {ref['path']}")
-        document = json.loads(raw)
-        receipt = json.loads(Path(ref["path"]).with_name("receipt.json").read_text())
-        operation_seconds = sum(
-            float(item["elapsed_seconds"])
-            for item in receipt["operations"]
-            if isinstance(item, dict) and "elapsed_seconds" in item
-        )
-        fits.append(
-            {
-                "artifact_bytes": int(document["artifact_bytes"]),
-                "fit_seconds": float(document["fit_seconds"]),
-                "status": document["status"],
-                "mfs_v2": document["mfs_v2"],
-                "official_tests_opened": document["official_tests_opened"],
-                "operation_seconds": operation_seconds,
-            }
-        )
-    amounts = {item["artifact_bytes"] for item in fits}
-    missing = [amount for amount in selected if amount not in amounts]
-    if missing:
-        raise ValueError(f"validation bytes missing from fit.json: {missing}")
-    if any(item["status"] != "ok" or item["mfs_v2"] is not None for item in fits):
-        raise ValueError("a confirmation fit.json is not ok or has a non-null MFS-v2")
-    if any(item["official_tests_opened"] for item in fits):
-        raise ValueError("a confirmation fit.json opened an official test")
+    if not selected:
+        raise ValueError("committed forest ledger has no native-selected size-4 byte charges")
+    cost = ledger["cost"]
     return {
-        "fit_count": len(fits),
-        "fit_seconds_sum": sum(item["fit_seconds"] for item in fits),
-        "operation_seconds_sum": sum(item["operation_seconds"] for item in fits),
+        "fit_count": int(cost["forest_new_gpu_fits"]),
+        "fit_seconds_sum": float(cost["forest_fit_core_seconds"]),
+        "operation_seconds_sum": float(cost["forest_fit_native_sample_operation_seconds"]),
         "selected_byte_min": min(selected),
         "selected_byte_max": max(selected),
         "selected_n": len(selected),
@@ -132,12 +101,12 @@ def forest_fits():
 
 
 def beyond_prepare():
-    document = json.loads(BEYOND_PREPARE.read_text())
+    """Prepare counts stored in the committed provenance dump and inventory."""
+    provenance = json.loads(PROVENANCE.read_text())
+    summary = provenance["beyondarena"]["prepare_summary"]
     feature_range = 0
     overlap = 0
-    for row in document["results"]:
-        if row["status"] == "prepared":
-            continue
+    for row in summary["failed_families"]:
         detail = str(row.get("detail") or "")
         if "projected feature count" in detail:
             feature_range += 1
@@ -145,65 +114,46 @@ def beyond_prepare():
             overlap += 1
         else:
             raise ValueError(f"unclassified prepare failure: {row.get('name')}")
-    inventory = json.loads((RESULTS / "beyondarena-s3-inventory.json").read_text())
-    revision = str(inventory["revision"])
+    inventory = json.loads(INVENTORY.read_text())
     return {
-        "families": int(document["families"]),
-        "prepared": int(document["prepared"]),
-        "failed": int(document["failed"]),
+        "families": int(summary["families"]),
+        "prepared": int(summary["prepared"]),
+        "failed": int(summary["failed"]),
         "feature_range": feature_range,
         "overlap": overlap,
         "inventory": int(inventory["dataset_count"]),
-        "revision": revision,
-        "official_test_opened_by_optimizer": bool(document["official_test_opened_by_optimizer"]),
+        "revision": str(inventory["revision"]),
+        "official_test_opened_by_optimizer": bool(summary["official_test_opened_by_optimizer"]),
     }
 
 
 def loss_medians():
-    """Point medians of the first and last logged step. Not a bootstrap."""
+    """Point medians already reduced in the committed loss-curve ledger."""
+    document = json.loads(LOSS_CURVES.read_text())
     found = {}
     for profile in ("features12_steps2048", "features12_steps8192"):
-        trains0, valids0, trains1, valids1 = [], [], [], []
-        for path in sorted((LOSS_ROOT / profile).glob("*/loss.tsv")):
-            first = last = None
-            with path.open() as handle:
-                for line in handle:
-                    if line.strip():
-                        parts = line.split()
-                        if first is None:
-                            first = parts
-                        last = parts
-            if first is None or last is None:
-                continue
-            trains0.append(float(first[1]))
-            valids0.append(float(first[2]))
-            trains1.append(float(last[1]))
-            valids1.append(float(last[2]))
+        row = document["profiles"][profile]
         found[profile] = {
-            "n": len(trains0),
-            "step0_train": statistics.median(trains0),
-            "step0_validation": statistics.median(valids0),
-            "final_train": statistics.median(trains1),
-            "final_validation": statistics.median(valids1),
+            "n": int(row["lineages"]),
+            "step0_train": float(row["step0_train"]),
+            "step0_validation": float(row["step0_validation"]),
+            "final_train": float(row["final_train"]),
+            "final_validation": float(row["final_validation"]),
         }
     return found
 
 
 def replay_medians():
-    found = {}
-    for profile in ("features12_steps2048", "features12_steps8192"):
-        values = []
-        for path in sorted((LOSS_ROOT / profile).glob("*/receipt.json")):
-            values.append(float(json.loads(path.read_text())["elapsed_seconds"]))
-        found[profile] = statistics.median(values)
-    return found
+    document = json.loads(REPLAY_COST.read_text())
+    return {
+        profile: float(document[profile]["median"])
+        for profile in ("features12_steps2048", "features12_steps8192")
+    }
 
 
 def collect_evidence():
-    if not WATCH_LOG.is_file():
-        raise FileNotFoundError(WATCH_LOG)
     return {
-        "watch": parse_watch(WATCH_LOG.read_text()),
+        "watch": load_watch(),
         "forest": forest_fits(),
         "beyond": beyond_prepare(),
         "loss": loss_medians(),
@@ -415,7 +365,7 @@ def main(argv=None):
             "watch": evidence["watch"],
         }
         if stored != fresh:
-            failures.append("fit-trace.json disagrees with a fresh read of fit.json, receipts, and the watch log")
+            failures.append("fit-trace.json disagrees with the committed receipts and ledgers")
     numbers = (GENERATED / "numbers.tex").read_text() if (GENERATED / "numbers.tex").is_file() else ""
     if not numbers:
         failures.append("generated/numbers.tex is missing")
@@ -428,7 +378,7 @@ def main(argv=None):
     if failures:
         print("\n".join(failures))
         return 1
-    print("paper numbers match fit.json, receipts, and the ARF watch log")
+    print("paper numbers match the committed receipts and ledgers")
     return 0
 
 
