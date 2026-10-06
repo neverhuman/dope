@@ -52,8 +52,8 @@ $\DopeWithinCap$ displayed DOPE artifacts sit inside the 10{,}240-byte cap.
 Official tests were not opened. Master Fitness v2 is null. TabSyn, a
 100-lineage TabDDPM panel, the production privacy-attack panel, fit-seed
 variance, and the full ablation grid are not measured.
-Table~\ref{tab:fidelity} is grouped-validation fidelity and an empirical
-distance ledger, not differential privacy or HIPAA de-identification.
+Grouped-validation fidelity and an empirical distance ledger are reported.
+They are not differential privacy or HIPAA de-identification.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -83,15 +83,14 @@ The contributions are:
 \item The displayed residual and the sealed-test training pipeline
 (Section~\ref{sec:method}, Fig.~\ref{fig:arch}, \eqref{eq:residual}).
 \item Retention, charged bytes, and grouped-validation fidelity, with
-lineage-bootstrap intervals
-(Fig.~\ref{fig:bytes}, Tables~\ref{tab:density}, \ref{tab:bytes}, and~\ref{tab:fidelity}).
+lineage-bootstrap intervals (Fig.~\ref{fig:bytes}).
 \item Paired Wilcoxon tests with Holm correction, rank-biserial
 correlations, and a Friedman--Nemenyi diagram on the common lineage set
-(Fig.~\ref{fig:pairs}, Table~\ref{tab:density}).
-\item A separate six-lineage Forest-Flow block
-(Table~\ref{tab:forest}).
+(Fig.~\ref{fig:pairs}).
+\item A separate six-lineage Forest-Flow block, not pooled with the
+density block.
 \item An explicit account of what this panel does not measure, including
-MFS-v2 (Table~\ref{tab:score} and Section~\ref{sec:threats}).
+MFS-v2 (Section~\ref{sec:threats}).
 \end{enumerate}
 An unexecuted method is not a win for DOPE. Density, neural, Forest-Flow,
 and BeyondArena blocks are not pooled.
@@ -99,9 +98,9 @@ and BeyondArena blocks are not pooled.
 \section{Related Work}
 \label{sec:related}
 Tabular synthesis has moved from parametric copulas~\cite{patki2016sdv} and
-Chow--Liu trees~\cite{chow1968dependence} through conditional GANs and
-variational autoencoders~\cite{xu2019ctgan} to diffusion and score-based
-models~\cite{kotelnikov2023tabddpm,kim2023stasy,lee2023codi,zhang2024tabsyn,shi2025tabdiff,mueller2025cdtd,jolicoeurmartineau2024forestdiffusion}.
+Chow--Liu trees~\cite{chow1968dependence} through conditional GANs, including
+TableGAN, and variational autoencoders~\cite{xu2019ctgan,park2018tablegan} to diffusion and score-based
+models~\cite{kotelnikov2023tabddpm,kim2023stasy,lee2023codi,zhang2024tabsyn,shi2025tabdiff,mueller2025cdtd,jolicoeurmartineau2024forestdiffusion,zagardo2026gatd}.
 Autoregressive and language-model generators~\cite{borisov2023great,solatorio2023realtabformer},
 prior-data fitted generators~\cite{ma2023tabpfgen,hollmann2025tabpfn},
 CTAB-GAN and CTAB-GAN+~\cite{zhao2021ctabgan,zhao2024ctabganplus}, and
@@ -116,7 +115,7 @@ REaLTabFormer, and TabPFGen are cited and not measured. SMOTE~\cite{chawla2002sm
 This panel scores regression retention, not classification oversampling.
 
 Differentially private Bayesian networks and marginal
-synthesizers~\cite{zhang2014privbayes,mckenna2021mst,mckenna2022aim} optimize
+synthesizers~\cite{zhang2014privbayes,mckenna2021mst,mckenna2022aim,cai2021privmrf} optimize
 a privacy budget. Membership inference and shadow-model attacks are a
 separate detection literature~\cite{shokri2017membership,hayes2018logan,vanbreugel2023domias}.
 Formal differential privacy is a different claim from an empirical
@@ -124,18 +123,15 @@ resemblance score~\cite{dwork2014foundations,abadi2016deep}. Utility reviews
 separate marginal fidelity from downstream
 prediction~\cite{snoke2018utility,raab2018practical}. Alpha-precision,
 beta-recall, SDMetrics, and synthcity are the usual fidelity
-reports~\cite{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}. The
-density cells already store a classifier two-sample statistic, a mean
-marginal Kolmogorov--Smirnov distance, and a pairwise correlation fidelity.
-Those fields are summarized below. Table~\ref{tab:fidelity} adds
-alpha-precision, beta-recall, a distance-to-closest-record share, and a
-DOMIAS AUC on the grouped validation split. ARF is absent because shared
+reports~\cite{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}.
+The fidelity results add alpha-precision, beta-recall, a
+distance-to-closest-record share, and a DOMIAS AUC. ARF is absent because shared
 validation sampling is still pending. The production privacy-attack panel
 remains \PrivacyAttackPanel. Nothing in those fields is a formal privacy
 guarantee or a HIPAA de-identification claim.
 
 Tree models remain strong tabular predictors, which is why CatBoost is one
-of the three auditors~\cite{grinsztajn2022trees,prokhorenkova2018catboost}.
+of the three auditors~\cite{grinsztajn2022trees,prokhorenkova2018catboost,shwartz-ziv2022tabular}.
 TabZilla and TabArena show how brittle a single split can
 be~\cite{mcelfresh2023tabzilla,erickson2026tabarena}. The regression
 lineages come from PMLB~\cite{olson2017pmlb,romano2021pmlb}. Comparing
@@ -177,7 +173,7 @@ selected. Other shapes exist and are not this result: micro-TVAEs, TinyMAT,
 joint TVAE, a masked transformer, and a TabSyn candidate. A direct-rank
 TabDDPM candidate is a research comparator with no claim on the
 10{,}240-byte tier. The scored campaign did not store a per-step loss. A
-later logged replay did. Section~\ref{sec:ablation} plots that replay. The
+later logged replay did. The supplement plots that replay. The
 replay files are not substituted for the scored artifacts, and a lower
 hidden-basis loss at 8{,}192 steps does not replace the displayed profile.
 The full width-and-step grid is \FullAblationGrid.

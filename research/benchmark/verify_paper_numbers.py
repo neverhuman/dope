@@ -22,6 +22,8 @@ RESULTS = REPO / "research" / "benchmark" / "results"
 PAPER = REPO / "docs" / "whitepaper"
 GENERATED = PAPER / "generated"
 TEX = PAPER / "dope-mfs.tex"
+ARCH = PAPER / "figures" / "architecture.tex"
+ARCH_LITERALS = {"80", "20", "16", "2048", "0.002"}
 WATCH_RECEIPT = RESULTS / "arf-native-closure-watch-v1.receipt.json"
 FOREST_LEDGER = RESULTS / "s3-matched-forest-confirmation-validation.json"
 LOSS_CURVES = GENERATED / "loss-curves.json"
@@ -245,12 +247,53 @@ def check_macros(evidence, numbers_text):
     _require(bodies, "LossValEndA", _sig3(loss["final_validation"]), failures)
     _require(bodies, "LossTrainEndB", _sig3(loss_b["final_train"]), failures)
     _require(bodies, "LossValEndB", _sig3(loss_b["final_validation"]), failures)
+    failures.extend(check_architecture(bodies))
     if "ForestEvalSec" in bodies:
         failures.append("ForestEvalSec is not a sum of fit.json fields")
     if beyond["official_test_opened_by_optimizer"]:
         failures.append("BeyondArena prepare summary opened an official test")
     if watch["new_generator_fits_started"] != 0:
         failures.append("ARF watch log started new generator fits")
+    return failures
+
+
+def architecture_expected():
+    """Displayed pipeline constants from the fitter source and the data lock."""
+    rust = (REPO / "rust/compiler/target_fitting/part_02.rs").read_text()
+    shape = re.search(r'"features12_steps2048" => \(12, (\d+), (\d+)\)', rust)
+    rate = re.search(r"\.build\(&store, ([0-9.eE+-]+)\)", rust)
+    lock = (REPO / "research/benchmark/results/s3-data.lock.json").read_text()
+    split = re.search(r"official_test_grouped_training_(\d+)_(\d+)", lock)
+    if shape is None or rate is None or split is None:
+        raise ValueError("architecture source constants are missing")
+    steps = f"{int(shape.group(2)):,}".replace(",", "{,}")
+    return {
+        "ArchSplitMajor": split.group(1),
+        "ArchSplitMinor": split.group(2),
+        "ArchWidth": shape.group(1),
+        "ArchSteps": steps,
+        "ArchLr": f"{float(rate.group(1)):.3f}",
+    }
+
+
+def check_architecture(bodies):
+    failures = []
+    expected = architecture_expected()
+    for name, value in expected.items():
+        _require(bodies, name, value, failures)
+    if not ARCH.is_file():
+        failures.append("figures/architecture.tex is missing")
+        return failures
+    raw = []
+    for line in ARCH.read_text().splitlines():
+        if "%" in line:
+            line = line.split("%", 1)[0]
+        for token in TOKEN.findall(line):
+            normalized = normalize_token(token)
+            if normalized in ARCH_LITERALS:
+                raw.append(normalized)
+    if raw:
+        failures.append("architecture.tex repeats generated literals: " + ", ".join(raw))
     return failures
 
 
