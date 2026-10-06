@@ -137,8 +137,11 @@ folds: 73 binary, 44 regression, 25 multiclass; 103 IID, 21 temporal, and 18
 grouped. Raw tables are under `raw/BeyondArena/` at the same revision.
 `research/BeyondArena/` is a later experiment prefix, not a second table copy.
 `results/beyondarena-s3-inventory.json` names every family.
-`results/beyondarena-panel.lock.json` version 2 locks 12 rights-cleared binary
-or regression families and sets `pooled_with_s3_100` false. An earlier
+`results/beyondarena-panel.lock.json` version 3 selects all 73 rights-cleared
+binary or regression families that are not in the PMLB 100 and sets
+`pooled_with_s3_100` false. Version 2 had kept 12 of those families. The
+retention rows in `results/beyondarena-retention-rows.json` are the words
+"not measured." An earlier
 three-name lock that pointed at Adult, California, and News was replaced
 before any BeyondArena fit. Official fold 0 of repeat 0 was then cut 80/20
 on the training side only, seed 1729. Four families exceed the 2,000-feature

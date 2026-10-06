@@ -30,8 +30,13 @@
   },
   "beyondarena_secondary": {
     "role": "context_and_robustness_only",
-    "maximum_source_families": 12,
-    "selection": "rights_cleared_previously_unscored_binary_or_regression_source_families_by_task_id_sha256_with_iid_grouped_temporal_strata",
+    "evaluation_lock": "research/benchmark/results/beyondarena-panel.lock.json",
+    "evaluation_lock_version": 3,
+    "maximum_source_families": 73,
+    "historical_prepare_cap": 12,
+    "selection": "all_rights_cleared_binary_or_regression_families_absent_from_the_pmlb_100",
+    "wave_1_partition": "inner_validation_of_official_training_fold",
+    "outer_fold_authorized": false,
     "test_partition": "evaluator_only",
     "pooled_with_public_headline": false
   },
