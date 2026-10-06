@@ -308,6 +308,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     lines.append(command("ExcludedN", str(lock.get("excluded") if lock.get("excluded") is not None else "not measured")))
     lines.append(command("UnknownRights", f"{int(lock['unknown_rights']):,}".replace(",", "{,}") if isinstance(lock.get("unknown_rights"), int) else "not measured"))
     lines.append(command("ThrSentence", _threshold_sentence(payload["threshold_robustness"]["DOPE"]["catboost"], sig3)))
+    lines.extend(_expanded_commands(payload["expanded"], sig3, tex_p, command))
     beyond = side.get("beyond") or {}
     lines.append(command("BeyondElapseA", _elapsed(_median_elapsed(beyond, "steps2048"), tex_bytes)))
     lines.append(command("BeyondElapseB", _elapsed(_median_elapsed(beyond, "steps8192"), tex_bytes)))
@@ -321,6 +322,11 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     _write_threshold(payload, out, sig3)
     _write_beyond(beyond, out, sig3, tex_bytes)
     _write_provenance(side, out)
+    _write_fidelity(payload["expanded"], out, sig3, tex_p)
+    _write_loss_beside(payload["expanded"], out, sig3)
+    _write_threshold_counts(payload["expanded"], out)
+    _write_coreset(payload["expanded"], out)
+    _write_hashes(payload["expanded"], out)
 
 
 def _median_elapsed(beyond, key):
@@ -384,6 +390,203 @@ def _write_beyond(beyond, out, sig3, tex_bytes):
         "\\begin{tabular}{@{}lrrrrr@{}}\n\\toprule\n"
         "Family & Fit rows & 2{,}048 B & 8{,}192 B & Val 2{,}048 & Val 8{,}192 \\\\\n"
         "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n"
+    )
+
+
+def _span(summary, sig3):
+    if not summary or not summary.get("n"):
+        return "---"
+    return f"{sig3(summary['median'])} [{sig3(summary['lo'])}, {sig3(summary['hi'])}] ({summary['n']})"
+
+
+def _contrast(pair, sig3, tex_p):
+    if not pair or not pair.get("n"):
+        return "---"
+    shown = tex_p(pair.get("holm_p"))
+    if shown != "---":
+        shown = f"${shown}$"
+    return (
+        "\\shortstack[c]{"
+        f"{sig3(pair['median_difference'])} [{sig3(pair['lo'])}, {sig3(pair['hi'])}]"
+        "\\\\ "
+        f"{shown}; {sig3(pair.get('rank_biserial'))}; {pair['n']}"
+        "}"
+    )
+
+
+def _expanded_commands(expanded, sig3, tex_p, command):
+    loss = expanded["loss"]
+    counts = expanded["threshold_counts"]
+    coreset = expanded["coreset"]
+    lines = [
+        command("CoreMin", str(coreset["fit_rows_min"])),
+        command("CoreMax", str(coreset["fit_rows_max"])),
+        command("CodeCommit", expanded["source_commit"]),
+        command("NThrLowCb", str(counts["0.001"]["catboost"])),
+        command("NThrLowLin", str(counts["0.001"]["linear"])),
+        command("NThrLowMlp", str(counts["0.001"]["mlp"])),
+        command("NThrMidCb", str(counts["0.01"]["catboost"])),
+        command("NThrMidLin", str(counts["0.01"]["linear"])),
+        command("NThrMidMlp", str(counts["0.01"]["mlp"])),
+        command("NThrHighCb", str(counts["0.05"]["catboost"])),
+        command("NThrHighLin", str(counts["0.05"]["linear"])),
+        command("NThrHighMlp", str(counts["0.05"]["mlp"])),
+    ]
+    for auditor, suffix in (("catboost", "Cb"), ("linear", "Lin"), ("mlp", "Mlp")):
+        block = loss[auditor]
+        lines.append(command(f"RmseReal{suffix}", sig3(block["real_rmse"]["median"])))
+        lines.append(command(f"RmseSyn{suffix}", sig3(block["synthetic_rmse"]["median"])))
+        lines.append(command(f"RtwoReal{suffix}", sig3(block["real_r2"]["median"])))
+        lines.append(command(f"RtwoSyn{suffix}", sig3(block["synthetic_r2"]["median"])))
+    return lines
+
+
+def _method_rows(block, labels, sig3):
+    rows = []
+    for method, label in labels:
+        metrics = block["methods"][method]
+        cells = [_span(metrics[name], sig3) for name in (
+            "alpha_precision", "beta_recall", "share_closer_to_train", "domias_auc")]
+        rows.append(label + " & " + " & ".join(cells) + r" \\")
+    return rows
+
+
+def _contrast_rows(block, labels, sig3, tex_p):
+    rows = []
+    for method, label in labels:
+        pairs = block["pairs"][method]
+        cells = [_contrast(pairs[name], sig3, tex_p) for name in (
+            "alpha_precision", "beta_recall", "share_closer_to_train", "domias_auc")]
+        rows.append(label + " & " + " & ".join(cells) + r" \\")
+    return rows
+
+
+def _write_fidelity(expanded, out, sig3, tex_p):
+    density_labels = (
+        ("DOPE", "DOPE"),
+        ("GaussianCopula", "Gaussian"),
+        ("Chow-Liu", "Chow--Liu"),
+        ("independent_marginals", "Indep."),
+    )
+    neural_labels = (("DOPE", "DOPE"), ("CTGAN", "CTGAN"), ("TVAE", "TVAE"))
+    contrast_labels = (
+        ("GaussianCopula", "DOPE$-$Gaussian"),
+        ("Chow-Liu", "DOPE$-$Chow--Liu"),
+        ("independent_marginals", "DOPE$-$Indep."),
+    )
+    neural_contrasts = (("CTGAN", "DOPE$-$CTGAN"), ("TVAE", "DOPE$-$TVAE"))
+    header = (
+        "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
+        "Method & $\\alpha$-prec. & $\\beta$-recall & DCR share & DOMIAS \\\\\n"
+        "\\multicolumn{5}{@{}l@{}}{\\emph{Median [interval] (lineages).}} \\\\\n\\midrule\n"
+    )
+    body = "\n".join(_method_rows(expanded["blocks"]["density"], density_labels, sig3))
+    body += "\n\\midrule\n" + "\n".join(_method_rows(expanded["blocks"]["neural"], neural_labels, sig3))
+    contrast = (
+        "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
+        "Contrast & $\\alpha$-prec. & $\\beta$-recall & DCR share & DOMIAS \\\\\n"
+        "\\multicolumn{5}{@{}l@{}}{\\emph{Line 2: Holm $p$; rank-biserial $r$; $n$. DOPE minus comparator.}} \\\\\n"
+        "\\midrule\n"
+        + "\n".join(_contrast_rows(expanded["blocks"]["density"], contrast_labels, sig3, tex_p))
+        + "\n\\midrule\n"
+        + "\n".join(_contrast_rows(expanded["blocks"]["neural"], neural_contrasts, sig3, tex_p))
+        + "\n\\bottomrule\n\\end{tabular}\n"
+    )
+    (out / "fidelity-privacy-table.tex").write_text(
+        header + body + "\n\\bottomrule\n\\end{tabular}\n\n\\vspace{0.5em}\n" + contrast
+    )
+
+
+def _write_threshold_counts(expanded, out):
+    counts = expanded["threshold_counts"]
+    rows = []
+    for key in ("0.001", "0.01", "0.05"):
+        row = counts[key]
+        rows.append(f"{key} & {row['catboost']} & {row['linear']} & {row['mlp']} \\\\")
+    (out / "threshold-counts.tex").write_text(
+        "\\begin{tabular}{@{}lrrr@{}}\n\\toprule\n"
+        "Threshold & CatBoost & Linear & MLP \\\\\n\\midrule\n"
+        + "\n".join(rows)
+        + "\n\\bottomrule\n\\end{tabular}\n"
+    )
+
+
+def _write_loss_beside(expanded, out, sig3):
+    rows = []
+    for auditor, label in (("catboost", "CatBoost"), ("linear", "Linear"), ("mlp", "MLP")):
+        block = expanded["loss"][auditor]
+        rows.append(
+            f"{label} & {block['n']} & {sig3(block['real_rmse']['median'])} & "
+            f"{sig3(block['synthetic_rmse']['median'])} & {sig3(block['real_r2']['median'])} & "
+            f"{sig3(block['synthetic_r2']['median'])} \\\\"
+        )
+    (out / "loss-beside-retention.tex").write_text(
+        "\\begin{tabular}{@{}lrrrrr@{}}\n\\toprule\n"
+        "Auditor & $n$ & RMSE real & RMSE synth. & $R^2$ real & $R^2$ synth. \\\\\n\\midrule\n"
+        + "\n".join(rows)
+        + "\n\\bottomrule\n\\end{tabular}\n"
+    )
+
+
+def _bin_phrase(coreset):
+    parts = []
+    for bins_, count in sorted(coreset["bins"].items(), key=lambda item: int(item[0])):
+        noun = "lineage" if count == 1 else "lineages"
+        parts.append(f"{count} {noun} at {bins_} bins")
+    if len(parts) == 1:
+        return parts[0]
+    return ", ".join(parts[:-1]) + ", and " + parts[-1]
+
+
+def _write_coreset(expanded, out):
+    coreset = expanded["coreset"]
+    bins = _bin_phrase(coreset)
+    text = (
+        "The fit view is not the full PMLB table. Frozen catalog metadata draws each "
+        "official training and test file by quota stratification on the target distribution "
+        "and high-variance feature quantile bins, aiming at "
+        f"{coreset['train_target_rows']} training rows and {coreset['test_target_rows']} test rows, "
+        f"with at most {coreset['final_max_rows']} rows in total and at least "
+        f"{coreset['minimum_final_rows']} rows. A source smaller than that quota keeps every row "
+        f"and still reserves a test share of at least {coreset['minimum_test_to_train_ratio_when_small']}. "
+        f"Of the {coreset['lineages']} prepared lineages, {coreset['not_downsampled']} were already "
+        "inside the quota. The other lineages use a hybrid coreset that keeps the "
+        f"observed feature and target range; the bin counts are {bins}. "
+        "The generator then groups identical official-training rows and assigns those groups "
+        f"with seed {coreset['split_seed']} so that about 80\\% of the rows become the fit view "
+        "and the rest become the validation holdout. Duplicate rows are not split across that cut. "
+        f"On these lineages the fit view has {coreset['fit_rows_min']} to {coreset['fit_rows_max']} rows. "
+        "The bound keeps every lineage on one worker view and leaves the official test sealed. "
+        "It is not a second draw at scoring time.\n"
+    )
+    (out / "coreset-paragraph.tex").write_text(text)
+
+
+def _break_path(path):
+    pieces = []
+    for piece in path.split("/"):
+        escaped = piece.replace("_", r"\_")
+        bits = [escaped[index : index + 16] for index in range(0, len(escaped), 16)]
+        pieces.append(r"\allowbreak{}".join(bits))
+    return r"/\allowbreak{}".join(pieces)
+
+
+def _write_hashes(expanded, out):
+    rows = [
+        f"Code commit of the measured harness & \\texttt{{{_break_hash(expanded['source_commit'])}}} \\\\",
+        f"Harness SHA-256 & \\texttt{{{_break_hash(expanded['harness_sha256'])}}} \\\\",
+    ]
+    for item in expanded["hashes"]:
+        rows.append(
+            f"\\texttt{{{_break_path(item['path'])}}} & \\texttt{{{_break_hash(item['sha256'])}}} \\\\"
+        )
+    (out / "artifact-hashes.tex").write_text(
+        "{\\scriptsize\n"
+        "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{8.6cm}"
+        ">{\\raggedright\\arraybackslash}p{8.6cm}@{}}\n\\toprule\n"
+        "Ledger or lock & SHA-256 \\\\\n\\midrule\n\\endhead\n"
+        + "\n".join(rows)
+        + "\n\\bottomrule\n\\end{longtable}\n}\n"
     )
 
 

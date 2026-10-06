@@ -766,8 +766,18 @@ def main():
             "superiority": "Retention tests do not authorize PTF-v1, MFS-v2, or release-safe L3",
             "wins": "lineage counts of positive, zero, and negative paired differences, DOPE minus the baseline",
             "strongest_baseline": "highest paired median retention inside the block and auditor; blocks are not pooled",
+            "holm_family_fidelity_density": "12 tests, 4 metrics times 3 density comparators, grouped validation, not pooled with retention",
+            "holm_family_fidelity_neural": "8 tests, 4 metrics times CTGAN and TVAE on the neural lineages only, not pooled",
+            "fidelity_privacy": "DCR share and DOMIAS AUC are empirical. A larger value sits nearer the fit view. Not a utility win, not DP, and not HIPAA.",
         },
     }
+    from expanded_panel import build_expanded
+
+    diagnostics = load("expanded-validation-diagnostics.json")
+    procedure = load("s3-coreset-procedure.json")
+    expanded = build_expanded(REPO, record, density_cells, diagnostics, procedure, density)
+    failures.extend(expanded["failures"])
+    payload["expanded"] = {key: value for key, value in expanded.items() if key != "failures"}
     payload["sidecars"] = collect_sidecars(record, neural_doc, forest_doc, forest_bytes)
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "panel-stats.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")

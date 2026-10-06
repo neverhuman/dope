@@ -1785,6 +1785,847 @@
     "ptf_v1": null,
     "release_safe_l3": null
   },
+  "expanded": {
+    "arf_measured": false,
+    "arf_reason": "shared_validation_sampling_pending",
+    "blocks": {
+      "density": {
+        "holm_family": 12,
+        "methods": {
+          "Chow-Liu": {
+            "alpha_precision": {
+              "hi": 0.9036466902091119,
+              "lo": 0.8246801127738018,
+              "median": 0.8584825183227203,
+              "n": 100
+            },
+            "beta_recall": {
+              "hi": 0.39995102360662166,
+              "lo": 0.31155810983397203,
+              "median": 0.35947389220464704,
+              "n": 100
+            },
+            "domias_auc": {
+              "hi": 0.5217,
+              "lo": 0.4952651931378244,
+              "median": 0.5115393292614644,
+              "n": 94
+            },
+            "share_closer_to_train": {
+              "hi": 0.815625,
+              "lo": 0.805625,
+              "median": 0.81,
+              "n": 100
+            }
+          },
+          "DOPE": {
+            "alpha_precision": {
+              "hi": 0.917632183908046,
+              "lo": 0.8890944771516681,
+              "median": 0.9051337425172388,
+              "n": 98
+            },
+            "beta_recall": {
+              "hi": 0.4729957805907174,
+              "lo": 0.3975903614457831,
+              "median": 0.4365528455284553,
+              "n": 98
+            },
+            "domias_auc": {
+              "hi": 0.52,
+              "lo": 0.4979,
+              "median": 0.5082,
+              "n": 94
+            },
+            "share_closer_to_train": {
+              "hi": 0.81375,
+              "lo": 0.80625,
+              "median": 0.8110304054054054,
+              "n": 98
+            }
+          },
+          "GaussianCopula": {
+            "alpha_precision": {
+              "hi": 0.8320197044334976,
+              "lo": 0.7856666666666667,
+              "median": 0.812471264367816,
+              "n": 100
+            },
+            "beta_recall": {
+              "hi": 0.4529417670682731,
+              "lo": 0.3778956675508399,
+              "median": 0.43006964567129286,
+              "n": 100
+            },
+            "domias_auc": {
+              "hi": 0.527,
+              "lo": 0.4942,
+              "median": 0.51255,
+              "n": 94
+            },
+            "share_closer_to_train": {
+              "hi": 0.81125,
+              "lo": 0.8025,
+              "median": 0.80625,
+              "n": 100
+            }
+          },
+          "independent_marginals": {
+            "alpha_precision": {
+              "hi": 0.8965030466694364,
+              "lo": 0.8679831048331256,
+              "median": 0.8848850711973844,
+              "n": 100
+            },
+            "beta_recall": {
+              "hi": 0.3465341365461848,
+              "lo": 0.19658119658119655,
+              "median": 0.28371138211382124,
+              "n": 100
+            },
+            "domias_auc": {
+              "hi": 0.5207708553298938,
+              "lo": 0.49584487534626037,
+              "median": 0.5072654669839382,
+              "n": 94
+            },
+            "share_closer_to_train": {
+              "hi": 0.805625,
+              "lo": 0.7975,
+              "median": 0.80125,
+              "n": 100
+            }
+          }
+        },
+        "pairs": {
+          "Chow-Liu": {
+            "alpha_precision": {
+              "dope_hi": 0.917632183908046,
+              "dope_lo": 0.8890944771516681,
+              "dope_median": 0.9051337425172388,
+              "familywise_hi": 0.0742987988210013,
+              "familywise_lo": 0.001966486636199971,
+              "hi": 0.05572413793103448,
+              "holm_p": 1.996462476032142e-05,
+              "lo": 0.00782440105248583,
+              "losses": 32,
+              "median_difference": 0.01933741864007754,
+              "n": 98,
+              "other_hi": 0.9030328209389281,
+              "other_lo": 0.8246801127738018,
+              "other_median": 0.8584825183227203,
+              "rank_biserial": 0.5506081220366935,
+              "sign_p": 0.0003849413203636322,
+              "ties": 0,
+              "wilcoxon_p": 2.218291640035713e-06,
+              "wilcoxon_statistic": 1090.0,
+              "wins": 66
+            },
+            "beta_recall": {
+              "dope_hi": 0.4729957805907174,
+              "dope_lo": 0.3975903614457831,
+              "dope_median": 0.4365528455284553,
+              "familywise_hi": 0.07633333333333342,
+              "familywise_lo": 0.02444460227272721,
+              "hi": 0.07158536585365854,
+              "holm_p": 1.31604394234772e-10,
+              "lo": 0.029333333333333322,
+              "losses": 16,
+              "median_difference": 0.047580808080807946,
+              "n": 98,
+              "other_hi": 0.3989999999999999,
+              "other_lo": 0.3056228809265659,
+              "other_median": 0.35947389220464704,
+              "rank_biserial": 0.7889095031952175,
+              "sign_p": 3.690177154556364e-12,
+              "ties": 0,
+              "wilcoxon_p": 1.1964035839524729e-11,
+              "wilcoxon_statistic": 512.0,
+              "wins": 82
+            },
+            "domias_auc": {
+              "dope_hi": 0.52,
+              "dope_lo": 0.4979,
+              "dope_median": 0.5082,
+              "familywise_hi": 0.012399999999999967,
+              "familywise_lo": -0.010415149409041789,
+              "hi": 0.010700000000000098,
+              "holm_p": 1.0,
+              "lo": -0.008023094582185475,
+              "losses": 46,
+              "median_difference": 0.0005806357961968267,
+              "n": 94,
+              "other_hi": 0.5217,
+              "other_lo": 0.4952651931378244,
+              "other_median": 0.5115393292614644,
+              "rank_biserial": 0.005719514985129261,
+              "sign_p": 0.49999999999999933,
+              "ties": 1,
+              "wilcoxon_p": 0.9617999899911738,
+              "wilcoxon_statistic": 2173.0,
+              "wins": 47
+            },
+            "share_closer_to_train": {
+              "dope_hi": 0.81375,
+              "dope_lo": 0.80625,
+              "dope_median": 0.8110304054054054,
+              "familywise_hi": 0.0025000000000000022,
+              "familywise_lo": -0.008750000000000036,
+              "hi": 0.0012500000000000844,
+              "holm_p": 0.8056192769624776,
+              "lo": -0.005624999999999991,
+              "losses": 50,
+              "median_difference": -0.0012499999999999734,
+              "n": 98,
+              "other_hi": 0.81625,
+              "other_lo": 0.80625,
+              "other_median": 0.810625,
+              "rank_biserial": -0.16913521261347347,
+              "sign_p": 0.8527651077157331,
+              "ties": 7,
+              "wilcoxon_p": 0.16112385539249552,
+              "wilcoxon_statistic": 1739.0,
+              "wins": 41
+            }
+          },
+          "GaussianCopula": {
+            "alpha_precision": {
+              "dope_hi": 0.917632183908046,
+              "dope_lo": 0.8890944771516681,
+              "dope_median": 0.9051337425172388,
+              "familywise_hi": 0.14017938000696628,
+              "familywise_lo": 0.03315649867374004,
+              "hi": 0.11320437342304457,
+              "holm_p": 1.856947178639469e-10,
+              "lo": 0.04513793103448277,
+              "losses": 18,
+              "median_difference": 0.08259607569952404,
+              "n": 98,
+              "other_hi": 0.8320197044334976,
+              "other_lo": 0.7856666666666667,
+              "other_median": 0.812471264367816,
+              "rank_biserial": 0.7814883529169243,
+              "sign_p": 8.303348785522802e-11,
+              "ties": 0,
+              "wilcoxon_p": 1.8569471786394687e-11,
+              "wilcoxon_statistic": 530.0,
+              "wins": 80
+            },
+            "beta_recall": {
+              "dope_hi": 0.4729957805907174,
+              "dope_lo": 0.3975903614457831,
+              "dope_median": 0.4365528455284553,
+              "familywise_hi": 0.05123232323232324,
+              "familywise_lo": -0.002409638554216942,
+              "hi": 0.0389558232931726,
+              "holm_p": 0.3941681384404818,
+              "lo": 0.011000000000000232,
+              "losses": 36,
+              "median_difference": 0.02400000000000002,
+              "n": 98,
+              "other_hi": 0.4529417670682731,
+              "other_lo": 0.3778956675508399,
+              "other_median": 0.43006964567129286,
+              "rank_biserial": 0.2152324847464759,
+              "sign_p": 0.007194816503547833,
+              "ties": 1,
+              "wilcoxon_p": 0.0656946897400803,
+              "wilcoxon_statistic": 1865.0,
+              "wins": 61
+            },
+            "domias_auc": {
+              "dope_hi": 0.52,
+              "dope_lo": 0.4979,
+              "dope_median": 0.5082,
+              "familywise_hi": 0.016548120191609728,
+              "familywise_lo": -0.01639999999999997,
+              "hi": 0.007399999999999962,
+              "holm_p": 1.0,
+              "lo": -0.006900000000000017,
+              "losses": 45,
+              "median_difference": 0.001570953694295274,
+              "n": 94,
+              "other_hi": 0.527,
+              "other_lo": 0.4942,
+              "other_median": 0.51255,
+              "rank_biserial": -0.08488241881298993,
+              "sign_p": 0.37859453707120333,
+              "ties": 0,
+              "wilcoxon_p": 0.4748603497402525,
+              "wilcoxon_statistic": 2043.0,
+              "wins": 49
+            },
+            "share_closer_to_train": {
+              "dope_hi": 0.81375,
+              "dope_lo": 0.80625,
+              "dope_median": 0.8110304054054054,
+              "familywise_hi": 0.007500000000000007,
+              "familywise_lo": -0.009375000000000022,
+              "hi": 0.0050000000000000044,
+              "holm_p": 1.0,
+              "lo": -0.006250000000000089,
+              "losses": 52,
+              "median_difference": -0.0025000000000000577,
+              "n": 98,
+              "other_hi": 0.81,
+              "other_lo": 0.8025,
+              "other_median": 0.80625,
+              "rank_biserial": 0.00020614306328592042,
+              "sign_p": 0.7601537502162565,
+              "ties": 0,
+              "wilcoxon_p": 0.99858618268093,
+              "wilcoxon_statistic": 2425.0,
+              "wins": 46
+            }
+          },
+          "independent_marginals": {
+            "alpha_precision": {
+              "dope_hi": 0.917632183908046,
+              "dope_lo": 0.8890944771516681,
+              "dope_median": 0.9051337425172388,
+              "familywise_hi": 0.037557471264367814,
+              "familywise_lo": 0.004773923279324188,
+              "hi": 0.0281264367816092,
+              "holm_p": 5.472940342447906e-05,
+              "lo": 0.00720306513409974,
+              "losses": 32,
+              "median_difference": 0.017879310344827593,
+              "n": 98,
+              "other_hi": 0.8965030466694364,
+              "other_lo": 0.8679831048331256,
+              "other_median": 0.8848850711973844,
+              "rank_biserial": 0.523397237682952,
+              "sign_p": 0.0003849413203636322,
+              "ties": 0,
+              "wilcoxon_p": 6.841175428059883e-06,
+              "wilcoxon_statistic": 1156.0,
+              "wins": 66
+            },
+            "beta_recall": {
+              "dope_hi": 0.4729957805907174,
+              "dope_lo": 0.3975903614457831,
+              "dope_median": 0.4365528455284553,
+              "familywise_hi": 0.15389258438038927,
+              "familywise_lo": 0.05805290404040405,
+              "hi": 0.13793978673313928,
+              "holm_p": 9.711718067128253e-15,
+              "lo": 0.06772863869270185,
+              "losses": 6,
+              "median_difference": 0.10382134599002074,
+              "n": 98,
+              "other_hi": 0.34933333333333344,
+              "other_lo": 0.19658119658119655,
+              "other_median": 0.28371138211382124,
+              "rank_biserial": 0.9369202226345084,
+              "sign_p": 3.547660479307405e-21,
+              "ties": 0,
+              "wilcoxon_p": 8.093098389273544e-16,
+              "wilcoxon_statistic": 153.0,
+              "wins": 92
+            },
+            "domias_auc": {
+              "dope_hi": 0.52,
+              "dope_lo": 0.4979,
+              "dope_median": 0.5082,
+              "familywise_hi": 0.02010101010101012,
+              "familywise_lo": -0.009500000000000008,
+              "hi": 0.014887052341597817,
+              "holm_p": 1.0,
+              "lo": -0.005948839976204656,
+              "losses": 45,
+              "median_difference": 0.002439767995240927,
+              "n": 94,
+              "other_hi": 0.5207708553298938,
+              "other_lo": 0.49584487534626037,
+              "other_median": 0.5072654669839382,
+              "rank_biserial": 0.07961564859299931,
+              "sign_p": 0.41792306731574297,
+              "ties": 1,
+              "wilcoxon_p": 0.5049651438655582,
+              "wilcoxon_statistic": 2011.5,
+              "wins": 48
+            },
+            "share_closer_to_train": {
+              "dope_hi": 0.81375,
+              "dope_lo": 0.80625,
+              "dope_median": 0.8110304054054054,
+              "familywise_hi": 0.013749999999999984,
+              "familywise_lo": 0.0012499999999999734,
+              "hi": 0.011249999999999982,
+              "holm_p": 0.004996972876850843,
+              "lo": 0.0024999999999999467,
+              "losses": 30,
+              "median_difference": 0.006249999999999978,
+              "n": 98,
+              "other_hi": 0.80625,
+              "other_lo": 0.7983270958083832,
+              "other_median": 0.80125,
+              "rank_biserial": 0.39776632302405496,
+              "sign_p": 0.00015279866379663143,
+              "ties": 2,
+              "wilcoxon_p": 0.000713853268121549,
+              "wilcoxon_statistic": 1402.0,
+              "wins": 66
+            }
+          }
+        }
+      },
+      "neural": {
+        "holm_family": 8,
+        "methods": {
+          "CTGAN": {
+            "alpha_precision": {
+              "hi": 0.8560287356321838,
+              "lo": 0.5195402298850575,
+              "median": 0.7193312434691745,
+              "n": 22
+            },
+            "beta_recall": {
+              "hi": 0.2666666666666665,
+              "lo": 0.14163473818646244,
+              "median": 0.16954417670682742,
+              "n": 22
+            },
+            "domias_auc": {
+              "hi": 0.5343,
+              "lo": 0.46349252431412397,
+              "median": 0.5016,
+              "n": 22
+            },
+            "share_closer_to_train": {
+              "hi": 0.842373791621912,
+              "lo": 0.8,
+              "median": 0.82,
+              "n": 22
+            }
+          },
+          "DOPE": {
+            "alpha_precision": {
+              "hi": 0.9396789819376026,
+              "lo": 0.8817369093231162,
+              "median": 0.9017049808429118,
+              "n": 22
+            },
+            "beta_recall": {
+              "hi": 0.4890000000000001,
+              "lo": 0.3813333333333333,
+              "median": 0.44105512960934645,
+              "n": 22
+            },
+            "domias_auc": {
+              "hi": 0.5382,
+              "lo": 0.47950000000000004,
+              "median": 0.5083894324285092,
+              "n": 22
+            },
+            "share_closer_to_train": {
+              "hi": 0.81875,
+              "lo": 0.8025,
+              "median": 0.81125,
+              "n": 22
+            }
+          },
+          "TVAE": {
+            "alpha_precision": {
+              "hi": 0.8958103448275861,
+              "lo": 0.7309236947791165,
+              "median": 0.849598670544246,
+              "n": 22
+            },
+            "beta_recall": {
+              "hi": 0.4012048192771085,
+              "lo": 0.2829999999999999,
+              "median": 0.3562248995983937,
+              "n": 22
+            },
+            "domias_auc": {
+              "hi": 0.562760261748959,
+              "lo": 0.48675,
+              "median": 0.5271231746262157,
+              "n": 22
+            },
+            "share_closer_to_train": {
+              "hi": 0.8425,
+              "lo": 0.8130937500000001,
+              "median": 0.825,
+              "n": 22
+            }
+          }
+        },
+        "pairs": {
+          "CTGAN": {
+            "alpha_precision": {
+              "dope_hi": 0.9396789819376026,
+              "dope_lo": 0.8817369093231162,
+              "dope_median": 0.9017049808429118,
+              "familywise_hi": 0.43226238286479246,
+              "familywise_lo": -0.009367816091954029,
+              "hi": 0.3675606641123882,
+              "holm_p": 0.0035314559936523438,
+              "lo": 0.0539310344827586,
+              "losses": 6,
+              "median_difference": 0.16849825844653432,
+              "n": 22,
+              "other_hi": 0.8560287356321838,
+              "other_lo": 0.5195402298850575,
+              "other_median": 0.7193312434691745,
+              "rank_biserial": 0.7944664031620553,
+              "sign_p": 0.026239395141601562,
+              "ties": 0,
+              "wilcoxon_p": 0.0005044937133789062,
+              "wilcoxon_statistic": 26.0,
+              "wins": 16
+            },
+            "beta_recall": {
+              "dope_hi": 0.4890000000000001,
+              "dope_lo": 0.3813333333333333,
+              "dope_median": 0.44105512960934645,
+              "familywise_hi": 0.2997368785486776,
+              "familywise_lo": 0.0680213675213675,
+              "hi": 0.25622489959839356,
+              "holm_p": 3.814697265625e-06,
+              "lo": 0.13075583420411008,
+              "losses": 0,
+              "median_difference": 0.21891127729308035,
+              "n": 22,
+              "other_hi": 0.2666666666666665,
+              "other_lo": 0.14163473818646244,
+              "other_median": 0.16954417670682742,
+              "rank_biserial": 1.0,
+              "sign_p": 2.384185791015625e-07,
+              "ties": 0,
+              "wilcoxon_p": 4.76837158203125e-07,
+              "wilcoxon_statistic": 0.0,
+              "wins": 22
+            },
+            "domias_auc": {
+              "dope_hi": 0.5382,
+              "dope_lo": 0.47950000000000004,
+              "dope_median": 0.5083894324285092,
+              "familywise_hi": 0.04065000000000005,
+              "familywise_lo": -0.019700866781316828,
+              "hi": 0.030821875000000054,
+              "holm_p": 0.6101517677307129,
+              "lo": -0.013850415512465353,
+              "losses": 11,
+              "median_difference": -0.00027953599048183286,
+              "n": 22,
+              "other_hi": 0.5343,
+              "other_lo": 0.46349252431412397,
+              "other_median": 0.5016,
+              "rank_biserial": 0.13043478260869565,
+              "sign_p": 0.5840940475463867,
+              "ties": 0,
+              "wilcoxon_p": 0.6101517677307129,
+              "wilcoxon_statistic": 110.0,
+              "wins": 11
+            },
+            "share_closer_to_train": {
+              "dope_hi": 0.81875,
+              "dope_lo": 0.8025,
+              "dope_median": 0.81125,
+              "familywise_hi": 0.020000000000000018,
+              "familywise_lo": -0.03530612244897963,
+              "hi": 0.014548872180451089,
+              "holm_p": 0.5319936197277517,
+              "lo": -0.028749999999999998,
+              "losses": 11,
+              "median_difference": -0.008124999999999993,
+              "n": 22,
+              "other_hi": 0.842373791621912,
+              "other_lo": 0.8,
+              "other_median": 0.82,
+              "rank_biserial": -0.27705627705627706,
+              "sign_p": 0.6681880950927734,
+              "ties": 1,
+              "wilcoxon_p": 0.26599680986387586,
+              "wilcoxon_statistic": 83.5,
+              "wins": 10
+            }
+          },
+          "TVAE": {
+            "alpha_precision": {
+              "dope_hi": 0.9396789819376026,
+              "dope_lo": 0.8817369093231162,
+              "dope_median": 0.9017049808429118,
+              "familywise_hi": 0.21254036837003182,
+              "familywise_lo": -0.013846974103309817,
+              "hi": 0.14074227946267837,
+              "holm_p": 0.03989696502685547,
+              "lo": 0.0071340996168582915,
+              "losses": 7,
+              "median_difference": 0.07086270753512136,
+              "n": 22,
+              "other_hi": 0.8958103448275861,
+              "other_lo": 0.7309236947791165,
+              "other_median": 0.849598670544246,
+              "rank_biserial": 0.6442687747035574,
+              "sign_p": 0.06690025329589844,
+              "ties": 0,
+              "wilcoxon_p": 0.006649494171142578,
+              "wilcoxon_statistic": 45.0,
+              "wins": 15
+            },
+            "beta_recall": {
+              "dope_hi": 0.4890000000000001,
+              "dope_lo": 0.3813333333333333,
+              "dope_median": 0.44105512960934645,
+              "familywise_hi": 0.1591024096385542,
+              "familywise_lo": -0.01227011494252872,
+              "hi": 0.13453815261044166,
+              "holm_p": 0.06880378723144531,
+              "lo": 0.005459770114942475,
+              "losses": 6,
+              "median_difference": 0.06222222222222218,
+              "n": 22,
+              "other_hi": 0.4012048192771085,
+              "other_lo": 0.2829999999999999,
+              "other_median": 0.3562248995983937,
+              "rank_biserial": 0.5731225296442688,
+              "sign_p": 0.026239395141601562,
+              "ties": 0,
+              "wilcoxon_p": 0.017200946807861328,
+              "wilcoxon_statistic": 54.0,
+              "wins": 16
+            },
+            "domias_auc": {
+              "dope_hi": 0.5382,
+              "dope_lo": 0.47950000000000004,
+              "dope_median": 0.5083894324285092,
+              "familywise_hi": 0.003557279061946581,
+              "familywise_lo": -0.050000000000000044,
+              "hi": -0.009723599632690566,
+              "holm_p": 0.10762596130371094,
+              "lo": -0.03601108033240996,
+              "losses": 17,
+              "median_difference": -0.021273599632690626,
+              "n": 22,
+              "other_hi": 0.562760261748959,
+              "other_lo": 0.48675,
+              "other_median": 0.5271231746262157,
+              "rank_biserial": -0.5098814229249012,
+              "sign_p": 0.9978282451629639,
+              "ties": 0,
+              "wilcoxon_p": 0.03587532043457031,
+              "wilcoxon_statistic": 62.0,
+              "wins": 5
+            },
+            "share_closer_to_train": {
+              "dope_hi": 0.81875,
+              "dope_lo": 0.8025,
+              "dope_median": 0.81125,
+              "familywise_hi": 0.007567567567567601,
+              "familywise_lo": -0.03999999999999998,
+              "hi": -0.0064102564102563875,
+              "holm_p": 0.05924910759954515,
+              "lo": -0.030000000000000027,
+              "losses": 16,
+              "median_difference": -0.024999999999999967,
+              "n": 22,
+              "other_hi": 0.8425,
+              "other_lo": 0.8130937500000001,
+              "other_median": 0.825,
+              "rank_biserial": -0.6126482213438735,
+              "sign_p": 0.9915497303009033,
+              "ties": 0,
+              "wilcoxon_p": 0.01184982151990903,
+              "wilcoxon_statistic": 49.0,
+              "wins": 6
+            }
+          }
+        }
+      }
+    },
+    "coreset": {
+      "bins": {
+        "11": 1,
+        "50": 39
+      },
+      "final_max_rows": 2000,
+      "fit_rows_max": 800,
+      "fit_rows_min": 72,
+      "lineages": 100,
+      "minimum_final_rows": 101,
+      "minimum_test_to_train_ratio_when_small": 0.2,
+      "not_downsampled": 60,
+      "sampling_method": "quota stratified by target distribution plus high-variance feature quantile bins",
+      "split_kind": "official_test_grouped_training_80_20",
+      "split_seed": 1729,
+      "test_target_rows": 1000,
+      "train_target_rows": 1000
+    },
+    "empirical_only": true,
+    "formal_dp": false,
+    "harness_sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
+    "hashes": [
+      {
+        "path": "research/benchmark/expanded_validation_metrics.py",
+        "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
+      },
+      {
+        "path": "research/benchmark/methods.lock.json",
+        "sha256": "899c355cb55769710ed369fea6b082589b31858860fb74929bf4190de28aca33"
+      },
+      {
+        "path": "research/benchmark/results/expanded-validation-diagnostics.json",
+        "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
+      },
+      {
+        "path": "research/benchmark/results/s3-coreset-procedure.json",
+        "sha256": "73251e43cf7838687427569931bf6127f42e932374af33137c57fd8fe8544704"
+      },
+      {
+        "path": "research/benchmark/results/s3-lineage-record.json",
+        "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
+      },
+      {
+        "path": "research/benchmark/results/density-matched-population-validation.json",
+        "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+      },
+      {
+        "path": "research/benchmark/results/sdv-matched-population-validation.json",
+        "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+      },
+      {
+        "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
+        "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
+      },
+      {
+        "path": "research/benchmark/results/s3-data.lock.json",
+        "sha256": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f"
+      },
+      {
+        "path": "research/benchmark/results/arf-native-closure-watch-v1.receipt.json",
+        "sha256": "7e8eeb1ba94ca747367e98d5a016d2ed3ed4c40c5a98ca76d7a5fe27ce9c173c"
+      },
+      {
+        "path": "research/benchmark/results/beyondarena-s3-inventory.json",
+        "sha256": "504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64"
+      },
+      {
+        "path": "docs/whitepaper/generated/fit-trace.json",
+        "sha256": "d8c31b9e4eb59cb1a087cf5dcdde4a91a73eca00f3704fbff647a7da6ce65522"
+      },
+      {
+        "path": "docs/whitepaper/generated/loss-curves.json",
+        "sha256": "0124915497c98e560ef99c1e5ecf7ad876f9174439ff9c763cf1cf906b4aebe1"
+      },
+      {
+        "path": "docs/whitepaper/generated/replay-cost.json",
+        "sha256": "faf77e7ce1ed1d22127701bf68bbfe2f8d183f89cbd3475dd80094888c36f086"
+      },
+      {
+        "path": "docs/whitepaper/generated/provenance.json",
+        "sha256": "6880d7d3595c0ab9ada7396db05513bc4be538278e44a510334e50e41c7dc7f7"
+      },
+      {
+        "path": "docs/whitepaper/generated/beyond-fit.json",
+        "sha256": "a1447f908bc9c51876d345597039607c734b507bf85aa8e08db0639e80a1f036"
+      }
+    ],
+    "hipaa_deidentification": false,
+    "loss": {
+      "catboost": {
+        "n": 97,
+        "real_r2": {
+          "hi": 0.9173627120290746,
+          "lo": 0.86083757927339,
+          "median": 0.8807068001630585,
+          "n": 97
+        },
+        "real_rmse": {
+          "hi": 0.06888233505975154,
+          "lo": 0.04498466411278509,
+          "median": 0.05332779237516103,
+          "n": 97
+        },
+        "synthetic_r2": {
+          "hi": 0.8449541712717421,
+          "lo": 0.7297267884155911,
+          "median": 0.7918964079247798,
+          "n": 97
+        },
+        "synthetic_rmse": {
+          "hi": 0.09261713186479673,
+          "lo": 0.0656581353019222,
+          "median": 0.08084601496785733,
+          "n": 97
+        }
+      },
+      "linear": {
+        "n": 92,
+        "real_r2": {
+          "hi": 0.6606400385345395,
+          "lo": 0.44820553304442934,
+          "median": 0.5853876483500107,
+          "n": 92
+        },
+        "real_rmse": {
+          "hi": 0.12579487846928405,
+          "lo": 0.09165442501503598,
+          "median": 0.1049912453154872,
+          "n": 92
+        },
+        "synthetic_r2": {
+          "hi": 0.6505502796444366,
+          "lo": 0.4314748212577841,
+          "median": 0.5511286174607599,
+          "n": 92
+        },
+        "synthetic_rmse": {
+          "hi": 0.12877043471058,
+          "lo": 0.09243574746330133,
+          "median": 0.11155650501703977,
+          "n": 92
+        }
+      },
+      "mlp": {
+        "n": 75,
+        "real_r2": {
+          "hi": 0.8227200184134333,
+          "lo": 0.5484252625720349,
+          "median": 0.6656734288955471,
+          "n": 75
+        },
+        "real_rmse": {
+          "hi": 0.11516160640069326,
+          "lo": 0.07347493400117977,
+          "median": 0.09810693748402592,
+          "n": 75
+        },
+        "synthetic_r2": {
+          "hi": 0.8855807225016963,
+          "lo": 0.6564366128612968,
+          "median": 0.7851544988471149,
+          "n": 75
+        },
+        "synthetic_rmse": {
+          "hi": 0.09795288873913471,
+          "lo": 0.05893398347425128,
+          "median": 0.08316915510349875,
+          "n": 75
+        }
+      }
+    },
+    "source_commit": "17f3294d139e19f0ec831605f8750368eebc30bb",
+    "threshold_counts": {
+      "0.001": {
+        "catboost": 97,
+        "linear": 93,
+        "mlp": 75
+      },
+      "0.01": {
+        "catboost": 97,
+        "linear": 92,
+        "mlp": 75
+      },
+      "0.05": {
+        "catboost": 97,
+        "linear": 90,
+        "mlp": 73
+      }
+    }
+  },
   "fidelity": {
     "Chow-Liu": {
       "c2st_auc": {
@@ -1875,8 +2716,11 @@
   },
   "format": "dope-paper-panel-stats",
   "notes": {
+    "fidelity_privacy": "DCR share and DOMIAS AUC are empirical. A larger value sits nearer the fit view. Not a utility win, not DP, and not HIPAA.",
     "friedman": "Nemenyi CD uses Demsar q_alpha 2.569 for four methods at alpha 0.05",
     "holm_family_density": "9 tests, 3 comparators times 3 auditors, size 4, density block only",
+    "holm_family_fidelity_density": "12 tests, 4 metrics times 3 density comparators, grouped validation, not pooled with retention",
+    "holm_family_fidelity_neural": "8 tests, 4 metrics times CTGAN and TVAE on the neural lineages only, not pooled",
     "holm_family_forest": "Forest-Flow native_selected, size 4, six-lineage confirmation, not pooled",
     "holm_family_neural": "CTGAN and TVAE times auditors, size 4, not pooled with density",
     "interval": "percentile lineage bootstrap of the median; three sample seeds stay inside each lineage median",
