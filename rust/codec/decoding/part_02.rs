@@ -111,6 +111,42 @@ mod tests {
     }
 
     #[test]
+    fn research_ablation_targets_use_existing_codec_without_width_zero() {
+        for features in [6u32, 12, 24] {
+            for logistic in [false, true] {
+                let terms = (0..features)
+                    .map(|feature| LinearTerm { feature, coefficient: 0.125 })
+                    .collect();
+                let target = if logistic {
+                    Target::SparseLogistic { intercept: 0.25, terms }
+                } else {
+                    Target::SparseLinear { intercept: 0.25, terms }
+                };
+                let encoded = encode_target(&target);
+                let decoded = decode_target(&encoded, features as usize).unwrap();
+                assert_eq!(encode_target(&decoded), encoded);
+                for width in [8u8, 16] {
+                    let target = Target::CompactNeuralResidual {
+                        intercept: 0.375,
+                        logistic,
+                        linear_terms: (0..features)
+                            .map(|feature| LinearTerm { feature, coefficient: 0.125 })
+                            .collect(),
+                        hidden_features: (0..features).collect(),
+                        hidden_width: width,
+                        input_weights: vec![0.125; features as usize * usize::from(width)],
+                        hidden_biases: vec![0.25; usize::from(width)],
+                        output_weights: vec![0.125; usize::from(width)],
+                    };
+                    let encoded = encode_target(&target);
+                    let decoded = decode_target(&encoded, features as usize).unwrap();
+                    assert_eq!(encode_target(&decoded), encoded);
+                }
+            }
+        }
+    }
+
+    #[test]
     fn section_accounting_reconciles_exact_encoded_length() {
         let encoded = encode_kernel(&kernel()).unwrap();
         let accounting = account_artifact(&encoded).unwrap();

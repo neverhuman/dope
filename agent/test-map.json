@@ -191,6 +191,18 @@
     "research/benchmark/tests/test_tabsyn_owned_lifecycle.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -v", "purpose": "verify actual metadata-only pidfd capture, natural concurrent reaping, unbound vanished identities, no foreign signals or leaked descriptors; exact owner one-CUDA policy, source binding and unchanged native 36+4 gates"},
     "research/benchmark/tabsyn-one-qualification.owner-addendum.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -v", "purpose": "verify actual metadata-only pidfd capture, natural concurrent reaping, unbound vanished identities, no foreign signals or leaked descriptors; exact owner one-CUDA policy, source binding and unchanged native 36+4 gates"},
     "research/benchmark/results/work-order-b-compute-costs-v2": {"command": "python3 -I -S -B -m unittest discover -s research/benchmark/tests -p test_work_order_b_compute_costs.py -v", "purpose": "replay committed CSV/schema byte for byte, reject source/report drift before load/decode, preserve scheduling cutoffs and unknown resource nulls, and prevent physical alias double charges without opening scientific inputs"},
-    "research/benchmark/tests/test_work_order_b_compute_costs.py": {"command": "python3 -I -S -B -m unittest discover -s research/benchmark/tests -p test_work_order_b_compute_costs.py -v", "purpose": "replay committed CSV/schema byte for byte, reject source/report drift before load/decode, preserve scheduling cutoffs and unknown resource nulls, and prevent physical alias double charges without opening scientific inputs"}
+    "research/benchmark/tests/test_work_order_b_compute_costs.py": {"command": "python3 -I -S -B -m unittest discover -s research/benchmark/tests -p test_work_order_b_compute_costs.py -v", "purpose": "replay committed CSV/schema byte for byte, reject source/report drift before load/decode, preserve scheduling cutoffs and unknown resource nulls, and prevent physical alias double charges without opening scientific inputs"},
+    "research/benchmark/research_ablation_binding.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_research_ablation_binding",
+      "purpose": "reject changed metadata before decoding, validate the bounded ablation profile and emitted opcode, preserve requested-only configuration and null release eligibility"
+    },
+    "research/benchmark/tests/test_research_ablation_binding.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_research_ablation_binding",
+      "purpose": "reject changed metadata before decoding, validate the bounded ablation profile and emitted opcode, preserve requested-only configuration and null release eligibility"
+    },
+    "research/benchmark/DOPE_ABLATIONS.md": {
+      "command": "just check",
+      "purpose": "verify the bounded research profile parser and existing artifact codec; generated native training and GPU parity remain separately admitted evidence"
+    }
   }
 }
