@@ -1,6 +1,8 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/LOCAL_CAPACITY_AMENDMENT.md": "external-evidence",
+    "research/benchmark/results/campaign-local-capacity-amendment": "external-evidence",
     "AGENTS.md": "governance",
     "README.md": "governance",
     "CHANGELOG.md": "governance",
