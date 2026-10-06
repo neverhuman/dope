@@ -1,6 +1,9 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/publish_checkpoint_index.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v", "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"},
+    "research/benchmark/tests/test_checkpoint_index.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v", "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"},
+    "research/benchmark/results/checkpoint-figure-input-index/": {"command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v", "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"},
     "research/benchmark/tabsyn_validation_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v", "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"},
     "research/benchmark/tests/test_tabsyn_validation_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v", "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"},
 
