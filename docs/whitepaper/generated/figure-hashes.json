@@ -3,6 +3,7 @@
   "pdf_sha256": {
     "loss-curves.pdf": "73883588acb82aeb1fb8b8755ca5186e23267ab7aaf19be8477425a8eee02f00",
     "paired-cdf.pdf": "95ac96004fcbea159730aa95e42345e325ee38394c1c2c8b144b760831e965c2",
+    "retention-bars.pdf": "d9f11579a7a57d5e653eb85460a4cb0386768d17708ae02575c5b73bdfbc1ee9",
     "retention-bytes.pdf": "4c6fb964d0d5d71fa9f08d4f08d19ab08f734ed43faf0554800597313d7dd636"
   }
 }
