@@ -1,0 +1,295 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Owner-authorized xbabe2 local100GB capacity amendment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "owner",
+    "owner_note_time",
+    "recorded_utc",
+    "owner_ruling_verbatim",
+    "reason",
+    "host",
+    "new_scratch_root",
+    "ceiling_bytes",
+    "ceiling_scope",
+    "admission_rules",
+    "amended_campaigns",
+    "execution_order",
+    "du_semantics",
+    "filesystem",
+    "old_xbabe2_fast_scratch_budget_separate",
+    "shared_gpu_fit_lease_path",
+    "projection_and_model_bytes_charged",
+    "scientific_configuration_changed_by_amendment",
+    "full_campaign_admitted",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe",
+    "superiority"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-owner-local-filesystem-capacity-amendment"
+    },
+    "version": {
+      "const": 1
+    },
+    "owner": {
+      "const": "ENG:watcher"
+    },
+    "owner_note_time": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recorded_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "owner_ruling_verbatim": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "host": {
+      "const": "xbabe2"
+    },
+    "new_scratch_root": {
+      "const": "/home/ubuntu/dope-scratch-x2"
+    },
+    "ceiling_bytes": {
+      "const": 100000000000
+    },
+    "ceiling_scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "admission_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completed_ok_case_refits_allowed",
+        "cpu_slots_disjoint_16_cores",
+        "foreign_process_signals_allowed",
+        "gpu_foreign_owner_check_before_each_launch",
+        "gpu_process_cap_bytes",
+        "hosts",
+        "maximum_study_cpu_slots",
+        "neural_fit_cap_seconds",
+        "one_gpu_fit_per_host",
+        "prior_failed_trial_and_cost_carry_required",
+        "tuning_cell_wall_cap_seconds",
+        "tuning_trials_per_cell_max",
+        "xbabe0_allowed",
+        "yield_to_jope_dltrain_or_hyperion"
+      ],
+      "properties": {
+        "completed_ok_case_refits_allowed": {
+          "const": false
+        },
+        "cpu_slots_disjoint_16_cores": {
+          "const": true
+        },
+        "foreign_process_signals_allowed": {
+          "const": false
+        },
+        "gpu_foreign_owner_check_before_each_launch": {
+          "const": true
+        },
+        "gpu_process_cap_bytes": {
+          "const": 17179869184
+        },
+        "hosts": {
+          "const": [
+            "xbabe1",
+            "xbabe2",
+            "xbabe3"
+          ]
+        },
+        "maximum_study_cpu_slots": {
+          "const": 4
+        },
+        "neural_fit_cap_seconds": {
+          "const": 600
+        },
+        "one_gpu_fit_per_host": {
+          "const": true
+        },
+        "prior_failed_trial_and_cost_carry_required": {
+          "const": true
+        },
+        "tuning_cell_wall_cap_seconds": {
+          "const": 43200
+        },
+        "tuning_trials_per_cell_max": {
+          "const": 8
+        },
+        "xbabe0_allowed": {
+          "const": false
+        },
+        "yield_to_jope_dltrain_or_hyperion": {
+          "const": true
+        }
+      }
+    },
+    "amended_campaigns": {
+      "const": [
+        "TabSyn qualification and 100-lineage native/default",
+        "TabDDPM continuation when xbabe3 remains held",
+        "DOPE fit-seed23 and37 CPU refits on 100 matched lineages"
+      ]
+    },
+    "execution_order": {
+      "const": [
+        "Fresh owner and aggregate resource admission before each fit",
+        "TabSyn qualification then100-lineage run; TabDDPM fallback without duplicate successful fits",
+        "Parallel nice19 CPU DOPE seed23/37 refits in a disjoint bounded slot"
+      ]
+    },
+    "du_semantics": {
+      "const": [
+        "--apparent-size",
+        "--count-links",
+        "--summarize",
+        "--bytes"
+      ]
+    },
+    "filesystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "device",
+        "root_inode",
+        "root_uid",
+        "disk_usage_bytes",
+        "mount"
+      ],
+      "properties": {
+        "device": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "root_inode": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "root_uid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "disk_usage_bytes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "free",
+            "total",
+            "used"
+          ],
+          "properties": {
+            "free": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "used": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "mount": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fstype",
+            "maj:min",
+            "options",
+            "source",
+            "target"
+          ],
+          "properties": {
+            "fstype": {
+              "const": "ext4"
+            },
+            "maj:min": {
+              "type": "string",
+              "minLength": 1
+            },
+            "options": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "target": {
+              "const": "/"
+            }
+          }
+        }
+      }
+    },
+    "old_xbabe2_fast_scratch_budget_separate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ceiling_bytes",
+        "existing_artifacts_moved_or_deleted",
+        "permitted_new_contents",
+        "root"
+      ],
+      "properties": {
+        "ceiling_bytes": {
+          "const": 200000000000
+        },
+        "existing_artifacts_moved_or_deleted": {
+          "const": false
+        },
+        "permitted_new_contents": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root": {
+          "const": "/mnt/fast-scratch/dope-benchmark"
+        }
+      }
+    },
+    "shared_gpu_fit_lease_path": {
+      "const": "/home/ubuntu/dope-scratch-x2/.gpu-fit.lock"
+    },
+    "projection_and_model_bytes_charged": {
+      "const": true
+    },
+    "scientific_configuration_changed_by_amendment": {
+      "const": false
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "superiority": {
+      "type": "null"
+    }
+  }
+}
