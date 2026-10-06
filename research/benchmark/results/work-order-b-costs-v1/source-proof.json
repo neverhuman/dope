@@ -1,0 +1,113 @@
+{
+  "attributed_energy_joules": null,
+  "committed_source_revision": "c4672e7ffa29f0bd88f1c04d8a83bd6d2a828b12",
+  "format": "dope-cost-component-source-proof",
+  "hardware_models": null,
+  "historical_co_tenant": null,
+  "logical_aliases_charged_again": false,
+  "mfs_v2": null,
+  "new_metric_jobs_started": 0,
+  "new_training_or_samples_started": 0,
+  "official_tests_opened": false,
+  "physical_operation_metadata_sha256": "f868a7f85b2a7dd07e3f46d73eda8bbb38d02246489488d18fc62b48a941b464",
+  "physical_operations": 3559,
+  "preparation_source_sha256": "ccb8e3cca36211eccc1c3a81fcb8c18940e16462fbd188195cb4bc0dcb2dee3d",
+  "private_preparation_sha256": {
+    "work-order-b-compute-ledger-v1/compact-measured-costs-v1.json": "a6a0081fc88fd94237967c71927ac5498525940db01668d637970e991c3cbf76",
+    "work-order-b-compute-ledger-v1/ledger-preparation-v4.json": "fdb9754c28cbf784052e9358f6583a6bb1939db7417a3ede3df071de09d89520",
+    "work-order-b-mfs-gaps-v1/component-gaps.json": "f4762a2f938eba4a9f219b5a1902b50a432d57ade477392891ccc0ab91c3b4b2"
+  },
+  "ptf_v1": null,
+  "public_source_reports": [
+    {
+      "path": "research/benchmark/results/arf-s3-population-native.json",
+      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+    },
+    {
+      "path": "research/benchmark/results/density-matched-population-validation.json",
+      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+    },
+    {
+      "path": "research/benchmark/results/dope-s3-population-gpu-fits.json",
+      "sha256": "df4a370ba66a595f665bf2f45d8a183dde9955b6ab65d7c28df0ec8ae24d4c21"
+    },
+    {
+      "path": "research/benchmark/results/dope-s3-population-validation.json",
+      "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
+    },
+    {
+      "path": "research/benchmark/results/dope-target-refinement-population-fits.json",
+      "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
+    },
+    {
+      "path": "research/benchmark/results/dope-target-refinement-population-validation.json",
+      "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+    },
+    {
+      "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
+      "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
+    },
+    {
+      "path": "research/benchmark/results/sdv-matched-population-validation.json",
+      "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+    },
+    {
+      "path": "research/benchmark/results/sdv-s3-population-native.json",
+      "sha256": "635fd4273886d59691356b85d2fad58eae596ef74a48dc0bfb5bffee653bacc3"
+    }
+  ],
+  "release_safe": null,
+  "scratch_custody": {
+    "density_native": {
+      "anchor": {
+        "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-native-custody-v1/receipt-lock-v1.json",
+        "sha256": "902c68d8ffd4ef7a8ed93539947ddb7496d0c14438f7a4a0c52631d51834f6f5"
+      },
+      "original_receipt_count": 1100,
+      "original_receipt_selector": "Bound reconciliation trial/batch receipts",
+      "original_receipt_set_sha256": "5bb22ce830bae9f79f6896b1b4a22918987af82908b377fb7d7093ffd71437ed",
+      "phase_timing_scope": "Original operation metadata; model/data bytes are never decoded",
+      "reconciliation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-native-custody-v1/reconciliation-v1.json",
+        "sha256": "efe8f169dbf8e1b7a68b44406ced32d910a2809f09682539facd24c86ac67187"
+      }
+    },
+    "density_shared": {
+      "anchor": {
+        "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-shared-validation-v1/receipt-lock-v1.json",
+        "sha256": "b2f5964cf40d047d63dc5698c42c2370d945384f5f9567d6809d0959f4f4d81b"
+      },
+      "original_receipt_count": 502,
+      "original_receipt_selector": "Bound reconciliation trial/batch receipts",
+      "original_receipt_set_sha256": "7d5eae5bea2d82bd52f07c9bf638812b904d7f0d1324f75e788b63028edbbc07",
+      "phase_timing_scope": "Original operation metadata; model/data bytes are never decoded",
+      "reconciliation": {
+        "path": "/mnt/fast-scratch/dope-benchmark/density-s3-population-shared-validation-v1/reconciliation-v1.json",
+        "sha256": "b72a1a7cc2c9298e9eb0cd1c774a995561a1ea7e51f39e269c4789532096cb09"
+      }
+    },
+    "forest_native": {
+      "anchor": {
+        "path": "/mnt/fast-scratch/dope-benchmark/forest-s3-native-v1/receipt-lock-v1.json",
+        "sha256": "b9be26c9a9c76c1829ca09309873993ffafb10d959b1489abc95f79aa5075e1f"
+      },
+      "original_receipt_count": 12,
+      "original_receipt_selector": "Bound public native_attempts[].receipt",
+      "original_receipt_set_sha256": "e654968193ef86cd6fec03bb337d308b101698c15765cd2072bb25f124de8b27",
+      "phase_timing_scope": "Original operation metadata; model/data bytes are never decoded"
+    }
+  },
+  "shared_gpu_cost": "Historical flags absent; future claims require clock-bound observations",
+  "source_code_and_contract": [
+    {
+      "path": "production/kpi-contract.json",
+      "sha256": "d04a2672ed25e92baeb89bec51ea5ccddb04165701cb44d2e1d53ca32f6e219b"
+    },
+    {
+      "path": "rust/certification/privacy_attacks/finalize_certification.rs",
+      "sha256": "9bea2aa33be911bc1ca1b2ecfd125535aea0bfa187cb48f573499f09e2f73da6"
+    }
+  ],
+  "superiority": null,
+  "version": 1
+}

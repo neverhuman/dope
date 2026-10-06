@@ -1159,6 +1159,12 @@ remain explicit. This preparation publishes no ARF common numbers or final
 configuration selection. Official tests stay sealed, and MFS-v2/PTF-v1,
 release-safe L3 and superiority claims stay null until their required gates pass.
 
+### Work Order B measured cost and missing-component ledger
+
+`results/work-order-b-costs-v1/` records measured closed research costs from immutable receipts and the exact missing evidence for all six MFS-v2 components and hard gates. Physical aliases are charged once; historical shared-GPU timing and hardware remain unknown where receipts omitted them. Scheduling cutoffs carry no method-failure conclusion. MFS-v2, PTF-v1, release-safe and superiority remain null.
+
+Reproduce the tables and schemas with `python3 -B -m research.benchmark.publish_work_order_b_costs --repo "$PWD" --output target/work-order-b-costs-replay-v1`. Original scratch receipts are needed for full receipt verification; the committed manifest binds their hashes.
+
 ## Complete ARF native population ledger
 
 The [ARF native ledger](results/arf-s3-population-native.md) accounts for all

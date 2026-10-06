@@ -1,0 +1,655 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "byte_charge_source_result": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "const": "research/benchmark/results/dope-target-refinement-population-fits.json"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "cap_failed_charges": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "compactness_formula": {
+      "const": "clamp(1 - fullychargedgeneratorbytes/10240,0,1); charged model+projection, no effective byte understatement"
+    },
+    "component_formula_source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "components": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "known_fit_values": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "missing_reason": {
+                "const": "Missing the minimum one-sided 95% lower retention bound across required dataset profiles, five fit seeds and sample schedules. Research medians do not provide this component."
+              },
+              "name": {
+                "const": "utility_transfer"
+              },
+              "score": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "known_fit_values",
+              "missing_reason",
+              "name",
+              "score"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "known_fit_values": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "missing_reason": {
+                "const": "Missing feature importance Spearman rank agreement and top-k Jaccard agreement for the required auditors."
+              },
+              "name": {
+                "const": "driver_fidelity"
+              },
+              "score": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "known_fit_values",
+              "missing_reason",
+              "name",
+              "score"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "known_fit_values": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "missing_reason": {
+                "const": "Missing marginal W1, sliced Wasserstein and multibandwidth MMD results. KS alone does not provide this component."
+              },
+              "name": {
+                "const": "distribution_fidelity"
+              },
+              "score": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "known_fit_values",
+              "missing_reason",
+              "name",
+              "score"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "known_fit_values": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "missing_reason": {
+                "const": "Missing the production dependence fidelity calculation and required repetitions. Pairwise correlation alone is insufficient."
+              },
+              "name": {
+                "const": "structure_fidelity"
+              },
+              "score": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "known_fit_values",
+              "missing_reason",
+              "name",
+              "score"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "known_fit_values": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "missing_reason": {
+                "const": "Missing the production PRDC precision, recall, density and coverage calculations for n and 4n and required repetitions."
+              },
+              "name": {
+                "const": "coverage_realism"
+              },
+              "score": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "known_fit_values",
+              "missing_reason",
+              "name",
+              "score"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "known_fit_values": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "missing_reason": {
+                "const": "62 fits have no measured artifact charge. Per-fit compactness values lack the required profile and repeat coverage for an aggregate."
+              },
+              "name": {
+                "const": "compactness"
+              },
+              "score": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "known_fit_values",
+              "missing_reason",
+              "name",
+              "score"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "type": "array"
+    },
+    "fit_cells": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "format": {
+      "const": "dope-mfs-component-gap-aggregates"
+    },
+    "hard_gate_passed": {
+      "type": "null"
+    },
+    "hard_gates": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "attribute_inference_advantage_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "calibration_degradation_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "driver_agreement_min"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "exact_copies_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "feature_importance_min_informative_features"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "feature_importance_spearman_min"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "feature_importance_top_k_jaccard_min"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "joint_fidelity_min"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "membership_auc_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "near_copies_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "nominal_95_coverage_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "nominal_95_coverage_min"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "ptf_v1_min"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "query_p95_normalized_error_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "rare_tail_subgroup_retention_min"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "const": "type_i_error_max"
+              },
+              "passed": {
+                "type": "null"
+              },
+              "status": {
+                "const": "not_evidenced"
+              }
+            },
+            "required": [
+              "name",
+              "passed",
+              "status"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 16,
+      "minItems": 16,
+      "type": "array"
+    },
+    "measured_charges": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "missing_global_gates": {
+      "items": {
+        "anyOf": [
+          {
+            "const": "Five matching final admission locks"
+          },
+          {
+            "const": "Required dataset and product profile coverage"
+          },
+          {
+            "const": "Full five-fit-seed x n/2n/4n/8n matrix"
+          },
+          {
+            "const": "Membership and attribute inference attacks"
+          },
+          {
+            "const": "Required real-versus-real and replay controls"
+          },
+          {
+            "const": "Authorized sealed official-test evaluator closure"
+          },
+          {
+            "const": "Preregistered paired analysis"
+          }
+        ]
+      },
+      "maxItems": 7,
+      "minItems": 7,
+      "type": "array"
+    },
+    "new_metric_jobs_started": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "production_contract_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "scalar_formula_changed": {
+      "const": false
+    },
+    "scope": {
+      "const": "Component evidence gaps from committed validation-only refinement; no new data, metrics, fits or test access"
+    },
+    "source_result": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "const": "research/benchmark/results/dope-target-refinement-population-validation.json"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "successful_charges": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "unmeasured_charges": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "version": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "byte_charge_source_result",
+    "cap_failed_charges",
+    "compactness_formula",
+    "component_formula_source_sha256",
+    "components",
+    "fit_cells",
+    "format",
+    "hard_gate_passed",
+    "hard_gates",
+    "measured_charges",
+    "mfs_v2",
+    "missing_global_gates",
+    "new_metric_jobs_started",
+    "official_tests_opened",
+    "production_certified",
+    "production_contract_sha256",
+    "ptf_v1",
+    "release_safe",
+    "scalar_formula_changed",
+    "scope",
+    "source_result",
+    "successful_charges",
+    "superiority",
+    "unmeasured_charges",
+    "version"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,7 @@
+component,aggregate_score,known_fit_values,missing_reason
+utility_transfer,,0,"Missing the minimum one-sided 95% lower retention bound across required dataset profiles, five fit seeds and sample schedules. Research medians do not provide this component."
+driver_fidelity,,0,Missing feature importance Spearman rank agreement and top-k Jaccard agreement for the required auditors.
+distribution_fidelity,,0,"Missing marginal W1, sliced Wasserstein and multibandwidth MMD results. KS alone does not provide this component."
+structure_fidelity,,0,Missing the production dependence fidelity calculation and required repetitions. Pairwise correlation alone is insufficient.
+coverage_realism,,0,"Missing the production PRDC precision, recall, density and coverage calculations for n and 4n and required repetitions."
+compactness,,138,62 fits have no measured artifact charge. Per-fit compactness values lack the required profile and repeat coverage for an aggregate.
