@@ -47,7 +47,7 @@ class PublicationRows(unittest.TestCase):
     def test_missing_receipt_is_not_measured(self):
         with tempfile.TemporaryDirectory() as tmp:
             text = rows.render(Path(tmp))
-        self.assertEqual(text.count("not measured"), 12)
+        self.assertEqual(text.count("not measured"), 16)
         self.assertNotIn(str(FIXTURE_MEDIAN), text)
         self.assertNotIn("0.940", text)
         self.assertFalse(rows.RESULTS.joinpath("tabddpm-matched-population-validation.json").is_file())
@@ -67,6 +67,27 @@ class PublicationRows(unittest.TestCase):
         self.assertIn("TabDDPM, author\\_default & 17 & 0.500 & 0.321 & 0.179", text)
         self.assertIn("TabSyn & not measured", text)
         self.assertIn("Forest-Flow & not measured", text)
+        self.assertIn("ARF & not measured", text)
+
+    def test_non_displayed_profile_is_omitted(self):
+        display, filename, method, format_name = next(
+            item for item in rows.PUBLICATIONS if item[0] == "ARF"
+        )
+        document = _report(method, format_name, median=0.321)
+        extra = dict(document["paired_descriptive"][0])
+        extra["configuration"] = "features12_steps8192"
+        extra["reference_median_retention"] = 0.111
+        extra["dope_median_retention"] = 0.222
+        document["paired_descriptive"].append(extra)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / filename).write_text(json.dumps(document))
+            text = rows.render(root)
+            self.assertEqual(rows.phrase(display, root), "0.321")
+        self.assertNotIn("0.111", text)
+        self.assertNotIn("0.222", text)
+        self.assertNotIn("8192", text)
+        self.assertIn("ARF, author\\_default & 17 & 0.500 & 0.321 & 0.179", text)
 
     def test_a_dope_win_flag_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:

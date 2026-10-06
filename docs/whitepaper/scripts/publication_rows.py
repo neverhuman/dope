@@ -40,7 +40,16 @@ PUBLICATIONS = (
         "ForestDiffusion/Forest-Flow",
         "dope-complete-original-forest-flow-matched-population-validation",
     ),
+    (
+        "ARF",
+        "arf-matched-population-validation.json",
+        "ARF",
+        "dope-complete-original-arf-matched-population-validation",
+    ),
 )
+
+# The manuscript's displayed generator. Other profiles in a receipt are not rows.
+DISPLAYED_CONFIGURATION = "features12_steps2048"
 
 CELL_KEYS = (
     "dataset",
@@ -153,9 +162,13 @@ def load_publication(path, method, format_name):
         _require(type(row["size_multiplier"]) is int, "publication pair size differs")
         count = row["paired_complete_informative_lineages"]
         _require(type(count) is int and count >= 0, "publication lineage count differs")
-        if row["size_multiplier"] == 4 and row["auditor"] == "catboost":
+        if (
+            row["size_multiplier"] == 4
+            and row["auditor"] == "catboost"
+            and row["configuration"] == DISPLAYED_CONFIGURATION
+        ):
             chosen.append(row)
-    _require(chosen, "publication has no size-4 CatBoost pair")
+    _require(chosen, "publication has no displayed size-4 CatBoost pair")
     return chosen
 
 
