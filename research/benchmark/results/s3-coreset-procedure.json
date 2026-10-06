@@ -1,0 +1,815 @@
+{
+  "final_max_rows": 2000,
+  "format": "dope-s3-coreset-procedure",
+  "lineages": 100,
+  "minimum_final_rows": 101,
+  "minimum_test_to_train_ratio_when_small": 0.2,
+  "official_tests_opened": false,
+  "rows": [
+    {
+      "bins": 50,
+      "dataset": "02a45777900441ce",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "047e62b52a3f4ede",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "04c80944e971cb3e",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "0561d673cb73c27e",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "060b9fff8092db17",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "06b0312a585b436e",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "0779d3fd5b3133a2",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "07f38946316c039b",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "0a8428ef25a69175",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "0d482c1dd7cc6592",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "0db59fd2579600d0",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "0f86a714ec5f3ac6",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "167578f5deba4977",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "19f2c3c2d67defd7",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "19f4780b53b3fa41",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "1a4456d1cc71a26a",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "1a803b27c2400dc4",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "1cb97b1d7314d43d",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "205f4b4982b9ea49",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "26eff843be35d831",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "282f8ddb43b5e677",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "297b7688a045c583",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "2c8d0985f3557d2b",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 11,
+      "dataset": "30ca2887550f0d8d",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "3408a6a513c627a3",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "35a9aa9b88f0e4d1",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "3d3321e27d14f9aa",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "44eaabe4cb923766",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "46b25db9396c8209",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "46c5a59e5ae42037",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "471f11cc2d38853a",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "47c581af5de1136b",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "48b7a3bf81e5f3e5",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "4a354d98c965b01f",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "4aa84fff8ad0cd26",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "51730b348b1bbd14",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "54b221668673164c",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "552665868f8f72ed",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "585fef2a1cb6b33f",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "642738a361f1c63a",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "64c64f0f9983c48f",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "654566a1f91408aa",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "693890aae9dc860b",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "6cacb11611345a24",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "7291b347fe0238fb",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "7423783f7e38bb9b",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "7a3d123dd555110d",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "7c8943b160464add",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "7e51711baa1b1fb1",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "80589368fa78f21a",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "8164950b155f7f56",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "85a31ae409944a1b",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "8d859cfa7b51a351",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "923483635406b213",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "9312d813229df035",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "94a00ea67f49bf84",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "94bd4520b8ceb3f0",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "956d34f13e7af830",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "9a10c15885022034",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "a04f964bc53281e0",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "a23f4bd626b76590",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "a32a69e7c701eb14",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "a5ba682572f53add",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "a863cd42be4d05d4",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "a97065df07a47eb0",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "ab279eded3b3c52b",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "aebf5d861a8365b4",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "b6adf79118a58cea",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "b78d323566930bd7",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "b7f9774e2142a758",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "bc85856c012bcc1b",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "c107ee39eb333a9d",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "c30ff9405c916718",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "c4f8e81b70d33a13",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "c649a4cee87c4321",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "cb5bf66ef2ee09ed",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "cba8393879afd1dc",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "ce1a79e2d658eb8a",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "ce837ccd24a3a18c",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "cee6f811d0bf199d",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "d255d3a2e1c8dbf4",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "d52bfd2b6ab1c850",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "d9a3408a840c9f48",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "da290fae0d6c072f",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "da78606950f100cd",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "dd16ac872ffb8673",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "de2868ac837699fd",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "e08f0b9931f93686",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "e18350fb51a9d1b0",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "e5a3a7b3668a1cc2",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "e68fdd96cc63271b",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "ed2efb82fce4b098",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "edc9d41a298fdf60",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "efd53e9c0f36d608",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "f0a3d6881458f990",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "f24e9383331c43e2",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": null,
+      "dataset": "f652ea96eff62654",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": null,
+      "dataset": "f8cf362e371e8960",
+      "downsampled": false,
+      "downsampling_method": null,
+      "minmax_features_preserved": null,
+      "minmax_target_preserved": null
+    },
+    {
+      "bins": 50,
+      "dataset": "fc3812567b5fdd64",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    },
+    {
+      "bins": 50,
+      "dataset": "fe6d7ac3fcd3129e",
+      "downsampled": true,
+      "downsampling_method": "hybrid_coreset",
+      "minmax_features_preserved": true,
+      "minmax_target_preserved": true
+    }
+  ],
+  "sampling_method": "quota stratified by target distribution plus high-variance feature quantile bins",
+  "source_read_max_rows": null,
+  "test_target_rows": 1000,
+  "train_target_rows": 1000,
+  "version": 1
+}

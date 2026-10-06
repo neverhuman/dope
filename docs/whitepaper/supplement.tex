@@ -2,6 +2,7 @@
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
+\usepackage{graphicx}
 
 \begin{document}
 
@@ -10,6 +11,7 @@
 \author{The DOPE Project}
 
 \maketitle
+\input{generated/numbers.tex}
 
 \begin{abstract}
 Lineage-level retention and byte charges for the displayed profile, the
@@ -33,5 +35,45 @@ the PMLB panel. Master Fitness v2 is not in these tables.
 \section{BeyondArena families in the dataset bucket}
 \label{app:beyond}
 \input{generated/beyondarena-inventory.tex}
+
+\section{Replay curves}
+The journal reports the median hidden-basis loss. The curves below are
+the logged replay of both step budgets, before the readout refit. The
+8{,}192-step panel is not the displayed model. The band is a 95\%
+lineage-bootstrap interval.
+\begin{center}
+\includegraphics[width=0.98\textwidth]{figures/loss-curves.pdf}
+\end{center}
+
+\section{Reproducibility}
+Regenerate the tables, the three figure PDFs, and the journal PDF with
+\texttt{just paper} from the commit that contains these files. The
+generator reads the committed validation ledgers, the hash-checked
+Forest-Flow \texttt{fit.json} files, the logged-replay receipts, and the
+ARF watch log. It does not open an official test file. The catalog hash
+is \CatalogSha. The grouped training split uses seed $\SplitSeed$. The
+measured fit seed is 11, and the sample seeds are 101, 211, and 307.
+\texttt{python3 research/benchmark/verify\_paper\_numbers.py} exits
+nonzero when a displayed macro disagrees with those files. Hardware for
+the Forest-Flow confirmation fits was the GPU host named in the fit
+files. Replay and BeyondArena wall times are the receipt field
+\texttt{elapsed\_seconds}. Placeholder cells for TabSyn, a full TabDDPM
+panel, the production privacy-attack panel, fit-seed variance, and the
+full ablation grid stay the words ``not measured'' until those runs
+exist. The journal fidelity table is a separate empirical ledger on the
+grouped validation split. It is not that production panel, and it is not
+differential privacy or HIPAA de-identification.
+
+\section{Fit coresets}
+\label{app:coreset}
+\input{generated/coreset-paragraph.tex}
+
+\section{Artifact hashes}
+\label{app:hashes}
+The rows below are SHA-256 of each ledger and round lock the paper reads,
+plus the commit and the file hash of the harness that measured the
+grouped-validation fidelity ledger. Regenerating the macros does not
+rewrite a ledger hash.
+\input{generated/artifact-hashes.tex}
 
 \end{document}

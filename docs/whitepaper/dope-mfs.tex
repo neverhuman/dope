@@ -49,8 +49,10 @@ $\NForestCb$-lineage Forest-Flow block is ahead on CatBoost
 (\WtlForestCb) at $\ForestByteLo$ to $\ForestByteHi$ bytes.
 $\DopeWithinCap$ displayed DOPE artifacts sit inside the 10{,}240-byte cap.
 Official tests were not opened. Master Fitness v2 is null. TabSyn, a
-100-lineage TabDDPM panel, privacy attacks, fit-seed variance, and the full
-ablation grid are not measured.
+100-lineage TabDDPM panel, the production privacy-attack panel, fit-seed
+variance, and the full ablation grid are not measured.
+Table~\ref{tab:fidelity} is grouped-validation fidelity and an empirical
+distance ledger, not differential privacy or HIPAA de-identification.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -79,8 +81,9 @@ The contributions are:
 \begin{enumerate}
 \item The displayed residual and the sealed-test training pipeline
 (Section~\ref{sec:method}, Fig.~\ref{fig:arch}, \eqref{eq:residual}).
-\item Retention and charged bytes with lineage-bootstrap intervals
-(Fig.~\ref{fig:bytes}, Tables~\ref{tab:density} and~\ref{tab:bytes}).
+\item Retention, charged bytes, and grouped-validation fidelity, with
+lineage-bootstrap intervals
+(Fig.~\ref{fig:bytes}, Tables~\ref{tab:density}, \ref{tab:bytes}, and~\ref{tab:fidelity}).
 \item Paired Wilcoxon tests with Holm correction, rank-biserial
 correlations, and a Friedman--Nemenyi diagram on the common lineage set
 (Fig.~\ref{fig:pairs}, Table~\ref{tab:density}).
@@ -123,9 +126,12 @@ beta-recall, SDMetrics, and synthcity are the usual fidelity
 reports~\cite{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}. The
 density cells already store a classifier two-sample statistic, a mean
 marginal Kolmogorov--Smirnov distance, and a pairwise correlation fidelity.
-Those fields are summarized below. DOMIAS, distance-to-closest-record, and
-alpha-precision were not computed on this panel. Nothing in those fields is
-a formal privacy guarantee or a HIPAA de-identification claim.
+Those fields are summarized below. Table~\ref{tab:fidelity} adds
+alpha-precision, beta-recall, a distance-to-closest-record share, and a
+DOMIAS AUC on the grouped validation split. ARF is absent because shared
+validation sampling is still pending. The production privacy-attack panel
+remains \PrivacyAttackPanel. Nothing in those fields is a formal privacy
+guarantee or a HIPAA de-identification claim.
 
 Tree models remain strong tabular predictors, which is why CatBoost is one
 of the three auditors~\cite{grinsztajn2022trees,prokhorenkova2018catboost}.
@@ -379,8 +385,7 @@ the MLP.
 On the $\FriedmanNCb$ lineages common to all four methods, the Friedman
 $p$-value is $\FriedmanPCb$ and the critical difference is $\FriedmanCdCb$.
 All six CatBoost pairs exceed that difference. Fig.~\ref{fig:pairs} shows
-the sorted paired differences and that critical-difference scale. The bar is
-a scale drawn from rank 1. It is not a bracket around one pair.
+the sorted paired differences. The bar is the critical difference.
 
 \begin{table*}[t]
 \caption{Density block at $4n$. W/T/L counts lineages.}
@@ -398,16 +403,28 @@ a scale drawn from rank 1. It is not a bracket around one pair.
 \label{fig:pairs}
 \end{figure*}
 
-The linear auditor does not separate DOPE from the Gaussian copula. The
-lineage record is \WtlLinGauss. The
-average ranks are $\RankDopeLin$ and $\RankGaussLin$, against a critical
-difference of $\FriedmanCdLin$. The Holm $p$-value is $\HolmLinGauss$, the
-median paired difference is $\DiffLinGauss$ with interval
-$\LoDiffLinGauss$ to $\HiDiffLinGauss$, and the rank-biserial correlation
-is $\RLinGauss$. The interval contains zero. Chow--Liu and the independent
-marginals remain separated from DOPE under the linear auditor and under the
-MLP. The MLP Friedman test separates all six pairs, including the Gaussian
-copula. A CatBoost separation is not a separation under every auditor.
+The linear auditor does not separate DOPE from the Gaussian copula
+(\WtlLinGauss; Holm $\HolmLinGauss$; difference $\DiffLinGauss$, interval
+$\LoDiffLinGauss$ to $\HiDiffLinGauss$; rank-biserial $\RLinGauss$).
+The interval contains zero. Ranks are $\RankDopeLin$ and $\RankGaussLin$
+against critical difference $\FriedmanCdLin$. Chow--Liu and the independent
+marginals remain separated under the linear auditor and the MLP. A CatBoost
+separation is not a separation under every auditor.
+
+Table~\ref{tab:rmse} is the median raw loss on the same informative
+lineages. RMSE is the square root of the stored mean squared error, and
+$R^2$ is one minus that loss divided by the training-mean null. Retention
+is the median of the per-lineage ratios, not the ratio of these medians.
+CatBoost reads RMSE $\RmseRealCb$ and $\RmseSynCb$, with $R^2$
+$\RtwoRealCb$ and $\RtwoSynCb$.
+
+\begin{table}[t]
+\caption{Raw auditor medians on the informative lineages.}
+\label{tab:rmse}
+\centering
+\scriptsize
+\input{generated/loss-beside-retention.tex}
+\end{table}
 
 Table~\ref{tab:bytes} counts artifacts at or under the cap. The two displayed
 DOPE artifacts over the cap are \MissA\ at \MissABytes\ bytes and \MissB\ at
@@ -430,23 +447,34 @@ AUC $\CtwoDope$ (interval $\CtwoLo$ to $\CtwoHi$, $n=\CtwoN$), mean marginal
 Kolmogorov--Smirnov distance $\KsDope$ ($\KsLo$ to $\KsHi$), and pairwise
 correlation fidelity $\CorrDope$ ($\CorrLo$ to $\CorrHi$). A two-sample AUC
 near one half means a linear-time classifier has trouble telling the
-synthetic rows from the real validation rows. That is a fidelity
-description. DOMIAS, distance-to-closest-record, and alpha-precision are
-\PrivacyAttackPanel.
+synthetic rows from the real validation rows. Table~\ref{tab:fidelity}
+adds alpha-precision, beta-recall, DCR share, and DOMIAS AUC. The lower
+block is the neural lineages only. Holm families are 12 and 8, separate
+from retention. Higher DCR share and DOMIAS AUC sit nearer the fit view
+and are not a quality win. DOMIAS stays near one half. The density DCR
+contrast against independent marginals clears Holm in that worse
+direction. ARF awaits shared validation sampling. The production
+privacy-attack panel remains \PrivacyAttackPanel. This is not
+differential privacy or HIPAA de-identification.
+
+\begin{table*}[t]
+\caption{Grouped-validation fidelity and empirical privacy. Not DP or HIPAA.}
+\label{tab:fidelity}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\input{generated/fidelity-privacy-table.tex}
+\end{table*}
 
 \subsection{Neural block}
 Table~\ref{tab:neural} is not pooled with Table~\ref{tab:density}. On the
-$\NNeuCb$ CatBoost lineages, DOPE's median is $\MedDopeNeuCb$ (interval
-$\LoDopeNeuCb$ to $\HiDopeNeuCb$), CTGAN's is $\MedCtganCb$, and TVAE's is
-$\MedTvaeCb$. TVAE is the stronger neural baseline on each auditor.
-Wins, ties, and losses against TVAE are \WtlTvaeCb\ under CatBoost,
-\WtlTvaeLin\ under the linear auditor, and \WtlTvaeMlp\ under the MLP.
-The median favors DOPE, and DOPE still loses lineages in each row.
-Every successful CTGAN and TVAE artifact
-in this byte count is over the cap ($\CtganWithin$ and $\TvaeWithin$). The
-native ledger records scheduling cutoffs for the unfinished search. Those
-cutoffs are unfinished work, not method failures, and they are why this
-block cannot support a method-wide conclusion.
+$\NNeuCb$ CatBoost lineages, DOPE's median is $\MedDopeNeuCb$, CTGAN's is
+$\MedCtganCb$, and TVAE's is $\MedTvaeCb$. TVAE is the stronger neural
+baseline. Wins, ties, and losses against TVAE are \WtlTvaeCb,
+\WtlTvaeLin, and \WtlTvaeMlp. The median favors DOPE, and DOPE still loses
+lineages. Every successful CTGAN and TVAE artifact in this byte count is
+over the cap ($\CtganWithin$ and $\TvaeWithin$). Scheduling cutoffs are
+unfinished work, not method failures.
 
 \begin{table*}[t]
 \caption{Neural block at $4n$, not pooled. W/T/L counts lineages.}
@@ -458,22 +486,17 @@ block cannot support a method-wide conclusion.
 \end{table*}
 
 \subsection{Forest-Flow}
-Table~\ref{tab:forest} is the six-lineage confirmation. It is not pooled
-with the $\NDopeCb$-lineage panel or with the neural block. The Forest-Flow CatBoost
-median is $\MedForestCb$ (interval $\LoForestCb$ to $\HiForestCb$) and the
-paired DOPE median is $\MedDopeForestCb$. Charged Forest-Flow artifacts run
-from $\ForestByteLo$ to $\ForestByteHi$ bytes, with median
-$\ForestByteMedian$, against a DOPE median of $\DopeForestByteMedian$ bytes
-on the same six lineages. DOPE is higher on one CatBoost lineage and lower
-on the other five (wins/ties/losses \WtlForestCb). The linear record is
-\WtlForestLin. The MLP record is \WtlForestMlp: DOPE is lower on every
-paired lineage. The within-block Holm tests are not significant at this
-count, so the loss counts are the descriptive record and not a certified
-Forest-Flow win either. This block is not a DOPE win. The byte charge is about five
-orders of magnitude larger. With $\NForestCb$ lineages this
-block does not support a method-wide ranking. The default and
-native-selected Forest-Flow charges are the same selection, recorded once.
-MFS-v2 on this block is null. The campaign is not marked complete.
+Table~\ref{tab:forest} is a $\NForestCb$-lineage confirmation, not pooled
+with the density or neural blocks. The Forest-Flow CatBoost median is
+$\MedForestCb$ (interval $\LoForestCb$ to $\HiForestCb$) and the paired
+DOPE median is $\MedDopeForestCb$. Wins, ties, and losses are
+\WtlForestCb\ under CatBoost, \WtlForestLin\ under the linear auditor, and
+\WtlForestMlp\ under the MLP. DOPE is lower on every paired MLP lineage.
+The Holm tests are not significant at this count, so this is not a
+certified win for either method. Charged Forest-Flow artifacts run from
+$\ForestByteLo$ to $\ForestByteHi$ bytes (median $\ForestByteMedian$)
+against a DOPE median of $\DopeForestByteMedian$ on the same lineages.
+MFS-v2 on this block is null.
 
 \begin{table*}[t]
 \caption{Forest-Flow confirmation at $4n$, CatBoost. Not pooled.}
@@ -516,19 +539,13 @@ Indep.\ marginals, study code & null \\
 \end{table}
 
 \subsection{BeyondArena}
-{\raggedright
-BeyondArena is the pinned snapshot
-\texttt{\BeyondRevision}.\par}
-It is a separate corpus. It is not one of the $\PreparedN$ PMLB lineages,
-and it is not pooled with them or with the neural block. $\BeyondPrepared$ of
-$\BeyondFamilies$ locked families were prepared and fit. $\BeyondFailed$ did
-not prepare: $\BeyondFeatureRange$ were outside the projected feature range,
-and $\BeyondOverlap$ hit an overlapping source row. The range was not raised,
-and overlapping rows were not dropped to force a fit. The prepared artifacts
-are inside the cap. Table~\ref{tab:beyond} records charged bytes and the
-final hidden-basis validation loss, before the readout refit. No retention
-auditor was run, so the block has no retention column. The supplement names
-all $\BeyondInventory$ families.
+{\raggedright BeyondArena (\texttt{\BeyondRevision}) is not one of the
+$\PreparedN$ PMLB lineages and is not pooled with them.\par}
+$\BeyondPrepared$ of $\BeyondFamilies$ families fit inside the cap.
+$\BeyondFailed$ did not prepare ($\BeyondFeatureRange$ outside the
+projected range, $\BeyondOverlap$ overlapping). The range was not raised.
+Table~\ref{tab:beyond} has no retention column. The supplement names all
+$\BeyondInventory$ families.
 \begin{table}[t]
 \caption{BeyondArena families that prepared. No retention auditor.}
 \label{tab:beyond}
@@ -551,75 +568,60 @@ $\MedSufBMlp$ ($\NSufMlp$ lineages; difference $\DiffSufMlp$). The supplement
 lists all $\PreparedN$ lineages at both budgets. A blank cell is an
 unavailable fit or an auditor that is not informative. It is not a zero.
 
-The scored fits did not keep a per-step series. Fig.~\ref{fig:loss} is the
-logged replay of both budgets, written to a new directory and not
-substituted for the scored artifacts. The curves are the hidden-basis
-objective before the closed-form readout refit. All $\ReplayN$ lineages
-finished both budgets. The median training loss starts at $\LossTrainStart$
-and ends at $\LossTrainEndA$ after 2{,}048 steps and at $\LossTrainEndB$
-after 8{,}192 steps. The median validation loss starts at $\LossValStart$
-and ends at $\LossValEndA$ and $\LossValEndB$. The band is a 95\%
-lineage-bootstrap interval evaluated every eight steps and filled linearly
-between those steps. The lower hidden-basis loss at 8{,}192 steps does not
-replace the displayed profile.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/loss-curves.pdf}
-\caption{Hidden-basis MSE on a log axis, before the readout refit. The 8{,}192-step panel is not the displayed model. The band is a lineage-bootstrap interval.}
-\label{fig:loss}
-\end{figure*}
+The scored fits did not keep a per-step series. The supplement plots the
+logged replay. It is not a substitute for the scored artifacts. All
+$\ReplayN$ lineages finished. Median training loss starts at
+$\LossTrainStart$ and ends at $\LossTrainEndA$ and $\LossTrainEndB$.
+Median validation loss starts at $\LossValStart$ and ends at
+$\LossValEndA$ and $\LossValEndB$. The lower loss at 8{,}192 steps does
+not replace the displayed profile.
 
 The primary informativeness threshold is $0.01$ times the absolute null
-loss. On the displayed CatBoost cells that threshold matches the lineage
-record. \ThrSentence\ Table~\ref{tab:threshold} repeats the check for the
-other density methods. Fit-seed variance across seeds other than $11$ is
-\FitSeedVariance.
+loss. Table~\ref{tab:threshold} lists the CatBoost median by threshold and,
+under it, the informative counts for all three auditors. Reading that
+lower tabular from top to bottom, CatBoost is \NThrLowCb, \NThrMidCb,
+\NThrHighCb; linear is \NThrLowLin, \NThrMidLin, \NThrHighLin; and the
+MLP is \NThrLowMlp, \NThrMidMlp, \NThrHighMlp. The middle row is the
+$0.01$ rule behind the retention tables. \ThrSentence\ Fit-seed variance
+across seeds other than $11$ is \FitSeedVariance.
 
 \begin{table}[t]
-\caption{CatBoost median (lineage count) by informativeness threshold.}
+\caption{Informativeness threshold and auditor counts.}
 \label{tab:threshold}
 \centering
 \scriptsize
 \input{generated/threshold-table.tex}
+\medskip
+\input{generated/threshold-counts.tex}
 \end{table}
 
 \section{Discussion}
-The measurements support a limited statement. On this validation panel, the
-displayed residual, charged at a median of $\DopeByteMedian$ bytes, recovers
-a CatBoost median retention of $\MedDopeCb$ and is separated from the three
-density comparators under that auditor and under the MLP. It is not
-separated from the Gaussian copula under the linear auditor. Forest-Flow, on
-$\NForestCb$ confirmation lineages, is ahead on CatBoost (\WtlForestCb) and
-on the MLP (\WtlForestMlp), at a byte charge five orders of magnitude larger.
-CTGAN and TVAE, on their own
-$\NNeuCb$-lineage block, do not match that retention and do not fit under the cap
-in the successful size-$4$ artifacts. None of those statements is an MFS-v2
-score, a PTF-v1 result, or a release-safe certification. The production
-scalar stays null until every hard gate passes and every component is
-present. A small Wilcoxon $p$-value on retention does not flip that null.
-
-The 8{,}192-step budget moves the CatBoost median by $\DiffSufCb$ on the
-paired subset and does not become the displayed model. BeyondArena shows
-that $\BeyondPrepared$ further families fit inside the cap. It does not show retention.
-TabSyn, a $\PreparedN$-lineage TabDDPM panel, an equal documented tuning
-budget, and a privacy or detection attack are not measured.
-The supplement carries the lineage rows that used to sit in the main
-article.
+The measurements support a limited statement. The displayed residual,
+median $\DopeByteMedian$ bytes, has CatBoost retention $\MedDopeCb$.
+CatBoost and the MLP separate it from the three density comparators. The
+linear auditor does not. Forest-Flow, on $\NForestCb$ lineages, is ahead
+on CatBoost (\WtlForestCb) and the MLP (\WtlForestMlp). CTGAN and TVAE do
+not match that retention, and their successful size-$4$ artifacts miss the
+cap. None of this is an MFS-v2 score, a PTF-v1 result, or a release-safe
+certification. A small Wilcoxon $p$-value does not flip that null. The
+8{,}192-step budget moves the CatBoost median by $\DiffSufCb$ and is not
+the displayed model. BeyondArena fits $\BeyondPrepared$ further families
+inside the cap and does not show retention. TabSyn, a $\PreparedN$-lineage
+TabDDPM panel, and an equal tuning budget are not measured. Fit-seed
+variance is \FitSeedVariance. Table~\ref{tab:fidelity} is an empirical
+ledger, not that production privacy-attack panel.
 
 \section{Threats to Validity}
 \label{sec:threats}
 \paragraph{Internal.}
-The fits use coresets, one fit seed, and a training-derived validation cut
-of the official training rows. The official test was not an input to
+The fits use coresets of \CoreMin\ to \CoreMax\ rows, one fit seed, and a
+training-derived validation cut of the official training rows. The
+supplement records the draw. The official test was not an input to
 training, selection, or the numbers in this paper. The informativeness rule
-drops lineages whose real-versus-null gap is negligible. \ThrSentence\ A
-different threshold can change the median's denominator. Incomplete groups
-are omitted rather than scored as zero, which raises the median relative to
-a policy that would impute failures as zero. Chow--Liu and independent
-marginals are study implementations, not the authors' packages. CTGAN and
-TVAE are native-selected on the lineages that finished. Unfinished
-scheduling cutoffs are not evidence that those methods fail.
+drops a negligible real-versus-null gap. \ThrSentence\ Incomplete groups
+are omitted, not zeroed. Chow--Liu and independent marginals are study
+code. CTGAN and TVAE use the lineages that finished. Unfinished
+scheduling cutoffs are not method failures.
 
 \paragraph{External.}
 These fits do not establish behavior on the full tables used by the
@@ -631,54 +633,26 @@ not pooled with the density block.
 
 \paragraph{Construct.}
 Retention is the reported utility. It is not the MFS-v2 scalar, which stays
-null, so this paper does not rank methods by that scalar. The linear
-auditor does not separate DOPE from the Gaussian copula. A CatBoost
-separation is not a separation under every auditor. Fidelity fields already
-on the density cells are not a membership-inference evaluation. Empirical
-resemblance is not differential privacy and is not HIPAA de-identification.
+null. The linear auditor does not separate DOPE from the Gaussian copula.
+Table~\ref{tab:fidelity} is not a membership-inference certification. Its
+DCR share and DOMIAS AUC are empirical. Empirical resemblance is not
+differential privacy and is not HIPAA de-identification.
 
 \paragraph{Statistical.}
-The Friedman and Wilcoxon results are descriptive. They are not the
-pre-registered production superiority test, because that test also requires
-gate-pass outcomes and a frozen evaluator. The four blocks answer different
-questions. Pooling the $\NDopeCb$-lineage density medians with the
-$\NNeuCb$-lineage neural medians, the $\NForestCb$-lineage Forest-Flow
-medians, or the $\BeyondPrepared$ BeyondArena losses would invent a sample
-size the ledgers do not have. A small $p$-value on retention does not flip
-the null certification scalar.
+The rank tests are descriptive, not the pre-registered production
+superiority test. Density, neural, Forest-Flow, and BeyondArena stay
+unpooled. A small retention $p$-value does not flip the null scalar.
 
 \section{Conclusion}
-\texttt{features12\_steps2048} is a 10{,}240-byte residual. On
-$\NDopeCb$ validation lineages its CatBoost retention is $\MedDopeCb$
-(interval $\LoDopeCb$ to $\HiDopeCb$), and $\DopeWithinCap$ artifacts
-fall inside the cap. Paired tests separate it from the Gaussian
-copula, a study Chow--Liu tree, and study independent marginals under
-CatBoost, and they do not separate it from the Gaussian copula under the
-linear auditor. Forest-Flow is ahead on CatBoost (\WtlForestCb), and DOPE
-wins none of the MLP lineages (\WtlForestMlp), at a far larger byte
-charge on $\NForestCb$ lineages. The common certification scalar is null, the
-official tests are sealed, and the generators that were not run are not
-measured.
+On $\NDopeCb$ validation lineages, \texttt{features12\_steps2048} has
+CatBoost retention $\MedDopeCb$ (interval $\LoDopeCb$ to $\HiDopeCb$)
+and $\DopeWithinCap$ artifacts inside the cap. CatBoost separates it
+from the density comparators; the linear auditor does not separate it
+from the Gaussian copula. Forest-Flow is ahead on CatBoost
+(\WtlForestCb) and the MLP (\WtlForestMlp). The certification scalar
+is null, official tests stay sealed, and unrun generators are not measured.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references,generated/related}
-
-\appendices
-\section{Reproducibility}
-\raggedright
-Regenerate the tables, the three figure PDFs, and this PDF with
-\texttt{just paper} from the commit that contains this file. The generator
-reads the committed validation ledgers, the hash-checked Forest-Flow
-\texttt{fit.json} files, the logged-replay receipts, and the ARF watch log.
-It does not open an official test file. The catalog hash is \CatalogSha.
-The grouped training split uses seed $\SplitSeed$. The measured fit seed is
-11, and the sample seeds are 101, 211, and 307.
-\texttt{python3 research/\allowbreak{}benchmark/\allowbreak{}verify\_paper\_numbers.py}
-exits nonzero when a displayed macro disagrees with those files. Hardware
-for the Forest-Flow confirmation fits was the GPU host named in the fit
-files. Replay and BeyondArena wall times are the receipt field
-\texttt{elapsed\_seconds}. Placeholder cells for TabSyn, a full TabDDPM
-panel, privacy attacks, fit-seed variance, and the full ablation grid stay
-the words ``not measured'' until those runs exist.
 
 \end{document}
