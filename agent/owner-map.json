@@ -219,6 +219,7 @@
     "research/benchmark/tests/test_work_order_b_compute_costs.py": "external-evidence",
     "research/benchmark/research_ablation_binding.py": "external-evidence",
     "research/benchmark/tests/test_research_ablation_binding.py": "external-evidence",
-    "research/benchmark/DOPE_ABLATIONS.md": "external-evidence"
+    "research/benchmark/DOPE_ABLATIONS.md": "external-evidence",
+    "research/benchmark/results/work-order-b-cost-closure-delta-v3": "external-evidence"
   }
 }
