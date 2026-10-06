@@ -22,6 +22,8 @@ RESULTS = REPO / "research" / "benchmark" / "results"
 PAPER = REPO / "docs" / "whitepaper"
 GENERATED = PAPER / "generated"
 TEX = PAPER / "dope-mfs.tex"
+SUPPLEMENT = PAPER / "supplement.tex"
+INVENTORY_TEX = GENERATED / "beyondarena-inventory.tex"
 ARCH = PAPER / "figures" / "architecture.tex"
 ARCH_LITERALS = {"80", "20", "16", "2048", "0.002"}
 WATCH_RECEIPT = RESULTS / "arf-native-closure-watch-v1.receipt.json"
@@ -357,6 +359,26 @@ def normalize_token(token):
     return token.replace("{,}", "").replace(",", "")
 
 
+def supplement_for_scan(text):
+    """Drop the hash-width token. It names an algorithm, not a measurement."""
+    return text.replace("SHA-256", "SHA")
+
+
+def check_inventory_caption():
+    """The family count is the generated macro, not a second typed copy."""
+    failures = []
+    if not INVENTORY_TEX.is_file():
+        return ["beyondarena-inventory.tex is missing"]
+    captions = [line for line in INVENTORY_TEX.read_text().splitlines() if "\\caption" in line]
+    if len(captions) != 1 or "\\BeyondInventory" not in captions[0]:
+        failures.append("beyondarena inventory caption must use BeyondInventory")
+        return failures
+    visible = captions[0].split("%", 1)[0].replace("\\BeyondInventory", "")
+    if TOKEN.search(visible):
+        failures.append("beyondarena inventory caption types a number")
+    return failures
+
+
 def untraced_numbers(tex, allowed):
     """Decimal and integer tokens in the manuscript body that no source owns."""
     missing = []
@@ -418,6 +440,13 @@ def main(argv=None):
     missing = untraced_numbers(TEX.read_text(), allowed)
     if missing:
         failures.append("untraced numbers in dope-mfs.tex: " + ", ".join(missing[:30]))
+    if SUPPLEMENT.is_file():
+        supplement_missing = untraced_numbers(supplement_for_scan(SUPPLEMENT.read_text()), allowed)
+        if supplement_missing:
+            failures.append("untraced numbers in supplement.tex: " + ", ".join(supplement_missing[:30]))
+    else:
+        failures.append("supplement.tex is missing")
+    failures.extend(check_inventory_caption())
     if failures:
         print("\n".join(failures))
         return 1
