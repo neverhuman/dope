@@ -131,7 +131,7 @@ Each item from the original verdict has one status.
 | Claims versus evidence | closed | Abstract, contribution items 4 and 5, and the conclusion each name the unmeasured macros. No DOPE win is claimed. Forest-Flow's lead is the six-lineage W/T/L, with a non-significant Holm test. |
 | BeyondArena | closed | BeyondArena subsection and `tab:beyond`. Revision `2ecfe882ccfb814fc27c4de10a64ceefd5d7655c`. No retention column. Not pooled with the density block. |
 | Venue | blocked-on-decision | Journal class is set. Which IEEE journal receives the PDF is an author decision. |
-| Byline | blocked-on-decision | Journal source stays The DOPE Project. `dope-mfs-anonymous.pdf` rewrites the byline and the hardware names only. |
+| Byline | blocked-on-decision | Journal source stays The DOPE Project. `dope-mfs-anonymous.pdf` rewrites the byline and the running header only. |
 | Sealed official test | blocked-on-decision | The receipt flag stays closed. Scoring the official test is not a writing change. |
 
 No item is open-W. The experiments that would change the recommendation are the B-lane receipts and the three decisions above.

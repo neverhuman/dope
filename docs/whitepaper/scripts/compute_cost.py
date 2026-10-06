@@ -9,10 +9,14 @@ invent a missing timer, host, or device. Official test files are not opened.
 
 from __future__ import annotations
 
+import copy
 import json
 import statistics
+import sys
 from collections import defaultdict
 from pathlib import Path
+
+from public_hardware import banned_hits, redact_bundle, seal_cost_row
 
 REPO = Path(__file__).resolve().parents[3]
 RESULTS = REPO / "research" / "benchmark" / "results"
@@ -64,7 +68,7 @@ def _gpu_name(fitted, directory, host):
         found.append(gpu["name"])
     unique = sorted(set(found))
     if len(unique) > 1:
-        raise ValueError(f"conflicting GPU names on {host}: {unique}")
+        raise ValueError(f"conflicting GPU names: {unique}")
     return unique[0] if unique else None
 
 
@@ -78,13 +82,13 @@ def _assign_gpu(row, observations):
         present = sorted({name for name in names if name})
         missing = sum(1 for name in names if not name)
         if len(present) > 1:
-            raise ValueError(f"{row['method']} host {host} has conflicting GPU names {present}")
+            raise ValueError(f"{row['method']} has conflicting GPU names {present}")
         if missing == 0 and len(present) == 1:
             gpu_by_host[host] = present[0]
         else:
             gpu_by_host[host] = None
             if present:
-                row["notes"].append(f"{host} GPU name is not on every fit")
+                row["notes"].append("GPU name is not on every fit for one machine")
     row["hosts"] = sorted(per_host)
     row["gpu_by_host"] = gpu_by_host
     row["host_fits"] = {host: len(names) for host, names in sorted(per_host.items())}
@@ -484,24 +488,48 @@ def _methods_from_bundle(bundle):
     }
 
 
+def _fresh_bundle():
+    return {
+        "format": "dope-paper-compute-cost-receipts",
+        "version": 1,
+        "official_tests_opened": False,
+        "density": _collect_density(),
+        "neural": _collect_neural(),
+        "forest": _collect_forest(),
+    }
+
+
+def _science(bundle):
+    """Redacted JSON text. Host names and fit paths do not affect the compare."""
+    redacted = redact_bundle(copy.deepcopy(bundle))
+    return json.dumps(redacted, sort_keys=True)
+
+
 def build():
+    committed = json.loads(RECEIPTS.read_text()) if RECEIPTS.is_file() else None
     if SCRATCH.is_dir():
-        bundle = {
-            "format": "dope-paper-compute-cost-receipts",
-            "version": 1,
-            "official_tests_opened": False,
-            "density": _collect_density(),
-            "neural": _collect_neural(),
-            "forest": _collect_forest(),
-        }
-        _dump(RECEIPTS, bundle)
+        fresh = _fresh_bundle()
+        if committed is not None and _science(fresh) != _science(committed):
+            print(
+                "scratch receipts differ from the committed bundle; keeping committed numbers",
+                file=sys.stderr,
+            )
+            bundle = committed
+        else:
+            bundle = fresh
     else:
         bundle = _load_bundle()
         print("scratch absent; reducing committed compute-cost receipts")
+    bundle = redact_bundle(bundle)
+    rendered = json.dumps(bundle)
+    if banned_hits(rendered):
+        raise ValueError("compute-cost receipts still contain a private token")
+    _dump(RECEIPTS, bundle)
     methods = _methods_from_bundle(bundle)
     for row in methods.values():
         row["cpu_model"] = None
         row["cpu_hours"] = None
+        seal_cost_row(row)
     payload = {
         "format": "dope-paper-compute-cost",
         "version": 1,
@@ -509,6 +537,9 @@ def build():
         "missing_field": "not recorded",
         "methods": methods,
     }
+    rendered_cost = json.dumps(payload)
+    if banned_hits(rendered_cost):
+        raise ValueError("compute-cost ledger still contains a private token")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     print(f"wrote {OUT}")

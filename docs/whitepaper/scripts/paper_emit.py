@@ -8,8 +8,11 @@ number.
 from __future__ import annotations
 
 import json
+import math
 import re
 from pathlib import Path
+
+from public_hardware import banned_hits, origin_counts, origin_sentence, public_hardware
 
 
 def _fit_trace(out):
@@ -101,52 +104,56 @@ def _tex_text(value):
     return "".join(replacements.get(char, char) for char in str(value))
 
 
-def _gpu_label(name):
-    if not isinstance(name, str) or not name:
-        return None
-    prefix = "NVIDIA GeForce "
-    if name.startswith(prefix):
-        return name[len(prefix):]
-    return name
+def _mfs_value(components):
+    """Equation (3). Float arithmetic matches the number checker's illustration."""
+    weights = (0.30, 0.20, 0.20, 0.15, 0.10, 0.05)
+    epsilon = 1e-6
+    total = sum(weights)
+    log_score = sum(
+        weight * math.log(epsilon + component) for weight, component in zip(weights, components)
+    )
+    return 100.0 * math.exp(log_score / total)
 
 
-# Journal builds keep the receipt host. The anonymous build renews the
-# public macros to these labels. An unknown host is an error, not a leak.
-_ANON_HOST = {
-    "xbabe1": "GPU host A",
-    "xbabe2": "GPU host B",
-    "xbabe3": "GPU host C",
-}
+def _format_mfs(value, places):
+    return f"{value:.{places}f}"
 
 
-def _anon_host(host):
-    if host not in _ANON_HOST:
-        raise ValueError(f"no anonymous label for host {host}")
-    return _ANON_HOST[host]
+def mfs_illustrations():
+    """Invented rows. Classic stays two decimals; the epsilon rows keep the tail."""
+    classic = _mfs_value((0.90, 0.80, 0.85, 0.70, 0.75, 0.95))
+    ones = _mfs_value((1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
+    at_cap = _mfs_value((0.90, 0.80, 0.85, 0.70, 0.75, 0.0))
+    return {
+        "classic": _format_mfs(classic, 2),
+        "all_ones": _format_mfs(ones, 4),
+        "zero_compactness": _format_mfs(at_cap, 4),
+    }
 
 
-def _hardware(row, rename=None):
-    hosts = list(row.get("hosts") or [])
-    by_host = row.get("gpu_by_host") or {}
-    if not hosts:
-        return "host not recorded"
-    members = {}
-    order = []
-    for host in hosts:
-        label = _gpu_label(by_host.get(host))
-        shown = rename(host) if rename else host
-        if label not in members:
-            members[label] = []
-            order.append(label)
-        members[label].append(shown)
-    parts = []
-    for label in order:
-        joined = ", ".join(members[label])
-        if label:
-            parts.append(f"{joined} {_tex_text(label)}")
-        else:
-            parts.append(f"{joined}, GPU not recorded")
-    return "; ".join(parts)
+def retention_algebra_sentence():
+    """Invented losses. Not a measured lineage."""
+    null_loss = 1.0
+    real_loss = 0.01
+    retention = 0.94
+    synthetic = real_loss + (1.0 - retention) * (null_loss - real_loss)
+    ratio = synthetic / real_loss
+    return (
+        f"Invented losses ${null_loss:g}$, ${real_loss:.2f}$, and retention "
+        f"${retention:.2f}$ give a synthetic-trained loss of ${synthetic:.4f}$, "
+        f"which is ${ratio:.2f}$ times the real-trained mean squared error. "
+        "The CatBoost median in this paper is not this example."
+    )
+
+
+def _hardware_sentence(row):
+    """Prefer the sealed public sentence. Both PDF builds use it."""
+    sentence = row.get("hardware")
+    if not isinstance(sentence, str) or not sentence:
+        sentence = public_hardware(row.get("hosts") or [], row.get("gpu_by_host") or {})
+    if banned_hits(sentence):
+        raise ValueError("hardware sentence contains a private token")
+    return _tex_text(sentence)
 
 
 def _load_generated(out, name):
@@ -203,9 +210,13 @@ def _architecture_commands(command):
     rust = (root / "rust/compiler/target_fitting/part_02.rs").read_text()
     shape = re.search(r'"features12_steps2048" => \(12, (\d+), (\d+)\)', rust)
     rate = re.search(r"\.build\(&store, ([0-9.eE+-]+)\)", rust)
+    production = re.search(
+        r"Ok\(\(12, feature_count\.min\(12\)\.clamp\((\d+), (\d+)\), (\d+)\)\)",
+        rust,
+    )
     lock = (root / "research/benchmark/results/s3-data.lock.json").read_text()
     split = re.search(r"official_test_grouped_training_(\d+)_(\d+)", lock)
-    if shape is None or rate is None or split is None:
+    if shape is None or rate is None or split is None or production is None:
         raise ValueError("architecture source constants are missing")
     steps = f"{int(shape.group(2)):,}".replace(",", "{,}")
     return [
@@ -214,6 +225,9 @@ def _architecture_commands(command):
         command("ArchWidth", shape.group(1)),
         command("ArchSteps", steps),
         command("ArchLr", f"{float(rate.group(1)):.3f}"),
+        command("ProductionWidthLo", production.group(1)),
+        command("ProductionWidthHi", production.group(2)),
+        command("ProductionSteps", production.group(3)),
     ]
 
 
@@ -239,16 +253,17 @@ def _write_compute_cost(out, lines, command):
     measured = (
         ("DOPE", "DOPE", "Dope", _span_cell("DopeByteMedian", "DopeByteLo", "DopeByteHi")),
         ("Gaussian copula", "GaussianCopula", "Gauss", _span_cell("GaussByteMedian", "GaussByteLo", "GaussByteHi")),
-        ("Chow--Liu, study", "Chow-Liu", "Chow", _span_cell("ChowByteMedian", "ChowByteLo", "ChowByteHi")),
-        ("Indep.\\ marginals", "independent_marginals", "Ind", _span_cell("IndByteMedian", "IndByteLo", "IndByteHi")),
+        ("Chow--Liu", "Chow-Liu", "Chow", _span_cell("ChowByteMedian", "ChowByteLo", "ChowByteHi")),
+        ("Independent marginals", "independent_marginals", "Ind", _span_cell("IndByteMedian", "IndByteLo", "IndByteHi")),
         ("CTGAN", "CTGAN", "Ctgan", _span_cell("CtganByteMedian", "CtganByteLo", "CtganByteHi")),
         ("TVAE", "TVAE", "Tvae", _span_cell("TvaeByteMedian", "TvaeByteLo", "TvaeByteHi")),
         ("Forest-Flow", "Forest-Flow", "Forest", _span_cell("ForestByteMedian", "ForestByteLo", "ForestByteHi")),
     )
     for label, key, prefix, byte_cell in measured:
         row = methods[key]
-        lines.append(command(f"{prefix}Hardware", _hardware(row)))
-        lines.append(command(f"{prefix}HardwareAnon", _hardware(row, _anon_host)))
+        sentence = _hardware_sentence(row)
+        lines.append(command(f"{prefix}Hardware", sentence))
+        lines.append(command(f"{prefix}HardwareAnon", sentence))
         fit = _time_cell(lines, command, prefix, "Fit", row["fit_median_seconds"], row["fit_max_seconds"])
         sample = _time_cell(lines, command, prefix, "Samp", row["sample_median_seconds"], row["sample_max_seconds"])
         memory = _memory_cell(lines, command, prefix, row["peak_ram_bytes"], row["peak_vram_mib"])
@@ -268,8 +283,9 @@ def _write_compute_cost(out, lines, command):
             _byte_median(artifact["median"], lambda number: f"{int(round(number)):,}".replace(",", "{,}")),
         ))
         arf_bytes = _span_cell("ArfByteMedian", "ArfByteLo", "ArfByteHi")
-    lines.append(command("ArfHardware", _hardware(arf)))
-    lines.append(command("ArfHardwareAnon", _hardware(arf, _anon_host)))
+    arf_sentence = _hardware_sentence(arf)
+    lines.append(command("ArfHardware", arf_sentence))
+    lines.append(command("ArfHardwareAnon", arf_sentence))
     rows.append(
         "ARF & \\NotRecorded & \\NotRecorded & \\NotRecorded & \\ArfHardware & \\NotRecorded & "
         f"{arf_bytes} \\\\"
@@ -345,17 +361,17 @@ def _write_availability(out):
     paragraph = (
         "Regenerate every \\texttt{generated/} file, the figure PDFs, and both manuscript PDFs "
         "with \\texttt{just paper} from the commit that contains these files. That recipe reads "
-        "the committed validation ledgers. When the benchmark scratch is mounted it also rereads "
+        "the committed validation ledgers. When a local receipt store is present it also rereads "
         "the fit receipts and the pinned LICENSE files. The PDF build reads the committed extracts "
         "and does not invent a missing timer or license. It does not open an official test file. "
         "The catalog hash is \\CatalogSha. The grouped training split uses seed $\\SplitSeed$. "
         "The measured fit seed is 11, and the sample seeds are 101, 211, and 307. "
         "\\texttt{python3 research/benchmark/verify\\_paper\\_numbers.py} exits nonzero when a "
         "displayed macro disagrees with those ledgers. Placeholder cells for TabSyn, a full "
-        "TabDDPM panel, the production privacy-attack panel, fit-seed variance, and the full "
+        "TabDDPM panel, the pre-specified privacy-attack panel, fit-seed variance, and the full "
         "ablation grid stay the words ``not measured'' until those runs exist. A receipt field "
         "that was not stored is ``not recorded.'' The journal fidelity table is a separate "
-        "empirical ledger on the grouped validation split. It is not the production privacy-attack "
+        "empirical ledger on the grouped validation split. It is not the pre-specified privacy-attack "
         "panel, and it is not differential privacy or HIPAA de-identification.\n\n"
         "PMLB is MIT. Every dataset entry in the data lock records SPDX MIT and the note that "
         "the source license is MIT (PMLB). "
@@ -365,7 +381,7 @@ def _write_availability(out):
         f"TabDDPM is {tabddpm}. "
         f"Forest-Diffusion is {forest}. "
         f"ARF is {arf}. "
-        f"Chow--Liu and the independent marginals are study code under this repository's license: {study}. "
+        f"Chow--Liu and the independent marginals are implementations written for this comparison, under this repository's license: {study}. "
         "The SDV repository LICENSE is not in the pinned snapshot, so that license is not recorded.\n"
     )
     (out / "availability.tex").write_text(paragraph)
@@ -522,8 +538,8 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     order = (
         ("DOPE reference", None),
         ("Gaussian copula", "GaussianCopula"),
-        ("Chow--Liu, study", "Chow-Liu"),
-        ("Indep.\\ marginals, study", "independent_marginals"),
+        ("Chow--Liu", "Chow-Liu"),
+        ("Independent marginals", "independent_marginals"),
         ("CTGAN", "CTGAN"),
         ("TVAE", "TVAE"),
     )
@@ -630,6 +646,38 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     lines.append(command("EligibleN", str(lock.get("eligible") if lock.get("eligible") is not None else "not measured")))
     lines.append(command("ExcludedN", str(lock.get("excluded") if lock.get("excluded") is not None else "not measured")))
     lines.append(command("UnknownRights", f"{int(lock['unknown_rights']):,}".replace(",", "{,}") if isinstance(lock.get("unknown_rights"), int) else "not measured"))
+    record_path = Path(__file__).resolve().parents[3] / "research/benchmark/results/s3-lineage-record.json"
+    ledger = json.loads(record_path.read_text())
+    names = [row["display_name"] for row in ledger["rows"]]
+    counts = origin_counts(names)
+    if sum(counts.values()) != len(names):
+        raise ValueError("origin counts do not cover the lineage ledger")
+    for bucket, macro in (
+        ("feynman", "OriginFeynman"),
+        ("strogatz", "OriginStrogatz"),
+        ("fri", "OriginFri"),
+        ("bng", "OriginBng"),
+        ("other", "OriginOther"),
+    ):
+        lines.append(command(macro, str(counts[bucket])))
+    origin = origin_sentence(counts)
+    if banned_hits(origin):
+        raise ValueError("origin sentence contains a private token")
+    lines.append(command("OriginSentence", origin))
+    shown = mfs_illustrations()
+    lines.append(command("MfsClassic", shown["classic"]))
+    lines.append(command("MfsAllOnes", shown["all_ones"]))
+    lines.append(command("MfsZeroCompact", shown["zero_compactness"]))
+    algebra = retention_algebra_sentence()
+    if banned_hits(algebra):
+        raise ValueError("retention algebra sentence contains a private token")
+    lines.append(command("RetentionAlgebra", algebra))
+    lines.append(command(
+        "DcrExchange",
+        "Under an independent draw, the unbalanced share sits near the fit-view fraction "
+        "of the pooled references. The grouped split keeps about four fifths of those rows "
+        "in the fit view, so the baseline is near four fifths, not one half.",
+    ))
     lines.append(command("ThrSentence", _threshold_sentence(payload["threshold_robustness"]["DOPE"]["catboost"], sig3)))
     lines.extend(_expanded_commands(payload["expanded"], sig3, tex_p, command))
     beyond = side.get("beyond") or {}
@@ -803,14 +851,14 @@ def _write_fidelity(expanded, out, sig3, tex_p):
     neural_contrasts = (("CTGAN", "DOPE$-$CTGAN"), ("TVAE", "DOPE$-$TVAE"))
     header = (
         "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
-        "Method & $\\alpha$-prec. & $\\beta$-recall & DCR share & DOMIAS \\\\\n"
+        "Method & $\\alpha$-prec. & $\\beta$-recall & \\shortstack{DCR share\\\\(unbalanced)} & DOMIAS \\\\\n"
         "\\multicolumn{5}{@{}l@{}}{\\emph{Median [interval] (lineages).}} \\\\\n\\midrule\n"
     )
     body = "\n".join(_method_rows(expanded["blocks"]["density"], density_labels, sig3))
     body += "\n\\midrule\n" + "\n".join(_method_rows(expanded["blocks"]["neural"], neural_labels, sig3))
     contrast = (
         "\\begin{tabular}{@{}lcccc@{}}\n\\toprule\n"
-        "Contrast & $\\alpha$-prec. & $\\beta$-recall & DCR share & DOMIAS \\\\\n"
+        "Contrast & $\\alpha$-prec. & $\\beta$-recall & \\shortstack{DCR share\\\\(unbalanced)} & DOMIAS \\\\\n"
         "\\multicolumn{5}{@{}l@{}}{\\emph{Line 2: Holm $p$; rank-biserial $r$; $n$. DOPE minus comparator.}} \\\\\n"
         "\\midrule\n"
         + "\n".join(_contrast_rows(expanded["blocks"]["density"], contrast_labels, sig3, tex_p))
@@ -848,7 +896,8 @@ def _write_loss_beside(expanded, out, sig3):
         )
     (out / "loss-beside-retention.tex").write_text(
         "\\begin{tabular}{@{}lrrrrr@{}}\n\\toprule\n"
-        "Auditor & $n$ & RMSE real & RMSE synth. & $R^2$ real & $R^2$ synth. \\\\\n\\midrule\n"
+        "Auditor & $n$ & RMSE real & RMSE synth. & "
+        "\\shortstack{training-mean\\\\skill, real} & \\shortstack{training-mean\\\\skill, synth.} \\\\\n\\midrule\n"
         + "\n".join(rows)
         + "\n\\bottomrule\n\\end{tabular}\n"
     )

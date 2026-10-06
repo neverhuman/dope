@@ -1,7 +1,12 @@
 """The lineage appendix keeps incomplete auditors blank and does not invent fitness."""
 import unittest
 
-from research.benchmark.publish_lineage_appendix import group_retention, lineage_record, panel_median
+from research.benchmark.publish_lineage_appendix import (
+    displayed_columns,
+    group_retention,
+    lineage_record,
+    panel_median,
+)
 
 
 def cell(seed, retention, informative=True, status="ok", bytes_value=1000, within=True):
@@ -39,6 +44,23 @@ class LineageAppendix(unittest.TestCase):
         self.assertEqual([row["dataset"] for row in rows], ["a", "b"])
         self.assertEqual(panel_median(rows, "catboost", 4), (2, 1.0))
         self.assertIsNone(rows[1]["fit_rows"])
+
+    def test_cap_column_is_the_byte_flag(self):
+        headings = [heading for heading, _getter in displayed_columns()]
+        self.assertEqual(headings[5], "cap")
+        row = {
+            "dataset": "aa",
+            "display_name": "alpha",
+            "fit_rows": 10,
+            "features": 2,
+            "sizes": {"4": {"charged_artifact_bytes": 100, "artifact_within_l3_cap": True}},
+        }
+        getter = displayed_columns()[5][1]
+        self.assertEqual(getter(row), "pass")
+        row["sizes"]["4"]["artifact_within_l3_cap"] = False
+        self.assertEqual(getter(row), "fail")
+        row["sizes"]["4"]["artifact_within_l3_cap"] = None
+        self.assertEqual(getter(row), "---")
 
     def test_cap_flag_cannot_disagree_with_bytes(self):
         with self.assertRaises(ValueError):

@@ -2516,7 +2516,7 @@
       },
       {
         "path": "docs/whitepaper/generated/provenance.json",
-        "sha256": "6880d7d3595c0ab9ada7396db05513bc4be538278e44a510334e50e41c7dc7f7"
+        "sha256": "dea64ea61eaacac0e287298bba3ba76aa7900819aa00feb3a5d66cdcb4fb8a17"
       },
       {
         "path": "docs/whitepaper/generated/beyond-fit.json",
@@ -2886,15 +2886,13 @@
       "forest_cpu_energy_joules": null,
       "forest_fit_core_seconds": 953.4443792356178,
       "forest_fit_native_sample_operation_seconds": 8801.492797114886,
-      "forest_gpu_host": "xbabe1",
       "forest_new_gpu_fits": 12,
       "forest_peak_gpu_used_mib": 3181,
       "forest_shared_evaluator_seconds": 228.73225121363066,
       "forest_whole_device_energy_estimate_joules": 357200.3873267654,
       "limitations": "Prior immutable metrics add no new compute. Operation time includes hashing, generation and native auditors; device power includes idle and is not job-attributed. Earlier DOPE architecture research is a separate cost; per-cell budgets do not imply equal total research spend.",
       "prior_comparison_new_fits": 0,
-      "prior_comparison_new_tuning_trials": 0,
-      "shared_evaluator_host": "xbabe2"
+      "prior_comparison_new_tuning_trials": 0
     },
     "lock": {
       "catalog_sha256": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120",

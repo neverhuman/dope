@@ -426,8 +426,8 @@ def write_density_table(density):
         "linear": "Linear",
         "mlp": "MLP",
         "GaussianCopula": "Gaussian copula",
-        "Chow-Liu": "Chow--Liu, study",
-        "independent_marginals": "Indep.\\ marginals, study",
+        "Chow-Liu": "Chow--Liu",
+        "independent_marginals": "Indep.\\ marginals",
     }
     rows = []
     for auditor in AUDITORS:
@@ -619,6 +619,12 @@ def _read_json(path):
     return json.loads(path.read_text())
 
 
+def _public_forest_cost(cost):
+    """Keep numeric cost fields. Machine names are not a paper statistic."""
+    hidden = {"forest_gpu_host", "shared_evaluator_host"}
+    return {key: value for key, value in cost.items() if key not in hidden}
+
+
 def collect_sidecars(record, neural_doc, forest_doc, forest_bytes):
     misses = []
     not_informative = []
@@ -656,7 +662,7 @@ def collect_sidecars(record, neural_doc, forest_doc, forest_bytes):
         "dope_byte_min": min(dope_amounts) if dope_amounts else None,
         "not_informative": not_informative,
         "sufficiency": {auditor: _paired_sufficiency(record, auditor) for auditor in AUDITORS},
-        "forest_cost": forest_doc.get("cost") or {},
+        "forest_cost": _public_forest_cost(forest_doc.get("cost") or {}),
         "dope_forest_byte_median": float(np.median(dope_forest)) if dope_forest else None,
         "forest_byte_median": float(np.median(forest_bytes)) if forest_bytes else None,
         "lock": {
