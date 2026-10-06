@@ -1,0 +1,112 @@
+{
+  "additional_column_permutation": null,
+  "admitted_lineages": 49,
+  "admitted_recipe_cells": 143,
+  "candidate_fit_lineages": 100,
+  "column_order": "projected_inputs_then_target",
+  "current_capacity_admitted": false,
+  "current_numeric_or_model_or_projection_or_sample_bytes_rehashed": false,
+  "execution_enabled": false,
+  "expanded_metric_operations_started_by_preparation": 0,
+  "fit_seed": 11,
+  "format": "work-order-b-tabsyn-operation-input-readiness-v1",
+  "historical_parent_exit": null,
+  "known_owner_gap_exempted": false,
+  "logical_sample_cells": 600,
+  "metadata_replay": {
+    "elapsed_seconds": 6.444700077176094,
+    "frozen_custody_map_ref": {
+      "bytes": 1321786,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-xbabe1-real-owner-v1/CPU-matched-gap-skip-DISABLED-v11/closed143-evaluator-preparation-only/closed143-verified-metadata-source-byte-map.v1r2.json",
+      "sha256": "30437b04ad411e24173c6638034332294956e270070f33015625a5554cd06e83"
+    },
+    "frozen_recipe_report_ref": {
+      "bytes": 638060,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-xbabe1-real-owner-v1/CPU-matched-gap-skip-DISABLED-v11/closed143-evaluator-preparation-only/closed143-input-recipes.metadata-only.actual.v1.json",
+      "sha256": "d039ca0b82998985abe16b1bc5007bfa5121bc678639836d393e851c0ea5fc17"
+    },
+    "full_resource_peak_claim": null,
+    "memory_limit_bytes": 268435456,
+    "outer_exit_ref": {
+      "bytes": 1163,
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v4/ROOT-metadata-replay-outer-exit.verified.json",
+      "sha256": "08cd8b567bb90051246aebc8085820ac0b224db9aa0b2a87487242d129a98c27"
+    },
+    "prepared_cells": 143,
+    "prepared_output_ref": {
+      "bytes": 2180724,
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v4/prepared-inputs.metadata-only.actual.json",
+      "sha256": "1df49f4c4a0d81ba52754b2eb6d8655e5b99e965599ee7b99222d604f3c0f377"
+    },
+    "qualification_ref": {
+      "bytes": 1821,
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v4/qualification.actual.json",
+      "sha256": "f95f229e2b3580dfd77b2fe94443c011f965d65ecc66736f0ad7bdf0430346dc"
+    },
+    "rejected_cells": 0,
+    "source_sha256": {
+      "tabsyn_closed143_inputs.py": "3b6a43c06b4afe4aa5c12cf7ead876bc776bd262dbd7b25daad1eedb6d95932e",
+      "tabsyn_metric_operation_inputs.py": "b0a0a62faf69b4e29ed9d974a0f102bd16ff04cbb90acfe3504b1951fe0a379c"
+    }
+  },
+  "method": "TabSyn",
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "ptf_v1": null,
+  "recipe_groups": [
+    {
+      "prepared_metadata_cells": 37,
+      "row_multiplier": 1,
+      "sample_seed": 101
+    },
+    {
+      "prepared_metadata_cells": 8,
+      "row_multiplier": 4,
+      "sample_seed": 101
+    },
+    {
+      "prepared_metadata_cells": 40,
+      "row_multiplier": 1,
+      "sample_seed": 211
+    },
+    {
+      "prepared_metadata_cells": 8,
+      "row_multiplier": 4,
+      "sample_seed": 211
+    },
+    {
+      "prepared_metadata_cells": 42,
+      "row_multiplier": 1,
+      "sample_seed": 307
+    },
+    {
+      "prepared_metadata_cells": 8,
+      "row_multiplier": 4,
+      "sample_seed": 307
+    }
+  ],
+  "release_safe_l3": null,
+  "row_multipliers": [
+    1,
+    4
+  ],
+  "runtime_provider_closure_verified": false,
+  "sample_seeds": [
+    101,
+    211,
+    307
+  ],
+  "sample_status_counts": {
+    "admitted_new_CPU": 95,
+    "admitted_retained_GPU": 48,
+    "unavailable_aggregate_admission_gap": 8,
+    "unavailable_monitor": 31,
+    "unstarted": 418
+  },
+  "scientific_fit_allocations": 0,
+  "selection_binding": "scaled_author_default",
+  "status": "metadata_prepared_metrics_unstarted",
+  "superiority": null,
+  "synthetic_header_rows": 1,
+  "train_and_validation_headers": 0
+}
