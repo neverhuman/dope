@@ -34,7 +34,7 @@ python3 -I -S -B research/benchmark/results/work-order-b-compute-costs-v2/render
 ```
 
 Report SHA256: `9ffb69a46f509fc9c2a0da8efdf81bc6ccf1bbfe97c8491a5439f910cb1f42a4`.
-Renderer SHA256: `f5fe48e7ff628d980a932661f4fb71d54fcc5a7a9b51a6645fddd344692817b2`.
+Renderer SHA256: `e3b1acb7021c317273035e4762cf67451596de19b520ac47be9ff196cc8c47fa`.
 Existing publisher SHA256: `d90e275318b8eb766fb340334103060de8aeb3c81f65728e28314b2da4f34e01`.
 
 `source-proof.json` retains exact frozen source receipts and anchored indexes. The 21KiB raw preparer remains private, with original input hashing, source/result pins and observed operator provenance in the immutable custody receipt:
