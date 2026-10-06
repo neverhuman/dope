@@ -1,0 +1,950 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_commit": {
+      "const": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7"
+    },
+    "author_default_epochs": {
+      "const": {
+        "diffusion": 10001,
+        "vae": 4000
+      }
+    },
+    "author_patience": {
+      "type": "integer"
+    },
+    "book_charges_are_measured_method_cost": {
+      "const": false
+    },
+    "cells": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "actual_fit_exit": {
+                "const": 0
+              },
+              "artifact_files": {
+                "additionalProperties": false,
+                "properties": {
+                  "decoder-final.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "diffusion-epoch-0.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "diffusion.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "encoder-final.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "model.json": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "numeric-state.npz": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "projection.json": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "vae-selected.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "decoder-final.safetensors",
+                  "diffusion-epoch-0.safetensors",
+                  "diffusion.safetensors",
+                  "encoder-final.safetensors",
+                  "model.json",
+                  "numeric-state.npz",
+                  "projection.json",
+                  "vae-selected.safetensors"
+                ],
+                "type": "object"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "config_sha256": {
+                "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+              },
+              "current_bulk_model_hashes_reverified": {
+                "const": false
+              },
+              "dataset_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "fit_complete": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_exit": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "const": 11
+              },
+              "inventory_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "joint_train_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "joint_validation_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "lineage_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "measured_scientific_seconds": {
+                "type": "number"
+              },
+              "measured_whole_seconds": {
+                "type": "number"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "physical_file_sizes_read_back": {
+                "const": true
+              },
+              "prior_book_charge_seconds": {
+                "type": "integer"
+              },
+              "prior_unmeasured_allocations": {
+                "type": "integer"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "retained_first_fit": {
+                "const": true
+              },
+              "small_receipts": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bytes": {
+                      "type": "integer"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "bytes",
+                    "path",
+                    "sha256"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 7,
+                "minItems": 7,
+                "type": "array"
+              },
+              "status": {
+                "const": "fit_ok"
+              },
+              "worker_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "actual_fit_exit",
+              "artifact_files",
+              "charged_artifact_bytes",
+              "config_sha256",
+              "current_bulk_model_hashes_reverified",
+              "dataset_id",
+              "fit_complete",
+              "fit_exit",
+              "fit_request",
+              "fit_seed",
+              "inventory_receipt",
+              "joint_train_sha256",
+              "joint_validation_sha256",
+              "lineage_sha256",
+              "measured_scientific_seconds",
+              "measured_whole_seconds",
+              "model_bytes",
+              "physical_file_sizes_read_back",
+              "prior_book_charge_seconds",
+              "prior_unmeasured_allocations",
+              "projection_bytes",
+              "retained_first_fit",
+              "small_receipts",
+              "status",
+              "worker_sha256"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "actual_fit_exit": {
+                "const": 0
+              },
+              "artifact_files": {
+                "additionalProperties": false,
+                "properties": {
+                  "decoder-final.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "diffusion-epoch-0.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "diffusion.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "encoder-final.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "model.json": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "numeric-state.npz": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "projection.json": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  },
+                  "vae-selected.safetensors": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "bytes",
+                      "sha256"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "decoder-final.safetensors",
+                  "diffusion-epoch-0.safetensors",
+                  "diffusion.safetensors",
+                  "encoder-final.safetensors",
+                  "model.json",
+                  "numeric-state.npz",
+                  "projection.json",
+                  "vae-selected.safetensors"
+                ],
+                "type": "object"
+              },
+              "charged_artifact_bytes": {
+                "type": "integer"
+              },
+              "config_sha256": {
+                "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+              },
+              "current_bulk_model_hashes_reverified": {
+                "const": false
+              },
+              "dataset_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "fit_complete": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_exit": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_request": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "fit_seed": {
+                "const": 11
+              },
+              "inventory_receipt": {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "type": "object"
+              },
+              "joint_train_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "joint_validation_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "lineage_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "measured_scientific_seconds": {
+                "type": "number"
+              },
+              "measured_whole_seconds": {
+                "type": "number"
+              },
+              "model_bytes": {
+                "type": "integer"
+              },
+              "physical_file_sizes_read_back": {
+                "const": true
+              },
+              "prior_book_charge_seconds": {
+                "type": "integer"
+              },
+              "prior_unmeasured_allocations": {
+                "type": "integer"
+              },
+              "projection_bytes": {
+                "type": "integer"
+              },
+              "retained_first_fit": {
+                "const": false
+              },
+              "small_receipts": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bytes": {
+                      "type": "integer"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "bytes",
+                    "path",
+                    "sha256"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 8,
+                "minItems": 8,
+                "type": "array"
+              },
+              "status": {
+                "const": "fit_ok"
+              },
+              "worker_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "actual_fit_exit",
+              "artifact_files",
+              "charged_artifact_bytes",
+              "config_sha256",
+              "current_bulk_model_hashes_reverified",
+              "dataset_id",
+              "fit_complete",
+              "fit_exit",
+              "fit_request",
+              "fit_seed",
+              "inventory_receipt",
+              "joint_train_sha256",
+              "joint_validation_sha256",
+              "lineage_sha256",
+              "measured_scientific_seconds",
+              "measured_whole_seconds",
+              "model_bytes",
+              "physical_file_sizes_read_back",
+              "prior_book_charge_seconds",
+              "prior_unmeasured_allocations",
+              "projection_bytes",
+              "retained_first_fit",
+              "small_receipts",
+              "status",
+              "worker_sha256"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 100,
+      "minItems": 100,
+      "type": "array"
+    },
+    "common_validation": {
+      "type": "null"
+    },
+    "common_validation_complete": {
+      "const": false
+    },
+    "config_sha256": {
+      "const": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "current_bulk_model_hashes_reverified": {
+      "const": false
+    },
+    "device": {
+      "const": "CUDA"
+    },
+    "energy_attributable_to_job": {
+      "type": "null"
+    },
+    "epoch_policy_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "fit_seed": {
+      "const": 11
+    },
+    "format": {
+      "const": "tabsyn-default100-scaled-cuda-fit-publication"
+    },
+    "full_runtime_hardware_certified": {
+      "const": false
+    },
+    "full_sample_matrix_complete": {
+      "const": false
+    },
+    "host": {
+      "const": "xbabe1"
+    },
+    "immutable_references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "local_source_cache": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_objective": {
+      "type": "null"
+    },
+    "native_selection_complete": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_superiority": {
+      "type": "null"
+    },
+    "partition": {
+      "const": "official_training_derived_validation"
+    },
+    "physical_file_sizes_read_back": {
+      "const": true
+    },
+    "privacy": {
+      "type": "null"
+    },
+    "privacy_coverage_complete": {
+      "const": false
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "publisher_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "scaled_epochs": {
+      "const": {
+        "diffusion": 1000,
+        "vae": 200
+      }
+    },
+    "scope": {
+      "const": "Default configuration fit phase only; 100 S3 TRAIN-derived validation lineages"
+    },
+    "source_files": {
+      "const": {
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_controller_v1.py": "f5ef5f996e20a5bc6f6f510bbc6fce61338dc360da7f1b269c2c95cedbb53386",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_entry_v1.py": "5d5ac24fc6e816edef007a3218b2556a4153dcfa395a415875057ef84303d25d",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_entry_v2.py": "5c69a932c9125ba59d38ed4b6140973c12c88c3f2f55a66f68cbd76840c1f5a4",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_population_v2.py": "e052cbb95fc22ebb0c90f574366556fa0ecdce2bdfa983bd5b8b6a7c031afe14",
+        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/tabsyn_native_target.captured.py": "584a1a07320c53d343ee119e5dcb9fc65ca49e19bf8c151e3375d9a05e2c69a7"
+      }
+    },
+    "summary": {
+      "additionalProperties": false,
+      "properties": {
+        "charged_model_and_projection_bytes": {
+          "type": "integer"
+        },
+        "closed_default_fits": {
+          "type": "integer"
+        },
+        "measured_scientific_seconds": {
+          "type": "number"
+        },
+        "measured_whole_seconds": {
+          "type": "number"
+        },
+        "new_default_fits": {
+          "type": "integer"
+        },
+        "prior_unmeasured_allocations": {
+          "type": "integer"
+        },
+        "prior_unmeasured_book_charge_seconds": {
+          "type": "integer"
+        },
+        "retained_default_fits": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "charged_model_and_projection_bytes",
+        "closed_default_fits",
+        "measured_scientific_seconds",
+        "measured_whole_seconds",
+        "new_default_fits",
+        "prior_unmeasured_allocations",
+        "prior_unmeasured_book_charge_seconds",
+        "retained_default_fits"
+      ],
+      "type": "object"
+    },
+    "track": {
+      "const": "scaled_200_vae_1000_diffusion"
+    },
+    "utility": {
+      "type": "null"
+    },
+    "verified_frozen_source_files": {
+      "type": "integer"
+    },
+    "verified_small_receipts": {
+      "type": "integer"
+    },
+    "version": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "author_commit",
+    "author_default_epochs",
+    "author_patience",
+    "book_charges_are_measured_method_cost",
+    "cells",
+    "common_validation",
+    "common_validation_complete",
+    "config_sha256",
+    "counts_as_dope_win",
+    "current_bulk_model_hashes_reverified",
+    "device",
+    "energy_attributable_to_job",
+    "epoch_policy_sha256",
+    "fit_seed",
+    "format",
+    "full_runtime_hardware_certified",
+    "full_sample_matrix_complete",
+    "host",
+    "immutable_references",
+    "local_source_cache",
+    "mfs_v2",
+    "native_objective",
+    "native_selection_complete",
+    "official_tests_opened",
+    "paired_superiority",
+    "partition",
+    "physical_file_sizes_read_back",
+    "privacy",
+    "privacy_coverage_complete",
+    "production_certified",
+    "ptf_v1",
+    "publisher_sha256",
+    "release_safe_l3",
+    "scaled_epochs",
+    "scope",
+    "source_files",
+    "summary",
+    "track",
+    "utility",
+    "verified_frozen_source_files",
+    "verified_small_receipts",
+    "version"
+  ],
+  "type": "object"
+}
