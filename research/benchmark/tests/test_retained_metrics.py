@@ -113,6 +113,87 @@ class PublicationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "frozen_receipt_changed"):
                 publish.verified(path, dict(bytes=len(original), sha256=hashlib.sha256(original).hexdigest()))
 
+    def multiple_fit_fixture(self, root, *, missing_sample=False):
+        """Two independent fits of one existing public six-sample lineage."""
+        def save(name, value):
+            path = root / name
+            body = (json.dumps(value, sort_keys=True, indent=2) + "\n").encode()
+            path.write_bytes(body)
+            return dict(path=str(path), bytes=len(body), sha256=hashlib.sha256(body).hexdigest())
+
+        first_dataset = self.panel["cells"][0]["dataset"]
+        originals = [cell for cell in self.panel["cells"] if cell["dataset"] == first_dataset]
+        jobs, refs = [], []
+        for seed in (23, 37):
+            for original in originals:
+                if missing_sample and seed == 37 and original["row_multiplier"] == 4 and original["sample_seed"] == 307:
+                    continue
+                receipt = copy.deepcopy(original)
+                identity = dict(dataset=first_dataset, fit_seed=seed,
+                                row_multiplier=receipt["row_multiplier"], sample_seed=receipt["sample_seed"])
+                digest = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+                receipt.update(job_identity=identity, job_sha256=digest, fit_seed=seed, status="ok",
+                               input_refs={}, source_refs=self.panel["source_refs"])
+                refs.append(save(digest + ".json", receipt))
+                jobs.append(dict(job_identity=identity, job_sha256=digest, evaluator_input=receipt))
+        manifest_ref = save("inputs.json", dict(jobs=jobs))
+        lock_ref = save("lock.json", dict(actual_complete=True, official_tests_opened=False,
+                        count=len(refs), receipts=refs, source_refs=self.panel["source_refs"]))
+        execution_ref = save("execution.json", dict(receipt_lock_ref=lock_ref, metric_receipts=len(refs),
+                             source_refs=dict(original_metric_input_manifest=manifest_ref,
+                                              measurement_driver=manifest_ref, runtime_inventory=manifest_ref)))
+        return lock_ref, root, manifest_ref, execution_ref
+
+    def test_independent_fit_seeds_have_separate_dataset_summaries(self):
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parents[3] / "target") as tmp:
+            panel = publish.build(*self.multiple_fit_fixture(Path(tmp)), by_fit_seed=True)
+            self.assertEqual(panel["sample_cells"], 12)
+            self.assertEqual({(row["fit_seed"], row["row_multiplier"]) for row in panel["summary"]},
+                             {(23, 1), (23, 4), (37, 1), (37, 4)})
+            self.assertTrue(all(row["datasets"] == 1 and row["cells"] == 3 for row in panel["summary"]))
+            self.assertTrue(all(panel[key] is None for key in ("mfs_v2", "ptf_v1", "superiority")))
+
+    def test_old_single_fit_mode_rejects_multiple_independent_fits(self):
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parents[3] / "target") as tmp:
+            with self.assertRaisesRegex(ValueError, "incomplete_three_sample_seed_group"):
+                publish.build(*self.multiple_fit_fixture(Path(tmp)))
+
+    def test_per_fit_summary_rejects_missing_sample_seed(self):
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parents[3] / "target") as tmp:
+            with self.assertRaisesRegex(ValueError, "incomplete_three_sample_seed_group"):
+                publish.build(*self.multiple_fit_fixture(Path(tmp), missing_sample=True), by_fit_seed=True)
+
+    def test_committed_cpu_replication_metrics_keep_fit_and_split_bindings(self):
+        root = Path(__file__).parents[1] / "results/cpu-fivefit-validation-v1"
+        manifest = json.loads((root / "manifest.json").read_text())
+        repo = Path(__file__).parents[3]
+        producer = repo / manifest["producer_ref"]["path"]
+        self.assertEqual(hashlib.sha256(producer.read_bytes()).hexdigest(), manifest["producer_ref"]["sha256"])
+        self.assertEqual(manifest["sample_cells"], 192)
+        self.assertFalse(manifest["five_fit_matrix_complete"])
+        self.assertFalse(manifest["full_population_complete"])
+        import jsonschema
+        jsonschema.Draft202012Validator(json.loads((root / "manifest.schema.json").read_text())).validate(manifest)
+        for method, expected in (("arf", 144), ("forest", 48)):
+            panel = json.loads((root / method / "panel.json").read_text())
+            fits = json.loads((repo / manifest["inputs"][method]["published_fit_panel"]["path"]).read_text())["fits"]
+            by_identity = {(row["dataset"], row["fit_seed"], row["configuration_sha256"]): row for row in fits}
+            self.assertEqual(panel["sample_cells"], expected)
+            self.assertEqual({x["fit_seed"] for x in panel["summary"]},
+                             {23} if method == "arf" else {23, 37, 53, 71})
+            for cell in panel["cells"]:
+                fitted = by_identity[cell["dataset"], cell["fit_seed"], cell["config_sha256"]]
+                self.assertEqual(cell["charged_artifact_bytes"], fitted["artifact_bytes"])
+                self.assertEqual(cell["input_hashes"]["train_ref"], fitted["train_sha256"])
+                self.assertEqual(cell["input_hashes"]["validation_ref"], fitted["validation_sha256"])
+                self.assertEqual(cell["selection_binding"], ",".join(fitted["configuration_labels"]))
+            rebuilt = {**panel, "metric_rows": [publish.flatten(cell) for cell in panel["cells"]]}
+            self.assertEqual(publish.render(rebuilt)["figure-kpis.csv"], (root / method / "figure-kpis.csv").read_bytes())
+            jsonschema.Draft202012Validator(json.loads((root / "panel.schema.json").read_text())).validate(panel)
+        for item in manifest["files"].values():
+            body = (repo / item["path"]).read_bytes()
+            self.assertEqual((len(body), hashlib.sha256(body).hexdigest()), (item["bytes"], item["sha256"]))
+
 
 if __name__ == "__main__":
     unittest.main()
