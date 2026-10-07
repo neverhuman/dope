@@ -41,7 +41,7 @@ checkpoint and its forecasts are recorded separately below.
 | --- | --- | --- | --- |
 | TabSyn | Eight-lineage scaled-default cohort | 100 default/native-selected lineages | Oct 14 20:00, conditional |
 | TabDDPM | Contracts/pilot only in this population publication interface | Complete 100-lineage default/native panel | Oct 14 20:00, conditional |
-| Forest-Flow | Six-lineage native-selected 4n confirmation; eight additional defaults at four fit seeds on two lineages, 48 common evaluations | Complete 100-lineage default/native panel and missing seed11 replication | Oct 10 02:00 new-default fit/metrics forecast; broader scope Oct 14 20:00, conditional |
+| Forest-Flow | Six-lineage native-selected 4n confirmation; ten additional defaults at five fit seeds on two lineages, 60 common evaluations | Complete 100-lineage default/native panel and missing seed11 replication | Oct 10 02:00 new-default fit/metrics forecast; broader scope Oct 14 20:00, conditional |
 | Forest-Diffusion | Pilot mode receipts | Separate complete 100-lineage diffusion-mode panel | Oct 14 20:00, conditional |
 | ARF | Complete 100-lineage fit11 default/native n/4n panel; 24 additional fit23 receipts on 12 lineages with 144 common evaluations | 796 physical / 800 logical additional fits across seeds 23/37/53/71, then remaining common metrics | Oct 8 02:00 fit close, conditional forecast; metrics follow |
 
@@ -76,6 +76,18 @@ directly pinned by the manifest. These clocks overlap and are not additive.
 These are measured prefix costs, not full-population throughput forecasts. The initial ARF and
 Forest cohorts have different sizes and cannot be ranked against each other.
 Full-population and five-fit completion remain false.
+
+The first two Forest-Flow default cohorts now have all five actual fit seeds
+11/23/37/53/71 and all 60 common n/4n evaluations, pinned by
+`research/benchmark/results/forest-first-two-fivefit-v1/manifest.json`.
+Ten checkpoint/error/native-KPI rows and SVG/PDF figures are reproducible.
+Samples are averaged within each fit before computing unbiased SD across five
+fit means; that SD is not a confidence interval. At 4n the informative lineage
+has CatBoost retention 1.036965 with between-fit SD 0.009010. The other lineage
+has uninformative utility, so its mean and SD remain null (0/5 support).
+This is a two-lineage default cohort, not a completed population or native-
+selected five-fit matrix. It changes no scientific selection or official-test
+admission. The earlier 48-cell publication is preserved as its original prefix.
 
 The ARF queue replicates the existing default and native-selected winners:
 796 physical fits, 800 logical configurations, with no new tuning. The

@@ -1,0 +1,106 @@
+{
+  "common_flatten_source_ref": {
+    "bytes": 10720,
+    "path": "research/benchmark/publish_retained_metrics.py",
+    "sha256": "dce2e68de574c5029e74de2675e9b1377789894e5a0482c0763d135db579384c"
+  },
+  "costs": {
+    "clocks_are_additive": false,
+    "common_process_wall_seconds": [
+      26.747209290973842,
+      24.075352454092354
+    ],
+    "sum_common_metric_seconds": 29.60968286031857,
+    "sum_generator_fit_seconds": 422.6447587246075,
+    "sum_native_audit_seconds": 69.34353486262262,
+    "sum_whole_fit_seconds": 549.8281673481688
+  },
+  "counts_as_dope_win": false,
+  "figure_environment": {
+    "creation_timestamp_omitted": true,
+    "matplotlib_version": "3.10.8",
+    "standard_deviation_is_not_confidence_interval": true
+  },
+  "files": {
+    "README.md": {
+      "bytes": 4607,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/README.md",
+      "sha256": "32912def33e8b10c7dc68cb89fbe2915f3d30c471c2c47e570af9285428c35f4"
+    },
+    "checkpoint-kpis.csv": {
+      "bytes": 4799,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/checkpoint-kpis.csv",
+      "sha256": "55566de73dc0b46795344434a965f3ec4e686b999d4a50e02e9c4995fa66bdff"
+    },
+    "figure-kpis.csv": {
+      "bytes": 6848,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/figure-kpis.csv",
+      "sha256": "ff42355c1a865ff6c0a67ef71411dcd810b5e23d2e90f2ac0cc04ef92a8a2071"
+    },
+    "fit-variance.pdf": {
+      "bytes": 22050,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/fit-variance.pdf",
+      "sha256": "2f36f8fe34217c9f9f903ccc1fb92b0de56013911ea770bdef72f38a790c514f"
+    },
+    "fit-variance.svg": {
+      "bytes": 78023,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/fit-variance.svg",
+      "sha256": "47df5054c760f3387148b872de8578876cb9216aba19aafe28056396dbaeb930"
+    },
+    "manifest.schema.json": {
+      "bytes": 2266,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/manifest.schema.json",
+      "sha256": "636c5f6143ab69f1464dbcdc34ec14fed3d1ac7ec22b284323228b5162fb457f"
+    },
+    "original-verification.json": {
+      "bytes": 23158,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/original-verification.json",
+      "sha256": "a9f55bf74e2279a40caf4a837cc30c9c8207e0ea5b732d9d0dbe83ad059fc029"
+    },
+    "panel.json": {
+      "bytes": 956753,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+      "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
+    },
+    "panel.schema.json": {
+      "bytes": 4725,
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.schema.json",
+      "sha256": "bc4da1455c4d58dab23ad96a80701c4ff2f52361f68f473c40515c7ecad9243c"
+    }
+  },
+  "format": "forest-first-two-fivefit-publication-v1",
+  "full_population_complete": false,
+  "generator_fits": 10,
+  "input_ref": {
+    "bytes": 29261,
+    "path": "/mnt/fast-scratch/dope-benchmark/forest-first-two-fivefit-publication-v1/inputs-v6.lock.json",
+    "sha256": "675ecf57d3950f71dcb1af0acef9916201352c90b2565aebcb6e73dcd8119ef1"
+  },
+  "lineages": 2,
+  "mfs_v2": null,
+  "native_selected_population_complete": false,
+  "official_tests_opened": false,
+  "original_checkpoints_sha_verified": 10,
+  "original_verification_ref": {
+    "bytes": 23158,
+    "path": "research/benchmark/results/forest-first-two-fivefit-v1/original-verification.json",
+    "sha256": "a9f55bf74e2279a40caf4a837cc30c9c8207e0ea5b732d9d0dbe83ad059fc029"
+  },
+  "producer_refs": {
+    "plot_forest_fit_variance.py": {
+      "bytes": 2670,
+      "path": "research/benchmark/plot_forest_fit_variance.py",
+      "sha256": "6dc263867e2d80d239251a2b579f3c31c92673d76e601ec9576a5e43cfc69378"
+    },
+    "publish_forest_fit_variance.py": {
+      "bytes": 17003,
+      "path": "research/benchmark/publish_forest_fit_variance.py",
+      "sha256": "65aeaeb1077c746c855c6abe1a8764ef6f9380efb685f8cf1bdd5b6480314740"
+    }
+  },
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "sample_cells": 60,
+  "superiority": null,
+  "version": 1
+}

@@ -1,0 +1,436 @@
+{
+  "actual_complete": true,
+  "closed_utc": "2026-10-07T09:30:41.826925+00:00",
+  "elapsed_seconds": 3.3312546089291573,
+  "fit_checkpoints": 10,
+  "format": "forest-first-two-fivefit-original-hash-verification-v1",
+  "input_sha256": "9dfac77a6b83ff1da7e6c6e523aa2167760a30fbafc7b269c3c585d88eb5affb",
+  "new_generator_fits": 0,
+  "numerical_metric_execution": false,
+  "official_tests_opened": false,
+  "original_checkpoint_bytes_verified": true,
+  "pickle_loaded": false,
+  "refs": [
+    {
+      "bytes": 1406,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c/fit.json",
+      "sha256": "97c32030a7391163dec7cc58d401be3be19592430291eeaa4c0cca4e3c156df6"
+    },
+    {
+      "bytes": 1398,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c.json",
+      "sha256": "a0d078ba4b1333159fb56dcc405745fe3bb10eb69634e1cd654c14be47219aef"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c/close.json",
+      "sha256": "33e5fd77ae2a2f4a457d7b4ef78bd0d218fe239974a8c4e1afeae958c16958a9"
+    },
+    {
+      "bytes": 77991,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+      "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+    },
+    {
+      "bytes": 2254,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-replicas-batch1/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c.json",
+      "sha256": "ddb0e8686c137fdf55d5d19cf28fd257855cebe01daadeb1d6a36f2fb2b522cd"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c/artifact/adapter.json",
+      "sha256": "ba55b0ce4fb1553f1ec64bb5705b05ef4e37c38413d14bb4be4f1541fc243863"
+    },
+    {
+      "bytes": 972,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c/artifact/projection.json",
+      "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+    },
+    {
+      "bytes": 216687008,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c/artifact/sampler.pkl",
+      "sha256": "d9ffb93c4875ced4969af55ff06254197b2c0284852dd55b655b258657d336ac"
+    },
+    {
+      "bytes": 13914,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/adapter.py",
+      "sha256": "91b5ddb995cedee35551a0c0592d069eef3819739571d4f2e961b3a5830feeba"
+    },
+    {
+      "bytes": 11906,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/controls.py",
+      "sha256": "43d4d3c6b6eeae661f882e89de444c081272f11afc9857ea25a7a7de7389d752"
+    },
+    {
+      "bytes": 2886,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/worker.py",
+      "sha256": "4c60dfa3ebdd6c5cf2a8d462ae3952f4170cbcf813763edad3e2664a75efbff1"
+    },
+    {
+      "bytes": 1379421,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/runtime.lock.json",
+      "sha256": "e9fa7a4a05dc4f9e3502fde0481e2d78de6785b455136b3ea05cdcc711d6d221"
+    },
+    {
+      "bytes": 6223032,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/runtime-inventory.lock.json",
+      "sha256": "3ca96d3e6781572846b9fb09fed3790c903ba41534935a6655e9134f44a6ade0"
+    },
+    {
+      "bytes": 1405,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae/fit.json",
+      "sha256": "76f98c9f6ba05642d21c18c7c5355de6b252b9a0d0f849f55b083f8fa6ec6207"
+    },
+    {
+      "bytes": 1398,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae.json",
+      "sha256": "1a4bc77acda552c1cc81dedff814017d96747465c87967d5760c0fa15e017f4f"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae/close.json",
+      "sha256": "a67d726c6cc21b72ddb57ec541d3b22278493b59970e00170bafa0d1b0c60fb5"
+    },
+    {
+      "bytes": 2255,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-replicas-batch1/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae.json",
+      "sha256": "526bccd21160a17c0a36953ade219765a20d54823ac4558430c2aaa8d1f0494e"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae/artifact/adapter.json",
+      "sha256": "92a07976ae98f0a9f13574615ddb803b1dbd6f744fa74c3dcae60481fe28352a"
+    },
+    {
+      "bytes": 972,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae/artifact/projection.json",
+      "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+    },
+    {
+      "bytes": 216796917,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae/artifact/sampler.pkl",
+      "sha256": "4864a3e61bf1c154303f29ea74c292e44396778b6c6463f98911cc15d20f365c"
+    },
+    {
+      "bytes": 1406,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf/fit.json",
+      "sha256": "1ef3311f1d5355886fa6b7209d71d705624d81e855cd2bc74d78282ba6317d72"
+    },
+    {
+      "bytes": 1398,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf.json",
+      "sha256": "8a58cdf09d358b4f9867e532831843d1ac6224af4ca0a65fe1330e5d5a9bdd18"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf/close.json",
+      "sha256": "1f2cc72c86e4969beff2dfdb6e59592e428a493497cfafa9331b00f5042cfe7f"
+    },
+    {
+      "bytes": 2249,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-replicas-batch1/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf.json",
+      "sha256": "49e8ebd0f01930a332d7b59941a87f40a028f63d1e079372d8b608668171dfb8"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf/artifact/adapter.json",
+      "sha256": "7701b4f9c53afff6b73d989953e2204f41cd02bc47e17db8ebaad65ff11317e4"
+    },
+    {
+      "bytes": 972,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf/artifact/projection.json",
+      "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+    },
+    {
+      "bytes": 217082225,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf/artifact/sampler.pkl",
+      "sha256": "0ab7b612fd535d24d71214381b5350f2a1d768c727f2a7b1dd80a1559d86138e"
+    },
+    {
+      "bytes": 1405,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4/fit.json",
+      "sha256": "e271b367c69ef4f2bb6ab3650801932c0c4fbaa3aaacd8ae9650a52c99f77121"
+    },
+    {
+      "bytes": 1398,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4.json",
+      "sha256": "3f64a41d179b1a1afe1d4f1b784e3ffc1d7d833e0d89fd1c0c96112dd65e7be8"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4/close.json",
+      "sha256": "5375180b0f4439dfa202015c4dcd01d2c2592034d222f9b7dba584583218b1fb"
+    },
+    {
+      "bytes": 2255,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-replicas-batch1/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4.json",
+      "sha256": "6e51a01f75e43f31ed25752026d4c0d109accc596f562d5f19cbb37de3158213"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4/artifact/adapter.json",
+      "sha256": "facecf8a80cea9f11d89d3d96bb0552d10dff635e5ef7c33018361042f023fd2"
+    },
+    {
+      "bytes": 972,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4/artifact/projection.json",
+      "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+    },
+    {
+      "bytes": 217139849,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4/artifact/sampler.pkl",
+      "sha256": "73e804bb84b440c99c03a38e0c1a210734f7206cc933a80aad939c7cbaa57fc4"
+    },
+    {
+      "bytes": 1408,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138/fit.json",
+      "sha256": "c5e6a583c7e5994ce1ee3c5a64d3ef47569e1702c0eb7ea1d41c60610fe96ca9"
+    },
+    {
+      "bytes": 1398,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138.json",
+      "sha256": "803db13388d03d4eaf2abf9e6d230e58bd85008d06ce760c8bfdf1fdf3c7886e"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138/close.json",
+      "sha256": "e42e1deafb00a35f128ee96419396ffb5b70db5d1d7490c71716a554959dd060"
+    },
+    {
+      "bytes": 2269,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-replicas-batch1/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138.json",
+      "sha256": "40036a57ee1a23b48dbb680d9f89122ffd0892aac0a3129a72a35eaec4bccf2b"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138/artifact/adapter.json",
+      "sha256": "900ed9994f5c9885bc4362b023f0415cdeb069c2f0b015431fcb5b303dcedb1c"
+    },
+    {
+      "bytes": 743,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138/artifact/projection.json",
+      "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+    },
+    {
+      "bytes": 143668775,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138/artifact/sampler.pkl",
+      "sha256": "bcb124d2e7f91c52a10e02f7a69234c53f41141421caa0304cd18ef06e2096c1"
+    },
+    {
+      "bytes": 1407,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7/fit.json",
+      "sha256": "9ac7e29468d21d10c592ba14c69268168956fccc649a7f4ae898b907864ff7f2"
+    },
+    {
+      "bytes": 1398,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7.json",
+      "sha256": "3fbd7595d8e810aee122fb30cf0c99e7071b9b753558c7fa958637e4a8a20c89"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7/close.json",
+      "sha256": "261689cae0f6f117fe8021824c18e514d4efaf459d58df7d8e27258305911c02"
+    },
+    {
+      "bytes": 2278,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-replicas-batch1/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7.json",
+      "sha256": "689fd66c23a0e47b6c34527ed33587edd17d845702c07e5f8ed4b27469a96520"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7/artifact/adapter.json",
+      "sha256": "d2708f0cc245ba4ae0dffe96bbf1b0257d1dab06fadea2b236767afee7d22c42"
+    },
+    {
+      "bytes": 743,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7/artifact/projection.json",
+      "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+    },
+    {
+      "bytes": 143583647,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7/artifact/sampler.pkl",
+      "sha256": "863caf979ca5375783d1256d02e25544dc0405bcba9a8f293b1d9d8944a9ffbe"
+    },
+    {
+      "bytes": 1406,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484/fit.json",
+      "sha256": "b058dca287e052f5a31dd21c1729193295003423629807a8254daa5a99f9cc86"
+    },
+    {
+      "bytes": 1398,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484.json",
+      "sha256": "66e13550636b93326e9bca78bfa213e930b38035b40b4ab437f3d30fb9f65ffb"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484/close.json",
+      "sha256": "045bf6131200a223d5e65fd4fc0148685fc89a5fcdca42412ea992703ce1c8c4"
+    },
+    {
+      "bytes": 2285,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-replicas-batch1/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484.json",
+      "sha256": "b347cc793e6cbf3cd315aafa5bee70566016b7a577a454f1c7d9db5f5657131b"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484/artifact/adapter.json",
+      "sha256": "61a847be32c2130dc207005261433d04416040793cf67afb4ff85775b8e366aa"
+    },
+    {
+      "bytes": 743,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484/artifact/projection.json",
+      "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+    },
+    {
+      "bytes": 143893892,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484/artifact/sampler.pkl",
+      "sha256": "c19455e02f6ebe391b70f950f2188da20ebee6b7bd164670f21b9765c853e941"
+    },
+    {
+      "bytes": 1407,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f/fit.json",
+      "sha256": "15e2b493b06b044698db0d96e31bf1f86645aa77295e52571c3e3a0c0547d1c7"
+    },
+    {
+      "bytes": 1398,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f.json",
+      "sha256": "58ddb0059ea3414577a17500e6bfa6588b08df7cfac323f9ea24b15b4b6cd721"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f/close.json",
+      "sha256": "faaaebbfda462b4fa4d80d74589aeadce447f9aedd88f506c8b21c1a3912a2a9"
+    },
+    {
+      "bytes": 2269,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-replicas-batch1/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f.json",
+      "sha256": "62a080fa8fd09fde32691dbb067ba61c31fd2611bdcab60be0ef1ac9a34795d1"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f/artifact/adapter.json",
+      "sha256": "321c2b807f884615cbb1bf89e04d0667c0647ba8de6e354544bf0712163c354d"
+    },
+    {
+      "bytes": 743,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f/artifact/projection.json",
+      "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+    },
+    {
+      "bytes": 143699510,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f/artifact/sampler.pkl",
+      "sha256": "94e957fe53a74773a6ebff133988d9b9810d1afe018d15c44e2a8c67b6ed10c4"
+    },
+    {
+      "bytes": 1391,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9bd7a6ce444edf4bbab0c3406fcf4417b17510c422d1bff50dbdb2b3fd2fa74c/fit.json",
+      "sha256": "d6a8e8d438ea4b8bec284f7e64bab5718e56c108f2dc882ae058dc701c49585d"
+    },
+    {
+      "bytes": 1382,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/jobs/9bd7a6ce444edf4bbab0c3406fcf4417b17510c422d1bff50dbdb2b3fd2fa74c.json",
+      "sha256": "8979af50a4d3369a1ea9f98691fb91721615f639f530326329f8b3df73349251"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9bd7a6ce444edf4bbab0c3406fcf4417b17510c422d1bff50dbdb2b3fd2fa74c/close.json",
+      "sha256": "010987e507b7a18ebcc62b59de852ec35aec6a733fdb40a4476d1b97d957961b"
+    },
+    {
+      "bytes": 3041,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/round.lock.json",
+      "sha256": "b9efacc1c7b99f6380e71e6584dc4a97ed48e68f3d28c0729f6cbe859c75cae7"
+    },
+    {
+      "bytes": 2303,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/native-replicas-batch1/9bd7a6ce444edf4bbab0c3406fcf4417b17510c422d1bff50dbdb2b3fd2fa74c.json",
+      "sha256": "8eda3e58c16e0ca8966f1d347d03b4b8d4d32f9332e6e4372fc5f894cb1cd999"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9bd7a6ce444edf4bbab0c3406fcf4417b17510c422d1bff50dbdb2b3fd2fa74c/artifact/adapter.json",
+      "sha256": "cfdc885015c8c5e4459f783aa901fa7289eaa827dd437fba1a815629e734eb14"
+    },
+    {
+      "bytes": 972,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9bd7a6ce444edf4bbab0c3406fcf4417b17510c422d1bff50dbdb2b3fd2fa74c/artifact/projection.json",
+      "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+    },
+    {
+      "bytes": 217068262,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9bd7a6ce444edf4bbab0c3406fcf4417b17510c422d1bff50dbdb2b3fd2fa74c/artifact/sampler.pkl",
+      "sha256": "6e4342ba72d4703a513309f035bd81a7bc3f2dfe879b5c26ece200b6dde6041f"
+    },
+    {
+      "bytes": 13914,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/adapter.py",
+      "sha256": "91b5ddb995cedee35551a0c0592d069eef3819739571d4f2e961b3a5830feeba"
+    },
+    {
+      "bytes": 11906,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/controls.py",
+      "sha256": "43d4d3c6b6eeae661f882e89de444c081272f11afc9857ea25a7a7de7389d752"
+    },
+    {
+      "bytes": 2880,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/worker.py",
+      "sha256": "47252a9e023006a1bc2f32bc03e0130766071041a2a3097c4ffbe06984450240"
+    },
+    {
+      "bytes": 1379421,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/runtime.lock.json",
+      "sha256": "e9fa7a4a05dc4f9e3502fde0481e2d78de6785b455136b3ea05cdcc711d6d221"
+    },
+    {
+      "bytes": 6223032,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/runtime-inventory.lock.json",
+      "sha256": "3ca96d3e6781572846b9fb09fed3790c903ba41534935a6655e9134f44a6ade0"
+    },
+    {
+      "bytes": 1391,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9c644faf04667f5ae566c6474d8be7a998ddc8b8ac42d467b5be5634e454d964/fit.json",
+      "sha256": "0018f9fc226f09550d344974785e5a0a37f7ee6b13c58bd7f2f336423ca74de7"
+    },
+    {
+      "bytes": 1382,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/jobs/9c644faf04667f5ae566c6474d8be7a998ddc8b8ac42d467b5be5634e454d964.json",
+      "sha256": "774940707f1f7095db784087e30f1f196a86613e6d46bcc49510dc5221818393"
+    },
+    {
+      "bytes": 258,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9c644faf04667f5ae566c6474d8be7a998ddc8b8ac42d467b5be5634e454d964/close.json",
+      "sha256": "551cd92febe755a72de0de87735d27a2905be8130aa0d648f832bb0c30dc6c76"
+    },
+    {
+      "bytes": 2325,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/native-replicas-batch1/9c644faf04667f5ae566c6474d8be7a998ddc8b8ac42d467b5be5634e454d964.json",
+      "sha256": "4da829383d9584810d716610055eebba87c5b919320024297f7ae3d4766aa1cb"
+    },
+    {
+      "bytes": 440,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9c644faf04667f5ae566c6474d8be7a998ddc8b8ac42d467b5be5634e454d964/artifact/adapter.json",
+      "sha256": "0ebe8966a2626708c2b6e1f10b80267e1c509f189801d8676a33bce030d4dbd2"
+    },
+    {
+      "bytes": 743,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9c644faf04667f5ae566c6474d8be7a998ddc8b8ac42d467b5be5634e454d964/artifact/projection.json",
+      "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+    },
+    {
+      "bytes": 143877366,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/attempts/9c644faf04667f5ae566c6474d8be7a998ddc8b8ac42d467b5be5634e454d964/artifact/sampler.pkl",
+      "sha256": "e686c000233aa9b092c27c9c35ebba55d7c1b33bc14657afd2aee64ae2185d8e"
+    },
+    {
+      "bytes": 9985,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/native-batch1.lock.json",
+      "sha256": "52afb1c4a666398144e9d9a52c5aad5b302b899a509f7b44b97e2753e135a69d"
+    },
+    {
+      "bytes": 3410,
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-first2-v1/native-batch1.lock.json",
+      "sha256": "5e677145678a680f782f531085b1e75ddde74e5388cd80d35ac15b58e817604d"
+    }
+  ],
+  "source_sha256": "eb1bd0c7e51e850c7ee71ae38f656706c3e27520c32d0e070d5265318aaa2ade"
+}
