@@ -68,9 +68,12 @@ validation density value appear in the per-fit JSON/CSV.
 adds the complete common-metric schedule for those same 32 fits: 144 ARF
 and 48 Forest-Flow cells. Each fit has n/4n and sample seeds 101/211/307.
 Fidelity, utility, detection and empirical privacy are measured; summaries
-keep generator fit seeds separate. ARF evaluation closed with actual exit0
-in 120.600844 seconds, Forest-Flow in 26.747209 seconds. These are measured
-prefix costs, not full-population throughput forecasts. The initial ARF and
+keep generator fit seeds separate. The summed per-cell numerical evaluation
+times are 71.113627 seconds for ARF and 19.243407 seconds for Forest-Flow.
+Total evaluator-process wall times, including verification and startup,
+are 120.600844 and 26.747209 seconds respectively; both exit0 records are
+directly pinned by the manifest. These clocks overlap and are not additive.
+These are measured prefix costs, not full-population throughput forecasts. The initial ARF and
 Forest cohorts have different sizes and cannot be ranked against each other.
 Full-population and five-fit completion remain false.
 
