@@ -25,41 +25,142 @@
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_retention -v",
       "purpose": "verify hash-before-JSON custody, strict types, complete three-sample groups, fit11 regression identity, alias accounting, same-cohort scalar aggregation, explicit exclusions, null gated scores and byte-exact CSV/Markdown regeneration"
     },
-    "research/benchmark/publish_tabddpm_retained.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v", "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"},
-    "research/benchmark/tests/test_tabddpm_retained.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v", "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"},
-    "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v", "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"},
-    "research/benchmark/results/work-order-b-strict16-qualification-progress-v1/": {"command": "python3 -I -S -B research/benchmark/results/work-order-b-strict16-qualification-progress-v1/test_render.py", "purpose": "Strict scalar schema, immutable receipt joins, frozen progress, no cost doublecount, null gated/peak claims, and deterministic public regeneration."},
-    "research/benchmark/results/arf-complete-additional-fits-v1/": {"command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v", "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"},
-    "research/benchmark/tests/test_forest_projected_cohort.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_forest_projected_cohort research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v", "purpose": "verify a frozen homogeneous five-fit projection only after complete original metric batch verification, exact per-fit aggregation and schemas, charged checkpoints, legacy replay, explicit null certification and no outcome-based cohort selection"},
-    "research/benchmark/results/forest-third-five-fivefit-v1/": {"command": "python3 -B -m unittest research.benchmark.tests.test_forest_projected_cohort research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v", "purpose": "verify a frozen homogeneous five-fit projection only after complete original metric batch verification, exact per-fit aggregation and schemas, charged checkpoints, legacy replay, explicit null certification and no outcome-based cohort selection"},
-    "research/benchmark/tests/test_forest_complete_cohort.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v", "purpose": "verify complete five-fit cohorts, frozen checkpoint and native/common joins, separate within-fit sample means and between-fit SD, exact KPI regeneration, legacy panel compatibility, and individually unscored timeout dispositions"},
-    "research/benchmark/results/forest-next-six-fivefit-v1/": {"command": "python3 -B -m unittest research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v", "purpose": "verify complete five-fit cohorts, frozen checkpoint and native/common joins, separate within-fit sample means and between-fit SD, exact KPI regeneration, legacy panel compatibility, and individually unscored timeout dispositions"},
-    "research/benchmark/publish_forest_fit_variance.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v", "purpose": "verify five independent generator fits per lineage, three samples within each fit, unbiased SD and explicit missing outcomes, frozen fit/split/native/checkpoint joins, artifact bytes, JSON schemas and exact KPI regeneration with null incomplete-population claims"},
-    "research/benchmark/plot_forest_fit_variance.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v", "purpose": "verify five independent generator fits per lineage, three samples within each fit, unbiased SD and explicit missing outcomes, frozen fit/split/native/checkpoint joins, artifact bytes, JSON schemas and exact KPI regeneration with null incomplete-population claims"},
-    "research/benchmark/tests/test_forest_fit_variance.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_forest_fit_variance -v", "purpose": "verify five independent generator fits per lineage, three samples within each fit, unbiased SD and explicit missing outcomes, frozen fit/split/native/checkpoint joins, artifact bytes, JSON schemas and exact KPI regeneration with null incomplete-population claims"},
-    "research/benchmark/results/forest-first-two-fivefit-v1/": {"command": "python3 -B -m unittest research.benchmark.tests.test_forest_fit_variance -v", "purpose": "verify five independent generator fits per lineage, three samples within each fit, unbiased SD and explicit missing outcomes, frozen fit/split/native/checkpoint joins, artifact bytes, JSON schemas and exact KPI regeneration with null incomplete-population claims"},
-    "research/benchmark/results/work-order-b-native8-progress-and-cost-v1/": {"command": "python3 -I -S -B research/benchmark/results/work-order-b-native8-progress-and-cost-v1/render.py --check", "purpose": "replay frozen eight-fit progress and operation clocks from hash-pinned public metadata; preserve incomplete five-fit coverage, historical artifact caps, nonadditive clocks and unknown peak/hardware/gated claims"},
-    "research/benchmark/results/cpu-fivefit-validation-v1/": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify complete sample groups separately per generator fit seed, original fit/split/configuration/bytes joins, schema, immutable file hashes, exact KPI CSV regeneration and null incomplete-population claims"},
-    "research/benchmark/publish_cpu_fit_batch.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v", "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"},
-    "research/benchmark/tests/test_cpu_fit_batch.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v", "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"},
-    "research/benchmark/results/cpu-fivefit-progress-v1/": {"command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v", "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"},
-
-    "docs/whitepaper/scripts/retained_evidence.py": {"command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v", "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, coverage forecasts and manuscript regeneration"},
-    "docs/whitepaper/scripts/test_retained_evidence.py": {"command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v", "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, coverage forecasts and manuscript regeneration"},
-    "docs/whitepaper/coverage-plan.json": {"command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v", "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, coverage forecasts and manuscript regeneration"},
-    "docs/whitepaper/generated/retained-evidence.json": {"command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v", "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, coverage forecasts and manuscript regeneration"},
-    "docs/whitepaper/generated/baseline-coverage.json": {"command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v", "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, coverage forecasts and manuscript regeneration"},
-    "research/benchmark/publish_retained_comparison.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_comparison -v", "purpose": "verify frozen physical receipt and native/default alias joins, reused diagnostics with auditor seed1729, complete100-lineage panels, matched-eight splits, empirical/null claims, schemas and reproducible KPI/JSONL/SVG outputs"},
-    "research/benchmark/tests/test_retained_comparison.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_comparison -v", "purpose": "verify frozen physical receipt and native/default alias joins, reused diagnostics with auditor seed1729, complete100-lineage panels, matched-eight splits, empirical/null claims, schemas and reproducible KPI/JSONL/SVG outputs"},
-    "research/benchmark/results/retained-classical-validation/": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_comparison -v", "purpose": "verify frozen physical receipt and native/default alias joins, reused diagnostics with auditor seed1729, complete100-lineage panels, matched-eight splits, empirical/null claims, schemas and reproducible KPI/JSONL/SVG outputs"},
-    "research/benchmark/measure_retained_samples.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"},
-    "research/benchmark/publish_retained_metrics.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"},
-    "research/benchmark/tests/test_retained_metrics.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"},
-    "research/benchmark/results/tabsyn-eight-lineage-validation/": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"},
-    "research/benchmark/common_validation_receipt_verifier.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_common_validation_publication -v", "purpose": "verify static metadata predicates, provenance-only scratch source, authenticated transitive receipt reads, canonical frozen jobs and null publication gates without executing scientific code"},
-    "research/benchmark/publish_common_validation_batch.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_common_validation_publication -v", "purpose": "verify authenticated metadata publication, transitive receipt read tracking, source rejection before execution, aliases and null gated scores without metric recomputation"},
-    "research/benchmark/tests/test_common_validation_publication.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_common_validation_publication -v", "purpose": "verify authenticated metadata publication, transitive receipt read tracking, source rejection before execution, aliases and null gated scores without metric recomputation"},
-    "research/benchmark/results/common-A952-validation-v1/": {"command": "python3 -I -S -B research/benchmark/results/common-A952-validation-v1/render.py --check", "purpose": "reproduce committed first12 CSV/SVG/README byte for byte; preserve unavailable diagnostics, incomplete cohort and physical cost accounting"},
+    "research/benchmark/publish_tabddpm_retained.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v",
+      "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"
+    },
+    "research/benchmark/tests/test_tabddpm_retained.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v",
+      "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"
+    },
+    "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v",
+      "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"
+    },
+    "research/benchmark/results/work-order-b-strict16-qualification-progress-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-strict16-qualification-progress-v1/test_render.py",
+      "purpose": "Strict scalar schema, immutable receipt joins, frozen progress, no cost doublecount, null gated/peak claims, and deterministic public regeneration."
+    },
+    "research/benchmark/results/arf-complete-additional-fits-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v",
+      "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"
+    },
+    "research/benchmark/tests/test_forest_projected_cohort.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_forest_projected_cohort research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v",
+      "purpose": "verify a frozen homogeneous five-fit projection only after complete original metric batch verification, exact per-fit aggregation and schemas, charged checkpoints, legacy replay, explicit null certification and no outcome-based cohort selection"
+    },
+    "research/benchmark/results/forest-third-five-fivefit-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_forest_projected_cohort research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v",
+      "purpose": "verify a frozen homogeneous five-fit projection only after complete original metric batch verification, exact per-fit aggregation and schemas, charged checkpoints, legacy replay, explicit null certification and no outcome-based cohort selection"
+    },
+    "research/benchmark/tests/test_forest_complete_cohort.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v",
+      "purpose": "verify complete five-fit cohorts, frozen checkpoint and native/common joins, separate within-fit sample means and between-fit SD, exact KPI regeneration, legacy panel compatibility, and individually unscored timeout dispositions"
+    },
+    "research/benchmark/results/forest-next-six-fivefit-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v",
+      "purpose": "verify complete five-fit cohorts, frozen checkpoint and native/common joins, separate within-fit sample means and between-fit SD, exact KPI regeneration, legacy panel compatibility, and individually unscored timeout dispositions"
+    },
+    "research/benchmark/publish_forest_fit_variance.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v",
+      "purpose": "verify five independent generator fits per lineage, three samples within each fit, unbiased SD and explicit missing outcomes, frozen fit/split/native/checkpoint joins, artifact bytes, JSON schemas and exact KPI regeneration with null incomplete-population claims"
+    },
+    "research/benchmark/plot_forest_fit_variance.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_fit_variance -v",
+      "purpose": "verify five independent generator fits per lineage, three samples within each fit, unbiased SD and explicit missing outcomes, frozen fit/split/native/checkpoint joins, artifact bytes, JSON schemas and exact KPI regeneration with null incomplete-population claims"
+    },
+    "research/benchmark/tests/test_forest_fit_variance.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_forest_fit_variance -v",
+      "purpose": "verify five independent generator fits per lineage, three samples within each fit, unbiased SD and explicit missing outcomes, frozen fit/split/native/checkpoint joins, artifact bytes, JSON schemas and exact KPI regeneration with null incomplete-population claims"
+    },
+    "research/benchmark/results/forest-first-two-fivefit-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_forest_fit_variance -v",
+      "purpose": "verify five independent generator fits per lineage, three samples within each fit, unbiased SD and explicit missing outcomes, frozen fit/split/native/checkpoint joins, artifact bytes, JSON schemas and exact KPI regeneration with null incomplete-population claims"
+    },
+    "research/benchmark/results/work-order-b-native8-progress-and-cost-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native8-progress-and-cost-v1/render.py --check",
+      "purpose": "replay frozen eight-fit progress and operation clocks from hash-pinned public metadata; preserve incomplete five-fit coverage, historical artifact caps, nonadditive clocks and unknown peak/hardware/gated claims"
+    },
+    "research/benchmark/results/cpu-fivefit-validation-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v",
+      "purpose": "verify complete sample groups separately per generator fit seed, original fit/split/configuration/bytes joins, schema, immutable file hashes, exact KPI CSV regeneration and null incomplete-population claims"
+    },
+    "research/benchmark/publish_cpu_fit_batch.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v",
+      "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"
+    },
+    "research/benchmark/tests/test_cpu_fit_batch.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v",
+      "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"
+    },
+    "research/benchmark/results/cpu-fivefit-progress-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v",
+      "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"
+    },
+    "docs/whitepaper/scripts/retained_evidence.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v",
+      "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, receipt-derived pending coverage and manuscript regeneration"
+    },
+    "docs/whitepaper/scripts/test_retained_evidence.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v",
+      "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, receipt-derived pending coverage and manuscript regeneration"
+    },
+    "docs/whitepaper/coverage-plan.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v",
+      "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, receipt-derived pending coverage and manuscript regeneration"
+    },
+    "docs/whitepaper/generated/retained-evidence.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v",
+      "purpose": "verify pinned merged validation metadata, pairing and aggregation, CIs, null outcomes, receipt-derived pending coverage and manuscript regeneration"
+    },
+    "docs/whitepaper/generated/baseline-coverage.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "research/benchmark/publish_retained_comparison.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_retained_comparison -v",
+      "purpose": "verify frozen physical receipt and native/default alias joins, reused diagnostics with auditor seed1729, complete100-lineage panels, matched-eight splits, empirical/null claims, schemas and reproducible KPI/JSONL/SVG outputs"
+    },
+    "research/benchmark/tests/test_retained_comparison.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_retained_comparison -v",
+      "purpose": "verify frozen physical receipt and native/default alias joins, reused diagnostics with auditor seed1729, complete100-lineage panels, matched-eight splits, empirical/null claims, schemas and reproducible KPI/JSONL/SVG outputs"
+    },
+    "research/benchmark/results/retained-classical-validation/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_retained_comparison -v",
+      "purpose": "verify frozen physical receipt and native/default alias joins, reused diagnostics with auditor seed1729, complete100-lineage panels, matched-eight splits, empirical/null claims, schemas and reproducible KPI/JSONL/SVG outputs"
+    },
+    "research/benchmark/measure_retained_samples.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v",
+      "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"
+    },
+    "research/benchmark/publish_retained_metrics.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v",
+      "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"
+    },
+    "research/benchmark/tests/test_retained_metrics.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v",
+      "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"
+    },
+    "research/benchmark/results/tabsyn-eight-lineage-validation/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v",
+      "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"
+    },
+    "research/benchmark/common_validation_receipt_verifier.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_common_validation_publication -v",
+      "purpose": "verify static metadata predicates, provenance-only scratch source, authenticated transitive receipt reads, canonical frozen jobs and null publication gates without executing scientific code"
+    },
+    "research/benchmark/publish_common_validation_batch.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_common_validation_publication -v",
+      "purpose": "verify authenticated metadata publication, transitive receipt read tracking, source rejection before execution, aliases and null gated scores without metric recomputation"
+    },
+    "research/benchmark/tests/test_common_validation_publication.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_common_validation_publication -v",
+      "purpose": "verify authenticated metadata publication, transitive receipt read tracking, source rejection before execution, aliases and null gated scores without metric recomputation"
+    },
+    "research/benchmark/results/common-A952-validation-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/common-A952-validation-v1/render.py --check",
+      "purpose": "reproduce committed first12 CSV/SVG/README byte for byte; preserve unavailable diagnostics, incomplete cohort and physical cost accounting"
+    },
     "research/benchmark/results/work-order-b-cost-closure-delta-v5/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-cost-closure-delta-v5/render.py --check",
       "purpose": "reproduce four closed evaluation-cost rows and tables from committed metadata; preserve unknown parent/hardware/sharing facts, nested-clock exclusions and alias dedup without receipt payload or host reads"
@@ -68,216 +169,838 @@
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-cost-closure-delta-v4/render.py --check",
       "purpose": "reproduce four closed-cost rows, finite schemas and manifests from committed metadata; keep unavailable admissions, unknown parent exits, overlapping clocks and separate engineering transports explicit without opening private receipts"
     },
-    "research/benchmark/publish_validation_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v", "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"},
-    "research/benchmark/tests/test_validation_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v", "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"},
-    "research/benchmark/results/matched-validation-descriptive-figure/": {"command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v", "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"},
-    "research/benchmark/publish_checkpoint_index.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v", "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"},
-    "research/benchmark/tests/test_checkpoint_index.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v", "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"},
-    "research/benchmark/results/checkpoint-figure-input-index/": {"command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v", "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"},
-    "research/benchmark/results/work-order-b-tabsyn-input-readiness-v1": {"command": "python3 -B -m jsonschema -i research/benchmark/results/work-order-b-tabsyn-input-readiness-v1/readiness.json research/benchmark/results/work-order-b-tabsyn-input-readiness-v1/readiness.schema.json", "purpose": "validate frozen143 metadata reconstruction, seed/size counts, immutable receipt hashes and absent execution/capacity/runtime/production claims"},
-    "research/benchmark/tests/test_tabsyn_metric_operation_positive.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v", "purpose": "verify complete generated CPU/GPU fit/sample/source/kind joins, source omissions, lineage/runtime drift and whole frozen matrix eligibility without numeric bodies or native execution"},
-    "research/benchmark/tabsyn_metric_operation_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v", "purpose": "verify exact frozen scientific fit/sample/process/source joins, metadata custody and recipe digests before initialization; preserve unavailable outcomes, common target-last order, missing runtime/capacity evidence and null scores without scientific execution"},
-    "research/benchmark/tabsyn_closed143_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v", "purpose": "verify exact frozen scientific fit/sample/process/source joins, metadata custody and recipe digests before initialization; preserve unavailable outcomes, common target-last order, missing runtime/capacity evidence and null scores without scientific execution"},
-    "research/benchmark/tests/test_tabsyn_metric_operation_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v", "purpose": "verify exact frozen scientific fit/sample/process/source joins, metadata custody and recipe digests before initialization; preserve unavailable outcomes, common target-last order, missing runtime/capacity evidence and null scores without scientific execution"},
-    "research/benchmark/tests/test_tabsyn_closed143_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v", "purpose": "verify exact frozen scientific fit/sample/process/source joins, metadata custody and recipe digests before initialization; preserve unavailable outcomes, common target-last order, missing runtime/capacity evidence and null scores without scientific execution"},
-
-    "research/benchmark/tabsyn_validation_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v", "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"},
-    "research/benchmark/tests/test_tabsyn_validation_inputs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v", "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"},
-
-    "research/benchmark/results/campaign-local-capacity-amendment-xbabe2": {"command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment-xbabe2.json research/benchmark/results/campaign-local-capacity-amendment-xbabe2.schema.json", "purpose": "validate the separate owner-authorized xbabe2 local100GB root, carried budgets, sealed tests and null claims; fresh per-fit admission remains required"},
-    "research/benchmark/DOPE_CPU_RESEARCH.md": {"command": "just check", "purpose": "verify explicit research-device parsing, ordinary-build rejection before fixed-hidden fallback, and Rust compiler compatibility; actual CPU libtorch training needs separate runtime qualification"},
-    "research/benchmark/LOCAL_CAPACITY_AMENDMENT.md": {"command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment.json research/benchmark/results/campaign-local-capacity-amendment.schema.json", "purpose": "validate the byte-exact owner resource amendment, separate storage ceilings, unchanged operation budgets and null claims without admitting scientific execution"},
-    "research/benchmark/results/campaign-local-capacity-amendment": {"command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment.json research/benchmark/results/campaign-local-capacity-amendment.schema.json", "purpose": "validate the byte-exact owner resource amendment, separate storage ceilings, unchanged operation budgets and null claims without admitting scientific execution"},
-    "research/benchmark/tabsyn-scaled-compute-policy.addendum.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v", "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"},
-    "research/benchmark/tabsyn-scaled-compute-policy.proposal.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v", "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"},
-    "research/benchmark/TABSYN_NUMERIC_ADMISSION.md": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v", "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"},
-    "research/benchmark/tests/test_tabsyn_admission.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v", "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"},
-    "research/benchmark/tabsyn_native_target.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v", "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"},
-    "research/benchmark/tabsyn_admission.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v", "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"},
-    "research/benchmark/tabsyn-adapter.LICENSE": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"},
-    "research/benchmark/tabsyn-adapter.NOTICE": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"},
-    "research/benchmark/tabsyn_adapter.py.license": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"},
-    "research/benchmark/tabsyn_adapter.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v", "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"},
-    "research/benchmark/tabsyn_runtime_guard.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
-    "research/benchmark/tabsyn_generated_contract.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
-    "research/benchmark/tabsyn-native-grid.proposal.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
-    "research/benchmark/requirements-tabsyn.in": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
-    "research/benchmark/requirements-tabsyn.lock.txt": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
-    "research/benchmark/TABSYN_RUNTIME_CONTRACT.md": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v", "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"},
-    "research/benchmark/tests/test_tabsyn_contract.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v", "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"},
-    "AGENTS.md": {"command": "just fast", "purpose": "verify repository guidance"},
-    "README.md": {"command": "just fast", "purpose": "verify onboarding guidance"},
-    "CHANGELOG.md": {"command": "just fast", "purpose": "verify release change record"},
-    "LICENSE": {"command": "just fast", "purpose": "verify repository metadata"},
-    ".cargo/": {"command": "just check", "purpose": "verify Cargo configuration"},
-    ".gitignore": {"command": "just fast", "purpose": "verify generated paths remain ignored"},
-    "rust-toolchain.toml": {"command": "just check", "purpose": "verify pinned Rust toolchain"},
-    "pyproject.toml": {"command": "PYTHONPATH=src python3 -m pytest -q tests", "purpose": "verify V1 package compatibility"},
-    "Justfile": {"command": "just fast", "purpose": "verify local proof recipes"},
-    ".github/": {"command": "just security", "purpose": "verify workflow syntax and scans"},
-    "agent/": {"command": "just score", "purpose": "verify audit policy and boundary evidence"},
-    "ops/": {"command": "bash scripts/ci-local.sh cpu", "purpose": "verify CI execution scripts"},
-    "tools/": {"command": "bash tools/security-lane.sh", "purpose": "verify canonical security wrapper"},
-    "scripts/": {"command": "bash scripts/ci-doctor.sh", "purpose": "verify local CI entry points"},
-    "docs/": {"command": "just score", "purpose": "verify release and repair guidance"},
-    "schemas/": {"command": "just score", "purpose": "verify receipt schemas against the emitted audit report"},
-    "contracts/": {"command": "cargo test --locked production::tests::embedded_contract_is_canonical_and_bound", "purpose": "verify generated tier constants and embedded digest"},
-    "rust/": {"command": "just check", "purpose": "run Rust unit, CLI, and Clippy checks"},
-    "Cargo.toml": {"command": "just check", "purpose": "verify locked Rust graph"},
-    "Cargo.lock": {"command": "just check", "purpose": "verify locked Rust graph"},
-    "build.rs": {"command": "just check", "purpose": "verify embedded contract digest"},
-    "production/": {"command": "just check", "purpose": "verify contract and release fixtures"},
-    "src/dope_kernel/": {"command": "PYTHONPATH=src python3 -m pytest -q tests", "purpose": "preserve V1 compatibility"},
-    "tests/": {"command": "just check", "purpose": "verify Rust CLI and Python fixtures"},
-    "validation/external/": {"command": "PYTHONPATH=validation/external target/external-venv/bin/python -m unittest discover -s validation/external/tests -v", "purpose": "verify pinned external learner evidence fixtures"},
-    "research/benchmark/fixtures/tabddpm-native-prelaunch/": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_tabddpm_prelaunch.py -v", "purpose": "verify frozen entry runtime drift rejection before dependency initialization"},
-    "research/benchmark/aim_native.py": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_aim_native.py -v", "purpose": "verify AIM author marginal objective, fixed epsilon, validation seal and drift rejection"},
-    "research/benchmark/gpu_refinement_bootstrap.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_gpu_refinement_bootstrap -v", "purpose": "verify external research round identity, exact flat source inventory and checked-buffer startup before helper initialization without GPU or real data access"},
-    "research/benchmark/tests/test_gpu_refinement_bootstrap.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_gpu_refinement_bootstrap -v", "purpose": "verify generated initializer rejection controls, source aliases and bytecode additions, duplicate/nonfinite declarations and unchanged checked-buffer execution"},
-    "research/benchmark/publish_s3_forest": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_s3_forest_panel.py -v", "purpose": "verify complete matched Forest-Flow matrix, frozen receipt and executable inventories, null claims and timeout accounting"},
-    "research/benchmark/publish_dope_population_fits": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_dope_population_fits.py -v", "purpose": "verify complete population fit custody, externally pinned receipt hashes, byte accounting and null claims"},
-    "research/benchmark/publish_tabsyn_population_fits": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_population_fits -v", "purpose": "verify scaled default100 CUDA fit custody, frozen source/receipt rejection, complete coverage and byte charges, unmeasured cost separation, null claims and exact JSON/schema/CSV/research-note regeneration"},
-    "research/benchmark/tests/test_tabsyn_population_fits.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_population_fits -v", "purpose": "verify frozen opaque fit fixtures and deterministic rights-safe publication without model, sample or scientific execution"},
-    "research/benchmark/results/tabsyn-default100-scaled-cuda-fits": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_population_fits -v", "purpose": "validate complete100 scaled fit-only ledger, original author track separation, measured costs and null gated claims; regenerate committed schema and tables"},
-    "research/benchmark/publish_tabsyn_native_audit.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_native_audit -v", "purpose": "verify author-objective inapplicability, actual worker identity, monitoring admission, prior failure costs, frozen receipt/source custody and null claims without executing models"},
-    "research/benchmark/tests/test_tabsyn_native_audit.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_native_audit -v", "purpose": "reject exit-zero monitoring upgrades, changed native objectives, source identities, deadlines and artifact charges using opaque fixtures"},
-    "research/benchmark/results/tabsyn-default100-native-audit": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_native_audit -v", "purpose": "regenerate complete 100-lineage native status ledger, schema and tables; preserve unavailable cases and null native/common/release scores"},
-    "research/benchmark/publish_dope_population_validation": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_dope_population_validation.py -v", "purpose": "verify complete all-profile population validation, frozen receipt digests, null claims, honest missing coverage and exact table regeneration"},
-    "research/benchmark/sdv_native_accounting.py": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_sdv_native_accounting.py -v", "purpose": "verify native-only winner selection, immutable reuse, failed compute and artifact charges, complete closure and sealed tests"},
-    "research/benchmark/reconcile_sdv_population.py": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_sdv_native_accounting.py -v", "purpose": "verify complete native trial identities and fail-closed coordinator closure without ML initialization"},
-    "research/benchmark/sdv_native_continuation.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_native_continuation.py -v", "purpose": "verify complete frozen native custody, retry identity, failed-attempt costs, CPU reuse and unchanged per-cell caps without launching jobs"},
-    "research/benchmark/publish_sdv_population_native": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_population_native_publication.py -v", "purpose": "verify externally frozen publication anchors, complete native denominators, unchanged native selections, failure/cost/byte evidence and deterministic rights-safe tables without model execution"},
-    "research/benchmark/results/sdv-s3-population-native": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_population_native_publication.py -v", "purpose": "verify complete native ledger publication and null claims; validate committed result/manifest schemas and regenerate tables and figures from hash-bound metadata locally"},
-    "research/benchmark/sdv_cpu_reuse.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_cpu_reuse.py -v", "purpose": "verify CPU-only native and common sample reuse, unchanged fitted artifact charges, source and worker drift rejection, native seed replay and failed-operation costs using opaque fixtures"},
-    "research/benchmark/great-source.audit": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only method inventory and fail-closed dispatch/admission; validate source audit schema and current author defaults against immutable scratch locally"},
-    "research/benchmark/realtabformer-source.audit": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only method inventory and fail-closed dispatch/admission; validate source audit schema and author defaults against immutable scratch locally"},
-    "research/benchmark/cdtd-source.audit": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only method inventory and fail-closed admission; validate CDTD schema, source hashes and native-policy facts against immutable scratch locally"},
-    "research/benchmark/results/gemt-unavailable": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify scoped unavailable inventory and fail-closed admission; validate GEM-T primary pages, bounded repository-search/candidate provenance, schema hashes and unfrozen native/reproduction claims locally"},
-    "research/benchmark/results/tabkde-unavailable": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify scoped unavailable inventory and fail-closed admission; validate TabKDE rights/tree/source/schema hashes and unverified reproduction/runtime claims locally"},
-    "research/benchmark/results/tabpfgen-unavailable": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify scoped unavailable inventory and fail-closed admission; validate independent TabPFGen provenance/tree/blob/schema hashes and unverified reproduction/runtime claims locally"},
-    "research/benchmark/pategan-source.audit": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only inventory and fail-closed admission; validate original PATE-GAN source schema/hashes, author defaults/native AUC and generator/preprocessing/privacy gaps locally"},
-    "research/benchmark/tabbyflow-source.audit": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only method inventory and fail-closed admission; validate TabbyFlow schema, selected source hashes, released defaults/native metric semantics and artifact/data gaps locally"},
-    "research/benchmark/dpctgan-source.audit": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only method inventory and fail-closed admission; validate DP-CTGAN schema, selected source hashes, author objectives, source privacy ordering and artifact gaps locally"},
-    "research/benchmark/mst-source.audit": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only inventory and fail-closed admission; validate MST schema, source hashes, native objective and actual fit/sample contracts against immutable scratch locally"},
-    "research/benchmark/tabcascade-source.audit": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only inventory and fail-closed admission; validate TabCascade schema, source hashes and current-author versus paper track facts against immutable scratch locally"},
-    "research/benchmark/tabdiff-source.audit": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only inventory and fail-closed final admission; validate audit JSON against its committed schema locally"},
-    "research/benchmark/results/ctabgan-plus-unavailable": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "preserve unavailable method dispatch and win exclusion; validate rights receipt schema, pinned source hashes and license evidence against immutable scratch locally"},
-    "research/benchmark/results/taegan-unavailable": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -v", "purpose": "preserve unavailable method dispatch and win exclusion; validate rights receipt schema, pinned source hashes and license evidence against immutable scratch locally"},
-    "research/benchmark/results/privbayes-unavailable": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "preserve unavailable method dispatch and win exclusion; validate rights receipt against its committed schema locally"},
-    "research/benchmark/tvinesynth-source.audit": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "verify source-only inventory and fail-closed admission; validate native applicability and null-claim receipt against its schema locally"},
-    "research/benchmark/research_container_members.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_research_container_members.py -v", "purpose": "verify externally frozen compressed/model/projection identities, owned immutable members, bounded expansion and complete unchanged byte ceiling before any model initialization"},
-    "research/benchmark/container_validation_worker.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_validation_worker.py -v", "purpose": "verify unadmitted/source/runtime/worker drift rejection before initialization, complete compressed charges, canonical retry identity, owned primary inputs and original sample replays without real model execution"},
-    "research/benchmark/container_python_custody.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_python_custody.py -v", "purpose": "verify externally bound interpreter and import inventories, bytecode and alias rejection before candidate initialization using opaque fixtures; preserve absent full runtime and execution admission claims"},
-    "research/benchmark/container_bootstrap_invocation.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_bootstrap_invocation.py -v", "purpose": "verify restricted interpreter argv/environment, canonical retry proposal, host restrictions and unchanged whole-batch deadline with no process startup or filesystem/runtime/admission claim"},
-    "research/benchmark/container_elf_inputs.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_elf_inputs.py -v", "purpose": "verify externally bound owned ELF declarations and malformed header/segment/string rejection using opaque bytes; never start, resolve or admit candidate execution"},
-    "research/benchmark/container_system_custody.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_system_custody.py -v", "purpose": "verify frozen ELF inventory membership, parent manifests, alias/file identities and owned-byte declaration replay before candidate startup; preserve absent loader resolution and execution admission"},
-    "research/benchmark/container_loader_custody.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_loader_custody.py -v", "purpose": "verify externally frozen selected loader files, alias chains, cache/configuration hashes, directory entries and absence records without resolving/loading libraries or admitting jobs"},
-    "research/benchmark/container_loader_catalog.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_loader_catalog.py -v", "purpose": "replay externally bound root and recursive provider edges in frozen candidate order, reject missing or changed bindings and retain unresolved competing identities without loader selection or execution admission"},
-    "research/benchmark/container_loader_configuration.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_loader_configuration.py -v", "purpose": "verify owned bounded configuration declarations, include membership and exactly bound additional directory/absence snapshots without cache construction, actual loader selection or execution admission"},
-    "research/benchmark/container_search_path_custody.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_search_path_custody.py -v", "purpose": "verify ordered root and selected-provider literal search-path projections against owned directory/absence snapshots without actual loader origin, search, selection or execution claims"},
-    "research/benchmark/container_loader_environment.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_loader_environment.py -v", "purpose": "verify restricted frozen invocation environment, selected library directory and preload absence snapshots with original outer timer and no actual loader or execution admission"},
-    "research/benchmark/container_bootstrap_filesystem.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_bootstrap_filesystem.py -v", "purpose": "verify proposed regular source membership, owned canonical request job/retry identity, private request parent and empty cache with original deadline; no final round or execution admission"},
-    "research/benchmark/container_native_sampler_custody.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_native_sampler_custody.py -v", "purpose": "verify owned native sampler ELF bytes and declaration replay against frozen fit/job/product identities, repeated file guards and original deadline without executable/provider/runtime admission"},
-    "research/benchmark/container_native_library_custody.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_native_library_custody.py -v", "purpose": "verify owned original native directory membership, exact historical file identities and literal alias snapshots, repeated final parents/helpers and original deadline without loader/runtime/execution admission"},
-    "research/benchmark/container_native_child_environment.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_native_child_environment.py -v", "purpose": "verify restricted separate native child environment declaration against canonical original request and selected native directory/preload absence, regular parents/helpers and original deadline without actual child/runtime/execution admission"},
-    "research/benchmark/container_native_runtime_inventory.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_native_runtime_inventory.py -v", "purpose": "verify exact original native file membership, bytes, hashes and fresh literal aliases beyond selected directory, regular metadata/helpers and original deadline without linker replay or runtime/execution admission"},
-    "research/benchmark/container_startup.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_startup.py -v", "purpose": "verify bound original filesystem/native/inventory parents and combined original-timer startup replay, failure propagation, regular metadata/helpers and null scores without dispatch/runtime/admission claims"},
-    "research/benchmark/container_guard_sources.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_guard_sources.py -v", "purpose": "verify exact startup guard source inventory before imports, immutable owned bytes, regular unaliased file admission, original deadline and null execution claims using opaque fixtures"},
-    "research/benchmark/container_owned_code.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_owned_code.py -v", "purpose": "verify compilation from externally bound immutable startup source bytes without staged initializers, cache reads, inherited compiler flags, deadline resets or execution claims"},
-    "research/benchmark/container_module_bindings.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_module_bindings.py -v", "purpose": "verify immutable compiled guard descriptors, exact source paths and private package names, repeated full source/helper custody and original deadline without initializers, namespace installation or execution claims"},
-    "research/benchmark/container_import_declarations.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_import_declarations.py -v", "purpose": "verify static import declarations from owned compiled-guard source identities, fixed module scope, dependency order, cycle rejection, final custody and original deadline without resolving imports or initializing modules"},
-    "research/benchmark/container_import_hook.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_import_hook.py -v", "purpose": "verify prepared import callbacks against preowned references and exact guard namespace identity, declared rows, strict types, copied maps and original timer without import delegation, initializers or dispatch"},
-    "research/benchmark/container_builtin_bindings.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_builtin_bindings.py -v", "purpose": "verify fixed copied caller-owned builtin selections, prepared hook replacement and dependency-ordered binding plans, strict metadata, final custody and original timer without namespace installation or initializers"},
-    "research/benchmark/container_namespace_bindings.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_namespace_bindings.py -v", "purpose": "verify restricted references bound only to new private namespace dictionaries, exact metadata and dependency order, repeated custody, original deadline and cleanup of owned bindings without live registry installation or real initializers"},
-    "research/benchmark/container_registry_bindings.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_registry_bindings.py -v", "purpose": "verify exact caller-owned registry type and keys, private package exclusion before parent work and after final custody, sixteen proposed additions and original deadline without live installation or real initializers"},
-    "research/benchmark/container_private_registry.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_private_registry.py -v", "purpose": "verify reference identity and readonly private registry overlay, copied selections before parent work, original-registry drift and namespace/source/helper/final deadline rejection without live activation or real guard initializers"},
-    "research/benchmark/container_guard_initialization.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_guard_initialization.py -v", "purpose": "verify source-recompiled executable objects including nested constants and signed zeros, declared dependency order, exact private namespace and registry references, final custody and original deadline without running initializers"},
-    "research/benchmark/density_validation_aggregate.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_validation_aggregate.py -v", "purpose": "verify complete expected 100-lineage density matrix, exact trial identities, byte consistency, null incomplete sample groups, retained denominator and negative retention, reference labels and rejection of gated or win claims using opaque cells"},
-    "research/benchmark/publish_density_matched": {"command": "python3 -B -m unittest research.benchmark.tests.test_density_matched_publisher research.benchmark.tests.test_density_matched_manifest -v", "purpose": "verify complete identical training-derived cohorts, closure before metric reads, immutable report digest before parsing, regenerated tables and null claims without frozen worker or learner initialization"},
-    "research/benchmark/density_matched_aggregate.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_density_matched_aggregate -v", "purpose": "verify complete6000-cell100-lineage coverage, exact sample identities, all failures and charges, unclipped retention and descriptive paired median differences without selection or superiority"},
-    "research/benchmark/density_declared_runtime_replay.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_density_declared_runtime -v", "purpose": "verify stored source and bytecode inventory hashes, declared system paths and alias identities without runtime initialization or loaded-library certification"},
-    "research/benchmark/results/density-matched": {"command": "python3 -B -m unittest research.benchmark.tests.test_density_matched_aggregate research.benchmark.tests.test_density_matched_publisher -v", "purpose": "verify complete matched publication contracts; schema validation and table/figure byte replay required from committed artifacts under target locally"},
-    "research/benchmark/density_publication_inputs.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_publication_inputs.py -v", "purpose": "verify externally anchored owned JSON, complete density closure and canonical requests, exact flat and separately anchored auxiliary trees, immutable original receipts, complete auxiliary coverage and bytes before report JSON decoding, projection-inclusive artifact charges and null publication admission without candidate execution"},
-    "research/benchmark/density-auxiliary-paths.lock.json": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_publication_inputs.py -v", "purpose": "verify immutable auxiliary path contract hash before JSON decoding, preserve frozen literal names, and reject changed contract bytes"},
-    "research/benchmark/density_metric_replay.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_metric_replay.py -v", "purpose": "verify frozen metric declarations, all auditors, unclipped retention and low-signal arithmetic, copy and real controls, canonical six-cell sample schedule, receipt-owned repetitions and complete logical binding without dependency initialization or candidate execution"},
-    "research/benchmark/density_native_replay.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_native_replay.py -v", "purpose": "verify original method snapshot and native grid/default/winner metadata, all1100 trial receipt bindings, finite likelihood and declared projection charges, cost caps, exact identities and unadmitted claims without rows/models/learner initialization"},
-    "research/benchmark/density_custody_replay.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_custody_replay.py -v", "purpose": "verify every native worker/trial artifact and projection charge, anchored closed operation timers and admissions, exact numeric identities, immutable statuses and prior-fit cost counted once without rows/model/dependency initialization or publication admission"},
-    "research/benchmark/research_container.py": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_research_container.py -v", "purpose": "verify bounded lossless container decoding, exact byte charges and rejection of corrupt or expanded payloads without model execution"},
-    "research/benchmark/publish_artifact_bytes": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_artifact_bytes.py -v", "purpose": "verify externally frozen receipts, complete byte-probe inventory, parent artifacts, charged container bytes and null generator claims"},
-    "research/benchmark/results/dope-artifact-byte-feasibility": {"command": "python3 -m unittest discover -s research/benchmark/tests -p test_artifact_bytes.py -v", "purpose": "verify source-bound byte publication and complete grid; validate schemas and regenerate tables/figures from immutable scratch locally"},
-    "research/benchmark/sdv_frozen_sample_validation.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_sdv_frozen_sample_validation -v", "purpose": "verify sealed existing SDV sample evaluation, native winner bindings, byte charges and rejection before dependency initialization without fitting"},
-    "research/benchmark/tests/test_sdv_frozen_sample_validation.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_sdv_frozen_sample_validation -v", "purpose": "verify sealed existing SDV sample evaluation, native winner bindings, byte charges and rejection before dependency initialization without fitting"},
-    "research/": {"command": "python3 -m unittest discover -s research/benchmark/tests -v", "purpose": "verify offline benchmark manifest, gate, run, and analysis contracts"},
-    "validation/requirements-v1.txt": {"command": "bash agent/check-python-v1-boundary.sh", "purpose": "verify pinned Python V1 compatibility graph"},
-    "validation/": {"command": "just check", "purpose": "verify validation dependencies and fixtures"},
-    "launch_tuner_tui.sh": {"command": "bash -n launch_tuner_tui.sh", "purpose": "verify launcher syntax"},
-    "research/benchmark/publish_dope_refinement_progress.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"},
-    "research/benchmark/publish_dope_refinement_progress_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"},
-    "research/benchmark/tests/test_dope_refinement_progress.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"},
-    "research/benchmark/results/dope-target-refinement-progress": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"},
-    "research/benchmark/arf_adapter.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_contract -v", "purpose": "verify owned isolated ARF runtime and exact file/directory inventories before dependency initializers, sealed input rejection, fit cap, canonical seeds, CPU thread allocations within affinity, verified factor buffers and projection-inclusive artifact charges; local synthetic author FORGE replay is separate from real benchmark claims"},
-    "research/benchmark/arf_runtime_guard.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_contract -v", "purpose": "verify owned isolated ARF runtime and exact file/directory inventories before dependency initializers, sealed input rejection, fit cap, canonical seeds, CPU thread allocations within affinity, verified factor buffers and projection-inclusive artifact charges; local synthetic author FORGE replay is separate from real benchmark claims"},
-    "research/benchmark/tests/test_arf_contract.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_contract -v", "purpose": "verify owned isolated ARF runtime and exact file/directory inventories before dependency initializers, sealed input rejection, fit cap, canonical seeds, CPU thread allocations within affinity, verified factor buffers and projection-inclusive artifact charges; local synthetic author FORGE replay is separate from real benchmark claims"},
-    "research/benchmark/publish_sdv_matched.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v", "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"},
-    "research/benchmark/publish_sdv_matched_figure.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v", "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"},
-    "research/benchmark/publish_sdv_matched_manifest.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v", "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"},
-    "research/benchmark/sdv_matched_aggregate.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v", "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"},
-    "research/benchmark/tests/test_sdv_matched_aggregate.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v", "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"},
-    "research/benchmark/tests/test_sdv_matched_publication.py": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v", "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"},
-    "research/benchmark/results/sdv-matched-population-validation": {"command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v", "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"},
-    "research/benchmark/arf_fit_request.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_fit_request research.benchmark.tests.test_arf_native_selection -v", "purpose": "verify exact canonical ARF job identity before imports, CPU environment and deadline limits, unavailable width rejection, own-FORDE-only selection, ties, complete trial accounting and cutoff separation; no real fits or campaign admission"},
-    "research/benchmark/arf_native_selection.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_fit_request research.benchmark.tests.test_arf_native_selection -v", "purpose": "verify exact canonical ARF job identity before imports, CPU environment and deadline limits, unavailable width rejection, own-FORDE-only selection, ties, complete trial accounting and cutoff separation; no real fits or campaign admission"},
-    "research/benchmark/tests/test_arf_fit_request.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_fit_request research.benchmark.tests.test_arf_native_selection -v", "purpose": "verify exact canonical ARF job identity before imports, CPU environment and deadline limits, unavailable width rejection, own-FORDE-only selection, ties, complete trial accounting and cutoff separation; no real fits or campaign admission"},
-    "research/benchmark/tests/test_arf_native_selection.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_fit_request research.benchmark.tests.test_arf_native_selection -v", "purpose": "verify exact canonical ARF job identity before imports, CPU environment and deadline limits, unavailable width rejection, own-FORDE-only selection, ties, complete trial accounting and cutoff separation; no real fits or campaign admission"},
-    "research/benchmark/publish_dope_refinement_discovery.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_discovery research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify complete144-cell discovery coverage, artifact rejection denominators, canonical seeds, lineage-first descriptive reduction and null gates; locally replay schemas, tables and figures from frozen receipts"},
-    "research/benchmark/publish_dope_refinement_discovery_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_discovery research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify complete144-cell discovery coverage, artifact rejection denominators, canonical seeds, lineage-first descriptive reduction and null gates; locally replay schemas, tables and figures from frozen receipts"},
-    "research/benchmark/publish_dope_refinement_discovery_manifest.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_discovery research.benchmark.tests.test_dope_refinement_progress -v", "purpose": "verify complete144-cell discovery coverage, artifact rejection denominators, canonical seeds, lineage-first descriptive reduction and null gates; locally replay schemas, tables and figures from frozen receipts"},
-    "research/benchmark/publish_dope_refinement_confirmation.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_confirmation research.benchmark.tests.test_dope_refinement_discovery -v", "purpose": "verify complete72-cell disjoint confirmation coverage, cap and projection accounting, canonical seeds, dataset-paired descriptive denominators and null gates; replay schemas/tables/figures from externally frozen receipts"},
-    "research/benchmark/publish_dope_refinement_confirmation_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_confirmation research.benchmark.tests.test_dope_refinement_discovery -v", "purpose": "verify complete72-cell disjoint confirmation coverage, cap and projection accounting, canonical seeds, dataset-paired descriptive denominators and null gates; replay schemas/tables/figures from externally frozen receipts"},
-    "research/benchmark/publish_dope_refinement_confirmation_manifest.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_confirmation research.benchmark.tests.test_dope_refinement_discovery -v", "purpose": "verify complete72-cell disjoint confirmation coverage, cap and projection accounting, canonical seeds, dataset-paired descriptive denominators and null gates; replay schemas/tables/figures from externally frozen receipts"},
-    "research/benchmark/publish_work_order_b_costs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_work_order_b_costs -v", "purpose": "verify original hash-bound receipt cost attribution and physical alias accounting, keep scheduling cutoffs separate from method failures, bind source/run/host/prior costs, reproduce all six missing-component and hard-gate identities, null scalar gates and byte-identical rights-safe tables/schemas"},
-    "research/benchmark/results/work-order-b-costs-v1": {"command": "python3 -B -m unittest research.benchmark.tests.test_work_order_b_costs -v", "purpose": "verify original hash-bound receipt cost attribution and physical alias accounting, keep scheduling cutoffs separate from method failures, bind source/run/host/prior costs, reproduce all six missing-component and hard-gate identities, null scalar gates and byte-identical rights-safe tables/schemas"},
-    "research/benchmark/tests/test_work_order_b_costs.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_work_order_b_costs -v", "purpose": "verify original hash-bound receipt cost attribution and physical alias accounting, keep scheduling cutoffs separate from method failures, bind source/run/host/prior costs, reproduce all six missing-component and hard-gate identities, null scalar gates and byte-identical rights-safe tables/schemas"},
-    "research/benchmark/publish_arf_population_matched.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v", "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"},
-    "research/benchmark/publish_arf_population_matched_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v", "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"},
-    "research/benchmark/publish_arf_population_matched_manifest.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v", "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"},
-    "research/benchmark/tests/test_arf_population_matched.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v", "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"},
-    "research/benchmark/tests/arf_matched_fixture.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v", "purpose": "verify opaque complete closed ARF receipt graph with valid baseline and rejection of transitive sample drift, wrong-seed metrics, forged receipts/digests, replay changes and input fit-seed aliases before metric decode"},
-    "research/benchmark/results/arf-matched-population-validation": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v", "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"},
-    "research/benchmark/publish_arf_population_native.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_native research.benchmark.tests.test_arf_native_selection -v", "purpose": "verify complete800-trial100-lineage native coverage, immutable receipt hashes before metric decoding, exact source/runtime/worker/artifact inventories, own-FORDE selection, projection charges, time accounting and null claims; replay schemas and tables from closed scratch locally without fits or sample execution"},
-    "research/benchmark/tests/test_arf_population_native.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_native research.benchmark.tests.test_arf_native_selection -v", "purpose": "verify complete800-trial100-lineage native coverage, immutable receipt hashes before metric decoding, exact source/runtime/worker/artifact inventories, own-FORDE selection, projection charges, time accounting and null claims; replay schemas and tables from closed scratch locally without fits or sample execution"},
-    "research/benchmark/results/arf-s3-population-native": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_native research.benchmark.tests.test_arf_native_selection -v", "purpose": "verify complete800-trial100-lineage native coverage, immutable receipt hashes before metric decoding, exact source/runtime/worker/artifact inventories, own-FORDE selection, projection charges, time accounting and null claims; replay schemas and tables from closed scratch locally without fits or sample execution"},
-    "research/benchmark/arf-native-paths.lock.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_native -v", "purpose": "verify immutable original coordinator directory name from a hash-bound path contract, exact empty scratch directory and added-file/directory/alias rejection without renaming frozen receipt paths"},
-    "research/benchmark/publish_dope_refinement_fits.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v", "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/publish_dope_refinement_fits_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v", "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/publish_dope_refinement_fits_manifest.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v", "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/tests/test_dope_refinement_fits.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v", "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/results/dope-target-refinement-population-fits": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v", "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/publish_dope_refinement_population.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v", "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/publish_dope_refinement_population_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v", "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/publish_dope_refinement_population_manifest.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v", "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/tests/test_dope_refinement_population.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v", "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/results/dope-target-refinement-population-validation": {"command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v", "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"},
-    "research/benchmark/verify_paper_numbers.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_verify_paper_numbers -v", "purpose": "verify manuscript numbers against hash-checked fit.json files, replay receipts, and the ARF watch log without opening official tests"},
-    "research/benchmark/tests/test_verify_paper_numbers.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_verify_paper_numbers -v", "purpose": "verify manuscript numbers against hash-checked fit.json files, replay receipts, and the ARF watch log without opening official tests"},
-    "research/benchmark/tests/test_paper_log.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_paper_log -v", "purpose": "fail the paper check when a build log contains an overfull box, an underfull box, an undefined reference, or a float that is too large"},
-    "research/benchmark/select_beyondarena_panel.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v", "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"},
-    "research/benchmark/publish_beyondarena_retention.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v", "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"},
-    "research/benchmark/tests/test_beyondarena_panel.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v", "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"},
-    "research/benchmark/results/beyondarena-panel.lock.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v", "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"},
-    "research/benchmark/results/beyondarena-retention-rows.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v", "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"},
-    "research/benchmark/results/beyondarena-prepare.schema.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v", "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"},
-    "research/benchmark/results/beyondarena-retention.schema.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v", "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"},
-    "research/benchmark/expanded_validation_metrics.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v", "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"},
-    "research/benchmark/expanded-validation-metrics.schema.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v", "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"},
-    "research/benchmark/tests/test_expanded_validation_metrics.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v", "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"},
-    "research/benchmark/fixtures/expanded-validation-metrics": {"command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v", "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"},
-    "research/benchmark/expanded-validation-metrics.NOTICE": {"command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v", "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"},
-    "research/benchmark/tabsyn_owned_lifecycle.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -v", "purpose": "verify actual metadata-only pidfd capture, natural concurrent reaping, unbound vanished identities, no foreign signals or leaked descriptors; exact owner one-CUDA policy, source binding and unchanged native 36+4 gates"},
-    "research/benchmark/tests/test_tabsyn_owned_lifecycle.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -v", "purpose": "verify actual metadata-only pidfd capture, natural concurrent reaping, unbound vanished identities, no foreign signals or leaked descriptors; exact owner one-CUDA policy, source binding and unchanged native 36+4 gates"},
-    "research/benchmark/tabsyn-one-qualification.owner-addendum.json": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -v", "purpose": "verify actual metadata-only pidfd capture, natural concurrent reaping, unbound vanished identities, no foreign signals or leaked descriptors; exact owner one-CUDA policy, source binding and unchanged native 36+4 gates"},
-    "research/benchmark/results/work-order-b-compute-costs-v2": {"command": "python3 -I -S -B -m unittest discover -s research/benchmark/tests -p test_work_order_b_compute_costs.py -v", "purpose": "replay committed CSV/schema byte for byte, reject source/report drift before load/decode, preserve scheduling cutoffs and unknown resource nulls, and prevent physical alias double charges without opening scientific inputs"},
-    "research/benchmark/tests/test_work_order_b_compute_costs.py": {"command": "python3 -I -S -B -m unittest discover -s research/benchmark/tests -p test_work_order_b_compute_costs.py -v", "purpose": "replay committed CSV/schema byte for byte, reject source/report drift before load/decode, preserve scheduling cutoffs and unknown resource nulls, and prevent physical alias double charges without opening scientific inputs"},
+    "research/benchmark/publish_validation_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v",
+      "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"
+    },
+    "research/benchmark/tests/test_validation_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v",
+      "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"
+    },
+    "research/benchmark/results/matched-validation-descriptive-figure/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v",
+      "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"
+    },
+    "research/benchmark/publish_checkpoint_index.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v",
+      "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"
+    },
+    "research/benchmark/tests/test_checkpoint_index.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v",
+      "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"
+    },
+    "research/benchmark/results/checkpoint-figure-input-index/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v",
+      "purpose": "verify frozen checkpoint metadata, complete sample identities, separate native objectives, null scores and reproducible figure KPI exports without scientific execution"
+    },
+    "research/benchmark/results/work-order-b-tabsyn-input-readiness-v1": {
+      "command": "python3 -B -m jsonschema -i research/benchmark/results/work-order-b-tabsyn-input-readiness-v1/readiness.json research/benchmark/results/work-order-b-tabsyn-input-readiness-v1/readiness.schema.json",
+      "purpose": "validate frozen143 metadata reconstruction, seed/size counts, immutable receipt hashes and absent execution/capacity/runtime/production claims"
+    },
+    "research/benchmark/tests/test_tabsyn_metric_operation_positive.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v",
+      "purpose": "verify complete generated CPU/GPU fit/sample/source/kind joins, source omissions, lineage/runtime drift and whole frozen matrix eligibility without numeric bodies or native execution"
+    },
+    "research/benchmark/tabsyn_metric_operation_inputs.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v",
+      "purpose": "verify exact frozen scientific fit/sample/process/source joins, metadata custody and recipe digests before initialization; preserve unavailable outcomes, common target-last order, missing runtime/capacity evidence and null scores without scientific execution"
+    },
+    "research/benchmark/tabsyn_closed143_inputs.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v",
+      "purpose": "verify exact frozen scientific fit/sample/process/source joins, metadata custody and recipe digests before initialization; preserve unavailable outcomes, common target-last order, missing runtime/capacity evidence and null scores without scientific execution"
+    },
+    "research/benchmark/tests/test_tabsyn_metric_operation_inputs.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v",
+      "purpose": "verify exact frozen scientific fit/sample/process/source joins, metadata custody and recipe digests before initialization; preserve unavailable outcomes, common target-last order, missing runtime/capacity evidence and null scores without scientific execution"
+    },
+    "research/benchmark/tests/test_tabsyn_closed143_inputs.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v",
+      "purpose": "verify exact frozen scientific fit/sample/process/source joins, metadata custody and recipe digests before initialization; preserve unavailable outcomes, common target-last order, missing runtime/capacity evidence and null scores without scientific execution"
+    },
+    "research/benchmark/tabsyn_validation_inputs.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v",
+      "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"
+    },
+    "research/benchmark/tests/test_tabsyn_validation_inputs.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v",
+      "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"
+    },
+    "research/benchmark/results/campaign-local-capacity-amendment-xbabe2": {
+      "command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment-xbabe2.json research/benchmark/results/campaign-local-capacity-amendment-xbabe2.schema.json",
+      "purpose": "validate the separate owner-authorized xbabe2 local100GB root, carried budgets, sealed tests and null claims; fresh per-fit admission remains required"
+    },
+    "research/benchmark/DOPE_CPU_RESEARCH.md": {
+      "command": "just check",
+      "purpose": "verify explicit research-device parsing, ordinary-build rejection before fixed-hidden fallback, and Rust compiler compatibility; actual CPU libtorch training needs separate runtime qualification"
+    },
+    "research/benchmark/LOCAL_CAPACITY_AMENDMENT.md": {
+      "command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment.json research/benchmark/results/campaign-local-capacity-amendment.schema.json",
+      "purpose": "validate the byte-exact owner resource amendment, separate storage ceilings, unchanged operation budgets and null claims without admitting scientific execution"
+    },
+    "research/benchmark/results/campaign-local-capacity-amendment": {
+      "command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment.json research/benchmark/results/campaign-local-capacity-amendment.schema.json",
+      "purpose": "validate the byte-exact owner resource amendment, separate storage ceilings, unchanged operation budgets and null claims without admitting scientific execution"
+    },
+    "research/benchmark/tabsyn-scaled-compute-policy.addendum.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v",
+      "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"
+    },
+    "research/benchmark/tabsyn-scaled-compute-policy.proposal.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v",
+      "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"
+    },
+    "research/benchmark/TABSYN_NUMERIC_ADMISSION.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v",
+      "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"
+    },
+    "research/benchmark/tests/test_tabsyn_admission.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v",
+      "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"
+    },
+    "research/benchmark/tabsyn_native_target.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v",
+      "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"
+    },
+    "research/benchmark/tabsyn_admission.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v",
+      "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"
+    },
+    "research/benchmark/tabsyn-adapter.LICENSE": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"
+    },
+    "research/benchmark/tabsyn-adapter.NOTICE": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"
+    },
+    "research/benchmark/tabsyn_adapter.py.license": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody and unchanged source-attribution scope"
+    },
+    "research/benchmark/tabsyn_adapter.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v",
+      "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"
+    },
+    "research/benchmark/tabsyn_runtime_guard.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"
+    },
+    "research/benchmark/tabsyn_generated_contract.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"
+    },
+    "research/benchmark/tabsyn-native-grid.proposal.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"
+    },
+    "research/benchmark/requirements-tabsyn.in": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"
+    },
+    "research/benchmark/requirements-tabsyn.lock.txt": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"
+    },
+    "research/benchmark/TABSYN_RUNTIME_CONTRACT.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract -v",
+      "purpose": "verify isolated reusable TabSyn runtime custody, numeric fixture boundaries, author native dispatch and unadmitted GPU/real-fit rejection"
+    },
+    "research/benchmark/tests/test_tabsyn_contract.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_contract research.benchmark.tests.test_tabsyn_admission -v",
+      "purpose": "verify generated metadata scope, actual inherited GPU lease, exact source and epoch-policy replay binding, rejection before dependency initialization, TRAIN-only target inversion and carried whole-operation/trial budgets; no actual CUDA admission claim"
+    },
+    "AGENTS.md": {
+      "command": "just fast",
+      "purpose": "verify repository guidance"
+    },
+    "README.md": {
+      "command": "just fast",
+      "purpose": "verify onboarding guidance"
+    },
+    "CHANGELOG.md": {
+      "command": "just fast",
+      "purpose": "verify release change record"
+    },
+    "LICENSE": {
+      "command": "just fast",
+      "purpose": "verify repository metadata"
+    },
+    ".cargo/": {
+      "command": "just check",
+      "purpose": "verify Cargo configuration"
+    },
+    ".gitignore": {
+      "command": "just fast",
+      "purpose": "verify generated paths remain ignored"
+    },
+    "rust-toolchain.toml": {
+      "command": "just check",
+      "purpose": "verify pinned Rust toolchain"
+    },
+    "pyproject.toml": {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests",
+      "purpose": "verify V1 package compatibility"
+    },
+    "Justfile": {
+      "command": "just fast",
+      "purpose": "verify local proof recipes"
+    },
+    ".github/": {
+      "command": "just security",
+      "purpose": "verify workflow syntax and scans"
+    },
+    "agent/": {
+      "command": "just score",
+      "purpose": "verify audit policy and boundary evidence"
+    },
+    "ops/": {
+      "command": "bash scripts/ci-local.sh cpu",
+      "purpose": "verify CI execution scripts"
+    },
+    "tools/": {
+      "command": "bash tools/security-lane.sh",
+      "purpose": "verify canonical security wrapper"
+    },
+    "scripts/": {
+      "command": "bash scripts/ci-doctor.sh",
+      "purpose": "verify local CI entry points"
+    },
+    "docs/": {
+      "command": "just score",
+      "purpose": "verify release and repair guidance"
+    },
+    "schemas/": {
+      "command": "just score",
+      "purpose": "verify receipt schemas against the emitted audit report"
+    },
+    "contracts/": {
+      "command": "cargo test --locked production::tests::embedded_contract_is_canonical_and_bound",
+      "purpose": "verify generated tier constants and embedded digest"
+    },
+    "rust/": {
+      "command": "just check",
+      "purpose": "run Rust unit, CLI, and Clippy checks"
+    },
+    "Cargo.toml": {
+      "command": "just check",
+      "purpose": "verify locked Rust graph"
+    },
+    "Cargo.lock": {
+      "command": "just check",
+      "purpose": "verify locked Rust graph"
+    },
+    "build.rs": {
+      "command": "just check",
+      "purpose": "verify embedded contract digest"
+    },
+    "production/": {
+      "command": "just check",
+      "purpose": "verify contract and release fixtures"
+    },
+    "src/dope_kernel/": {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests",
+      "purpose": "preserve V1 compatibility"
+    },
+    "tests/": {
+      "command": "just check",
+      "purpose": "verify Rust CLI and Python fixtures"
+    },
+    "validation/external/": {
+      "command": "PYTHONPATH=validation/external target/external-venv/bin/python -m unittest discover -s validation/external/tests -v",
+      "purpose": "verify pinned external learner evidence fixtures"
+    },
+    "research/benchmark/fixtures/tabddpm-native-prelaunch/": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_tabddpm_prelaunch.py -v",
+      "purpose": "verify frozen entry runtime drift rejection before dependency initialization"
+    },
+    "research/benchmark/aim_native.py": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_aim_native.py -v",
+      "purpose": "verify AIM author marginal objective, fixed epsilon, validation seal and drift rejection"
+    },
+    "research/benchmark/gpu_refinement_bootstrap.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_gpu_refinement_bootstrap -v",
+      "purpose": "verify external research round identity, exact flat source inventory and checked-buffer startup before helper initialization without GPU or real data access"
+    },
+    "research/benchmark/tests/test_gpu_refinement_bootstrap.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_gpu_refinement_bootstrap -v",
+      "purpose": "verify generated initializer rejection controls, source aliases and bytecode additions, duplicate/nonfinite declarations and unchanged checked-buffer execution"
+    },
+    "research/benchmark/publish_s3_forest": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_s3_forest_panel.py -v",
+      "purpose": "verify complete matched Forest-Flow matrix, frozen receipt and executable inventories, null claims and timeout accounting"
+    },
+    "research/benchmark/publish_dope_population_fits": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_dope_population_fits.py -v",
+      "purpose": "verify complete population fit custody, externally pinned receipt hashes, byte accounting and null claims"
+    },
+    "research/benchmark/publish_tabsyn_population_fits": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_population_fits -v",
+      "purpose": "verify scaled default100 CUDA fit custody, frozen source/receipt rejection, complete coverage and byte charges, unmeasured cost separation, null claims and exact JSON/schema/CSV/research-note regeneration"
+    },
+    "research/benchmark/tests/test_tabsyn_population_fits.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_population_fits -v",
+      "purpose": "verify frozen opaque fit fixtures and deterministic rights-safe publication without model, sample or scientific execution"
+    },
+    "research/benchmark/results/tabsyn-default100-scaled-cuda-fits": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_population_fits -v",
+      "purpose": "validate complete100 scaled fit-only ledger, original author track separation, measured costs and null gated claims; regenerate committed schema and tables"
+    },
+    "research/benchmark/publish_tabsyn_native_audit.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_native_audit -v",
+      "purpose": "verify author-objective inapplicability, actual worker identity, monitoring admission, prior failure costs, frozen receipt/source custody and null claims without executing models"
+    },
+    "research/benchmark/tests/test_tabsyn_native_audit.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_native_audit -v",
+      "purpose": "reject exit-zero monitoring upgrades, changed native objectives, source identities, deadlines and artifact charges using opaque fixtures"
+    },
+    "research/benchmark/results/tabsyn-default100-native-audit": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_native_audit -v",
+      "purpose": "regenerate complete 100-lineage native status ledger, schema and tables; preserve unavailable cases and null native/common/release scores"
+    },
+    "research/benchmark/publish_dope_population_validation": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_dope_population_validation.py -v",
+      "purpose": "verify complete all-profile population validation, frozen receipt digests, null claims, honest missing coverage and exact table regeneration"
+    },
+    "research/benchmark/sdv_native_accounting.py": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_sdv_native_accounting.py -v",
+      "purpose": "verify native-only winner selection, immutable reuse, failed compute and artifact charges, complete closure and sealed tests"
+    },
+    "research/benchmark/reconcile_sdv_population.py": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_sdv_native_accounting.py -v",
+      "purpose": "verify complete native trial identities and fail-closed coordinator closure without ML initialization"
+    },
+    "research/benchmark/sdv_native_continuation.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_native_continuation.py -v",
+      "purpose": "verify complete frozen native custody, retry identity, failed-attempt costs, CPU reuse and unchanged per-cell caps without launching jobs"
+    },
+    "research/benchmark/publish_sdv_population_native": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_population_native_publication.py -v",
+      "purpose": "verify externally frozen publication anchors, complete native denominators, unchanged native selections, failure/cost/byte evidence and deterministic rights-safe tables without model execution"
+    },
+    "research/benchmark/results/sdv-s3-population-native": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_population_native_publication.py -v",
+      "purpose": "verify complete native ledger publication and null claims; validate committed result/manifest schemas and regenerate tables and figures from hash-bound metadata locally"
+    },
+    "research/benchmark/sdv_cpu_reuse.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_cpu_reuse.py -v",
+      "purpose": "verify CPU-only native and common sample reuse, unchanged fitted artifact charges, source and worker drift rejection, native seed replay and failed-operation costs using opaque fixtures"
+    },
+    "research/benchmark/great-source.audit": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only method inventory and fail-closed dispatch/admission; validate source audit schema and current author defaults against immutable scratch locally"
+    },
+    "research/benchmark/realtabformer-source.audit": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only method inventory and fail-closed dispatch/admission; validate source audit schema and author defaults against immutable scratch locally"
+    },
+    "research/benchmark/cdtd-source.audit": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only method inventory and fail-closed admission; validate CDTD schema, source hashes and native-policy facts against immutable scratch locally"
+    },
+    "research/benchmark/results/gemt-unavailable": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify scoped unavailable inventory and fail-closed admission; validate GEM-T primary pages, bounded repository-search/candidate provenance, schema hashes and unfrozen native/reproduction claims locally"
+    },
+    "research/benchmark/results/tabkde-unavailable": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify scoped unavailable inventory and fail-closed admission; validate TabKDE rights/tree/source/schema hashes and unverified reproduction/runtime claims locally"
+    },
+    "research/benchmark/results/tabpfgen-unavailable": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify scoped unavailable inventory and fail-closed admission; validate independent TabPFGen provenance/tree/blob/schema hashes and unverified reproduction/runtime claims locally"
+    },
+    "research/benchmark/pategan-source.audit": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only inventory and fail-closed admission; validate original PATE-GAN source schema/hashes, author defaults/native AUC and generator/preprocessing/privacy gaps locally"
+    },
+    "research/benchmark/tabbyflow-source.audit": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only method inventory and fail-closed admission; validate TabbyFlow schema, selected source hashes, released defaults/native metric semantics and artifact/data gaps locally"
+    },
+    "research/benchmark/dpctgan-source.audit": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only method inventory and fail-closed admission; validate DP-CTGAN schema, selected source hashes, author objectives, source privacy ordering and artifact gaps locally"
+    },
+    "research/benchmark/mst-source.audit": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only inventory and fail-closed admission; validate MST schema, source hashes, native objective and actual fit/sample contracts against immutable scratch locally"
+    },
+    "research/benchmark/tabcascade-source.audit": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only inventory and fail-closed admission; validate TabCascade schema, source hashes and current-author versus paper track facts against immutable scratch locally"
+    },
+    "research/benchmark/tabdiff-source.audit": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only inventory and fail-closed final admission; validate audit JSON against its committed schema locally"
+    },
+    "research/benchmark/results/ctabgan-plus-unavailable": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "preserve unavailable method dispatch and win exclusion; validate rights receipt schema, pinned source hashes and license evidence against immutable scratch locally"
+    },
+    "research/benchmark/results/taegan-unavailable": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "preserve unavailable method dispatch and win exclusion; validate rights receipt schema, pinned source hashes and license evidence against immutable scratch locally"
+    },
+    "research/benchmark/results/privbayes-unavailable": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "preserve unavailable method dispatch and win exclusion; validate rights receipt against its committed schema locally"
+    },
+    "research/benchmark/tvinesynth-source.audit": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify source-only inventory and fail-closed admission; validate native applicability and null-claim receipt against its schema locally"
+    },
+    "research/benchmark/research_container_members.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_research_container_members.py -v",
+      "purpose": "verify externally frozen compressed/model/projection identities, owned immutable members, bounded expansion and complete unchanged byte ceiling before any model initialization"
+    },
+    "research/benchmark/container_validation_worker.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_validation_worker.py -v",
+      "purpose": "verify unadmitted/source/runtime/worker drift rejection before initialization, complete compressed charges, canonical retry identity, owned primary inputs and original sample replays without real model execution"
+    },
+    "research/benchmark/container_python_custody.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_python_custody.py -v",
+      "purpose": "verify externally bound interpreter and import inventories, bytecode and alias rejection before candidate initialization using opaque fixtures; preserve absent full runtime and execution admission claims"
+    },
+    "research/benchmark/container_bootstrap_invocation.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_bootstrap_invocation.py -v",
+      "purpose": "verify restricted interpreter argv/environment, canonical retry proposal, host restrictions and unchanged whole-batch deadline with no process startup or filesystem/runtime/admission claim"
+    },
+    "research/benchmark/container_elf_inputs.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_elf_inputs.py -v",
+      "purpose": "verify externally bound owned ELF declarations and malformed header/segment/string rejection using opaque bytes; never start, resolve or admit candidate execution"
+    },
+    "research/benchmark/container_system_custody.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_system_custody.py -v",
+      "purpose": "verify frozen ELF inventory membership, parent manifests, alias/file identities and owned-byte declaration replay before candidate startup; preserve absent loader resolution and execution admission"
+    },
+    "research/benchmark/container_loader_custody.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_loader_custody.py -v",
+      "purpose": "verify externally frozen selected loader files, alias chains, cache/configuration hashes, directory entries and absence records without resolving/loading libraries or admitting jobs"
+    },
+    "research/benchmark/container_loader_catalog.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_loader_catalog.py -v",
+      "purpose": "replay externally bound root and recursive provider edges in frozen candidate order, reject missing or changed bindings and retain unresolved competing identities without loader selection or execution admission"
+    },
+    "research/benchmark/container_loader_configuration.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_loader_configuration.py -v",
+      "purpose": "verify owned bounded configuration declarations, include membership and exactly bound additional directory/absence snapshots without cache construction, actual loader selection or execution admission"
+    },
+    "research/benchmark/container_search_path_custody.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_search_path_custody.py -v",
+      "purpose": "verify ordered root and selected-provider literal search-path projections against owned directory/absence snapshots without actual loader origin, search, selection or execution claims"
+    },
+    "research/benchmark/container_loader_environment.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_loader_environment.py -v",
+      "purpose": "verify restricted frozen invocation environment, selected library directory and preload absence snapshots with original outer timer and no actual loader or execution admission"
+    },
+    "research/benchmark/container_bootstrap_filesystem.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_bootstrap_filesystem.py -v",
+      "purpose": "verify proposed regular source membership, owned canonical request job/retry identity, private request parent and empty cache with original deadline; no final round or execution admission"
+    },
+    "research/benchmark/container_native_sampler_custody.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_native_sampler_custody.py -v",
+      "purpose": "verify owned native sampler ELF bytes and declaration replay against frozen fit/job/product identities, repeated file guards and original deadline without executable/provider/runtime admission"
+    },
+    "research/benchmark/container_native_library_custody.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_native_library_custody.py -v",
+      "purpose": "verify owned original native directory membership, exact historical file identities and literal alias snapshots, repeated final parents/helpers and original deadline without loader/runtime/execution admission"
+    },
+    "research/benchmark/container_native_child_environment.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_native_child_environment.py -v",
+      "purpose": "verify restricted separate native child environment declaration against canonical original request and selected native directory/preload absence, regular parents/helpers and original deadline without actual child/runtime/execution admission"
+    },
+    "research/benchmark/container_native_runtime_inventory.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_native_runtime_inventory.py -v",
+      "purpose": "verify exact original native file membership, bytes, hashes and fresh literal aliases beyond selected directory, regular metadata/helpers and original deadline without linker replay or runtime/execution admission"
+    },
+    "research/benchmark/container_startup.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_startup.py -v",
+      "purpose": "verify bound original filesystem/native/inventory parents and combined original-timer startup replay, failure propagation, regular metadata/helpers and null scores without dispatch/runtime/admission claims"
+    },
+    "research/benchmark/container_guard_sources.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_guard_sources.py -v",
+      "purpose": "verify exact startup guard source inventory before imports, immutable owned bytes, regular unaliased file admission, original deadline and null execution claims using opaque fixtures"
+    },
+    "research/benchmark/container_owned_code.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_owned_code.py -v",
+      "purpose": "verify compilation from externally bound immutable startup source bytes without staged initializers, cache reads, inherited compiler flags, deadline resets or execution claims"
+    },
+    "research/benchmark/container_module_bindings.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_module_bindings.py -v",
+      "purpose": "verify immutable compiled guard descriptors, exact source paths and private package names, repeated full source/helper custody and original deadline without initializers, namespace installation or execution claims"
+    },
+    "research/benchmark/container_import_declarations.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_import_declarations.py -v",
+      "purpose": "verify static import declarations from owned compiled-guard source identities, fixed module scope, dependency order, cycle rejection, final custody and original deadline without resolving imports or initializing modules"
+    },
+    "research/benchmark/container_import_hook.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_import_hook.py -v",
+      "purpose": "verify prepared import callbacks against preowned references and exact guard namespace identity, declared rows, strict types, copied maps and original timer without import delegation, initializers or dispatch"
+    },
+    "research/benchmark/container_builtin_bindings.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_builtin_bindings.py -v",
+      "purpose": "verify fixed copied caller-owned builtin selections, prepared hook replacement and dependency-ordered binding plans, strict metadata, final custody and original timer without namespace installation or initializers"
+    },
+    "research/benchmark/container_namespace_bindings.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_namespace_bindings.py -v",
+      "purpose": "verify restricted references bound only to new private namespace dictionaries, exact metadata and dependency order, repeated custody, original deadline and cleanup of owned bindings without live registry installation or real initializers"
+    },
+    "research/benchmark/container_registry_bindings.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_registry_bindings.py -v",
+      "purpose": "verify exact caller-owned registry type and keys, private package exclusion before parent work and after final custody, sixteen proposed additions and original deadline without live installation or real initializers"
+    },
+    "research/benchmark/container_private_registry.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_private_registry.py -v",
+      "purpose": "verify reference identity and readonly private registry overlay, copied selections before parent work, original-registry drift and namespace/source/helper/final deadline rejection without live activation or real guard initializers"
+    },
+    "research/benchmark/container_guard_initialization.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_container_guard_initialization.py -v",
+      "purpose": "verify source-recompiled executable objects including nested constants and signed zeros, declared dependency order, exact private namespace and registry references, final custody and original deadline without running initializers"
+    },
+    "research/benchmark/density_validation_aggregate.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_validation_aggregate.py -v",
+      "purpose": "verify complete expected 100-lineage density matrix, exact trial identities, byte consistency, null incomplete sample groups, retained denominator and negative retention, reference labels and rejection of gated or win claims using opaque cells"
+    },
+    "research/benchmark/publish_density_matched": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_density_matched_publisher research.benchmark.tests.test_density_matched_manifest -v",
+      "purpose": "verify complete identical training-derived cohorts, closure before metric reads, immutable report digest before parsing, regenerated tables and null claims without frozen worker or learner initialization"
+    },
+    "research/benchmark/density_matched_aggregate.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_density_matched_aggregate -v",
+      "purpose": "verify complete6000-cell100-lineage coverage, exact sample identities, all failures and charges, unclipped retention and descriptive paired median differences without selection or superiority"
+    },
+    "research/benchmark/density_declared_runtime_replay.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_density_declared_runtime -v",
+      "purpose": "verify stored source and bytecode inventory hashes, declared system paths and alias identities without runtime initialization or loaded-library certification"
+    },
+    "research/benchmark/results/density-matched": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_density_matched_aggregate research.benchmark.tests.test_density_matched_publisher -v",
+      "purpose": "verify complete matched publication contracts; schema validation and table/figure byte replay required from committed artifacts under target locally"
+    },
+    "research/benchmark/density_publication_inputs.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_publication_inputs.py -v",
+      "purpose": "verify externally anchored owned JSON, complete density closure and canonical requests, exact flat and separately anchored auxiliary trees, immutable original receipts, complete auxiliary coverage and bytes before report JSON decoding, projection-inclusive artifact charges and null publication admission without candidate execution"
+    },
+    "research/benchmark/density-auxiliary-paths.lock.json": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_publication_inputs.py -v",
+      "purpose": "verify immutable auxiliary path contract hash before JSON decoding, preserve frozen literal names, and reject changed contract bytes"
+    },
+    "research/benchmark/density_metric_replay.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_metric_replay.py -v",
+      "purpose": "verify frozen metric declarations, all auditors, unclipped retention and low-signal arithmetic, copy and real controls, canonical six-cell sample schedule, receipt-owned repetitions and complete logical binding without dependency initialization or candidate execution"
+    },
+    "research/benchmark/density_native_replay.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_native_replay.py -v",
+      "purpose": "verify original method snapshot and native grid/default/winner metadata, all1100 trial receipt bindings, finite likelihood and declared projection charges, cost caps, exact identities and unadmitted claims without rows/models/learner initialization"
+    },
+    "research/benchmark/density_custody_replay.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_density_custody_replay.py -v",
+      "purpose": "verify every native worker/trial artifact and projection charge, anchored closed operation timers and admissions, exact numeric identities, immutable statuses and prior-fit cost counted once without rows/model/dependency initialization or publication admission"
+    },
+    "research/benchmark/research_container.py": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_research_container.py -v",
+      "purpose": "verify bounded lossless container decoding, exact byte charges and rejection of corrupt or expanded payloads without model execution"
+    },
+    "research/benchmark/publish_artifact_bytes": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_artifact_bytes.py -v",
+      "purpose": "verify externally frozen receipts, complete byte-probe inventory, parent artifacts, charged container bytes and null generator claims"
+    },
+    "research/benchmark/results/dope-artifact-byte-feasibility": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -p test_artifact_bytes.py -v",
+      "purpose": "verify source-bound byte publication and complete grid; validate schemas and regenerate tables/figures from immutable scratch locally"
+    },
+    "research/benchmark/sdv_frozen_sample_validation.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_sdv_frozen_sample_validation -v",
+      "purpose": "verify sealed existing SDV sample evaluation, native winner bindings, byte charges and rejection before dependency initialization without fitting"
+    },
+    "research/benchmark/tests/test_sdv_frozen_sample_validation.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_sdv_frozen_sample_validation -v",
+      "purpose": "verify sealed existing SDV sample evaluation, native winner bindings, byte charges and rejection before dependency initialization without fitting"
+    },
+    "research/": {
+      "command": "python3 -m unittest discover -s research/benchmark/tests -v",
+      "purpose": "verify offline benchmark manifest, gate, run, and analysis contracts"
+    },
+    "validation/requirements-v1.txt": {
+      "command": "bash agent/check-python-v1-boundary.sh",
+      "purpose": "verify pinned Python V1 compatibility graph"
+    },
+    "validation/": {
+      "command": "just check",
+      "purpose": "verify validation dependencies and fixtures"
+    },
+    "launch_tuner_tui.sh": {
+      "command": "bash -n launch_tuner_tui.sh",
+      "purpose": "verify launcher syntax"
+    },
+    "research/benchmark/publish_dope_refinement_progress.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v",
+      "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"
+    },
+    "research/benchmark/publish_dope_refinement_progress_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v",
+      "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"
+    },
+    "research/benchmark/tests/test_dope_refinement_progress.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v",
+      "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"
+    },
+    "research/benchmark/results/dope-target-refinement-progress": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v",
+      "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"
+    },
+    "research/benchmark/arf_adapter.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_contract -v",
+      "purpose": "verify owned isolated ARF runtime and exact file/directory inventories before dependency initializers, sealed input rejection, fit cap, canonical seeds, CPU thread allocations within affinity, verified factor buffers and projection-inclusive artifact charges; local synthetic author FORGE replay is separate from real benchmark claims"
+    },
+    "research/benchmark/arf_runtime_guard.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_contract -v",
+      "purpose": "verify owned isolated ARF runtime and exact file/directory inventories before dependency initializers, sealed input rejection, fit cap, canonical seeds, CPU thread allocations within affinity, verified factor buffers and projection-inclusive artifact charges; local synthetic author FORGE replay is separate from real benchmark claims"
+    },
+    "research/benchmark/tests/test_arf_contract.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_contract -v",
+      "purpose": "verify owned isolated ARF runtime and exact file/directory inventories before dependency initializers, sealed input rejection, fit cap, canonical seeds, CPU thread allocations within affinity, verified factor buffers and projection-inclusive artifact charges; local synthetic author FORGE replay is separate from real benchmark claims"
+    },
+    "research/benchmark/publish_sdv_matched.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v",
+      "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"
+    },
+    "research/benchmark/publish_sdv_matched_figure.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v",
+      "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"
+    },
+    "research/benchmark/publish_sdv_matched_manifest.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v",
+      "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"
+    },
+    "research/benchmark/sdv_matched_aggregate.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v",
+      "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"
+    },
+    "research/benchmark/tests/test_sdv_matched_aggregate.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v",
+      "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"
+    },
+    "research/benchmark/tests/test_sdv_matched_publication.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v",
+      "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"
+    },
+    "research/benchmark/results/sdv-matched-population-validation": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v",
+      "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"
+    },
+    "research/benchmark/arf_fit_request.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_fit_request research.benchmark.tests.test_arf_native_selection -v",
+      "purpose": "verify exact canonical ARF job identity before imports, CPU environment and deadline limits, unavailable width rejection, own-FORDE-only selection, ties, complete trial accounting and cutoff separation; no real fits or campaign admission"
+    },
+    "research/benchmark/arf_native_selection.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_fit_request research.benchmark.tests.test_arf_native_selection -v",
+      "purpose": "verify exact canonical ARF job identity before imports, CPU environment and deadline limits, unavailable width rejection, own-FORDE-only selection, ties, complete trial accounting and cutoff separation; no real fits or campaign admission"
+    },
+    "research/benchmark/tests/test_arf_fit_request.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_fit_request research.benchmark.tests.test_arf_native_selection -v",
+      "purpose": "verify exact canonical ARF job identity before imports, CPU environment and deadline limits, unavailable width rejection, own-FORDE-only selection, ties, complete trial accounting and cutoff separation; no real fits or campaign admission"
+    },
+    "research/benchmark/tests/test_arf_native_selection.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_fit_request research.benchmark.tests.test_arf_native_selection -v",
+      "purpose": "verify exact canonical ARF job identity before imports, CPU environment and deadline limits, unavailable width rejection, own-FORDE-only selection, ties, complete trial accounting and cutoff separation; no real fits or campaign admission"
+    },
+    "research/benchmark/publish_dope_refinement_discovery.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_discovery research.benchmark.tests.test_dope_refinement_progress -v",
+      "purpose": "verify complete144-cell discovery coverage, artifact rejection denominators, canonical seeds, lineage-first descriptive reduction and null gates; locally replay schemas, tables and figures from frozen receipts"
+    },
+    "research/benchmark/publish_dope_refinement_discovery_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_discovery research.benchmark.tests.test_dope_refinement_progress -v",
+      "purpose": "verify complete144-cell discovery coverage, artifact rejection denominators, canonical seeds, lineage-first descriptive reduction and null gates; locally replay schemas, tables and figures from frozen receipts"
+    },
+    "research/benchmark/publish_dope_refinement_discovery_manifest.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_discovery research.benchmark.tests.test_dope_refinement_progress -v",
+      "purpose": "verify complete144-cell discovery coverage, artifact rejection denominators, canonical seeds, lineage-first descriptive reduction and null gates; locally replay schemas, tables and figures from frozen receipts"
+    },
+    "research/benchmark/publish_dope_refinement_confirmation.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_confirmation research.benchmark.tests.test_dope_refinement_discovery -v",
+      "purpose": "verify complete72-cell disjoint confirmation coverage, cap and projection accounting, canonical seeds, dataset-paired descriptive denominators and null gates; replay schemas/tables/figures from externally frozen receipts"
+    },
+    "research/benchmark/publish_dope_refinement_confirmation_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_confirmation research.benchmark.tests.test_dope_refinement_discovery -v",
+      "purpose": "verify complete72-cell disjoint confirmation coverage, cap and projection accounting, canonical seeds, dataset-paired descriptive denominators and null gates; replay schemas/tables/figures from externally frozen receipts"
+    },
+    "research/benchmark/publish_dope_refinement_confirmation_manifest.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_confirmation research.benchmark.tests.test_dope_refinement_discovery -v",
+      "purpose": "verify complete72-cell disjoint confirmation coverage, cap and projection accounting, canonical seeds, dataset-paired descriptive denominators and null gates; replay schemas/tables/figures from externally frozen receipts"
+    },
+    "research/benchmark/publish_work_order_b_costs.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_work_order_b_costs -v",
+      "purpose": "verify original hash-bound receipt cost attribution and physical alias accounting, keep scheduling cutoffs separate from method failures, bind source/run/host/prior costs, reproduce all six missing-component and hard-gate identities, null scalar gates and byte-identical rights-safe tables/schemas"
+    },
+    "research/benchmark/results/work-order-b-costs-v1": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_work_order_b_costs -v",
+      "purpose": "verify original hash-bound receipt cost attribution and physical alias accounting, keep scheduling cutoffs separate from method failures, bind source/run/host/prior costs, reproduce all six missing-component and hard-gate identities, null scalar gates and byte-identical rights-safe tables/schemas"
+    },
+    "research/benchmark/tests/test_work_order_b_costs.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_work_order_b_costs -v",
+      "purpose": "verify original hash-bound receipt cost attribution and physical alias accounting, keep scheduling cutoffs separate from method failures, bind source/run/host/prior costs, reproduce all six missing-component and hard-gate identities, null scalar gates and byte-identical rights-safe tables/schemas"
+    },
+    "research/benchmark/publish_arf_population_matched.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v",
+      "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"
+    },
+    "research/benchmark/publish_arf_population_matched_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v",
+      "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"
+    },
+    "research/benchmark/publish_arf_population_matched_manifest.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v",
+      "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"
+    },
+    "research/benchmark/tests/test_arf_population_matched.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v",
+      "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"
+    },
+    "research/benchmark/tests/arf_matched_fixture.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v",
+      "purpose": "verify opaque complete closed ARF receipt graph with valid baseline and rejection of transitive sample drift, wrong-seed metrics, forged receipts/digests, replay changes and input fit-seed aliases before metric decode"
+    },
+    "research/benchmark/results/arf-matched-population-validation": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_matched -v",
+      "purpose": "verify complete1200-cell native/default ARF coverage, frozen receipt hashes before metrics, unchanged FORDE selections, matched DOPE worker/reference identities, bytes/costs/unavailable cells, typed seeds, sample-before-lineage reductions and null gates; regenerate complete closed panel without fits or samples"
+    },
+    "research/benchmark/publish_arf_population_native.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_native research.benchmark.tests.test_arf_native_selection -v",
+      "purpose": "verify complete800-trial100-lineage native coverage, immutable receipt hashes before metric decoding, exact source/runtime/worker/artifact inventories, own-FORDE selection, projection charges, time accounting and null claims; replay schemas and tables from closed scratch locally without fits or sample execution"
+    },
+    "research/benchmark/tests/test_arf_population_native.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_native research.benchmark.tests.test_arf_native_selection -v",
+      "purpose": "verify complete800-trial100-lineage native coverage, immutable receipt hashes before metric decoding, exact source/runtime/worker/artifact inventories, own-FORDE selection, projection charges, time accounting and null claims; replay schemas and tables from closed scratch locally without fits or sample execution"
+    },
+    "research/benchmark/results/arf-s3-population-native": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_native research.benchmark.tests.test_arf_native_selection -v",
+      "purpose": "verify complete800-trial100-lineage native coverage, immutable receipt hashes before metric decoding, exact source/runtime/worker/artifact inventories, own-FORDE selection, projection charges, time accounting and null claims; replay schemas and tables from closed scratch locally without fits or sample execution"
+    },
+    "research/benchmark/arf-native-paths.lock.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_population_native -v",
+      "purpose": "verify immutable original coordinator directory name from a hash-bound path contract, exact empty scratch directory and added-file/directory/alias rejection without renaming frozen receipt paths"
+    },
+    "research/benchmark/publish_dope_refinement_fits.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v",
+      "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/publish_dope_refinement_fits_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v",
+      "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/publish_dope_refinement_fits_manifest.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v",
+      "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/tests/test_dope_refinement_fits.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v",
+      "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/results/dope-target-refinement-population-fits": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_fits -v",
+      "purpose": "verify complete two-profile fit accounting, immutable external receipt hashes before outcomes, strict job identities, aliases, projection charges, infrastructure classification, prior cost reuse and null claims; regenerate tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/publish_dope_refinement_population.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v",
+      "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/publish_dope_refinement_population_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v",
+      "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/publish_dope_refinement_population_manifest.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v",
+      "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/tests/test_dope_refinement_population.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v",
+      "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/results/dope-target-refinement-population-validation": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_population -v",
+      "purpose": "verify complete1200-cell matched validation coverage, externally pinned receipts before metrics, native reference and worker identity, canonical seeds, seed-before-lineage reduction, aggregate replay, unclipped retention, copy controls, charged bytes, failure denominators and null claims; regenerate schemas/tables/figures from closed scratch without fits or samples"
+    },
+    "research/benchmark/verify_paper_numbers.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_verify_paper_numbers -v",
+      "purpose": "verify manuscript numbers against hash-checked fit.json files, replay receipts, and the ARF watch log without opening official tests"
+    },
+    "research/benchmark/tests/test_verify_paper_numbers.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_verify_paper_numbers -v",
+      "purpose": "verify manuscript numbers against hash-checked fit.json files, replay receipts, and the ARF watch log without opening official tests"
+    },
+    "research/benchmark/tests/test_paper_log.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_paper_log -v",
+      "purpose": "fail the paper check when a build log contains an overfull box, an underfull box, an undefined reference, or a float that is too large"
+    },
+    "research/benchmark/select_beyondarena_panel.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v",
+      "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"
+    },
+    "research/benchmark/publish_beyondarena_retention.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v",
+      "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"
+    },
+    "research/benchmark/tests/test_beyondarena_panel.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v",
+      "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"
+    },
+    "research/benchmark/results/beyondarena-panel.lock.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v",
+      "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"
+    },
+    "research/benchmark/results/beyondarena-retention-rows.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v",
+      "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"
+    },
+    "research/benchmark/results/beyondarena-prepare.schema.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v",
+      "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"
+    },
+    "research/benchmark/results/beyondarena-retention.schema.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v",
+      "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"
+    },
+    "research/benchmark/expanded_validation_metrics.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v",
+      "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"
+    },
+    "research/benchmark/expanded-validation-metrics.schema.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v",
+      "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"
+    },
+    "research/benchmark/tests/test_expanded_validation_metrics.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v",
+      "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"
+    },
+    "research/benchmark/fixtures/expanded-validation-metrics": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v",
+      "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"
+    },
+    "research/benchmark/expanded-validation-metrics.NOTICE": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v",
+      "purpose": "verify generated numerical controls against pinned licensed author equations, grouped C2ST, duplicate-aware privacy attacks, early split rejection, typed missing evidence, schema and null certification; no real data or generator execution"
+    },
+    "research/benchmark/tabsyn_owned_lifecycle.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -v",
+      "purpose": "verify actual metadata-only pidfd capture, natural concurrent reaping, unbound vanished identities, no foreign signals or leaked descriptors; exact owner one-CUDA policy, source binding and unchanged native 36+4 gates"
+    },
+    "research/benchmark/tests/test_tabsyn_owned_lifecycle.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -v",
+      "purpose": "verify actual metadata-only pidfd capture, natural concurrent reaping, unbound vanished identities, no foreign signals or leaked descriptors; exact owner one-CUDA policy, source binding and unchanged native 36+4 gates"
+    },
+    "research/benchmark/tabsyn-one-qualification.owner-addendum.json": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -v",
+      "purpose": "verify actual metadata-only pidfd capture, natural concurrent reaping, unbound vanished identities, no foreign signals or leaked descriptors; exact owner one-CUDA policy, source binding and unchanged native 36+4 gates"
+    },
+    "research/benchmark/results/work-order-b-compute-costs-v2": {
+      "command": "python3 -I -S -B -m unittest discover -s research/benchmark/tests -p test_work_order_b_compute_costs.py -v",
+      "purpose": "replay committed CSV/schema byte for byte, reject source/report drift before load/decode, preserve scheduling cutoffs and unknown resource nulls, and prevent physical alias double charges without opening scientific inputs"
+    },
+    "research/benchmark/tests/test_work_order_b_compute_costs.py": {
+      "command": "python3 -I -S -B -m unittest discover -s research/benchmark/tests -p test_work_order_b_compute_costs.py -v",
+      "purpose": "replay committed CSV/schema byte for byte, reject source/report drift before load/decode, preserve scheduling cutoffs and unknown resource nulls, and prevent physical alias double charges without opening scientific inputs"
+    },
     "research/benchmark/research_ablation_binding.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_research_ablation_binding",
       "purpose": "reject changed metadata before decoding, validate the bounded ablation profile and emitted opcode, preserve requested-only configuration and null release eligibility"
@@ -297,6 +1020,38 @@
     "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-paid-cost-delta-v1/render.py --check",
       "purpose": "reproduce five closed paid native operation costs and separate zero-science metadata hold from hash-pinned public scalar metadata; preserve unknown logical progress/sharing/peak fields and nonadditive nested clocks without private inputs or host reads"
+    },
+    "docs/whitepaper/scripts/published_baseline_inventory.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "docs/whitepaper/generated/baseline-coverage.tex": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "docs/whitepaper/generated/published-baseline-figure-hashes.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "docs/whitepaper/figures/published-baseline-cohorts.pdf": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "docs/whitepaper/scripts/published_baseline_inventory.schema.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "docs/whitepaper/scripts/test_published_baseline_inventory.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "docs/whitepaper/generated/published-baseline-kpis.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "docs/whitepaper/generated/published-baseline-kpis.csv": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
+      "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
     }
   }
 }

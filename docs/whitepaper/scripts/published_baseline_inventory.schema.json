@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "rows", "sources", "official_tests_opened", "mfs_v2", "ptf_v1", "release_safe_l3", "superiority", "scope", "limitations"],
+  "properties": {
+    "format": {"const": "paper-published-baseline-inventory-v1"},
+    "rows": {"type": "array", "minItems": 7, "maxItems": 7, "items": {"$ref": "#/$defs/row"}},
+    "figure_points": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/point"}},
+    "sources": {"type": "object", "minProperties": 10, "maxProperties": 10, "additionalProperties": {"$ref": "#/$defs/source"}},
+    "official_tests_opened": {"const": false},
+    "mfs_v2": {"type": "null"},
+    "ptf_v1": {"type": "null"},
+    "release_safe_l3": {"type": "null"},
+    "superiority": {"type": "null"},
+    "scope": {"type": "string"},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "count": {"type": ["integer", "null"], "minimum": 0},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "pointer"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^research/benchmark/results/"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "pointer": {"type": "string", "pattern": "^($|/)"}
+      }
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "complete_retained_lineages", "complete_retained_sample_cells", "coverage", "complete100", "five_fit_lineages", "sources", "final_five_fit_complete", "full100_eta_mt", "eta_is_observed_completion", "remaining_campaign_status", "production_certified"],
+      "properties": {
+        "method": {"enum": ["TabSyn", "TabDDPM", "Forest-Flow", "Forest-Diffusion", "ARF", "GaussianCopula", "Chow-Liu"]},
+        "complete_retained_lineages": {"$ref": "#/$defs/count"},
+        "complete_retained_sample_cells": {"$ref": "#/$defs/count"},
+        "logical_sample_cells": {"$ref": "#/$defs/count"},
+        "retained_models": {"$ref": "#/$defs/count"},
+        "pilot_logical_cells": {"$ref": "#/$defs/count"},
+        "published_additional_metric_cells": {"$ref": "#/$defs/count"},
+        "published_additional_physical_fits": {"$ref": "#/$defs/count"},
+        "five_fit_lineages": {"$ref": "#/$defs/count"},
+        "coverage": {"type": "string"},
+        "complete100": {"type": "boolean"},
+        "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+        "final_five_fit_complete": {"const": false},
+        "full100_eta_mt": {"type": "null"},
+        "eta_is_observed_completion": {"const": false},
+        "remaining_campaign_status": {"const": "pending"},
+        "production_certified": {"const": false}
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cohort", "dataset", "metric", "value", "measured_fits", "sample_seeds", "row_multiplier", "aggregation", "support_status", "sources"],
+      "properties": {
+        "cohort": {"type": "string"},
+        "dataset": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "metric": {"enum": ["catboost_retention", "marginal_error_mean", "c2st_catboost_auc", "distance_mia_auc"]},
+        "value": {"type": ["number", "null"]},
+        "measured_fits": {"type": "integer", "minimum": 0, "maximum": 5},
+        "sample_seeds": {"const": [101, 211, 307]},
+        "row_multiplier": {"const": 4},
+        "aggregation": {"enum": ["mean_of_three_sample_seeds", "mean_of_five_fit_means_after_three_sample_means"]},
+        "support_status": {"enum": ["measured", "unavailable"]},
+        "sources": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"$ref": "#/$defs/source"}}
+      },
+      "allOf": [{"if": {"properties": {"support_status": {"const": "unavailable"}}}, "then": {"properties": {"value": {"type": "null"}}}, "else": {"properties": {"value": {"type": "number"}}}}]
+    }
+  }
+}

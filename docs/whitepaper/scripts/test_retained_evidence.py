@@ -98,9 +98,9 @@ class RetainedEvidence(unittest.TestCase):
         for name in ("mfs_v2", "ptf_v1", "superiority"):
             self.assertIsNone(self.generated[name])
 
-    def test_coverage_counts_and_eta_arithmetic_are_not_admissions(self):
+    def test_coverage_is_published_receipts_with_pending_outcomes(self):
         data = json.loads((evidence.OUT / "baseline-coverage.json").read_bytes())
-        self.assertEqual(data["calculated_slot_hours"], 156)
+        self.assertNotIn("calculated_slot_hours", data)
         rows = {r["method"]: r for r in data["rows"]}
         self.assertEqual(rows["TabSyn"]["complete_retained_sample_cells"], 48)
         self.assertTrue(rows["ARF"]["complete100"])
@@ -108,7 +108,8 @@ class RetainedEvidence(unittest.TestCase):
         for method in ("TabSyn", "TabDDPM", "Forest-Flow", "Forest-Diffusion"):
             self.assertFalse(rows[method]["complete100"])
             self.assertFalse(rows[method]["eta_is_observed_completion"])
-            self.assertEqual(rows[method]["full100_eta_mt"], "2026-10-14T20:00:00-06:00")
+            self.assertIsNone(rows[method]["full100_eta_mt"])
+            self.assertEqual(rows[method]["remaining_campaign_status"], "pending")
 
 
 if __name__ == "__main__":
