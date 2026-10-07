@@ -28,6 +28,7 @@ FIGURES = (
     ROOT / "figures" / "retention-bars.pdf",
     ROOT / "figures" / "paired-cdf.pdf",
     ROOT / "figures" / "loss-curves.pdf",
+    ROOT / "figures" / "retained-matched-eight.pdf",
 )
 # A measurement typed into the prose. Integers and one-decimal illustration
 # values such as the MFS arithmetic example stay in the generator instead.
@@ -36,9 +37,9 @@ MACRO_DEF = re.compile(r"\\(?:newcommand|renewcommand)\*?\{\\(\w+)\}")
 MACRO_USE = re.compile(r"\\([A-Z][A-Za-z]+)")
 # Final logs from the latexmk run. A first pass reports undefined references on purpose.
 LOGS = (
-    Path("/tmp/dope-mfs-3.log"),
-    Path("/tmp/dope-mfs-anonymous-3.log"),
-    Path("/tmp/supplement-3.log"),
+    ROOT.parents[1] / "target/paper-build/dope-mfs-3.log",
+    ROOT.parents[1] / "target/paper-build/dope-mfs-anonymous-3.log",
+    ROOT.parents[1] / "target/paper-build/supplement-3.log",
 )
 LOG_HITS = ("Warning", "undefined", "Undefined", "Overfull", "Underfull")
 
@@ -85,6 +86,11 @@ def main() -> int:
         recorded_hashes = json.loads(hash_path.read_text()).get("pdf_sha256") or {}
     else:
         failures.append("generated/figure-hashes.json is missing")
+    retained_hash_path = ROOT / "generated/retained-figure-hashes.json"
+    if retained_hash_path.is_file():
+        recorded_hashes.update(json.loads(retained_hash_path.read_text()).get("pdf_sha256") or {})
+    else:
+        failures.append("generated/retained-figure-hashes.json is missing")
     for path in FIGURES:
         if not path.exists():
             failures.append(f"missing figure {path.name}")

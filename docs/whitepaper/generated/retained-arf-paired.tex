@@ -1,0 +1,12 @@
+\begin{tabular}{@{}llcrrr@{}}
+\toprule
+ARF config. & Auditor & $n$ & DOPE minus ARF & Simultaneous median CI & Holm $p$ \\
+\midrule
+Default & catboost & 97 & 0.077 & [0.019, 0.154] & $1.31\times 10^{-5}$ \\
+Native & catboost & 97 & 0.095 & [0.028, 0.175] & $5.47\times 10^{-7}$ \\
+Default & linear & 92 & 0.027 & [0.0056, 0.090] & $8.53\times 10^{-5}$ \\
+Native & linear & 92 & 0.037 & [0.00582, 0.113] & $1.62\times 10^{-5}$ \\
+Default & mlp & 75 & 0.115 & [0.043, 0.236] & $4.56\times 10^{-8}$ \\
+Native & mlp & 75 & 0.143 & [0.040, 0.253] & $8.01\times 10^{-8}$ \\
+\bottomrule
+\end{tabular}

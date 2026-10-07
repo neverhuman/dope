@@ -43,7 +43,7 @@
 \begin{abstract}
 This paper measures how much of a real-trained regressor's improvement
 over a null is recovered by an auditor trained on synthetic rows. The
-generator stays under a 10{,}240-byte artifact. It is a compact residual,
+generator is evaluated against a 10{,}240-byte artifact budget. It is a compact residual,
 not a GAN, a diffusion model, or a transformer: at most 12 screened
 inputs, a width-16 $\tanh$ layer, a refit readout, and 2{,}048 AdamW
 steps at learning rate $0.002$, with no embedding. The configuration id
@@ -137,7 +137,9 @@ synthesis is the synthpop line~\cite{nowok2016synthpop}. A recent survey
 collects these design choices~\cite{borisov2024survey}. This paper runs the
 Gaussian copula, a Chow--Liu baseline written for this comparison,
 independent marginals written for this comparison, CTGAN, TVAE,
-and a $\NForestCb$-lineage Forest-Flow confirmation. TabSyn, TabDDPM on the
+and a $\NForestCb$-lineage Forest-Flow confirmation. New retained panels
+also measure ARF and a scaled author-default TabSyn subset
+(Section~\ref{sec:retained}). TabDDPM on the
 $\PreparedN$-lineage panel, STaSy, CoDi, TabDiff, CTAB-GAN+, GReaT,
 REaLTabFormer, and TabPFGen are cited and not measured. SMOTE~\cite{chawla2002smote} was not run.
 This panel scores regression retention, not classification oversampling.
@@ -153,8 +155,10 @@ prediction~\cite{snoke2018utility,raab2018practical}. Alpha-precision,
 beta-recall, SDMetrics, and synthcity are the usual fidelity
 reports~\cite{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}.
 The fidelity results add alpha-precision, beta-recall, a
-distance-to-closest-record share, and a DOMIAS AUC. ARF is not in that
-fidelity table. The displayed-profile publication median is \ArfResult.
+distance-to-closest-record share, and a DOMIAS AUC. ARF and the retained
+TabSyn subset have an additional fidelity, detection and empirical-privacy
+panel in Section~\ref{sec:retained}. The displayed-profile ARF
+publication median is \ArfResult.
 The pre-specified privacy-attack panel
 remains \PrivacyAttackPanel. Nothing in those fields is a formal privacy
 guarantee or a HIPAA de-identification claim.
@@ -416,8 +420,9 @@ defined in Section~\ref{sec:results}. Chow--Liu uses eight
 bins and Laplace smoothing $1.0$. It is an implementation written for this
 comparison, as are the independent marginals. The ARF watch log's last count is $\ArfWatchClosed$ closed
 and $\ArfWatchOk$ ok out of $\ArfWatchPlanned$ planned, then a sealing record.
-That log is not a retention panel. The displayed-profile ARF publication
-median is \ArfResult.
+The later matched ARF publication supplies scored retention; its
+displayed-profile comparison median is \ArfResult. The new retained
+diagnostic panel has a separate receipt and aggregation rule.
 Forest-Flow on $\NForestCb$ lineages uses the
 author regression objective on its frozen grid. Native objectives are not
 ranked across methods.
@@ -660,8 +665,9 @@ against a DOPE median of $\DopeForestByteMedian$ on the same lineages.
 MFS-v2 on this block is null.
 
 Table~\ref{tab:publication} is the published matched-population receipt
-for ARF at $4n$ on the displayed profile. TabDDPM, TabSyn, and the full
-Forest-Flow publication have no receipt file, so they are omitted.
+for ARF at $4n$ on the displayed profile. Complete-population TabDDPM,
+TabSyn, and Forest-Flow receipts are omitted; the completed retained
+TabSyn subset is reported separately below.
 
 \begin{table*}[t]
 \caption{Forest-Flow confirmation at $4n$, CatBoost. Not pooled.}
@@ -679,6 +685,103 @@ Forest-Flow publication have no receipt file, so they are omitted.
 \setlength{\tabcolsep}{3pt}
 \input{generated/publication-rows.tex}
 \end{table}
+
+\subsection{Retained validation evidence}
+\label{sec:retained}
+Tables~\ref{tab:retained100} and~\ref{tab:retained8} add the merged
+retained-sample evidence. Each lineage averages all three sample seeds
+before a lineage-bootstrap median and percentile interval are computed.
+This differs from the median-of-seed rule in the earlier blocks; those
+blocks and their numbers are preserved. A lineage enters a metric only
+when all three values exist. An unavailable outcome stays absent.
+Table~\ref{tab:retained100} covers the same prepared population for ARF,
+copula and Chow--Liu defaults and native-selected configurations.
+Table~\ref{tab:retained8} includes only the complete scaled author-default
+TabSyn lineages and the classical methods on those identical inputs.
+It cannot establish a full-population TabSyn result or a native-tuned
+TabSyn comparison. These evaluations did not select a configuration.
+
+\begin{table*}[t]
+\caption{Retained classical validation at $4n$. Median [95\% lineage-bootstrap interval] (informative lineages). Native selection uses each method's own objective.}
+\label{tab:retained100}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{generated/retained-classical100.tex}
+\end{table*}
+
+\begin{table*}[t]
+\caption{Matched retained TabSyn subset at $4n$. Same inputs and real-data controls for every method; median [95\% interval] (lineages). Separate from the full classical population.}
+\label{tab:retained8}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{generated/retained-matched8.tex}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/retained-matched-eight.pdf}
+\caption{Matched retained subset: median and marginal lineage-bootstrap intervals. Privacy AUC is an empirical diagnostic; its interval is not a privacy guarantee.}
+\label{fig:retained8}
+\end{figure*}
+
+Table~\ref{tab:retainedpairs} gives exploratory TabSyn-minus-comparator
+retention differences on shared lineages. The Holm family comprises
+four metrics (CatBoost retention, mean marginal KS/TV, CatBoost C2ST AUC
+and distance-MIA AUC) times six classical configurations. Conservative
+binomial/order-statistic intervals for the median difference use
+Bonferroni correction over the entire family, conditional on independent
+lineages. This small cohort requires unbounded simultaneous intervals.
+Finite tail-adjusted bootstrap ranges are retained only as exploratory
+descriptions; they do not guarantee familywise coverage.
+Marginal intervals in Fig.~\ref{fig:retained8} are not simultaneous
+intervals. The machine-readable reduction includes every diagnostic
+contrast and all applicability exclusions. A raw AUC difference is not
+a directional utility or privacy win. Selection of the completed subset,
+one fit seed and its small lineage count limit this exploratory analysis.
+
+\begin{table*}[t]
+\caption{Exploratory matched-subset CatBoost differences. Conservative simultaneous median intervals and Holm $p$ over the entire four-metric family; the corrected intervals are unbounded.}
+\label{tab:retainedpairs}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{generated/retained-paired.tex}
+\end{table*}
+
+Table~\ref{tab:arfpaired} separately extends the published DOPE--ARF
+retention comparison with lineage intervals. It preserves that receipt's
+median-of-three rule. Its six-test family contains two ARF configurations
+and three auditors. The shared-lineage intersections differ by auditor.
+These validation descriptions leave the release and superiority gates null.
+
+\begin{table*}[t]
+\caption{DOPE--ARF legacy matched receipt at $4n$: exploratory paired differences, conservative simultaneous median intervals and Holm $p$. Median-of-seed aggregation.}
+\label{tab:arfpaired}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{generated/retained-arf-paired.tex}
+\end{table*}
+
+The supplement prints the deterministic first-batch diagnostics per
+physical job. Incomplete seed groups and mixed research profiles prevent
+population confidence intervals or method rankings for that batch.
+All reductions trace to committed receipt paths, source digests and JSON
+pointers in \path{docs/whitepaper/generated/retained-evidence.json}.
+The original receipt references are retained in
+\path{research/benchmark/results/retained-classical-validation/panel.json}
+and the first-batch publication recorded in that reduction.
+
+\begin{table*}[t]
+\caption{Baseline coverage as recorded in the committed publications. Full-population forecasts marked * are conditional planning dates, not admissions or measured results.}
+\label{tab:baselinecoverage}
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{generated/baseline-coverage.tex}
+\end{table*}
+
+The coverage table distinguishes Forest-Flow confirmation from the
+Forest-Diffusion pilot modes. No full-population diffusion result is
+inferred from the Flow subset. Forecasts assume a dedicated admitted slot
+per method from the declared start, the default fits plus the native-trial
+ceiling at the recorded per-fit limit, and an evaluation allowance.
+\path{docs/whitepaper/coverage-plan.json} gives those assumptions;
+\path{docs/whitepaper/generated/baseline-coverage.json} records the
+arithmetic and source receipts. Queue contention moves these forecasts.
+No final five-fit baseline completion is scheduled or implied.
 
 \subsection{Release score}
 The scalar in \eqref{eq:mfs} is null for every method in this paper.
@@ -755,6 +858,12 @@ are omitted, not zeroed. Chow--Liu and independent marginals are
 implementations written for this comparison. CTGAN and TVAE use the
 lineages that finished. Runs that stopped at the recorded time limit are
 omitted. They are not counted as failures of a finished fit.
+The validation cut also supplies native tuning signals. These are
+post-selection validation estimates, not independent official-test
+estimates. Lineage intervals hold the split and fitted artifact fixed;
+they omit fitting uncertainty. Related simulation lineages can violate
+the independence assumption behind both bootstrap and order-statistic
+intervals. The retained-subset results therefore remain exploratory.
 
 \paragraph{External.}
 These fits do not establish behavior on the full tables used by the

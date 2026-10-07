@@ -1,3 +1,11 @@
+# Current retained-evidence review
+
+See `RETAINED_EVIDENCE_REVIEW.md` for the 2026-10-07 integration review and
+`generated/baseline-coverage.json` for current scope. The review below is
+historical: its source-only TabSyn and missing ARF diagnostic statements
+are superseded by the merged retained evidence. Full-population neural and
+five-fit coverage remain incomplete.
+
 # TKDE reviewer report
 
 Manuscript: *Regression Utility of a 10,240-Byte Tabular Generator*.

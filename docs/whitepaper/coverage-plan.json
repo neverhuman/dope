@@ -1,0 +1,12 @@
+{
+  "as_of_utc": "2026-10-07T04:55:00Z",
+  "scope": "100-lineage fit-seed-11 author-default and native-selected validation panels; final five-fit campaign is separate and unscheduled",
+  "conditional_start_mt": "2026-10-08T08:00:00-06:00",
+  "default_fits": 100,
+  "native_trial_ceiling": 800,
+  "per_fit_seconds": 600,
+  "sampling_and_metrics_allowance_hours": 6,
+  "capacity_condition": "One dedicated eligible slot per method for 156 hours, fresh owner admission, no contention with the encoding-priority queue; no GPU lease or launch is granted by this forecast",
+  "retained_TabDDPM_Forest_metric_target_mt": "2026-10-07T12:00:00-06:00",
+  "retained_target_condition": "Receipts and CPU capacity must be available; this is a target, not an observed completion"
+}

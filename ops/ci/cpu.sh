@@ -29,9 +29,13 @@ PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests
 PYTHONPATH=. python3 -m unittest research.benchmark.tests.test_dope_refinement_fits.RefinementFits.test_committed_fit_ledger_tracks_publisher -v
 python3 research/benchmark/verify_paper_numbers.py
 python3 docs/whitepaper/scripts/compute_cost.py
+uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'matplotlib==3.10.8'
+target/ci-python/bin/python docs/whitepaper/scripts/retained_evidence.py
 target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py
+target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py'
 python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_publication_rows.py'
 python3 docs/whitepaper/scripts/publication_rows.py
+git diff --exit-code -- docs/whitepaper/generated/retained-evidence.json docs/whitepaper/generated/retained-*.tex docs/whitepaper/generated/retained-figure-hashes.json docs/whitepaper/generated/baseline-coverage.json docs/whitepaper/generated/baseline-coverage.tex docs/whitepaper/figures/retained-matched-eight.pdf
 if python3 -c 'import matplotlib' >/dev/null 2>&1; then
   python3 docs/whitepaper/scripts/render_figures.py --check
 fi
