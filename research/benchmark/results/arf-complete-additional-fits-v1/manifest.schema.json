@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "additional_fit_matrix_complete": {
+      "const": true
+    },
+    "common_metrics_complete": {
+      "const": false
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "files": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "bytes"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "fit_seeds": {
+      "const": [
+        23,
+        37,
+        53,
+        71
+      ]
+    },
+    "five_fit_matrix_complete": {
+      "const": false
+    },
+    "format": {
+      "const": "dope-arf-complete-additional-fit-publication-v1"
+    },
+    "inputs": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_reproduction": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "type": "object"
+        },
+        "coordinator_exit_observation": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "type": "object"
+        },
+        "input_manifest": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "type": "object"
+        },
+        "logical_coverage": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "type": "object"
+        },
+        "original_completion": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "type": "object"
+        },
+        "original_round": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "input_manifest",
+        "original_round",
+        "original_completion",
+        "coordinator_exit_observation",
+        "logical_coverage",
+        "actual_reproduction"
+      ],
+      "type": "object"
+    },
+    "lineages": {
+      "const": 100
+    },
+    "logical_alias_count": {
+      "const": 4
+    },
+    "logical_fit_count": {
+      "const": 800
+    },
+    "measured_costs": {
+      "additionalProperties": false,
+      "properties": {
+        "clocks_are_additive": {
+          "const": false
+        },
+        "round_coordinator_wall_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "sum_charged_artifact_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "summed_worker_fit_and_validation_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "whole_population_throughput_extrapolated": {
+          "const": false
+        }
+      },
+      "required": [
+        "sum_charged_artifact_bytes",
+        "summed_worker_fit_and_validation_seconds",
+        "round_coordinator_wall_seconds",
+        "clocks_are_additive",
+        "whole_population_throughput_extrapolated"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_kpis_ranked_across_methods": {
+      "const": false
+    },
+    "native_winner_selection_fit_seed": {
+      "const": 11
+    },
+    "new_tuning_trials": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "physical_fit_count": {
+      "const": 796
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "reused_seed11_scope": {
+      "type": "string"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "additional_fit_matrix_complete",
+    "common_metrics_complete",
+    "five_fit_matrix_complete",
+    "official_tests_opened",
+    "native_kpis_ranked_across_methods",
+    "new_tuning_trials",
+    "native_winner_selection_fit_seed",
+    "logical_fit_count",
+    "physical_fit_count",
+    "lineages",
+    "fit_seeds",
+    "logical_alias_count",
+    "counts_as_dope_win",
+    "reused_seed11_scope",
+    "inputs",
+    "files",
+    "measured_costs",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe",
+    "superiority"
+  ],
+  "type": "object"
+}

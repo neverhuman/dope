@@ -1,0 +1,98 @@
+{
+  "additional_fit_matrix_complete": true,
+  "common_metrics_complete": false,
+  "counts_as_dope_win": false,
+  "files": {
+    "research/benchmark/publish_cpu_fit_batch.py": {
+      "bytes": 8740,
+      "path": "research/benchmark/publish_cpu_fit_batch.py",
+      "sha256": "cdd86b8412cb25d1f73cf1ab0b56b4d6c4795e8c4c0e43ddf5e6f094300c3168"
+    },
+    "research/benchmark/results/arf-complete-additional-fits-v1/README.md": {
+      "bytes": 3558,
+      "path": "research/benchmark/results/arf-complete-additional-fits-v1/README.md",
+      "sha256": "7a881209a47969f77de5faf51c7e464526513ec68f5efdd3fa63200155b17f4d"
+    },
+    "research/benchmark/results/arf-complete-additional-fits-v1/fits.csv": {
+      "bytes": 109027,
+      "path": "research/benchmark/results/arf-complete-additional-fits-v1/fits.csv",
+      "sha256": "0b4b9d42e5b1e95e55b881f07b5ad5fa0e9bc46d51a13d325d93b5d493171acf"
+    },
+    "research/benchmark/results/arf-complete-additional-fits-v1/manifest.schema.json": {
+      "bytes": 6740,
+      "path": "research/benchmark/results/arf-complete-additional-fits-v1/manifest.schema.json",
+      "sha256": "347a0ee0ab0b0da1340d6bda372dd4f7e5e3debf61d3d1bf6e8abb9aae9cb341"
+    },
+    "research/benchmark/results/arf-complete-additional-fits-v1/panel.json": {
+      "bytes": 2359282,
+      "path": "research/benchmark/results/arf-complete-additional-fits-v1/panel.json",
+      "sha256": "7acfd172db6b43537723aff63e47faed35cd1319fb371fef34ad4328ebe46cca"
+    },
+    "research/benchmark/results/arf-complete-additional-fits-v1/panel.schema.json": {
+      "bytes": 6934,
+      "path": "research/benchmark/results/arf-complete-additional-fits-v1/panel.schema.json",
+      "sha256": "db74b377b59b4bf8c75b95cd71ea4b1cc05801188e98688f85d13ca39563fbd0"
+    }
+  },
+  "fit_seeds": [
+    23,
+    37,
+    53,
+    71
+  ],
+  "five_fit_matrix_complete": false,
+  "format": "dope-arf-complete-additional-fit-publication-v1",
+  "inputs": {
+    "actual_reproduction": {
+      "bytes": 1249,
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-complete-additional-fits-publication-v1/replay.actual.json",
+      "sha256": "8c40d68b54f66663e2e3cd6cb78d99206563c5d871f7c00379a04fd6768b0623"
+    },
+    "coordinator_exit_observation": {
+      "bytes": 940,
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-complete-additional-fits-publication-v1/coordinator-exit-observed.actual.json",
+      "sha256": "9d5985b11999c6ad4f8b28ca2409674f465a0d3e152c0641963f3a512911b9f5"
+    },
+    "input_manifest": {
+      "bytes": 801741,
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-complete-additional-fits-publication-v1/inputs.lock.json",
+      "sha256": "65c8d56c600b404949af26da22f0393b22ece17078d14fa412fea6e92bfa8d5e"
+    },
+    "logical_coverage": {
+      "bytes": 250267,
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-complete-additional-fits-publication-v1/logical-coverage.actual.json",
+      "sha256": "2b15372c26f1cc02682d44dc5087854aec854a61683bee5ed69533f91135095c"
+    },
+    "original_completion": {
+      "bytes": 231,
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/completion.json",
+      "sha256": "6696715e80698b142f67b86403beae1c48aec1be9d247ab2b234c5bab24d21e3"
+    },
+    "original_round": {
+      "bytes": 154020,
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+      "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+    }
+  },
+  "lineages": 100,
+  "logical_alias_count": 4,
+  "logical_fit_count": 800,
+  "measured_costs": {
+    "clocks_are_additive": false,
+    "round_coordinator_wall_seconds": 17751.16075678123,
+    "sum_charged_artifact_bytes": 1943952843,
+    "summed_worker_fit_and_validation_seconds": 13187.080405344721,
+    "whole_population_throughput_extrapolated": false
+  },
+  "mfs_v2": null,
+  "native_kpis_ranked_across_methods": false,
+  "native_winner_selection_fit_seed": 11,
+  "new_tuning_trials": 0,
+  "official_tests_opened": false,
+  "physical_fit_count": 796,
+  "ptf_v1": null,
+  "release_safe": null,
+  "reused_seed11_scope": "Original seed11 winners/defaults remain in their own frozen native round, referenced by every new job; they are not new fits here.",
+  "superiority": null,
+  "version": 1
+}

@@ -1392,3 +1392,5 @@ Run the generated receipt controls with:
 ```sh
 python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v
 ```
+
+The [complete additional ARF fit ledger](results/arf-complete-additional-fits-v1/README.md) records all 796 physical / 800 logical refits on 100 frozen lineages, with native density values, checkpoint hashes and costs. Common five-fit evaluation coverage remains a separate running matrix.

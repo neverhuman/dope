@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "common_metrics_complete": {
+      "const": false
+    },
+    "fits": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_bytes": {
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "artifact_inventory": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "sha256",
+                "bytes"
+              ],
+              "type": "object"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "closure": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "configuration_labels": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "configuration_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "cpu_affinity": {
+            "items": {
+              "type": "integer"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "dataset": {
+            "type": "string"
+          },
+          "elapsed_seconds": {
+            "minimum": 0,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "fit_seed": {
+            "enum": [
+              23,
+              37,
+              53,
+              71
+            ]
+          },
+          "job": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "job_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "ARF",
+              "Forest-Flow"
+            ]
+          },
+          "native_objective": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "native_validation_value": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "projection_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "receipt": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "round": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "failed",
+              "infra",
+              "timeout"
+            ]
+          },
+          "train_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "validation_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "dataset",
+          "fit_seed",
+          "status",
+          "native_validation_value",
+          "artifact_bytes",
+          "receipt",
+          "round",
+          "job",
+          "closure",
+          "native_objective",
+          "artifact_inventory",
+          "elapsed_seconds",
+          "cpu_affinity",
+          "configuration_labels",
+          "configuration_sha256",
+          "job_sha256",
+          "train_sha256",
+          "validation_sha256",
+          "projection_sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "five_fit_matrix_complete": {
+      "const": false
+    },
+    "forest_native_selected_replications": {
+      "const": "not_admitted_in_this_round"
+    },
+    "format": {
+      "const": "dope-cpu-fivefit-progress-v1"
+    },
+    "full_campaign_admitted": {
+      "const": false
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_values_ranked_across_methods": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "outcome_counts": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "physical_fit_counts": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "planned_new_physical_fits": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "snapshot_utc": {
+      "type": "string"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "snapshot_utc",
+    "fits",
+    "physical_fit_counts",
+    "outcome_counts",
+    "planned_new_physical_fits",
+    "forest_native_selected_replications",
+    "official_tests_opened",
+    "full_campaign_admitted",
+    "common_metrics_complete",
+    "five_fit_matrix_complete",
+    "native_values_ranked_across_methods",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe",
+    "superiority"
+  ],
+  "type": "object"
+}

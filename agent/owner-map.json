@@ -11,6 +11,7 @@
     "research/benchmark/publish_cpu_fit_batch.py": "external-evidence",
     "research/benchmark/tests/test_cpu_fit_batch.py": "external-evidence",
     "research/benchmark/results/cpu-fivefit-progress-v1/": "external-evidence",
+    "research/benchmark/results/arf-complete-additional-fits-v1/": "external-evidence",
 
     "docs/whitepaper/scripts/retained_evidence.py": "external-evidence",
     "docs/whitepaper/scripts/test_retained_evidence.py": "external-evidence",

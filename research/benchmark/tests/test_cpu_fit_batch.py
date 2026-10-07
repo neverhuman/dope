@@ -114,5 +114,50 @@ class CpuFitBatch(unittest.TestCase):
             self.assertEqual(sum(panel['physical_fit_counts'].values()),len(panel['fits']))
             self.assertFalse(panel['five_fit_matrix_complete'])
 
+    def test_committed_complete_arf_additional_fit_matrix(self):
+        import collections
+        import jsonschema
+        repo=Path(__file__).resolve().parents[3]
+        root=repo/'research/benchmark/results/arf-complete-additional-fits-v1'
+        manifest=json.loads((root/'manifest.json').read_text())
+        jsonschema.validate(manifest,json.loads((root/'manifest.schema.json').read_text()))
+        for name,row in manifest['files'].items():
+            path=repo/name
+            self.assertEqual(self.sha(path),row['sha256'])
+            self.assertEqual(path.stat().st_size,row['bytes'])
+        panel=json.loads((root/'panel.json').read_text())
+        jsonschema.validate(panel,json.loads((root/'panel.schema.json').read_text()))
+        self.assertEqual(publisher.render(panel),(root/'fits.csv').read_text())
+        rows=panel['fits']
+        self.assertEqual(len(rows),796)
+        self.assertEqual(len({r['job_sha256'] for r in rows}),796)
+        self.assertEqual({r['status'] for r in rows},{'ok'})
+        self.assertEqual(len({r['dataset'] for r in rows}),100)
+        self.assertEqual(collections.Counter(r['fit_seed'] for r in rows),
+                         {23:199,37:199,53:199,71:199})
+        logical={(r['dataset'],r['fit_seed'],label) for r in rows
+                 for label in r['configuration_labels']}
+        self.assertEqual(len(logical),800)
+        self.assertEqual(collections.Counter((seed,label) for _,seed,label in logical),
+                         {(seed,label):100 for seed in (23,37,53,71)
+                          for label in ('author_default','native_selected')})
+        self.assertEqual(sum(len(r['configuration_labels'])-1 for r in rows),4)
+        self.assertEqual(sum(r['artifact_bytes'] for r in rows),
+                         manifest['measured_costs']['sum_charged_artifact_bytes'])
+        self.assertAlmostEqual(sum(r['elapsed_seconds'] for r in rows),
+                               manifest['measured_costs']['summed_worker_fit_and_validation_seconds'])
+        self.assertEqual({r['native_objective'] for r in rows},
+                         {'heldout_forde_mean_log_density'})
+        self.assertFalse(panel['common_metrics_complete'])
+        self.assertFalse(panel['five_fit_matrix_complete'])
+        self.assertFalse(panel['full_campaign_admitted'])
+        self.assertTrue(manifest['additional_fit_matrix_complete'])
+        self.assertFalse(manifest['native_kpis_ranked_across_methods'])
+        self.assertFalse(manifest['official_tests_opened'])
+        for gate in ('mfs_v2','ptf_v1','release_safe','superiority'):
+            self.assertIsNone(manifest[gate])
+            self.assertIsNone(panel[gate])
+
+
 
 if __name__=='__main__':unittest.main()
