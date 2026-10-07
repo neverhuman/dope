@@ -1,0 +1,1041 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "additional_production_missing_evidence": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "beyondarena": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_cells": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "configuration": {
+          "type": "string"
+        },
+        "fit_seed": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "missing": {
+          "type": "string"
+        },
+        "outer_fold_authorized": {
+          "type": "boolean"
+        },
+        "panel_lock_path": {
+          "type": "string"
+        },
+        "pooled_with_S3": {
+          "type": "boolean"
+        },
+        "receipt_state": {
+          "type": "string"
+        },
+        "rows_path": {
+          "type": "string"
+        },
+        "sample_seeds": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "scheduled_logical_sample_cells": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "selected_family_denominator": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "size_multiplier": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "accepted_cells",
+        "configuration",
+        "fit_seed",
+        "missing",
+        "outer_fold_authorized",
+        "panel_lock_path",
+        "pooled_with_S3",
+        "receipt_state",
+        "rows_path",
+        "sample_seeds",
+        "scheduled_logical_sample_cells",
+        "selected_family_denominator",
+        "size_multiplier"
+      ],
+      "type": "object"
+    },
+    "claims": {
+      "const": {
+        "HIPAA_deidentification": false,
+        "MFS_v2": null,
+        "PTF_v1": null,
+        "complete_campaign_certified": false,
+        "empirical_privacy_only": true,
+        "formal_DP": false,
+        "official_TEST_opened_by_audit": false,
+        "release_safe_L3": null,
+        "scientific_trials_started_by_audit": 0,
+        "superiority": null
+      }
+    },
+    "components": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "available_contributions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "definition": {
+            "type": "string"
+          },
+          "missing_exact_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          },
+          "score": {
+            "type": "null"
+          },
+          "source_location": {
+            "type": "string"
+          },
+          "status": {
+            "const": "partial_inputs_exact_component_uncomputed"
+          },
+          "weight": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "available_contributions",
+          "definition",
+          "missing_exact_inputs",
+          "name",
+          "score",
+          "source_location",
+          "status",
+          "weight"
+        ],
+        "type": "object"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "type": "array"
+    },
+    "deduplication": {
+      "type": "string"
+    },
+    "final_public_evaluator_admission": {
+      "additionalProperties": false,
+      "properties": {
+        "DOPE_native_objective": {
+          "type": "null"
+        },
+        "DOPE_native_objective_field_present": {
+          "type": "boolean"
+        },
+        "admitted": {
+          "type": "null"
+        },
+        "assess_executed": {
+          "type": "boolean"
+        },
+        "exact_required_lock_paths": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "present_at_commit": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "path",
+              "present_at_commit"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "gap_scope": {
+          "type": "string"
+        },
+        "method_row_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "method_status_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "locked": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "pilot_locked": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "source_audit_pending": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "unavailable": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "locked",
+            "pilot_locked",
+            "source_audit_pending",
+            "unavailable"
+          ],
+          "type": "object"
+        },
+        "methods_final_frozen": {
+          "type": "boolean"
+        },
+        "methods_lock_complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "DOPE_native_objective",
+        "DOPE_native_objective_field_present",
+        "admitted",
+        "assess_executed",
+        "exact_required_lock_paths",
+        "gap_scope",
+        "method_row_count",
+        "method_status_counts",
+        "methods_final_frozen",
+        "methods_lock_complete"
+      ],
+      "type": "object"
+    },
+    "first12_scoped_batch": {
+      "additionalProperties": false,
+      "properties": {
+        "frozen_physical_queue": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "logical_aliases": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "logical_aliases_by_method": {
+          "additionalProperties": false,
+          "properties": {
+            "Chow-Liu": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "DOPE": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "Forest-Flow": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "GaussianCopula": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "TVAE": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "independent_marginals": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "Chow-Liu",
+            "DOPE",
+            "Forest-Flow",
+            "GaussianCopula",
+            "TVAE",
+            "independent_marginals"
+          ],
+          "type": "object"
+        },
+        "panel_path": {
+          "type": "string"
+        },
+        "per_method_full_queue_denominators": {
+          "type": "null"
+        },
+        "physical_evaluations": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "pooling_policy": {
+          "type": "string"
+        },
+        "positive_physical_queue_cells": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "public_slice_physical_cells": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "utility_measured_by_this_slice": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "frozen_physical_queue",
+        "logical_aliases",
+        "logical_aliases_by_method",
+        "panel_path",
+        "per_method_full_queue_denominators",
+        "physical_evaluations",
+        "pooling_policy",
+        "positive_physical_queue_cells",
+        "public_slice_physical_cells",
+        "utility_measured_by_this_slice"
+      ],
+      "type": "object"
+    },
+    "forest_fivefit_metadata_join": {
+      "const": {
+        "common_sample_cells": 390,
+        "complete_fit_groups": 65,
+        "distinct_author_default_reporting_lineages": 13,
+        "distinct_lineage_denominator_of_100_S3": 100,
+        "fit_seed_schedule": [
+          11,
+          23,
+          37,
+          53,
+          71
+        ],
+        "full_population_fivefit_complete": false,
+        "pairwise_lineage_intersections": [
+          0,
+          0,
+          0
+        ],
+        "panel_paths": [
+          "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+          "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
+          "research/benchmark/results/forest-third-five-fivefit-v1/panel.json"
+        ],
+        "production_seed_stability_pass": null,
+        "quality_or_superiority_claim": null,
+        "sample_seed_schedule": [
+          101,
+          211,
+          307
+        ],
+        "size_schedule": [
+          1,
+          4
+        ],
+        "source_runtime_homogeneous_across_union": null
+      }
+    },
+    "format": {
+      "const": "work-order-b-six-component-hard-gate-coverage-audit"
+    },
+    "panel_coverage": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_bounded_fit_structural_profile_coverage": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "measured_cells": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "measured_lineages": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "profile": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "measured_cells",
+                "measured_lineages",
+                "profile"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "actual_profile_shape_cells": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "byte_record_identity_unambiguous": {
+            "type": "boolean"
+          },
+          "canonical_component_scores": {
+            "additionalProperties": false,
+            "properties": {
+              "compactness": {
+                "type": "null"
+              },
+              "coverage_realism": {
+                "type": "null"
+              },
+              "distribution_fidelity": {
+                "type": "null"
+              },
+              "driver_fidelity": {
+                "type": "null"
+              },
+              "structure_fidelity": {
+                "type": "null"
+              },
+              "utility_transfer": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "compactness",
+              "coverage_realism",
+              "distribution_fidelity",
+              "driver_fidelity",
+              "structure_fidelity",
+              "utility_transfer"
+            ],
+            "type": "object"
+          },
+          "canonical_six_component_vector_complete": {
+            "const": false
+          },
+          "complete_six_sample_fit_groups": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "configuration_or_profile": {
+            "type": "string"
+          },
+          "declared_lineages": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "declared_logical_cells": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "distinct_dataset_fit_configuration_byte_records": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "fit_seeds": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "formal_dp": {
+            "const": false
+          },
+          "historical_S3_reference_profile_coverage": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "declared_cells": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "declared_lineages": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "measured_cells": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "profile": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "declared_cells",
+                "declared_lineages",
+                "measured_cells",
+                "profile"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "l3_charged_byte_records_over_10240": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "l3_charged_byte_records_within_10240": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "measured_cells": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "measured_lineages": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "method": {
+            "type": "string"
+          },
+          "metric_available_cells": {
+            "additionalProperties": false,
+            "properties": {
+              "alpha_beta": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "c2st_catboost": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "c2st_logistic": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "catboost_informative_retention": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "catboost_loss_triple": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "categorical_contingency": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "charged_artifact_bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "distance_membership_auc": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "domias_kde_auc": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "linear_informative_retention": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "linear_loss_triple": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "marginal_ks_tv": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "mlp_informative_retention": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "mlp_loss_triple": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "pairwise_pearson": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "projected_exact_near_copy_counts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "projected_real_vs_real_copy_counts": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "alpha_beta",
+              "c2st_catboost",
+              "c2st_logistic",
+              "catboost_informative_retention",
+              "catboost_loss_triple",
+              "categorical_contingency",
+              "charged_artifact_bytes",
+              "distance_membership_auc",
+              "domias_kde_auc",
+              "linear_informative_retention",
+              "linear_loss_triple",
+              "marginal_ks_tv",
+              "mlp_informative_retention",
+              "mlp_loss_triple",
+              "pairwise_pearson",
+              "projected_exact_near_copy_counts",
+              "projected_real_vs_real_copy_counts"
+            ],
+            "type": "object"
+          },
+          "panel_path": {
+            "type": "string"
+          },
+          "projected_exact_copy_positive_cells": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "projected_near_copy_positive_cells": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "ptf_v1": {
+            "type": "null"
+          },
+          "release_safe_l3": {
+            "type": "null"
+          },
+          "sample_seeds": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "size_multipliers": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "status_counts": {
+            "additionalProperties": false,
+            "properties": {
+              "common_samples_unavailable": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "fit_unavailable": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "ok": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [],
+            "type": "object"
+          },
+          "structural_shape_scope": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "actual_bounded_fit_structural_profile_coverage",
+          "actual_profile_shape_cells",
+          "byte_record_identity_unambiguous",
+          "canonical_component_scores",
+          "canonical_six_component_vector_complete",
+          "complete_six_sample_fit_groups",
+          "configuration_or_profile",
+          "declared_lineages",
+          "declared_logical_cells",
+          "distinct_dataset_fit_configuration_byte_records",
+          "fit_seeds",
+          "formal_dp",
+          "historical_S3_reference_profile_coverage",
+          "l3_charged_byte_records_over_10240",
+          "l3_charged_byte_records_within_10240",
+          "measured_cells",
+          "measured_lineages",
+          "method",
+          "metric_available_cells",
+          "panel_path",
+          "projected_exact_copy_positive_cells",
+          "projected_near_copy_positive_cells",
+          "ptf_v1",
+          "release_safe_l3",
+          "sample_seeds",
+          "scope",
+          "size_multipliers",
+          "status_counts",
+          "structural_shape_scope"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "production_certification_gate_names": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "production_release_gate_names": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "remaining_actions_in_order": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "priority": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "science_needed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "priority",
+          "science_needed"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "research_generator_hard_gates": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "coverage_status": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "required_evidence": {
+            "type": "string"
+          },
+          "threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "verified_full_gate": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "coverage_status",
+          "name",
+          "required_evidence",
+          "threshold",
+          "verified_full_gate"
+        ],
+        "type": "object"
+      },
+      "maxItems": 26,
+      "minItems": 26,
+      "type": "array"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "scoring_contract": {
+      "const": {
+        "epsilon": 1e-06,
+        "fit_seeds": [
+          11,
+          23,
+          37,
+          53,
+          71
+        ],
+        "minimum_profile_groups": 100,
+        "minimum_profile_informative_groups": 30,
+        "privacy_soft_weight": 0,
+        "production_auditor_seeds": [
+          57721,
+          161803,
+          271828
+        ],
+        "ptf": "minimum required-size one-sided95 lower bound over task/profile/auditor aggregates; equal-lineage clustered paired Student-t",
+        "required_sizes": [
+          1,
+          4
+        ],
+        "research_utility_auditor_seed": 1729,
+        "sample_seeds": [
+          101,
+          211,
+          307
+        ],
+        "scalarization": "100*exp(sum(weight*log(epsilon+component))) only after all research generator gates pass",
+        "scaling_sizes": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "sparse_profile_folding": "task/other; no profile declared independent solely because it has measurements",
+        "weights": {
+          "compactness": 0.05,
+          "coverage_realism": 0.1,
+          "distribution_fidelity": 0.2,
+          "driver_fidelity": 0.2,
+          "structure_fidelity": 0.15,
+          "utility_transfer": 0.3
+        }
+      }
+    },
+    "source_commit": {
+      "const": "aca476026ce02b1b2d4258e38e6989d31a54f39c"
+    },
+    "source_refs": {
+      "const": [
+        {
+          "bytes": 1763,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/contract.json",
+          "sha256": "ccccf3deaa8f219ea6ce14d44296c5996579a55af98a5afddf0099d513f0f894"
+        },
+        {
+          "bytes": 1610,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "production/kpi-contract.json",
+          "sha256": "d04a2672ed25e92baeb89bec51ea5ccddb04165701cb44d2e1d53ca32f6e219b"
+        },
+        {
+          "bytes": 7100,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/score.py",
+          "sha256": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+        },
+        {
+          "bytes": 13172,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/admission.py",
+          "sha256": "20c48b93decb554b04cf6f377d4c7e51f401b31bbf540ff0b8fe365cbf8eb226"
+        },
+        {
+          "bytes": 6986,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/pilot_metrics.py",
+          "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3"
+        },
+        {
+          "bytes": 13747,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/expanded_validation_metrics.py",
+          "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
+        },
+        {
+          "bytes": 10317,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "rust/fitness.rs",
+          "sha256": "ec796c937ae9dda0a2a8b71a4e0540e3b57023a428cbae437c34524e20b23fe5"
+        },
+        {
+          "bytes": 12445,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "rust/fitness_metrics.rs",
+          "sha256": "f53ffa6189a7b592d06007254e0b38019341582a09297e67f700abb80d0b34a8"
+        },
+        {
+          "bytes": 12879,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "rust/certification/privacy_attacks/finalize_certification.rs",
+          "sha256": "9bea2aa33be911bc1ca1b2ecfd125535aea0bfa187cb48f573499f09e2f73da6"
+        },
+        {
+          "bytes": 13777,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "rust/production/part_02.rs",
+          "sha256": "e335420189a72cd8d42f97f6618d369a89a5e1e3ee2149f8b26d44ddb0b53749"
+        },
+        {
+          "bytes": 14540,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "rust/production/coverage_and_gates/part_01.rs",
+          "sha256": "ccbd3507b3a60ff2b7279fcefcfd2c6fdd193f4a71cb4679030f1f9b251f8c74"
+        },
+        {
+          "bytes": 15722,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "rust/contract/part_01.rs",
+          "sha256": "0de04bb6415cc23f897aa1f2ffbbfd3c6349b4b2b7b47ed71be7c95f0995a2c3"
+        },
+        {
+          "bytes": 1834757,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/s3-lineage-record.json",
+          "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
+        },
+        {
+          "bytes": 209168,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/s3-data.lock.json",
+          "sha256": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f"
+        },
+        {
+          "bytes": 7718907,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/retained-classical-validation/panel.json",
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
+        },
+        {
+          "bytes": 7352232,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/dope-s3-population-validation.json",
+          "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
+        },
+        {
+          "bytes": 3901636,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/dope-target-refinement-population-validation.json",
+          "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+        },
+        {
+          "bytes": 21794615,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/density-matched-population-validation.json",
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+        },
+        {
+          "bytes": 13567823,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/sdv-matched-population-validation.json",
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+        },
+        {
+          "bytes": 2426210,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
+        },
+        {
+          "bytes": 1751802,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
+          "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
+        },
+        {
+          "bytes": 956753,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
+        },
+        {
+          "bytes": 2750434,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
+        },
+        {
+          "bytes": 2368071,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
+        },
+        {
+          "bytes": 1560389,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+          "sha256": "8ea3e5c2157a6113e5ccb777c6cba1c16810d951eff28d822a0d30d6e2da4f8d"
+        },
+        {
+          "bytes": 233338,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/pilot24-tabpc-native.json",
+          "sha256": "8ea6ca0d8e8e36f661d0ffcdb9b5227d35a62398655e666dae93e7c9bdbc187c"
+        },
+        {
+          "bytes": 77406,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/common-A952-validation-v1/first12.completed.json",
+          "sha256": "8e039b1d57298f10bf7c05c2f3a8b14481a60ed663c1063ed30c273854f3bdfe"
+        },
+        {
+          "bytes": 12555,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/beyondarena-retention-rows.json",
+          "sha256": "ce59ab1022ef5263097c4c25c854ffb94e22216b388ec1379c67e041b66f7546"
+        },
+        {
+          "bytes": 45460,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/results/beyondarena-panel.lock.json",
+          "sha256": "8f99c356e8610aea895e82355a4279b30fe85f3836359f3b277e75183cf20a98"
+        },
+        {
+          "bytes": 123868,
+          "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+          "path": "research/benchmark/methods.lock.json",
+          "sha256": "899c355cb55769710ed369fea6b082589b31858860fb74929bf4190de28aca33"
+        }
+      ]
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "additional_production_missing_evidence",
+    "beyondarena",
+    "claims",
+    "components",
+    "deduplication",
+    "final_public_evaluator_admission",
+    "first12_scoped_batch",
+    "format",
+    "panel_coverage",
+    "production_certification_gate_names",
+    "production_release_gate_names",
+    "remaining_actions_in_order",
+    "research_generator_hard_gates",
+    "scope",
+    "scoring_contract",
+    "source_commit",
+    "source_refs",
+    "version",
+    "forest_fivefit_metadata_join"
+  ],
+  "title": "Fixed source and measured-panel six-component coverage audit",
+  "type": "object"
+}

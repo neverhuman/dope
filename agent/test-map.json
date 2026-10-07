@@ -5,6 +5,7 @@
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
       "purpose": "verify authenticated scalar input before JSON decoding, exact six summary identities, null gates, immutable SVG/PDF/source custody, strict public provenance, separate paired-difference semantics and lazy optional plotting imports without rendering"
     },
+    "research/benchmark/results/work-order-b-six-component-coverage-v1/": {"command": "python3 -B -m jsonschema -i research/benchmark/results/work-order-b-six-component-coverage-v1/coverage.json research/benchmark/results/work-order-b-six-component-coverage-v1/coverage.schema.json", "purpose": "validate fixed-snapshot component and hard-gate coverage, separate cohorts and missing evidence with null gated claims"},
     "research/benchmark/results/matched-linear-fit11-figure-v1/": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
       "purpose": "verify authenticated scalar input before JSON decoding, exact six summary identities, null gates, immutable SVG/PDF/source custody, strict public provenance, separate paired-difference semantics and lazy optional plotting imports without rendering"
