@@ -1,0 +1,204 @@
+{
+  "TabDDPM_selection_document_ref": {
+    "bytes": 5596,
+    "path": "../tabddpm-twelve-lineage-retained-validation/README.md",
+    "sha256": "a8996981e515b1b142f29c066dd92f84ce6d26c9c9872f48f1c4a75d93a603c4"
+  },
+  "actual_render_receipt_refs": [
+    {
+      "bytes": 581,
+      "role": "actual_closed_corrected_render_parent_wait",
+      "sha256": "279f61c7a05a62608647d8aeb01c8aff770fd27bb581b99f21a8215186f084ac"
+    },
+    {
+      "bytes": 3807,
+      "role": "authenticated_input_environment_and_artifacts",
+      "sha256": "2f2354279499382d334563cafec71bafa593d21986749ef74e74622aee31d098"
+    }
+  ],
+  "artifact_scope": {
+    "comparison_unconstrained_by_stored_byte_cap": true,
+    "stored_bytes_do_not_establish_production_eligibility": true,
+    "threshold_bytes": 10240
+  },
+  "artifacts": [
+    {
+      "bytes": 22434,
+      "filename": "matched-linear-fit11.svg",
+      "sha256": "5d0dbbea790ac3ad92006ac40643699df94c092f1ec2b52407f024a71254a526"
+    },
+    {
+      "bytes": 18304,
+      "filename": "matched-linear-fit11.pdf",
+      "sha256": "00608f323e2b5472ed75bc89ee27a953e0f3301abe85b79b143f7e51c21521db"
+    }
+  ],
+  "control_execution_receipt_included": false,
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "backend": "agg",
+    "font": "DejaVu Sans",
+    "matplotlib": "3.6.3",
+    "numpy": "1.26.4",
+    "python": "3.12.3"
+  },
+  "excluded_Forest_low_signal_lineages": [
+    "19f4780b53b3fa41",
+    "a04f964bc53281e0"
+  ],
+  "figure_revision_re_rendered": true,
+  "format": "matched_linear_fit11_figure_public_provenance",
+  "gated_scores": {
+    "mfs_v2": null,
+    "ptf_v1": null,
+    "release_safe_l3": null,
+    "superiority": null
+  },
+  "immutable_artifacts_copied_from_actual_render": true,
+  "input_authenticated_before_JSON_decode": true,
+  "metric_provenance_ref": {
+    "bytes": 73187,
+    "path": "../matched-linear-fit11-retention-v1/source-proof.json",
+    "sha256": "04c6881be665a049eb8d425f1b8c32408bfeb44557d38e5d72e127ee74f172c9"
+  },
+  "new_scientific_evaluation": false,
+  "panel_ref": {
+    "bytes": 244428,
+    "path": "../matched-linear-fit11-retention-v1/panel.json",
+    "sha256": "5914fb8aea11e8090cd7cac70a748bccb75cf7a9f1092c25616b78cd1c5bb048"
+  },
+  "panels": [
+    {
+      "configuration": "author_default",
+      "method": "TabDDPM",
+      "paired_lineages": 10,
+      "size_multipliers": [
+        1,
+        4
+      ]
+    },
+    {
+      "configuration": "native_selected",
+      "method": "TabDDPM",
+      "paired_lineages": 12,
+      "size_multipliers": [
+        1,
+        4
+      ]
+    },
+    {
+      "configuration": "author_default",
+      "method": "Forest-Flow",
+      "paired_lineages": 11,
+      "size_multipliers": [
+        1,
+        4
+      ]
+    }
+  ],
+  "prepared_control_count": 11,
+  "prepared_controls_ref": {
+    "bytes": 7332,
+    "path": "research/benchmark/tests/test_matched_linear_fit11_figure.py",
+    "sha256": "63696fceced1f9869a787caa8c37e3970b4ddc29ad1d89156a9c55761577e951"
+  },
+  "protocol": {
+    "CatBoost_or_MLP_outcomes_pooled": false,
+    "Forest_configuration": "author_default;fit11_only;other_fit_seeds_not_pooled",
+    "TabDDPM_native_selection": "original_author_CatBoost_validation_R_squared_mean_over_sample_seeds_0_to_4;common_linear_outcomes_selected_nothing",
+    "across_lineage": "median_on_same_complete_informative_paired_cohort",
+    "auditor": "linear",
+    "effective_linear_auditor_seed": null,
+    "fit_seed": 11,
+    "official_TEST_opened": false,
+    "paired_difference": "median_of_lineage_mean_DOPE_minus_lineage_mean_comparator;not_difference_of_aggregate_medians",
+    "sample_seeds": [
+      101,
+      211,
+      307
+    ],
+    "sample_sizes": [
+      "n",
+      "4n"
+    ],
+    "shared_utility_source_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+    "task": "regression",
+    "within_lineage": "arithmetic_mean_of_three_sample_retention_values"
+  },
+  "renderer_ref": {
+    "bytes": 9036,
+    "path": "research/benchmark/render_matched_linear_fit11_figure.py",
+    "sha256": "52dcd1dafd424783c7e009ce1040520d89a9f44bb00519a801af8aa0645cbc51"
+  },
+  "renderer_source_byte_identical_to_actual_render": true,
+  "rendering_cost_only": {
+    "actual_child_exit_code": 0,
+    "aggregate_address_space_reservation_bytes": null,
+    "energy": null,
+    "fresh_child_peak_RSS_bytes": null,
+    "hardware": null,
+    "parent_elapsed_seconds": null,
+    "plotting_elapsed_seconds": 0.9602974029257894,
+    "training_or_campaign_cost": null
+  },
+  "rows_models_samples_headers_or_TEST_values_published": false,
+  "status": "rendered_descriptive_validation",
+  "summary_scalars": [
+    {
+      "DOPE_median_of_same_cohort_three_sample_means": 0.9890685232150573,
+      "median_paired_difference": -0.004389784987948175,
+      "paired_complete_informative_lineages": 11,
+      "peer_configuration": "author_default",
+      "peer_median_of_same_cohort_three_sample_means": 0.9954909320486822,
+      "peer_method": "Forest-Flow",
+      "size_multiplier": 1
+    },
+    {
+      "DOPE_median_of_same_cohort_three_sample_means": 0.9959564886631725,
+      "median_paired_difference": -0.004078936575610204,
+      "paired_complete_informative_lineages": 11,
+      "peer_configuration": "author_default",
+      "peer_median_of_same_cohort_three_sample_means": 0.9958692408959764,
+      "peer_method": "Forest-Flow",
+      "size_multiplier": 4
+    },
+    {
+      "DOPE_median_of_same_cohort_three_sample_means": 0.9959124939438193,
+      "median_paired_difference": 0.3185924386489893,
+      "paired_complete_informative_lineages": 10,
+      "peer_configuration": "author_default",
+      "peer_median_of_same_cohort_three_sample_means": 0.8236121184670189,
+      "peer_method": "TabDDPM",
+      "size_multiplier": 1
+    },
+    {
+      "DOPE_median_of_same_cohort_three_sample_means": 1.0035052660868466,
+      "median_paired_difference": 0.1662822409333109,
+      "paired_complete_informative_lineages": 10,
+      "peer_configuration": "author_default",
+      "peer_median_of_same_cohort_three_sample_means": 0.8541209239983931,
+      "peer_method": "TabDDPM",
+      "size_multiplier": 4
+    },
+    {
+      "DOPE_median_of_same_cohort_three_sample_means": 0.9959124939438193,
+      "median_paired_difference": 0.09692420263923945,
+      "paired_complete_informative_lineages": 12,
+      "peer_configuration": "native_selected",
+      "peer_median_of_same_cohort_three_sample_means": 0.8858174930630447,
+      "peer_method": "TabDDPM",
+      "size_multiplier": 1
+    },
+    {
+      "DOPE_median_of_same_cohort_three_sample_means": 1.0035052660868466,
+      "median_paired_difference": 0.04806893922819688,
+      "paired_complete_informative_lineages": 12,
+      "peer_configuration": "native_selected",
+      "peer_median_of_same_cohort_three_sample_means": 0.967827557189882,
+      "peer_method": "TabDDPM",
+      "size_multiplier": 4
+    }
+  ],
+  "version": 1,
+  "whole_runtime_equivalence_claimed": false
+}

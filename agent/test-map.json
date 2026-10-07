@@ -1,6 +1,18 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/render_matched_linear_fit11_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
+      "purpose": "verify authenticated scalar input before JSON decoding, exact six summary identities, null gates, immutable SVG/PDF/source custody, strict public provenance, separate paired-difference semantics and lazy optional plotting imports without rendering"
+    },
+    "research/benchmark/results/matched-linear-fit11-figure-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
+      "purpose": "verify authenticated scalar input before JSON decoding, exact six summary identities, null gates, immutable SVG/PDF/source custody, strict public provenance, separate paired-difference semantics and lazy optional plotting imports without rendering"
+    },
+    "research/benchmark/tests/test_matched_linear_fit11_figure.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
+      "purpose": "verify authenticated scalar input before JSON decoding, exact six summary identities, null gates, immutable SVG/PDF/source custody, strict public provenance, separate paired-difference semantics and lazy optional plotting imports without rendering"
+    },
     "research/benchmark/render_matched_linear_fit11.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_retention -v",
       "purpose": "verify hash-before-JSON custody, strict types, complete three-sample groups, fit11 regression identity, alias accounting, same-cohort scalar aggregation, explicit exclusions, null gated scores and byte-exact CSV/Markdown regeneration"
