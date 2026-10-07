@@ -1,0 +1,196 @@
+{
+  "cost": {
+    "CPU_core_seconds": null,
+    "GPU_kernel_seconds": null,
+    "campaign_total_wall_seconds": null,
+    "cumulative_new_native_and_prefit_paid_parent_seconds": 924.4300867351703,
+    "energy_joules": null,
+    "hardware_model": null,
+    "historical_prefit_infrastructure_parent_seconds": 18.162802021950483,
+    "native8_committed_slice_recharged": false,
+    "nested_elapsed_added_to_parent": false,
+    "new_first_strict16_native_parent_seconds": 109.85987342894077,
+    "new_native_ok_parent_seconds_cumulative": 906.2672847132199,
+    "previous_native_and_prefit_paid_parent_seconds": 814.5702133062296,
+    "qualification_added_to_native_paid_total": false,
+    "retained_seed11_cost_recharged": false,
+    "true_peak_VRAM_bytes": null,
+    "true_peak_host_RAM_bytes": null
+  },
+  "format": "work-order-b-strict16-qualification-progress-v1",
+  "operations": [
+    {
+      "GPU_target_operator_verified": true,
+      "actual_parent_wait_exit": 0,
+      "attempt": 1,
+      "charged_model_plus_projection_bytes": 2323,
+      "co_tenant": false,
+      "id": "qualification_1",
+      "job_sha256": "0dd7fbe90b55210f4b462a1cf31b0632445aa944c575a59401ede1bb6a206002",
+      "maximum_observed_own_GPU_resident_mib": 430,
+      "maximum_observed_sampling_gap_seconds": 9.094138647895306,
+      "nested_operation_seconds_nonadditive": 224.59872544463724,
+      "observed_provider_validation_verified": true,
+      "parent_elapsed_seconds": 224.84345388785005,
+      "parent_ref": {
+        "bytes": 918,
+        "sha256": "14ad9c39468bd790590e82f75878fd7e39f59065105f75190cc28cfebe5f1fa6"
+      },
+      "phase": "generated_qualification",
+      "receipt_ref": {
+        "bytes": 14336,
+        "sha256": "88a317c00b976cd51fe30cc02462bc8d43d7edd8491e9cf6b819f7ff8b3b14fc"
+      },
+      "resident_measurement_kind": "sum_verified_owned_pid_start_tick_resident_mib",
+      "seed": 11,
+      "shared_GPU_cost": false,
+      "status": "ok"
+    },
+    {
+      "GPU_target_operator_verified": true,
+      "actual_parent_wait_exit": 0,
+      "attempt": 1,
+      "charged_model_plus_projection_bytes": 2323,
+      "co_tenant": false,
+      "id": "qualification_2",
+      "job_sha256": "faa218720743176110c443d556155b8b8c7f78d3633c4c54c6c4ab60a5c16e4d",
+      "maximum_observed_own_GPU_resident_mib": 430,
+      "maximum_observed_sampling_gap_seconds": 6.7410480058752,
+      "nested_operation_seconds_nonadditive": 112.2299680528231,
+      "observed_provider_validation_verified": true,
+      "parent_elapsed_seconds": 112.35657747182995,
+      "parent_ref": {
+        "bytes": 918,
+        "sha256": "5a526816c16062d086760c393ed9aac27f7540f561241f5b958af51ed0012a8e"
+      },
+      "phase": "generated_qualification",
+      "receipt_ref": {
+        "bytes": 14334,
+        "sha256": "5f1a069990c99480dda71c4476251f34f914ea7feed7b3a05db929cb54ee65a7"
+      },
+      "resident_measurement_kind": "sum_verified_owned_pid_start_tick_resident_mib",
+      "seed": 11,
+      "shared_GPU_cost": false,
+      "status": "ok"
+    },
+    {
+      "GPU_target_operator_verified": true,
+      "actual_parent_wait_exit": 0,
+      "attempt": 1,
+      "charged_model_plus_projection_bytes": 762,
+      "co_tenant": false,
+      "id": "first_strict16_native",
+      "job_sha256": "647edf5a5a7aa683db4f17517c142ca0ac8e37c24e6f7a2fe625da091ff68eef",
+      "maximum_observed_own_GPU_resident_mib": 430,
+      "maximum_observed_sampling_gap_seconds": 3.657013980206102,
+      "nested_operation_seconds_nonadditive": 109.71488933125511,
+      "observed_provider_validation_verified": true,
+      "parent_elapsed_seconds": 109.85987342894077,
+      "parent_ref": {
+        "bytes": 1863,
+        "sha256": "f7440653377bda471105190a5b4bd31a66b13d2a66b9a759626858c3dd2993cd"
+      },
+      "phase": "native_profile_continuation",
+      "receipt_ref": {
+        "bytes": 35824,
+        "sha256": "f39f3577ea8b901868680f85bb1e3c47a3e741760d1e83cfd8643c065eb5fd29"
+      },
+      "resident_measurement_kind": "sum_verified_owned_pid_start_tick_resident_mib",
+      "seed": 37,
+      "shared_GPU_cost": false,
+      "status": "ok"
+    }
+  ],
+  "progress": {
+    "first_strict16_native_ok": 1,
+    "historical_artifact_caps": 2,
+    "historical_failed_physical_attempt_preserved": true,
+    "historical_infrastructure_is_same_logical_slot_as_first_strict16_success": true,
+    "historical_paid_prefit_infrastructure_attempts": 1,
+    "inclusive_paid_trial_count": 111,
+    "infra_attempt_adds_an_extra_logical_slot": false,
+    "new_native_ok": 10,
+    "ok": 108,
+    "pending_logical_slots_in_snapshot": 390,
+    "remaining_strict16_physical_jobs_in_snapshot": 390,
+    "retained_seed11_ok": 98,
+    "scientific_terminal_slots": 110,
+    "stored_native_operations_started": 0,
+    "stored_native_operations_started_is_authoritative": false,
+    "total_logical_slots": 500
+  },
+  "qualification": {
+    "actual_outer_wait_exit": 0,
+    "charged_into_final_cell_budget": false,
+    "full_system_runtime_closure_certified": false,
+    "generated_R_and_D_parent_seconds": 337.20003135968,
+    "generated_operations": 2,
+    "generated_total_ceiling_seconds": 1200,
+    "historical_qualification_seconds_separate": 388.65127065824345,
+    "ok": 2,
+    "owned_controller_and_keeper_closed": true,
+    "parity": {
+      "inspection_bytes_equal": true,
+      "inspection_sha256": "3efa5fc88e5a5707c26fb2b98aa900617b81edc0dfbf291bf9e94a974e8c9a44",
+      "model_bytes_equal": true,
+      "model_sha256": "1c3965821c87127674833be39d6d94cecef05cdd6b054405519f436ba87346b1",
+      "projection_bytes_equal": true,
+      "projection_sha256": "05fba44e9fbd706e81f4e849c99024b9464192e62eef565854740083f96fa19d"
+    },
+    "production_certified": false,
+    "seed": 11
+  },
+  "resource_profile": {
+    "CPU_affinity": [
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95
+    ],
+    "GPU_device": 0,
+    "binary_sha256": "5d5ef250dbcf2296ad9f0b897b17c8c579258ff943dd161f58102cd3f5bb5a3f",
+    "cell_inclusive_seconds_cap": 43200,
+    "cell_trial_cap": 8,
+    "custody_source_sha256": "fc5a05a2732a679b42ea353beba7d6237d1ec059f78300d55464e58715a0c261",
+    "declared_RAM_envelope_bytes": 17179869184,
+    "host": "xbabe2",
+    "new_operation_budget_seconds": 240000,
+    "new_operation_ceiling_seconds": 600,
+    "runtime_binding_sha256": "4a03b321a54b45ea672830c06d3c4d267b77a0790730c76b612c1b09cf9c8901"
+  },
+  "scope": {
+    "MFS_v2": null,
+    "PTF_v1": null,
+    "fivefit_stability": null,
+    "fixed_campaign_serial_mutex_scope": "our_campaign_jobs_only",
+    "foreign_DLTrain_campaign_mutex_participation": null,
+    "method_complete": null,
+    "native_winner": null,
+    "official_tests_opened": false,
+    "per_operation_co_tenant_and_shared_GPU_flags_are_measured": true,
+    "prior9_native_aggregate_co_tenant": null,
+    "release_safe": null,
+    "sample_completeness": null,
+    "superiority": null,
+    "true_peak_or_zero_impact_certification": false
+  },
+  "snapshot": {
+    "anchor": "first_strict16_native_terminal",
+    "anchor_receipt_sha256": "f39f3577ea8b901868680f85bb1e3c47a3e741760d1e83cfd8643c065eb5fd29",
+    "live_later_operations_included": false,
+    "prepared_at_UTC": "2026-10-07T11:15:37.316108+00:00"
+  },
+  "version": 1
+}

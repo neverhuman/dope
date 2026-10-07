@@ -1,0 +1,151 @@
+{
+  "alias_join": {
+    "original_physical_job_sha256": "0064b9d563f16e44475468d7855c8f0472fd5d6b480a35f89736a5d4af7d3d0b",
+    "original_status": "charged_prefit_infrastructure_failure",
+    "paid_infrastructure_history_preserved": true,
+    "release_or_scientific_equivalence_certified": false,
+    "seed": 37,
+    "successor_physical_job_sha256": "647edf5a5a7aa683db4f17517c142ca0ac8e37c24e6f7a2fe625da091ff68eef"
+  },
+  "custody": {
+    "host_calls_or_new_measurements": 0,
+    "input_metadata_hashes_verified_before_decode": true,
+    "models_projections_samples_rows_arrays_TEST_unopened": true,
+    "private_model_or_sample_payload_included": false,
+    "private_receipt_paths_included": false,
+    "public_regenerator_requires_private_inputs": false
+  },
+  "format": "work-order-b-strict16-qualification-source-proof-v1",
+  "input_metadata": [
+    {
+      "bytes": 118794,
+      "role": "current_charged_budget",
+      "sha256": "b172b4c49f763b612d8ff3f01d529847524405f4dd340e5879be3575107ec62c"
+    },
+    {
+      "bytes": 1863,
+      "role": "first_native_parent",
+      "sha256": "f7440653377bda471105190a5b4bd31a66b13d2a66b9a759626858c3dd2993cd"
+    },
+    {
+      "bytes": 35824,
+      "role": "first_native_receipt",
+      "sha256": "f39f3577ea8b901868680f85bb1e3c47a3e741760d1e83cfd8643c065eb5fd29"
+    },
+    {
+      "bytes": 123393,
+      "role": "historical_native_controller_closure",
+      "sha256": "26d0e63944991217176774229122926389cb9c118cfcb517021847babcd039a5"
+    },
+    {
+      "bytes": 260342,
+      "role": "logical_to_physical_aliases",
+      "sha256": "edd57b17f82cbc1479540a5ecc582edc295d34369b7c9a1f30d2e8fe0d8dc77d"
+    },
+    {
+      "bytes": 918,
+      "role": "qualification_1_parent",
+      "sha256": "14ad9c39468bd790590e82f75878fd7e39f59065105f75190cc28cfebe5f1fa6"
+    },
+    {
+      "bytes": 14336,
+      "role": "qualification_1_receipt",
+      "sha256": "88a317c00b976cd51fe30cc02462bc8d43d7edd8491e9cf6b819f7ff8b3b14fc"
+    },
+    {
+      "bytes": 918,
+      "role": "qualification_2_parent",
+      "sha256": "5a526816c16062d086760c393ed9aac27f7540f561241f5b958af51ed0012a8e"
+    },
+    {
+      "bytes": 14334,
+      "role": "qualification_2_receipt",
+      "sha256": "5f1a069990c99480dda71c4476251f34f914ea7feed7b3a05db929cb54ee65a7"
+    },
+    {
+      "bytes": 4299,
+      "role": "qualification_closure",
+      "sha256": "636ffa6557c26d3a4e4b5bc0d1f321df9b6b692ab9d22fbcd1aa4004e85135ce"
+    },
+    {
+      "bytes": 5105,
+      "role": "strict16_resource_profile",
+      "sha256": "f34a5c805699ec1125b1c8ed4ce56f75174be633f62eee8b183a2cc28749ab6d"
+    }
+  ],
+  "operation_joins": [
+    {
+      "id": "qualification_1",
+      "job_sha256": "0dd7fbe90b55210f4b462a1cf31b0632445aa944c575a59401ede1bb6a206002",
+      "parent_ref": {
+        "bytes": 918,
+        "sha256": "14ad9c39468bd790590e82f75878fd7e39f59065105f75190cc28cfebe5f1fa6"
+      },
+      "receipt_ref": {
+        "bytes": 14336,
+        "sha256": "88a317c00b976cd51fe30cc02462bc8d43d7edd8491e9cf6b819f7ff8b3b14fc"
+      }
+    },
+    {
+      "id": "qualification_2",
+      "job_sha256": "faa218720743176110c443d556155b8b8c7f78d3633c4c54c6c4ab60a5c16e4d",
+      "parent_ref": {
+        "bytes": 918,
+        "sha256": "5a526816c16062d086760c393ed9aac27f7540f561241f5b958af51ed0012a8e"
+      },
+      "receipt_ref": {
+        "bytes": 14334,
+        "sha256": "5f1a069990c99480dda71c4476251f34f914ea7feed7b3a05db929cb54ee65a7"
+      }
+    },
+    {
+      "id": "first_strict16_native",
+      "job_sha256": "647edf5a5a7aa683db4f17517c142ca0ac8e37c24e6f7a2fe625da091ff68eef",
+      "parent_ref": {
+        "bytes": 1863,
+        "sha256": "f7440653377bda471105190a5b4bd31a66b13d2a66b9a759626858c3dd2993cd"
+      },
+      "receipt_ref": {
+        "bytes": 35824,
+        "sha256": "f39f3577ea8b901868680f85bb1e3c47a3e741760d1e83cfd8643c065eb5fd29"
+      }
+    }
+  ],
+  "overlap": {
+    "closed_evaluation_ledgers_included": false,
+    "later_live_operations_included": false,
+    "native8_cost_added_again": false,
+    "qualification_R_and_D_in_native_paid_history": false,
+    "snapshot_native8_included_in_native_paid_history": true
+  },
+  "preserved_budget": {
+    "cumulative_paid_seconds": 924.4300867351703,
+    "historical_prefit_infrastructure_seconds": 18.162802021950483,
+    "inclusive_trials": 111
+  },
+  "qualification_parity": {
+    "inspection_bytes_equal": true,
+    "inspection_sha256": "3efa5fc88e5a5707c26fb2b98aa900617b81edc0dfbf291bf9e94a974e8c9a44",
+    "model_bytes_equal": true,
+    "model_sha256": "1c3965821c87127674833be39d6d94cecef05cdd6b054405519f436ba87346b1",
+    "projection_bytes_equal": true,
+    "projection_sha256": "05fba44e9fbd706e81f4e849c99024b9464192e62eef565854740083f96fa19d"
+  },
+  "source_scope": {
+    "binary_sha256": "5d5ef250dbcf2296ad9f0b897b17c8c579258ff943dd161f58102cd3f5bb5a3f",
+    "execution_source_sha256": {
+      "source/bootstrap.py": "60fc70bd1797af7a667113f97269001ebd8844a9726a8e965eb34e4d9559e4b2",
+      "source/coordinator.py": "03bc418e23fd4e3e2f775406432d6d8db1586fd55d2473d9465c23be02591248",
+      "source/custody.py": "fc5a05a2732a679b42ea353beba7d6237d1ec059f78300d55464e58715a0c261",
+      "source/lifecycle.py": "7f413f9dccb0c48eb022679f239c941ca9da030857869f7052f567dbeebe90bd",
+      "source/monitor.py": "c653a5bd527fbb82fffa4c25add2d3290a9de3ca4de20c3ddd43643c2d258f41",
+      "source/observer.py": "171c199e031e5b2eaa6232191d4f04a335f19ade7f631f1b14202075c3f52384",
+      "source/qos.py": "7ac399e98709a3ebfed2e4338db286f0e45948b7d78f37028e459a6708d17d83"
+    },
+    "full_system_runtime_closure_certified": false,
+    "historical_runtime_closure_upgraded": false,
+    "production_certified": false,
+    "runtime_binding_sha256": "4a03b321a54b45ea672830c06d3c4d267b77a0790730c76b612c1b09cf9c8901"
+  },
+  "version": 1
+}

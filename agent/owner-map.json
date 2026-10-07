@@ -1,6 +1,7 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/results/work-order-b-strict16-qualification-progress-v1/": "external-evidence",
     "research/benchmark/publish_forest_fit_variance.py": "external-evidence",
     "research/benchmark/plot_forest_fit_variance.py": "external-evidence",
     "research/benchmark/tests/test_forest_fit_variance.py": "external-evidence",
