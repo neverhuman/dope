@@ -1,0 +1,239 @@
+{
+  "$defs": {
+    "ref": {
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "dope-forest-fivefit-timeout-dispositions-v1"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "observed_utc": {
+      "const": "2026-10-07T12:05:54.627628+00:00"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "physical_closed": {
+      "const": 128
+    },
+    "planned_fits": {
+      "const": 400
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe": {
+      "const": null
+    },
+    "round": {
+      "const": {
+        "bytes": 77991,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    "round_mutated": {
+      "const": false
+    },
+    "signals_sent": {
+      "const": 0
+    },
+    "source_files": {
+      "const": {
+        "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/adapter.py": "91b5ddb995cedee35551a0c0592d069eef3819739571d4f2e961b3a5830feeba",
+        "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/controls.py": "43d4d3c6b6eeae661f882e89de444c081272f11afc9857ea25a7a7de7389d752",
+        "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/worker.py": "4c60dfa3ebdd6c5cf2a8d462ae3952f4170cbcf813763edad3e2664a75efbff1"
+      }
+    },
+    "status_counts": {
+      "const": {
+        "ok": 120,
+        "timeout": 8
+      }
+    },
+    "superiority": {
+      "const": null
+    },
+    "systemd_observation": {
+      "const": "MainPID=4038850\nResult=success\nMemoryCurrent=7956221952\nActiveState=active\n"
+    },
+    "timeout_dispositions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_artifact": {
+            "const": false
+          },
+          "adapter_timeout_seconds": {
+            "const": null
+          },
+          "admission_receipt": {
+            "$ref": "#/$defs/ref"
+          },
+          "closure_receipt": {
+            "$ref": "#/$defs/ref"
+          },
+          "common_metrics": {
+            "const": null
+          },
+          "configuration_name": {
+            "const": "author_default"
+          },
+          "configuration_sha256": {
+            "const": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2"
+          },
+          "continuation_policy": {
+            "const": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged."
+          },
+          "dataset": {
+            "enum": [
+              "297b7688a045c583",
+              "48b7a3bf81e5f3e5"
+            ]
+          },
+          "disposition": {
+            "const": "retain_as_fit_timeout_under_original_budget"
+          },
+          "fit_receipt": {
+            "$ref": "#/$defs/ref"
+          },
+          "fit_seed": {
+            "enum": [
+              23,
+              37,
+              53,
+              71
+            ]
+          },
+          "fit_timeout_seconds": {
+            "const": 600
+          },
+          "job_receipt": {
+            "$ref": "#/$defs/ref"
+          },
+          "job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "measured_elapsed_seconds": {
+            "const": null
+          },
+          "method_quality_conclusion": {
+            "const": null
+          },
+          "mfs_v2": {
+            "const": null
+          },
+          "native_validation_kpi": {
+            "const": null
+          },
+          "official_tests_opened": {
+            "const": false
+          },
+          "ptf_v1": {
+            "const": null
+          },
+          "release_safe": {
+            "const": null
+          },
+          "retry_started": {
+            "const": false
+          },
+          "status": {
+            "const": "timeout"
+          },
+          "stderr": {
+            "$ref": "#/$defs/ref"
+          },
+          "stdout": {
+            "$ref": "#/$defs/ref"
+          },
+          "superiority": {
+            "const": null
+          },
+          "worker_exit_code": {
+            "const": 124
+          }
+        },
+        "required": [
+          "accepted_artifact",
+          "adapter_timeout_seconds",
+          "admission_receipt",
+          "closure_receipt",
+          "common_metrics",
+          "configuration_name",
+          "configuration_sha256",
+          "continuation_policy",
+          "dataset",
+          "disposition",
+          "fit_receipt",
+          "fit_seed",
+          "fit_timeout_seconds",
+          "job_receipt",
+          "job_sha256",
+          "measured_elapsed_seconds",
+          "method_quality_conclusion",
+          "mfs_v2",
+          "native_validation_kpi",
+          "official_tests_opened",
+          "ptf_v1",
+          "release_safe",
+          "retry_started",
+          "status",
+          "stderr",
+          "stdout",
+          "superiority",
+          "worker_exit_code"
+        ],
+        "type": "object"
+      },
+      "maxItems": 8,
+      "minItems": 8,
+      "type": "array"
+    }
+  },
+  "required": [
+    "format",
+    "mfs_v2",
+    "observed_utc",
+    "official_tests_opened",
+    "physical_closed",
+    "planned_fits",
+    "ptf_v1",
+    "release_safe",
+    "round",
+    "round_mutated",
+    "signals_sent",
+    "source_files",
+    "status_counts",
+    "superiority",
+    "systemd_observation",
+    "timeout_dispositions"
+  ],
+  "title": "Frozen eight Forest-Flow timeout dispositions, no scores",
+  "type": "object"
+}

@@ -1,0 +1,305 @@
+{
+  "$defs": {
+    "original_verification": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_complete": {
+          "const": true
+        },
+        "closed_utc": {
+          "type": "string"
+        },
+        "elapsed_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "fit_checkpoints": {
+          "const": 30
+        },
+        "format": {
+          "const": "forest-complete-cohort-original-hash-verification-v1"
+        },
+        "input_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "new_generator_fits": {
+          "const": 0
+        },
+        "numerical_metric_execution": {
+          "const": false
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "original_checkpoint_bytes_verified": {
+          "const": true
+        },
+        "pickle_loaded": {
+          "const": false
+        },
+        "refs": {
+          "items": {
+            "$ref": "#/$defs/ref"
+          },
+          "maxItems": 225,
+          "minItems": 225,
+          "type": "array"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "format",
+        "actual_complete",
+        "fit_checkpoints",
+        "new_generator_fits",
+        "numerical_metric_execution",
+        "official_tests_opened",
+        "original_checkpoint_bytes_verified",
+        "pickle_loaded",
+        "input_sha256",
+        "source_sha256",
+        "elapsed_seconds",
+        "closed_utc",
+        "refs"
+      ],
+      "type": "object"
+    },
+    "ref": {
+      "properties": {
+        "bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "stat": {
+      "additionalProperties": false,
+      "properties": {
+        "between_fit_sample_sd": {
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mean": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "measured_fits": {
+          "maximum": 5,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unavailable_fits": {
+          "maximum": 5,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mean",
+        "between_fit_sample_sd",
+        "measured_fits",
+        "unavailable_fits"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "between_fit_aggregation": {
+      "const": "mean_and_unbiased_sample_standard_deviation"
+    },
+    "cells": {
+      "items": {
+        "properties": {
+          "receipt_ref": {
+            "$ref": "#/$defs/ref"
+          }
+        },
+        "required": [
+          "dataset",
+          "fit_seed",
+          "sample_seed",
+          "row_multiplier",
+          "metrics",
+          "receipt_ref"
+        ],
+        "type": "object"
+      },
+      "maxItems": 180,
+      "minItems": 180,
+      "type": "array"
+    },
+    "common_sample_cells": {
+      "const": 180
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "fit_seeds": {
+      "const": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ]
+    },
+    "fits": {
+      "items": {
+        "required": [
+          "dataset",
+          "fit_seed",
+          "job_sha256",
+          "artifact_bytes",
+          "artifact_inventory",
+          "native_value",
+          "native_auditor_seed_scores",
+          "fit_ref",
+          "close_ref",
+          "native_ref",
+          "job_ref"
+        ],
+        "type": "object"
+      },
+      "maxItems": 30,
+      "minItems": 30,
+      "type": "array"
+    },
+    "five_fit_default_cohort_complete": {
+      "const": true
+    },
+    "format": {
+      "const": "forest-default-fivefit-variance-panel-v1"
+    },
+    "full_population_complete": {
+      "const": false
+    },
+    "generator_fits": {
+      "const": 30
+    },
+    "inputs": {
+      "type": "object"
+    },
+    "lineages": {
+      "const": 6
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_selected_population_complete": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "per_fit": {
+      "maxItems": 60,
+      "minItems": 60,
+      "type": "array"
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "row_multipliers": {
+      "const": [
+        1,
+        4
+      ]
+    },
+    "sample_seeds": {
+      "const": [
+        101,
+        211,
+        307
+      ]
+    },
+    "standard_deviation_is_not_confidence_interval": {
+      "const": true
+    },
+    "summary": {
+      "items": {
+        "properties": {
+          "metrics": {
+            "additionalProperties": {
+              "$ref": "#/$defs/stat"
+            },
+            "type": "object"
+          },
+          "native_value": {
+            "$ref": "#/$defs/stat"
+          }
+        },
+        "required": [
+          "dataset",
+          "row_multiplier",
+          "metrics",
+          "native_value"
+        ],
+        "type": "object"
+      },
+      "maxItems": 12,
+      "minItems": 12,
+      "type": "array"
+    },
+    "superiority": {
+      "const": null
+    },
+    "within_fit_aggregation": {
+      "const": "mean_of_three_samples"
+    }
+  },
+  "required": [
+    "format",
+    "lineages",
+    "generator_fits",
+    "common_sample_cells",
+    "fit_seeds",
+    "sample_seeds",
+    "row_multipliers",
+    "within_fit_aggregation",
+    "between_fit_aggregation",
+    "standard_deviation_is_not_confidence_interval",
+    "full_population_complete",
+    "native_selected_population_complete",
+    "five_fit_default_cohort_complete",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "superiority",
+    "counts_as_dope_win",
+    "inputs",
+    "fits",
+    "cells",
+    "per_fit",
+    "summary"
+  ],
+  "title": "Forest-Flow six additional complete five-fit default cohorts",
+  "type": "object"
+}

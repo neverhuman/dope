@@ -53,11 +53,18 @@ def fit_statistic(values):
 
 
 def build(inputs):
-    require(inputs['format'] == 'forest-two-lineage-fivefit-input-v1', 'input_format_changed')
+    if inputs['format'] == 'forest-two-lineage-fivefit-input-v1':
+        lineages = 2
+    else:
+        require(inputs['format'] == 'forest-complete-cohort-fivefit-input-v1', 'input_format_changed')
+        lineages = inputs['lineages']
+        require(type(lineages) is int and 1 <= lineages <= 100, 'invalid_lineage_count')
+    expected_fits, expected_cells = lineages * 5, lineages * 30
+    require(len(inputs['fits']) == expected_fits, 'complete_fit_cohort_required')
     require(inputs['official_tests_opened'] is False, 'official_tests_must_be_sealed')
     proof = verified(inputs['original_verification'])
     old_inputs = verified(inputs['original_verification_inputs'])
-    require(proof['actual_complete'] is True and proof['fit_checkpoints'] == 10
+    require(proof['actual_complete'] is True and proof['fit_checkpoints'] == expected_fits
             and proof['input_sha256'] == inputs['original_verification_inputs']['sha256']
             and proof['original_checkpoint_bytes_verified'] is True
             and proof['official_tests_opened'] is False and proof['pickle_loaded'] is False,
@@ -92,7 +99,7 @@ def build(inputs):
                     'unsupported_metric_claim')
             implementations.add(tuple(sorted((k, v['sha256']) for k, v in cell['source_refs'].items())))
             cells.append(dict(cell, receipt_ref=ref))
-    require(len(cells) == 60 and len({c['job_sha256'] for c in cells}) == 60
+    require(len(cells) == expected_cells and len({c['job_sha256'] for c in cells}) == expected_cells
             and len(implementations) == 1, 'complete_common_metric_cohort_required')
     native_members = {}
     for batch in inputs['native_batches']:
@@ -103,7 +110,7 @@ def build(inputs):
         for ref in complete['receipts']:
             require(ref['path'] not in native_members, 'duplicate_native_receipt')
             native_members[ref['path']] = (ref['sha256'], batch['round']['sha256'])
-    require(len(native_members) == 10, 'ten_native_objective_receipts_required')
+    require(len(native_members) == expected_fits, 'complete_native_objective_receipts_required')
     fits = []
     for entry in inputs['fits']:
         fit, job, close, native = (verified(entry[k]) for k in ('fit', 'job', 'close', 'native'))
@@ -168,7 +175,7 @@ def build(inputs):
             fit_seconds=fit['fit_seconds'], whole_fit_seconds=fit['elapsed_seconds'], native_seconds=native['elapsed_seconds'],
             train_sha256=job['worker']['files']['train.csv'], validation_sha256=job['worker']['files']['validation.csv'],
             fit_ref=entry['fit'], close_ref=entry['close'], native_ref=entry['native'], job_ref=entry['job']))
-    per_fit, summaries = summarize(fits, cells)
+    per_fit, summaries = summarize(fits, cells, lineages)
     public_cells = []
     for cell in cells:
         public = dict(cell)
@@ -177,17 +184,19 @@ def build(inputs):
         public['job_identity_projection'] = identity
         public_cells.append(public)
     return dict(format='forest-default-fivefit-variance-panel-v1', inputs=inputs, fits=fits, cells=public_cells, per_fit=per_fit,
-        summary=summaries, lineages=2, generator_fits=10, common_sample_cells=60,
+        summary=summaries, lineages=lineages, generator_fits=expected_fits, common_sample_cells=expected_cells,
         fit_seeds=sorted(FIT_SEEDS), sample_seeds=sorted(SAMPLE_SEEDS), row_multipliers=[1, 4],
         within_fit_aggregation='mean_of_three_samples', between_fit_aggregation='mean_and_unbiased_sample_standard_deviation',
         standard_deviation_is_not_confidence_interval=True, full_population_complete=False,
         native_selected_population_complete=False, five_fit_default_cohort_complete=True, **GATES)
 
 
-def summarize(fits, cells):
+def summarize(fits, cells, lineages=2):
     datasets = sorted({f['dataset'] for f in fits})
-    require(len(fits) == 10 and len(datasets) == 2
-            and len({(f['dataset'], f['fit_seed']) for f in fits}) == 10, 'ten_distinct_fits_required')
+    require(type(lineages) is int and 1 <= lineages <= 100, 'invalid_lineage_count')
+    require(len(fits) == lineages * 5 and len(datasets) == lineages
+            and len({(f['dataset'], f['fit_seed']) for f in fits}) == lineages * 5,
+            'ten_distinct_fits_required' if lineages == 2 else 'complete_distinct_fits_required')
     per_fit, summaries = [], []
     for dataset in datasets:
         selected = sorted((f for f in fits if f['dataset'] == dataset), key=lambda f: f['fit_seed'])

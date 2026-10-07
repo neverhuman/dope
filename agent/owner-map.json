@@ -2,6 +2,9 @@
   "workspace": "dope",
   "owners": {
     "research/benchmark/results/work-order-b-strict16-qualification-progress-v1/": "external-evidence",
+    "research/benchmark/results/arf-complete-additional-fits-v1/": "external-evidence",
+    "research/benchmark/tests/test_forest_complete_cohort.py": "external-evidence",
+    "research/benchmark/results/forest-next-six-fivefit-v1/": "external-evidence",
     "research/benchmark/publish_forest_fit_variance.py": "external-evidence",
     "research/benchmark/plot_forest_fit_variance.py": "external-evidence",
     "research/benchmark/tests/test_forest_fit_variance.py": "external-evidence",
@@ -11,7 +14,6 @@
     "research/benchmark/publish_cpu_fit_batch.py": "external-evidence",
     "research/benchmark/tests/test_cpu_fit_batch.py": "external-evidence",
     "research/benchmark/results/cpu-fivefit-progress-v1/": "external-evidence",
-    "research/benchmark/results/arf-complete-additional-fits-v1/": "external-evidence",
 
     "docs/whitepaper/scripts/retained_evidence.py": "external-evidence",
     "docs/whitepaper/scripts/test_retained_evidence.py": "external-evidence",
