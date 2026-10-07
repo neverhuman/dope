@@ -1,0 +1,50 @@
+{
+  "actual_bound_input_sha256": "118884b052962f1ddae0d64ef334ca4f2493d7ed93dcf78e26df6dcd4967c10f",
+  "actual_phase_sha256": "883f77d969dd6f4d1d0f689727d16d3e9a5ae0de3c7d94fb9a8307fa4ef6c63e",
+  "actual_positive_manifest_sha256": "8cf48de8045f221031a1671ba926bd5acaa972e55a22eb18d2c363d069239b4b",
+  "all_adapter_metadata_receipts_in_final_rehash": true,
+  "evaluator": {
+    "bytes": 13747,
+    "repository_path": "research/benchmark/expanded_validation_metrics.py",
+    "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
+  },
+  "evaluator_core_schema": {
+    "bytes": 14962,
+    "repository_path": "research/benchmark/expanded-validation-metrics.schema.json",
+    "sha256": "7a22ce930edb578ca67d048ef4f31438cc8f1e9e0bf0de5eddebd47599735f52"
+  },
+  "format": "common-A952-first12-source-proof",
+  "frozen_batch_input_sha256": "d79f55728605c69985be53422ca5c8bce0db762b206661cf3f0c92f09d6b687a",
+  "frozen_first12_identity_rechecked_after_projection": true,
+  "gated_scores_added": false,
+  "historical_nonA952_results_pooled": false,
+  "new_metric_jobs_started_by_publication": 0,
+  "original_publisher_actual_sha256": "e3f18ded64418b67d203afca04341df109a548516a197cc4913dedea616a50b6",
+  "original_queue_adapter_provenance_only_not_executed": true,
+  "projection_actual_exit_code": 0,
+  "public_filenames_corrected": true,
+  "public_leaves_regenerated_byte_exact": true,
+  "public_result_sha256": "8e039b1d57298f10bf7c05c2f3a8b14481a60ed663c1063ed30c273854f3bdfe",
+  "public_schema_sha256": "efec2959aff8efed8006dd6959fe7993627cbddc2329f6951381d108df209601",
+  "publication_contract_test_proof_sha256": "c7e07147e013e36bdd4592a38c7d2872fc6d3a864fa6c71f2848a923fa05a70c",
+  "publication_contract_test_sha256": "848364e1e9a62cc8eacc956a274833378d7efe554ea336b691400d58e7bfc415",
+  "publication_contract_tests_passed": 20,
+  "publication_renderer_sha256": "fff7243b0a184703bf448b31d13b89b9c24492d84902e12fcf1e4e35fff4ef60",
+  "publisher_sha256": "c4095343612daf1106ba8196ed09fdd3265704a358446cde5389aaf6274d97ef",
+  "queue_adapter_sha256": "27e1d7dda3dbc411418d714b9f8e578d4fe4612701d64533fab29659961adf06",
+  "raw_data_model_sample_TEST_body_reads": false,
+  "repaired_publisher_regenerated_original_json_byte_exact": true,
+  "repaired_static_verifier_reprojection_actual_sha256": "2b014cf04015f6762006c6eb5a1159750c3d2200016ceefce538530e3ddd2f3f",
+  "schema_and_public_regression_checks_passed": 16,
+  "schema_regression_proof_sha256": "59ac656ee003777e43528ff66c7c99a3da8c773c194e54a2ad183cc0511fa5b5",
+  "schema_validation_actual_exit_code": 0,
+  "serial_operator_sha256": "8e44d300ae7a4e478d34d81e33203ac03d015bfe837ba14a708a2dbdf46cf528",
+  "static_metadata_verifier": {
+    "bytes": 6426,
+    "repository_path": "research/benchmark/common_validation_receipt_verifier.py",
+    "sha256": "4701dc05d84a16e0da421763590e8bba3b5204cf72db7f3d760841c06441afc0"
+  },
+  "static_verifier_body_and_constant_AST_equivalence_proof_sha256": "e6c7b329ddd6240b04b4ab1a69117ac3f858982420e5a15121291cd181265973",
+  "version": 1,
+  "worker_sha256": "0471682d505b0e388443ec29d7b15ec903a4f14ab987b886100e6c8f9ae0318a"
+}

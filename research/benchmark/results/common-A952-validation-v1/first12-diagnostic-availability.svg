@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820">
+<rect width="1200" height="820" fill="white"/>
+<style>text{font-family:Arial,sans-serif;fill:#152238} .small{font-size:12px} .heading{font-size:20px;font-weight:bold} .mono{font-family:monospace;font-size:12px}</style>
+<text x="28" y="38" class="heading">A952 frozen first-12 batch: diagnostic availability</text>
+<text x="28" y="64" class="small">12 authenticated physical cells / 14 logical aliases. Cohort stopped after 16/5724 successes; no ranking or gated scores.</text>
+<text x="355.0" y="167" class="small" text-anchor="end" transform="rotate(-40 355.0 167)">Pearson difference</text>
+<text x="445.0" y="167" class="small" text-anchor="end" transform="rotate(-40 445.0 167)">Category TV</text>
+<text x="535.0" y="167" class="small" text-anchor="end" transform="rotate(-40 535.0 167)">Mixed dependence</text>
+<text x="625.0" y="167" class="small" text-anchor="end" transform="rotate(-40 625.0 167)">Alpha/beta</text>
+<text x="715.0" y="167" class="small" text-anchor="end" transform="rotate(-40 715.0 167)">C2ST CatBoost</text>
+<text x="805.0" y="167" class="small" text-anchor="end" transform="rotate(-40 805.0 167)">C2ST logistic</text>
+<text x="895.0" y="167" class="small" text-anchor="end" transform="rotate(-40 895.0 167)">NNDR</text>
+<text x="985.0" y="167" class="small" text-anchor="end" transform="rotate(-40 985.0 167)">Distance MIA</text>
+<text x="1075.0" y="167" class="small" text-anchor="end" transform="rotate(-40 1075.0 167)">DOMIAS KDE</text>
+<text x="28" y="209" class="mono">0002af084a92 independent_marginals</text>
+<rect x="310" y="185" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="206" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="185" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="206" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="185" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="206" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="185" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="206" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="185" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="206" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="185" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="206" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="185" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="206" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="185" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="206" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="185" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="206" class="small" text-anchor="middle">measured</text>
+<text x="28" y="247" class="mono">000377f02a18 DOPE</text>
+<rect x="310" y="223" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="244" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="223" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="244" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="223" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="244" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="223" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="244" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="223" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="244" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="223" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="244" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="223" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="244" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="223" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="244" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="223" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="244" class="small" text-anchor="middle">measured</text>
+<text x="28" y="285" class="mono">000f66aa8642 DOPE</text>
+<rect x="310" y="261" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="282" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="261" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="282" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="261" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="282" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="261" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="282" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="261" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="282" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="261" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="282" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="261" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="282" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="261" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="282" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="261" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="282" class="small" text-anchor="middle">measured</text>
+<text x="28" y="323" class="mono">001897658278 Chow-Liu</text>
+<rect x="310" y="299" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="320" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="299" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="442.0" y="320" class="small" text-anchor="middle">measured</text>
+<rect x="490" y="299" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="320" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="299" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="320" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="299" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="320" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="299" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="320" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="299" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="320" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="299" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="320" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="299" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="1072.0" y="320" class="small" text-anchor="middle">unavailable</text>
+<text x="28" y="361" class="mono">0021656cfc57 Forest-Flow</text>
+<rect x="310" y="337" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="358" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="337" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="358" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="337" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="358" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="337" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="358" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="337" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="358" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="337" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="358" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="337" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="358" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="337" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="358" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="337" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="358" class="small" text-anchor="middle">measured</text>
+<text x="28" y="399" class="mono">00514b7a27e2 DOPE</text>
+<rect x="310" y="375" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="396" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="375" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="396" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="375" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="396" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="375" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="396" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="375" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="396" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="375" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="396" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="375" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="396" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="375" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="396" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="375" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="396" class="small" text-anchor="middle">measured</text>
+<text x="28" y="437" class="mono">0056ef8c748b independent_marginals</text>
+<rect x="310" y="413" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="434" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="413" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="434" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="413" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="434" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="413" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="434" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="413" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="434" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="413" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="434" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="413" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="434" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="413" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="434" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="413" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="1072.0" y="434" class="small" text-anchor="middle">unavailable</text>
+<text x="28" y="475" class="mono">006a72169115 GaussianCopula</text>
+<rect x="310" y="451" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="472" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="451" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="472" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="451" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="472" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="451" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="472" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="451" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="472" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="451" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="472" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="451" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="472" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="451" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="472" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="451" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="472" class="small" text-anchor="middle">measured</text>
+<text x="28" y="513" class="mono">006cafa72e1a DOPE</text>
+<rect x="310" y="489" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="510" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="489" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="510" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="489" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="510" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="489" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="510" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="489" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="510" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="489" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="510" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="489" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="510" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="489" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="510" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="489" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="510" class="small" text-anchor="middle">measured</text>
+<text x="28" y="551" class="mono">006dfe86527f independent_marginals</text>
+<rect x="310" y="527" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="548" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="527" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="548" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="527" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="548" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="527" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="548" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="527" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="548" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="527" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="548" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="527" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="548" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="527" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="548" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="527" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="1072.0" y="548" class="small" text-anchor="middle">unavailable</text>
+<text x="28" y="589" class="mono">007f4ac594ee TVAE</text>
+<rect x="310" y="565" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="586" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="565" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="586" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="565" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="586" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="565" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="586" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="565" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="586" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="565" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="586" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="565" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="586" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="565" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="586" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="565" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="586" class="small" text-anchor="middle">measured</text>
+<text x="28" y="627" class="mono">0090be69a85e GaussianCopula</text>
+<rect x="310" y="603" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="352.0" y="624" class="small" text-anchor="middle">measured</text>
+<rect x="400" y="603" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="442.0" y="624" class="small" text-anchor="middle">unavailable</text>
+<rect x="490" y="603" width="84" height="32" rx="3" fill="#eeeeee"/>
+<text x="532.0" y="624" class="small" text-anchor="middle">unavailable</text>
+<rect x="580" y="603" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="622.0" y="624" class="small" text-anchor="middle">measured</text>
+<rect x="670" y="603" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="712.0" y="624" class="small" text-anchor="middle">measured</text>
+<rect x="760" y="603" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="802.0" y="624" class="small" text-anchor="middle">measured</text>
+<rect x="850" y="603" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="892.0" y="624" class="small" text-anchor="middle">measured</text>
+<rect x="940" y="603" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="982.0" y="624" class="small" text-anchor="middle">measured</text>
+<rect x="1030" y="603" width="84" height="32" rx="3" fill="#dceeea"/>
+<text x="1072.0" y="624" class="small" text-anchor="middle">measured</text>
+<text x="28" y="688" class="small">Grey marks preserve typed unavailable evidence; they are never scored as zero.</text>
+<text x="28" y="712" class="small">TRAIN-derived numeric kinds: binary representation TV and continuous Pearson/KS; author semantic categories remain unavailable.</text>
+<text x="28" y="736" class="small">Privacy diagnostics are empirical only: no formal DP, HIPAA de-identification or release-safe claim.</text>
+<text x="28" y="760" class="small">Exact values and per-cell costs are retained in first12-metrics-and-costs.csv and the schema-validated public JSON.</text>
+</svg>
