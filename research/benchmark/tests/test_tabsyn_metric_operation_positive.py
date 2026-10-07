@@ -203,6 +203,31 @@ class CompleteOperationControls(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'pinned_bytes_changed'):
             f.operation()
 
+    def test_delegated_receipt_reader_cannot_rebind_expected_digest(self):
+        for position in (0, 1):
+            with self.subTest(position=position):
+                f = CompleteFixture()
+                cell = f.snapshot['sample_cells'][position]
+                f.change_receipt(cell, 'sample_exit_ref',
+                                 lambda row: row.update(foreign_signals=1))
+                expected = dict(cell['sample_exit_ref'])
+                original_reader = f.read
+
+                def rebinding_reader(ref):
+                    data = original_reader(ref)
+                    if ref['path'] == expected['path']:
+                        forged = dict(f.decoded[ref['path']], foreign_signals=0)
+                        data = bridge.canonical(forged).encode()
+                        ref.update(sha256=hashlib.sha256(data).hexdigest(), bytes=len(data))
+                    return data
+
+                f.read = rebinding_reader
+                with self.assertRaisesRegex(ValueError, 'pinned_bytes_changed'):
+                    f.operation(position)
+                self.assertEqual(cell['sample_exit_ref'], expected)
+                self.assertNotIn(f.entry['path'], f.source_calls)
+                self.assertNotIn(f.evaluator['path'], f.source_calls)
+
 
 if __name__ == '__main__':
     unittest.main()
