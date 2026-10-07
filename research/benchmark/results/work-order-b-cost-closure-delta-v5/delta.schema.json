@@ -1,0 +1,413 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "alias_cost_accounting": {
+      "enum": [
+        "one timer per physical action; aliases do not multiply costs; utility-only is a separate action"
+      ],
+      "type": "string"
+    },
+    "base_v4_report_sha256": {
+      "enum": [
+        "bb94cf926bb37e3984a707c049facdf178e40cd61131daa6d369e27e93c7ee64"
+      ],
+      "type": "string"
+    },
+    "campaign_wall_seconds": {
+      "enum": [
+        null
+      ],
+      "type": "null"
+    },
+    "first12_publication_status": {
+      "enum": [
+        "separate_committed_slice_excluded_from_this_delta"
+      ],
+      "type": "string"
+    },
+    "format": {
+      "enum": [
+        "work-order-b-closed-evaluation-cost-delta-v5"
+      ],
+      "type": "string"
+    },
+    "full_retained_panel_logical_aliases": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "full_retained_panel_physical_diagnostics": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "generator_fit_seconds": {
+      "enum": [
+        null
+      ],
+      "type": "null"
+    },
+    "generator_sample_seconds": {
+      "enum": [
+        null
+      ],
+      "type": "null"
+    },
+    "mfs_v2": {
+      "enum": [
+        null
+      ],
+      "type": "null"
+    },
+    "native_winner": {
+      "enum": [
+        null
+      ],
+      "type": "null"
+    },
+    "new_metric_physical_jobs": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "new_metric_timer_wall_seconds_sum": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "new_utility_only_jobs": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "old_A952_seconds_added": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "ptf_v1": {
+      "enum": [
+        null
+      ],
+      "type": "null"
+    },
+    "release_safe_l3": {
+      "enum": [
+        null
+      ],
+      "type": "null"
+    },
+    "retained_diagnostic_jobs_not_recharged": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "rows": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "CPU_model": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "GPU_model": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "GPU_wall_seconds": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "actual_kernel_exit": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "actual_parent_wait_exit": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "clock_basis": {
+            "enum": [
+              "per_job_time.perf_counter_wall_sum"
+            ],
+            "type": "string"
+          },
+          "co_tenant": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "core_seconds": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "cpu_affinity": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "maxItems": 8,
+            "minItems": 8,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "cpu_host": {
+            "enum": [
+              "xbabe1",
+              "xbabe2"
+            ],
+            "type": "string"
+          },
+          "energy_joules": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "evidence_sha256": {
+            "items": {
+              "enum": [
+                "dba021575580d31aa3cc5e36a511d1f00e2475beada49c1da8e4a0490abce791",
+                "39faea430dc3e64bca4be4c28ba922bf553b2542c96ed6f4744b91857bc1ba13",
+                "c525dabd54eea49be04adc6450e8c34f157c28a8dd843b5d83feef9c70b51536",
+                "815350d3d599e9ed2f980cf7fdc33567ae76bc88f57faff052841ffd17092113",
+                "8b88bfb39eb52a16184251b3c1c78a483f075da84441ea67344be30c7aeb3dd8",
+                "935f3f14b94f6285785931009ed3e67e8dc712750304e780f4870098968343fc",
+                "77c6c2cf3549137175a55ae02a47aa1527b7819271b2f151edb1babde8b11e1f",
+                "66ca84e7661bc3efebeeb3f17e7aea7b6a8306458b52ce9f3ea3db25868576cc"
+              ],
+              "type": "string"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "full_panel_logical_aliases": {
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "host_memory_total_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "id": {
+            "enum": [
+              "tabsyn_retained48_evaluation",
+              "arf_retained1116_evaluation",
+              "copula_chow_new2017_evaluation",
+              "retained5_utility_only1729"
+            ],
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "TabSyn",
+              "ARF",
+              "GaussianCopula+Chow-Liu",
+              "GaussianCopula+Chow-Liu utility only"
+            ],
+            "type": "string"
+          },
+          "method_completion_claim": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "metric_timer_wall_seconds": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "new_physical_jobs": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "peak_GPU_used_mib": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "peak_rss_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "phase": {
+            "enum": [
+              "evaluation",
+              "utility_only"
+            ],
+            "type": "string"
+          },
+          "ram_limit_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "ram_limit_evidence": {
+            "enum": [
+              "execution_record_kernel_settings",
+              "accepted_kernel_launch_settings"
+            ],
+            "type": "string"
+          },
+          "retained_diagnostics_excluded": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "rss_basis": {
+            "enum": [
+              "process_lifetime_RUSAGE_SELF_ru_maxrss_times_1024"
+            ],
+            "type": "string"
+          },
+          "shared_gpu_cost": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "swap_limit_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "typed_closed_receipt_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "utility_auditors_ok": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "whole_operation_wall_seconds": {
+            "enum": [
+              null
+            ],
+            "type": "null"
+          },
+          "whole_runner_wall_seconds": {
+            "minimum": 0,
+            "type": [
+              "null",
+              "number"
+            ]
+          }
+        },
+        "required": [
+          "CPU_model",
+          "GPU_model",
+          "GPU_wall_seconds",
+          "actual_kernel_exit",
+          "actual_parent_wait_exit",
+          "clock_basis",
+          "co_tenant",
+          "core_seconds",
+          "cpu_affinity",
+          "cpu_host",
+          "energy_joules",
+          "evidence_sha256",
+          "full_panel_logical_aliases",
+          "host_memory_total_bytes",
+          "id",
+          "method",
+          "method_completion_claim",
+          "metric_timer_wall_seconds",
+          "new_physical_jobs",
+          "peak_GPU_used_mib",
+          "peak_rss_bytes",
+          "phase",
+          "ram_limit_bytes",
+          "ram_limit_evidence",
+          "retained_diagnostics_excluded",
+          "rss_basis",
+          "shared_gpu_cost",
+          "swap_limit_bytes",
+          "typed_closed_receipt_count",
+          "utility_auditors_ok",
+          "whole_operation_wall_seconds",
+          "whole_runner_wall_seconds"
+        ],
+        "type": "object"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "status": {
+      "enum": [
+        "standalone_closed_evaluation_slice"
+      ],
+      "type": "string"
+    },
+    "superiority": {
+      "enum": [
+        null
+      ],
+      "type": "null"
+    },
+    "utility_outer_clock_added_to_metric_timer_sum": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "v4_sample_or_qualification_clocks_added": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "version": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "alias_cost_accounting",
+    "base_v4_report_sha256",
+    "campaign_wall_seconds",
+    "first12_publication_status",
+    "format",
+    "full_retained_panel_logical_aliases",
+    "full_retained_panel_physical_diagnostics",
+    "generator_fit_seconds",
+    "generator_sample_seconds",
+    "mfs_v2",
+    "native_winner",
+    "new_metric_physical_jobs",
+    "new_metric_timer_wall_seconds_sum",
+    "new_utility_only_jobs",
+    "official_tests_opened",
+    "old_A952_seconds_added",
+    "ptf_v1",
+    "release_safe_l3",
+    "retained_diagnostic_jobs_not_recharged",
+    "rows",
+    "status",
+    "superiority",
+    "utility_outer_clock_added_to_metric_timer_sum",
+    "v4_sample_or_qualification_clocks_added",
+    "version"
+  ],
+  "title": "Closed APP retained evaluation cost delta",
+  "type": "object"
+}

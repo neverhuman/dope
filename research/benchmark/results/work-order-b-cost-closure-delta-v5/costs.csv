@@ -1,0 +1,5 @@
+id,method,phase,new_physical_jobs,full_panel_logical_aliases,metric_timer_wall_seconds,whole_runner_wall_seconds,cpu_host,cpu_affinity,peak_rss_bytes,ram_limit_bytes,host_memory_total_bytes,CPU_model,GPU_model,GPU_wall_seconds,energy_joules,core_seconds,co_tenant,shared_gpu_cost,actual_parent_wait_exit,actual_kernel_exit
+tabsyn_retained48_evaluation,TabSyn,evaluation,48,48,49.57422557566315,null,xbabe1,"96,97,98,99,100,101,102,103",318398464,4294967296,67197415424,null,null,null,null,null,null,null,null,null
+arf_retained1116_evaluation,ARF,evaluation,1116,1200,1396.0949017289095,null,xbabe2,"104,105,106,107,108,109,110,111",768512000,4294967296,134838829056,null,null,null,null,null,null,null,null,null
+copula_chow_new2017_evaluation,GaussianCopula+Chow-Liu,evaluation,2017,2400,2239.0019078888,null,xbabe1,"96,97,98,99,100,101,102,103",845471744,4294967296,67197415424,null,null,null,null,null,null,null,null,null
+retained5_utility_only1729,GaussianCopula+Chow-Liu utility only,utility_only,5,null,2.723123642615974,7.970948356203735,xbabe2,"104,105,106,107,108,109,110,111",297795584,4294967296,134838829056,null,null,null,null,null,null,null,null,null

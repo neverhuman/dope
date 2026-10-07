@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "ROOT_first12_PR": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "ROOT_first12_approved_head": {
+      "enum": [
+        "c01048e58a698d9ff4eab1b47cec2d963eb75f0a"
+      ],
+      "type": "string"
+    },
+    "ROOT_first12_committed_separate_slice_verified_and_excluded": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    },
+    "ROOT_first12_merge_custody_digest": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sha256": {
+          "enum": [
+            "400a34ea2d95f6e1e856dc57e4d42393144ba7772e391b50b7c08b811b1b33a8"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "ROOT_first12_merged_UTC": {
+      "enum": [
+        "2026-10-07T04:41:56Z"
+      ],
+      "type": "string"
+    },
+    "ROOT_first12_merged_commit": {
+      "enum": [
+        "774c72f16ebae006ad627eddeacf2f5c727fa70b"
+      ],
+      "type": "string"
+    },
+    "TS_ARF_individual_receipt_timers_rederived": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "co_tenant_or_hardware_facts_invented": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "density_2022_cost_metadata_rows_deduplicated": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    },
+    "density_new_and_retained_and_utility_timer_sums_reconciled": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    },
+    "dependency_modules_initialized": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "durable_archive_created_by_this_preparation": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "format": {
+      "enum": [
+        "work-order-b-evaluation-cost-input-proof-v5"
+      ],
+      "type": "string"
+    },
+    "individual_receipt_payloads_opened": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "inputs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "digest_checked_before_decode": {
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          },
+          "role": {
+            "enum": [
+              "TS_execution",
+              "TS_lock",
+              "ARF_execution",
+              "ARF_lock",
+              "density_execution",
+              "density_lock",
+              "density_reconciliation",
+              "density_cost_rows",
+              "utility_execution",
+              "utility_lock",
+              "first12_frozen_input",
+              "ROOT_current16_phase",
+              "base_v4",
+              "TS_timer_source",
+              "classical_timer_source",
+              "utility_timer_source"
+            ],
+            "type": "string"
+          },
+          "sha256": {
+            "enum": [
+              "dba021575580d31aa3cc5e36a511d1f00e2475beada49c1da8e4a0490abce791",
+              "39faea430dc3e64bca4be4c28ba922bf553b2542c96ed6f4744b91857bc1ba13",
+              "c525dabd54eea49be04adc6450e8c34f157c28a8dd843b5d83feef9c70b51536",
+              "815350d3d599e9ed2f980cf7fdc33567ae76bc88f57faff052841ffd17092113",
+              "8b88bfb39eb52a16184251b3c1c78a483f075da84441ea67344be30c7aeb3dd8",
+              "935f3f14b94f6285785931009ed3e67e8dc712750304e780f4870098968343fc",
+              "d510352c7710ab55bd15bf13eef736a00665578b896c010f6f1caf80b7e49cbd",
+              "f0d2ab03a21b8f53d13ef2435c09de7e36b7de45e0e900e2a4272dbf7dc1e3b4",
+              "77c6c2cf3549137175a55ae02a47aa1527b7819271b2f151edb1babde8b11e1f",
+              "66ca84e7661bc3efebeeb3f17e7aea7b6a8306458b52ce9f3ea3db25868576cc",
+              "d79f55728605c69985be53422ca5c8bce0db762b206661cf3f0c92f09d6b687a",
+              "883f77d969dd6f4d1d0f689727d16d3e9a5ae0de3c7d94fb9a8307fa4ef6c63e",
+              "bb94cf926bb37e3984a707c049facdf178e40cd61131daa6d369e27e93c7ee64",
+              "0d9bce814c22656a171ed98c40e2784c8ee0efaf3592b8eb78f3017f919dd96a",
+              "553750022364da3c19410887b96b71d4a235bf0cb22cebb2b98df4a76f9a6b1e",
+              "f3f8d26ceedd97d6b69e916103863515702bfb955169c17b4a23fe073e78b362"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "digest_checked_before_decode",
+          "role",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 16,
+      "minItems": 16,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "logical_aliases_multiply_costs": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "metadata_only": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    },
+    "nested_utility_outer_clock_added": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "new_probes_or_scientific_execution": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "parent_unknowns_preserved": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    },
+    "previous_v4_costs_recharged": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "private_input_proof_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "enum": [
+            "target/work-order-b-next-cost-ledger-source-inventory-v1/closed-APP-retained-evaluation-costs-v5-private-preparation-v1/INPUT_PROOF.private.json"
+          ],
+          "type": "string"
+        },
+        "sha256": {
+          "enum": [
+            "ac55cdddd892f2af293030b586c12b6669e1fc780be809380937e1f38f7bfbbd"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "public_renderer_needs_private_receipts": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "raw_data_model_sample_TEST_reads": {
+      "enum": [
+        false
+      ],
+      "type": "boolean"
+    },
+    "receipt_lock_counts_and_unique_references_verified": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    },
+    "retained_A952_timer_wall_seconds_excluded": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "retained_diagnostic_jobs_excluded": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "retained_jobs_overlapping_ROOT_current16": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "retained_jobs_overlapping_ROOT_first12": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "scope_update_private_proof_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "enum": [
+            "target/work-order-b-next-cost-ledger-source-inventory-v1/closed-APP-retained-evaluation-costs-v5-PR169-committed-scope-successor-v2/COMMITTED_SCOPE_UPDATE.private-proof.json"
+          ],
+          "type": "string"
+        },
+        "sha256": {
+          "enum": [
+            "61cd63b1ca6c9e52c17376a929c6702c7afcd03fa5700f7404766346869756bf"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "unresolved": {
+      "items": {
+        "enum": [
+          "Parent/kernel exits remain unknown; absent/collected unit defaults are not observed zero.",
+          "CPU/GPU models, device use, energy, core-seconds, co-tenancy and campaign wall time are unmeasured in these exact inputs.",
+          "TS/ARF timer totals are authenticated execution aggregates; individual receipt bodies were not reread.",
+          "Native fit/sample costs and v4 clocks are separate. ROOT first12 is a separately committed slice; its clocks are excluded from this delta."
+        ],
+        "type": "string"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "version": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "ROOT_first12_PR",
+    "ROOT_first12_approved_head",
+    "ROOT_first12_committed_separate_slice_verified_and_excluded",
+    "ROOT_first12_merge_custody_digest",
+    "ROOT_first12_merged_UTC",
+    "ROOT_first12_merged_commit",
+    "TS_ARF_individual_receipt_timers_rederived",
+    "co_tenant_or_hardware_facts_invented",
+    "density_2022_cost_metadata_rows_deduplicated",
+    "density_new_and_retained_and_utility_timer_sums_reconciled",
+    "dependency_modules_initialized",
+    "durable_archive_created_by_this_preparation",
+    "format",
+    "individual_receipt_payloads_opened",
+    "inputs",
+    "logical_aliases_multiply_costs",
+    "metadata_only",
+    "nested_utility_outer_clock_added",
+    "new_probes_or_scientific_execution",
+    "parent_unknowns_preserved",
+    "previous_v4_costs_recharged",
+    "private_input_proof_ref",
+    "public_renderer_needs_private_receipts",
+    "raw_data_model_sample_TEST_reads",
+    "receipt_lock_counts_and_unique_references_verified",
+    "retained_A952_timer_wall_seconds_excluded",
+    "retained_diagnostic_jobs_excluded",
+    "retained_jobs_overlapping_ROOT_current16",
+    "retained_jobs_overlapping_ROOT_first12",
+    "scope_update_private_proof_ref",
+    "unresolved",
+    "version"
+  ],
+  "title": "Rights-safe evaluation cost input proof",
+  "type": "object"
+}

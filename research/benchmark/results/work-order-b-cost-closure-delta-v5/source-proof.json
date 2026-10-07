@@ -1,0 +1,147 @@
+{
+  "ROOT_first12_PR": 169,
+  "ROOT_first12_approved_head": "c01048e58a698d9ff4eab1b47cec2d963eb75f0a",
+  "ROOT_first12_committed_separate_slice_verified_and_excluded": true,
+  "ROOT_first12_merge_custody_digest": {
+    "bytes": 1584,
+    "sha256": "400a34ea2d95f6e1e856dc57e4d42393144ba7772e391b50b7c08b811b1b33a8"
+  },
+  "ROOT_first12_merged_UTC": "2026-10-07T04:41:56Z",
+  "ROOT_first12_merged_commit": "774c72f16ebae006ad627eddeacf2f5c727fa70b",
+  "TS_ARF_individual_receipt_timers_rederived": false,
+  "co_tenant_or_hardware_facts_invented": false,
+  "density_2022_cost_metadata_rows_deduplicated": true,
+  "density_new_and_retained_and_utility_timer_sums_reconciled": true,
+  "dependency_modules_initialized": false,
+  "durable_archive_created_by_this_preparation": false,
+  "format": "work-order-b-evaluation-cost-input-proof-v5",
+  "individual_receipt_payloads_opened": 0,
+  "inputs": [
+    {
+      "bytes": 2584,
+      "digest_checked_before_decode": true,
+      "role": "TS_execution",
+      "sha256": "dba021575580d31aa3cc5e36a511d1f00e2475beada49c1da8e4a0490abce791"
+    },
+    {
+      "bytes": 13930,
+      "digest_checked_before_decode": true,
+      "role": "TS_lock",
+      "sha256": "39faea430dc3e64bca4be4c28ba922bf553b2542c96ed6f4744b91857bc1ba13"
+    },
+    {
+      "bytes": 2449,
+      "digest_checked_before_decode": true,
+      "role": "ARF_execution",
+      "sha256": "c525dabd54eea49be04adc6450e8c34f157c28a8dd843b5d83feef9c70b51536"
+    },
+    {
+      "bytes": 298889,
+      "digest_checked_before_decode": true,
+      "role": "ARF_lock",
+      "sha256": "815350d3d599e9ed2f980cf7fdc33567ae76bc88f57faff052841ffd17092113"
+    },
+    {
+      "bytes": 2094,
+      "digest_checked_before_decode": true,
+      "role": "density_execution",
+      "sha256": "8b88bfb39eb52a16184251b3c1c78a483f075da84441ea67344be30c7aeb3dd8"
+    },
+    {
+      "bytes": 555607,
+      "digest_checked_before_decode": true,
+      "role": "density_lock",
+      "sha256": "935f3f14b94f6285785931009ed3e67e8dc712750304e780f4870098968343fc"
+    },
+    {
+      "bytes": 3720,
+      "digest_checked_before_decode": true,
+      "role": "density_reconciliation",
+      "sha256": "d510352c7710ab55bd15bf13eef736a00665578b896c010f6f1caf80b7e49cbd"
+    },
+    {
+      "bytes": 1326339,
+      "digest_checked_before_decode": true,
+      "role": "density_cost_rows",
+      "sha256": "f0d2ab03a21b8f53d13ef2435c09de7e36b7de45e0e900e2a4272dbf7dc1e3b4"
+    },
+    {
+      "bytes": 8990,
+      "digest_checked_before_decode": true,
+      "role": "utility_execution",
+      "sha256": "77c6c2cf3549137175a55ae02a47aa1527b7819271b2f151edb1babde8b11e1f"
+    },
+    {
+      "bytes": 2375,
+      "digest_checked_before_decode": true,
+      "role": "utility_lock",
+      "sha256": "66ca84e7661bc3efebeeb3f17e7aea7b6a8306458b52ce9f3ea3db25868576cc"
+    },
+    {
+      "bytes": 2642,
+      "digest_checked_before_decode": true,
+      "role": "first12_frozen_input",
+      "sha256": "d79f55728605c69985be53422ca5c8bce0db762b206661cf3f0c92f09d6b687a"
+    },
+    {
+      "bytes": 22725,
+      "digest_checked_before_decode": true,
+      "role": "ROOT_current16_phase",
+      "sha256": "883f77d969dd6f4d1d0f689727d16d3e9a5ae0de3c7d94fb9a8307fa4ef6c63e"
+    },
+    {
+      "bytes": 5103,
+      "digest_checked_before_decode": true,
+      "role": "base_v4",
+      "sha256": "bb94cf926bb37e3984a707c049facdf178e40cd61131daa6d369e27e93c7ee64"
+    },
+    {
+      "bytes": 11019,
+      "digest_checked_before_decode": true,
+      "role": "TS_timer_source",
+      "sha256": "0d9bce814c22656a171ed98c40e2784c8ee0efaf3592b8eb78f3017f919dd96a"
+    },
+    {
+      "bytes": 11076,
+      "digest_checked_before_decode": true,
+      "role": "classical_timer_source",
+      "sha256": "553750022364da3c19410887b96b71d4a235bf0cb22cebb2b98df4a76f9a6b1e"
+    },
+    {
+      "bytes": 6905,
+      "digest_checked_before_decode": true,
+      "role": "utility_timer_source",
+      "sha256": "f3f8d26ceedd97d6b69e916103863515702bfb955169c17b4a23fe073e78b362"
+    }
+  ],
+  "logical_aliases_multiply_costs": false,
+  "metadata_only": true,
+  "nested_utility_outer_clock_added": false,
+  "new_probes_or_scientific_execution": false,
+  "parent_unknowns_preserved": true,
+  "previous_v4_costs_recharged": false,
+  "private_input_proof_ref": {
+    "bytes": 7547,
+    "path": "target/work-order-b-next-cost-ledger-source-inventory-v1/closed-APP-retained-evaluation-costs-v5-private-preparation-v1/INPUT_PROOF.private.json",
+    "sha256": "ac55cdddd892f2af293030b586c12b6669e1fc780be809380937e1f38f7bfbbd"
+  },
+  "public_renderer_needs_private_receipts": false,
+  "raw_data_model_sample_TEST_reads": false,
+  "receipt_lock_counts_and_unique_references_verified": true,
+  "retained_A952_timer_wall_seconds_excluded": 31.6338860578835,
+  "retained_diagnostic_jobs_excluded": 5,
+  "retained_jobs_overlapping_ROOT_current16": 5,
+  "retained_jobs_overlapping_ROOT_first12": 3,
+  "scope_update_private_proof_ref": {
+    "bytes": 4777,
+    "path": "target/work-order-b-next-cost-ledger-source-inventory-v1/closed-APP-retained-evaluation-costs-v5-PR169-committed-scope-successor-v2/COMMITTED_SCOPE_UPDATE.private-proof.json",
+    "sha256": "61cd63b1ca6c9e52c17376a929c6702c7afcd03fa5700f7404766346869756bf"
+  },
+  "unresolved": [
+    "Parent/kernel exits remain unknown; absent/collected unit defaults are not observed zero.",
+    "CPU/GPU models, device use, energy, core-seconds, co-tenancy and campaign wall time are unmeasured in these exact inputs.",
+    "TS/ARF timer totals are authenticated execution aggregates; individual receipt bodies were not reread.",
+    "Native fit/sample costs and v4 clocks are separate. ROOT first12 is a separately committed slice; its clocks are excluded from this delta."
+  ],
+  "version": 1
+}
