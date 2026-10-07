@@ -1,0 +1,403 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "alias_join": {
+      "additionalProperties": false,
+      "properties": {
+        "original_physical_job_sha256": {
+          "maxLength": 300,
+          "minLength": 1,
+          "pattern": "[0-9a-f]{64}",
+          "type": "string"
+        },
+        "original_status": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "paid_infrastructure_history_preserved": {
+          "const": true,
+          "type": "boolean"
+        },
+        "release_or_scientific_equivalence_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "seed": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "successor_physical_job_sha256": {
+          "maxLength": 300,
+          "minLength": 1,
+          "pattern": "[0-9a-f]{64}",
+          "type": "string"
+        }
+      },
+      "required": [
+        "successor_physical_job_sha256",
+        "original_physical_job_sha256",
+        "original_status",
+        "seed",
+        "paid_infrastructure_history_preserved",
+        "release_or_scientific_equivalence_certified"
+      ],
+      "type": "object"
+    },
+    "custody": {
+      "additionalProperties": false,
+      "properties": {
+        "host_calls_or_new_measurements": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "input_metadata_hashes_verified_before_decode": {
+          "const": true,
+          "type": "boolean"
+        },
+        "models_projections_samples_rows_arrays_TEST_unopened": {
+          "const": true,
+          "type": "boolean"
+        },
+        "private_model_or_sample_payload_included": {
+          "const": false,
+          "type": "boolean"
+        },
+        "private_receipt_paths_included": {
+          "const": false,
+          "type": "boolean"
+        },
+        "public_regenerator_requires_private_inputs": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "input_metadata_hashes_verified_before_decode",
+        "models_projections_samples_rows_arrays_TEST_unopened",
+        "private_receipt_paths_included",
+        "private_model_or_sample_payload_included",
+        "public_regenerator_requires_private_inputs",
+        "host_calls_or_new_measurements"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "work-order-b-strict16-qualification-source-proof-v1",
+      "maxLength": 300,
+      "minLength": 1,
+      "type": "string"
+    },
+    "input_metadata": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "role": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "maxLength": 300,
+            "minLength": 1,
+            "pattern": "[0-9a-f]{64}",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 11,
+      "minItems": 11,
+      "type": "array"
+    },
+    "operation_joins": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "qualification_1",
+              "qualification_2",
+              "first_strict16_native"
+            ],
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "job_sha256": {
+            "maxLength": 300,
+            "minLength": 1,
+            "pattern": "[0-9a-f]{64}",
+            "type": "string"
+          },
+          "parent_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "sha256": {
+                "maxLength": 300,
+                "minLength": 1,
+                "pattern": "[0-9a-f]{64}",
+                "type": "string"
+              }
+            },
+            "required": [
+              "bytes",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "receipt_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "sha256": {
+                "maxLength": 300,
+                "minLength": 1,
+                "pattern": "[0-9a-f]{64}",
+                "type": "string"
+              }
+            },
+            "required": [
+              "bytes",
+              "sha256"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "job_sha256",
+          "receipt_ref",
+          "parent_ref"
+        ],
+        "type": "object"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "overlap": {
+      "additionalProperties": false,
+      "properties": {
+        "closed_evaluation_ledgers_included": {
+          "const": false,
+          "type": "boolean"
+        },
+        "later_live_operations_included": {
+          "const": false,
+          "type": "boolean"
+        },
+        "native8_cost_added_again": {
+          "const": false,
+          "type": "boolean"
+        },
+        "qualification_R_and_D_in_native_paid_history": {
+          "const": false,
+          "type": "boolean"
+        },
+        "snapshot_native8_included_in_native_paid_history": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "snapshot_native8_included_in_native_paid_history",
+        "native8_cost_added_again",
+        "closed_evaluation_ledgers_included",
+        "qualification_R_and_D_in_native_paid_history",
+        "later_live_operations_included"
+      ],
+      "type": "object"
+    },
+    "preserved_budget": {
+      "additionalProperties": false,
+      "properties": {
+        "cumulative_paid_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "historical_prefit_infrastructure_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "inclusive_trials": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "inclusive_trials",
+        "cumulative_paid_seconds",
+        "historical_prefit_infrastructure_seconds"
+      ],
+      "type": "object"
+    },
+    "qualification_parity": {
+      "additionalProperties": false,
+      "properties": {
+        "inspection_bytes_equal": {
+          "const": true,
+          "type": "boolean"
+        },
+        "inspection_sha256": {
+          "maxLength": 300,
+          "minLength": 1,
+          "pattern": "[0-9a-f]{64}",
+          "type": "string"
+        },
+        "model_bytes_equal": {
+          "const": true,
+          "type": "boolean"
+        },
+        "model_sha256": {
+          "maxLength": 300,
+          "minLength": 1,
+          "pattern": "[0-9a-f]{64}",
+          "type": "string"
+        },
+        "projection_bytes_equal": {
+          "const": true,
+          "type": "boolean"
+        },
+        "projection_sha256": {
+          "maxLength": 300,
+          "minLength": 1,
+          "pattern": "[0-9a-f]{64}",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_sha256",
+        "projection_sha256",
+        "inspection_sha256",
+        "model_bytes_equal",
+        "projection_bytes_equal",
+        "inspection_bytes_equal"
+      ],
+      "type": "object"
+    },
+    "source_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "binary_sha256": {
+          "maxLength": 300,
+          "minLength": 1,
+          "pattern": "[0-9a-f]{64}",
+          "type": "string"
+        },
+        "execution_source_sha256": {
+          "additionalProperties": false,
+          "properties": {
+            "source/bootstrap.py": {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            "source/coordinator.py": {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            "source/custody.py": {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            "source/lifecycle.py": {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            "source/monitor.py": {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            "source/observer.py": {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            "source/qos.py": {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "source/bootstrap.py",
+            "source/coordinator.py",
+            "source/custody.py",
+            "source/lifecycle.py",
+            "source/monitor.py",
+            "source/observer.py",
+            "source/qos.py"
+          ],
+          "type": "object"
+        },
+        "full_system_runtime_closure_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "historical_runtime_closure_upgraded": {
+          "const": false,
+          "type": "boolean"
+        },
+        "production_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "runtime_binding_sha256": {
+          "maxLength": 300,
+          "minLength": 1,
+          "pattern": "[0-9a-f]{64}",
+          "type": "string"
+        }
+      },
+      "required": [
+        "runtime_binding_sha256",
+        "binary_sha256",
+        "execution_source_sha256",
+        "full_system_runtime_closure_certified",
+        "historical_runtime_closure_upgraded",
+        "production_certified"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "const": 1,
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "input_metadata",
+    "operation_joins",
+    "qualification_parity",
+    "alias_join",
+    "preserved_budget",
+    "custody",
+    "source_scope",
+    "overlap"
+  ],
+  "type": "object"
+}
