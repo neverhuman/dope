@@ -32,7 +32,9 @@ do not change Rust certification.
 ## Cost and time budgets
 
 The CPU PR job has a 35 minute quota; the security and full-audit jobs each
-have 30 minutes. The GPU compute spend cap is one scheduled 120-minute job per
+have 30 minutes. Disposable guest package installs wait at most 300 seconds
+for an existing dpkg lock, within those job quotas, then fail if it remains held.
+The GPU compute spend cap is one scheduled 120-minute job per
 week with no automatic retries. A single neural
 fit is limited to 10 minutes and 16 GiB of estimated GPU memory. Abort a run
 when its timer, memory quota, or sealed-corpus authorization fails; the job
