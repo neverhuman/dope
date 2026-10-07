@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "dependencies": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "required": [
+        "numpy",
+        "scipy",
+        "scikit-learn",
+        "catboost"
+      ],
+      "type": "object"
+    },
+    "job_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "metrics": {
+      "properties": {
+        "mfs_v2": {
+          "type": "null"
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "privacy": {
+          "properties": {
+            "empirical_only": {
+              "const": true
+            },
+            "formal_dp": {
+              "const": false
+            },
+            "hipaa_deidentification": {
+              "const": false
+            }
+          },
+          "required": [
+            "empirical_only",
+            "formal_dp",
+            "hipaa_deidentification"
+          ],
+          "type": "object"
+        },
+        "ptf_v1": {
+          "type": "null"
+        },
+        "release_safe_l3": {
+          "type": "null"
+        },
+        "superiority": {
+          "type": "null"
+        },
+        "utility": {
+          "properties": {
+            "auditors": {
+              "required": [
+                "catboost",
+                "linear",
+                "mlp"
+              ],
+              "type": "object"
+            },
+            "null_loss": {
+              "type": "number"
+            },
+            "selection_use": {
+              "const": false
+            }
+          },
+          "required": [
+            "null_loss",
+            "auditors",
+            "selection_use"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "fidelity",
+        "detection",
+        "privacy",
+        "alpha_beta",
+        "utility",
+        "official_tests_opened",
+        "mfs_v2",
+        "ptf_v1",
+        "release_safe_l3",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "receipt_ref": {
+      "properties": {
+        "bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "type": "object"
+    },
+    "receipt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_refs": {
+      "additionalProperties": {
+        "properties": {
+          "bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "bytes"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "receipt_sha256",
+    "receipt_ref",
+    "job_sha256",
+    "dependencies",
+    "source_refs",
+    "metrics"
+  ],
+  "title": "Distinct retained validation measurement",
+  "type": "object"
+}

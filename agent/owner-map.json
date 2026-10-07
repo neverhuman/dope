@@ -1,6 +1,9 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/publish_retained_comparison.py": "external-evidence",
+    "research/benchmark/tests/test_retained_comparison.py": "external-evidence",
+    "research/benchmark/results/retained-classical-validation/": "external-evidence",
     "research/benchmark/measure_retained_samples.py": "external-evidence",
     "research/benchmark/publish_retained_metrics.py": "external-evidence",
     "research/benchmark/tests/test_retained_metrics.py": "external-evidence",
