@@ -1,6 +1,9 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/render_matched_linear_fit11_figure.py": "external-evidence",
+    "research/benchmark/results/matched-linear-fit11-figure-v1/": "external-evidence",
+    "research/benchmark/tests/test_matched_linear_fit11_figure.py": "external-evidence",
     "research/benchmark/render_matched_linear_fit11.py": "external-evidence",
     "research/benchmark/results/matched-linear-fit11-retention-v1/": "external-evidence",
     "research/benchmark/tests/test_matched_linear_fit11_retention.py": "external-evidence",
