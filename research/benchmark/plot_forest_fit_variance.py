@@ -13,6 +13,8 @@ assert panel['five_fit_default_cohort_complete'] and panel['common_sample_cells'
 matplotlib.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 9,
                            'svg.hashsalt': 'forest-two-lineage-fivefit-v1',
                            'axes.spines.top': False, 'axes.spines.right': False})
+if panel['lineages'] > 2:
+    matplotlib.rcParams['pdf.fonttype'] = 42
 fig, axes = plt.subplots(1, 3, figsize=(max(10.4, panel['lineages'] * 2.1), 3.5))
 datasets = sorted({r['dataset'] for r in panel['summary']})
 metrics = [('marginal_error_mean', 'Marginal KS/TV error'),

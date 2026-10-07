@@ -134,6 +134,12 @@ class CompleteForestCohort(unittest.TestCase):
             self.assertIsNone(row['common_metrics'])
             self.assertIsNone(row['method_quality_conclusion'])
 
+    def test_new_pdf_embeds_truetype_and_has_no_type3_fonts(self):
+        body = (ROOT/'fit-variance.pdf').read_bytes()
+        self.assertNotIn(b'/Subtype /Type3', body)
+        self.assertIn(b'/CIDFontType2', body)
+        self.assertIn(b'/FontFile2', body)
+
 
 if __name__ == '__main__':
     unittest.main()

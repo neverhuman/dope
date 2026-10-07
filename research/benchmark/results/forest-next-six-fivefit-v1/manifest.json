@@ -19,7 +19,9 @@
   "figure_environment": {
     "creation_timestamp_omitted": true,
     "matplotlib_version": "3.10.8",
-    "standard_deviation_is_not_confidence_interval": true
+    "pdf_font_type": 42,
+    "standard_deviation_is_not_confidence_interval": true,
+    "type3_fonts": 0
   },
   "files": {
     "README.md": {
@@ -38,9 +40,9 @@
       "sha256": "dcd9e4c6fd9dea75ab2bbbe47ba2bb3ffb66c70a52e4d1915e9fce245a3f744f"
     },
     "fit-variance.pdf": {
-      "bytes": 27977,
+      "bytes": 23968,
       "path": "research/benchmark/results/forest-next-six-fivefit-v1/fit-variance.pdf",
-      "sha256": "4208495ba3def130de21ba90b298ab71b0fc12a5c4fe421d53945e5cc905fe4a"
+      "sha256": "6ecf69aaf14b6831335412bd194ab3e3013a7321449cc518801e6ed5717593ba"
     },
     "fit-variance.svg": {
       "bytes": 105056,
@@ -98,9 +100,9 @@
   },
   "producer_refs": {
     "plot_forest_fit_variance.py": {
-      "bytes": 3047,
+      "bytes": 3118,
       "path": "research/benchmark/plot_forest_fit_variance.py",
-      "sha256": "1cf8de45452d4ff561cc59704c0a31056d4c579a5943ee81a7cc342ff303b7ac"
+      "sha256": "421bc63aef36b3a9477a33e28c0484dc3162f27cbcc7bb117f1f5419fa113611"
     },
     "publish_forest_fit_variance.py": {
       "bytes": 17664,

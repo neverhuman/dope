@@ -88,9 +88,9 @@
   },
   "producer_refs": {
     "plot_forest_fit_variance.py": {
-      "bytes": 3047,
+      "bytes": 3118,
       "path": "research/benchmark/plot_forest_fit_variance.py",
-      "sha256": "1cf8de45452d4ff561cc59704c0a31056d4c579a5943ee81a7cc342ff303b7ac"
+      "sha256": "421bc63aef36b3a9477a33e28c0484dc3162f27cbcc7bb117f1f5419fa113611"
     },
     "publish_forest_fit_variance.py": {
       "bytes": 17664,
