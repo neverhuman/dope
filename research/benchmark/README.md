@@ -1,5 +1,10 @@
 # Offline generator benchmark (research only)
 
+[Forest-Flow first complete five-fit cohorts](results/forest-first-two-fivefit-v1/README.md)
+reports ten real checkpoints, sixty common validation cells, native author-ML
+objective audits and variation across five independent fits on two lineages.
+The 100-lineage matrix and all gated claims remain incomplete/null.
+
 [`LOCAL_CAPACITY_AMENDMENT.md`](LOCAL_CAPACITY_AMENDMENT.md) records the owner's
 separate 200 GB xbabe3 local scratch authorization, its immutable receipt and
 unchanged operation budgets. It grants no scientific or final-test admission.
