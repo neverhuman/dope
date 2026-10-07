@@ -179,6 +179,13 @@ class PublicationTests(unittest.TestCase):
             fits = json.loads((repo / manifest["inputs"][method]["published_fit_panel"]["path"]).read_text())["fits"]
             by_identity = {(row["dataset"], row["fit_seed"], row["configuration_sha256"]): row for row in fits}
             self.assertEqual(panel["sample_cells"], expected)
+            clocks = manifest["metric_costs"][method]
+            self.assertAlmostEqual(clocks["summed_per_cell_numerical_seconds"],
+                                   sum(cell["metric_seconds"] for cell in panel["cells"]))
+            self.assertGreaterEqual(clocks["evaluator_process_wall_seconds"],
+                                    clocks["summed_per_cell_numerical_seconds"])
+            self.assertFalse(clocks["clocks_are_additive"])
+            self.assertEqual(clocks["actual_exit_code"], 0)
             self.assertEqual({x["fit_seed"] for x in panel["summary"]},
                              {23} if method == "arf" else {23, 37, 53, 71})
             for cell in panel["cells"]:

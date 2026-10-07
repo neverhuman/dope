@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "CPU replication validation batch manifest",
   "type": "object",
-  "required": ["format", "version", "producer_ref", "producer_options", "inputs", "files", "fit_scope", "sample_cells", "common_metrics_complete_for_published_fit_prefix", "full_population_complete", "five_fit_matrix_complete", "native_objectives_changed", "official_tests_opened", "mfs_v2", "ptf_v1", "release_safe_l3", "superiority"],
+  "required": ["format", "version", "producer_ref", "producer_options", "inputs", "files", "fit_scope", "sample_cells", "metric_costs", "common_metrics_complete_for_published_fit_prefix", "full_population_complete", "five_fit_matrix_complete", "native_objectives_changed", "official_tests_opened", "mfs_v2", "ptf_v1", "release_safe_l3", "superiority"],
   "properties": {
     "format": {"const": "dope-cpu-fit-replication-common-validation-batch"},
     "version": {"const": 1},
@@ -12,6 +12,7 @@
     "files": {"type": "object", "additionalProperties": {"$ref": "#/$defs/ref"}},
     "fit_scope": {"type": "object", "required": ["arf", "forest"]},
     "sample_cells": {"const": 192},
+    "metric_costs": {"type": "object", "required": ["arf", "forest"], "additionalProperties": {"type": "object", "required": ["summed_per_cell_numerical_seconds", "evaluator_process_wall_seconds", "actual_exit_code", "clocks_are_additive"], "properties": {"summed_per_cell_numerical_seconds": {"type": "number", "minimum": 0}, "evaluator_process_wall_seconds": {"type": "number", "minimum": 0}, "actual_exit_code": {"const": 0}, "clocks_are_additive": {"const": false}}}},
     "common_metrics_complete_for_published_fit_prefix": {"const": true},
     "full_population_complete": {"const": false},
     "five_fit_matrix_complete": {"const": false},
