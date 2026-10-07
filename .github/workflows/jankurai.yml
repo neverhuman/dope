@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Rust toolchain manager in the disposable guest
-        run: sudo apt-get update && sudo apt-get install -y rustup
+        run: sudo apt-get update && sudo apt-get -o DPkg::Lock::Timeout=300 install -y rustup
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'

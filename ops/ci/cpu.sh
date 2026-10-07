@@ -49,7 +49,7 @@ git diff --exit-code -- docs/whitepaper/generated/fit-trace.json docs/whitepaper
 python3 -B -m unittest research.benchmark.tests.test_verify_paper_numbers research.benchmark.tests.test_paper_log
 if ! command -v latexmk >/dev/null 2>&1 || ! command -v pdffonts >/dev/null 2>&1; then
   sudo apt-get update
-  sudo apt-get install -y latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-pictures texlive-publishers
+  sudo apt-get -o DPkg::Lock::Timeout=300 install -y latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-pictures texlive-publishers
 fi
 bash docs/whitepaper/scripts/build_pdf.sh
 python3 docs/whitepaper/scripts/check_paper.py
