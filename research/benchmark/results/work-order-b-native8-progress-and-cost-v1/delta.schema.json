@@ -1,0 +1,473 @@
+{
+  "$id": "work-order-b-native8-progress-cost-v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "budget": {
+      "additionalProperties": false,
+      "properties": {
+        "changed_cell_inclusive_seconds_after": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "changed_cell_inclusive_seconds_before": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "changed_cell_sha256_prefix": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "changed_cell_trial_count_after": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "changed_cell_trial_count_before": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "current_trial_counter_sum": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "existing_deadline_preserved": {
+          "const": true,
+          "type": "boolean"
+        },
+        "historical_trials_and_artifact_caps_preserved": {
+          "const": true,
+          "type": "boolean"
+        },
+        "initial_trial_counter_sum": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "maximum_inclusive_seconds_per_cell": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "maximum_inclusive_trials_per_cell": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "maximum_new_attempt_actual_seconds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "native_operations_started_stored_value": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "new_operation_compute_ceiling_seconds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "stored_counter_is_authoritative_fit_count": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "changed_cell_inclusive_seconds_after",
+        "changed_cell_inclusive_seconds_before",
+        "changed_cell_sha256_prefix",
+        "changed_cell_trial_count_after",
+        "changed_cell_trial_count_before",
+        "current_trial_counter_sum",
+        "existing_deadline_preserved",
+        "historical_trials_and_artifact_caps_preserved",
+        "initial_trial_counter_sum",
+        "maximum_inclusive_seconds_per_cell",
+        "maximum_inclusive_trials_per_cell",
+        "maximum_new_attempt_actual_seconds",
+        "native_operations_started_stored_value",
+        "new_operation_compute_ceiling_seconds",
+        "stored_counter_is_authoritative_fit_count"
+      ],
+      "type": "object"
+    },
+    "claims": {
+      "additionalProperties": false,
+      "properties": {
+        "MFS_v2": {
+          "type": "null"
+        },
+        "PTF_v1": {
+          "type": "null"
+        },
+        "complete_five_fit_stability": {
+          "type": "null"
+        },
+        "foreign_mutex_participation_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "full_runtime_certification": {
+          "type": "null"
+        },
+        "logical108_implies_campaign_complete": {
+          "const": false,
+          "type": "boolean"
+        },
+        "maximum_observation_is_true_peak": {
+          "const": false,
+          "type": "boolean"
+        },
+        "metadata_GPU_refusals_are_method_failures": {
+          "const": false,
+          "type": "boolean"
+        },
+        "native_winner": {
+          "type": "null"
+        },
+        "official_tests_opened": {
+          "const": false,
+          "type": "boolean"
+        },
+        "release_safe": {
+          "type": "null"
+        },
+        "superiority": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "MFS_v2",
+        "PTF_v1",
+        "complete_five_fit_stability",
+        "foreign_mutex_participation_certified",
+        "full_runtime_certification",
+        "logical108_implies_campaign_complete",
+        "maximum_observation_is_true_peak",
+        "metadata_GPU_refusals_are_method_failures",
+        "native_winner",
+        "official_tests_opened",
+        "release_safe",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "cost": {
+      "additionalProperties": false,
+      "properties": {
+        "campaign_total_seconds": {
+          "type": "null"
+        },
+        "charged_artifact_bytes_model_plus_projection_sum": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "charged_new_whole_actual_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "historical_reuse_cost_recharged": {
+          "const": false,
+          "type": "boolean"
+        },
+        "metadata_refusal_count": {
+          "type": "null"
+        },
+        "metadata_refusal_seconds": {
+          "type": "null"
+        },
+        "new1_parent_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "operation_clock_basis": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent_clock_basis": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent_plus_nested_cost_added": {
+          "const": false,
+          "type": "boolean"
+        },
+        "prior7_parent_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "qualification_R_and_D_cost_recharged": {
+          "const": false,
+          "type": "boolean"
+        },
+        "sum8_nested_operation_seconds_nonadditive": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "sum8_parent_seconds": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "campaign_total_seconds",
+        "charged_artifact_bytes_model_plus_projection_sum",
+        "charged_new_whole_actual_seconds",
+        "historical_reuse_cost_recharged",
+        "metadata_refusal_count",
+        "metadata_refusal_seconds",
+        "new1_parent_seconds",
+        "operation_clock_basis",
+        "parent_clock_basis",
+        "parent_plus_nested_cost_added",
+        "prior7_parent_seconds",
+        "qualification_R_and_D_cost_recharged",
+        "sum8_nested_operation_seconds_nonadditive",
+        "sum8_parent_seconds"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "work-order-b-native8-progress-cost-v1",
+      "minLength": 1,
+      "type": "string"
+    },
+    "native_seed_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "seed23": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "seed37": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "seed53": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "seed71": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seed23",
+        "seed37",
+        "seed53",
+        "seed71"
+      ],
+      "type": "object"
+    },
+    "operations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "CPU_model": {
+            "type": "null"
+          },
+          "CPU_seconds": {
+            "type": "null"
+          },
+          "GPU_kernel_seconds": {
+            "type": "null"
+          },
+          "GPU_model": {
+            "type": "null"
+          },
+          "actual_parent_wait_exit_code": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "attempt": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "charged_artifact_bytes_model_plus_projection": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "co_tenant": {
+            "const": false,
+            "type": "boolean"
+          },
+          "energy_joules": {
+            "type": "null"
+          },
+          "fit_only_seconds": {
+            "type": "null"
+          },
+          "job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "logical_identity_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "maximum_observed_own_resident_mib": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "maximum_observed_sampling_gap_seconds": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "operation_elapsed_seconds": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "ordinal": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "parent_elapsed_seconds": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "parent_receipt_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "parent_receipt_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "resident_measurement_kind": {
+            "const": "sum_verified_owned_pid_start_tick_resident_mib",
+            "minLength": 1,
+            "type": "string"
+          },
+          "sample_only_seconds": {
+            "type": "null"
+          },
+          "seed": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "shared_gpu_cost": {
+            "const": false,
+            "type": "boolean"
+          },
+          "status": {
+            "const": "ok",
+            "minLength": 1,
+            "type": "string"
+          },
+          "terminal_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "terminal_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "true_peak_RAM_bytes": {
+            "type": "null"
+          },
+          "true_peak_VRAM_mib": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "CPU_model",
+          "CPU_seconds",
+          "GPU_kernel_seconds",
+          "GPU_model",
+          "actual_parent_wait_exit_code",
+          "attempt",
+          "charged_artifact_bytes_model_plus_projection",
+          "co_tenant",
+          "energy_joules",
+          "fit_only_seconds",
+          "job_sha256",
+          "logical_identity_sha256",
+          "maximum_observed_own_resident_mib",
+          "maximum_observed_sampling_gap_seconds",
+          "operation_elapsed_seconds",
+          "ordinal",
+          "parent_elapsed_seconds",
+          "parent_receipt_bytes",
+          "parent_receipt_sha256",
+          "resident_measurement_kind",
+          "sample_only_seconds",
+          "seed",
+          "shared_gpu_cost",
+          "status",
+          "terminal_bytes",
+          "terminal_sha256",
+          "true_peak_RAM_bytes",
+          "true_peak_VRAM_mib"
+        ],
+        "type": "object"
+      },
+      "maxItems": 8,
+      "minItems": 8,
+      "type": "array"
+    },
+    "progress": {
+      "additionalProperties": false,
+      "properties": {
+        "closed_logical_slots": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "historical_artifact_caps": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "historical_seed11_ok_reuse": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "new_native_ok": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "ok": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "total_logical_slots": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unstarted_in_frozen_snapshot": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "closed_logical_slots",
+        "historical_artifact_caps",
+        "historical_seed11_ok_reuse",
+        "new_native_ok",
+        "ok",
+        "total_logical_slots",
+        "unstarted_in_frozen_snapshot"
+      ],
+      "type": "object"
+    },
+    "scope": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "snapshot_anchor_input_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "budget",
+    "claims",
+    "cost",
+    "format",
+    "native_seed_counts",
+    "operations",
+    "progress",
+    "scope",
+    "snapshot_anchor_input_id",
+    "version"
+  ],
+  "type": "object"
+}

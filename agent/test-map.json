@@ -1,6 +1,7 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/results/work-order-b-native8-progress-and-cost-v1/": {"command": "python3 -I -S -B research/benchmark/results/work-order-b-native8-progress-and-cost-v1/render.py --check", "purpose": "replay frozen eight-fit progress and operation clocks from hash-pinned public metadata; preserve incomplete five-fit coverage, historical artifact caps, nonadditive clocks and unknown peak/hardware/gated claims"},
     "research/benchmark/publish_cpu_fit_batch.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v", "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"},
     "research/benchmark/tests/test_cpu_fit_batch.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v", "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"},
     "research/benchmark/results/cpu-fivefit-progress-v1/": {"command": "python3 -B -m unittest research.benchmark.tests.test_cpu_fit_batch -v", "purpose": "verify frozen physical fit identities and receipt hashes before native metric reads, model/projection/source drift, byte accounting, replica aliases and null incomplete-matrix gates without any generator execution"},
