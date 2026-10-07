@@ -62,6 +62,23 @@
           ],
           "type": "object"
         },
+        "tabddpm-current-checkpoints.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
         "tabddpm-current-operation-receipts.csv": {
           "additionalProperties": false,
           "properties": {
@@ -101,6 +118,7 @@
         "checkpoints.csv",
         "figure-kpis.csv",
         "forest-key-errors.csv",
+        "tabddpm-current-checkpoints.csv",
         "tabddpm-current-operation-receipts.csv",
         "tabddpm-historical-v8-checkpoints.csv"
       ],
@@ -504,7 +522,91 @@
           ],
           "type": "object"
         },
+        "tabddpm_current_index": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_metadata_readset": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
         "tabddpm_current_operations": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_plan": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_round": {
           "additionalProperties": false,
           "properties": {
             "bytes": {
@@ -575,7 +677,11 @@
         "forest_key_errors",
         "metadata_readset",
         "tabddpm_actual_validation",
+        "tabddpm_current_index",
+        "tabddpm_current_metadata_readset",
         "tabddpm_current_operations",
+        "tabddpm_current_plan",
+        "tabddpm_current_round",
         "tabddpm_historical_checkpoints",
         "tabddpm_partial_index"
       ],
@@ -794,17 +900,41 @@
           ],
           "type": "object"
         },
+        "current_common_key_errors": {
+          "type": "integer"
+        },
+        "current_full_100_lineage_comparison_complete": {
+          "const": false
+        },
+        "current_late_native_buffers": {
+          "type": "integer"
+        },
         "current_model_hash_remeasured": {
           "const": false
+        },
+        "current_native_objectives": {
+          "type": "integer"
         },
         "current_operation_records": {
           "type": "integer"
         },
         "current_provider_inventory_complete": {
-          "const": false
+          "const": true
+        },
+        "current_provider_lineages": {
+          "type": "integer"
+        },
+        "current_recorded_providers": {
+          "type": "integer"
         },
         "historical_checkpoint_records": {
           "type": "integer"
+        },
+        "historical_readset_gap": {
+          "type": "string"
+        },
+        "inventory_completeness_scope": {
+          "type": "string"
         },
         "native_scores_are_error_losses": {
           "const": false
@@ -818,10 +948,18 @@
       },
       "required": [
         "aggregate_units",
+        "current_common_key_errors",
+        "current_full_100_lineage_comparison_complete",
+        "current_late_native_buffers",
         "current_model_hash_remeasured",
+        "current_native_objectives",
         "current_operation_records",
         "current_provider_inventory_complete",
+        "current_provider_lineages",
+        "current_recorded_providers",
         "historical_checkpoint_records",
+        "historical_readset_gap",
+        "inventory_completeness_scope",
         "native_scores_are_error_losses",
         "no_new_scientific_work",
         "precise_gap"

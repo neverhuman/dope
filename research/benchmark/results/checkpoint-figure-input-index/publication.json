@@ -14,6 +14,10 @@
       "bytes": 27607,
       "sha256": "819bc6875eaeaf7bb2bbf824ca856b8c94b12bccfe0067a8fff063019c863921"
     },
+    "tabddpm-current-checkpoints.csv": {
+      "bytes": 73642,
+      "sha256": "3cac94c72a22675b512dc7a3e312d4577b4a9d744ba638612e2343f698fe42c1"
+    },
     "tabddpm-current-operation-receipts.csv": {
       "bytes": 27168,
       "sha256": "228217e3f16ebba20ade9fe8d21577dd2811cee68ba6d320cab51ecbbc09e37e"
@@ -83,7 +87,7 @@
   "forest_error_scope": "Separate n/seed101 descriptive fragment; not the 4n/three-sample-seed schedule.",
   "format": "checkpoint-and-figure-input-publication-v1",
   "full_five_fit_seed_coverage": false,
-  "inputs_lock_sha256": "813ffe564d44995566c055f3dc3d2505d25ebf0f6178d0dfe2454414aa6999b2",
+  "inputs_lock_sha256": "0197e8d23ef18c8d6c798ec2d7e275b987375a8928524db2d243b9fbbae8334b",
   "key_error_measured_records": 1273,
   "loss_units": "TSTR/TRTR mean squared error in each frozen numeric target representation; no cross-dataset raw-MSE ranking.",
   "mfs_v2": null,
@@ -124,10 +128,30 @@
       "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-index.actual-validation.receipt.v1.json",
       "sha256": "7121cfc48209981b8252cd598d1d662df6b09d5c2c475366da3b719864fe5c2a"
     },
+    "tabddpm_current_index": {
+      "bytes": 156048,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/current-provider-index-v1/checkpoints-and-native-errors.actual.json",
+      "sha256": "1f24d5df19890b9389ce5a8dba642e862aeb58053ad7b8acb433cf80c5192b5d"
+    },
+    "tabddpm_current_metadata_readset": {
+      "bytes": 17801,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/current-provider-index-v1/publication-metadata-readset.frozen.v1.json",
+      "sha256": "bf3ab52d2e237e5e4ded4e397719fce459f7694e020bf1a154f2936e86c3482b"
+    },
     "tabddpm_current_operations": {
       "bytes": 27189,
       "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.current-operation-receipts.v1.csv",
       "sha256": "d3a30086cc37783055c21188ddafeb00d710c376e8df7fc2c88c3e6fe7e07a92"
+    },
+    "tabddpm_current_plan": {
+      "bytes": 931857,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/continuation.plan.json",
+      "sha256": "2bb62890adc6e0ebc5ea1a80eb6ff98cd3ae899739fadc4e96198a12c02b6178"
+    },
+    "tabddpm_current_round": {
+      "bytes": 1514698,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/round.lock.json",
+      "sha256": "cfa86976a2681f1c988962b1f5dc16f855a0e9f5471b5952f31ccbc1f96ab54b"
     },
     "tabddpm_historical_checkpoints": {
       "bytes": 95507,
@@ -142,10 +166,10 @@
   },
   "production_certified": false,
   "ptf_v1": null,
-  "publisher_sha256": "ddf57425a3af63990f542de1d07c51046b41cbfdd904a3afca96b030f5bd5d86",
+  "publisher_sha256": "afdf98237aa34af38670a981ddbedfa84be46c7eac6855ee959cd4b3ddcaa4a6",
   "release_safe": null,
   "remaining_methods": [
-    "TabDDPM inventory pending; full comparison incomplete",
+    "TabDDPM common metrics and full comparison incomplete",
     "TabSyn shared metrics incomplete",
     "Forest-Flow full panel incomplete"
   ],
@@ -194,13 +218,21 @@
       "native_complete": 49,
       "units_are_distinct": true
     },
+    "current_common_key_errors": 0,
+    "current_full_100_lineage_comparison_complete": false,
+    "current_late_native_buffers": 5,
     "current_model_hash_remeasured": false,
+    "current_native_objectives": 49,
     "current_operation_records": 20,
-    "current_provider_inventory_complete": false,
+    "current_provider_inventory_complete": true,
+    "current_provider_lineages": 18,
+    "current_recorded_providers": 63,
     "historical_checkpoint_records": 43,
+    "historical_readset_gap": "Current TD14 custody binds63/49/21 counts and20 operation bodies. Its exact current plan2bb62890 and roundcfa86976 are referenced, but their full bodies are not in the inspected TD14 custody directory. The available locally hash-bound artifact inventory is historical v8 (43 providers), so this index does not individually inventory/reconcile all63 current providers. No absence elsewhere is claimed.",
+    "inventory_completeness_scope": "All 63 recorded providers in this frozen readset; not the 500 planned fits or full 100-lineage comparison.",
     "native_scores_are_error_losses": false,
     "no_new_scientific_work": true,
-    "precise_gap": "Current TD14 custody binds63/49/21 counts and20 operation bodies. Its exact current plan2bb62890 and roundcfa86976 are referenced, but their full bodies are not in the inspected TD14 custody directory. The available locally hash-bound artifact inventory is historical v8 (43 providers), so this index does not individually inventory/reconcile all63 current providers. No absence elsewhere is claimed."
+    "precise_gap": "Current recorded provider metadata is bound; shared auditor errors remain unmeasured and artifact payloads were not rehashed."
   },
   "version": 1
 }

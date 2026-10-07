@@ -29,6 +29,16 @@ incomplete; MFS-v2, PTF-v1, release and superiority claims remain null.
   completions and 21 matched batches: different units, never substituted for
   one another or for a complete 100-lineage comparison. The exact current
   inventory gap is scoped to the inspected local custody/readset.
+- `tabddpm-current-checkpoints.csv`: all 63 recorded provider inventories in the
+  separately frozen current metadata readset, covering 18 lineages. Each row
+  lists recorded artifact paths, hashes and bytes including projection bytes.
+  The 49 measured native values join back to the original author five-seed
+  validation R² receipts. Five scored native buffers were first pinned during the
+  later metadata collection; their prior digest binding remains false. All
+  common 4n CatBoost TSTR MSE values remain null because shared auditor receipts
+  were not measured in this readset. This table fills the current recorded
+  inventory gap without completing the planned 500 fits or the 100-lineage
+  comparison. Historical tables and their separate scope are retained.
 - `publication.json` and its schema bind tables, source publications and immutable
   private metadata inputs. Current model/sample payloads were not read or
   rehashed. No present retention or availability claim follows from a recorded
@@ -44,6 +54,6 @@ python3 -B -m unittest research.benchmark.tests.test_checkpoint_index -v
 
 The private full checkpoint index/readset remain referenced by immutable digests;
 weights, source rows, samples and detailed logs are not committed. TabDDPM's full
-checkpoint inventory, TabSyn's common validation metrics, Forest-Flow's complete
+matched common metrics, TabSyn's common validation metrics, Forest-Flow's complete
 panel, and the common expanded diagnostic matrix still require measured evidence.
 This index does not establish an IEEE-ready complete comparison.

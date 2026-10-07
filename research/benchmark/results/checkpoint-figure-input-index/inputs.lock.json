@@ -1,5 +1,5 @@
 {
-  "format": "checkpoint-figure-input-lock-v1",
+  "format": "checkpoint-figure-input-lock-v2",
   "new_fit_sample_or_auditor_operations": 0,
   "official_tests_opened": false,
   "payloads_rehashed": false,
@@ -34,10 +34,30 @@
       "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-index.actual-validation.receipt.v1.json",
       "sha256": "7121cfc48209981b8252cd598d1d662df6b09d5c2c475366da3b719864fe5c2a"
     },
+    "tabddpm_current_index": {
+      "bytes": 156048,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/current-provider-index-v1/checkpoints-and-native-errors.actual.json",
+      "sha256": "1f24d5df19890b9389ce5a8dba642e862aeb58053ad7b8acb433cf80c5192b5d"
+    },
+    "tabddpm_current_metadata_readset": {
+      "bytes": 17801,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/current-provider-index-v1/publication-metadata-readset.frozen.v1.json",
+      "sha256": "bf3ab52d2e237e5e4ded4e397719fce459f7694e020bf1a154f2936e86c3482b"
+    },
     "tabddpm_current_operations": {
       "bytes": 27189,
       "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.current-operation-receipts.v1.csv",
       "sha256": "d3a30086cc37783055c21188ddafeb00d710c376e8df7fc2c88c3e6fe7e07a92"
+    },
+    "tabddpm_current_plan": {
+      "bytes": 931857,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/continuation.plan.json",
+      "sha256": "2bb62890adc6e0ebc5ea1a80eb6ff98cd3ae899739fadc4e96198a12c02b6178"
+    },
+    "tabddpm_current_round": {
+      "bytes": 1514698,
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/round.lock.json",
+      "sha256": "cfa86976a2681f1c988962b1f5dc16f855a0e9f5471b5952f31ccbc1f96ab54b"
     },
     "tabddpm_historical_checkpoints": {
       "bytes": 95507,
