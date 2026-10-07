@@ -15,7 +15,7 @@ from .publish_s3_matched import schema
 HERE = Path(__file__).parent
 RESULTS = HERE / 'results'
 NAME = 'checkpoint-figure-input-index'
-INPUT_SHA = '813ffe564d44995566c055f3dc3d2505d25ebf0f6178d0dfe2454414aa6999b2'
+INPUT_SHA = '0197e8d23ef18c8d6c798ec2d7e275b987375a8928524db2d243b9fbbae8334b'
 PANELS = ('dope-s3-population-validation.json', 'dope-target-refinement-population-validation.json',
           'arf-matched-population-validation.json', 'density-matched-population-validation.json')
 SEEDS = (101, 211, 307)
@@ -162,6 +162,94 @@ def verify_checkpoint_errors(index, panels):
         guard.require(checkpoint['key_error_value'] == expected, 'checkpoint error differs from measured cells')
 
 
+def tabddpm_current_rows(index, plan, round_lock, receipts, plan_sha):
+    """Export recorded providers, joining author R² to its original small receipt."""
+    guard.require(index['official_tests_opened'] is False and type(index['payload_reads']) is int
+                  and index['payload_reads'] == 0 and index['shared_metric_cells_published'] == 0
+                  and index['current_bulk_rehashed'] is False and index['full_campaign_complete'] is False,
+                  'current provider inventory scope differs')
+    jobs = {j['job_sha256']: j for j in plan['jobs']}
+    canonical = {hashlib.sha256(json.dumps(j, sort_keys=True, separators=(',', ':'),
+                                         allow_nan=False).encode()).hexdigest(): j for j in round_lock['jobs']}
+    guard.require(len(jobs) == len(plan['jobs']) and len(canonical) == len(round_lock['jobs']),
+                  'duplicate frozen fit identity')
+    objective = plan['native_objective']
+    guard.require(objective == round_lock['native_objective'] and objective['direction'] == 'maximize'
+                  and objective['shared_kpi_used_for_selection'] is False
+                  and objective['native_values_cross_method_ranking'] is False,
+                  'native objective differs from the frozen author objective')
+    output = []; identities = set()
+    for row in index['rows']:
+        job_sha = row['canonical_job_sha256']; guard.digest(job_sha)
+        guard.require(job_sha not in identities and row['source_plan_sha256'] == plan_sha,
+                      'duplicate provider or changed source plan')
+        identities.add(job_sha); job = jobs[job_sha]; original = canonical[job_sha]
+        guard.require(row['method'] == original['method'] == 'TabDDPM'
+                      and row['dataset'] == job['dataset'] == original['dataset']
+                      and row['configuration'] == job['configuration'] == original['configuration_name']
+                      and type(row['fit_seed']) is int and type(original['fit_seed']) is int
+                      and row['fit_seed'] == original['fit_seed'] == 11,
+                      'current provider differs from its frozen fit identity')
+        inventory = row['artifact_inventory']
+        guard.require(inventory and len({a['path'] for a in inventory}) == len(inventory),
+                      'missing or duplicate recorded artifact')
+        for artifact in inventory:
+            guard.digest(artifact['sha256'])
+            guard.require(type(artifact['bytes']) is int and artifact['bytes'] >= 0,
+                          'invalid recorded artifact bytes')
+        guard.require(type(row['artifact_recorded_bytes']) is int
+                      and row['artifact_recorded_bytes'] == sum(a['bytes'] for a in inventory)
+                      and row['artifact_payload_rehashed_now'] is False and row['shared_tstr_mse'] is None,
+                      'recorded charge or unmeasured common error differs')
+        provider = job['artifact_provider']; fit_ref = row['fit_receipt']
+        if provider is not None:
+            guard.require(provider['path'] == row['provider_recorded_path']
+                          and provider['inventory'] == inventory, 'predecessor provider differs')
+        else:
+            guard.require(fit_ref is not None, 'new provider has no fit receipt')
+            fit = receipts[fit_ref['sha256']]
+            guard.require(fit['job_sha256'] == job_sha and fit['status'] == 'ok'
+                          and fit['artifact_inventory'] == inventory
+                          and fit['artifact_bytes'] == row['artifact_recorded_bytes'],
+                          'new provider differs from its recorded fit')
+        ref = row['native_receipt']; value = row['native_validation_r2']
+        if ref is not None:
+            native = receipts[ref['sha256']]
+            guard.require(native['job_sha256'] == job_sha and native['official_tests_opened'] is False
+                          and native['mfs_v2'] is None and native['ptf_v1'] is None
+                          and native['partition'] == 'official_training_derived_validation'
+                          and native['name'] == row['native_objective'] == objective['name']
+                          and native['implementation_sha256'] == objective['implementation_sha256']
+                          and native['validation_sha256'] == original['worker']['files']['validation.csv']
+                          and native['direction'] == objective['direction'] and finite(value)
+                          and native['value'] == value, 'native score differs from its original receipt')
+            components = native['components']
+            guard.require([c['sample_seed'] for c in components] == objective['sample_seeds']
+                          and all(type(c['sample_seed']) is int and finite(c['r2']) for c in components)
+                          and math.isclose(value, math.fsum(c['r2'] for c in components) / len(components),
+                                           rel_tol=1e-12, abs_tol=1e-12), 'native five-seed mean differs')
+            guard.require(type(row['native_output_buffer_prior_digest_bound']) is bool,
+                          'native custody status must remain explicit')
+        else:
+            guard.require(value is None and row['native_error_reason'], 'missing native score lacks a reason')
+        output.append(dict(method=row['method'], dataset=row['dataset'], configuration=row['configuration'],
+            fit_seed=row['fit_seed'], canonical_job_sha256=job_sha,
+            provider_recorded_path=row['provider_recorded_path'], artifact_recorded_bytes=row['artifact_recorded_bytes'],
+            artifact_inventory=inventory, native_objective=row['native_objective'], native_validation_r2=value,
+            native_receipt_path=ref['path'] if ref else None, native_receipt_sha256=ref['sha256'] if ref else None,
+            native_output_buffer_prior_digest_bound=row['native_output_buffer_prior_digest_bound'],
+            key_error_metric='shared_validation_4n_catboost_tstr_mse', key_error_value=None,
+            key_error_missing_reason='Shared auditor receipt not measured in this readset; R2 is a separate author native objective.',
+            artifact_payload_rehashed_now=False))
+    guard.require(len(output) == index['checkpoint_records']
+                  and len({r['dataset'] for r in output}) == index['unique_lineages']
+                  and sum(r['native_validation_r2'] is not None for r in output)
+                      == index['native_scalar_verified_from_original_receipt']
+                  and sum(r['matched_sample_batch_recorded'] is True for r in index['rows'])
+                      == index['matched_sample_batches'], 'current provider coverage differs')
+    return output
+
+
 def build():
     anchor_path = (RESULTS / NAME / 'inputs.lock.json').absolute()
     anchor = guard.decode(bound_bytes(anchor_path, INPUT_SHA))
@@ -173,6 +261,20 @@ def build():
     for path, ref in readset.items():
         body = bound_bytes(path, ref['sha256'])
         guard.require(len(body) == ref['bytes'], 'metadata byte count differs')
+    td_readset = guard.decode(frozen['tabddpm_current_metadata_readset'])
+    td_buffers = {}
+    for path, ref in td_readset.items():
+        body = bound_bytes(path, ref['sha256'])
+        guard.require(len(body) == ref['bytes'], 'current native metadata byte count differs')
+        td_buffers[ref['sha256']] = body
+    td_index = guard.decode(frozen['tabddpm_current_index'])
+    td_plan = guard.decode(frozen['tabddpm_current_plan'])
+    td_round = guard.decode(frozen['tabddpm_current_round'])
+    guard.require(td_round['continuation_plan_sha256'] == anchor['private_inputs']['tabddpm_current_plan']['sha256'],
+                  'current round refers to a different continuation plan')
+    td_current = tabddpm_current_rows(td_index, td_plan, td_round,
+        {pin: guard.decode(body) for pin, body in td_buffers.items()},
+        anchor['private_inputs']['tabddpm_current_plan']['sha256'])
     index = guard.decode(frozen['checkpoint_index'])
     source_pins = {name: ref['sha256'] for name, ref in index['source_publications'].items()}
     panels = {}
@@ -190,11 +292,13 @@ def build():
                'figure-kpis.csv': csv_text(figure_rows, figure_fields),
                'forest-key-errors.csv': csv_lf(frozen['forest_key_errors']),
                'tabddpm-historical-v8-checkpoints.csv': csv_lf(frozen['tabddpm_historical_checkpoints']),
-               'tabddpm-current-operation-receipts.csv': csv_lf(frozen['tabddpm_current_operations'])}
+               'tabddpm-current-operation-receipts.csv': csv_lf(frozen['tabddpm_current_operations']),
+               'tabddpm-current-checkpoints.csv': csv_text(td_current, tuple(td_current[0]))}
     forest = guard.decode(frozen['forest_coverage'])
     td = guard.decode(frozen['tabddpm_partial_index'])
     # Repeat the small metadata and frozen-input checks before writing derived evidence.
     for path, ref in readset.items(): bound_bytes(path, ref['sha256'])
+    for path, ref in td_readset.items(): bound_bytes(path, ref['sha256'])
     for name, ref in anchor['private_inputs'].items():
         guard.require(bound_bytes(ref['path'], ref['sha256']) == frozen[name], 'input changed during projection')
     for name, expected in source_pins.items(): bound_bytes((RESULTS / name).absolute(), expected)
@@ -209,15 +313,22 @@ def build():
         forest_coverage=forest,
         tabddpm_coverage=dict(aggregate_units=td['current_TD14_aggregate_units'],
             historical_checkpoint_records=len(td['historical_recorded_providers']),
-            current_operation_records=len(td['current_operations']), precise_gap=td['precise_gap'],
-            current_provider_inventory_complete=False, current_model_hash_remeasured=False,
+            current_operation_records=len(td['current_operations']), historical_readset_gap=td['precise_gap'],
+            precise_gap='Current recorded provider metadata is bound; shared auditor errors remain unmeasured and artifact payloads were not rehashed.',
+            current_provider_inventory_complete=True, current_model_hash_remeasured=False,
+            inventory_completeness_scope='All 63 recorded providers in this frozen readset; not the 500 planned fits or full 100-lineage comparison.',
+            current_recorded_providers=len(td_current), current_provider_lineages=td_index['unique_lineages'],
+            current_native_objectives=sum(r['native_validation_r2'] is not None for r in td_current),
+            current_common_key_errors=0, current_full_100_lineage_comparison_complete=False,
+            current_late_native_buffers=sum(r['native_validation_r2'] is not None
+                and r['native_output_buffer_prior_digest_bound'] is False for r in td_current),
             native_scores_are_error_losses=False, no_new_scientific_work=True),
         private_inputs=anchor['private_inputs'],
         source_publications={name: dict(path='research/benchmark/results/' + name, sha256=pin) for name, pin in source_pins.items()},
         inputs_lock_sha256=INPUT_SHA, publisher_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         artifact_tables={name: dict(sha256=hashlib.sha256(body).hexdigest(), bytes=len(body)) for name, body in outputs.items()},
         checkpoint_aliases_are_additional_compute=False, full_five_fit_seed_coverage=False,
-        artifact_payload_bytes_read=0, remaining_methods=['TabDDPM inventory pending; full comparison incomplete',
+        artifact_payload_bytes_read=0, remaining_methods=['TabDDPM common metrics and full comparison incomplete',
                                                         'TabSyn shared metrics incomplete', 'Forest-Flow full panel incomplete'],
         **CLAIMS)
     return report, outputs

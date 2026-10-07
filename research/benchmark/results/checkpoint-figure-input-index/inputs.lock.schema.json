@@ -1,57 +1,324 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "const": {
-    "format": "checkpoint-figure-input-lock-v1",
-    "new_fit_sample_or_auditor_operations": 0,
-    "official_tests_opened": false,
-    "payloads_rehashed": false,
-    "private_inputs": {
-      "checkpoint_actual_receipt": {
-        "bytes": 1479,
-        "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/actual.receipt.json",
-        "sha256": "3f6620dbf6d48b4b3a3d5ca28505da5f5a7227a60aebf4da2b320dfd96e41946"
-      },
-      "checkpoint_index": {
-        "bytes": 15137552,
-        "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/checkpoints.json",
-        "sha256": "a9dccced93d2be2bc44be76c8f99b14ce3435d823c333969b5f28b9577b4c67b"
-      },
-      "forest_coverage": {
-        "bytes": 2123,
-        "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/checkpoint-key-errors.coverage.receipt.v1.json",
-        "sha256": "708990f2a615520078300825fcdc8f42ddd051654d116716dc8924457a7edcfd"
-      },
-      "forest_key_errors": {
-        "bytes": 27645,
-        "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoint-key-errors.frozen-v24.v1.csv",
-        "sha256": "a8304a407337594bbdcc0c1ec3d089b99f4238705aaa00932fce0c8035e39e4b"
-      },
-      "metadata_readset": {
-        "bytes": 887520,
-        "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/metadata-readset.json",
-        "sha256": "4df012a79e2edcc07f803e3d5e7ffc71b66322d08e0cb02ebe63fd14875f07ce"
-      },
-      "tabddpm_actual_validation": {
-        "bytes": 9716,
-        "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-index.actual-validation.receipt.v1.json",
-        "sha256": "7121cfc48209981b8252cd598d1d662df6b09d5c2c475366da3b719864fe5c2a"
-      },
-      "tabddpm_current_operations": {
-        "bytes": 27189,
-        "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.current-operation-receipts.v1.csv",
-        "sha256": "d3a30086cc37783055c21188ddafeb00d710c376e8df7fc2c88c3e6fe7e07a92"
-      },
-      "tabddpm_historical_checkpoints": {
-        "bytes": 95507,
-        "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.historical-v8-recorded-provider-checkpoints.v1.csv",
-        "sha256": "98d414d4262d431e0a1f8cafad7f45d12939fdfdcc8e95ae0f96f38ec1ae64eb"
-      },
-      "tabddpm_partial_index": {
-        "bytes": 151314,
-        "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-metadata.partial.v1.json",
-        "sha256": "066b62908eb05d16381e88bd0ab58166c8a363e968df24721c4a13c92c43996f"
-      }
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "checkpoint-figure-input-lock-v2"
     },
-    "scientific_execution": false
-  }
+    "new_fit_sample_or_auditor_operations": {
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "payloads_rehashed": {
+      "const": false
+    },
+    "private_inputs": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_actual_receipt": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "checkpoint_index": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "forest_coverage": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "forest_key_errors": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "metadata_readset": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_actual_validation": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_index": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_metadata_readset": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_operations": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_plan": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_current_round": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_historical_checkpoints": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "tabddpm_partial_index": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "checkpoint_actual_receipt",
+        "checkpoint_index",
+        "forest_coverage",
+        "forest_key_errors",
+        "metadata_readset",
+        "tabddpm_actual_validation",
+        "tabddpm_current_index",
+        "tabddpm_current_metadata_readset",
+        "tabddpm_current_operations",
+        "tabddpm_current_plan",
+        "tabddpm_current_round",
+        "tabddpm_historical_checkpoints",
+        "tabddpm_partial_index"
+      ],
+      "type": "object"
+    },
+    "scientific_execution": {
+      "const": false
+    }
+  },
+  "required": [
+    "format",
+    "new_fit_sample_or_auditor_operations",
+    "official_tests_opened",
+    "payloads_rehashed",
+    "private_inputs",
+    "scientific_execution"
+  ],
+  "type": "object"
 }

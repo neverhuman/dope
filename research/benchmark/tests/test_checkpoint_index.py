@@ -25,6 +25,72 @@ def fixture():
 
 
 class CheckpointIndex(unittest.TestCase):
+    def current_fixture(self):
+        objective = dict(name='author_five_synthetic_seed_validation_catboost_r2_mean',
+                         direction='maximize', implementation_sha256='1' * 64,
+                         sample_seeds=list(range(5)), shared_kpi_used_for_selection=False,
+                         native_values_cross_method_ranking=False)
+        original = dict(method='TabDDPM', dataset='0' * 16, configuration_name='default', fit_seed=11,
+                        worker=dict(files={'validation.csv': '6' * 64}))
+        job_sha = hashlib.sha256(json.dumps(original, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        inventory = [dict(path='projection.json', bytes=9, sha256='2' * 64)]
+        receipt = dict(job_sha256=job_sha, official_tests_opened=False, mfs_v2=None, ptf_v1=None,
+            partition='official_training_derived_validation', name=objective['name'], direction='maximize',
+            implementation_sha256=objective['implementation_sha256'], validation_sha256='6' * 64, value=.3,
+            components=[dict(sample_seed=i, r2=.3) for i in range(5)])
+        row = dict(method='TabDDPM', dataset=original['dataset'], configuration='default', fit_seed=11,
+            canonical_job_sha256=job_sha, source_plan_sha256='3' * 64, artifact_inventory=inventory,
+            artifact_recorded_bytes=9, artifact_payload_rehashed_now=False, shared_tstr_mse=None,
+            provider_recorded_path='/opaque/artifact', fit_receipt=None,
+            native_receipt=dict(sha256='4' * 64, path='/opaque/native.json'), native_validation_r2=.3,
+            native_objective=objective['name'], native_output_buffer_prior_digest_bound=False,
+            native_error_reason=None, matched_sample_batch_recorded=False)
+        index = dict(official_tests_opened=False, payload_reads=0, current_bulk_rehashed=False,
+            full_campaign_complete=False, rows=[row], checkpoint_records=1, unique_lineages=1,
+            native_scalar_verified_from_original_receipt=1, shared_metric_cells_published=0, matched_sample_batches=0)
+        job = dict(job_sha256=job_sha, dataset=row['dataset'], configuration='default',
+                   artifact_provider=dict(path=row['provider_recorded_path'], inventory=inventory))
+        plan = dict(jobs=[job], native_objective=objective)
+        round_lock = dict(jobs=[original], native_objective=objective)
+        return index, plan, round_lock, {'4' * 64: receipt}, '3' * 64
+
+    def test_current_author_score_keeps_late_custody_and_unmeasured_common_error(self):
+        row = p.tabddpm_current_rows(*self.current_fixture())[0]
+        self.assertEqual(row['native_validation_r2'], .3)
+        self.assertFalse(row['native_output_buffer_prior_digest_bound'])
+        self.assertIsNone(row['key_error_value'])
+        self.assertIn('separate author native objective', row['key_error_missing_reason'])
+
+    def test_current_provider_rejects_identity_inventory_and_native_mean_forgery(self):
+        for change in ('fit_seed', 'configuration', 'duplicate', 'charge', 'receipt_job', 'mean',
+                       'seed', 'score', 'common_error', 'sealed', 'split'):
+            index, plan, round_lock, receipts, plan_sha = self.current_fixture()
+            row = index['rows'][0]; receipt = receipts['4' * 64]
+            if change == 'fit_seed': row['fit_seed'] = 11.
+            if change == 'configuration': row['configuration'] = 'native_trial_1'
+            if change == 'duplicate': index['rows'].append(deepcopy(row))
+            if change == 'charge': row['artifact_recorded_bytes'] = 8
+            if change == 'receipt_job': receipt['job_sha256'] = '5' * 64
+            if change == 'mean': receipt['components'][0]['r2'] = 1.
+            if change == 'seed': receipt['components'][0]['sample_seed'] = 0.
+            if change == 'score': receipt['mfs_v2'] = .99
+            if change == 'common_error': row['shared_tstr_mse'] = .3
+            if change == 'sealed': receipt['official_tests_opened'] = True
+            if change == 'split': receipt['validation_sha256'] = '7' * 64
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                p.tabddpm_current_rows(index, plan, round_lock, receipts, plan_sha)
+
+    def test_current_new_provider_must_join_its_fit_inventory(self):
+        index, plan, round_lock, receipts, plan_sha = self.current_fixture()
+        row = index['rows'][0]; plan['jobs'][0]['artifact_provider'] = None
+        with self.assertRaises(ValueError): p.tabddpm_current_rows(index, plan, round_lock, receipts, plan_sha)
+        row['fit_receipt'] = dict(sha256='5' * 64)
+        receipts['5' * 64] = dict(job_sha256=row['canonical_job_sha256'], status='ok',
+                                 artifact_inventory=row['artifact_inventory'], artifact_bytes=9)
+        self.assertEqual(len(p.tabddpm_current_rows(index, plan, round_lock, receipts, plan_sha)), 1)
+        receipts['5' * 64]['artifact_bytes'] = 10
+        with self.assertRaises(ValueError): p.tabddpm_current_rows(index, plan, round_lock, receipts, plan_sha)
+
     def test_csv_export_preserves_quoted_fields_and_missing_values(self):
         original = b'a,b,c\r\n"has,comma",,"has""quote"\r\n'
         output = p.csv_lf(original)
@@ -119,6 +185,18 @@ class CheckpointIndex(unittest.TestCase):
         self.assertTrue(all(r['key_error_missing_reason'] for r in rows if not r['key_error_value']))
         self.assertTrue(all('MSE at 4n' in r['key_error_metric'] for r in rows))
         self.assertTrue(all(json.loads(r['recorded_artifacts']) for r in rows))
+
+    def test_committed_current_tabddpm_inventory_does_not_substitute_native_for_common(self):
+        report = self.report(); root = p.RESULTS / p.NAME
+        rows = list(csv.DictReader(io.StringIO((root / 'tabddpm-current-checkpoints.csv').read_text())))
+        self.assertEqual(len(rows), 63)
+        self.assertEqual(len({r['canonical_job_sha256'] for r in rows}), 63)
+        self.assertEqual(len({r['dataset'] for r in rows}), 18)
+        self.assertEqual(sum(bool(r['native_validation_r2']) for r in rows), 49)
+        self.assertTrue(all(r['key_error_value'] == '' and r['key_error_missing_reason'] for r in rows))
+        self.assertEqual(sum(r['native_output_buffer_prior_digest_bound'] == 'False'
+                             and bool(r['native_validation_r2']) for r in rows), 5)
+        self.assertFalse(report['tabddpm_coverage']['current_full_100_lineage_comparison_complete'])
 
     def test_committed_schema_hashes_source_and_claims(self):
         report = self.report(); root = p.RESULTS / p.NAME
