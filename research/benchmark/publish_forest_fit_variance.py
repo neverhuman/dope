@@ -60,6 +60,15 @@ def build(inputs):
         lineages = inputs['lineages']
         require(type(lineages) is int and 1 <= lineages <= 100, 'invalid_lineage_count')
     expected_fits, expected_cells = lineages * 5, lineages * 30
+    projection = inputs.get('cohort_projection')
+    cohort = None
+    if projection is not None:
+        require(type(projection) is dict and type(projection['datasets']) is list
+                and len(projection['datasets']) == lineages
+                and all(type(v) is str for v in projection['datasets']), 'invalid_cohort_projection')
+        require(len(set(projection['datasets'])) == lineages
+                and projection['shared_metric_selection_used'] is False, 'invalid_cohort_projection')
+        cohort = set(projection['datasets'])
     require(len(inputs['fits']) == expected_fits, 'complete_fit_cohort_required')
     require(inputs['official_tests_opened'] is False, 'official_tests_must_be_sealed')
     proof = verified(inputs['original_verification'])
@@ -98,7 +107,8 @@ def build(inputs):
                     and all(cell[k] is None for k in ('mfs_v2', 'ptf_v1', 'release_safe_l3', 'superiority')),
                     'unsupported_metric_claim')
             implementations.add(tuple(sorted((k, v['sha256']) for k, v in cell['source_refs'].items())))
-            cells.append(dict(cell, receipt_ref=ref))
+            if cohort is None or cell['dataset'] in cohort:
+                cells.append(dict(cell, receipt_ref=ref))
     require(len(cells) == expected_cells and len({c['job_sha256'] for c in cells}) == expected_cells
             and len(implementations) == 1, 'complete_common_metric_cohort_required')
     native_members = {}
@@ -110,6 +120,9 @@ def build(inputs):
         for ref in complete['receipts']:
             require(ref['path'] not in native_members, 'duplicate_native_receipt')
             native_members[ref['path']] = (ref['sha256'], batch['round']['sha256'])
+    if cohort is not None:
+        require(set(entry['native']['path'] for entry in inputs['fits']) <= set(native_members), 'projected_native_receipt_missing')
+        native_members = {entry['native']['path']: native_members[entry['native']['path']] for entry in inputs['fits']}
     require(len(native_members) == expected_fits, 'complete_native_objective_receipts_required')
     fits = []
     for entry in inputs['fits']:
@@ -129,6 +142,7 @@ def build(inputs):
                 and fit['round_sha256'] == close['round_sha256'] == entry['round']['sha256']
                 and any(j['job_sha256'] == fit['job_sha256'] and j['file_sha256'] == entry['job']['sha256']
                         for j in round_lock['jobs']), 'fit_not_in_frozen_round')
+        require(cohort is None or fit['dataset'] in cohort, 'projected_fit_dataset_changed')
         require(fit['status'] == native['status'] == 'ok' and close['worker_exit_code'] == 0
                 and close['fit_receipt_sha256'] == native['fit_ref']['sha256'] == entry['fit']['sha256']
                 and fit['job_file_sha256'] == native['job_ref']['sha256'] == entry['job']['sha256']

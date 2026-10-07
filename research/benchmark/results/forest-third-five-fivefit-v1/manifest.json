@@ -1,0 +1,113 @@
+{
+  "common_flatten_source_ref": {
+    "bytes": 10720,
+    "path": "research/benchmark/publish_retained_metrics.py",
+    "sha256": "dce2e68de574c5029e74de2675e9b1377789894e5a0482c0763d135db579384c"
+  },
+  "costs": {
+    "clocks_are_additive": false,
+    "common_process_wall_seconds": [
+      90.32695650588721,
+      23.2224638229236
+    ],
+    "sum_common_metric_seconds": 89.7667307103984,
+    "sum_generator_fit_seconds": 626.6618677470833,
+    "sum_native_audit_seconds": 152.86649599205703,
+    "sum_whole_fit_seconds": 930.0782323544845
+  },
+  "counts_as_dope_win": false,
+  "figure_environment": {
+    "creation_timestamp_omitted": true,
+    "matplotlib_version": "3.10.8",
+    "pdf_font_type": 42,
+    "standard_deviation_is_not_confidence_interval": true,
+    "type3_fonts": 0
+  },
+  "files": {
+    "README.md": {
+      "bytes": 4427,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/README.md",
+      "sha256": "1ace0d29b2f26e1f02a590ac018ebe651f1a230166bd67c08f325222b906b8cb"
+    },
+    "checkpoint-kpis.csv": {
+      "bytes": 12160,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/checkpoint-kpis.csv",
+      "sha256": "5519215a7d6f515206e36d5d11bb7db4ac5a08bec7a4c8b874a36aed2c9c89a3"
+    },
+    "figure-kpis.csv": {
+      "bytes": 17892,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/figure-kpis.csv",
+      "sha256": "c394d8ff4d1050fbb3e9a410635e2f79d7822a81214d3b26824254437a6a6e72"
+    },
+    "fit-variance.pdf": {
+      "bytes": 22429,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/fit-variance.pdf",
+      "sha256": "5999260c9d541c13d5d5d5f8618349cf436938bcf86432392b612980e9138bc5"
+    },
+    "fit-variance.svg": {
+      "bytes": 93083,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/fit-variance.svg",
+      "sha256": "827ec8bd6f0d61a2cb99f6565f1c6d33ee45628255bc0bf9060eb171adaeb441"
+    },
+    "inputs.lock.json": {
+      "bytes": 63792,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/inputs.lock.json",
+      "sha256": "abde27da0caa541c2477ce1d36cce172ee03a1c68e86cac00935db1149088a62"
+    },
+    "manifest.schema.json": {
+      "bytes": 2281,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/manifest.schema.json",
+      "sha256": "4da7269daa5aa0e22266dc0cbaeee8fe6092ddf82e21e494ce119b30fc198015"
+    },
+    "original-verification.json": {
+      "bytes": 53455,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/original-verification.json",
+      "sha256": "137c5ee6edbf8410229a8144cf4675c257558500f40b9b14f438b67756a4f47c"
+    },
+    "panel.json": {
+      "bytes": 2368071,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
+      "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
+    },
+    "panel.schema.json": {
+      "bytes": 6374,
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.schema.json",
+      "sha256": "7631901396a830cb18eb81650931736b1cb5c8ad2dcf21fd8903a887952a1981"
+    }
+  },
+  "format": "forest-third-five-fivefit-publication-v1",
+  "full_population_complete": false,
+  "generator_fits": 25,
+  "input_ref": {
+    "bytes": 63792,
+    "path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/inputs.lock.json",
+    "sha256": "abde27da0caa541c2477ce1d36cce172ee03a1c68e86cac00935db1149088a62"
+  },
+  "lineages": 5,
+  "mfs_v2": null,
+  "native_selected_population_complete": false,
+  "official_tests_opened": false,
+  "original_checkpoints_sha_verified": 25,
+  "original_verification_ref": {
+    "bytes": 53455,
+    "path": "research/benchmark/results/forest-third-five-fivefit-v1/original-verification.json",
+    "sha256": "137c5ee6edbf8410229a8144cf4675c257558500f40b9b14f438b67756a4f47c"
+  },
+  "producer_refs": {
+    "plot_forest_fit_variance.py": {
+      "bytes": 3439,
+      "path": "research/benchmark/plot_forest_fit_variance.py",
+      "sha256": "00ac9bd525bf1953744e6fde205acd1f7cbc932c611cefd04c2233c21e882578"
+    },
+    "publish_forest_fit_variance.py": {
+      "bytes": 18651,
+      "path": "research/benchmark/publish_forest_fit_variance.py",
+      "sha256": "54e273911caa546be97fd33a499986ca2bf2fd4f9ef7241adb3a98b43583c4af"
+    }
+  },
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "sample_cells": 150,
+  "superiority": null,
+  "version": 1
+}

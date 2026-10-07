@@ -1,5 +1,7 @@
 # Offline generator benchmark (research only)
 
+[Forest-Flow five additional homogeneous five-fit cohorts](results/forest-third-five-fivefit-v1/README.md)
+
 [Forest-Flow six additional complete five-fit cohorts](results/forest-next-six-fivefit-v1/README.md)
 reports thirty checkpoints, 180 common validation cells, thirty native author-ML
 objective audits and between-fit SD. Eight earlier timeouts retain explicit,

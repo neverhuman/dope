@@ -1,0 +1,902 @@
+{
+  "cohort_projection": {
+    "datasets": [
+      "e18350fb51a9d1b0",
+      "ce837ccd24a3a18c",
+      "f652ea96eff62654",
+      "7423783f7e38bb9b",
+      "552665868f8f72ed"
+    ],
+    "excluded_dataset": "ed2efb82fce4b098",
+    "native_membership_verified_against_unmodified_whole_batch_locks": true,
+    "original_metric_batches_verified_before_projection": true,
+    "reason": "legacy seed11 GPU fit is retained separately; homogeneous current CPU fit receipts only",
+    "shared_metric_selection_used": false
+  },
+  "fits": [
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3224588b20de06d601b3b417e9f619f95573da78eb18f1ef0680256507b63b8b.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/daf19b0701fdccb266256675b17113dae2d2f29978abc4b32d66bfede7e91af9/close.json",
+        "sha256": "3224588b20de06d601b3b417e9f619f95573da78eb18f1ef0680256507b63b8b"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/f6368b7d28b5f75c1670636819cb31a1db838723b8c203ac1ac8c753cc026dc3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/daf19b0701fdccb266256675b17113dae2d2f29978abc4b32d66bfede7e91af9/fit.json",
+        "sha256": "f6368b7d28b5f75c1670636819cb31a1db838723b8c203ac1ac8c753cc026dc3"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/e0dd0c39e95ff877acde359e50720ef6ca9ab84b720cab88bd86fb89c990eb68.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/daf19b0701fdccb266256675b17113dae2d2f29978abc4b32d66bfede7e91af9.json",
+        "sha256": "e0dd0c39e95ff877acde359e50720ef6ca9ab84b720cab88bd86fb89c990eb68"
+      },
+      "native": {
+        "bytes": 2292,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/1d47d70952d32051a393b3ef99cde998498fdd0515622927867488fcefd31212.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/daf19b0701fdccb266256675b17113dae2d2f29978abc4b32d66bfede7e91af9.json",
+        "sha256": "1d47d70952d32051a393b3ef99cde998498fdd0515622927867488fcefd31212"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/6143ff4c061fbe09b7de965a9cf8dcc15996e1c4c0cbcb8fd02f95a9c966cf37.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/e9d685e01c0e929d6003fda2d7e9fa237da9bbd694d21d1adacbee673aead3e8/close.json",
+        "sha256": "6143ff4c061fbe09b7de965a9cf8dcc15996e1c4c0cbcb8fd02f95a9c966cf37"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/1ce4bf7c27d1c7cc55d994e56641b9b66b2fe709ea1274cc265d4012b8c01d6d.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/e9d685e01c0e929d6003fda2d7e9fa237da9bbd694d21d1adacbee673aead3e8/fit.json",
+        "sha256": "1ce4bf7c27d1c7cc55d994e56641b9b66b2fe709ea1274cc265d4012b8c01d6d"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/10f730fabae86074be52c48bfc09cfb40275fbf4c1b2f3534038fb3834936007.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/e9d685e01c0e929d6003fda2d7e9fa237da9bbd694d21d1adacbee673aead3e8.json",
+        "sha256": "10f730fabae86074be52c48bfc09cfb40275fbf4c1b2f3534038fb3834936007"
+      },
+      "native": {
+        "bytes": 2292,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/e6d50477ac464ca1b1a130ad33e84cb9540aae8343335fba5b76698400539f96.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/e9d685e01c0e929d6003fda2d7e9fa237da9bbd694d21d1adacbee673aead3e8.json",
+        "sha256": "e6d50477ac464ca1b1a130ad33e84cb9540aae8343335fba5b76698400539f96"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/33bf9d6157595513fa9bea83d3144f42f3548e52af2bf8455062ef0db9efb344.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/26346c9e5ffbab0b1fb128633b42845ba8c6cdf9df666354ba4890ceba9dd480/close.json",
+        "sha256": "33bf9d6157595513fa9bea83d3144f42f3548e52af2bf8455062ef0db9efb344"
+      },
+      "fit": {
+        "bytes": 1406,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/2fe09aa921d5e1b6a4814f21cc6aa504a612459a47b4e14adbcf1da50d5a8236.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/26346c9e5ffbab0b1fb128633b42845ba8c6cdf9df666354ba4890ceba9dd480/fit.json",
+        "sha256": "2fe09aa921d5e1b6a4814f21cc6aa504a612459a47b4e14adbcf1da50d5a8236"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/33dca97f0dc8e78a75114642724831227f9f9767fb4b90132d41bfccd52064cf.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/26346c9e5ffbab0b1fb128633b42845ba8c6cdf9df666354ba4890ceba9dd480.json",
+        "sha256": "33dca97f0dc8e78a75114642724831227f9f9767fb4b90132d41bfccd52064cf"
+      },
+      "native": {
+        "bytes": 2291,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/dd5924cd8675ed2dfca6e24f4e1824657947205024672ec5efac43df1012f77c.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/26346c9e5ffbab0b1fb128633b42845ba8c6cdf9df666354ba4890ceba9dd480.json",
+        "sha256": "dd5924cd8675ed2dfca6e24f4e1824657947205024672ec5efac43df1012f77c"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/863b8e32bddf3d242ccaeae9ae1cc6e0d7e333643d3d317fc2e77508f4d5ac27.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/7a8b72ee4b5ea5ca3e35112ea61bf3f7bc8bec7950b8288af2eb8ee6bae80a90/close.json",
+        "sha256": "863b8e32bddf3d242ccaeae9ae1cc6e0d7e333643d3d317fc2e77508f4d5ac27"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/5dcd011ebf8ca0a265ba2faaa6d714b7a28ae7c87a4d5991986e00526aa48174.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/7a8b72ee4b5ea5ca3e35112ea61bf3f7bc8bec7950b8288af2eb8ee6bae80a90/fit.json",
+        "sha256": "5dcd011ebf8ca0a265ba2faaa6d714b7a28ae7c87a4d5991986e00526aa48174"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/c6cfe158461e765bb616035f7ee33a544e080c99670d588fcc8defc865c909e3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/7a8b72ee4b5ea5ca3e35112ea61bf3f7bc8bec7950b8288af2eb8ee6bae80a90.json",
+        "sha256": "c6cfe158461e765bb616035f7ee33a544e080c99670d588fcc8defc865c909e3"
+      },
+      "native": {
+        "bytes": 2287,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/9a0f53d4930933d9eabe8b90a49765c0c5f652bd699fdc2c3ccf5a0ff150153b.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/7a8b72ee4b5ea5ca3e35112ea61bf3f7bc8bec7950b8288af2eb8ee6bae80a90.json",
+        "sha256": "9a0f53d4930933d9eabe8b90a49765c0c5f652bd699fdc2c3ccf5a0ff150153b"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/ab41dcf3608cfbbcf3dc26f72482bb5bff93970a58849f41c5eb59556cf2a004.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ed54ccb3b53b125bc49e7ecf2d311555062a9c4e7d96afa06a1594b96f425add/close.json",
+        "sha256": "ab41dcf3608cfbbcf3dc26f72482bb5bff93970a58849f41c5eb59556cf2a004"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/70eda861dde1aefc9b6a832b45a2bf718e01872147c79d6a711368534ae7d47f.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ed54ccb3b53b125bc49e7ecf2d311555062a9c4e7d96afa06a1594b96f425add/fit.json",
+        "sha256": "70eda861dde1aefc9b6a832b45a2bf718e01872147c79d6a711368534ae7d47f"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/76d3dd3c069ed968131949f2d226e880ae98c7f68212a258128976ce3a14678b.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/ed54ccb3b53b125bc49e7ecf2d311555062a9c4e7d96afa06a1594b96f425add.json",
+        "sha256": "76d3dd3c069ed968131949f2d226e880ae98c7f68212a258128976ce3a14678b"
+      },
+      "native": {
+        "bytes": 2297,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/25adaa1029424bf95886938343a8f33f6faa9d8ea5c705a1771eb23ced676e9b.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/ed54ccb3b53b125bc49e7ecf2d311555062a9c4e7d96afa06a1594b96f425add.json",
+        "sha256": "25adaa1029424bf95886938343a8f33f6faa9d8ea5c705a1771eb23ced676e9b"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/67c1badeff1c1c44637e1dbe2941f1fc5f4b35eae12723933cea539ed1d609b4.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/e7982d15aeffd307ec4e6804ed29db9f9c8b20fcfe25aecaab4e2e9acc586d46/close.json",
+        "sha256": "67c1badeff1c1c44637e1dbe2941f1fc5f4b35eae12723933cea539ed1d609b4"
+      },
+      "fit": {
+        "bytes": 1406,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/b3499968d9b6fbea1555cb5d2f41bc89748323c7aa058e5126fcd8a121eaec0a.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/e7982d15aeffd307ec4e6804ed29db9f9c8b20fcfe25aecaab4e2e9acc586d46/fit.json",
+        "sha256": "b3499968d9b6fbea1555cb5d2f41bc89748323c7aa058e5126fcd8a121eaec0a"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/d9bee2c014e503a2d21390d86e63515c952194b4dd44a73f94edc8301b898e73.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/e7982d15aeffd307ec4e6804ed29db9f9c8b20fcfe25aecaab4e2e9acc586d46.json",
+        "sha256": "d9bee2c014e503a2d21390d86e63515c952194b4dd44a73f94edc8301b898e73"
+      },
+      "native": {
+        "bytes": 2305,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/35864446ef8ba04d186d2fa0a7cecde5471bcb7e131ac161ed8911268dee132a.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/e7982d15aeffd307ec4e6804ed29db9f9c8b20fcfe25aecaab4e2e9acc586d46.json",
+        "sha256": "35864446ef8ba04d186d2fa0a7cecde5471bcb7e131ac161ed8911268dee132a"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/354f1c241812b1b382712d5c7609346ffbcbfe4ee542e8080411a4c2a1bce0d8.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/222471b202015d19590e1e0981a1d290f8163a57f70eb20afbd6edff4bd35ac4/close.json",
+        "sha256": "354f1c241812b1b382712d5c7609346ffbcbfe4ee542e8080411a4c2a1bce0d8"
+      },
+      "fit": {
+        "bytes": 1408,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/743aa7fccb1df91fbb4ee6e47656bc6186ae77bccef25cbf80f9044db60e74a7.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/222471b202015d19590e1e0981a1d290f8163a57f70eb20afbd6edff4bd35ac4/fit.json",
+        "sha256": "743aa7fccb1df91fbb4ee6e47656bc6186ae77bccef25cbf80f9044db60e74a7"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/4debce400aa83c01d85675bfc3ac4e2ce0950753c15e227d45735f09e721e5d2.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/222471b202015d19590e1e0981a1d290f8163a57f70eb20afbd6edff4bd35ac4.json",
+        "sha256": "4debce400aa83c01d85675bfc3ac4e2ce0950753c15e227d45735f09e721e5d2"
+      },
+      "native": {
+        "bytes": 2303,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/e3ffa6e4f845685b8436fb6d4eb135d2d0df3a50768e896502dafaffe677540c.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/222471b202015d19590e1e0981a1d290f8163a57f70eb20afbd6edff4bd35ac4.json",
+        "sha256": "e3ffa6e4f845685b8436fb6d4eb135d2d0df3a50768e896502dafaffe677540c"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/ed150aa718aa71315f784d23da1e5a0e280f0a1db4fedf54011568444f97dc8b.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/cad109649b21f45593ac21eb0af878e79f0bc8a91d2c9d2556699628fddaf9e5/close.json",
+        "sha256": "ed150aa718aa71315f784d23da1e5a0e280f0a1db4fedf54011568444f97dc8b"
+      },
+      "fit": {
+        "bytes": 1406,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/793a813b78a751d7aacd2efae793c687bf92a7e897eb13f2c7facc606db00019.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/cad109649b21f45593ac21eb0af878e79f0bc8a91d2c9d2556699628fddaf9e5/fit.json",
+        "sha256": "793a813b78a751d7aacd2efae793c687bf92a7e897eb13f2c7facc606db00019"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/a0e896f86c8af63824574cd1aa7e2e393e4c3d1bd42a5d82698d32ca40141dea.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/cad109649b21f45593ac21eb0af878e79f0bc8a91d2c9d2556699628fddaf9e5.json",
+        "sha256": "a0e896f86c8af63824574cd1aa7e2e393e4c3d1bd42a5d82698d32ca40141dea"
+      },
+      "native": {
+        "bytes": 2296,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/c8662014ad9ffdba2231fc0d0148fa25e5d3c1c7b6bb310eca5479adf6aebcf1.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/cad109649b21f45593ac21eb0af878e79f0bc8a91d2c9d2556699628fddaf9e5.json",
+        "sha256": "c8662014ad9ffdba2231fc0d0148fa25e5d3c1c7b6bb310eca5479adf6aebcf1"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/0dfe8f2202ffdef6b3db1f2c54ed36722719d100f1de1ebc56af60e6ab999068.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/bffa3ac3332a627cab54edaadcd600bab2db44a98eab282c774d08b5890f6f28/close.json",
+        "sha256": "0dfe8f2202ffdef6b3db1f2c54ed36722719d100f1de1ebc56af60e6ab999068"
+      },
+      "fit": {
+        "bytes": 1406,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/f011a6357eee1fd7e98506407e8a47d9a7643d540e68bebe386085504b4c3c6a.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/bffa3ac3332a627cab54edaadcd600bab2db44a98eab282c774d08b5890f6f28/fit.json",
+        "sha256": "f011a6357eee1fd7e98506407e8a47d9a7643d540e68bebe386085504b4c3c6a"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/23a2997e57a42336097f22dd20b5a131140bd67d2c5918102630667eb69f0a9c.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/bffa3ac3332a627cab54edaadcd600bab2db44a98eab282c774d08b5890f6f28.json",
+        "sha256": "23a2997e57a42336097f22dd20b5a131140bd67d2c5918102630667eb69f0a9c"
+      },
+      "native": {
+        "bytes": 2293,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/f8b059d811c15fb1a772bc6e23646ac87c2e04bbb92f70345036b0bffd2c3f2e.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/bffa3ac3332a627cab54edaadcd600bab2db44a98eab282c774d08b5890f6f28.json",
+        "sha256": "f8b059d811c15fb1a772bc6e23646ac87c2e04bbb92f70345036b0bffd2c3f2e"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/41a1360a396e8c24da4bc43579c319ce44882dfed4cfafa1415868ed23766034.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4ab14704587006f5191a01594e27959cf748ad548dcd5cf79b457f25490cb957/close.json",
+        "sha256": "41a1360a396e8c24da4bc43579c319ce44882dfed4cfafa1415868ed23766034"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/68537debe27f77a0986a0c1a2e39908655c619fb1c71e89814becf2afe671776.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4ab14704587006f5191a01594e27959cf748ad548dcd5cf79b457f25490cb957/fit.json",
+        "sha256": "68537debe27f77a0986a0c1a2e39908655c619fb1c71e89814becf2afe671776"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/23fd104c4b05bbddc6c3713a652849c9e191e0865817355071c60a1c255c757b.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/4ab14704587006f5191a01594e27959cf748ad548dcd5cf79b457f25490cb957.json",
+        "sha256": "23fd104c4b05bbddc6c3713a652849c9e191e0865817355071c60a1c255c757b"
+      },
+      "native": {
+        "bytes": 2289,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/f8683b7346effceb7512ea6e94241ef7277f38e060b2f33893d153b588663f7c.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/4ab14704587006f5191a01594e27959cf748ad548dcd5cf79b457f25490cb957.json",
+        "sha256": "f8683b7346effceb7512ea6e94241ef7277f38e060b2f33893d153b588663f7c"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/922f5cf2872b21d1bbcc07f4c690d74f506a96886258d4f71e327c5ef9087a42.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/03ff64508ba59fa7815747d761f3fa67d880b98cce19c84741b06bbdffd6d4f1/close.json",
+        "sha256": "922f5cf2872b21d1bbcc07f4c690d74f506a96886258d4f71e327c5ef9087a42"
+      },
+      "fit": {
+        "bytes": 1406,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/fd4ed6445730df5ca42009340dee423e0bfe6b7dae23134275bd1d78dd66b89d.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/03ff64508ba59fa7815747d761f3fa67d880b98cce19c84741b06bbdffd6d4f1/fit.json",
+        "sha256": "fd4ed6445730df5ca42009340dee423e0bfe6b7dae23134275bd1d78dd66b89d"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/f7e9b83998204f4a05c9822f85345fd1f8f22effabf1d872dc3b86587fff2688.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/03ff64508ba59fa7815747d761f3fa67d880b98cce19c84741b06bbdffd6d4f1.json",
+        "sha256": "f7e9b83998204f4a05c9822f85345fd1f8f22effabf1d872dc3b86587fff2688"
+      },
+      "native": {
+        "bytes": 2294,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3aabfabd9f0f54050e2d2b9b28633116ed57e22f5907435c013f0a6636a3723a.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/03ff64508ba59fa7815747d761f3fa67d880b98cce19c84741b06bbdffd6d4f1.json",
+        "sha256": "3aabfabd9f0f54050e2d2b9b28633116ed57e22f5907435c013f0a6636a3723a"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/19c7a3ac424d53ea170f5950bc3e50a34cf1c778cbfdafcb88061195cd74e28a.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ba25d768879ce9656f24cb491fb9704eb9de90491a30b212e893c29114a90bde/close.json",
+        "sha256": "19c7a3ac424d53ea170f5950bc3e50a34cf1c778cbfdafcb88061195cd74e28a"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/8ade67b2c33fc22f64abe4a5918078de093a420fa3827fbacc04c54ac2e48373.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ba25d768879ce9656f24cb491fb9704eb9de90491a30b212e893c29114a90bde/fit.json",
+        "sha256": "8ade67b2c33fc22f64abe4a5918078de093a420fa3827fbacc04c54ac2e48373"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/e0ad291bdc63e18fc34560819a623454956512879a89cf3dda304048d8bd0d50.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/ba25d768879ce9656f24cb491fb9704eb9de90491a30b212e893c29114a90bde.json",
+        "sha256": "e0ad291bdc63e18fc34560819a623454956512879a89cf3dda304048d8bd0d50"
+      },
+      "native": {
+        "bytes": 2288,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/a902d7e969820955775ff346708d2962db63b991c34db34fb8d1515adc170450.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/ba25d768879ce9656f24cb491fb9704eb9de90491a30b212e893c29114a90bde.json",
+        "sha256": "a902d7e969820955775ff346708d2962db63b991c34db34fb8d1515adc170450"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/1b76414bd8037f730dd1031147fdf6213db8322c224fb1c236f68188b5e5a938.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/22b18f8716c059ed444d581ca0eb827971f3b3f3df420ab10b546c63b84d5c23/close.json",
+        "sha256": "1b76414bd8037f730dd1031147fdf6213db8322c224fb1c236f68188b5e5a938"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/c40499eea78ca8416e5dceca7bc67e5baf4ac2cce2051596ac70a01975e0fcd3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/22b18f8716c059ed444d581ca0eb827971f3b3f3df420ab10b546c63b84d5c23/fit.json",
+        "sha256": "c40499eea78ca8416e5dceca7bc67e5baf4ac2cce2051596ac70a01975e0fcd3"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3d79e972cf843fc37ed895396bf2da5f0304b91c033daa1c887dcd23c4374433.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/22b18f8716c059ed444d581ca0eb827971f3b3f3df420ab10b546c63b84d5c23.json",
+        "sha256": "3d79e972cf843fc37ed895396bf2da5f0304b91c033daa1c887dcd23c4374433"
+      },
+      "native": {
+        "bytes": 2308,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/b43316ad2623c8206097f677cbe878388eb2faaf5f49de7fc0b60e33a44212af.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/22b18f8716c059ed444d581ca0eb827971f3b3f3df420ab10b546c63b84d5c23.json",
+        "sha256": "b43316ad2623c8206097f677cbe878388eb2faaf5f49de7fc0b60e33a44212af"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/82d4b31b5ff78f2503f0e029af9203ba578937095bde88b52fa9fe7c26eeddfb.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/00aca974dcc0500fca49c788dcb5ff4f33a0a5f457458724f4cf9e84031333ca/close.json",
+        "sha256": "82d4b31b5ff78f2503f0e029af9203ba578937095bde88b52fa9fe7c26eeddfb"
+      },
+      "fit": {
+        "bytes": 1408,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/e5f9ed0b96a3115cfec7b0fa7a00f34b5903d7d7208b11a2151bfc6fe882a889.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/00aca974dcc0500fca49c788dcb5ff4f33a0a5f457458724f4cf9e84031333ca/fit.json",
+        "sha256": "e5f9ed0b96a3115cfec7b0fa7a00f34b5903d7d7208b11a2151bfc6fe882a889"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/4cf4fd8985fa60303eef7253545d425b83bcc8599dd056441929cbf63248e1b6.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/00aca974dcc0500fca49c788dcb5ff4f33a0a5f457458724f4cf9e84031333ca.json",
+        "sha256": "4cf4fd8985fa60303eef7253545d425b83bcc8599dd056441929cbf63248e1b6"
+      },
+      "native": {
+        "bytes": 2299,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/69882907a746e64b456938fbacb5811a284c5826c82e2f10ca6ce433049175c8.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/00aca974dcc0500fca49c788dcb5ff4f33a0a5f457458724f4cf9e84031333ca.json",
+        "sha256": "69882907a746e64b456938fbacb5811a284c5826c82e2f10ca6ce433049175c8"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/9b381afcfc31e7d5c67e1ab8109880b5f08daac138a33ae47fb65f9bd6a5fd7d.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/f2837e2a80c0c094ddea52e93c1c76f894ea3cd7a6a121330d85d39cd9ceb31f/close.json",
+        "sha256": "9b381afcfc31e7d5c67e1ab8109880b5f08daac138a33ae47fb65f9bd6a5fd7d"
+      },
+      "fit": {
+        "bytes": 1408,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/45169db77ccdeb586de407d262089cc6e8ea4cd37f36026a00d474874ae4cd93.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/f2837e2a80c0c094ddea52e93c1c76f894ea3cd7a6a121330d85d39cd9ceb31f/fit.json",
+        "sha256": "45169db77ccdeb586de407d262089cc6e8ea4cd37f36026a00d474874ae4cd93"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/32b8d4dc97305d7622075728cef78f91b09019da439c3f08dc64f4cf848fa008.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/f2837e2a80c0c094ddea52e93c1c76f894ea3cd7a6a121330d85d39cd9ceb31f.json",
+        "sha256": "32b8d4dc97305d7622075728cef78f91b09019da439c3f08dc64f4cf848fa008"
+      },
+      "native": {
+        "bytes": 2297,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/99b9150b7e2e95206fda84388316bdfa320818cc067f1d06673b3aed6c572972.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/f2837e2a80c0c094ddea52e93c1c76f894ea3cd7a6a121330d85d39cd9ceb31f.json",
+        "sha256": "99b9150b7e2e95206fda84388316bdfa320818cc067f1d06673b3aed6c572972"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/ed22024b2f83c5e710cbb6a8e0b74b82b189c7aaed0ed011f419da711ec9457d.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/866a884305ad51c4cca1d2d54145798a23d7197efb7d16deb703410c91fb5169/close.json",
+        "sha256": "ed22024b2f83c5e710cbb6a8e0b74b82b189c7aaed0ed011f419da711ec9457d"
+      },
+      "fit": {
+        "bytes": 1408,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/de13e33eceeda902d311cd39a732c5c22f6651a30173736e4fb490eff75ea094.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/866a884305ad51c4cca1d2d54145798a23d7197efb7d16deb703410c91fb5169/fit.json",
+        "sha256": "de13e33eceeda902d311cd39a732c5c22f6651a30173736e4fb490eff75ea094"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/d22a8410b3dd22c11f36b184618923eccd94c441954fcf71925cf3d1b44de251.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/866a884305ad51c4cca1d2d54145798a23d7197efb7d16deb703410c91fb5169.json",
+        "sha256": "d22a8410b3dd22c11f36b184618923eccd94c441954fcf71925cf3d1b44de251"
+      },
+      "native": {
+        "bytes": 2302,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/651bf027a25ce69640c255e2eb6c4eda67fcc06f0fc3c455c59ed5443343bb76.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/866a884305ad51c4cca1d2d54145798a23d7197efb7d16deb703410c91fb5169.json",
+        "sha256": "651bf027a25ce69640c255e2eb6c4eda67fcc06f0fc3c455c59ed5443343bb76"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/ba2cae9c6d39687c8eb0013b00bea9532546475a7c9d321af21528146b3f6ff7.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/79d2a598e69c00c97072cf45b132df5667b03ed4a60a165890cfe3060caabbdd/close.json",
+        "sha256": "ba2cae9c6d39687c8eb0013b00bea9532546475a7c9d321af21528146b3f6ff7"
+      },
+      "fit": {
+        "bytes": 1406,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/cce5fcb177e2950ed0d73c486a4cb7e1254496a29ba62b368641c5f0dad509da.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/79d2a598e69c00c97072cf45b132df5667b03ed4a60a165890cfe3060caabbdd/fit.json",
+        "sha256": "cce5fcb177e2950ed0d73c486a4cb7e1254496a29ba62b368641c5f0dad509da"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/95d8ae1dbee782ffad7c8415f265d7ed3f3d8c94c2d7e13f336af4d165cb8a38.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/79d2a598e69c00c97072cf45b132df5667b03ed4a60a165890cfe3060caabbdd.json",
+        "sha256": "95d8ae1dbee782ffad7c8415f265d7ed3f3d8c94c2d7e13f336af4d165cb8a38"
+      },
+      "native": {
+        "bytes": 2297,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/fb2c74be9a350e4ff1dd1117f6cff8534e4574ecccbfd68184bfd22269864f10.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/79d2a598e69c00c97072cf45b132df5667b03ed4a60a165890cfe3060caabbdd.json",
+        "sha256": "fb2c74be9a350e4ff1dd1117f6cff8534e4574ecccbfd68184bfd22269864f10"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/5c676439f50f7075d52a0c97dfca42610e0347200342ad45216eb55e29c5e6f2.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/1fc5bf8fb563674ed20c090c254004daa5629a5bea28ec08ffc9dbfb162fa454/close.json",
+        "sha256": "5c676439f50f7075d52a0c97dfca42610e0347200342ad45216eb55e29c5e6f2"
+      },
+      "fit": {
+        "bytes": 1405,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/bb9189807426907e99abcbf088990d1e402c86bb79856fb14f8893ef62ebce42.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/1fc5bf8fb563674ed20c090c254004daa5629a5bea28ec08ffc9dbfb162fa454/fit.json",
+        "sha256": "bb9189807426907e99abcbf088990d1e402c86bb79856fb14f8893ef62ebce42"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/1c1d45be4a59b78f5c105e81dbe603d949213779b58ef229baa911ae2849c599.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/1fc5bf8fb563674ed20c090c254004daa5629a5bea28ec08ffc9dbfb162fa454.json",
+        "sha256": "1c1d45be4a59b78f5c105e81dbe603d949213779b58ef229baa911ae2849c599"
+      },
+      "native": {
+        "bytes": 2285,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/4482c707e0dc25eb7b7d4dc5cde03619f414e8ce320631cd639508012d970158.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/1fc5bf8fb563674ed20c090c254004daa5629a5bea28ec08ffc9dbfb162fa454.json",
+        "sha256": "4482c707e0dc25eb7b7d4dc5cde03619f414e8ce320631cd639508012d970158"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/620f9375a59766bb785cfc3c657e689bc96bf18d1ddbb8477a4c7663999d57c8.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/425ae7b28a9f5ff3527d77505b731f2d5522cd08544ba2ed6a7502ce6d1d7a6b/close.json",
+        "sha256": "620f9375a59766bb785cfc3c657e689bc96bf18d1ddbb8477a4c7663999d57c8"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3a27533da68ad3d729a9e17ef1651b7fc654a0fe6616a02dc1a3dc81c999a8e7.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/425ae7b28a9f5ff3527d77505b731f2d5522cd08544ba2ed6a7502ce6d1d7a6b/fit.json",
+        "sha256": "3a27533da68ad3d729a9e17ef1651b7fc654a0fe6616a02dc1a3dc81c999a8e7"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/f4afdcb01cf581ec680ace0d40d0e1f905663a45789a2e978e17a6a80da41f1d.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/425ae7b28a9f5ff3527d77505b731f2d5522cd08544ba2ed6a7502ce6d1d7a6b.json",
+        "sha256": "f4afdcb01cf581ec680ace0d40d0e1f905663a45789a2e978e17a6a80da41f1d"
+      },
+      "native": {
+        "bytes": 2294,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/bd6713e7d240737d7eb8217d9ff4124e6c47d13423020684be6ad60db5ceeb55.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/425ae7b28a9f5ff3527d77505b731f2d5522cd08544ba2ed6a7502ce6d1d7a6b.json",
+        "sha256": "bd6713e7d240737d7eb8217d9ff4124e6c47d13423020684be6ad60db5ceeb55"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/1a867c9e630a7d9e9e58eb0df728b58f1c6492a4c0d853be5ca79f7da7a655a9.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/3b62a221f7a9445f1da9f8209863d4fe68d9cb5b8a87626b00a717dac5a8f7db/close.json",
+        "sha256": "1a867c9e630a7d9e9e58eb0df728b58f1c6492a4c0d853be5ca79f7da7a655a9"
+      },
+      "fit": {
+        "bytes": 1407,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/25b5ac2cfd17aa027fa6a0ae134deb9e508d7e8a511afd9bd70345e66fcd2e92.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/3b62a221f7a9445f1da9f8209863d4fe68d9cb5b8a87626b00a717dac5a8f7db/fit.json",
+        "sha256": "25b5ac2cfd17aa027fa6a0ae134deb9e508d7e8a511afd9bd70345e66fcd2e92"
+      },
+      "job": {
+        "bytes": 1399,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/d1c475d66d348ac856fdd0a0f1e87affde12270b02165931bad273f2b26bd635.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/3b62a221f7a9445f1da9f8209863d4fe68d9cb5b8a87626b00a717dac5a8f7db.json",
+        "sha256": "d1c475d66d348ac856fdd0a0f1e87affde12270b02165931bad273f2b26bd635"
+      },
+      "native": {
+        "bytes": 2306,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/f235901cb9fbabc291c261231a8614e769aba968202213fdc2a9a313ffbf5caa.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-replicas/3b62a221f7a9445f1da9f8209863d4fe68d9cb5b8a87626b00a717dac5a8f7db.json",
+        "sha256": "f235901cb9fbabc291c261231a8614e769aba968202213fdc2a9a313ffbf5caa"
+      },
+      "round": {
+        "bytes": 77991,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/1d19b14fab28fdae43be4ba9673c7bc191f6171877bd36e15d1d7484626d43d8.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/7a051964d07ec77bc560360db9f5131867219a5ddf6c34e278b4a6d154fc380d/close.json",
+        "sha256": "1d19b14fab28fdae43be4ba9673c7bc191f6171877bd36e15d1d7484626d43d8"
+      },
+      "fit": {
+        "bytes": 1389,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/52fbeea7fd4e81c90107475e55099c0fa549a12cd85218880da0d9534975b058.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/7a051964d07ec77bc560360db9f5131867219a5ddf6c34e278b4a6d154fc380d/fit.json",
+        "sha256": "52fbeea7fd4e81c90107475e55099c0fa549a12cd85218880da0d9534975b058"
+      },
+      "job": {
+        "bytes": 1383,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/4cb87af97dc2c1cea156b7888b4908d80d2722f8f80925712fcf24d223cd5a9d.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/jobs/7a051964d07ec77bc560360db9f5131867219a5ddf6c34e278b4a6d154fc380d.json",
+        "sha256": "4cb87af97dc2c1cea156b7888b4908d80d2722f8f80925712fcf24d223cd5a9d"
+      },
+      "native": {
+        "bytes": 2358,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/ad4c3d3bdb44534f3a9d3fa404e857385a339b0054a297c8e54ec0f6fb3e6dd9.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/native-replicas/7a051964d07ec77bc560360db9f5131867219a5ddf6c34e278b4a6d154fc380d.json",
+        "sha256": "ad4c3d3bdb44534f3a9d3fa404e857385a339b0054a297c8e54ec0f6fb3e6dd9"
+      },
+      "round": {
+        "bytes": 4472,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/round.lock.json",
+        "sha256": "3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/67b7f1ea35332af50bf73d30c34e2312fb189a08c62a3e3eccc089bba8162f91.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/14c14567ae7e91096405a66d1374fc520b41166123daf8615650c101f391ca51/close.json",
+        "sha256": "67b7f1ea35332af50bf73d30c34e2312fb189a08c62a3e3eccc089bba8162f91"
+      },
+      "fit": {
+        "bytes": 1391,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/7a64e61c67983ad0890aed88a1e6b80620cc36e4f6e87b412d653dd8cd95beb3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/14c14567ae7e91096405a66d1374fc520b41166123daf8615650c101f391ca51/fit.json",
+        "sha256": "7a64e61c67983ad0890aed88a1e6b80620cc36e4f6e87b412d653dd8cd95beb3"
+      },
+      "job": {
+        "bytes": 1383,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/0c7681c23ad9e1d6384a097d7ef7ae5e78a3d48712d692fd32859829237b7c4a.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/jobs/14c14567ae7e91096405a66d1374fc520b41166123daf8615650c101f391ca51.json",
+        "sha256": "0c7681c23ad9e1d6384a097d7ef7ae5e78a3d48712d692fd32859829237b7c4a"
+      },
+      "native": {
+        "bytes": 2365,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/a21cb05c22a5218042551b80239b877f91c0149ac4495fe444c796b5139994e6.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/native-replicas/14c14567ae7e91096405a66d1374fc520b41166123daf8615650c101f391ca51.json",
+        "sha256": "a21cb05c22a5218042551b80239b877f91c0149ac4495fe444c796b5139994e6"
+      },
+      "round": {
+        "bytes": 4472,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/round.lock.json",
+        "sha256": "3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/c5399b6b6558752f57313cce90f42cf419f9f1dcbc5f92e49dfe3038a8531532.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/b932f1d96d556135b9df018d498ea0f6cf16cd17b71a2900db7832e01275de55/close.json",
+        "sha256": "c5399b6b6558752f57313cce90f42cf419f9f1dcbc5f92e49dfe3038a8531532"
+      },
+      "fit": {
+        "bytes": 1391,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/f5c872763f4bf39a73c9e33bb8ad2787c76b4067d3dcb8db0956c9e1274f5adb.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/b932f1d96d556135b9df018d498ea0f6cf16cd17b71a2900db7832e01275de55/fit.json",
+        "sha256": "f5c872763f4bf39a73c9e33bb8ad2787c76b4067d3dcb8db0956c9e1274f5adb"
+      },
+      "job": {
+        "bytes": 1383,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/1ebf12962c395506792abe26c2b2beabfa42db979dc9cb48a22fabc6d896608e.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/jobs/b932f1d96d556135b9df018d498ea0f6cf16cd17b71a2900db7832e01275de55.json",
+        "sha256": "1ebf12962c395506792abe26c2b2beabfa42db979dc9cb48a22fabc6d896608e"
+      },
+      "native": {
+        "bytes": 2359,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/c30e717d3cc1a2c5caa4fc95bd525705884e76d7a5c25637d98bbf0c63ea2252.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/native-replicas/b932f1d96d556135b9df018d498ea0f6cf16cd17b71a2900db7832e01275de55.json",
+        "sha256": "c30e717d3cc1a2c5caa4fc95bd525705884e76d7a5c25637d98bbf0c63ea2252"
+      },
+      "round": {
+        "bytes": 4472,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/round.lock.json",
+        "sha256": "3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/618169198dbcd83f3162ef624b7b590cb14716edb6d107ad1c2092ecebaa57de.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/548ee09731e63abb5ac6e70986b99843b9f2e2dcd0ab30a56ed549d9eb05fdf2/close.json",
+        "sha256": "618169198dbcd83f3162ef624b7b590cb14716edb6d107ad1c2092ecebaa57de"
+      },
+      "fit": {
+        "bytes": 1390,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/56b83640501162c5598f1f6e206bec82037790ea15e65600a3da6e32b8cffd9b.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/548ee09731e63abb5ac6e70986b99843b9f2e2dcd0ab30a56ed549d9eb05fdf2/fit.json",
+        "sha256": "56b83640501162c5598f1f6e206bec82037790ea15e65600a3da6e32b8cffd9b"
+      },
+      "job": {
+        "bytes": 1383,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/7e95a091a08ec4a0bc8881b709f0867307c49ef1c55eaf39682eeb45673420f3.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/jobs/548ee09731e63abb5ac6e70986b99843b9f2e2dcd0ab30a56ed549d9eb05fdf2.json",
+        "sha256": "7e95a091a08ec4a0bc8881b709f0867307c49ef1c55eaf39682eeb45673420f3"
+      },
+      "native": {
+        "bytes": 2377,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/8a6b08272e316adc0c7841f763e2d126ac6715b111dfb3d65e225d10f5d3808d.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/native-replicas/548ee09731e63abb5ac6e70986b99843b9f2e2dcd0ab30a56ed549d9eb05fdf2.json",
+        "sha256": "8a6b08272e316adc0c7841f763e2d126ac6715b111dfb3d65e225d10f5d3808d"
+      },
+      "round": {
+        "bytes": 4472,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/round.lock.json",
+        "sha256": "3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74"
+      }
+    },
+    {
+      "close": {
+        "bytes": 258,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/847921aa0a966be69002fb64fc64ce8f976e7681a9cb4783482295a3599ee821.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/cf0347d62ece0c60d796ff2fbd41f82ef13840f1b8ab0e74ffa86afa6e3c0847/close.json",
+        "sha256": "847921aa0a966be69002fb64fc64ce8f976e7681a9cb4783482295a3599ee821"
+      },
+      "fit": {
+        "bytes": 1392,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/6878456747a1721ce4d6e42ead3ac7d5d0a2de248d5aae77c8f052fd9bc485b1.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/attempts/cf0347d62ece0c60d796ff2fbd41f82ef13840f1b8ab0e74ffa86afa6e3c0847/fit.json",
+        "sha256": "6878456747a1721ce4d6e42ead3ac7d5d0a2de248d5aae77c8f052fd9bc485b1"
+      },
+      "job": {
+        "bytes": 1383,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/1825aacf1fbc8e108e183ce57d42c3185c327f7d7c3b8a399f9553a63e02e330.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/jobs/cf0347d62ece0c60d796ff2fbd41f82ef13840f1b8ab0e74ffa86afa6e3c0847.json",
+        "sha256": "1825aacf1fbc8e108e183ce57d42c3185c327f7d7c3b8a399f9553a63e02e330"
+      },
+      "native": {
+        "bytes": 2359,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/40560c6ab2f5c9cd621c2612638a5a0a9bf58dc962c53247e30d13c3cbdfc025.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/native-replicas/cf0347d62ece0c60d796ff2fbd41f82ef13840f1b8ab0e74ffa86afa6e3c0847.json",
+        "sha256": "40560c6ab2f5c9cd621c2612638a5a0a9bf58dc962c53247e30d13c3cbdfc025"
+      },
+      "round": {
+        "bytes": 4472,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/round.lock.json",
+        "sha256": "3d2b7c50655ff299600ebe222252b9dfea093c433a72a8a5c89edcb3187a3a74"
+      }
+    }
+  ],
+  "format": "forest-complete-cohort-fivefit-input-v1",
+  "lineages": 5,
+  "metric_batches": [
+    {
+      "input_manifest": {
+        "bytes": 528804,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-third-cohort-v1/common-metrics-inputs.lock.json",
+        "sha256": "9691f77bbc6b6b9b700beefaee3f219608f6ecc79a1a43fe984a6e7b840365d6"
+      },
+      "process_exit": {
+        "bytes": 331,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-third-cohort-v1/metrics-exit.actual.json",
+        "sha256": "b9b1aa884fb2d55831208a18d6d80823de186881f14faa2e8630b6aad75c152b"
+      },
+      "receipt_lock": {
+        "bytes": 42532,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-third-cohort-v1/metric-receipts/receipt-lock.json",
+        "sha256": "964d0e08d851c9e5369df99941b039d091c101fe73ee8f385ce3c1cf92999f0b"
+      }
+    },
+    {
+      "input_manifest": {
+        "bytes": 111661,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-seed11-third-cohort-five-v1/common-metrics-inputs.lock.json",
+        "sha256": "42fb7fca6df90050721a24b555795c7d64f275ce72fedaa6309c76e4dac9154a"
+      },
+      "process_exit": {
+        "bytes": 330,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-seed11-third-cohort-five-v1/metrics-exit.actual.json",
+        "sha256": "e94f23c435cf14718f95881e80d4a579300f61efc6725a94cd2aec982a0b0b08"
+      },
+      "receipt_lock": {
+        "bytes": 9945,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-seed11-third-cohort-five-v1/metric-receipts/receipt-lock.json",
+        "sha256": "d390d91a0ab8fd7a1b06bbbfa4b90e329ec3403af5269b9e5f8f004be0d37179"
+      }
+    }
+  ],
+  "native_batches": [
+    {
+      "completion": {
+        "bytes": 7293,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/e35987f8c58d04f98478ad1ab0f390e697580d1ebb4570cacccdf380892e835e.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native-completion.json",
+        "sha256": "e35987f8c58d04f98478ad1ab0f390e697580d1ebb4570cacccdf380892e835e"
+      },
+      "round": {
+        "bytes": 29014,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/034cb0930d13b566b7f6c70d9516f95319cd5903ffb5647d8201e1b766979645.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/validation-batch3-v1/native.lock.json",
+        "sha256": "034cb0930d13b566b7f6c70d9516f95319cd5903ffb5647d8201e1b766979645"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 1814,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/8a9067175bd0e0179524f8f22c1e81c4ce3ee110f148bd1f338ce317042da785.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/native-completion.json",
+        "sha256": "8a9067175bd0e0179524f8f22c1e81c4ce3ee110f148bd1f338ce317042da785"
+      },
+      "round": {
+        "bytes": 7871,
+        "mirror_path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/metadata/b3249064eff525a6a3649a6c4d470e450c7b2987959a292441ec21a774fc45f2.json",
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/missing-fit11-third-cohort-five-v1/native.lock.json",
+        "sha256": "b3249064eff525a6a3649a6c4d470e450c7b2987959a292441ec21a774fc45f2"
+      }
+    }
+  ],
+  "official_tests_opened": false,
+  "original_verification": {
+    "bytes": 53455,
+    "path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/original-verification.actual.json",
+    "sha256": "137c5ee6edbf8410229a8144cf4675c257558500f40b9b14f438b67756a4f47c"
+  },
+  "original_verification_inputs": {
+    "bytes": 36834,
+    "path": "/mnt/fast-scratch/dope-benchmark/forest-third-cohort-five-fivefit-publication-v1/original-verification-inputs.lock.json",
+    "sha256": "e10c0886220ea51b1f5765629c4d1de1608b8e66d1c1cd64f4c7bb8b81393e1e"
+  },
+  "selection": {
+    "outcome_based_selection": false,
+    "representative_population_claim": false,
+    "rule": "five current-runtime seed11 closures from predeclared resource-only third six-lineage cohort; existing legacy-GPU seed11 lineage kept separate"
+  }
+}

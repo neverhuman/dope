@@ -88,14 +88,14 @@
   },
   "producer_refs": {
     "plot_forest_fit_variance.py": {
-      "bytes": 3118,
+      "bytes": 3439,
       "path": "research/benchmark/plot_forest_fit_variance.py",
-      "sha256": "421bc63aef36b3a9477a33e28c0484dc3162f27cbcc7bb117f1f5419fa113611"
+      "sha256": "00ac9bd525bf1953744e6fde205acd1f7cbc932c611cefd04c2233c21e882578"
     },
     "publish_forest_fit_variance.py": {
-      "bytes": 17664,
+      "bytes": 18651,
       "path": "research/benchmark/publish_forest_fit_variance.py",
-      "sha256": "bfe32aa6d38bfef7fd7ffea5ff1c72db8ea69f4a478436335743304944d36342"
+      "sha256": "54e273911caa546be97fd33a499986ca2bf2fd4f9ef7241adb3a98b43583c4af"
     }
   },
   "ptf_v1": null,
