@@ -1,5 +1,73 @@
 {
   "$defs": {
+    "original_verification": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_complete": {
+          "const": true
+        },
+        "closed_utc": {
+          "type": "string"
+        },
+        "elapsed_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "fit_checkpoints": {
+          "const": 10
+        },
+        "format": {
+          "const": "forest-first-two-fivefit-original-hash-verification-v1"
+        },
+        "input_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "new_generator_fits": {
+          "const": 0
+        },
+        "numerical_metric_execution": {
+          "const": false
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "original_checkpoint_bytes_verified": {
+          "const": true
+        },
+        "pickle_loaded": {
+          "const": false
+        },
+        "refs": {
+          "items": {
+            "$ref": "#/$defs/ref"
+          },
+          "maxItems": 84,
+          "minItems": 84,
+          "type": "array"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "format",
+        "actual_complete",
+        "fit_checkpoints",
+        "new_generator_fits",
+        "numerical_metric_execution",
+        "official_tests_opened",
+        "original_checkpoint_bytes_verified",
+        "pickle_loaded",
+        "input_sha256",
+        "source_sha256",
+        "elapsed_seconds",
+        "closed_utc",
+        "refs"
+      ],
+      "type": "object"
+    },
     "ref": {
       "properties": {
         "bytes": {

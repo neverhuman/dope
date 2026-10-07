@@ -124,6 +124,9 @@ class FitVarianceControls(unittest.TestCase):
             for gate in ('mfs_v2', 'ptf_v1', 'release_safe_l3', 'superiority'):
                 self.assertIsNone(cell[gate])
         proof = json.loads((ROOT / 'original-verification.json').read_text())
+        proof_schema = dict(json.loads((ROOT / 'panel.schema.json').read_text()), **{'$ref': '#/$defs/original_verification'})
+        proof_schema.pop('required'); proof_schema.pop('properties'); proof_schema.pop('additionalProperties')
+        jsonschema.Draft202012Validator(proof_schema).validate(proof)
         originals = {r['path']: r for r in proof['refs']}
         self.assertTrue(proof['actual_complete']); self.assertEqual(proof['fit_checkpoints'], 10)
         self.assertFalse(proof['pickle_loaded']); self.assertFalse(proof['official_tests_opened'])
