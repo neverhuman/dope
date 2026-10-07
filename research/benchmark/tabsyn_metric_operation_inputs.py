@@ -201,7 +201,8 @@ def prepare_operation(snapshot_ref, adapter_ref, lineage_sha256, sample_seed, ro
     worker, fit = snapshot['workers'][lineage_sha256], fits[lineage_sha256]
     try:
         fitted, fit_popen_ref = validate_fit_operation(worker, fit, metadata_reader)
-        plan = adapter['prepare_cell'](cell, worker, fit, metadata_reader)
+        plan = adapter['prepare_cell'](
+            cell, worker, fit, lambda ref: checked(ref, metadata_reader))
         catalog = decode(snapshot['actual100_kind_catalog_ref'], metadata_reader)
         require(catalog['format'] == 'dope100-actual-kind-map-catalog'
                 and catalog['official_tests_opened'] is False

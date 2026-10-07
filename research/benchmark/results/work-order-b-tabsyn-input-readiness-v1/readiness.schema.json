@@ -16,7 +16,7 @@
     "known_owner_gap_exempted": false,
     "logical_sample_cells": 600,
     "metadata_replay": {
-      "elapsed_seconds": 6.444700077176094,
+      "elapsed_seconds": 7.11784827709198,
       "frozen_custody_map_ref": {
         "bytes": 1321786,
         "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-xbabe1-real-owner-v1/CPU-matched-gap-skip-DISABLED-v11/closed143-evaluator-preparation-only/closed143-verified-metadata-source-byte-map.v1r2.json",
@@ -30,25 +30,25 @@
       "full_resource_peak_claim": null,
       "memory_limit_bytes": 268435456,
       "outer_exit_ref": {
-        "bytes": 1163,
-        "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v4/ROOT-metadata-replay-outer-exit.verified.json",
-        "sha256": "08cd8b567bb90051246aebc8085820ac0b224db9aa0b2a87487242d129a98c27"
+        "bytes": 747,
+        "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v5/ROOT-metadata-replay-outer-exit.actual.json",
+        "sha256": "bd405c7bca24cfc2b71df2d77035cd6f5227abafd44fe65d0bcd1383757ba024"
       },
       "prepared_cells": 143,
       "prepared_output_ref": {
         "bytes": 2180724,
-        "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v4/prepared-inputs.metadata-only.actual.json",
+        "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v5/prepared-inputs.metadata-only.actual.json",
         "sha256": "1df49f4c4a0d81ba52754b2eb6d8655e5b99e965599ee7b99222d604f3c0f377"
       },
       "qualification_ref": {
-        "bytes": 1821,
-        "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v4/qualification.actual.json",
-        "sha256": "f95f229e2b3580dfd77b2fe94443c011f965d65ecc66736f0ad7bdf0430346dc"
+        "bytes": 1820,
+        "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-metric-receipts-v1/closed143-metadata-replay-v5/qualification.actual.json",
+        "sha256": "5160d210d19abc64a7e1ed6df331df989dc40942bf75fd2d6f54b617d6af494e"
       },
       "rejected_cells": 0,
       "source_sha256": {
         "tabsyn_closed143_inputs.py": "3b6a43c06b4afe4aa5c12cf7ead876bc776bd262dbd7b25daad1eedb6d95932e",
-        "tabsyn_metric_operation_inputs.py": "b0a0a62faf69b4e29ed9d974a0f102bd16ff04cbb90acfe3504b1951fe0a379c"
+        "tabsyn_metric_operation_inputs.py": "7dbad5606ec268a99af5b4914c996d7a05bf950347a5900ed0ca450d9b7abf1f"
       }
     },
     "method": "TabSyn",
