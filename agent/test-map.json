@@ -1,6 +1,18 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/render_matched_linear_fit11.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_retention -v",
+      "purpose": "verify hash-before-JSON custody, strict types, complete three-sample groups, fit11 regression identity, alias accounting, same-cohort scalar aggregation, explicit exclusions, null gated scores and byte-exact CSV/Markdown regeneration"
+    },
+    "research/benchmark/results/matched-linear-fit11-retention-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_retention -v",
+      "purpose": "verify hash-before-JSON custody, strict types, complete three-sample groups, fit11 regression identity, alias accounting, same-cohort scalar aggregation, explicit exclusions, null gated scores and byte-exact CSV/Markdown regeneration"
+    },
+    "research/benchmark/tests/test_matched_linear_fit11_retention.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_retention -v",
+      "purpose": "verify hash-before-JSON custody, strict types, complete three-sample groups, fit11 regression identity, alias accounting, same-cohort scalar aggregation, explicit exclusions, null gated scores and byte-exact CSV/Markdown regeneration"
+    },
     "research/benchmark/publish_tabddpm_retained.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v", "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"},
     "research/benchmark/tests/test_tabddpm_retained.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v", "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"},
     "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/": {"command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_retained -v", "purpose": "verify original native selection snapshots independently of common outcomes, strict fit/sample identities, frozen split and operation joins, complete sample groups, artifact accounting, schemas, scalar regeneration and null incomplete-population claims"},

@@ -1,0 +1,7 @@
+peer_method,peer_configuration,size_multiplier,paired_complete_informative_lineages,DOPE_median_of_same_cohort_three_sample_means,peer_median_of_same_cohort_three_sample_means,median_paired_difference
+Forest-Flow,author_default,1,11,0.9890685232150573,0.9954909320486822,-0.004389784987948175
+Forest-Flow,author_default,4,11,0.9959564886631725,0.9958692408959764,-0.004078936575610204
+TabDDPM,author_default,1,10,0.9959124939438193,0.8236121184670189,0.3185924386489893
+TabDDPM,author_default,4,10,1.0035052660868466,0.8541209239983931,0.1662822409333109
+TabDDPM,native_selected,1,12,0.9959124939438193,0.8858174930630447,0.09692420263923945
+TabDDPM,native_selected,4,12,1.0035052660868466,0.967827557189882,0.04806893922819688
