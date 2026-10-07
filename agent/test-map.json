@@ -12,6 +12,10 @@
     "research/benchmark/publish_common_validation_batch.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_common_validation_publication -v", "purpose": "verify authenticated metadata publication, transitive receipt read tracking, source rejection before execution, aliases and null gated scores without metric recomputation"},
     "research/benchmark/tests/test_common_validation_publication.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_common_validation_publication -v", "purpose": "verify authenticated metadata publication, transitive receipt read tracking, source rejection before execution, aliases and null gated scores without metric recomputation"},
     "research/benchmark/results/common-A952-validation-v1/": {"command": "python3 -I -S -B research/benchmark/results/common-A952-validation-v1/render.py --check", "purpose": "reproduce committed first12 CSV/SVG/README byte for byte; preserve unavailable diagnostics, incomplete cohort and physical cost accounting"},
+    "research/benchmark/results/work-order-b-cost-closure-delta-v5/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-cost-closure-delta-v5/render.py --check",
+      "purpose": "reproduce four closed evaluation-cost rows and tables from committed metadata; preserve unknown parent/hardware/sharing facts, nested-clock exclusions and alias dedup without receipt payload or host reads"
+    },
     "research/benchmark/results/work-order-b-cost-closure-delta-v4/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-cost-closure-delta-v4/render.py --check",
       "purpose": "reproduce four closed-cost rows, finite schemas and manifests from committed metadata; keep unavailable admissions, unknown parent exits, overlapping clocks and separate engineering transports explicit without opening private receipts"
