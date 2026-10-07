@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="506" viewBox="0 0 1120 506">
+<rect width="100%" height="100%" fill="white"/>
+<g font-family="DejaVu Sans, sans-serif" fill="#18212b">
+<text x="20" y="32" font-size="21">Classical methods: 100 validation lineages</text>
+<text x="20" y="58" font-size="12">Mean of three sample seeds per dataset, then dataset median; fit seed 11; values (measured datasets).</text>
+<text x="20" y="86" font-size="13">Method / configuration / size</text>
+<text x="410" y="86" font-size="13">CatBoost retention</text>
+<text x="585" y="86" font-size="13">Marginal KS/TV</text>
+<text x="760" y="86" font-size="13">CatBoost C2ST AUC</text>
+<text x="935" y="86" font-size="13">Distance MIA AUC</text>
+<text x="20" y="112" font-size="13">ARF / author_default / 1n</text>
+<text x="410" y="112" font-size="13">0.734146 (99)</text>
+<text x="585" y="112" font-size="13">0.111803 (100)</text>
+<text x="760" y="112" font-size="13">0.609071 (100)</text>
+<text x="935" y="112" font-size="13">0.544400 (100)</text>
+<text x="20" y="140" font-size="13">ARF / author_default / 4n</text>
+<text x="410" y="140" font-size="13">0.819671 (99)</text>
+<text x="585" y="140" font-size="13">0.102971 (100)</text>
+<text x="760" y="140" font-size="13">0.603676 (100)</text>
+<text x="935" y="140" font-size="13">0.553047 (100)</text>
+<text x="20" y="168" font-size="13">ARF / native_selected / 1n</text>
+<text x="410" y="168" font-size="13">0.667814 (99)</text>
+<text x="585" y="168" font-size="13">0.113204 (100)</text>
+<text x="760" y="168" font-size="13">0.610607 (100)</text>
+<text x="935" y="168" font-size="13">0.543317 (100)</text>
+<text x="20" y="196" font-size="13">ARF / native_selected / 4n</text>
+<text x="410" y="196" font-size="13">0.806244 (99)</text>
+<text x="585" y="196" font-size="13">0.104697 (100)</text>
+<text x="760" y="196" font-size="13">0.609517 (100)</text>
+<text x="935" y="196" font-size="13">0.542217 (100)</text>
+<text x="20" y="224" font-size="13">Chow-Liu / author_default / 1n</text>
+<text x="410" y="224" font-size="13">0.553635 (99)</text>
+<text x="585" y="224" font-size="13">0.134027 (100)</text>
+<text x="760" y="224" font-size="13">0.698734 (100)</text>
+<text x="935" y="224" font-size="13">0.504833 (100)</text>
+<text x="20" y="252" font-size="13">Chow-Liu / author_default / 4n</text>
+<text x="410" y="252" font-size="13">0.643338 (99)</text>
+<text x="585" y="252" font-size="13">0.127789 (100)</text>
+<text x="760" y="252" font-size="13">0.721110 (100)</text>
+<text x="935" y="252" font-size="13">0.513336 (100)</text>
+<text x="20" y="280" font-size="13">Chow-Liu / native_selected / 1n</text>
+<text x="410" y="280" font-size="13">0.447624 (99)</text>
+<text x="585" y="280" font-size="13">0.130068 (100)</text>
+<text x="760" y="280" font-size="13">0.694772 (100)</text>
+<text x="935" y="280" font-size="13">0.511950 (100)</text>
+<text x="20" y="308" font-size="13">Chow-Liu / native_selected / 4n</text>
+<text x="410" y="308" font-size="13">0.566382 (99)</text>
+<text x="585" y="308" font-size="13">0.125770 (100)</text>
+<text x="760" y="308" font-size="13">0.701649 (99)</text>
+<text x="935" y="308" font-size="13">0.512930 (100)</text>
+<text x="20" y="336" font-size="13">GaussianCopula / author_default / 1n</text>
+<text x="410" y="336" font-size="13">0.574355 (99)</text>
+<text x="585" y="336" font-size="13">0.131497 (100)</text>
+<text x="760" y="336" font-size="13">0.613542 (100)</text>
+<text x="935" y="336" font-size="13">0.508900 (100)</text>
+<text x="20" y="364" font-size="13">GaussianCopula / author_default / 4n</text>
+<text x="410" y="364" font-size="13">0.593679 (99)</text>
+<text x="585" y="364" font-size="13">0.125888 (100)</text>
+<text x="760" y="364" font-size="13">0.614512 (100)</text>
+<text x="935" y="364" font-size="13">0.513785 (100)</text>
+<text x="20" y="392" font-size="13">GaussianCopula / native_selected / 1n</text>
+<text x="410" y="392" font-size="13">0.580928 (99)</text>
+<text x="585" y="392" font-size="13">0.138726 (100)</text>
+<text x="760" y="392" font-size="13">0.736579 (100)</text>
+<text x="935" y="392" font-size="13">0.507125 (100)</text>
+<text x="20" y="420" font-size="13">GaussianCopula / native_selected / 4n</text>
+<text x="410" y="420" font-size="13">0.640884 (99)</text>
+<text x="585" y="420" font-size="13">0.134100 (100)</text>
+<text x="760" y="420" font-size="13">0.730022 (99)</text>
+<text x="935" y="420" font-size="13">0.506762 (100)</text>
+<text x="20" y="482" font-size="12">Validation only. Empirical attacks; no formal DP, production score or superiority claim.</text></g></svg>

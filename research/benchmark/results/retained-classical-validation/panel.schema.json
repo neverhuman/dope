@@ -1,0 +1,481 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "comparison_scope": {
+      "const": "training_derived_validation_only"
+    },
+    "complete_classical_lineages": {
+      "const": 100
+    },
+    "execution_records": {
+      "required": [
+        "arf",
+        "copula_chow",
+        "utility_only"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "dope-retained-classical-validation-comparison"
+    },
+    "input_refs": {
+      "properties": {
+        "execution_refs": {
+          "additionalProperties": {
+            "properties": {
+              "bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "type": "object"
+          },
+          "required": [
+            "arf",
+            "copula_chow",
+            "utility_only"
+          ],
+          "type": "object"
+        },
+        "joined_panel_refs": {
+          "items": {
+            "properties": {
+              "bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "type": "object"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "tabsyn_panel_ref": {
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "joined_panel_refs",
+        "tabsyn_panel_ref",
+        "execution_refs"
+      ],
+      "type": "object"
+    },
+    "logical_sample_cells": {
+      "const": 3648
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "physical_metrics_file": {
+      "properties": {
+        "bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "type": "object"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "rows": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "alias_json_pointer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "alias_origin_ref": {
+            "anyOf": [
+              {
+                "properties": {
+                  "bytes": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256",
+                  "bytes"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alpha_precision": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "beta_recall": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "c2st_catboost_auc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "c2st_logistic_auc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "catboost_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "catboost_trtr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "catboost_tstr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "charged_artifact_bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "contingency_tv_mean": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "dataset": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "dcr_fit_median": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "dcr_validation_median": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "distance_mia_auc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "domias_kde_auc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "fit_seed": {
+            "const": 11
+          },
+          "input_hashes": {
+            "additionalProperties": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "required": [
+              "train",
+              "validation",
+              "synthetic",
+              "projection"
+            ],
+            "type": "object"
+          },
+          "linear_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "linear_trtr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "linear_tstr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "marginal_error_mean": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "method": {
+            "enum": [
+              "ARF",
+              "GaussianCopula",
+              "Chow-Liu",
+              "TabSyn"
+            ]
+          },
+          "metric_job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "metric_receipt_ref": {
+            "properties": {
+              "bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "type": "object"
+          },
+          "mlp_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mlp_trtr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mlp_tstr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "nndr_fit_median": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "null_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "pairwise_pearson_difference_mean": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "row_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          },
+          "sample_seed": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "selection_binding": {
+            "enum": [
+              "author_default",
+              "native_selected",
+              "scaled_author_default"
+            ]
+          }
+        },
+        "required": [
+          "dataset",
+          "method",
+          "selection_binding",
+          "fit_seed",
+          "sample_seed",
+          "row_multiplier",
+          "config_sha256",
+          "charged_artifact_bytes",
+          "metric_job_sha256",
+          "metric_receipt_ref",
+          "alias_origin_ref",
+          "alias_json_pointer",
+          "input_hashes",
+          "marginal_error_mean",
+          "pairwise_pearson_difference_mean",
+          "contingency_tv_mean",
+          "alpha_precision",
+          "beta_recall",
+          "c2st_catboost_auc",
+          "c2st_logistic_auc",
+          "dcr_fit_median",
+          "dcr_validation_median",
+          "nndr_fit_median",
+          "distance_mia_auc",
+          "domias_kde_auc",
+          "null_loss",
+          "catboost_trtr_loss",
+          "catboost_tstr_loss",
+          "catboost_retention",
+          "linear_trtr_loss",
+          "linear_tstr_loss",
+          "linear_retention",
+          "mlp_trtr_loss",
+          "mlp_tstr_loss",
+          "mlp_retention"
+        ],
+        "type": "object"
+      },
+      "maxItems": 3648,
+      "minItems": 3648,
+      "type": "array"
+    },
+    "selection_use": {
+      "const": false
+    },
+    "summary": {
+      "maxItems": 26,
+      "minItems": 26,
+      "type": "array"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "tabsyn_lineages": {
+      "const": 8
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "input_refs",
+    "execution_records",
+    "rows",
+    "summary",
+    "physical_metrics_file",
+    "logical_sample_cells",
+    "complete_classical_lineages",
+    "tabsyn_lineages",
+    "comparison_scope",
+    "production_certified",
+    "selection_use",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "superiority"
+  ],
+  "title": "Complete retained classical validation comparison",
+  "type": "object"
+}
