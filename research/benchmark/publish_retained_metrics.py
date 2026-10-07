@@ -44,7 +44,7 @@ def flatten(cell):
     return row
 
 
-def build(lock_ref, receipt_dir, manifest_ref, execution_ref):
+def build(lock_ref, receipt_dir, manifest_ref, execution_ref, *, by_fit_seed=False):
     lock = verified(Path(receipt_dir) / Path(lock_ref["path"]).name, lock_ref)
     manifest = verified(Path(receipt_dir) / Path(manifest_ref["path"]).name, manifest_ref)
     execution = verified(Path(receipt_dir) / Path(execution_ref["path"]).name, execution_ref)
@@ -98,8 +98,10 @@ def build(lock_ref, receipt_dir, manifest_ref, execution_ref):
     cells.sort(key=lambda r: (r["method"], r["dataset"], r["config_sha256"], r["row_multiplier"], r["sample_seed"]))
     flat = [flatten(cell) for cell in cells]
     summary = []
-    for method, selection, n in sorted({(x["method"], x["selection_binding"], x["row_multiplier"]) for x in flat}):
-        group = [x for x in flat if (x["method"], x["selection_binding"], x["row_multiplier"]) == (method, selection, n)]
+    group_keys = ("method", "selection_binding", "row_multiplier") + (("fit_seed",) if by_fit_seed else ())
+    for identity in sorted({tuple(x[key] for key in group_keys) for x in flat}):
+        method, selection, n = identity[:3]
+        group = [x for x in flat if tuple(x[key] for key in group_keys) == identity]
         lineages = sorted({x["dataset"] for x in group})
         if any(len([x for x in group if x["dataset"] == dataset]) != 3 or
                {x["sample_seed"] for x in group if x["dataset"] == dataset} != {101, 211, 307} or
@@ -110,6 +112,8 @@ def build(lock_ref, receipt_dir, manifest_ref, execution_ref):
                    configuration_hashes=sorted({x["config_sha256"] for x in group}),
                    row_multiplier=n, datasets=len(lineages), cells=len(group),
                    aggregation="mean_of_three_sample_seeds_then_median_of_datasets")
+        if by_fit_seed:
+            row["fit_seed"] = identity[3]
         for metric in flat[0]:
             if metric in ("dataset", "method", "fit_seed", "sample_seed", "row_multiplier", "config_sha256", "selection_binding"):
                 continue
@@ -157,11 +161,14 @@ def main():
     parser.add_argument("--execution-record-sha256", required=True)
     parser.add_argument("--execution-record-bytes", type=int, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--summarize-by-fit-seed", action="store_true",
+                        help="Report separate dataset medians for each independent generator fit seed.")
     args = parser.parse_args()
     lock_ref = dict(path=str(args.receipt_lock), sha256=args.receipt_lock_sha256, bytes=args.receipt_lock_bytes)
     manifest_ref = dict(path=str(args.input_manifest), sha256=args.input_manifest_sha256, bytes=args.input_manifest_bytes)
     execution_ref = dict(path=str(args.execution_record), sha256=args.execution_record_sha256, bytes=args.execution_record_bytes)
-    panel = build(lock_ref, args.receipt_dir, manifest_ref, execution_ref)
+    panel = build(lock_ref, args.receipt_dir, manifest_ref, execution_ref,
+                  by_fit_seed=args.summarize_by_fit_seed)
     args.output.mkdir(parents=True, exist_ok=True)
     for name, data in render(panel).items():
         (args.output / name).write_bytes(data)
