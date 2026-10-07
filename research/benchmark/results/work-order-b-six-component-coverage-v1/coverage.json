@@ -3246,7 +3246,7 @@
       "metric_available_cells": {
         "alpha_beta": 0,
         "c2st_catboost": 0,
-        "c2st_logistic": 0,
+        "c2st_logistic": 12,
         "catboost_informative_retention": 12,
         "catboost_loss_triple": 12,
         "categorical_contingency": 0,
@@ -3255,12 +3255,12 @@
         "domias_kde_auc": 0,
         "linear_informative_retention": 12,
         "linear_loss_triple": 12,
-        "marginal_ks_tv": 0,
+        "marginal_ks_tv": 12,
         "mlp_informative_retention": 6,
         "mlp_loss_triple": 12,
-        "pairwise_pearson": 0,
-        "projected_exact_near_copy_counts": 0,
-        "projected_real_vs_real_copy_counts": 0
+        "pairwise_pearson": 12,
+        "projected_exact_near_copy_counts": 12,
+        "projected_real_vs_real_copy_counts": 12
       },
       "panel_path": "research/benchmark/results/pilot24-tabpc-native.json",
       "projected_exact_copy_positive_cells": 0,
@@ -3314,7 +3314,7 @@
       "metric_available_cells": {
         "alpha_beta": 0,
         "c2st_catboost": 0,
-        "c2st_logistic": 0,
+        "c2st_logistic": 12,
         "catboost_informative_retention": 12,
         "catboost_loss_triple": 12,
         "categorical_contingency": 0,
@@ -3323,12 +3323,12 @@
         "domias_kde_auc": 0,
         "linear_informative_retention": 12,
         "linear_loss_triple": 12,
-        "marginal_ks_tv": 0,
+        "marginal_ks_tv": 12,
         "mlp_informative_retention": 6,
         "mlp_loss_triple": 12,
-        "pairwise_pearson": 0,
-        "projected_exact_near_copy_counts": 0,
-        "projected_real_vs_real_copy_counts": 0
+        "pairwise_pearson": 12,
+        "projected_exact_near_copy_counts": 12,
+        "projected_real_vs_real_copy_counts": 12
       },
       "panel_path": "research/benchmark/results/pilot24-tabpc-native.json",
       "projected_exact_copy_positive_cells": 0,
