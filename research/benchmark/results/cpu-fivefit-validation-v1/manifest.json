@@ -1,0 +1,137 @@
+{
+  "common_metrics_complete_for_published_fit_prefix": true,
+  "files": {
+    "README.md": {
+      "bytes": 3526,
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/README.md",
+      "sha256": "2dcd5795d6cb2740b6c115b9a4303bb6b6d6b5f82432ee4794c6a2af1f20cd96"
+    },
+    "arf/figure-kpis.csv": {
+      "bytes": 74301,
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/figure-kpis.csv",
+      "sha256": "d0d9317e3dd10d3fe9923cb2906d9d8425d791403c3570edeec4f6384b0a70d0"
+    },
+    "arf/panel.json": {
+      "bytes": 1751802,
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
+      "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
+    },
+    "forest/figure-kpis.csv": {
+      "bytes": 24590,
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/forest/figure-kpis.csv",
+      "sha256": "277eb4ba3546cca582938dd5794e68a12d0f07477fd79be6358ccb27b06a5037"
+    },
+    "forest/panel.json": {
+      "bytes": 556101,
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/forest/panel.json",
+      "sha256": "a4af32f29918ee299a86ef4ff0fb59408dcdd187c7c11a074be9229b2ece7423"
+    },
+    "manifest.schema.json": {
+      "bytes": 1691,
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/manifest.schema.json",
+      "sha256": "09ce15855a932c99d656d6aae6c227150501a3f2bc9528e7c1dc77fcaa5699ed"
+    },
+    "panel.schema.json": {
+      "bytes": 2413,
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/panel.schema.json",
+      "sha256": "20db82aa05c063cfa06c2515247af9b38cda9e3f3c2b087ea41f09feb6e736ca"
+    }
+  },
+  "fit_scope": {
+    "arf": {
+      "configuration": "default_and_native_selected",
+      "fit_seeds": [
+        23
+      ],
+      "fits": 24,
+      "lineages": 12
+    },
+    "forest": {
+      "configuration": "author_default",
+      "fit_seeds": [
+        23,
+        37,
+        53,
+        71
+      ],
+      "fits": 8,
+      "lineages": 2
+    }
+  },
+  "five_fit_matrix_complete": false,
+  "format": "dope-cpu-fit-replication-common-validation-batch",
+  "full_population_complete": false,
+  "inputs": {
+    "arf": {
+      "actual_replay_record": {
+        "bytes": 1728,
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-samples-batch1/publication-batch1-v2/replay.actual.json",
+        "sha256": "deec058d1f468cc68909b8d2d44e4ff4f94c04651fac2c1de637a7b9d29e72e2"
+      },
+      "execution_record": {
+        "bytes": 2593,
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-samples-batch1/publication-batch1-v1/execution.actual.json",
+        "sha256": "322350c4c3d62273772a176bf05b24838b74c4b035cbf58165c78b9c1a696f7d"
+      },
+      "input_manifest": {
+        "bytes": 569446,
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-samples-batch1/common-metrics-inputs.lock.json",
+        "sha256": "740753ab200943eb8bc680efb292688c58778651984083d8c3fc0d2b0419ae59"
+      },
+      "published_fit_panel": {
+        "bytes": 71681,
+        "path": "research/benchmark/results/cpu-fivefit-progress-v1/arf/panel.json",
+        "sha256": "9ac5363a1be7d8661ae7ed329f8c7e6b1b88b441cca16f05e5274472e109360c"
+      },
+      "receipt_lock": {
+        "bytes": 41812,
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-samples-batch1/metric-receipts/receipt-lock.json",
+        "sha256": "14fdee86219b78a3743d41ed4399d1f77a2826db6a575d0c3510cceb609e642c"
+      }
+    },
+    "forest": {
+      "actual_replay_record": {
+        "bytes": 1707,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/publication-batch1-v2/replay.actual.json",
+        "sha256": "54ca41ad4fa73d21d9c497b5614355160de7b1663d934eef6c749351bb4992cd"
+      },
+      "execution_record": {
+        "bytes": 2383,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/publication-batch1-v1/execution.actual.json",
+        "sha256": "bc22b3c27d7530c62462875ded17409f6fc31f750a9635a2054242b869b0a13b"
+      },
+      "input_manifest": {
+        "bytes": 180161,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/common-metrics-inputs.lock.json",
+        "sha256": "a466ec88d5a42313439324408b5de50bee2a75c4393b6553a0bda2e081adcce5"
+      },
+      "published_fit_panel": {
+        "bytes": 19948,
+        "path": "research/benchmark/results/cpu-fivefit-progress-v1/forest/panel.json",
+        "sha256": "557592f589a9b61e71e26254572a330c0e8d3aa9ce5d8ce568ad8d14990eed04"
+      },
+      "receipt_lock": {
+        "bytes": 14355,
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/receipt-lock.json",
+        "sha256": "1b5d3e97367366658f8e6fedea1f28d4833a250f5f98666ef42f809d7baf4a14"
+      }
+    }
+  },
+  "mfs_v2": null,
+  "native_objectives_changed": false,
+  "official_tests_opened": false,
+  "producer_options": {
+    "summarize_by_fit_seed": true
+  },
+  "producer_ref": {
+    "bytes": 10720,
+    "path": "research/benchmark/publish_retained_metrics.py",
+    "sha256": "dce2e68de574c5029e74de2675e9b1377789894e5a0482c0763d135db579384c"
+  },
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "sample_cells": 192,
+  "source_commit_before_publication": "7c96338c59949ab0135b270bd9c8829b58630d27",
+  "superiority": null,
+  "version": 1
+}
