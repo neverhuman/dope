@@ -1,0 +1,162 @@
+{
+  "all_eight_actual_parent_waits_are_zero": true,
+  "all_receipt_hashes_verified_before_decode": true,
+  "artifact_charge_and_resident_observation_are_terminal_scalars": true,
+  "format": "work-order-b-native8-source-proof-v1",
+  "frozen_500_identity_matrix_and_eight_job_attempt_seed_status_joins_verified": true,
+  "full_suite_or_control_execution": false,
+  "historical_reuse_or_qualification_cost_recharged": false,
+  "inputs": [
+    {
+      "bytes": 33247,
+      "sha256": "53325694bfc9118f1359b2b940ed46b36628309eb609bc3b6a1b7a45ec0c3575",
+      "source_id": "native-operation-01-terminal"
+    },
+    {
+      "bytes": 1723,
+      "sha256": "fdbae866c491a694e807d57b5786836ac1ac1d359095a14d7d37cb6e8cd5ab35",
+      "source_id": "native-operation-01-parent"
+    },
+    {
+      "bytes": 35822,
+      "sha256": "b8620cf78f31ea55a54f2f558cbbae588ed272892e6c8b7958f4eb276ac8db1b",
+      "source_id": "native-operation-02-terminal"
+    },
+    {
+      "bytes": 1718,
+      "sha256": "fc7bb23b4cd8a46def4b1946431f2df579b6f9fd4e64eef2a5b2d8a10780ffba",
+      "source_id": "native-operation-02-parent"
+    },
+    {
+      "bytes": 35826,
+      "sha256": "9cd40d82e05c568938c8e83f2f22c8128174f995813847e2d3df4db4cb85286c",
+      "source_id": "native-operation-03-terminal"
+    },
+    {
+      "bytes": 1718,
+      "sha256": "f205df0a2e77e51fe4e27c84147b255d1b54db8df7b371bcfc08eaa9c74b2ae2",
+      "source_id": "native-operation-03-parent"
+    },
+    {
+      "bytes": 35823,
+      "sha256": "3fa636399624ae212ee367136e438bba2f0e666be3857908051d846c0c2a2387",
+      "source_id": "native-operation-04-terminal"
+    },
+    {
+      "bytes": 1721,
+      "sha256": "3fff4a0700adb303a2d6c4657dfdab3cb1d52a1d484a5e7123949924ecd52410",
+      "source_id": "native-operation-04-parent"
+    },
+    {
+      "bytes": 35827,
+      "sha256": "6c911b983ebf3f64173dd418a0637a8ac07a99cd7d434da7abd57698c6ef752d",
+      "source_id": "native-operation-05-terminal"
+    },
+    {
+      "bytes": 1751,
+      "sha256": "194c30db0bc348cf24c8f3a8a03c8a53fdf670377f40ca856614dd4608be6240",
+      "source_id": "native-operation-05-parent"
+    },
+    {
+      "bytes": 35825,
+      "sha256": "a3de0dcd5c079791928cf0e291b5237e28f7f9ec301f112bab18f1ce71898ab6",
+      "source_id": "native-operation-06-terminal"
+    },
+    {
+      "bytes": 1750,
+      "sha256": "5ab8b4c2ca9a46974c5babc5e47b33d5ee103f825adcec329d00d8925479e198",
+      "source_id": "native-operation-06-parent"
+    },
+    {
+      "bytes": 35823,
+      "sha256": "62433ab4953bc03328c93abfda07e68d7ef5009438562a9bfe01508226bdcc9c",
+      "source_id": "native-operation-07-terminal"
+    },
+    {
+      "bytes": 1750,
+      "sha256": "04bc250848c17262a33da03b32f773b4868472ca2f3ee02858e863765bd7dfc4",
+      "source_id": "native-operation-07-parent"
+    },
+    {
+      "bytes": 33252,
+      "sha256": "37de63d21e904fc18b1cd175aedb11bec5e3aa5165a74784ecff1167d2824679",
+      "source_id": "native-operation-08-terminal"
+    },
+    {
+      "bytes": 2127,
+      "sha256": "1bc8349ebc62492febc9323c2f582465d932e71d593407efee9444053d8cd2a1",
+      "source_id": "native-operation-08-parent"
+    },
+    {
+      "bytes": 16612,
+      "sha256": "9a26ae9f4e27df091f91308f47a457cb485ae5e90310d1bcb961b44a1f46e966",
+      "source_id": "frozen-private-progress"
+    },
+    {
+      "bytes": 14227,
+      "sha256": "d22a17e2fcb2f2f223d47bd0cfb0528e1973b2d9177eba3817e5cdbd97967b7d",
+      "source_id": "frozen-private-input-proof"
+    },
+    {
+      "bytes": 1720,
+      "sha256": "c18ed5dfb72a0d1e5c3acf20b008781bec9c877a14202e1ecea42a46648a280e",
+      "source_id": "frozen-private-measured-csv"
+    },
+    {
+      "bytes": 68353,
+      "sha256": "9ffa102fc48e93405ede1699d4b51a8cc29fbd30ac9e4f13e97150ba97ad5106",
+      "source_id": "frozen-prefix7-resume"
+    },
+    {
+      "bytes": 14035337,
+      "sha256": "f0ce102e79d692e4c1becb5a283be0f491fbad9e06a29e2796154c18c7fdc106",
+      "source_id": "frozen-500-job-identities"
+    },
+    {
+      "bytes": 110818,
+      "sha256": "0c81b07d13e036c7413de0d09ff3aeaae25efdf25732685093905352218659d6",
+      "source_id": "frozen-400-queue"
+    },
+    {
+      "bytes": 25225,
+      "sha256": "33aba9b0d4433936198615032c04e8b5604b64d6ee71b27499a590eda1652a45",
+      "source_id": "new-operation-request"
+    },
+    {
+      "bytes": 6172,
+      "sha256": "b99785c6ea1910c9b93b01aa745f77ebf784aea513e5fee3783fe81fc3aa06fb",
+      "source_id": "new-operation-round"
+    },
+    {
+      "bytes": 118793,
+      "sha256": "ddf5c5af0b609498b16cae7016d3b5a4a41b7c69c0c6b2f18cd1cbe490636170",
+      "source_id": "prior-native7-charged-budget"
+    },
+    {
+      "bytes": 118690,
+      "sha256": "bc8367e677f355564f69cca6fc99dbd315ed8f5daf5eca2c0ca5467eef1d2270",
+      "source_id": "initial-inclusive-budget"
+    },
+    {
+      "bytes": 118792,
+      "sha256": "022f93fde7bdc070545a642e76983b77aa53fc4624c8b1cc860b241815aef64b",
+      "source_id": "current-native8-charged-budget"
+    }
+  ],
+  "later_operations_included": false,
+  "metadata_only": true,
+  "new_hosts_probes_library_native_or_scientific_execution": false,
+  "physical_cost_dedup_key": "job_sha256_and_attempt_with_distinct_terminal_and_parent_digest",
+  "private_absolute_paths_or_payloads_included": false,
+  "public_regenerator_needs_private_receipts": false,
+  "true_peak_or_kernel_time_inferred": false,
+  "unresolved": [
+    "campaign_wide_cost_total",
+    "true_peak_RAM_and_VRAM",
+    "hardware_models_CPU_kernel_and_energy_cost",
+    "five_fit_stability_and_gated_scientific_claims",
+    "foreign_mutex_participation"
+  ],
+  "unstarted_slots_classified_as_method_failures": false,
+  "version": 1
+}

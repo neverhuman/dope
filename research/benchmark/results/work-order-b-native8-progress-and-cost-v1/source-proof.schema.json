@@ -1,0 +1,130 @@
+{
+  "$id": "work-order-b-native8-source-proof-v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_eight_actual_parent_waits_are_zero": {
+      "const": true,
+      "type": "boolean"
+    },
+    "all_receipt_hashes_verified_before_decode": {
+      "const": true,
+      "type": "boolean"
+    },
+    "artifact_charge_and_resident_observation_are_terminal_scalars": {
+      "const": true,
+      "type": "boolean"
+    },
+    "format": {
+      "const": "work-order-b-native8-source-proof-v1",
+      "minLength": 1,
+      "type": "string"
+    },
+    "frozen_500_identity_matrix_and_eight_job_attempt_seed_status_joins_verified": {
+      "const": true,
+      "type": "boolean"
+    },
+    "full_suite_or_control_execution": {
+      "const": false,
+      "type": "boolean"
+    },
+    "historical_reuse_or_qualification_cost_recharged": {
+      "const": false,
+      "type": "boolean"
+    },
+    "inputs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "source_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "sha256",
+          "source_id"
+        ],
+        "type": "object"
+      },
+      "maxItems": 27,
+      "minItems": 27,
+      "type": "array"
+    },
+    "later_operations_included": {
+      "const": false,
+      "type": "boolean"
+    },
+    "metadata_only": {
+      "const": true,
+      "type": "boolean"
+    },
+    "new_hosts_probes_library_native_or_scientific_execution": {
+      "const": false,
+      "type": "boolean"
+    },
+    "physical_cost_dedup_key": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "private_absolute_paths_or_payloads_included": {
+      "const": false,
+      "type": "boolean"
+    },
+    "public_regenerator_needs_private_receipts": {
+      "const": false,
+      "type": "boolean"
+    },
+    "true_peak_or_kernel_time_inferred": {
+      "const": false,
+      "type": "boolean"
+    },
+    "unresolved": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "unstarted_slots_classified_as_method_failures": {
+      "const": false,
+      "type": "boolean"
+    },
+    "version": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "all_eight_actual_parent_waits_are_zero",
+    "all_receipt_hashes_verified_before_decode",
+    "artifact_charge_and_resident_observation_are_terminal_scalars",
+    "format",
+    "frozen_500_identity_matrix_and_eight_job_attempt_seed_status_joins_verified",
+    "full_suite_or_control_execution",
+    "historical_reuse_or_qualification_cost_recharged",
+    "inputs",
+    "later_operations_included",
+    "metadata_only",
+    "new_hosts_probes_library_native_or_scientific_execution",
+    "physical_cost_dedup_key",
+    "private_absolute_paths_or_payloads_included",
+    "public_regenerator_needs_private_receipts",
+    "true_peak_or_kernel_time_inferred",
+    "unresolved",
+    "unstarted_slots_classified_as_method_failures",
+    "version"
+  ],
+  "type": "object"
+}

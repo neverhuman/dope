@@ -1,6 +1,7 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/results/work-order-b-native8-progress-and-cost-v1/": "external-evidence",
     "research/benchmark/publish_cpu_fit_batch.py": "external-evidence",
     "research/benchmark/tests/test_cpu_fit_batch.py": "external-evidence",
     "research/benchmark/results/cpu-fivefit-progress-v1/": "external-evidence",
