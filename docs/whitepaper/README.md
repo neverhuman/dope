@@ -25,9 +25,22 @@ reference list is `references.bib`.
 
 ## What is allowed to change a number
 
-Edit tables only from `research/benchmark/RESULTS_STATUS.md` or from a newer
-ledger that replaces it. Keep the 97-lineage density panel and the
+Edit tables only from committed, hash-pinned validation publications. The
+retained panels merged on 2026-10-07 are reduced by
+`scripts/retained_evidence.py`: TabSyn's eight-lineage scaled-default
+subset, classical default/native samples on 100 lineages, and the
+authenticated deterministic first12 diagnostics. Generated source digests,
+JSON pointers, lineage means, intervals and paired differences are in
+`generated/retained-evidence.json`; coverage and conditional ETAs are in
+`generated/baseline-coverage.json`. Original receipt paths are in the
+referenced benchmark publications. `just paper` regenerates these inputs
+and their figure before building the PDFs; build evidence stays in the
+checkout's `target/paper-build/`.
+
+Keep the 97-lineage density panel and the
 21-lineage CTGAN/TVAE panel in separate rows. Official test partitions stay
 closed. Empirical privacy text in this draft is not a differential-privacy
 or HIPAA claim. PTF-v1, release-safe L3, and paired superiority stay out of
-the abstract until the frozen gates say otherwise.
+the abstract until the frozen gates say otherwise. The new mean-of-three
+retained panels and legacy median-of-three blocks stay separate. A paired
+validation difference does not certify superiority.

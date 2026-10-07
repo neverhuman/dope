@@ -1,5 +1,19 @@
 # IEEE review readiness
 
+## Retained-evidence update, 2026-10-07
+
+The merged retained publications are now integrated in the manuscript:
+TabSyn eight-lineage/48-evaluation scaled-default cohort; ARF/copula/Chow-Liu
+100-lineage default/native n/4n diagnostics and utility; and an authenticated
+first12 diagnostic appendix. `scripts/retained_evidence.py` regenerates
+lineage intervals, exploratory paired statistics, figure data and the
+coverage table with conditional ETAs. Receipts remain validation-only;
+full-population neural coverage, final five-fit comparisons and release
+certification remain incomplete. No GPU use is authorized by this writing
+update. The earlier readiness audit below is a historical snapshot; its
+TabSyn/source-only and ARF/watch-only statements are superseded by the
+current coverage table and `RETAINED_EVIDENCE_REVIEW.md`.
+
 Reconciled 2026-10-05 with the local audit `.agent/PAPER_IEEE_READINESS.md`
 (that file stays uncommitted). The PR 124 manuscript was IEEEtran `journal`,
 14 letter pages, at `52b187b`. This note lives on `paper-ieee-w1`. Lane W

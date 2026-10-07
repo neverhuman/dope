@@ -1,0 +1,99 @@
+{
+  "calculated_slot_hours": 156.0,
+  "plan": {
+    "as_of_utc": "2026-10-07T04:55:00Z",
+    "capacity_condition": "One dedicated eligible slot per method for 156 hours, fresh owner admission, no contention with the encoding-priority queue; no GPU lease or launch is granted by this forecast",
+    "conditional_start_mt": "2026-10-08T08:00:00-06:00",
+    "default_fits": 100,
+    "native_trial_ceiling": 800,
+    "per_fit_seconds": 600,
+    "retained_TabDDPM_Forest_metric_target_mt": "2026-10-07T12:00:00-06:00",
+    "retained_target_condition": "Receipts and CPU capacity must be available; this is a target, not an observed completion",
+    "sampling_and_metrics_allowance_hours": 6,
+    "scope": "100-lineage fit-seed-11 author-default and native-selected validation panels; final five-fit campaign is separate and unscheduled"
+  },
+  "plan_sha256": "e9c456f8d80f510ab9cd5916e850e2de584114fa685cd0c8f73828e4ce02759c",
+  "rows": [
+    {
+      "complete100": false,
+      "complete_retained_lineages": 8,
+      "complete_retained_sample_cells": 48,
+      "coverage": "Scaled author-default subset, n/4n; full100/native tuning incomplete",
+      "eta_is_observed_completion": false,
+      "final_five_fit_complete": false,
+      "full100_eta_mt": "2026-10-14T20:00:00-06:00",
+      "method": "TabSyn"
+    },
+    {
+      "complete100": false,
+      "complete_retained_lineages": null,
+      "complete_retained_sample_cells": null,
+      "coverage": "Contract/pilot receipts; no complete100 matched population publication",
+      "eta_is_observed_completion": false,
+      "final_five_fit_complete": false,
+      "full100_eta_mt": "2026-10-14T20:00:00-06:00",
+      "method": "TabDDPM"
+    },
+    {
+      "complete100": false,
+      "complete_retained_lineages": 6,
+      "complete_retained_sample_cells": null,
+      "coverage": "Native-selected4n confirmation; full100 incomplete",
+      "eta_is_observed_completion": false,
+      "final_five_fit_complete": false,
+      "full100_eta_mt": "2026-10-14T20:00:00-06:00",
+      "method": "Forest-Flow"
+    },
+    {
+      "complete100": false,
+      "complete_retained_lineages": null,
+      "complete_retained_sample_cells": null,
+      "coverage": "Pilot includes author mode variants; no separate complete100 diffusion panel",
+      "eta_is_observed_completion": false,
+      "final_five_fit_complete": false,
+      "full100_eta_mt": "2026-10-14T20:00:00-06:00",
+      "method": "Forest-Diffusion",
+      "pilot_logical_cells": 108
+    },
+    {
+      "complete100": true,
+      "complete_retained_lineages": 100,
+      "complete_retained_sample_cells": 1200,
+      "completion_observation_source": {
+        "pointer": "/execution_records/arf/recorded_UTC",
+        "source": "classical"
+      },
+      "coverage": "Default/native, n/4n, three sample seeds; fit11 complete",
+      "eta_is_observed_completion": true,
+      "final_five_fit_complete": false,
+      "full100_eta_mt": "2026-10-06T21:16:07.031116-06:00",
+      "method": "ARF"
+    }
+  ],
+  "sources": {
+    "arf": {
+      "path": "research/benchmark/results/arf-matched-population-validation.json",
+      "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
+    },
+    "classical": {
+      "path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
+    },
+    "first12": {
+      "path": "research/benchmark/results/common-A952-validation-v1/first12.completed.json",
+      "sha256": "8e039b1d57298f10bf7c05c2f3a8b14481a60ed663c1063ed30c273854f3bdfe"
+    },
+    "forest": {
+      "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
+      "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
+    },
+    "forest_pilot": {
+      "path": "research/benchmark/results/pilot24-forestdiffusion-native.json",
+      "sha256": "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"
+    },
+    "tabsyn": {
+      "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
+      "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
+    }
+  }
+}

@@ -1,6 +1,11 @@
 {
   "workspace": "dope",
   "owners": {
+    "docs/whitepaper/scripts/retained_evidence.py": "external-evidence",
+    "docs/whitepaper/scripts/test_retained_evidence.py": "external-evidence",
+    "docs/whitepaper/coverage-plan.json": "external-evidence",
+    "docs/whitepaper/generated/retained-evidence.json": "external-evidence",
+    "docs/whitepaper/generated/baseline-coverage.json": "external-evidence",
     "research/benchmark/publish_retained_comparison.py": "external-evidence",
     "research/benchmark/tests/test_retained_comparison.py": "external-evidence",
     "research/benchmark/results/retained-classical-validation/": "external-evidence",

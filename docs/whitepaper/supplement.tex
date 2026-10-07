@@ -3,6 +3,7 @@
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{graphicx}
+\usepackage{url}
 \usepackage{etoolbox}
 \makeatletter
 \apptocmd{\@maketitle}{%
@@ -66,6 +67,26 @@ medians are $\MedSufAMlp$ and $\MedSufBMlp$ ($\NSufMlp$ lineages;
 difference $\DiffSufMlp$).
 \begin{center}
 \includegraphics[width=\textwidth]{figures/loss-curves.pdf}
+\end{center}
+
+\section{Authenticated first-batch diagnostics}
+The canonical-job batch is incomplete at population and sample-group
+level. The following values are individual physical evaluations. Logical
+aliases share one evaluation and its cost. DOPE jobs in this batch use
+the frozen research profiles named in the source receipt; they do not
+replace the displayed profile. No population interval or ranking is
+computed. Pearson entries are the pinned source mean; alpha and beta
+use its pinned unembedded variant, and MIA is an empirical distance attack.
+Per-column marginals, all detection folds, DCR/NNDR, applicability reasons,
+costs and full job digests are in
+the first-batch source listed in
+\path{docs/whitepaper/generated/retained-evidence.json}.
+The operation-clock sum excludes training and sampling. Official tests
+remain sealed and all gated scores remain null.
+
+\begin{center}
+\scriptsize
+\input{generated/retained-first12.tex}
 \end{center}
 
 \section{Release score that was not emitted}

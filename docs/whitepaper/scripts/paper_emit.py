@@ -540,7 +540,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
         command("DopeByteLo", tex_bytes(side.get("dope_byte_min"))),
         command("TabSynPanel", "not measured"),
         command("TabDDPMPanel", "not measured"),
-        command("TabSynResult", _publication_phrase("TabSyn")),
+        command("TabSynResult", "measured on a retained validation subset"),
         command("TabDDPMResult", _publication_phrase("TabDDPM")),
         command("ForestPublication", _publication_phrase("Forest-Flow")),
         command("ArfResult", _publication_phrase("ARF")),
