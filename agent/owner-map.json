@@ -270,6 +270,7 @@
     "research/benchmark/research_ablation_binding.py": "external-evidence",
     "research/benchmark/tests/test_research_ablation_binding.py": "external-evidence",
     "research/benchmark/DOPE_ABLATIONS.md": "external-evidence",
-    "research/benchmark/results/work-order-b-cost-closure-delta-v3": "external-evidence"
+    "research/benchmark/results/work-order-b-cost-closure-delta-v3": "external-evidence",
+    "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": "external-evidence"
   }
 }
