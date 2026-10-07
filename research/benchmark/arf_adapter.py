@@ -4,6 +4,7 @@ import hashlib
 import io
 import json
 import math
+import os
 from pathlib import Path
 import stat
 import time
@@ -84,9 +85,13 @@ def check_runtime(path, expected, base):
 
 def fit(*, runtime_path, runtime_sha256, base, train, train_sha256,
         validation, validation_sha256, projection, projection_sha256,
-        artifact, configuration, fit_seed, deadline_epoch):
+        artifact, configuration, fit_seed, deadline_epoch, cpu_threads=16):
     deadline(deadline_epoch)
     check(deadline_epoch - time.time() <= 600, 'ARF fit ceiling exceeds 600 seconds')
+    check(type(cpu_threads) is int and 1 <= cpu_threads <= 16,
+          'invalid ARF CPU allocation')
+    if cpu_threads != 16:
+        check(cpu_threads <= len(os.sched_getaffinity(0)), 'ARF CPU allocation exceeds affinity')
     check_runtime(runtime_path, runtime_sha256, base)
     seed(fit_seed); config(configuration)
     check(Path(train).name == 'train.csv' and Path(validation).name == 'validation.csv'
@@ -106,7 +111,7 @@ def fit(*, runtime_path, runtime_sha256, base, train, train_sha256,
     start = time.monotonic()
     model = arf(frames[0], num_trees=configuration['num_trees'],
                 min_node_size=configuration['min_node_size'], max_iters=configuration['max_iters'],
-                delta=0, early_stop=True, verbose=False, random_state=fit_seed, n_jobs=16)
+                delta=0, early_stop=True, verbose=False, random_state=fit_seed, n_jobs=cpu_threads)
     model.forde(dist='truncnorm', oob=False, alpha=configuration['alpha'])
     value = native.heldout_mean_log_density(model, frames[1])
     deadline(deadline_epoch)
@@ -114,6 +119,7 @@ def fit(*, runtime_path, runtime_sha256, base, train, train_sha256,
     (output / 'projection.json').write_bytes(projection_bytes)
     (output / 'adapter.json').write_text(json.dumps(dict(format='dope-arf-research-adapter-v1',
         runtime_sha256=runtime_sha256, fit_seed=fit_seed, configuration=configuration,
+        cpu_threads=cpu_threads,
         source_rows_required=False, support='clip_to_unit_interval'), sort_keys=True) + '\n')
     files = inventory(output)
     check((output / 'projection.json').read_bytes() == projection_bytes, 'ARF projection copy differs')
@@ -124,7 +130,7 @@ def fit(*, runtime_path, runtime_sha256, base, train, train_sha256,
         preprocessing_fit_partition='train_only', fit_seed=fit_seed,
         not_comparable_across_methods=True), artifact_inventory=files,
         artifact_bytes=sum(r['bytes'] for r in files.values()),
-        fit_and_density_seconds=time.monotonic()-start,
+        fit_and_density_seconds=time.monotonic()-start, cpu_threads=cpu_threads,
         training_rows=len(training), validation_rows=len(heldout), official_tests_opened=False)
 
 

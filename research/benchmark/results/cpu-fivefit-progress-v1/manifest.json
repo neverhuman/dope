@@ -1,0 +1,50 @@
+{
+  "common_metrics_complete": false,
+  "files": {
+    "research/benchmark/publish_cpu_fit_batch.py": {
+      "bytes": 8740,
+      "sha256": "cdd86b8412cb25d1f73cf1ab0b56b4d6c4795e8c4c0e43ddf5e6f094300c3168"
+    },
+    "research/benchmark/results/cpu-fivefit-progress-v1/arf/fits.csv": {
+      "bytes": 3361,
+      "sha256": "d9fdd018ce3962577c74b8f479e52671a1924e274f5f8cb127cefa4ec4301f0a"
+    },
+    "research/benchmark/results/cpu-fivefit-progress-v1/arf/panel.json": {
+      "bytes": 71681,
+      "sha256": "9ac5363a1be7d8661ae7ed329f8c7e6b1b88b441cca16f05e5274472e109360c"
+    },
+    "research/benchmark/results/cpu-fivefit-progress-v1/forest/fits.csv": {
+      "bytes": 1127,
+      "sha256": "194aa7967581e58138b3568fb913acbef23fe4985bd29e38aa5d91460cbffa39"
+    },
+    "research/benchmark/results/cpu-fivefit-progress-v1/forest/panel.json": {
+      "bytes": 19948,
+      "sha256": "557592f589a9b61e71e26254572a330c0e8d3aa9ce5d8ce568ad8d14990eed04"
+    },
+    "research/benchmark/results/cpu-fivefit-progress-v1/manifest.schema.json": {
+      "bytes": 2242,
+      "sha256": "a64819a595a01fc09bd3e2fd86c3792e16e8a9f577e7e02ce982595e69536d6a"
+    },
+    "research/benchmark/results/cpu-fivefit-progress-v1/panel.schema.json": {
+      "bytes": 6934,
+      "sha256": "db74b377b59b4bf8c75b95cd71ea4b1cc05801188e98688f85d13ca39563fbd0"
+    }
+  },
+  "format": "dope-cpu-fivefit-publication-manifest-v1",
+  "full_matrix_complete": false,
+  "input_manifests": {
+    "ARF": {
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/publication-batch1.lock.json",
+      "sha256": "f535c82e42474da21346ac98fdc4164f783a26ab5a17945e60bd1fc659476cee"
+    },
+    "Forest-Flow": {
+      "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/publication-batch1.lock.json",
+      "sha256": "7f6feec42bde5d8b9d2e01bffd244560a53ce2850de15254bf75227fd344d6b9"
+    }
+  },
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "ptf_v1": null,
+  "release_safe": null,
+  "superiority": null
+}

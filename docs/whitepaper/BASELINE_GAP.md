@@ -1,7 +1,9 @@
 # Baseline coverage and remaining evidence
 
-Updated 2026-10-07 from merged validation publications. This memo authorizes
-no fit, sample generation, GPU use or official-test access.
+Updated 2026-10-07 from validation publications and the receipt-backed CPU
+replication checkpoint below. This memo itself authorizes no fit, sample
+generation, GPU use or official-test access; execution follows the separate
+owner order and frozen research rounds.
 
 ## Completed evidence
 
@@ -31,7 +33,9 @@ The original scratch receipt paths and their hashes remain in those JSONs.
 
 The executable coverage table and ETA arithmetic are
 `generated/baseline-coverage.json` and `generated/baseline-coverage.tex`.
-`coverage-plan.json` freezes the forecast assumptions as of 04:55Z.
+`coverage-plan.json` freezes the earlier forecast assumptions as of 04:55Z.
+The generated coverage table remains that snapshot; the new CPU execution
+checkpoint and its forecasts are recorded separately below.
 
 | Method | Complete measured scope | Remaining full-population scope | ETA MDT |
 | --- | --- | --- | --- |
@@ -39,15 +43,45 @@ The executable coverage table and ETA arithmetic are
 | TabDDPM | Contracts/pilot only in this population publication interface | Complete 100-lineage default/native panel | Oct 14 20:00, conditional |
 | Forest-Flow | Six-lineage native-selected 4n confirmation | Complete 100-lineage default/native panel | Oct 14 20:00, conditional |
 | Forest-Diffusion | Pilot mode receipts | Separate complete 100-lineage diffusion-mode panel | Oct 14 20:00, conditional |
-| ARF | Complete 100-lineage fit11 default/native n/4n panel | Final five-fit matrix | Retained panel observed complete Oct 6 21:16; final five-fit unscheduled |
+| ARF | Complete 100-lineage fit11 default/native n/4n panel; 24 additional fit23 receipts on 12 lineages | 796 physical / 800 logical additional fits across seeds 23/37/53/71, then common metrics | Oct 8 02:00 fit close, conditional forecast; metrics follow |
 
 Each future forecast assumes a dedicated eligible slot starting Oct 8
 08:00 MDT: 100 default fits plus up to 800 native tuning trials at 600s,
 150 slot-hours, plus six hours for sampling/metrics. No slot has been
 leased by this table. Encoding-priority work retains priority. Contention,
 source/runtime readiness and fresh admission can move the dates. Final
-five-fit baseline matrices are separate and unscheduled. Native tuning
+five-fit neural matrices remain separate; the CPU replication rounds below
+are running under their own frozen research admission. Native tuning
 must use each method's own objective; shared metrics select nothing.
+
+## Active CPU replication checkpoint (2026-10-07)
+
+`research/benchmark/results/cpu-fivefit-progress-v1/manifest.json` pins
+24 additional ARF fits and eight Forest-Flow fits, all successful in this
+published prefix. The ARF prefix covers 12 lineages at fit seed 23.
+Forest-Flow has seeds 23/37/53/71 on two lineages using author defaults.
+The same frozen training-derived splits are used; no official test is read.
+These fit receipts do not constitute new common-metric or five-fit panel
+completion. Each model's checkpoint hash, charged bytes and ARF's native
+validation density value appear in the per-fit JSON/CSV.
+
+The ARF queue replicates the existing default and native-selected winners:
+796 physical fits, 800 logical configurations, with no new tuning. The
+fit-close forecast is Oct 8 02:00 MDT, conditional on its four-core CPU slot;
+common n/4n measurements follow and have no observed completion time yet.
+This 20-slot-hour planning allowance is conservative relative to the
+previous native round but is not a measured full-round duration.
+Forest-Flow's 400 additional default fits have a conditional fit-and-metrics
+forecast of Oct 10 02:00 MDT: at most 400 times 600 seconds of fit work plus
+six hours provisionally reserved for evaluation. Storage/RAM admission can
+extend it. Native-selected replication and missing seed-11 coverage require
+complete native-winner receipts and remain unscheduled. The initial small
+lineages cannot determine full-population throughput or method ranks.
+
+Both slots use four cores, low CPU/I/O priority, 8 GiB RAM caps and a 15%
+available-RAM floor. The CPU allocation change is recorded in the frozen
+rounds. GPUs remain subject to encodings-first admission, and no neural
+run is authorized by these forecasts. No existing artifact is deleted.
 
 ## Scientific limits that remain
 
