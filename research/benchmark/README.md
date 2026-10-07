@@ -1,5 +1,6 @@
 # Offline generator benchmark (research only)
 
+[Forest-Flow five additional homogeneous five-fit cohorts](results/forest-third-five-fivefit-v1/README.md)
 The [retained TabDDPM cohort](results/tabddpm-twelve-lineage-retained-validation/README.md)
 adds 126 measured n/4n validation cells from 21 existing model records on
 12 S3 lineages. Original author-default and author-R²-selected configurations

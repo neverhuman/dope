@@ -49,6 +49,11 @@ fig.text(.5, .01, 'Dots: mean of three samples within each fit. Squares: five-fi
          ha='center', fontsize=8)
 fig.tight_layout(rect=(0, .06, 1, .93))
 fig.savefig(root / 'fit-variance.svg', metadata={'Date': None, 'Creator': 'Dope research benchmark'})
+# Canonicalize generated path whitespace for projected publications while
+# preserving the byte replay of earlier unprojected figures.
+if panel['inputs'].get('cohort_projection') is not None:
+    svg = root / 'fit-variance.svg'
+    svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines()) + '\n')
 fig.savefig(root / 'fit-variance.pdf', metadata={'CreationDate': None, 'ModDate': None, 'Creator': 'Dope research benchmark'})
 fig.savefig(root / 'fit-variance-preview.png', dpi=140)
 plt.close(fig)

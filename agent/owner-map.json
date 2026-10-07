@@ -6,6 +6,8 @@
     "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/": "external-evidence",
     "research/benchmark/results/work-order-b-strict16-qualification-progress-v1/": "external-evidence",
     "research/benchmark/results/arf-complete-additional-fits-v1/": "external-evidence",
+    "research/benchmark/tests/test_forest_projected_cohort.py": "external-evidence",
+    "research/benchmark/results/forest-third-five-fivefit-v1/": "external-evidence",
     "research/benchmark/tests/test_forest_complete_cohort.py": "external-evidence",
     "research/benchmark/results/forest-next-six-fivefit-v1/": "external-evidence",
     "research/benchmark/publish_forest_fit_variance.py": "external-evidence",
