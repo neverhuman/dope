@@ -25,7 +25,6 @@
     "research/benchmark/publish_cpu_fit_batch.py": "external-evidence",
     "research/benchmark/tests/test_cpu_fit_batch.py": "external-evidence",
     "research/benchmark/results/cpu-fivefit-progress-v1/": "external-evidence",
-
     "docs/whitepaper/scripts/retained_evidence.py": "external-evidence",
     "docs/whitepaper/scripts/test_retained_evidence.py": "external-evidence",
     "docs/whitepaper/coverage-plan.json": "external-evidence",
@@ -56,10 +55,8 @@
     "research/benchmark/tabsyn_closed143_inputs.py": "external-evidence",
     "research/benchmark/tests/test_tabsyn_metric_operation_inputs.py": "external-evidence",
     "research/benchmark/tests/test_tabsyn_closed143_inputs.py": "external-evidence",
-
     "research/benchmark/tabsyn_validation_inputs.py": "external-evidence",
     "research/benchmark/tests/test_tabsyn_validation_inputs.py": "external-evidence",
-
     "research/benchmark/DOPE_CPU_RESEARCH.md": "external-evidence",
     "research/benchmark/LOCAL_CAPACITY_AMENDMENT.md": "external-evidence",
     "research/benchmark/results/campaign-local-capacity-amendment": "external-evidence",
@@ -277,6 +274,14 @@
     "research/benchmark/tests/test_research_ablation_binding.py": "external-evidence",
     "research/benchmark/DOPE_ABLATIONS.md": "external-evidence",
     "research/benchmark/results/work-order-b-cost-closure-delta-v3": "external-evidence",
-    "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": "external-evidence"
+    "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": "external-evidence",
+    "docs/whitepaper/generated/published-baseline-figure-hashes.json": "external-evidence",
+    "docs/whitepaper/figures/published-baseline-cohorts.pdf": "external-evidence",
+    "docs/whitepaper/scripts/published_baseline_inventory.schema.json": "external-evidence",
+    "docs/whitepaper/scripts/published_baseline_inventory.py": "external-evidence",
+    "docs/whitepaper/scripts/test_published_baseline_inventory.py": "external-evidence",
+    "docs/whitepaper/generated/published-baseline-kpis.json": "external-evidence",
+    "docs/whitepaper/generated/baseline-coverage.tex": "external-evidence",
+    "docs/whitepaper/generated/published-baseline-kpis.csv": "external-evidence"
   }
 }

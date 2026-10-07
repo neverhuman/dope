@@ -38,9 +38,10 @@ uv pip install --python target/ci-python/bin/python --constraint validation/requ
 target/ci-python/bin/python docs/whitepaper/scripts/retained_evidence.py
 target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py'
+target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py'
 python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_publication_rows.py'
 python3 docs/whitepaper/scripts/publication_rows.py
-git diff --exit-code -- docs/whitepaper/generated/retained-evidence.json docs/whitepaper/generated/retained-*.tex docs/whitepaper/generated/retained-figure-hashes.json docs/whitepaper/generated/baseline-coverage.json docs/whitepaper/generated/baseline-coverage.tex docs/whitepaper/figures/retained-matched-eight.pdf
+git diff --exit-code -- docs/whitepaper/generated/retained-evidence.json docs/whitepaper/generated/retained-*.tex docs/whitepaper/generated/retained-figure-hashes.json docs/whitepaper/generated/baseline-coverage.json docs/whitepaper/generated/baseline-coverage.tex docs/whitepaper/figures/retained-matched-eight.pdf docs/whitepaper/generated/published-baseline-kpis.json docs/whitepaper/generated/published-baseline-kpis.csv docs/whitepaper/generated/published-baseline-figure-hashes.json docs/whitepaper/figures/published-baseline-cohorts.pdf
 if python3 -c 'import matplotlib' >/dev/null 2>&1; then
   python3 docs/whitepaper/scripts/render_figures.py --check
 fi

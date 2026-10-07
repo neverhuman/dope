@@ -29,6 +29,7 @@ FIGURES = (
     ROOT / "figures" / "paired-cdf.pdf",
     ROOT / "figures" / "loss-curves.pdf",
     ROOT / "figures" / "retained-matched-eight.pdf",
+    ROOT / "figures" / "published-baseline-cohorts.pdf",
 )
 # A measurement typed into the prose. Integers and one-decimal illustration
 # values such as the MFS arithmetic example stay in the generator instead.
@@ -91,6 +92,11 @@ def main() -> int:
         recorded_hashes.update(json.loads(retained_hash_path.read_text()).get("pdf_sha256") or {})
     else:
         failures.append("generated/retained-figure-hashes.json is missing")
+    published_hash_path = ROOT / "generated" / "published-baseline-figure-hashes.json"
+    if published_hash_path.is_file():
+        recorded_hashes.update(json.loads(published_hash_path.read_text()).get("pdf_sha256") or {})
+    else:
+        failures.append("generated/published-baseline-figure-hashes.json is missing")
     for path in FIGURES:
         if not path.exists():
             failures.append(f"missing figure {path.name}")

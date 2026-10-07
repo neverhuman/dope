@@ -767,7 +767,7 @@ The original receipt references are retained in
 and the first-batch publication recorded in that reduction.
 
 \begin{table*}[t]
-\caption{Baseline coverage as recorded in the committed publications. Full-population forecasts marked * are conditional planning dates, not admissions or measured results.}
+\caption{Baseline coverage from committed publications. Pending rows have no estimated result or completion date.}
 \label{tab:baselinecoverage}
 \centering\scriptsize\setlength{\tabcolsep}{3pt}
 \input{generated/baseline-coverage.tex}
@@ -775,12 +775,14 @@ and the first-batch publication recorded in that reduction.
 
 The coverage table distinguishes Forest-Flow confirmation from the
 Forest-Diffusion pilot modes. No full-population diffusion result is
-inferred from the Flow subset. Forecasts assume a dedicated admitted slot
-per method from the declared start, the default fits plus the native-trial
-ceiling at the recorded per-fit limit, and an evaluation allowance.
-\path{docs/whitepaper/coverage-plan.json} gives those assumptions;
-\path{docs/whitepaper/generated/baseline-coverage.json} records the
-arithmetic and source receipts. Queue contention moves these forecasts.
+inferred from the Flow subset. Additional native-scored fits and published
+common-metric cells are counted separately. Pending publication does not
+mean that a method failed. Receipt paths and digests are recorded in
+\path{docs/whitepaper/generated/baseline-coverage.json}.
+The supplementary descriptive figure inputs in
+\path{docs/whitepaper/generated/published-baseline-kpis.csv} retain a
+receipt path and JSON pointer for every value. Cohorts and fit counts differ;
+these inputs do not support a paired ranking.
 No final five-fit baseline completion is scheduled or implied.
 
 \subsection{Release score}

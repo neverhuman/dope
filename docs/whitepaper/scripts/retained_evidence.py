@@ -5,7 +5,6 @@ import hashlib
 import json
 import math
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from scipy import stats
@@ -222,44 +221,10 @@ def main():
 
 
 def coverage(docs):
-    path = REPO / "docs/whitepaper/coverage-plan.json"
-    plan = json.loads(path.read_bytes())
-    hours = (plan["default_fits"] + plan["native_trial_ceiling"]) * plan["per_fit_seconds"] / 3600 + plan["sampling_and_metrics_allowance_hours"]
-    forecast = datetime.fromisoformat(plan["conditional_start_mt"]) + timedelta(hours=hours)
-    forest_n = len({x["dataset"] for x in docs["forest"]["summary"] if x["method"] == "ForestDiffusion/Forest-Flow"
-                    and x["configuration"] == "native_selected" and x["size_multiplier"] == 4
-                    and x["utility"]["catboost"].get("complete_informative_sample_group")})
-    rows = [
-        {"method": "TabSyn", "complete_retained_lineages": 8, "complete_retained_sample_cells": 48,
-         "coverage": "Scaled author-default subset, n/4n; full100/native tuning incomplete", "complete100": False},
-        {"method": "TabDDPM", "complete_retained_lineages": None, "complete_retained_sample_cells": None,
-         "coverage": "Contract/pilot receipts; no complete100 matched population publication", "complete100": False},
-        {"method": "Forest-Flow", "complete_retained_lineages": forest_n, "complete_retained_sample_cells": None,
-         "coverage": "Native-selected4n confirmation; full100 incomplete", "complete100": False},
-        {"method": "Forest-Diffusion", "complete_retained_lineages": None, "complete_retained_sample_cells": None, "pilot_logical_cells": len(docs["forest_pilot"]["cells"]),
-         "coverage": "Pilot includes author mode variants; no separate complete100 diffusion panel", "complete100": False},
-        {"method": "ARF", "complete_retained_lineages": 100, "complete_retained_sample_cells": 1200,
-         "coverage": "Default/native, n/4n, three sample seeds; fit11 complete", "complete100": True},
-    ]
-    for row in rows:
-        observed = datetime.fromisoformat(docs["classical"]["execution_records"]["arf"]["recorded_UTC"]).astimezone(timezone(timedelta(hours=-6)))
-        row["full100_eta_mt"] = observed.isoformat() if row["complete100"] else forecast.isoformat()
-        if row["complete100"]:
-            row["completion_observation_source"] = {"source": "classical", "pointer": "/execution_records/arf/recorded_UTC"}
-        row["eta_is_observed_completion"] = row["complete100"]
-        row["final_five_fit_complete"] = False
-    record = {"plan": plan, "plan_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-              "calculated_slot_hours": hours, "rows": rows, "sources": {k: {"path": p, "sha256": h} for k, (p, h) in SOURCES.items()}}
-    (OUT / "baseline-coverage.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
-    lines = [r"\begin{tabular}{@{}lp{8.3cm}l@{}}", r"\toprule", r"Method & Measured coverage & Full-population ETA (MDT) \\", r"\midrule"]
-    for row in rows:
-        lineages = str(row["complete_retained_lineages"]) if row["complete_retained_lineages"] is not None else "Partial"
-        desc = row["coverage"].replace("full100", "full population").replace("complete100", "full population").replace("fit11", "fit seed 11").replace("selected4n", "selected $4n$")
-        timestamp = datetime.fromisoformat(row["full100_eta_mt"])
-        eta = ("Complete, " if row["complete100"] else "") + timestamp.strftime("%b. %d, %H:%M") + ("" if row["complete100"] else "*")
-        lines.append(row["method"] + " & " + lineages + ": " + desc + " & " + eta + r" \\")
-    lines += [r"\bottomrule", r"\end{tabular}", ""]
-    (OUT / "baseline-coverage.tex").write_text("\n".join(lines))
+    # Population coverage is based on merged receipts. Unfinished cells remain
+    # pending, with no estimated scientific outcome or completion date.
+    from published_baseline_inventory import emit
+    emit(REPO)
 
 
 def render_figure(data):

@@ -1,99 +1,240 @@
 {
-  "calculated_slot_hours": 156.0,
-  "plan": {
-    "as_of_utc": "2026-10-07T04:55:00Z",
-    "capacity_condition": "One dedicated eligible slot per method for 156 hours, fresh owner admission, no contention with the encoding-priority queue; no GPU lease or launch is granted by this forecast",
-    "conditional_start_mt": "2026-10-08T08:00:00-06:00",
-    "default_fits": 100,
-    "native_trial_ceiling": 800,
-    "per_fit_seconds": 600,
-    "retained_TabDDPM_Forest_metric_target_mt": "2026-10-07T12:00:00-06:00",
-    "retained_target_condition": "Receipts and CPU capacity must be available; this is a target, not an observed completion",
-    "sampling_and_metrics_allowance_hours": 6,
-    "scope": "100-lineage fit-seed-11 author-default and native-selected validation panels; final five-fit campaign is separate and unscheduled"
-  },
-  "plan_sha256": "e9c456f8d80f510ab9cd5916e850e2de584114fa685cd0c8f73828e4ce02759c",
+  "format": "paper-published-baseline-inventory-v1",
+  "limitations": [
+    "Cohorts and fit counts differ; plot is descriptive, not a ranking or paired comparison.",
+    "Forest fit SD is not a confidence interval; this plot shows lineage points and medians without CI bars.",
+    "Native objectives select only within their own methods; native scores are never ranked across methods.",
+    "Additional ARF metrics completed on scratch remain pending publication in this frozen merged-receipt inventory."
+  ],
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "ptf_v1": null,
+  "release_safe_l3": null,
   "rows": [
     {
       "complete100": false,
       "complete_retained_lineages": 8,
       "complete_retained_sample_cells": 48,
-      "coverage": "Scaled author-default subset, n/4n; full100/native tuning incomplete",
+      "coverage": "8 scaled-default lineages; 48 cells; fit seed 11. Native tuning and full population pending.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
-      "full100_eta_mt": "2026-10-14T20:00:00-06:00",
-      "method": "TabSyn"
+      "five_fit_lineages": 0,
+      "full100_eta_mt": null,
+      "method": "TabSyn",
+      "production_certified": false,
+      "remaining_campaign_status": "pending",
+      "sources": [
+        {
+          "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
+          "pointer": "",
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
+        }
+      ]
+    },
+    {
+      "complete100": false,
+      "complete_retained_lineages": 12,
+      "complete_retained_sample_cells": 126,
+      "coverage": "12 retained lineages; 126 physical/132 logical cells; 21 models, fit seed 11. Default/native cohorts differ; native search incomplete.",
+      "eta_is_observed_completion": false,
+      "final_five_fit_complete": false,
+      "five_fit_lineages": 0,
+      "full100_eta_mt": null,
+      "logical_sample_cells": 132,
+      "method": "TabDDPM",
+      "production_certified": false,
+      "remaining_campaign_status": "pending",
+      "retained_models": 21,
+      "sources": [
+        {
+          "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
+          "pointer": "",
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
+        }
+      ]
+    },
+    {
+      "complete100": false,
+      "complete_retained_lineages": 13,
+      "complete_retained_sample_cells": 390,
+      "coverage": "13 default lineages at five fit seeds; 65 models/390 cells. Separate legacy six-lineage default/native panel; full population pending.",
+      "eta_is_observed_completion": false,
+      "final_five_fit_complete": false,
+      "five_fit_lineages": 13,
+      "full100_eta_mt": null,
+      "method": "Forest-Flow",
+      "production_certified": false,
+      "remaining_campaign_status": "pending",
+      "retained_models": 65,
+      "sources": [
+        {
+          "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+          "pointer": "",
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
+        },
+        {
+          "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
+          "pointer": "",
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
+        },
+        {
+          "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
+          "pointer": "",
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
+        },
+        {
+          "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
+          "pointer": "",
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
+        }
+      ]
     },
     {
       "complete100": false,
       "complete_retained_lineages": null,
       "complete_retained_sample_cells": null,
-      "coverage": "Contract/pilot receipts; no complete100 matched population publication",
+      "coverage": "Pilot only; separate 100-lineage matched diffusion panel pending.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
-      "full100_eta_mt": "2026-10-14T20:00:00-06:00",
-      "method": "TabDDPM"
-    },
-    {
-      "complete100": false,
-      "complete_retained_lineages": 6,
-      "complete_retained_sample_cells": null,
-      "coverage": "Native-selected4n confirmation; full100 incomplete",
-      "eta_is_observed_completion": false,
-      "final_five_fit_complete": false,
-      "full100_eta_mt": "2026-10-14T20:00:00-06:00",
-      "method": "Forest-Flow"
-    },
-    {
-      "complete100": false,
-      "complete_retained_lineages": null,
-      "complete_retained_sample_cells": null,
-      "coverage": "Pilot includes author mode variants; no separate complete100 diffusion panel",
-      "eta_is_observed_completion": false,
-      "final_five_fit_complete": false,
-      "full100_eta_mt": "2026-10-14T20:00:00-06:00",
+      "five_fit_lineages": 0,
+      "full100_eta_mt": null,
       "method": "Forest-Diffusion",
-      "pilot_logical_cells": 108
+      "pilot_logical_cells": 108,
+      "production_certified": false,
+      "remaining_campaign_status": "pending",
+      "sources": [
+        {
+          "path": "research/benchmark/results/pilot24-forestdiffusion-native.json",
+          "pointer": "",
+          "sha256": "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"
+        }
+      ]
     },
     {
       "complete100": true,
       "complete_retained_lineages": 100,
       "complete_retained_sample_cells": 1200,
-      "completion_observation_source": {
-        "pointer": "/execution_records/arf/recorded_UTC",
-        "source": "classical"
-      },
-      "coverage": "Default/native, n/4n, three sample seeds; fit11 complete",
-      "eta_is_observed_completion": true,
+      "coverage": "100 default/native lineages at fit seed 11; 1200 logical cells. 796 additional native-scored fits; 144 additional common cells published. Remaining publication pending.",
+      "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
-      "full100_eta_mt": "2026-10-06T21:16:07.031116-06:00",
-      "method": "ARF"
+      "five_fit_lineages": 0,
+      "full100_eta_mt": null,
+      "method": "ARF",
+      "production_certified": false,
+      "published_additional_metric_cells": 144,
+      "published_additional_physical_fits": 796,
+      "remaining_campaign_status": "pending",
+      "sources": [
+        {
+          "path": "research/benchmark/results/retained-classical-validation/panel.json",
+          "pointer": "",
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
+        },
+        {
+          "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
+          "pointer": "",
+          "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
+        },
+        {
+          "path": "research/benchmark/results/arf-complete-additional-fits-v1/panel.json",
+          "pointer": "",
+          "sha256": "7acfd172db6b43537723aff63e47faed35cd1319fb371fef34ad4328ebe46cca"
+        }
+      ]
+    },
+    {
+      "complete100": true,
+      "complete_retained_lineages": 100,
+      "complete_retained_sample_cells": 1200,
+      "coverage": "100 default/native lineages at fit seed 11; 1200 logical cells. Five-fit common coverage pending.",
+      "eta_is_observed_completion": false,
+      "final_five_fit_complete": false,
+      "five_fit_lineages": 0,
+      "full100_eta_mt": null,
+      "method": "GaussianCopula",
+      "production_certified": false,
+      "remaining_campaign_status": "pending",
+      "sources": [
+        {
+          "path": "research/benchmark/results/retained-classical-validation/panel.json",
+          "pointer": "",
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
+        }
+      ]
+    },
+    {
+      "complete100": true,
+      "complete_retained_lineages": 100,
+      "complete_retained_sample_cells": 1200,
+      "coverage": "100 default/native lineages at fit seed 11; 1200 logical cells. Five-fit common coverage pending.",
+      "eta_is_observed_completion": false,
+      "final_five_fit_complete": false,
+      "five_fit_lineages": 0,
+      "full100_eta_mt": null,
+      "method": "Chow-Liu",
+      "production_certified": false,
+      "remaining_campaign_status": "pending",
+      "sources": [
+        {
+          "path": "research/benchmark/results/retained-classical-validation/panel.json",
+          "pointer": "",
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
+        }
+      ]
     }
   ],
+  "scope": "Published validation evidence only; pending cells have no estimated value or completion date.",
   "sources": {
-    "arf": {
-      "path": "research/benchmark/results/arf-matched-population-validation.json",
-      "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
+    "arf_fits": {
+      "path": "research/benchmark/results/arf-complete-additional-fits-v1/panel.json",
+      "pointer": "",
+      "sha256": "7acfd172db6b43537723aff63e47faed35cd1319fb371fef34ad4328ebe46cca"
+    },
+    "arf_prefix": {
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
+      "pointer": "",
+      "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
     },
     "classical": {
       "path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "pointer": "",
       "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
     },
-    "first12": {
-      "path": "research/benchmark/results/common-A952-validation-v1/first12.completed.json",
-      "sha256": "8e039b1d57298f10bf7c05c2f3a8b14481a60ed663c1063ed30c273854f3bdfe"
+    "forest2": {
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+      "pointer": "",
+      "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
     },
-    "forest": {
+    "forest5": {
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
+      "pointer": "",
+      "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
+    },
+    "forest6": {
+      "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
+      "pointer": "",
+      "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
+    },
+    "forest_legacy": {
       "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
+      "pointer": "",
       "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
     },
     "forest_pilot": {
       "path": "research/benchmark/results/pilot24-forestdiffusion-native.json",
+      "pointer": "",
       "sha256": "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"
+    },
+    "tabddpm": {
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
+      "pointer": "",
+      "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
     },
     "tabsyn": {
       "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
+      "pointer": "",
       "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
     }
-  }
+  },
+  "superiority": null
 }
