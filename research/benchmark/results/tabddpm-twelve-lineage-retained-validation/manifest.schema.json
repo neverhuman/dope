@@ -1,0 +1,119 @@
+{
+  "$defs": {
+    "ref": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "costs": {
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "default_lineages": {
+      "const": 10
+    },
+    "files": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ref"
+      },
+      "type": "object"
+    },
+    "five_fit_coverage": {
+      "const": false
+    },
+    "format": {
+      "const": "tabddpm-retained-comparison-manifest-v1"
+    },
+    "full_population_complete": {
+      "const": false
+    },
+    "lineages": {
+      "const": 12
+    },
+    "logical_metric_cells": {
+      "const": 132
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_search_complete": {
+      "const": false
+    },
+    "native_selected_lineages": {
+      "const": 12
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "physical_metric_cells": {
+      "const": 126
+    },
+    "private_input_lock": {
+      "$ref": "#/$defs/ref"
+    },
+    "producer_refs": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ref"
+      },
+      "type": "object"
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "retained_models": {
+      "const": 21
+    },
+    "superiority": {
+      "const": null
+    }
+  },
+  "required": [
+    "format",
+    "files",
+    "producer_refs",
+    "private_input_lock",
+    "costs",
+    "physical_metric_cells",
+    "logical_metric_cells",
+    "retained_models",
+    "lineages",
+    "default_lineages",
+    "native_selected_lineages",
+    "official_tests_opened",
+    "full_population_complete",
+    "native_search_complete",
+    "five_fit_coverage",
+    "counts_as_dope_win",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "superiority"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,1235 @@
+{
+  "$defs": {
+    "ref": {
+      "additionalProperties": true,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "checkpoints": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_bytes": {
+            "type": "integer"
+          },
+          "artifact_cap_bytes": {
+            "const": 10240
+          },
+          "artifact_cap_exceeded": {
+            "const": true
+          },
+          "artifact_inventory": {
+            "items": {
+              "$ref": "#/$defs/ref"
+            },
+            "maxItems": 4,
+            "minItems": 4,
+            "type": "array"
+          },
+          "config_sha256": {
+            "type": "string"
+          },
+          "configuration_name": {
+            "type": "string"
+          },
+          "dataset": {
+            "type": "string"
+          },
+          "fit_seed": {
+            "const": 11
+          },
+          "frozen_round_utc": {
+            "type": "string"
+          },
+          "job_sha256": {
+            "type": "string"
+          },
+          "logical_roles": {
+            "type": "array"
+          },
+          "matched_operation_seconds": {
+            "type": "number"
+          },
+          "matched_receipt": {
+            "$ref": "#/$defs/ref"
+          },
+          "native_audit_seconds": {
+            "type": "number"
+          },
+          "native_declared_grid_size": {
+            "const": 5
+          },
+          "native_full_grid_successful": {
+            "type": "boolean"
+          },
+          "native_objective": {
+            "const": "author_five_synthetic_seed_validation_catboost_r2_mean"
+          },
+          "native_receipt": {
+            "$ref": "#/$defs/ref"
+          },
+          "native_selection_sha256": {
+            "type": "string"
+          },
+          "native_successful_pool_size": {
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "native_value": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "artifact_bytes",
+          "artifact_cap_bytes",
+          "artifact_cap_exceeded",
+          "artifact_inventory",
+          "config_sha256",
+          "configuration_name",
+          "dataset",
+          "fit_seed",
+          "frozen_round_utc",
+          "job_sha256",
+          "logical_roles",
+          "matched_operation_seconds",
+          "matched_receipt",
+          "native_audit_seconds",
+          "native_declared_grid_size",
+          "native_full_grid_successful",
+          "native_objective",
+          "native_receipt",
+          "native_selection_sha256",
+          "native_successful_pool_size",
+          "native_value"
+        ],
+        "type": "object"
+      },
+      "maxItems": 21,
+      "minItems": 21,
+      "type": "array"
+    },
+    "costs": {
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "default_lineages": {
+      "const": 10
+    },
+    "five_fit_coverage": {
+      "const": false
+    },
+    "format": {
+      "const": "tabddpm-retained-native-default-validation-v1"
+    },
+    "full_population_complete": {
+      "const": false
+    },
+    "inputs": {
+      "type": "object"
+    },
+    "lineages": {
+      "const": 12
+    },
+    "logical_metric_cells": {
+      "const": 132
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_reporting_frontier": {
+      "type": "object"
+    },
+    "native_reporting_rule": {
+      "const": "latest_original_frozen_round_per_lineage_before_common_outcome_reads"
+    },
+    "native_search_complete": {
+      "const": false
+    },
+    "native_selected_lineages": {
+      "const": 12
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "original_runtime_closure_recertified": {
+      "const": false
+    },
+    "physical_metric_cells": {
+      "const": 126
+    },
+    "physical_panel": {
+      "$defs": {
+        "ref": {
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "properties": {
+        "cells": {
+          "items": {
+            "properties": {
+              "charged_artifact_bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "dataset": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "fit_seed": {
+                "const": 11
+              },
+              "job_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "method": {
+                "const": "TabDDPM"
+              },
+              "mfs_v2": {
+                "type": "null"
+              },
+              "official_tests_opened": {
+                "const": false
+              },
+              "ptf_v1": {
+                "type": "null"
+              },
+              "receipt_ref": {
+                "$ref": "#/$defs/ref"
+              },
+              "release_safe_l3": {
+                "type": "null"
+              },
+              "row_multiplier": {
+                "enum": [
+                  1,
+                  4
+                ]
+              },
+              "sample_seed": {
+                "enum": [
+                  101,
+                  211,
+                  307
+                ]
+              },
+              "superiority": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "job_sha256",
+              "dataset",
+              "method",
+              "fit_seed",
+              "sample_seed",
+              "row_multiplier",
+              "charged_artifact_bytes",
+              "metrics",
+              "receipt_ref",
+              "input_hashes",
+              "official_tests_opened",
+              "mfs_v2",
+              "ptf_v1",
+              "release_safe_l3",
+              "superiority"
+            ],
+            "type": "object"
+          },
+          "maxItems": 126,
+          "minItems": 126,
+          "type": "array"
+        },
+        "comparison_scope": {
+          "const": "training_derived_validation_only"
+        },
+        "format": {
+          "const": "dope-retained-validation-panel"
+        },
+        "lineages": {
+          "const": 12
+        },
+        "mfs_v2": {
+          "type": "null"
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "production_certified": {
+          "const": false
+        },
+        "ptf_v1": {
+          "type": "null"
+        },
+        "receipt_lock_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "release_safe_l3": {
+          "type": "null"
+        },
+        "sample_cells": {
+          "const": 126
+        },
+        "selection_use": {
+          "const": false
+        },
+        "source_refs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ref"
+          },
+          "type": "object"
+        },
+        "summary": {
+          "minItems": 1,
+          "type": "array"
+        },
+        "superiority": {
+          "type": "null"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "format",
+        "version",
+        "receipt_lock_ref",
+        "source_refs",
+        "cells",
+        "summary",
+        "sample_cells",
+        "lineages",
+        "selection_use",
+        "production_certified",
+        "official_tests_opened",
+        "mfs_v2",
+        "ptf_v1",
+        "release_safe_l3",
+        "superiority"
+      ],
+      "title": "Retained validation diagnostic panel",
+      "type": "object"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "retained_models": {
+      "const": 21
+    },
+    "rows": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "alpha_precision": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "beta_recall": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "c2st_catboost_auc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "c2st_logistic_auc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "catboost_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "catboost_trtr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "catboost_tstr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "charged_artifact_bytes": {
+            "minimum": 10241,
+            "type": "integer"
+          },
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "contingency_tv_mean": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "dataset": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "dcr_fit_median": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "dcr_validation_median": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "distance_mia_auc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "domias_kde_auc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "fit_seed": {
+            "const": 11
+          },
+          "linear_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "linear_trtr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "linear_tstr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "marginal_error_mean": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "method": {
+            "const": "TabDDPM"
+          },
+          "metric_receipt": {
+            "$ref": "#/$defs/ref"
+          },
+          "mlp_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mlp_trtr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mlp_tstr_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "nndr_fit_median": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "null_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "original_fit_job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "pairwise_pearson_difference_mean": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "row_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          },
+          "sample_seed": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "selection_binding": {
+            "enum": [
+              "author_default",
+              "native_selected"
+            ]
+          }
+        },
+        "required": [
+          "alpha_precision",
+          "beta_recall",
+          "c2st_catboost_auc",
+          "c2st_logistic_auc",
+          "catboost_retention",
+          "catboost_trtr_loss",
+          "catboost_tstr_loss",
+          "charged_artifact_bytes",
+          "config_sha256",
+          "contingency_tv_mean",
+          "dataset",
+          "dcr_fit_median",
+          "dcr_validation_median",
+          "distance_mia_auc",
+          "domias_kde_auc",
+          "fit_seed",
+          "linear_retention",
+          "linear_trtr_loss",
+          "linear_tstr_loss",
+          "marginal_error_mean",
+          "method",
+          "metric_receipt",
+          "mlp_retention",
+          "mlp_trtr_loss",
+          "mlp_tstr_loss",
+          "nndr_fit_median",
+          "null_loss",
+          "original_fit_job_sha256",
+          "pairwise_pearson_difference_mean",
+          "row_multiplier",
+          "sample_seed",
+          "selection_binding"
+        ],
+        "type": "object"
+      },
+      "maxItems": 132,
+      "minItems": 132,
+      "type": "array"
+    },
+    "selection_use": {
+      "const": false
+    },
+    "summary": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "aggregation": {
+            "type": "string"
+          },
+          "alpha_precision": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "beta_recall": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "c2st_catboost_auc": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "c2st_logistic_auc": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "catboost_retention": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "catboost_trtr_loss": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "catboost_tstr_loss": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "contingency_tv_mean": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "datasets": {
+            "type": "integer"
+          },
+          "dcr_fit_median": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "dcr_validation_median": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "distance_mia_auc": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "domias_kde_auc": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "linear_retention": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "linear_trtr_loss": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "linear_tstr_loss": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "marginal_error_mean": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "method": {
+            "type": "string"
+          },
+          "mlp_retention": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "mlp_trtr_loss": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "mlp_tstr_loss": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "nndr_fit_median": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "null_loss": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "pairwise_pearson_difference_mean": {
+            "additionalProperties": false,
+            "properties": {
+              "measured_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "median": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unavailable_datasets": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "median",
+              "measured_datasets",
+              "unavailable_datasets"
+            ],
+            "type": "object"
+          },
+          "row_multiplier": {
+            "type": "integer"
+          },
+          "sample_cells": {
+            "type": "integer"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "selection_binding": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "aggregation",
+          "alpha_precision",
+          "beta_recall",
+          "c2st_catboost_auc",
+          "c2st_logistic_auc",
+          "catboost_retention",
+          "catboost_trtr_loss",
+          "catboost_tstr_loss",
+          "contingency_tv_mean",
+          "datasets",
+          "dcr_fit_median",
+          "dcr_validation_median",
+          "distance_mia_auc",
+          "domias_kde_auc",
+          "linear_retention",
+          "linear_trtr_loss",
+          "linear_tstr_loss",
+          "marginal_error_mean",
+          "method",
+          "mlp_retention",
+          "mlp_trtr_loss",
+          "mlp_tstr_loss",
+          "nndr_fit_median",
+          "null_loss",
+          "pairwise_pearson_difference_mean",
+          "row_multiplier",
+          "sample_cells",
+          "scope",
+          "selection_binding"
+        ],
+        "type": "object"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array"
+    },
+    "superiority": {
+      "type": "null"
+    }
+  },
+  "required": [
+    "checkpoints",
+    "costs",
+    "counts_as_dope_win",
+    "default_lineages",
+    "five_fit_coverage",
+    "format",
+    "full_population_complete",
+    "inputs",
+    "lineages",
+    "logical_metric_cells",
+    "mfs_v2",
+    "native_reporting_frontier",
+    "native_reporting_rule",
+    "native_search_complete",
+    "native_selected_lineages",
+    "official_tests_opened",
+    "original_runtime_closure_recertified",
+    "physical_metric_cells",
+    "physical_panel",
+    "ptf_v1",
+    "release_safe_l3",
+    "retained_models",
+    "rows",
+    "selection_use",
+    "summary",
+    "superiority"
+  ],
+  "title": "Twelve-lineage retained TabDDPM validation publication",
+  "type": "object"
+}
