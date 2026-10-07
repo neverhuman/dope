@@ -1,6 +1,7 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/results/work-order-b-cost-closure-delta-v4/": "external-evidence",
     "research/benchmark/publish_validation_figure.py": "external-evidence",
     "research/benchmark/tests/test_validation_figure.py": "external-evidence",
     "research/benchmark/results/matched-validation-descriptive-figure/": "external-evidence",

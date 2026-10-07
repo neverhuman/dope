@@ -1,6 +1,10 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/results/work-order-b-cost-closure-delta-v4/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-cost-closure-delta-v4/render.py --check",
+      "purpose": "reproduce four closed-cost rows, finite schemas and manifests from committed metadata; keep unavailable admissions, unknown parent exits, overlapping clocks and separate engineering transports explicit without opening private receipts"
+    },
     "research/benchmark/publish_validation_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v", "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"},
     "research/benchmark/tests/test_validation_figure.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v", "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"},
     "research/benchmark/results/matched-validation-descriptive-figure/": {"command": "python3 -B -m unittest research.benchmark.tests.test_validation_figure -v", "purpose": "verify frozen utility inputs, common informative cohorts, real-vs-real control pairing, missing groups, null scores and reproducible descriptive CSV/SVG/PDF outputs without scientific execution"},
