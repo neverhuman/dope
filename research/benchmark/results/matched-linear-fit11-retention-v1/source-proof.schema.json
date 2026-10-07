@@ -1,0 +1,358 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "MFS_PTF_release_superiority_claimed": {
+      "const": false
+    },
+    "auditor_protocol": {
+      "const": {
+        "CatBoost_and_MLP_included": false,
+        "DOPE_supplied_auditor_seeds": [
+          101,
+          211,
+          307
+        ],
+        "effective_linear_seed": null,
+        "linear_constructor": "LinearRegression()",
+        "outer_diagnostic_results_pooled": false,
+        "retained_supplied_auditor_seed": 1729,
+        "shared_utility_source_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+        "task": "regression"
+      }
+    },
+    "committed_input_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
+    "declared_relevant_runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "additional_retained_refs": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "type": "integer"
+              },
+              "exact_original_auxiliary_alias_metadata": {
+                "type": "boolean"
+              },
+              "exact_original_native_runtime_metadata": {
+                "type": "boolean"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "bytes",
+              "sha256",
+              "role",
+              "exact_original_native_runtime_metadata",
+              "exact_original_auxiliary_alias_metadata"
+            ],
+            "type": "object"
+          },
+          "maxItems": 42,
+          "minItems": 42,
+          "type": "array"
+        },
+        "additional_retained_refs_by_role": {
+          "additionalProperties": false,
+          "properties": {
+            "elf_loader": {
+              "type": "integer"
+            },
+            "native_provider": {
+              "type": "integer"
+            },
+            "stdlib_source_or_extension": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "native_provider",
+            "stdlib_source_or_extension",
+            "elf_loader"
+          ],
+          "type": "object"
+        },
+        "historical_full_runtime_closure_upgraded": {
+          "type": "boolean"
+        },
+        "inventory_refs": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "type": "integer"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "role",
+              "bytes",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        "numerical_package_refs_exact": {
+          "type": "integer"
+        },
+        "required_system_provider_refs": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "type": "integer"
+              },
+              "exact_original_native_runtime_metadata": {
+                "type": "boolean"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "bytes",
+              "sha256",
+              "role",
+              "exact_original_native_runtime_metadata"
+            ],
+            "type": "object"
+          },
+          "maxItems": 8,
+          "minItems": 8,
+          "type": "array"
+        },
+        "stdlib_source_or_extension_refs_exact": {
+          "type": "integer"
+        },
+        "whole_runtime_equivalence_claimed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "numerical_package_refs_exact",
+        "stdlib_source_or_extension_refs_exact",
+        "required_system_provider_refs",
+        "inventory_refs",
+        "additional_retained_refs",
+        "additional_retained_refs_by_role",
+        "whole_runtime_equivalence_claimed",
+        "historical_full_runtime_closure_upgraded"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "measured_descriptive_validation_source_proof"
+    },
+    "hash_before_metadata_decode": {
+      "const": true
+    },
+    "metric_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "type": "integer"
+          },
+          "role": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 342,
+      "minItems": 342,
+      "type": "array"
+    },
+    "new_fit_sample_evaluation_or_provider_initialization": {
+      "const": false
+    },
+    "original_artifact_context": {
+      "const": {
+        "Forest_fit11_only_in_retention_comparison": true,
+        "Forest_models_above_threshold": 65,
+        "Forest_retained_five_fit_models": 65,
+        "TabDDPM_models_above_threshold": 21,
+        "TabDDPM_retained_models": 21,
+        "comparison_unconstrained_by_threshold": true,
+        "production_eligibility_inferred": false,
+        "stored_byte_threshold_bytes": 10240
+      }
+    },
+    "panel_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "private_join_proof_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "type": "integer"
+          },
+          "role": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "projection_task_only_extraction": {
+      "const": true
+    },
+    "projection_task_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "type": "integer"
+          },
+          "dataset": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "task": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dataset",
+          "bytes",
+          "sha256",
+          "task"
+        ],
+        "type": "object"
+      },
+      "maxItems": 23,
+      "minItems": 23,
+      "type": "array"
+    },
+    "raw_rows_model_weights_samples_TEST_or_headers_emitted": {
+      "const": false
+    },
+    "source_code_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "panel_ref",
+    "private_join_proof_refs",
+    "committed_input_refs",
+    "source_code_refs",
+    "projection_task_refs",
+    "metric_refs",
+    "declared_relevant_runtime",
+    "auditor_protocol",
+    "original_artifact_context",
+    "hash_before_metadata_decode",
+    "projection_task_only_extraction",
+    "raw_rows_model_weights_samples_TEST_or_headers_emitted",
+    "new_fit_sample_evaluation_or_provider_initialization",
+    "MFS_PTF_release_superiority_claimed"
+  ],
+  "type": "object"
+}

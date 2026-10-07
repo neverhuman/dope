@@ -1,0 +1,414 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "DOPE_configuration": {
+      "const": "features12_steps2048"
+    },
+    "across_lineage_aggregation": {
+      "type": "string"
+    },
+    "artifact_scope": {
+      "const": {
+        "artifact_bytes_define_production_eligibility": false,
+        "charged_bytes_are_model_plus_projection": true,
+        "comparison_unconstrained_by_stored_byte_cap": true,
+        "stored_byte_threshold_bytes": 10240
+      }
+    },
+    "auditor": {
+      "const": "pilot6c_linear_regression"
+    },
+    "between_fit_aggregation": {
+      "type": "null"
+    },
+    "cells": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "DOPE_charged_artifact_bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "DOPE_metric_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "DOPE_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "TRAIN_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "VAL_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "auditor": {
+            "const": "linear"
+          },
+          "dataset": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "effective_auditor_seed": {
+            "const": null
+          },
+          "fit_seed": {
+            "const": 11
+          },
+          "informative": {
+            "type": "boolean"
+          },
+          "null_loss": {
+            "type": "number"
+          },
+          "peer_charged_artifact_bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "peer_configuration": {
+            "type": "string"
+          },
+          "peer_method": {
+            "type": "string"
+          },
+          "peer_metric_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "peer_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "projection_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "real_validation_loss": {
+            "type": "number"
+          },
+          "sample_seed": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "size_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          },
+          "task": {
+            "const": "regression"
+          }
+        },
+        "required": [
+          "DOPE_metric_sha256",
+          "DOPE_retention",
+          "TRAIN_sha256",
+          "VAL_sha256",
+          "auditor",
+          "dataset",
+          "effective_auditor_seed",
+          "fit_seed",
+          "informative",
+          "null_loss",
+          "peer_configuration",
+          "peer_method",
+          "peer_metric_sha256",
+          "peer_retention",
+          "projection_sha256",
+          "real_validation_loss",
+          "sample_seed",
+          "size_multiplier",
+          "task",
+          "DOPE_charged_artifact_bytes",
+          "peer_charged_artifact_bytes"
+        ],
+        "type": "object"
+      },
+      "maxItems": 210,
+      "minItems": 210,
+      "type": "array"
+    },
+    "comparison_scope": {
+      "const": "official_training_derived_validation_only"
+    },
+    "cost_scope": {
+      "const": {
+        "energy": null,
+        "hardware": null,
+        "logical_aliases_are_independent": false,
+        "physical_cost_estimated": false,
+        "training_or_campaign_cost": null,
+        "wall_seconds": null
+      }
+    },
+    "counts_as_DOPE_win": {
+      "const": false
+    },
+    "coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "CatBoost_or_MLP_cells_pooled": {
+          "type": "integer"
+        },
+        "distinct_DOPE_metric_receipts": {
+          "type": "integer"
+        },
+        "distinct_peer_metric_receipts": {
+          "type": "integer"
+        },
+        "logical_comparator_cells": {
+          "type": "integer"
+        },
+        "projection_tasks_authenticated_as_regression": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "CatBoost_or_MLP_cells_pooled",
+        "distinct_DOPE_metric_receipts",
+        "distinct_peer_metric_receipts",
+        "logical_comparator_cells",
+        "projection_tasks_authenticated_as_regression"
+      ],
+      "type": "object"
+    },
+    "effective_auditor_seed": {
+      "type": "null"
+    },
+    "exclusions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "dataset": {
+            "type": "string"
+          },
+          "peer_configuration": {
+            "type": "string"
+          },
+          "peer_method": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "size_multiplier": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dataset",
+          "peer_configuration",
+          "peer_method",
+          "reason",
+          "size_multiplier"
+        ],
+        "type": "object"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array"
+    },
+    "fit_seed": {
+      "const": 11
+    },
+    "five_fit_variance_claim": {
+      "const": false
+    },
+    "format": {
+      "const": "measured_descriptive_validation"
+    },
+    "gated_scores": {
+      "additionalProperties": false,
+      "properties": {
+        "mfs_v2": {
+          "type": "null"
+        },
+        "ptf_v1": {
+          "type": "null"
+        },
+        "release_safe_l3": {
+          "type": "null"
+        },
+        "superiority": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "mfs_v2",
+        "ptf_v1",
+        "release_safe_l3",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "historical_full_runtime_closure_upgraded": {
+      "const": false
+    },
+    "new_fit_sample_or_evaluation": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_lineage_groups": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "DOPE_three_sample_mean": {
+            "type": "number"
+          },
+          "dataset": {
+            "type": "string"
+          },
+          "peer_configuration": {
+            "type": "string"
+          },
+          "peer_method": {
+            "type": "string"
+          },
+          "peer_three_sample_mean": {
+            "type": "number"
+          },
+          "size_multiplier": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "DOPE_three_sample_mean",
+          "dataset",
+          "peer_configuration",
+          "peer_method",
+          "peer_three_sample_mean",
+          "size_multiplier"
+        ],
+        "type": "object"
+      },
+      "maxItems": 66,
+      "minItems": 66,
+      "type": "array"
+    },
+    "panel_id": {
+      "const": "matched_linear_fit11_retention_v1"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "runtime_scope": {
+      "type": "string"
+    },
+    "sample_seeds": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "size_multipliers": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "source_scope": {
+      "type": "string"
+    },
+    "status": {
+      "const": "measured_descriptive_validation"
+    },
+    "summary": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "DOPE_median_of_same_cohort_three_sample_means": {
+            "type": "number"
+          },
+          "median_paired_difference": {
+            "type": "number"
+          },
+          "paired_complete_informative_lineages": {
+            "type": "integer"
+          },
+          "peer_configuration": {
+            "type": "string"
+          },
+          "peer_median_of_same_cohort_three_sample_means": {
+            "type": "number"
+          },
+          "peer_method": {
+            "type": "string"
+          },
+          "size_multiplier": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "DOPE_median_of_same_cohort_three_sample_means",
+          "median_paired_difference",
+          "paired_complete_informative_lineages",
+          "peer_configuration",
+          "peer_median_of_same_cohort_three_sample_means",
+          "peer_method",
+          "size_multiplier"
+        ],
+        "type": "object"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "type": "array"
+    },
+    "version": {
+      "const": 1
+    },
+    "within_lineage_aggregation": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "DOPE_configuration",
+    "across_lineage_aggregation",
+    "auditor",
+    "between_fit_aggregation",
+    "cells",
+    "comparison_scope",
+    "counts_as_DOPE_win",
+    "coverage",
+    "effective_auditor_seed",
+    "exclusions",
+    "fit_seed",
+    "five_fit_variance_claim",
+    "format",
+    "gated_scores",
+    "historical_full_runtime_closure_upgraded",
+    "new_fit_sample_or_evaluation",
+    "official_tests_opened",
+    "paired_lineage_groups",
+    "production_certified",
+    "runtime_scope",
+    "sample_seeds",
+    "size_multipliers",
+    "source_scope",
+    "status",
+    "summary",
+    "within_lineage_aggregation",
+    "version",
+    "panel_id",
+    "artifact_scope",
+    "cost_scope"
+  ],
+  "type": "object"
+}
