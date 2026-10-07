@@ -1,6 +1,14 @@
 # Offline generator benchmark (research only)
 
 [Forest-Flow five additional homogeneous five-fit cohorts](results/forest-third-five-fivefit-v1/README.md)
+The [retained TabDDPM cohort](results/tabddpm-twelve-lineage-retained-validation/README.md)
+adds 126 measured n/4n validation cells from 21 existing model records on
+12 S3 lineages. Original author-default and author-R²-selected configurations
+are preserved, including partial successful search pools and historical
+selection snapshots. Its checkpoint/error CSV and common fidelity, utility,
+detection and empirical privacy values are reproducible. This is a completed
+available cohort with one fit seed; the 100-lineage population, five-fit
+coverage, official-test evaluation and gated production claims remain unfinished.
 
 [Forest-Flow six additional complete five-fit cohorts](results/forest-next-six-fivefit-v1/README.md)
 reports thirty checkpoints, 180 common validation cells, thirty native author-ML

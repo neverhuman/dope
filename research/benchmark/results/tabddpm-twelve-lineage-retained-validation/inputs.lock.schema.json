@@ -1,0 +1,73 @@
+{
+  "$defs": {
+    "ref": {
+      "additionalProperties": true,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "execution": {
+      "$ref": "#/$defs/ref"
+    },
+    "format": {
+      "const": "tabddpm-retained-comparison-input-v1"
+    },
+    "input_manifest": {
+      "$ref": "#/$defs/ref"
+    },
+    "metadata_mirrors": {
+      "type": "array"
+    },
+    "metric_directory": {
+      "const": "/home/ubuntu/dope-scratch-x2/tabddpm-retained-common-validation-v1/publication-receipts-v1"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "original_candidate_readset": {
+      "$ref": "#/$defs/ref"
+    },
+    "original_verification": {
+      "$ref": "#/$defs/ref"
+    },
+    "receipt_lock": {
+      "$ref": "#/$defs/ref"
+    },
+    "selection_use": {
+      "const": false
+    }
+  },
+  "required": [
+    "execution",
+    "format",
+    "input_manifest",
+    "metadata_mirrors",
+    "metric_directory",
+    "official_tests_opened",
+    "original_candidate_readset",
+    "original_verification",
+    "receipt_lock",
+    "selection_use"
+  ],
+  "type": "object"
+}
