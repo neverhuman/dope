@@ -1,0 +1,7 @@
+id,phase,status,seed,attempt,parent_elapsed_seconds,metadata_hold_seconds,paid_trial_increment,charged_model_plus_projection_bytes,co_tenant,shared_GPU_cost,maximum_observed_own_GPU_resident_mib,job_sha256
+paid_operation_1,native_population,infrastructure_failure,53,1,215.10170043818653,,1,,true,true,0,7be4bfaf9c0d4ff63f7174eea84c3a0a83d2fbfb008a6f9dd0b7d5e6207ef7cc
+paid_operation_2,native_population,infrastructure_failure,71,1,121.13267643656582,,1,,,,,ba58903175f2bc8bd713713a718e4ba583f3dd272b9003fb5448d300f17c7b10
+paid_operation_3,native_population,ok,23,1,107.42202999116853,,1,2910,false,false,430,2fcf5f5b5865229f1d1b82593699838d993760b3a3c67fd9389940a5111f9d2e
+paid_operation_4,native_population,ok,37,1,107.94702758127823,,1,2903,false,false,430,b78d270a3f1825232058bfac6ffdc4c9f8adcc2c2866e8a82d2d39651eac5d11
+paid_operation_5,native_population,infrastructure_failure,53,1,148.38862826814875,,1,,true,true,0,49f24de00b57748c099d30f3313f09274c80ba19f7f89b6fcb732b0b4803da41
+released_sampler_metadata_hold,metadata_hold,released_without_science,,,,1670.3220896930434,0,,,,,

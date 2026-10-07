@@ -269,6 +269,10 @@
     "research/benchmark/results/work-order-b-cost-closure-delta-v3": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-cost-closure-delta-v3/render.py --check",
       "purpose": "verify pinned closure cost JSON before decoding, exact table/schema/manifest replay, phase counts, custody exclusion and unknown parent exits without scientific execution"
+    },
+    "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-paid-cost-delta-v1/render.py --check",
+      "purpose": "reproduce five closed paid native operation costs and separate zero-science metadata hold from hash-pinned public scalar metadata; preserve unknown logical progress/sharing/peak fields and nonadditive nested clocks without private inputs or host reads"
     }
   }
 }
