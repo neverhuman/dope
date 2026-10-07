@@ -17,6 +17,7 @@ ci_require_command uv
 uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'jsonschema==4.26.0'
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_checkpoint_index -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_validation_figure -q
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_retained_metrics -q
 cd validation/external
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --locked --extra xgboost --extra lightgbm
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --offline --locked --extra xgboost --extra lightgbm
