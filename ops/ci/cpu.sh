@@ -18,6 +18,7 @@ uv pip install --python target/ci-python/bin/python --constraint validation/requ
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_checkpoint_index -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_validation_figure -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_retained_metrics -q
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_tabddpm_retained -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_forest_fit_variance -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_forest_complete_cohort -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_retained_comparison -q

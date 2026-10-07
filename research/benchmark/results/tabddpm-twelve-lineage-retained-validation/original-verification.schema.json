@@ -1,0 +1,91 @@
+{
+  "$defs": {
+    "ref": {
+      "additionalProperties": true,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_readset_sha256": {
+      "const": "82cb4eb609592fa42dbdaecdaace8500e88740c31d0d4654af0a9d9742a7518b"
+    },
+    "common_outcomes_read_for_selection": {
+      "const": false
+    },
+    "exclusions": {
+      "maxItems": 0,
+      "type": "array"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/ref"
+      },
+      "type": "array"
+    },
+    "format": {
+      "const": "tabddpm-retained-matched-original-verification-v1"
+    },
+    "new_generator_fits": {
+      "const": 0
+    },
+    "new_sample_generation": {
+      "const": false
+    },
+    "observed_utc": {
+      "type": "string"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "original_runtime_closure_recertified": {
+      "const": false
+    },
+    "records": {
+      "maxItems": 21,
+      "minItems": 21,
+      "type": "array"
+    },
+    "verification_seconds": {
+      "type": "number"
+    },
+    "verified_model_payloads": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "candidate_readset_sha256",
+    "common_outcomes_read_for_selection",
+    "exclusions",
+    "files",
+    "format",
+    "new_generator_fits",
+    "new_sample_generation",
+    "observed_utc",
+    "official_tests_opened",
+    "original_runtime_closure_recertified",
+    "records",
+    "verification_seconds",
+    "verified_model_payloads"
+  ],
+  "type": "object"
+}

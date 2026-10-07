@@ -1,0 +1,106 @@
+{
+  "costs": {
+    "charged_artifact_bytes": 10873137,
+    "clocks_are_additive": false,
+    "common_process_wall_seconds": 165.67349422490224,
+    "new_generator_fits": 0,
+    "sum_common_metric_seconds": 159.29164614109322,
+    "sum_matched_operation_seconds": 1953.9285451937467,
+    "sum_native_audit_seconds": 528.1010099453852
+  },
+  "counts_as_dope_win": false,
+  "default_lineages": 10,
+  "files": {
+    "README.md": {
+      "bytes": 5596,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/README.md",
+      "sha256": "a8996981e515b1b142f29c066dd92f84ce6d26c9c9872f48f1c4a75d93a603c4"
+    },
+    "checkpoint-kpis.csv": {
+      "bytes": 9885,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/checkpoint-kpis.csv",
+      "sha256": "59f3b127d83f8fdd63a1bccae0c5d03d6e90c631fda2cca3fa5a3777c6eb4472"
+    },
+    "figure-kpis.csv": {
+      "bytes": 78442,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/figure-kpis.csv",
+      "sha256": "3d2d4887d967ebf03c7d310118752fef6fa69227b1355eb645e61553538596a2"
+    },
+    "inputs.lock.json": {
+      "bytes": 220194,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/inputs.lock.json",
+      "sha256": "e245b125ffbb29b1685356b9b58659645c890fcbb4fb023c10f1137167a669e8"
+    },
+    "inputs.lock.schema.json": {
+      "bytes": 1523,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/inputs.lock.schema.json",
+      "sha256": "252060fe85459a3172cafb1c5ffde463d07746156d4431a711ce7425ef684987"
+    },
+    "manifest.schema.json": {
+      "bytes": 2273,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/manifest.schema.json",
+      "sha256": "cce6cb24ec3e717fccfa9e8549f55d50d82665c95a4bf61f5639018087d7ac4d"
+    },
+    "original-verification.json": {
+      "bytes": 646945,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/original-verification.json",
+      "sha256": "9e31868702afe97db9f950e4e23d0377d0fa3ec29d0c58457bceec552c74729c"
+    },
+    "original-verification.schema.json": {
+      "bytes": 1905,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/original-verification.schema.json",
+      "sha256": "2217f66c6e09b6f8a213d026fc24cf98ba5d3c21b7f84c8d6dcdbf09824c926c"
+    },
+    "panel.json": {
+      "bytes": 2426210,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
+      "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
+    },
+    "panel.schema.json": {
+      "bytes": 30790,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.schema.json",
+      "sha256": "f52b9429290a32b0c2671c56eb1189958228b2379a9e826eddeda6b6cbfffa21"
+    },
+    "validation.svg": {
+      "bytes": 2082,
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/validation.svg",
+      "sha256": "de0bbd6dc0a4d064b340aa3900cd757f97f3fae64bdeadc0b37394de56b1f461"
+    }
+  },
+  "five_fit_coverage": false,
+  "format": "tabddpm-retained-comparison-manifest-v1",
+  "full_population_complete": false,
+  "lineages": 12,
+  "logical_metric_cells": 132,
+  "mfs_v2": null,
+  "native_search_complete": false,
+  "native_selected_lineages": 12,
+  "official_tests_opened": false,
+  "physical_metric_cells": 126,
+  "private_input_lock": {
+    "bytes": 220194,
+    "path": "/mnt/fast-scratch/dope-benchmark/tabddpm-retained-common-publication-v1/inputs.lock.json",
+    "sha256": "e245b125ffbb29b1685356b9b58659645c890fcbb4fb023c10f1137167a669e8"
+  },
+  "producer_refs": {
+    "publisher": {
+      "bytes": 19429,
+      "path": "research/benchmark/publish_tabddpm_retained.py",
+      "sha256": "256a47e3e2b3ac76513e4337984c47c002679fdb1238dc3f563c300c07bab9ba"
+    },
+    "retained_metrics": {
+      "bytes": 10720,
+      "path": "research/benchmark/publish_retained_metrics.py",
+      "sha256": "dce2e68de574c5029e74de2675e9b1377789894e5a0482c0763d135db579384c"
+    },
+    "summary": {
+      "bytes": 17685,
+      "path": "research/benchmark/publish_retained_comparison.py",
+      "sha256": "258c447724e0f6fc02cdce48c2a56ac89a6af737e977f84fdc7acfe5d3a0497f"
+    }
+  },
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "retained_models": 21,
+  "superiority": null
+}

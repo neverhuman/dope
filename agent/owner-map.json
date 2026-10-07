@@ -1,6 +1,9 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/publish_tabddpm_retained.py": "external-evidence",
+    "research/benchmark/tests/test_tabddpm_retained.py": "external-evidence",
+    "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/": "external-evidence",
     "research/benchmark/results/work-order-b-strict16-qualification-progress-v1/": "external-evidence",
     "research/benchmark/results/arf-complete-additional-fits-v1/": "external-evidence",
     "research/benchmark/tests/test_forest_complete_cohort.py": "external-evidence",
