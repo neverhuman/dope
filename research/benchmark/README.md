@@ -1,5 +1,11 @@
 # Offline generator benchmark (research only)
 
+[Forest-Flow six additional complete five-fit cohorts](results/forest-next-six-fivefit-v1/README.md)
+reports thirty checkpoints, 180 common validation cells, thirty native author-ML
+objective audits and between-fit SD. Eight earlier timeouts retain explicit,
+unscored dispositions. The full default/native-selected population is incomplete;
+official tests are sealed and gated claims remain null.
+
 [Forest-Flow first complete five-fit cohorts](results/forest-first-two-fivefit-v1/README.md)
 reports ten real checkpoints, sixty common validation cells, native author-ML
 objective audits and variation across five independent fits on two lineages.

@@ -1,0 +1,462 @@
+{
+  "format": "dope-forest-fivefit-timeout-dispositions-v1",
+  "mfs_v2": null,
+  "observed_utc": "2026-10-07T12:05:54.627628+00:00",
+  "official_tests_opened": false,
+  "physical_closed": 128,
+  "planned_fits": 400,
+  "ptf_v1": null,
+  "release_safe": null,
+  "round": {
+    "bytes": 77991,
+    "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+    "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+  },
+  "round_mutated": false,
+  "signals_sent": 0,
+  "source_files": {
+    "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/adapter.py": "91b5ddb995cedee35551a0c0592d069eef3819739571d4f2e961b3a5830feeba",
+    "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/controls.py": "43d4d3c6b6eeae661f882e89de444c081272f11afc9857ea25a7a7de7389d752",
+    "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/worker.py": "4c60dfa3ebdd6c5cf2a8d462ae3952f4170cbcf813763edad3e2664a75efbff1"
+  },
+  "status_counts": {
+    "ok": 120,
+    "timeout": 8
+  },
+  "superiority": null,
+  "systemd_observation": "MainPID=4038850\nResult=success\nMemoryCurrent=7956221952\nActiveState=active\n",
+  "timeout_dispositions": [
+    {
+      "accepted_artifact": false,
+      "adapter_timeout_seconds": null,
+      "admission_receipt": {
+        "bytes": 569,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/103ad2ec41bf48a3e4d50446c0b11a7ccb407f4d656f0e3865e85c490de60f2c/admission.json",
+        "sha256": "60347315da122a06ab415d0affe19d83edd29f15a32c4c2c948ad896d61d5ce9"
+      },
+      "closure_receipt": {
+        "bytes": 260,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/103ad2ec41bf48a3e4d50446c0b11a7ccb407f4d656f0e3865e85c490de60f2c/close.json",
+        "sha256": "c36e0ee995e42f4997c523b4aa78f5a89f38398cc171f6789320617b0f1e93bf"
+      },
+      "common_metrics": null,
+      "configuration_name": "author_default",
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "continuation_policy": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged.",
+      "dataset": "297b7688a045c583",
+      "disposition": "retain_as_fit_timeout_under_original_budget",
+      "fit_receipt": {
+        "bytes": 340,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/103ad2ec41bf48a3e4d50446c0b11a7ccb407f4d656f0e3865e85c490de60f2c/fit.json",
+        "sha256": "a0904a85e43e00c72a61c6e582d6aa6bffeeafa2864506a3bd20adefa50dc658"
+      },
+      "fit_seed": 53,
+      "fit_timeout_seconds": 600,
+      "job_receipt": {
+        "bytes": 1400,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/103ad2ec41bf48a3e4d50446c0b11a7ccb407f4d656f0e3865e85c490de60f2c.json",
+        "sha256": "d2cb8af42e3039e5a600ba5d9c7d3b20e6aaf67041951f6bacad0f8d72d9ddd9"
+      },
+      "job_sha256": "103ad2ec41bf48a3e4d50446c0b11a7ccb407f4d656f0e3865e85c490de60f2c",
+      "measured_elapsed_seconds": null,
+      "method_quality_conclusion": null,
+      "mfs_v2": null,
+      "native_validation_kpi": null,
+      "official_tests_opened": false,
+      "ptf_v1": null,
+      "release_safe": null,
+      "retry_started": false,
+      "status": "timeout",
+      "stderr": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/103ad2ec41bf48a3e4d50446c0b11a7ccb407f4d656f0e3865e85c490de60f2c/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/103ad2ec41bf48a3e4d50446c0b11a7ccb407f4d656f0e3865e85c490de60f2c/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "superiority": null,
+      "worker_exit_code": 124
+    },
+    {
+      "accepted_artifact": false,
+      "adapter_timeout_seconds": null,
+      "admission_receipt": {
+        "bytes": 569,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/578adfd2b1de1aef32264727a82fbb419a19b4add81a270340a146b78ed63ca5/admission.json",
+        "sha256": "e9044de047401d64b3f252a1bb4c66daac554ec43281e08d8669b21561d04f01"
+      },
+      "closure_receipt": {
+        "bytes": 260,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/578adfd2b1de1aef32264727a82fbb419a19b4add81a270340a146b78ed63ca5/close.json",
+        "sha256": "5acb6a60119df487902195ab23d35e75d18ad4a92ddd31c7d86973cfb62cdb5d"
+      },
+      "common_metrics": null,
+      "configuration_name": "author_default",
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "continuation_policy": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged.",
+      "dataset": "297b7688a045c583",
+      "disposition": "retain_as_fit_timeout_under_original_budget",
+      "fit_receipt": {
+        "bytes": 340,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/578adfd2b1de1aef32264727a82fbb419a19b4add81a270340a146b78ed63ca5/fit.json",
+        "sha256": "d4b6a76942b092c1b22581c7eb8116e1f8ef7f1bd3fee3c6edfb03c19bffd5b6"
+      },
+      "fit_seed": 23,
+      "fit_timeout_seconds": 600,
+      "job_receipt": {
+        "bytes": 1400,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/578adfd2b1de1aef32264727a82fbb419a19b4add81a270340a146b78ed63ca5.json",
+        "sha256": "481048a76885570ec1896bdf0b720dd4bd388c52e5a23cdbc176a18af65639c3"
+      },
+      "job_sha256": "578adfd2b1de1aef32264727a82fbb419a19b4add81a270340a146b78ed63ca5",
+      "measured_elapsed_seconds": null,
+      "method_quality_conclusion": null,
+      "mfs_v2": null,
+      "native_validation_kpi": null,
+      "official_tests_opened": false,
+      "ptf_v1": null,
+      "release_safe": null,
+      "retry_started": false,
+      "status": "timeout",
+      "stderr": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/578adfd2b1de1aef32264727a82fbb419a19b4add81a270340a146b78ed63ca5/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/578adfd2b1de1aef32264727a82fbb419a19b4add81a270340a146b78ed63ca5/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "superiority": null,
+      "worker_exit_code": 124
+    },
+    {
+      "accepted_artifact": false,
+      "adapter_timeout_seconds": null,
+      "admission_receipt": {
+        "bytes": 569,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/73f20894a64e8b238948dd2c502b1432808d06022eb6f377b899d37d709504d9/admission.json",
+        "sha256": "6096a5e9a72dc6a55a0396c3e81e727b3a8b3ddcf8f01871580e402aa3dd2c2c"
+      },
+      "closure_receipt": {
+        "bytes": 260,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/73f20894a64e8b238948dd2c502b1432808d06022eb6f377b899d37d709504d9/close.json",
+        "sha256": "2526df497cf40109f2e6c32652bfe6a6db9f9b9ddb129d2fba4fc06c9896f154"
+      },
+      "common_metrics": null,
+      "configuration_name": "author_default",
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "continuation_policy": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged.",
+      "dataset": "48b7a3bf81e5f3e5",
+      "disposition": "retain_as_fit_timeout_under_original_budget",
+      "fit_receipt": {
+        "bytes": 340,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/73f20894a64e8b238948dd2c502b1432808d06022eb6f377b899d37d709504d9/fit.json",
+        "sha256": "b859295b1b29fbb6b57e9590c4afaa24084725a9b27826fe20d508a2f74c6c9f"
+      },
+      "fit_seed": 37,
+      "fit_timeout_seconds": 600,
+      "job_receipt": {
+        "bytes": 1400,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/73f20894a64e8b238948dd2c502b1432808d06022eb6f377b899d37d709504d9.json",
+        "sha256": "061f4a0fcc82a4c57a79d1ac21be4abfc4e98c8aa8b322e213566e3bacd497e4"
+      },
+      "job_sha256": "73f20894a64e8b238948dd2c502b1432808d06022eb6f377b899d37d709504d9",
+      "measured_elapsed_seconds": null,
+      "method_quality_conclusion": null,
+      "mfs_v2": null,
+      "native_validation_kpi": null,
+      "official_tests_opened": false,
+      "ptf_v1": null,
+      "release_safe": null,
+      "retry_started": false,
+      "status": "timeout",
+      "stderr": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/73f20894a64e8b238948dd2c502b1432808d06022eb6f377b899d37d709504d9/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/73f20894a64e8b238948dd2c502b1432808d06022eb6f377b899d37d709504d9/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "superiority": null,
+      "worker_exit_code": 124
+    },
+    {
+      "accepted_artifact": false,
+      "adapter_timeout_seconds": null,
+      "admission_receipt": {
+        "bytes": 569,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/952d8db2dc10ae125a2d7a3244172e2e19153a34d100006fe97fe75605ed90ec/admission.json",
+        "sha256": "b464febe29eb8ff446b0248e503dfa64728b286b5d52aef273e30f74061d197f"
+      },
+      "closure_receipt": {
+        "bytes": 260,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/952d8db2dc10ae125a2d7a3244172e2e19153a34d100006fe97fe75605ed90ec/close.json",
+        "sha256": "8f395ff41059316d57a45f9760848344c39aa635b501dd37ce44fd23d6161274"
+      },
+      "common_metrics": null,
+      "configuration_name": "author_default",
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "continuation_policy": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged.",
+      "dataset": "48b7a3bf81e5f3e5",
+      "disposition": "retain_as_fit_timeout_under_original_budget",
+      "fit_receipt": {
+        "bytes": 340,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/952d8db2dc10ae125a2d7a3244172e2e19153a34d100006fe97fe75605ed90ec/fit.json",
+        "sha256": "c1350d23312f2889d7247d6165b45f7061d480ea098f787e3a42a12290c06ab5"
+      },
+      "fit_seed": 23,
+      "fit_timeout_seconds": 600,
+      "job_receipt": {
+        "bytes": 1400,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/952d8db2dc10ae125a2d7a3244172e2e19153a34d100006fe97fe75605ed90ec.json",
+        "sha256": "51fb7fb98a044d11de8e8f4f89d0f73ca379ab38630f6c9d7a09b576bf236b38"
+      },
+      "job_sha256": "952d8db2dc10ae125a2d7a3244172e2e19153a34d100006fe97fe75605ed90ec",
+      "measured_elapsed_seconds": null,
+      "method_quality_conclusion": null,
+      "mfs_v2": null,
+      "native_validation_kpi": null,
+      "official_tests_opened": false,
+      "ptf_v1": null,
+      "release_safe": null,
+      "retry_started": false,
+      "status": "timeout",
+      "stderr": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/952d8db2dc10ae125a2d7a3244172e2e19153a34d100006fe97fe75605ed90ec/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/952d8db2dc10ae125a2d7a3244172e2e19153a34d100006fe97fe75605ed90ec/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "superiority": null,
+      "worker_exit_code": 124
+    },
+    {
+      "accepted_artifact": false,
+      "adapter_timeout_seconds": null,
+      "admission_receipt": {
+        "bytes": 569,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/c74c9dea54fe7fdcec2d2344f097f6161fb79a37489766bb4b28db37906388b0/admission.json",
+        "sha256": "b255086a85d5d435dd50bd78c23f4c4a98c41dd1d4492d82a722a7391eaa5147"
+      },
+      "closure_receipt": {
+        "bytes": 260,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/c74c9dea54fe7fdcec2d2344f097f6161fb79a37489766bb4b28db37906388b0/close.json",
+        "sha256": "35ad5283165a518ac9c9bd9f0514477378c0093746de2bd876dcb4f4f87efb79"
+      },
+      "common_metrics": null,
+      "configuration_name": "author_default",
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "continuation_policy": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged.",
+      "dataset": "48b7a3bf81e5f3e5",
+      "disposition": "retain_as_fit_timeout_under_original_budget",
+      "fit_receipt": {
+        "bytes": 340,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/c74c9dea54fe7fdcec2d2344f097f6161fb79a37489766bb4b28db37906388b0/fit.json",
+        "sha256": "005baa235e591894b5710f8c241caec73190264ef5b8ca23b4260b0d9ba88729"
+      },
+      "fit_seed": 71,
+      "fit_timeout_seconds": 600,
+      "job_receipt": {
+        "bytes": 1400,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/c74c9dea54fe7fdcec2d2344f097f6161fb79a37489766bb4b28db37906388b0.json",
+        "sha256": "6039969e5053cbc231d1247c942d38928f347934dbbf03a34a22f9acd2400a89"
+      },
+      "job_sha256": "c74c9dea54fe7fdcec2d2344f097f6161fb79a37489766bb4b28db37906388b0",
+      "measured_elapsed_seconds": null,
+      "method_quality_conclusion": null,
+      "mfs_v2": null,
+      "native_validation_kpi": null,
+      "official_tests_opened": false,
+      "ptf_v1": null,
+      "release_safe": null,
+      "retry_started": false,
+      "status": "timeout",
+      "stderr": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/c74c9dea54fe7fdcec2d2344f097f6161fb79a37489766bb4b28db37906388b0/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/c74c9dea54fe7fdcec2d2344f097f6161fb79a37489766bb4b28db37906388b0/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "superiority": null,
+      "worker_exit_code": 124
+    },
+    {
+      "accepted_artifact": false,
+      "adapter_timeout_seconds": null,
+      "admission_receipt": {
+        "bytes": 569,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/eeb84c7217e2b1dccc5f7731c7d193d91ab79fa92adcf4a4d59c81d7d37698c2/admission.json",
+        "sha256": "cffe39d5212d8fe2bde2421bcf6bf6816ed837112f96630d5310c30a949d7fb4"
+      },
+      "closure_receipt": {
+        "bytes": 260,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/eeb84c7217e2b1dccc5f7731c7d193d91ab79fa92adcf4a4d59c81d7d37698c2/close.json",
+        "sha256": "d40d166bc07cd623539f72b10a0015a1404f86e857ac64b111afe0b86aa4bfcb"
+      },
+      "common_metrics": null,
+      "configuration_name": "author_default",
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "continuation_policy": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged.",
+      "dataset": "297b7688a045c583",
+      "disposition": "retain_as_fit_timeout_under_original_budget",
+      "fit_receipt": {
+        "bytes": 340,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/eeb84c7217e2b1dccc5f7731c7d193d91ab79fa92adcf4a4d59c81d7d37698c2/fit.json",
+        "sha256": "c1b043e6e0105cd7c771f5e96f242271335c8bf73831b2cdebc1861c5ed2395b"
+      },
+      "fit_seed": 37,
+      "fit_timeout_seconds": 600,
+      "job_receipt": {
+        "bytes": 1400,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/eeb84c7217e2b1dccc5f7731c7d193d91ab79fa92adcf4a4d59c81d7d37698c2.json",
+        "sha256": "22b4107de41939e1595d1393fa7fc31850303b5c575bdc46b342b4e6cbc780a9"
+      },
+      "job_sha256": "eeb84c7217e2b1dccc5f7731c7d193d91ab79fa92adcf4a4d59c81d7d37698c2",
+      "measured_elapsed_seconds": null,
+      "method_quality_conclusion": null,
+      "mfs_v2": null,
+      "native_validation_kpi": null,
+      "official_tests_opened": false,
+      "ptf_v1": null,
+      "release_safe": null,
+      "retry_started": false,
+      "status": "timeout",
+      "stderr": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/eeb84c7217e2b1dccc5f7731c7d193d91ab79fa92adcf4a4d59c81d7d37698c2/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/eeb84c7217e2b1dccc5f7731c7d193d91ab79fa92adcf4a4d59c81d7d37698c2/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "superiority": null,
+      "worker_exit_code": 124
+    },
+    {
+      "accepted_artifact": false,
+      "adapter_timeout_seconds": null,
+      "admission_receipt": {
+        "bytes": 569,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ef012c692a4c67bdc4197795b92ee3c5fba98172eaceeea3ef0d4457cc697c99/admission.json",
+        "sha256": "e62f65be8d04603c6d382eff3029448c464f370368981ed2a3ded57fab020253"
+      },
+      "closure_receipt": {
+        "bytes": 260,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ef012c692a4c67bdc4197795b92ee3c5fba98172eaceeea3ef0d4457cc697c99/close.json",
+        "sha256": "30e52155c6bb212075e7052852c57b222ac4830c7b7f25b23128e53cd686d734"
+      },
+      "common_metrics": null,
+      "configuration_name": "author_default",
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "continuation_policy": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged.",
+      "dataset": "297b7688a045c583",
+      "disposition": "retain_as_fit_timeout_under_original_budget",
+      "fit_receipt": {
+        "bytes": 340,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ef012c692a4c67bdc4197795b92ee3c5fba98172eaceeea3ef0d4457cc697c99/fit.json",
+        "sha256": "7924ce3e5543a4394702562b207887ee249e46ec26574ca3b1d5cb9835323bdb"
+      },
+      "fit_seed": 71,
+      "fit_timeout_seconds": 600,
+      "job_receipt": {
+        "bytes": 1400,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/ef012c692a4c67bdc4197795b92ee3c5fba98172eaceeea3ef0d4457cc697c99.json",
+        "sha256": "0062c13f1b8c1794d34016a784308a1ab2a830c3beb1c1f20753c4be1488b13e"
+      },
+      "job_sha256": "ef012c692a4c67bdc4197795b92ee3c5fba98172eaceeea3ef0d4457cc697c99",
+      "measured_elapsed_seconds": null,
+      "method_quality_conclusion": null,
+      "mfs_v2": null,
+      "native_validation_kpi": null,
+      "official_tests_opened": false,
+      "ptf_v1": null,
+      "release_safe": null,
+      "retry_started": false,
+      "status": "timeout",
+      "stderr": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ef012c692a4c67bdc4197795b92ee3c5fba98172eaceeea3ef0d4457cc697c99/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ef012c692a4c67bdc4197795b92ee3c5fba98172eaceeea3ef0d4457cc697c99/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "superiority": null,
+      "worker_exit_code": 124
+    },
+    {
+      "accepted_artifact": false,
+      "adapter_timeout_seconds": null,
+      "admission_receipt": {
+        "bytes": 569,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ff249695e2dfac2487c66fbf1107815f2ec5ed23295ffcb3b971b2075149bd0e/admission.json",
+        "sha256": "79fb5279acdbf6a3fa171418fb6692d266adfbfa5241ecc514466920e4b492e0"
+      },
+      "closure_receipt": {
+        "bytes": 260,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ff249695e2dfac2487c66fbf1107815f2ec5ed23295ffcb3b971b2075149bd0e/close.json",
+        "sha256": "16c4cd760170830e56f3c5dcc113f8a0de5077a361c089b7030d38f669bb256f"
+      },
+      "common_metrics": null,
+      "configuration_name": "author_default",
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "continuation_policy": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged.",
+      "dataset": "48b7a3bf81e5f3e5",
+      "disposition": "retain_as_fit_timeout_under_original_budget",
+      "fit_receipt": {
+        "bytes": 340,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ff249695e2dfac2487c66fbf1107815f2ec5ed23295ffcb3b971b2075149bd0e/fit.json",
+        "sha256": "03b079bad1b074288c3634563cfd5c044bee948c60c9ecd8dcce9202e6fe31a3"
+      },
+      "fit_seed": 53,
+      "fit_timeout_seconds": 600,
+      "job_receipt": {
+        "bytes": 1400,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/ff249695e2dfac2487c66fbf1107815f2ec5ed23295ffcb3b971b2075149bd0e.json",
+        "sha256": "702bcfe66a0a61b739c4c86b221a572eac8e9deb272faad243ff36206aaa9a9c"
+      },
+      "job_sha256": "ff249695e2dfac2487c66fbf1107815f2ec5ed23295ffcb3b971b2075149bd0e",
+      "measured_elapsed_seconds": null,
+      "method_quality_conclusion": null,
+      "mfs_v2": null,
+      "native_validation_kpi": null,
+      "official_tests_opened": false,
+      "ptf_v1": null,
+      "release_safe": null,
+      "retry_started": false,
+      "status": "timeout",
+      "stderr": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ff249695e2dfac2487c66fbf1107815f2ec5ed23295ffcb3b971b2075149bd0e/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/ff249695e2dfac2487c66fbf1107815f2ec5ed23295ffcb3b971b2075149bd0e/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "superiority": null,
+      "worker_exit_code": 124
+    }
+  ]
+}

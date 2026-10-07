@@ -9,16 +9,17 @@ import matplotlib.pyplot as plt
 
 root = Path(sys.argv[1])
 panel = json.loads((root / 'panel.json').read_text())
-assert panel['five_fit_default_cohort_complete'] and panel['common_sample_cells'] == 60
+assert panel['five_fit_default_cohort_complete'] and panel['common_sample_cells'] == panel['lineages'] * 30
 matplotlib.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 9,
                            'svg.hashsalt': 'forest-two-lineage-fivefit-v1',
                            'axes.spines.top': False, 'axes.spines.right': False})
-fig, axes = plt.subplots(1, 3, figsize=(10.4, 3.5))
+fig, axes = plt.subplots(1, 3, figsize=(max(10.4, panel['lineages'] * 2.1), 3.5))
 datasets = sorted({r['dataset'] for r in panel['summary']})
 metrics = [('marginal_error_mean', 'Marginal KS/TV error'),
            ('c2st_catboost_auc', 'CatBoost C2ST AUC'),
            ('catboost_retention', 'CatBoost utility retention')]
-colors = ['#31688e', '#35b779']
+palette = ['#31688e', '#35b779', '#443983', '#21918c', '#7ad151', '#d9a441']
+colors = [palette[i % len(palette)] for i in range(len(datasets))]
 for ax, (metric, label) in zip(axes, metrics):
     for x, (dataset, color) in enumerate(zip(datasets, colors)):
         summary = next(r for r in panel['summary'] if r['dataset'] == dataset and r['row_multiplier'] == 4)
@@ -33,12 +34,15 @@ for ax, (metric, label) in zip(axes, metrics):
         else:
             ax.text(x, .48, 'Uninformative\n0/5 measured', transform=ax.get_xaxis_transform(),
                     ha='center', va='center', color='#555555', fontsize=8)
-    ax.set_xticks([0, 1], [d[:8] + '\u2026' for d in datasets])
-    ax.set_xlim(-.35, 1.45)
+    ax.set_xticks(list(range(len(datasets))), [d[:8] + '\u2026' for d in datasets])
+    if len(datasets) > 2:
+        plt.setp(ax.get_xticklabels(), rotation=30, ha='right', fontsize=8)
+    ax.set_xlim(-.35, len(datasets) - .55)
     ax.set_ylabel(label)
     ax.set_xlabel('Frozen lineage ID')
     ax.grid(axis='y', alpha=.18)
-fig.suptitle('Forest-Flow author defaults: first two complete five-fit lineages, 4n', fontsize=11)
+scope = 'first two' if panel['lineages'] == 2 else str(panel['lineages'])
+fig.suptitle('Forest-Flow author defaults: ' + scope + ' complete five-fit lineages, 4n', fontsize=11)
 fig.text(.5, .01, 'Dots: mean of three samples within each fit. Squares: five-fit mean \u00b1 sample SD (not a CI). Validation only.',
          ha='center', fontsize=8)
 fig.tight_layout(rect=(0, .06, 1, .93))

@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "ref": {
+      "properties": {
+        "bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "common_flatten_source_ref": {
+      "$ref": "#/$defs/ref"
+    },
+    "costs": {
+      "type": "object"
+    },
+    "counts_as_dope_win": {
+      "const": false
+    },
+    "figure_environment": {
+      "type": "object"
+    },
+    "files": {
+      "type": "object"
+    },
+    "format": {
+      "const": "forest-next-six-fivefit-publication-v1"
+    },
+    "full_population_complete": {
+      "const": false
+    },
+    "generator_fits": {
+      "const": 30
+    },
+    "input_ref": {
+      "$ref": "#/$defs/ref"
+    },
+    "lineages": {
+      "const": 6
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "native_selected_population_complete": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "original_checkpoints_sha_verified": {
+      "const": 30
+    },
+    "original_verification_ref": {
+      "$ref": "#/$defs/ref"
+    },
+    "producer_refs": {
+      "type": "object"
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "sample_cells": {
+      "const": 180
+    },
+    "superiority": {
+      "const": null
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "counts_as_dope_win",
+    "format",
+    "full_population_complete",
+    "generator_fits",
+    "lineages",
+    "mfs_v2",
+    "native_selected_population_complete",
+    "official_tests_opened",
+    "original_checkpoints_sha_verified",
+    "ptf_v1",
+    "release_safe_l3",
+    "sample_cells",
+    "superiority",
+    "version",
+    "files",
+    "producer_refs",
+    "costs",
+    "figure_environment",
+    "input_ref",
+    "original_verification_ref",
+    "common_flatten_source_ref"
+  ],
+  "title": "Forest-Flow next-six five-fit output manifest",
+  "type": "object"
+}
