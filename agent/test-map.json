@@ -1,6 +1,10 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/measure_retained_samples.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"},
+    "research/benchmark/publish_retained_metrics.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"},
+    "research/benchmark/tests/test_retained_metrics.py": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"},
+    "research/benchmark/results/tabsyn-eight-lineage-validation/": {"command": "python3 -B -m unittest research.benchmark.tests.test_retained_metrics -v", "purpose": "verify retained input hashes, sealed tests, canonical jobs, RAM floor, constant-target utility, immutable receipts, complete sample groups, schema, scalar regeneration and null claims"},
     "research/benchmark/results/work-order-b-cost-closure-delta-v4/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-cost-closure-delta-v4/render.py --check",
       "purpose": "reproduce four closed-cost rows, finite schemas and manifests from committed metadata; keep unavailable admissions, unknown parent exits, overlapping clocks and separate engineering transports explicit without opening private receipts"
