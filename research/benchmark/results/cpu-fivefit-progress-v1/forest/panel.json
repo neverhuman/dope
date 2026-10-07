@@ -1,0 +1,482 @@
+{
+  "common_metrics_complete": false,
+  "fits": [
+    {
+      "artifact_bytes": 216688420,
+      "artifact_inventory": [
+        {
+          "bytes": 440,
+          "path": "adapter.json",
+          "sha256": "ba55b0ce4fb1553f1ec64bb5705b05ef4e37c38413d14bb4be4f1541fc243863"
+        },
+        {
+          "bytes": 972,
+          "path": "projection.json",
+          "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+        },
+        {
+          "bytes": 216687008,
+          "path": "sampler.pkl",
+          "sha256": "d9ffb93c4875ced4969af55ff06254197b2c0284852dd55b655b258657d336ac"
+        }
+      ],
+      "closure": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c/close.json",
+        "sha256": "33e5fd77ae2a2f4a457d7b4ef78bd0d218fe239974a8c4e1afeae958c16958a9"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "cpu_affinity": [
+        64,
+        65,
+        66,
+        67
+      ],
+      "dataset": "0d482c1dd7cc6592",
+      "elapsed_seconds": 71.22000146936625,
+      "fit_seed": 23,
+      "job": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c.json",
+        "sha256": "a0d078ba4b1333159fb56dcc405745fe3bb10eb69634e1cd654c14be47219aef"
+      },
+      "job_sha256": "9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c",
+      "method": "Forest-Flow",
+      "native_objective": null,
+      "native_validation_value": null,
+      "projection_sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662",
+      "receipt": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/9a2d09427a73a9f9f7d7e79a368e097ebc9d312a52609e26a19f9a3966a1888c/fit.json",
+        "sha256": "97c32030a7391163dec7cc58d401be3be19592430291eeaa4c0cca4e3c156df6"
+      },
+      "round": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      },
+      "status": "ok",
+      "train_sha256": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+      "validation_sha256": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+    },
+    {
+      "artifact_bytes": 216798329,
+      "artifact_inventory": [
+        {
+          "bytes": 440,
+          "path": "adapter.json",
+          "sha256": "92a07976ae98f0a9f13574615ddb803b1dbd6f744fa74c3dcae60481fe28352a"
+        },
+        {
+          "bytes": 972,
+          "path": "projection.json",
+          "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+        },
+        {
+          "bytes": 216796917,
+          "path": "sampler.pkl",
+          "sha256": "4864a3e61bf1c154303f29ea74c292e44396778b6c6463f98911cc15d20f365c"
+        }
+      ],
+      "closure": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae/close.json",
+        "sha256": "a67d726c6cc21b72ddb57ec541d3b22278493b59970e00170bafa0d1b0c60fb5"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "cpu_affinity": [
+        64,
+        65,
+        66,
+        67
+      ],
+      "dataset": "0d482c1dd7cc6592",
+      "elapsed_seconds": 70.66726649366319,
+      "fit_seed": 37,
+      "job": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae.json",
+        "sha256": "1a4bc77acda552c1cc81dedff814017d96747465c87967d5760c0fa15e017f4f"
+      },
+      "job_sha256": "baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae",
+      "method": "Forest-Flow",
+      "native_objective": null,
+      "native_validation_value": null,
+      "projection_sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662",
+      "receipt": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/baacf9d081b40d8b09c1565364115ee047228e7ed541453fc39a4e1be25476ae/fit.json",
+        "sha256": "76f98c9f6ba05642d21c18c7c5355de6b252b9a0d0f849f55b083f8fa6ec6207"
+      },
+      "round": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      },
+      "status": "ok",
+      "train_sha256": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+      "validation_sha256": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+    },
+    {
+      "artifact_bytes": 217083637,
+      "artifact_inventory": [
+        {
+          "bytes": 440,
+          "path": "adapter.json",
+          "sha256": "7701b4f9c53afff6b73d989953e2204f41cd02bc47e17db8ebaad65ff11317e4"
+        },
+        {
+          "bytes": 972,
+          "path": "projection.json",
+          "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+        },
+        {
+          "bytes": 217082225,
+          "path": "sampler.pkl",
+          "sha256": "0ab7b612fd535d24d71214381b5350f2a1d768c727f2a7b1dd80a1559d86138e"
+        }
+      ],
+      "closure": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf/close.json",
+        "sha256": "1f2cc72c86e4969beff2dfdb6e59592e428a493497cfafa9331b00f5042cfe7f"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "cpu_affinity": [
+        64,
+        65,
+        66,
+        67
+      ],
+      "dataset": "0d482c1dd7cc6592",
+      "elapsed_seconds": 70.6557515701279,
+      "fit_seed": 53,
+      "job": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf.json",
+        "sha256": "8a58cdf09d358b4f9867e532831843d1ac6224af4ca0a65fe1330e5d5a9bdd18"
+      },
+      "job_sha256": "629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf",
+      "method": "Forest-Flow",
+      "native_objective": null,
+      "native_validation_value": null,
+      "projection_sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662",
+      "receipt": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/629f31353eaf4491d3746390457ac5813c3dc7791975ecdcbc27efb9ecb58dcf/fit.json",
+        "sha256": "1ef3311f1d5355886fa6b7209d71d705624d81e855cd2bc74d78282ba6317d72"
+      },
+      "round": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      },
+      "status": "ok",
+      "train_sha256": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+      "validation_sha256": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+    },
+    {
+      "artifact_bytes": 217141261,
+      "artifact_inventory": [
+        {
+          "bytes": 440,
+          "path": "adapter.json",
+          "sha256": "facecf8a80cea9f11d89d3d96bb0552d10dff635e5ef7c33018361042f023fd2"
+        },
+        {
+          "bytes": 972,
+          "path": "projection.json",
+          "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+        },
+        {
+          "bytes": 217139849,
+          "path": "sampler.pkl",
+          "sha256": "73e804bb84b440c99c03a38e0c1a210734f7206cc933a80aad939c7cbaa57fc4"
+        }
+      ],
+      "closure": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4/close.json",
+        "sha256": "5375180b0f4439dfa202015c4dcd01d2c2592034d222f9b7dba584583218b1fb"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "cpu_affinity": [
+        64,
+        65,
+        66,
+        67
+      ],
+      "dataset": "0d482c1dd7cc6592",
+      "elapsed_seconds": 70.481195573695,
+      "fit_seed": 71,
+      "job": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4.json",
+        "sha256": "3f64a41d179b1a1afe1d4f1b784e3ffc1d7d833e0d89fd1c0c96112dd65e7be8"
+      },
+      "job_sha256": "4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4",
+      "method": "Forest-Flow",
+      "native_objective": null,
+      "native_validation_value": null,
+      "projection_sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662",
+      "receipt": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/4fdb228240576c783843f8f1aa678519b399f246b8215f4423d82ec839f39ad4/fit.json",
+        "sha256": "e271b367c69ef4f2bb6ab3650801932c0c4fbaa3aaacd8ae9650a52c99f77121"
+      },
+      "round": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      },
+      "status": "ok",
+      "train_sha256": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+      "validation_sha256": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+    },
+    {
+      "artifact_bytes": 143669958,
+      "artifact_inventory": [
+        {
+          "bytes": 440,
+          "path": "adapter.json",
+          "sha256": "900ed9994f5c9885bc4362b023f0415cdeb069c2f0b015431fcb5b303dcedb1c"
+        },
+        {
+          "bytes": 743,
+          "path": "projection.json",
+          "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+        },
+        {
+          "bytes": 143668775,
+          "path": "sampler.pkl",
+          "sha256": "bcb124d2e7f91c52a10e02f7a69234c53f41141421caa0304cd18ef06e2096c1"
+        }
+      ],
+      "closure": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138/close.json",
+        "sha256": "e42e1deafb00a35f128ee96419396ffb5b70db5d1d7490c71716a554959dd060"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "cpu_affinity": [
+        64,
+        65,
+        66,
+        67
+      ],
+      "dataset": "19f4780b53b3fa41",
+      "elapsed_seconds": 39.207784965634346,
+      "fit_seed": 23,
+      "job": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138.json",
+        "sha256": "803db13388d03d4eaf2abf9e6d230e58bd85008d06ce760c8bfdf1fdf3c7886e"
+      },
+      "job_sha256": "610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138",
+      "method": "Forest-Flow",
+      "native_objective": null,
+      "native_validation_value": null,
+      "projection_sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2",
+      "receipt": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/610f577d2c4471de9c3bea226b80f2fc6e2f3b39f2ac175ff7852ca4663f5138/fit.json",
+        "sha256": "c5e6a583c7e5994ce1ee3c5a64d3ef47569e1702c0eb7ea1d41c60610fe96ca9"
+      },
+      "round": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      },
+      "status": "ok",
+      "train_sha256": "419f6a21fca3f8ff9b8f327cd0272b1424346c053d31d47a33379d23f402459a",
+      "validation_sha256": "2cc247a823cf5d2dcee0650971491c196649acad4287f5e450253844dd38e7f3"
+    },
+    {
+      "artifact_bytes": 143584830,
+      "artifact_inventory": [
+        {
+          "bytes": 440,
+          "path": "adapter.json",
+          "sha256": "d2708f0cc245ba4ae0dffe96bbf1b0257d1dab06fadea2b236767afee7d22c42"
+        },
+        {
+          "bytes": 743,
+          "path": "projection.json",
+          "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+        },
+        {
+          "bytes": 143583647,
+          "path": "sampler.pkl",
+          "sha256": "863caf979ca5375783d1256d02e25544dc0405bcba9a8f293b1d9d8944a9ffbe"
+        }
+      ],
+      "closure": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7/close.json",
+        "sha256": "261689cae0f6f117fe8021824c18e514d4efaf459d58df7d8e27258305911c02"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "cpu_affinity": [
+        64,
+        65,
+        66,
+        67
+      ],
+      "dataset": "19f4780b53b3fa41",
+      "elapsed_seconds": 39.05634646303952,
+      "fit_seed": 37,
+      "job": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7.json",
+        "sha256": "3fbd7595d8e810aee122fb30cf0c99e7071b9b753558c7fa958637e4a8a20c89"
+      },
+      "job_sha256": "2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7",
+      "method": "Forest-Flow",
+      "native_objective": null,
+      "native_validation_value": null,
+      "projection_sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2",
+      "receipt": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/2336c963358a3ce08390fda30a198c9b8a8eb904bd973c02764e1428a2d882f7/fit.json",
+        "sha256": "9ac7e29468d21d10c592ba14c69268168956fccc649a7f4ae898b907864ff7f2"
+      },
+      "round": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      },
+      "status": "ok",
+      "train_sha256": "419f6a21fca3f8ff9b8f327cd0272b1424346c053d31d47a33379d23f402459a",
+      "validation_sha256": "2cc247a823cf5d2dcee0650971491c196649acad4287f5e450253844dd38e7f3"
+    },
+    {
+      "artifact_bytes": 143895075,
+      "artifact_inventory": [
+        {
+          "bytes": 440,
+          "path": "adapter.json",
+          "sha256": "61a847be32c2130dc207005261433d04416040793cf67afb4ff85775b8e366aa"
+        },
+        {
+          "bytes": 743,
+          "path": "projection.json",
+          "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+        },
+        {
+          "bytes": 143893892,
+          "path": "sampler.pkl",
+          "sha256": "c19455e02f6ebe391b70f950f2188da20ebee6b7bd164670f21b9765c853e941"
+        }
+      ],
+      "closure": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484/close.json",
+        "sha256": "045bf6131200a223d5e65fd4fc0148685fc89a5fcdca42412ea992703ce1c8c4"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "cpu_affinity": [
+        64,
+        65,
+        66,
+        67
+      ],
+      "dataset": "19f4780b53b3fa41",
+      "elapsed_seconds": 39.09093758556992,
+      "fit_seed": 53,
+      "job": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484.json",
+        "sha256": "66e13550636b93326e9bca78bfa213e930b38035b40b4ab437f3d30fb9f65ffb"
+      },
+      "job_sha256": "8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484",
+      "method": "Forest-Flow",
+      "native_objective": null,
+      "native_validation_value": null,
+      "projection_sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2",
+      "receipt": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/8cbaabb78dfe3074eba2aeec365fba42b215ff8e1319b46ab36408d98b678484/fit.json",
+        "sha256": "b058dca287e052f5a31dd21c1729193295003423629807a8254daa5a99f9cc86"
+      },
+      "round": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      },
+      "status": "ok",
+      "train_sha256": "419f6a21fca3f8ff9b8f327cd0272b1424346c053d31d47a33379d23f402459a",
+      "validation_sha256": "2cc247a823cf5d2dcee0650971491c196649acad4287f5e450253844dd38e7f3"
+    },
+    {
+      "artifact_bytes": 143700693,
+      "artifact_inventory": [
+        {
+          "bytes": 440,
+          "path": "adapter.json",
+          "sha256": "321c2b807f884615cbb1bf89e04d0667c0647ba8de6e354544bf0712163c354d"
+        },
+        {
+          "bytes": 743,
+          "path": "projection.json",
+          "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+        },
+        {
+          "bytes": 143699510,
+          "path": "sampler.pkl",
+          "sha256": "94e957fe53a74773a6ebff133988d9b9810d1afe018d15c44e2a8c67b6ed10c4"
+        }
+      ],
+      "closure": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f/close.json",
+        "sha256": "faaaebbfda462b4fa4d80d74589aeadce447f9aedd88f506c8b21c1a3912a2a9"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2",
+      "cpu_affinity": [
+        64,
+        65,
+        66,
+        67
+      ],
+      "dataset": "19f4780b53b3fa41",
+      "elapsed_seconds": 39.23620201461017,
+      "fit_seed": 71,
+      "job": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/jobs/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f.json",
+        "sha256": "58ddb0059ea3414577a17500e6bfa6588b08df7cfac323f9ea24b15b4b6cd721"
+      },
+      "job_sha256": "d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f",
+      "method": "Forest-Flow",
+      "native_objective": null,
+      "native_validation_value": null,
+      "projection_sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2",
+      "receipt": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/attempts/d8e0b4ce206165aac26319c469b93a86a373f18e2c982e169752beb6a36ef44f/fit.json",
+        "sha256": "15e2b493b06b044698db0d96e31bf1f86645aa77295e52571c3e3a0c0547d1c7"
+      },
+      "round": {
+        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
+      },
+      "status": "ok",
+      "train_sha256": "419f6a21fca3f8ff9b8f327cd0272b1424346c053d31d47a33379d23f402459a",
+      "validation_sha256": "2cc247a823cf5d2dcee0650971491c196649acad4287f5e450253844dd38e7f3"
+    }
+  ],
+  "five_fit_matrix_complete": false,
+  "forest_native_selected_replications": "not_admitted_in_this_round",
+  "format": "dope-cpu-fivefit-progress-v1",
+  "full_campaign_admitted": false,
+  "mfs_v2": null,
+  "native_values_ranked_across_methods": false,
+  "official_tests_opened": false,
+  "outcome_counts": {
+    "ok": 8
+  },
+  "physical_fit_counts": {
+    "Forest-Flow": 8
+  },
+  "planned_new_physical_fits": {
+    "Forest-Flow": 400
+  },
+  "ptf_v1": null,
+  "release_safe": null,
+  "snapshot_utc": "2026-10-07T07:07:22.954994+00:00",
+  "superiority": null,
+  "version": 1
+}

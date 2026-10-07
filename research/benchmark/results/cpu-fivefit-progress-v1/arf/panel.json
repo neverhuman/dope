@@ -1,0 +1,1754 @@
+{
+  "common_metrics_complete": false,
+  "fits": [
+    {
+      "artifact_bytes": 612106,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "6e7708d405def5315d2d1c6b41307abe1636e0237dec76457ca0938718e362eb"
+        },
+        {
+          "bytes": 260678,
+          "path": "bounds.csv",
+          "sha256": "fa3af8c4a08e0b3ed1c221b2b16f862561410af8551984469cfb289ff65b431b"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 348473,
+          "path": "continuous.csv",
+          "sha256": "8ec50ac0be527c5e373abdb75bbfe1f062e2d032b20e7d15362ffaccc7a80f33"
+        },
+        {
+          "bytes": 680,
+          "path": "model.json",
+          "sha256": "a0cec0a2dce0664e6a48aaacc9984c0071141abb1eba2933199466267f80c661"
+        },
+        {
+          "bytes": 1926,
+          "path": "projection.json",
+          "sha256": "2fa5424b537cef4ceb4df78bcae0d5c511b4a3262fa688d0f583bbf3b70f07b1"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/57cb489abde62817ac8861470f714ed6489d0850bad7f96b23938ced536393e6/close.json",
+        "sha256": "281cd1db1fbc9504afe0e3f505990e794914fdc74b93c1b5ee9f84fe33647f11"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "f8ca4b7686d1b774e5ec54fb29e4ee06e852e1045334a91efa1cc68d69af339a",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "047e62b52a3f4ede",
+      "elapsed_seconds": 10.93216244224459,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/57cb489abde62817ac8861470f714ed6489d0850bad7f96b23938ced536393e6.json",
+        "sha256": "ed65a256755897af3c545863c2d6af7988d637699bb5302d4e92fed829718b53"
+      },
+      "job_sha256": "57cb489abde62817ac8861470f714ed6489d0850bad7f96b23938ced536393e6",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 13.795620029876487,
+      "projection_sha256": "2fa5424b537cef4ceb4df78bcae0d5c511b4a3262fa688d0f583bbf3b70f07b1",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/57cb489abde62817ac8861470f714ed6489d0850bad7f96b23938ced536393e6/fit.json",
+        "sha256": "21dcd3268fa62f4ef322a8f49d23fde5b5f72bdcb8d4d4f89ce8f8cee814ba21"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "1d1485bda0abccbde19e0d12dac3c60f0958f4feec36694a3789de92f6c0b3ce",
+      "validation_sha256": "479c29361dd7532bfae2bc604534f99e98abd20ef3fd1bfcc1cf8b2e368dac14"
+    },
+    {
+      "artifact_bytes": 364564,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 154467,
+          "path": "bounds.csv",
+          "sha256": "8b13dc69738ce29fd1f026d92edf2d52036e485bf1eb215b253801a4e39adb7b"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 207142,
+          "path": "continuous.csv",
+          "sha256": "0ec0e24e33d74055df7bc4633c7d869eb96f9cc04c813256b9e236be2d8ae53c"
+        },
+        {
+          "bytes": 680,
+          "path": "model.json",
+          "sha256": "5397414ffea76318415bed0a99271f80f5140e9333de9023780c0605694b1a04"
+        },
+        {
+          "bytes": 1926,
+          "path": "projection.json",
+          "sha256": "2fa5424b537cef4ceb4df78bcae0d5c511b4a3262fa688d0f583bbf3b70f07b1"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/e41346650068ad95dec32ab752d0eb1db195a7e6368aedbb1d4f8550a11eb9a3/close.json",
+        "sha256": "172bded4413af7eb083e1f29feb6e3fbec1bc10835c2408623786341eeca9a7f"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "047e62b52a3f4ede",
+      "elapsed_seconds": 9.357461280189455,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/e41346650068ad95dec32ab752d0eb1db195a7e6368aedbb1d4f8550a11eb9a3.json",
+        "sha256": "83c87de871d0b71c46d49f7b0d1149281f02cecedd5c59b0445c3155baa4b1f5"
+      },
+      "job_sha256": "e41346650068ad95dec32ab752d0eb1db195a7e6368aedbb1d4f8550a11eb9a3",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 13.720981329159754,
+      "projection_sha256": "2fa5424b537cef4ceb4df78bcae0d5c511b4a3262fa688d0f583bbf3b70f07b1",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/e41346650068ad95dec32ab752d0eb1db195a7e6368aedbb1d4f8550a11eb9a3/fit.json",
+        "sha256": "2dac7ebb3a574056249ac1b274cc559243ca41f9bfad68b7529d1f6737f9f4c8"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "1d1485bda0abccbde19e0d12dac3c60f0958f4feec36694a3789de92f6c0b3ce",
+      "validation_sha256": "479c29361dd7532bfae2bc604534f99e98abd20ef3fd1bfcc1cf8b2e368dac14"
+    },
+    {
+      "artifact_bytes": 229752,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "6e7708d405def5315d2d1c6b41307abe1636e0237dec76457ca0938718e362eb"
+        },
+        {
+          "bytes": 101591,
+          "path": "bounds.csv",
+          "sha256": "f7b16ce82ec6b56b8069e3635ff051752b45a93cfe4678228caa108411742f9e"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 126850,
+          "path": "continuous.csv",
+          "sha256": "04ebb056e51546a4d7c0d14475c74abea032b3243eada40e9af8262ae3a71f07"
+        },
+        {
+          "bytes": 490,
+          "path": "model.json",
+          "sha256": "44bdcfa77138724bb9b40ac1f04b92ec4fe990cfaf76036c280eee8f2f692c1f"
+        },
+        {
+          "bytes": 472,
+          "path": "projection.json",
+          "sha256": "0c6dda519f2b0ca56b1646a35ce1feb4690d19baf27ffd4d5ba57f429cf69b5a"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/2c951fe6d111aee1560d4dd562165df7a51e5748eb7e60c1806f576181caa1fa/close.json",
+        "sha256": "0ce6cc10194933e327489670d7074614809a2290d9d36183fc48b7e9a2b4c87e"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "f8ca4b7686d1b774e5ec54fb29e4ee06e852e1045334a91efa1cc68d69af339a",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "04c80944e971cb3e",
+      "elapsed_seconds": 9.462525459006429,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/2c951fe6d111aee1560d4dd562165df7a51e5748eb7e60c1806f576181caa1fa.json",
+        "sha256": "dd6ca37f966fe0a6cb0bff2ed928e302326c7e7be7c1c59bf0982d911e637cd9"
+      },
+      "job_sha256": "2c951fe6d111aee1560d4dd562165df7a51e5748eb7e60c1806f576181caa1fa",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 3.132375541871804,
+      "projection_sha256": "0c6dda519f2b0ca56b1646a35ce1feb4690d19baf27ffd4d5ba57f429cf69b5a",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/2c951fe6d111aee1560d4dd562165df7a51e5748eb7e60c1806f576181caa1fa/fit.json",
+        "sha256": "e9e4c705024832375248c964e9097d053db929a27c82a9e75a19333a5947fe16"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "8ebb0653b89020f3ec31c6f23b6c84b9bac8bfde9e89c4a01437beddeef9dc73",
+      "validation_sha256": "022861c7e25e3342cb75a049abcaf87bde8b18680c601a4eeb3d2dde0aa59367"
+    },
+    {
+      "artifact_bytes": 136419,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 59866,
+          "path": "bounds.csv",
+          "sha256": "082ffb7d1e531ad678ae57afb050d3345e9c7f117e6b5b9828bf018f17886629"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 75242,
+          "path": "continuous.csv",
+          "sha256": "81bf09036b79de0c8cd9409fed1885d01a940510600ee88718ee969d492be34e"
+        },
+        {
+          "bytes": 490,
+          "path": "model.json",
+          "sha256": "6d63b0684faa8d11afd46f15bd9826b04cca7107bf33299d9ed23ce424449162"
+        },
+        {
+          "bytes": 472,
+          "path": "projection.json",
+          "sha256": "0c6dda519f2b0ca56b1646a35ce1feb4690d19baf27ffd4d5ba57f429cf69b5a"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/8690c25896171991af40cc45a2f906a32ea8481ff4b12a11bbd9db4bc15b559e/close.json",
+        "sha256": "d86b3cee29d4fd99633a2829bde256576148e36764fa731a8cb0c67bc7739849"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "04c80944e971cb3e",
+      "elapsed_seconds": 9.094171664211899,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/8690c25896171991af40cc45a2f906a32ea8481ff4b12a11bbd9db4bc15b559e.json",
+        "sha256": "c94c5ec406f373045b0c5f9612787921d0072db628c6aa6afb60319517aca777"
+      },
+      "job_sha256": "8690c25896171991af40cc45a2f906a32ea8481ff4b12a11bbd9db4bc15b559e",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 3.149404298710032,
+      "projection_sha256": "0c6dda519f2b0ca56b1646a35ce1feb4690d19baf27ffd4d5ba57f429cf69b5a",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/8690c25896171991af40cc45a2f906a32ea8481ff4b12a11bbd9db4bc15b559e/fit.json",
+        "sha256": "87f3de08f058ad2a1b3dbd49d66044e52766245f1f4c2b427b6d8a766d197931"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "8ebb0653b89020f3ec31c6f23b6c84b9bac8bfde9e89c4a01437beddeef9dc73",
+      "validation_sha256": "022861c7e25e3342cb75a049abcaf87bde8b18680c601a4eeb3d2dde0aa59367"
+    },
+    {
+      "artifact_bytes": 143676,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 60829,
+          "path": "bounds.csv",
+          "sha256": "b14c640f5fd5d63976dde8bad92cc5fd2ee236538df83b7fccebef710d1302ff"
+        },
+        {
+          "bytes": 10717,
+          "path": "categories.csv",
+          "sha256": "4df6da3e53aaf920a92b1c345a65456094a2d4146aea369f2a2b55bc04aa11b5"
+        },
+        {
+          "bytes": 70270,
+          "path": "continuous.csv",
+          "sha256": "58eb16b63a3dedd36400dd752ccba06e035ac1349ff6570f36c40e4df23aa4b9"
+        },
+        {
+          "bytes": 571,
+          "path": "model.json",
+          "sha256": "6d1a2bd4210bd5aeeb179e6edcfef579ec83d0f10f3718afa2c971a6fadb53a1"
+        },
+        {
+          "bytes": 972,
+          "path": "projection.json",
+          "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/06518dad4d74fca4a2ac9880da087c820ec39aeb7e6084a7f99e3aecfede95d8/close.json",
+        "sha256": "d5dd2849aa7f3d63b6a351380b1dbbf79237ed4b78f8b9a9f3f445c3c1bff70f"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "0d482c1dd7cc6592",
+      "elapsed_seconds": 9.888886090833694,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/06518dad4d74fca4a2ac9880da087c820ec39aeb7e6084a7f99e3aecfede95d8.json",
+        "sha256": "9b77e68d060f17623b04871eb4ca6d93100cf75e6ef4debeab5215d326bd021f"
+      },
+      "job_sha256": "06518dad4d74fca4a2ac9880da087c820ec39aeb7e6084a7f99e3aecfede95d8",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 2.259306137250005,
+      "projection_sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/06518dad4d74fca4a2ac9880da087c820ec39aeb7e6084a7f99e3aecfede95d8/fit.json",
+        "sha256": "86976140ab4d1c7f8a04f6f773f4bce12ff1e2b719bf243545f2e34c3d15b8fc"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+      "validation_sha256": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+    },
+    {
+      "artifact_bytes": 72582,
+      "artifact_inventory": [
+        {
+          "bytes": 318,
+          "path": "adapter.json",
+          "sha256": "e3e07791fb9d59a164eb2955fe65a1a509bf40654be270cb72f053f6e466ecbf"
+        },
+        {
+          "bytes": 29833,
+          "path": "bounds.csv",
+          "sha256": "79ce26f8907b8e405cc3bc2452b8a772cd4afdc2bb4f654ff8a34d684dd1536c"
+        },
+        {
+          "bytes": 5879,
+          "path": "categories.csv",
+          "sha256": "d15043279dff656791c5434d9f4bead1262e995f31f3e1c8bcac18b7e5e7354c"
+        },
+        {
+          "bytes": 35009,
+          "path": "continuous.csv",
+          "sha256": "4c6c79f9a167542589ecc7edb9bc6725b7a104697a6f4cec3dd68bb4e4f73569"
+        },
+        {
+          "bytes": 571,
+          "path": "model.json",
+          "sha256": "3b2a5cc999516027796b7c495b3ac74f277cc35f758d1e9a04c9bc8685b72b01"
+        },
+        {
+          "bytes": 972,
+          "path": "projection.json",
+          "sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/0e122b9121dce0675b837375acfd9452aff7c44802a767bbdee74e5a93663526/close.json",
+        "sha256": "e8a7907348057ff31e24fd43a8552c4eb32f9bab27030f4c6990784d1b37281c"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "e2054065515e0e39ac0ca0d0ba1f2be89acaa23687140658167752a830866bf6",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "0d482c1dd7cc6592",
+      "elapsed_seconds": 8.649574893061072,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/0e122b9121dce0675b837375acfd9452aff7c44802a767bbdee74e5a93663526.json",
+        "sha256": "3f114e4d5ff541f0c31d3a84167b8b340048ed2da21103f4ec25c82c44882798"
+      },
+      "job_sha256": "0e122b9121dce0675b837375acfd9452aff7c44802a767bbdee74e5a93663526",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 2.1361440014456696,
+      "projection_sha256": "0017e5b938e3161e5f3459d3c384612d987fa027226affbf560800df298d0662",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/0e122b9121dce0675b837375acfd9452aff7c44802a767bbdee74e5a93663526/fit.json",
+        "sha256": "fc6ce26f990e1fb5919a850281b6d5381fd3e01722761dfbd951012d0878abaa"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+      "validation_sha256": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+    },
+    {
+      "artifact_bytes": 216476,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 100513,
+          "path": "bounds.csv",
+          "sha256": "a4bd49936f5eac08eecd175e491f1956ab7019e31a25500cf6d366a9bea72cb2"
+        },
+        {
+          "bytes": 51777,
+          "path": "categories.csv",
+          "sha256": "3c1c0700c6c736f7895245d2c8b1dd6b505b11b00036327d1c5a577d92d46ff3"
+        },
+        {
+          "bytes": 62140,
+          "path": "continuous.csv",
+          "sha256": "3f38b95c680822ad98b2ee5679ee056d839c89175e0de08e903e7b2b19383d64"
+        },
+        {
+          "bytes": 630,
+          "path": "model.json",
+          "sha256": "672f2e0a187f41446db8070181d41068c423e349816f1556e8ad318060d39bcc"
+        },
+        {
+          "bytes": 1099,
+          "path": "projection.json",
+          "sha256": "74b7e1483b1507b43fe6256064c06a46c1658159af8a6c2fa349a7b05080c6c0"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/b48c95132a3dbfcc63142b21058f39c27bacde77d3cb2f3bff6d2c3941f72ede/close.json",
+        "sha256": "802bcf36df8fca374da0c4ca5a4c2ff26edffb7b5c9e15c2f28cbf7985ad3f32"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "0db59fd2579600d0",
+      "elapsed_seconds": 10.411058290861547,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/b48c95132a3dbfcc63142b21058f39c27bacde77d3cb2f3bff6d2c3941f72ede.json",
+        "sha256": "8e0d1d99dc0231556a4895e4828287873c2b0f456c10f240bbb8313ae0aa9705"
+      },
+      "job_sha256": "b48c95132a3dbfcc63142b21058f39c27bacde77d3cb2f3bff6d2c3941f72ede",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": -1.7652993748662515,
+      "projection_sha256": "74b7e1483b1507b43fe6256064c06a46c1658159af8a6c2fa349a7b05080c6c0",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/b48c95132a3dbfcc63142b21058f39c27bacde77d3cb2f3bff6d2c3941f72ede/fit.json",
+        "sha256": "384eec32c47926446c9012a1ad1990e0bd382614ab8f636f5dcb46c1d1708191"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "7547535a2aa692ddfdf994ce1f9065a893dbe416fcf707b8c5844d279f6e4bc7",
+      "validation_sha256": "2e6882cd563e6b9e62c131994c131904eb5c7b7083387b7cf61458839802ceb8"
+    },
+    {
+      "artifact_bytes": 362394,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "6e7708d405def5315d2d1c6b41307abe1636e0237dec76457ca0938718e362eb"
+        },
+        {
+          "bytes": 168068,
+          "path": "bounds.csv",
+          "sha256": "31042059c87043916bd64a06b010f4ef74e7ed6b1b993158906524977df17c86"
+        },
+        {
+          "bytes": 88573,
+          "path": "categories.csv",
+          "sha256": "5ef707d2c2430150a5d03883d84de1737e965ca9e7eac5a693043abdc9713560"
+        },
+        {
+          "bytes": 103707,
+          "path": "continuous.csv",
+          "sha256": "e86f8d8372c7d7f03ba9cae8262d0e1be69b38491a5f18bc422e622f23978bf5"
+        },
+        {
+          "bytes": 630,
+          "path": "model.json",
+          "sha256": "14d21ad43073cd814855c265c9344e5fad8120e2e3dc80fbd91c4569965e5b84"
+        },
+        {
+          "bytes": 1099,
+          "path": "projection.json",
+          "sha256": "74b7e1483b1507b43fe6256064c06a46c1658159af8a6c2fa349a7b05080c6c0"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/e3181013cee15adff003ecd5daaab4ab132cd164b85654ba1f437e78d70338f8/close.json",
+        "sha256": "9a88c31d0148e59c3491731704d2b889a3d847fc151b6a3be7d6ce9b2a537958"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "f8ca4b7686d1b774e5ec54fb29e4ee06e852e1045334a91efa1cc68d69af339a",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "0db59fd2579600d0",
+      "elapsed_seconds": 10.309632048010826,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/e3181013cee15adff003ecd5daaab4ab132cd164b85654ba1f437e78d70338f8.json",
+        "sha256": "e7b83f17f143c8aa1cc6b7241aec78d58b3a44c6dc5ef6b38a8f10976d5e1e71"
+      },
+      "job_sha256": "e3181013cee15adff003ecd5daaab4ab132cd164b85654ba1f437e78d70338f8",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": -1.692454040952956,
+      "projection_sha256": "74b7e1483b1507b43fe6256064c06a46c1658159af8a6c2fa349a7b05080c6c0",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/e3181013cee15adff003ecd5daaab4ab132cd164b85654ba1f437e78d70338f8/fit.json",
+        "sha256": "04fa95614702831432a320773acc83650a673d38d811eb39b1781665effc0940"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "7547535a2aa692ddfdf994ce1f9065a893dbe416fcf707b8c5844d279f6e4bc7",
+      "validation_sha256": "2e6882cd563e6b9e62c131994c131904eb5c7b7083387b7cf61458839802ceb8"
+    },
+    {
+      "artifact_bytes": 121497,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 52080,
+          "path": "bounds.csv",
+          "sha256": "2d9e9afd9f1cb77bd11cfe69c6d52f67090e3e39e673f9f712b6fe6bea30474f"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 67801,
+          "path": "continuous.csv",
+          "sha256": "ad1061cef4caf54075c5a14f5de65c769330d09830200bf16b05a49d16d31118"
+        },
+        {
+          "bytes": 524,
+          "path": "model.json",
+          "sha256": "94bc3be373bfa6cdfa3d7ed67fee64b5da97e1b131ca2984d05b800cc2e32be6"
+        },
+        {
+          "bytes": 743,
+          "path": "projection.json",
+          "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/37641f873815aa25b08e7d79da845cd2677c95bbbfa3c752a0c950e2f8d42e00/close.json",
+        "sha256": "1b9185779025faafcbc57c832f509396779ab92fa85df1a9aab9910837324c26"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "19f4780b53b3fa41",
+      "elapsed_seconds": 9.26196160307154,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/37641f873815aa25b08e7d79da845cd2677c95bbbfa3c752a0c950e2f8d42e00.json",
+        "sha256": "97913b8ae3a132e6ffa6f7569d44d2048f461f9cc9731dfa99580045f21570a5"
+      },
+      "job_sha256": "37641f873815aa25b08e7d79da845cd2677c95bbbfa3c752a0c950e2f8d42e00",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 1.5843169347818806,
+      "projection_sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/37641f873815aa25b08e7d79da845cd2677c95bbbfa3c752a0c950e2f8d42e00/fit.json",
+        "sha256": "8b3e13f684f5cf9eb3dc4e063bac0f4ab51385c279217e2dc8f81425d7c22a63"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "419f6a21fca3f8ff9b8f327cd0272b1424346c053d31d47a33379d23f402459a",
+      "validation_sha256": "2cc247a823cf5d2dcee0650971491c196649acad4287f5e450253844dd38e7f3"
+    },
+    {
+      "artifact_bytes": 121497,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7d9cd1eccd8caa1370849e1127bd1567dd32b51fbd2b551ce903ee8cce9e672b"
+        },
+        {
+          "bytes": 52080,
+          "path": "bounds.csv",
+          "sha256": "2d9e9afd9f1cb77bd11cfe69c6d52f67090e3e39e673f9f712b6fe6bea30474f"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 67801,
+          "path": "continuous.csv",
+          "sha256": "ad1061cef4caf54075c5a14f5de65c769330d09830200bf16b05a49d16d31118"
+        },
+        {
+          "bytes": 524,
+          "path": "model.json",
+          "sha256": "94bc3be373bfa6cdfa3d7ed67fee64b5da97e1b131ca2984d05b800cc2e32be6"
+        },
+        {
+          "bytes": 743,
+          "path": "projection.json",
+          "sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/3fba348eff60787e07250b134ca744e26f5d2b1cde489e92385ea1bb00a99470/close.json",
+        "sha256": "63862aec4a07ab21af1c6ce3b0b9335cb1772fa2f4a919dd4caa4854414be39f"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "1c0317ad8f9e3ea26e9b08f229774d3a9535cc1f3323c74db20c76af9e6fe9f4",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "19f4780b53b3fa41",
+      "elapsed_seconds": 8.593384189065546,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/3fba348eff60787e07250b134ca744e26f5d2b1cde489e92385ea1bb00a99470.json",
+        "sha256": "4e62776b653b2b0a4801c432daf46de8be81aad7d73728eec75ed604c67fa957"
+      },
+      "job_sha256": "3fba348eff60787e07250b134ca744e26f5d2b1cde489e92385ea1bb00a99470",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 1.5843169347818806,
+      "projection_sha256": "9f6cdbbf38a0a97d6d83a2eee1fe399c08f428f68f671e87615739b4fab83bf2",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/3fba348eff60787e07250b134ca744e26f5d2b1cde489e92385ea1bb00a99470/fit.json",
+        "sha256": "15d0c249b50e2e2c22ea75736a1f0815eba29e43193fab3a6b6ede49cb753544"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "419f6a21fca3f8ff9b8f327cd0272b1424346c053d31d47a33379d23f402459a",
+      "validation_sha256": "2cc247a823cf5d2dcee0650971491c196649acad4287f5e450253844dd38e7f3"
+    },
+    {
+      "artifact_bytes": 21999,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "11e9ef0463e7464602ff6bfcf8a87d61b2ba3ed2bb5efdfc43a5997ceffd8527"
+        },
+        {
+          "bytes": 7973,
+          "path": "bounds.csv",
+          "sha256": "a4ac0c78bf0ef732f4b7db64194323e29edd87adaa9b98750151f209101370d6"
+        },
+        {
+          "bytes": 1210,
+          "path": "categories.csv",
+          "sha256": "9be4ed735b6a8880cdce4626cc5f491ebf3030fe7655ccec0cd1aceed9447287"
+        },
+        {
+          "bytes": 10225,
+          "path": "continuous.csv",
+          "sha256": "78627f1a93b7dbb7c8994cf0f8bfda4ac2723a7d4ada58deed66cb867f8528fd"
+        },
+        {
+          "bytes": 657,
+          "path": "model.json",
+          "sha256": "8acf1acf482484668159c7301d00b819932aa410c9b5b9acd0c30ec0757afc27"
+        },
+        {
+          "bytes": 1617,
+          "path": "projection.json",
+          "sha256": "2b95f2fae3dcf86e2563c44e2336c4cec9e4944b385360ebb0f85f3f0b846fa2"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/6054dcc25ed2a153d5d3ebc77368e2c3485e8129df20735066b64aec7eebb628/close.json",
+        "sha256": "de37fcb578d8446067cedc33baf6d6892de6c280b2cbeb68cf96dbc558590e10"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "913f73e186067c3775305b9be02ad9c3cfbad0b23b3a9d48370a8917c7aaf651",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "1cb97b1d7314d43d",
+      "elapsed_seconds": 8.7836409881711,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/6054dcc25ed2a153d5d3ebc77368e2c3485e8129df20735066b64aec7eebb628.json",
+        "sha256": "c186535711da6e5019281ea552a84566cba86a6292ae080c761b115d8dc83c13"
+      },
+      "job_sha256": "6054dcc25ed2a153d5d3ebc77368e2c3485e8129df20735066b64aec7eebb628",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": -5.578204692407763,
+      "projection_sha256": "2b95f2fae3dcf86e2563c44e2336c4cec9e4944b385360ebb0f85f3f0b846fa2",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/6054dcc25ed2a153d5d3ebc77368e2c3485e8129df20735066b64aec7eebb628/fit.json",
+        "sha256": "a396c1c9b80c09f62fb67b9bedbd7c0670590916ba6d5f41478f9e8ae7812491"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "2153c876678f02d69b7e9b2c42792f31d48270fde7a2dea492e391497a561298",
+      "validation_sha256": "aa7b450ddb58fcab4fed76945ce4c5e9490b375ea8af765d97989182dbe0da5f"
+    },
+    {
+      "artifact_bytes": 456971,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 213242,
+          "path": "bounds.csv",
+          "sha256": "bdea7c7250d5e59b35253f05e70ab98687fc6d3d81d23113948ea4708c074365"
+        },
+        {
+          "bytes": 18546,
+          "path": "categories.csv",
+          "sha256": "d87cfd968752a32607f4d1df8f9902145286011e259b3aab932c73c58df1150b"
+        },
+        {
+          "bytes": 222592,
+          "path": "continuous.csv",
+          "sha256": "9b2e68f042fb69da3b9f1185656d154a886aa4bc0c6b11cbf79369ffb623078e"
+        },
+        {
+          "bytes": 657,
+          "path": "model.json",
+          "sha256": "36aa5cb6bb1db3d402f619ac846de50e697edbaf2ed440ff617abf413e95c506"
+        },
+        {
+          "bytes": 1617,
+          "path": "projection.json",
+          "sha256": "2b95f2fae3dcf86e2563c44e2336c4cec9e4944b385360ebb0f85f3f0b846fa2"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/fad1a8384529ec0363c6a30fab3cb76fbfaea89a34876d2ef1540960e39553f8/close.json",
+        "sha256": "b097e17c27bd6733332d8fd2ce93304628c627a4300bf7a3f8197132b712bc59"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "1cb97b1d7314d43d",
+      "elapsed_seconds": 9.730126204900444,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/fad1a8384529ec0363c6a30fab3cb76fbfaea89a34876d2ef1540960e39553f8.json",
+        "sha256": "559508414e6845c7ac15e96caa0c9e817decc53a0856bef1621e5bc13173b1d2"
+      },
+      "job_sha256": "fad1a8384529ec0363c6a30fab3cb76fbfaea89a34876d2ef1540960e39553f8",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": -27.701238890831213,
+      "projection_sha256": "2b95f2fae3dcf86e2563c44e2336c4cec9e4944b385360ebb0f85f3f0b846fa2",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/fad1a8384529ec0363c6a30fab3cb76fbfaea89a34876d2ef1540960e39553f8/fit.json",
+        "sha256": "55d7e1b3f305fc8b91509664a00dbb997f932f2624fb295da39a158d8048766a"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "2153c876678f02d69b7e9b2c42792f31d48270fde7a2dea492e391497a561298",
+      "validation_sha256": "aa7b450ddb58fcab4fed76945ce4c5e9490b375ea8af765d97989182dbe0da5f"
+    },
+    {
+      "artifact_bytes": 2687654,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 1146016,
+          "path": "bounds.csv",
+          "sha256": "19da0d545b0dc8f4afb4c5ae68073951747b3bc4cc4044eef0a3d450e7e127ec"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 1532857,
+          "path": "continuous.csv",
+          "sha256": "c59887dfccf2622fbabb66c99e60ddb1a435315ad774e733650f1e718be1a92d"
+        },
+        {
+          "bytes": 1364,
+          "path": "model.json",
+          "sha256": "d4b6932b4af541697017142b7de1f47b213c85bf9c4e7bc22a5f2100f22feb07"
+        },
+        {
+          "bytes": 7068,
+          "path": "projection.json",
+          "sha256": "1e0ec7dfa403ee53af6cd2090a9c5e2238af47a88d5d5a743cc90738860a6e6f"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/3e4a3a1c85f6264d30e3fbda10d6030dd0b6c02953b2bd56fdb7546db1de4157/close.json",
+        "sha256": "496962e889297410aaedf8b3d425585850a90b3d1a9be64e7b1260847b9a3d91"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "297b7688a045c583",
+      "elapsed_seconds": 14.366389804985374,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/3e4a3a1c85f6264d30e3fbda10d6030dd0b6c02953b2bd56fdb7546db1de4157.json",
+        "sha256": "7e5dc1856b4675b7911c1e35573fb8031351e6788b91cbfdba1df36303957b3e"
+      },
+      "job_sha256": "3e4a3a1c85f6264d30e3fbda10d6030dd0b6c02953b2bd56fdb7546db1de4157",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": -9.60305243045687,
+      "projection_sha256": "1e0ec7dfa403ee53af6cd2090a9c5e2238af47a88d5d5a743cc90738860a6e6f",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/3e4a3a1c85f6264d30e3fbda10d6030dd0b6c02953b2bd56fdb7546db1de4157/fit.json",
+        "sha256": "33fb70efbc67fdf23507e0fc2652bab6210387401ffff96d63bd1faef752ae95"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "1a357cd0d1cf129bf2430ffee5aedcb4f97adbbc9e618c3a09ba74d37806a53b",
+      "validation_sha256": "9ccc2d0785b0f8436eaab286a06832ee2cdf2c50d36ea4236e6f407f90edf565"
+    },
+    {
+      "artifact_bytes": 235025,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "106c915a6e29bafbc74a2d284813371c5d3ab250b36be9067085f25fa209af2b"
+        },
+        {
+          "bytes": 93624,
+          "path": "bounds.csv",
+          "sha256": "f08f6d3df0b79854bce61e9bcaa408e92ab90f43190870e05c889f7ce24640d5"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 132620,
+          "path": "continuous.csv",
+          "sha256": "44fac9a86bded1bfc9dfb68b147f13bf1d48e8522ffef642bf40689af83024f3"
+        },
+        {
+          "bytes": 1364,
+          "path": "model.json",
+          "sha256": "0611762bc1ca2ee2924df2e202be335ec93ffd2e5d631196a694a02bf9f3554e"
+        },
+        {
+          "bytes": 7068,
+          "path": "projection.json",
+          "sha256": "1e0ec7dfa403ee53af6cd2090a9c5e2238af47a88d5d5a743cc90738860a6e6f"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/f759cc64ea59f14466132bf77a3a80bbc9f772f01251118ab801cc883698a0f4/close.json",
+        "sha256": "0a557ff71bd32e254de5547695a11dd04435d20d87d3899009f151ecbef2592b"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "249ef9978e4fbd23d48e2dc0024bc2f7a973f7e15f202dd3762c61e088803723",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "297b7688a045c583",
+      "elapsed_seconds": 10.292245413176715,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/f759cc64ea59f14466132bf77a3a80bbc9f772f01251118ab801cc883698a0f4.json",
+        "sha256": "7996c1c8c83093b9f3a5407c14b341e85047fff1caf4f3375a43252fb1296f98"
+      },
+      "job_sha256": "f759cc64ea59f14466132bf77a3a80bbc9f772f01251118ab801cc883698a0f4",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": -8.79274891228195,
+      "projection_sha256": "1e0ec7dfa403ee53af6cd2090a9c5e2238af47a88d5d5a743cc90738860a6e6f",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/f759cc64ea59f14466132bf77a3a80bbc9f772f01251118ab801cc883698a0f4/fit.json",
+        "sha256": "2dca18b03971e538f8d064bc58ee628ed3ffee6963f070bbf82c6860d7dc725d"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "1a357cd0d1cf129bf2430ffee5aedcb4f97adbbc9e618c3a09ba74d37806a53b",
+      "validation_sha256": "9ccc2d0785b0f8436eaab286a06832ee2cdf2c50d36ea4236e6f407f90edf565"
+    },
+    {
+      "artifact_bytes": 154073,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 67716,
+          "path": "bounds.csv",
+          "sha256": "936759dcb43328b701c4c173cfdfda483b316645ff3990097c59e2c53b425c83"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 85046,
+          "path": "continuous.csv",
+          "sha256": "d2387e094938e331cd1dc36a6583709a89e710145b7dc62d0ffe8e4eb4fc25a1"
+        },
+        {
+          "bytes": 490,
+          "path": "model.json",
+          "sha256": "4ae1647df2a12505286196e56bad2917556e1e68158791d69da0d8087585f706"
+        },
+        {
+          "bytes": 472,
+          "path": "projection.json",
+          "sha256": "39d104d0cb70afb22bf1f7ac2c95f123e8fdbc6b1090d9815714008846ba8374"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/561f3f1d294e86e0e68d14f8f3c7ce2b228a8f27a7e72970abdd92f050a3968c/close.json",
+        "sha256": "3683d1f27b3031b502c0a8b5cb6fc743b44fedd1c2428d4cd7f8efe14fc25079"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "693890aae9dc860b",
+      "elapsed_seconds": 9.578436015173793,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/561f3f1d294e86e0e68d14f8f3c7ce2b228a8f27a7e72970abdd92f050a3968c.json",
+        "sha256": "25a0127fa00dbddca0f7ea41737afbb9e1f53c13a3facddba4e78ee84603dc56"
+      },
+      "job_sha256": "561f3f1d294e86e0e68d14f8f3c7ce2b228a8f27a7e72970abdd92f050a3968c",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 2.8910797127108694,
+      "projection_sha256": "39d104d0cb70afb22bf1f7ac2c95f123e8fdbc6b1090d9815714008846ba8374",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/561f3f1d294e86e0e68d14f8f3c7ce2b228a8f27a7e72970abdd92f050a3968c/fit.json",
+        "sha256": "ada3b2b8f23989c05839c61ee67ed45d4cf3c87d47ef790bb76ff53b74c1fd3a"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "68fd8cfe611d95435b1f5c419cb2b143e10d6ecc4be09165ea50ee9954b1c2a0",
+      "validation_sha256": "908af7725ee8eaae8f86fb9f306110caadef77396fca044e1bb2fddc187d878d"
+    },
+    {
+      "artifact_bytes": 253710,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "6e7708d405def5315d2d1c6b41307abe1636e0237dec76457ca0938718e362eb"
+        },
+        {
+          "bytes": 112227,
+          "path": "bounds.csv",
+          "sha256": "0da12a1e1b41d7b1354379f2bd0a1b273d659170b4d139dd030945d26ebd7862"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 140172,
+          "path": "continuous.csv",
+          "sha256": "1bcd84005c2515663e1dcbb764f15e077733bebd6bb93cce9afe763801c2f968"
+        },
+        {
+          "bytes": 490,
+          "path": "model.json",
+          "sha256": "c60474c69afcf397ca38061f68a993ba2b7a06515e8bff5d863302c3a4352abe"
+        },
+        {
+          "bytes": 472,
+          "path": "projection.json",
+          "sha256": "39d104d0cb70afb22bf1f7ac2c95f123e8fdbc6b1090d9815714008846ba8374"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/a79f88b2f7c10a3e13d71dc8daf0bad039a5c5808492840b94f01aef24ecfcde/close.json",
+        "sha256": "627889c22e34883d0896613f144a653e7133760eea0898e5baaecc47661699c8"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "f8ca4b7686d1b774e5ec54fb29e4ee06e852e1045334a91efa1cc68d69af339a",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "693890aae9dc860b",
+      "elapsed_seconds": 8.84270368469879,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/a79f88b2f7c10a3e13d71dc8daf0bad039a5c5808492840b94f01aef24ecfcde.json",
+        "sha256": "49b17e51e88ecb39358b048a936af460e49e9318fcf8f7fb882b63acfb3196a0"
+      },
+      "job_sha256": "a79f88b2f7c10a3e13d71dc8daf0bad039a5c5808492840b94f01aef24ecfcde",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 2.8917610754230823,
+      "projection_sha256": "39d104d0cb70afb22bf1f7ac2c95f123e8fdbc6b1090d9815714008846ba8374",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/a79f88b2f7c10a3e13d71dc8daf0bad039a5c5808492840b94f01aef24ecfcde/fit.json",
+        "sha256": "ef4f1695538936c07a78de1937b9445dc0e3ae425676e194ac474863dae84eee"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "68fd8cfe611d95435b1f5c419cb2b143e10d6ecc4be09165ea50ee9954b1c2a0",
+      "validation_sha256": "908af7725ee8eaae8f86fb9f306110caadef77396fca044e1bb2fddc187d878d"
+    },
+    {
+      "artifact_bytes": 743545,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "6e7708d405def5315d2d1c6b41307abe1636e0237dec76457ca0938718e362eb"
+        },
+        {
+          "bytes": 316829,
+          "path": "bounds.csv",
+          "sha256": "a3b4d534f8aa8ef897f364a4bac0b2ee3f487e952793c02e7d93d398f9fceea9"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 423310,
+          "path": "continuous.csv",
+          "sha256": "d3111ce8b1b910b52bc5d39bfe61a7b6e4dcf82b17f605dd0e079c45db2baa2c"
+        },
+        {
+          "bytes": 734,
+          "path": "model.json",
+          "sha256": "f55a8f9b3cc6cea019a65e868b269d12908f6bade312c71a61335033482c16b4"
+        },
+        {
+          "bytes": 2323,
+          "path": "projection.json",
+          "sha256": "50c4ae845f924ce60fe90652e9d9e1c6e24a39afcc4484849ea1aa58ee80687c"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/65df254c42c4694524392d844e6b29fcf27379d5dfe16dac49f14045cc28f1b7/close.json",
+        "sha256": "ea9bfd1995be4f54a27cc2150e633d06c58b09a9425f9b9ec6b9ea190809e15c"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "f8ca4b7686d1b774e5ec54fb29e4ee06e852e1045334a91efa1cc68d69af339a",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "9a10c15885022034",
+      "elapsed_seconds": 10.475942836143076,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/65df254c42c4694524392d844e6b29fcf27379d5dfe16dac49f14045cc28f1b7.json",
+        "sha256": "403f8c5f4bd7672df5ba293d709d025415c2c9061a0794568ada21d052292838"
+      },
+      "job_sha256": "65df254c42c4694524392d844e6b29fcf27379d5dfe16dac49f14045cc28f1b7",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 14.018201862981785,
+      "projection_sha256": "50c4ae845f924ce60fe90652e9d9e1c6e24a39afcc4484849ea1aa58ee80687c",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/65df254c42c4694524392d844e6b29fcf27379d5dfe16dac49f14045cc28f1b7/fit.json",
+        "sha256": "b2e58d5282df682f04c5954d313c73c25e7ccb6fb88af8b8dc3ce7d0a514e4d9"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "fe61850f06c4b355b764b0b410389557baacfa57457fce28c6870004c6934453",
+      "validation_sha256": "f6b3345e987d7949810c5381eb43d5d566387b79ed62d4c95c23ccfbd28c902f"
+    },
+    {
+      "artifact_bytes": 447380,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 189717,
+          "path": "bounds.csv",
+          "sha256": "95a112dd18b7be8e988978e8e3a7a653a58b30550bbc3f3324cfdf9dc5b0d691"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 254257,
+          "path": "continuous.csv",
+          "sha256": "eb10a357028d566d19d2eeb9c33ec582d963bd1b7130ce64e8d344c54d497b08"
+        },
+        {
+          "bytes": 734,
+          "path": "model.json",
+          "sha256": "cfb60da5075e48683f7358217e7ba96bda13abfc394b10f8bf6b8468e18a14c2"
+        },
+        {
+          "bytes": 2323,
+          "path": "projection.json",
+          "sha256": "50c4ae845f924ce60fe90652e9d9e1c6e24a39afcc4484849ea1aa58ee80687c"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/80ebaadb23e7132b1c044c9a5566cbfde767c08ddd90d686185470e34b316beb/close.json",
+        "sha256": "591cd17881644bb38e840fe9396b9a35828350fb2fa8387eb18de92c24f6f06c"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "9a10c15885022034",
+      "elapsed_seconds": 9.655312636867166,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/80ebaadb23e7132b1c044c9a5566cbfde767c08ddd90d686185470e34b316beb.json",
+        "sha256": "dfa718576f2c5e1dbff2261441dd80e9d767107cedd736b357841894370a9ab2"
+      },
+      "job_sha256": "80ebaadb23e7132b1c044c9a5566cbfde767c08ddd90d686185470e34b316beb",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 13.752953523601093,
+      "projection_sha256": "50c4ae845f924ce60fe90652e9d9e1c6e24a39afcc4484849ea1aa58ee80687c",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/80ebaadb23e7132b1c044c9a5566cbfde767c08ddd90d686185470e34b316beb/fit.json",
+        "sha256": "48c5d8e66bf5404653fcfab81a379be358900d9a13635533ead58bf28c42e64c"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "fe61850f06c4b355b764b0b410389557baacfa57457fce28c6870004c6934453",
+      "validation_sha256": "f6b3345e987d7949810c5381eb43d5d566387b79ed62d4c95c23ccfbd28c902f"
+    },
+    {
+      "artifact_bytes": 167242,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "6e7708d405def5315d2d1c6b41307abe1636e0237dec76457ca0938718e362eb"
+        },
+        {
+          "bytes": 69899,
+          "path": "bounds.csv",
+          "sha256": "e45dc561f70115dedadda20280fd0faca94c2af093d1ee3f639e7022ca8c05f6"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 95888,
+          "path": "continuous.csv",
+          "sha256": "8b021b94787dbcbef5f9fadf6c105f264ed8e7bcc4a264a7b77a1e21e46c605d"
+        },
+        {
+          "bytes": 507,
+          "path": "model.json",
+          "sha256": "709fa3385208191069c72f0646cbc2ca01631575068a1b617ce358b0f57dc29f"
+        },
+        {
+          "bytes": 599,
+          "path": "projection.json",
+          "sha256": "7d1de67d72ca2193b2de96b4ee3a84db12a546defc52be4ec14c1a5a586b259d"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/01ef8b2d0683613571619e807e1c35a5c2582be35cc2ac974fa592966e4f3b05/close.json",
+        "sha256": "bfca548e8267c4ac1e6f20e28e312b4514763df264f6daacc95dd63fc4fa4209"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "f8ca4b7686d1b774e5ec54fb29e4ee06e852e1045334a91efa1cc68d69af339a",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "a863cd42be4d05d4",
+      "elapsed_seconds": 9.037082531955093,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/01ef8b2d0683613571619e807e1c35a5c2582be35cc2ac974fa592966e4f3b05.json",
+        "sha256": "91c0313d717bded823d4c7e1624f1b540f0f1c6af095b499d77e2dd6e14147cc"
+      },
+      "job_sha256": "01ef8b2d0683613571619e807e1c35a5c2582be35cc2ac974fa592966e4f3b05",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 0.3843337983268114,
+      "projection_sha256": "7d1de67d72ca2193b2de96b4ee3a84db12a546defc52be4ec14c1a5a586b259d",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/01ef8b2d0683613571619e807e1c35a5c2582be35cc2ac974fa592966e4f3b05/fit.json",
+        "sha256": "af55fd7fa1017190110a86e0278e2fab0f3b7fec1277b457f7c934d1b54dd19f"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "defc068c66613396d6a12b94070f5d1345e9d1062a77a98d2a5dd4423b2c240a",
+      "validation_sha256": "da7de3a943b039a039a48a7cca5d5f37f170f0f7af0cbc552c8fdf131fed3c8d"
+    },
+    {
+      "artifact_bytes": 102717,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 42714,
+          "path": "bounds.csv",
+          "sha256": "d218398cc43b7d1b60979b6d922a93b38a088bbf546b1ab4c9c650c6226712da"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 58548,
+          "path": "continuous.csv",
+          "sha256": "42776ab929a4d40c8fe4088d544b06c8733d1ce1c7b035192424d83ab23fdd88"
+        },
+        {
+          "bytes": 507,
+          "path": "model.json",
+          "sha256": "d406d71af095e65ce21c0cd7246b0151caf061a1d473e97a3fc816f1c6f64bea"
+        },
+        {
+          "bytes": 599,
+          "path": "projection.json",
+          "sha256": "7d1de67d72ca2193b2de96b4ee3a84db12a546defc52be4ec14c1a5a586b259d"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/aa1f860d98d769021d89e1a905e3308e14eceadcac5856b33e85b94461f65907/close.json",
+        "sha256": "0838118d2ff31dfc3baa44cce8eec86fa0f5254281e21eb2b59836eb74a86713"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "a863cd42be4d05d4",
+      "elapsed_seconds": 9.661725287791342,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/aa1f860d98d769021d89e1a905e3308e14eceadcac5856b33e85b94461f65907.json",
+        "sha256": "0aaec113ea020da01f5004062da5b332ddd938cba78ea0ef88683c6352d5f1ed"
+      },
+      "job_sha256": "aa1f860d98d769021d89e1a905e3308e14eceadcac5856b33e85b94461f65907",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 0.37525639325702376,
+      "projection_sha256": "7d1de67d72ca2193b2de96b4ee3a84db12a546defc52be4ec14c1a5a586b259d",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/aa1f860d98d769021d89e1a905e3308e14eceadcac5856b33e85b94461f65907/fit.json",
+        "sha256": "85869d93d3394196b2bfb75d53039c2b4d690805ff426c55224e2aaf0aa3ddff"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "defc068c66613396d6a12b94070f5d1345e9d1062a77a98d2a5dd4423b2c240a",
+      "validation_sha256": "da7de3a943b039a039a48a7cca5d5f37f170f0f7af0cbc552c8fdf131fed3c8d"
+    },
+    {
+      "artifact_bytes": 308899,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 133148,
+          "path": "bounds.csv",
+          "sha256": "01c954ff709c642646676d904188f76bf6a646c0694791178720d784ebe44e77"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 173708,
+          "path": "continuous.csv",
+          "sha256": "5eba91ece9c7c20471deb42d556c667d820bbe6edff1bf090e1cb6bc7272beda"
+        },
+        {
+          "bytes": 575,
+          "path": "model.json",
+          "sha256": "40d12a5399b4955115a0a0f8639420dc90984e587830135be15685ad8a98bdf3"
+        },
+        {
+          "bytes": 1119,
+          "path": "projection.json",
+          "sha256": "9bc054f6cc811b6600a65337b480f0d5e3a8e95106182988778b7ffed88cccb1"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/53be2ef097c303d5d939fba9748d3831c88ac5efcb998e020c49a24fe293bfa8/close.json",
+        "sha256": "376b5dd0d2ae61dbec8182c0b1c4018cc019aea6f92599641cca3afbefc8b809"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "cba8393879afd1dc",
+      "elapsed_seconds": 9.421885959804058,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/53be2ef097c303d5d939fba9748d3831c88ac5efcb998e020c49a24fe293bfa8.json",
+        "sha256": "cf13def5e9785987556b4727c501435e927abd8c056d84ea95f4e7392d9e92bf"
+      },
+      "job_sha256": "53be2ef097c303d5d939fba9748d3831c88ac5efcb998e020c49a24fe293bfa8",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 11.547147288986817,
+      "projection_sha256": "9bc054f6cc811b6600a65337b480f0d5e3a8e95106182988778b7ffed88cccb1",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/53be2ef097c303d5d939fba9748d3831c88ac5efcb998e020c49a24fe293bfa8/fit.json",
+        "sha256": "d82858536627526dfd1595298ed0f7663000d9bd0c2bac27b73785e7fadfc568"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "e0bfd08d334b2bcba7242eb3aa14510b9f802aa841fc8aebf9e0ce089ccd2acf",
+      "validation_sha256": "705b54f278e37ce210a99a78a8bb86c55deaeb91ac2d143d477ed5b2126e05ac"
+    },
+    {
+      "artifact_bytes": 498967,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "6e7708d405def5315d2d1c6b41307abe1636e0237dec76457ca0938718e362eb"
+        },
+        {
+          "bytes": 215967,
+          "path": "bounds.csv",
+          "sha256": "415eeb5b979f7bcf8e95e3cb6876924cb65a36d346aa4b3fc44ce7d29124d2f2"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 280957,
+          "path": "continuous.csv",
+          "sha256": "eef9298016a06c5873feea0c13d0dcb1babc41a90582d9ff7677b9d48b93381b"
+        },
+        {
+          "bytes": 575,
+          "path": "model.json",
+          "sha256": "4f284125b5b0ccf8efc6679f5b86273ee935cc518ddc7ae5cbaa2e9463d68610"
+        },
+        {
+          "bytes": 1119,
+          "path": "projection.json",
+          "sha256": "9bc054f6cc811b6600a65337b480f0d5e3a8e95106182988778b7ffed88cccb1"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/e1abdaeb768387cfc97f148b1c00733ee61f1d716a10dbb74f7162ed70435994/close.json",
+        "sha256": "a0a9ea55c15c61311861e8079099494783a6ff107cf124ced0b82fff3ab91475"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "f8ca4b7686d1b774e5ec54fb29e4ee06e852e1045334a91efa1cc68d69af339a",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "cba8393879afd1dc",
+      "elapsed_seconds": 10.430547310970724,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/e1abdaeb768387cfc97f148b1c00733ee61f1d716a10dbb74f7162ed70435994.json",
+        "sha256": "3e0cfa4bb55f3e99eb9d94c2ddc27c643000ca7a412a8a09d9ee65c398526877"
+      },
+      "job_sha256": "e1abdaeb768387cfc97f148b1c00733ee61f1d716a10dbb74f7162ed70435994",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 11.471796237074837,
+      "projection_sha256": "9bc054f6cc811b6600a65337b480f0d5e3a8e95106182988778b7ffed88cccb1",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/e1abdaeb768387cfc97f148b1c00733ee61f1d716a10dbb74f7162ed70435994/fit.json",
+        "sha256": "8fc6a3324078c41c28085d7340cc9336d8ec42f7373bb85972b3c0693167a3f2"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "e0bfd08d334b2bcba7242eb3aa14510b9f802aa841fc8aebf9e0ce089ccd2acf",
+      "validation_sha256": "705b54f278e37ce210a99a78a8bb86c55deaeb91ac2d143d477ed5b2126e05ac"
+    },
+    {
+      "artifact_bytes": 712964,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "6e7708d405def5315d2d1c6b41307abe1636e0237dec76457ca0938718e362eb"
+        },
+        {
+          "bytes": 303753,
+          "path": "bounds.csv",
+          "sha256": "e8328417adb8f6fe1fdf978d036201457ff474298a22eda0a1fae67d0ba74208"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 405840,
+          "path": "continuous.csv",
+          "sha256": "c0cf01566af38625070294f39b9dde6b632e9fe7588e1e98ac609ec5c4c49d74"
+        },
+        {
+          "bytes": 734,
+          "path": "model.json",
+          "sha256": "4a839790eb0aba7e78df0e86b17c24540024608cbfd32dca42e24b0a2ca1dbe7"
+        },
+        {
+          "bytes": 2288,
+          "path": "projection.json",
+          "sha256": "bf5e0fda1911356221e606d40ff855b47034444b1953833e275c0111a6edcb39"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/bb74d4b0bafbb1047977a95948842e7bd6cc2fa76763d48b5ca01e7225dd0c9a/close.json",
+        "sha256": "179e5ce4d40be18a9563061aba4081039c960fce5a56f3b7174eb0cef62c948d"
+      },
+      "configuration_labels": [
+        "native_selected"
+      ],
+      "configuration_sha256": "f8ca4b7686d1b774e5ec54fb29e4ee06e852e1045334a91efa1cc68d69af339a",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "efd53e9c0f36d608",
+      "elapsed_seconds": 11.861597871873528,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/bb74d4b0bafbb1047977a95948842e7bd6cc2fa76763d48b5ca01e7225dd0c9a.json",
+        "sha256": "7e662f07bdf4eae93258d75b9545eab008e7d8c32c7858d00de860cb48dbad62"
+      },
+      "job_sha256": "bb74d4b0bafbb1047977a95948842e7bd6cc2fa76763d48b5ca01e7225dd0c9a",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 14.021811081292942,
+      "projection_sha256": "bf5e0fda1911356221e606d40ff855b47034444b1953833e275c0111a6edcb39",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/bb74d4b0bafbb1047977a95948842e7bd6cc2fa76763d48b5ca01e7225dd0c9a/fit.json",
+        "sha256": "d3ddb0fbb76a05869a42c8c04c06749b582027918693c2bd37273b12070260e0"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "0f6516cd336cd1b430b3535b9dc5d2b7070e79d565ab502966f3c831ec94a546",
+      "validation_sha256": "4bced512c8e2d327fa60bf737c76d4ae6ff86bb1a3aa18f7b9291c06da1eb38b"
+    },
+    {
+      "artifact_bytes": 432597,
+      "artifact_inventory": [
+        {
+          "bytes": 317,
+          "path": "adapter.json",
+          "sha256": "7cfc7933e20c60879c834f1a1cfc41ab4d748b84a9f70d7c5b90cb8efaee52b3"
+        },
+        {
+          "bytes": 183470,
+          "path": "bounds.csv",
+          "sha256": "b2db3762df13e030b0362b40e53ca0e2e93da210c0952557044f8be3c356dadd"
+        },
+        {
+          "bytes": 32,
+          "path": "categories.csv",
+          "sha256": "d04138923934adf577786bb70d45c9a07742043a97771b82cbd98cf30824c8a5"
+        },
+        {
+          "bytes": 245756,
+          "path": "continuous.csv",
+          "sha256": "4d22cc9afc66e631c7879af9662f5a253543e879d5ae568764cd90c72a8506dc"
+        },
+        {
+          "bytes": 734,
+          "path": "model.json",
+          "sha256": "e0fbd8f47aa855d744a5dbc0a9d25cab7141cd8a7d5b637cc710353954ec604c"
+        },
+        {
+          "bytes": 2288,
+          "path": "projection.json",
+          "sha256": "bf5e0fda1911356221e606d40ff855b47034444b1953833e275c0111a6edcb39"
+        }
+      ],
+      "closure": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/dd3a519bc55266b6717ea1bf8baeb2c78e5c1cbc229f668fafbbb61ded4aae61/close.json",
+        "sha256": "f8c580515305e49f5144ab6e04cf99594cc3911707f60c004b1734335605a6fa"
+      },
+      "configuration_labels": [
+        "author_default"
+      ],
+      "configuration_sha256": "4507a3e146f846c85ce3f5e89e18303c4d7da14a72a998d3541ae5c61610edd8",
+      "cpu_affinity": [
+        60,
+        61,
+        62,
+        63
+      ],
+      "dataset": "efd53e9c0f36d608",
+      "elapsed_seconds": 9.846749573014677,
+      "fit_seed": 23,
+      "job": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/jobs/dd3a519bc55266b6717ea1bf8baeb2c78e5c1cbc229f668fafbbb61ded4aae61.json",
+        "sha256": "c6df04d891aac35e87dfafa1ae8f6808f9143a654c1794defa2a0e37a4e33e77"
+      },
+      "job_sha256": "dd3a519bc55266b6717ea1bf8baeb2c78e5c1cbc229f668fafbbb61ded4aae61",
+      "method": "ARF",
+      "native_objective": "heldout_forde_mean_log_density",
+      "native_validation_value": 13.598579680157426,
+      "projection_sha256": "bf5e0fda1911356221e606d40ff855b47034444b1953833e275c0111a6edcb39",
+      "receipt": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/attempts/dd3a519bc55266b6717ea1bf8baeb2c78e5c1cbc229f668fafbbb61ded4aae61/fit.json",
+        "sha256": "62d9a1d893d3bda6ac63586eb877b101b573ee795a054ea4a336fd212b47e0d9"
+      },
+      "round": {
+        "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-cpu-v1/round.lock.json",
+        "sha256": "8e9c248c77b84a72ca2b0ab3e4ea010cd884ebe21e7e4d2b84c8eaff5fd9b729"
+      },
+      "status": "ok",
+      "train_sha256": "0f6516cd336cd1b430b3535b9dc5d2b7070e79d565ab502966f3c831ec94a546",
+      "validation_sha256": "4bced512c8e2d327fa60bf737c76d4ae6ff86bb1a3aa18f7b9291c06da1eb38b"
+    }
+  ],
+  "five_fit_matrix_complete": false,
+  "forest_native_selected_replications": "not_admitted_in_this_round",
+  "format": "dope-cpu-fivefit-progress-v1",
+  "full_campaign_admitted": false,
+  "mfs_v2": null,
+  "native_values_ranked_across_methods": false,
+  "official_tests_opened": false,
+  "outcome_counts": {
+    "ok": 24
+  },
+  "physical_fit_counts": {
+    "ARF": 24
+  },
+  "planned_new_physical_fits": {
+    "ARF": 796
+  },
+  "ptf_v1": null,
+  "release_safe": null,
+  "snapshot_utc": "2026-10-07T07:06:45.598638+00:00",
+  "superiority": null,
+  "version": 1
+}

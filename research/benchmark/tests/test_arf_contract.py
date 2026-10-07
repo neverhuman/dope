@@ -133,6 +133,31 @@ class Guard(unittest.TestCase):
         kwargs=self.fit_request();kwargs['configuration']['num_trees']=True
         self.rejected_before_import('fit',kwargs)
 
+    def test_cpu_allocation_rejected_before_runtime_or_dependency_initialization(self):
+        kwargs=self.fit_request()
+        with patch.object(adapter, 'check_runtime', side_effect=AssertionError('runtime reached')):
+            for threads in (True, 0, 17, 4.0, '4'):
+                with self.subTest(threads=threads):
+                    self.rejected_before_import('fit', kwargs | {'cpu_threads': threads})
+            with patch.object(adapter.os, 'sched_getaffinity', return_value={60, 61}):
+                self.rejected_before_import('fit', kwargs | {'cpu_threads': 4})
+
+    def test_four_core_fit_passes_allocation_to_original_author_constructor(self):
+        kwargs=self.fit_request()
+        constructor=__import__('unittest.mock', fromlist=['Mock']).Mock(side_effect=RuntimeError('stop at fit'))
+        numpy=SimpleNamespace(random=SimpleNamespace(seed=lambda _: None), asarray=lambda x: x)
+        author=SimpleNamespace(arf=constructor)
+        with patch.object(adapter, 'check_runtime'), \
+             patch.object(adapter.native, 'prepare_frames', return_value=('train', 'validation')), \
+             patch.object(adapter.os, 'sched_getaffinity', return_value={60,61,62,63}), \
+             patch.dict(sys.modules, {'numpy': numpy, 'arfpy': SimpleNamespace(), 'arfpy.arf': author}):
+            with self.assertRaisesRegex(RuntimeError, 'stop at fit'):
+                adapter.fit(runtime_path=self.lock, runtime_sha256=self.sha, base=self.base,
+                            deadline_epoch=__import__('time').time()+590, cpu_threads=4, **kwargs)
+        self.assertEqual(constructor.call_args.kwargs['n_jobs'], 4)
+        self.assertEqual(constructor.call_args.kwargs['random_state'], 11)
+        self.assertEqual(constructor.call_args.args, ('train',))
+
     def test_extra_empty_runtime_directory_rejected_before_import(self):
         (self.numpy.parent/'unbound_namespace').mkdir();self.rejected_before_import()
 

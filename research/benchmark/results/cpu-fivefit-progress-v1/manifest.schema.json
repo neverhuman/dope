@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "common_metrics_complete": {
+      "const": false
+    },
+    "files": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "format": {
+      "const": "dope-cpu-fivefit-publication-manifest-v1"
+    },
+    "full_matrix_complete": {
+      "const": false
+    },
+    "input_manifests": {
+      "additionalProperties": false,
+      "properties": {
+        "ARF": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "Forest-Flow": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "ARF",
+        "Forest-Flow"
+      ],
+      "type": "object"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "superiority": {
+      "type": "null"
+    }
+  },
+  "required": [
+    "format",
+    "files",
+    "input_manifests",
+    "full_matrix_complete",
+    "common_metrics_complete",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe",
+    "superiority"
+  ],
+  "type": "object"
+}
