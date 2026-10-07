@@ -1410,3 +1410,5 @@ python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inp
 ```
 
 The [complete additional ARF fit ledger](results/arf-complete-additional-fits-v1/README.md) records all 796 physical / 800 logical refits on 100 frozen lineages, with native density values, checkpoint hashes and costs. Common five-fit evaluation coverage remains a separate running matrix.
+
+The [six-component coverage ledger](results/work-order-b-six-component-coverage-v1/README.md) maps the exact MFS-v2 components and hard gates to available evidence and missing inputs at the pinned `aca4760` snapshot. Later campaign progress is excluded from its counts. Component, production and superiority scores remain null.

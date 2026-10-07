@@ -1,0 +1,3848 @@
+{
+  "additional_production_missing_evidence": [
+    "Full pinned gold auditor family coverage, calibration, supported subgroups and rare-class/tail inference",
+    "Feature-view and rare-slice membership/attribute coverage; runtime dictionary ceiling64MiB",
+    "Production generalization regret<=.01, across-seed validation-lossSD<=.005, nominal uncertainty coverage[.90,.98]",
+    "Router versus random/best-fixed, candidate both-task coverage, conditional learned-representation Pareto evidence",
+    "Exact signatures/byte reconciliation and complete required CoverageReport; controller/evaluator disk>=150GiB"
+  ],
+  "beyondarena": {
+    "accepted_cells": 0,
+    "configuration": "features12_steps2048",
+    "fit_seed": 11,
+    "missing": "No accepted BeyondArena inner-validation receipts in committed rowset; S3/other pilot diagnostics do not fill this separate73-family denominator",
+    "outer_fold_authorized": false,
+    "panel_lock_path": "research/benchmark/results/beyondarena-panel.lock.json",
+    "pooled_with_S3": false,
+    "receipt_state": "absent",
+    "rows_path": "research/benchmark/results/beyondarena-retention-rows.json",
+    "sample_seeds": [
+      101,
+      211,
+      307
+    ],
+    "scheduled_logical_sample_cells": 219,
+    "selected_family_denominator": 73,
+    "size_multiplier": 4
+  },
+  "claims": {
+    "HIPAA_deidentification": false,
+    "MFS_v2": null,
+    "PTF_v1": null,
+    "complete_campaign_certified": false,
+    "empirical_privacy_only": true,
+    "formal_DP": false,
+    "official_TEST_opened_by_audit": false,
+    "release_safe_L3": null,
+    "scientific_trials_started_by_audit": 0,
+    "superiority": null
+  },
+  "components": [
+    {
+      "available_contributions": [
+        "null/TRTR/TSTR losses and informative retention for three research auditors",
+        "complete n/4n and three sample-seed groups in cited cohorts"
+      ],
+      "definition": "clamp(minimum gold one-sided95 retention,0,1)",
+      "missing_exact_inputs": [
+        "Gold-family auditor identities/versions and seeds57721,161803,271828 are not the research1729 schedule",
+        "Per lineage/task/structural-profile/auditor/size clustered one-sided95 bound and low-signal compliance",
+        "Full frozen eligible denominator and required coverage, including failures/timeouts"
+      ],
+      "name": "utility_transfer",
+      "score": null,
+      "source_location": "finalize_certification.rs:31-36,190-191",
+      "status": "partial_inputs_exact_component_uncomputed",
+      "weight": 0.3
+    },
+    {
+      "available_contributions": [
+        "Utility controls can support later frozen feature-importance auditors"
+      ],
+      "definition": "0.5*clamp((worst FI Spearman+1)/2,0,1)+0.5*clamp(worst top-k Jaccard,0,1)",
+      "missing_exact_inputs": [
+        "Permutation-importance rank/top-k receipts on the same feature view",
+        "Measured informative-feature count and complete/applicable FI view; raw Pearson is not feature-importance Spearman"
+      ],
+      "name": "driver_fidelity",
+      "score": null,
+      "source_location": "finalize_certification.rs:65-70,192-196",
+      "status": "partial_inputs_exact_component_uncomputed",
+      "weight": 0.2
+    },
+    {
+      "available_contributions": [
+        "Published per-column KS/TV and C2ST are descriptive distribution evidence"
+      ],
+      "definition": "0.50*minimum marginal W1 fidelity+0.25*minimum sliced-Wasserstein fidelity+0.25*minimum MMD fidelity",
+      "missing_exact_inputs": [
+        "Exact marginal W1 fidelity from the certification producer",
+        "16-slice normalized SW with 64 quantile positions per slice and multi-bandwidth MMD diagnostics for both required sizes and three generations; KS/TV/C2ST are not substitute formulas"
+      ],
+      "name": "distribution_fidelity",
+      "score": null,
+      "source_location": "finalize_certification.rs:179-200;fitness_metrics.rs:248-275",
+      "status": "partial_inputs_exact_component_uncomputed",
+      "weight": 0.2
+    },
+    {
+      "available_contributions": [
+        "Pearson differences and categorical contingency TV on declared eligible pairs",
+        "Explicit mixed-type dependence unavailability in A952"
+      ],
+      "definition": "minimum production pairwise-dependence fidelity",
+      "missing_exact_inputs": [
+        "Pinned production dependence-fidelity transform and complete mixed/constant/applicability evidence; published mean Pearson error is not the worst production scalar",
+        "Production joint/driver/query gates separately remain unmeasured"
+      ],
+      "name": "structure_fidelity",
+      "score": null,
+      "source_location": "finalize_certification.rs:179-201",
+      "status": "partial_inputs_exact_component_uncomputed",
+      "weight": 0.15
+    },
+    {
+      "available_contributions": [
+        "A952 unembedded alpha-precision/beta-recall and DCR/NNDR are descriptive coverage/realism diagnostics"
+      ],
+      "definition": "minimum over six gold diagnostic cells of .25*PRDC precision+.25*recall+.20*min(density,1)+.30*coverage",
+      "missing_exact_inputs": [
+        "Embedded PRDC precision/recall/density/coverage from fitness_metrics.rs on n/4n and three generations",
+        "Alpha/beta variants are not PRDC and cannot be substituted"
+      ],
+      "name": "coverage_realism",
+      "score": null,
+      "source_location": "finalize_certification.rs:181-202;fitness_metrics.rs:276-283",
+      "status": "partial_inputs_exact_component_uncomputed",
+      "weight": 0.1
+    },
+    {
+      "available_contributions": [
+        "Committed model-plus-projection byte records and original L3-cap flags",
+        "Above-cap records conclusively fail the corresponding charged-byte size requirement, independently of utility"
+      ],
+      "definition": "clamp(1-artifact_bytes/tier_limit,0,1); L3 limit10240; L2 limit32768",
+      "missing_exact_inputs": [
+        "Exact full released-generator inventory, source-row absence and sampling proof; certification producer counts kernel bytes while benchmark charging includes preprocessing",
+        "No favorable scalar is inferred from partial inventory or repeated sample-cell charges"
+      ],
+      "name": "compactness",
+      "score": null,
+      "source_location": "finalize_certification.rs:174-205",
+      "status": "partial_inputs_exact_component_uncomputed",
+      "weight": 0.05
+    }
+  ],
+  "deduplication": "Coverage rows are separate source cohorts, never automatically additive. Forest first-two/next-six/third-five reporting lineages are pairwise disjoint (2+6+5=13); the third-five projection excludes a legacy-source lineage from its own original batch. Source/runtime homogeneity across all13 is not asserted. TabSyn eight appears in retained-classical; density/SDV repeat DOPE; historical A952 outputs and default/native selections may alias. Sample aliases are not independent fits.",
+  "final_public_evaluator_admission": {
+    "DOPE_native_objective": null,
+    "DOPE_native_objective_field_present": false,
+    "admitted": null,
+    "assess_executed": false,
+    "exact_required_lock_paths": [
+      {
+        "path": "research/benchmark/methods.lock.json",
+        "present_at_commit": true
+      },
+      {
+        "path": "research/benchmark/datasets.lock.json",
+        "present_at_commit": false
+      },
+      {
+        "path": "research/benchmark/budget.lock.json",
+        "present_at_commit": false
+      },
+      {
+        "path": "research/benchmark/method-dataset-matrix.lock.json",
+        "present_at_commit": false
+      },
+      {
+        "path": "research/benchmark/evaluator.lock.json",
+        "present_at_commit": false
+      }
+    ],
+    "gap_scope": "Exact committed research/benchmark paths only; research result/input locks do not substitute for the five final lock files",
+    "method_row_count": 29,
+    "method_status_counts": {
+      "locked": 6,
+      "pilot_locked": 6,
+      "source_audit_pending": 11,
+      "unavailable": 6
+    },
+    "methods_final_frozen": false,
+    "methods_lock_complete": false
+  },
+  "first12_scoped_batch": {
+    "frozen_physical_queue": 5724,
+    "logical_aliases": 14,
+    "logical_aliases_by_method": {
+      "Chow-Liu": 1,
+      "DOPE": 5,
+      "Forest-Flow": 2,
+      "GaussianCopula": 2,
+      "TVAE": 1,
+      "independent_marginals": 3
+    },
+    "panel_path": "research/benchmark/results/common-A952-validation-v1/first12.completed.json",
+    "per_method_full_queue_denominators": null,
+    "physical_evaluations": 12,
+    "pooling_policy": "A952 outputs may overlap separately committed panels; authenticate job/sample hashes before reuse; do not add clocks or coverage",
+    "positive_physical_queue_cells": 16,
+    "public_slice_physical_cells": 12,
+    "utility_measured_by_this_slice": false
+  },
+  "forest_fivefit_metadata_join": {
+    "common_sample_cells": 390,
+    "complete_fit_groups": 65,
+    "distinct_author_default_reporting_lineages": 13,
+    "distinct_lineage_denominator_of_100_S3": 100,
+    "fit_seed_schedule": [
+      11,
+      23,
+      37,
+      53,
+      71
+    ],
+    "full_population_fivefit_complete": false,
+    "pairwise_lineage_intersections": [
+      0,
+      0,
+      0
+    ],
+    "panel_paths": [
+      "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+      "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
+      "research/benchmark/results/forest-third-five-fivefit-v1/panel.json"
+    ],
+    "production_seed_stability_pass": null,
+    "quality_or_superiority_claim": null,
+    "sample_seed_schedule": [
+      101,
+      211,
+      307
+    ],
+    "size_schedule": [
+      1,
+      4
+    ],
+    "source_runtime_homogeneous_across_union": null
+  },
+  "format": "work-order-b-six-component-hard-gate-coverage-audit",
+  "panel_coverage": [
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 100,
+      "configuration_or_profile": "author_default",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 100,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 100,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 600,
+      "measured_lineages": 100,
+      "method": "ARF",
+      "metric_available_cells": {
+        "alpha_beta": 600,
+        "c2st_catboost": 600,
+        "c2st_logistic": 600,
+        "catboost_informative_retention": 594,
+        "catboost_loss_triple": 600,
+        "categorical_contingency": 42,
+        "charged_artifact_bytes": 600,
+        "distance_membership_auc": 600,
+        "domias_kde_auc": 498,
+        "linear_informative_retention": 564,
+        "linear_loss_triple": 600,
+        "marginal_ks_tv": 600,
+        "mlp_informative_retention": 528,
+        "mlp_loss_triple": 600,
+        "pairwise_pearson": 600,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "100 classical lineages plus separate eight-lineage TabSyn; fit seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 600
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 100,
+      "configuration_or_profile": "native_selected",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 100,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 100,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 600,
+      "measured_lineages": 100,
+      "method": "ARF",
+      "metric_available_cells": {
+        "alpha_beta": 600,
+        "c2st_catboost": 600,
+        "c2st_logistic": 600,
+        "catboost_informative_retention": 594,
+        "catboost_loss_triple": 600,
+        "categorical_contingency": 42,
+        "charged_artifact_bytes": 600,
+        "distance_membership_auc": 600,
+        "domias_kde_auc": 498,
+        "linear_informative_retention": 564,
+        "linear_loss_triple": 600,
+        "marginal_ks_tv": 600,
+        "mlp_informative_retention": 528,
+        "mlp_loss_triple": 600,
+        "pairwise_pearson": 600,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "100 classical lineages plus separate eight-lineage TabSyn; fit seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 600
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 100,
+      "configuration_or_profile": "author_default",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 100,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 43,
+      "l3_charged_byte_records_within_10240": 57,
+      "measured_cells": 600,
+      "measured_lineages": 100,
+      "method": "Chow-Liu",
+      "metric_available_cells": {
+        "alpha_beta": 600,
+        "c2st_catboost": 600,
+        "c2st_logistic": 600,
+        "catboost_informative_retention": 594,
+        "catboost_loss_triple": 600,
+        "categorical_contingency": 42,
+        "charged_artifact_bytes": 600,
+        "distance_membership_auc": 600,
+        "domias_kde_auc": 498,
+        "linear_informative_retention": 564,
+        "linear_loss_triple": 600,
+        "marginal_ks_tv": 600,
+        "mlp_informative_retention": 528,
+        "mlp_loss_triple": 600,
+        "pairwise_pearson": 600,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "100 classical lineages plus separate eight-lineage TabSyn; fit seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 600
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 100,
+      "configuration_or_profile": "native_selected",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 100,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 69,
+      "l3_charged_byte_records_within_10240": 31,
+      "measured_cells": 600,
+      "measured_lineages": 100,
+      "method": "Chow-Liu",
+      "metric_available_cells": {
+        "alpha_beta": 600,
+        "c2st_catboost": 599,
+        "c2st_logistic": 599,
+        "catboost_informative_retention": 594,
+        "catboost_loss_triple": 600,
+        "categorical_contingency": 42,
+        "charged_artifact_bytes": 600,
+        "distance_membership_auc": 600,
+        "domias_kde_auc": 498,
+        "linear_informative_retention": 564,
+        "linear_loss_triple": 600,
+        "marginal_ks_tv": 600,
+        "mlp_informative_retention": 528,
+        "mlp_loss_triple": 600,
+        "pairwise_pearson": 600,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "100 classical lineages plus separate eight-lineage TabSyn; fit seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 600
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 100,
+      "configuration_or_profile": "author_default",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 100,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 59,
+      "l3_charged_byte_records_within_10240": 41,
+      "measured_cells": 600,
+      "measured_lineages": 100,
+      "method": "GaussianCopula",
+      "metric_available_cells": {
+        "alpha_beta": 600,
+        "c2st_catboost": 600,
+        "c2st_logistic": 600,
+        "catboost_informative_retention": 594,
+        "catboost_loss_triple": 600,
+        "categorical_contingency": 42,
+        "charged_artifact_bytes": 600,
+        "distance_membership_auc": 600,
+        "domias_kde_auc": 492,
+        "linear_informative_retention": 564,
+        "linear_loss_triple": 600,
+        "marginal_ks_tv": 600,
+        "mlp_informative_retention": 528,
+        "mlp_loss_triple": 600,
+        "pairwise_pearson": 600,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "100 classical lineages plus separate eight-lineage TabSyn; fit seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 600
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 100,
+      "configuration_or_profile": "native_selected",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 100,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 38,
+      "l3_charged_byte_records_within_10240": 62,
+      "measured_cells": 600,
+      "measured_lineages": 100,
+      "method": "GaussianCopula",
+      "metric_available_cells": {
+        "alpha_beta": 600,
+        "c2st_catboost": 599,
+        "c2st_logistic": 599,
+        "catboost_informative_retention": 594,
+        "catboost_loss_triple": 600,
+        "categorical_contingency": 42,
+        "charged_artifact_bytes": 600,
+        "distance_membership_auc": 600,
+        "domias_kde_auc": 498,
+        "linear_informative_retention": 564,
+        "linear_loss_triple": 600,
+        "marginal_ks_tv": 600,
+        "mlp_informative_retention": 528,
+        "mlp_loss_triple": 600,
+        "pairwise_pearson": 600,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "100 classical lineages plus separate eight-lineage TabSyn; fit seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 600
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 8,
+      "configuration_or_profile": "scaled_author_default",
+      "declared_lineages": 8,
+      "declared_logical_cells": 48,
+      "distinct_dataset_fit_configuration_byte_records": 8,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 24,
+          "declared_lineages": 4,
+          "measured_cells": 24,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 6,
+          "declared_lineages": 1,
+          "measured_cells": 6,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 18,
+          "declared_lineages": 3,
+          "measured_cells": 18,
+          "profile": "regression/32-255/1-16"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 8,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 48,
+      "measured_lineages": 8,
+      "method": "TabSyn",
+      "metric_available_cells": {
+        "alpha_beta": 48,
+        "c2st_catboost": 48,
+        "c2st_logistic": 48,
+        "catboost_informative_retention": 48,
+        "catboost_loss_triple": 48,
+        "categorical_contingency": 6,
+        "charged_artifact_bytes": 48,
+        "distance_membership_auc": 48,
+        "domias_kde_auc": 36,
+        "linear_informative_retention": 48,
+        "linear_loss_triple": 48,
+        "marginal_ks_tv": 48,
+        "mlp_informative_retention": 48,
+        "mlp_loss_triple": 48,
+        "pairwise_pearson": 48,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "100 classical lineages plus separate eight-lineage TabSyn; fit seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 48
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 98,
+      "configuration_or_profile": "features12_steps2048",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 98,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 0,
+      "l3_charged_byte_records_within_10240": 98,
+      "measured_cells": 588,
+      "measured_lineages": 98,
+      "method": "DOPE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 588,
+        "catboost_informative_retention": 582,
+        "catboost_loss_triple": 588,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 588,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 552,
+        "linear_loss_triple": 588,
+        "marginal_ks_tv": 588,
+        "mlp_informative_retention": 514,
+        "mlp_loss_triple": 588,
+        "pairwise_pearson": 588,
+        "projected_exact_near_copy_counts": 588,
+        "projected_real_vs_real_copy_counts": 588
+      },
+      "panel_path": "research/benchmark/results/dope-s3-population-validation.json",
+      "projected_exact_copy_positive_cells": 4,
+      "projected_near_copy_positive_cells": 98,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Four fixed DOPE profiles; all100 logical lineages; seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 12,
+        "ok": 588
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 98,
+      "configuration_or_profile": "features12_steps512",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 98,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 0,
+      "l3_charged_byte_records_within_10240": 98,
+      "measured_cells": 588,
+      "measured_lineages": 98,
+      "method": "DOPE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 588,
+        "catboost_informative_retention": 582,
+        "catboost_loss_triple": 588,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 588,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 552,
+        "linear_loss_triple": 588,
+        "marginal_ks_tv": 588,
+        "mlp_informative_retention": 514,
+        "mlp_loss_triple": 588,
+        "pairwise_pearson": 588,
+        "projected_exact_near_copy_counts": 588,
+        "projected_real_vs_real_copy_counts": 588
+      },
+      "panel_path": "research/benchmark/results/dope-s3-population-validation.json",
+      "projected_exact_copy_positive_cells": 7,
+      "projected_near_copy_positive_cells": 100,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Four fixed DOPE profiles; all100 logical lineages; seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 12,
+        "ok": 588
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 94,
+      "configuration_or_profile": "features24_steps2048",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 94,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 66,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 6,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 0,
+      "l3_charged_byte_records_within_10240": 94,
+      "measured_cells": 564,
+      "measured_lineages": 94,
+      "method": "DOPE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 564,
+        "catboost_informative_retention": 558,
+        "catboost_loss_triple": 564,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 564,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 528,
+        "linear_loss_triple": 564,
+        "marginal_ks_tv": 564,
+        "mlp_informative_retention": 496,
+        "mlp_loss_triple": 564,
+        "pairwise_pearson": 564,
+        "projected_exact_near_copy_counts": 564,
+        "projected_real_vs_real_copy_counts": 564
+      },
+      "panel_path": "research/benchmark/results/dope-s3-population-validation.json",
+      "projected_exact_copy_positive_cells": 4,
+      "projected_near_copy_positive_cells": 98,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Four fixed DOPE profiles; all100 logical lineages; seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 36,
+        "ok": 564
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 94,
+      "configuration_or_profile": "features24_steps512",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 94,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 66,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 6,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 0,
+      "l3_charged_byte_records_within_10240": 94,
+      "measured_cells": 564,
+      "measured_lineages": 94,
+      "method": "DOPE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 564,
+        "catboost_informative_retention": 558,
+        "catboost_loss_triple": 564,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 564,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 528,
+        "linear_loss_triple": 564,
+        "marginal_ks_tv": 564,
+        "mlp_informative_retention": 496,
+        "mlp_loss_triple": 564,
+        "pairwise_pearson": 564,
+        "projected_exact_near_copy_counts": 564,
+        "projected_real_vs_real_copy_counts": 564
+      },
+      "panel_path": "research/benchmark/results/dope-s3-population-validation.json",
+      "projected_exact_copy_positive_cells": 7,
+      "projected_near_copy_positive_cells": 100,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Four fixed DOPE profiles; all100 logical lineages; seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 36,
+        "ok": 564
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 68,
+      "configuration_or_profile": "features12_steps8192",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 68,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 252,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 60,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 84,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 0,
+      "l3_charged_byte_records_within_10240": 68,
+      "measured_cells": 408,
+      "measured_lineages": 68,
+      "method": "DOPE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 408,
+        "catboost_informative_retention": 408,
+        "catboost_loss_triple": 408,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 408,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 384,
+        "linear_loss_triple": 408,
+        "marginal_ks_tv": 408,
+        "mlp_informative_retention": 356,
+        "mlp_loss_triple": 408,
+        "pairwise_pearson": 408,
+        "projected_exact_near_copy_counts": 408,
+        "projected_real_vs_real_copy_counts": 408
+      },
+      "panel_path": "research/benchmark/results/dope-target-refinement-population-validation.json",
+      "projected_exact_copy_positive_cells": 5,
+      "projected_near_copy_positive_cells": 62,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Two frozen refinement profiles; all100 logical lineages; seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 192,
+        "ok": 408
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 68,
+      "configuration_or_profile": "features12_width8_steps8192",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 68,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 264,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 48,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 90,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 6,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 0,
+      "l3_charged_byte_records_within_10240": 68,
+      "measured_cells": 408,
+      "measured_lineages": 68,
+      "method": "DOPE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 408,
+        "catboost_informative_retention": 402,
+        "catboost_loss_triple": 408,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 408,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 384,
+        "linear_loss_triple": 408,
+        "marginal_ks_tv": 408,
+        "mlp_informative_retention": 358,
+        "mlp_loss_triple": 408,
+        "pairwise_pearson": 408,
+        "projected_exact_near_copy_counts": 408,
+        "projected_real_vs_real_copy_counts": 408
+      },
+      "panel_path": "research/benchmark/results/dope-target-refinement-population-validation.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 67,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Two frozen refinement profiles; all100 logical lineages; seed11",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 192,
+        "ok": 408
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 100,
+      "configuration_or_profile": "default",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 100,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 14,
+      "l3_charged_byte_records_within_10240": 86,
+      "measured_cells": 600,
+      "measured_lineages": 100,
+      "method": "independent_marginals",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 600,
+        "catboost_informative_retention": 594,
+        "catboost_loss_triple": 600,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 600,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 564,
+        "linear_loss_triple": 600,
+        "marginal_ks_tv": 600,
+        "mlp_informative_retention": 520,
+        "mlp_loss_triple": 600,
+        "pairwise_pearson": 600,
+        "projected_exact_near_copy_counts": 600,
+        "projected_real_vs_real_copy_counts": 600
+      },
+      "panel_path": "research/benchmark/results/density-matched-population-validation.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 31,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Independent marginals only; other methods repeat separately cited panels",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 600
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 100,
+      "configuration_or_profile": "native_selected",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 100,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 372,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 84,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 12,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 6,
+      "l3_charged_byte_records_within_10240": 94,
+      "measured_cells": 600,
+      "measured_lineages": 100,
+      "method": "independent_marginals",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 600,
+        "catboost_informative_retention": 594,
+        "catboost_loss_triple": 600,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 600,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 564,
+        "linear_loss_triple": 600,
+        "marginal_ks_tv": 600,
+        "mlp_informative_retention": 520,
+        "mlp_loss_triple": 600,
+        "pairwise_pearson": 600,
+        "projected_exact_near_copy_counts": 600,
+        "projected_real_vs_real_copy_counts": 600
+      },
+      "panel_path": "research/benchmark/results/density-matched-population-validation.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 26,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Independent marginals only; other methods repeat separately cited panels",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 600
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 18,
+      "configuration_or_profile": "default",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 18,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 72,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 12,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 24,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 18,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 108,
+      "measured_lineages": 18,
+      "method": "CTGAN",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 108,
+        "catboost_informative_retention": 102,
+        "catboost_loss_triple": 108,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 108,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 102,
+        "linear_loss_triple": 108,
+        "marginal_ks_tv": 108,
+        "mlp_informative_retention": 104,
+        "mlp_loss_triple": 108,
+        "pairwise_pearson": 108,
+        "projected_exact_near_copy_counts": 108,
+        "projected_real_vs_real_copy_counts": 108
+      },
+      "panel_path": "research/benchmark/results/sdv-matched-population-validation.json",
+      "projected_exact_copy_positive_cells": 4,
+      "projected_near_copy_positive_cells": 11,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "SDV retained common samples only; scheduling gaps explicitly retained",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "common_samples_unavailable": 492,
+        "ok": 108
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 22,
+      "configuration_or_profile": "native_selected",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 22,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 78,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 18,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 36,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 22,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 132,
+      "measured_lineages": 22,
+      "method": "CTGAN",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 132,
+        "catboost_informative_retention": 126,
+        "catboost_loss_triple": 132,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 132,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 126,
+        "linear_loss_triple": 132,
+        "marginal_ks_tv": 132,
+        "mlp_informative_retention": 126,
+        "mlp_loss_triple": 132,
+        "pairwise_pearson": 132,
+        "projected_exact_near_copy_counts": 132,
+        "projected_real_vs_real_copy_counts": 132
+      },
+      "panel_path": "research/benchmark/results/sdv-matched-population-validation.json",
+      "projected_exact_copy_positive_cells": 3,
+      "projected_near_copy_positive_cells": 13,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "SDV retained common samples only; scheduling gaps explicitly retained",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "common_samples_unavailable": 468,
+        "ok": 132
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 19,
+      "configuration_or_profile": "default",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 19,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 66,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 18,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 30,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 19,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 114,
+      "measured_lineages": 19,
+      "method": "TVAE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 114,
+        "catboost_informative_retention": 108,
+        "catboost_loss_triple": 114,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 114,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 108,
+        "linear_loss_triple": 114,
+        "marginal_ks_tv": 114,
+        "mlp_informative_retention": 110,
+        "mlp_loss_triple": 114,
+        "pairwise_pearson": 114,
+        "projected_exact_near_copy_counts": 114,
+        "projected_real_vs_real_copy_counts": 114
+      },
+      "panel_path": "research/benchmark/results/sdv-matched-population-validation.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 17,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "SDV retained common samples only; scheduling gaps explicitly retained",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "common_samples_unavailable": 486,
+        "ok": 114
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 22,
+      "configuration_or_profile": "native_selected",
+      "declared_lineages": 100,
+      "declared_logical_cells": 600,
+      "distinct_dataset_fit_configuration_byte_records": 22,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 372,
+          "declared_lineages": 62,
+          "measured_cells": 78,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 84,
+          "declared_lineages": 14,
+          "measured_cells": 18,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/256-1023/65-256"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 20,
+          "measured_cells": 36,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 12,
+          "declared_lineages": 2,
+          "measured_cells": 0,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 22,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 132,
+      "measured_lineages": 22,
+      "method": "TVAE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 132,
+        "catboost_informative_retention": 126,
+        "catboost_loss_triple": 132,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 132,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 126,
+        "linear_loss_triple": 132,
+        "marginal_ks_tv": 132,
+        "mlp_informative_retention": 126,
+        "mlp_loss_triple": 132,
+        "pairwise_pearson": 132,
+        "projected_exact_near_copy_counts": 132,
+        "projected_real_vs_real_copy_counts": 132
+      },
+      "panel_path": "research/benchmark/results/sdv-matched-population-validation.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 18,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "SDV retained common samples only; scheduling gaps explicitly retained",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "common_samples_unavailable": 468,
+        "ok": 132
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 10,
+      "configuration_or_profile": "author_default",
+      "declared_lineages": 10,
+      "declared_logical_cells": 60,
+      "distinct_dataset_fit_configuration_byte_records": 10,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 30,
+          "declared_lineages": 5,
+          "measured_cells": 30,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 6,
+          "declared_lineages": 1,
+          "measured_cells": 6,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 18,
+          "declared_lineages": 3,
+          "measured_cells": 18,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 6,
+          "declared_lineages": 1,
+          "measured_cells": 6,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 10,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 60,
+      "measured_lineages": 10,
+      "method": "TabDDPM",
+      "metric_available_cells": {
+        "alpha_beta": 60,
+        "c2st_catboost": 60,
+        "c2st_logistic": 60,
+        "catboost_informative_retention": 60,
+        "catboost_loss_triple": 60,
+        "categorical_contingency": 6,
+        "charged_artifact_bytes": 60,
+        "distance_membership_auc": 60,
+        "domias_kde_auc": 42,
+        "linear_informative_retention": 60,
+        "linear_loss_triple": 60,
+        "marginal_ks_tv": 60,
+        "mlp_informative_retention": 60,
+        "mlp_loss_triple": 60,
+        "pairwise_pearson": 60,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Reporting frontier132 aliases of126 physical measurements;21 model records",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 60
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 12,
+      "configuration_or_profile": "native_selected",
+      "declared_lineages": 12,
+      "declared_logical_cells": 72,
+      "distinct_dataset_fit_configuration_byte_records": 12,
+      "fit_seeds": [
+        11
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 30,
+          "declared_lineages": 5,
+          "measured_cells": 30,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 18,
+          "declared_lineages": 3,
+          "measured_cells": 18,
+          "profile": "regression/256-1023/17-64"
+        },
+        {
+          "declared_cells": 18,
+          "declared_lineages": 3,
+          "measured_cells": 18,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 6,
+          "declared_lineages": 1,
+          "measured_cells": 6,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 12,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 72,
+      "measured_lineages": 12,
+      "method": "TabDDPM",
+      "metric_available_cells": {
+        "alpha_beta": 72,
+        "c2st_catboost": 72,
+        "c2st_logistic": 72,
+        "catboost_informative_retention": 72,
+        "catboost_loss_triple": 72,
+        "categorical_contingency": 6,
+        "charged_artifact_bytes": 72,
+        "distance_membership_auc": 72,
+        "domias_kde_auc": 54,
+        "linear_informative_retention": 72,
+        "linear_loss_triple": 72,
+        "marginal_ks_tv": 72,
+        "mlp_informative_retention": 72,
+        "mlp_loss_triple": 72,
+        "pairwise_pearson": 72,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Reporting frontier132 aliases of126 physical measurements;21 model records",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 72
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [
+        {
+          "measured_cells": 66,
+          "measured_lineages": 11,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "measured_cells": 6,
+          "measured_lineages": 1,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "actual_profile_shape_cells": 72,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 12,
+      "configuration_or_profile": "author_default",
+      "declared_lineages": 12,
+      "declared_logical_cells": 72,
+      "distinct_dataset_fit_configuration_byte_records": 12,
+      "fit_seeds": [
+        23
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 66,
+          "declared_lineages": 11,
+          "measured_cells": 66,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 6,
+          "declared_lineages": 1,
+          "measured_cells": 6,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 12,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 72,
+      "measured_lineages": 12,
+      "method": "ARF",
+      "metric_available_cells": {
+        "alpha_beta": 72,
+        "c2st_catboost": 72,
+        "c2st_logistic": 72,
+        "catboost_informative_retention": 66,
+        "catboost_loss_triple": 72,
+        "categorical_contingency": 6,
+        "charged_artifact_bytes": 72,
+        "distance_membership_auc": 72,
+        "domias_kde_auc": 36,
+        "linear_informative_retention": 66,
+        "linear_loss_triple": 72,
+        "marginal_ks_tv": 72,
+        "mlp_informative_retention": 60,
+        "mlp_loss_triple": 72,
+        "pairwise_pearson": 72,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "ARF12 lineages additional fitseed23;144 cells",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 72
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [
+        {
+          "measured_cells": 66,
+          "measured_lineages": 11,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "measured_cells": 6,
+          "measured_lineages": 1,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "actual_profile_shape_cells": 72,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 12,
+      "configuration_or_profile": "native_selected",
+      "declared_lineages": 12,
+      "declared_logical_cells": 72,
+      "distinct_dataset_fit_configuration_byte_records": 12,
+      "fit_seeds": [
+        23
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 66,
+          "declared_lineages": 11,
+          "measured_cells": 66,
+          "profile": "regression/32-255/1-16"
+        },
+        {
+          "declared_cells": 6,
+          "declared_lineages": 1,
+          "measured_cells": 6,
+          "profile": "regression/32-255/17-64"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 12,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 72,
+      "measured_lineages": 12,
+      "method": "ARF",
+      "metric_available_cells": {
+        "alpha_beta": 72,
+        "c2st_catboost": 70,
+        "c2st_logistic": 70,
+        "catboost_informative_retention": 66,
+        "catboost_loss_triple": 72,
+        "categorical_contingency": 6,
+        "charged_artifact_bytes": 72,
+        "distance_membership_auc": 72,
+        "domias_kde_auc": 36,
+        "linear_informative_retention": 66,
+        "linear_loss_triple": 72,
+        "marginal_ks_tv": 72,
+        "mlp_informative_retention": 60,
+        "mlp_loss_triple": 72,
+        "pairwise_pearson": 72,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "ARF12 lineages additional fitseed23;144 cells",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 72
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [
+        {
+          "measured_cells": 60,
+          "measured_lineages": 2,
+          "profile": "regression/32-255/1-16"
+        }
+      ],
+      "actual_profile_shape_cells": 60,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 10,
+      "configuration_or_profile": "author_default",
+      "declared_lineages": 2,
+      "declared_logical_cells": 60,
+      "distinct_dataset_fit_configuration_byte_records": 10,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 60,
+          "declared_lineages": 2,
+          "measured_cells": 60,
+          "profile": "regression/32-255/1-16"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 10,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 60,
+      "measured_lineages": 2,
+      "method": "Forest-Flow",
+      "metric_available_cells": {
+        "alpha_beta": 60,
+        "c2st_catboost": 60,
+        "c2st_logistic": 60,
+        "catboost_informative_retention": 30,
+        "catboost_loss_triple": 60,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 60,
+        "distance_membership_auc": 60,
+        "domias_kde_auc": 30,
+        "linear_informative_retention": 30,
+        "linear_loss_triple": 60,
+        "marginal_ks_tv": 60,
+        "mlp_informative_retention": 30,
+        "mlp_loss_triple": 60,
+        "pairwise_pearson": 60,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Forest2 lineages fivefit default;60 cells",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 60
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [
+        {
+          "measured_cells": 60,
+          "measured_lineages": 2,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "measured_cells": 120,
+          "measured_lineages": 4,
+          "profile": "regression/32-255/1-16"
+        }
+      ],
+      "actual_profile_shape_cells": 180,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 30,
+      "configuration_or_profile": "author_default",
+      "declared_lineages": 6,
+      "declared_logical_cells": 180,
+      "distinct_dataset_fit_configuration_byte_records": 30,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 60,
+          "declared_lineages": 2,
+          "measured_cells": 60,
+          "profile": "regression/256-1023/1-16"
+        },
+        {
+          "declared_cells": 120,
+          "declared_lineages": 4,
+          "measured_cells": 120,
+          "profile": "regression/32-255/1-16"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 30,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 180,
+      "measured_lineages": 6,
+      "method": "Forest-Flow",
+      "metric_available_cells": {
+        "alpha_beta": 180,
+        "c2st_catboost": 179,
+        "c2st_logistic": 179,
+        "catboost_informative_retention": 180,
+        "catboost_loss_triple": 180,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 180,
+        "distance_membership_auc": 180,
+        "domias_kde_auc": 180,
+        "linear_informative_retention": 150,
+        "linear_loss_triple": 180,
+        "marginal_ks_tv": 180,
+        "mlp_informative_retention": 120,
+        "mlp_loss_triple": 180,
+        "pairwise_pearson": 180,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Forest6 distinct lineages fivefit default;180 cells; disjoint from first-two and third-five cohorts",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 180
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [
+        {
+          "measured_cells": 150,
+          "measured_lineages": 5,
+          "profile": "regression/256-1023/1-16"
+        }
+      ],
+      "actual_profile_shape_cells": 150,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 25,
+      "configuration_or_profile": "author_default",
+      "declared_lineages": 5,
+      "declared_logical_cells": 150,
+      "distinct_dataset_fit_configuration_byte_records": 25,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [
+        {
+          "declared_cells": 150,
+          "declared_lineages": 5,
+          "measured_cells": 150,
+          "profile": "regression/256-1023/1-16"
+        }
+      ],
+      "l3_charged_byte_records_over_10240": 25,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 150,
+      "measured_lineages": 5,
+      "method": "Forest-Flow",
+      "metric_available_cells": {
+        "alpha_beta": 150,
+        "c2st_catboost": 150,
+        "c2st_logistic": 150,
+        "catboost_informative_retention": 150,
+        "catboost_loss_triple": 150,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 150,
+        "distance_membership_auc": 150,
+        "domias_kde_auc": 150,
+        "linear_informative_retention": 150,
+        "linear_loss_triple": 150,
+        "marginal_ks_tv": 150,
+        "mlp_informative_retention": 150,
+        "mlp_loss_triple": 150,
+        "pairwise_pearson": 150,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Forest5 additional distinct lineages; homogeneous current CPU projection of its own original six-lineage batch;150 cells; not a subset of the separate next-six panel",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 150
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 0,
+      "configuration_or_profile": "default",
+      "declared_lineages": 1,
+      "declared_logical_cells": 30,
+      "distinct_dataset_fit_configuration_byte_records": 0,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 0,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 0,
+      "measured_lineages": 0,
+      "method": "CTGAN",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 0,
+        "catboost_informative_retention": 0,
+        "catboost_loss_triple": 0,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 0,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 0,
+        "linear_loss_triple": 0,
+        "marginal_ks_tv": 0,
+        "mlp_informative_retention": 0,
+        "mlp_loss_triple": 0,
+        "pairwise_pearson": 0,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate historical two-dataset neural/DOPE pilot; not pooled with S3",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 30
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 5,
+      "configuration_or_profile": "default_and_tuned",
+      "declared_lineages": 1,
+      "declared_logical_cells": 30,
+      "distinct_dataset_fit_configuration_byte_records": 5,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 5,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 30,
+      "measured_lineages": 1,
+      "method": "CTGAN",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 30,
+        "catboost_informative_retention": 30,
+        "catboost_loss_triple": 30,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 30,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 30,
+        "linear_loss_triple": 30,
+        "marginal_ks_tv": 30,
+        "mlp_informative_retention": 30,
+        "mlp_loss_triple": 30,
+        "pairwise_pearson": 30,
+        "projected_exact_near_copy_counts": 30,
+        "projected_real_vs_real_copy_counts": 30
+      },
+      "panel_path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate historical two-dataset neural/DOPE pilot; not pooled with S3",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 30
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 5,
+      "configuration_or_profile": "tuned",
+      "declared_lineages": 1,
+      "declared_logical_cells": 30,
+      "distinct_dataset_fit_configuration_byte_records": 5,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 5,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 30,
+      "measured_lineages": 1,
+      "method": "CTGAN",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 30,
+        "catboost_informative_retention": 30,
+        "catboost_loss_triple": 30,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 30,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 30,
+        "linear_loss_triple": 30,
+        "marginal_ks_tv": 30,
+        "mlp_informative_retention": 30,
+        "mlp_loss_triple": 30,
+        "pairwise_pearson": 30,
+        "projected_exact_near_copy_counts": 30,
+        "projected_real_vs_real_copy_counts": 30
+      },
+      "panel_path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 4,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate historical two-dataset neural/DOPE pilot; not pooled with S3",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 30
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 10,
+      "configuration_or_profile": "q8_selected",
+      "declared_lineages": 2,
+      "declared_logical_cells": 60,
+      "distinct_dataset_fit_configuration_byte_records": 10,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 0,
+      "l3_charged_byte_records_within_10240": 10,
+      "measured_cells": 60,
+      "measured_lineages": 2,
+      "method": "DOPE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 60,
+        "catboost_informative_retention": 60,
+        "catboost_loss_triple": 60,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 60,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 60,
+        "linear_loss_triple": 60,
+        "marginal_ks_tv": 60,
+        "mlp_informative_retention": 60,
+        "mlp_loss_triple": 60,
+        "pairwise_pearson": 60,
+        "projected_exact_near_copy_counts": 60,
+        "projected_real_vs_real_copy_counts": 60
+      },
+      "panel_path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 25,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate historical two-dataset neural/DOPE pilot; not pooled with S3",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 60
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 5,
+      "configuration_or_profile": "default",
+      "declared_lineages": 1,
+      "declared_logical_cells": 30,
+      "distinct_dataset_fit_configuration_byte_records": 5,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 5,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 30,
+      "measured_lineages": 1,
+      "method": "TVAE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 30,
+        "catboost_informative_retention": 30,
+        "catboost_loss_triple": 30,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 30,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 30,
+        "linear_loss_triple": 30,
+        "marginal_ks_tv": 30,
+        "mlp_informative_retention": 30,
+        "mlp_loss_triple": 30,
+        "pairwise_pearson": 30,
+        "projected_exact_near_copy_counts": 30,
+        "projected_real_vs_real_copy_counts": 30
+      },
+      "panel_path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate historical two-dataset neural/DOPE pilot; not pooled with S3",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 30
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 5,
+      "configuration_or_profile": "default_and_tuned",
+      "declared_lineages": 1,
+      "declared_logical_cells": 30,
+      "distinct_dataset_fit_configuration_byte_records": 5,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 5,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 30,
+      "measured_lineages": 1,
+      "method": "TVAE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 30,
+        "catboost_informative_retention": 30,
+        "catboost_loss_triple": 30,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 30,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 30,
+        "linear_loss_triple": 30,
+        "marginal_ks_tv": 30,
+        "mlp_informative_retention": 30,
+        "mlp_loss_triple": 30,
+        "pairwise_pearson": 30,
+        "projected_exact_near_copy_counts": 30,
+        "projected_real_vs_real_copy_counts": 30
+      },
+      "panel_path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 30,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate historical two-dataset neural/DOPE pilot; not pooled with S3",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 30
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 5,
+      "configuration_or_profile": "tuned",
+      "declared_lineages": 1,
+      "declared_logical_cells": 30,
+      "distinct_dataset_fit_configuration_byte_records": 5,
+      "fit_seeds": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 5,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 30,
+      "measured_lineages": 1,
+      "method": "TVAE",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 30,
+        "catboost_informative_retention": 30,
+        "catboost_loss_triple": 30,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 30,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 30,
+        "linear_loss_triple": 30,
+        "marginal_ks_tv": 30,
+        "mlp_informative_retention": 30,
+        "mlp_loss_triple": 30,
+        "pairwise_pearson": 30,
+        "projected_exact_near_copy_counts": 30,
+        "projected_real_vs_real_copy_counts": 30
+      },
+      "panel_path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 1,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate historical two-dataset neural/DOPE pilot; not pooled with S3",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "ok": 30
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 2,
+      "configuration_or_profile": "default",
+      "declared_lineages": 3,
+      "declared_logical_cells": 18,
+      "distinct_dataset_fit_configuration_byte_records": 2,
+      "fit_seeds": [
+        23
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 2,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 12,
+      "measured_lineages": 2,
+      "method": "TabPC",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 0,
+        "catboost_informative_retention": 12,
+        "catboost_loss_triple": 12,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 12,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 12,
+        "linear_loss_triple": 12,
+        "marginal_ks_tv": 0,
+        "mlp_informative_retention": 6,
+        "mlp_loss_triple": 12,
+        "pairwise_pearson": 0,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/pilot24-tabpc-native.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate TabPC three-dataset pilot; fitseed23; failed tracks separate",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 6,
+        "ok": 12
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    },
+    {
+      "actual_bounded_fit_structural_profile_coverage": [],
+      "actual_profile_shape_cells": 0,
+      "byte_record_identity_unambiguous": true,
+      "canonical_component_scores": {
+        "compactness": null,
+        "coverage_realism": null,
+        "distribution_fidelity": null,
+        "driver_fidelity": null,
+        "structure_fidelity": null,
+        "utility_transfer": null
+      },
+      "canonical_six_component_vector_complete": false,
+      "complete_six_sample_fit_groups": 2,
+      "configuration_or_profile": "tuned",
+      "declared_lineages": 3,
+      "declared_logical_cells": 18,
+      "distinct_dataset_fit_configuration_byte_records": 2,
+      "fit_seeds": [
+        23
+      ],
+      "formal_dp": false,
+      "historical_S3_reference_profile_coverage": [],
+      "l3_charged_byte_records_over_10240": 2,
+      "l3_charged_byte_records_within_10240": 0,
+      "measured_cells": 12,
+      "measured_lineages": 2,
+      "method": "TabPC",
+      "metric_available_cells": {
+        "alpha_beta": 0,
+        "c2st_catboost": 0,
+        "c2st_logistic": 0,
+        "catboost_informative_retention": 12,
+        "catboost_loss_triple": 12,
+        "categorical_contingency": 0,
+        "charged_artifact_bytes": 12,
+        "distance_membership_auc": 0,
+        "domias_kde_auc": 0,
+        "linear_informative_retention": 12,
+        "linear_loss_triple": 12,
+        "marginal_ks_tv": 0,
+        "mlp_informative_retention": 6,
+        "mlp_loss_triple": 12,
+        "pairwise_pearson": 0,
+        "projected_exact_near_copy_counts": 0,
+        "projected_real_vs_real_copy_counts": 0
+      },
+      "panel_path": "research/benchmark/results/pilot24-tabpc-native.json",
+      "projected_exact_copy_positive_cells": 0,
+      "projected_near_copy_positive_cells": 0,
+      "ptf_v1": null,
+      "release_safe_l3": null,
+      "sample_seeds": [
+        101,
+        211,
+        307
+      ],
+      "scope": "Separate TabPC three-dataset pilot; fitseed23; failed tracks separate",
+      "size_multipliers": [
+        1,
+        4
+      ],
+      "status_counts": {
+        "fit_unavailable": 6,
+        "ok": 12
+      },
+      "structural_shape_scope": "Reference bins use historical S3 lineage-record fit_rows/features, not current panel shapes. Actual bins use each measured cell train rows and target-included marginal column count minus one; no final official-population coverage claim."
+    }
+  ],
+  "production_certification_gate_names": [
+    "auditor_family_coverage",
+    "tstr_retention_or_low_signal_noninferiority",
+    "calibration",
+    "rare_class_and_tail",
+    "supported_subgroups",
+    "driver",
+    "feature_view_coverage",
+    "feature_importance_spearman",
+    "feature_importance_top_k_jaccard",
+    "joint_fidelity",
+    "query_fidelity",
+    "nominal_95_coverage",
+    "type_i_error",
+    "membership_inference",
+    "rare_slice_privacy_coverage",
+    "rare_slice_membership",
+    "rare_slice_attribute_inference",
+    "attribute_inference",
+    "exact_copies",
+    "near_copies",
+    "runtime_size",
+    "artifact_size"
+  ],
+  "production_release_gate_names": [
+    "ptf_v1",
+    "calibration",
+    "rare_tail_subgroup",
+    "driver",
+    "joint_fidelity",
+    "query_fidelity",
+    "nominal_95_coverage",
+    "type_i_error",
+    "membership",
+    "feature_view_coverage",
+    "feature_importance_spearman",
+    "feature_importance_top_k_jaccard",
+    "attribute_inference",
+    "copy_and_leakage",
+    "generalization_regret",
+    "seed_stability",
+    "uncertainty_coverage",
+    "router",
+    "learned_representation",
+    "candidate_coverage",
+    "auditor_coverage",
+    "byte_reconciliation",
+    "signatures_and_receipts",
+    "coverage",
+    "controller_disk",
+    "evaluator_disk"
+  ],
+  "remaining_actions_in_order": [
+    {
+      "action": "Bind complete five final locks and native-objective/selection/runtime evidence to the already measured receipts before requesting final TEST admission; retain allUnavailable/timeout cells and freeze-set digest",
+      "priority": 1,
+      "science_needed": false
+    },
+    {
+      "action": "Reuse existing complete same-lineage n/4n loss triples and byte receipts; freeze exact gold auditor/source/seed/profile schedule, then measure missing gold/FI/W1/SW/MMD/PRDC diagnostics on authorized training-derived validation",
+      "priority": 2,
+      "science_needed": true
+    },
+    {
+      "action": "Complete independent fit-seed/method/configuration coverage and binary/structural-profile denominators; Forest small complete cohorts contribute only to their own scope; preserve native selection and all failure histories",
+      "priority": 3,
+      "science_needed": true
+    },
+    {
+      "action": "Measure full frozen empirical attack access/control suite, calibration/query/tail/coverage/Type-I evidence and exact complete generator inventories; no empirical result upgrades to formal DP",
+      "priority": 4,
+      "science_needed": true
+    },
+    {
+      "action": "Execute the separately frozen BeyondArena inner-validation cohort73 only under its own admission/rights/budget; record actual receipts before filling its six-component map; keep official outer tests sealed",
+      "priority": 5,
+      "science_needed": true
+    }
+  ],
+  "research_generator_hard_gates": [
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "ptf_v1_min",
+      "required_evidence": "Gold lower confidence bound >=.99; three frozen auditor seeds; complete required lineage/profile schedule",
+      "threshold": 0.99,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "feature_importance_spearman_min",
+      "required_evidence": "FI rank Spearman >=.70 when >=3 informative features",
+      "threshold": 0.7,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "feature_importance_top_k_jaccard_min",
+      "required_evidence": "FI top-k Jaccard >=.50 when applicable",
+      "threshold": 0.5,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "joint_fidelity_min",
+      "required_evidence": "Production joint fidelity >=.90, not mean pair correlation",
+      "threshold": 0.9,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "driver_agreement_min",
+      "required_evidence": "Production driver agreement >=.95",
+      "threshold": 0.95,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "rare_tail_subgroup_retention_min",
+      "required_evidence": "Measured rare-tail and supported subgroup retention >=.95",
+      "threshold": 0.95,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "nominal_95_coverage_min",
+      "required_evidence": "Nominal95 inference coverage >=.90",
+      "threshold": 0.9,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "calibration_degradation_max",
+      "required_evidence": "Calibration degradation <=.02",
+      "threshold": 0.02,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "query_p95_normalized_error_max",
+      "required_evidence": "Frozen query p95 normalized error <=.05",
+      "threshold": 0.05,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "type_i_error_max",
+      "required_evidence": "Type-I error <=.06",
+      "threshold": 0.06,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "nominal_95_coverage_max",
+      "required_evidence": "Nominal95 inference coverage <=.98",
+      "threshold": 0.98,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "partial_scoped_evidence",
+      "name": "membership_auc_max",
+      "required_evidence": "Full frozen membership/rare-record attack access suite maxAUC <=.55; distance/DOMIAS alone incomplete",
+      "threshold": 0.55,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "attribute_inference_advantage_max",
+      "required_evidence": "Attribute inference advantage <=.05 across frozen access suite",
+      "threshold": 0.05,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "partial_scoped_evidence",
+      "name": "exact_copies_max",
+      "required_evidence": "Zero exact copies across complete frozen access suite; pilot projected counts only partial",
+      "threshold": 0,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "partial_scoped_evidence",
+      "name": "near_copies_max",
+      "required_evidence": "Zero near copies across complete frozen access suite; some published DOPE projected counts are positive",
+      "threshold": 0,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "feature_importance_applicability",
+      "required_evidence": "Measured nonnegative informative feature count",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "feature_importance_complete",
+      "required_evidence": "All required FI feature views measured; absence cannot mean inapplicable",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "artifact_inventory",
+      "required_evidence": "Exact complete released-file inventory and reconciled bytes",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "partial_scoped_evidence",
+      "name": "tier_bytes",
+      "required_evidence": "Reconciled total inventory <=tier cap; available charged-byte records retain pass/fail without release certification",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "source_rows_absent",
+      "required_evidence": "Released artifact sampling requires no source rows",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "partial_scoped_evidence",
+      "name": "artifact_sampling_verified",
+      "required_evidence": "Sampling replay verifies the exact released inventory",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "privacy_attack_complete",
+      "required_evidence": "shadow_membership/attribute/rare_record/exact/near/static_artifact/released_rows_only/real_vs_real, access1x10x100 capped1M",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "partial_scoped_evidence",
+      "name": "real_vs_real_control_complete",
+      "required_evidence": "Complete calibrated attack controls, not only projected copy-count control",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "partial_scoped_evidence",
+      "name": "required_size_cells_complete",
+      "required_evidence": "Required n/4n cells; scaling n/2n/4n/8n schedule remains separately required by admission",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "metric_implementations_locked",
+      "required_evidence": "Full metric producer/version/runtime and final evaluator lock",
+      "threshold": null,
+      "verified_full_gate": null
+    },
+    {
+      "coverage_status": "required_exact_evidence_not_bound_by_inspected_panels",
+      "name": "mfs_components_complete",
+      "required_evidence": "All six exact component values finite within[0,1]",
+      "threshold": null,
+      "verified_full_gate": null
+    }
+  ],
+  "scope": "Fixed committed source/public-scalar metadata audit; no new metrics, final evaluator, private payload or whitepaper change",
+  "scoring_contract": {
+    "epsilon": 1e-06,
+    "fit_seeds": [
+      11,
+      23,
+      37,
+      53,
+      71
+    ],
+    "minimum_profile_groups": 100,
+    "minimum_profile_informative_groups": 30,
+    "privacy_soft_weight": 0,
+    "production_auditor_seeds": [
+      57721,
+      161803,
+      271828
+    ],
+    "ptf": "minimum required-size one-sided95 lower bound over task/profile/auditor aggregates; equal-lineage clustered paired Student-t",
+    "required_sizes": [
+      1,
+      4
+    ],
+    "research_utility_auditor_seed": 1729,
+    "sample_seeds": [
+      101,
+      211,
+      307
+    ],
+    "scalarization": "100*exp(sum(weight*log(epsilon+component))) only after all research generator gates pass",
+    "scaling_sizes": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "sparse_profile_folding": "task/other; no profile declared independent solely because it has measurements",
+    "weights": {
+      "compactness": 0.05,
+      "coverage_realism": 0.1,
+      "distribution_fidelity": 0.2,
+      "driver_fidelity": 0.2,
+      "structure_fidelity": 0.15,
+      "utility_transfer": 0.3
+    }
+  },
+  "source_commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+  "source_refs": [
+    {
+      "bytes": 1763,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/contract.json",
+      "sha256": "ccccf3deaa8f219ea6ce14d44296c5996579a55af98a5afddf0099d513f0f894"
+    },
+    {
+      "bytes": 1610,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "production/kpi-contract.json",
+      "sha256": "d04a2672ed25e92baeb89bec51ea5ccddb04165701cb44d2e1d53ca32f6e219b"
+    },
+    {
+      "bytes": 7100,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/score.py",
+      "sha256": "3c81ce4ab6cdb468f0b2e54bfd668389a0b1fcdbcce68a49ab40bf12036f9968"
+    },
+    {
+      "bytes": 13172,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/admission.py",
+      "sha256": "20c48b93decb554b04cf6f377d4c7e51f401b31bbf540ff0b8fe365cbf8eb226"
+    },
+    {
+      "bytes": 6986,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/pilot_metrics.py",
+      "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3"
+    },
+    {
+      "bytes": 13747,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/expanded_validation_metrics.py",
+      "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
+    },
+    {
+      "bytes": 10317,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "rust/fitness.rs",
+      "sha256": "ec796c937ae9dda0a2a8b71a4e0540e3b57023a428cbae437c34524e20b23fe5"
+    },
+    {
+      "bytes": 12445,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "rust/fitness_metrics.rs",
+      "sha256": "f53ffa6189a7b592d06007254e0b38019341582a09297e67f700abb80d0b34a8"
+    },
+    {
+      "bytes": 12879,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "rust/certification/privacy_attacks/finalize_certification.rs",
+      "sha256": "9bea2aa33be911bc1ca1b2ecfd125535aea0bfa187cb48f573499f09e2f73da6"
+    },
+    {
+      "bytes": 13777,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "rust/production/part_02.rs",
+      "sha256": "e335420189a72cd8d42f97f6618d369a89a5e1e3ee2149f8b26d44ddb0b53749"
+    },
+    {
+      "bytes": 14540,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "rust/production/coverage_and_gates/part_01.rs",
+      "sha256": "ccbd3507b3a60ff2b7279fcefcfd2c6fdd193f4a71cb4679030f1f9b251f8c74"
+    },
+    {
+      "bytes": 15722,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "rust/contract/part_01.rs",
+      "sha256": "0de04bb6415cc23f897aa1f2ffbbfd3c6349b4b2b7b47ed71be7c95f0995a2c3"
+    },
+    {
+      "bytes": 1834757,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/s3-lineage-record.json",
+      "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
+    },
+    {
+      "bytes": 209168,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/s3-data.lock.json",
+      "sha256": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f"
+    },
+    {
+      "bytes": 7718907,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
+    },
+    {
+      "bytes": 7352232,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/dope-s3-population-validation.json",
+      "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
+    },
+    {
+      "bytes": 3901636,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/dope-target-refinement-population-validation.json",
+      "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+    },
+    {
+      "bytes": 21794615,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/density-matched-population-validation.json",
+      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+    },
+    {
+      "bytes": 13567823,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/sdv-matched-population-validation.json",
+      "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+    },
+    {
+      "bytes": 2426210,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
+      "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
+    },
+    {
+      "bytes": 1751802,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
+      "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
+    },
+    {
+      "bytes": 956753,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+      "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
+    },
+    {
+      "bytes": 2750434,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
+      "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
+    },
+    {
+      "bytes": 2368071,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
+      "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
+    },
+    {
+      "bytes": 1560389,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/pilot24-native-neural-fivefit.json",
+      "sha256": "8ea3e5c2157a6113e5ccb777c6cba1c16810d951eff28d822a0d30d6e2da4f8d"
+    },
+    {
+      "bytes": 233338,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/pilot24-tabpc-native.json",
+      "sha256": "8ea6ca0d8e8e36f661d0ffcdb9b5227d35a62398655e666dae93e7c9bdbc187c"
+    },
+    {
+      "bytes": 77406,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/common-A952-validation-v1/first12.completed.json",
+      "sha256": "8e039b1d57298f10bf7c05c2f3a8b14481a60ed663c1063ed30c273854f3bdfe"
+    },
+    {
+      "bytes": 12555,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/beyondarena-retention-rows.json",
+      "sha256": "ce59ab1022ef5263097c4c25c854ffb94e22216b388ec1379c67e041b66f7546"
+    },
+    {
+      "bytes": 45460,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/results/beyondarena-panel.lock.json",
+      "sha256": "8f99c356e8610aea895e82355a4279b30fe85f3836359f3b277e75183cf20a98"
+    },
+    {
+      "bytes": 123868,
+      "commit": "aca476026ce02b1b2d4258e38e6989d31a54f39c",
+      "path": "research/benchmark/methods.lock.json",
+      "sha256": "899c355cb55769710ed369fea6b082589b31858860fb74929bf4190de28aca33"
+    }
+  ],
+  "version": 1
+}

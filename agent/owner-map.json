@@ -2,6 +2,7 @@
   "workspace": "dope",
   "owners": {
     "research/benchmark/render_matched_linear_fit11_figure.py": "external-evidence",
+    "research/benchmark/results/work-order-b-six-component-coverage-v1/": "external-evidence",
     "research/benchmark/results/matched-linear-fit11-figure-v1/": "external-evidence",
     "research/benchmark/tests/test_matched_linear_fit11_figure.py": "external-evidence",
     "research/benchmark/render_matched_linear_fit11.py": "external-evidence",
