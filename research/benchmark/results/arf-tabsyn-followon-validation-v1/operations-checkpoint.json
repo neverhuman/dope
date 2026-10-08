@@ -1,0 +1,54 @@
+{
+  "closures_per_hour": 29.97259408902406,
+  "elapsed_seconds": 3002.743097,
+  "fit_disposition_eta_mt": "2026-10-07T23:05:44.662674-06:00",
+  "forecast_only": true,
+  "forest_counts": {
+    "ok": 222,
+    "timeout": 62
+  },
+  "forest_fits": 284,
+  "format": "forest-fit-disposition-operational-forecast-v1",
+  "metric_allowance_hours": 6,
+  "metric_publication_eta_mt": "2026-10-08T05:05:44.662674-06:00",
+  "mfs_v2": null,
+  "observations": [
+    {
+      "observed_utc": "2026-10-08T00:23:29.191607+00:00",
+      "physical_closed": 259,
+      "planned": 400,
+      "status_counts": {
+        "ok": 197,
+        "timeout": 62
+      }
+    },
+    {
+      "observed_utc": "2026-10-08T01:13:31.934704+00:00",
+      "physical_closed": 284,
+      "planned": 400,
+      "status_counts": {
+        "ok": 222,
+        "timeout": 62
+      }
+    }
+  ],
+  "observed_utc": "2026-10-08T01:13:31.934704+00:00",
+  "official_tests_opened": false,
+  "planned": 400,
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "remaining": 116,
+  "signals_sent": 0,
+  "source_log_prefix_ref": {
+    "bytes": 14896,
+    "path": "target/campaign-owned-worker-watch-v1/forest.checks.actual.jsonl",
+    "scope": "First bytes of an append-only operational log; not a scientific metric receipt.",
+    "sha256": "14ba617a36f1f9c1d3fdef4caabe906bb655ef497c1a5f1ff27dcf3a187804d9"
+  },
+  "superiority": null,
+  "timeout_retries_admitted": false,
+  "window_end_closed": 284,
+  "window_start_closed": 259,
+  "window_start_utc": "2026-10-08T00:23:29.191607+00:00",
+  "workers_started": 0
+}

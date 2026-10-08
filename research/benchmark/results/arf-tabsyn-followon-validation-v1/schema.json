@@ -1,0 +1,1384 @@
+{
+  "$defs": {
+    "import_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "arf_logical_cells": {
+          "const": 6000
+        },
+        "arf_physical_metric_receipts": {
+          "const": 5892
+        },
+        "clocks_are_additive": {
+          "const": false
+        },
+        "current_bulk_model_hashes_rechecked": {
+          "const": false
+        },
+        "exported_utc": {
+          "type": "string"
+        },
+        "format": {
+          "const": "arf-tabsyn-scalar-export-lock-v1"
+        },
+        "metric_source_refs": {
+          "additionalProperties": false,
+          "maxProperties": 2,
+          "minProperties": 2,
+          "properties": {
+            "expanded_validation_metrics": {
+              "$ref": "#/$defs/ref"
+            },
+            "pilot_metrics": {
+              "$ref": "#/$defs/ref"
+            }
+          },
+          "required": [
+            "expanded_validation_metrics",
+            "pilot_metrics"
+          ],
+          "type": "object"
+        },
+        "mfs_v2": {
+          "const": null
+        },
+        "new_auditor_evaluations": {
+          "const": 0
+        },
+        "new_fits": {
+          "const": 0
+        },
+        "new_samples": {
+          "const": 0
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "original_metric_receipts_verified_before_decode": {
+          "const": true
+        },
+        "portable_regeneration": {
+          "type": "string"
+        },
+        "ptf_v1": {
+          "const": null
+        },
+        "release_safe_l3": {
+          "const": null
+        },
+        "scalar_export_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "seed11_alias_fit_and_sample_receipts_reverified": {
+          "const": true
+        },
+        "source_refs": {
+          "additionalProperties": false,
+          "maxProperties": 7,
+          "minProperties": 7,
+          "properties": {
+            "arf_continuation_completion": {
+              "$ref": "#/$defs/ref"
+            },
+            "arf_coverage_verification": {
+              "$ref": "#/$defs/ref"
+            },
+            "arf_prior_seed23_publication": {
+              "$ref": "#/$defs/ref"
+            },
+            "arf_seed11_publication": {
+              "$ref": "#/$defs/ref"
+            },
+            "tabsyn_execution": {
+              "$ref": "#/$defs/ref"
+            },
+            "tabsyn_input_manifest": {
+              "$ref": "#/$defs/ref"
+            },
+            "tabsyn_metric_lock": {
+              "$ref": "#/$defs/ref"
+            }
+          },
+          "required": [
+            "arf_continuation_completion",
+            "arf_coverage_verification",
+            "arf_prior_seed23_publication",
+            "arf_seed11_publication",
+            "tabsyn_execution",
+            "tabsyn_input_manifest",
+            "tabsyn_metric_lock"
+          ],
+          "type": "object"
+        },
+        "superiority": {
+          "const": null
+        },
+        "tabsyn_evaluator_wall_seconds": {
+          "const": 159.66587376175448
+        },
+        "tabsyn_new_cells": {
+          "const": 95
+        }
+      },
+      "required": [
+        "arf_logical_cells",
+        "arf_physical_metric_receipts",
+        "clocks_are_additive",
+        "current_bulk_model_hashes_rechecked",
+        "exported_utc",
+        "format",
+        "metric_source_refs",
+        "mfs_v2",
+        "new_auditor_evaluations",
+        "new_fits",
+        "new_samples",
+        "official_tests_opened",
+        "original_metric_receipts_verified_before_decode",
+        "portable_regeneration",
+        "ptf_v1",
+        "release_safe_l3",
+        "scalar_export_ref",
+        "seed11_alias_fit_and_sample_receipts_reverified",
+        "source_refs",
+        "superiority",
+        "tabsyn_evaluator_wall_seconds",
+        "tabsyn_new_cells"
+      ],
+      "type": "object"
+    },
+    "manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "items": {
+            "$ref": "#/$defs/ref"
+          },
+          "maxItems": 7,
+          "minItems": 7,
+          "type": "array"
+        },
+        "format": {
+          "const": "arf-tabsyn-followon-publication-manifest-v1"
+        },
+        "mfs_v2": {
+          "const": null
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "ptf_v1": {
+          "const": null
+        },
+        "publisher_path": {
+          "const": "research/benchmark/publish_arf_tabsyn_followon.py"
+        },
+        "publisher_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "release_safe_l3": {
+          "const": null
+        },
+        "superiority": {
+          "const": null
+        }
+      },
+      "required": [
+        "files",
+        "format",
+        "mfs_v2",
+        "official_tests_opened",
+        "ptf_v1",
+        "publisher_path",
+        "publisher_sha256",
+        "release_safe_l3",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "operations": {
+      "additionalProperties": false,
+      "properties": {
+        "closures_per_hour": {
+          "const": 29.97259408902406
+        },
+        "elapsed_seconds": {
+          "const": 3002.743097
+        },
+        "fit_disposition_eta_mt": {
+          "const": "2026-10-07T23:05:44.662674-06:00"
+        },
+        "forecast_only": {
+          "const": true
+        },
+        "forest_counts": {
+          "const": {
+            "ok": 222,
+            "timeout": 62
+          }
+        },
+        "forest_fits": {
+          "const": 284
+        },
+        "format": {
+          "const": "forest-fit-disposition-operational-forecast-v1"
+        },
+        "metric_allowance_hours": {
+          "const": 6
+        },
+        "metric_publication_eta_mt": {
+          "const": "2026-10-08T05:05:44.662674-06:00"
+        },
+        "mfs_v2": {
+          "const": null
+        },
+        "observations": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "observed_utc": {
+                "type": "string"
+              },
+              "physical_closed": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "planned": {
+                "const": 400
+              },
+              "status_counts": {
+                "additionalProperties": false,
+                "properties": {
+                  "ok": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "timeout": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "ok",
+                  "timeout"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "observed_utc",
+              "physical_closed",
+              "planned",
+              "status_counts"
+            ],
+            "type": "object"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "observed_utc": {
+          "const": "2026-10-08T01:13:31.934704+00:00"
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "planned": {
+          "const": 400
+        },
+        "ptf_v1": {
+          "const": null
+        },
+        "release_safe_l3": {
+          "const": null
+        },
+        "remaining": {
+          "const": 116
+        },
+        "signals_sent": {
+          "const": 0
+        },
+        "source_log_prefix_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "bytes",
+            "sha256",
+            "scope"
+          ],
+          "type": "object"
+        },
+        "superiority": {
+          "const": null
+        },
+        "timeout_retries_admitted": {
+          "const": false
+        },
+        "window_end_closed": {
+          "const": 284
+        },
+        "window_start_closed": {
+          "const": 259
+        },
+        "window_start_utc": {
+          "const": "2026-10-08T00:23:29.191607+00:00"
+        },
+        "workers_started": {
+          "const": 0
+        }
+      },
+      "required": [
+        "observed_utc",
+        "forest_fits",
+        "forest_counts",
+        "planned",
+        "remaining",
+        "window_start_utc",
+        "window_start_closed",
+        "window_end_closed",
+        "elapsed_seconds",
+        "closures_per_hour",
+        "fit_disposition_eta_mt",
+        "metric_publication_eta_mt",
+        "forecast_only",
+        "timeout_retries_admitted",
+        "workers_started",
+        "signals_sent",
+        "official_tests_opened",
+        "mfs_v2",
+        "ptf_v1",
+        "format",
+        "source_log_prefix_ref",
+        "observations",
+        "metric_allowance_hours",
+        "release_safe_l3",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "per_fit": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "complete_sample_group": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "metrics": {
+                "properties": {
+                  "alpha_precision": {
+                    "type": "null"
+                  },
+                  "beta_recall": {
+                    "type": "null"
+                  },
+                  "c2st_catboost_auc": {
+                    "type": "null"
+                  },
+                  "c2st_logistic_auc": {
+                    "type": "null"
+                  },
+                  "catboost_retention": {
+                    "type": "null"
+                  },
+                  "catboost_trtr_loss": {
+                    "type": "null"
+                  },
+                  "catboost_tstr_loss": {
+                    "type": "null"
+                  },
+                  "contingency_tv_mean": {
+                    "type": "null"
+                  },
+                  "dcr_fit_median": {
+                    "type": "null"
+                  },
+                  "dcr_validation_median": {
+                    "type": "null"
+                  },
+                  "distance_mia_auc": {
+                    "type": "null"
+                  },
+                  "domias_kde_auc": {
+                    "type": "null"
+                  },
+                  "linear_retention": {
+                    "type": "null"
+                  },
+                  "linear_trtr_loss": {
+                    "type": "null"
+                  },
+                  "linear_tstr_loss": {
+                    "type": "null"
+                  },
+                  "marginal_error_mean": {
+                    "type": "null"
+                  },
+                  "mlp_retention": {
+                    "type": "null"
+                  },
+                  "mlp_trtr_loss": {
+                    "type": "null"
+                  },
+                  "mlp_tstr_loss": {
+                    "type": "null"
+                  },
+                  "nndr_fit_median": {
+                    "type": "null"
+                  },
+                  "null_loss": {
+                    "type": "null"
+                  },
+                  "pairwise_pearson_difference_mean": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "complete_sample_group": {
+          "type": "boolean"
+        },
+        "dataset": {
+          "pattern": "^[0-9a-f]{16}$",
+          "type": "string"
+        },
+        "fit_seed": {
+          "enum": [
+            11,
+            23,
+            37,
+            53,
+            71
+          ]
+        },
+        "measured_sample_seeds": {
+          "items": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "method": {
+          "enum": [
+            "ARF",
+            "TabSyn"
+          ]
+        },
+        "metrics": {
+          "additionalProperties": false,
+          "properties": {
+            "alpha_precision": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "beta_recall": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "c2st_catboost_auc": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "c2st_logistic_auc": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "catboost_retention": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "catboost_trtr_loss": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "catboost_tstr_loss": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "contingency_tv_mean": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "dcr_fit_median": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "dcr_validation_median": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "distance_mia_auc": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "domias_kde_auc": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "linear_retention": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "linear_trtr_loss": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "linear_tstr_loss": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "marginal_error_mean": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "mlp_retention": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "mlp_trtr_loss": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "mlp_tstr_loss": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "nndr_fit_median": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "null_loss": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "pairwise_pearson_difference_mean": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "marginal_error_mean",
+            "pairwise_pearson_difference_mean",
+            "contingency_tv_mean",
+            "alpha_precision",
+            "beta_recall",
+            "c2st_catboost_auc",
+            "c2st_logistic_auc",
+            "dcr_fit_median",
+            "dcr_validation_median",
+            "nndr_fit_median",
+            "distance_mia_auc",
+            "domias_kde_auc",
+            "null_loss",
+            "catboost_trtr_loss",
+            "catboost_tstr_loss",
+            "catboost_retention",
+            "linear_trtr_loss",
+            "linear_tstr_loss",
+            "linear_retention",
+            "mlp_trtr_loss",
+            "mlp_tstr_loss",
+            "mlp_retention"
+          ],
+          "type": "object"
+        },
+        "missing_sample_seeds": {
+          "items": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "row_multiplier": {
+          "enum": [
+            1,
+            4
+          ]
+        },
+        "selection_binding": {
+          "enum": [
+            "author_default",
+            "native_selected",
+            "scaled_author_default"
+          ]
+        },
+        "source_row_indices": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "dataset",
+        "method",
+        "selection_binding",
+        "fit_seed",
+        "row_multiplier",
+        "complete_sample_group",
+        "measured_sample_seeds",
+        "missing_sample_seeds",
+        "source_row_indices",
+        "metrics"
+      ],
+      "type": "object"
+    },
+    "ref": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "type": "object"
+    },
+    "row": {
+      "additionalProperties": false,
+      "properties": {
+        "alias_json_pointer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "alias_origin_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "alpha_precision": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "beta_recall": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "c2st_catboost_auc": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "c2st_logistic_auc": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "catboost_retention": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "catboost_trtr_loss": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "catboost_tstr_loss": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "charged_artifact_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "config_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "contingency_tv_mean": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "dataset": {
+          "pattern": "^[0-9a-f]{16}$",
+          "type": "string"
+        },
+        "dcr_fit_median": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "dcr_validation_median": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "distance_mia_auc": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "domias_kde_auc": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "fit_seed": {
+          "enum": [
+            11,
+            23,
+            37,
+            53,
+            71
+          ]
+        },
+        "input_hashes": {
+          "additionalProperties": false,
+          "properties": {
+            "projection": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "synthetic": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "train": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "validation": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "train",
+            "validation",
+            "projection",
+            "synthetic"
+          ],
+          "type": "object"
+        },
+        "linear_retention": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "linear_trtr_loss": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "linear_tstr_loss": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "logical_alias": {
+          "type": "boolean"
+        },
+        "logical_identity_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "marginal_error_mean": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "method": {
+          "enum": [
+            "ARF",
+            "TabSyn"
+          ]
+        },
+        "metric_job_identity": {
+          "type": "object"
+        },
+        "metric_job_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "metric_receipt_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "mfs_v2": {
+          "type": "null"
+        },
+        "mlp_retention": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mlp_trtr_loss": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mlp_tstr_loss": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "nndr_fit_median": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "null_loss": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "pairwise_pearson_difference_mean": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "physical_sampling_backend": {
+          "enum": [
+            "ARF_CPU_four_core_replication",
+            "cpu",
+            "existing_ARF_CPU_samples"
+          ]
+        },
+        "ptf_v1": {
+          "type": "null"
+        },
+        "release_safe_l3": {
+          "type": "null"
+        },
+        "row_multiplier": {
+          "enum": [
+            1,
+            4
+          ]
+        },
+        "sample_seed": {
+          "enum": [
+            101,
+            211,
+            307
+          ]
+        },
+        "selection_binding": {
+          "enum": [
+            "author_default",
+            "native_selected",
+            "scaled_author_default"
+          ]
+        },
+        "superiority": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "dataset",
+        "method",
+        "fit_seed",
+        "sample_seed",
+        "row_multiplier",
+        "config_sha256",
+        "selection_binding",
+        "charged_artifact_bytes",
+        "logical_identity_sha256",
+        "metric_receipt_ref",
+        "metric_job_sha256",
+        "metric_job_identity",
+        "input_hashes",
+        "physical_sampling_backend",
+        "logical_alias",
+        "alias_origin_ref",
+        "alias_json_pointer",
+        "marginal_error_mean",
+        "pairwise_pearson_difference_mean",
+        "contingency_tv_mean",
+        "alpha_precision",
+        "beta_recall",
+        "c2st_catboost_auc",
+        "c2st_logistic_auc",
+        "dcr_fit_median",
+        "dcr_validation_median",
+        "nndr_fit_median",
+        "distance_mia_auc",
+        "domias_kde_auc",
+        "null_loss",
+        "catboost_trtr_loss",
+        "catboost_tstr_loss",
+        "catboost_retention",
+        "linear_trtr_loss",
+        "linear_tstr_loss",
+        "linear_retention",
+        "mlp_trtr_loss",
+        "mlp_tstr_loss",
+        "mlp_retention",
+        "official_tests_opened",
+        "mfs_v2",
+        "ptf_v1",
+        "release_safe_l3",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "stat": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "measured_fits": {
+                "maximum": 4
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "fit_sample_sd": {
+                "type": "null"
+              },
+              "mean": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "fit_sample_sd": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "fit_seed_means": {
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "maxItems": 5,
+          "minItems": 5,
+          "type": "array"
+        },
+        "mean": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "measured_fits": {
+          "maximum": 5,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sd_is_confidence_interval": {
+          "const": false
+        }
+      },
+      "required": [
+        "fit_seed_means",
+        "measured_fits",
+        "mean",
+        "fit_sample_sd",
+        "sd_is_confidence_interval"
+      ],
+      "type": "object"
+    },
+    "summary": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "pattern": "^[0-9a-f]{16}$",
+          "type": "string"
+        },
+        "fit_seeds": {
+          "const": [
+            11,
+            23,
+            37,
+            53,
+            71
+          ]
+        },
+        "method": {
+          "enum": [
+            "ARF",
+            "TabSyn"
+          ]
+        },
+        "metrics": {
+          "additionalProperties": false,
+          "properties": {
+            "alpha_precision": {
+              "$ref": "#/$defs/stat"
+            },
+            "beta_recall": {
+              "$ref": "#/$defs/stat"
+            },
+            "c2st_catboost_auc": {
+              "$ref": "#/$defs/stat"
+            },
+            "c2st_logistic_auc": {
+              "$ref": "#/$defs/stat"
+            },
+            "catboost_retention": {
+              "$ref": "#/$defs/stat"
+            },
+            "catboost_trtr_loss": {
+              "$ref": "#/$defs/stat"
+            },
+            "catboost_tstr_loss": {
+              "$ref": "#/$defs/stat"
+            },
+            "contingency_tv_mean": {
+              "$ref": "#/$defs/stat"
+            },
+            "dcr_fit_median": {
+              "$ref": "#/$defs/stat"
+            },
+            "dcr_validation_median": {
+              "$ref": "#/$defs/stat"
+            },
+            "distance_mia_auc": {
+              "$ref": "#/$defs/stat"
+            },
+            "domias_kde_auc": {
+              "$ref": "#/$defs/stat"
+            },
+            "linear_retention": {
+              "$ref": "#/$defs/stat"
+            },
+            "linear_trtr_loss": {
+              "$ref": "#/$defs/stat"
+            },
+            "linear_tstr_loss": {
+              "$ref": "#/$defs/stat"
+            },
+            "marginal_error_mean": {
+              "$ref": "#/$defs/stat"
+            },
+            "mlp_retention": {
+              "$ref": "#/$defs/stat"
+            },
+            "mlp_trtr_loss": {
+              "$ref": "#/$defs/stat"
+            },
+            "mlp_tstr_loss": {
+              "$ref": "#/$defs/stat"
+            },
+            "nndr_fit_median": {
+              "$ref": "#/$defs/stat"
+            },
+            "null_loss": {
+              "$ref": "#/$defs/stat"
+            },
+            "pairwise_pearson_difference_mean": {
+              "$ref": "#/$defs/stat"
+            }
+          },
+          "required": [
+            "marginal_error_mean",
+            "pairwise_pearson_difference_mean",
+            "contingency_tv_mean",
+            "alpha_precision",
+            "beta_recall",
+            "c2st_catboost_auc",
+            "c2st_logistic_auc",
+            "dcr_fit_median",
+            "dcr_validation_median",
+            "nndr_fit_median",
+            "distance_mia_auc",
+            "domias_kde_auc",
+            "null_loss",
+            "catboost_trtr_loss",
+            "catboost_tstr_loss",
+            "catboost_retention",
+            "linear_trtr_loss",
+            "linear_tstr_loss",
+            "linear_retention",
+            "mlp_trtr_loss",
+            "mlp_tstr_loss",
+            "mlp_retention"
+          ],
+          "type": "object"
+        },
+        "row_multiplier": {
+          "enum": [
+            1,
+            4
+          ]
+        },
+        "selection_binding": {
+          "enum": [
+            "author_default",
+            "native_selected",
+            "scaled_author_default"
+          ]
+        },
+        "source_per_fit_indices": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "maxItems": 5,
+          "minItems": 5,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "dataset",
+        "method",
+        "selection_binding",
+        "row_multiplier",
+        "fit_seeds",
+        "source_per_fit_indices",
+        "metrics"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "arf_alias_cells": {
+      "const": 108
+    },
+    "arf_common_n4n_five_fit_complete": {
+      "const": true
+    },
+    "arf_fit_seeds": {
+      "const": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ]
+    },
+    "arf_lineages": {
+      "const": 100
+    },
+    "arf_logical_cells": {
+      "const": 6000
+    },
+    "arf_physical_metric_receipts": {
+      "const": 5892
+    },
+    "comparison_scope": {
+      "const": "training_derived_validation_only"
+    },
+    "current_bulk_model_hashes_rechecked": {
+      "const": false
+    },
+    "format": {
+      "const": "arf-tabsyn-followon-validation-v1"
+    },
+    "inputs": {
+      "$ref": "#/$defs/import_lock"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "native_selection_changed": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "per_fit": {
+      "items": {
+        "$ref": "#/$defs/per_fit"
+      },
+      "maxItems": 2041,
+      "minItems": 2041,
+      "type": "array"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "rows": {
+      "items": {
+        "$ref": "#/$defs/row"
+      },
+      "maxItems": 6095,
+      "minItems": 6095,
+      "type": "array"
+    },
+    "summary": {
+      "items": {
+        "$ref": "#/$defs/summary"
+      },
+      "maxItems": 400,
+      "minItems": 400,
+      "type": "array"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "tabsyn_complete_n_groups": {
+      "const": 19
+    },
+    "tabsyn_new_cells": {
+      "const": 95
+    },
+    "tabsyn_new_lineages": {
+      "const": 41
+    },
+    "tabsyn_partial_n_groups": {
+      "const": 22
+    }
+  },
+  "required": [
+    "format",
+    "rows",
+    "per_fit",
+    "summary",
+    "inputs",
+    "arf_logical_cells",
+    "arf_physical_metric_receipts",
+    "arf_alias_cells",
+    "arf_lineages",
+    "arf_fit_seeds",
+    "arf_common_n4n_five_fit_complete",
+    "tabsyn_new_cells",
+    "tabsyn_new_lineages",
+    "tabsyn_complete_n_groups",
+    "tabsyn_partial_n_groups",
+    "production_certified",
+    "current_bulk_model_hashes_rechecked",
+    "native_selection_changed",
+    "comparison_scope",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "superiority"
+  ],
+  "type": "object"
+}

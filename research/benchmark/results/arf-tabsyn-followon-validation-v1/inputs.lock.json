@@ -1,0 +1,75 @@
+{
+  "arf_logical_cells": 6000,
+  "arf_physical_metric_receipts": 5892,
+  "clocks_are_additive": false,
+  "current_bulk_model_hashes_rechecked": false,
+  "exported_utc": "2026-10-08T01:32:37.479498+00:00",
+  "format": "arf-tabsyn-scalar-export-lock-v1",
+  "metric_source_refs": {
+    "expanded_validation_metrics": {
+      "bytes": 13747,
+      "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/expanded_validation_metrics.py",
+      "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
+    },
+    "pilot_metrics": {
+      "bytes": 6986,
+      "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/pilot_metrics.py",
+      "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3"
+    }
+  },
+  "mfs_v2": null,
+  "new_auditor_evaluations": 0,
+  "new_fits": 0,
+  "new_samples": 0,
+  "official_tests_opened": false,
+  "original_metric_receipts_verified_before_decode": true,
+  "portable_regeneration": "Scalar projection only; original receipt hashes cannot be reconstructed from excerpts.",
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "scalar_export_ref": {
+    "bytes": 16937043,
+    "path": "scalar-cells.jsonl",
+    "sha256": "a9c9c6f63ed4439eca38402109beebdc2a5fec6c3be4a1037ec8754b4486578c"
+  },
+  "seed11_alias_fit_and_sample_receipts_reverified": true,
+  "source_refs": {
+    "arf_continuation_completion": {
+      "bytes": 8085,
+      "path": "/mnt/fast-scratch/dope-benchmark/arf-s3-fivefit-validation-continuation-v5/completion.actual.json",
+      "sha256": "512f2ca27147d41c77956a4ef4d24fc67339a9bf0e1461690165494119803a08"
+    },
+    "arf_coverage_verification": {
+      "bytes": 1779945,
+      "path": "target/arf-complete-validation-join-preparation-v4/coverage-preflight.actual.json",
+      "sha256": "9b5fcca34cb49391ae22e82d756da4c61aff832d3843cc0bb39d8bae8c9c07bb"
+    },
+    "arf_prior_seed23_publication": {
+      "bytes": 1751802,
+      "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
+      "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
+    },
+    "arf_seed11_publication": {
+      "bytes": 7718907,
+      "path": "research/benchmark/results/retained-classical-validation/panel.json",
+      "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
+    },
+    "tabsyn_execution": {
+      "bytes": 264,
+      "path": "/home/ubuntu/dope-scratch-x2/tabsyn-retained-95-common-v1/metrics-exit.actual.json",
+      "sha256": "f1d79d8fed5f782d221f8d8ede539338964beb2408c5ec9c3b83cd18fcfb677c"
+    },
+    "tabsyn_input_manifest": {
+      "bytes": 737736,
+      "path": "/home/ubuntu/dope-scratch-x2/tabsyn-retained-95-common-v1/inputs.lock.json",
+      "sha256": "52d790c28b55bfcbd28658afd8e38374f2e89234e84d46fa989c4bcac58abacd"
+    },
+    "tabsyn_metric_lock": {
+      "bytes": 27420,
+      "path": "/home/ubuntu/dope-scratch-x2/tabsyn-retained-95-common-v1/metric-receipts/receipt-lock.json",
+      "sha256": "3f917159f4e963fb45a2bc00e8144b8fe2c50f26e29926b3300ba0d1b08ee222"
+    }
+  },
+  "superiority": null,
+  "tabsyn_evaluator_wall_seconds": 159.66587376175448,
+  "tabsyn_new_cells": 95
+}

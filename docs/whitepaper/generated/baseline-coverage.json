@@ -2,9 +2,9 @@
   "format": "paper-published-baseline-inventory-v1",
   "limitations": [
     "Cohorts and fit counts differ; plot is descriptive, not a ranking or paired comparison.",
-    "Forest fit SD is not a confidence interval; this plot shows lineage points and medians without CI bars.",
+    "ARF and Forest fit SD is not a confidence interval; this plot shows lineage points and medians without CI bars.",
     "Native objectives select only within their own methods; native scores are never ranked across methods.",
-    "Additional ARF metrics completed on scratch remain pending publication in this frozen merged-receipt inventory."
+    "The new TabSyn n cohort differs in sample size and lineages from all 4n cohorts; 22 partial groups have no figure mean."
   ],
   "mfs_v2": null,
   "official_tests_opened": false,
@@ -15,12 +15,17 @@
       "complete100": false,
       "complete_retained_lineages": 8,
       "complete_retained_sample_cells": 48,
-      "coverage": "8 scaled-default lineages; 48 cells; fit seed 11. Native tuning and full population pending.",
+      "complete_three_sample_groups": 35,
+      "coverage": "49 scaled-default lineages, 143 measured cells at fit11: eight complete n/4n lineages (48 cells), plus 95 n cells on 41 lineages (19 complete/22 partial groups). Native tuning/full population pending.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
+      "five_fit_common_n4n_complete": false,
       "five_fit_lineages": 0,
       "full100_eta_mt": null,
+      "logical_sample_cells": 143,
+      "measured_lineages": 49,
       "method": "TabSyn",
+      "partial_three_sample_groups": 22,
       "production_certified": false,
       "remaining_campaign_status": "pending",
       "sources": [
@@ -28,6 +33,11 @@
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
           "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
+        },
+        {
+          "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
+          "pointer": "",
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         }
       ]
     },
@@ -38,6 +48,7 @@
       "coverage": "12 retained lineages; 126 physical/132 logical cells; 21 models, fit seed 11. Default/native cohorts differ; native search incomplete.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
+      "five_fit_common_n4n_complete": false,
       "five_fit_lineages": 0,
       "full100_eta_mt": null,
       "logical_sample_cells": 132,
@@ -60,6 +71,7 @@
       "coverage": "13 default lineages at five fit seeds; 65 models/390 cells. Separate legacy six-lineage default/native panel; full population pending.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
+      "five_fit_common_n4n_complete": false,
       "five_fit_lineages": 13,
       "full100_eta_mt": null,
       "method": "Forest-Flow",
@@ -96,6 +108,7 @@
       "coverage": "Pilot only; separate 100-lineage matched diffusion panel pending.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
+      "five_fit_common_n4n_complete": false,
       "five_fit_lineages": 0,
       "full100_eta_mt": null,
       "method": "Forest-Diffusion",
@@ -113,27 +126,24 @@
     {
       "complete100": true,
       "complete_retained_lineages": 100,
-      "complete_retained_sample_cells": 1200,
-      "coverage": "100 default/native lineages at fit seed 11; 1200 logical cells. 796 additional native-scored fits; 144 additional common cells published. Remaining publication pending.",
+      "complete_retained_sample_cells": 6000,
+      "coverage": "100 default/native lineages at five fit seeds, n/4n, three sample seeds: 6,000 logical cells / 5,892 physical receipts (108 aliases). Between-fit SD available; official-test certification pending.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
-      "five_fit_lineages": 0,
+      "five_fit_common_n4n_complete": true,
+      "five_fit_lineages": 100,
       "full100_eta_mt": null,
       "method": "ARF",
+      "physical_metric_receipts": 5892,
       "production_certified": false,
-      "published_additional_metric_cells": 144,
+      "published_additional_metric_cells": 4800,
       "published_additional_physical_fits": 796,
       "remaining_campaign_status": "pending",
       "sources": [
         {
-          "path": "research/benchmark/results/retained-classical-validation/panel.json",
+          "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
           "pointer": "",
-          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
-        },
-        {
-          "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
-          "pointer": "",
-          "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         },
         {
           "path": "research/benchmark/results/arf-complete-additional-fits-v1/panel.json",
@@ -149,6 +159,7 @@
       "coverage": "100 default/native lineages at fit seed 11; 1200 logical cells. Five-fit common coverage pending.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
+      "five_fit_common_n4n_complete": false,
       "five_fit_lineages": 0,
       "full100_eta_mt": null,
       "method": "GaussianCopula",
@@ -169,6 +180,7 @@
       "coverage": "100 default/native lineages at fit seed 11; 1200 logical cells. Five-fit common coverage pending.",
       "eta_is_observed_completion": false,
       "final_five_fit_complete": false,
+      "five_fit_common_n4n_complete": false,
       "five_fit_lineages": 0,
       "full100_eta_mt": null,
       "method": "Chow-Liu",
@@ -199,6 +211,11 @@
       "path": "research/benchmark/results/retained-classical-validation/panel.json",
       "pointer": "",
       "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
+    },
+    "followon": {
+      "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
+      "pointer": "",
+      "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
     },
     "forest2": {
       "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",

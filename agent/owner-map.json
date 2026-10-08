@@ -284,6 +284,9 @@
     "docs/whitepaper/scripts/test_published_baseline_inventory.py": "external-evidence",
     "docs/whitepaper/generated/published-baseline-kpis.json": "external-evidence",
     "docs/whitepaper/generated/baseline-coverage.tex": "external-evidence",
-    "docs/whitepaper/generated/published-baseline-kpis.csv": "external-evidence"
+    "docs/whitepaper/generated/published-baseline-kpis.csv": "external-evidence",
+    "research/benchmark/publish_arf_tabsyn_followon.py": "external-evidence",
+    "research/benchmark/tests/test_arf_tabsyn_followon.py": "external-evidence",
+    "research/benchmark/results/arf-tabsyn-followon-validation-v1/": "external-evidence"
   }
 }

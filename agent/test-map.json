@@ -1054,6 +1054,18 @@
     "docs/whitepaper/generated/published-baseline-kpis.csv": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py' -v",
       "purpose": "verify pinned merged receipt counts, exact per-lineage reductions, complete seed groups, missing outcomes, schemas, pending populations, null gates and deterministic public figure inputs"
+    },
+    "research/benchmark/publish_arf_tabsyn_followon.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_tabsyn_followon -v",
+      "purpose": "verify pinned scalar export, exact five-fit schedule, alias receipt identities, partition hashes, missing TabSyn groups, null gates, schemas and deterministic KPI reductions"
+    },
+    "research/benchmark/tests/test_arf_tabsyn_followon.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_tabsyn_followon -v",
+      "purpose": "verify pinned scalar export, exact five-fit schedule, alias receipt identities, partition hashes, missing TabSyn groups, null gates, schemas and deterministic KPI reductions"
+    },
+    "research/benchmark/results/arf-tabsyn-followon-validation-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_arf_tabsyn_followon -v",
+      "purpose": "verify pinned scalar export, exact five-fit schedule, alias receipt identities, partition hashes, missing TabSyn groups, null gates, schemas and deterministic KPI reductions"
     }
   }
 }
