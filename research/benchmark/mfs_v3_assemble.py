@@ -21,7 +21,7 @@ from research.benchmark.representation import (
     TABULAR_PROTOCOL,
     representation_closeness,
 )
-from research.benchmark.score import evaluate_v3
+from research.benchmark.mfs_v3_score import evaluate_v3
 
 AUDITORS = ("kumo_tabular_l", "mitra_v2", "tabicl2")
 HEADLINE = "kumo_tabular_l"

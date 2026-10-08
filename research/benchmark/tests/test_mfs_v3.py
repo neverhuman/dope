@@ -13,7 +13,8 @@ from research.benchmark.representation import (
     midrank_quantile,
     write_local_lookup,
 )
-from research.benchmark.score import CONTRACT, evaluate_v3, validate_contract
+from research.benchmark.mfs_v3_score import evaluate_v3
+from research.benchmark.score import CONTRACT, validate_contract
 
 
 ROOT = Path(__file__).resolve().parents[3]
