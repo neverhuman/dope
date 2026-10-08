@@ -37,6 +37,10 @@
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3 -v",
       "purpose": "fit the real-train quantile map and keep source strings out of the public hash manifest"
     },
+    "research/benchmark/mfs_v3_score.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3 research.benchmark.tests.test_score -v",
+      "purpose": "score MFS-v3 outside the byte-pinned v2 scorer and keep the v2 pin unchanged"
+    },
     "production/kpi-contract-v3.json": {
       "command": "cargo test --locked --lib fitness::tests::embedded_v3_contract_matches_the_build_digest",
       "purpose": "bind the pre-registered MFS-v3 sibling contract to its build digest"
