@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "pointer": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256",
+              "pointer"
+            ],
+            "type": "object"
+          },
+          "individual_original_receipt_trace_complete": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "table_or_macro_input",
+              "algorithm_diagram",
+              "figure",
+              "supplementary_figure"
+            ]
+          },
+          "producers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "reduction_source_refs": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "path": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "pointer": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "bytes",
+                "sha256",
+                "pointer"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "artifact",
+          "kind",
+          "producers",
+          "reduction_source_refs",
+          "individual_original_receipt_trace_complete"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "checks_completed": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "exit_code": {
+            "const": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "receipt_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "pointer": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256",
+              "pointer"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "exit_code",
+          "receipt_ref"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "affected_refs": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "path": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "pointer": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "bytes",
+                "sha256",
+                "pointer"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "claims": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "id": {
+            "enum": [
+              "TRACE-01",
+              "SCOPE-01"
+            ]
+          },
+          "line_markers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "production_claim_emitted": {
+            "const": false
+          },
+          "requested_action": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "evidence_gap",
+              "scope_ambiguity"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "severity",
+          "claims",
+          "affected_refs",
+          "evidence",
+          "requested_action",
+          "production_claim_emitted"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "format": {
+      "const": "dope-paper-receipt-redteam-v1"
+    },
+    "manuscripts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "pointer": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256",
+          "pointer"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "numeric_kpi_points": {
+      "const": 2648
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "reviewed_main_commit": {
+      "const": "26801e4b45cd6e4867d33bf8a4094e2c01d1c02b"
+    },
+    "reviewed_utc": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "superiority": {
+      "const": null
+    },
+    "verification_scope": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "format",
+    "reviewed_main_commit",
+    "reviewed_utc",
+    "scope",
+    "manuscripts",
+    "artifacts",
+    "numeric_kpi_points",
+    "findings",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "superiority",
+    "verification_scope",
+    "checks_completed"
+  ],
+  "type": "object"
+}

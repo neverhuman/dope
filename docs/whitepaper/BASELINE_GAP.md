@@ -52,8 +52,8 @@ is admitted by this table. No existing worker is restarted or pre-empted.
 
 | Baseline row | Next measurable/publication milestone | Numeric ETA / condition |
 | --- | --- | --- |
-| ARF | Complete five-fit common measurements closed; publish this frozen follow-on | Actual scalar close Oct 7 16:46 MDT; publication handoff target Oct 7 20:30 MDT, subject to CI/review |
-| TabSyn | Publish all 95 already measured retained cells and partial-group accounting | Oct 7 20:30 MDT, subject to CI/review; no new compute needed |
+| ARF | Complete five-fit common measurements closed; publish this frozen follow-on | Actual scalar close Oct 7 16:46 MDT; PR187 merged Oct 7 20:36 MDT |
+| TabSyn | Publish all 95 already measured retained cells and partial-group accounting | PR187 merged Oct 7 20:36 MDT; no new compute needed |
 | TabSyn | Full native-selection and five-fit population | Conservative 272.67 eligible GPU-slot hours: up to 800 native trials x 600 s plus 800 replication fits (400 default and 400 native-selected) x 600 s, plus 6 h sampling/evaluation. If a slot starts Oct 8 08:00 MDT: Oct 19 16:40 MDT; no slot granted, native-objective readiness still required |
 | TabDDPM | Full default/native-selection and five-fit population | Conservative 287.67 eligible GPU-slot hours: up to 90 missing default fits, 800 native trials, 800 default/native replication fits, all at 600 s, plus 6 h sampling/evaluation. If a slot starts Oct 8 08:00 MDT: Oct 20 07:40 MDT; no slot granted, retained-OK jobs must first be reconciled |
 | Forest-Flow | Close dispositions for the existing 400-fit CPU queue, then evaluate successful retained models | Fit-disposition forecast Oct 7 23:06 MDT; metric-publication forecast Oct 8 05:06 MDT, assuming recent throughput and a provisional six-hour evaluation allowance |
@@ -78,6 +78,29 @@ own frozen KPI. Earlier architecture research, default fitting, and final
 replication remain separately accounted; equal per-cell caps do not imply
 equal total research spend. The six-hour evaluation allowances are planning
 assumptions and are not summed into measured scientific compute costs.
+
+## TabDDPM matched seeds and exact missing cells
+
+`research/benchmark/results/tabddpm-matched-fit-coverage-v1/panel.json`
+and `cell-coverage.csv` account for every lineage/selection/fit/sample/size
+slot on the same 100 validation lineages as ARF. There are 132 measured
+logical slots at fit11 and zero at each of fit23/37/53/71; 5,868 of the
+6,000 target slots remain pending. Pending is not a method failure.
+The joined comparison has 243 receipt-linked sample pairs. It averages
+three sample seeds inside each matched lineage, and preserves native
+selection, identical training/validation/projection hashes and real controls.
+Detection uses the same frozen five-fold grouped protocol and splitter seed
+1729; identical synthetic-row fold membership is not certified.
+
+The CSV gives a numeric conditional ETA for **each** missing slot, relative
+to the hypothetical Oct8 08:00 MDT admitted-GPU start used above. The current
+order is CPU-only; no neural continuation is granted or launched. The final
+cap-envelope date is Oct20 07:40 MDT, including a provisional six-hour metric
+allowance. Historical trials count toward the eight-trial/12-hour cap; the
+ledger neither permits another eight trials nor freezes unknown configurations.
+The retained native-selection pools remain incomplete where originally recorded.
+Scalar comparison outcomes contain no forecasts, new confidence intervals,
+or superiority claims. The original broader research costs remain separate.
 
 ## Scientific limits
 

@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "files": {
+      "additionalProperties": false,
+      "properties": {
+        "README.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "cell-coverage.csv": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "manifest.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "matched-summary.md": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "panel.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "panel.schema.json": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "panel.json",
+        "cell-coverage.csv",
+        "matched-summary.md",
+        "panel.schema.json",
+        "README.md",
+        "manifest.schema.json"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "tabddpm-matched-fit-coverage-manifest-v1"
+    },
+    "producer": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "const": "research/benchmark/publish_tabddpm_matched_coverage.py"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "format",
+    "files",
+    "producer"
+  ],
+  "type": "object"
+}

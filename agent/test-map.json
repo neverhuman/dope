@@ -1,13 +1,22 @@
 {
   "workspace": "dope",
   "tests": {
-    "research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/": {"command": "python3 -I -S -B research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/render.py --check", "purpose": "replay frozen index008 positive GPU operation, exact 500-slot seed coverage and distinct whole-parent cost bases without private inputs or gated claims"},
-    "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {"command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check", "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"},
+    "research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/render.py --check",
+      "purpose": "replay frozen index008 positive GPU operation, exact 500-slot seed coverage and distinct whole-parent cost bases without private inputs or gated claims"
+    },
+    "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check",
+      "purpose": "replay hash-frozen closed indices006\u2013007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
+    },
     "research/benchmark/render_matched_linear_fit11_figure.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
       "purpose": "verify authenticated scalar input before JSON decoding, exact six summary identities, null gates, immutable SVG/PDF/source custody, strict public provenance, separate paired-difference semantics and lazy optional plotting imports without rendering"
     },
-    "research/benchmark/results/work-order-b-six-component-coverage-v1/": {"command": "python3 -B -m jsonschema -i research/benchmark/results/work-order-b-six-component-coverage-v1/coverage.json research/benchmark/results/work-order-b-six-component-coverage-v1/coverage.schema.json", "purpose": "validate fixed-snapshot component and hard-gate coverage, separate cohorts and missing evidence with null gated claims"},
+    "research/benchmark/results/work-order-b-six-component-coverage-v1/": {
+      "command": "python3 -B -m jsonschema -i research/benchmark/results/work-order-b-six-component-coverage-v1/coverage.json research/benchmark/results/work-order-b-six-component-coverage-v1/coverage.schema.json",
+      "purpose": "validate fixed-snapshot component and hard-gate coverage, separate cohorts and missing evidence with null gated claims"
+    },
     "research/benchmark/results/matched-linear-fit11-figure-v1/": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
       "purpose": "verify authenticated scalar input before JSON decoding, exact six summary identities, null gates, immutable SVG/PDF/source custody, strict public provenance, separate paired-difference semantics and lazy optional plotting imports without rendering"
@@ -1067,6 +1076,22 @@
     "research/benchmark/results/arf-tabsyn-followon-validation-v1/": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_arf_tabsyn_followon -v",
       "purpose": "verify pinned scalar export, exact five-fit schedule, alias receipt identities, partition hashes, missing TabSyn groups, null gates, schemas and deterministic KPI reductions"
+    },
+    "research/benchmark/results/paper-receipt-redteam-20261008-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_matched_coverage -v",
+      "purpose": "verify paper red-team snapshot and table/figure source digests, schemas, exact KPI-point count and null release claims without reading rows or models"
+    },
+    "research/benchmark/publish_tabddpm_matched_coverage.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_matched_coverage -v",
+      "purpose": "verify immutable publication hashes, matched partitions and real controls, nominal grouped-fold protocol, complete sample groups, same-cohort scalar reductions, exact fit-seed coverage, conditional ETA separation, schemas and null release gates"
+    },
+    "research/benchmark/tests/test_tabddpm_matched_coverage.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_matched_coverage -v",
+      "purpose": "verify immutable publication hashes, matched partitions and real controls, nominal grouped-fold protocol, complete sample groups, same-cohort scalar reductions, exact fit-seed coverage, conditional ETA separation, schemas and null release gates"
+    },
+    "research/benchmark/results/tabddpm-matched-fit-coverage-v1/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_matched_coverage -v",
+      "purpose": "verify immutable publication hashes, matched partitions and real controls, nominal grouped-fold protocol, complete sample groups, same-cohort scalar reductions, exact fit-seed coverage, conditional ETA separation, schemas and null release gates"
     }
   }
 }
