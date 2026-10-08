@@ -292,6 +292,11 @@
     "research/benchmark/results/paper-receipt-redteam-20261008-v1/": "external-evidence",
     "research/benchmark/publish_tabddpm_matched_coverage.py": "external-evidence",
     "research/benchmark/tests/test_tabddpm_matched_coverage.py": "external-evidence",
-    "research/benchmark/results/tabddpm-matched-fit-coverage-v1/": "external-evidence"
+    "research/benchmark/results/tabddpm-matched-fit-coverage-v1/": "external-evidence",
+    "docs/whitepaper/scripts/paper_receipts.py": "external-evidence",
+    "docs/whitepaper/scripts/local_receipts.py": "external-evidence",
+    "docs/whitepaper/scripts/test_paper_receipts.py": "external-evidence",
+    "research/benchmark/results/paper-original-metadata-v1/": "external-evidence",
+    "docs/whitepaper/generated/original-field-map.json": "external-evidence"
   }
 }

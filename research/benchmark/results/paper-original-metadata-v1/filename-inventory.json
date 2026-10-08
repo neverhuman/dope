@@ -1,0 +1,669 @@
+{
+  "beyond_evaluator": [
+    {
+      "identity": "airfoil_self_noise",
+      "test_csv": true,
+      "train_csv": false,
+      "validation_csv": false
+    },
+    {
+      "identity": "garments_worker_productivity",
+      "test_csv": true,
+      "train_csv": false,
+      "validation_csv": false
+    },
+    {
+      "identity": "musk",
+      "test_csv": true,
+      "train_csv": false,
+      "validation_csv": false
+    },
+    {
+      "identity": "telemonitoring_parkinsons_biomedical_voice_measurements",
+      "test_csv": true,
+      "train_csv": false,
+      "validation_csv": false
+    },
+    {
+      "identity": "video_transcoding_time_prediction",
+      "test_csv": true,
+      "train_csv": false,
+      "validation_csv": false
+    }
+  ],
+  "beyond_worker": [
+    {
+      "identity": "airfoil_self_noise",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "garments_worker_productivity",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "musk",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "telemonitoring_parkinsons_biomedical_voice_measurements",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "video_transcoding_time_prediction",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    }
+  ],
+  "file_contents_opened": false,
+  "s3_worker": [
+    {
+      "identity": "02a45777900441ce",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "047e62b52a3f4ede",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "04c80944e971cb3e",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "0561d673cb73c27e",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "060b9fff8092db17",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "06b0312a585b436e",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "0779d3fd5b3133a2",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "07f38946316c039b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "0a8428ef25a69175",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "0d482c1dd7cc6592",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "0db59fd2579600d0",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "0f86a714ec5f3ac6",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "167578f5deba4977",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "19f2c3c2d67defd7",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "19f4780b53b3fa41",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "1a4456d1cc71a26a",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "1a803b27c2400dc4",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "1cb97b1d7314d43d",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "205f4b4982b9ea49",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "26eff843be35d831",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "282f8ddb43b5e677",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "297b7688a045c583",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "2c8d0985f3557d2b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "30ca2887550f0d8d",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "3408a6a513c627a3",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "35a9aa9b88f0e4d1",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "3d3321e27d14f9aa",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "44eaabe4cb923766",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "46b25db9396c8209",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "46c5a59e5ae42037",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "471f11cc2d38853a",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "47c581af5de1136b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "48b7a3bf81e5f3e5",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "4a354d98c965b01f",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "4aa84fff8ad0cd26",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "51730b348b1bbd14",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "54b221668673164c",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "552665868f8f72ed",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "585fef2a1cb6b33f",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "642738a361f1c63a",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "64c64f0f9983c48f",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "654566a1f91408aa",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "693890aae9dc860b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "6cacb11611345a24",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "7291b347fe0238fb",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "7423783f7e38bb9b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "7a3d123dd555110d",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "7c8943b160464add",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "7e51711baa1b1fb1",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "80589368fa78f21a",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "8164950b155f7f56",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "85a31ae409944a1b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "8d859cfa7b51a351",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "923483635406b213",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "9312d813229df035",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "94a00ea67f49bf84",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "94bd4520b8ceb3f0",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "956d34f13e7af830",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "9a10c15885022034",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "a04f964bc53281e0",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "a23f4bd626b76590",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "a32a69e7c701eb14",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "a5ba682572f53add",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "a863cd42be4d05d4",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "a97065df07a47eb0",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "ab279eded3b3c52b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "aebf5d861a8365b4",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "b6adf79118a58cea",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "b78d323566930bd7",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "b7f9774e2142a758",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "bc85856c012bcc1b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "c107ee39eb333a9d",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "c30ff9405c916718",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "c4f8e81b70d33a13",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "c649a4cee87c4321",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "cb5bf66ef2ee09ed",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "cba8393879afd1dc",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "ce1a79e2d658eb8a",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "ce837ccd24a3a18c",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "cee6f811d0bf199d",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "d255d3a2e1c8dbf4",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "d52bfd2b6ab1c850",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "d9a3408a840c9f48",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "da290fae0d6c072f",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "da78606950f100cd",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "dd16ac872ffb8673",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "de2868ac837699fd",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "e08f0b9931f93686",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "e18350fb51a9d1b0",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "e5a3a7b3668a1cc2",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "e68fdd96cc63271b",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "ed2efb82fce4b098",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "edc9d41a298fdf60",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "efd53e9c0f36d608",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "f0a3d6881458f990",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "f24e9383331c43e2",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "f652ea96eff62654",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "f8cf362e371e8960",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "fc3812567b5fdd64",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    },
+    {
+      "identity": "fe6d7ac3fcd3129e",
+      "test_csv": false,
+      "train_csv": true,
+      "validation_csv": true
+    }
+  ]
+}

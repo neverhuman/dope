@@ -626,6 +626,8 @@ def _public_forest_cost(cost):
 
 
 def collect_sidecars(record, neural_doc, forest_doc, forest_bytes):
+    from paper_receipts import checked_extracts
+    original_extracts, original_loss = checked_extracts()
     misses = []
     not_informative = []
     dope_amounts = []
@@ -676,10 +678,10 @@ def collect_sidecars(record, neural_doc, forest_doc, forest_bytes):
             "split_kind": split.get("kind"),
             "split_seed": split.get("seed"),
         },
-        "replay": _read_json(OUT / "replay-cost.json"),
-        "beyond": _read_json(OUT / "beyond-fit.json"),
-        "provenance_counts": _read_json(OUT / "provenance-counts.json"),
-        "loss": _read_json(OUT / "loss-curves.json"),
+        "replay": original_extracts["replay-cost.json"],
+        "beyond": original_extracts["beyond-fit.json"],
+        "provenance_counts": original_extracts["provenance-counts.json"],
+        "loss": original_loss,
     }
 
 

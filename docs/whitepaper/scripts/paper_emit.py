@@ -376,14 +376,19 @@ def _write_availability(out):
     paragraph = (
         "Regenerate every \\texttt{generated/} file, the figure PDFs, and both manuscript PDFs "
         "with \\texttt{just paper} from the commit that contains these files. That recipe reads "
-        "the committed validation ledgers. When a local receipt store is present it also rereads "
-        "the fit receipts and the pinned LICENSE files. The PDF build reads the committed extracts "
-        "and does not invent a missing timer or license. It does not open an official test file. "
+        "the committed validation ledgers, original fit metadata, and compressed numeric replay logs. "
+        "The replay cost, loss curves, and BeyondArena extracts have file and field mappings in "
+        "\\texttt{generated/original-field-map.json}. Those original metadata snapshots were captured "
+        "after the historical runs; they do not reconstruct historical custody or replace scored artifacts. "
+        "Pinned LICENSE extracts are reread when their local store is available. "
+        "It does not open an official test file. "
         "The catalog hash is \\CatalogSha. The grouped training split uses seed $\\SplitSeed$. "
-        "The measured fit seed is 11, and the sample seeds are 101, 211, and 307. "
+        "The primary displayed DOPE and legacy comparison fits use seed 11 and sample seeds 101, 211, and 307. "
+        "Later retained panels document additional ARF and Forest-Flow fit seeds and the measured "
+        "TabSyn and TabDDPM subsets separately. "
         "\\texttt{python3 research/benchmark/verify\\_paper\\_numbers.py} exits nonzero when a "
-        "displayed macro disagrees with those ledgers. TabSyn, a full TabDDPM panel, the "
-        "pre-specified privacy-attack panel, fit-seed variance, and the full ablation grid are "
+        "displayed macro disagrees with those ledgers. Full neural baseline coverage, the "
+        "pre-specified privacy-attack panel, displayed-DOPE fit-seed variance, and the full ablation grid are "
         "named in the prose and omitted from the tables until those runs exist. The journal "
         "fidelity table is a separate "
         "empirical ledger on the grouped validation split. It is not the pre-specified privacy-attack "
@@ -545,7 +550,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
         command("ForestPublication", _publication_phrase("Forest-Flow")),
         command("ArfResult", _publication_phrase("ARF")),
         command("PrivacyAttackPanel", "not measured"),
-        command("FitSeedVariance", "not measured"),
+        command("FitSeedVariance", "not measured for the displayed DOPE generator"),
         command("FullAblationGrid", "not measured"),
         command("CampaignElapsed", "not measured"),
     ]

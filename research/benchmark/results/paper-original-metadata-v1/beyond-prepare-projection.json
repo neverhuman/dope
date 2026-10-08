@@ -1,0 +1,87 @@
+{
+  "failed": 7,
+  "families": 12,
+  "official_test_opened_by_optimizer": false,
+  "original_bytes": 7653,
+  "original_namespace": "beyondarena-prepared-v1/prepare-summary.json",
+  "original_sha256": "5bd0b28e97cbf477e309b8e082d326ec9fcf2d028dc357c441c521907d003587",
+  "prepared": 5,
+  "projection": "Top-level counts and results name/status/split flags; failure detail classified to reason_category. Target, rows, extrema, detail and trace omitted.",
+  "results": [
+    {
+      "inner_seed": 1729,
+      "inner_split": "official_training_grouped_80_20",
+      "name": "airfoil_self_noise",
+      "official_test_opened_by_optimizer": false,
+      "status": "prepared",
+      "test_in_worker": false
+    },
+    {
+      "name": "early_learning_predictors",
+      "reason_category": "projected_feature_range",
+      "status": "prepare_failed"
+    },
+    {
+      "name": "lending_club",
+      "reason_category": "projected_feature_range",
+      "status": "prepare_failed"
+    },
+    {
+      "name": "heart_disease_va_long_beach",
+      "reason_category": "cross_partition_overlap",
+      "status": "prepare_failed"
+    },
+    {
+      "inner_seed": 1729,
+      "inner_split": "official_training_grouped_80_20",
+      "name": "musk",
+      "official_test_opened_by_optimizer": false,
+      "status": "prepared",
+      "test_in_worker": false
+    },
+    {
+      "name": "kick",
+      "reason_category": "projected_feature_range",
+      "status": "prepare_failed"
+    },
+    {
+      "name": "qsar_biodeg",
+      "reason_category": "cross_partition_overlap",
+      "status": "prepare_failed"
+    },
+    {
+      "inner_seed": 1729,
+      "inner_split": "official_training_grouped_80_20",
+      "name": "telemonitoring_parkinsons_biomedical_voice_measurements",
+      "official_test_opened_by_optimizer": false,
+      "status": "prepared",
+      "test_in_worker": false
+    },
+    {
+      "name": "hotel_booking_demand",
+      "reason_category": "cross_partition_overlap",
+      "status": "prepare_failed"
+    },
+    {
+      "name": "wine_world_cost",
+      "reason_category": "projected_feature_range",
+      "status": "prepare_failed"
+    },
+    {
+      "inner_seed": 1729,
+      "inner_split": "official_training_grouped_80_20",
+      "name": "video_transcoding_time_prediction",
+      "official_test_opened_by_optimizer": false,
+      "status": "prepared",
+      "test_in_worker": false
+    },
+    {
+      "inner_seed": 1729,
+      "inner_split": "official_training_grouped_80_20",
+      "name": "garments_worker_productivity",
+      "official_test_opened_by_optimizer": false,
+      "status": "prepared",
+      "test_in_worker": false
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "base_main_commit": "ea1f5dace066f9df8e446ec6a9a1dd8242a9b961",
+  "format": "dope-paper-trace-scope-repair-v1",
+  "historical_audit": {
+    "bytes": 103614,
+    "path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/report.json",
+    "sha256": "a4701f7c1b06a10a38d9a0d9c3f7c59f3b54325c031369814e31bd290ef40341"
+  },
+  "historical_paper_snapshot": {
+    "bytes": 23463,
+    "path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper.json",
+    "sha256": "dbbcabc1c89a64931059e85c7139dc175100442fcbf3ce4b21da3cf4a66669aa"
+  },
+  "mfs_v2": null,
+  "new_fits_samples_or_auditors": 0,
+  "observed_utc": "2026-10-08T05:55:28.442858+00:00",
+  "official_tests_opened": false,
+  "original_field_map": {
+    "bytes": 294928,
+    "path": "docs/whitepaper/generated/original-field-map.json",
+    "sha256": "041f87621ef5715c9e64a81a541975c9d3993f0f1d284cef118efc2d81aa4a59"
+  },
+  "original_historical_custody_reconstructed": false,
+  "original_index": {
+    "bytes": 298306,
+    "path": "research/benchmark/results/paper-original-metadata-v1/index.json",
+    "sha256": "6d73d5f7b37849526a98a451b41a49e045ef21e911058d920940c5ea989f7fd9"
+  },
+  "ptf_v1": null,
+  "release_safe_l3": null,
+  "repairs": [
+    {
+      "action": "Commit current original receipt/report/numeric-log captures, field mappings, safe prepare projection and filename observations; reduce and authenticate paper inputs; regenerate full loss bootstrap/PDF from committed logs. Historical unused provenance dump is retained as an archive, not a new original receipt.",
+      "finding": "TRACE-01"
+    },
+    {
+      "action": "Qualify seed11 and no-five-fit wording as the primary displayed DOPE/legacy comparison; separately preserve retained ARF/Forest five-fit and TabSyn/TabDDPM coverage.",
+      "finding": "SCOPE-01"
+    }
+  ],
+  "rows_or_weights_published": false,
+  "scored_artifacts_replaced": false,
+  "superiority": null,
+  "unchanged_measured_outputs": [
+    {
+      "bytes": 254,
+      "path": "docs/whitepaper/generated/replay-cost.json",
+      "sha256": "faf77e7ce1ed1d22127701bf68bbfe2f8d183f89cbd3475dd80094888c36f086"
+    },
+    {
+      "bytes": 2794,
+      "path": "docs/whitepaper/generated/beyond-fit.json",
+      "sha256": "a1447f908bc9c51876d345597039607c734b507bf85aa8e08db0639e80a1f036"
+    },
+    {
+      "bytes": 260,
+      "path": "docs/whitepaper/generated/provenance-counts.json",
+      "sha256": "a5d7e93ab147decaf7548dc4b697a6b7c0adae16ac172f8780ed83e2d3ff0848"
+    },
+    {
+      "bytes": 1197,
+      "path": "docs/whitepaper/generated/loss-curves.json",
+      "sha256": "0124915497c98e560ef99c1e5ecf7ad876f9174439ff9c763cf1cf906b4aebe1"
+    },
+    {
+      "bytes": 387885,
+      "path": "docs/whitepaper/figures/loss-curves.pdf",
+      "sha256": "73883588acb82aeb1fb8b8755ca5186e23267ab7aaf19be8477425a8eee02f00"
+    }
+  ]
+}

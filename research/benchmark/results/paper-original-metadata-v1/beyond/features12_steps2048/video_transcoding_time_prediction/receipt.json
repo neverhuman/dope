@@ -1,0 +1,1 @@
+{"artifact_bytes": 5054, "elapsed_seconds": 7.004, "exit_code": 0, "loss_rows": 2048, "max_rss_kib": 1342408, "name": "video_transcoding_time_prediction", "official_test_opened": false, "profile": "features12_steps2048", "selected_candidate": "compact_neural_residual_symbolic", "status": "ok", "task": "regression", "within_l3_cap": true}

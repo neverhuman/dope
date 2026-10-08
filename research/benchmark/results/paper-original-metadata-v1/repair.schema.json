@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "historical_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ]
+    },
+    "original_index": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ]
+    },
+    "original_field_map": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ]
+    },
+    "historical_paper_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ]
+    },
+    "format": {
+      "const": "dope-paper-trace-scope-repair-v1"
+    },
+    "observed_utc": {
+      "type": "string"
+    },
+    "base_main_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "unchanged_measured_outputs": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ]
+      }
+    },
+    "repairs": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "finding": {
+            "enum": [
+              "TRACE-01",
+              "SCOPE-01"
+            ]
+          },
+          "action": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "finding",
+          "action"
+        ]
+      }
+    },
+    "original_historical_custody_reconstructed": {
+      "const": false
+    },
+    "scored_artifacts_replaced": {
+      "const": false
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "rows_or_weights_published": {
+      "const": false
+    },
+    "new_fits_samples_or_auditors": {
+      "const": 0
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "release_safe_l3": {
+      "type": "null"
+    },
+    "superiority": {
+      "type": "null"
+    }
+  },
+  "required": [
+    "historical_audit",
+    "original_index",
+    "original_field_map",
+    "historical_paper_snapshot",
+    "format",
+    "observed_utc",
+    "base_main_commit",
+    "unchanged_measured_outputs",
+    "repairs",
+    "original_historical_custody_reconstructed",
+    "scored_artifacts_replaced",
+    "official_tests_opened",
+    "rows_or_weights_published",
+    "new_fits_samples_or_auditors",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "superiority"
+  ]
+}

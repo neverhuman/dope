@@ -57,3 +57,14 @@ checked two-core,4GiB,zero-swap limits. These are verification resources, not
 scientific fit-cost or admission claims. No original row/model/sample/test was
 opened. Repository required gates and hosted CI remain separate from this
 red-team proof.
+
+## Historical paper bytes
+
+`historical-paper.json` indexes deterministic gzip snapshots of the exact
+paper inputs read at `reviewed_main_commit`. Each snapshot was obtained from
+that Git commit and verified against the original report's byte length and
+SHA-256 before compression. The report and findings are unchanged. This
+lets later corrections update the manuscript while the historical audit
+continues to verify its original evidence, rather than pinning future
+manuscripts to an obsolete text. Immutable benchmark publications remain
+bound to their original committed paths.

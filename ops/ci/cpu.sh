@@ -34,6 +34,8 @@ cd "$root"
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_tabsyn_admission research.benchmark.tests.test_tabsyn_owned_lifecycle -q
 # A publisher edit that leaves the committed fit ledger stale fails before campaign publication.
 PYTHONPATH=. python3 -m unittest research.benchmark.tests.test_dope_refinement_fits.RefinementFits.test_committed_fit_ledger_tracks_publisher -v
+python3 docs/whitepaper/scripts/local_receipts.py --check
+python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_paper_receipts.py -v
 python3 research/benchmark/verify_paper_numbers.py
 python3 docs/whitepaper/scripts/compute_cost.py
 uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'matplotlib==3.10.8'

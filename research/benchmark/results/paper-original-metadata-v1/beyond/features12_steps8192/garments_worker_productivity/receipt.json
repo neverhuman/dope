@@ -1,0 +1,1 @@
+{"artifact_bytes": 2372, "elapsed_seconds": 14.008, "exit_code": 0, "loss_rows": 8192, "max_rss_kib": 882236, "name": "garments_worker_productivity", "official_test_opened": false, "profile": "features12_steps8192", "selected_candidate": "compact_neural_residual_symbolic", "status": "ok", "task": "regression", "within_l3_cap": true}

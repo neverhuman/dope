@@ -1,6 +1,8 @@
 """Reject incomparable receipt joins and prevent scheduling estimates becoming results."""
 import copy
 import hashlib
+import gzip
+import io
 import json
 from pathlib import Path
 from statistics import mean, median
@@ -123,11 +125,39 @@ class MatchedCoverage(unittest.TestCase):
         for artifact in report["artifacts"]:
             refs.extend([artifact["artifact"], *artifact["reduction_source_refs"]])
         for finding in report["findings"]: refs.extend(finding["affected_refs"])
-        for ref in refs:
+        snapshot_raw = (root / "historical-paper.json").read_bytes()
+        self.assertEqual(hashlib.sha256(snapshot_raw).hexdigest(),
+                         "dbbcabc1c89a64931059e85c7139dc175100442fcbf3ce4b21da3cf4a66669aa")
+        snapshot = json.loads(snapshot_raw)
+        snapshot_schema = json.loads((root / "historical-paper.schema.json").read_bytes())
+        jsonschema.Draft202012Validator(snapshot_schema).validate(snapshot)
+        self.assertEqual(snapshot["reviewed_main_commit"], report["reviewed_main_commit"])
+        self.assertEqual(snapshot["report_sha256"], hashlib.sha256((root / "report.json").read_bytes()).hexdigest())
+        archived = {r["original_path"]: r for r in snapshot["sources"]}
+        self.assertEqual(len(archived), len(snapshot["sources"]))
+        self.assertEqual(set(archived), {r["path"] for r in refs if r["path"].startswith("docs/whitepaper/")})
+
+        def audited_bytes(ref):
             self.assertFalse(Path(ref["path"]).is_absolute())
-            raw = (publisher.REPO / ref["path"]).read_bytes()
+            if ref["path"] in archived:
+                entry = archived[ref["path"]]
+                self.assertEqual((entry["original_bytes"], entry["original_sha256"]), (ref["bytes"], ref["sha256"]))
+                path = publisher.REPO / entry["snapshot_path"]
+                self.assertEqual(path.parent, root / "historical-paper")
+                compressed = path.read_bytes()
+                self.assertEqual((len(compressed), hashlib.sha256(compressed).hexdigest()),
+                                 (entry["snapshot_bytes"], entry["snapshot_sha256"]))
+                with gzip.GzipFile(fileobj=io.BytesIO(compressed)) as handle:
+                    raw = handle.read(entry["original_bytes"] + 1)
+            else:
+                raw = (publisher.REPO / ref["path"]).read_bytes()
             self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), (ref["bytes"], ref["sha256"]))
-        kp = json.loads((publisher.REPO / "docs/whitepaper/generated/published-baseline-kpis.json").read_bytes())
+            return raw
+
+        for ref in refs:
+            audited_bytes(ref)
+        kp_ref = next(r for r in refs if r["path"] == "docs/whitepaper/generated/published-baseline-kpis.json")
+        kp = json.loads(audited_bytes(kp_ref))
         self.assertEqual(report["numeric_kpi_points"], len(kp["figure_points"]))
         self.assertEqual({f["id"] for f in report["findings"]}, {"TRACE-01", "SCOPE-01"})
         self.assertFalse(report["official_tests_opened"])

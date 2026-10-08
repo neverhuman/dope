@@ -1,0 +1,1 @@
+{"artifact_bytes": 524, "dataset": "8d859cfa7b51a351", "elapsed_seconds": 14.246, "exit_code": 0, "loss_rows": 8192, "max_rss_kib": 949172, "official_tests_opened": false, "profile": "features12_steps8192", "replaces_scored_artifact": false, "selected_candidate": "compact_neural_residual_symbolic", "status": "ok"}

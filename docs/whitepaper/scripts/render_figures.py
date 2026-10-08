@@ -56,7 +56,7 @@ REPO = Path(__file__).resolve().parents[3]
 RESULTS = REPO / "research" / "benchmark" / "results"
 GEN = REPO / "docs" / "whitepaper" / "generated"
 FIG = REPO / "docs" / "whitepaper" / "figures"
-LOSS_ROOT = Path("/mnt/fast-scratch/dope-benchmark/dope-s3-loss-log-v1/replay")
+from paper_receipts import loss_matrix as committed_loss_matrix
 SEED = 20261005
 DRAWS = 10_000
 BYTE_CAP = 10240
@@ -213,18 +213,7 @@ def draw_paired(stats, dest=None):
 
 
 def loss_matrix(profile):
-    paths = sorted((LOSS_ROOT / profile).glob("*/loss.tsv"))
-    rows = []
-    for path in paths:
-        table = np.loadtxt(path)
-        if table.ndim != 2 or table.shape[1] != 3:
-            continue
-        rows.append(table[:, 1:])
-    if not rows:
-        return None
-    width = min(row.shape[0] for row in rows)
-    stacked = np.stack([row[:width] for row in rows], axis=0)
-    return stacked
+    return np.asarray(committed_loss_matrix(profile), dtype=float)
 
 
 def bootstrap_band(values, rng):
@@ -255,24 +244,14 @@ def bootstrap_band(values, rng):
     return median, lo, hi
 
 
-def draw_loss():
-    """Redraw the replay curves only when the scratch log is mounted.
-
-    A missing log must leave the committed PDF and JSON in place. CI does not
-    have that scratch, and an error stub would fail the diff.
-    """
-    if not LOSS_ROOT.is_dir():
-        print("loss replay absent; committed loss-curves.pdf kept")
-        return FIG / "loss-curves.pdf" if (FIG / "loss-curves.pdf").is_file() else None
+def draw_loss(dest=None, summary_dest=None):
+    """Regenerate curves and bootstrap intervals from authenticated committed TSVs."""
     rng = np.random.default_rng(SEED)
     profiles = ("features12_steps2048", "features12_steps8192")
     figure, axes = plt.subplots(1, 2, figsize=(7.16, 2.55), sharey=True)
     summary = {"seed": SEED, "draws": DRAWS, "stride_note": "band evaluated every 8 steps and linearly filled", "profiles": {}}
     for axis, profile in zip(axes, profiles):
         matrix = loss_matrix(profile)
-        if matrix is None:
-            summary["profiles"][profile] = {"error": "no loss.tsv"}
-            continue
         train, train_lo, train_hi = bootstrap_band(matrix[:, :, 0], rng)
         valid, valid_lo, valid_hi = bootstrap_band(matrix[:, :, 1], rng)
         steps = np.arange(train.size)
@@ -305,9 +284,10 @@ def draw_loss():
         }
     axes[0].legend(frameon=False)
     figure.tight_layout(pad=0.35)
-    path = FIG / "loss-curves.pdf"
+    path = Path(dest) if dest is not None else FIG / "loss-curves.pdf"
     _save(figure, path)
-    (GEN / "loss-curves.json").write_text(json.dumps(summary, indent=2) + "\n")
+    summary_path = Path(summary_dest) if summary_dest is not None else GEN / "loss-curves.json"
+    summary_path.write_text(json.dumps(summary, indent=2) + "\n")
     return path
 
 
@@ -411,15 +391,15 @@ def _check():
             "retention-bytes.pdf": draw_retention(record, stats, Path(tmp) / "retention-bytes.pdf"),
             "retention-bars.pdf": draw_retention_bars(stats, Path(tmp) / "retention-bars.pdf"),
             "paired-cdf.pdf": draw_paired(stats, Path(tmp) / "paired-cdf.pdf"),
+            "loss-curves.pdf": draw_loss(Path(tmp) / "loss-curves.pdf", Path(tmp) / "loss-curves.json"),
         }
+        if (Path(tmp) / "loss-curves.json").read_bytes() != (GEN / "loss-curves.json").read_bytes():
+            raise SystemExit("loss bootstrap summary does not reproduce from committed traces")
         for name, path in fresh.items():
             digest = _sha256(path)
             committed = _sha256(FIG / name)
             if digest != recorded[name] or committed != recorded[name]:
                 raise SystemExit(f"{name} hash {digest} does not match the committed figure")
-    loss_name = "loss-curves.pdf"
-    if _sha256(FIG / loss_name) != recorded[loss_name]:
-        raise SystemExit("loss-curves.pdf does not match figure-hashes.json")
     print("figure hashes match")
 
 

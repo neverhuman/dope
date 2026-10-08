@@ -2459,6 +2459,18 @@
     "harness_sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
     "hashes": [
       {
+        "path": "research/benchmark/results/paper-original-metadata-v1/index.json",
+        "sha256": "6d73d5f7b37849526a98a451b41a49e045ef21e911058d920940c5ea989f7fd9"
+      },
+      {
+        "path": "docs/whitepaper/generated/original-field-map.json",
+        "sha256": "041f87621ef5715c9e64a81a541975c9d3993f0f1d284cef118efc2d81aa4a59"
+      },
+      {
+        "path": "docs/whitepaper/scripts/paper_receipts.py",
+        "sha256": "6a7942f1bfbc965c718a7a8aa3d06189a78e155dbc2df502c9f787b213c03315"
+      },
+      {
         "path": "research/benchmark/expanded_validation_metrics.py",
         "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
       },

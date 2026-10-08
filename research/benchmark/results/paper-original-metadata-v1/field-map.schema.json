@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "dope-paper-original-field-map-v1"
+    },
+    "index": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "fits": {
+      "type": "array",
+      "minItems": 210,
+      "maxItems": 210,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "replay",
+              "beyond"
+            ]
+          },
+          "profile": {
+            "enum": [
+              "features12_steps2048",
+              "features12_steps8192"
+            ]
+          },
+          "identity": {
+            "type": "string"
+          },
+          "elapsed_seconds": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "pointer": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256",
+              "pointer"
+            ]
+          },
+          "artifact_bytes": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "pointer": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256",
+              "pointer"
+            ]
+          },
+          "fit_rows": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "pointer": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256",
+              "pointer"
+            ]
+          },
+          "loss": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "pointer": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256",
+              "pointer"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "profile",
+          "identity",
+          "elapsed_seconds",
+          "artifact_bytes",
+          "fit_rows",
+          "loss"
+        ]
+      }
+    },
+    "filename_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pointer": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "pointer"
+      ]
+    },
+    "prepare": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pointer": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "pointer"
+      ]
+    },
+    "replay_cost_reduction": {
+      "type": "string"
+    },
+    "loss_curve_reduction": {
+      "type": "string"
+    },
+    "beyond_reduction": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "format",
+    "index",
+    "fits",
+    "filename_counts",
+    "prepare",
+    "replay_cost_reduction",
+    "loss_curve_reduction",
+    "beyond_reduction"
+  ]
+}

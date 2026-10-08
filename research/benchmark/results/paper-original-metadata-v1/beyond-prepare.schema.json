@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "failed": {
+      "const": 7
+    },
+    "families": {
+      "const": 12
+    },
+    "prepared": {
+      "const": 5
+    },
+    "official_test_opened_by_optimizer": {
+      "const": false
+    },
+    "original_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "original_namespace": {
+      "const": "beyondarena-prepared-v1/prepare-summary.json"
+    },
+    "original_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "projection": {
+      "type": "string"
+    },
+    "results": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "prepared",
+              "prepare_failed"
+            ]
+          },
+          "reason_category": {
+            "enum": [
+              "projected_feature_range",
+              "cross_partition_overlap"
+            ]
+          },
+          "inner_seed": {
+            "const": 1729
+          },
+          "inner_split": {
+            "const": "official_training_grouped_80_20"
+          },
+          "official_test_opened_by_optimizer": {
+            "const": false
+          },
+          "test_in_worker": {
+            "const": false
+          }
+        },
+        "required": [
+          "name",
+          "status"
+        ],
+        "oneOf": [
+          {
+            "properties": {
+              "status": {
+                "const": "prepared"
+              }
+            },
+            "required": [
+              "inner_seed",
+              "inner_split",
+              "official_test_opened_by_optimizer",
+              "test_in_worker"
+            ],
+            "not": {
+              "required": [
+                "reason_category"
+              ]
+            }
+          },
+          {
+            "properties": {
+              "status": {
+                "const": "prepare_failed"
+              }
+            },
+            "required": [
+              "reason_category"
+            ],
+            "not": {
+              "required": [
+                "inner_seed"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "failed",
+    "families",
+    "prepared",
+    "official_test_opened_by_optimizer",
+    "original_bytes",
+    "original_namespace",
+    "original_sha256",
+    "projection",
+    "results"
+  ]
+}

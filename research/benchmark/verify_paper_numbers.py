@@ -106,18 +106,13 @@ def forest_fits():
 
 def beyond_prepare():
     """Prepare counts stored in the committed provenance dump and inventory."""
-    provenance = json.loads(PROVENANCE.read_text())
-    summary = provenance["beyondarena"]["prepare_summary"]
-    feature_range = 0
-    overlap = 0
-    for row in summary["failed_families"]:
-        detail = str(row.get("detail") or "")
-        if "projected feature count" in detail:
-            feature_range += 1
-        elif "overlapping source row" in detail:
-            overlap += 1
-        else:
-            raise ValueError(f"unclassified prepare failure: {row.get('name')}")
+    scripts = PAPER / "scripts"
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from paper_receipts import prepare
+    summary = prepare()
+    feature_range = sum(r.get("reason_category") == "projected_feature_range" for r in summary["results"])
+    overlap = sum(r.get("reason_category") == "cross_partition_overlap" for r in summary["results"])
     inventory = json.loads(INVENTORY.read_text())
     return {
         "families": int(summary["families"]),
@@ -133,7 +128,11 @@ def beyond_prepare():
 
 def loss_medians():
     """Point medians already reduced in the committed loss-curve ledger."""
-    document = json.loads(LOSS_CURVES.read_text())
+    scripts = PAPER / "scripts"
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    from paper_receipts import checked_loss_summary
+    document = checked_loss_summary()
     found = {}
     for profile in ("features12_steps2048", "features12_steps8192"):
         row = document["profiles"][profile]

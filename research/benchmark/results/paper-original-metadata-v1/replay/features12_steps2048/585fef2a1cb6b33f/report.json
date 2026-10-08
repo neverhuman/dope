@@ -1,0 +1,29 @@
+{
+  "format": "dope-kernel-compile-report",
+  "version": 3,
+  "release_policy": {
+    "version": 1,
+    "tier": "l3",
+    "maximum_artifact_bytes": 10240,
+    "require_formal_dp": false
+  },
+  "release_policy_hash": "2b4bd82cd7f35cf9d334a44f5e670bfc5e56d44e51d2691fd4704ad362ee7b87",
+  "task": "regression",
+  "rows": 267,
+  "positional_features": 2,
+  "selected_candidate": "compact_neural_residual_symbolic",
+  "artifact_bytes": 400,
+  "effective_bytes": 400,
+  "bits_per_original_cell": 3.9950062421972534,
+  "compliant": false,
+  "failed_gates": [
+    "utility",
+    "production_evidence_unmeasured"
+  ],
+  "candidate_count": 1,
+  "frontier_count": 1,
+  "beam_width": 1,
+  "elapsed_seconds": 3.730911326,
+  "contains_row_payloads": false,
+  "contains_row_references": false
+}

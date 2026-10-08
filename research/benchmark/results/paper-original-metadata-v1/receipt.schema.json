@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "dataset": {
+      "type": "string"
+    },
+    "elapsed_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "exit_code": {
+      "const": 0
+    },
+    "loss_rows": {
+      "enum": [
+        2048,
+        8192
+      ]
+    },
+    "max_rss_kib": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "profile": {
+      "enum": [
+        "features12_steps2048",
+        "features12_steps8192"
+      ]
+    },
+    "replaces_scored_artifact": {
+      "const": false
+    },
+    "selected_candidate": {
+      "const": "compact_neural_residual_symbolic"
+    },
+    "status": {
+      "const": "ok"
+    },
+    "name": {
+      "type": "string"
+    },
+    "official_test_opened": {
+      "const": false
+    },
+    "task": {
+      "enum": [
+        "regression",
+        "binary"
+      ]
+    },
+    "within_l3_cap": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "artifact_bytes",
+    "elapsed_seconds",
+    "exit_code",
+    "loss_rows",
+    "max_rss_kib",
+    "profile",
+    "selected_candidate",
+    "status"
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "dataset",
+        "official_tests_opened",
+        "replaces_scored_artifact"
+      ],
+      "not": {
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "required": [
+        "name",
+        "official_test_opened",
+        "task",
+        "within_l3_cap"
+      ],
+      "not": {
+        "required": [
+          "dataset"
+        ]
+      }
+    }
+  ]
+}
