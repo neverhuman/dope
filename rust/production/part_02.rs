@@ -1,5 +1,3 @@
-
-
 impl StructuralProfile {
     pub fn from_shape(task: Task, rows: usize, features: usize) -> Result<Self> {
         if !(1..=2_000).contains(&features) {
@@ -211,7 +209,7 @@ fn mean(values: impl Iterator<Item = f64>) -> f64 {
     values.iter().sum::<f64>() / values.len().max(1) as f64
 }
 
-fn one_sided_lower(values: &[f64], level: f64) -> Option<f64> {
+pub(crate) fn one_sided_lower(values: &[f64], level: f64) -> Option<f64> {
     if values.is_empty() {
         return None;
     }

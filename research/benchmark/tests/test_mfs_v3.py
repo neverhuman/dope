@@ -1,0 +1,137 @@
+import json
+import stat
+import tempfile
+import unittest
+from pathlib import Path
+
+from research.benchmark.representation import (
+    artifact_has_cleartext,
+    category_code,
+    hash_manifest,
+    midrank_quantile,
+    write_local_lookup,
+)
+from research.benchmark.score import CONTRACT, evaluate_v3, validate_contract
+
+
+ROOT = Path(__file__).resolve().parents[3]
+
+
+def passing():
+    return {
+        "encoder": "kumo_tabular_l",
+        "distance": 0.2,
+        "d_null": 0.5,
+        "d_match": 0.4,
+        "gap_mitra": -0.1,
+        "gap_tabicl": -0.2,
+        "exact_row_matches": 0,
+        "near_copy_ok": True,
+        "cleartext_absent": True,
+        "membership_auc": 0.5,
+        "attribute_inference_advantage": 0.0,
+        "artifact_bytes": 1000,
+        "normalizer": "empirical_midrank_quantile_v1",
+        "utility_protocol": "train_on_synthetic_score_on_real",
+        "utility_auditors": ["kumo_tabular_l", "mitra_v2", "tabicl2"],
+        "mfs_components": {
+            "utility_transfer": 0.5,
+            "driver_fidelity": 0.5,
+            "distribution_fidelity": 0.5,
+            "structure_fidelity": 0.5,
+            "coverage_realism": 0.5,
+            "compactness": 0.5,
+        },
+    }
+
+
+class MfsV3Tests(unittest.TestCase):
+    def test_v2_contract_pin_is_unchanged(self):
+        validate_contract(ROOT)
+        self.assertEqual(CONTRACT["mfs_v2"]["weights"]["utility_transfer"], 0.30)
+        self.assertNotIn("representation_closeness", CONTRACT["mfs_v2"]["weights"])
+
+    def test_geometric_mean_of_a_complete_vector(self):
+        report = evaluate_v3(passing())
+        self.assertTrue(report["eligible"])
+        self.assertAlmostEqual(report["representation_closeness"], 0.5)
+        self.assertAlmostEqual(report["score"], 100 * (0.5 + 1e-6))
+
+    def test_catboost_retention_cannot_fill_tabular_transfer(self):
+        evidence = passing()
+        evidence["utility_protocol"] = "auditor_retention"
+        evidence["utility_auditors"] = ["catboost"]
+        report = evaluate_v3(evidence)
+        self.assertIsNone(report["score"])
+        self.assertIn("tabular_transfer", report["failed_gates"])
+
+    def test_one_exact_row_match_is_null(self):
+        evidence = passing()
+        evidence["exact_row_matches"] = 1
+        report = evaluate_v3(evidence)
+        self.assertIsNone(report["score"])
+        self.assertIn("exact_row_match", report["failed_gates"])
+
+    def test_cleartext_header_is_null(self):
+        evidence = passing()
+        evidence["cleartext_absent"] = not artifact_has_cleartext(b"header,age\n1", [b"age"])
+        report = evaluate_v3(evidence)
+        self.assertIsNone(report["score"])
+        self.assertIn("cleartext_absent", report["failed_gates"])
+
+    def test_refused_encoder_is_null(self):
+        evidence = passing()
+        evidence["encoder"] = "foundation"
+        report = evaluate_v3(evidence)
+        self.assertIsNone(report["score"])
+        self.assertIn("clean_encoder", report["failed_gates"])
+        evidence["encoder"] = "tabpfn35"
+        self.assertIsNone(evaluate_v3(evidence)["score"])
+
+    def test_zero_match_distance_and_mitra_disagreement_are_null(self):
+        evidence = passing()
+        evidence["d_match"] = 0.0
+        self.assertIsNone(evaluate_v3(evidence)["score"])
+        evidence["d_match"] = 0.4
+        evidence["gap_mitra"] = 0.2
+        report = evaluate_v3(evidence)
+        self.assertIsNone(report["representation_closeness"])
+        self.assertIsNone(report["score"])
+
+    def test_supplied_closeness_cannot_replace_the_measurement(self):
+        evidence = passing()
+        evidence["mfs_components"]["representation_closeness"] = 1.0
+        evidence["d_match"] = 0.0
+        self.assertIsNone(evaluate_v3(evidence)["score"])
+
+    def test_manifest_and_quantile_drop_source_text(self):
+        manifest = hash_manifest(b"salt", [("age", 1, 1)], "kumo_tabular_l", 100)
+        encoded = json.dumps(manifest)
+        self.assertNotIn("age", encoded)
+        self.assertEqual(len(manifest["columns"][0]["hash"]), 16)
+        real = [1.0, 2.0, 4.0]
+        frozen = midrank_quantile(real, [0.0, 1.0, 3.0, 4.0, 9.0])
+        self.assertAlmostEqual(frozen[2], 2.0 / 3.0)
+        synthetic = [10.0, 11.0, 12.0]
+        frozen_synth = midrank_quantile(real, synthetic)
+        self.assertNotEqual(frozen_synth, midrank_quantile(synthetic, synthetic))
+        self.assertTrue(all(abs(value - (2.5 / 3.0)) < 1e-12 for value in frozen_synth))
+        self.assertNotIn("red", f"{category_code(b'salt', 'red')}")
+
+    def test_lookup_file_stays_outside_the_repo(self):
+        with self.assertRaises(ValueError):
+            write_local_lookup(ROOT / "production", ROOT, b"salt", [("age", 1, 1)], ["red"])
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_local_lookup(Path(tmp), ROOT, b"salt", [("age", 1, 1)], ["red"])
+            self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
+            self.assertTrue(artifact_has_cleartext(path.read_bytes(), [b"age", b"red"]))
+            fixture = Path(tmp) / "artifact.csv"
+            fixture.write_bytes(b"header,age\n1")
+            self.assertTrue(artifact_has_cleartext(fixture.read_bytes(), [b"age"]))
+            encoded = json.dumps(hash_manifest(b"salt", [("age", 1, 1)], "kumo_tabular_l", 100))
+            self.assertNotIn("age", encoded)
+            self.assertNotIn("red", encoded)
+
+
+if __name__ == "__main__":
+    unittest.main()

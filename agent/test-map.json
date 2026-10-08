@@ -1,6 +1,50 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/tests/test_mfs_v3_panel.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
+      "purpose": "lock the MFS-v3 panel cohort, shared map, null band, and GPU yield rule"
+    },
+    "research/benchmark/mfs_v3_panel.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
+      "purpose": "lock the MFS-v3 panel cohort, shared map, null band, and GPU yield rule"
+    },
+    "rust/mfs_v3_holdout.rs": {
+      "command": "cargo test --locked --bin mfs-v3-holdout",
+      "purpose": "score mapped holdout tables with the production holdout function and refuse values outside the unit interval"
+    },
+    "research/benchmark/mfs_v3_holdout.py": {
+      "command": "cargo test --locked --bin mfs-v3-holdout",
+      "purpose": "pack mapped tables for the production holdout scorer without opening official test files"
+    },
+    "research/benchmark/mfs_v3_assemble.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel.AssembleScoreTest -v",
+      "purpose": "assemble MFS-v3 only through evaluate_v3 and keep an unscanned artifact null"
+    },
+    "docs/whitepaper/scripts/mfs_v3_table.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_mfs_v3_table.py -v",
+      "purpose": "recompute the Kumo, Mitra, and TabICL density table from lineage retentions"
+    },
+    "docs/whitepaper/scripts/test_mfs_v3_table.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_mfs_v3_table.py -v",
+      "purpose": "recompute the Kumo, Mitra, and TabICL density table from lineage retentions"
+    },
+    "research/benchmark/tests/test_mfs_v3.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3 research.benchmark.tests.test_score -v",
+      "purpose": "score MFS-v3 only from frozen weights and measured gates, and keep the v2 pin unchanged"
+    },
+    "research/benchmark/representation.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3 -v",
+      "purpose": "fit the real-train quantile map and keep source strings out of the public hash manifest"
+    },
+    "production/kpi-contract-v3.json": {
+      "command": "cargo test --locked --lib fitness::tests::embedded_v3_contract_matches_the_build_digest",
+      "purpose": "bind the pre-registered MFS-v3 sibling contract to its build digest"
+    },
+    "rust/representation.rs": {
+      "command": "cargo test --locked --lib representation::",
+      "purpose": "check the frozen quantile map, HMAC manifest, and representation closeness gates"
+    },
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
       "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"

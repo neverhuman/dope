@@ -364,19 +364,103 @@ Compactness is $\mathrm{clamp}(1 - \mathrm{bytes}/10240,\, 0,\, 1)$. An
 artifact past $10{,}240$ bytes fails the byte gate, and the scalar stays
 null. Crossing the cap is a failed gate, distinct from a retention of zero.
 
+MFS-v3 is the score a later release has to pass. MFS-v2 is unchanged.
+Historical receipts still pin the v2 file. \eqref{eq:mfs} is the same
+geometric mean, with one added weight. Utility transfer is $0.35$.
+Representation closeness, driver fidelity, and distribution fidelity are
+each $0.15$. Structure fidelity is $0.10$. Coverage realism and
+compactness are each $0.05$. Privacy stays at soft weight zero. A missing
+component, a failed gate, or any other weight vector makes the scalar
+null.
+
+Distribution fidelity, structure fidelity, coverage realism, and
+compactness keep their v2 definitions. The driver term stored beside
+this panel is rank agreement of absolute correlations with the target.
+It is not the permutation-importance auditor in the v2 definition, and
+this paper does not publish it as a component value. v2 utility transfer
+remains the one-sided lower bound on
+retention for the CatBoost, linear, and MLP auditors in the tables below.
+v3 utility transfer is that same bound when the auditor is a clean-license
+tabular model. The model is conditioned on the synthetic rows and scored
+on real holdout rows. Kumo large is the headline auditor. Mitra and TabICL
+repeat the measurement on the same mapped tables. A CatBoost retention
+cannot fill this component.
+
+Real fit rows, real holdout rows, and synthetic rows share one map. The
+map is fit on the real fit rows only. Numeric columns go to the open unit
+interval by an empirical mid-rank quantile. Categorical levels are
+pre-encoded to fixed codes in that same interval. Column names become HMAC
+digests. The map does not publish a minimum or a maximum. A second fit on
+the synthetic rows is a protocol failure. The tabular auditors and the
+embedding distance both see this mapped pair.
+
+Representation closeness asks whether Kumo large places the mapped
+synthetic table near the mapped real table. The distance is half the
+Euclidean length between the two unit-length vectors, and it lies in
+$[0,1]$. Closeness is one minus that distance divided by the distance to a
+matched null. The synthetic table must also sit closer than an
+independent-marginal table of the same size, under the same map. The
+matched null is a second table whose cheap-model scores sit in a band
+fixed before the synthetic rows are encoded. Mitra and TabICL must show
+the same sign as Kumo large on that gap. A sign flip, a zero match
+distance, or a missing vector makes the component null. The component is
+required. It does not stand in for the tabular transfer.
+
+The headline encoder is Kumo large. Its loss is the structured-data-model
+regressor's mean of the inverse-transformed quantile forecasts. A single
+in-context prediction is a different scale and is not this loss. Mitra and
+TabICL repeat that transfer on the same mapped tables. Both are required
+for the tabular gate. Neither is averaged into representation closeness.
+Mitra is the zero-shot regressor. TabICL restores the context scale before
+the squared error. Kumo small and the project encoder a0 were not run.
+Kumo is available under the OpenMDW
+license and the Apache license. Mitra is Apache-licensed. TabICL is
+BSD-licensed. The chase score refuses
+Foundation and TabPFN, whose licenses are not in the clean set for this
+release. It also refuses the target encoder, the historical context
+assembly, Hyperion, TabDPT, and the target-aware blocks. TabDPT's weights
+are Apache-licensed and still refused, because that model was trained on
+real tables that overlap this panel. Hyperion is the project's and still
+refused, because one training arm saw labels. The $4{,}168$-dimensional
+vector remains the router embedding. It is not an input to \eqref{eq:mfs}.
+The shipped generator remains \texttt{features12\_\allowbreak{}steps2048}.
+
+The object a recipient keeps is that generator together with a hash
+manifest: a salt identifier, the normalizer name, the encoder pin, one
+digest per column, a dtype code, and the byte length. The manifest carries
+no row, header, category string, extremum, or encoder weight. The salt and
+the hash-to-label map stay in a local file the recipient holds. A public
+sidecar that echoes a source string or an extremum fails the cleartext
+gate. An exact copy of a real row fails its own gate. Crossing
+$10{,}240$ bytes fails the byte gate. In each case the scalar stays null.
+
+The tabular error and the embedding distance answer different questions.
+Tabular transfer asks whether a clean tabular model conditioned on the
+synthetic rows recovers the improvement that the same model obtained from
+real fit rows. Representation closeness asks whether the mapped synthetic
+table sits near the mapped real table. A release needs both measurements.
+A copied row, a cleartext string, or a byte-cap failure still removes the
+score.
+
 PTF-v1 is the other release KPI. Its hard gates include joint fidelity,
 membership and attribute attacks, copy checks, and feature-importance
-agreement on a sealed holdout. It is null here, as is MFS-v2. Compile-time
+agreement on a sealed holdout. It is null here, as are MFS-v2 and MFS-v3.
+Compile-time
 search records the proxy $0.45u + 0.25d + 0.30j$ and then keeps the
 candidate with the smallest gate shortfall, then the smallest artifact.
 That record withholds a release certificate. The proxy is not
 \eqref{eq:mfs}.
 
-No artifact in this paper has a measured MFS-v2 value. Emitting one requires
-the six components, a non-empty hard-gate map that passed, both the size-$n$
-and size-$4n$ artifacts, real-versus-real controls, artifact-only sampling,
-and locked metric implementations. A retention win does not supply those
-inputs. Copying a retention number into \eqref{eq:mfs} would publish a value
+No artifact in this paper has a measured MFS-v2 or MFS-v3 value. Emitting
+MFS-v2 requires the six components, a non-empty hard-gate map that passed,
+both the size-$n$ and size-$4n$ artifacts, real-versus-real controls,
+artifact-only sampling, and locked metric implementations. Emitting MFS-v3
+also requires the clean tabular transfer and the embedding distance under
+the shared map, and every hard gate has to pass. Table~\ref{tab:mfsv3}
+reports the measured retentions. A retention is not the scalar. The
+cleartext scan is unscanned where the stored column codes are internal
+identifiers, and other gates fail on many lineages, so the scalar stays
+null. A retention win does not supply those inputs. Copying a retention number into \eqref{eq:mfs} would publish a value
 the contract refuses to emit. The supplement applies \eqref{eq:mfs} to
 invented components, including a zero compactness term. Those rows are
 arithmetic. They show the shape of the product. They are not a score for any
@@ -561,6 +645,38 @@ axis is the retention difference. The segment is the critical difference.
 \includegraphics[width=\textwidth]{figures/paired-cdf.pdf}
 \caption{CatBoost paired differences, sorted, and the Nemenyi scale. Rank 1 is the higher retention. The segment length is the critical difference.}
 \label{fig:pairs}
+\end{figure*}
+
+Table~\ref{tab:mfsv3} is the same density block scored by Kumo large, Mitra, and TabICL.
+The shared map and the three sample seeds are the ones named above.
+These auditors are not pooled with the CatBoost, linear, and MLP rows.
+Fig.~\ref{fig:mfsv3bars} shows the lineage medians.
+Fig.~\ref{fig:mfsv3pairs} shows the sorted paired differences.
+Squares are the Gaussian copula, triangles are Chow--Liu, and diamonds are the independent marginals.
+
+\input{generated/mfs-v3-scalar.tex}
+
+\begin{table*}[t]
+\caption{Kumo large, Mitra, and TabICL on the density block at $4n$. W/T/L counts lineages. A row is a retention, not an MFS value.}
+\label{tab:mfsv3}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\input{generated/mfs-v3-density-table.tex}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/mfs-v3-retention-bars.pdf}
+\caption{Kumo large, Mitra, and TabICL retention at $4n$. Higher is better. Each bar is the lineage median and its lineage-bootstrap interval. Hatches distinguish the methods. This panel is not an MFS value.}
+\label{fig:mfsv3bars}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/mfs-v3-paired.pdf}
+\caption{Paired retention differences for Kumo large, Mitra, and TabICL, sorted by lineage. Filled marks are lineages.}
+\label{fig:mfsv3pairs}
 \end{figure*}
 
 The linear auditor does not separate DOPE from the Gaussian copula
@@ -796,8 +912,12 @@ these inputs do not support a paired ranking.
 The ARF validation completion does not admit final official-test certification.
 
 \subsection{Release score}
-The scalar in \eqref{eq:mfs} is null for every method in this paper.
-The supplement shows the invented arithmetic.
+The scalars in \eqref{eq:mfs}, under the pinned v2 weights and under the
+pre-registered v3 weights, are null for every method in this paper.
+Table~\ref{tab:mfsv3} measures the clean-license tabular transfer, and the
+same receipt records the embedding distance. Failed gates, including an
+unscanned cleartext check, keep every scalar null. The supplement shows
+the invented v2 arithmetic.
 The evaluation locks for a final test were not frozen.
 
 \subsection{BeyondArena}
@@ -848,7 +968,9 @@ $11$ is \FitSeedVariance.
 \section{Discussion}
 CTGAN and TVAE do not match the CatBoost retention, and their successful
 size-$4n$ artifacts miss the cap. None of these comparisons emits MFS-v2,
-PTF-v1, or a release at the 10{,}240-byte tier. A small Wilcoxon
+MFS-v3, PTF-v1, or a release at the 10{,}240-byte tier.
+Table~\ref{tab:mfsv3} is a retention table and does not emit those scores.
+A small Wilcoxon
 $p$-value does not flip that null. The 8{,}192-step budget moves the
 CatBoost median by $\DiffSufCb$ and is not the displayed model. BeyondArena
 fits $\BeyondPrepared$ further families inside the cap and does not show
@@ -900,8 +1022,8 @@ BeyondArena is a separate fit check. It is not a retention panel, and it is
 not pooled with the density block.
 
 \paragraph{Construct.}
-Retention is the reported utility. The release score in
-Section~\ref{sec:kpi} stays null. The linear auditor does not separate DOPE from the Gaussian copula,
+Retention is the reported utility. Both release scores in
+Section~\ref{sec:kpi} stay null. The linear auditor does not separate DOPE from the Gaussian copula,
 and that result is not an equivalence. Shipping this artifact is not the
 same experiment as shipping the compact predictor itself. The panel does
 not contain that control, so it does not show that a recipient needs the
@@ -926,8 +1048,9 @@ from the density comparators. The linear auditor does not separate it
 from the Gaussian copula, and that result is not an equivalence. The
 $\NForestCb$-lineage Forest-Flow block leads on CatBoost (\WtlForestCb)
 and the MLP (\WtlForestMlp). Those counts are not a certified win. The
-unmeasured publications and the release scores are unchanged from
-Section~\ref{sec:scope}. Official tests stay sealed.
+unmeasured publications stay unmeasured. The Kumo large, Mitra, and
+TabICL retentions are in Table~\ref{tab:mfsv3}. MFS-v2 and MFS-v3 stay
+null, as do the scores in Section~\ref{sec:scope}. Official tests stay sealed.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references,generated/related}

@@ -322,6 +322,7 @@ def protocol_tokens():
     _must_contain(root / "rust/compiler/target_fitting/part_02.rs", "backward_step_clip(&loss, 5.0)", failures)
     _must_contain(root / "rust/compiler/target_fitting/part_01.rs", "coefficient.abs() >= 1e-5", failures)
     _must_contain(root / "rust/fitness.rs", "utility_transfer: 0.30", failures)
+    _must_contain(root / "rust/fitness.rs", "utility_transfer: 0.35", failures)
     _must_contain(root / "rust/fitness.rs", "Some(100.0 * (log_score / total_weight).exp())", failures)
     _must_contain(root / "rust/embedding/part_01.rs", "ACTION_EMBEDDING_DIMENSION: usize = 4_168", failures)
     _must_contain(root / "rust/embedding/part_01.rs", "ACTION_EMBEDDING_CANDIDATES: usize = 24", failures)
@@ -350,7 +351,7 @@ def protocol_tokens():
     tokens = {
         "1", "2", "3", "4", "5", "6", "8", "10", "12", "16", "24", "64", "80", "100", "128", "856",
         "2048", "4168", "8192", "10000", "10240",
-        "0.002", "0.01", "0.05", "0.10", "0.15", "0.20", "0.25", "0.30", "0.45",
+        "0.002", "0.01", "0.05", "0.10", "0.15", "0.20", "0.25", "0.30", "0.35", "0.45",
         "0.70", "0.75", "0.80", "0.85", "0.90", "0.95", "1.0", "1.5", "1.6", "2.569",
         "82.40", "0.14", "101", "211", "307", "11", "95", "0", "20",
     }
