@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "dope-paper-original-metadata-v1"
+    },
+    "captured_utc": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "rows_or_weights_read": {
+      "const": false
+    },
+    "original_historical_frozen_hashes_reconstructed": {
+      "const": false
+    },
+    "replay_replaces_scored_artifact": {
+      "const": false
+    },
+    "records": {
+      "type": "array",
+      "minItems": 210,
+      "maxItems": 210,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "replay",
+              "beyond"
+            ]
+          },
+          "profile": {
+            "enum": [
+              "features12_steps2048",
+              "features12_steps8192"
+            ]
+          },
+          "lineage_or_family": {
+            "type": "string"
+          },
+          "original_namespace": {
+            "type": "string"
+          },
+          "receipt_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^research/benchmark/results/paper-original-metadata-v1/"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "original_bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "original_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256"
+            ]
+          },
+          "report_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^research/benchmark/results/paper-original-metadata-v1/"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "original_bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "original_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256"
+            ]
+          },
+          "loss_trace_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^research/benchmark/results/paper-original-metadata-v1/"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "original_bytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "original_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "path",
+              "bytes",
+              "sha256"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "profile",
+          "lineage_or_family",
+          "original_namespace",
+          "receipt_ref",
+          "report_ref",
+          "loss_trace_ref"
+        ]
+      }
+    },
+    "filename_inventory_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^research/benchmark/results/paper-original-metadata-v1/"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "original_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "original_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ]
+    },
+    "beyond_prepare_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^research/benchmark/results/paper-original-metadata-v1/"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "original_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "original_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ]
+    }
+  },
+  "required": [
+    "format",
+    "captured_utc",
+    "scope",
+    "official_tests_opened",
+    "rows_or_weights_read",
+    "original_historical_frozen_hashes_reconstructed",
+    "replay_replaces_scored_artifact",
+    "records",
+    "filename_inventory_ref",
+    "beyond_prepare_ref"
+  ]
+}

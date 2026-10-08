@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "file_contents_opened": {
+      "const": false
+    },
+    "s3_worker": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "identity": {
+            "type": "string"
+          },
+          "train_csv": {
+            "type": "boolean"
+          },
+          "validation_csv": {
+            "type": "boolean"
+          },
+          "test_csv": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "identity",
+          "train_csv",
+          "validation_csv",
+          "test_csv"
+        ]
+      },
+      "minItems": 100,
+      "maxItems": 100
+    },
+    "beyond_worker": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "identity": {
+            "type": "string"
+          },
+          "train_csv": {
+            "type": "boolean"
+          },
+          "validation_csv": {
+            "type": "boolean"
+          },
+          "test_csv": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "identity",
+          "train_csv",
+          "validation_csv",
+          "test_csv"
+        ]
+      },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "beyond_evaluator": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "identity": {
+            "type": "string"
+          },
+          "train_csv": {
+            "type": "boolean"
+          },
+          "validation_csv": {
+            "type": "boolean"
+          },
+          "test_csv": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "identity",
+          "train_csv",
+          "validation_csv",
+          "test_csv"
+        ]
+      },
+      "minItems": 5,
+      "maxItems": 5
+    }
+  },
+  "required": [
+    "file_contents_opened",
+    "s3_worker",
+    "beyond_worker",
+    "beyond_evaluator"
+  ]
+}

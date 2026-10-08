@@ -1093,6 +1093,26 @@
     "research/benchmark/results/tabddpm-matched-fit-coverage-v1/": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_tabddpm_matched_coverage -v",
       "purpose": "verify immutable publication hashes, matched partitions and real controls, nominal grouped-fold protocol, complete sample groups, same-cohort scalar reductions, exact fit-seed coverage, conditional ETA separation, schemas and null release gates"
+    },
+    "docs/whitepaper/scripts/paper_receipts.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_receipts.py' -v",
+      "purpose": "verify original numeric receipt hashes before decode, full replay and BeyondArena matrices, exact scalar reductions, field mappings, safe preparation projection and filename-only sealed-test observations"
+    },
+    "docs/whitepaper/scripts/local_receipts.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_receipts.py' -v",
+      "purpose": "verify original numeric receipt hashes before decode, full replay and BeyondArena matrices, exact scalar reductions, field mappings, safe preparation projection and filename-only sealed-test observations"
+    },
+    "docs/whitepaper/scripts/test_paper_receipts.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_receipts.py' -v",
+      "purpose": "verify original numeric receipt hashes before decode, full replay and BeyondArena matrices, exact scalar reductions, field mappings, safe preparation projection and filename-only sealed-test observations"
+    },
+    "research/benchmark/results/paper-original-metadata-v1/": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_receipts.py' -v",
+      "purpose": "verify original numeric receipt hashes before decode, full replay and BeyondArena matrices, exact scalar reductions, field mappings, safe preparation projection and filename-only sealed-test observations"
+    },
+    "docs/whitepaper/generated/original-field-map.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_receipts.py' -v",
+      "purpose": "verify original numeric receipt hashes before decode, full replay and BeyondArena matrices, exact scalar reductions, field mappings, safe preparation projection and filename-only sealed-test observations"
     }
   }
 }

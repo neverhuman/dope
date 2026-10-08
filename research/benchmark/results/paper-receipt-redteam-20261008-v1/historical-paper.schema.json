@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "dope-historical-paper-audit-snapshot-v1"
+    },
+    "reviewed_main_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "report_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 46,
+      "maxItems": 46,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "original_path": {
+            "type": "string"
+          },
+          "original_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "original_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "snapshot_path": {
+            "type": "string"
+          },
+          "snapshot_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "snapshot_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "original_path",
+          "original_bytes",
+          "original_sha256",
+          "snapshot_path",
+          "snapshot_bytes",
+          "snapshot_sha256"
+        ]
+      }
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "format",
+    "reviewed_main_commit",
+    "report_sha256",
+    "sources",
+    "reason"
+  ]
+}

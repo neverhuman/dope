@@ -1,0 +1,376 @@
+{
+  "format": "dope-historical-paper-audit-snapshot-v1",
+  "reason": "Preserve the exact historical audited paper bytes while correcting its findings. The original report and benchmark publication sources are unchanged.",
+  "report_sha256": "a4701f7c1b06a10a38d9a0d9c3f7c59f3b54325c031369814e31bd290ef40341",
+  "reviewed_main_commit": "26801e4b45cd6e4867d33bf8a4094e2c01d1c02b",
+  "sources": [
+    {
+      "original_bytes": 47931,
+      "original_path": "docs/whitepaper/dope-mfs.tex",
+      "original_sha256": "2b9203b2716b2b30cf2ee55fd98480e172de014f6e586430bf47c6283520eef3",
+      "snapshot_bytes": 16546,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/2b9203b2716b2b30cf2ee55fd98480e172de014f6e586430bf47c6283520eef3.gz",
+      "snapshot_sha256": "a2e540f9ddacee93c3c269af07941b7ed03ca896723e6c9b750d1ee335c187cd"
+    },
+    {
+      "original_bytes": 1078,
+      "original_path": "docs/whitepaper/figures/architecture.tex",
+      "original_sha256": "a6961a17266a34f1b2b6512d6bb8a6b04b4b50e54b573d7ec0c5fada35f4090f",
+      "snapshot_bytes": 576,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/a6961a17266a34f1b2b6512d6bb8a6b04b4b50e54b573d7ec0c5fada35f4090f.gz",
+      "snapshot_sha256": "b0c0b4dd73771994b9f3b73eb0184c1b2d9f19f830d25c637c492ae526e31ecd"
+    },
+    {
+      "original_bytes": 387885,
+      "original_path": "docs/whitepaper/figures/loss-curves.pdf",
+      "original_sha256": "73883588acb82aeb1fb8b8755ca5186e23267ab7aaf19be8477425a8eee02f00",
+      "snapshot_bytes": 386951,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/73883588acb82aeb1fb8b8755ca5186e23267ab7aaf19be8477425a8eee02f00.gz",
+      "snapshot_sha256": "39361cb3b426bde45864e7f80de984dd4bee461004b36c35e6f3ad1fef3840a4"
+    },
+    {
+      "original_bytes": 19247,
+      "original_path": "docs/whitepaper/figures/paired-cdf.pdf",
+      "original_sha256": "95ac96004fcbea159730aa95e42345e325ee38394c1c2c8b144b760831e965c2",
+      "snapshot_bytes": 17467,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/95ac96004fcbea159730aa95e42345e325ee38394c1c2c8b144b760831e965c2.gz",
+      "snapshot_sha256": "ea4e89e7751f1903ceb1417a087c10e681a46e19708d69c124966658767961e4"
+    },
+    {
+      "original_bytes": 56757,
+      "original_path": "docs/whitepaper/figures/published-baseline-cohorts.pdf",
+      "original_sha256": "346a600068359b3f7798fe5d35ed96bab23c189fb7de882a9db567cdcd544003",
+      "snapshot_bytes": 41770,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/346a600068359b3f7798fe5d35ed96bab23c189fb7de882a9db567cdcd544003.gz",
+      "snapshot_sha256": "a255c2148845d1b8d2c31f0c094e9d3541e0228d81c5c620e162a01f61590144"
+    },
+    {
+      "original_bytes": 17811,
+      "original_path": "docs/whitepaper/figures/retained-matched-eight.pdf",
+      "original_sha256": "aafc372f86b90d66ed68c362fd289d03eebd7854b8334ebb9beace811f2bfc66",
+      "snapshot_bytes": 16645,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/aafc372f86b90d66ed68c362fd289d03eebd7854b8334ebb9beace811f2bfc66.gz",
+      "snapshot_sha256": "93f0b3a20031ac5e38d0cf6420a1717c9366cb8ee4d298340f5ca5c8a4cf2987"
+    },
+    {
+      "original_bytes": 16279,
+      "original_path": "docs/whitepaper/figures/retention-bars.pdf",
+      "original_sha256": "d9f11579a7a57d5e653eb85460a4cb0386768d17708ae02575c5b73bdfbc1ee9",
+      "snapshot_bytes": 15065,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/d9f11579a7a57d5e653eb85460a4cb0386768d17708ae02575c5b73bdfbc1ee9.gz",
+      "snapshot_sha256": "3169963728b2167880f85a708a3d93ef01f92d301fbb98829e5052b342339f5e"
+    },
+    {
+      "original_bytes": 35567,
+      "original_path": "docs/whitepaper/figures/retention-bytes.pdf",
+      "original_sha256": "4c6fb964d0d5d71fa9f08d4f08d19ab08f734ed43faf0554800597313d7dd636",
+      "snapshot_bytes": 31837,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/4c6fb964d0d5d71fa9f08d4f08d19ab08f734ed43faf0554800597313d7dd636.gz",
+      "snapshot_sha256": "e977b049b458e0e3d35037c286db5b668b73df8ca3e3781651e2ecaa932fb9f8"
+    },
+    {
+      "original_bytes": 5046,
+      "original_path": "docs/whitepaper/generated/artifact-hashes.tex",
+      "original_sha256": "c85bf109990e78d810dea2e99eab144b471f22bb7a25efbd7bb783614b9372ae",
+      "snapshot_bytes": 1389,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/c85bf109990e78d810dea2e99eab144b471f22bb7a25efbd7bb783614b9372ae.gz",
+      "snapshot_sha256": "a48b8b5f05edd5e2fa1a1d3bb3ac8f1f423af4dd39782ac503fe98aee88429cb"
+    },
+    {
+      "original_bytes": 2016,
+      "original_path": "docs/whitepaper/generated/availability.tex",
+      "original_sha256": "ffd10094b5ac3419367a7b5f182860b8248db5875d8cd6b34b970d3aaeb8a6cd",
+      "snapshot_bytes": 997,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/ffd10094b5ac3419367a7b5f182860b8248db5875d8cd6b34b970d3aaeb8a6cd.gz",
+      "snapshot_sha256": "cf02467744ba2e52db68781d499b9828cbb1c3fdb8a08dfb8be8ca928dec1771"
+    },
+    {
+      "original_bytes": 10516,
+      "original_path": "docs/whitepaper/generated/baseline-coverage.json",
+      "original_sha256": "a6cc9a4902027d9575ac4f62eeb68c4cec006776d452d4ccd1d13eab0a68f839",
+      "snapshot_bytes": 2170,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/a6cc9a4902027d9575ac4f62eeb68c4cec006776d452d4ccd1d13eab0a68f839.gz",
+      "snapshot_sha256": "81802d1c6495300c43e9a80c735bd832840754f582e5436a29ef6fc178c75b80"
+    },
+    {
+      "original_bytes": 1246,
+      "original_path": "docs/whitepaper/generated/baseline-coverage.tex",
+      "original_sha256": "290663bce5370f52010f46b2fc505ffc9b34ead15b188ee2d5df21eec8adc485",
+      "snapshot_bytes": 581,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/290663bce5370f52010f46b2fc505ffc9b34ead15b188ee2d5df21eec8adc485.gz",
+      "snapshot_sha256": "b0c64ccb34ef8be92f74a7563eee6ccd2682084beb308c1c40f64eb864690e51"
+    },
+    {
+      "original_bytes": 2794,
+      "original_path": "docs/whitepaper/generated/beyond-fit.json",
+      "original_sha256": "a1447f908bc9c51876d345597039607c734b507bf85aa8e08db0639e80a1f036",
+      "snapshot_bytes": 586,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/a1447f908bc9c51876d345597039607c734b507bf85aa8e08db0639e80a1f036.gz",
+      "snapshot_sha256": "f55fcbdceb5021b00ccbcef761f762c97144657e4eb8b7f3926d37ea1ff00028"
+    },
+    {
+      "original_bytes": 422,
+      "original_path": "docs/whitepaper/generated/beyond-fit.tex",
+      "original_sha256": "0354780742d6c886ec7cd48b59b190f8292531f4769869d0782207424d38a4a1",
+      "snapshot_bytes": 255,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/0354780742d6c886ec7cd48b59b190f8292531f4769869d0782207424d38a4a1.gz",
+      "snapshot_sha256": "c7429cc0f817bb9c115871625289db3d63e7fd7e65488ca31558ddbe268ab0d6"
+    },
+    {
+      "original_bytes": 10475,
+      "original_path": "docs/whitepaper/generated/beyondarena-inventory.tex",
+      "original_sha256": "7cc4b730b4a2adf16af16ab92bdda50942cdaaa63d9ce0794bee2bd03cd1db3c",
+      "snapshot_bytes": 3176,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/7cc4b730b4a2adf16af16ab92bdda50942cdaaa63d9ce0794bee2bd03cd1db3c.gz",
+      "snapshot_sha256": "962bf8f5dc4115866edd96e95697109cf5e7daed0d326a7e8cea7886351ccb7e"
+    },
+    {
+      "original_bytes": 398,
+      "original_path": "docs/whitepaper/generated/byte-table.tex",
+      "original_sha256": "9987d51c4d6555d1f44eeff484ac02e493bd2508e39b7fb24dd6d2f27e4d6887",
+      "snapshot_bytes": 281,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/9987d51c4d6555d1f44eeff484ac02e493bd2508e39b7fb24dd6d2f27e4d6887.gz",
+      "snapshot_sha256": "54daaab0d9399563267ec6884ad0f1037a7665e3880b426266a5dc6ae364528d"
+    },
+    {
+      "original_bytes": 73961,
+      "original_path": "docs/whitepaper/generated/compute-cost-receipts.json",
+      "original_sha256": "16cd9f392d96d3cfabefe09777d32efd35aadf443b0f324805595e461d30ece9",
+      "snapshot_bytes": 12405,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/16cd9f392d96d3cfabefe09777d32efd35aadf443b0f324805595e461d30ece9.gz",
+      "snapshot_sha256": "5ab6aa9fd689f721ebfd1bd19d0e1304431df18428d024e69592a88e5e96d066"
+    },
+    {
+      "original_bytes": 970,
+      "original_path": "docs/whitepaper/generated/compute-cost-table.tex",
+      "original_sha256": "7cb672690152b1f281d80d36d251f7d30a6787a2d43409a04d7f2eda056fd471",
+      "snapshot_bytes": 362,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/7cb672690152b1f281d80d36d251f7d30a6787a2d43409a04d7f2eda056fd471.gz",
+      "snapshot_sha256": "0a78a7d5a0790884d32f2adad8546a111e03bffdb57d4e691ccfbb02a47cf2bc"
+    },
+    {
+      "original_bytes": 7263,
+      "original_path": "docs/whitepaper/generated/compute-cost.json",
+      "original_sha256": "5bf2906adc5bfaf1572a3be99d2754747e9cd3b3396f00fb40b2d64b4a0bef4b",
+      "snapshot_bytes": 1355,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/5bf2906adc5bfaf1572a3be99d2754747e9cd3b3396f00fb40b2d64b4a0bef4b.gz",
+      "snapshot_sha256": "47547bbfdcdb30562693f99c011676595e1c3a0b8e03fb67814ffc23b192b9cd"
+    },
+    {
+      "original_bytes": 1043,
+      "original_path": "docs/whitepaper/generated/coreset-paragraph.tex",
+      "original_sha256": "ff633e5092f92d717ac4f4c8484749420d5d3a3ee2843979ba744229d92c2f14",
+      "snapshot_bytes": 564,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/ff633e5092f92d717ac4f4c8484749420d5d3a3ee2843979ba744229d92c2f14.gz",
+      "snapshot_sha256": "a53a89ee2cca2c2716822fbbec795fe58f91ba6072686bc42761f0b03ebe4c3c"
+    },
+    {
+      "original_bytes": 1360,
+      "original_path": "docs/whitepaper/generated/density-table.tex",
+      "original_sha256": "b1689efcb9839bf2c77202dd9cd062eee2208f9583768f48b37ab21407f4d5d6",
+      "snapshot_bytes": 577,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/b1689efcb9839bf2c77202dd9cd062eee2208f9583768f48b37ab21407f4d5d6.gz",
+      "snapshot_sha256": "6d936466284bae6ee344f857ebf119457d226ee079cc56eb15519cb833f251fb"
+    },
+    {
+      "original_bytes": 2829,
+      "original_path": "docs/whitepaper/generated/fidelity-privacy-table.tex",
+      "original_sha256": "df29d5bfecda8a570adfd313889a17e6cddf947bb4647db2bf17dd34b7f3051a",
+      "snapshot_bytes": 1015,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/df29d5bfecda8a570adfd313889a17e6cddf947bb4647db2bf17dd34b7f3051a.gz",
+      "snapshot_sha256": "d0c2490a507f1acf30f1a6247f3e975d2e824d7aaae306adebaf70adefc37a81"
+    },
+    {
+      "original_bytes": 524,
+      "original_path": "docs/whitepaper/generated/forest-table.tex",
+      "original_sha256": "2078e39bec16f42632f8f9ca04558bd8f213654200e6e67820f03f6644d75472",
+      "snapshot_bytes": 331,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/2078e39bec16f42632f8f9ca04558bd8f213654200e6e67820f03f6644d75472.gz",
+      "snapshot_sha256": "e289bea72d4453af430a01c1e0454873afe849a79eead3a4e6d75e81d118f14e"
+    },
+    {
+      "original_bytes": 931,
+      "original_path": "docs/whitepaper/generated/headline-table.tex",
+      "original_sha256": "66ba2e5b4bf56b148bcfa25eb8fdf5298e049bd99a0aa5ab421006698be02be1",
+      "snapshot_bytes": 449,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/66ba2e5b4bf56b148bcfa25eb8fdf5298e049bd99a0aa5ab421006698be02be1.gz",
+      "snapshot_sha256": "cf88d5ce14b23314a3c7b9d6146d3c66edbfee671e12782cce1279371648bdd9"
+    },
+    {
+      "original_bytes": 343,
+      "original_path": "docs/whitepaper/generated/loss-beside-retention.tex",
+      "original_sha256": "8d2f4ab9e92ab37bd36a44b20707770c653901d184c61e59c31af983f62b28d6",
+      "snapshot_bytes": 222,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/8d2f4ab9e92ab37bd36a44b20707770c653901d184c61e59c31af983f62b28d6.gz",
+      "snapshot_sha256": "15e8d2b41067a508083fa73a2d32df2220b16d4b15dc1ef1ecc21f914af5ce9e"
+    },
+    {
+      "original_bytes": 1197,
+      "original_path": "docs/whitepaper/generated/loss-curves.json",
+      "original_sha256": "0124915497c98e560ef99c1e5ecf7ad876f9174439ff9c763cf1cf906b4aebe1",
+      "snapshot_bytes": 358,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/0124915497c98e560ef99c1e5ecf7ad876f9174439ff9c763cf1cf906b4aebe1.gz",
+      "snapshot_sha256": "9bc98ee1112ef62ddf7d0e4bf987f4d360f7bcb3fdfec31231f87a0ebfab5591"
+    },
+    {
+      "original_bytes": 898,
+      "original_path": "docs/whitepaper/generated/neural-table.tex",
+      "original_sha256": "0763946b01f7070c812b80d0702e53b08fecdfd126877801bf1d2c952b2b6966",
+      "snapshot_bytes": 426,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/0763946b01f7070c812b80d0702e53b08fecdfd126877801bf1d2c952b2b6966.gz",
+      "snapshot_sha256": "70190a1d5c7dde33f1def2eb42f3a84afaac0e7479af7a49b4fd14c014879c2a"
+    },
+    {
+      "original_bytes": 10153,
+      "original_path": "docs/whitepaper/generated/numbers.tex",
+      "original_sha256": "eb3d28711c5096c79ac7502a0edcf3e434647477ad636233b02fd4f74dc3f69b",
+      "snapshot_bytes": 3024,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/eb3d28711c5096c79ac7502a0edcf3e434647477ad636233b02fd4f74dc3f69b.gz",
+      "snapshot_sha256": "94aae1c8f71b49200600368450dcd25a6871a17277277792063d73f8018a004d"
+    },
+    {
+      "original_bytes": 106553,
+      "original_path": "docs/whitepaper/generated/panel-stats.json",
+      "original_sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703",
+      "snapshot_bytes": 24071,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703.gz",
+      "snapshot_sha256": "7b23cd4b6ed36da39c9346f95ae9b14033dcf1e3938c959c2c6c336e422a52a5"
+    },
+    {
+      "original_bytes": 260,
+      "original_path": "docs/whitepaper/generated/provenance-counts.json",
+      "original_sha256": "a5d7e93ab147decaf7548dc4b697a6b7c0adae16ac172f8780ed83e2d3ff0848",
+      "snapshot_bytes": 158,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/a5d7e93ab147decaf7548dc4b697a6b7c0adae16ac172f8780ed83e2d3ff0848.gz",
+      "snapshot_sha256": "e212277edee3830e352140d774066e58eb871d99733c8b28bb83207d66b5cd3f"
+    },
+    {
+      "original_bytes": 792,
+      "original_path": "docs/whitepaper/generated/provenance-table.tex",
+      "original_sha256": "da82a2870823debb58a2e6ca434192630e7fde52760d9a11c299d0451fdce750",
+      "snapshot_bytes": 486,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/da82a2870823debb58a2e6ca434192630e7fde52760d9a11c299d0451fdce750.gz",
+      "snapshot_sha256": "539a5449ee2a169ecc9b248bb724016524e20650fe8137580ad89916c03c9388"
+    },
+    {
+      "original_bytes": 30845,
+      "original_path": "docs/whitepaper/generated/provenance.json",
+      "original_sha256": "dea64ea61eaacac0e287298bba3ba76aa7900819aa00feb3a5d66cdcb4fb8a17",
+      "snapshot_bytes": 6652,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/dea64ea61eaacac0e287298bba3ba76aa7900819aa00feb3a5d66cdcb4fb8a17.gz",
+      "snapshot_sha256": "9cc1248d5fab30c4be7a9f3be08e53150e2060d69d5f2499d9d0471016586988"
+    },
+    {
+      "original_bytes": 236,
+      "original_path": "docs/whitepaper/generated/publication-rows.tex",
+      "original_sha256": "8f167bc8f12dc7b187fb01b70586ee1aa2dd6b538cd2b4e46f4d043b1f444e0d",
+      "snapshot_bytes": 184,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/8f167bc8f12dc7b187fb01b70586ee1aa2dd6b538cd2b4e46f4d043b1f444e0d.gz",
+      "snapshot_sha256": "f797601fa844e42d5392d2deed620154e2c0f3649c9b2850d2d05513edd81ae2"
+    },
+    {
+      "original_bytes": 2576771,
+      "original_path": "docs/whitepaper/generated/published-baseline-kpis.json",
+      "original_sha256": "e8c3a26f687be6b02d00ddbfb1bbe08c331edb3289dfcc05c457625b2c1f3b89",
+      "snapshot_bytes": 60692,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/e8c3a26f687be6b02d00ddbfb1bbe08c331edb3289dfcc05c457625b2c1f3b89.gz",
+      "snapshot_sha256": "ec1d2993728033ab14cb015ea686b55a6bda2137f7eca4450e3b2492067eb4fa"
+    },
+    {
+      "original_bytes": 254,
+      "original_path": "docs/whitepaper/generated/replay-cost.json",
+      "original_sha256": "faf77e7ce1ed1d22127701bf68bbfe2f8d183f89cbd3475dd80094888c36f086",
+      "snapshot_bytes": 146,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/faf77e7ce1ed1d22127701bf68bbfe2f8d183f89cbd3475dd80094888c36f086.gz",
+      "snapshot_sha256": "2e06ba22b8aa59851d6b519feab9377f98daa32b79f0012d657ba0b70e1e3a22"
+    },
+    {
+      "original_bytes": 594,
+      "original_path": "docs/whitepaper/generated/retained-arf-paired.tex",
+      "original_sha256": "62a08fe0b0508f647b0b0082800f4af1be482a577cfd100232dbfabb991e21d7",
+      "snapshot_bytes": 315,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/62a08fe0b0508f647b0b0082800f4af1be482a577cfd100232dbfabb991e21d7.gz",
+      "snapshot_sha256": "2442f0366735a8b3675fff3ae0a84bc184b216a8dad9d235e1c811bb7a079d4f"
+    },
+    {
+      "original_bytes": 955,
+      "original_path": "docs/whitepaper/generated/retained-classical100.tex",
+      "original_sha256": "edd629fd6697b98096f90067fbd2be09601f724ea4381b03083d0056ecb5bd04",
+      "snapshot_bytes": 418,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/edd629fd6697b98096f90067fbd2be09601f724ea4381b03083d0056ecb5bd04.gz",
+      "snapshot_sha256": "66b33dcbe656fbe524610dafbeba1b04182b1c394854c834928ef8c73fac2e33"
+    },
+    {
+      "original_bytes": 1343097,
+      "original_path": "docs/whitepaper/generated/retained-evidence.json",
+      "original_sha256": "3970fd7c41eb0e9fa6a2a63bf4f4c963de53f09aac0352eea9a241d2e336103d",
+      "snapshot_bytes": 230542,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/3970fd7c41eb0e9fa6a2a63bf4f4c963de53f09aac0352eea9a241d2e336103d.gz",
+      "snapshot_sha256": "cc717a489d1e108ef7396e895917e09e88eae83fbfc7ec74141a2f42ea6bab75"
+    },
+    {
+      "original_bytes": 888,
+      "original_path": "docs/whitepaper/generated/retained-first12.tex",
+      "original_sha256": "b90ea892f9b45af213456096d4b9d9b84446be8863770aedb9ff31c46853194a",
+      "snapshot_bytes": 458,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/b90ea892f9b45af213456096d4b9d9b84446be8863770aedb9ff31c46853194a.gz",
+      "snapshot_sha256": "331a112762cc0491b3e4c2d2c0d7e721ad00195ad1fc6fffc16b38402fe7922f"
+    },
+    {
+      "original_bytes": 1050,
+      "original_path": "docs/whitepaper/generated/retained-matched8.tex",
+      "original_sha256": "2f4d5b6b2f7dbc41cfc255a876fddb50366f8142bbe2654b8b7606559ddcbbf2",
+      "snapshot_bytes": 468,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/2f4d5b6b2f7dbc41cfc255a876fddb50366f8142bbe2654b8b7606559ddcbbf2.gz",
+      "snapshot_sha256": "3827ac08d3b1cdaf2f8e3ae990fbaf34a6735569f952341deb974b1e9c4aa3df"
+    },
+    {
+      "original_bytes": 463,
+      "original_path": "docs/whitepaper/generated/retained-paired.tex",
+      "original_sha256": "eaf0897fdcdb53c6ab712d6244996a7d565ef0dddb308a1dff9c7c60577a5685",
+      "snapshot_bytes": 248,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/eaf0897fdcdb53c6ab712d6244996a7d565ef0dddb308a1dff9c7c60577a5685.gz",
+      "snapshot_sha256": "d7070d12e34df3f9008fcb3d5c2a581c05ae5ed0879b9b523d7edddd749b17dd"
+    },
+    {
+      "original_bytes": 10492,
+      "original_path": "docs/whitepaper/generated/s3-2048-lineages.tex",
+      "original_sha256": "b38eb301c73421be68411eb877f0c39821372fb5cee01de53c4e646b21e901f4",
+      "snapshot_bytes": 4024,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/b38eb301c73421be68411eb877f0c39821372fb5cee01de53c4e646b21e901f4.gz",
+      "snapshot_sha256": "5e2e6c1faa83a98282c6eba9db8b245628021e97bcc13eef689e894096bf537e"
+    },
+    {
+      "original_bytes": 7453,
+      "original_path": "docs/whitepaper/generated/s3-8192-lineages.tex",
+      "original_sha256": "84e67fbe356d0a958ced60ad064830725831c30b9dad3b9eefa49c5e76f2550f",
+      "snapshot_bytes": 2955,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/84e67fbe356d0a958ced60ad064830725831c30b9dad3b9eefa49c5e76f2550f.gz",
+      "snapshot_sha256": "e46dd9862d247dccfa215f64134d372bbf5598d8f4408802f6844dd0603eab0c"
+    },
+    {
+      "original_bytes": 181,
+      "original_path": "docs/whitepaper/generated/threshold-counts.tex",
+      "original_sha256": "e0a647333c2934a902e3e5884daf37bfb9f174bd7173d30e7f6e51727fb7d80d",
+      "snapshot_bytes": 146,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/e0a647333c2934a902e3e5884daf37bfb9f174bd7173d30e7f6e51727fb7d80d.gz",
+      "snapshot_sha256": "25b5ae5ecee7fac33ad04994ec08da500d40b816085186511320bb76f50f7d41"
+    },
+    {
+      "original_bytes": 427,
+      "original_path": "docs/whitepaper/generated/threshold-table.tex",
+      "original_sha256": "4c5cba0bf7e8c133ccccfc2e14968758860517acdd6fcb25dee2c497786aa094",
+      "snapshot_bytes": 193,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/4c5cba0bf7e8c133ccccfc2e14968758860517acdd6fcb25dee2c497786aa094.gz",
+      "snapshot_sha256": "9da1da6eb70c3e26f2c00a5c73fdca4155bb5a778f78aa200c595628807bc240"
+    },
+    {
+      "original_bytes": 6811,
+      "original_path": "docs/whitepaper/supplement.tex",
+      "original_sha256": "d2e313f5180e73339442942d64b9eac3b64a53bf629d4b4962a5bed8986c3957",
+      "snapshot_bytes": 3069,
+      "snapshot_path": "research/benchmark/results/paper-receipt-redteam-20261008-v1/historical-paper/d2e313f5180e73339442942d64b9eac3b64a53bf629d4b4962a5bed8986c3957.gz",
+      "snapshot_sha256": "44f901bb4af57054bab1c8b9509d8d86ccb2ad1a368d8b8b2bc5eaaccdcbb01a"
+    }
+  ]
+}

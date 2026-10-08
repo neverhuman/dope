@@ -112,7 +112,9 @@ TabSyn is \TabSynResult. The 100-lineage TabDDPM publication is
 \TabDDPMResult. The full Forest-Flow publication is \ForestPublication.
 The pre-specified privacy-attack panel is \PrivacyAttackPanel. Fit-seed
 variance is \FitSeedVariance. The full ablation grid is \FullAblationGrid.
-The fits use one fit seed, 11, and coresets of \CoreMin\ to \CoreMax\ rows.
+The primary displayed DOPE and legacy comparison fits use seed 11 and
+coresets of \CoreMin\ to \CoreMax\ rows. Later retained ARF and
+Forest-Flow panels report their additional fit seeds separately.
 Official tests stay sealed. MFS-v2 is null. PTF-v1, the release KPI whose
 hard gates include joint fidelity, membership and attribute attacks, copy
 checks, and feature-importance agreement on a sealed holdout, is null. A release at the
@@ -411,7 +413,8 @@ contents were not read.
 \input{generated/provenance-table.tex}
 \end{table*}
 
-Fit seed $11$ is the population actually measured. Sizes $n$ and $4n$ are
+Fit seed $11$ defines the primary displayed DOPE and legacy comparison
+populations. Later retained panels state their own fit-seed coverage. Sizes $n$ and $4n$ are
 both stored. The tables below are $4n$. The Gaussian copula row is Copulas
 0.14.1 \texttt{Gaussian\-Multivariate}, selected by held-out mean log
 density. CTGAN and TVAE are the author implementation, selected by the mean
@@ -441,9 +444,10 @@ family is separate and has six lineages. A Friedman test and a Nemenyi
 critical difference use the four density methods on their common
 complete-informative set, with rank 1 assigned to the higher retention. The
 critical-difference constant for four methods at $\alpha=0.05$ is $2.569$.
-The interval resamples the informative lineages of this panel. Each lineage
+The primary comparison interval resamples informative lineages. Each lineage
 contributes the median of sample seeds $101$, $211$, and $307$ from the
-single fit at seed $11$. The interval does not include a new fit, a new
+single fit at seed $11$. Later ARF and Forest-Flow panels report between-fit
+variation separately. This primary interval does not include a new fit, a new
 split, a new population, or a change of auditor.
 These are descriptive validation tests. They are not the release KPI in
 Section~\ref{sec:scope}, and they do not authorize a release at the
@@ -853,7 +857,8 @@ generators is not measured.
 \section{Threats to Validity}
 \label{sec:threats}
 \paragraph{Internal.}
-The fits use the coreset in Section~\ref{sec:setup}, fit seed $11$ only,
+The primary displayed DOPE and legacy comparison fits use the coreset
+in Section~\ref{sec:setup} and fit seed $11$,
 and a training-derived validation cut of the official training rows. The
 scored retention panel is regression only. Other tasks are not a result
 of these tables. The
@@ -872,8 +877,10 @@ the independence assumption behind both bootstrap and order-statistic
 intervals. The retained-subset results therefore remain exploratory.
 
 \paragraph{External.}
-These fits do not establish behavior on the full tables used by the
-diffusion papers, on five fit seeds, or on the official test.
+The primary displayed DOPE fits do not establish behavior on the full
+tables used by the diffusion papers, across five fit seeds, or on the
+official test. The additional ARF and Forest-Flow fit seeds do not establish
+DOPE fitting uncertainty.
 Generalization past seed $\SplitSeed$ is \FitSeedVariance. Forest-Flow's
 byte comparison uses $\NForestCb$ lineages and the hash-checked fit files.
 BeyondArena is a separate fit check. It is not a retention panel, and it is

@@ -42,8 +42,8 @@ score:
     bash ops/ci/audit.sh run
 
 paper:
-    python3 research/benchmark/verify_paper_numbers.py --write-evidence
     python3 docs/whitepaper/scripts/local_receipts.py
+    python3 research/benchmark/verify_paper_numbers.py --write-evidence
     python3 docs/whitepaper/scripts/compute_cost.py
     python3 docs/whitepaper/scripts/licenses.py
     python3 docs/whitepaper/scripts/retained_evidence.py
@@ -55,6 +55,7 @@ paper:
     python3 docs/whitepaper/scripts/check_paper.py
 
 paper-check:
+    python3 docs/whitepaper/scripts/local_receipts.py --check
     python3 research/benchmark/verify_paper_numbers.py
     python3 docs/whitepaper/scripts/compute_cost.py
     python3 docs/whitepaper/scripts/retained_evidence.py

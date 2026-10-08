@@ -19,6 +19,9 @@ SEEDS = (101, 211, 307)
 PRIMARY_THRESHOLD = 0.01
 
 HASH_PATHS = (
+    "research/benchmark/results/paper-original-metadata-v1/index.json",
+    "docs/whitepaper/generated/original-field-map.json",
+    "docs/whitepaper/scripts/paper_receipts.py",
     "research/benchmark/expanded_validation_metrics.py",
     "research/benchmark/methods.lock.json",
     "research/benchmark/results/expanded-validation-diagnostics.json",

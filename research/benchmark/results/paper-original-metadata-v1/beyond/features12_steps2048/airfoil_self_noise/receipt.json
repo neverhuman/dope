@@ -1,0 +1,1 @@
+{"artifact_bytes": 804, "elapsed_seconds": 5.003, "exit_code": 0, "loss_rows": 2048, "max_rss_kib": 880000, "name": "airfoil_self_noise", "official_test_opened": false, "profile": "features12_steps2048", "selected_candidate": "compact_neural_residual_symbolic", "status": "ok", "task": "regression", "within_l3_cap": true}

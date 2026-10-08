@@ -44,3 +44,18 @@ or HIPAA claim. PTF-v1, release-safe L3, and paired superiority stay out of
 the abstract until the frozen gates say otherwise. The new mean-of-three
 retained panels and legacy median-of-three blocks stay separate. A paired
 validation difference does not certify superiority.
+
+## Original metadata and seed scope
+
+`research/benchmark/results/paper-original-metadata-v1/index.json` binds
+210 original fit receipt/report pairs and compressed numeric replay traces,
+plus safe preparation outcomes and a filename-only provenance observation.
+The capture date is explicit; earlier historical custody is not reconstructed.
+`generated/original-field-map.json` records file hashes and field selectors.
+The loss PDF and bootstrap summary now regenerate from committed inputs on
+machines without campaign scratch. `local_receipts.py --check` rejects a
+changed original or aggregate before its values can enter the paper.
+
+Fit seed 11 describes the primary displayed DOPE and legacy comparisons.
+The retained ARF and Forest-Flow five-fit appendices have their own coverage;
+their additional seeds do not establish DOPE fit variance or a release score.
