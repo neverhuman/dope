@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all100_budget_cells_single_paid_delta_verified": {
+      "const": true
+    },
+    "author_renderer_or_controls_executed": {
+      "const": false
+    },
+    "canonical_job_and_seed_alias_join_verified": {
+      "const": true
+    },
+    "counts_from_previous_frozen500_projection_plus_one_positive": {
+      "const": true
+    },
+    "format": {
+      "const": "rights-safe-native-index008-receipt-source-proof-v1"
+    },
+    "hash_before_decode": {
+      "const": true
+    },
+    "immutable_metadata_inputs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "role": {
+            "enum": [
+              "previous_full500_reconciliation",
+              "completed_index008_operator_terminal",
+              "positive_native_operation",
+              "native_parent_exit",
+              "charged_budget119",
+              "native_outer_status",
+              "index008_dispatch",
+              "prior_budget118",
+              "prepared_request_refs",
+              "request_metadata",
+              "round_metadata",
+              "prior_capacity_FINAL",
+              "prior_capacity_snapshot",
+              "alias391",
+              "frozen500_identity_lock_stream_hash_only",
+              "prior_full500_seed_projection"
+            ],
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "sha256",
+          "role"
+        ],
+        "type": "object"
+      },
+      "maxItems": 16,
+      "minItems": 16,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "private_join_proof": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "private_models_samples_TEST_arrays_or_data_required_by_decoder": {
+      "const": false
+    },
+    "production_or_quality_certification_claimed": {
+      "const": false
+    },
+    "public_files": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "file": {
+            "enum": [
+              "README.md",
+              "dataset-seed-coverage.csv",
+              "operation-cost.csv",
+              "result.json",
+              "schema.json",
+              "source-proof.schema.json",
+              "table.md"
+            ],
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "sha256",
+          "file"
+        ],
+        "type": "object"
+      },
+      "maxItems": 7,
+      "minItems": 7,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "public_private_absolute_paths": {
+      "const": false
+    }
+  },
+  "required": [
+    "all100_budget_cells_single_paid_delta_verified",
+    "author_renderer_or_controls_executed",
+    "canonical_job_and_seed_alias_join_verified",
+    "counts_from_previous_frozen500_projection_plus_one_positive",
+    "format",
+    "hash_before_decode",
+    "immutable_metadata_inputs",
+    "private_join_proof",
+    "private_models_samples_TEST_arrays_or_data_required_by_decoder",
+    "production_or_quality_certification_claimed",
+    "public_files",
+    "public_private_absolute_paths"
+  ],
+  "title": "Native index008 rights-safe receipt source proof",
+  "type": "object"
+}

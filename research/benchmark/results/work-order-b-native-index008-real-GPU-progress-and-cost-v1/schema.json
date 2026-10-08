@@ -1,0 +1,695 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "capacity_before_operation": {
+      "additionalProperties": false,
+      "properties": {
+        "GPU_internal_allocator_hard_cap_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "RAM_reservation_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fit_timeout_seconds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "phase": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "point_in_time_RAM_headroom_is_future_guarantee": {
+          "const": false,
+          "type": "boolean"
+        },
+        "prospective_GPU_resident_threshold_mib": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "reserved_CPU_slot": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "whole_run_RAM_peak_forecast_bytes": {
+          "type": "null"
+        },
+        "xbabe2_aggregate_RAM_reservation_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "xbabe2_measured_MemAvailable_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "GPU_internal_allocator_hard_cap_certified",
+        "RAM_reservation_bytes",
+        "fit_timeout_seconds",
+        "phase",
+        "point_in_time_RAM_headroom_is_future_guarantee",
+        "prospective_GPU_resident_threshold_mib",
+        "reserved_CPU_slot",
+        "whole_run_RAM_peak_forecast_bytes",
+        "xbabe2_aggregate_RAM_reservation_bytes",
+        "xbabe2_measured_MemAvailable_bytes"
+      ],
+      "type": "object"
+    },
+    "cost_basis": {
+      "additionalProperties": false,
+      "properties": {
+        "all_architecture_R_and_D_cost_complete": {
+          "type": "boolean"
+        },
+        "cumulative_new_operation_parent_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "increment_parent_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "nested_operator_driver_or_metadata_time_added": {
+          "const": false,
+          "type": "boolean"
+        },
+        "previous_new_operation_parent_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "released_sampler_metadata_hold_seconds_separate_excluded": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "selected_historical_inclusive_cell_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "selected_historical_inclusive_trial_units": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "selected_historical_seed11_cell_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "stale_counter_authoritative": {
+          "const": false,
+          "type": "boolean"
+        },
+        "stale_native_operations_started_counter": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "strict16_generated_qualification_seconds_separate_excluded": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "all_architecture_R_and_D_cost_complete",
+        "cumulative_new_operation_parent_seconds",
+        "increment_parent_seconds",
+        "nested_operator_driver_or_metadata_time_added",
+        "previous_new_operation_parent_seconds",
+        "released_sampler_metadata_hold_seconds_separate_excluded",
+        "selected_historical_inclusive_cell_seconds",
+        "selected_historical_inclusive_trial_units",
+        "selected_historical_seed11_cell_seconds",
+        "stale_counter_authoritative",
+        "stale_native_operations_started_counter",
+        "strict16_generated_qualification_seconds_separate_excluded"
+      ],
+      "type": "object"
+    },
+    "dataset_seed_coverage": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_seed_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "all_five_accepted": {
+            "type": "boolean"
+          },
+          "dataset": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "seed11": {
+            "enum": [
+              "historical_artifact_cap",
+              "infrastructure_unresolved",
+              "ok_historical_reuse",
+              "ok_new_fit",
+              "unstarted_at_paid_budget_snapshot"
+            ],
+            "type": "string"
+          },
+          "seed23": {
+            "enum": [
+              "historical_artifact_cap",
+              "infrastructure_unresolved",
+              "ok_historical_reuse",
+              "ok_new_fit",
+              "unstarted_at_paid_budget_snapshot"
+            ],
+            "type": "string"
+          },
+          "seed37": {
+            "enum": [
+              "historical_artifact_cap",
+              "infrastructure_unresolved",
+              "ok_historical_reuse",
+              "ok_new_fit",
+              "unstarted_at_paid_budget_snapshot"
+            ],
+            "type": "string"
+          },
+          "seed53": {
+            "enum": [
+              "historical_artifact_cap",
+              "infrastructure_unresolved",
+              "ok_historical_reuse",
+              "ok_new_fit",
+              "unstarted_at_paid_budget_snapshot"
+            ],
+            "type": "string"
+          },
+          "seed71": {
+            "enum": [
+              "historical_artifact_cap",
+              "infrastructure_unresolved",
+              "ok_historical_reuse",
+              "ok_new_fit",
+              "unstarted_at_paid_budget_snapshot"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "accepted_seed_count",
+          "all_five_accepted",
+          "dataset",
+          "seed11",
+          "seed23",
+          "seed37",
+          "seed53",
+          "seed71"
+        ],
+        "type": "object"
+      },
+      "maxItems": 100,
+      "minItems": 100,
+      "type": "array"
+    },
+    "format": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "gated_claims": {
+      "additionalProperties": false,
+      "properties": {
+        "MFS_v2": {
+          "type": "null"
+        },
+        "PTF_v1": {
+          "type": "null"
+        },
+        "fivefit_stability": {
+          "type": "null"
+        },
+        "formal_privacy": {
+          "type": "null"
+        },
+        "method_complete": {
+          "type": "null"
+        },
+        "production_runtime_certification": {
+          "type": "null"
+        },
+        "release_safe": {
+          "type": "null"
+        },
+        "sample_completeness": {
+          "type": "null"
+        },
+        "superiority": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "MFS_v2",
+        "PTF_v1",
+        "fivefit_stability",
+        "formal_privacy",
+        "method_complete",
+        "production_runtime_certification",
+        "release_safe",
+        "sample_completeness",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "logical500": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "accepted_historical_seed11_reuse": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "accepted_new_fits": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "accounted_slots": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "dataset_lineages": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "historical_artifact_caps": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "physical_paid_trials": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "resolved_old_infrastructure_extra_trial": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "scheduled_fit_seeds": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "scheduled_slots": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "scientific_terminals_accepted_plus_cap": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "scientifically_unresolved": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "snapshot_unstarted": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unresolved_infrastructure_slots": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "accepted",
+        "accepted_historical_seed11_reuse",
+        "accepted_new_fits",
+        "accounted_slots",
+        "dataset_lineages",
+        "historical_artifact_caps",
+        "physical_paid_trials",
+        "resolved_old_infrastructure_extra_trial",
+        "scheduled_fit_seeds",
+        "scheduled_slots",
+        "scientific_terminals_accepted_plus_cap",
+        "scientifically_unresolved",
+        "snapshot_unstarted",
+        "unresolved_infrastructure_slots"
+      ],
+      "type": "object"
+    },
+    "measured_positive_operation": {
+      "additionalProperties": false,
+      "properties": {
+        "GPU_index": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "GPU_observation_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "GPU_residency_measurement_kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "RSS_observation_scope": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "causal_impact_identified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "charged_model_plus_projection_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "co_tenant_observed": {
+          "type": "boolean"
+        },
+        "energy_joules": {
+          "type": "null"
+        },
+        "full_system_runtime_closure_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "gpu_target_operator_verified": {
+          "type": "boolean"
+        },
+        "hardware_model": {
+          "type": "null"
+        },
+        "host": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "initial_observed_device_free_mib": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kernel_only_fit_seconds": {
+          "type": "null"
+        },
+        "maximum_observed_own_GPU_resident_mib": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "maximum_observed_own_RSS_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "maximum_observed_sampling_gap_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "minimum_observed_device_free_mib": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "model_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "model_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "nested_operation_seconds_nonadditive": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "observed_providers_verified": {
+          "type": "boolean"
+        },
+        "operator_wait_seconds_nonadditive": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "paid_trial_increment": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "parent_cost_basis": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent_exit_code": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "parent_wait_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "projection_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "projection_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "shared_GPU_cost_observed": {
+          "type": "boolean"
+        },
+        "sharing_scope": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "true_peak_RAM_bytes": {
+          "type": "null"
+        },
+        "true_peak_VRAM_mib": {
+          "type": "null"
+        },
+        "zero_impact_claim": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "GPU_index",
+        "GPU_observation_count",
+        "GPU_residency_measurement_kind",
+        "RSS_observation_scope",
+        "causal_impact_identified",
+        "charged_model_plus_projection_bytes",
+        "co_tenant_observed",
+        "energy_joules",
+        "full_system_runtime_closure_certified",
+        "gpu_target_operator_verified",
+        "hardware_model",
+        "host",
+        "initial_observed_device_free_mib",
+        "kernel_only_fit_seconds",
+        "maximum_observed_own_GPU_resident_mib",
+        "maximum_observed_own_RSS_bytes",
+        "maximum_observed_sampling_gap_seconds",
+        "minimum_observed_device_free_mib",
+        "model_bytes",
+        "model_sha256",
+        "nested_operation_seconds_nonadditive",
+        "observed_providers_verified",
+        "operator_wait_seconds_nonadditive",
+        "paid_trial_increment",
+        "parent_cost_basis",
+        "parent_exit_code",
+        "parent_wait_seconds",
+        "projection_bytes",
+        "projection_sha256",
+        "shared_GPU_cost_observed",
+        "sharing_scope",
+        "status",
+        "true_peak_RAM_bytes",
+        "true_peak_VRAM_mib",
+        "zero_impact_claim"
+      ],
+      "type": "object"
+    },
+    "seed_coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_by_seed": {
+          "additionalProperties": false,
+          "properties": {
+            "11": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "23": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "37": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "53": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "71": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "11",
+            "23",
+            "37",
+            "53",
+            "71"
+          ],
+          "type": "object"
+        },
+        "accepted_seed_count_histogram": {
+          "additionalProperties": false,
+          "properties": {
+            "0": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "1": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "2": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "3": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "5": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "5"
+          ],
+          "type": "object"
+        },
+        "historical_reuse_runtime_upgraded": {
+          "const": false,
+          "type": "boolean"
+        },
+        "lineages_with_all_five_accepted_seeds": {
+          "items": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "lineages_with_at_least_five_accepted_seeds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "mixed_runtime_equivalence_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "quality_or_stability": {
+          "type": "null"
+        },
+        "sample_completeness": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "accepted_by_seed",
+        "accepted_seed_count_histogram",
+        "historical_reuse_runtime_upgraded",
+        "lineages_with_all_five_accepted_seeds",
+        "lineages_with_at_least_five_accepted_seeds",
+        "mixed_runtime_equivalence_certified",
+        "quality_or_stability",
+        "sample_completeness"
+      ],
+      "type": "object"
+    },
+    "snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "dataset": {
+          "pattern": "^[0-9a-f]{16}$",
+          "type": "string"
+        },
+        "fit_seed": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "job_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "later_live_progress_included": {
+          "const": false,
+          "type": "boolean"
+        },
+        "logical_identity_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "operation_index": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "terminal_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "unstarted_is_snapshot_not_deadline": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "attempt",
+        "dataset",
+        "fit_seed",
+        "job_sha256",
+        "kind",
+        "later_live_progress_included",
+        "logical_identity_sha256",
+        "operation_index",
+        "terminal_sha256",
+        "unstarted_is_snapshot_not_deadline"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "capacity_before_operation",
+    "cost_basis",
+    "dataset_seed_coverage",
+    "format",
+    "gated_claims",
+    "logical500",
+    "measured_positive_operation",
+    "seed_coverage",
+    "snapshot"
+  ],
+  "title": "Frozen native index008 measured GPU operation and logical progress",
+  "type": "object"
+}
