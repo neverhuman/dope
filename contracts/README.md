@@ -11,3 +11,7 @@ contract, checks the historical v1 fixture, and writes a digest receipt.
 `production/kpi-contract-v1.json` is a historical input for read-only receipt
 verification. New freezes and releases bind v2. The contract test and the
 locked CPU CI lane check the generated seam on every change.
+
+`production/kpi-contract-v3.json` pre-registers MFS-v3. It is not the active
+embedded contract. v2 stays the file historical receipts pin. A v3 scalar is
+null until its components and hard gates are measured.

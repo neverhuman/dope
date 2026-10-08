@@ -200,6 +200,235 @@ impl MasterFitnessReport {
     }
 }
 
+/// MFS-v3 adds representation closeness and keeps privacy as a hard gate.
+/// The v2 contract and `MasterFitnessReport::evaluate` are unchanged.
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct FitnessWeightsV3 {
+    pub utility_transfer: f64,
+    pub representation_closeness: f64,
+    pub driver_fidelity: f64,
+    pub distribution_fidelity: f64,
+    pub structure_fidelity: f64,
+    pub coverage_realism: f64,
+    pub compactness: f64,
+}
+
+impl FitnessWeightsV3 {
+    fn entries(&self) -> [(&'static str, f64); 7] {
+        [
+            ("utility_transfer", self.utility_transfer),
+            ("representation_closeness", self.representation_closeness),
+            ("driver_fidelity", self.driver_fidelity),
+            ("distribution_fidelity", self.distribution_fidelity),
+            ("structure_fidelity", self.structure_fidelity),
+            ("coverage_realism", self.coverage_realism),
+            ("compactness", self.compactness),
+        ]
+    }
+
+    pub fn is_valid(&self) -> bool {
+        self.entries()
+            .iter()
+            .all(|(_, weight)| weight.is_finite() && *weight > 0.0)
+            && (self.entries().iter().map(|(_, weight)| weight).sum::<f64>() - 1.0).abs() <= 1e-12
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct MasterFitnessV3Contract {
+    pub version: u8,
+    pub scalarization: String,
+    pub privacy_soft_weight: f64,
+    pub epsilon: f64,
+    pub weights: FitnessWeightsV3,
+}
+
+impl MasterFitnessV3Contract {
+    pub fn is_frozen(&self) -> bool {
+        self.version == 3
+            && self.scalarization == "geometric_mean"
+            && self.privacy_soft_weight == 0.0
+            && self.epsilon == 1e-6
+            && self.weights.is_valid()
+            && self.weights
+                == FitnessWeightsV3 {
+                    utility_transfer: 0.35,
+                    representation_closeness: 0.15,
+                    driver_fidelity: 0.15,
+                    distribution_fidelity: 0.15,
+                    structure_fidelity: 0.10,
+                    coverage_realism: 0.05,
+                    compactness: 0.05,
+                }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScoredComponentsV3 {
+    pub utility_transfer: Option<f64>,
+    pub driver_fidelity: Option<f64>,
+    pub distribution_fidelity: Option<f64>,
+    pub structure_fidelity: Option<f64>,
+    pub coverage_realism: Option<f64>,
+    pub compactness: Option<f64>,
+}
+
+impl ScoredComponentsV3 {
+    fn entries(&self) -> [(&'static str, Option<f64>); 6] {
+        [
+            ("utility_transfer", self.utility_transfer),
+            ("driver_fidelity", self.driver_fidelity),
+            ("distribution_fidelity", self.distribution_fidelity),
+            ("structure_fidelity", self.structure_fidelity),
+            ("coverage_realism", self.coverage_realism),
+            ("compactness", self.compactness),
+        ]
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct RepresentationObservation {
+    pub encoder: String,
+    pub distance: f64,
+    pub d_null: f64,
+    pub d_match: f64,
+    pub gap_mitra: f64,
+    pub gap_tabicl: f64,
+    pub exact_row_matches: u64,
+    pub near_copy_ok: bool,
+    pub cleartext_absent: bool,
+    pub membership_auc: f64,
+    pub attribute_inference_advantage: f64,
+    pub artifact_bytes: u64,
+    pub normalizer: String,
+    pub utility_protocol: String,
+    pub utility_auditors: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct MasterFitnessV3Report {
+    pub version: u8,
+    pub eligible: bool,
+    pub hard_gates: BTreeMap<String, bool>,
+    pub score: Option<f64>,
+    pub representation_closeness: Option<f64>,
+    pub unavailable_terms: Vec<String>,
+}
+
+fn component_in_unit(value: Option<f64>) -> Option<f64> {
+    value.filter(|value| value.is_finite() && (0.0..=1.0).contains(value))
+}
+
+/// Returns null unless the frozen v3 weights, the security gates, and the
+/// computed representation component are all present. A caller-supplied
+/// closeness number is not accepted.
+pub fn evaluate_v3(
+    contract: &MasterFitnessV3Contract,
+    components: &ScoredComponentsV3,
+    observation: &RepresentationObservation,
+) -> MasterFitnessV3Report {
+    let shared_map = observation.normalizer == crate::representation::NORMALIZER;
+    let closeness = if shared_map {
+        crate::representation::representation_closeness(
+            observation.distance,
+            observation.d_null,
+            observation.d_match,
+            observation.gap_mitra,
+            observation.gap_tabicl,
+        )
+    } else {
+        None
+    };
+    let tabular_ok = crate::representation::tabular_transfer_ok(
+        &observation.normalizer,
+        &observation.utility_protocol,
+        &observation.utility_auditors,
+    );
+    let mut scored = components.clone();
+    if !tabular_ok {
+        scored.utility_transfer = None;
+    }
+    let mut hard_gates = BTreeMap::new();
+    hard_gates.insert("exact_row_match".into(), observation.exact_row_matches == 0);
+    hard_gates.insert("near_copy".into(), observation.near_copy_ok);
+    hard_gates.insert("cleartext_absent".into(), observation.cleartext_absent);
+    hard_gates.insert(
+        "clean_encoder".into(),
+        crate::representation::headline_encoder(&observation.encoder),
+    );
+    hard_gates.insert(
+        "membership_auc".into(),
+        observation.membership_auc.is_finite() && observation.membership_auc <= 0.55,
+    );
+    hard_gates.insert(
+        "attribute_inference".into(),
+        observation.attribute_inference_advantage.is_finite()
+            && observation.attribute_inference_advantage <= 0.05,
+    );
+    hard_gates.insert("tier_bytes".into(), observation.artifact_bytes <= 10_240);
+    hard_gates.insert("shared_normalizer".into(), shared_map);
+    hard_gates.insert("tabular_transfer".into(), tabular_ok);
+    hard_gates.insert("representation_closeness".into(), closeness.is_some());
+    let mut unavailable_terms = scored
+        .entries()
+        .into_iter()
+        .filter(|(_, value)| component_in_unit(*value).is_none())
+        .map(|(name, _)| name.to_string())
+        .collect::<Vec<_>>();
+    if closeness.is_none() {
+        unavailable_terms.push("representation_closeness".into());
+    }
+    let gates_pass =
+        contract.is_frozen() && !hard_gates.is_empty() && hard_gates.values().all(|passed| *passed);
+    let measured = scored
+        .entries()
+        .into_iter()
+        .map(|(_, value)| component_in_unit(value))
+        .collect::<Option<Vec<_>>>();
+    let score = if gates_pass {
+        measured.and_then(|values| {
+            let closeness = closeness?;
+            let mut log_score =
+                contract.weights.representation_closeness * (contract.epsilon + closeness).ln();
+            let named = [
+                ("utility_transfer", values[0]),
+                ("driver_fidelity", values[1]),
+                ("distribution_fidelity", values[2]),
+                ("structure_fidelity", values[3]),
+                ("coverage_realism", values[4]),
+                ("compactness", values[5]),
+            ];
+            for (name, value) in named {
+                let weight = contract
+                    .weights
+                    .entries()
+                    .into_iter()
+                    .find(|(key, _)| *key == name)
+                    .map(|(_, weight)| weight)
+                    .unwrap_or(0.0);
+                log_score += weight * (contract.epsilon + value).ln();
+            }
+            let total = contract
+                .weights
+                .entries()
+                .iter()
+                .map(|(_, weight)| weight)
+                .sum::<f64>();
+            (total > 0.0).then_some(100.0 * (log_score / total).exp())
+        })
+    } else {
+        None
+    };
+    MasterFitnessV3Report {
+        version: contract.version,
+        eligible: score.is_some(),
+        hard_gates,
+        score,
+        representation_closeness: closeness,
+        unavailable_terms,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -291,5 +520,141 @@ mod tests {
         assert!((report.score.unwrap() - expected).abs() < 1e-10);
         assert_eq!(report.weight_sensitivity.len(), 9);
         assert!(report.weight_sensitivity.values().all(Option::is_some));
+    }
+
+    fn v3_contract() -> MasterFitnessV3Contract {
+        MasterFitnessV3Contract {
+            version: 3,
+            scalarization: "geometric_mean".into(),
+            privacy_soft_weight: 0.0,
+            epsilon: 1e-6,
+            weights: FitnessWeightsV3 {
+                utility_transfer: 0.35,
+                representation_closeness: 0.15,
+                driver_fidelity: 0.15,
+                distribution_fidelity: 0.15,
+                structure_fidelity: 0.10,
+                coverage_realism: 0.05,
+                compactness: 0.05,
+            },
+        }
+    }
+
+    fn passing_components() -> ScoredComponentsV3 {
+        ScoredComponentsV3 {
+            utility_transfer: Some(0.5),
+            driver_fidelity: Some(0.5),
+            distribution_fidelity: Some(0.5),
+            structure_fidelity: Some(0.5),
+            coverage_realism: Some(0.5),
+            compactness: Some(0.5),
+        }
+    }
+
+    fn passing_observation() -> RepresentationObservation {
+        RepresentationObservation {
+            encoder: "kumo_tabular_l".into(),
+            distance: 0.2,
+            d_null: 0.5,
+            d_match: 0.4,
+            gap_mitra: -0.1,
+            gap_tabicl: -0.2,
+            exact_row_matches: 0,
+            near_copy_ok: true,
+            cleartext_absent: true,
+            membership_auc: 0.5,
+            attribute_inference_advantage: 0.0,
+            artifact_bytes: 1_000,
+            normalizer: crate::representation::NORMALIZER.into(),
+            utility_protocol: crate::representation::TABULAR_PROTOCOL.into(),
+            utility_auditors: crate::representation::TABULAR_AUDITORS
+                .iter()
+                .map(|name| (*name).to_string())
+                .collect(),
+        }
+    }
+
+    #[test]
+    fn v3_geometric_mean_uses_the_frozen_weights() {
+        let report = evaluate_v3(
+            &v3_contract(),
+            &passing_components(),
+            &passing_observation(),
+        );
+        assert!(report.eligible);
+        assert!((report.representation_closeness.unwrap() - 0.5).abs() < 1e-12);
+        assert!((report.score.unwrap() - 100.0 * (0.5 + 1e-6)).abs() < 1e-9);
+    }
+
+    #[test]
+    fn v3_exact_row_match_is_null() {
+        let mut observation = passing_observation();
+        observation.exact_row_matches = 1;
+        let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+        assert!(!report.hard_gates["exact_row_match"]);
+        assert_eq!(report.score, None);
+    }
+
+    #[test]
+    fn v3_cleartext_byte_is_null() {
+        let mut observation = passing_observation();
+        observation.cleartext_absent =
+            !crate::representation::artifact_has_cleartext(b"header,age\n", &[b"age"]);
+        let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+        assert_eq!(report.score, None);
+        assert!(!report.hard_gates["cleartext_absent"]);
+    }
+
+    #[test]
+    fn v3_refused_encoder_is_null() {
+        let mut observation = passing_observation();
+        observation.encoder = "foundation".into();
+        let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+        assert!(!report.hard_gates["clean_encoder"]);
+        assert_eq!(report.score, None);
+    }
+
+    #[test]
+    fn v3_zero_match_distance_and_sign_flip_are_null() {
+        let mut observation = passing_observation();
+        observation.d_match = 0.0;
+        assert_eq!(
+            evaluate_v3(&v3_contract(), &passing_components(), &observation).score,
+            None
+        );
+        observation.d_match = 0.4;
+        observation.gap_mitra = 0.2;
+        let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+        assert!(report.representation_closeness.is_none());
+        assert_eq!(report.score, None);
+    }
+
+    #[test]
+    fn v3_auditor_retention_cannot_fill_tabular_transfer() {
+        let mut observation = passing_observation();
+        observation.utility_protocol = "auditor_retention".into();
+        observation.utility_auditors = vec!["catboost".into()];
+        let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+        assert!(!report.hard_gates["tabular_transfer"]);
+        assert!(
+            report
+                .unavailable_terms
+                .iter()
+                .any(|term| term == "utility_transfer")
+        );
+        assert_eq!(report.score, None);
+    }
+
+    #[test]
+    fn embedded_v3_contract_matches_the_build_digest() {
+        use sha2::{Digest, Sha256};
+        let bytes = include_bytes!("../production/kpi-contract-v3.json");
+        let normalized = bytes.strip_suffix(b"\n").unwrap_or(bytes);
+        let digest = format!("{:x}", Sha256::digest(normalized));
+        assert_eq!(digest, env!("DOPE_KPI_CONTRACT_V3_SHA256"));
+        let parsed: serde_json::Value = serde_json::from_slice(normalized).unwrap();
+        let contract: MasterFitnessV3Contract =
+            serde_json::from_value(parsed["master_fitness"].clone()).unwrap();
+        assert!(contract.is_frozen());
     }
 }

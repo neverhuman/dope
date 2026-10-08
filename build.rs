@@ -89,4 +89,33 @@ fn main() {
         "cargo:rustc-env=DOPE_KPI_CONTRACT_V1_BLAKE3={}",
         blake3::hash(&v1_bytes).to_hex()
     );
+    let v3_path = "production/kpi-contract-v3.json";
+    println!("cargo:rerun-if-changed={v3_path}");
+    let v3 = fs::read(v3_path).expect("MFS-v3 contract must be readable");
+    let v3_parsed: Value = serde_json::from_slice(&v3).expect("MFS-v3 contract must be JSON");
+    assert_eq!(
+        v3_parsed["version"].as_u64(),
+        Some(3),
+        "MFS-v3 file must be version 3"
+    );
+    assert_eq!(
+        v3_parsed["master_fitness"]["version"].as_u64(),
+        Some(3),
+        "MFS-v3 scalar must be version 3"
+    );
+    assert_eq!(
+        v3_parsed["master_fitness"]["privacy_soft_weight"].as_f64(),
+        Some(0.0),
+        "MFS-v3 privacy stays a gate"
+    );
+    let v3_bytes = serde_json::to_vec(&canonical(&v3_parsed)).expect("MFS-v3 contract serializes");
+    assert_eq!(
+        v3.strip_suffix(b"\n").unwrap_or(&v3),
+        v3_bytes,
+        "production/kpi-contract-v3.json must use canonical JSON encoding"
+    );
+    println!(
+        "cargo:rustc-env=DOPE_KPI_CONTRACT_V3_SHA256={:x}",
+        Sha256::digest(&v3_bytes)
+    );
 }

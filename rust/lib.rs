@@ -26,6 +26,7 @@ pub mod packed;
 pub mod production;
 pub mod regression_embeddings;
 pub mod release;
+pub mod representation;
 pub mod router;
 pub mod sample;
 
