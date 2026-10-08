@@ -1,0 +1,2112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "baseline_commit": {
+      "const": "4138f5fa04c656ad0cee80b1ff8c8c53eacd3b98",
+      "type": "string"
+    },
+    "baseline_delta_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "const": 9576,
+          "type": "integer"
+        },
+        "sha256": {
+          "const": "e5377bb0db549cf7be91f376810239dac9ce852e2323c154923c6b2a8b337e30",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "baseline_source_proof_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "const": 6111,
+          "type": "integer"
+        },
+        "sha256": {
+          "const": "e32014ffb250e249375f3bafcbb5bb067740d023163a31f068b9987c118014f2",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "custody": {
+      "additionalProperties": false,
+      "properties": {
+        "host_calls_or_scientific_execution": {
+          "const": 0,
+          "type": "integer"
+        },
+        "input_hashes_verified_before_decode": {
+          "const": true
+        },
+        "models_samples_rows_arrays_or_TEST_opened": {
+          "const": false
+        },
+        "private_paths_or_raw_receipt_payloads_in_public_leaf": {
+          "const": false
+        },
+        "public_regenerator_requires_private_inputs": {
+          "const": false
+        }
+      },
+      "required": [
+        "host_calls_or_scientific_execution",
+        "input_hashes_verified_before_decode",
+        "models_samples_rows_arrays_or_TEST_opened",
+        "private_paths_or_raw_receipt_payloads_in_public_leaf",
+        "public_regenerator_requires_private_inputs"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "work-order-b-native-indices006-007-paid-cost-source-proof-v1",
+      "type": "string"
+    },
+    "input_metadata": {
+      "items": false,
+      "maxItems": 70,
+      "minItems": 70,
+      "prefixItems": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 14035989,
+              "type": "integer"
+            },
+            "role": {
+              "const": "mixed_logical500_identity_manifest",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "94fe235bb185fdce5b93821cf60052467f55d0f7cdca87b1896e02e7ca359cb6",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 260342,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original_to_strict16_alias391",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "edd57b17f82cbc1479540a5ecc582edc295d34369b7c9a1f30d2e8fe0d8dc77d",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35081,
+              "type": "integer"
+            },
+            "role": {
+              "const": "actual_keeper_init",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "42266360f2e35a4451981fc6dd6803894e825082b86e422e5fe51a6b8dd0605c",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 11253,
+              "type": "integer"
+            },
+            "role": {
+              "const": "actual_controller_init",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "9b83815c1ec5e529d7813726f9ac001b5777691a67cb6574da69d4bc2549b0c3",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 31943,
+              "type": "integer"
+            },
+            "role": {
+              "const": "actual_resource_profile_resume",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "835f04aace06decff29cb974086f616c2e9d828121919fd8a130bb7ec10890b8",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2830219,
+              "type": "integer"
+            },
+            "role": {
+              "const": "historical_seed11_strict_reuse_lock",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "8e5a090619c5420041b97c0382f9cbe20ea759b29cf633b8745f8d8c86cb58e3",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 7368,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original_controller_or_keeper_source",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "c27ea14f24a0886cca28bf59d6705dfbf856c06704cafbbc4538e08e6d094250",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 12698,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original_controller_or_keeper_source",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "c6d4dc899680f3e1995638a588840472ff9f97b7437aa8c112b9bfa2cb86a403",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 68353,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original_positive7_resume",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "9ffa102fc48e93405ede1699d4b51a8cc29fbd30ac9e4f13e97150ba97ad5106",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 123393,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original32_controller_closure",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "26d0e63944991217176774229122926389cb9c118cfcb517021847babcd039a5",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 31518,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original32_keeper_release",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "e5587705c7ad24a1104aa5cefa1179f5021c417c8ae9b70572d4444a22c6f428",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1723,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "fdbae866c491a694e807d57b5786836ac1ac1d359095a14d7d37cb6e8cd5ab35",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 33247,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_native_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "53325694bfc9118f1359b2b940ed46b36628309eb609bc3b6a1b7a45ec0c3575",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1718,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "fc7bb23b4cd8a46def4b1946431f2df579b6f9fd4e64eef2a5b2d8a10780ffba",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35822,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_native_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "b8620cf78f31ea55a54f2f558cbbae588ed272892e6c8b7958f4eb276ac8db1b",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1718,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "f205df0a2e77e51fe4e27c84147b255d1b54db8df7b371bcfc08eaa9c74b2ae2",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35826,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_native_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "9cd40d82e05c568938c8e83f2f22c8128174f995813847e2d3df4db4cb85286c",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1721,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "3fff4a0700adb303a2d6c4657dfdab3cb1d52a1d484a5e7123949924ecd52410",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35823,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_native_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "3fa636399624ae212ee367136e438bba2f0e666be3857908051d846c0c2a2387",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1751,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "194c30db0bc348cf24c8f3a8a03c8a53fdf670377f40ca856614dd4608be6240",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35827,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_native_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "6c911b983ebf3f64173dd418a0637a8ac07a99cd7d434da7abd57698c6ef752d",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1750,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "5ab8b4c2ca9a46974c5babc5e47b33d5ee103f825adcec329d00d8925479e198",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35825,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_native_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "a3de0dcd5c079791928cf0e291b5237e28f7f9ec301f112bab18f1ce71898ab6",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1750,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "04bc250848c17262a33da03b32f773b4868472ca2f3ee02858e863765bd7dfc4",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35823,
+              "type": "integer"
+            },
+            "role": {
+              "const": "prior7_native_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "62433ab4953bc03328c93abfda07e68d7ef5009438562a9bfe01508226bdcc9c",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2127,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original32_current3_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "1bc8349ebc62492febc9323c2f582465d932e71d593407efee9444053d8cd2a1",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2313,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original32_current3_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "f86f82fc1f6c9c1197000538fa4d2c51fedb0b535277a4a7c4fb360f262108ef",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2351,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original32_current3_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "8458b0c0c67030b9040eaeffd5c5426fc954423a6814d19d0666ca79b2b87a28",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 33252,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original32_current3_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "37de63d21e904fc18b1cd175aedb11bec5e3aa5165a74784ecff1167d2824679",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35821,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original32_current3_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "f6e5195efc56f0bcab3d9de1cd72f251d6d0739645ef716213890e815d338dde",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 23376,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original32_current3_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "9557469a4e4593272ae727554ebe5a144bc264fd1646faca67dcc9b6ba2c152d",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 118794,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_initial_preserved_budget",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "cf5b4c3895e1fa2d715b510d0d1f70faf61067db1999c111c0c2172d92a7434f",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 118690,
+              "type": "integer"
+            },
+            "role": {
+              "const": "original_selected_seed11_budget",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "bc8367e677f355564f69cca6fc99dbd315ed8f5daf5eca2c0ca5467eef1d2270",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 474918,
+              "type": "integer"
+            },
+            "role": {
+              "const": "historical_trial_cost_ledger",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "f079a2391ab75355463cf6f686abef762c6ba09f8341298f8951e7d1500dc860",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1863,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index0_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "f7440653377bda471105190a5b4bd31a66b13d2a66b9a759626858c3dd2993cd",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35824,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index0_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "f39f3577ea8b901868680f85bb1e3c47a3e741760d1e83cfd8643c065eb5fd29",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1863,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index1_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "696e93c7d9d5a2ef9ff303bbd0b8cd0a545857e165e5787e973e3ab63839c890",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 24202,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index1_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "6461434a6f8723579345e3fc97a5e0e80af8e0acd2dd455a9ba99a20ee8a8c47",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1861,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index2_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "80b6dfa2ba4c01692afa71f0f2d32504d69e051e98ea7f5bb8c0c7d42e112148",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 23355,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index2_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "9d8dbe18f72513bb26a4ce878032dc129ebca3bd100ddc167d5676f0f3311fb4",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1863,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index3_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "e4559732451a7ea3690f26f490ffbc3256ec7c89763d9718a0b4334a3a2bc534",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 33246,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index3_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "9efe5bbafdfda2da0f95fd3bdecb1104d60136306ddf5cf09fef977ce3ae2c33",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1863,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index4_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "47b1671238d106135a62208e1248b5c6bbfe0fe12bec01db865ad3acb01fdaac",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 35826,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index4_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "766b012b17099dde33f90ecd1d1e8e36b3a55a1486fb30d7669d945948b1655e",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1863,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index5_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "1eec91c7a576b81206b10c31d0cb956fec5b000f7b4600a62cf4612d6d8b3f16",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 34007,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index5_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "fcee614d1822a047ad57c1cd96f61a9c6dd0ae7cc8854cb4464c43fc5fc85bb9",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1862,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index6_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "a3fa9c807c0d1531904c69a62743cb3b604310ca5c09fd2f86a6e38ccd06adb0",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 23376,
+              "type": "integer"
+            },
+            "role": {
+              "const": "strict16_index6_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "85077d9e7cace7192cdd88d6ac663fb27f395e2f9fd196b5c3d3d87d300c8377",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 118794,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index6_actual_charged_budget",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "c06e4352339ab18e4e6a563485651325e146ac052dcc9bd16e9af6d647040232",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1034,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index6_outer_scientific_status",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "5a9af401ed18cb47e979e5fbeb97e2732dc7ef8e32cf4a69b83ed6bc1fa121eb",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2887,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index6_actual_owned_closure",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "4720de145906c9d60cc270bb6f5104c593914c02c9a0c7a26bf71ff8d3f725b8",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 23693,
+              "type": "integer"
+            },
+            "role": {
+              "const": "previous_index006_reconciliation",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "58c5e38e150379b18f188b88482d201c497d96fabfe7d5c3bb6c305536802acf",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 21777,
+              "type": "integer"
+            },
+            "role": {
+              "const": "previous_input_proof",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "dab238f28e7b8fc718720aa2d58e117280068ef9b946ee268d15da67cc01e620",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 4242,
+              "type": "integer"
+            },
+            "role": {
+              "const": "previous_index006_public_proposal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "070ec961ced00d250b81f7e6a2335ef683d1b171eb63b0754054042ed526671d",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 10684,
+              "type": "integer"
+            },
+            "role": {
+              "const": "previous_public_proposal_source_proof",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "45e815c0eb54a4d10afd8ae50e8537a81cdfd392c99a6feaae53f4eda028f358",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 4184,
+              "type": "integer"
+            },
+            "role": {
+              "const": "previous_proposal_renderer",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "da18fe1f8aaf5a157b7b68020bc0ed9b313dbb1a9bdfec234a7a0b6d7e5bc1d5",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 3069,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index007_completed_operator_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "d1c360f9fe60041033410d211c3cb8b36355012c52255aa0f6b304d3ada8bb2d",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2958,
+              "type": "integer"
+            },
+            "role": {
+              "const": "actual_operator_FINAL",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "53d15cf9ae8ca664b728e1cb0dd1d5dfa4a43341f98c94bd3b8728818aa076ec",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1862,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index007_actual_parent",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "f4649f6c3b2a756f259aeaf0916afe558db30acb2cec674a07606e3ccd8a7dfa",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 23355,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index007_native_terminal",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "d44f8060bbe411258ec9216345e4a2937117367b0a7d3c1d95b7b3663206fba8",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 118794,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index007_charged_budget",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "38e954e603ef42609b8c81d9fcd8b2e64e962a3019aca43d0c5e5014bbb1dc32",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 1034,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index007_outer_status",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "3d6be3fb7ef949cdef4c30934146be47e8af3f46d22cf96ef8b5d345faf41bbc",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2891,
+              "type": "integer"
+            },
+            "role": {
+              "const": "selected_metadata_attempt20_driver_wait",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "c817ecbdaba79905cf8b7f081034ceed3cb279432697fe253047bd99e1bdef04",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 6859,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index007_actual_dispatch",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "5c8372d7e7945a806639609a8d51391168356933ad7bda905f2099e22c717f30",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 19554,
+              "type": "integer"
+            },
+            "role": {
+              "const": "operator_source",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "a867ea9207d39296f0693dd58041feddd0c6c3577e01a354f7c7b55e3ce84dd2",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 14035989,
+              "type": "integer"
+            },
+            "role": {
+              "const": "mixed_logical500_identity_manifest",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "94fe235bb185fdce5b93821cf60052467f55d0f7cdca87b1896e02e7ca359cb6",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 260342,
+              "type": "integer"
+            },
+            "role": {
+              "const": "logical_to_physical_alias391",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "edd57b17f82cbc1479540a5ecc582edc295d34369b7c9a1f30d2e8fe0d8dc77d",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 118794,
+              "type": "integer"
+            },
+            "role": {
+              "const": "previous_index006_charged_budget",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "c06e4352339ab18e4e6a563485651325e146ac052dcc9bd16e9af6d647040232",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 32042,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index007_request_metadata",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "acd721b876bef231e7fe2d8553f0a8846da468b28e878d7fceb5d717cad159c8",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 7044,
+              "type": "integer"
+            },
+            "role": {
+              "const": "index007_round_metadata",
+              "type": "string"
+            },
+            "sha256": {
+              "const": "2511263451f1acffd51a15c793b96e42734bb6c687631286c3959dfd992c127e",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "role",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "array"
+    },
+    "operation_joins": {
+      "items": false,
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "const": "paid_index006",
+              "type": "string"
+            },
+            "job_sha256": {
+              "const": "7f63d99d8abfc002aaabcc503ee3c4d256d2f37acfc5aa22d90ebc76ca228ead",
+              "type": "string"
+            },
+            "parent_ref": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "const": 1862,
+                  "type": "integer"
+                },
+                "sha256": {
+                  "const": "a3fa9c807c0d1531904c69a62743cb3b604310ca5c09fd2f86a6e38ccd06adb0",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "bytes",
+                "sha256"
+              ],
+              "type": "object"
+            },
+            "receipt_ref": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "const": 23376,
+                  "type": "integer"
+                },
+                "sha256": {
+                  "const": "85077d9e7cace7192cdd88d6ac663fb27f395e2f9fd196b5c3d3d87d300c8377",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "bytes",
+                "sha256"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "id",
+            "job_sha256",
+            "parent_ref",
+            "receipt_ref"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "const": "paid_index007",
+              "type": "string"
+            },
+            "job_sha256": {
+              "const": "09b1d0e53d9d192c7186a04337104a8207b779ce5ba84e36df92687071ff56f6",
+              "type": "string"
+            },
+            "parent_ref": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "const": 1862,
+                  "type": "integer"
+                },
+                "sha256": {
+                  "const": "f4649f6c3b2a756f259aeaf0916afe558db30acb2cec674a07606e3ccd8a7dfa",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "bytes",
+                "sha256"
+              ],
+              "type": "object"
+            },
+            "receipt_ref": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "const": 23355,
+                  "type": "integer"
+                },
+                "sha256": {
+                  "const": "d44f8060bbe411258ec9216345e4a2937117367b0a7d3c1d95b7b3663206fba8",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "bytes",
+                "sha256"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "id",
+            "job_sha256",
+            "parent_ref",
+            "receipt_ref"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "array"
+    },
+    "reconciliation": {
+      "additionalProperties": false,
+      "properties": {
+        "alias391_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 260342,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "edd57b17f82cbc1479540a5ecc582edc295d34369b7c9a1f30d2e8fe0d8dc77d",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "cell_ledger_equals_selected_seed11_ledger_plus_new_parent_aggregate": {
+          "const": true
+        },
+        "current_budget_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 118794,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "38e954e603ef42609b8c81d9fcd8b2e64e962a3019aca43d0c5e5014bbb1dc32",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "current_classification_sha256": {
+          "const": "797ca061bec52290cb98dcee84d9c316b4ea6daf81e52279b436959c063f42a0",
+          "type": "string"
+        },
+        "current_historical_inclusive_all_cell_ledger_seconds": {
+          "const": 2525.3003210125025,
+          "type": "number"
+        },
+        "historical_strict_lock_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2830219,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "8e5a090619c5420041b97c0382f9cbe20ea759b29cf633b8745f8d8c86cb58e3",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "index007_incremental_paid_trial_count": {
+          "const": 1,
+          "type": "integer"
+        },
+        "index007_incremental_parent_seconds": {
+          "const": 52.06936496170238,
+          "type": "number"
+        },
+        "logical500_manifest_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 14035989,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "94fe235bb185fdce5b93821cf60052467f55d0f7cdca87b1896e02e7ca359cb6",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "logical_roster_join_verified": {
+          "const": true
+        },
+        "metadata_hold_or_unpaid_metadata_paid_trial_increment": {
+          "const": 0,
+          "type": "integer"
+        },
+        "nested_parent_and_operator_timers_nonadditive": {
+          "const": true
+        },
+        "previous_index006_proposal_was_not_assumed_committed": {
+          "const": true
+        },
+        "private_input_proof_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 9289,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "a7bdc7870b8023c2d493be3d6bfc4678bb8b7045a5f76356e0b74b1a6489e764",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "private_reconciliation_report_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 28493,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "9c8457a06e70a3eff0806d1ad8bfb7315fdb6d57d8c0280019b74d3a6944fbc7",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "same_slot_old32_infrastructure_preserved_as_paid_history": {
+          "const": true
+        },
+        "selected_historical_seed11_initial_cell_ledger_seconds": {
+          "const": 794.540052289376,
+          "type": "number"
+        },
+        "sum_parent_seconds_plus_PR181_baseline_matches_current_budget": {
+          "const": true
+        },
+        "trial_cell_sum_116_to_118": {
+          "const": true
+        }
+      },
+      "required": [
+        "alias391_ref",
+        "current_budget_ref",
+        "current_classification_sha256",
+        "historical_strict_lock_ref",
+        "index007_incremental_paid_trial_count",
+        "index007_incremental_parent_seconds",
+        "logical500_manifest_ref",
+        "logical_roster_join_verified",
+        "metadata_hold_or_unpaid_metadata_paid_trial_increment",
+        "nested_parent_and_operator_timers_nonadditive",
+        "previous_index006_proposal_was_not_assumed_committed",
+        "private_input_proof_ref",
+        "private_reconciliation_report_ref",
+        "same_slot_old32_infrastructure_preserved_as_paid_history",
+        "sum_parent_seconds_plus_PR181_baseline_matches_current_budget",
+        "trial_cell_sum_116_to_118",
+        "current_historical_inclusive_all_cell_ledger_seconds",
+        "selected_historical_seed11_initial_cell_ledger_seconds",
+        "cell_ledger_equals_selected_seed11_ledger_plus_new_parent_aggregate"
+      ],
+      "type": "object"
+    },
+    "separate_metadata_and_operator_observations": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregate_unpaid_deferral_wall_seconds": {
+          "type": "null"
+        },
+        "elapsed_clocks_nonadditive": {
+          "const": true
+        },
+        "operator_FINAL_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2958,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "53d15cf9ae8ca664b728e1cb0dd1d5dfa4a43341f98c94bd3b8728818aa076ec",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "operator_total_wall_seconds": {
+          "const": 800.1747174239717,
+          "type": "number"
+        },
+        "paid_trial_increment_from_metadata": {
+          "const": 0,
+          "type": "integer"
+        },
+        "selected_driver_parent_wait_seconds": {
+          "const": 7.87944485200569,
+          "type": "number"
+        },
+        "selected_driver_wait_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 2891,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "c817ecbdaba79905cf8b7f081034ceed3cb279432697fe253047bd99e1bdef04",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "selected_terminal_operator_wait_seconds": {
+          "const": 55.00510452222079,
+          "type": "number"
+        },
+        "selected_terminal_wait_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "bytes": {
+              "const": 3069,
+              "type": "integer"
+            },
+            "sha256": {
+              "const": "d1c360f9fe60041033410d211c3cb8b36355012c52255aa0f6b304d3ada8bb2d",
+              "type": "string"
+            }
+          },
+          "required": [
+            "bytes",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "unpaid_metadata_attempt_count_ROOT_reported": {
+          "const": 19,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "aggregate_unpaid_deferral_wall_seconds",
+        "elapsed_clocks_nonadditive",
+        "operator_FINAL_ref",
+        "operator_total_wall_seconds",
+        "paid_trial_increment_from_metadata",
+        "selected_driver_parent_wait_seconds",
+        "selected_driver_wait_ref",
+        "selected_terminal_operator_wait_seconds",
+        "selected_terminal_wait_ref",
+        "unpaid_metadata_attempt_count_ROOT_reported"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "baseline_commit",
+    "baseline_delta_ref",
+    "baseline_source_proof_ref",
+    "custody",
+    "format",
+    "input_metadata",
+    "operation_joins",
+    "reconciliation",
+    "separate_metadata_and_operator_observations",
+    "version"
+  ],
+  "type": "object"
+}

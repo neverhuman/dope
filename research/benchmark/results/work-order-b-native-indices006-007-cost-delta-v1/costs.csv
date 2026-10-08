@@ -1,0 +1,3 @@
+id,phase,status,seed,attempt,parent_elapsed_seconds,metadata_hold_seconds,paid_trial_increment,charged_model_plus_projection_bytes,co_tenant,shared_GPU_cost,maximum_observed_own_GPU_resident_mib,job_sha256
+paid_index006,native_population,infrastructure_failure,71,1,54.26875431090593,,1,,,,,7f63d99d8abfc002aaabcc503ee3c4d256d2f37acfc5aa22d90ebc76ca228ead
+paid_index007,native_population,infrastructure_failure,23,1,52.06936496170238,,1,,,,,09b1d0e53d9d192c7186a04337104a8207b779ce5ba84e36df92687071ff56f6
