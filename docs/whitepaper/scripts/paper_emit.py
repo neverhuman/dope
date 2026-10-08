@@ -990,7 +990,7 @@ def _write_hashes(expanded, out):
             f"\\texttt{{{_break_path(item['path'])}}} & \\texttt{{{_break_hash(item['sha256'])}}} \\\\"
         )
     (out / "artifact-hashes.tex").write_text(
-        "{\\scriptsize\n"
+        "{\\footnotesize\n"
         "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{8.6cm}"
         ">{\\raggedright\\arraybackslash}p{8.6cm}@{}}\n\\toprule\n"
         "Ledger or lock & SHA-256 \\\\\n\\midrule\n\\endhead\n"
@@ -1016,7 +1016,7 @@ def _write_provenance(side, out):
         f"Evaluator \\texttt{{test.csv}} files, contents not read & {counts.get('beyond_evaluator_test_csv', 'not measured')} \\\\",
     ]
     (out / "provenance-table.tex").write_text(
-        "\\begin{tabular}{@{}lp{11cm}@{}}\n\\toprule\n"
+        "\\begin{tabular}{@{}l>{\\raggedright\\arraybackslash}p{11cm}@{}}\n\\toprule\n"
         "Item & Record \\\\\n\\midrule\n"
         + "\n".join(rows)
         + "\n\\bottomrule\n\\end{tabular}\n"

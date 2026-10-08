@@ -270,7 +270,7 @@ def write_longtable(path, caption, rows, columns):
     path.parent.mkdir(parents=True, exist_ok=True)
     align = "l" * len(columns)
     lines = [
-        "\\scriptsize",
+        "\\footnotesize",
         "\\begin{longtable}{" + align + "}",
         "\\caption{" + caption + "}\\\\",
         "\\toprule",
