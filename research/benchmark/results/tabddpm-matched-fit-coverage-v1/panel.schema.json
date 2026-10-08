@@ -1,0 +1,719 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "coverage_by_fit_seed": {
+      "const": {
+        "11": 132,
+        "23": 0,
+        "37": 0,
+        "53": 0,
+        "71": 0
+      }
+    },
+    "detection_protocol": {
+      "const": {
+        "folds": 5,
+        "identical_fold_membership_certified": false,
+        "source_sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
+        "splitter": "StratifiedGroupKFold",
+        "splitter_seed": 1729
+      }
+    },
+    "fit_seeds": {
+      "const": [
+        11,
+        23,
+        37,
+        53,
+        71
+      ]
+    },
+    "five_fit_complete": {
+      "const": false
+    },
+    "format": {
+      "const": "tabddpm-matched-fit-coverage-v1"
+    },
+    "full_population_complete": {
+      "const": false
+    },
+    "grid": {
+      "items": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "conditional_eta_mdt": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "eligible_gpu_minutes_to_metrics": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "measurement": {
+                  "type": "null"
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "measured"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "conditional_eta_mdt": {
+                  "type": "null"
+                },
+                "eligible_gpu_minutes_to_metrics": {
+                  "type": "null"
+                },
+                "measurement": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "pointer": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "sha256",
+                    "pointer"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "conditional_eta_mdt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dataset": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "eligible_gpu_minutes_to_metrics": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "fit_seed": {
+            "enum": [
+              11,
+              23,
+              37,
+              53,
+              71
+            ]
+          },
+          "input_hashes": {
+            "additionalProperties": false,
+            "properties": {
+              "projection": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "train": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "validation": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "train",
+              "validation",
+              "projection"
+            ],
+            "type": "object"
+          },
+          "measurement": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "pointer": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256",
+                  "pointer"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "method": {
+            "const": "TabDDPM"
+          },
+          "row_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          },
+          "sample_seed": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "selection_binding": {
+            "enum": [
+              "author_default",
+              "native_selected"
+            ]
+          },
+          "status": {
+            "enum": [
+              "measured",
+              "pending_no_gpu_admission"
+            ]
+          }
+        },
+        "required": [
+          "dataset",
+          "fit_seed",
+          "row_multiplier",
+          "sample_seed",
+          "method",
+          "selection_binding",
+          "input_hashes",
+          "status",
+          "measurement",
+          "eligible_gpu_minutes_to_metrics",
+          "conditional_eta_mdt"
+        ],
+        "type": "object"
+      },
+      "maxItems": 6000,
+      "minItems": 6000,
+      "type": "array"
+    },
+    "matched_cells": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "dataset": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "fit_seed": {
+            "const": 11
+          },
+          "input_hashes": {
+            "additionalProperties": false,
+            "properties": {
+              "projection": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "train": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "validation": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "train",
+              "validation",
+              "projection"
+            ],
+            "type": "object"
+          },
+          "reference_method": {
+            "enum": [
+              "ARF",
+              "TabSyn"
+            ]
+          },
+          "reference_publication": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "pointer": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "pointer"
+            ],
+            "type": "object"
+          },
+          "reference_receipt": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "type": "object"
+          },
+          "reference_selection": {
+            "enum": [
+              "author_default",
+              "native_selected",
+              "scaled_author_default"
+            ]
+          },
+          "row_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          },
+          "sample_seed": {
+            "enum": [
+              101,
+              211,
+              307
+            ]
+          },
+          "tabddpm_publication": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "pointer": {
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "pointer"
+            ],
+            "type": "object"
+          },
+          "tabddpm_receipt": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "bytes"
+            ],
+            "type": "object"
+          },
+          "tabddpm_selection": {
+            "enum": [
+              "author_default",
+              "native_selected"
+            ]
+          }
+        },
+        "required": [
+          "dataset",
+          "fit_seed",
+          "row_multiplier",
+          "sample_seed",
+          "tabddpm_selection",
+          "reference_method",
+          "reference_selection",
+          "input_hashes",
+          "tabddpm_publication",
+          "reference_publication",
+          "tabddpm_receipt",
+          "reference_receipt"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "measured_logical_slots": {
+      "const": 132
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "new_auditor_evaluations": {
+      "const": 0
+    },
+    "new_fits": {
+      "const": 0
+    },
+    "new_samples": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "paired_descriptive": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "complete_sample_lineages": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "confidence_interval": {
+            "type": "null"
+          },
+          "datasets": {
+            "items": {
+              "pattern": "^[0-9a-f]{16}$",
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "fit_seed": {
+            "const": 11
+          },
+          "informative_lineages": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "median_paired_difference": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "metric": {
+            "enum": [
+              "catboost_retention",
+              "marginal_error_mean",
+              "c2st_catboost_auc",
+              "distance_mia_auc"
+            ]
+          },
+          "reference_median": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "reference_method": {
+            "enum": [
+              "ARF",
+              "TabSyn"
+            ]
+          },
+          "reference_selection": {
+            "enum": [
+              "author_default",
+              "native_selected",
+              "scaled_author_default"
+            ]
+          },
+          "row_multiplier": {
+            "enum": [
+              1,
+              4
+            ]
+          },
+          "superiority": {
+            "type": "null"
+          },
+          "tabddpm_median": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "tabddpm_selection": {
+            "enum": [
+              "author_default",
+              "native_selected"
+            ]
+          }
+        },
+        "required": [
+          "tabddpm_selection",
+          "reference_method",
+          "reference_selection",
+          "fit_seed",
+          "row_multiplier",
+          "metric",
+          "complete_sample_lineages",
+          "informative_lineages",
+          "datasets",
+          "tabddpm_median",
+          "reference_median",
+          "median_paired_difference",
+          "confidence_interval",
+          "superiority"
+        ],
+        "type": "object"
+      },
+      "maxItems": 32,
+      "minItems": 32,
+      "type": "array"
+    },
+    "pending_logical_slots": {
+      "const": 5868
+    },
+    "physical_metric_receipts": {
+      "const": 126
+    },
+    "planned_logical_slots": {
+      "const": 6000
+    },
+    "planning": {
+      "additionalProperties": false,
+      "properties": {
+        "anchor_mdt": {
+          "const": "2026-10-08T08:00:00-06:00"
+        },
+        "gpu_admitted": {
+          "const": false
+        },
+        "historical_trials_count_toward_eight_trial_cap": {
+          "const": true
+        },
+        "provisional_evaluation_minutes": {
+          "const": 360
+        },
+        "runnable_job_manifest": {
+          "const": false
+        },
+        "selected_missing_configuration_known": {
+          "const": false
+        },
+        "total_cap_minutes": {
+          "const": 16900
+        },
+        "total_gpu_slot_hours": {
+          "const": 287.6666666666667
+        },
+        "twelve_hour_cell_cap_unchanged": {
+          "const": true
+        }
+      },
+      "required": [
+        "anchor_mdt",
+        "gpu_admitted",
+        "total_cap_minutes",
+        "provisional_evaluation_minutes",
+        "total_gpu_slot_hours",
+        "historical_trials_count_toward_eight_trial_cap",
+        "twelve_hour_cell_cap_unchanged",
+        "selected_missing_configuration_known",
+        "runnable_job_manifest"
+      ],
+      "type": "object"
+    },
+    "production_certified": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "retained_models": {
+      "const": 21
+    },
+    "row_multipliers": {
+      "const": [
+        1,
+        4
+      ]
+    },
+    "sample_seeds": {
+      "const": [
+        101,
+        211,
+        307
+      ]
+    },
+    "source_refs": {
+      "additionalProperties": false,
+      "properties": {
+        "followon": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "pointer": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "pointer"
+          ],
+          "type": "object"
+        },
+        "tabddpm": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "pointer": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "pointer"
+          ],
+          "type": "object"
+        },
+        "tabsyn": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "pointer": {
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "pointer"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "tabddpm",
+        "followon",
+        "tabsyn"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "const": null
+    },
+    "validation_population": {
+      "const": 100
+    }
+  },
+  "required": [
+    "format",
+    "source_refs",
+    "validation_population",
+    "fit_seeds",
+    "sample_seeds",
+    "row_multipliers",
+    "planned_logical_slots",
+    "measured_logical_slots",
+    "pending_logical_slots",
+    "coverage_by_fit_seed",
+    "physical_metric_receipts",
+    "retained_models",
+    "grid",
+    "matched_cells",
+    "paired_descriptive",
+    "detection_protocol",
+    "planning",
+    "new_fits",
+    "new_samples",
+    "new_auditor_evaluations",
+    "production_certified",
+    "full_population_complete",
+    "five_fit_complete",
+    "official_tests_opened",
+    "mfs_v2",
+    "ptf_v1",
+    "release_safe_l3",
+    "superiority"
+  ],
+  "type": "object"
+}

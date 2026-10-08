@@ -1,0 +1,33 @@
+{
+  "files": {
+    "README.md": {
+      "bytes": 4350,
+      "sha256": "b7f87ce4267237a10dff4b699a9442162b4e28bbed58566a77f09c11d924d8e3"
+    },
+    "cell-coverage.csv": {
+      "bytes": 619717,
+      "sha256": "9401e63559821d4af27e8e26478b6a4b74cafb003d06944351a6f2f45e5663cc"
+    },
+    "manifest.schema.json": {
+      "bytes": 3582,
+      "sha256": "6bc8326be7064ad8dc04b015700c4cf884285171978efc7a8de5c16dd8912ddb"
+    },
+    "matched-summary.md": {
+      "bytes": 4298,
+      "sha256": "4622087d15b8fa3cf4ea9cc00593a63fa0ddb983259c8b7bd62e92b64dc80f4e"
+    },
+    "panel.json": {
+      "bytes": 4478669,
+      "sha256": "3a2261ee2930081238baab888b5c50e9caa3942b8d4f37e42e2518a753ea9607"
+    },
+    "panel.schema.json": {
+      "bytes": 17140,
+      "sha256": "5c7c8bc2a6c0971858175096091b202ce4442a7c640f7983c87bd00ff5a2c02e"
+    }
+  },
+  "format": "tabddpm-matched-fit-coverage-manifest-v1",
+  "producer": {
+    "path": "research/benchmark/publish_tabddpm_matched_coverage.py",
+    "sha256": "5ac21fcef68e39372b6271d74654b740cb3f9388ed594d9fd63831eddd1c3bf9"
+  }
+}

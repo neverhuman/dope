@@ -288,6 +288,10 @@
     "docs/whitepaper/generated/published-baseline-kpis.csv": "external-evidence",
     "research/benchmark/publish_arf_tabsyn_followon.py": "external-evidence",
     "research/benchmark/tests/test_arf_tabsyn_followon.py": "external-evidence",
-    "research/benchmark/results/arf-tabsyn-followon-validation-v1/": "external-evidence"
+    "research/benchmark/results/arf-tabsyn-followon-validation-v1/": "external-evidence",
+    "research/benchmark/results/paper-receipt-redteam-20261008-v1/": "external-evidence",
+    "research/benchmark/publish_tabddpm_matched_coverage.py": "external-evidence",
+    "research/benchmark/tests/test_tabddpm_matched_coverage.py": "external-evidence",
+    "research/benchmark/results/tabddpm-matched-fit-coverage-v1/": "external-evidence"
   }
 }
