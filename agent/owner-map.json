@@ -1,6 +1,7 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": "external-evidence",
     "research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/": "external-evidence",
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": "external-evidence",
     "research/benchmark/render_matched_linear_fit11_figure.py": "external-evidence",

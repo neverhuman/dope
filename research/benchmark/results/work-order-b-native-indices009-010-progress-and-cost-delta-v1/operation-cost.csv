@@ -1,0 +1,3 @@
+operation_index,job_sha256,dataset,fit_seed,attempt,status,parent_exit_code,whole_native_parent_seconds,charged_model_plus_projection_bytes,GPU_observation_count,co_tenant_observed,shared_GPU_cost_observed,maximum_observed_own_GPU_resident_mib,maximum_observed_own_RSS_bytes
+9,721b1c05130a3c7dc1102dc130f934304f917fb38fbec6373f82b021d049c646,060b9fff8092db17,53,1,ok,0,299.157879341,5714,5,False,False,430,884449280
+10,5e26b40f8c480bdea931ddaaa02022ee22df837af0807240feeddfe41f321373,060b9fff8092db17,71,1,infrastructure_failure,0,97.250585811,,0,,,,
