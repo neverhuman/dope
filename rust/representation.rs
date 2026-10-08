@@ -416,7 +416,16 @@ mod tests {
             .duration_since(std::time::UNIX_EPOCH)
             .expect("clock")
             .as_nanos();
-        let tmp = std::env::temp_dir().join(format!("dope-mfs-v3-lookup-{stamp}"));
+        // Self-hosted runners set the process temp directory inside the checkout.
+        // The lookup has to be created somewhere the guard accepts.
+        let tmp = ["/dev/shm", "/var/tmp", "/tmp"]
+            .into_iter()
+            .map(|base| PathBuf::from(base).join(format!("dope-mfs-v3-lookup-{stamp}")))
+            .chain(std::iter::once(
+                std::env::temp_dir().join(format!("dope-mfs-v3-lookup-{stamp}")),
+            ))
+            .find(|dir| lookup_inside_repo(dir, &repo).ok() == Some(false))
+            .expect("a directory outside the repository");
         fs::create_dir_all(&tmp).unwrap();
         let path = write_local_lookup(&tmp, &repo, b"salt", &[("age", 1, 1)], &["red"]).unwrap();
         #[cfg(unix)]

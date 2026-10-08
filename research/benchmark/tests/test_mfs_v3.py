@@ -1,6 +1,8 @@
 import json
+import shutil
 import stat
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -15,6 +17,22 @@ from research.benchmark.score import CONTRACT, evaluate_v3, validate_contract
 
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def _directory_outside_repo(repo: Path) -> Path:
+    """A directory the lookup guard accepts. Runner temp can sit inside the checkout."""
+    stamp = time.time_ns()
+    refusal = None
+    for base in (Path("/dev/shm"), Path("/var/tmp"), Path("/tmp"), Path(tempfile.gettempdir())):
+        candidate = base / f"dope-mfs-v3-lookup-{stamp}"
+        try:
+            written = write_local_lookup(candidate, repo, b"probe", [("c", 1, 1)], [])
+        except ValueError as exc:
+            refusal = exc
+            continue
+        written.unlink()
+        return candidate
+    raise AssertionError(refusal or "no directory outside the repository")
 
 
 def passing():
@@ -121,16 +139,19 @@ class MfsV3Tests(unittest.TestCase):
     def test_lookup_file_stays_outside_the_repo(self):
         with self.assertRaises(ValueError):
             write_local_lookup(ROOT / "production", ROOT, b"salt", [("age", 1, 1)], ["red"])
-        with tempfile.TemporaryDirectory() as tmp:
-            path = write_local_lookup(Path(tmp), ROOT, b"salt", [("age", 1, 1)], ["red"])
+        outside = _directory_outside_repo(ROOT)
+        try:
+            path = write_local_lookup(outside, ROOT, b"salt", [("age", 1, 1)], ["red"])
             self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
             self.assertTrue(artifact_has_cleartext(path.read_bytes(), [b"age", b"red"]))
-            fixture = Path(tmp) / "artifact.csv"
+            fixture = outside / "artifact.csv"
             fixture.write_bytes(b"header,age\n1")
             self.assertTrue(artifact_has_cleartext(fixture.read_bytes(), [b"age"]))
             encoded = json.dumps(hash_manifest(b"salt", [("age", 1, 1)], "kumo_tabular_l", 100))
             self.assertNotIn("age", encoded)
             self.assertNotIn("red", encoded)
+        finally:
+            shutil.rmtree(outside, ignore_errors=True)
 
 
 if __name__ == "__main__":
