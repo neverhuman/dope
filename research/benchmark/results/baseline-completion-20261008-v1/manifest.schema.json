@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "files": {
+      "const": [
+        {
+          "bytes": 2024,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/README.md",
+          "sha256": "6d9c716e35e0ddd2121f37d2b37d1381ec32b27a96dbc46f8d55df60409c442d"
+        },
+        {
+          "bytes": 1996,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/completion.md",
+          "sha256": "5ffd06aa833c3d39ac3f7534b11530b1629e252f2b14ac7a18dd4be6ce338107"
+        },
+        {
+          "bytes": 312477,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/forest-inputs.json.gz",
+          "sha256": "9cf9b5dd2089cec38d143c7074c0fcce545ecbf7552a3fea2524b6539047b94e"
+        },
+        {
+          "bytes": 2250,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/inputs.lock.json",
+          "sha256": "3630991b75607ac02c8166c2090b6e4509ecd47cd169b86a11c2b32c02b6db98"
+        },
+        {
+          "bytes": 2750,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/inputs.lock.schema.json",
+          "sha256": "63ace43937e4d6478c5b17fd6b715e9632c8070a333fae8adf63cf18f2fee243"
+        },
+        {
+          "bytes": 5130,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/panel.json",
+          "sha256": "46abb42e01d02babe197c76e11017d8da6c309e2858a5899d6abce5b58c807dc"
+        },
+        {
+          "bytes": 6542,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/panel.schema.json",
+          "sha256": "d939fbc1f642e5d11674037191d14c5497d5b593a8351be5780be3cd29cf05af"
+        },
+        {
+          "bytes": 1276,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/rate.json",
+          "sha256": "18ba209cdc4e0154d0ef8b3ccebc285c2925b04313458ccb58a1e75e71b83d2c"
+        },
+        {
+          "bytes": 2022,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/rate.schema.json",
+          "sha256": "1b1e0fb496c87b6b13c05981bb1ccc66f8c82ce9748ac0a88de3c8703bf96fe1"
+        },
+        {
+          "bytes": 210528,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/timeout-dispositions.json",
+          "sha256": "03c4fc67f3b5e5148f4189be5610fe319f3bbdcabc7498aac01816ce87a0fb51"
+        },
+        {
+          "bytes": 4125,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/timeout-dispositions.schema.json",
+          "sha256": "56e7eae8b5990c6e010acb1718ec956fec8f68a2249a3089a35c480cc2f203db"
+        },
+        {
+          "bytes": 162,
+          "path": "docs/whitepaper/generated/baseline-budget.tex",
+          "sha256": "5fc565f0ef74593f20b0ce64e2e01c28d6b94f0977843951e63714296d190cf9"
+        }
+      ]
+    },
+    "format": {
+      "const": "baseline-completion-result-manifest-v1"
+    },
+    "mfs_v2": {
+      "const": null
+    },
+    "new_evaluations": {
+      "const": 0
+    },
+    "new_fits": {
+      "const": 0
+    },
+    "official_tests_opened": {
+      "const": false
+    },
+    "ptf_v1": {
+      "const": null
+    },
+    "publisher": {
+      "const": {
+        "path": "research/benchmark/publish_baseline_completion.py",
+        "sha256": "931a98002e2a681af616c16ff0244022e4c89c65a8f3fb5413de42329b5d47e3"
+      }
+    },
+    "release_safe_l3": {
+      "const": null
+    },
+    "superiority": {
+      "const": null
+    }
+  },
+  "required": [
+    "files",
+    "format",
+    "mfs_v2",
+    "new_evaluations",
+    "new_fits",
+    "official_tests_opened",
+    "ptf_v1",
+    "publisher",
+    "release_safe_l3",
+    "superiority"
+  ],
+  "title": "Frozen baseline completion result manifest",
+  "type": "object"
+}

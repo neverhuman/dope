@@ -1,7 +1,10 @@
 {
   "workspace": "dope",
   "tests": {
-    "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {"command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check", "purpose": "replay frozen indices009–010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"},
+    "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
+      "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
+    },
     "research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/render.py --check",
       "purpose": "replay frozen index008 positive GPU operation, exact 500-slot seed coverage and distinct whole-parent cost bases without private inputs or gated claims"
@@ -1113,6 +1116,26 @@
     "docs/whitepaper/generated/original-field-map.json": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_receipts.py' -v",
       "purpose": "verify original numeric receipt hashes before decode, full replay and BeyondArena matrices, exact scalar reductions, field mappings, safe preparation projection and filename-only sealed-test observations"
+    },
+    "research/benchmark/publish_baseline_completion.py": {
+      "command": "target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -v",
+      "purpose": "recount original frozen fit/job/closure bytes, separate fits from metric coverage, preserve 600-second timeout outcomes and historical costs, reproduce schemas and tables, and keep forecasts and gated scores distinct"
+    },
+    "research/benchmark/tests/test_baseline_completion.py": {
+      "command": "target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -v",
+      "purpose": "recount original frozen fit/job/closure bytes, separate fits from metric coverage, preserve 600-second timeout outcomes and historical costs, reproduce schemas and tables, and keep forecasts and gated scores distinct"
+    },
+    "research/benchmark/results/baseline-completion-20261008-v1/": {
+      "command": "target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -v",
+      "purpose": "recount original frozen fit/job/closure bytes, separate fits from metric coverage, preserve 600-second timeout outcomes and historical costs, reproduce schemas and tables, and keep forecasts and gated scores distinct"
+    },
+    "docs/whitepaper/BASELINE_PROTOCOL.md": {
+      "command": "target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -v",
+      "purpose": "recount original frozen fit/job/closure bytes, separate fits from metric coverage, preserve 600-second timeout outcomes and historical costs, reproduce schemas and tables, and keep forecasts and gated scores distinct"
+    },
+    "docs/whitepaper/generated/baseline-budget.tex": {
+      "command": "target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -v",
+      "purpose": "regenerate fit-cap and timeout macros only from hash-bound original baseline receipts"
     }
   }
 }

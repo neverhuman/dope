@@ -7,12 +7,25 @@ number.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import re
 from pathlib import Path
 
 from public_hardware import banned_hits, origin_counts, origin_sentence, public_hardware
+
+
+def baseline_budget_commands(command):
+    """Budget prose uses the same hash-bound completion receipt as its roster."""
+    source = Path(__file__).resolve().parents[3] / 'research/benchmark/results/baseline-completion-20261008-v1/panel.json'
+    raw = source.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != '46abb42e01d02babe197c76e11017d8da6c309e2858a5899d6abce5b58c807dc':
+        raise ValueError('baseline completion receipt drift')
+    data = json.loads(raw)
+    timeouts = next(r['fit_timeouts'] for r in data['rows'] if r['method'] == 'Forest-Flow')
+    return [command('BaselineForestFitLimit', str(data['forest_fit_timeout_seconds'])),
+            command('BaselineForestTimeouts', str(timeouts))]
 
 
 def _fit_trace(out):
@@ -706,6 +719,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     lines.extend(_architecture_commands(command))
     byte_rows.append(_write_compute_cost(out, lines, command, tex_bytes))
     _write_availability(out)
+    lines.extend(baseline_budget_commands(command))
     (out / "numbers.tex").write_text("".join(lines))
     (out / "byte-table.tex").write_text(
         "\\begin{tabular}{@{}lrr@{}}\n\\toprule\n"

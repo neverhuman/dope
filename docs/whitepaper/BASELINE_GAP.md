@@ -46,8 +46,16 @@ the follow-on completes their common-metric coverage rather than fitting again.
 
 ## Numeric ETA checkpoint (MDT, UTC-06:00)
 
+The newer receipt-backed checkpoint is
+`research/benchmark/results/baseline-completion-20261008-v1/completion.md`.
+It separates fit dispositions from metric cells and retains all 75 observed
+Forest-Flow timeouts. [The protocol addendum](BASELINE_PROTOCOL.md) keeps the
+original 600-second canonical fit cap and forbids selective higher-limit
+replacement of those timeouts. This decision was recorded after observing
+them; it is not retroactive preregistration.
+
 Forecasts are operational planning, never estimated KPI values. All GPU
-capacity is currently reserved for another campaign; no neural continuation
+capacity checked at this checkpoint is occupied or reserved; no neural continuation
 is admitted by this table. No existing worker is restarted or pre-empted.
 
 | Baseline row | Next measurable/publication milestone | Numeric ETA / condition |
@@ -56,14 +64,16 @@ is admitted by this table. No existing worker is restarted or pre-empted.
 | TabSyn | Publish all 95 already measured retained cells and partial-group accounting | PR187 merged Oct 7 20:36 MDT; no new compute needed |
 | TabSyn | Full native-selection and five-fit population | Conservative 272.67 eligible GPU-slot hours: up to 800 native trials x 600 s plus 800 replication fits (400 default and 400 native-selected) x 600 s, plus 6 h sampling/evaluation. If a slot starts Oct 8 08:00 MDT: Oct 19 16:40 MDT; no slot granted, native-objective readiness still required |
 | TabDDPM | Full default/native-selection and five-fit population | Conservative 287.67 eligible GPU-slot hours: up to 90 missing default fits, 800 native trials, 800 default/native replication fits, all at 600 s, plus 6 h sampling/evaluation. If a slot starts Oct 8 08:00 MDT: Oct 20 07:40 MDT; no slot granted, retained-OK jobs must first be reconciled |
-| Forest-Flow | Close dispositions for the existing 400-fit CPU queue, then evaluate successful retained models | Fit-disposition forecast Oct 7 23:06 MDT; metric-publication forecast Oct 8 05:06 MDT, assuming recent throughput and a provisional six-hour evaluation allowance |
-| Forest-Flow | Fill timeouts / complete native-selected five-fit population | Not admitted. Up to 100 default fits, 800 native trials and 800 default/native replication fits at 600 s plus 6 h evaluation give a 289.33 CPU-slot-hour allowance; Oct 20 09:20 MDT if started Oct 8 08:00 MDT. Reuse and timeout dispositions must be frozen first |
+| Forest-Flow | Close dispositions for the existing 400-fit CPU queue, then evaluate successful retained models | Frozen Oct8 02:02 MDT checkpoint: 343/400 = 268 OK +75 timeout. Fit-disposition forecast Oct8 10:11 MDT at 6.99 dispositions/hour; conditional metric allowance to Oct8 16:11 MDT. This includes missing timeout models, not 400 successful fits |
+| Forest-Flow | Separate native-selected five-fit population / possible budget sensitivity | Not admitted. The former 289.33 CPU-slot-hour allowance (Oct20 09:20 MDT for Oct8 08:00 start) is a planning envelope, not permission to refill timeout cells or replace the canonical comparison. Native selection, reuse and any separate sensitivity matrix must be frozen first |
 | Forest-Diffusion | Separate native/default population | Conservative 156 GPU-slot hours (900 capped fits plus 6 h evaluation); Oct 14 20:00 MDT if a slot starts Oct 8 08:00 MDT; no slot granted |
 
-The frozen `research/benchmark/results/arf-tabsyn-followon-validation-v1/operations-checkpoint.json`
-records the Forest checkpoint at 01:13:31Z on Oct 8: 284/400 fits closed,
-222 successful and 62 timeouts. Over the preceding 50.05 minutes,
-25 dispositions closed (29.97/hour), leaving 116. The extrapolation is
+The newer frozen `research/benchmark/results/baseline-completion-20261008-v1/panel.json`
+records 343/400 fits closed, 268 successful and 75 timeouts at 08:02:05Z
+on Oct8. Its `rate.json` records seven dispositions over the preceding
+60.05-minute observation window (6.99/hour); 57 remain at the newer snapshot.
+The earlier 284-fit checkpoint remains unchanged in the follow-on publication.
+The extrapolation is
 `remaining / recent rate`; throughput changes and RAM/storage admission
 move the ETA. Queue closure means every attempt has a disposition, not that
 all models succeeded or that all lineages have five successful fits. A
