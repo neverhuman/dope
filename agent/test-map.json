@@ -1,6 +1,7 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/": {"command": "python3 -I -S -B research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/render.py --check", "purpose": "replay frozen index008 positive GPU operation, exact 500-slot seed coverage and distinct whole-parent cost bases without private inputs or gated claims"},
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {"command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check", "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"},
     "research/benchmark/render_matched_linear_fit11_figure.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
