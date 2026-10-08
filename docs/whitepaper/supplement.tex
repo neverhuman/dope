@@ -39,6 +39,7 @@ components. They are not measurements on these lineages.
 \maketitle
 
 \onecolumn
+\raggedbottom
 \appendices
 \section{Displayed profile, all 100 lineages}
 \label{app:2048}
@@ -65,9 +66,12 @@ complete three-seed group, the linear medians are $\MedSufALin$ and
 $\MedSufBLin$ ($\NSufLin$ lineages; difference $\DiffSufLin$). The MLP
 medians are $\MedSufAMlp$ and $\MedSufBMlp$ ($\NSufMlp$ lineages;
 difference $\DiffSufMlp$).
-\begin{center}
+\begin{figure}[t]
+\centering
 \includegraphics[width=\textwidth]{figures/loss-curves.pdf}
-\end{center}
+\caption{Logged replay of both step budgets before the readout refit. The solid line is the training median and the dashed line is the validation median. Each band is a 95\% lineage-bootstrap interval. The longer budget is not the displayed model.}
+\label{fig:replay}
+\end{figure}
 
 \section{Authenticated first-batch diagnostics}
 The canonical-job batch is incomplete at population and sample-group
@@ -85,7 +89,7 @@ The operation-clock sum excludes training and sampling. Official tests
 remain sealed and all gated scores remain null.
 
 \begin{center}
-\scriptsize
+\footnotesize
 \input{generated/retained-first12.tex}
 \end{center}
 
@@ -109,7 +113,7 @@ formula. None of these rows was measured.
 \caption{Invented applications of the journal's score formula. Not a measurement.}
 \label{tab:illustration}
 \centering
-\scriptsize
+\footnotesize
 \begin{tabular}{@{}lc@{}}
 \toprule
 Invented input & Scalar \\

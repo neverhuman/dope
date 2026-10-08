@@ -106,3 +106,16 @@ Venue-only, marked in `related.bib`. No DOI was written:
 | `zhang2020sdmetrics` | Software documentation. No DOI |
 | `demsar2006statistical` | JMLR page has no DOI |
 | `benavoli2017time` | JMLR page has no DOI. The 2016 preprint DOI was not substituted for the journal article |
+
+## 2026-10-08 pass
+
+doi.org returned citation JSON whose title and authors match these four entries. Each venue page still has no DOI of its own, so the field is the arXiv record, same rule as the 2026-10-06 arXiv table.
+
+| Key | DOI | Record |
+| --- | --- | --- |
+| `xu2019ctgan` | `10.48550/ARXIV.1907.00503` | Xu, Skoularidou, Cuesta-Infante, Veeramachaneni. Title matches the NeurIPS entry |
+| `watson2023arf` | `10.48550/ARXIV.2205.09435` | Watson, Blesch, Kapar, Wright. Title matches the AISTATS entry |
+| `kotelnikov2023tabddpm` | `10.48550/ARXIV.2209.15421` | Kotelnikov, Baranchuk, Rubachev, Babenko. Title matches the ICML entry |
+| `prokhorenkova2018catboost` | `10.48550/ARXIV.1706.09516` | Prokhorenkova, Gusev, Vorobev, Dorogush, Gulin. Title matches the NeurIPS entry |
+
+The six venue-only rows above stay without a DOI. A substitute record would name a different author list, a later preprint, or a page that does not resolve.

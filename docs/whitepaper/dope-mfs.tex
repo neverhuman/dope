@@ -409,7 +409,8 @@ contents were not read.
 \caption{Test-split provenance. File-name counts only.}
 \label{tab:provenance}
 \centering
-\scriptsize
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \input{generated/provenance-table.tex}
 \end{table*}
 
@@ -470,7 +471,7 @@ walls, the Forest-Flow sums, and the unsplit density attempt timers.
 \caption{Fit time, memory, GPU, and charged bytes where a fit timer was stored.}
 \label{tab:cost}
 \centering
-\scriptsize
+\footnotesize
 \setlength{\tabcolsep}{1.5pt}
 \input{generated/compute-cost-table.tex}
 \end{table*}
@@ -491,7 +492,7 @@ $\DiffGaussCb$ is not $\MedDopeCb$ minus $\MedGaussCb$.
 \caption{Strongest tuned baseline at $4n$. W/T/L counts lineages. Holm stays inside the block.}
 \label{tab:headline}
 \centering
-\scriptsize
+\footnotesize
 \setlength{\tabcolsep}{3pt}
 \input{generated/headline-table.tex}
 \end{table*}
@@ -550,7 +551,7 @@ axis is the retention difference. The segment is the critical difference.
 \caption{Density block at $4n$. W/T/L counts lineages.}
 \label{tab:density}
 \centering
-\scriptsize
+\footnotesize
 \setlength{\tabcolsep}{3pt}
 \input{generated/density-table.tex}
 \end{table*}
@@ -584,7 +585,8 @@ skill $\RtwoRealCb$ and $\RtwoSynCb$.
 \caption{Raw auditor medians on the informative lineages.}
 \label{tab:rmse}
 \centering
-\scriptsize
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \input{generated/loss-beside-retention.tex}
 \end{table}
 
@@ -600,7 +602,7 @@ the result. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi.
 \caption{Charged bytes at $4n$. Forest-Flow is not pooled.}
 \label{tab:bytes}
 \centering
-\scriptsize
+\footnotesize
 \input{generated/byte-table.tex}
 \end{table}
 
@@ -630,7 +632,7 @@ de-identification.
 \caption{Grouped-validation fidelity and empirical privacy. Not DP or HIPAA.}
 \label{tab:fidelity}
 \centering
-\scriptsize
+\footnotesize
 \setlength{\tabcolsep}{2pt}
 \input{generated/fidelity-privacy-table.tex}
 \end{table*}
@@ -650,7 +652,7 @@ finished fit.
 \caption{Neural block at $4n$, not pooled. W/T/L counts lineages.}
 \label{tab:neural}
 \centering
-\scriptsize
+\footnotesize
 \setlength{\tabcolsep}{3pt}
 \input{generated/neural-table.tex}
 \end{table*}
@@ -677,7 +679,7 @@ TabSyn subset is reported separately below.
 \caption{Forest-Flow confirmation at $4n$, CatBoost. Not pooled.}
 \label{tab:forest}
 \centering
-\scriptsize
+\footnotesize
 \input{generated/forest-table.tex}
 \end{table*}
 
@@ -685,7 +687,7 @@ TabSyn subset is reported separately below.
 \caption{Published ARF matched receipts at $4n$, CatBoost.}
 \label{tab:publication}
 \centering
-\scriptsize
+\footnotesize
 \setlength{\tabcolsep}{3pt}
 \input{generated/publication-rows.tex}
 \end{table}
@@ -708,14 +710,14 @@ TabSyn comparison. These evaluations did not select a configuration.
 \begin{table*}[t]
 \caption{Retained classical validation at $4n$. Median [95\% lineage-bootstrap interval] (informative lineages). Native selection uses each method's own objective.}
 \label{tab:retained100}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
 \input{generated/retained-classical100.tex}
 \end{table*}
 
 \begin{table*}[t]
 \caption{Matched retained TabSyn subset at $4n$. Same inputs and real-data controls for every method; median [95\% interval] (lineages). Separate from the full classical population.}
 \label{tab:retained8}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
 \input{generated/retained-matched8.tex}
 \end{table*}
 
@@ -744,7 +746,7 @@ one fit seed and its small lineage count limit this exploratory analysis.
 \begin{table*}[t]
 \caption{Exploratory matched-subset CatBoost differences. Conservative simultaneous median intervals and Holm $p$ over the entire four-metric family; the corrected intervals are unbounded.}
 \label{tab:retainedpairs}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
 \input{generated/retained-paired.tex}
 \end{table*}
 
@@ -757,7 +759,7 @@ These validation descriptions leave the release and superiority gates null.
 \begin{table*}[t]
 \caption{DOPE--ARF legacy matched receipt at $4n$: exploratory paired differences, conservative simultaneous median intervals and Holm $p$. Median-of-seed aggregation.}
 \label{tab:arfpaired}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
 \input{generated/retained-arf-paired.tex}
 \end{table*}
 
@@ -773,7 +775,7 @@ and the first-batch publication recorded in that reduction.
 \begin{table*}[t]
 \caption{Baseline coverage from committed publications. Pending rows have no estimated result or completion date.}
 \label{tab:baselinecoverage}
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
 \input{generated/baseline-coverage.tex}
 \end{table*}
 
@@ -810,7 +812,7 @@ $\BeyondInventory$ families.
 \caption{BeyondArena families that prepared. No retention auditor.}
 \label{tab:beyond}
 \centering
-\scriptsize
+\footnotesize
 \setlength{\tabcolsep}{3pt}
 \input{generated/beyond-fit.tex}
 \end{table}
@@ -837,7 +839,7 @@ $11$ is \FitSeedVariance.
 \caption{Informativeness threshold and auditor counts.}
 \label{tab:threshold}
 \centering
-\scriptsize
+\footnotesize
 \input{generated/threshold-table.tex}
 \medskip
 \input{generated/threshold-counts.tex}
