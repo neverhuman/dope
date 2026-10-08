@@ -189,8 +189,8 @@ def reduce_originals(repo=REPO):
         raise ValueError('test filename present in worker')
     preparation = prepare(index, repo)
     mapping = {'format': 'dope-paper-original-field-map-v1', 'index': {'path':INDEX_PATH,'sha256':INDEX_SHA256},
-               'fits': trace, 'filename_counts': source(index['filename_inventory_ref'], '/'),
-               'prepare': source(index['beyond_prepare_ref'], '/'),
+               'fits': trace, 'filename_counts': source(index['filename_inventory_ref'], ''),
+               'prepare': source(index['beyond_prepare_ref'], ''),
                'replay_cost_reduction': 'Sort elapsed_seconds within each 100-lineage profile; n/min/max/sum/median.',
                'loss_curve_reduction': 'Per-step lineage median; 10000 lineage bootstrap draws with seed 20261005, train then validation per profile, stride 8 with linear interpolation. render_figures.py.',
                'beyond_reduction': 'Each family/profile artifact bytes and elapsed_seconds from receipt; fit_rows from report; validation_loss from final third TSV field.'}
