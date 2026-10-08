@@ -1,119 +1,92 @@
 # Baseline coverage and remaining evidence
 
-Updated 2026-10-07 from validation publications and the receipt-backed CPU
-replication checkpoint below. This memo itself authorizes no fit, sample
-generation, GPU use or official-test access; execution follows the separate
-owner order and frozen research rounds.
+Updated 2026-10-08 from authenticated validation publications. Official
+tests remain sealed. This memo grants no fit, sampling, GPU, or test access.
+Native objectives select configurations only within their own method;
+common fidelity, utility, detection, and privacy metrics select nothing.
 
-## Completed evidence
+## Published common measurements
 
-- TabSyn: eight complete lineages, 48 sample evaluations at n/4n and seeds
-  101/211/307, fit seed 11, scaled author defaults. Fidelity, utility,
-  detection and empirical privacy are measured. This is not a 100-lineage
-  or native-tuned TabSyn comparison.
-- ARF, GaussianCopula and study-owned Chow-Liu: each has 1,200 logical
-  default/native cells on the same 100 lineages, n/4n and three sample
-  seeds. The distinct metric records are 1,116, 972 and 1,050 respectively;
-  numeric aliases are not extra independent replicates.
-- The deterministic first12 diagnostic batch has authenticated physical
-  evaluation receipts and incomplete sample groups. It supports per-cell
-  diagnostics, not population medians, intervals or rankings.
-- The earlier density, CTGAN/TVAE, ARF retention and six-lineage Forest-Flow
-  confirmation blocks remain separately measured. Scheduling cutoffs are
-  not method failures. Native KPIs are not ranked across methods.
+| Method | Receipt-backed measured coverage | Remaining scope |
+| --- | --- | --- |
+| ARF | 100 lineages, default/native-selected, five fit seeds 11/23/37/53/71, n/4n, three sample seeds: 6,000 logical cells / 5,892 physical metric receipts | Official-test/release certification; other protocol sizes are not inferred |
+| TabSyn | 143 scaled-default cells on 49 lineages, fit11: the earlier eight complete n/4n lineages (48 cells), plus 95 n cells on 41 other lineages | 22 partial n groups; complete default population, native tuning and five-fit replication |
+| TabDDPM | 12 retained lineages, 21 models, 126 physical / 132 logical n/4n cells, fit11; default cohort 10, native-selected cohort 12 | Full population, completed native search, five-fit replication |
+| Forest-Flow | 13 disjoint default lineages at five fit seeds, 65 models / 390 n/4n cells; earlier six-lineage native/default panel remains separate | Rest of current default fit/metric round, timeouts, native-selected replication |
+| Forest-Diffusion | Pilot mode receipts only | Separate diffusion-mode population; Flow does not establish this result |
+| GaussianCopula / Chow-Liu | Each 100 lineages, fit11, default/native, 1,200 logical cells; 972 / 1,050 distinct physical receipts | Five-fit common coverage; official-test certification |
 
-Sources: `research/benchmark/results/tabsyn-eight-lineage-validation/`,
-`research/benchmark/results/retained-classical-validation/`,
-`research/benchmark/results/common-A952-validation-v1/`,
-`research/benchmark/results/arf-matched-population-validation.json` and
-`research/benchmark/results/s3-matched-forest-confirmation-validation.json`.
-The original scratch receipt paths and their hashes remain in those JSONs.
+Sources, including every original metric receipt path and digest:
 
-## Remaining strong-baseline coverage
+- `research/benchmark/results/arf-tabsyn-followon-validation-v1/manifest.json`
+  and `panel.json`: complete ARF follow-on and the 95 retained TabSyn cells.
+- `research/benchmark/results/tabsyn-eight-lineage-validation/panel.json`:
+  the earlier 48 TabSyn measurements. The old and new cohorts do not overlap.
+- `research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json`.
+- `research/benchmark/results/forest-first-two-fivefit-v1/panel.json`,
+  `forest-next-six-fivefit-v1/panel.json`, and
+  `forest-third-five-fivefit-v1/panel.json`: default five-fit cohorts.
+- `research/benchmark/results/retained-classical-validation/panel.json`:
+  the original ARF/copula/Chow-Liu fit11 panel.
 
-The executable coverage table and ETA arithmetic are
-`generated/baseline-coverage.json` and `generated/baseline-coverage.tex`.
-`coverage-plan.json` freezes the earlier forecast assumptions as of 04:55Z.
-The generated coverage table remains that snapshot; the new CPU execution
-checkpoint and its forecasts are recorded separately below.
+`generated/baseline-coverage.json` and `.tex` now use these publications.
+`generated/published-baseline-kpis.json` and `.csv` trace each figure value
+to a repository source digest and JSON pointer. The new TabSyn n cohort is
+separate from the older 4n cohort. Its 22 incomplete groups retain individual
+measurements but have no group mean or figure point. There are 35 complete
+three-sample groups overall; this is not 49 complete n/4n lineages.
 
-| Method | Complete measured scope | Remaining full-population scope | ETA MDT |
-| --- | --- | --- | --- |
-| TabSyn | Eight-lineage scaled-default cohort | 100 default/native-selected lineages | Oct 14 20:00, conditional |
-| TabDDPM | Contracts/pilot only in this population publication interface | Complete 100-lineage default/native panel | Oct 14 20:00, conditional |
-| Forest-Flow | Six-lineage native-selected 4n confirmation; ten additional defaults at five fit seeds on two lineages, 60 common evaluations | Complete 100-lineage default/native panel and missing seed11 replication | Oct 10 02:00 new-default fit/metrics forecast; broader scope Oct 14 20:00, conditional |
-| Forest-Diffusion | Pilot mode receipts | Separate complete 100-lineage diffusion-mode panel | Oct 14 20:00, conditional |
-| ARF | Complete 100-lineage fit11 default/native n/4n panel; 24 additional fit23 receipts on 12 lineages with 144 common evaluations | 796 physical / 800 logical additional fits across seeds 23/37/53/71, then remaining common metrics | Oct 8 02:00 fit close, conditional forecast; metrics follow |
+ARF has 1,200 logical cells at each fit seed. The 108 aliases are not extra
+independent measurements. Three sample seeds are averaged within each fit;
+means and unbiased sample SD are then computed across five independent fits.
+Missing auditor support keeps both mean and SD null. SD is not a confidence
+interval or a paired superiority result. The earlier 796 physical additional
+ARF fit receipts remain in `arf-complete-additional-fits-v1/panel.json`;
+the follow-on completes their common-metric coverage rather than fitting again.
 
-Each future forecast assumes a dedicated eligible slot starting Oct 8
-08:00 MDT: 100 default fits plus up to 800 native tuning trials at 600s,
-150 slot-hours, plus six hours for sampling/metrics. No slot has been
-leased by this table. Encoding-priority work retains priority. Contention,
-source/runtime readiness and fresh admission can move the dates. Final
-five-fit neural matrices remain separate; the CPU replication rounds below
-are running under their own frozen research admission. Native tuning
-must use each method's own objective; shared metrics select nothing.
+## Numeric ETA checkpoint (MDT, UTC-06:00)
 
-## Active CPU replication checkpoint (2026-10-07)
+Forecasts are operational planning, never estimated KPI values. All GPU
+capacity is currently reserved for another campaign; no neural continuation
+is admitted by this table. No existing worker is restarted or pre-empted.
 
-`research/benchmark/results/cpu-fivefit-progress-v1/manifest.json` pins
-24 additional ARF fits and eight Forest-Flow fits, all successful in this
-published prefix. The ARF prefix covers 12 lineages at fit seed 23.
-Forest-Flow has seeds 23/37/53/71 on two lineages using author defaults.
-The same frozen training-derived splits are used; no official test is read.
-Each model's checkpoint hash, charged bytes and ARF's native
-validation density value appear in the per-fit JSON/CSV.
+| Baseline row | Next measurable/publication milestone | Numeric ETA / condition |
+| --- | --- | --- |
+| ARF | Complete five-fit common measurements closed; publish this frozen follow-on | Actual scalar close Oct 7 16:46 MDT; publication handoff target Oct 7 20:30 MDT, subject to CI/review |
+| TabSyn | Publish all 95 already measured retained cells and partial-group accounting | Oct 7 20:30 MDT, subject to CI/review; no new compute needed |
+| TabSyn | Full native-selection and five-fit population | Conservative 272.67 eligible GPU-slot hours: up to 800 native trials x 600 s plus 800 replication fits (400 default and 400 native-selected) x 600 s, plus 6 h sampling/evaluation. If a slot starts Oct 8 08:00 MDT: Oct 19 16:40 MDT; no slot granted, native-objective readiness still required |
+| TabDDPM | Full default/native-selection and five-fit population | Conservative 287.67 eligible GPU-slot hours: up to 90 missing default fits, 800 native trials, 800 default/native replication fits, all at 600 s, plus 6 h sampling/evaluation. If a slot starts Oct 8 08:00 MDT: Oct 20 07:40 MDT; no slot granted, retained-OK jobs must first be reconciled |
+| Forest-Flow | Close dispositions for the existing 400-fit CPU queue, then evaluate successful retained models | Fit-disposition forecast Oct 7 23:06 MDT; metric-publication forecast Oct 8 05:06 MDT, assuming recent throughput and a provisional six-hour evaluation allowance |
+| Forest-Flow | Fill timeouts / complete native-selected five-fit population | Not admitted. Up to 100 default fits, 800 native trials and 800 default/native replication fits at 600 s plus 6 h evaluation give a 289.33 CPU-slot-hour allowance; Oct 20 09:20 MDT if started Oct 8 08:00 MDT. Reuse and timeout dispositions must be frozen first |
+| Forest-Diffusion | Separate native/default population | Conservative 156 GPU-slot hours (900 capped fits plus 6 h evaluation); Oct 14 20:00 MDT if a slot starts Oct 8 08:00 MDT; no slot granted |
 
-`research/benchmark/results/cpu-fivefit-validation-v1/manifest.json` now
-adds the complete common-metric schedule for those same 32 fits: 144 ARF
-and 48 Forest-Flow cells. Each fit has n/4n and sample seeds 101/211/307.
-Fidelity, utility, detection and empirical privacy are measured; summaries
-keep generator fit seeds separate. The summed per-cell numerical evaluation
-times are 71.113627 seconds for ARF and 19.243407 seconds for Forest-Flow.
-Total evaluator-process wall times, including verification and startup,
-are 120.600844 and 26.747209 seconds respectively; both exit0 records are
-directly pinned by the manifest. These clocks overlap and are not additive.
-These are measured prefix costs, not full-population throughput forecasts. The initial ARF and
-Forest cohorts have different sizes and cannot be ranked against each other.
-Full-population and five-fit completion remain false.
+The frozen `research/benchmark/results/arf-tabsyn-followon-validation-v1/operations-checkpoint.json`
+records the Forest checkpoint at 01:13:31Z on Oct 8: 284/400 fits closed,
+222 successful and 62 timeouts. Over the preceding 50.05 minutes,
+25 dispositions closed (29.97/hour), leaving 116. The extrapolation is
+`remaining / recent rate`; throughput changes and RAM/storage admission
+move the ETA. Queue closure means every attempt has a disposition, not that
+all models succeeded or that all lineages have five successful fits. A
+timeout is a missing method cell; it contributes no DOPE win. Retries are
+not admitted or automatically launched by this memo. The original timed-out
+attempt receipts and costs remain retained.
 
-The first two Forest-Flow default cohorts now have all five actual fit seeds
-11/23/37/53/71 and all 60 common n/4n evaluations, pinned by
-`research/benchmark/results/forest-first-two-fivefit-v1/manifest.json`.
-Ten checkpoint/error/native-KPI rows and SVG/PDF figures are reproducible.
-Samples are averaged within each fit before computing unbiased SD across five
-fit means; that SD is not a confidence interval. At 4n the informative lineage
-has CatBoost retention 1.036965 with between-fit SD 0.009010. The other lineage
-has uninformative utility, so its mean and SD remain null (0/5 support).
-This is a two-lineage default cohort, not a completed population or native-
-selected five-fit matrix. It changes no scientific selection or official-test
-admission. The earlier 48-cell publication is preserved as its original prefix.
+GPU forecasts are cap-based allowances, not observed runtimes or guaranteed
+dates. Each final method/dataset tuning cell remains capped at eight trials
+and 12 hours, counting failures and timeouts. Native trials use the method's
+own frozen KPI. Earlier architecture research, default fitting, and final
+replication remain separately accounted; equal per-cell caps do not imply
+equal total research spend. The six-hour evaluation allowances are planning
+assumptions and are not summed into measured scientific compute costs.
 
-The ARF queue replicates the existing default and native-selected winners:
-796 physical fits, 800 logical configurations, with no new tuning. The
-fit-close forecast is Oct 8 02:00 MDT, conditional on its four-core CPU slot;
-remaining common n/4n measurements follow; the first published prefix is complete.
-This 20-slot-hour planning allowance is conservative relative to the
-previous native round but is not a measured full-round duration.
-Forest-Flow's 400 additional default fits have a conditional fit-and-metrics
-forecast of Oct 10 02:00 MDT: at most 400 times 600 seconds of fit work plus
-six hours provisionally reserved for evaluation. Storage/RAM admission can
-extend it. Native-selected replication and missing seed-11 coverage require
-complete native-winner receipts and remain unscheduled. The initial small
-lineages cannot determine full-population throughput or method ranks.
+## Scientific limits
 
-Both slots use four cores, low CPU/I/O priority, 8 GiB RAM caps and a 15%
-available-RAM floor. The CPU allocation change is recorded in the frozen
-rounds. GPUs remain subject to encodings-first admission, and no neural
-run is authorized by these forecasts. No existing artifact is deleted.
-
-## Scientific limits that remain
-
-Official tests stay sealed; the observations are training-derived validation
-results. MFS-v2, PTF-v1, release-safe L3 and production superiority remain
-null. TabSyn's completed subset and the six-lineage Forest-Flow confirmation
-cannot establish a full-population neural ranking. Fit-seed variance and the
-full DOPE ablation grid remain uncompleted. The attacks reported here are
-empirical; attribute-inference and full certification coverage are not
-inferred. Missing/unavailable source or method cells contribute no DOPE win.
-Equal per-cell caps do not imply equal total architecture-research compute.
+All measurements use training-derived validation. MFS-v2, PTF-v1,
+release-safe L3, production certification, and superiority remain null.
+Different dataset cohorts, fit counts and sample sizes do not support an
+across-cohort ranking. The existing matched-eight paired analysis is preserved;
+this publication does not replace it with a larger unmatched TabSyn cohort.
+Empirical privacy attacks establish no formal DP or HIPAA claim. Original
+sample rows, model weights and detailed logs remain restricted. This
+publication authenticates scalar exports and original receipt identities;
+it does not rehash current bulk weights or rerun scientific auditors.

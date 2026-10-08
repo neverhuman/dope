@@ -26,6 +26,7 @@ SOURCES = {
     "arf_fits": ("arf-complete-additional-fits-v1/panel.json", "7acfd172db6b43537723aff63e47faed35cd1319fb371fef34ad4328ebe46cca"),
     "forest_legacy": ("s3-matched-forest-confirmation-validation.json", "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"),
     "forest_pilot": ("pilot24-forestdiffusion-native.json", "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"),
+    "followon": ("arf-tabsyn-followon-validation-v1/panel.json", "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"),
 }
 METRICS = ("catboost_retention", "marginal_error_mean", "c2st_catboost_auc", "distance_mia_auc")
 
@@ -70,6 +71,13 @@ def scalar(cell, metric):
 
 def build(docs):
     ts, td, arf = docs["tabsyn"], docs["tabddpm"], docs["arf_fits"]
+    followon = docs["followon"]
+    if not followon["arf_common_n4n_five_fit_complete"] or followon["arf_logical_cells"] != 6000:
+        raise ValueError("incomplete published ARF followon")
+    ts_old_ids = {c["dataset"] for c in ts["cells"]}
+    ts_new_ids = {r["dataset"] for r in followon["rows"] if r["method"] == "TabSyn"}
+    if ts_old_ids & ts_new_ids:
+        raise ValueError("overlapping published TabSyn cohorts")
     forests = [docs[name] for name in ("forest2", "forest6", "forest5")]
     forest_ids = [{c["dataset"] for c in p["cells"]} for p in forests]
     if sum(map(len, forest_ids)) != len(set.union(*forest_ids)):
@@ -78,8 +86,10 @@ def build(docs):
         raise ValueError("incomplete published Forest cohort")
     rows = [
         dict(method="TabSyn", complete_retained_lineages=ts["lineages"], complete_retained_sample_cells=ts["sample_cells"],
-             coverage=f"{ts['lineages']} scaled-default lineages; {ts['sample_cells']} cells; fit seed 11. Native tuning and full population pending.",
-             complete100=False, five_fit_lineages=0, sources=[source_ref("tabsyn", "")]),
+             measured_lineages=len(ts_old_ids | ts_new_ids), logical_sample_cells=ts["sample_cells"]+followon["tabsyn_new_cells"],
+             complete_three_sample_groups=16+followon["tabsyn_complete_n_groups"], partial_three_sample_groups=followon["tabsyn_partial_n_groups"],
+             coverage=f"49 scaled-default lineages, 143 measured cells at fit11: eight complete n/4n lineages (48 cells), plus 95 n cells on 41 lineages (19 complete/22 partial groups). Native tuning/full population pending.",
+             complete100=False, five_fit_lineages=0, sources=[source_ref("tabsyn", ""),source_ref("followon", "")]),
         dict(method="TabDDPM", complete_retained_lineages=td["lineages"], complete_retained_sample_cells=td["physical_metric_cells"],
              logical_sample_cells=td["logical_metric_cells"], retained_models=td["retained_models"],
              coverage=f"{td['lineages']} retained lineages; {td['physical_metric_cells']} physical/{td['logical_metric_cells']} logical cells; {td['retained_models']} models, fit seed 11. Default/native cohorts differ; native search incomplete.",
@@ -93,12 +103,12 @@ def build(docs):
              pilot_logical_cells=len(docs["forest_pilot"]["cells"]), five_fit_lineages=0,
              coverage="Pilot only; separate 100-lineage matched diffusion panel pending.", complete100=False,
              sources=[source_ref("forest_pilot", "")]),
-        dict(method="ARF", complete_retained_lineages=len({c["dataset"] for c in docs["classical"]["rows"] if c["method"]=="ARF"}),
-             complete_retained_sample_cells=len([c for c in docs["classical"]["rows"] if c["method"] == "ARF"]),
-             published_additional_metric_cells=docs["arf_prefix"]["sample_cells"],
-             published_additional_physical_fits=arf["physical_fit_counts"]["ARF"], five_fit_lineages=0,
-             coverage=f"{len({c['dataset'] for c in docs['classical']['rows'] if c['method']=='ARF'})} default/native lineages at fit seed 11; {len([c for c in docs['classical']['rows'] if c['method']=='ARF'])} logical cells. {arf['physical_fit_counts']['ARF']} additional native-scored fits; {docs['arf_prefix']['sample_cells']} additional common cells published. Remaining publication pending.",
-             complete100=True, sources=[source_ref(name, "") for name in ("classical", "arf_prefix", "arf_fits")]),
+        dict(method="ARF", complete_retained_lineages=followon["arf_lineages"],
+             complete_retained_sample_cells=followon["arf_logical_cells"], physical_metric_receipts=followon["arf_physical_metric_receipts"],
+             published_additional_metric_cells=followon["arf_logical_cells"]-1200,
+             published_additional_physical_fits=arf["physical_fit_counts"]["ARF"], five_fit_lineages=followon["arf_lineages"],
+             coverage="100 default/native lineages at five fit seeds, n/4n, three sample seeds: 6,000 logical cells / 5,892 physical receipts (108 aliases). Between-fit SD available; official-test certification pending.",
+             complete100=True, sources=[source_ref(name, "") for name in ("followon", "arf_fits")]),
     ]
     for method in ("GaussianCopula", "Chow-Liu"):
         cells = [c for c in docs["classical"]["rows"] if c["method"] == method]
@@ -110,16 +120,14 @@ def build(docs):
     for row in rows:
         row.update(final_five_fit_complete=False, full100_eta_mt=None, eta_is_observed_completion=False,
                    remaining_campaign_status="pending", production_certified=False)
+        row["five_fit_common_n4n_complete"] = row["method"] == "ARF"
     # Descriptive cohort points only: identical sample schedules are required,
     # and configurations/cohorts remain separate. No across-cohort inference.
     points = []
     inputs = [("tabsyn", "TabSyn scaled (8)", ts["cells"], "cells", None, "TabSyn"),
               ("tabddpm", "TabDDPM default (10)", td["rows"], "rows", "author_default", "TabDDPM"),
               ("tabddpm", "TabDDPM native (12)", td["rows"], "rows", "native_selected", "TabDDPM"),
-              ("classical", "ARF default (100)", docs["classical"]["rows"], "rows", "author_default", "ARF"),
-              ("classical", "ARF native (100)", docs["classical"]["rows"], "rows", "native_selected", "ARF"),
-              ("arf_prefix", "ARF seed23 default (12)", docs["arf_prefix"]["cells"], "cells", "author_default", "ARF"),
-              ("arf_prefix", "ARF seed23 native (12)", docs["arf_prefix"]["cells"], "cells", "native_selected", "ARF")]
+              ]
     for method in ("GaussianCopula", "Chow-Liu"):
         for config, label in (("author_default", "default"), ("native_selected", "native")):
             inputs.append(("classical", method+" "+label+" (100)", docs["classical"]["rows"], "rows", config, method))
@@ -141,6 +149,27 @@ def build(docs):
                     measured_fits=1, sample_seeds=[101, 211, 307], row_multiplier=4,
                     aggregation="mean_of_three_sample_seeds", support_status="measured" if all(finite(v) for v in values) else "unavailable",
                     sources=[source_ref(name, "/"+collection+"/"+str(i)) for i, _ in group]))
+    # Partial TabSyn groups remain published per cell with null group means.
+    # The new n cohort is separate from the earlier complete 4n cohort.
+    for i, group in enumerate(followon["per_fit"]):
+        if group["method"] != "TabSyn" or not group["complete_sample_group"]:
+            continue
+        for metric in METRICS:
+            value = group["metrics"][metric]
+            points.append(dict(cohort="TabSyn scaled n (19)", dataset=group["dataset"], metric=metric,
+                value=value, measured_fits=1, sample_seeds=[101,211,307], row_multiplier=1,
+                aggregation="mean_of_three_sample_seeds", support_status="measured" if finite(value) else "unavailable",
+                sources=[source_ref("followon", "/rows/"+str(index)) for index in group["source_row_indices"]]))
+    for i, summary in enumerate(followon["summary"]):
+        if summary["row_multiplier"] != 4:
+            continue
+        label = "default" if summary["selection_binding"] == "author_default" else "native"
+        for metric in METRICS:
+            stat = summary["metrics"][metric]
+            points.append(dict(cohort="ARF five fits "+label+" (100)", dataset=summary["dataset"], metric=metric,
+                value=stat["mean"], measured_fits=stat["measured_fits"], sample_seeds=[101,211,307], row_multiplier=4,
+                aggregation="mean_of_five_fit_means_after_three_sample_means", support_status="measured" if stat["mean"] is not None else "unavailable",
+                sources=[source_ref("followon", "/summary/"+str(i)+"/metrics/"+metric)]))
     for name in ("forest2", "forest6", "forest5"):
         for i, summary in enumerate(docs[name]["summary"]):
             if summary["row_multiplier"] != 4:
@@ -157,9 +186,9 @@ def build(docs):
         mfs_v2=None, ptf_v1=None, release_safe_l3=None, superiority=None,
         scope="Published validation evidence only; pending cells have no estimated value or completion date.",
         limitations=["Cohorts and fit counts differ; plot is descriptive, not a ranking or paired comparison.",
-            "Forest fit SD is not a confidence interval; this plot shows lineage points and medians without CI bars.",
+            "ARF and Forest fit SD is not a confidence interval; this plot shows lineage points and medians without CI bars.",
             "Native objectives select only within their own methods; native scores are never ranked across methods.",
-            "Additional ARF metrics completed on scratch remain pending publication in this frozen merged-receipt inventory."])
+            "The new TabSyn n cohort differs in sample size and lineages from all 4n cohorts; 22 partial groups have no figure mean."])
 
 
 def render_table(data):
@@ -201,7 +230,7 @@ def render_figure(data, path):
         axis.tick_params(axis="y", labelsize=7)
     axes[0].invert_yaxis()
     fig.supxlabel("Gray: lineage means. Diamonds: medians. Retention: symlog, linear in [-1,1].\n"
-                  "Different cohorts; descriptive only. Unavailable values remain null in the CSV.", fontsize=6.8)
+                  "Different cohorts; descriptive only. TabSyn n (19): n; all other cohorts: 4n. Missing values stay null.", fontsize=6.8)
     fig.subplots_adjust(left=.29, right=.995, bottom=.19, top=.92, wspace=.18)
     fig.savefig(path,metadata={"CreationDate":None,"ModDate":None});plt.close(fig)
 

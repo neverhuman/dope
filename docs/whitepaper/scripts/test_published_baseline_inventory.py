@@ -41,21 +41,25 @@ class PublishedBaselineInventory(unittest.TestCase):
                 cells = [c for _, c in resolved]
                 self.assertEqual(sorted(c["sample_seed"] for c in cells), [101,211,307])
                 self.assertEqual({c["dataset"] for c in cells}, {point["dataset"]})
-                self.assertEqual({c["row_multiplier"] for c in cells}, {4})
+                self.assertEqual({c["row_multiplier"] for c in cells}, {point["row_multiplier"]})
                 self.assertEqual(len({(c["fit_seed"],c["config_sha256"]) for c in cells}), 1)
                 values = [inventory.scalar(c,point["metric"]) if "metrics" in c else c[point["metric"]] for c in cells]
-                expected = sum(values)/3 if all(inventory.finite(x) for x in values) else None
+                expected = (mean(values) if resolved[0][0] == "followon" else sum(values)/3) if all(inventory.finite(x) for x in values) else None
             else:
                 key, stat = resolved[0]
                 # Check the aggregate against independent fit means as well as
                 # the published summary. Fit SD is never treated as a CI.
+                selection = "native_selected" if " native " in point["cohort"] else "author_default"
                 values = [f["metrics"][point["metric"]] for f in self.docs[key]["per_fit"]
-                          if f["dataset"] == point["dataset"] and f["row_multiplier"] == 4]
+                          if f["dataset"] == point["dataset"] and f["row_multiplier"] == 4
+                          and (key != "followon" or f["selection_binding"] == selection)]
                 finite = [x for x in values if inventory.finite(x)]
                 self.assertEqual(len(values), 5)
                 self.assertEqual(len(finite), stat["measured_fits"])
-                if finite:
+                if finite and (key != "followon" or len(finite) == 5):
                     self.assertAlmostEqual(mean(finite), stat["mean"], places=13)
+                elif key == "followon":
+                    self.assertIsNone(stat["mean"])
                 expected = stat["mean"] if len(finite) == 5 else None
             self.assertEqual(point["value"], expected)
             self.assertEqual(point["support_status"], "unavailable" if expected is None else "measured")
@@ -96,10 +100,21 @@ class PublishedBaselineInventory(unittest.TestCase):
         self.assertEqual((self.rows["TabSyn"]["complete_retained_lineages"],self.rows["TabSyn"]["complete_retained_sample_cells"]),(8,48))
         self.assertEqual((self.rows["TabDDPM"]["retained_models"],self.rows["TabDDPM"]["complete_retained_sample_cells"],self.rows["TabDDPM"]["logical_sample_cells"]),(21,126,132))
         self.assertEqual((self.rows["Forest-Flow"]["five_fit_lineages"],self.rows["Forest-Flow"]["retained_models"],self.rows["Forest-Flow"]["complete_retained_sample_cells"]),(13,65,390))
-        self.assertEqual((self.rows["ARF"]["published_additional_physical_fits"],self.rows["ARF"]["published_additional_metric_cells"]),(796,144))
-        for method in ("ARF","GaussianCopula","Chow-Liu"):
+        self.assertEqual((self.rows["ARF"]["published_additional_physical_fits"],self.rows["ARF"]["published_additional_metric_cells"]),(796,4800))
+        self.assertEqual((self.rows["ARF"]["five_fit_lineages"],self.rows["ARF"]["complete_retained_sample_cells"],self.rows["ARF"]["physical_metric_receipts"]),(100,6000,5892))
+        self.assertEqual((self.rows["TabSyn"]["measured_lineages"],self.rows["TabSyn"]["logical_sample_cells"],self.rows["TabSyn"]["complete_three_sample_groups"],self.rows["TabSyn"]["partial_three_sample_groups"]),(49,143,35,22))
+        self.assertTrue(self.rows["ARF"]["five_fit_common_n4n_complete"])
+        for method in ("GaussianCopula","Chow-Liu"):
             self.assertEqual(self.rows[method]["complete_retained_sample_cells"],1200)
         self.assertEqual(Counter(p["cohort"] for p in self.data["figure_points"])["Forest-Flow five fits (13)"],52)
+
+    def test_partial_tabsyn_groups_have_no_plotted_mean(self):
+        partial = {f["dataset"] for f in self.docs["followon"]["per_fit"]
+                   if f["method"] == "TabSyn" and not f["complete_sample_group"]}
+        points = [p for p in self.data["figure_points"] if p["cohort"] == "TabSyn scaled n (19)"]
+        self.assertEqual(len(points), 19*4)
+        self.assertFalse(partial & {p["dataset"] for p in points})
+        self.assertEqual({p["row_multiplier"] for p in points}, {1})
 
     def test_pending_gates_and_public_output_have_no_private_tokens(self):
         self.assertFalse(self.data["official_tests_opened"])

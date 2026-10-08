@@ -1,0 +1,47 @@
+{
+  "files": [
+    {
+      "bytes": 3990,
+      "path": "README.md",
+      "sha256": "9c3fcd0414f485b6d0401ab1843af23664fbd2c5e09c5dc885211d75396decb4"
+    },
+    {
+      "bytes": 4577157,
+      "path": "figure-kpis.csv",
+      "sha256": "e9a76759a976abc1891d5ef3cbb28c5154ab0b41394bcc1851331c6ac7f02416"
+    },
+    {
+      "bytes": 3165,
+      "path": "inputs.lock.json",
+      "sha256": "9e7e7e5ea73b4b12ba05375673a16fd3719d664f21b1656bfa46541dbce5e6a9"
+    },
+    {
+      "bytes": 1548,
+      "path": "operations-checkpoint.json",
+      "sha256": "26951bbe117ea1bcccca2da2d21179074836e07a389623c15bd9618c3715a0c2"
+    },
+    {
+      "bytes": 21453198,
+      "path": "panel.json",
+      "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
+    },
+    {
+      "bytes": 16937043,
+      "path": "scalar-cells.jsonl",
+      "sha256": "a9c9c6f63ed4439eca38402109beebdc2a5fec6c3be4a1037ec8754b4486578c"
+    },
+    {
+      "bytes": 32483,
+      "path": "schema.json",
+      "sha256": "3a1dfb64ede9692987e2342b6dc963300d9ef5e73ca068b59bc29faf84065fd1"
+    }
+  ],
+  "format": "arf-tabsyn-followon-publication-manifest-v1",
+  "mfs_v2": null,
+  "official_tests_opened": false,
+  "ptf_v1": null,
+  "publisher_path": "research/benchmark/publish_arf_tabsyn_followon.py",
+  "publisher_sha256": "d4820fca946e52d9d73728eb45a919351a0c94722cffc0dc22f725dd12ca2269",
+  "release_safe_l3": null,
+  "superiority": null
+}
