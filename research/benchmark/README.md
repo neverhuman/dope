@@ -1,5 +1,11 @@
 # Offline generator benchmark (research only)
 
+[Native indices009–010 GPU progress and cost delta](results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/README.md)
+records one accepted seed53 fit and one infrastructure-failed seed71 operation,
+with both whole-parent costs retained. Its dated snapshot follows index008;
+partial five-fit coverage and observed residency do not establish stability
+or a gated production score.
+
 [Forest-Flow five additional homogeneous five-fit cohorts](results/forest-third-five-fivefit-v1/README.md)
 The [retained TabDDPM cohort](results/tabddpm-twelve-lineage-retained-validation/README.md)
 adds 126 measured n/4n validation cells from 21 existing model records on
