@@ -1,0 +1,151 @@
+{
+  "baseline": {
+    "PR": 181,
+    "delta_ref": {
+      "bytes": 9576,
+      "sha256": "e5377bb0db549cf7be91f376810239dac9ce852e2323c154923c6b2a8b337e30"
+    },
+    "merged_commit": "4138f5fa04c656ad0cee80b1ff8c8c53eacd3b98",
+    "paid_parent_seconds": 1624.4221494505182,
+    "paid_trial_count": 116,
+    "published_result": "work-order-b-native-paid-cost-delta-v1",
+    "source_proof_ref": {
+      "bytes": 6111,
+      "sha256": "e32014ffb250e249375f3bafcbb5bb067740d023163a31f068b9987c118014f2"
+    }
+  },
+  "cost": {
+    "CPU_core_seconds": null,
+    "GPU_kernel_seconds": null,
+    "aggregate_unpaid_deferral_wall_seconds": null,
+    "campaign_total_wall_seconds": null,
+    "current_cumulative_native_and_prefit_paid_parent_seconds": 1730.7602687231265,
+    "current_historical_inclusive_all_cell_ledger_seconds": 2525.3003210125025,
+    "energy_joules": null,
+    "hardware_model": null,
+    "historical_prefit_infrastructure_seconds_already_in_baseline": 18.162802021950483,
+    "native_parent_aggregate_includes_selected_historical_seed11_seconds": false,
+    "nested_elapsed_added_to_parent": false,
+    "new_charged_model_plus_projection_bytes": 0,
+    "new_infrastructure_parent_seconds": 106.33811927260831,
+    "new_ok_parent_seconds": 0,
+    "new_paid_parent_seconds": 106.33811927260831,
+    "operator_and_unpaid_metadata_wall_seconds_added": false,
+    "retained_seed11_or_prior_native_slices_recharged": false,
+    "selected_historical_seed11_initial_cell_ledger_seconds": 794.540052289376,
+    "separate_current_operator_total_wall_seconds_excluded_from_native_total": 800.1747174239717,
+    "separate_generated_R_and_D_parent_seconds_not_recharged": 337.20003135968,
+    "separate_metadata_hold_seconds_excluded_from_native_total": 1670.3220896930434,
+    "true_peak_VRAM_bytes": null,
+    "true_peak_host_RAM_bytes": null
+  },
+  "format": "work-order-b-native-indices006-007-paid-infrastructure-cost-delta-v1",
+  "operations": [
+    {
+      "GPU_clock_observation_count": 0,
+      "GPU_target_operator_verified": false,
+      "actual_parent_wait_exit": 0,
+      "attempt": 1,
+      "charged_model_plus_projection_bytes": null,
+      "co_tenant": null,
+      "id": "paid_index006",
+      "job_sha256": "7f63d99d8abfc002aaabcc503ee3c4d256d2f37acfc5aa22d90ebc76ca228ead",
+      "maximum_observed_own_GPU_resident_mib": null,
+      "metadata_hold_seconds": null,
+      "nested_operation_seconds_nonadditive": 54.12445148220286,
+      "observed_provider_validation_verified": false,
+      "paid_trial_increment": 1,
+      "parent_elapsed_seconds": 54.26875431090593,
+      "parent_ref": {
+        "bytes": 1862,
+        "sha256": "a3fa9c807c0d1531904c69a62743cb3b604310ca5c09fd2f86a6e38ccd06adb0"
+      },
+      "phase": "native_population",
+      "receipt_ref": {
+        "bytes": 23376,
+        "sha256": "85077d9e7cace7192cdd88d6ac663fb27f395e2f9fd196b5c3d3d87d300c8377"
+      },
+      "resident_measurement_kind": null,
+      "seed": 71,
+      "shared_GPU_cost": null,
+      "status": "infrastructure_failure"
+    },
+    {
+      "GPU_clock_observation_count": 0,
+      "GPU_target_operator_verified": false,
+      "actual_parent_wait_exit": 0,
+      "attempt": 1,
+      "charged_model_plus_projection_bytes": null,
+      "co_tenant": null,
+      "id": "paid_index007",
+      "job_sha256": "09b1d0e53d9d192c7186a04337104a8207b779ce5ba84e36df92687071ff56f6",
+      "maximum_observed_own_GPU_resident_mib": null,
+      "metadata_hold_seconds": null,
+      "nested_operation_seconds_nonadditive": 51.91708086896688,
+      "observed_provider_validation_verified": false,
+      "paid_trial_increment": 1,
+      "parent_elapsed_seconds": 52.06936496170238,
+      "parent_ref": {
+        "bytes": 1862,
+        "sha256": "f4649f6c3b2a756f259aeaf0916afe558db30acb2cec674a07606e3ccd8a7dfa"
+      },
+      "phase": "native_population",
+      "receipt_ref": {
+        "bytes": 23355,
+        "sha256": "d44f8060bbe411258ec9216345e4a2937117367b0a7d3c1d95b7b3663206fba8"
+      },
+      "resident_measurement_kind": null,
+      "seed": 23,
+      "shared_GPU_cost": null,
+      "status": "infrastructure_failure"
+    }
+  ],
+  "progress": {
+    "current_inclusive_paid_trial_count": 118,
+    "current_logical_progress": {
+      "accepted": 110,
+      "accepted_historical_seed11_reuse": 98,
+      "accepted_new_fit": 12,
+      "accounted_slots": 117,
+      "distinct_unresolved_infrastructure_slots": 5,
+      "historical_artifact_cap": 2,
+      "scheduled": 500,
+      "unstarted_at_paid_budget_snapshot": 383
+    },
+    "current_new_native_and_prefit_physical_attempts_since_seed11": 18,
+    "inclusive_paid_trial_count_basis": "100 preserved selected seed11 cell-budget units plus18 new native/prefit physical attempts",
+    "logical_roster_join_verified": true,
+    "new_infrastructure_physical_operations": 2,
+    "new_ok_physical_operations": 0,
+    "new_paid_physical_operations": 2,
+    "paid_trial_increment": 2,
+    "previous_inclusive_paid_trial_count": 116,
+    "stored_native_operations_started": 0,
+    "stored_native_operations_started_is_authoritative": false
+  },
+  "scope": {
+    "MFS_v2": null,
+    "PTF_v1": null,
+    "automatic_paid_retry_authorized": false,
+    "empty_GPU_clock_default_false_sharing_normalized_to_unknown": true,
+    "fivefit_stability": null,
+    "foreign_DLTrain_campaign_mutex_participation": null,
+    "infra_is_method_failure_claim": false,
+    "metadata_hold_native_trial_increment": 0,
+    "metadata_hold_scientific_entries": 0,
+    "method_complete": null,
+    "mutex_scope": "our_campaign_jobs_only",
+    "native_winner": null,
+    "new_host_calls_or_measurements": 0,
+    "official_tests_opened": false,
+    "release_safe": null,
+    "residency_is_an_observation_not_true_peak": true,
+    "sample_completeness": null,
+    "superiority": null
+  },
+  "snapshot": {
+    "anchor_receipt_sha256": "d44f8060bbe411258ec9216345e4a2937117367b0a7d3c1d95b7b3663206fba8",
+    "later_live_operations_included": false
+  },
+  "version": 1
+}
