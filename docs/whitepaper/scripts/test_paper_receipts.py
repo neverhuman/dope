@@ -37,6 +37,19 @@ class PaperReceipts(unittest.TestCase):
         validators['beyond-prepare'].validate(self.preparation)
         validators['field-map'].validate(self.extracts['original-field-map.json'])
 
+    def test_whole_document_selectors_resolve_to_real_roots(self):
+        mapping=self.extracts['original-field-map.json']
+        for key in ('filename_counts','prepare'):
+            ref=mapping[key]
+            self.assertEqual(ref['pointer'],'')
+            document=json.loads(receipts.checked_bytes(ref))
+            self.assertIsInstance(document,dict)
+        inventory=json.loads(receipts.checked_bytes(mapping['filename_counts']))
+        self.assertEqual(sum(r['train_csv'] for r in inventory['s3_worker']),
+                         self.extracts['provenance-counts.json']['s3_train_csv'])
+        preparation=json.loads(receipts.checked_bytes(mapping['prepare']))
+        self.assertEqual(preparation,self.preparation)
+
     def test_repair_receipt_sources_unchanged_and_gates_null(self):
         root=receipts.REPO/'research/benchmark/results/paper-original-metadata-v1'
         document=json.loads((root/'repair.json').read_bytes())

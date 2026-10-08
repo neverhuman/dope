@@ -16,9 +16,9 @@
   "observed_utc": "2026-10-08T05:55:28.442858+00:00",
   "official_tests_opened": false,
   "original_field_map": {
-    "bytes": 294928,
+    "bytes": 294926,
     "path": "docs/whitepaper/generated/original-field-map.json",
-    "sha256": "041f87621ef5715c9e64a81a541975c9d3993f0f1d284cef118efc2d81aa4a59"
+    "sha256": "5b164d434414d3389f639d3645f40b11a999b32c56daa2cfe36d25b2205082b6"
   },
   "original_historical_custody_reconstructed": false,
   "original_index": {

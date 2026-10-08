@@ -3,7 +3,7 @@
   "filename_counts": {
     "bytes": 14531,
     "path": "research/benchmark/results/paper-original-metadata-v1/filename-inventory.json",
-    "pointer": "/",
+    "pointer": "",
     "sha256": "97aa58431d42ed148c23498a999c16782853215be98ad0fb74fdac23df26df15"
   },
   "fits": [
@@ -6107,7 +6107,7 @@
   "prepare": {
     "bytes": 2642,
     "path": "research/benchmark/results/paper-original-metadata-v1/beyond-prepare-projection.json",
-    "pointer": "/",
+    "pointer": "",
     "sha256": "863c396e78e4d9d6db7fb39f63a8ae5d8ae5d67f078601a3d1da5d507d7a65a5"
   },
   "replay_cost_reduction": "Sort elapsed_seconds within each 100-lineage profile; n/min/max/sum/median."
