@@ -375,16 +375,17 @@ null.
 
 Distribution fidelity, structure fidelity, coverage realism, and
 compactness keep their v2 definitions. The driver term stored beside
-this panel is rank agreement of absolute correlations with the target.
-It is not the permutation-importance auditor in the v2 definition, and
-this paper does not publish it as a component value. v2 utility transfer
+this panel is the same equal mixture of rank agreement and top-feature-set
+overlap, applied to absolute correlations with the target. It is not the
+permutation-importance auditor in the v2 definition, and this paper does
+not publish it as a component value. v2 utility transfer
 remains the one-sided lower bound on
 retention for the CatBoost, linear, and MLP auditors in the tables below.
-v3 utility transfer is that same bound when the auditor is a clean-license
-tabular model. The model is conditioned on the synthetic rows and scored
-on real holdout rows. Kumo large is the headline auditor. Mitra and TabICL
-repeat the measurement on the same mapped tables. A CatBoost retention
-cannot fill this component.
+v3 utility transfer is that same bound on the Kumo large retention.
+The model is conditioned on the synthetic rows and scored
+on real holdout rows. Mitra and TabICL must be measured on the same mapped
+tables for the gate. Their retentions are not averaged into the bound.
+A CatBoost retention cannot fill this component.
 
 Real fit rows, real holdout rows, and synthetic rows share one map. The
 map is fit on the real fit rows only. Numeric columns go to the open unit
