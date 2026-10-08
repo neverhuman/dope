@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "baseline-completion-input-lock-v1"
+    },
+    "sources": {
+      "const": {
+        "followon": {
+          "bytes": 21453198,
+          "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
+        },
+        "forest2": {
+          "bytes": 956753,
+          "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
+        },
+        "forest5": {
+          "bytes": 2368071,
+          "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
+        },
+        "forest6": {
+          "bytes": 2750434,
+          "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
+        },
+        "forest_input": {
+          "bytes": 312477,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/forest-inputs.json.gz",
+          "sha256": "9cf9b5dd2089cec38d143c7074c0fcce545ecbf7552a3fea2524b6539047b94e"
+        },
+        "rate": {
+          "bytes": 1276,
+          "path": "research/benchmark/results/baseline-completion-20261008-v1/rate.json",
+          "sha256": "18ba209cdc4e0154d0ef8b3ccebc285c2925b04313458ccb58a1e75e71b83d2c"
+        },
+        "tabddpm": {
+          "bytes": 4478669,
+          "path": "research/benchmark/results/tabddpm-matched-fit-coverage-v1/panel.json",
+          "sha256": "3a2261ee2930081238baab888b5c50e9caa3942b8d4f37e42e2518a753ea9607"
+        },
+        "tabsyn_fits": {
+          "bytes": 555911,
+          "path": "research/benchmark/results/tabsyn-default100-scaled-cuda-fits.json",
+          "sha256": "cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272"
+        },
+        "tabsyn_native": {
+          "bytes": 427383,
+          "path": "research/benchmark/results/tabsyn-default100-native-audit.json",
+          "sha256": "be455dfc3b9caf15db72646e8c07aa3c5c17cf49df46c8906ddff25d2c3dcac9"
+        },
+        "tabsyn_old": {
+          "bytes": 582699,
+          "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
+        }
+      }
+    }
+  },
+  "required": [
+    "format",
+    "sources"
+  ],
+  "title": "Frozen inputs.lock baseline completion receipt",
+  "type": "object"
+}

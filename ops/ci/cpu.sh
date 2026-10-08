@@ -20,6 +20,7 @@ PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_retained_metrics -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_tabddpm_retained -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_tabddpm_matched_coverage -q
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_forest_fit_variance -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_forest_complete_cohort -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_forest_projected_cohort -q

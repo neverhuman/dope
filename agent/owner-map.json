@@ -298,6 +298,11 @@
     "docs/whitepaper/scripts/local_receipts.py": "external-evidence",
     "docs/whitepaper/scripts/test_paper_receipts.py": "external-evidence",
     "research/benchmark/results/paper-original-metadata-v1/": "external-evidence",
-    "docs/whitepaper/generated/original-field-map.json": "external-evidence"
+    "docs/whitepaper/generated/original-field-map.json": "external-evidence",
+    "research/benchmark/publish_baseline_completion.py": "external-evidence",
+    "research/benchmark/tests/test_baseline_completion.py": "external-evidence",
+    "research/benchmark/results/baseline-completion-20261008-v1/": "external-evidence",
+    "docs/whitepaper/BASELINE_PROTOCOL.md": "external-evidence",
+    "docs/whitepaper/generated/baseline-budget.tex": "external-evidence"
   }
 }

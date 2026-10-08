@@ -1,0 +1,50 @@
+{
+  "dispositions_per_hour": 6.994747643994126,
+  "end": {
+    "complete": false,
+    "gpu_inventory_accessed": false,
+    "needs_operator_repair": false,
+    "observed_utc": "2026-10-08T07:54:00.209926+00:00",
+    "physical_closed": 342,
+    "planned": 400,
+    "signals_sent": 0,
+    "status_counts": {
+      "ok": 267,
+      "timeout": 75
+    },
+    "transport_exit_code": 0,
+    "unit": {
+      "ActiveState": "active",
+      "ExecMainStatus": "0",
+      "MainPID": "4038850",
+      "SubState": "running"
+    },
+    "workers_started": 0
+  },
+  "fit_disposition_eta_mdt": "2026-10-08T10:11:31.179629-06:00",
+  "fit_disposition_eta_utc": "2026-10-08T16:11:31.179629+00:00",
+  "format": "baseline-operational-rate-v1",
+  "not_all_success": true,
+  "not_kpi_forecast": true,
+  "start": {
+    "complete": false,
+    "gpu_inventory_accessed": false,
+    "needs_operator_repair": false,
+    "observed_utc": "2026-10-08T06:53:57.506686+00:00",
+    "physical_closed": 335,
+    "planned": 400,
+    "signals_sent": 0,
+    "status_counts": {
+      "ok": 264,
+      "timeout": 71
+    },
+    "transport_exit_code": 0,
+    "unit": {
+      "ActiveState": "active",
+      "ExecMainStatus": "0",
+      "MainPID": "4038850",
+      "SubState": "running"
+    },
+    "workers_started": 0
+  }
+}

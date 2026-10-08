@@ -1,0 +1,177 @@
+{
+  "$defs": {
+    "ref": {
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "properties": {
+      "accepted_artifact": {
+        "const": false
+      },
+      "adapter_timeout_seconds": {
+        "const": null
+      },
+      "admission_receipt": {
+        "$ref": "#/$defs/ref"
+      },
+      "closure_receipt": {
+        "$ref": "#/$defs/ref"
+      },
+      "common_metrics": {
+        "const": null
+      },
+      "configuration_name": {
+        "const": "author_default"
+      },
+      "configuration_sha256": {
+        "const": "00fae5436add3ba03fd5f0d90631b5d96fb4563d0a7ef302b5fc6714db2decb2"
+      },
+      "continuation_policy": {
+        "const": "No automatic retry. Preserve this physical attempt and its paid history. Any owner-admitted continuation must retain the same logical identity, use a separate physical attempt, count against its eight-trial/12-hour cell budget, and leave the frozen 600-second fit cap unchanged."
+      },
+      "dataset": {
+        "enum": [
+          "060b9fff8092db17",
+          "0a8428ef25a69175",
+          "205f4b4982b9ea49",
+          "26eff843be35d831",
+          "282f8ddb43b5e677",
+          "297b7688a045c583",
+          "46c5a59e5ae42037",
+          "47c581af5de1136b",
+          "48b7a3bf81e5f3e5",
+          "654566a1f91408aa",
+          "7a3d123dd555110d",
+          "80589368fa78f21a",
+          "956d34f13e7af830",
+          "a32a69e7c701eb14",
+          "a97065df07a47eb0",
+          "b78d323566930bd7",
+          "bc85856c012bcc1b",
+          "c107ee39eb333a9d",
+          "c4f8e81b70d33a13",
+          "e08f0b9931f93686"
+        ]
+      },
+      "disposition": {
+        "const": "retain_as_fit_timeout_under_original_budget"
+      },
+      "fit_receipt": {
+        "$ref": "#/$defs/ref"
+      },
+      "fit_seed": {
+        "enum": [
+          23,
+          37,
+          53,
+          71
+        ]
+      },
+      "fit_timeout_seconds": {
+        "const": 600
+      },
+      "job_receipt": {
+        "$ref": "#/$defs/ref"
+      },
+      "job_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "measured_elapsed_seconds": {
+        "const": null
+      },
+      "method_quality_conclusion": {
+        "const": null
+      },
+      "mfs_v2": {
+        "const": null
+      },
+      "native_validation_kpi": {
+        "const": null
+      },
+      "official_tests_opened": {
+        "const": false
+      },
+      "ptf_v1": {
+        "const": null
+      },
+      "release_safe": {
+        "const": null
+      },
+      "retry_started": {
+        "const": false
+      },
+      "status": {
+        "const": "timeout"
+      },
+      "stderr": {
+        "$ref": "#/$defs/ref"
+      },
+      "stdout": {
+        "$ref": "#/$defs/ref"
+      },
+      "superiority": {
+        "const": null
+      },
+      "worker_exit_code": {
+        "const": 124
+      }
+    },
+    "required": [
+      "accepted_artifact",
+      "adapter_timeout_seconds",
+      "admission_receipt",
+      "closure_receipt",
+      "common_metrics",
+      "configuration_name",
+      "configuration_sha256",
+      "continuation_policy",
+      "dataset",
+      "disposition",
+      "fit_receipt",
+      "fit_seed",
+      "fit_timeout_seconds",
+      "job_receipt",
+      "job_sha256",
+      "measured_elapsed_seconds",
+      "method_quality_conclusion",
+      "mfs_v2",
+      "native_validation_kpi",
+      "official_tests_opened",
+      "ptf_v1",
+      "release_safe",
+      "retry_started",
+      "status",
+      "stderr",
+      "stdout",
+      "superiority",
+      "worker_exit_code"
+    ],
+    "type": "object"
+  },
+  "maxItems": 75,
+  "minItems": 75,
+  "title": "Frozen 75 Forest-Flow timeout dispositions",
+  "type": "array"
+}
