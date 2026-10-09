@@ -198,9 +198,13 @@ def main() -> int:
     if leaked:
         failures.append(f"hand-typed decimals in dope-mfs.tex: {leaked[:12]}")
     if NUMBERS.exists():
-        defined = set(MACRO_DEF.findall(NUMBERS.read_text()))
+        number_sources = NUMBERS.read_text()
+        wave2_numbers = ROOT / "generated/review-wave2-numbers.tex"
+        if wave2_numbers.is_file():
+            number_sources += "\n" + wave2_numbers.read_text()
+        defined = set(MACRO_DEF.findall(number_sources))
         # Also accept commands defined with \def\Name
-        defined.update(re.findall(r"\\def\\(\w+)", NUMBERS.read_text()))
+        defined.update(re.findall(r"\\def\\(\w+)", number_sources))
         used = set(MACRO_USE.findall(body))
         missing = sorted(
             name for name in used

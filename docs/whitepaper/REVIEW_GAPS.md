@@ -12,10 +12,10 @@ why it cannot be done. If a new result weakens a claim, the paper weakens the cl
 | CM-05 | Contribution bullets point at the wrong figures; bullet 1 has no verb | Repoint; rewrite | closed |
 | CM-06 | "Each method selected on its own objective" overstates | Per-method selection table | closed: tab:selection |
 | CM-07 | Table 5 Holm family undocumented | Declare family_size per table | closed: sec:stats and captions state the family; density-table footnote in a4be7ed is 3 tests per auditor |
-| CM-08 | Pre-registered size-n endpoint not reported | Report size n next to 4n | closed in the main PDF: Table 2 inputs `generated/review-size-retention.tex` at size n and size 4n for the methods in that file. TabSyn stays outside it. Author-default ARF and native-selected ARF are separate rows |
+| CM-08 | Pre-registered size-n endpoint not reported | Report size n next to 4n | closed: the main table inputs `generated/review-wave2-size-retention.tex` at size n and size 4n, including TabSyn and same-cohort DOPE rows. Author-default and native-selected ARF remain separate configurations |
 | CM-09 | Endpoint is validation; official test sealed | One sealed run of the frozen config | in progress, wave 2. The sealed run has not started. No official-test number is reported |
-| CM-10 | Supplement is in IEEE style; no anonymous supplement | ICLR-style supplement + anonymous build + leak grep | source closed in 62f93e0. The anonymous supplement PDF is in the wave-1 PDF commit. Hosted clean-rebuild is not claimed green |
-| CM-11 | `just paper` does not regenerate everything | Complete build graph + clean-rebuild CI job | source closed through b589297: authenticated review outputs precede the teaser, and the clean job restores the pinned historical compute receipt. Hosted CI is not claimed green |
+| CM-10 | Supplement is in IEEE style; no anonymous supplement | ICLR-style supplement + anonymous build + leak grep | closed: ICLR-style supplement, anonymous source build, and leak checks are part of the paper gate. Hosted clean-rebuild passed at 2bf3578; the final wave-2 head needs its own green run |
+| CM-11 | `just paper` does not regenerate everything | Complete build graph + clean-rebuild CI job | closed: the complete authenticated scalar graph precedes rendering and source PDF builds. Hosted clean-rebuild passed at 2bf3578; final wave-2 CI is recorded separately |
 | CM-12 | Byte charge includes projection.json but the text omits it | Define bytes as model + projection | closed: encoded model file plus projection.json |
 | CM-13 | MFS-v3 can exceed 100 | Clip; perfect profile = 100 test | closed: eq:mfsv3 clips to [0,100]; the main text no longer prints the historical all-ones illustration. Native v3 uses max(c, epsilon) and the clip at f6665d9. The v2 path remains eq:mfs |
 | CM-14 | Negative bytes pass the tier gate | 0 < int bytes ≤ 10240; negative tests | closed in a4be7ed: integer bytes with 0 < x ≤ 10240 |
@@ -26,38 +26,48 @@ why it cannot be done. If a new result weakens a claim, the paper weakens the cl
 | CM-19 | compute_panel inputs not SHA-pinned | Pinned loader | closed at d75f10f: registered inputs are SHA-pinned before decode, including the author-default ARF headline rows |
 | CM-20 | C2ST n=98 vs 97; BeyondArena 12 vs 142 | Explicit denominators | closed: fidelity n is the complete three-seed group; BeyondFamilies is the fit check and BeyondInventory is the inventory |
 | CM-21 | Related-work taxonomy mixes families and evaluation | Restructure | closed: generators by family, then what was measured, then utility and privacy |
-| PR-05 | Size n + real-bootstrap ×4 control | Tables + claims state the size | size n is Table 2 of the main PDF. The real-bootstrap comparison is the supplement control table, reduced from the bound scalar ledger |
-| PR-06 | Predictor-only control | Control in all retention tables; paired CI | the supplement inputs generated/review-controls.tex from the bound scalar ledger. Equivalence stays unclaimed |
+| PR-05 | Size n + real-bootstrap ×4 control | Tables + claims state the size | closed: both sizes appear in the main retention table, and the real-bootstrap control is reduced from the bound 5700-cell scalar ledger in the supplement |
+| PR-06 | Predictor-only control | Control in all retention tables; paired CI | closed: the supplement inputs generated/review-controls.tex from the bound scalar ledger. Every declared aggregate is reproduced before rendering; equivalence stays unclaimed |
 | PR-07 | One fit seed; no clustering; no final test | ≥5 seeds, hierarchical bootstrap, family sensitivity, one sealed run | family bootstrap and excluding-simulated sensitivity emitted in 3c63eec. Extra DOPE fit seeds and the sealed run are in progress, wave 2, with no number |
-| PR-08 | TabSyn on 8 lineages; TabDDPM not run | All 97 lineages + ledger | the matched TabSyn cohort and TabDDPM v5 remain in progress, wave 2. The retained subset stays a separate historical cohort. This paper prints no number for the matched cohort or for TabDDPM v5 |
-| PR-09 | No privacy/fidelity panel | DCR/NNDR/MIA with CI; fidelity; C2ST | the historical fidelity table stays in the supplement and stays outside formal DP and outside HIPAA de-identification. The review privacy panel remains in progress, wave 2, and this paper prints no number for it. The stored logistic file stays uninput |
+| PR-08 | TabSyn on 8 lineages; TabDDPM not run | All 97 lineages + ledger | TabSyn closed: independently captured sample hashes and frozen fit receipts admit 594 scalar cells on 99 lineages, reproducing the published aggregate. Both sizes, matched DOPE rows, paired intervals, and actual auditor denominators are generated. All paired family intervals include zero; size-4n MLP favors TabSyn at the median. TabDDPM v5 remains pending with no number; the retained subset remains separate |
+| PR-09 | No privacy/fidelity panel | DCR/NNDR/MIA with CI; fidelity; C2ST | partly closed: bound privacy cells reproduce the original DCR, NNDR, and membership-attack panel. Configuration-aware KS, correlation, logistic and common CatBoost detectors, and alpha/beta tables are generated from pinned ledgers. Missing Forest-Flow detector/alpha cells remain unavailable; attribute inference and predictor attacks remain pending. Empirical diagnostics stay outside formal DP and HIPAA de-identification |
 | PR-10 | "Ties" read off non-significant tests | Pre-declared TOST; delta-method variance | paired-difference table placed in the supplement; every filled TOST cell is no. Equivalence stays unclaimed. The TOST-only file stays uninput because its ARF rows lack a configuration column. Delta-method appendix remains |
 | PR-11 | No stress suite or ablations | XOR/parity/product; k, blocks, budget | not started. No number |
-| PR-12 | Credentialed data path; profile default | PMLB fetch path; no default profile; artifact statement | source closed in 62f93e0: public PMLB fetch, no default AWS profile, artifact custody stated. Hosted clean-rebuild is not claimed green |
-| PR-13 | Novelty claimed on the metric; teaser shows marginal medians | Credit TSTR/TRTR; paired-difference teaser | closed: Esteban et al. TSTR/TRTR cited; claim is the encoding and the release gate; teaser draws the DOPE generator minus author-default ARF, the Gaussian copula, and Chow--Liu with stored family-cluster intervals |
+| PR-12 | Credentialed data path; profile default | PMLB fetch path; no default profile; artifact statement | closed: public credential-free PMLB fetch, no default AWS profile, artifact custody statement, and source clean-build gate |
+| PR-13 | Novelty claimed on the metric; teaser shows marginal medians | Credit TSTR/TRTR; paired-difference teaser | closed: Esteban et al. TSTR/TRTR cited; claim is the encoding and the release gate. The teaser draws paired generator differences against author-default ARF, the Gaussian copula, Chow--Liu, and matched TabSyn, with family-cluster intervals and separate cohort counts |
 | RS-01 | ARF missing from abstract, Fig. 1, and the strongest-baseline sentence | Put the generated paired ARF difference in those places | closed: abstract, Fig. 1, the headline sentence, and `generated/headline-table.tex` use author-default size-$4n$ family-cluster ARF from the pinned review panel. The linear interval contains zero. The teaser draws that series beside the copula and Chow--Liu |
-| RS-02 | Tables 12–14 lack a DOPE row on the same cohort | Matched-cohort DOPE row from lane B | in progress, wave 2. The matched TabSyn aggregate has no bound scalar cells, so this paper prints no number. Distinct from the retained subset |
-| RS-03 | C2ST classifier differs by method | One classifier and one n for every method | in progress, wave 2. The review privacy panel prints no number. Forest-Flow remains unscored. The stored logistic file stays uninput |
+| RS-02 | Tables 12–14 lack a DOPE row on the same cohort | Matched-cohort DOPE row from lane B | closed: both size factors show DOPE and TabSyn on each auditor’s actual informative intersection in the main table and supplement. The matched 99-lineage source cohort stays distinct from the retained subset |
+| RS-03 | C2ST classifier differs by method | One classifier and one n for every method | partly closed: the shared grouped CatBoost detector is reported beside distinct historical logistic AUC cells with explicit per-metric n. TabSyn is scored by the same fixed implementation. One TabSyn CatBoost cell is unavailable; Forest-Flow remains unavailable. Unequal cohorts prevent a cross-method ranking |
 | RS-04 | DOPE called a measurement in the abstract and a generator in the figures | One definition | closed: title, abstract, and captions name DOPE as the encoding and the generator it writes; retention is the measurement. Legend source files outside this lane still print the generator label |
-| 11c | Negation density above 5 per 1,000 words | Keep every caveat and drop spaced " not " | closed on the wave-1 PDF: `pdftotext -layout` of `dope-mfs.pdf` has 5 spaced " not " in 5756 words (0.869 per 1,000). The utility-score sentence keeps one required "not" |
-| 11d | Main body before References over 10 pages | Move long displays into the supplement | wave-1 `dope-mfs.pdf` is 11 pages and the References heading is the first line of page 11. Body before References is 10 pages |
+| 11c | Negation density above 5 per 1,000 words | Keep every caveat and drop spaced " not " | closed: the wave-2 source PDF passes check_paper against the fixed maximum of 5 spaced " not " per 1,000 words |
+| 11d | Main body before References over 10 pages | Move long displays into the supplement | closed: both source main PDFs have 10 pages, with References beginning on page 9. The main body passes check_paper; the large privacy and fidelity displays remain in the supplement |
 
-## Wave 1 / wave 2
+## Wave 2 admission and remaining work
 
-Wave 1 keeps every finished and correct generated table. A stored aggregate with no bound scalar cells is not that kind of table. Nothing in the wave-2 list has a printed number.
+Every displayed result comes from a committed generated file and an authenticated
+scalar source. The build authenticates the complete graph before decoding and
+replays the controls, privacy, TabSyn utility, and fidelity aggregates before any
+render. Hash mismatch, missing pins, duplicate cells, malformed identities, or an
+opened official-test flag refuse emission.
 
-Finished, with the number only in the generated file named here:
+Finished public units:
 
-- Size n beside size 4n is `generated/review-size-retention.tex` in the main text. TabSyn stays outside that file.
-- Paired differences are `generated/review-paired.tex`. Every filled TOST cell in that table is no. Family and excluding-simulated sensitivity are `generated/review-family.tex`. Denominators are `generated/review-denominator.tex`.
-- `review-tost.tex`, `review-rmse.tex`, `review-fidelity-stored.tex`, and `review-seeds-existing.tex` stay uninput because an ARF block repeats in each without an author-default versus native-selected column.
+- Controls: `generated/review-controls.tex` is reproduced from the bound scalar ledger. Equivalence remains unclaimed.
+- Privacy: `generated/review-privacy.tex` is reproduced from the bound public DCR/NNDR/membership cells. These are empirical diagnostics, outside formal DP and HIPAA de-identification.
+- TabSyn: `generated/review-tabsyn.tex`, `review-wave2-size-retention.tex`, and the teaser use the bound full cohort and actual matched auditor intersections. All paired family intervals include zero. The retained subset remains a separate cohort.
+- Fidelity: `generated/review-fidelity.tex` separates ARF configurations, historical logistic AUC, and shared CatBoost AUC; `review-alpha-beta.tex` identifies the numeric full cohort and retained mixed-type cohort. Every metric has its own denominator and family-cluster interval. Forest-Flow alpha/beta and detector cells remain unavailable.
+- Custody: the frozen sample grid has six unavailable cells; six foreign `worker` operations and a legacy unavailable operation with an unknown official-test flag are quarantined in the original sampling receipt. They never enter the admitted cohort. Missing cells are excluded explicitly, with no imputed result.
+- Singleton bootstrap optimization: frozen conformance fixtures preserve the original interval endpoints and RNG state. Draw count, clustering, configuration, and statistical estimands stay unchanged.
 
-In progress, wave 2. No number:
+Remaining gaps, with no result number:
 
-- Predictor-only and real-bootstrap controls. The supplement inputs the generated control table. The scalar ledger reproduces the committed aggregate. Equivalence stays unclaimed.
-- The review privacy panel. The same aggregate gap applies. Empirical privacy stays outside formal DP and outside HIPAA de-identification, and this paper prints no privacy-panel number.
-- The matched TabSyn cohort. It stays distinct from the retained subset. This paper prints no matched-cohort number.
-- TabDDPM population v5, unit `dope-rf-tabddpm-v5`, still running on xbabe3 at the pre-registered config. A failed or missing cell is not a win.
-- Extra DOPE fit seeds. Qualification passed. At c6f5ad4 the even lineage-record indexes had finished on xbabe1 and the odd indexes were still fitting, with `dope-rf-seeds-x3` waiting on TabDDPM v5. The hierarchical reducer is not an inclusion path for this cut. This paper prints no extra-seed number.
-- The sealed official-test run has not started. An existing `started.json` is refused, so the run cannot resume. No official-test number.
-- PR-11, the XOR/parity/product stress suite, was not started.
+- Attribute-inference and shipped-predictor attacks require their own committed predeclarations before execution.
+- Extra DOPE fit seeds have no admitted result in this historical-validation integration. Existing and separately declared v2 jobs remain untouched; no extra-seed median is printed.
+- TabDDPM population v5 lacks an admitted finished unit for this paper. No result is printed and no existing job is touched.
+- Selection and scoring still share validation rows. The sealed official-test run stays untouched; no official-test result or disjoint-selection claim is printed.
+- Equal tuning budgets are unestablished by the current receipts. No budget-parity claim is printed.
+- The full XOR/parity/product stress suite and a complete three-axis ablation suite remain pending. No result is imputed.
+
+The final exact-head local and hosted gate results are recorded in the external
+`WAVES_LEDGER.md` and `REVIEW_FIX_PROGRESS.md`; a historical green run never
+stands in for the final head.

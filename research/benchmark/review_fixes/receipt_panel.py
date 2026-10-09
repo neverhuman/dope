@@ -770,10 +770,14 @@ def emit_tex(payload) -> None:
     for row in payload["denominator"]:
         if row["auditor"] != "catboost":
             continue
+        counts = [row[key] for key in ("n_informative", "n_noninformative", "n_undefined",
+                                      "n_capped", "sensitivity_n")]
+        # Empty sensitivity coverage cannot establish an informative count.
+        # Forest-Flow's original receipts omit the required null-loss metadata.
+        displayed = ["---"] * len(counts) if not any(counts) else list(map(str, counts))
         denom_lines.append(
             f"{tex_name(row['method'])} & {tex_name(row['configuration'])} & {row['size']}$n$ & "
-            f"{row['n_informative']} & {row['n_noninformative']} & {row['n_undefined']} & "
-            f"{row['n_capped']} & {row['sensitivity_n']} & {fmt(row['sensitivity_median'])} \\\\"
+            + " & ".join(displayed) + f" & {fmt(row['sensitivity_median'])} \\\\"
         )
     write_tex("review-denominator.tex", _table(
         "Method & Configuration & Size & Informative & Noninformative & Undefined & Capped & Sensitivity $n$ & Capped median",

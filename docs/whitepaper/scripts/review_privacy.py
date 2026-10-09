@@ -8,6 +8,7 @@ Logistic C2ST stored on the population ledgers is not relabeled here.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import sys
@@ -156,39 +157,8 @@ def render_privacy(payload: dict) -> str:
     )
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--cells", type=Path)
-    parser.add_argument("--from-panel", type=Path)
-    parser.add_argument("--check", action="store_true")
-    args = parser.parse_args()
-    if args.from_panel or (args.check and args.cells is None):
-        panel_path = args.from_panel or (RESULTS / "review-fixes-privacy-v1" / "panel.json")
-        payload = json.loads(panel_path.read_text())
-        rendered = render_privacy(payload)
-        tex_path = GENERATED / "review-privacy.tex"
-        json_path = GENERATED / "review-privacy.json"
-        text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
-        if args.check:
-            if not tex_path.is_file() or tex_path.read_text() != rendered:
-                raise SystemExit("review-privacy.tex does not match the panel")
-            if not json_path.is_file() or json_path.read_text() != text:
-                raise SystemExit("review-privacy.json does not match the panel")
-            print("privacy check ok")
-            return
-        if text != panel_path.read_text():
-            raise SystemExit("privacy panel is not canonical json")
-        (GENERATED / "review-privacy.json").write_text(text)
-        write_tex("review-privacy.tex", rendered)
-        return
-    if args.cells is None:
-        print("privacy cells not scored yet")
-        return
-    cells = _cells(args.cells)
-    if not cells:
-        print("privacy cells not scored yet")
-        return
-    record, _sha_record = _load("s3-lineage-record.json")
+def payload_from_cells(cells: list[dict], sources=None) -> dict:
+    record = json.loads(sources["research/benchmark/results/s3-lineage-record.json"]) if sources is not None else _load("s3-lineage-record.json")[0]
     names = names_of(record)
     grouped = defaultdict(dict)
     rows_per_class = []
@@ -253,7 +223,7 @@ def main() -> None:
         "format": "dope-review-fix-privacy",
         "version": 1,
         "cells": len(cells),
-        "predeclaration_sha256": _sha(REPO / "research" / "benchmark" / "review_fixes" / "predeclare.json"),
+        "predeclaration_sha256": hashlib.sha256(sources["research/benchmark/review_fixes/predeclare.json"]).hexdigest() if sources is not None else _sha(REPO / "research" / "benchmark" / "review_fixes" / "predeclare.json"),
         "rows_per_class": {
             "n": len(rows_per_class),
             "min": min(rows_per_class) if rows_per_class else None,
@@ -271,13 +241,49 @@ def main() -> None:
         "claims": {"formal_dp": False, "hipaa_deidentification": False, "mfs_v2": None, "ptf_v1": None,
                    "release_safe_l3": None, "superiority": None},
     }
+    return payload
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cells", type=Path)
+    parser.add_argument("--from-panel", type=Path)
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    if args.from_panel or (args.check and args.cells is None):
+        panel_path = args.from_panel or (RESULTS / "review-fixes-privacy-v1" / "panel.json")
+        payload = json.loads(panel_path.read_text())
+        rendered = render_privacy(payload)
+        tex_path = GENERATED / "review-privacy.tex"
+        json_path = GENERATED / "review-privacy.json"
+        text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        if args.check:
+            if not tex_path.is_file() or tex_path.read_text() != rendered:
+                raise SystemExit("review-privacy.tex does not match the panel")
+            if not json_path.is_file() or json_path.read_text() != text:
+                raise SystemExit("review-privacy.json does not match the panel")
+            print("privacy check ok")
+            return
+        if text != panel_path.read_text():
+            raise SystemExit("privacy panel is not canonical json")
+        (GENERATED / "review-privacy.json").write_text(text)
+        write_tex("review-privacy.tex", rendered)
+        return
+    if args.cells is None:
+        print("privacy cells not scored yet")
+        return
+    cells = _cells(args.cells)
+    if not cells:
+        print("privacy cells not scored yet")
+        return
+    payload = payload_from_cells(cells)
     out = RESULTS / "review-fixes-privacy-v1"
     out.mkdir(parents=True, exist_ok=True)
     text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
     (out / "panel.json").write_text(text)
     (GENERATED / "review-privacy.json").write_text(text)
     write_tex("review-privacy.tex", render_privacy(payload))
-    holdout = [row for row in summaries if row["metric"] == "dcr_validation_median" and row["method"] == "DOPE"]
+    holdout = [row for row in payload["summaries"] if row["metric"] == "dcr_validation_median" and row["method"] == "DOPE"]
     for row in holdout:
         print(
             f"DOPE holdout DCR size {row['size']}n median {fmt(row['median'])} "

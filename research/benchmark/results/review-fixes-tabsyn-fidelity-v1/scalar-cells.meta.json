@@ -1,0 +1,14 @@
+{
+  "catboost": "1.2.10",
+  "cell_count": 594,
+  "declaration_sha256": "686742975a461e59ac486997a637ab0e817d89141159a1da0f48adfb6eaeaec0",
+  "expanded_implementation_sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
+  "formal_dp": false,
+  "format": "dope-wave2-tabsyn-fidelity-cells-v1",
+  "ledger_sha256": "f7df39e9a45989fbe9cb8ff127134a3edd284ad72de3530cb63ee462fce50697",
+  "numpy": "1.26.4",
+  "official_tests_opened": false,
+  "producer_sha256": "3a0f958b5b1a7b5bf1621baea6d26d48693dbc56ad2f2f8bcb5c609fad17c7a9",
+  "scikit-learn": "1.7.2",
+  "scipy": "1.16.3"
+}

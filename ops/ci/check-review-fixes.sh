@@ -17,6 +17,10 @@ TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittes
   research.benchmark.review_fixes.test_predeclare_v2 \
   research.benchmark.review_fixes.test_rescore_cells \
   research.benchmark.review_fixes.test_v2_panel \
-  research.benchmark.review_fixes.test_rescore_ledger -q
+  research.benchmark.review_fixes.test_rescore_ledger \
+  research.benchmark.review_fixes.test_bound_review_cells \
+  research.benchmark.review_fixes.test_review_fidelity -q
 TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
   -s docs/whitepaper/scripts -p 'test_paper_control_inputs.py' -q
+TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
+  -s docs/whitepaper/scripts -p 'test_paper_wave2_inputs.py' -q

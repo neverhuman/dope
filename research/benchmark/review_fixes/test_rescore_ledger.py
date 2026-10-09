@@ -1,4 +1,4 @@
-"""K0 replay custody checks on temporary fixtures. No benchmark data is read and no auditor runs."""
+"""K0 replay custody checks on isolated fixtures. No benchmark data is read and no auditor runs."""
 
 import hashlib
 import json
@@ -7,6 +7,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from research.benchmark.review_fixes import rescore_adapters as A
 from research.benchmark.review_fixes import rescore_ledger as R
@@ -148,6 +149,31 @@ class CustodyTests(ScoreCase):
         self.assertEqual((cell["status"], cell["reason"]), ("failed", "evaluator_digest_mismatch"))
 
 
+class ErrorTests(ScoreCase):
+    def test_bad_csv_records_only_the_exception_type(self):
+        path = self.write("sample.csv", b"1,0\n")
+        with patch.object(self.pilot, "measure", side_effect=ValueError("source value forbidden")):
+            _, cell = self.score(fixture_job(path, sha(path.read_bytes())))
+        self.assertEqual((cell["status"], cell["reason"]), ("failed", "ValueError"))
+        self.assertNotIn("source value forbidden", json.dumps(cell))
+
+    def test_catboost_failure_keeps_a_typed_unavailable_cell(self):
+        from catboost import CatBoostError
+        path = self.write("sample.csv", b"1,0\n")
+        with patch.object(self.pilot, "measure", side_effect=CatBoostError("source value forbidden")):
+            _, cell = self.score(fixture_job(path, sha(path.read_bytes())))
+        self.assertEqual((cell["status"], cell["reason"]), ("failed", "CatBoostError"))
+        self.assertNotIn("source value forbidden", json.dumps(cell))
+
+    def test_unexpected_failure_stops_and_removes_the_headerless_copy(self):
+        path = self.write("sample.csv", b"f0,target\n1,0\n")
+        with patch.object(self.pilot, "measure", side_effect=AssertionError("internal invariant")):
+            with self.assertRaises(AssertionError):
+                self.score(fixture_job(path, sha(path.read_bytes()), has_header=True))
+        self.assertFalse(any((self.root / "scratch").glob("*.headerless.csv")))
+        self.assertFalse(self.out.exists())
+
+
 class ReplayTests(ScoreCase):
     def test_comparison_is_exact_and_reports_the_largest_gap(self):
         fresh = {name: {"retention": 0.5} for name in A.AUDITORS}
@@ -276,10 +302,11 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual([job["route"] for job in jobs], ["receipt", "sibling"])
         self.assertEqual(jobs[1]["csv_path"], str(sample_dir / "n1-seed211.csv"))
         self.assertEqual(jobs[1]["csv_sha256"], "c" * 64)
-        rows[1]["metric_receipt_ref"]["path"] = "/home/ubuntu/dope-scratch-x2/k0-fixture-absent/lost.json"
+        rows[1]["metric_receipt_ref"]["path"] = str(self.root / "remote" / "lost.json")
         ledger.write_text(json.dumps({"rows": rows}))
-        with self.assertRaises(A.RemoteOnly):
-            A.arf(ledger, {"host": "xbabe3"})
+        with patch.object(A, "LOCATIONS", ((str(self.root) + "/", "xbabe2"),)):
+            with self.assertRaises(A.RemoteOnly):
+                A.arf(ledger, {"host": "xbabe3"})
 
 
 if __name__ == "__main__":
