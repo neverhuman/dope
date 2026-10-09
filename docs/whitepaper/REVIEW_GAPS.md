@@ -57,7 +57,7 @@ Finished, with the number only in the generated file named here:
 In progress, wave 2. No number:
 
 - TabDDPM population v5, unit `dope-rf-tabddpm-v5`, still running on xbabe3 at the pre-registered config. A failed or missing cell is not a win.
-- DOPE fit seeds beyond published fit seed 11. The features12_steps2048 trainer has no seed argument yet. Lane C owns `rust/`.
+- DOPE fit seeds beyond published fit seed 11. f6665d9 exposes `compile --fit-seed`. Qualification unit `dope-rf-seeds-qualify` is running on xbabe1. Fit units are not started. No number.
 - The sealed official-test run. It has not started. A start marker now refuses any later invocation, so an interrupted attempt stays incomplete.
 
 PR-11, the XOR/parity/product stress suite, was not started.
