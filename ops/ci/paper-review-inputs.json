@@ -20,6 +20,10 @@
       "bytes": 306014,
       "sha256": "f0ecf5929825f1f07d877d4e01714f1ebd55868db3b863482f46be0f27ffdf47"
     },
+    "research/benchmark/results/review-fixes-tabsyn-v1/panel.json": {
+      "bytes": 12676,
+      "sha256": "8e87a4b304588f6b3c2e6cf34c2a2ee9f4b4f0ea3d282f836f14cbc23a7dbfa3"
+    },
     "research/benchmark/results/s3-lineage-record.json": {
       "bytes": 1834757,
       "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
@@ -33,8 +37,8 @@
       "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
     },
     "research/benchmark/review_fixes/paper-build.json": {
-      "bytes": 1566,
-      "sha256": "6f58e460387ebf6b44b9f77cf61a4521deffac2a78b53d1a6d734b95bf42915d"
+      "bytes": 1903,
+      "sha256": "d18cb21b86a0250842501e8627fc1bdf7ed421f57c8b920f4487cb552bccfd1f"
     },
     "research/benchmark/review_fixes/predeclare.json": {
       "bytes": 12002,
