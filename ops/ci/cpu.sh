@@ -48,6 +48,7 @@ target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_publication_rows.py'
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_compute_panel.py'
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_review_inputs.py'
+target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_packaging.py'
 bash ops/ci/check-review-fixes.sh target/ci-python/bin/python
 python3 docs/whitepaper/scripts/publication_rows.py
 git diff --exit-code -- docs/whitepaper/generated/retained-evidence.json docs/whitepaper/generated/retained-*.tex docs/whitepaper/generated/retained-figure-hashes.json docs/whitepaper/generated/baseline-coverage.json docs/whitepaper/generated/baseline-coverage.tex docs/whitepaper/figures/retained-matched-eight.pdf docs/whitepaper/generated/published-baseline-kpis.json docs/whitepaper/generated/published-baseline-kpis.csv docs/whitepaper/generated/published-baseline-figure-hashes.json docs/whitepaper/figures/published-baseline-cohorts.pdf
