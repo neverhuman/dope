@@ -1,6 +1,10 @@
 {
   "captured_from_commit": "b77480779781c22f81e63a6018feada5dee88849",
   "files": {
+    "compute-cost-receipts.json": {
+      "bytes": 73961,
+      "sha256": "16cd9f392d96d3cfabefe09777d32efd35aadf443b0f324805595e461d30ece9"
+    },
     "licenses.json": {
       "bytes": 3847,
       "sha256": "fb857edbb49b3ac852b836cb5710c95531dc0ea619517a7f22498f991f0484c4"
