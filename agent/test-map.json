@@ -1245,6 +1245,14 @@
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_review_inputs.py'",
       "purpose": "authenticate the independent review graph and public panel input lock before decoding or rendering; reject drift, symlinks and missing pins without reading dataset rows"
     },
+    "research/benchmark/review_fixes/": {
+      "command": "bash ops/ci/check-review-fixes.sh",
+      "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
+    },
+    "ops/ci/check-review-fixes.sh": {
+      "command": "bash ops/ci/check-review-fixes.sh",
+      "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
+    },
     "research/benchmark/bounded_auditors.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics research.benchmark.tests.test_real_test_utility -v",
       "purpose": "verify explicit four-thread feature-importance and prediction calls for future auditors while preserving historical measured harness identities and numerical equations"
