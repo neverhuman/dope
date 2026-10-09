@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run the declared Lane B paper-reduction graph; never discover experiments."""
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -8,6 +9,49 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
+LOCK = REPO / 'ops/ci/paper-review-inputs.json'
+LOCK_SHA256 = '92ab68cce9634802d040bf70c44fd5529c816ff5027be53e14086e22764ebdfd'
+
+
+def authenticated(path, digest, size=None):
+    if path.is_symlink():
+        raise ValueError('symlinked review paper input')
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != digest or (size is not None and len(raw) != size):
+        raise ValueError('review paper input digest or length mismatch')
+    return raw
+
+
+def authenticated_graph():
+    lock = json.loads(authenticated(LOCK, LOCK_SHA256))
+    if lock.get('format') != 'dope-paper-review-inputs-v1':
+        raise ValueError('invalid review paper input lock')
+    files = lock['files']
+    graph_name = GRAPH.relative_to(REPO).as_posix()
+    if graph_name not in files:
+        raise ValueError('review graph has no input pin')
+    raw_graph = None
+    for name, pin in files.items():
+        relative = Path(name)
+        if (relative.is_absolute() or '..' in relative.parts or relative.as_posix() != name
+                or relative.suffix != '.json'
+                or not name.startswith(('research/benchmark/results/', 'research/benchmark/review_fixes/'))):
+            raise ValueError('invalid review paper input path')
+        path = REPO / relative
+        if path.resolve() != REPO.resolve() / relative:
+            raise ValueError('redirected review paper input')
+        if type(pin['bytes']) is not int or pin['bytes'] <= 0:
+            raise ValueError('invalid review paper input length')
+        raw = authenticated(path, pin['sha256'], pin['bytes'])
+        if name == graph_name:
+            raw_graph = raw
+    # Every public dependency is authenticated before decoding the build graph.
+    graph = json.loads(raw_graph)
+    for entry in graph['scripts']:
+        args = entry.get('args', [])
+        if len(args) != 2 or args[0] != '--from-panel' or args[1] not in files:
+            raise ValueError('review renderer requires one independently pinned public panel')
+    return graph
 
 
 def main():
@@ -19,7 +63,7 @@ def main():
             raise ValueError('review outputs require a declared paper-build graph')
         print('review paper graph has no committed outputs yet')
         return
-    graph = json.loads(GRAPH.read_text())
+    graph = authenticated_graph()
     if graph.get('format') != 'dope-review-paper-build-v1':
         raise ValueError('invalid review paper graph')
     declared = set()

@@ -1237,6 +1237,14 @@
       "command": "just paper-check",
       "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
     },
+    "ops/ci/paper-review-inputs.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_review_inputs.py'",
+      "purpose": "authenticate the independent review graph and public panel input lock before decoding or rendering; reject drift, symlinks and missing pins without reading dataset rows"
+    },
+    "docs/whitepaper/scripts/test_paper_review_inputs.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_review_inputs.py'",
+      "purpose": "authenticate the independent review graph and public panel input lock before decoding or rendering; reject drift, symlinks and missing pins without reading dataset rows"
+    },
     "research/benchmark/bounded_auditors.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics research.benchmark.tests.test_real_test_utility -v",
       "purpose": "verify explicit four-thread feature-importance and prediction calls for future auditors while preserving historical measured harness identities and numerical equations"
