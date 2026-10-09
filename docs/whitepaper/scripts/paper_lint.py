@@ -278,7 +278,8 @@ def orphan_tabulars(source: str) -> list[str]:
     """Every tabular sits in a captioned table float, or is a captioned longtable.
 
     Run on expanded source. A tabular inside a \\begingroup that lets
-    \\tabular be \\longtable counts as a longtable.
+    \\tabular be \\longtable counts as a longtable. A tabular nested in a table
+    cell belongs to its parent, which carries the caption check.
     """
     text = strip_comments(source)
     files, groups, envs, records, closed = [], [], [], [], {}
@@ -310,7 +311,8 @@ def orphan_tabulars(source: str) -> list[str]:
             name, index = env.group(2), serial
             serial += 1
             envs.append((name, env.start(), index))
-            if name in TABULARS:
+            nested = any(item[0] in TABULARS for item in envs[:-1])
+            if name in TABULARS and not nested:
                 longtable = name == "longtable" or (name == "tabular" and (any(groups) or global_longtable))
                 outer = next((item[2] for item in reversed(envs[:-1]) if item[0] in FLOATS), None)
                 records.append((index, longtable, outer, files[-1] if files else "main source", env.end()))

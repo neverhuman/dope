@@ -17,7 +17,7 @@ import figure_spec
 SCRIPTS = Path(__file__).resolve().parent
 PAPER = SCRIPTS.parent
 REPO = PAPER.parents[1]
-DRAWING = ("render_figures.py", "teaser_figure.py", "mfs_v3_table.py")
+DRAWING = ("render_figures.py", "v2_figures.py", "mfs_v3_table.py")
 
 
 def _limit_calls(tree):

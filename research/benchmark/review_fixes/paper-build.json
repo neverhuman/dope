@@ -51,6 +51,7 @@
       "check_args": ["--check"],
       "outputs": [
         "docs/whitepaper/generated/v2-contrasts.tex",
+        "docs/whitepaper/generated/v2-fidelity-levels.tex",
         "docs/whitepaper/generated/v2-fidelity-table.tex",
         "docs/whitepaper/generated/v2-headline-table.tex",
         "docs/whitepaper/generated/v2-headline.json",

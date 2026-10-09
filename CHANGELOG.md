@@ -11,7 +11,10 @@
   privacy panel in the main paper; a utility-per-byte figure; a rewritten
   manuscript and supplement; a README benchmark generated from the same
   ledgers; and guards against orphan tables, figure-text drift, and
-  denominator mismatches.
+  denominator mismatches. On the validation panel the five-seed CatBoost
+  retention at 4n is 0.898, against 0.949 for the earlier fit-seed-11
+  population: both binaries write identical artifacts, and seed 11, the seed at
+  which the profile was chosen, ranks first of five on 47 of 99 lineages.
 
 - Add tiered compact kernels, measured release gates, and versioned MFS-v2
   evidence on the single PR branch. No production release is declared.

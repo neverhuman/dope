@@ -90,6 +90,10 @@ class OrphanTabularTests(unittest.TestCase):
         self.assertIn("outside a captioned table float", orphans("\\input{generated/t.tex}")[0])
         self.assertEqual(len(orphans("\\begin{figure}\\caption{F.}\\input{generated/t.tex}\\end{figure}")), 1)
         self.assertEqual(orphans("\\begin{longtable}{ll}\\caption{L.}\\\\ A & B\\end{longtable}"), [])
+        # A value-over-interval cell nests a tabular; its parent carries the caption check.
+        cell = "\\begin{tabular}[t]{@{}c@{}}$1$\\\\[0,2]\\end{tabular}"
+        self.assertEqual(orphans("\\begin{longtable}{ll}\\caption{L.}\\\\ A & " + cell + "\\end{longtable}"), [])
+        self.assertEqual(len(orphans("\\begin{tabular}{ll}A & " + cell + "\\end{tabular}")), 1)
 
 
 class PdfTextTests(unittest.TestCase):

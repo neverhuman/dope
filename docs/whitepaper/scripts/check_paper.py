@@ -364,6 +364,7 @@ _LATEX = {
     "Maketitle",
     "Midrule",
     "Paragraph",
+    "Phi",
     "Ref",
     "Section",
     "Sigma",

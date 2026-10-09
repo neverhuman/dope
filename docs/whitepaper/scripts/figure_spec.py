@@ -29,10 +29,11 @@ Y_LIM = (-1.5, 1.6)
 # paired-cdf.pdf top row and mfs-v3-paired.pdf: sorted paired retention
 # differences. Differences outside this window are counted in the panel title.
 PAIRED_X_LIM = (-1.5, 1.5)
-# teaser.pdf: paired retention differences, counted outside the same frame.
-TEASER_X_LIM = (-1.5, 1.5)
-# teaser.pdf rows: the three comparators sit at 0, 1, and 2.
-TEASER_ROWS_Y_LIM = (-0.55, 2.55)
+# teaser.pdf: Hodges-Lehmann paired differences per auditor. A difference outside
+# the window is drawn at the nearer edge as an arrow with its value printed.
+TEASER_X_LIM = (-0.3, 0.5)
+# teaser.pdf rows sit at 0..k-1; this margin pads the first and last row.
+TEASER_ROW_PAD = 0.6
 # paired-cdf.pdf bottom strip: the Friedman average rank of each method.
 RANK_X_LIM = (0.8, 4.3)
 RANK_Y_LIM = (-0.9, 0.7)
@@ -58,7 +59,9 @@ class FigureSpec:
 
 FIGURES = {
     "teaser.pdf": FigureSpec(
-        "teaser_figure.py", "paired retention difference", "x", TEASER_X_LIM, True, macro="Teaser"),
+        "v2_figures.py", "paired retention difference", "x", TEASER_X_LIM, True, macro="Teaser"),
+    "pareto.pdf": FigureSpec(
+        "v2_figures.py", "CatBoost retention level against median charged bytes", "x", scale="log"),
     "retention-bytes.pdf": FigureSpec(
         "render_figures.py", "retention level", "y", Y_LIM, True, macro="Scatter"),
     "paired-cdf.pdf": FigureSpec(

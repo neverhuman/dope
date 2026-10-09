@@ -3,15 +3,18 @@
 import argparse
 import hashlib
 import json
+import multiprocessing
 import subprocess
 import sys
+import types
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Callable, NamedTuple
 
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = 'feee440df084c798af7b7bb69e9e638d8145b77f5f2433ca6f3a2c3e279157cb'
+LOCK_SHA256 = 'debdd5bb000eabece60c225f645ca0737a3ed717579f7ff34c8142dc9b6379ba'
 
 
 class Replay(NamedTuple):
@@ -140,6 +143,7 @@ def authenticated_graph():
         inputs[name] = authenticated(path, pin['sha256'], pin['bytes'])
     # Every public dependency is authenticated before decoding the build graph.
     graph = json.loads(inputs[graph_name])
+    pending = []
     for entry in graph['scripts']:
         args = entry.get('args', [])
         if len(args) != 2 or args[0] != '--from-panel' or args[1] not in files:
@@ -148,8 +152,27 @@ def authenticated_graph():
         if spec is not None:
             if args[1] != spec.panel or any(name not in inputs for name in (spec.ledger, *spec.extras)):
                 raise ValueError(f'{spec.label} renderer requires the pinned scalar ledger and panel')
-            authenticated_replay(spec, inputs)
+            pending.append(spec)
+    run_replays(pending, inputs)
     return graph
+
+
+def run_replays(specs, inputs):
+    """Replays are independent, so they run in parallel processes; any failure still raises here.
+
+    A registry whose reducers are not plain functions (a test double) replays in order.
+    """
+    if len(specs) < 2 or not all(isinstance(spec.reduce, types.FunctionType) for spec in specs):
+        for spec in specs:
+            authenticated_replay(spec, inputs)
+        return
+    context = multiprocessing.get_context('fork')
+    with ProcessPoolExecutor(max_workers=len(specs), mp_context=context) as pool:
+        futures = [pool.submit(authenticated_replay, spec,
+                               {name: inputs[name] for name in (spec.panel, spec.ledger, *spec.extras)})
+                   for spec in specs]
+        for future in futures:
+            future.result()
 
 
 def closed_records(raw, label):

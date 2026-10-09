@@ -10,6 +10,28 @@ Version `0.3.0-alpha.1`, [MIT License](LICENSE). This source tree is a research 
 ## Results at a glance
 
 <!-- BEGIN BENCHMARK -->
+Validation panel: 100 PMLB regression tables, CatBoost auditor, synthetic size 4n. DOPE uses five fit seeds; intervals are 95% nested bootstrap intervals (simulated-family clusters, then lineages, then fit seeds). The difference column is DOPE minus the method on shared lineages (Hodges–Lehmann).
+
+| Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Within 10,240 B |
+| --- | ---: | --- | --- | ---: | ---: | ---: |
+| **DOPE (ours)** | 99 | 0.898 [0.804, 0.972] | — | — | 1.9 KB | 98% |
+| TabSyn (scaled schedule) | 98 | 0.897 [0.816, 0.979] | −0.008 [−0.057, 0.042] | 47/0/51 | 42.3 MB | 0% |
+| ARF (author default) | 99 | 0.822 [0.689, 0.894] | +0.048 [−0.034, 0.149] | 60/0/39 | 1.4 MB | 0% |
+| ARF (native selected) | 99 | 0.804 [0.647, 0.885] | +0.083 [0.006, 0.191] | 66/0/33 | 1.6 MB | 0% |
+| Gaussian copula | 99 | 0.669 [0.369, 0.867] | +0.191 [0.089, 0.273] | 83/0/16 | 5.5 KB | 62% |
+| Chow-Liu tree | 99 | 0.576 [0.294, 0.638] | +0.356 [0.242, 0.728] | 91/0/8 | 29.9 KB | 31% |
+| Independent marginals | 99 | −0.012 [−0.040, −0.002] | +0.881 [0.790, 0.964] | 99/0/0 | 2.5 KB | 94% |
+| TVAE (native selected) | 21 | 0.674 [0.452, 0.776] | +0.201 [0.097, 0.339] | 19/0/2 | 308.6 KB | 0% |
+| CTGAN (native selected) | 21 | −0.080 [−0.282, 0.223] | +0.912 [0.731, 1.298] | 21/0/0 | 731.0 KB | 0% |
+| Forest-Flow (historical) | 6 | 1.011 [0.905, 1.041] | −0.231 [−0.382, −0.005] | 0/0/6 | 325.8 MB | 0% |
+| Real rows resampled (control) | 99 | 1.018 [1.005, 1.028] | −0.179 [−0.276, −0.074] | 10/0/89 | none | — |
+| Predictor-only control (control) | 99 | 0.631 [0.375, 0.784] | +0.197 [0.112, 0.267] | 92/0/7 | none | — |
+
+![CatBoost retention at synthetic size 4n against median charged artifact bytes on a log axis. DOPE's median artifact is 1.9 KB; the other generators' medians run from 2.5 KB to 325.8 MB.](docs/readme/pareto.png)
+
+![DOPE minus each comparator, Hodges–Lehmann retention difference with 95% nested intervals, under the CatBoost, linear, and MLP auditors.](docs/readme/paired.png)
+
+The strongest full-panel comparator is TabSyn (scaled schedule). These are validation estimates on a training-derived cut; the official test split is reserved for one pre-registered run. Resampled real rows are an upper reference, not a generator. The release score (MFS-v3) is null for every method until its privacy and representation gates are measured. DOPE's median artifact is 1.9 KB.
 <!-- END BENCHMARK -->
 
 ## What the artifact stores
@@ -32,7 +54,7 @@ cd dope
 cargo build --locked --release -p dope-kernel
 ```
 
-That command writes `target/release/dope-kernel`. The core is Rust; Python is used only for the bounded V1 baseline under `src/dope_kernel` and the offline research harness under `research/`.
+That command writes `target/release/dope-kernel`. The generator is Rust. Python is used for the bounded V1 baseline under `src/dope_kernel`, the offline research harness under `research/`, and the scripts that rebuild the paper under `docs/whitepaper/scripts`.
 
 ## Quick start
 

@@ -92,8 +92,8 @@ class ReplayRegistryTests(unittest.TestCase):
             extras = tuple((self.root / name).read_bytes() for name in spec.extras)
             reduce.assert_called_once_with([toy_cell()], extras)
 
-    def test_registry_names_the_three_review_renderers(self):
-        self.assertEqual({spec.label for spec in GATE.REPLAYS.values()}, {'control', 'privacy', 'TabSyn'})
+    def test_registry_names_the_four_review_renderers(self):
+        self.assertEqual({spec.label for spec in GATE.REPLAYS.values()}, {'control', 'privacy', 'TabSyn', 'v2'})
         self.assertIn('research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.jsonl',
                       GATE.registered_ledgers())
 

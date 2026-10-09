@@ -77,7 +77,7 @@ A recipient keeps the generator and a hash manifest: a salt identifier, the norm
 The release score uses the contract's weighted geometric mean with a component floor, clipped to $[0,100]$; the components lie in $[0,1]$ and a failed gate yields a null scalar. The matched null is the median linear-MSE candidate among three deterministic independent-marginal tables. This is a median selector; a learnability band is outside this implementation. The near-copy floor is the declared quantile of nearest-other squared distances among distinct real fit rows on the shared map, with linear interpolation, and undefined floors fail the gate. The scorer tests in \path{research/benchmark/tests/test_mfs_v3.py} verify exactly $100$ for a perfect profile, the byte boundary, and each prerequisite; the panel tests verify median null selection and the quantile floor. \cref{tab:conformance} lists the implemented fields, and \cref{tab:illustration} applies the bounded formula to invented components.
 
 \begin{table}[t]
-\caption{\textbf{MFS-v3 contract fields as implemented.} Each row is read from \texttt{production/kpi-contract-v3.json} by the scorer. No Holm family.}
+\caption{\textbf{MFS-v3 contract fields as implemented.} Each row is read from \texttt{production/\allowbreak{}kpi-contract-v3.json} by the scorer. No Holm family.}
 \label{tab:conformance}
 \centering
 \small
@@ -192,10 +192,10 @@ The frozen Forest-Flow budget keeps the \BaselineForestFitLimit-second fit cap a
 \subsection{Public data and artifact availability}
 \label{app:public-kit}
 A credential-free path to the source data is
-\begin{quote}\small
-\texttt{python3~-m~research.benchmark.fetch\_pmlb~-{}-list}\\
-\texttt{python3~-m~research.benchmark.fetch\_pmlb~DATASET\_ID~OUTPUT\_DIRECTORY}
-\end{quote}
+\par\smallskip\noindent{\footnotesize
+\hspace*{1.5em}\verb|python3 -m research.benchmark.fetch_pmlb --list|\\
+\hspace*{1.5em}\verb|python3 -m research.benchmark.fetch_pmlb DATASET_ID OUTPUT_DIRECTORY|\par}\smallskip
+\noindent
 It authenticates PMLB data against an upstream Git LFS SHA pin at a fixed public revision. The public manifest lists every prepared lineage's PMLB identifier and the historical train, validation, and test split hashes from the committed data lock. The historical staging used a hybrid coreset and target-stratified selection whose exact row indices were never captured, so the public fetch reproduces the source datasets and the split identities but cannot rebuild the exact historical partitions; publishing the fit and validation partitions themselves (PMLB is MIT-licensed) closes that gap and is scheduled with the artifact release. The originally scored model files and synthetic rows have no published bundle yet; the committed validation ledgers, the original metadata, and the compressed numeric logs, authenticated by the input pins and rebuilt by \texttt{just paper}, reproduce every reduction and figure.
 
 \subsection{Reproducibility and hashes}
@@ -360,11 +360,12 @@ The real-row control draws the published training rows with replacement until th
 \label{app:privacy}
 \cref{tab:fidelity-hist} is the grouped-validation fidelity ledger of the fit-seed-$11$ population. On the density cells, DOPE has median logistic two-sample AUC $\CtwoDope$ ($\CtwoLo$ to $\CtwoHi$, $n=\CtwoN$), mean marginal Kolmogorov--Smirnov distance $\KsDope$ ($\KsLo$ to $\KsHi$, $n=\KsN$), and pairwise correlation fidelity $\CorrDope$ ($\CorrLo$ to $\CorrHi$, $n=\CorrN$); each count is the lineages with a complete three-seed fidelity group. A logistic detector near one half can still miss nonlinear differences, which is why the main paper reports a CatBoost detector. The DCR column of that ledger is the fraction of synthetic queries whose nearest reference is in the fit view, with ties scored one half; \DcrExchange\ The DOMIAS column is the isolated kernel density-ratio equation from the pinned author expression, evaluated on this numeric projection, which differs from the original DOMIAS training pipeline.
 
-\cref{tab:review-privacy} is the review privacy panel behind Table~3 of the main paper: for every method on the fit-seed-$11$ samples, a CatBoost two-sample detector with at most $200$ rows per class, the median distance to the closest fit row and to the closest validation row, the nearest-neighbour distance ratio against the fit rows, and a distance-based membership AUC. The fit reference holds about four times as many rows as the validation reference, so the distance to the fit rows is smaller by construction. None of these numbers is a differential-privacy guarantee or a HIPAA de-identification claim. Shadow-model attacks, attribute inference, and an attack on the shipped artifact are defined in predeclare\_v2 and are scheduled. \cref{tab:review-fidelity} adds the stored fidelity of every method from its population ledger.
+\cref{tab:review-privacy} is the review privacy panel behind Table~3 of the main paper: for every method on the fit-seed-$11$ samples, a CatBoost two-sample detector with at most $200$ rows per class, the median distance to the closest fit row and to the closest validation row, the nearest-neighbour distance ratio against the fit rows, and a distance-based membership AUC. The fit reference holds about four times as many rows as the validation reference, so the distance to the fit rows is smaller by construction. None of these numbers is a differential-privacy guarantee or a HIPAA de-identification claim. Shadow-model attacks, attribute inference, and an attack on the shipped artifact are defined in predeclare\_v2 and are scheduled. \cref{tab:v2-fidelity} compares every arm's marginal, pairwise, and logistic-detector fidelity on the five-seed cells, and \cref{tab:review-fidelity} adds the stored fidelity of the fit-seed-$11$ population ledgers.
 
 \begingroup
 \scriptsize
 \setlength{\tabcolsep}{2pt}
+\input{generated/v2-fidelity-levels.tex}
 \input{generated/review-privacy.tex}
 \input{generated/review-fidelity-stored.tex}
 \endgroup

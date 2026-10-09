@@ -24,6 +24,7 @@ import matplotlib
 matplotlib.use("Agg")
 
 import figure_style
+from figure_spec import TEASER_ROW_PAD, TEASER_X_LIM
 
 figure_style.apply(matplotlib, size=7.6)
 import matplotlib.pyplot as plt  # noqa: E402
@@ -40,7 +41,7 @@ CONTROL = "#A8A8A8"
 BAND = "#EDEDED"
 CAP = 10240
 FULL_PANEL = 90
-CLIP_WINDOW = (-0.3, 0.5)
+FOREST_TICKS = (-0.2, 0.0, 0.2, 0.4)
 AUDITORS = (("catboost", "CatBoost"), ("linear", "Linear"), ("mlp", "MLP"))
 # The figures draw these arms only; every other arm stays in the supplement tables.
 FIGURE_CODES = ("TabSyn", "Arf", "Gauss", "Chow", "Ind", "Tvae", "Ctgan", "Forest", "TabDdpm", "TabDiff",
@@ -72,7 +73,7 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     figure, axes = plt.subplots(1, 3, figsize=(width, height), sharey=True)
     # A fixed window keeps the close comparisons readable; a row outside it is drawn at the edge
     # with an arrow and its value printed, so nothing is dropped.
-    left, right = CLIP_WINDOW
+    left, right = TEASER_X_LIM
     for axis, (auditor, title) in zip(axes, AUDITORS):
         figure_style.panel(axis, grid="x")
         axis.axvspan(-margin, margin, color=BAND, zorder=0, linewidth=0)
@@ -83,7 +84,9 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
                 continue
             y = len(rows) - 1 - index
             colour = CONTROL if arm["role"] == "control" else CONTEXT
-            hollow = row["n"] < FULL_PANEL
+            # Hollow marks a small cohort; an auditor's own count drops uninformative lineages.
+            cohort = arm["contrasts"]["catboost"]["n"]
+            hollow = cohort < FULL_PANEL
             lo, hi = max(left, row["hl_lo"]), min(right, row["hl_hi"])
             if hi > lo:
                 axis.plot([lo, hi], [y, y], color=colour, linewidth=1.4, solid_capstyle="round", zorder=2)
@@ -99,14 +102,15 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
                               textcoords="offset points", ha="right" if point > right else "left",
                               fontsize=6.0, color=figure_style.INK)
             if auditor == "mlp":
-                axis.annotate(f"n={row['n']}", xy=(1.0, y), xycoords=("axes fraction", "data"),
+                axis.annotate(f"n={cohort}", xy=(1.0, y), xycoords=("axes fraction", "data"),
                               xytext=(3, 0), textcoords="offset points", va="center", fontsize=6.4,
                               color=figure_style.INK)
         axis.set_xlim(left, right)
+        axis.set_xticks(FOREST_TICKS)
         axis.set_title(title)
     axes[0].set_yticks(range(len(rows)))
     axes[0].set_yticklabels([arm["display"] for arm in reversed(rows)])
-    axes[0].set_ylim(-0.6, len(rows) - 0.4)
+    axes[0].set_ylim(-TEASER_ROW_PAD, len(rows) - 1 + TEASER_ROW_PAD)
     figure.supxlabel("DOPE minus comparator, Hodges-Lehmann retention difference (95% nested interval)",
                      fontsize=figure_style_size(), y=0.01)
     figure.subplots_adjust(left=0.27, right=0.93, bottom=0.2, top=0.9, wspace=0.08)
@@ -125,8 +129,8 @@ LABEL_OFFSETS = ((4, 3, "left", "bottom"), (4, -3, "left", "top"), (-4, 3, "righ
 CONTROL_POSITIONS = (0.02, 0.98, 0.5, 0.26, 0.74)
 
 
-def _place(axis, text: str, anchors, placed: list, **style):
-    """Annotate at the first anchor and offset whose box stays in the axes and clears placed boxes."""
+def _place(axis, text: str, anchors, placed: list, avoid=(), **style):
+    """Annotate at the first anchor and offset whose box stays in the axes and clears placed labels and marks."""
     renderer = axis.figure.canvas.get_renderer()
     frame = axis.get_window_extent(renderer)
     first = None
@@ -136,7 +140,7 @@ def _place(axis, text: str, anchors, placed: list, **style):
                                   ha=ha, va=va, **style)
             box = label.get_window_extent(renderer).expanded(1.04, 1.1)
             inside = (box.x0 >= frame.x0 and box.x1 <= frame.x1 and box.y0 >= frame.y0 and box.y1 <= frame.y1)
-            if inside and not any(box.overlaps(other) for other in placed):
+            if inside and not any(box.overlaps(other) for other in (*placed, *avoid)):
                 placed.append(box)
                 if first is not None:
                     first.remove()
@@ -170,18 +174,22 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
         axis.set_ylim(min(ys) - pad, max(ys) + 2.2 * pad)
     for arm in controls:
         axis.axhline(arm["level"]["median"], color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.9, zorder=1)
+    marks: dict[str, list] = {}
     for arm in plotted:
         level, size = arm["level"], arm["bytes"]["median"]
         is_dope = arm["code"] == "Dope"
         colour = ACCENT if is_dope else CONTEXT
         hollow = (level["n"] or 0) < FULL_PANEL
-        axis.plot([arm["bytes"]["q1"], arm["bytes"]["q3"]], [level["median"]] * 2, color=colour,
-                  linewidth=1.1, alpha=0.8, zorder=2)
+        drawn_marks = axis.plot([arm["bytes"]["q1"], arm["bytes"]["q3"]], [level["median"]] * 2, color=colour,
+                                linewidth=1.1, alpha=0.8, zorder=2)
         if level["lo"] is not None:
-            axis.plot([size, size], [level["lo"], level["hi"]], color=colour, linewidth=1.1, zorder=2)
-        axis.plot([size], [level["median"]], marker="o", markersize=6.5 if is_dope else 4.8, zorder=3,
-                  markerfacecolor="white" if hollow else colour,
-                  markeredgecolor=ACCENT_EDGE if is_dope else colour, markeredgewidth=1.0)
+            drawn_marks += axis.plot([size, size], [level["lo"], level["hi"]], color=colour, linewidth=1.1, zorder=2)
+        drawn_marks += axis.plot([size], [level["median"]], marker="o", markersize=6.5 if is_dope else 4.8, zorder=3,
+                                 markerfacecolor="white" if hollow else colour,
+                                 markeredgecolor=ACCENT_EDGE if is_dope else colour, markeredgewidth=1.0)
+        marks[arm["code"]] = drawn_marks
+    renderer = figure.canvas.get_renderer()
+    boxes = {code: [line.get_window_extent(renderer) for line in lines] for code, lines in marks.items()}
     # Labels go on after every mark and limit is fixed, DOPE first, then by retention.
     placed: list = []
     _place(axis, "10,240-byte cap", [((CAP, 1.0), ("data", "axes fraction"), ((3, -3, "left", "top"),))],
@@ -189,8 +197,9 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     order = sorted(plotted, key=lambda arm: (arm["code"] != "Dope", -(arm["level"]["median"] or 0.0)))
     for arm in order:
         is_dope = arm["code"] == "Dope"
+        others = [box for code, owned in boxes.items() if code != arm["code"] for box in owned]
         _place(axis, arm["display"], [((arm["bytes"]["median"], arm["level"]["median"]), "data", LABEL_OFFSETS)],
-               placed, fontsize=6.6 if is_dope else 6.2, color=figure_style.INK,
+               placed, avoid=others, fontsize=6.6 if is_dope else 6.2, color=figure_style.INK,
                fontweight="bold" if is_dope else "normal")
     for arm in controls:
         anchors = [((fraction, arm["level"]["median"]), ("axes fraction", "data"),

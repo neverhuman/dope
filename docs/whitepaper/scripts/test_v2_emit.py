@@ -91,7 +91,7 @@ class EmitterTests(unittest.TestCase):
         table = E.headline_table(panel(), BYTES)
         body = [line for line in table.splitlines() if line.endswith("\\\\") and "&" in line][1:]
         self.assertTrue(body[0].startswith("TabSyn (scaled schedule)"))
-        self.assertIn("\\shortstack", E.size_table(panel()))
+        self.assertIn("\\begin{tabular}[t]", E.size_table(panel()))
 
 
 if __name__ == "__main__":

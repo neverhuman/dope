@@ -273,12 +273,11 @@ def headline_table(panel, byte_stats) -> str:
             continue
         arm = M.BY_CODE[code]
         stats = byte_stats.get(f"{arm.method}|{arm.configuration}")
-        diffs = " & ".join("---" if row is None else f"${num(row['hl'])}$ \\scriptsize$[{num(row['hl_lo'])},{num(row['hl_hi'])}]$"
-                           for row in cells)
+        diffs = " & ".join("---" if row is None else _centered(row["hl"], row["hl_lo"], row["hl_hi"]) for row in cells)
         lead_row = cells[0]
         rows.append(f"{arm.display} & {lead_row['n']} & {diffs} & {lead_row['wins']}/{lead_row['ties']}/{lead_row['losses']}"
                     f" & ${pval(lead_row.get('holm_p'))}$ & {'---' if stats is None else '$' + human_bytes(stats['median']) + '$'} \\\\")
-    head = ("\\begin{tabular}{@{}lrlllrrr@{}}\n\\toprule\n"
+    head = ("\\begin{tabular}{@{}lrcccrrr@{}}\n\\toprule\n"
             "Comparator & $n$ & CatBoost & Linear & MLP & W/T/L & Holm $p$ & Bytes \\\\\n\\midrule\n")
     return head + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n"
 
@@ -294,7 +293,7 @@ def size_table(panel) -> str:
             for size in (1, 4):
                 row = levels.get((code, auditor, size))
                 cells.append("---" if row is None else
-                             f"\\shortstack{{${num(row['median'])}$\\\\\\tiny$[{num(row.get('lo'), 2)},{num(row.get('hi'), 2)}]$}}")
+                             _cell(row["median"], f"[{num(row.get('lo'), 2)},{num(row.get('hi'), 2)}]", "c"))
         rows.append(f"{M.BY_CODE[code].display} & {levels[(code, 'catboost', 4)]['n']} & " + " & ".join(cells) + " \\\\")
     head = ("\\begin{tabular}{@{}lrcccccc@{}}\n\\toprule\n"
             " & & \\multicolumn{2}{c}{CatBoost} & \\multicolumn{2}{c}{Linear} & \\multicolumn{2}{c}{MLP} \\\\\n"
@@ -330,6 +329,21 @@ def _longtable(columns: str, head: str, rows: list[str], caption: str, label: st
             + "\n".join(rows) + "\n\\bottomrule\n\\end{longtable}\n")
 
 
+def _cell(value, bracket: str, align: str) -> str:
+    """Value over its interval in a top-aligned inner tabular, so the value sits on the row's baseline."""
+    return f"\\begin{{tabular}}[t]{{@{{}}{align}@{{}}}}${num(value)}$\\\\\\tiny${bracket}$\\end{{tabular}}"
+
+
+def _centered(value, lo, hi) -> str:
+    """A centered value over its interval, as the size table prints levels."""
+    return _cell(value, interval(lo, hi), "c")
+
+
+def _stacked(value, lo, hi) -> str:
+    """A value over its interval, so a wide table keeps its column count inside the text width."""
+    return _cell(value, interval(lo, hi), "l")
+
+
 def contrasts_table(panel) -> str:
     rows = []
     order = {code: index for index, code in enumerate(HEADLINE_ORDER)}
@@ -340,8 +354,8 @@ def contrasts_table(panel) -> str:
         holm = "---" if row.get("holm_p") is None else f"${pval(row['holm_p'])}$ ({row['holm_family_n']})"
         rows.append(" & ".join([
             "$n$" if row["size"] == 1 else "$4n$", M.AUDITOR_DISPLAY[row["auditor"]], arm.display, str(row["n"]),
-            f"${num(row['median'])}$ \\scriptsize${interval(row['median_lo'], row['median_hi'])}$",
-            f"${num(row['hl'])}$ \\scriptsize${interval(row['hl_lo'], row['hl_hi'])}$",
+            _stacked(row["median"], row["median_lo"], row["median_hi"]),
+            _stacked(row["hl"], row["hl_lo"], row["hl_hi"]),
             f"{row['wins']}/{row['ties']}/{row['losses']}", holm,
             "---" if equivalence.get("equivalent") is None else ("yes" if equivalence["equivalent"] else "no"),
             "---" if yuen is None else ("yes" if yuen else "no")]) + " \\\\")
@@ -350,7 +364,8 @@ def contrasts_table(panel) -> str:
                "is in parentheses; families are declared per size in predeclare\\_v2. HL eq.\\ is the pre-declared "
                "equivalence rule (90\\% interval of the Hodges--Lehmann difference inside $\\pm 0.02$); Yuen eq.\\ is the "
                "trimmed-mean sensitivity.")
-    return _longtable("@{}llp{1.25in}rllrlll@{}", head, rows, caption, "tab:v2-contrasts")
+    return _longtable("@{}ll>{\\raggedright\\arraybackslash}p{1.1in}rllrlll@{}", head, rows, caption,
+                      "tab:v2-contrasts")
 
 
 def levels_table(panel) -> str:
@@ -367,6 +382,28 @@ def levels_table(panel) -> str:
     return _longtable("@{}p{1.6in}llrrrl@{}", head, rows, caption, "tab:v2-levels")
 
 
+def fidelity_levels_table(panel) -> str:
+    """Marginal, pairwise, and logistic-detector fidelity of every arm at 4n from the five-seed cells."""
+    metrics = ("marginal_ks_mean", "pair_correlation_fidelity", "c2st_auc_logistic")
+    index = {(_code(row), row["metric"]): row for row in panel.get("fidelity", []) if row["size"] == 4}
+    order = {code: position for position, code in enumerate(LEVEL_ORDER)}
+    codes = sorted({code for code, _ in index if code in order}, key=lambda code: order[code])
+    rows = []
+    for code in codes:
+        cells = [index.get((code, metric)) for metric in metrics]
+        count = next((row["n"] for row in cells if row is not None), "---")
+        rows.append(" & ".join([M.BY_CODE[code].display, str(count)] + [
+            "---" if row is None else f"${num(row['median'])}$ ${interval(row.get('lo'), row.get('hi'))}$"
+            for row in cells]) + " \\\\")
+    head = "Arm & $n$ & KS distance & Pair correlation & Logistic C2ST"
+    caption = ("\\textbf{Fidelity of every arm at $4n$, five-seed cells.} Median over lineages with the 95\\% nested "
+               "bootstrap interval of the mean marginal Kolmogorov--Smirnov distance (lower is closer), the pairwise "
+               "correlation fidelity (higher is closer), and a logistic two-sample AUC (one half is indistinguishable); "
+               "$n$ counts lineages with a complete three-seed group. A five-seed arm needs three complete fits per "
+               "lineage. No Holm family.")
+    return _longtable("@{}p{1.6in}rlll@{}", head, rows, caption, "tab:v2-fidelity")
+
+
 def seeds_table(panel) -> str:
     seed = panel["seed_rank"]
     two = panel["two_by_two"]
@@ -379,7 +416,8 @@ def seeds_table(panel) -> str:
                        ("historical_seed11", "historical seed-11 population")):
         rows.append(f"2$\\times$2 cell: {label} & {two['n_common']} common ({two.get(key + '_own_n', 0)} own) & "
                     f"${num(two.get(key))}$ (own lineages ${num(two.get(key + '_own_median'))}$) \\\\")
-    return ("\\begin{tabular}{@{}p{2.6in}ll@{}}\n\\toprule\nDiagnostic & Count & Value \\\\\n\\midrule\n"
+    return ("\\begin{tabular}{@{}>{\\raggedright\\arraybackslash}p{2.1in}>{\\raggedright\\arraybackslash}p{0.95in}"
+            ">{\\raggedright\\arraybackslash}p{1.85in}@{}}\n\\toprule\nDiagnostic & Count & Value \\\\\n\\midrule\n"
             + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
 
 
@@ -412,6 +450,7 @@ def outputs(panel, fits, privacy) -> dict[str, str]:
         "v2-contrasts.tex": contrasts_table(panel),
         "v2-levels.tex": levels_table(panel),
         "v2-seeds.tex": seeds_table(panel),
+        "v2-fidelity-levels.tex": fidelity_levels_table(panel),
         "v2-headline.json": json.dumps(headline_json(panel, byte_stats), indent=1, sort_keys=True) + "\n",
     }
 
