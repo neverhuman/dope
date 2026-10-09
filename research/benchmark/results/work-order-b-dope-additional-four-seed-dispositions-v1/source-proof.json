@@ -1,0 +1,95 @@
+{
+  "authenticated_runner_source": {
+    "runner_bytes": 22009,
+    "runner_file": "research/benchmark/review_fixes/fit_seeds.py",
+    "runner_sha256": "01f445f232b6570ecf481beaf00a3f710df8615b5610ea73a83932dfe2127884"
+  },
+  "format": "work-order-b-dope-additional-four-seed-public-source-proof-v1",
+  "frozen_receipt_metadata_manifest": {
+    "bytes": 4275415,
+    "sha256": "0ff6d15d6982b50af4ddf730451633c4096a349aee0236bdabc521c08c4df6a9"
+  },
+  "manager_accounting_observations": {
+    "intervals": 2,
+    "parent_campaign_wait_not_inferred": true,
+    "reported_CPU_seconds": 35351.298,
+    "sha256": "6a2e96729848196abf23a1bbecc4328ab650a17853a83afe3a339ce039c7dbf1"
+  },
+  "no_private_inputs_or_science_reopened": true,
+  "public_files": [
+    {
+      "bytes": 484576,
+      "file": "result.json",
+      "sha256": "58bd1ca7671f843c41db051c5f07ffd58c11b1cb5245ede2626fcbd906c72530"
+    },
+    {
+      "bytes": 15294,
+      "file": "schema.json",
+      "sha256": "07ad0b6770b394906fe6767de1e1c839ea584f2dc06ce477792bce7176288074"
+    },
+    {
+      "bytes": 148,
+      "file": "seed-coverage.csv",
+      "sha256": "bf82a2428a952f2f9e105ebfd3d5d66aee04ae4d2941943a730ad9916c267fee"
+    },
+    {
+      "bytes": 594,
+      "file": "operation-cost.csv",
+      "sha256": "dc5d96f0f07366767092d6253f3d98438c6e1917d12f3e3217633c665a64fda5"
+    },
+    {
+      "bytes": 1201,
+      "file": "table.md",
+      "sha256": "553456d915af44461e69b4ae7e7fd279dc9e4713a393e52c156413838b19cd61"
+    },
+    {
+      "bytes": 4305,
+      "file": "README.md",
+      "sha256": "89c1c026b948107ff854c595f045e8a268fab431cc91427568d434d00f0fd75f"
+    },
+    {
+      "bytes": 4346,
+      "file": "source-proof.schema.json",
+      "sha256": "110ae30a82458ab28ae0dcf4f7cdd99acf25e1d0c5f798c1c221e63d810fb803"
+    }
+  ],
+  "receipt_counts": {
+    "fits": 400,
+    "sample_metrics": 2400
+  },
+  "receipt_digest_encoding": {
+    "canonical_JSON": "UTF-8 json.dumps(records, sort_keys=True, separators=(\",\", \":\"), allow_nan=False, ensure_ascii=True); no trailing newline",
+    "digest_algorithm": "sha256",
+    "fit_record_fields": [
+      "dataset_lineage_id",
+      "fit_seed",
+      "receipt_bytes",
+      "receipt_sha256"
+    ],
+    "fit_sort_fields": [
+      "dataset_lineage_id",
+      "fit_seed"
+    ],
+    "metric_record_fields": [
+      "dataset_lineage_id",
+      "fit_seed",
+      "sample_seed",
+      "size_multiplier",
+      "receipt_bytes",
+      "receipt_sha256",
+      "synthetic_sha256_declared"
+    ],
+    "metric_sort_fields": [
+      "dataset_lineage_id",
+      "fit_seed",
+      "sample_seed",
+      "size_multiplier"
+    ],
+    "per_fit_metric_subset": "Filter complete metric records by dataset_lineage_id and fit_seed; retain every metric record field; use the same metric sort order."
+  },
+  "receipt_set_hashes": {
+    "fits": "d5be30682d6f544b94ff2c5468b68c5e892cf086f9127368c35eb4bdba712550",
+    "sample_metrics": "e51eee26d1fff82cefbc4b4269d212ef147b807178219473b845836a4dc0bbd2"
+  },
+  "receipt_stats_stable_before_and_after": true
+}
