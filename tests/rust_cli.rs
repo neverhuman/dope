@@ -85,16 +85,9 @@ fn explicit_fit_seed_preserves_historical_seed_11_artifact_bytes() {
     #[cfg(feature = "gpu-research-training")]
     {
         let target = |bytes: &[u8]| {
-            let loaded = dope_kernel::codec::decode_kernel(bytes).unwrap();
-            match loaded {
-                dope_kernel::codec::LoadedKernel::V2(kernel)
-                | dope_kernel::codec::LoadedKernel::V3(kernel) => {
-                    serde_json::to_value(kernel.symbolic().unwrap().1).unwrap()
-                }
-                dope_kernel::codec::LoadedKernel::V1(_) => {
-                    panic!("expected native learned artifact")
-                }
-            }
+            // decode_kernel returns the native kernel. LoadedKernel is the file wrapper.
+            let kernel = dope_kernel::codec::decode_kernel(bytes).unwrap();
+            serde_json::to_value(kernel.symbolic().unwrap().1).unwrap()
         };
         // Prove dispersion in fitted weights, separately from the encoded seed.
         assert_ne!(target(&historical), target(&distinct));
