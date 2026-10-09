@@ -63,9 +63,9 @@
       "sha256": "0124915497c98e560ef99c1e5ecf7ad876f9174439ff9c763cf1cf906b4aebe1"
     },
     {
-      "bytes": 387885,
+      "bytes": 385881,
       "path": "docs/whitepaper/figures/loss-curves.pdf",
-      "sha256": "73883588acb82aeb1fb8b8755ca5186e23267ab7aaf19be8477425a8eee02f00"
+      "sha256": "538f4cab480a2686ef848139d8174d34fded388bb38f93a222b1c546cdcfd774"
     }
   ]
 }
