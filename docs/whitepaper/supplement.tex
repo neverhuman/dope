@@ -449,10 +449,13 @@ The review privacy panel in the main paper reports, for every method on the fit-
 \end{table}
 
 \textbf{First-batch diagnostics.} The canonical-job batch below is incomplete at population and sample-group level, so its values are individual physical evaluations without a population interval or ranking. DOPE jobs in this batch use frozen research profiles that differ from the reported profile. Pearson entries are the pinned source mean, alpha and beta use its pinned unembedded variant, and MIA is an empirical distance attack. Per-column marginals, detection folds, DCR and NNDR, costs, and job digests are in the first-batch source listed in \path{docs/whitepaper/generated/retained-evidence.json}.
-\begin{center}
+\begin{table}[t]
+\caption{\textbf{First-batch diagnostics, one row per physical job.} Individual evaluations without a population interval. No Holm family.}
+\label{tab:first12}
+\centering
 \footnotesize
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-first12.tex}\end{minipage}}
-\end{center}
+\end{table}
 
 \textbf{BeyondArena} (\texttt{\BeyondRevision}) is a separate fit check outside the $\PreparedN$ PMLB lineages. $\BeyondPrepared$ of the $\BeyondFamilies$ families in that check finished inside the cap, and $\BeyondFailed$ did not prepare ($\BeyondFeatureRange$ outside the projected range, $\BeyondOverlap$ overlapping); BeyondArena medians are \BeyondElapseA\ and \BeyondElapseB. The inventory of all $\BeyondInventory$ families is in \cref{app:beyond}. No retention auditor ran on BeyondArena.
 
@@ -466,20 +469,25 @@ The review privacy panel in the main paper reports, for every method on the fit-
 \end{table}
 
 \section{Per-lineage tables}
+The tables below list every prepared lineage of the fit-seed-$11$ population, the sufficiency budget, and the BeyondArena inventory. They are the rows behind the medians of the historical block tables, and a blank cell is an unavailable fit or an uninformative auditor rather than a zero. The five-seed v2 cells are in the committed scalar ledger \path{research/benchmark/results/review-fixes-v2/scalar-cells.jsonl}, which holds one row per fit, sample seed, size, and auditor for every arm.
+
 \subsection{Reported profile, all 100 lineages (fit seed 11)}
 \label{app:2048}
+The cap column marks charged bytes at or under $10{,}240$; it is a byte check, not a release certificate. Retention columns are CatBoost at $n$ and $4n$, linear at $4n$, and the MLP at $4n$, each the median of the three sample seeds; the identifier is the lineage's dataset hash prefix and the name is its PMLB name.
 \begingroup\scriptsize\setlength{\tabcolsep}{2pt}
 \input{generated/s3-2048-lineages.tex}
 \endgroup
 
 \subsection{Sufficiency budget (fit seed 11)}
 \label{app:8192}
+These rows are the \texttt{features12\_\allowbreak{}steps8192} budget check on the lineages where it produced a charged byte count or a retention; the remaining lineages have neither and are omitted. The columns match the reported-profile table, so the two tables can be read side by side for the step-budget axis of \cref{sec:ablation}. The longer budget is a check on the reported profile and is not the reported model.
 \begingroup\scriptsize\setlength{\tabcolsep}{2pt}
 \input{generated/s3-8192-lineages.tex}
 \endgroup
 
 \subsection{BeyondArena families in the dataset bucket}
 \label{app:beyond}
+The inventory below lists every BeyondArena family name in the dataset bucket with its task, row count, feature count, recorded license, and split type. Only the families with a cleared license entered the fit check of \cref{sec:retained}, and none of them was scored for retention. The inventory is a list of candidate tables for later panels and makes no claim about any of them.
 \begingroup\setlength{\tabcolsep}{2pt}
 \input{generated/beyondarena-inventory.tex}
 \endgroup
