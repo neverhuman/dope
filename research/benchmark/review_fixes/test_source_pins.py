@@ -116,6 +116,8 @@ class PublishedSourcePinTests(unittest.TestCase):
     def test_first_lineage_decode_is_authenticated_before_sealed_admission(self):
         # main is the captured source under complete mocks. No actual host,
         # registry, sample resolver, gate or official-test read is permitted.
+        # predeclare_v2 now refuses the v1 run first (test_predeclare_v2 covers
+        # that refusal); the bypass keeps this ordering check on the v1 source.
         (self.root / "s3-lineage-record.json").write_bytes(b"opaque replacement")
         registry = self.root / "toy-registry-never-opened"
         argv = ["sealed-toy", "--predeclare", str(self.root / "never-read"),
@@ -126,6 +128,7 @@ class PublishedSourcePinTests(unittest.TestCase):
             patch.object(sys, "argv", argv),
             patch.object(sealed.os, "uname", return_value=types.SimpleNamespace(nodename=sealed.APPROVED_HOST)),
             patch.dict(os.environ, {"DOPE_RF_UNSEAL": "1"}),
+            patch.object(sealed, "_refuse_superseded"),
             patch.object(sealed, "REGISTRY", registry),
             patch.object(sealed, "registry_mode", return_value="fresh") as mode,
             patch.object(sealed, "_preflight", side_effect=AssertionError("preflight before auth")) as preflight,
