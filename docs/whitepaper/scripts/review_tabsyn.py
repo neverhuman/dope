@@ -189,8 +189,8 @@ def render_tabsyn(payload: dict) -> str:
             lines.append(prefix + "DOPE $-$ TabSyn & " + _contrast(contrast))
     absent = ", ".join(payload["artifact_absent"]) or "none"
     caption = (
-        "TabSyn in the scaled configuration (200 VAE epochs and 1{,}000 diffusion epochs, fit seed 11) "
-        "beside DOPE features12\\_\\allowbreak steps2048, validation retention. A level is the median over lineages "
+        "\\textbf{TabSyn beside DOPE, fit seed 11.} TabSyn runs the scaled configuration (200 VAE epochs and "
+        "1{,}000 diffusion epochs) beside DOPE features12\\_\\allowbreak steps2048, validation retention. A level is the median over lineages "
         "of each lineage's median retention over sample seeds 101, 211 and 307, all three informative; "
         "$n$ counts lineages. Each matched TabSyn row is followed by DOPE on the same lineages and by "
         "the paired DOPE minus TabSyn difference. Interval: 95\\% family-cluster bootstrap percentile "
@@ -209,6 +209,7 @@ def render_tabsyn(payload: dict) -> str:
         lines,
         "lllrrrrlrr",
         note,
+        label="tab:review-tabsyn",
     )
 
 

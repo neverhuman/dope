@@ -1,4 +1,4 @@
-"""K0 replay custody checks on temporary fixtures. No benchmark data is read and no auditor runs."""
+"""K0 replay custody checks on fixture directories. No benchmark data is read and no auditor runs."""
 
 import hashlib
 import json
@@ -6,6 +6,7 @@ import math
 import os
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from research.benchmark.review_fixes import rescore_adapters as A
@@ -276,10 +277,14 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual([job["route"] for job in jobs], ["receipt", "sibling"])
         self.assertEqual(jobs[1]["csv_path"], str(sample_dir / "n1-seed211.csv"))
         self.assertEqual(jobs[1]["csv_sha256"], "c" * 64)
-        rows[1]["metric_receipt_ref"]["path"] = "/home/ubuntu/dope-scratch-x2/k0-fixture-absent/lost.json"
+        # A receipt under another host's scratch home is remote-only. The home is a fixture prefix here,
+        # because a CI runner may refuse even an lstat under /home/ubuntu.
+        other_home = str(self.root / "x2-home") + "/"
+        rows[1]["metric_receipt_ref"]["path"] = other_home + "k0-fixture-absent/lost.json"
         ledger.write_text(json.dumps({"rows": rows}))
-        with self.assertRaises(A.RemoteOnly):
-            A.arf(ledger, {"host": "xbabe3"})
+        with patch.object(A, "LOCATIONS", ((other_home, "xbabe2"), *A.LOCATIONS)):
+            with self.assertRaises(A.RemoteOnly):
+                A.arf(ledger, {"host": "xbabe3"})
 
 
 if __name__ == "__main__":

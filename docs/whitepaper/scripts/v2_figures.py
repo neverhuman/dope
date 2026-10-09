@@ -117,28 +117,61 @@ def figure_style_size() -> float:
     return matplotlib.rcParams["axes.labelsize"]
 
 
+# Candidate label offsets in points, tried in order; the first that clears every placed label wins.
+LABEL_OFFSETS = ((4, 3, "left", "bottom"), (4, -3, "left", "top"), (-4, 3, "right", "bottom"),
+                 (-4, -3, "right", "top"), (0, 7, "center", "bottom"), (0, -7, "center", "top"),
+                 (6, 9, "left", "bottom"), (6, -9, "left", "top"), (-6, 9, "right", "bottom"),
+                 (-6, -9, "right", "top"))
+CONTROL_POSITIONS = (0.02, 0.98, 0.5, 0.26, 0.74)
+
+
+def _place(axis, text: str, anchors, placed: list, **style):
+    """Annotate at the first anchor and offset whose box stays in the axes and clears placed boxes."""
+    renderer = axis.figure.canvas.get_renderer()
+    frame = axis.get_window_extent(renderer)
+    first = None
+    for xy, xycoords, offsets in anchors:
+        for dx, dy, ha, va in offsets:
+            label = axis.annotate(text, xy=xy, xycoords=xycoords, xytext=(dx, dy), textcoords="offset points",
+                                  ha=ha, va=va, **style)
+            box = label.get_window_extent(renderer).expanded(1.04, 1.1)
+            inside = (box.x0 >= frame.x0 and box.x1 <= frame.x1 and box.y0 >= frame.y0 and box.y1 <= frame.y1)
+            if inside and not any(box.overlaps(other) for other in placed):
+                placed.append(box)
+                if first is not None:
+                    first.remove()
+                return label
+            if first is None:
+                first = label
+            else:
+                label.remove()
+    # Nothing clears: keep the first candidate rather than drop the label.
+    placed.append(first.get_window_extent(renderer))
+    return first
+
+
 def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None = None) -> Path:
     figure, axis = plt.subplots(figsize=(width, 2.7))
+    # The frame is final before any label is measured.
+    figure.subplots_adjust(left=0.1, right=0.98, bottom=0.17, top=0.95)
     figure_style.panel(axis, grid="both")
     axis.set_xscale("log")
     axis.axvline(CAP, color=figure_style.SPINE, linestyle=(0, (4, 3)), linewidth=0.8, zorder=1)
-    axis.annotate("10,240-byte cap", xy=(CAP, 1.0), xycoords=("data", "axes fraction"), xytext=(3, -9),
-                  textcoords="offset points", fontsize=6.4, color=figure_style.INK)
     drawn = [arm for arm in headline["arms"] if arm["code"] == "Dope" or arm["code"] in FIGURE_CODES]
-    xs = [arm["bytes"][key] for arm in drawn if arm["bytes"] and arm["role"] in {"headline", "generator"}
-          for key in ("q1", "q3")]
-    right_edge = 10 ** (math.ceil(math.log10(max(xs))) + 0.3) if xs else None
-    for arm in drawn:
-        level = arm["level"]
-        if arm["role"] == "control":
-            axis.axhline(level["median"], color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.9, zorder=1)
-            axis.annotate(arm["display"], xy=(0.42, level["median"]), xycoords=("axes fraction", "data"),
-                          xytext=(0, 2), textcoords="offset points", ha="center", va="bottom",
-                          fontsize=6.4, color=figure_style.INK)
-            continue
-        if arm["bytes"] is None or arm["role"] == "diagnostic":
-            continue
-        size = arm["bytes"]["median"]
+    plotted = [arm for arm in drawn if arm["role"] in {"headline", "generator"} and arm["bytes"] is not None]
+    controls = [arm for arm in drawn if arm["role"] == "control"]
+    xs = [arm["bytes"][key] for arm in plotted for key in ("q1", "q3")]
+    ys = [value for arm in plotted for value in (arm["level"]["lo"], arm["level"]["hi"], arm["level"]["median"])
+          if value is not None] + [arm["level"]["median"] for arm in controls]
+    if xs:
+        axis.set_xlim(10 ** math.floor(math.log10(min(xs)) - 0.2), 10 ** (math.ceil(math.log10(max(xs))) + 0.3))
+    if ys:
+        pad = 0.08 * (max(ys) - min(ys) or 1.0)
+        axis.set_ylim(min(ys) - pad, max(ys) + 2.2 * pad)
+    for arm in controls:
+        axis.axhline(arm["level"]["median"], color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.9, zorder=1)
+    for arm in plotted:
+        level, size = arm["level"], arm["bytes"]["median"]
         is_dope = arm["code"] == "Dope"
         colour = ACCENT if is_dope else CONTEXT
         hollow = (level["n"] or 0) < FULL_PANEL
@@ -149,16 +182,24 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
         axis.plot([size], [level["median"]], marker="o", markersize=6.5 if is_dope else 4.8, zorder=3,
                   markerfacecolor="white" if hollow else colour,
                   markeredgecolor=ACCENT_EDGE if is_dope else colour, markeredgewidth=1.0)
-        near_right = right_edge is not None and size > right_edge / 40
-        axis.annotate(arm["display"], xy=(size, level["median"]), xytext=(-4 if near_right else 4, 3),
-                      textcoords="offset points", ha="right" if near_right else "left",
-                      fontsize=6.6 if is_dope else 6.2, color=figure_style.INK,
-                      fontweight="bold" if is_dope else "normal")
-    if xs:
-        axis.set_xlim(10 ** math.floor(math.log10(min(xs)) - 0.2), right_edge)
+    # Labels go on after every mark and limit is fixed, DOPE first, then by retention.
+    placed: list = []
+    _place(axis, "10,240-byte cap", [((CAP, 1.0), ("data", "axes fraction"), ((3, -3, "left", "top"),))],
+           placed, fontsize=6.4, color=figure_style.INK)
+    order = sorted(plotted, key=lambda arm: (arm["code"] != "Dope", -(arm["level"]["median"] or 0.0)))
+    for arm in order:
+        is_dope = arm["code"] == "Dope"
+        _place(axis, arm["display"], [((arm["bytes"]["median"], arm["level"]["median"]), "data", LABEL_OFFSETS)],
+               placed, fontsize=6.6 if is_dope else 6.2, color=figure_style.INK,
+               fontweight="bold" if is_dope else "normal")
+    for arm in controls:
+        anchors = [((fraction, arm["level"]["median"]), ("axes fraction", "data"),
+                    ((0, 2, "left" if fraction < 0.1 else ("right" if fraction > 0.9 else "center"), "bottom"),
+                     (0, -2, "left" if fraction < 0.1 else ("right" if fraction > 0.9 else "center"), "top")))
+                   for fraction in CONTROL_POSITIONS]
+        _place(axis, arm["display"], anchors, placed, fontsize=6.4, color=figure_style.INK)
     axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)")
     axis.set_ylabel("CatBoost retention at 4n")
-    figure.subplots_adjust(left=0.1, right=0.98, bottom=0.17, top=0.95)
     return _save(figure, path, dpi)
 
 

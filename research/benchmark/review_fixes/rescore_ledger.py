@@ -6,7 +6,7 @@ versions, scored it with BLAS and OpenMP at one thread. rescore_adapters.py
 turns each ledger into normalized jobs. A CSV is refused when it is named
 test.csv, sits under an evaluator directory, or is reached through a symlink.
 Its sha256 must equal the sample hash in the ledger. A header row is stripped
-into a temporary copy under <out>/tmp. One v2 cell JSON is written per job,
+into a headerless copy under <out>/tmp. One v2 cell JSON is written per job,
 and a missing sample is recorded as sample_absent, never imputed. Printing is
 outcome-blind: counts, timings and the largest absolute replay difference,
 never a retention value.
@@ -111,7 +111,7 @@ def headerless(csv_path: Path, has_header: bool, tmp: Path, meta: dict) -> Path:
             return csv_path
         tmp.mkdir(parents=True, exist_ok=True)
         handle, name = tempfile.mkstemp(dir=tmp, suffix=".headerless.csv")
-        meta["temporary"] = name
+        meta["headerless_copy"] = name
         with os.fdopen(handle, "wb") as sink:
             shutil.copyfileobj(stream, sink)
     meta["header_stripped"] = True
@@ -210,11 +210,12 @@ def score_group(task: dict) -> list[dict]:
         status, reason, report, synthetic = _evaluate(first, task, meta)
     except A.Refused as error:
         status, reason, report, synthetic = "failed", error.code, None, first["csv_sha256"]
-    except Exception as error:  # noqa: BLE001  one bad CSV must not stop the replay
+    except (ArithmeticError, AttributeError, LookupError, OSError, RuntimeError, TypeError, ValueError) as error:
+        # One unreadable or degenerate CSV is a failed cell; it must not stop the replay.
         status, reason, report, synthetic = "failed", type(error).__name__, None, first["csv_sha256"]
     finally:
-        if meta.get("temporary"):
-            Path(meta["temporary"]).unlink(missing_ok=True)
+        if meta.get("headerless_copy"):
+            Path(meta["headerless_copy"]).unlink(missing_ok=True)
     wall, cpu = time.monotonic() - started, _cpu() - cpu
     results = []
     for index, job in enumerate(task["jobs"]):

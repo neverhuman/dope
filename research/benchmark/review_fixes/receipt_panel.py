@@ -659,23 +659,6 @@ def _nfields(line: str) -> int:
     return body.replace(r"\&", "").count("&") + 1
 
 
-def _table(header: str, rows: list[str], align: str) -> str:
-    expected = _nfields(header)
-    if len(align) != expected:
-        raise ValueError(f"column spec {align!r} does not match header fields {expected}: {header}")
-    for row in rows:
-        if row.lstrip().startswith("%"):
-            continue
-        got = _nfields(row)
-        if got != expected:
-            raise ValueError(f"row has {got} fields, header has {expected}: {row}")
-    body = "\n".join(rows) if rows else "% no rows"
-    return (
-        f"\\begin{{tabular}}{{{align}}}\n\\toprule\n"
-        f"{header} \\\\\n\\midrule\n{body}\n\\bottomrule\n\\end{{tabular}}\n"
-    )
-
-
 def _metric_median(block) -> str:
     if isinstance(block, dict):
         return fmt(block.get("median"))
@@ -704,20 +687,18 @@ def _metric_label(row) -> str:
 
 
 def emit_tex(payload) -> None:
-    note = (
-        "% Wilcoxon and the TOST t-tests treat paired lineages as iid. "
-        "The interval is the family-cluster bootstrap of the median. "
-        "Holm families are separate for size n and size 4n "
-        "(density 9, neural 6, ARF 6, Forest-Flow 3).\n"
-    )
+    from research.benchmark.review_fixes.review_tex import longtable
     retention = [
         _row_retention(row["method"], row["configuration"], row["auditor"], row["size"], row)
         for row in payload["retention"]
     ]
-    write_tex("review-size-retention.tex", _table(
+    write_tex("review-size-retention.tex", longtable(
+        "\\textbf{Retention level by method, configuration, auditor, and size, fit seed 11.} Median over the "
+        "informative lineages with the family-cluster bootstrap 95\\% interval. No Holm family.",
         "Method & Configuration & Auditor & Size & $n$ & Median & Hierarchical 95\\% CI",
         retention,
         "lllllrr",
+        label="tab:review-size",
     ))
     paired_lines = []
     for row in payload["paired"]:
@@ -728,10 +709,15 @@ def emit_tex(payload) -> None:
             f"{tex_name(row['configuration'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} & "
             f"{fmt(row['mean'])} & {flag} & {row['wins']}/{row['ties']}/{row['losses']} & {fmt(row['holm_p'], 3)} \\\\"
         )
-    write_tex("review-paired.tex", note + _table(
+    write_tex("review-paired.tex", longtable(
+        "\\textbf{DOPE minus comparator at both sizes, fit seed 11.} Median paired retention difference with its "
+        "family-cluster bootstrap 95\\% interval, the mean difference, and the v1 mean-difference equivalence test "
+        "at $\\pm 0.02$. W/T/L counts lineages. The Wilcoxon and equivalence tests treat lineages as independent. "
+        "Holm families are separate per size: density 9, neural 6, ARF 6, and Forest-Flow 3 tests.",
         "Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
         paired_lines,
         "lllllrrllrl",
+        label="tab:review-paired",
     ))
     family_lines = []
     for row in payload["family"]:
@@ -749,16 +735,25 @@ def emit_tex(payload) -> None:
             f"excluding simulated & {row['size']}$n$ & catboost & {tex_name(row['method'])} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
         )
-    write_tex("review-family.tex", _table(
+    write_tex("review-family.tex", longtable(
+        "\\textbf{Source-family sensitivity, fit seed 11.} A DOPE row is the median DOPE retention within one "
+        "source family; a comparator row is the median DOPE-minus-comparator difference on that family, under "
+        "CatBoost. The excluding-simulated rows drop the four simulated families. Intervals are the family-cluster "
+        "bootstrap. These rows are a sensitivity, printed without Holm $p$-values.",
         "Family & Size & Auditor & Contrast & $n$ & Median & Hierarchical CI",
         family_lines,
         "lllllrr",
+        label="tab:review-family",
     ))
     # Informative is the retention-row level n; the other counts are complete-loss rows.
-    write_tex("review-denominator.tex", _table(
+    write_tex("review-denominator.tex", longtable(
+        "\\textbf{Informative-lineage denominators, fit seed 11, CatBoost.} Informative is the lineage count behind "
+        "each retention level. Complete-loss rows have three finite stored null, TRTR, and TSTR losses, and the "
+        "noninformative, undefined, capped, and sensitivity counts are taken among them. No Holm family.",
         denominator_view.HEADER,
         denominator_view.denominator_lines(payload, fmt, tex_name),
         denominator_view.ALIGN,
+        label="tab:review-denominator",
     ))
     # TOST, RMSE, stored fidelity and existing seeds name each configuration.
     from research.benchmark.review_fixes.receipt_tables import configured_tables

@@ -166,7 +166,7 @@ def render_privacy(payload: dict, references: dict) -> str:
         f"{tex_name(row['method'])} {row['n']} ({tex_name(row['reason'])})" for row in payload["unavailable"]
     ) or "none"
     caption = (
-        "Holdout privacy and CatBoost detection of the published fit-seed-11 synthetic samples. "
+        "\\textbf{Holdout privacy and CatBoost detection, fit seed 11.} Rows cover the published synthetic samples. "
         "Each value is the median over lineages of each lineage's median over sample seeds 101, 211 and 307; "
         "$n$ counts lineages with three finite seeds. Own-lineage rows keep every scored lineage whose "
         "synthetic row count equals fit rows times size; matched-density rows use the lineages shared by "
@@ -190,6 +190,7 @@ def render_privacy(payload: dict, references: dict) -> str:
         lines,
         "lllllrrr",
         note,
+        label="tab:review-privacy",
     )
 
 

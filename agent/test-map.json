@@ -425,6 +425,10 @@
       "command": "just fast",
       "purpose": "verify release change record"
     },
+    "CITATION.cff": {
+      "command": "just fast",
+      "purpose": "verify citation metadata"
+    },
     "LICENSE": {
       "command": "just fast",
       "purpose": "verify repository metadata"

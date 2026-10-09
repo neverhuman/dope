@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from research.benchmark.review_fixes import denominator_view as view
 from research.benchmark.review_fixes import receipt_panel as panel
+from research.benchmark.review_fixes.review_tex import longtable
 from research.benchmark.review_fixes.source_pins import PUBLISHED_SOURCE_SHA256
 
 PANEL_NAME = "review-fixes-receipts-v1/panel.json"
@@ -50,7 +51,7 @@ class DenominatorViewTests(unittest.TestCase):
         self.assertEqual([row["informative"] for row in linear], [5])
         lines = view.denominator_lines(_fixture(), panel.fmt, panel.tex_name)
         self.assertEqual(lines[0], "ForestDiffusion/Forest-Flow & native\\_selected & 4$n$ & 6 & 0 & 0 & 0 & 0 & 0 & --- \\\\")
-        table = panel._table(view.HEADER, lines, view.ALIGN)
+        table = longtable("Denominators. No Holm family.", view.HEADER, lines, view.ALIGN)
         self.assertIn("Informative & \\shortstack[r]{Complete-\\\\loss rows} & \\shortstack[r]{Non-\\\\informative}", table)
         self.assertEqual(panel._nfields(view.HEADER), len(view.ALIGN))
 
@@ -91,7 +92,7 @@ class DenominatorViewTests(unittest.TestCase):
             if row["n_incomplete"] == 0:
                 self.assertEqual(row["informative"], row["n_informative"])
 
-    def test_emit_changes_only_the_denominator_table(self):
+    def test_emit_matches_the_committed_tables(self):
         generated = panel.REPO / "docs" / "whitepaper" / "generated"
         target = panel.REPO / "target"
         target.mkdir(exist_ok=True)

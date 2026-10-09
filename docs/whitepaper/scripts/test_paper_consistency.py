@@ -104,10 +104,41 @@ class ConsistencyTests(unittest.TestCase):
         tied = [row(("B", "x"), 95, median=0.5), row(("A", "y"), 95, median=0.5)]
         self.assertEqual(consistency.strongest_comparator(tied)["method"], "A")
 
-    def test_wiring_to_committed_files_is_a_declared_todo(self):
-        with self.assertRaisesRegex(NotImplementedError, "TODO"):
-            consistency.load_generated_artifacts()
-        self.assertIn("TODO(v2-guards)", consistency.load_generated_artifacts.__doc__)
+    def test_v2_panel_wiring_checks_counts_and_the_strongest_arm(self):
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def level(method, configuration, n, median, size=4, auditor="catboost"):
+            return {"method": method, "configuration": configuration, "size": size, "auditor": auditor,
+                    "n": n, "median": median}
+
+        panel = {
+            "levels": [level("DOPE", "headline", 97, 0.9), level("TabSyn", "scaled", 96, 0.88),
+                       level("ARF", "author_default", 97, 0.85), level("Forest", "historical", 6, 0.99),
+                       level("real_bootstrap_4n", "control", 97, 1.0)],
+            "contrasts": [dict(level("TabSyn", "scaled", 95, None)), dict(level("ARF", "author_default", 97, None)),
+                          dict(level("Forest", "historical", 6, None)),
+                          dict(level("real_bootstrap_4n", "control", 97, None))],
+            "strongest": {"method": "TabSyn", "configuration": "scaled", "median": 0.88, "paired_n": 95},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "panel.json"
+            path.write_text(json.dumps(panel))
+            self.assertIsNone(consistency.load_generated_artifacts(root / "absent.json", root))
+            artifacts = consistency.load_generated_artifacts(path, root)
+            self.assertEqual(consistency.check_artifacts(
+                {key: artifacts[key] for key in ("informative", "paired")}), [])
+            self.assertEqual(consistency.strongest_violations(artifacts), [])
+            panel["strongest"] = {"method": "ARF", "configuration": "author_default"}
+            path.write_text(json.dumps(panel))
+            self.assertIn("rule gives ('TabSyn', 'scaled')",
+                          consistency.strongest_violations(consistency.load_generated_artifacts(path, root))[0])
+            panel["contrasts"][1]["n"] = 98
+            path.write_text(json.dumps(panel))
+            artifacts = consistency.load_generated_artifacts(path, root)
+            self.assertTrue(consistency.check_artifacts({key: artifacts[key] for key in ("informative", "paired")}))
 
 
 if __name__ == "__main__":

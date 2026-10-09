@@ -193,20 +193,25 @@ def _sentences(panel, byte_stats) -> list[str]:
                          for _, other_size, other_value in points)]
     dope_bytes = byte_stats["DOPE|headline"]["median"]
     heavy = {"CTGAN", "TVAE", "TabSyn", "ARF", "ForestDiffusion/Forest-Flow", "TabDDPM", "TabDiff", "GReaT"}
-    larger = [math.log10(size / dope_bytes) for arm, size, _ in points if arm.method in heavy]
+    larger = [size / dope_bytes for arm, size, _ in points if arm.method in heavy]
     full = [arm.code for arm in generators if levels[(arm.code, "catboost", 4)]["n"] >= 90]
     order = {size: sorted(full, key=lambda code: -levels[(code, "catboost", size)]["median"])
              for size in (1, 4) if all((code, "catboost", size) in levels for code in full)}
     same = len(order) == 2 and order[1] == order[4]
     lifted = sum(1 for code in full if code != "Dope"
                  and levels[(code, "catboost", 4)]["median"] > levels[(code, "catboost", 1)]["median"])
-    equivalent = [row for row in panel["contrasts"] if (row.get("equivalence") or {}).get("equivalent")]
-    return [cmd("VParetoSet", ", ".join(pareto)), cmd("VOrdersLo", f"{min(larger):.1f}" if larger else "---"),
-            cmd("VOrdersHi", f"{max(larger):.1f}" if larger else "---"),
+    # Equivalence is reported for generator comparisons; controls and diagnostic DOPE arms are not comparators.
+    equivalent = [row for row in panel["contrasts"] if (row.get("equivalence") or {}).get("equivalent")
+                  and M.arm(row["method"], row["configuration"]).role == "generator"]
+    count = len(equivalent)
+    sentence = ("No generator comparison meets that rule." if count == 0 else
+                ("One generator comparison meets that rule" if count == 1 else
+                 f"{count} generator comparisons meet that rule") + "; supplement~E lists every rule outcome.")
+    return [cmd("VParetoSet", ", ".join(pareto)), cmd("VRatioMin", ratio(min(larger)) if larger else DASH),
+            cmd("VRatioMax", ratio(max(larger)) if larger else DASH),
             cmd("VSizeRankSame", "is the same at both sizes" if same else "changes between the two sizes"),
-            cmd("VSizeLifted", f"{lifted} of {len(full) - 1}"), cmd("VEquivCount", len(equivalent)),
-            cmd("VEquivSentence", "No comparison meets that rule." if not equivalent else
-                f"{len(equivalent)} comparisons meet that rule; supplement~E lists them.")]
+            cmd("VSizeLifted", f"{lifted} of {len(full) - 1}"), cmd("VEquivCount", count),
+            cmd("VEquivSentence", sentence)]
 
 
 def _privacy_macros(privacy) -> list[str]:
@@ -373,26 +378,41 @@ def headline_json(panel, byte_stats) -> dict:
     return out
 
 
+def outputs(panel, fits, privacy) -> dict[str, str]:
+    byte_stats = v2_bytes.all_arms(fits)
+    return {
+        "v2-numbers.tex": macros(panel, byte_stats, fits, privacy),
+        "v2-headline-table.tex": headline_table(panel, byte_stats),
+        "v2-size-table.tex": size_table(panel),
+        "v2-fidelity-table.tex": fidelity_table(privacy),
+        "v2-contrasts.tex": contrasts_table(panel),
+        "v2-levels.tex": levels_table(panel),
+        "v2-seeds.tex": seeds_table(panel),
+        "v2-headline.json": json.dumps(headline_json(panel, byte_stats), indent=1, sort_keys=True) + "\n",
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--from-panel", type=Path, default=PANEL)
     parser.add_argument("--out", type=Path, default=GENERATED)
+    parser.add_argument("--check", action="store_true", help="fail when a committed output differs")
     args = parser.parse_args()
     panel = json.loads(args.from_panel.read_text())
     if panel.get("official_tests_opened") is not False:
         raise SystemExit("v2 panel official test flag is not closed")
     fits = [json.loads(line) for line in FITS.read_text().splitlines() if line.strip()]
     privacy = json.loads(PRIVACY.read_text())
-    byte_stats = v2_bytes.all_arms(fits)
+    texts = outputs(panel, fits, privacy)
+    if args.check:
+        stale = sorted(name for name, text in texts.items()
+                       if not (args.out / name).is_file() or (args.out / name).read_text() != text)
+        if stale:
+            raise SystemExit("v2 outputs differ from the panel: " + ", ".join(stale))
+        return
     args.out.mkdir(parents=True, exist_ok=True)
-    (args.out / "v2-numbers.tex").write_text(macros(panel, byte_stats, fits, privacy))
-    (args.out / "v2-headline-table.tex").write_text(headline_table(panel, byte_stats))
-    (args.out / "v2-size-table.tex").write_text(size_table(panel))
-    (args.out / "v2-fidelity-table.tex").write_text(fidelity_table(privacy))
-    (args.out / "v2-contrasts.tex").write_text(contrasts_table(panel))
-    (args.out / "v2-levels.tex").write_text(levels_table(panel))
-    (args.out / "v2-seeds.tex").write_text(seeds_table(panel))
-    (args.out / "v2-headline.json").write_text(json.dumps(headline_json(panel, byte_stats), indent=1, sort_keys=True) + "\n")
+    for name, text in texts.items():
+        (args.out / name).write_text(text)
 
 
 if __name__ == "__main__":

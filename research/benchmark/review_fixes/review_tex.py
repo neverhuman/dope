@@ -14,7 +14,7 @@ def assert_distinct(keys, label: str) -> None:
         seen.add(key)
 
 
-def longtable(caption: str, header: str, rows: list[str], align: str, note: str = "") -> str:
+def longtable(caption: str, header: str, rows: list[str], align: str, note: str = "", label: str = "") -> str:
     """A longtable whose caption states its Holm family, as check_paper.py requires."""
     if "Holm" not in caption:
         raise ValueError("review table caption must state its Holm family or that it has none")
@@ -29,7 +29,8 @@ def longtable(caption: str, header: str, rows: list[str], align: str, note: str 
     head = f"\\toprule\n{header} \\\\\n\\midrule\n"
     return (
         note
-        + f"\\begin{{longtable}}{{{align}}}\n\\caption{{{caption}}}\\\\\n"
+        + f"\\begin{{longtable}}{{{align}}}\n\\caption{{{caption}}}"
+        + (f"\\label{{{label}}}" if label else "") + "\\\\\n"
         + head + "\\endfirsthead\n"
         + head + "\\endhead\n"
         + "\n".join(rows)

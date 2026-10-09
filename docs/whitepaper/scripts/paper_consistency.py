@@ -11,18 +11,22 @@ auditor). Shapes:
   printed      rows ``{"file", "quantity", "n", "cohort"}``; ``cohort`` is the
                declared cohort label or None
 
-Every check returns readable violations. load_generated_artifacts, the
-wiring to the committed files, is a TODO.
+Every check returns readable violations. load_generated_artifacts reads the
+committed v2 panel and the headline JSON emitted from it.
 """
 
 from __future__ import annotations
 
+import json
 import math
 from pathlib import Path
 
 PAPER = Path(__file__).resolve().parents[1]
 GENERATED = PAPER / "generated"
+V2_PANEL = PAPER.parents[1] / "research" / "benchmark" / "results" / "review-fixes-v2" / "panel.json"
 REFERENCE = ("DOPE", "features12_steps2048")
+V2_REFERENCE = ("DOPE", "headline")
+CONTROLS = ("predictor_only", "real_bootstrap_4n")
 
 
 def row_key(row, method=None, configuration=None) -> tuple:
@@ -139,15 +143,44 @@ def check_artifacts(artifacts: dict) -> list[str]:
     return failures
 
 
-def load_generated_artifacts(generated: Path = GENERATED) -> dict:
-    """TODO(v2-guards): parse the committed generated files into the shapes above.
+def load_generated_artifacts(panel_path: Path = V2_PANEL, generated: Path = GENERATED) -> dict | None:
+    """The v2 panel's levels and contrasts in the shapes above, or None before the panel exists."""
+    if not panel_path.is_file():
+        return None
+    panel = json.loads(panel_path.read_text())
+    keys = ("method", "configuration", "size", "auditor")
+    levels = [{**{key: row[key] for key in keys}, "n": row["n"], "median": row.get("median")}
+              for row in panel["levels"]]
+    paired = [{**{key: row[key] for key in keys}, "n": row["n"], "left_method": V2_REFERENCE[0],
+               "left_configuration": V2_REFERENCE[1]} for row in panel["contrasts"]]
+    headline_path = generated / "v2-headline.json"
+    return {"informative": [{**row, "n_informative": row["n"]} for row in levels], "paired": paired,
+            "level": levels, "strongest": panel.get("strongest"),
+            "headline": json.loads(headline_path.read_text()) if headline_path.is_file() else None}
 
-    Planned sources: ``level`` from review-receipts.json "retention" rows (the
-    rows behind review-size-retention.tex); ``informative`` from the
-    Informative column of review-denominator.tex together with the n of each
-    panel-stats.json block; ``paired`` from review-receipts.json "paired" rows
-    and the panel-stats.json density, neural, and Forest-Flow pairs; and
-    ``printed`` from the N macros in numbers.tex, headline-table.tex, and
-    forest-table.tex, each with the cohort label its caption declares.
-    """
-    raise NotImplementedError(f"wiring to {generated} is a TODO; pass parsed dicts to check_artifacts")
+
+def strongest_violations(artifacts: dict) -> list[str]:
+    """The panel's strongest comparator is the argmax the rule gives, and the headline JSON repeats it."""
+    paired_n = {(row["method"], row["configuration"]): row["n"] for row in artifacts["paired"]
+                if row["size"] == 4 and row["auditor"] == "catboost"}
+    rows = [{**row, "paired_n": paired_n.get((row["method"], row["configuration"]))} for row in artifacts["level"]]
+    best = strongest_comparator(rows, exclude=(V2_REFERENCE[0], *CONTROLS))
+    stated = artifacts.get("strongest")
+    expected = None if best is None else (best["method"], best["configuration"])
+    found = None if stated is None else (stated["method"], stated["configuration"])
+    failures = []
+    if expected != found:
+        failures.append(f"strongest comparator is {found} but the rule gives {expected}")
+    headline = artifacts.get("headline")
+    if headline is not None and headline.get("strongest") != stated:
+        failures.append("v2-headline.json names a different strongest comparator than the panel")
+    return failures
+
+
+def check_v2() -> list[str]:
+    """Count and strongest-comparator checks over the committed v2 panel; empty before it exists."""
+    artifacts = load_generated_artifacts()
+    if artifacts is None:
+        return []
+    failures = check_artifacts({key: artifacts[key] for key in ("informative", "paired")})
+    return failures + strongest_violations(artifacts)

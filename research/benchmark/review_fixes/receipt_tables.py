@@ -12,19 +12,11 @@ from research.benchmark.review_fixes.receipt_panel import (
     _measured_prefix,
     _metric_label,
     _metric_median,
-    _table,
     ci,
     fmt,
     tex_name,
 )
-from research.benchmark.review_fixes.review_tex import assert_distinct
-
-TOST_NOTE = (
-    "% Wilcoxon and the TOST t-tests treat paired lineages as iid. "
-    "The interval is the family-cluster bootstrap of the median. "
-    "Holm families are separate for size n and size 4n "
-    "(density 9, neural 6, ARF 6, Forest-Flow 3).\n"
-)
+from research.benchmark.review_fixes.review_tex import assert_distinct, longtable
 
 
 def tost_table(payload: dict) -> str:
@@ -39,10 +31,15 @@ def tost_table(payload: dict) -> str:
             f"[{fmt(tost['ci90_lo'])}, {fmt(tost['ci90_hi'])}] & "
             f"{fmt(tost['p'], 3)} & {'yes' if tost['equivalent'] else 'no'} \\\\"
         )
-    return TOST_NOTE + _table(
+    return longtable(
+        "\\textbf{v1 mean-difference equivalence, fit seed 11.} Mean DOPE-minus-comparator retention difference, "
+        "its 90\\% $t$ interval, and the larger of the two one-sided $p$-values against $\\pm 0.02$. The test treats "
+        "lineages as independent, and outliers move the mean; it is kept for continuity with the first version. "
+        "Holm families as in the paired table; the equivalence $p$ is unadjusted.",
         "Size & Auditor & Comparator & Configuration & Mean diff. & 90\\% CI & TOST $p$ & Equivalent at $\\pm 0.02$",
         lines,
         "llllrrrl",
+        label="tab:review-tost",
     )
 
 
@@ -54,10 +51,14 @@ def rmse_table(payload: dict) -> str:
         f"{row['n_regression']} & {fmt(row['synthetic_rmse_median'])} & {fmt(row['real_rmse_median'])} \\\\"
         for row in rows
     ]
-    return _table(
+    return longtable(
+        "\\textbf{CatBoost auditor RMSE, fit seed 11.} Median over regression lineages of the validation RMSE of the "
+        "auditor trained on synthetic rows and of the auditor trained on the real fit rows. RMSE is in each "
+        "lineage's target units, so a median mixes scales and is no cross-method ranking. No Holm family.",
         "Method & Configuration & Size & Regression lineages & Synthetic RMSE & Real TRTR RMSE",
         lines,
         "lllrrr",
+        label="tab:review-rmse",
     )
 
 
@@ -70,17 +71,15 @@ def fidelity_stored_table(payload: dict) -> str:
         f"{tex_name(_metric_label(row))} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
         for row in rows
     ]
-    methods = ", ".join(sorted({str(row["method"]) for row in rows}))
-    note = (
-        "% Stored logistic C2ST, marginal KS, and pair correlation from the population ledgers. "
-        "Each n counts lineages with three finite stored values. Cohorts are not matched, "
-        "and this table is not a cross-method ranking. The stored C2ST is not the GBDT detector. "
-        f"Methods in this file: {methods}. TabSyn is not in these ledgers.\n"
-    )
-    return note + _table(
+    return longtable(
+        "\\textbf{Stored fidelity from the population ledgers, fit seed 11.} Logistic two-sample AUC, mean marginal "
+        "Kolmogorov--Smirnov distance, and pair-correlation fidelity; $n$ counts lineages with three finite stored "
+        "values, with the family-cluster bootstrap interval. Cohorts differ across methods, so the rows are no "
+        "ranking. The stored detector is logistic, not CatBoost, and TabSyn is absent from these ledgers. No Holm family.",
         "Method & Configuration & Size & Metric & $n$ lineages & Median & Hierarchical CI",
         lines,
         "llllrrr",
+        label="tab:review-fidelity",
     )
 
 
@@ -98,15 +97,15 @@ def seeds_existing_table(payload: dict) -> str:
         f"{_metric_median(row.get('dcr_validation_median'))} \\\\"
         for row in rows
     ]
-    return (
-        "% Existing cpu-fivefit prefix. It is not pooled with the 97-lineage table. "
-        "Measured/prefix counts finite CatBoost retentions over the prefix size. "
-        "Configuration is the panel selection binding.\n"
-    ) + _table(
+    return longtable(
+        "\\textbf{Earlier five-fit prefix.} Medians on the lineage prefix of an earlier CPU five-fit run, never "
+        "pooled with the full-panel tables. Measured/prefix counts finite CatBoost retentions over the prefix size, "
+        "and the configuration is the panel's selection binding. No Holm family.",
         "Method & Configuration & Fit seed & Size & Measured/prefix & CatBoost retention & "
         "Distance MIA AUC & Holdout DCR median",
         lines,
         "lllllrrr",
+        label="tab:review-prefix",
     )
 
 

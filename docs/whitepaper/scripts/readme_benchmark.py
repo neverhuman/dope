@@ -72,11 +72,13 @@ def benchmark_block(headline: dict) -> str:
                      f"| {diff} | {wtl} | {artifact} | {within} |")
     key = (headline["strongest"]["method"], headline["strongest"]["configuration"])
     strongest = next(arm for arm in headline["arms"] if (arm["method"], arm["configuration"]) == key)
+    others = [arm["bytes"]["median"] for arm in headline["arms"]
+              if arm["role"] == "generator" and arm["bytes"] is not None]
     lines += [
         "",
         "![CatBoost retention at synthetic size 4n against median charged artifact bytes on a log axis. "
-        "DOPE sits at about two kilobytes; the neural, diffusion, and forest generators sit at hundreds of "
-        "kilobytes to hundreds of megabytes.](docs/readme/pareto.png)",
+        f"DOPE's median artifact is {size(dope['bytes']['median'])}; the other generators' medians run from "
+        f"{size(min(others))} to {size(max(others))}.](docs/readme/pareto.png)",
         "",
         "![DOPE minus each comparator, Hodges–Lehmann retention difference with 95% nested intervals, "
         "under the CatBoost, linear, and MLP auditors.](docs/readme/paired.png)",

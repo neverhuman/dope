@@ -8,6 +8,7 @@ after the data are seen. Output floats are unrounded; emitters format them.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import os
@@ -142,7 +143,8 @@ def _run(function, tasks: list, jobs: int) -> list:
         return list(pool.map(function, tasks, chunksize=4))
 
 
-def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs: int | None = None) -> dict:
+def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs: int | None = None,
+           predeclare: bytes | None = None) -> dict:
     jobs = min(os.cpu_count() or 1, 16) if jobs is None else jobs
     values = fit_values(cells, names)
     arms = sorted({key[0] for key in values})
@@ -180,7 +182,7 @@ def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs:
                    for size in SIZES for auditor in AUDITORS]
     return {
         "format": "dope-review-fix-v2-panel", "version": 1, "fidelity": fidelity,
-        "predeclare_sha256": hashlib.sha256(PREDECLARE.read_bytes()).hexdigest(),
+        "predeclare_sha256": hashlib.sha256(PREDECLARE.read_bytes() if predeclare is None else predeclare).hexdigest(),
         "draws": draws, "levels": levels, "contrasts": contrasts,
         "strongest": strongest(levels, contrasts),
         "seed_rank": S.seed_rank_test(seeds), "seeds_23_71": sensitivity,
@@ -244,8 +246,45 @@ def two_by_two(values: dict) -> dict:
     return out
 
 
+def check_fits(cells: list[dict], fits: list[dict]) -> None:
+    """Every DOPE cell refit under v2 comes from an ok fit in the fit ledger, so bytes and retention share fits."""
+    ok = {(fit["configuration"], fit["dataset"], fit["fit_seed"]) for fit in fits
+          if fit.get("official_tests_opened") is False and fit["status"] == "ok"}
+    if not ok:
+        raise ValueError("fit ledger has no ok fit")
+    refit = {fit["configuration"] for fit in fits}
+    for cell in cells:
+        if cell["method"] == "DOPE" and cell["configuration"] in refit:
+            if (cell["configuration"], cell["dataset"], cell["fit_seed"]) not in ok:
+                raise ValueError("a DOPE cell has no ok fit in the fit ledger")
+
+
 def load_ledger(path: Path) -> list[dict]:
     cells = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
     if any(cell.get("official_tests_opened") is not False for cell in cells):
         raise ValueError("ledger official test flag is not closed")
     return cells
+
+
+def names_of(record: dict) -> dict[str, str]:
+    return {row["dataset"]: row["display_name"] for row in record["rows"]}
+
+
+def canonical(panel: dict) -> str:
+    return json.dumps(panel, indent=1, sort_keys=True, allow_nan=False) + "\n"
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Write the pinned v2 panel from the v2 scalar ledger.")
+    parser.add_argument("--ledger", type=Path, required=True)
+    parser.add_argument("--lineage-record", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--jobs", type=int, default=None)
+    args = parser.parse_args()
+    names = names_of(json.loads(args.lineage_record.read_text()))
+    args.out.write_text(canonical(reduce(load_ledger(args.ledger), names, jobs=args.jobs)))
+    print(f"wrote {args.out} sha256 {hashlib.sha256(args.out.read_bytes()).hexdigest()}")
+
+
+if __name__ == "__main__":
+    main()

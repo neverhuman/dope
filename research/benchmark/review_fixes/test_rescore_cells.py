@@ -32,12 +32,12 @@ class RescoreTests(unittest.TestCase):
 
     def test_stored_utility_reads_both_record_shapes(self):
         with tempfile.TemporaryDirectory() as tmp:
-            old = Path(tmp) / "old.json"
-            old.write_text(json.dumps({"status": "ok", "metrics": {"utility": {"catboost": {"retention": 0.9}}}}))
-            new = Path(tmp) / "new.json"
-            new.write_text(json.dumps({"status": "ok", "utility": {"mlp": {"retention": 1.1}}}))
-            self.assertEqual(R._stored_utility(old)["catboost"], 0.9)
-            self.assertEqual(R._stored_utility(new)["mlp"], 1.1)
+            nested = Path(tmp) / "nested.json"
+            nested.write_text(json.dumps({"status": "ok", "metrics": {"utility": {"catboost": {"retention": 0.9}}}}))
+            flat = Path(tmp) / "flat.json"
+            flat.write_text(json.dumps({"status": "ok", "utility": {"mlp": {"retention": 1.1}}}))
+            self.assertEqual(R._stored_utility(nested)["catboost"], 0.9)
+            self.assertEqual(R._stored_utility(flat)["mlp"], 1.1)
             self.assertIsNone(R._stored_utility(Path(tmp) / "absent.json"))
 
 

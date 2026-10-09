@@ -61,7 +61,17 @@ def replay_tabsyn(cells, extras):
                        json.loads(gate), json.loads(eight_panel)).encode()
 
 
+def replay_v2(cells, extras):
+    from research.benchmark.review_fixes import v2_panel
+
+    fits, record, predeclare = extras
+    v2_panel.check_fits(cells, [json.loads(line) for line in fits.splitlines()])
+    panel = v2_panel.reduce(cells, v2_panel.names_of(json.loads(record)), predeclare=predeclare)
+    return v2_panel.canonical(panel).encode()
+
+
 TABSYN = 'research/benchmark/results/review-fixes-tabsyn-v1/'
+V2 = 'research/benchmark/results/review-fixes-v2/'
 REPLAYS = {
     'docs/whitepaper/scripts/review_controls.py': Replay(
         'control',
@@ -80,7 +90,15 @@ REPLAYS = {
         (TABSYN + 'evaluator-replay.jsonl', TABSYN + 'parser-check.json',
          'research/benchmark/results/tabsyn-eight-lineage-validation/panel.json'),
         replay_tabsyn),
+    'docs/whitepaper/scripts/review_v2_emit.py': Replay(
+        'v2',
+        V2 + 'panel.json',
+        V2 + 'scalar-cells.jsonl',
+        (V2 + 'fits.jsonl', 'research/benchmark/results/s3-lineage-record.json',
+         'research/benchmark/review_fixes/predeclare_v2.json'),
+        replay_v2),
 }
+OUTPUT_PREFIXES = ('review-', 'v2-')
 
 
 def registered_ledgers():
@@ -189,13 +207,14 @@ def main():
         for relative in entry['outputs']:
             path = Path(relative)
             if (path.parent.as_posix() not in ('docs/whitepaper/generated', 'docs/whitepaper/figures')
-                    or not path.name.startswith('review-')):
+                    or not path.name.startswith(OUTPUT_PREFIXES)):
                 raise ValueError('invalid review output path')
             if not (REPO / path).is_file():
                 raise ValueError('missing declared review output')
             declared.add(path.as_posix())
     actual = {p.relative_to(REPO).as_posix() for directory in ('generated', 'figures')
-              for p in (REPO / 'docs/whitepaper' / directory).glob('review-*') if p.is_file()}
+              for prefix in OUTPUT_PREFIXES
+              for p in (REPO / 'docs/whitepaper' / directory).glob(prefix + '*') if p.is_file()}
     if actual != declared:
         raise ValueError('review build graph does not cover every committed output')
 

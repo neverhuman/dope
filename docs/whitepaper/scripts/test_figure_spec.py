@@ -96,9 +96,7 @@ class FigureSpecTest(unittest.TestCase):
                 self.assertEqual(figure_spec.main(["--check"]), 1)
             self.assertIn("missing", shown.getvalue())
 
-    def test_committed_macro_file_matches_when_present(self):
-        if not (figure_spec.GENERATED / figure_spec.MACRO_NAME).is_file():
-            self.skipTest("generated/figure-spec.tex is written by the emitter on the next paper build")
+    def test_committed_macro_file_matches_the_spec(self):
         self.assertEqual(figure_spec.check_macros(), [])
 
     def test_drawing_code_reads_every_window_from_the_spec(self):

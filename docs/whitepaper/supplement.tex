@@ -257,36 +257,17 @@ A Friedman test and a Nemenyi critical difference compare the four density metho
 \end{table}
 
 \subsection{Fit-seed-11 review panels}
-The tables below are the fit-seed-$11$ review panels that preceded the five-seed refit. A method with two configurations keeps a separate row for each. Their intervals are the family-cluster bootstrap of the median, and their equivalence column is the v1 mean-difference test.
+The tables below are the fit-seed-$11$ review panels that preceded the five-seed refit. A method with two configurations keeps one row per configuration. Their intervals are the family-cluster bootstrap of the median, their equivalence column is the v1 mean-difference test, and their Holm families are split by size: nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests per size. Forest-Flow cells store no null loss, so its loss-path columns in \cref{tab:review-denominator} are empty while its informative count matches the size table. The sensitivity column of that table is the capped cohort, a different denominator from the headline.
 
-\subsubsection*{Paired differences at both sizes (fit seed 11)}
-Holm is split by size, with nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests per size.
 \begingroup
 \scriptsize
 \setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
 \input{generated/review-paired.tex}
-\endgroup
-
-\subsubsection*{Source-family sensitivity (fit seed 11)}
-A DOPE row reports the median retention within one source family; a comparator row reports the median DOPE-minus-comparator difference on that family. The excluding-simulated cut uses the same rule. These rows are a sensitivity and are never pooled with the headline.
-\begingroup
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
+\input{generated/review-tabsyn.tex}
+\input{generated/review-tost.tex}
 \input{generated/review-family.tex}
-\endgroup
-
-\subsubsection*{Informative-lineage denominators (fit seed 11)}
-Informative counts the lineages behind each retention level in the size table. Complete-loss rows are the lineages with three finite stored null, TRTR, and TSTR losses; the noninformative, undefined, capped, and sensitivity counts are taken among those rows. Forest-Flow cells store no null loss, so its loss-path columns are empty while its informative count matches the size table. The sensitivity column is the capped cohort, and a different denominator is a different cohort.
-\begingroup
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
 \input{generated/review-denominator.tex}
+\input{generated/review-rmse.tex}
 \endgroup
 
 \subsection{Historical block tables}
@@ -372,8 +353,6 @@ The real-row control draws the published training rows with replacement until th
 \begingroup
 \scriptsize
 \setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
 \input{generated/review-controls.tex}
 \endgroup
 
@@ -381,7 +360,14 @@ The real-row control draws the published training rows with replacement until th
 \label{app:privacy}
 \cref{tab:fidelity-hist} is the grouped-validation fidelity ledger of the fit-seed-$11$ population. On the density cells, DOPE has median logistic two-sample AUC $\CtwoDope$ ($\CtwoLo$ to $\CtwoHi$, $n=\CtwoN$), mean marginal Kolmogorov--Smirnov distance $\KsDope$ ($\KsLo$ to $\KsHi$, $n=\KsN$), and pairwise correlation fidelity $\CorrDope$ ($\CorrLo$ to $\CorrHi$, $n=\CorrN$); each count is the lineages with a complete three-seed fidelity group. A logistic detector near one half can still miss nonlinear differences, which is why the main paper reports a CatBoost detector. The DCR column of that ledger is the fraction of synthetic queries whose nearest reference is in the fit view, with ties scored one half; \DcrExchange\ The DOMIAS column is the isolated kernel density-ratio equation from the pinned author expression, evaluated on this numeric projection, which differs from the original DOMIAS training pipeline.
 
-The review privacy panel in the main paper reports, for every method on the fit-seed-$11$ samples, a CatBoost two-sample detector with at most $200$ rows per class, the median distance to the closest fit row and to the closest validation row, the nearest-neighbour distance ratio against the fit rows, and a distance-based membership AUC. The fit reference holds about four times as many rows as the validation reference, so the distance to the fit rows is smaller by construction. None of these numbers is a differential-privacy guarantee or a HIPAA de-identification claim. Shadow-model attacks, attribute inference, and an attack on the shipped artifact are defined in predeclare\_v2 and are scheduled.
+\cref{tab:review-privacy} is the review privacy panel behind Table~3 of the main paper: for every method on the fit-seed-$11$ samples, a CatBoost two-sample detector with at most $200$ rows per class, the median distance to the closest fit row and to the closest validation row, the nearest-neighbour distance ratio against the fit rows, and a distance-based membership AUC. The fit reference holds about four times as many rows as the validation reference, so the distance to the fit rows is smaller by construction. None of these numbers is a differential-privacy guarantee or a HIPAA de-identification claim. Shadow-model attacks, attribute inference, and an attack on the shipped artifact are defined in predeclare\_v2 and are scheduled. \cref{tab:review-fidelity} adds the stored fidelity of every method from its population ledger.
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\input{generated/review-privacy.tex}
+\input{generated/review-fidelity-stored.tex}
+\endgroup
 
 \begin{table}[t]
 \caption{\textbf{Grouped-validation fidelity and empirical privacy, fit seed 11.} The fidelity denominator is the complete three-seed group count, distinct from the $\NDopeCb$ retention lineages. Holm families are 12 density tests and 8 neural tests, separate from retention.}
@@ -478,7 +464,7 @@ The tables below list every prepared lineage of the fit-seed-$11$ population, th
 
 \subsection{Reported profile, all 100 lineages (fit seed 11)}
 \label{app:2048}
-The cap column marks charged bytes at or under $10{,}240$; it is a byte check, not a release certificate. Retention columns are CatBoost at $n$ and $4n$, linear at $4n$, and the MLP at $4n$, each the median of the three sample seeds; the identifier is the lineage's dataset hash prefix and the name is its PMLB name.
+These rows are the historical fit-seed-$11$ population of the reported profile. The cap column marks charged bytes at or under $10{,}240$; it is a byte check, not a release certificate. Retention columns are CatBoost at $n$ and $4n$, linear at $4n$, and the MLP at $4n$, each the median of the three sample seeds; the identifier is the lineage's dataset hash prefix and the name is its PMLB name.
 \begingroup\scriptsize\setlength{\tabcolsep}{2pt}
 \input{generated/s3-2048-lineages.tex}
 \endgroup

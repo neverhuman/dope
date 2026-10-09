@@ -29,9 +29,9 @@ from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
     write_tex,
     _load,
     _sha,
-    _table,
     ci,
 )
+from research.benchmark.review_fixes.review_tex import longtable  # noqa: E402
 from research.benchmark.review_fixes.stats import (  # noqa: E402
     cluster_of,
     holm,
@@ -247,18 +247,17 @@ def render_controls(payload: dict) -> str:
             f"{row['size']}$n$ & catboost & split {row['split_seed']} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
         )
-    return (
-        "% Size n Holm family has 3 tests (predictor-only times three auditors). "
-        "real\\_bootstrap\\_4n has no size-n arm, so it is not a member of that family. "
-        "Size 4n Holm family has 6 tests. "
-        "Predictor fit seeds 23, 37, 53, and 71 are all reported and are not in the Holm family. "
-        "Split-seed rows are a separate sensitivity and are not pooled with fit seed 11. "
-        "Wilcoxon and TOST treat lineages as iid. The interval is the family-cluster bootstrap.\n"
-        + _table(
-            "Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
-            lines,
-            "lllrrrrllr",
-        )
+    return longtable(
+        "\\textbf{DOPE minus each control, fit seed 11.} A paired row is the median DOPE-minus-control retention "
+        "difference with its family-cluster bootstrap 95\\% interval, the mean difference, the v1 mean-difference "
+        "equivalence test at $\\pm 0.02$, and W/T/L over lineages; the Wilcoxon and equivalence tests treat lineages "
+        "as independent. Predictor fit-seed and split-seed rows give the control's own CatBoost retention level. "
+        "The size-$n$ Holm family is the three predictor-only tests, because the real-row control exists at $4n$ "
+        "only; the size-$4n$ family has six tests. Fit-seed and split-seed rows are outside both Holm families.",
+        "Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
+        lines,
+        "lllrrrrllr",
+        label="tab:review-controls",
     )
 
 
