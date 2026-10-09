@@ -41,6 +41,9 @@ BAND = "#EDEDED"
 CAP = 10240
 FULL_PANEL = 90
 AUDITORS = (("catboost", "CatBoost"), ("linear", "Linear"), ("mlp", "MLP"))
+# The figures draw these arms only; every other arm stays in the supplement tables.
+FIGURE_CODES = ("TabSyn", "Arf", "Gauss", "Chow", "Ind", "Tvae", "Ctgan", "Forest", "TabDdpm", "TabDiff",
+                "Great", "Synthpop", "Smote", "Pred", "Boot")
 OUTPUTS = {
     "teaser.pdf": (FIG, "teaser-figure-hashes.json"),
     "pareto.pdf": (FIG, "pareto-figure-hashes.json"),
@@ -51,7 +54,7 @@ OUTPUTS = {
 
 def _rows(headline: dict) -> list[dict]:
     """Comparator rows for the forest plot: full panel, smaller cohorts, then controls."""
-    rows = [arm for arm in headline["arms"] if arm["code"] != "Dope" and arm["contrasts"]["catboost"]]
+    rows = [arm for arm in headline["arms"] if arm["code"] in FIGURE_CODES and arm["contrasts"]["catboost"]]
     rank = {"generator": 0, "diagnostic": 2, "control": 3}
 
     def key(arm):
@@ -110,10 +113,11 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     axis.axvline(CAP, color=figure_style.SPINE, linestyle=(0, (4, 3)), linewidth=0.8, zorder=1)
     axis.annotate("10,240-byte cap", xy=(CAP, 1.0), xycoords=("data", "axes fraction"), xytext=(3, -9),
                   textcoords="offset points", fontsize=6.4, color=figure_style.INK)
-    xs = [arm["bytes"][key] for arm in headline["arms"] if arm["bytes"] and arm["role"] in {"headline", "generator"}
+    drawn = [arm for arm in headline["arms"] if arm["code"] == "Dope" or arm["code"] in FIGURE_CODES]
+    xs = [arm["bytes"][key] for arm in drawn if arm["bytes"] and arm["role"] in {"headline", "generator"}
           for key in ("q1", "q3")]
     right_edge = 10 ** (math.ceil(math.log10(max(xs))) + 0.3) if xs else None
-    for arm in headline["arms"]:
+    for arm in drawn:
         level = arm["level"]
         if arm["role"] == "control":
             axis.axhline(level["median"], color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.9, zorder=1)

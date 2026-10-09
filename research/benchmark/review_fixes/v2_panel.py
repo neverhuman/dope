@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -120,30 +122,54 @@ def contrast(left: list[dict], right: list[dict], label: str, right_arm: tuple, 
     return paired
 
 
-def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS) -> dict:
+def _level_task(task: tuple) -> dict:
+    kind, key, items, label, minimum, draws = task
+    return {"kind": kind, "key": key, **S.nested_level(items, label, minimum, draws)}
+
+
+def _contrast_task(task: tuple) -> dict:
+    key, left, right, label, arm, draws = task
+    result = contrast(left, right, label, arm, draws)
+    result.pop("differences")
+    return {"key": key, **result}
+
+
+def _run(function, tasks: list, jobs: int) -> list:
+    """Every statistic seeds its own generator from its label, so order and workers never change a value."""
+    if jobs <= 1 or len(tasks) < 2:
+        return [function(task) for task in tasks]
+    with ProcessPoolExecutor(max_workers=jobs) as pool:
+        return list(pool.map(function, tasks, chunksize=4))
+
+
+def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs: int | None = None) -> dict:
+    jobs = min(os.cpu_count() or 1, 16) if jobs is None else jobs
     values = fit_values(cells, names)
     arms = sorted({key[0] for key in values})
-    levels, contrasts = [], []
-    for arm in arms:
-        for size in SIZES:
-            for auditor in AUDITORS:
-                items = values.get((arm, size, auditor), [])
-                if not items:
-                    continue
-                level = S.nested_level(items, f"level|{arm}|{size}|{auditor}", min_fits(arm), draws)
-                levels.append({"method": arm[0], "configuration": arm[1], "size": size,
-                               "auditor": auditor, **level})
-    for arm in [item for item in arms if item != HEADLINE]:
-        for size in SIZES:
-            for auditor in AUDITORS:
-                left = values.get((HEADLINE, size, auditor), [])
-                right = values.get((arm, size, auditor), [])
-                if not left or not right:
-                    continue
-                result = contrast(left, right, f"paired|{arm}|{size}|{auditor}", arm, draws)
-                result.pop("differences")
-                contrasts.append({"method": arm[0], "configuration": arm[1], "size": size,
-                                  "auditor": auditor, "family": family_of_arm(arm), **result})
+    level_tasks = [("level", (arm, size, auditor), values[(arm, size, auditor)], f"level|{arm}|{size}|{auditor}",
+                    min_fits(arm), draws)
+                   for arm in arms for size in SIZES for auditor in AUDITORS if values.get((arm, size, auditor))]
+    fidelity_items = fidelity_values(cells, names)
+    level_tasks += [("fidelity", key, items, f"fidelity|{key[0]}|{key[1]}|{key[2]}", min_fits(key[0]), draws)
+                    for key, items in sorted(fidelity_items.items(), key=lambda kv: repr(kv[0]))]
+    contrast_tasks = [((arm, size, auditor), values[(HEADLINE, size, auditor)], values[(arm, size, auditor)],
+                       f"paired|{arm}|{size}|{auditor}", arm, draws)
+                      for arm in arms if arm != HEADLINE for size in SIZES for auditor in AUDITORS
+                      if values.get((HEADLINE, size, auditor)) and values.get((arm, size, auditor))]
+    levels, fidelity = [], []
+    for result in _run(_level_task, level_tasks, jobs):
+        kind, key = result.pop("kind"), result.pop("key")
+        if kind == "level":
+            arm, size, auditor = key
+            levels.append({"method": arm[0], "configuration": arm[1], "size": size, "auditor": auditor, **result})
+        else:
+            arm, size, metric = key
+            fidelity.append({"method": arm[0], "configuration": arm[1], "size": size, "metric": metric, **result})
+    contrasts = []
+    for result in _run(_contrast_task, contrast_tasks, jobs):
+        arm, size, auditor = result.pop("key")
+        contrasts.append({"method": arm[0], "configuration": arm[1], "size": size, "auditor": auditor,
+                          "family": family_of_arm(arm), **result})
     _holm(contrasts)
     seeds = [item for item in values.get((HEADLINE, 4, "catboost"), [])]
     later = {key: [item for item in items if item["fit_seed"] != 11]
@@ -152,10 +178,6 @@ def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS) -> di
                     **S.nested_level(later.get((HEADLINE, size, auditor), []),
                                      f"level|seeds23-71|{size}|{auditor}", S.MIN_FITS_FIVE_SEED, draws)}
                    for size in SIZES for auditor in AUDITORS]
-    fidelity = []
-    for (arm, size, metric), items in sorted(fidelity_values(cells, names).items(), key=lambda kv: repr(kv[0])):
-        fidelity.append({"method": arm[0], "configuration": arm[1], "size": size, "metric": metric,
-                         **S.nested_level(items, f"fidelity|{arm}|{size}|{metric}", min_fits(arm), draws)})
     return {
         "format": "dope-review-fix-v2-panel", "version": 1, "fidelity": fidelity,
         "predeclare_sha256": hashlib.sha256(PREDECLARE.read_bytes()).hexdigest(),
