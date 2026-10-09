@@ -1,0 +1,26 @@
+{
+  "cell_count": 4836,
+  "formal_dp": false,
+  "format": "dope-review-fix-privacy-scalar-cells-v1",
+  "hipaa_deidentification": false,
+  "official_tests_opened": false,
+  "panel_sha256": "2caa429ae03b5bbc61b30c4ce9391670f70ec9a991e2d398974a8bf3d76942f8",
+  "predeclaration_sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5",
+  "producer": {
+    "expanded_implementation_sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
+    "git_sha": "999a0f897519fe70367da73e9126eaba444cc42b",
+    "path": "research/benchmark/review_fixes/privacy_fidelity.py",
+    "sha256": "80adb6aa3ee793d882ce3b2f5b50c94fd2ebc9964c3df67e412a594926dabfa7"
+  },
+  "reference_rows": {
+    "fit_median": 667.0,
+    "fit_to_holdout_median": 4.0120481927710845,
+    "holdout_median": 166.0,
+    "lineages": 100
+  },
+  "sha256": "4702f9c48c543a311af198a5652e8b41904004ac22d94949ba455eef82a9521d",
+  "source": "scalar json documents only; the absolute scratch csv path is dropped",
+  "stripped_fields": [
+    "csv"
+  ]
+}

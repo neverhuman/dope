@@ -2,7 +2,9 @@
 """Aggregate holdout privacy and GBDT C2ST cell JSON into one table.
 
 The cell files are the output of research/benchmark/review_fixes/privacy_fidelity.py.
-Logistic C2ST stored on the population ledgers is not relabeled here.
+payload_from_cells reduces the bound scalar ledger to the committed panel, and the
+table takes its DCR reference sizes from that ledger. Logistic C2ST stored on the
+population ledgers is not relabeled here.
 """
 
 from __future__ import annotations
@@ -26,9 +28,10 @@ from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
     write_tex,
     _load,
     _sha,
-    _table,
     ci,
 )
+from research.benchmark.review_fixes.bind_privacy_cells import decode_jsonl, reference_rows  # noqa: E402
+from research.benchmark.review_fixes.review_tex import assert_distinct, longtable  # noqa: E402
 from research.benchmark.review_fixes.stats import cluster_of, median_ci  # noqa: E402
 
 from research.benchmark.expanded_validation_metrics import MAX_ROWS  # noqa: E402
@@ -125,69 +128,73 @@ def _cells(root: Path) -> list[dict]:
     return found
 
 
-def render_privacy(payload: dict) -> str:
-    lines = []
-    for row in payload["summaries"]:
-        lines.append(
-            f"{tex_name(row['method'])} & {tex_name(row['configuration'])} & {row['size']}$n$ & "
-            f"{tex_name(row['metric'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
-        )
-    for row in payload["matched_density"]:
-        lines.append(
-            f"{tex_name(row['method'])} & matched density & {row['size']}$n$ & "
-            f"{tex_name(row['metric'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
-        )
-    unavailable = " ".join(
-        f"{tex_name(row['method'])} {row['reason']} {row['n']}."
-        for row in payload["unavailable"]
+METRIC_LABELS = {
+    "dcr_validation_median": "holdout DCR",
+    "dcr_fit_median": "fit DCR",
+    "nndr_fit_median": "fit NNDR",
+    "distance_mia_auc": "distance MIA AUC",
+    "c2st_catboost_auc": "CatBoost C2ST AUC",
+}
+
+
+def _count(value) -> str:
+    return f"{int(value):,}" if float(value).is_integer() else f"{float(value):,.1f}"
+
+
+def ledger_references(panel_path: Path, payload: dict) -> dict:
+    """Reference sizes come from the bound scalar ledger beside the panel."""
+    ledger = panel_path.with_name("scalar-cells.jsonl")
+    if ledger.is_symlink() or not ledger.is_file():
+        raise SystemExit("privacy table needs the bound scalar ledger beside its panel")
+    cells = decode_jsonl(ledger.read_bytes())
+    if len(cells) != payload["cells"]:
+        raise SystemExit("privacy scalar ledger does not match the panel cell count")
+    return reference_rows(cells)
+
+
+def render_privacy(payload: dict, references: dict) -> str:
+    lines, keys = [], []
+    for cohort, rows in (("own lineages", payload["summaries"]), ("matched density", payload["matched_density"])):
+        for row in rows:
+            keys.append((row["method"], row["configuration"], cohort, row["size"], row["metric"]))
+            lines.append(
+                f"{tex_name(row['method'])} & {tex_name(row['configuration'])} & {cohort} & {row['size']}$n$ & "
+                f"{METRIC_LABELS[row['metric']]} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
+            )
+    assert_distinct(keys, "privacy table")
+    unavailable = "; ".join(
+        f"{tex_name(row['method'])} {row['n']} ({tex_name(row['reason'])})" for row in payload["unavailable"]
+    ) or "none"
+    caption = (
+        "Holdout privacy and CatBoost detection of the published fit-seed-11 synthetic samples. "
+        "Each value is the median over lineages of each lineage's median over sample seeds 101, 211 and 307; "
+        "$n$ counts lineages with three finite seeds. Own-lineage rows keep every scored lineage whose "
+        "synthetic row count equals fit rows times size; matched-density rows use the lineages shared by "
+        "DOPE, GaussianCopula, Chow-Liu and independent marginals. Interval: 95\\% family-cluster bootstrap "
+        "percentile interval of the median, 10{,}000 draws. Holdout DCR uses each lineage's validation rows "
+        f"as the reference set (median {_count(references['holdout_median'])} rows); fit DCR and fit NNDR use "
+        f"its training rows (median {_count(references['fit_median'])} rows, a median "
+        f"{references['fit_to_holdout_median']:.1f} times as many), so the two distances use reference sets "
+        "of different sizes. Distance MIA AUC is an empirical membership attack, and CatBoost C2ST uses "
+        "min(validation, synthetic, 800) rows per class. Empirical attack scores are not formal differential "
+        "privacy and not HIPAA de-identification. Unavailable cells stay out of every median and are not "
+        f"wins: {unavailable}. No Holm family."
     )
-    return (
-        "% Empirical attack metrics only. Not formal differential privacy and not HIPAA de-identification. "
-        "c2st\\_catboost\\_auc is the GBDT detector. Stored logistic C2ST is a different table. "
-        "Unmatched rows keep each method's own lineages whose synthetic row count equals fit rows times size. "
-        "Matched density rows use the intersection of DOPE, GaussianCopula, Chow-Liu, and independent marginals. "
-        "Unavailable cells are not wins. "
-        + unavailable
-        + "\n"
-    ) + _table(
-        "Method & Configuration & Size & Metric & $n$ lineages & Median & Hierarchical CI",
+    note = (
+        "% c2st\\_catboost\\_auc is the GBDT detector. Stored logistic C2ST is a different table. "
+        f"Reference sizes cover {references['lineages']} scored lineages.\n"
+    )
+    return longtable(
+        caption,
+        "Method & Configuration & Cohort & Size & Metric & $n$ & Median & 95\\% CI",
         lines,
-        "lllllrr",
+        "lllllrrr",
+        note,
     )
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--cells", type=Path)
-    parser.add_argument("--from-panel", type=Path)
-    parser.add_argument("--check", action="store_true")
-    args = parser.parse_args()
-    if args.from_panel or (args.check and args.cells is None):
-        panel_path = args.from_panel or (RESULTS / "review-fixes-privacy-v1" / "panel.json")
-        payload = json.loads(panel_path.read_text())
-        rendered = render_privacy(payload)
-        tex_path = GENERATED / "review-privacy.tex"
-        json_path = GENERATED / "review-privacy.json"
-        text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
-        if args.check:
-            if not tex_path.is_file() or tex_path.read_text() != rendered:
-                raise SystemExit("review-privacy.tex does not match the panel")
-            if not json_path.is_file() or json_path.read_text() != text:
-                raise SystemExit("review-privacy.json does not match the panel")
-            print("privacy check ok")
-            return
-        if text != panel_path.read_text():
-            raise SystemExit("privacy panel is not canonical json")
-        (GENERATED / "review-privacy.json").write_text(text)
-        write_tex("review-privacy.tex", rendered)
-        return
-    if args.cells is None:
-        print("privacy cells not scored yet")
-        return
-    cells = _cells(args.cells)
-    if not cells:
-        print("privacy cells not scored yet")
-        return
+def payload_from_cells(cells: list[dict]) -> dict:
+    """Reduce scalar privacy cells to the committed aggregate. Writes nothing."""
     record, _sha_record = _load("s3-lineage-record.json")
     names = names_of(record)
     grouped = defaultdict(dict)
@@ -249,7 +256,7 @@ def main() -> None:
             })
             summaries.append(summary)
     matched = _matched_density(grouped, names)
-    payload = {
+    return {
         "format": "dope-review-fix-privacy",
         "version": 1,
         "cells": len(cells),
@@ -271,13 +278,48 @@ def main() -> None:
         "claims": {"formal_dp": False, "hipaa_deidentification": False, "mfs_v2": None, "ptf_v1": None,
                    "release_safe_l3": None, "superiority": None},
     }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cells", type=Path)
+    parser.add_argument("--from-panel", type=Path)
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    if args.from_panel or (args.check and args.cells is None):
+        panel_path = args.from_panel or (RESULTS / "review-fixes-privacy-v1" / "panel.json")
+        payload = json.loads(panel_path.read_text())
+        rendered = render_privacy(payload, ledger_references(panel_path, payload))
+        tex_path = GENERATED / "review-privacy.tex"
+        json_path = GENERATED / "review-privacy.json"
+        text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        if args.check:
+            if not tex_path.is_file() or tex_path.read_text() != rendered:
+                raise SystemExit("review-privacy.tex does not match the panel")
+            if not json_path.is_file() or json_path.read_text() != text:
+                raise SystemExit("review-privacy.json does not match the panel")
+            print("privacy check ok")
+            return
+        if text != panel_path.read_text():
+            raise SystemExit("privacy panel is not canonical json")
+        (GENERATED / "review-privacy.json").write_text(text)
+        write_tex("review-privacy.tex", rendered)
+        return
+    if args.cells is None:
+        print("privacy cells not scored yet")
+        return
+    cells = _cells(args.cells)
+    if not cells:
+        print("privacy cells not scored yet")
+        return
+    payload = payload_from_cells(cells)
     out = RESULTS / "review-fixes-privacy-v1"
     out.mkdir(parents=True, exist_ok=True)
     text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
     (out / "panel.json").write_text(text)
     (GENERATED / "review-privacy.json").write_text(text)
-    write_tex("review-privacy.tex", render_privacy(payload))
-    holdout = [row for row in summaries if row["metric"] == "dcr_validation_median" and row["method"] == "DOPE"]
+    write_tex("review-privacy.tex", render_privacy(payload, reference_rows(cells)))
+    holdout = [row for row in payload["summaries"] if row["metric"] == "dcr_validation_median" and row["method"] == "DOPE"]
     for row in holdout:
         print(
             f"DOPE holdout DCR size {row['size']}n median {fmt(row['median'])} "
