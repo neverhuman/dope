@@ -58,7 +58,7 @@ In progress, wave 2. No number:
 
 - TabDDPM population v5, unit `dope-rf-tabddpm-v5`, still running on xbabe3 at the pre-registered config. A failed or missing cell is not a win.
 - DOPE fit seeds beyond published fit seed 11. f6665d9 exposes `compile --fit-seed`. Qualification passed. `dope-rf-seeds-x1` is fitting the even lineage-record indexes on xbabe1. `dope-rf-seeds-x3` is fitting the odd indexes on xbabe3 and waits while `dope-rf-tabddpm-v5` is active. No number until scored cells are reduced.
-- The sealed official-test run has not started. In progress, wave 2. A resume can accept a matching start marker and skip the exclusive gate, so that guard stays open. No official-test number is reported.
+- The sealed official-test run has not started. In progress, wave 2. An existing `started.json` is refused, so the run cannot resume. No official-test number.
 
 PR-11, the XOR/parity/product stress suite, was not started. In progress, wave 2. No number.
 
