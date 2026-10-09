@@ -882,13 +882,13 @@ def patch_stored_fidelity(panel_path: Path) -> None:
     _require_anchor(payload)
     campaign = _load_reductions()
     fresh = stored_fidelity_rows(campaign["reductions"], campaign["names"])
-    old = {
+    prior = {
         (row["method"], row["configuration"], row["size"], row["metric"]): row.get("median")
         for row in payload.get("fidelity_stored") or []
     }
     for row in fresh:
         key = (row["method"], row["configuration"], row["size"], row["metric"])
-        if key in old and not _same_median(old[key], row.get("median")):
+        if key in prior and not _same_median(prior[key], row.get("median")):
             raise SystemExit(f"stored fidelity drift {key}")
     payload["fidelity_stored"] = fresh
     payload["fidelity_coverage"] = (
@@ -896,9 +896,9 @@ def patch_stored_fidelity(panel_path: Path) -> None:
         "stored C2ST is logistic; TabSyn is absent from these ledgers"
     )
     text = json.dumps(_clean(payload), indent=2, sort_keys=True) + "\n"
-    temporary = panel_path.with_suffix(".json.tmp")
-    temporary.write_text(text)
-    temporary.replace(panel_path)
+    staging = panel_path.with_suffix(".json.tmp")
+    staging.write_text(text)
+    staging.replace(panel_path)
     print(f"patched fidelity rows {len(fresh)} anchor n={payload['anchor']['n']}")
 
 

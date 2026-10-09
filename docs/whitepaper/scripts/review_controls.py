@@ -260,7 +260,7 @@ def main() -> None:
                 drafted.append(item)
                 family.append(item["wilcoxon_p"])
         adjusted = holm(family)
-        family_n = len([p_value for p_value in family if p_value is not None])
+        family_n = len(family)
         if size == 1:
             holm_note = (
                 "size-n family is the three predictor-only auditor tests; "

@@ -111,6 +111,59 @@ def _nndr_median(block):
     return _measured_value(block)
 
 
+def _expected_sample_sha(cell: dict, csv_path: str | None) -> str | None:
+    evidence = cell.get("metric_receipt") if cell.get("method") == "DOPE" else cell.get("sample_evidence")
+    if not isinstance(evidence, dict):
+        return None
+    sample_sha = evidence.get("sample_sha256")
+    if isinstance(sample_sha, str):
+        return sample_sha
+    # SDV binds a CSV directly. A forest receipt digest is not a sample digest.
+    if isinstance(csv_path, str) and evidence.get("path") == csv_path:
+        return evidence.get("sha256")
+    return None
+
+
+def _valid_sha(value) -> bool:
+    return isinstance(value, str) and len(value) == 64 and all(ch in "0123456789abcdef" for ch in value)
+
+
+def _authenticated_sample_sha(path: Path, job: dict) -> str:
+    expected = job.get("expected_sha256")
+    if not _valid_sha(expected):
+        raise ValueError("published sample sha pin missing")
+    if path.name == "test.csv":
+        raise ValueError("official test sample refused")
+    if _sha(path) != expected:
+        raise ValueError("published sample sha mismatch")
+    return expected
+
+
+def _existing_problem(record: dict, job: dict) -> str | None:
+    for field in ("dataset", "method", "configuration", "size", "sample_seed"):
+        if record.get(field) != job.get(field):
+            return "existing privacy cell identity mismatch"
+    if record.get("status") == "ok":
+        expected = job.get("expected_sha256")
+        if not _valid_sha(expected):
+            return "existing privacy cell published pin missing"
+        if record.get("expected_sha256") != expected or record.get("synthetic_sha256") != expected:
+            return "existing privacy cell requires sample-pin revalidation"
+    return None
+
+
+def _validate_existing(path: Path, job: dict) -> None:
+    record = json.loads(path.read_text())
+    problem = _existing_problem(record, job)
+    if problem is not None:
+        raise ValueError(problem)
+    if record.get("status") == "ok":
+        csv_path = job.get("csv")
+        if not isinstance(csv_path, str):
+            raise ValueError("published sample sha pin missing")
+        _authenticated_sample_sha(Path(csv_path), job)
+
+
 def _index(results: Path) -> list[dict]:
     cache = {}
     jobs = []
@@ -127,14 +180,16 @@ def _index(results: Path) -> list[dict]:
             dataset = cell.get("dataset")
             if size not in (1, 4) or seed not in SEEDS or not isinstance(dataset, str):
                 continue
+            csv_path = _resolve_sample_csv(cell)
             jobs.append({
                 "dataset": dataset,
                 "method": method,
                 "configuration": configuration,
                 "size": size,
                 "sample_seed": seed,
-                "csv": _resolve_sample_csv(cell),
+                "csv": csv_path,
                 "source": filename,
+                "expected_sha256": _expected_sample_sha(cell, csv_path),
             })
     return jobs
 
@@ -148,6 +203,7 @@ def _score_one(job: dict) -> dict:
     out = Path(job["out"])
     out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists():
+        _validate_existing(out, job)
         return {"status": "skipped", "path": str(out)}
     payload = {
         "dataset": job["dataset"],
@@ -156,6 +212,8 @@ def _score_one(job: dict) -> dict:
         "size": job["size"],
         "sample_seed": job["sample_seed"],
         "csv": job.get("csv"),
+        "source": job.get("source"),
+        "expected_sha256": job.get("expected_sha256"),
         "official_tests_opened": False,
         "formal_dp": False,
         "hipaa_deidentification": False,
@@ -171,6 +229,7 @@ def _score_one(job: dict) -> dict:
         _write(out, payload)
         return {"status": "unavailable", "path": str(out)}
     try:
+        synthetic_sha256 = _authenticated_sample_sha(path, job)
         _wait_for_memory()
         expanded = _load_expanded()
         root = WORKERS / job["dataset"]
@@ -185,7 +244,7 @@ def _score_one(job: dict) -> dict:
         payload.update(
             status="ok",
             reason=None,
-            synthetic_sha256=_sha(path),
+            synthetic_sha256=synthetic_sha256,
             rows={"fit": int(fit.shape[0]), "validation": int(validation.shape[0]), "synthetic": int(synthetic.shape[0])},
             dcr_fit_median=_median(privacy.get("dcr_fit")),
             dcr_validation_median=_median(privacy.get("dcr_validation")),
@@ -203,9 +262,9 @@ def _score_one(job: dict) -> dict:
 
 
 def _write(path: Path, payload: dict) -> None:
-    temporary = path.with_suffix(".json.tmp")
-    temporary.write_text(json.dumps(payload, sort_keys=True) + "\n")
-    temporary.replace(path)
+    staging = path.with_suffix(".json.tmp")
+    staging.write_text(json.dumps(payload, sort_keys=True) + "\n")
+    staging.replace(path)
 
 
 def main() -> None:
@@ -223,6 +282,10 @@ def main() -> None:
     jobs = _index(args.results)
     if args.index_only:
         args.out.mkdir(parents=True, exist_ok=True)
+        for job in jobs:
+            out = _out_path(args.out, job)
+            if out.exists():
+                _validate_existing(out, job)
         text = "".join(json.dumps(job, sort_keys=True) + "\n" for job in jobs)
         (args.out / "index.jsonl").write_text(text)
         resolved = sum(isinstance(job.get("csv"), str) for job in jobs)
@@ -233,7 +296,9 @@ def main() -> None:
         out = _out_path(args.out, job)
         job = dict(job)
         job["out"] = str(out)
-        if not out.exists():
+        if out.exists():
+            _validate_existing(out, job)
+        else:
             pending.append(job)
     print(f"jobs {len(jobs)} pending {len(pending)}", flush=True)
     if not pending:

@@ -15,11 +15,13 @@ import csv
 import hashlib
 import importlib.abc
 import importlib.machinery
+import importlib.util
 import json
 import os
 import signal
 import subprocess
 import time
+import types
 from pathlib import Path
 
 RUNTIME_LOCK = Path("/mnt/fast-scratch/dope-benchmark/tabsyn-x2-runtime-v1/runtime.lock.json")
@@ -171,6 +173,58 @@ def parser_check(panel: Path, pilot_path: Path) -> int:
     return 0 if match else 2
 
 
+_REJECTED_CALLS = frozenset({"eval", "exec", "compile", "__import__", "breakpoint", "input"})
+_REJECTED_MODULES = frozenset({
+    "subprocess", "socket", "ctypes", "pickle", "shutil", "pty", "multiprocessing",
+})
+
+
+def _call_name(node: ast.AST) -> str | None:
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return node.attr
+    return None
+
+
+def _reject_adapter(tree: ast.AST) -> None:
+    """Refuse sinks that are outside the pinned adapter's authenticated boundary."""
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and _call_name(node.func) in _REJECTED_CALLS:
+            raise SystemExit("adapter call is outside the authenticated boundary")
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".", 1)[0] in _REJECTED_MODULES:
+                    raise SystemExit("adapter import is outside the authenticated boundary")
+        if isinstance(node, ast.ImportFrom):
+            module = node.module or ""
+            if module.split(".", 1)[0] in _REJECTED_MODULES:
+                raise SystemExit("adapter import is outside the authenticated boundary")
+
+
+def _load_allowlisted(tree: ast.AST, namespace: dict, work: Path) -> dict:
+    """Load a stripped adapter only after the call and import boundary accepts it."""
+    _reject_adapter(tree)
+    module = ast.Module(body=list(tree.body), type_ignores=[])
+    ast.fix_missing_locations(module)
+    work.parent.mkdir(parents=True, exist_ok=True)
+    binding = "captured_review_fix_tabsyn_bindings"
+    bindings = types.ModuleType(binding)
+    bindings.verify_runtime = namespace["verify_runtime"]
+    bindings.verify_operation = namespace["verify_operation"]
+    import sys
+    sys.modules[binding] = bindings
+    prelude = "from captured_review_fix_tabsyn_bindings import verify_runtime, verify_operation\n"
+    work.write_text(prelude + ast.unparse(module))
+    spec = importlib.util.spec_from_file_location("captured_review_fix_tabsyn_adapter", work)
+    loaded = importlib.util.module_from_spec(spec)
+    if spec.loader is None:
+        raise SystemExit("adapter loader is missing")
+    spec.loader.exec_module(loaded)
+    loaded.__file__ = namespace["__file__"]
+    return {key: value for key, value in loaded.__dict__.items() if key != "__builtins__"}
+
+
 def _load_namespace(request: dict):
     runtime_path = Path(request["runtime_ref"]["path"])
     runtime_pin = request["runtime_ref"]["sha256"]
@@ -238,9 +292,9 @@ def _load_namespace(request: dict):
         "verify_runtime": verify_runtime,
         "verify_operation": verify_operation,
     }
-    exec(compile(tree, "captured_review_fix_tabsyn_adapter", "exec"), namespace)
-    namespace["_holder"] = holder
-    return namespace, runtime
+    loaded = _load_allowlisted(tree, namespace, OUTPUT / "allowlisted-adapter.py")
+    loaded["_holder"] = holder
+    return loaded, runtime
 
 
 def sys_executable() -> str:
@@ -316,12 +370,12 @@ def sample_lineage(dataset: str, artifact: Path, git_sha: str) -> int:
                     code_sha256=info["code_sha256"],
                     admission=holder["grant"],
                 )
-                temporary = final.with_suffix(".csv.tmp")
-                with temporary.open("w", newline="") as handle:
+                staging = final.with_suffix(".csv.tmp")
+                with staging.open("w", newline="") as handle:
                     writer = csv.writer(handle)
                     writer.writerow([f"f{i}" for i in range(matrix.shape[1] - 1)] + ["target"])
                     writer.writerows([[*row[1:], row[0]] for row in matrix])
-                temporary.replace(final)
+                staging.replace(final)
                 status = "ok"
                 reason = None
             except Exception as error:
@@ -416,9 +470,9 @@ def score_samples(panel_workers_pilot: Path) -> int:
                         "status": "failed", "reason": type(error).__name__,
                         "official_tests_opened": False,
                     }
-                temporary = metric.with_suffix(".json.tmp")
-                temporary.write_text(json.dumps(payload, sort_keys=True) + "\n")
-                temporary.replace(metric)
+                staging = metric.with_suffix(".json.tmp")
+                staging.write_text(json.dumps(payload, sort_keys=True) + "\n")
+                staging.replace(metric)
                 print(dataset, size, seed, payload["status"], flush=True)
     return 0
 

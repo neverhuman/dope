@@ -13,8 +13,11 @@ import argparse
 import json
 import math
 import sys
+import tempfile
 from collections import defaultdict
 from pathlib import Path
+
+import numpy as np
 
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO))
@@ -29,11 +32,15 @@ from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
     write_tex,
 )
 from research.benchmark.review_fixes.stats import (  # noqa: E402
+    DRAWS,
     SIMULATED,
     cluster_of,
     family_of,
     median_ci,
+    rng_for,
 )
+
+ESTIMAND = "median of lineage medians of completed fit-seed retentions"
 
 FIT_SEEDS = (23, 37, 53, 71)
 SAMPLE_SEEDS = (101, 211, 307)
@@ -65,10 +72,12 @@ def load_metrics(root: Path) -> list[dict]:
         seen.add(key)
         if row.get("fit_seed") not in FIT_SEEDS or row.get("sample_seed") not in SAMPLE_SEEDS:
             raise SystemExit("fit-seed metric is outside the declared seeds")
-        if row.get("size") not in SIZES or row.get("method") != "DOPE":
+        if row.get("size") not in SIZES:
             raise SystemExit("fit-seed metric is outside the declared grid")
-        if row.get("configuration") != "features12_steps2048":
-            raise SystemExit("fit-seed metric is not features12_steps2048")
+        if row.get("status") == "ok" and (
+            row.get("method") != "DOPE" or row.get("configuration") != "features12_steps2048"
+        ):
+            raise SystemExit("fit-seed metric is outside the declared grid")
         found.append(row)
     if not found:
         raise SystemExit("no fit-seed metric cells")
@@ -89,12 +98,26 @@ def _retention(row: dict, auditor: str):
     return None
 
 
-def triples(rows: list[dict]) -> dict:
+def _on_grid(row: dict) -> bool:
+    return (
+        row.get("fit_seed") in FIT_SEEDS
+        and row.get("sample_seed") in SAMPLE_SEEDS
+        and row.get("size") in SIZES
+        and isinstance(row.get("dataset"), str)
+        and bool(row["dataset"])
+    )
+
+
+def triples(rows: list[dict], planned_datasets: list[str] | None = None) -> dict:
     """Median of three sample seeds. An incomplete triple is counted and unused."""
     buckets = defaultdict(dict)
     names = {}
+    failed_cells = 0
     for row in rows:
+        if not _on_grid(row):
+            raise SystemExit("fit-seed metric is outside the declared grid")
         if row.get("status") != "ok":
+            failed_cells += 1
             continue
         names[row["dataset"]] = row.get("display_name") or row["dataset"]
         for auditor in AUDITORS:
@@ -118,21 +141,139 @@ def triples(rows: list[dict]) -> dict:
             "cluster": cluster_of(names[dataset], dataset),
             "family": family_of(names[dataset]),
         })
-    return {"complete": complete, "incomplete_triples": incomplete, "names": names}
+    if planned_datasets is None:
+        datasets = sorted({row["dataset"] for row in rows})
+    else:
+        if not isinstance(planned_datasets, list) or not all(isinstance(item, str) and item for item in planned_datasets):
+            raise SystemExit("fit-seed planned grid is not a dataset list")
+        datasets = planned_datasets
+    present = {(row["dataset"], row["fit_seed"], row["size"]) for row in rows}
+    missing = sum(
+        1
+        for dataset in datasets
+        for fit_seed in FIT_SEEDS
+        for size in SIZES
+        if (dataset, fit_seed, size) not in present
+    )
+    return {
+        "complete": complete,
+        "incomplete_triples": incomplete,
+        "missing_triples": missing,
+        "failed_cells": failed_cells,
+        "names": names,
+    }
+
+
+def _empty_summary() -> dict:
+    return {
+        "n": 0,
+        "n_fits": 0,
+        "median": None,
+        "lo": None,
+        "hi": None,
+        "iid_lo": None,
+        "iid_hi": None,
+        "estimand": ESTIMAND,
+    }
+
+
+def _nested_summary(items: list[dict], label: str) -> dict:
+    """Family, then lineage, then fit. Each lineage has equal weight."""
+    if not items:
+        return _empty_summary()
+    lineages: dict[str, dict] = {}
+    for item in items:
+        slot = lineages.setdefault(item["dataset"], {"cluster": item["cluster"], "values": []})
+        slot["values"].append(float(item["retention"]))
+    n = len(lineages)
+    n_fits = sum(len(slot["values"]) for slot in lineages.values())
+    lineage_points = [float(np.median(slot["values"])) for slot in lineages.values()]
+    point = float(np.median(lineage_points))
+    if n == 1:
+        return {
+            "n": 1,
+            "n_fits": n_fits,
+            "median": point,
+            "lo": point,
+            "hi": point,
+            "iid_lo": point,
+            "iid_hi": point,
+            "estimand": ESTIMAND,
+        }
+    clusters: dict[str, list[str]] = {}
+    for dataset, slot in lineages.items():
+        clusters.setdefault(slot["cluster"], []).append(dataset)
+    one_each = all(len(members) == 1 for members in clusters.values()) and all(
+        len(slot["values"]) == 1 for slot in lineages.values()
+    )
+    if one_each:
+        base = median_ci(
+            [item["retention"] for item in items],
+            label,
+            [item["cluster"] for item in items],
+        )
+        base["n_fits"] = n_fits
+        base["estimand"] = ESTIMAND
+        return base
+    rng = rng_for(label + "|nested")
+    cluster_ids = list(clusters)
+    grouped = [
+        [np.asarray(lineages[dataset]["values"], dtype=float) for dataset in clusters[cluster]]
+        for cluster in cluster_ids
+    ]
+    n_clusters = len(grouped)
+    samples = np.empty(DRAWS, dtype=float)
+    for draw in range(DRAWS):
+        chosen = rng.integers(0, n_clusters, size=n_clusters)
+        lineage_draws = []
+        for index in chosen:
+            members = grouped[int(index)]
+            picked = rng.integers(0, len(members), size=len(members))
+            for member_index in picked:
+                values = members[int(member_index)]
+                take = rng.integers(0, len(values), size=len(values))
+                lineage_draws.append(float(np.median(values[take])))
+        samples[draw] = float(np.median(lineage_draws))
+    lo, hi = np.quantile(samples, [0.025, 0.975])
+    iid = median_ci(lineage_points, label + "|lineage-iid")
+    return {
+        "n": n,
+        "n_fits": n_fits,
+        "median": point,
+        "lo": float(lo),
+        "hi": float(hi),
+        "iid_lo": iid["lo"],
+        "iid_hi": iid["hi"],
+        "estimand": ESTIMAND,
+    }
 
 
 def _summary(items: list[dict], label: str) -> dict:
-    if not items:
-        return {"n": 0, "median": None, "lo": None, "hi": None}
-    return median_ci(
-        [item["retention"] for item in items],
-        label,
-        [item["cluster"] for item in items],
-    )
+    return _nested_summary(items, label)
+
+
+def _require_cells(panel: dict) -> None:
+    cells = panel.get("cells") if isinstance(panel, dict) else None
+    if not isinstance(cells, list):
+        raise SystemExit("fit-seed panel cells are not a cell list")
+    planned = panel.get("planned_datasets")
+    if planned is not None and (
+        not isinstance(planned, list) or not all(isinstance(item, str) and item for item in planned)
+    ):
+        raise SystemExit("fit-seed planned grid is not a dataset list")
+    for row in cells:
+        if not isinstance(row, dict) or not _on_grid(row):
+            raise SystemExit("fit-seed panel cell is outside the declared grid")
+        if row.get("official_tests_opened") is True:
+            raise SystemExit("fit-seed panel opened an official test")
+        if row.get("status") == "ok" and (
+            row.get("method") != "DOPE" or row.get("configuration") != "features12_steps2048"
+        ):
+            raise SystemExit("fit-seed panel cell is outside the declared grid")
 
 
 def reduce_panel(panel: dict) -> dict:
-    reduced = triples(panel["cells"])
+    reduced = triples(panel["cells"], planned_datasets=panel.get("planned_datasets"))
     rows = reduced["complete"]
     blocks = []
     for size in SIZES:
@@ -185,8 +326,11 @@ def reduce_panel(panel: dict) -> dict:
         "pooled_with_fit_seed_11": False,
         "missing_seeds_imputed": False,
         "official_tests_opened": False,
+        "estimand": ESTIMAND,
         "scored_cells": len(panel["cells"]),
         "incomplete_triples": reduced["incomplete_triples"],
+        "missing_triples": reduced["missing_triples"],
+        "failed_cells": reduced["failed_cells"],
         "blocks": blocks,
     }
 
@@ -307,8 +451,77 @@ def _self_check() -> None:
         block for block in summary["blocks"]
         if block["kind"] == "hierarchical" and block["auditor"] == "catboost" and block["size"] == 1
     )
-    if hier["n"] != 1 or abs(hier["median"] - 0.3) > 1e-12:
+    if hier["n"] != 1 or hier.get("n_fits") != 1 or abs(hier["median"] - 0.3) > 1e-12:
         raise SystemExit("compact panel median drifted")
+    weighted = []
+    for sample_seed in SAMPLE_SEEDS:
+        weighted.append(cell("aa000000000000aa", "feynman_aa", 23, sample_seed, 1, 0.1))
+    for fit_seed in (23, 37):
+        for sample_seed in SAMPLE_SEEDS:
+            weighted.append(cell("bb000000000000bb", "feynman_bb", fit_seed, sample_seed, 1, 0.9))
+    weighted_summary = reduce_panel(build_panel(weighted))
+    weighted_hier = next(
+        block for block in weighted_summary["blocks"]
+        if block["kind"] == "hierarchical" and block["auditor"] == "catboost" and block["size"] == 1
+    )
+    if weighted_hier["n"] != 2 or weighted_hier["n_fits"] != 3 or abs(weighted_hier["median"] - 0.5) > 1e-12:
+        raise SystemExit("lineage weight drifted")
+    single = []
+    for fit_seed, retention in ((23, 0.2), (37, 0.8)):
+        for sample_seed in SAMPLE_SEEDS:
+            single.append(cell("cc000000000000cc", "plain_cc", fit_seed, sample_seed, 1, retention))
+    single_summary = reduce_panel(build_panel(single))
+    single_hier = next(
+        block for block in single_summary["blocks"]
+        if block["kind"] == "hierarchical" and block["auditor"] == "catboost" and block["size"] == 1
+    )
+    if single_hier["n"] != 1 or single_hier["n_fits"] != 2 or abs(single_hier["median"] - 0.5) > 1e-12:
+        raise SystemExit("single-lineage fit count drifted")
+    planned = triples(rows, planned_datasets=[rows[0]["dataset"], "dd000000000000dd"])
+    if planned["missing_triples"] != len(FIT_SEEDS) * len(SIZES) * 2 - 1 or planned["failed_cells"] != 0:
+        raise SystemExit("missing planned triple was omitted")
+    failed = cell("aa00000000000001", "plain", 37, 101, 1, None)
+    failed["status"] = "failed"
+    failed.pop("method", None)
+    failed.pop("configuration", None)
+    counted = triples(rows + [failed])
+    if counted["failed_cells"] != 1 or any(item["fit_seed"] == 37 for item in counted["complete"]):
+        raise SystemExit("failed cell was imputed")
+    try:
+        _require_cells({"cells": 3})
+    except SystemExit as error:
+        if "cell list" not in str(error):
+            raise
+    else:
+        raise SystemExit("aggregate input was accepted")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "sample-failed.metric.json").write_text(json.dumps({
+            "status": "failed",
+            "dataset": "aa00000000000001",
+            "fit_seed": 23,
+            "sample_seed": 101,
+            "size": 1,
+            "official_tests_opened": False,
+        }))
+        loaded = load_metrics(root)
+        if len(loaded) != 1 or loaded[0].get("method") is not None:
+            raise SystemExit("failure record aborted ingestion")
+        (root / "sample-unprofiled.metric.json").write_text(json.dumps({
+            "status": "ok",
+            "dataset": "bb00000000000002",
+            "fit_seed": 37,
+            "sample_seed": 211,
+            "size": 4,
+            "official_tests_opened": False,
+        }))
+        try:
+            load_metrics(root)
+        except SystemExit as error:
+            if "declared grid" not in str(error):
+                raise
+        else:
+            raise SystemExit("ok record without a profile was accepted")
     print("fit-seeds self-check ok", flush=True)
 
 
@@ -330,6 +543,7 @@ def main() -> None:
         raise SystemExit("pass --from-metrics or --from-panel")
     if panel.get("official_tests_opened") is True:
         raise SystemExit("fit-seed panel opened an official test")
+    _require_cells(panel)
     if args.check:
         _check(panel)
         return

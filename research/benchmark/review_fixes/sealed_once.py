@@ -272,9 +272,9 @@ def partition_path(registry: Path, dataset: str) -> Path:
 
 def write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(".json.tmp")
-    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-    temporary.replace(path)
+    staging = path.with_suffix(".json.tmp")
+    staging.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    staging.replace(path)
 
 
 def read_checkpoint(path: Path) -> dict | None:
@@ -368,8 +368,13 @@ def _missing_published_grid(manifest: list[dict], datasets: list[str]) -> list[s
 
 def _published_problem(sample: dict) -> str | None:
     """A published ok cell with no 64-hex sample pin cannot be scored."""
-    if sample.get("published_status") != "ok" or not isinstance(sample.get("csv"), str):
+    if sample.get("published_status") != "ok":
         return None
+    if not isinstance(sample.get("csv"), str):
+        return (
+            f"published ok sample unresolved {sample.get('method')} {sample.get('dataset')} "
+            f"{sample.get('size')} {sample.get('sample_seed')}"
+        )
     expected = sample.get("expected_sha256")
     if not isinstance(expected, str) or len(expected) != 64:
         return (
@@ -387,12 +392,12 @@ def _preflight(controls: Path, datasets: list[str]) -> list[dict]:
     for sample in _published_samples():
         csv_path = sample.get("csv")
         expected = sample.get("expected_sha256")
-        if sample.get("published_status") != "ok" or not isinstance(csv_path, str):
-            manifest.append({**sample, "file_sha256": None, "ready": False, "reason": "published_sample_absent"})
-            continue
         problem = _published_problem(sample)
         if problem is not None:
             problems.append(problem)
+            continue
+        if sample.get("published_status") != "ok":
+            manifest.append({**sample, "file_sha256": None, "ready": False, "reason": "published_sample_absent"})
             continue
         path = Path(csv_path)
         if path.name == "test.csv" or not path.is_file():
@@ -478,6 +483,14 @@ def _gate(args, manifest: list[dict], registry: Path | None = None) -> dict:
     ready = sum(1 for row in manifest if row.get("ready"))
     if ready == 0:
         raise SystemExit("preflight found no train-only samples")
+    # Capture missing ancestors before mkdir. Sync the marker and each new
+    # directory, including the first parent that already existed.
+    sync_directories = [registry]
+    parent = registry.parent
+    while not parent.is_dir():
+        sync_directories.append(parent)
+        parent = parent.parent
+    sync_directories.append(parent)
     registry.mkdir(parents=True, exist_ok=True)
     started = registry / "started.json"
     payload = {
@@ -492,6 +505,14 @@ def _gate(args, manifest: list[dict], registry: Path | None = None) -> dict:
     with os.fdopen(fd, "w") as handle:
         json.dump(payload, handle, sort_keys=True)
         handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    for directory in sync_directories:
+        directory_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
     return document
 
 
@@ -593,9 +614,9 @@ def main() -> None:
         "summary": summary,
         "claims": {"mfs_v2": None, "ptf_v1": None, "release_safe_l3": None, "superiority": None, "formal_dp": False},
     }
-    temporary = args.out / "panel.json.tmp"
-    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-    temporary.replace(args.out / "panel.json")
+    staging = args.out / "panel.json.tmp"
+    staging.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    staging.replace(args.out / "panel.json")
     for row in summary:
         if row["method"] == "DOPE" and row["auditor"] == "catboost":
             print(

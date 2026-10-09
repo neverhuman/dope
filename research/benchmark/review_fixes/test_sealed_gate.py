@@ -6,7 +6,9 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+from research.benchmark.review_fixes import sealed_once
 from research.benchmark.review_fixes.sealed_once import (
     FREEZE_BLOB,
     FREEZE_SHA256,
@@ -38,6 +40,81 @@ class SealedGateTests(unittest.TestCase):
         self.assertIn("no sha pin", _published_problem(sample))
         absent = {**sample, "published_status": "fit_unavailable", "csv": None}
         self.assertIsNone(_published_problem(absent))
+
+    def test_ok_unresolved_sample_refuses_preflight_before_reads(self):
+        sample = {
+            "method": "DOPE",
+            "dataset": "aa",
+            "size": 1,
+            "sample_seed": 101,
+            "published_status": "ok",
+            "csv": None,
+            "expected_sha256": "a" * 64,
+        }
+        self.assertIn("ok sample unresolved", _published_problem(sample))
+        with (
+            patch.object(sealed_once, "_published_samples", return_value=[sample]),
+            patch.object(sealed_once, "_sha256") as hashed,
+            patch.object(sealed_once, "_csv_shape") as shaped,
+            patch.object(sealed_once, "_gate") as gate,
+        ):
+            with self.assertRaisesRegex(SystemExit, "before unsealing.*ok sample unresolved"):
+                sealed_once._preflight(Path("fixture-controls"), [])
+            hashed.assert_not_called()
+            shaped.assert_not_called()
+            gate.assert_not_called()
+
+    def test_failed_unresolved_sample_remains_an_absence(self):
+        sample = {
+            "method": "DOPE",
+            "dataset": "aa",
+            "size": 1,
+            "sample_seed": 101,
+            "published_status": "fit_unavailable",
+            "csv": None,
+            "expected_sha256": None,
+        }
+        with patch.object(sealed_once, "_published_samples", return_value=[sample]):
+            manifest = sealed_once._preflight(Path("fixture-controls"), [])
+        self.assertFalse(manifest[0]["ready"])
+        self.assertEqual(manifest[0]["reason"], "published_sample_absent")
+
+    def test_start_marker_is_synced_before_any_reader(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            registry = Path(tmp) / "registry"
+            self.assertNotEqual(registry.resolve(), sealed_once.REGISTRY.resolve())
+            args = argparse.Namespace(
+                out=registry,
+                host="xbabe3",
+                predeclare=Path("predeclare.json"),
+                expect_git_blob="deadbeef",
+                expect_sha256="deadbeef",
+            )
+            prior = os.environ.get("DOPE_RF_UNSEAL")
+            os.environ["DOPE_RF_UNSEAL"] = "1"
+            calls = []
+            real_fsync = os.fsync
+
+            def counting(fd):
+                calls.append(fd)
+                return real_fsync(fd)
+
+            try:
+                with (
+                    patch.object(sealed_once, "_assert_original_freeze", return_value={}),
+                    patch.object(sealed_once.os, "fsync", side_effect=counting),
+                ):
+                    sealed_once._gate(args, [{"ready": True}], registry=registry)
+                marker = registry / "started.json"
+                self.assertTrue(marker.is_file())
+                self.assertGreaterEqual(len(calls), 2)
+                self.assertNotIn("test.csv", marker.read_text())
+                self.assertFalse((registry / "panel.json").exists())
+            finally:
+                if prior is None:
+                    os.environ.pop("DOPE_RF_UNSEAL", None)
+                else:
+                    os.environ["DOPE_RF_UNSEAL"] = prior
 
     def test_missing_grid_cell_is_reported(self):
         manifest = [{
@@ -104,7 +181,7 @@ class SealedGateTests(unittest.TestCase):
                 expect_git_blob="deadbeef",
                 expect_sha256="deadbeef",
             )
-            old = os.environ.get("DOPE_RF_UNSEAL")
+            prior = os.environ.get("DOPE_RF_UNSEAL")
             os.environ["DOPE_RF_UNSEAL"] = "1"
             try:
                 with self.assertRaises(SystemExit) as caught:
@@ -112,10 +189,10 @@ class SealedGateTests(unittest.TestCase):
                 self.assertIn("original predeclare freeze", str(caught.exception))
                 self.assertFalse((registry / "started.json").exists())
             finally:
-                if old is None:
+                if prior is None:
                     os.environ.pop("DOPE_RF_UNSEAL", None)
                 else:
-                    os.environ["DOPE_RF_UNSEAL"] = old
+                    os.environ["DOPE_RF_UNSEAL"] = prior
 
     def test_started_marker_refuses_reopen_and_keeps_output(self):
         with tempfile.TemporaryDirectory() as tmp:

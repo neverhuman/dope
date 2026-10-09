@@ -135,9 +135,9 @@ def _score(pilot, train_path, valid_path, synthetic_path, task: str) -> dict:
 
 
 def _emit(out: Path, payload: dict) -> None:
-    temporary = out.with_suffix(".json.tmp")
-    temporary.write_text(json.dumps(payload, sort_keys=True) + "\n")
-    temporary.replace(out)
+    staging = out.with_suffix(".json.tmp")
+    staging.write_text(json.dumps(payload, sort_keys=True) + "\n")
+    staging.replace(out)
 
 
 def _one(job: dict) -> dict:
