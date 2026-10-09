@@ -15,6 +15,38 @@ from pathlib import Path
 
 from public_hardware import banned_hits, origin_counts, origin_sentence, public_hardware
 
+# Distinct cost phrases. The same words joined by "and" were the CM-03 sentence.
+TABSYN_COST = "not measured (the retained validation subset reports quality, not cost)"
+TABDDPM_COST = "not measured (this paper scores no TabDDPM population quality)"
+_MACRO_LINE = re.compile(r"\\newcommand\{\\([A-Za-z]+)\}\{(.*)\}")
+_MACRO_AND = re.compile(r"\\([A-Za-z]+)\\?\s+and\s+\\([A-Za-z]+)")
+_PHRASE_REPEAT = re.compile(
+    r"(\b[A-Za-z][\w'’-]*(?:\s+[A-Za-z][\w'’-]*){0,8})\s+and\s+\1\b",
+    re.IGNORECASE,
+)
+
+
+def assert_no_adjacent_repeat(lines, manuscript):
+    """Reject a generated phrase that repeats, and two identical phrases joined by and."""
+    if "not measured and not measured" in manuscript:
+        raise ValueError("manuscript repeats 'not measured and not measured'")
+    bodies = {}
+    for line in lines:
+        match = _MACRO_LINE.search(line)
+        if not match:
+            continue
+        name, body = match.group(1), match.group(2)
+        bodies[name] = body
+        found = _PHRASE_REPEAT.search(body)
+        if found:
+            raise ValueError(f"generated macro {name} repeats {found.group(1)!r}")
+    for match in _MACRO_AND.finditer(manuscript):
+        left, right = match.group(1), match.group(2)
+        if left not in bodies or right not in bodies:
+            continue
+        if bodies[left] == bodies[right] and re.search(r"[A-Za-z]", bodies[left]):
+            raise ValueError(f"adjacent macros {left} and {right} expand to the same phrase")
+
 
 def baseline_budget_commands(command):
     """Budget prose uses the same hash-bound completion receipt as its roster."""
@@ -387,25 +419,28 @@ def _write_availability(out):
     if sdv.get("name"):
         raise ValueError("SDV license was filled without a pinned LICENSE file")
     paragraph = (
-        "Regenerate every \\texttt{generated/} file, the figure PDFs, and both manuscript PDFs "
-        "with \\texttt{just paper} from the commit that contains these files. That recipe reads "
+        "Regenerate every \\texttt{generated/} file and the figure PDFs with "
+        "\\texttt{just paper} from the commit that contains these files. The same recipe writes "
+        "the journal PDF, the anonymous journal PDF, the supplement PDF, and the anonymous supplement PDF. "
+        "That recipe reads "
         "the committed validation ledgers, original fit metadata, and compressed numeric replay logs. "
         "The replay cost, loss curves, and BeyondArena extracts have file and field mappings in "
         "\\texttt{generated/original-field-map.json}. Those original metadata snapshots were captured "
-        "after the historical runs; they do not reconstruct historical custody or replace scored artifacts. "
+        "after the historical runs; they leave historical custody and the scored artifacts in place. "
         "Pinned LICENSE extracts are reread when their local store is available. "
-        "It does not open an official test file. "
+        "Official test files stay sealed. "
         "The catalog hash is \\CatalogSha. The grouped training split uses seed $\\SplitSeed$. "
         "The primary displayed DOPE and legacy comparison fits use seed 11 and sample seeds 101, 211, and 307. "
         "Later retained panels document additional ARF and Forest-Flow fit seeds and the measured "
         "TabSyn and TabDDPM subsets separately. "
         "\\texttt{python3 research/benchmark/verify\\_paper\\_numbers.py} exits nonzero when a "
         "displayed macro disagrees with those ledgers. Full neural baseline coverage, the "
-        "pre-specified privacy-attack panel, displayed-DOPE fit-seed variance, and the full ablation grid are "
-        "named in the prose and omitted from the tables until those runs exist. The journal "
+        "pre-specified privacy-attack panel, displayed-DOPE fit-seed variance, and the full ablation grid "
+        "stay named in the prose and stay out of the tables until those runs exist. The journal "
         "fidelity table is a separate "
-        "empirical ledger on the grouped validation split. It is not the pre-specified privacy-attack "
-        "panel, and it is not differential privacy or HIPAA de-identification.\n\n"
+        "empirical ledger on the grouped validation split. It stands apart from the pre-specified "
+        "privacy-attack panel. Empirical resemblance stays outside differential privacy and outside "
+        "HIPAA de-identification.\n\n"
         "PMLB is MIT. Every dataset entry in the data lock records SPDX MIT and the note that "
         "the source license is MIT (PMLB). "
         f"CTGAN and TVAE share one pinned LICENSE file: {ctgan}. "
@@ -415,7 +450,7 @@ def _write_availability(out):
         f"Forest-Diffusion is {forest}. "
         f"ARF is {arf}. "
         f"Chow--Liu and the independent marginals are implementations written for this comparison, under this repository's license: {study}. "
-        "The SDV repository LICENSE is not in the pinned snapshot, so that license is not recorded.\n"
+        "The SDV repository LICENSE is absent from the pinned snapshot, so this paragraph leaves that license unrecorded.\n"
     )
     (out / "availability.tex").write_text(paragraph)
 
@@ -556,8 +591,8 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
         command("DopeWithinCap", f"{dope_bytes['within_cap']}/{dope_bytes['known']}"),
         command("DopeByteMedian", _byte_median(dope_bytes["median"]["median"], tex_bytes)),
         command("DopeByteLo", tex_bytes(side.get("dope_byte_min"))),
-        command("TabSynPanel", "not measured"),
-        command("TabDDPMPanel", "not measured"),
+        command("TabSynPanel", TABSYN_COST),
+        command("TabDDPMPanel", TABDDPM_COST),
         command("TabSynResult", "measured on a retained validation subset"),
         command("TabDDPMResult", _publication_phrase("TabDDPM")),
         command("ForestPublication", _publication_phrase("Forest-Flow")),
@@ -720,6 +755,8 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     byte_rows.append(_write_compute_cost(out, lines, command, tex_bytes))
     _write_availability(out)
     lines.extend(baseline_budget_commands(command))
+    manuscript = (Path(__file__).resolve().parents[1] / "dope-mfs.tex").read_text()
+    assert_no_adjacent_repeat(lines, manuscript)
     (out / "numbers.tex").write_text("".join(lines))
     (out / "byte-table.tex").write_text(
         "\\begin{tabular}{@{}lrr@{}}\n\\toprule\n"

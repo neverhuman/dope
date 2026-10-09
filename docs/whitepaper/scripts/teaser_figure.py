@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Page-1 teaser from the committed density-block panel.
 
-Reads docs/whitepaper/generated/panel-stats.json only. Paired medians and
-95% lineage-bootstrap intervals are plotted as stored. No other ledger is
-opened, and no median is recomputed or re-selected.
+Reads docs/whitepaper/generated/panel-stats.json only. Each panel is one
+auditor. Rows are DOPE-minus-comparator paired differences: filled marks are
+lineages, and the open mark is the stored median with its stored 95%
+lineage-bootstrap interval. No median is recomputed.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ os.environ.setdefault("SOURCE_DATE_EPOCH", "1760000000")
 import matplotlib
 
 matplotlib.use("Agg")
-from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 
 import figure_style
 
@@ -38,20 +39,14 @@ AUDITORS = (
     ("linear", "Linear"),
     ("mlp", "MLP"),
 )
-# Fixed order, the same series in every panel. Not sorted by the median.
-SERIES = (
-    ("DOPE", "DOPE (ours)", figure_style.DOPE),
-    ("GaussianCopula", "Gaussian copula", figure_style.GAUSSIAN),
-    ("Chow-Liu", "Chow-Liu", figure_style.CHOW),
-    ("independent_marginals", "Independent marginals", figure_style.INDEPENDENT),
+# Same markers as the body paired-difference figure. Not sorted by the median.
+COMPARATORS = (
+    ("GaussianCopula", "Gaussian copula", figure_style.GAUSSIAN, "s"),
+    ("Chow-Liu", "Chow-Liu", figure_style.CHOW, "^"),
+    ("independent_marginals", "Independent", figure_style.INDEPENDENT, "D"),
 )
-
-
-def sig3(value):
-    """Same retention rounding as compute_panel.sig3. Display only."""
-    if abs(value) >= 0.01:
-        return f"{value:.3f}"
-    return f"{value:.3g}"
+# The body figure uses this window and counts the points that fall outside it.
+CLIP = 1.5
 
 
 def _interval(median, lo, hi, label):
@@ -62,82 +57,102 @@ def _interval(median, lo, hi, label):
     return float(median), float(lo), float(hi)
 
 
-def density_rows(stats):
-    """One row per auditor: four paired (median, lo, hi) tuples and the count."""
+def density_differences(stats):
+    """One panel per auditor. Differences and intervals are stored, not refit."""
     block = stats["blocks"]["density"]
     panels = []
     for key, title in AUDITORS:
         pairs = block[key]["pairs"]
-        anchor = pairs["GaussianCopula"]
-        dope = _interval(anchor["dope_median"], anchor["dope_lo"], anchor["dope_hi"], f"{key} DOPE")
-        count = int(anchor["n"])
-        rows = {"DOPE": dope}
-        for method, _label, _color in SERIES[1:]:
+        rows = []
+        count = None
+        for method, label, color, marker in COMPARATORS:
             pair = pairs[method]
-            if int(pair["n"]) != count:
+            values = [float(item) for item in pair["differences"]]
+            if len(values) != int(pair["n"]):
+                raise SystemExit(f"{key} {method} difference count {len(values)} != {pair['n']}")
+            if count is None:
+                count = int(pair["n"])
+            elif int(pair["n"]) != count:
                 raise SystemExit(f"{key} {method} paired count {pair['n']} != {count}")
-            if abs(pair["dope_median"] - dope[0]) > 5e-12:
-                raise SystemExit(f"{key} {method} DOPE median does not match the anchor")
-            rows[method] = _interval(
-                pair["other_median"], pair["other_lo"], pair["other_hi"], f"{key} {method}"
+            median, lo, hi = _interval(
+                pair["median_difference"], pair["lo"], pair["hi"], f"{key} {method} difference"
             )
+            rows.append((label, color, marker, values, median, lo, hi))
         panels.append((title, count, rows))
     return panels
 
 
+def _offsets(index, count):
+    """Deterministic strip. Rank order is the only vertical jitter."""
+    if count <= 1:
+        return [float(index)]
+    return [index - 0.32 + 0.64 * rank / (count - 1) for rank in range(count)]
+
+
 def draw(stats, dest):
-    panels = density_rows(stats)
+    panels = density_differences(stats)
     figure, axes = plt.subplots(
         1,
         3,
-        figsize=(figure_style.TEASER_WIDTH_IN, 2.62),
+        figsize=(figure_style.TEASER_WIDTH_IN, 2.95),
+        sharex=True,
         sharey=True,
     )
     for axis, (title, count, rows) in zip(axes, panels):
-        positions = list(range(len(SERIES)))
-        medians = [rows[key][0] for key, _label, _color in SERIES]
-        lowers = [rows[key][0] - rows[key][1] for key, _label, _color in SERIES]
-        uppers = [rows[key][2] - rows[key][0] for key, _label, _color in SERIES]
-        colors = [color for _key, _label, color in SERIES]
-        axis.bar(
-            positions,
-            medians,
-            width=0.72,
-            color=colors,
-            edgecolor="none",
-            zorder=2,
+        outside = 0
+        for index, (_label, color, marker, values, median, lo, hi) in enumerate(rows):
+            ordered = sorted(values)
+            outside += sum(value < -CLIP or value > CLIP for value in ordered)
+            axis.scatter(
+                ordered,
+                _offsets(index, len(ordered)),
+                s=7,
+                c=color,
+                marker=marker,
+                linewidths=0,
+                zorder=2,
+            )
+            axis.errorbar(
+                [median],
+                [index],
+                xerr=[[median - lo], [hi - median]],
+                fmt=marker,
+                color=color,
+                markerfacecolor="white",
+                markeredgewidth=0.8,
+                markersize=5.5,
+                elinewidth=0.8,
+                capsize=2.0,
+                capthick=0.7,
+                zorder=4,
+            )
+        axis.axvline(0, color="#333333", linewidth=0.6, zorder=1)
+        axis.set_xlim(-CLIP, CLIP)
+        axis.set_title(f"{title}, {count}\n{outside} outside the frame", fontsize=7.2)
+        figure_style.panel(axis, grid="x")
+    axes[0].set_yticks([0, 1, 2])
+    axes[0].set_yticklabels(["Copula", "Chow-Liu", "Independent"], fontsize=6.5)
+    axes[0].set_ylim(-0.55, 2.55)
+    for axis in axes[1:]:
+        axis.tick_params(labelleft=False)
+    axes[1].set_xlabel("retention difference (dimensionless)", fontsize=7)
+    handles = [
+        Line2D(
+            [0],
+            [0],
+            marker=marker,
+            color="none",
+            markerfacecolor=color,
+            markeredgecolor=color,
+            linestyle="None",
+            markersize=5,
+            label=label,
         )
-        axis.errorbar(
-            positions,
-            medians,
-            yerr=[lowers, uppers],
-            fmt="none",
-            ecolor="#333333",
-            elinewidth=0.7,
-            capsize=2.2,
-            capthick=0.7,
-            zorder=3,
-        )
-        axis.axhline(0, color="#333333", linewidth=0.6, zorder=1)
-        for xpos, (key, _label, _color) in zip(positions, SERIES):
-            median, lo, hi = rows[key]
-            text = sig3(median)
-            if median >= 0:
-                axis.text(xpos, hi + 0.03, text, ha="center", va="bottom", fontsize=6.5, color=figure_style.INK)
-            else:
-                axis.text(xpos, lo - 0.03, text, ha="center", va="top", fontsize=6.5, color=figure_style.INK)
-        axis.set_xticks(positions)
-        axis.set_xticklabels([])
-        axis.set_title(f"{title}, {count} lineages")
-        figure_style.panel(axis, grid="y")
-    axes[0].set_ylabel("retention (dimensionless)")
-    axes[0].set_ylim(-0.28, 1.42)
-    handles = [Patch(facecolor=color, edgecolor="none", label=label) for _key, label, color in SERIES]
-    labels = [label for _key, label, _color in SERIES]
-    # Left and top insets keep the rotated y label and the bold titles
-    # inside the page. A zero left rect clips "retention" by about 4pt.
-    figure.tight_layout(pad=0.35, rect=(0.03, 0.16, 1, 0.98))
-    figure_style.legend_below(figure, handles, labels, ncol=2)
+        for _key, label, color, marker in COMPARATORS
+    ]
+    labels = [label for _key, label, _color, _marker in COMPARATORS]
+    figure.tight_layout(pad=0.35, rect=(0.02, 0.16, 1, 0.98))
+    figure_style.legend_below(figure, handles, labels, ncol=3)
     path = Path(dest)
     path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(path, metadata={"CreationDate": None, "ModDate": None})
@@ -158,8 +173,8 @@ def write_outputs():
     path = draw(stats, FIG / PDF_NAME)
     payload = hash_document(path)
     (GEN / HASH_NAME).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-    for title, count, rows in density_rows(stats):
-        rendered = ", ".join(f"{label} {sig3(rows[key][0])}" for key, label, _color in SERIES)
+    for title, count, rows in density_differences(stats):
+        rendered = ", ".join(f"{label} {median:.3f} [{lo:.3f}, {hi:.3f}]" for label, _c, _m, _v, median, lo, hi in rows)
         print(f"{title} n={count}: {rendered}")
     print(path)
     print(payload["pdf_sha256"][PDF_NAME])
