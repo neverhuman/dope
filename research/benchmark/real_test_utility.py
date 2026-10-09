@@ -10,7 +10,8 @@ from pathlib import Path
 
 from .admission import assess
 from .manifest import digest
-from .pilot_metrics import _loss, _model
+from .pilot_metrics import _loss
+from .bounded_auditors import _model
 from .score import artifact_inventory, sha256
 
 
@@ -104,6 +105,7 @@ def evaluate(repo_root: Path, lock_root: Path, worker_dir: Path, evaluator_dir: 
               "dataset": test_manifest["id"], "task": task,
               "implementation_sha256": sha256(Path(__file__)),
               "auditor_implementation_sha256": sha256(Path(__file__).with_name("pilot_metrics.py")),
+              "auditor_resource_implementation_sha256": sha256(Path(__file__).with_name("bounded_auditors.py")),
               "dependency_versions": {"numpy": np.__version__, "scikit-learn": sklearn.__version__,
                                       "catboost": catboost.__version__},
               "train_sha256": sha256(worker_dir / "train.csv"),

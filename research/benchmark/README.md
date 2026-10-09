@@ -1,10 +1,29 @@
 # Offline generator benchmark (research only)
 
+[Native fit progress through index094](results/work-order-b-native-through094-fit-progress-and-cost-v1/README.md)
+records 195 accepted fit identities out of 500 and 22 lineages with all five
+accepted fit seeds. Its nine detailed operations retain charged bytes, sampled
+GPU observations and exact grants. Fit identity coverage does not establish
+sample completeness, quality or stability; all gated scores remain unavailable.
+
+[Native indices011–014 progress and cost delta](results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/README.md)
+records three accepted GPU fits and one infrastructure-failed operation, with
+all four whole-parent costs charged. Its fixed snapshot has 115 accepted fits,
+two historical artifact caps, seven unresolved infrastructure slots and 376
+unstarted slots out of 500; subsequent live work is excluded. Quality,
+five-fit stability and gated scores remain unavailable.
+
 [Native indices009–010 GPU progress and cost delta](results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/README.md)
 records one accepted seed53 fit and one infrastructure-failed seed71 operation,
 with both whole-parent costs retained. Its dated snapshot follows index008;
 partial five-fit coverage and observed residency do not establish stability
 or a gated production score.
+
+The [Forest-Flow additional-default fit ledger](results/work-order-b-forest400-additional-default-fit-dispositions-v1/README.md)
+records 400 closed slots: 291 accepted fit receipts and 109 timeouts. Seventy-one
+lineages have all four additional seeds accepted. Fit seed 11 is unjoined;
+coverage across five fits and quality scores remain null. The 72.869 GB artifact
+total is historical receipt-declared bytes, not verified retained storage.
 
 [Forest-Flow five additional homogeneous five-fit cohorts](results/forest-third-five-fivefit-v1/README.md)
 The [retained TabDDPM cohort](results/tabddpm-twelve-lineage-retained-validation/README.md)
@@ -1422,3 +1441,7 @@ The [six-component coverage ledger](results/work-order-b-six-component-coverage-
 The [closed operations006–007 cost delta](results/work-order-b-native-indices006-007-cost-delta-v1/README.md) accounts for two infrastructure attempts and the exact 500-slot snapshot: 110 accepted, two historical caps, five unresolved infrastructure slots and 383 snapshot-unstarted. The 118 inclusive budget units and 117 canonical accounted slots use distinct count bases; historical-inclusive and new-parent clocks are alternatives. It adds no quality or production claim.
 
 The [index008 GPU operation and progress ledger](results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/README.md) records one measured accepted fit: 424.280 seconds, 5,723 charged artifact bytes and a frozen 111/500 accepted-fit count. Only two lineages have all five accepted seeds; resource observations are not true peaks and gated scores remain null.
+
+## Auditor resource profile
+
+For new measurements, `bounded_auditors._model`, `c2st` and `evaluate` keep CatBoost training, automatic feature importance and prediction on four threads. Their statistical equations and seed settings match the historical harnesses. Bind this new source and its two imported historical sources in the measurement receipt. Sealed utility records both the historical auditor hash and the resource-wrapper hash. The measured historical `pilot_metrics.py` and `expanded_validation_metrics.py` files retain their original bytes; existing results keep their original provenance.

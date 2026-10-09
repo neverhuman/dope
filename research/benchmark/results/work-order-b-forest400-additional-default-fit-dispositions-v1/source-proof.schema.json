@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_execution": {
+      "const": "Metadata preparation and public-only integrity, renderer and schema checks; no host, model, sample, fit or scientific evaluation execution"
+    },
+    "format": {
+      "const": "Forest400-rights-safe-source-proof-v1"
+    },
+    "original_recount_forest_segment": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "private_input_join_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "public_files": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "file": {
+            "enum": [
+              "result.json",
+              "schema.json",
+              "README.md",
+              "seed-coverage.csv",
+              "table.md",
+              "source-proof.schema.json"
+            ]
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "receipt_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "close": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "bytes",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "fit": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "bytes",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "job": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "bytes",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_sha256",
+          "job",
+          "fit",
+          "close"
+        ],
+        "type": "object"
+      },
+      "maxItems": 400,
+      "minItems": 400,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "source_snapshot_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "role": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 9,
+      "minItems": 9,
+      "type": "array"
+    }
+  },
+  "required": [
+    "format",
+    "author_execution",
+    "private_input_join_sha256",
+    "source_snapshot_refs",
+    "receipt_refs",
+    "public_files",
+    "original_recount_forest_segment"
+  ],
+  "type": "object"
+}

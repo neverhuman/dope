@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import patch
 
-from research.benchmark import real_test_utility
+from research.benchmark import bounded_auditors, pilot_metrics, real_test_utility
 from research.benchmark.manifest import digest
 from research.benchmark.real_test_utility import evaluate, retention
 from research.benchmark.score import artifact_inventory, sha256
@@ -26,6 +26,41 @@ def generated_artifact_directory(path):
 
 
 class RealTestUtilityTests(unittest.TestCase):
+    def test_catboost_utility_bounds_importance_and_prediction_threads(self):
+        import math
+        import numpy as np
+        from catboost import CatBoostClassifier, CatBoostRegressor
+        x = np.arange(30, dtype=float).reshape(-1, 1) / 30
+        for task, cls in (("binary", CatBoostClassifier), ("regression", CatBoostRegressor)):
+            with self.subTest(task=task):
+                importance = cls.get_feature_importance
+                prediction_name = "predict_proba" if task == "binary" else "predict"
+                predict = getattr(cls, prediction_name)
+                calls = {"importance": [], "prediction": []}
+
+                def checked_importance(model, *args, **kwargs):
+                    self.assertEqual(kwargs.get("thread_count"), 4)
+                    self.assertEqual(model.get_param("thread_count"), 4)
+                    calls["importance"].append(kwargs["thread_count"])
+                    return importance(model, *args, **kwargs)
+
+                def checked_prediction(model, *args, **kwargs):
+                    self.assertEqual(kwargs.get("thread_count"), 4)
+                    calls["prediction"].append(kwargs["thread_count"])
+                    return predict(model, *args, **kwargs)
+
+                y = (x[:, 0] >= .5).astype(int) if task == "binary" else x[:, 0] ** 2
+                with patch.object(cls, "get_feature_importance", checked_importance), \
+                        patch.object(cls, prediction_name, checked_prediction):
+                    model = bounded_auditors._model("catboost", task, 1729).fit(x, y)
+                    loss = pilot_metrics._loss(model, x, y, task)
+                self.assertTrue(math.isfinite(loss))
+                self.assertEqual(calls, {"importance": [4], "prediction": [4]})
+                self.assertEqual({k: model.get_param(k) for k in
+                                  ("iterations", "depth", "learning_rate", "random_seed")},
+                                 {"iterations": 100, "depth": 6, "learning_rate": .05,
+                                  "random_seed": 1729})
+
     def test_null_normalized_retention_and_low_signal(self):
         measured = retention(1.0, 0.5, 0.75)
         self.assertEqual(measured["retention"], 0.5)
