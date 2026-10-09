@@ -8,6 +8,30 @@ from research.benchmark.mfs_v3_score import _v3_contract
 
 
 class PackagingTests(unittest.TestCase):
+    def test_body_limit_counts_text_before_references_on_the_same_page(self):
+        first_ten = "body\f" * 10
+        self.assertEqual(check_paper.presentation_failures(first_ten + 'R E F E R E N C E S\n'), [])
+        self.assertIn('main body before References exceeds 10 pages',
+                      check_paper.presentation_failures(first_ten + 'last body paragraph\nReferences\n'))
+        self.assertIn('main PDF has no References heading',
+                      check_paper.presentation_failures(first_ten))
+
+    def test_frozen_negation_limit_rejects_six_but_allows_five_per_thousand(self):
+        for count in (5, 6):
+            text = 'word ' * (999 - count) + ' not ' * count + '\nReferences\n'
+            self.assertEqual(len(text.split()), 1000)
+            failed = 'main PDF negation density exceeds 5 per 1000 words'
+            if count == 5:
+                self.assertNotIn(failed, check_paper.presentation_failures(text))
+            else:
+                self.assertIn(failed, check_paper.presentation_failures(text))
+
+    def test_nonprinting_pdf_glyphs_cannot_dilute_negation_density(self):
+        text = 'word ' * 993 + ' not ' * 6 + '\nReferences\n'
+        text = ' \x01 ' * 200 + text
+        self.assertIn('main PDF negation density exceeds 5 per 1000 words',
+                      check_paper.presentation_failures(text))
+
     def test_name_and_url_leaks_are_case_insensitive(self):
         for text in ('Jepson Taylor', 'alton alexander', 'NEVERHUMAN Research',
                      'https://github.com/neverhuman/dope', 'https://example.com/jepsontaylor'):

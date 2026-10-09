@@ -73,6 +73,33 @@ def anonymous_leaks(text: str) -> list[str]:
     return [pattern for pattern in patterns if re.search(pattern, text, re.IGNORECASE)]
 
 
+def presentation_failures(layout: str) -> list[str]:
+    """Frozen rubric limits on the main PDF's layout extraction."""
+    failures = []
+    reference_start = None
+    for page_index, page in enumerate(layout.split("\f")):
+        lines = page.splitlines()
+        for line_index, line in enumerate(lines):
+            # pdfTeX can split a small-cap heading into spaced letters.
+            if re.sub(r"[^A-Za-z]", "", line).upper() == "REFERENCES":
+                prefix = "\n".join(lines[:line_index]).strip()
+                reference_start = page_index + bool(prefix)
+                break
+        if reference_start is not None:
+            break
+    if reference_start is None:
+        failures.append("main PDF has no References heading")
+    elif reference_start > 10:
+        failures.append("main body before References exceeds 10 pages")
+    # Match the frozen grep -o ' not ' / wc -w metric exactly.
+    words = int(subprocess.check_output(["wc", "-w"], input=layout, text=True))
+    if words == 0:
+        failures.append("main PDF layout extraction is empty")
+    elif 1000 * layout.count(" not ") > 5 * words:
+        failures.append("main PDF negation density exceeds 5 per 1000 words")
+    return failures
+
+
 def main() -> int:
     failures = []
     raw_tex = TEX.read_text()
@@ -211,6 +238,11 @@ def main() -> int:
             )
             if anonymous_leaks(extracted + "\n" + info + "\n" + links):
                 failures.append(path.name + " contains an identifying name or URL")
+        if path.name in ("dope-mfs.pdf", "dope-mfs-anonymous.pdf"):
+            layout = subprocess.check_output(
+                ["pdftotext", "-layout", str(path), "-"], text=True, errors="replace"
+            )
+            failures.extend(path.name + ": " + item for item in presentation_failures(layout))
         if path.name == "dope-mfs.pdf" and "DOPE" not in extracted:
             failures.append("journal PDF does not show the DOPE title")
     for log in LOGS:
