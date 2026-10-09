@@ -15,6 +15,7 @@ from research.benchmark.mfs_v3_panel import (
     cleartext_absent,
     cohort_document,
     density_lineages,
+    distinct_nearest_quantile_squared,
     exact_row_matches,
     fit_map,
     gpu_may_start,
@@ -63,7 +64,7 @@ class PanelProtocolTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             load_numeric_table(Path("/tmp/test.csv"))
 
-    def test_null_band_is_fixed_before_an_encoder_distance(self):
+    def test_median_null_is_fixed_before_an_encoder_distance(self):
         fit = np.column_stack([np.linspace(0.1, 0.9, 12), np.linspace(0.2, 0.8, 12)])
         holdout = np.column_stack([np.linspace(0.15, 0.85, 8), np.linspace(0.25, 0.75, 8)])
         seeds = tuple(null_seed("aa", "DOPE", "features12_steps2048", 101, index) for index in range(3))
@@ -72,9 +73,30 @@ class PanelProtocolTest(unittest.TestCase):
         self.assertEqual(len(losses), 3)
         self.assertEqual(null_index, 0)
         self.assertIn(match_index, (0, 1, 2))
+        self.assertEqual(match_index, sorted(range(3), key=lambda i: (losses[i], i))[1])
         self.assertTrue(all(np.isfinite(loss) for loss in losses))
         again = build_nulls(fit, holdout, 6, seeds)
         self.assertEqual(losses, again[1])
+        with self.assertRaises(ValueError):
+            build_nulls(fit, holdout, 6, seeds[:2])
+        with self.assertRaises(ValueError):
+            build_nulls(fit, holdout, 6, (seeds[0],) * 3)
+
+    def test_near_copy_floor_is_declared_quantile_not_minimum(self):
+        from research.benchmark.mfs_v3_score import _v3_contract
+
+        fit = np.arange(101, dtype=float).reshape(-1, 1) * 10
+        fit[1] = 0.01
+        distances = [0.0001, 0.0001] + [100.0] * 99
+        q = _v3_contract()["release_gates"]["near_copy_quantile"]
+        expected = float(np.quantile(distances, q, method="linear"))
+        self.assertAlmostEqual(distinct_nearest_quantile_squared(fit), expected)
+        # With more distinct real rows, the declared quantile exceeds the minimum.
+        fit = np.arange(201, dtype=float).reshape(-1, 1) * 10
+        fit[1] = 0.01
+        self.assertGreater(distinct_nearest_quantile_squared(fit), 0.0001)
+        self.assertFalse(near_copy_ok(fit, np.array([[0.1]])))
+        self.assertFalse(near_copy_ok(np.zeros((2, 1)), np.ones((1, 1))))
 
     def test_pins_and_a_tiny_cohort_do_not_claim_a_win(self):
         self.assertEqual(list(TABULAR_AUDITORS), ["kumo_tabular_l", "mitra_v2", "tabicl2"])
@@ -228,16 +250,17 @@ class AssembleScoreTest(unittest.TestCase):
         self.assertEqual(distribution_fidelity(1.0, 1.0, 1.0), 1.0)
         self.assertEqual(distribution_fidelity(0.0, 0.0, 0.0), 0.0)
 
-    def test_a_complete_lineage_scores_and_an_unscanned_artifact_stays_null(self):
+    def test_legacy_lineage_without_prerequisite_evidence_stays_null(self):
         from research.benchmark.mfs_v3_assemble import panel_receipt, score_lineage
 
         seeds = [_measured_seed() for _ in range(3)]
         scored = score_lineage(seeds, lambda values: sum(values) / len(values))
         self.assertFalse(scored["counts_as_dope_win"])
         self.assertIsNone(scored["superiority"])
-        self.assertEqual(scored["failed_gates"], [])
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+        self.assertTrue(set(PREREQUISITES).issubset(scored["failed_gates"]))
         self.assertAlmostEqual(scored["retention"]["kumo_tabular_l"], 0.8)
-        self.assertIsNotNone(scored["score"])
+        self.assertIsNone(scored["score"])
         withheld = score_lineage([_measured_seed(cleartext=None) for _ in range(3)], lambda values: 0.8)
         self.assertIsNone(withheld["score"])
         self.assertIn("cleartext_absent", withheld["failed_gates"])
@@ -245,6 +268,15 @@ class AssembleScoreTest(unittest.TestCase):
         receipt = panel_receipt([scored])
         self.assertFalse(receipt["counts_as_dope_win"])
         self.assertFalse(receipt["official_tests_opened"])
+
+    def test_measured_prerequisites_propagate_and_fractional_bytes_do_not(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+
+        seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+        self.assertIsNotNone(score_lineage(seeds, lambda values: 0.8)["score"])
+        seeds[0]["artifact_bytes"] = 1000.5
+        self.assertIn("tier_bytes", score_lineage(seeds, lambda values: 0.8)["failed_gates"])
 
     def test_retention_maps_keep_only_finite_lineage_medians(self):
         from research.benchmark.mfs_v3_assemble import retention_maps
