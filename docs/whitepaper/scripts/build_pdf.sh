@@ -3,6 +3,8 @@
 # Auxiliaries and logs stay in the checkout target directory; PDFs are copied here.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# A direct PDF build has the same pinned, validation-only admission as just paper.
+nice -n 10 ionice -c 3 python3 ../../ops/ci/paper-review-outputs.py --check-inputs
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-1760000000}"
 build_root="$(realpath ../..)/target/paper-build"
 mkdir -p "$build_root"
