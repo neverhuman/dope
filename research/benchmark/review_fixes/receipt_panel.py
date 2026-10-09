@@ -733,19 +733,6 @@ def emit_tex(payload) -> None:
         paired_lines,
         "lllllrrllrl",
     ))
-    tost_lines = []
-    for row in payload["paired"]:
-        tost = row["tost"]
-        tost_lines.append(
-            f"{row['size']}$n$ & {tex_name(row['auditor'])} & {tex_name(row['method'])} & "
-            f"{fmt(tost['mean'])} & [{fmt(tost['ci90_lo'])}, {fmt(tost['ci90_hi'])}] & "
-            f"{fmt(tost['p'], 3)} & {'yes' if tost['equivalent'] else 'no'} \\\\"
-        )
-    write_tex("review-tost.tex", note + _table(
-        "Size & Auditor & Comparator & Mean diff. & 90\\% CI & TOST $p$ & Equivalent at $\\pm 0.02$",
-        tost_lines,
-        "lllrrrl",
-    ))
     family_lines = []
     for row in payload["family"]:
         if row.get("method") != "DOPE" and row["auditor"] != "catboost":
@@ -773,53 +760,10 @@ def emit_tex(payload) -> None:
         denominator_view.denominator_lines(payload, fmt, tex_name),
         denominator_view.ALIGN,
     ))
-    rmse_lines = []
-    for row in payload["rmse"]:
-        if row["auditor"] != "catboost":
-            continue
-        rmse_lines.append(
-            f"{tex_name(row['method'])} & {row['size']}$n$ & {row['n_regression']} & "
-            f"{fmt(row['synthetic_rmse_median'])} & {fmt(row['real_rmse_median'])} \\\\"
-        )
-    write_tex("review-rmse.tex", _table(
-        "Method & Size & Regression lineages & Synthetic RMSE & Real TRTR RMSE",
-        rmse_lines,
-        "llrrr",
-    ))
-    fidelity_lines = []
-    for row in payload["fidelity_stored"]:
-        fidelity_lines.append(
-            f"{tex_name(row['method'])} & {row['size']}$n$ & {tex_name(_metric_label(row))} & "
-            f"{row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
-        )
-    methods = ", ".join(sorted({str(row["method"]) for row in payload["fidelity_stored"]}))
-    fidelity_note = (
-        "% Stored logistic C2ST, marginal KS, and pair correlation from the population ledgers. "
-        "Each n counts lineages with three finite stored values. Cohorts are not matched, "
-        "and this table is not a cross-method ranking. The stored C2ST is not the GBDT detector. "
-        f"Methods in this file: {methods}. TabSyn is not in these ledgers.\n"
-    )
-    write_tex("review-fidelity-stored.tex", fidelity_note + _table(
-        "Method & Size & Metric & $n$ lineages & Median & Hierarchical CI",
-        fidelity_lines,
-        "lllrrr",
-    ))
-    seed_lines = []
-    for row in payload["existing_multiseed"]:
-        seed_lines.append(
-            f"{tex_name(row['method'])} & {row['fit_seed']} & {row['row_multiplier']} & "
-            f"{_measured_prefix(row)} & {_metric_median(row.get('catboost_retention'))} & "
-            f"{_metric_median(row.get('distance_mia_auc'))} & "
-            f"{_metric_median(row.get('dcr_validation_median'))} \\\\"
-        )
-    write_tex("review-seeds-existing.tex", (
-        "% Existing cpu-fivefit prefix. It is not pooled with the 97-lineage table. "
-        "Measured/prefix counts finite CatBoost retentions over the prefix size.\n"
-    ) + _table(
-        "Method & Fit seed & Size & Measured/prefix & CatBoost retention & Distance MIA AUC & Holdout DCR median",
-        seed_lines,
-        "llllrrr",
-    ))
+    # TOST, RMSE, stored fidelity and existing seeds name each configuration.
+    from research.benchmark.review_fixes.receipt_tables import configured_tables
+    for name, body in configured_tables(payload).items():
+        write_tex(name, body)
     _figure(payload["delta_method_points"])
 
 

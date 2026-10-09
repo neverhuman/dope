@@ -20,5 +20,7 @@ TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittes
   research.benchmark.review_fixes.test_rescore_cells \
   research.benchmark.review_fixes.test_v2_panel \
   research.benchmark.review_fixes.test_rescore_ledger -q
-TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
-  -s docs/whitepaper/scripts -p 'test_paper_control_inputs.py' -q
+for pattern in test_paper_control_inputs.py test_paper_review_tables.py; do
+  TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
+    -s docs/whitepaper/scripts -p "$pattern" -q
+done
