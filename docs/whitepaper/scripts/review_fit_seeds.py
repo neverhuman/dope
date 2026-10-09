@@ -194,10 +194,12 @@ def _nested_summary(items: list[dict], label: str) -> dict:
             "n": 1,
             "n_fits": n_fits,
             "median": point,
-            "lo": point,
-            "hi": point,
-            "iid_lo": point,
-            "iid_hi": point,
+            # One completed lineage does not identify cohort uncertainty.
+            "lo": None,
+            "hi": None,
+            "iid_lo": None,
+            "iid_hi": None,
+            "ci_status": "not_identified_single_lineage",
             "estimand": ESTIMAND,
         }
     clusters: dict[str, list[str]] = {}
@@ -377,6 +379,8 @@ def build_panel(rows: list[dict]) -> dict:
 
 
 def render(summary: dict) -> str:
+    if any(block.get("lo") is None or block.get("hi") is None for block in summary["blocks"]):
+        raise SystemExit("fit-seed cohort CI is not identified; refusing table publication")
     lines = [
         "% Fit seeds 23, 37, 53, and 71. Not the published fit-seed-11 table.",
         "% A fit seed is included only when sample seeds 101, 211, and 307 all have a finite retention.",
