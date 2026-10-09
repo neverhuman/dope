@@ -35,6 +35,15 @@
         "docs/whitepaper/generated/review-privacy.json",
         "docs/whitepaper/generated/review-privacy.tex"
       ]
+    },
+    {
+      "path": "docs/whitepaper/scripts/review_tabsyn.py",
+      "args": ["--from-panel", "research/benchmark/results/review-fixes-tabsyn-v1/panel.json"],
+      "check_args": ["--check"],
+      "outputs": [
+        "docs/whitepaper/generated/review-tabsyn.json",
+        "docs/whitepaper/generated/review-tabsyn.tex"
+      ]
     }
   ]
 }
