@@ -62,7 +62,8 @@ class MfsV3TableTest(unittest.TestCase):
             self.assertNotIn(refused, text)
         note = mfs_v3_table.scalar_tex(measured)
         self.assertIn(f"{KUMO_ESTIMATORS} inverse-transformed", note)
-        self.assertIn("scores 0 of 16", note)
+        self.assertIn("scores 0 of 16 method--lineage cells (4 lineages", note)
+        self.assertIn("Holm family: 3 tests per auditor", text)
         for name in TABULAR_AUDITORS:
             for part in VECTOR_PIN[name].split("_"):
                 self.assertIn(part, note)
@@ -78,14 +79,27 @@ class MfsV3TableTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             mfs_v3_table.require_receipt(receipt)
 
+    def test_duplicate_unknown_and_incomplete_matrix_raise(self):
+        import copy
+        rows = [_lineage(method, dataset, 0.1) for method in mfs_v3_table.METHODS for dataset in ("aa", "bb")]
+        for mutate in (lambda r: r.append(copy.deepcopy(r[0])),
+                       lambda r: r[0].update(method="unknown"),
+                       lambda r: r.pop()):
+            bad = copy.deepcopy(rows)
+            mutate(bad)
+            with self.assertRaises(ValueError):
+                mfs_v3_table.measure(_receipt(bad))
+
     def test_real_receipt_matches_its_lineage_retentions(self):
         path = mfs_v3_table.RECEIPT
         self.assertTrue(path.is_file(), "density receipt is missing")
         receipt = json.loads(path.read_text())
         measured = mfs_v3_table.measure(receipt)
         self.assertEqual(measured["scored"], 0)
-        self.assertEqual(measured["lineages"], 388)
+        self.assertEqual(measured["method_lineage_cells"], 388)
         self.assertEqual(measured["cleartext_unscanned"], 388)
+        self.assertEqual(measured["n_lineages"], 97)
+        self.assertEqual(measured["n_methods"], 4)
         for auditor in TABULAR_AUDITORS:
             for comparator in mfs_v3_table.COMPARATORS:
                 pair = measured["block"][auditor]["pairs"][comparator]

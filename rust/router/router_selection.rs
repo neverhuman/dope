@@ -298,6 +298,23 @@ mod tests {
     }
 
     #[test]
+    fn documented_sketch_decomposition_matches_emitted_width() {
+        // Paper §2.2: target/shape, across-column distributions, padded
+        // per-feature blocks, and global pairwise distribution.
+        let target_and_shape = 10;
+        let across_columns = 12 * 6;
+        let per_feature = 64 * 12;
+        let global_pairwise = 6;
+        let documented_width = target_and_shape + across_columns + per_feature + global_pairwise;
+        assert_eq!(documented_width, 856);
+        for width in [1, 12, 64, 65] {
+            let train = table(vec![vec![0.1, 0.4, 0.6, 0.8]; width]);
+            let sketch = DatasetSketch::from_train(&train, Task::Binary);
+            assert_eq!(sketch.values.len(), documented_width);
+        }
+    }
+
+    #[test]
     fn sketch_is_row_and_column_permutation_invariant() {
         let original = table(vec![
             vec![0.1, 0.4, f32::NAN, 0.8],

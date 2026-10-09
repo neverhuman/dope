@@ -65,7 +65,7 @@ X_LIM = (-1.5, 1.5)
 
 
 def _finite(value) -> bool:
-    return isinstance(value, (int, float)) and math.isfinite(value)
+    return type(value) in (int, float) and math.isfinite(value)
 
 
 def require_receipt(receipt: dict) -> int:
@@ -99,14 +99,27 @@ def require_receipt(receipt: dict) -> int:
 def lineage_maps(receipt: dict) -> dict:
     """Auditor, method, dataset to the finite lineage retention."""
     found = {name: {method: {} for method in METHODS} for name in TABULAR_AUDITORS}
+    identities = set()
+    cohorts = {method: set() for method in METHODS}
     for row in receipt["lineages"]:
         method = row.get("method")
         dataset = row.get("dataset")
-        if method not in METHODS or not isinstance(dataset, str):
-            continue
+        if method not in METHODS or not isinstance(dataset, str) or not dataset:
+            raise ValueError("unknown method or invalid lineage identity")
+        if (method, dataset) in identities:
+            raise ValueError("duplicate method-lineage-auditor key")
+        identities.add((method, dataset))
+        cohorts[method].add(dataset)
         for name, value in (row.get("retention") or {}).items():
-            if name in found and _finite(value):
+            if name not in found:
+                raise ValueError("unknown auditor")
+            if value is not None and not _finite(value):
+                raise ValueError("invalid retention value")
+            if _finite(value):
                 found[name][method][dataset] = float(value)
+    expected = cohorts["DOPE"]
+    if not expected or any(cohort != expected for cohort in cohorts.values()):
+        raise ValueError("incomplete matched method-lineage matrix")
     return found
 
 
@@ -121,6 +134,10 @@ def measure(receipt: dict) -> dict:
     """Recompute medians, intervals, and Holm from the lineage retentions."""
     scored = require_receipt(receipt)
     maps = lineage_maps(receipt)
+    n_cells = len(receipt["lineages"])
+    n_lineages = len({row["dataset"] for row in receipt["lineages"]})
+    if n_cells != len(METHODS) * n_lineages:
+        raise ValueError("method-lineage cell count disagrees with matched matrix")
     stored = receipt.get("retention_summary") or {}
     block = {}
     for auditor in TABULAR_AUDITORS:
@@ -157,7 +174,10 @@ def measure(receipt: dict) -> dict:
     return {
         "block": block,
         "cleartext_unscanned": cleartext,
-        "lineages": len(receipt["lineages"]),
+        "method_lineage_cells": len(receipt["lineages"]),
+        "n_lineages": len({row["dataset"] for row in receipt["lineages"]}),
+        "n_methods": len(METHODS),
+        "family_size": len(COMPARATORS),
         "scored": scored,
     }
 
@@ -185,6 +205,8 @@ def table_tex(measured: dict) -> str:
         "Auditor & Comparator & $n$ & DOPE & Other & Difference & W/T/L & Holm $p$ \\\\\n"
         "\\midrule\n"
         f"{body}\n\\bottomrule\n\\end{{tabular}}\n"
+        f"\\par\\smallskip{{\\scriptsize Holm family: {measured['family_size']} tests per auditor; "
+        "DOPE versus Gaussian copula, Chow--Liu, and independent marginals.}\\par\n"
     )
 
 
@@ -195,8 +217,9 @@ def scalar_tex(measured: dict) -> str:
     )
     return (
         f"Kumo large averages {KUMO_ESTIMATORS} inverse-transformed quantile forecasts. "
-        f"The receipt scores {measured['scored']} of {measured['lineages']} lineages, so the scalar is null. "
-        f"Cleartext is unscanned on {measured['cleartext_unscanned']} lineages.\n"
+        f"The receipt scores {measured['scored']} of {measured['method_lineage_cells']} method--lineage cells "
+        f"({measured['n_lineages']} lineages $\\times$ {measured['n_methods']} methods), so the scalar is null. "
+        f"Cleartext is unscanned on {measured['cleartext_unscanned']} method--lineage cells.\n"
         "\\begin{center}\\scriptsize\n"
         "\\begin{tabular}{@{}l>{\\raggedright\\arraybackslash}p{2.15in}@{}}\n"
         f"{rows}\n"
@@ -357,13 +380,13 @@ def check_outputs(measured: dict) -> None:
 
 
 def main() -> None:
-    receipt = json.loads(RECEIPT.read_text())
+    receipt = compute_panel.load(RECEIPT.name)
     measured = measure(receipt)
     if "--check" in sys.argv:
         check_outputs(measured)
         return
     write_outputs(measured)
-    print(f"wrote {TABLE_NAME} scored {measured['scored']} of {measured['lineages']}")
+    print(f"wrote {TABLE_NAME} scored {measured['scored']} of {measured['method_lineage_cells']} method-lineage cells")
 
 
 if __name__ == "__main__":

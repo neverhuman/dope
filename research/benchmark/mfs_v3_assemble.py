@@ -21,7 +21,7 @@ from research.benchmark.representation import (
     TABULAR_PROTOCOL,
     representation_closeness,
 )
-from research.benchmark.mfs_v3_score import evaluate_v3
+from research.benchmark.mfs_v3_score import PREREQUISITES, evaluate_v3
 
 AUDITORS = ("kumo_tabular_l", "mitra_v2", "tabicl2")
 HEADLINE = "kumo_tabular_l"
@@ -135,8 +135,8 @@ def score_lineage(seeds: list[dict], bound) -> dict:
     distribution = None
     if marginal is not None and sliced is not None and mmd is not None:
         distribution = distribution_fidelity(marginal, sliced, mmd)
-    bytes_known = [_finite(seed.get("artifact_bytes")) for seed in seeds]
-    artifact_bytes = max(float(seed["artifact_bytes"]) for seed in seeds) if all(bytes_known) and seeds else None
+    bytes_known = [type(seed.get("artifact_bytes")) is int for seed in seeds]
+    artifact_bytes = max(seed["artifact_bytes"] for seed in seeds) if all(bytes_known) and seeds else None
     headline_rows = [seed.get("auditors", {}).get(HEADLINE) or {} for seed in seeds]
     headline_retentions = [seed_retention(row) for row in headline_rows]
     # The gate needs finite losses from every auditor. A noninformative retention
@@ -150,6 +150,8 @@ def score_lineage(seeds: list[dict], bound) -> dict:
         for name in AUDITORS
     )
     evidence = {
+        **{key: len(seeds) == len(SAMPLE_SEEDS) and all(seed.get(key) is True for seed in seeds)
+           for key in PREREQUISITES},
         "normalizer": NORMALIZER,
         "utility_protocol": TABULAR_PROTOCOL,
         "utility_auditors": list(TABULAR_AUDITORS) if losses_ready else [],
