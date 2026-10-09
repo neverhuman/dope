@@ -191,7 +191,7 @@ object. Publishing current scratch files under those identities would require
 an additional custody audit; logged replay fits have different artifact
 identities. The committed validation ledgers, original metadata, and compressed numeric logs,
 authenticated by the input pins and rebuilt by \texttt{just paper}, reproduce the
-historical reductions and figures. The control, holdout-privacy, and TabSyn
+historical reductions and figures. The holdout-privacy and TabSyn
 cell-level reductions remain in progress, wave 2. This paper prints no number
 for them. Original model sampling and historical partition
 reconstruction stay packaging limitations.
@@ -744,7 +744,7 @@ stays unpooled from the density block.
 Retention is the reported utility. Both release scores in
 the release-score section of the main text stay null. The linear auditor leaves DOPE unseparated from the Gaussian copula,
 and equivalence stays unclaimed. Shipping this artifact stays a different
-experiment from shipping the compact predictor itself. The predictor-only control and the real-row resample remain in progress, wave 2. This paper prints no number for them.
+experiment from shipping the compact predictor itself. The supplement's control table reports the predictor-only control and the real-row resample.
 Equivalence stays unclaimed. Normalized-space RMSE is the loss
 the auditors stored. Original-unit error after inverting the training
 transform stays unstored, and this paper leaves it unreported.
@@ -958,8 +958,18 @@ The Holm column in this table is printed at three decimals. The main-text headli
 \input{generated/review-paired.tex}
 \endgroup
 
-\subsection{Controls, holdout privacy, and the TabSyn cohort}
-The predictor-only control, the real-row resample, the holdout privacy panel, and the matched TabSyn cohort remain in progress, wave 2. This paper prints no number for them. The retained TabSyn subset above is a different cohort. The stored logistic detector stays out of this section.
+\subsection{Controls}
+The real-row resample draws the published training rows with replacement until the table has four times the training row count. The predictor-only control fits the compact predictor on those training rows, samples each feature from its training marginal, and adds residual noise. Neither control uses the DOPE encoding. The paired column is DOPE minus the control. The size-$n$ Holm family is the three predictor-only auditor tests. The real-row resample has no size-$n$ arm, so it stays outside that family. The size-$4n$ Holm family has six tests. Extra predictor fit seeds stay in the table and stay outside the Holm family. Split-seed rows are a separate sensitivity. Wilcoxon and TOST treat lineages as independent. Equivalence stays unclaimed.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-controls.tex}
+\endgroup
+
+\subsection{Holdout privacy and the matched TabSyn cohort}
+The holdout privacy panel and the matched TabSyn cohort remain in progress, wave 2. This paper prints no number for them. The retained TabSyn subset above is a different cohort. The stored logistic detector stays out of this section.
 
 \subsection{Source-family sensitivity}
 DOPE rows report median absolute retention within each source family.
