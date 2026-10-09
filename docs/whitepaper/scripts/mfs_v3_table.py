@@ -28,6 +28,7 @@ from research.benchmark.mfs_v3_panel import KUMO_ESTIMATORS, REFUSED_ENCODERS, V
 from research.benchmark.representation import TABULAR_AUDITORS
 
 import compute_panel
+import figure_style
 
 RECEIPT = REPO / "research" / "benchmark" / "results" / "mfs-v3-density-panel.json"
 GENERATED = REPO / "docs" / "whitepaper" / "generated"
@@ -50,15 +51,15 @@ COMPARATOR_TEX = {
     "independent_marginals": "Indep.\\ marginals",
 }
 BAR_STYLE = {
-    "DOPE": ("DOPE", "#0072B2", ""),
-    "GaussianCopula": ("Gaussian\ncopula", "#E69F00", "//"),
-    "Chow-Liu": ("Chow-Liu", "#009E73", "\\\\"),
-    "independent_marginals": ("Indep.", "#D55E00", "xx"),
+    "DOPE": ("DOPE\n(ours)", figure_style.DOPE, ""),
+    "GaussianCopula": ("Gaussian\ncopula", figure_style.GAUSSIAN, "//"),
+    "Chow-Liu": ("Chow-Liu", figure_style.CHOW, "\\\\"),
+    "independent_marginals": ("Indep.", figure_style.INDEPENDENT, "xx"),
 }
 MARKS = (
-    ("GaussianCopula", "Gaussian copula", "#E69F00", "s"),
-    ("Chow-Liu", "Chow-Liu", "#009E73", "^"),
-    ("independent_marginals", "Independent", "#D55E00", "D"),
+    ("GaussianCopula", "Gaussian copula", figure_style.GAUSSIAN, "s"),
+    ("Chow-Liu", "Chow-Liu", figure_style.CHOW, "^"),
+    ("independent_marginals", "Independent", figure_style.INDEPENDENT, "D"),
 )
 X_LIM = (-1.5, 1.5)
 
@@ -206,35 +207,9 @@ def scalar_tex(measured: dict) -> str:
 
 def _fonts():
     import matplotlib
-    from matplotlib import font_manager
 
     matplotlib.use("Agg")
-    liberation = Path("/usr/share/fonts/truetype/liberation")
-    for face in (
-        "LiberationSerif-Regular.ttf",
-        "LiberationSerif-Bold.ttf",
-        "LiberationSerif-Italic.ttf",
-        "LiberationSerif-BoldItalic.ttf",
-    ):
-        path = liberation / face
-        if not path.is_file():
-            raise SystemExit(f"figure font is missing: {path}")
-        font_manager.fontManager.addfont(str(path))
-    matplotlib.rcParams.update({
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-        "font.family": "serif",
-        "font.serif": ["Liberation Serif"],
-        "font.size": 8.1,
-        "axes.labelsize": 8.1,
-        "axes.titlesize": 8.1,
-        "xtick.labelsize": 8.1,
-        "ytick.labelsize": 8.1,
-        "legend.fontsize": 8.1,
-        "axes.linewidth": 0.6,
-        "xtick.major.width": 0.6,
-        "ytick.major.width": 0.6,
-    })
+    figure_style.apply(matplotlib, size=8.1)
     import matplotlib.pyplot as plt
 
     return plt
@@ -243,8 +218,9 @@ def _fonts():
 def _bars(measured: dict, dest: Path) -> None:
     plt = _fonts()
     import numpy as np
+    from matplotlib.patches import Patch
 
-    figure, axes = plt.subplots(1, 3, figsize=(7.16, 3.15), sharey=True)
+    figure, axes = plt.subplots(1, 3, figsize=(7.16, 3.45), sharey=True)
     for axis, auditor in zip(axes, TABULAR_AUDITORS):
         pairs = measured["block"][auditor]["pairs"]
         anchor = pairs["GaussianCopula"]
@@ -254,7 +230,6 @@ def _bars(measured: dict, dest: Path) -> None:
             if int(pair["n"]) != int(anchor["n"]):
                 raise SystemExit(f"{auditor} {key} paired count does not match")
             rows.append((key, pair["other_median"], pair["other_lo"], pair["other_hi"]))
-        rows.sort(key=lambda item: item[1], reverse=True)
         positions = np.arange(len(rows))
         medians = [row[1] for row in rows]
         lowers = [row[1] - row[2] for row in rows]
@@ -273,15 +248,25 @@ def _bars(measured: dict, dest: Path) -> None:
             else:
                 axis.text(xpos, row[2] - 0.03, label, ha="center", va="top", color="#1a1a1a")
         axis.set_xticks(positions)
-        axis.set_xticklabels([BAR_STYLE[row[0]][0] for row in rows])
+        axis.set_xticklabels([])
+        axis.tick_params(axis="x", length=0)
         axis.set_title(f"{AUDITOR_TEX[auditor]}, {anchor['n']} lineages")
-        axis.yaxis.grid(True, linewidth=0.4, color="#E0E0E0", zorder=0)
-        axis.set_axisbelow(True)
-        axis.spines["top"].set_visible(False)
-        axis.spines["right"].set_visible(False)
+        figure_style.panel(axis, grid="y")
     axes[0].set_ylabel("retention (dimensionless)")
     axes[0].set_ylim(-0.28, 1.18)
-    figure.tight_layout(pad=0.4)
+    handles = [
+        Patch(
+            facecolor=BAR_STYLE[key][1],
+            edgecolor="#222222",
+            linewidth=0.4,
+            hatch=BAR_STYLE[key][2],
+            label=BAR_STYLE[key][0].replace("\n", " "),
+        )
+        for key in ("DOPE", "GaussianCopula", "Chow-Liu", "independent_marginals")
+    ]
+    labels = [handle.get_label() for handle in handles]
+    figure.tight_layout(pad=0.4, rect=(0, 0.12, 1, 1))
+    figure_style.legend_below(figure, handles, labels, ncol=4)
     figure.savefig(dest)
     plt.close(figure)
 
@@ -302,11 +287,13 @@ def _paired(measured: dict, dest: Path) -> None:
             axis.set_xticks([-1.0, 0.0, 1.0])
             outside = int(np.sum((values < X_LIM[0]) | (values > X_LIM[1])))
             lo, hi = pair["lo"], pair["hi"]
+            figure_style.panel(axis, grid="x")
             axis.set_title(
                 f"{AUDITOR_TEX[auditor]}, {label}\n"
                 f"{compute_panel.sig3(pair['median_difference'])} "
                 f"[{compute_panel.sig3(lo)}, {compute_panel.sig3(hi)}]"
-                f" ({outside} outside)"
+                f" ({outside} outside)",
+                fontsize=6.4,
             )
             if row == 2:
                 axis.set_xlabel("retention difference (dimensionless)")

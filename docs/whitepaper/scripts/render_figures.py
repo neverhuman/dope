@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Four IEEE figures from panel-stats.json, the lineage record, and loss TSVs.
+"""Four paper figures from panel-stats.json, the lineage record, and loss TSVs.
 
-Type 42 serif fonts. Lineage-bootstrap intervals only. No per-seed whiskers.
+Type 42 DejaVu Sans. Lineage-bootstrap intervals only. No per-seed whiskers.
 """
 
 from __future__ import annotations
@@ -17,38 +17,12 @@ os.environ.setdefault("SOURCE_DATE_EPOCH", "1760000000")
 import matplotlib
 
 matplotlib.use("Agg")
-from matplotlib import font_manager
-# TrueType only. TeX Gyre Termes is OpenType/CFF, and fonttype 42 then
-# makes pdffonts warn that the font type does not match the embedded file.
-_LIBERATION = Path("/usr/share/fonts/truetype/liberation")
-for _face in (
-    "LiberationSerif-Regular.ttf",
-    "LiberationSerif-Bold.ttf",
-    "LiberationSerif-Italic.ttf",
-    "LiberationSerif-BoldItalic.ttf",
-):
-    _font_path = _LIBERATION / _face
-    if not _font_path.is_file():
-        raise SystemExit(f"figure font is missing: {_font_path}")
-    font_manager.fontManager.addfont(str(_font_path))
+import figure_style
+
 # Composed at 7.16in and placed at \textwidth (516pt). TeX reads that
 # PDF as 517.45pt, so 8.1pt here remains at least 8pt after placement.
 FONT_PT = 8.1
-matplotlib.rcParams.update({
-    "pdf.fonttype": 42,
-    "ps.fonttype": 42,
-    "font.family": "serif",
-    "font.serif": ["Liberation Serif"],
-    "font.size": FONT_PT,
-    "axes.labelsize": FONT_PT,
-    "axes.titlesize": FONT_PT,
-    "xtick.labelsize": FONT_PT,
-    "ytick.labelsize": FONT_PT,
-    "legend.fontsize": FONT_PT,
-    "axes.linewidth": 0.6,
-    "xtick.major.width": 0.6,
-    "ytick.major.width": 0.6,
-})
+figure_style.apply(matplotlib, size=FONT_PT)
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -62,10 +36,10 @@ DRAWS = 10_000
 BYTE_CAP = 10240
 AUDITORS = ("catboost", "linear", "mlp")
 METHODS = (
-    ("DOPE", "DOPE", "#0072B2", "o"),
-    ("GaussianCopula", "Gaussian copula", "#E69F00", "s"),
-    ("Chow-Liu", "Chow-Liu", "#009E73", "^"),
-    ("independent_marginals", "Independent", "#D55E00", "D"),
+    ("DOPE", "DOPE (ours)", figure_style.DOPE, "o"),
+    ("GaussianCopula", "Gaussian copula", figure_style.GAUSSIAN, "s"),
+    ("Chow-Liu", "Chow-Liu", figure_style.CHOW, "^"),
+    ("independent_marginals", "Independent", figure_style.INDEPENDENT, "D"),
 )
 Y_LIM = (-1.5, 1.6)
 
@@ -116,7 +90,7 @@ def _write_hashes():
 
 
 def draw_retention(record, stats, dest=None):
-    figure, axes = plt.subplots(1, 3, figsize=(7.16, 2.55), sharey=True)
+    figure, axes = plt.subplots(1, 3, figsize=(7.16, 2.85), sharey=True)
     titles = {"catboost": "CatBoost", "linear": "Linear", "mlp": "MLP"}
     for axis, auditor in zip(axes, AUDITORS):
         points = series_points(record, auditor)
@@ -125,16 +99,17 @@ def draw_retention(record, stats, dest=None):
             cloud = points[key]
             inside = [(x, y) for x, y in cloud if Y_LIM[0] <= y <= Y_LIM[1]]
             outside += len(cloud) - len(inside)
+            dominant = key == "DOPE"
             if inside:
                 axis.scatter(
                     [item[0] for item in inside],
                     [item[1] for item in inside],
-                    s=12,
+                    s=16 if dominant else 12,
                     c=color,
                     marker=marker,
                     linewidths=0,
                     label=label,
-                    zorder=2,
+                    zorder=4 if dominant else 2,
                 )
             summary = stats["blocks"]["density"][auditor]["methods"][key]
             if cloud and summary["median"] is not None and Y_LIM[0] <= summary["median"] <= Y_LIM[1]:
@@ -145,35 +120,36 @@ def draw_retention(record, stats, dest=None):
                     yerr=[[summary["median"] - summary["lo"]], [summary["hi"] - summary["median"]]],
                     fmt=marker,
                     color=color,
-                    markersize=5.5,
+                    markersize=6.2 if dominant else 5.5,
                     markerfacecolor="white",
-                    markeredgewidth=0.8,
-                    elinewidth=0.8,
+                    markeredgewidth=0.9 if dominant else 0.8,
+                    elinewidth=0.9 if dominant else 0.8,
                     capsize=2,
-                    zorder=3,
+                    zorder=5 if dominant else 3,
                 )
-        axis.axvline(np.log10(BYTE_CAP), color="#666666", linestyle="--", linewidth=0.7)
+        axis.axvline(np.log10(BYTE_CAP), color="#666666", linestyle="--", linewidth=0.7, zorder=1)
         axis.set_ylim(*Y_LIM)
         axis.set_title(f"{titles[auditor]} ({outside} outside)")
         axis.set_xlabel("log10 charged bytes")
+        figure_style.panel(axis, grid="both")
         if auditor == "catboost":
             axis.set_ylabel("retention (dimensionless)")
     handles, labels = axes[0].get_legend_handles_labels()
-    figure.tight_layout(pad=0.35, rect=(0, 0, 1, 0.90))
-    figure.legend(handles, labels, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 0.98))
+    figure.tight_layout(pad=0.35, rect=(0, 0.14, 1, 1))
+    figure_style.legend_below(figure, handles, labels, ncol=4)
     path = Path(dest) if dest is not None else FIG / "retention-bytes.pdf"
     _save(figure, path)
     return path
 
 
 def draw_paired(stats, dest=None):
-    figure = plt.figure(figsize=(7.16, 3.45))
-    grid = figure.add_gridspec(2, 3, height_ratios=(1.35, 1.0), hspace=0.55, wspace=0.35)
+    figure = plt.figure(figsize=(7.16, 3.85))
+    grid = figure.add_gridspec(2, 3, height_ratios=(1.5, 1.0), hspace=0.78, wspace=0.38)
     pairs = stats["blocks"]["density"]["catboost"]["pairs"]
     order = (
-        ("GaussianCopula", "Gaussian copula", "#E69F00", "s"),
-        ("Chow-Liu", "Chow-Liu", "#009E73", "^"),
-        ("independent_marginals", "Independent", "#D55E00", "D"),
+        ("GaussianCopula", "Gaussian copula", figure_style.GAUSSIAN, "s"),
+        ("Chow-Liu", "Chow-Liu", figure_style.CHOW, "^"),
+        ("independent_marginals", "Independent", figure_style.INDEPENDENT, "D"),
     )
     for column, (key, label, color, marker) in enumerate(order):
         axis = figure.add_subplot(grid[0, column])
@@ -181,12 +157,18 @@ def draw_paired(stats, dest=None):
         axis.scatter(values, np.arange(1, values.size + 1), s=14, c=color, marker=marker, linewidths=0)
         axis.axvline(0, color="#333333", linewidth=0.6)
         axis.set_xlim(-1.5, 1.5)
-        axis.set_xlabel("retention difference (dimensionless)")
+        # One shared phrase. Repeating it under every panel collides in DejaVu Sans.
+        if column == 1:
+            axis.set_xlabel("retention difference (dimensionless)", fontsize=7)
         if column == 0:
             axis.set_ylabel("sorted lineage index")
         lo, hi = pairs[key]["lo"], pairs[key]["hi"]
         outside = int(np.sum((values < -1.5) | (values > 1.5)))
-        axis.set_title(f"{label}\nmedian {pairs[key]['median_difference']:.3f} [{lo:.3f}, {hi:.3f}] ({outside} outside)")
+        figure_style.panel(axis, grid="both")
+        axis.set_title(
+            f"{label}\n{pairs[key]['median_difference']:.3f} [{lo:.3f}, {hi:.3f}] ({outside} outside)",
+            fontsize=6.6,
+        )
     axis = figure.add_subplot(grid[1, :])
     friedman = stats["blocks"]["density"]["catboost"]["friedman"]
     ranks = friedman["average_ranks"]
@@ -206,7 +188,7 @@ def draw_paired(stats, dest=None):
     axis.set_ylim(-0.9, 0.7)
     axis.set_yticks([])
     axis.set_xlabel("average rank (1 is highest retention)")
-    axis.set_title(f"CatBoost, {friedman['n']} lineages")
+    axis.set_title(f"CatBoost, {friedman['n']} lineages", pad=6)
     path = Path(dest) if dest is not None else FIG / "paired-cdf.pdf"
     _save(figure, path)
     return path
@@ -256,15 +238,16 @@ def draw_loss(dest=None, summary_dest=None):
         valid, valid_lo, valid_hi = bootstrap_band(matrix[:, :, 1], rng)
         steps = np.arange(train.size)
         floor = 1e-8
-        axis.plot(steps, np.maximum(train, floor), color="#0072B2", linestyle="-", linewidth=1.0, label="train")
-        axis.fill_between(steps, np.maximum(train_lo, floor), np.maximum(train_hi, floor), color="#0072B2", alpha=0.18, linewidth=0)
-        axis.plot(steps, np.maximum(valid, floor), color="#D55E00", linestyle="--", linewidth=1.0, label="validation")
-        axis.fill_between(steps, np.maximum(valid_lo, floor), np.maximum(valid_hi, floor), color="#D55E00", alpha=0.18, linewidth=0)
+        axis.plot(steps, np.maximum(train, floor), color=figure_style.TRAIN, linestyle="-", linewidth=1.3, label="train")
+        axis.fill_between(steps, np.maximum(train_lo, floor), np.maximum(train_hi, floor), color=figure_style.TRAIN, alpha=0.18, linewidth=0)
+        axis.plot(steps, np.maximum(valid, floor), color=figure_style.VALIDATION, linestyle="--", linewidth=1.0, label="validation")
+        axis.fill_between(steps, np.maximum(valid_lo, floor), np.maximum(valid_hi, floor), color=figure_style.VALIDATION, alpha=0.18, linewidth=0)
         axis.set_xlabel("AdamW step")
         axis.set_ylabel("hidden-basis MSE" if profile.endswith("2048") else "")
         axis.set_yscale("log")
         axis.set_ylim(3e-4, 0.7)
         title = "2,048 steps" if profile.endswith("2048") else "8,192 steps, not displayed"
+        figure_style.panel(axis, grid="both")
         axis.set_title(f"{title}, {matrix.shape[0]} lineages")
         summary["profiles"][profile] = {
             "lineages": int(matrix.shape[0]),
@@ -293,12 +276,12 @@ def draw_loss(dest=None, summary_dest=None):
 
 # Same colors as the density marks, plus the two neural generators.
 BAR_STYLE = {
-    "DOPE": ("DOPE", "#0072B2"),
-    "GaussianCopula": ("Gaussian\ncopula", "#E69F00"),
-    "Chow-Liu": ("Chow-Liu", "#009E73"),
-    "independent_marginals": ("Independent\nmarginals", "#D55E00"),
-    "TVAE": ("TVAE", "#56B4E9"),
-    "CTGAN": ("CTGAN", "#CC79A7"),
+    "DOPE": ("DOPE\n(ours)", figure_style.DOPE),
+    "GaussianCopula": ("Gaussian\ncopula", figure_style.GAUSSIAN),
+    "Chow-Liu": ("Chow-Liu", figure_style.CHOW),
+    "independent_marginals": ("Independent\nmarginals", figure_style.INDEPENDENT),
+    "TVAE": ("TVAE", figure_style.TVAE),
+    "CTGAN": ("CTGAN", figure_style.CTGAN),
 }
 
 
@@ -321,7 +304,6 @@ def _paired_bars(block, baseline_keys):
         if abs(pair["dope_median"] - anchor["dope_median"]) > 5e-12:
             raise SystemExit(f"{key} DOPE median does not match {anchor_key}")
         rows.append((key, pair["other_median"], pair["other_lo"], pair["other_hi"]))
-    rows.sort(key=lambda item: item[1], reverse=True)
     return rows, int(anchor["n"])
 
 
@@ -374,10 +356,7 @@ def draw_retention_bars(stats, dest=None, *, readme=False):
         axis.set_xticks(positions)
         axis.set_xticklabels([BAR_STYLE[row[0]][0] for row in rows])
         axis.set_title(f"{title}, {count} lineages")
-        axis.yaxis.grid(True, linewidth=0.4, color="#E0E0E0", zorder=0)
-        axis.set_axisbelow(True)
-        axis.spines["top"].set_visible(False)
-        axis.spines["right"].set_visible(False)
+        figure_style.panel(axis, grid="y")
     if readme:
         axes[0].set_ylabel("retention (dimensionless)")
         for axis in axes:
