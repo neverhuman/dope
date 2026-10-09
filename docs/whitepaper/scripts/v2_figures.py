@@ -36,9 +36,10 @@ README_DIR = REPO / "docs" / "readme"
 HEADLINE = GEN / "v2-headline.json"
 ACCENT = "#76B900"
 ACCENT_EDGE = "#3F6B00"
+DEFAULT_GREEN = "#A6D96A"
 CONTEXT = "#7A7A7A"
 CONTROL = "#A8A8A8"
-BAND = "#EDEDED"
+BAND = "#D6D6D6"
 CAP = 10240
 FULL_PANEL = 90
 FOREST_TICKS = (-0.2, 0.0, 0.2, 0.4)
@@ -90,6 +91,12 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
             lo, hi = max(left, row["hl_lo"]), min(right, row["hl_hi"])
             if hi > lo:
                 axis.plot([lo, hi], [y, y], color=colour, linewidth=1.4, solid_capstyle="round", zorder=2)
+            # An interval cut by the window ends in an arrowhead at that edge.
+            for bound, edge, sign in ((row["hl_hi"], right, 1), (row["hl_lo"], left, -1)):
+                if sign * (bound - edge) > 0 and left <= row["hl"] <= right:
+                    axis.annotate("", xy=(edge, y), xytext=(edge - sign * 0.06, y),
+                                  arrowprops={"arrowstyle": "-|>", "color": colour, "lw": 1.0,
+                                              "shrinkA": 0, "shrinkB": 0, "mutation_scale": 7}, zorder=2)
             point = row["hl"]
             if left <= point <= right:
                 axis.plot([point], [y], marker="o", markersize=4.6, zorder=3,
@@ -98,9 +105,10 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
                 edge = right if point > right else left
                 axis.plot([edge], [y], marker=">" if point > right else "<", markersize=5.0, zorder=3,
                           color=colour)
-                axis.annotate(f"{point:.2f}", xy=(edge, y), xytext=(-3 if point > right else 3, 4),
-                              textcoords="offset points", ha="right" if point > right else "left",
-                              fontsize=6.0, color=figure_style.INK)
+                axis.annotate(f"{point:.2f}", xy=(edge, y), xytext=(-6 if point > right else 6, 0),
+                              textcoords="offset points", ha="right" if point > right else "left", va="center",
+                              fontsize=6.0, color=figure_style.INK,
+                              bbox={"boxstyle": "square,pad=0.1", "facecolor": "white", "edgecolor": "none"})
             if auditor == "mlp":
                 axis.annotate(f"n={cohort}", xy=(1.0, y), xycoords=("axes fraction", "data"),
                               xytext=(3, 0), textcoords="offset points", va="center", fontsize=6.4,
@@ -161,8 +169,10 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     figure_style.panel(axis, grid="both")
     axis.set_xscale("log")
     axis.axvline(CAP, color=figure_style.SPINE, linestyle=(0, (4, 3)), linewidth=0.8, zorder=1)
-    drawn = [arm for arm in headline["arms"] if arm["code"] == "Dope" or arm["code"] in FIGURE_CODES]
-    plotted = [arm for arm in drawn if arm["role"] in {"headline", "generator"} and arm["bytes"] is not None]
+    # The untuned default sits beside the reported profile, so the byte axis shows what the profile choice adds.
+    drawn = [arm for arm in headline["arms"] if arm["code"] in ("Dope", "DopeDef") or arm["code"] in FIGURE_CODES]
+    plotted = [arm for arm in drawn if (arm["role"] in {"headline", "generator"} or arm["code"] == "DopeDef")
+               and arm["bytes"] is not None]
     controls = [arm for arm in drawn if arm["role"] == "control"]
     xs = [arm["bytes"][key] for arm in plotted for key in ("q1", "q3")]
     ys = [value for arm in plotted for value in (arm["level"]["lo"], arm["level"]["hi"], arm["level"]["median"])
@@ -178,7 +188,7 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     for arm in plotted:
         level, size = arm["level"], arm["bytes"]["median"]
         is_dope = arm["code"] == "Dope"
-        colour = ACCENT if is_dope else CONTEXT
+        colour = ACCENT if is_dope else (DEFAULT_GREEN if arm["code"] == "DopeDef" else CONTEXT)
         hollow = (level["n"] or 0) < FULL_PANEL
         drawn_marks = axis.plot([arm["bytes"]["q1"], arm["bytes"]["q3"]], [level["median"]] * 2, color=colour,
                                 linewidth=1.1, alpha=0.8, zorder=2)
@@ -206,7 +216,8 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
                     ((0, 2, "left" if fraction < 0.1 else ("right" if fraction > 0.9 else "center"), "bottom"),
                      (0, -2, "left" if fraction < 0.1 else ("right" if fraction > 0.9 else "center"), "top")))
                    for fraction in CONTROL_POSITIONS]
-        _place(axis, arm["display"], anchors, placed, fontsize=6.4, color=figure_style.INK)
+        _place(axis, arm["display"], anchors, placed, avoid=[box for owned in boxes.values() for box in owned],
+               fontsize=6.4, color=figure_style.INK)
     axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)")
     axis.set_ylabel("CatBoost retention at 4n")
     return _save(figure, path, dpi)

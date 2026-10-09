@@ -202,7 +202,7 @@ def _simulated_count() -> list[str]:
 
 def _sentences(panel, byte_stats) -> list[str]:
     levels = {(_code(row), row["auditor"], row["size"]): row for row in panel["levels"]}
-    generators = [arm for arm in M.ARMS if arm.role in {"headline", "generator"}
+    generators = [arm for arm in M.ARMS if (arm.role in {"headline", "generator"} or arm.code == "DopeDef")
                   and f"{arm.method}|{arm.configuration}" in byte_stats
                   and byte_stats[f"{arm.method}|{arm.configuration}"] is not None
                   and (arm.code, "catboost", 4) in levels]
@@ -214,7 +214,8 @@ def _sentences(panel, byte_stats) -> list[str]:
     dope_bytes = byte_stats["DOPE|headline"]["median"]
     heavy = {"CTGAN", "TVAE", "TabSyn", "ARF", "ForestDiffusion/Forest-Flow", "TabDDPM", "TabDiff", "GReaT"}
     larger = [size / dope_bytes for arm, size, _ in points if arm.method in heavy]
-    full = [arm.code for arm in generators if levels[(arm.code, "catboost", 4)]["n"] >= 90]
+    # The untuned default joins the Pareto points only; it is no comparator in the size ranking.
+    full = [arm.code for arm in generators if arm.code != "DopeDef" and levels[(arm.code, "catboost", 4)]["n"] >= 90]
     order = {size: sorted(full, key=lambda code: -levels[(code, "catboost", size)]["median"])
              for size in (1, 4) if all((code, "catboost", size) in levels for code in full)}
     same = len(order) == 2 and order[1] == order[4]
@@ -231,7 +232,7 @@ def _sentences(panel, byte_stats) -> list[str]:
                ("One generator comparison is" if count == 1 else f"{count} generator comparisons are")
                + " equivalent under the pre-declared rule")
     return [cmd("VEquivResults", results),
-            cmd("VParetoSet", ", ".join(pareto)), cmd("VRatioMin", ratio(min(larger)) if larger else DASH),
+            cmd("VParetoSet", "; ".join(pareto)), cmd("VRatioMin", ratio(min(larger)) if larger else DASH),
             cmd("VRatioMax", ratio(max(larger)) if larger else DASH),
             cmd("VSizeRankSame", "is the same at both sizes" if same else "changes between the two sizes"),
             cmd("VSizeLifted", f"{lifted} of {len(full) - 1}"), cmd("VEquivCount", count),
@@ -255,8 +256,8 @@ def _fidelity_macros(panel) -> list[str]:
     out = []
     keys = {"marginal_ks_mean": "Ks", "pair_correlation_fidelity": "Corr", "c2st_auc_logistic": "Logit"}
     for row in panel.get("fidelity", []):
-        if (row["method"], row["configuration"], row["size"]) == ("DOPE", "headline", 4):
-            base = "V" + keys[row["metric"]] + "Dope"
+        if row["size"] == 4:
+            base = "V" + keys[row["metric"]] + _code(row)
             out += [cmd(base, num(row["median"])), cmd(base + "Lo", num(row.get("lo"))),
                     cmd(base + "Hi", num(row.get("hi")))]
     return out
@@ -316,7 +317,8 @@ def fidelity_table(privacy) -> str:
         for metric in metrics:
             row = index.get((key, metric))
             cells.append("---" if row is None else f"${num(row['median'])}$ \\scriptsize$[{num(row['lo'], 2)},{num(row['hi'], 2)}]$")
-        count = (index.get((key, "c2st_catboost_auc")) or {}).get("n", "---")
+        counts = sorted({row["n"] for row in (index.get((key, metric)) for metric in metrics) if row is not None})
+        count = "---" if not counts else (str(counts[0]) if len(counts) == 1 else f"{counts[0]}--{counts[-1]}")
         rows.append(f"{name} & {count} & " + " & ".join(cells) + " \\\\")
     head = ("\\begin{tabular}{@{}lrlllll@{}}\n\\toprule\n"
             "Method & $n$ & C2ST & DCR fit & DCR val. & NNDR & MIA AUC \\\\\n\\midrule\n")
@@ -347,7 +349,7 @@ def _stacked(value, lo, hi) -> str:
 def contrasts_table(panel) -> str:
     rows = []
     order = {code: index for index, code in enumerate(HEADLINE_ORDER)}
-    for row in sorted(panel["contrasts"], key=lambda r: (r["size"], order.get(_code(r), 99), r["auditor"])):
+    for row in sorted(panel["contrasts"], key=lambda r: (r["size"], order.get(_code(r), 99), _code(r), r["auditor"])):
         arm = M.arm(row["method"], row["configuration"])
         equivalence = row.get("equivalence") or {}
         yuen = (row.get("yuen") or {}).get("equivalent")
