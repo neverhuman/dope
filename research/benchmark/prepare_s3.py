@@ -44,7 +44,7 @@ def selected_catalog(catalog: Path) -> tuple[list[dict], int]:
     return sorted(selected, key=lambda row: row["dataset_hash"]), len(all_rows) - len(selected)
 
 
-def prepare_entry(row: dict, scratch: Path, profile: str) -> dict:
+def prepare_entry(row: dict, scratch: Path, profile: str | None) -> dict:
     dataset_id = row["dataset_hash"]
     source = fetch(dataset_id, scratch, profile)
     columns = row["files"]["train"]["columns"]
@@ -97,7 +97,7 @@ def verify_prepared(receipt: dict, scratch: Path) -> None:
         raise ValueError("prepared S3 manifest or sealed partition changed")
 
 
-def run(scratch: Path, profile: str) -> dict:
+def run(scratch: Path, profile: str | None) -> dict:
     if not scratch.resolve().is_relative_to(ROOT.resolve()):
         raise ValueError("S3 preparation must stay on benchmark scratch")
     catalog = scratch / "catalog/v1/catalog.jsonl"
@@ -145,7 +145,7 @@ def run(scratch: Path, profile: str) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scratch", type=Path, default=ROOT)
-    parser.add_argument("--profile", default="veox-jepson-prod")
+    parser.add_argument("--profile", help="optional AWS profile; otherwise use the standard AWS credential chain")
     args = parser.parse_args()
     summary = run(args.scratch, args.profile)
     print(json.dumps({key: summary[key] for key in
