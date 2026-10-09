@@ -115,7 +115,7 @@ def runtime_drift(lock_path: Path) -> dict:
 
 
 def _fit(cell: Path, worker: Path, dataset: str, seed: int, arm_name: str, binary: Path,
-         env: dict, identity: dict, auth: dict, contract: dict) -> dict:
+         env: dict, identity: dict, auth: dict, contract: dict, gpu_lock: Path) -> dict:
     model = cell / "model.dpk"
     record_path = cell / "fit.json"
     decision = v1.resume_fit(v1._read_json(record_path), model.is_file())
@@ -124,8 +124,8 @@ def _fit(cell: Path, worker: Path, dataset: str, seed: int, arm_name: str, binar
         return v1._read_json(record_path)
     cell.mkdir(parents=True, exist_ok=True)
     command = compile_command(binary, worker, auth["task"], model, seed, contract)
-    # One GPU fit per host: every slot shares this lock under the output root.
-    with (cell.parents[2] / ".gpu-fit.lock").open("a") as lock:
+    # One GPU fit per host: every runner on the host shares this lock file.
+    with gpu_lock.open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         returncode, elapsed = v1._run_bounded(command, cell / "fit.log", env, v1.FIT_WALL_SECONDS)
     artifact_bytes, compliant = v1._parse_compile_log(cell / "fit.log")
@@ -247,7 +247,7 @@ def run(args) -> None:
         v1._wait_to_fit(list(args.yield_unit))
         cell = out / dataset / args.arm / f"fit-{seed}"
         record = _fit(cell, worker, dataset, seed, args.arm, binary, env, {**identity, "display_name": name},
-                      auth, contract)
+                      auth, contract, args.gpu_lock or out / ".gpu-fit.lock")
         if record.get("status") != "ok":
             continue
         for size in v1.SIZES:
@@ -258,7 +258,7 @@ def run(args) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    for name in ("--workers", "--lineage-record", "--out", "--binary", "--runtime-lock"):
+    for name in ("--workers", "--lineage-record", "--out", "--binary", "--runtime-lock", "--gpu-lock"):
         parser.add_argument(name, type=Path)
     parser.add_argument("--host")
     parser.add_argument("--arm", choices=ARMS, default="headline")
