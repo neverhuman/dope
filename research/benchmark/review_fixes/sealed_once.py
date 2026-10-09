@@ -25,6 +25,9 @@ REPO = Path(__file__).resolve().parents[3]
 import sys
 sys.path.insert(0, str(REPO))
 from research.benchmark.review_fixes.sample_paths import resolve_sample_csv
+from research.benchmark.review_fixes.source_pins import (
+    PUBLISHED_SOURCE_SHA256, authenticated_published_bytes,
+)
 from research.benchmark.review_fixes.stats import cluster_of, median_ci
 
 PILOT_PATH = HERE.parent / "pilot_metrics.py"
@@ -114,7 +117,7 @@ def _retention(pilot, train, test, synthetic, task: str, seed: int = 1729) -> di
 
 def _published_samples() -> list[dict]:
     """Train-only published samples. Fit seed 11 only. Duplicates are refused."""
-    _assert_ledger_pins()
+    captured = _assert_ledger_pins()
     found = {}
     specs = (
         ("density-matched-population-validation.json", "DOPE", "features12_steps2048"),
@@ -123,7 +126,7 @@ def _published_samples() -> list[dict]:
         ("density-matched-population-validation.json", "independent_marginals", "native_selected"),
     )
     for filename, method, configuration in specs:
-        document = json.loads((RESULTS / filename).read_text())
+        document = json.loads(captured[filename])
         for cell in document["cells"]:
             if cell.get("method") != method or cell.get("configuration") != configuration:
                 continue
@@ -332,11 +335,8 @@ def _control_record(controls: Path, dataset: str, method: str, size: int, seed: 
     return {"csv": str(csv_path), "expected_sha256": expected}
 
 
-def _assert_ledger_pins() -> None:
-    panel_path = RESULTS / "review-fixes-receipts-v1" / "panel.json"
-    if not panel_path.is_file():
-        raise SystemExit("receipt panel pin file is missing")
-    pins = json.loads(panel_path.read_text()).get("sources") or {}
+def _assert_ledger_pins() -> dict[str, bytes]:
+    panel_name = "review-fixes-receipts-v1/panel.json"
     names = (
         "s3-lineage-record.json",
         "density-matched-population-validation.json",
@@ -344,10 +344,12 @@ def _assert_ledger_pins() -> None:
         "arf-matched-population-validation.json",
         "s3-matched-forest-confirmation-validation.json",
     )
+    captured = authenticated_published_bytes(RESULTS, (*names, panel_name))
+    pins = json.loads(captured[panel_name]).get("sources") or {}
     for name in names:
-        recorded = pins.get(name)
-        if not isinstance(recorded, str) or _sha256(RESULTS / name) != recorded:
+        if pins.get(name) != PUBLISHED_SOURCE_SHA256[name]:
             raise SystemExit(f"source drift {name}")
+    return captured
 
 
 def _missing_published_grid(manifest: list[dict], datasets: list[str]) -> list[str]:
@@ -538,9 +540,10 @@ def main() -> None:
         raise SystemExit("sealed registry mode must be fresh")
     for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
         os.environ[key] = "1"
+    captured = _assert_ledger_pins()
     names = {
         row["dataset"]: row["display_name"]
-        for row in json.loads((RESULTS / "s3-lineage-record.json").read_text())["rows"]
+        for row in json.loads(captured["s3-lineage-record.json"])["rows"]
     }
     manifest = _preflight(args.controls, sorted(names))
     document = _gate(args, manifest)

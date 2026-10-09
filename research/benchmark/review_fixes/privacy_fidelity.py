@@ -13,12 +13,17 @@ import importlib.util
 import json
 import math
 import os
+import sys
 import time
 from pathlib import Path
 
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO))
+from research.benchmark.review_fixes.source_pins import authenticated_published_bytes
+
 EXPANDED_PATH = HERE.parent / "expanded_validation_metrics.py"
 WORKERS = Path("/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker")
 SEEDS = (101, 211, 307)
@@ -165,11 +170,12 @@ def _validate_existing(path: Path, job: dict) -> None:
 
 
 def _index(results: Path) -> list[dict]:
+    captured = authenticated_published_bytes(results, (spec[0] for spec in PUBLISHED))
     cache = {}
     jobs = []
     for filename, method, configuration in PUBLISHED:
         if filename not in cache:
-            cache[filename] = json.loads((results / filename).read_text())["cells"]
+            cache[filename] = json.loads(captured[filename])["cells"]
         for cell in cache[filename]:
             if cell.get("method") != method or cell.get("configuration") != configuration:
                 continue
