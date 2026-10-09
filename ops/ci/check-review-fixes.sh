@@ -23,7 +23,7 @@ TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittes
   research.benchmark.review_fixes.test_bind_tabsyn_cells \
   research.benchmark.review_fixes.test_bind_privacy_cells \
   research.benchmark.review_fixes.test_tabsyn_evaluator_replay -q
-for pattern in test_paper_control_inputs.py test_paper_review_tables.py; do
+for pattern in test_paper_control_inputs.py test_paper_replay_registry.py test_paper_review_tables.py; do
   TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
     -s docs/whitepaper/scripts -p "$pattern" -q
 done

@@ -6,14 +6,87 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Callable, NamedTuple
 
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = '36738416d2913c68c13a853d735011453e6740a40817032547ca702f9025528a'
-CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
-CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
-CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
+LOCK_SHA256 = '6b35b5124c1216e75c1ca200c44a909986b5a265551a041676063843167729b2'
+
+
+class Replay(NamedTuple):
+    """A renderer whose pinned panel must be recomputed from a pinned scalar ledger.
+
+    reduce(cells, extras) receives the decoded ledger and the authenticated bytes
+    of extras, in order, and returns the canonical panel bytes.
+    """
+    label: str
+    panel: str
+    ledger: str
+    extras: tuple
+    reduce: Callable
+
+
+def unique_cells(cells, check, identity_of, label):
+    seen = set()
+    for cell in cells:
+        check(cell)
+        identity = identity_of(cell)
+        if identity in seen:
+            raise ValueError(f'{label} ledger contains a duplicate identity')
+        seen.add(identity)
+
+
+def replay_controls(cells, _extras):
+    from research.benchmark.review_fixes.bind_control_cells import (
+        assert_public_scalar, canonical_panel, identity_of,
+    )
+    from docs.whitepaper.scripts.review_controls import payload_from_cells
+
+    unique_cells(cells, assert_public_scalar, identity_of, 'control')
+    return canonical_panel(payload_from_cells(cells)).encode()
+
+
+def replay_privacy(cells, _extras):
+    from research.benchmark.review_fixes.bind_privacy_cells import replay
+
+    return replay(cells).encode()
+
+
+def replay_tabsyn(cells, extras):
+    from research.benchmark.review_fixes import bind_tabsyn_cells as bind
+
+    receipts, gate, eight_panel = extras
+    return bind.replay(cells, bind.decode_jsonl(receipts, 'TabSyn evaluator receipts'),
+                       json.loads(gate), json.loads(eight_panel)).encode()
+
+
+TABSYN = 'research/benchmark/results/review-fixes-tabsyn-v1/'
+REPLAYS = {
+    'docs/whitepaper/scripts/review_controls.py': Replay(
+        'control',
+        'research/benchmark/results/review-fixes-controls-v1/panel.json',
+        'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl',
+        (), replay_controls),
+    'docs/whitepaper/scripts/review_privacy.py': Replay(
+        'privacy',
+        'research/benchmark/results/review-fixes-privacy-v1/panel.json',
+        'research/benchmark/results/review-fixes-privacy-v1/scalar-cells.jsonl',
+        (), replay_privacy),
+    'docs/whitepaper/scripts/review_tabsyn.py': Replay(
+        'TabSyn',
+        TABSYN + 'panel.json',
+        TABSYN + 'scalar-cells.jsonl',
+        (TABSYN + 'evaluator-replay.jsonl', TABSYN + 'parser-check.json',
+         'research/benchmark/results/tabsyn-eight-lineage-validation/panel.json'),
+        replay_tabsyn),
+}
+
+
+def registered_ledgers():
+    """The only line-delimited inputs the lock may pin."""
+    return {name for spec in REPLAYS.values() for name in (spec.ledger, *spec.extras)
+            if name.endswith('.jsonl')}
 
 
 def authenticated(path, digest, size=None):
@@ -33,11 +106,12 @@ def authenticated_graph():
     graph_name = GRAPH.relative_to(REPO).as_posix()
     if graph_name not in files:
         raise ValueError('review graph has no input pin')
+    ledgers = registered_ledgers()
     inputs = {}
     for name, pin in files.items():
         relative = Path(name)
         if (relative.is_absolute() or '..' in relative.parts or relative.as_posix() != name
-                or (relative.suffix != '.json' and name != CONTROL_LEDGER)
+                or (relative.suffix != '.json' and name not in ledgers)
                 or not name.startswith(('research/benchmark/results/', 'research/benchmark/review_fixes/'))):
             raise ValueError('invalid review paper input path')
         path = REPO / relative
@@ -52,39 +126,36 @@ def authenticated_graph():
         args = entry.get('args', [])
         if len(args) != 2 or args[0] != '--from-panel' or args[1] not in files:
             raise ValueError('review renderer requires one independently pinned public panel')
-        if entry['path'] == CONTROL_RENDERER:
-            if args[1] != CONTROL_PANEL or CONTROL_LEDGER not in inputs:
-                raise ValueError('control renderer requires the pinned scalar ledger and panel')
-            authenticated_controls(inputs)
+        spec = REPLAYS.get(entry['path'])
+        if spec is not None:
+            if args[1] != spec.panel or any(name not in inputs for name in (spec.ledger, *spec.extras)):
+                raise ValueError(f'{spec.label} renderer requires the pinned scalar ledger and panel')
+            authenticated_replay(spec, inputs)
     return graph
 
 
-def authenticated_controls(inputs):
+def closed_records(raw, label):
+    records = [json.loads(line) for line in raw.splitlines()]
+    if not records:
+        raise ValueError(f'{label} ledger is empty')
+    if any(not isinstance(record, dict) or record.get('official_tests_opened') is not False
+           for record in records):
+        raise ValueError(f'{label} ledger official test flag is not closed')
+    return records
+
+
+def authenticated_replay(spec, inputs):
     # Decode only authenticated public bytes, and reject an open test flag before
     # importing the reducer. Never reopen a ledger after checking its digest.
-    cells = [json.loads(line) for line in inputs[CONTROL_LEDGER].splitlines()]
-    if not cells:
-        raise ValueError('control ledger is empty')
-    if any(not isinstance(cell, dict) or cell.get('official_tests_opened') is not False
-           for cell in cells):
-        raise ValueError('control ledger official test flag is not closed')
+    cells = closed_records(inputs[spec.ledger], spec.label)
+    for name in spec.extras:
+        if name.endswith('.jsonl'):
+            closed_records(inputs[name], f'{spec.label} {Path(name).stem}')
     if str(REPO) not in sys.path:
         sys.path.insert(0, str(REPO))
-    from research.benchmark.review_fixes.bind_control_cells import (
-        assert_public_scalar, canonical_panel, identity_of,
-    )
-    from docs.whitepaper.scripts.review_controls import payload_from_cells
-
-    seen = set()
-    for cell in cells:
-        assert_public_scalar(cell)
-        identity = identity_of(cell)
-        if identity in seen:
-            raise ValueError('control ledger contains a duplicate identity')
-        seen.add(identity)
-    recomputed = canonical_panel(payload_from_cells(cells)).encode()
-    if recomputed != inputs[CONTROL_PANEL]:
-        raise ValueError('control scalar ledger does not reproduce the pinned panel')
+    recomputed = spec.reduce(cells, tuple(inputs[name] for name in spec.extras))
+    if recomputed != inputs[spec.panel]:
+        raise ValueError(f'{spec.label} scalar ledger does not reproduce the pinned panel')
 
 
 def main():
@@ -102,7 +173,8 @@ def main():
     if graph.get('format') != 'dope-review-paper-build-v1':
         raise ValueError('invalid review paper graph')
     if args.check_inputs:
-        print('review paper inputs authenticated; control scalar panel reproduced')
+        labels = [REPLAYS[entry['path']].label for entry in graph['scripts'] if entry['path'] in REPLAYS]
+        print('review paper inputs authenticated; scalar panels reproduced: ' + (', '.join(labels) or 'none'))
         return
     declared = set()
     for entry in graph['scripts']:

@@ -13,6 +13,8 @@ SPEC = importlib.util.spec_from_file_location(
     'paper_review_control_gate', ROOT / 'ops/ci/paper-review-outputs.py')
 GATE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(GATE)
+CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
+CONTROL = GATE.REPLAYS[CONTROL_RENDERER]
 
 
 def scalar_cell():
@@ -42,16 +44,16 @@ class ControlEmitTests(unittest.TestCase):
         self.root = Path(self.tmp.name)
         self.graph_name = 'research/benchmark/review_fixes/paper-build.json'
         self.graph = self.root / self.graph_name
-        self.ledger = self.root / GATE.CONTROL_LEDGER
-        self.panel = self.root / GATE.CONTROL_PANEL
+        self.ledger = self.root / CONTROL.ledger
+        self.panel = self.root / CONTROL.panel
         self.lock = self.root / 'lock.json'
         self.output_name = 'docs/whitepaper/generated/review-controls.tex'
         self.output = self.root / self.output_name
         for path in (self.graph, self.ledger, self.panel, self.output):
             path.parent.mkdir(parents=True, exist_ok=True)
         self.graph.write_text(json.dumps({'format': 'dope-review-paper-build-v1', 'scripts': [{
-            'path': GATE.CONTROL_RENDERER,
-            'args': ['--from-panel', GATE.CONTROL_PANEL], 'check_args': ['--check'],
+            'path': CONTROL_RENDERER,
+            'args': ['--from-panel', CONTROL.panel], 'check_args': ['--check'],
             'outputs': [self.output_name],
         }]}))
         self.panel_payload = {'paired': [], 'predictor_fit_seeds': [], 'split_seeds': []}
@@ -68,9 +70,9 @@ class ControlEmitTests(unittest.TestCase):
         self.ledger.write_text(''.join(json.dumps(cell, sort_keys=True) + '\n' for cell in cells))
 
     def relock(self, include_ledger=True, extra_name=None):
-        names = [self.graph_name, GATE.CONTROL_PANEL]
+        names = [self.graph_name, CONTROL.panel]
         if include_ledger:
-            names.append(GATE.CONTROL_LEDGER)
+            names.append(CONTROL.ledger)
         if extra_name:
             names.append(extra_name)
         files = {}
