@@ -51,7 +51,8 @@ class DenominatorViewTests(unittest.TestCase):
         lines = view.denominator_lines(_fixture(), panel.fmt, panel.tex_name)
         self.assertEqual(lines[0], "ForestDiffusion/Forest-Flow & native\\_selected & 4$n$ & 6 & 0 & 0 & 0 & 0 & 0 & --- \\\\")
         table = panel._table(view.HEADER, lines, view.ALIGN)
-        self.assertIn("Informative & Complete-loss rows & Noninformative", table)
+        self.assertIn("Informative & \\shortstack[r]{Complete-\\\\loss rows} & \\shortstack[r]{Non-\\\\informative}", table)
+        self.assertEqual(panel._nfields(view.HEADER), len(view.ALIGN))
 
     def test_inconsistent_panels_are_refused(self):
         missing = _fixture()

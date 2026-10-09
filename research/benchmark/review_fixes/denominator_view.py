@@ -11,10 +11,18 @@ byte changes.
 
 from __future__ import annotations
 
-HEADER = (
-    "Method & Configuration & Size & Informative & Complete-loss rows & "
-    "Noninformative & Undefined & Capped & Sensitivity $n$ & Capped median"
-)
+
+def _stacked(top: str, bottom: str) -> str:
+    return f"\\shortstack[r]{{{top}\\\\{bottom}}}"
+
+
+# Ten columns at \scriptsize with 2pt separation: one-line headers set 457pt
+# against the 397pt text width; these stacked headers set 390pt.
+HEADER = " & ".join((
+    "Method", "Configuration", "Size", "Informative", _stacked("Complete-", "loss rows"),
+    _stacked("Non-", "informative"), "Undefined", "Capped", _stacked("Sensitivity", "$n$"),
+    _stacked("Capped", "median"),
+))
 ALIGN = "lllrrrrrrr"
 AUDITOR = "catboost"
 
