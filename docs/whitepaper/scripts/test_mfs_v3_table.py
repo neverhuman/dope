@@ -101,7 +101,7 @@ class MfsV3TableTest(unittest.TestCase):
         self.assertIn("not averaged into the bound", text)
         self.assertNotIn("Driver fidelity, distribution fidelity", text)
         self.assertNotIn("no clean-license tabular transfer has been measured", text)
-        self.assertIn("\\input{generated/mfs-v3-density-table.tex}", text)
+        self.assertIn("\\fittowidthfile{generated/mfs-v3-density-table.tex}", text)
         self.assertIn("\\input{generated/mfs-v3-scalar.tex}", text)
         self.assertIn("Downstream Objective-Preserving Encoding", text)
         self.assertNotIn("10{,}240-Byte Tabular Generator", text)
