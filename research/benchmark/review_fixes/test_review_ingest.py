@@ -90,7 +90,8 @@ class SamplePinTests(unittest.TestCase):
                 ("fixture.json", "DOPE", "features12_steps2048"),
                 ("fixture.json", "CTGAN", "native_selected"),
             ]),
-            patch.object(Path, "read_text", return_value=json.dumps({"cells": cells})),
+            patch.object(producer, "authenticated_published_bytes",
+                         return_value={"fixture.json": json.dumps({"cells": cells}).encode()}),
             patch.object(producer, "_resolve_sample_csv", return_value="/fixture/sample.csv"),
         ):
             jobs = producer._index(Path("fixture-results"))
