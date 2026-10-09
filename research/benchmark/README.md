@@ -19,6 +19,12 @@ with both whole-parent costs retained. Its dated snapshot follows index008;
 partial five-fit coverage and observed residency do not establish stability
 or a gated production score.
 
+The [Forest-Flow additional-default fit ledger](results/work-order-b-forest400-additional-default-fit-dispositions-v1/README.md)
+records 400 closed slots: 291 accepted fit receipts and 109 timeouts. Seventy-one
+lineages have all four additional seeds accepted. Fit seed 11 is unjoined;
+coverage across five fits and quality scores remain null. The 72.869 GB artifact
+total is historical receipt-declared bytes, not verified retained storage.
+
 [Forest-Flow five additional homogeneous five-fit cohorts](results/forest-third-five-fivefit-v1/README.md)
 The [retained TabDDPM cohort](results/tabddpm-twelve-lineage-retained-validation/README.md)
 adds 126 measured n/4n validation cells from 21 existing model records on
