@@ -255,6 +255,7 @@ copula and Chow--Liu defaults and native-selected configurations.
 TabSyn lineages and the classical methods on those identical inputs.
 It cannot establish a full-population TabSyn result or a native-tuned
 TabSyn comparison. These evaluations leave the configuration unselected.
+The review panel later in this supplement scores the predeclared TabSyn artifacts on their own receipt and stays distinct from this retained subset.
 
 \begin{table}[t]
 \caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). The parenthetical count is the denominator. Native rows use the objective recorded for that configuration. No Holm family in this table.}
@@ -732,9 +733,11 @@ stays unpooled from the density block.
 Retention is the reported utility. Both release scores in
 the release-score section of the main text stay null. The linear auditor leaves DOPE unseparated from the Gaussian copula,
 and equivalence stays unclaimed. Shipping this artifact stays a different
-experiment from shipping the compact predictor itself. That control stays
-outside this panel, so the panel leaves unanswered whether a recipient needs the
-synthetic rows rather than the predictor. Normalized-space RMSE is the loss
+experiment from shipping the compact predictor itself. The review-panel
+section reports that predictor-only control. On CatBoost the paired difference
+favors the DOPE generator. On the linear auditor the interval contains zero.
+Equivalence stays unclaimed. The real-row resample at size $4n$ is the row-count control.
+On CatBoost that paired difference is negative, so the resampled real rows lead the DOPE generator on that auditor. Normalized-space RMSE is the loss
 the auditors stored. Original-unit error after inverting the training
 transform stays unstored, and this paper leaves it unreported.
 The supplement's fidelity table stays outside a membership-inference certification. Its
@@ -749,6 +752,46 @@ A non-significant test leaves equivalence unclaimed. The supplement
 gives the delta-method variance of one lineage's retention and the reason a
 small denominator is dropped. The intervals in the tables remain the lineage
 bootstrap of the median. Those intervals omit the delta-method term.
+
+\subsection{Training freeze, router vector, and emission requirements}
+Training screens the inputs, maps them
+through the width-16 $\tanh$ layer, and runs AdamW on the regression
+mean-squared error, with gradient clipping at $5$. The hidden weights and
+biases are then frozen.
+The intercept, the linear skip, and the hidden readout are refit on those
+frozen features. Coefficients whose absolute value is below $10^{-5}$ are
+dropped from the skip.
+
+The $4{,}168$-dimensional vector appends 24 candidate states from one router
+bundle onto the 856-wide sketch in the main text. A second bundle moves the same table. An index
+stores the 856-wide sketch. The longer vector is a route from one bundle.
+A neighbor found with the sketch is still fit with the displayed
+profile. The artifact is still charged in bytes, and it still faces the
+release score in the main text.
+The sketch stays outside the fitness components. A router action that names a
+retention or a failure probability is a prediction from the bundle. It stays
+outside the historical formula.
+
+PTF-v1 hard gates include joint fidelity,
+membership and attribute attacks, copy checks, and feature-importance
+agreement on a sealed holdout. PTF-v1 is null here, as are MFS-v2 and MFS-v3.
+Compile-time search records the proxy $0.45u + 0.25d + 0.30j$ and then keeps the
+candidate with the smallest gate shortfall, then the smallest artifact.
+That record withholds a release certificate. The proxy stays outside both release-score formulas.
+
+Emitting MFS-v2 requires the six components, a non-empty hard-gate map that passed,
+both the size-$n$ and size-$4n$ artifacts, real-versus-real controls,
+artifact-only sampling, and locked metric implementations. Emitting MFS-v3
+requires the bounded formula in the main text: the four prerequisites named there, the clean
+tabular transfer, the embedding distance under the shared map, and a pass
+on every hard gate. The Kumo, Mitra, and TabICL table
+reports the measured retentions. A retention stays distinct from the scalar.
+A retention win leaves those inputs empty. Copying a retention number into the historical formula would publish a value
+the contract refuses to emit. The generated rows apply the bounded formula to
+invented components, including a zero compactness term. Those rows are
+arithmetic on the bounded formula. They show the shape of the product.
+Baselines stay on their native objectives. The shared
+columns in this paper stay retention and charged bytes.
 
 \section{Tables and figures moved from the main text}
 The displays below are the selection rule, the compute ledger, and the
@@ -820,6 +863,14 @@ TabDDPM & No scored population selection. & Publication is \TabDDPMResult. & Cos
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/mfs-v3-density-table.tex}\end{minipage}}
 \end{table}
 
+RMSE is the square root of the stored mean squared error.
+Training-mean skill is one minus that loss divided by the training-mean
+null loss. Conventional held-out $R^2$ uses the mean of the evaluation
+targets and stays unstored for these rows. Retention
+is the median of the per-lineage ratios and stays distinct from the ratio of these medians.
+CatBoost reads RMSE $\RmseRealCb$ and $\RmseSynCb$, with training-mean
+skill $\RtwoRealCb$ and $\RtwoSynCb$.
+
 \begin{table}[t]
 \caption{\textbf{Raw auditor medians on the informative lineages.} The denominator is the informative lineages for that auditor. No Holm family.}
 \label{tab:rmse}
@@ -828,6 +879,14 @@ TabDDPM & No scored population selection. & Publication is \TabDDPMResult. & Cos
 \setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/loss-beside-retention.tex}\end{minipage}}
 \end{table}
+
+The two displayed
+DOPE artifacts over the cap are \MissA\ at \MissABytes\ bytes and \MissB\ at
+\MissBBytes\ bytes. \NotInfName\ has a fit whose CatBoost group stays
+uninformative, so the CatBoost median uses $\NDopeCb$ lineages while the byte
+count uses $\PreparedN$. Independent marginals pass the cap more often than
+the Chow--Liu baseline and still sit near retention zero. Smallness alone stays outside
+the result. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi.
 
 \begin{table}[t]
 \caption{\textbf{Charged bytes at $4n$.} For displayed DOPE artifacts the charge is the encoded model file plus \texttt{projection.json}. The denominator is the artifacts with a stored charge. CatBoost retention uses $\NDopeCb$ lineages. Forest-Flow stays unpooled. No Holm family.}
@@ -862,6 +921,103 @@ TabDDPM & No scored population selection. & Publication is \TabDDPMResult. & Cos
 \setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/publication-rows.tex}\end{minipage}}
 \end{table}
+
+\section{Review panels}
+\label{sec:review-panels}
+The panels below come from the pinned review receipts.
+A method with two configurations keeps a separate row for each configuration.
+Every filled TOST cell in the paired, control, and TabSyn difference tables is no.
+Equivalence stays unclaimed.
+A missing artifact stays out of the median.
+Empirical distance and membership scores stay outside differential privacy and outside HIPAA de-identification.
+Four generated files stay out of this section because an ARF block repeats there without an author-default versus native-selected column: the TOST-only file, the RMSE file, the stored logistic fidelity file, and the existing-seed file.
+
+\subsection{Paired differences at both sizes}
+The Wilcoxon and TOST calculations treat paired lineages as independent.
+The printed interval is the family-cluster bootstrap of the median.
+Holm is split by size. Each size has nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-paired.tex}
+\endgroup
+
+\subsection{Size n and size 4n controls}
+The difference is the DOPE generator minus the named control.
+On CatBoost the real-row resample at size $4n$ leads the DOPE generator, and that paired difference is negative.
+On CatBoost the predictor-only paired difference favors the DOPE generator.
+On the linear auditor the predictor-only interval contains zero.
+The size-$n$ Holm family has three predictor-only tests.
+The real-bootstrap arm is present at size $4n$ only, so the size-$4n$ family has six tests.
+The predeclare text names six tests per size. This panel records the smaller size-$n$ family.
+Predictor-fit level rows and split-seed rows stay outside the Holm family and stay unpooled from the displayed fit seed.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-controls.tex}
+\endgroup
+
+\subsection{TabSyn matched cohort}
+Own-lineage rows use every informative TabSyn lineage.
+Matched rows use the intersection with informative DOPE \texttt{features12\_steps2048}.
+The difference is the DOPE generator minus TabSyn on that intersection.
+The CatBoost hierarchical interval contains zero at both sizes.
+The linear mean sits far from the median, and the median is the summary.
+Holm family size is three per size, one method times the three auditors, and stays separate from the published comparator blocks.
+A lineage with no artifact under the predeclared roots stays out of the median.
+This receipt stays distinct from the retained TabSyn subset above.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-tabsyn.tex}
+\endgroup
+
+\subsection{Holdout privacy and one classifier}
+Holdout DCR, NNDR, a distance membership score, and one CatBoost two-sample AUC.
+The same classifier is used for every scored method.
+Lineage counts differ where a sample or a finite triple is absent.
+Forest-Flow sample files are absent, and those cells stay out of the median.
+Unmatched rows keep each method's own lineages.
+Matched density rows use the intersection of the DOPE generator, the Gaussian copula, Chow--Liu, and the independent marginals.
+That intersection stays distinct from the TabSyn cohort.
+The stored logistic detector is a different file and stays out of this section.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-privacy.tex}
+\endgroup
+
+\subsection{Source-family sensitivity}
+Per-source-family medians and an excluding-simulated cut.
+The interval is the hierarchical CI.
+These rows are a sensitivity and stay unpooled from the headline.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-family.tex}
+\endgroup
+
+\subsection{Informative-lineage denominators}
+Informative, noninformative, and undefined lineage counts.
+The sensitivity column is the capped cohort.
+A different denominator is a different cohort.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-denominator.tex}
+\endgroup
 
 \section{Delta-method variance of retention}
 \label{app:retention-variance}
