@@ -499,6 +499,56 @@ def _wtl(pair):
     return f"{int(pair['wins'])}/{int(pair['ties'])}/{int(pair['losses'])}"
 
 
+# Family-cluster paired rows in the committed review panel. Four decimals match
+# generated/review-paired.tex. A drift in that receipt fails closed.
+_REVIEW_PANEL_SHA256 = "f0ecf5929825f1f07d877d4e01714f1ebd55868db3b863482f46be0f27ffdf47"
+
+
+def _arf_decimals(value):
+    return f"{float(value):.4f}"
+
+
+def arf_author_default_rows():
+    """Size-4n author-default DOPE-minus-ARF rows from the review panel."""
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "research/benchmark/results/review-fixes-receipts-v1/panel.json"
+    )
+    raw = path.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != _REVIEW_PANEL_SHA256:
+        raise ValueError("review panel receipt drift")
+    chosen = {}
+    for row in json.loads(raw)["paired"]:
+        if row.get("method") != "ARF" or row.get("configuration") != "author_default":
+            continue
+        if row.get("size") != 4:
+            continue
+        auditor = row.get("auditor")
+        if auditor in chosen:
+            raise ValueError(f"duplicate ARF author-default row for {auditor}")
+        chosen[auditor] = row
+    if set(chosen) != {"catboost", "linear", "mlp"}:
+        raise ValueError("ARF author-default size-4n rows are incomplete")
+    return chosen
+
+
+def arf_paired_commands(command):
+    """Macros for the stored family-cluster median and its interval."""
+    lines = []
+    for auditor, stem in (("catboost", "Cb"), ("linear", "Lin"), ("mlp", "Mlp")):
+        row = arf_author_default_rows()[auditor]
+        lines.append(command(f"DiffArf{stem}", _arf_decimals(row["median"])))
+        lines.append(command(f"LoDiffArf{stem}", _arf_decimals(row["lo"])))
+        lines.append(command(f"HiDiffArf{stem}", _arf_decimals(row["hi"])))
+        lines.append(command(f"NDiffArf{stem}", str(int(row["n"]))))
+        lines.append(command(
+            f"WtlArf{stem}",
+            f"{int(row['wins'])}/{int(row['ties'])}/{int(row['losses'])}",
+        ))
+    return lines
+
+
 def _publication_phrase(display):
     """Receipt median from the B-lane publication, or ``not measured``."""
     from publication_rows import phrase
@@ -755,6 +805,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     byte_rows.append(_write_compute_cost(out, lines, command, tex_bytes))
     _write_availability(out)
     lines.extend(baseline_budget_commands(command))
+    lines.extend(arf_paired_commands(command))
     manuscript = (Path(__file__).resolve().parents[1] / "dope-mfs.tex").read_text()
     assert_no_adjacent_repeat(lines, manuscript)
     (out / "numbers.tex").write_text("".join(lines))

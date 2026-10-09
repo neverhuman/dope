@@ -35,7 +35,7 @@ why it cannot be done. If a new result weakens a claim, the paper weakens the cl
 | PR-11 | No stress suite or ablations | XOR/parity/product; k, blocks, budget | open |
 | PR-12 | Credentialed data path; profile default | PMLB fetch path; no default profile; artifact statement | open |
 | PR-13 | Novelty claimed on the metric; teaser shows marginal medians | Credit TSTR/TRTR; paired-difference teaser | closed: Esteban et al. TSTR/TRTR cited; claim is the encoding and the release gate; teaser is paired differences |
-| RS-01 | ARF missing from abstract, Fig. 1, and the strongest-baseline sentence | Put the generated paired ARF difference in those places | open: waiting on lane B generated paired series. The teaser still draws Chow--Liu, the Gaussian copula, and independent marginals |
+| RS-01 | ARF missing from abstract, Fig. 1, and the strongest-baseline sentence | Put the generated paired ARF difference in those places | prose closed: author-default size-$4n$ family-cluster macros from the pinned review panel (DiffArfCb and the linear and MLP intervals). The teaser plot still draws the density comparators |
 | RS-02 | Tables 12–14 lack a DOPE row on the same cohort | Matched-cohort DOPE row from lane B | open: waiting on lane B |
 | RS-03 | C2ST classifier differs by method | One classifier and one n for every method | open: lane B rerun; manuscript text waits on that output |
 | RS-04 | DOPE called a measurement in the abstract and a generator in the figures | One definition | closed in prose: DOPE is the encoding and the generator it writes; retention is the measurement column; legends label that generator DOPE |

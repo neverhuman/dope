@@ -66,19 +66,17 @@ $^1$NEVERHUMAN Research}
 \renewcommand{\headrulewidth}{0pt}
 
 \begin{abstract}
-We introduce \textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE), a byte-budgeted tabular encoding with a release gate that stays null when a component or a hard gate is missing.
-Retention, the shared utility column, is a null-normalized train-on-synthetic/train-on-real ratio~\citep{esteban2017rcgan}. The ratio is that prior TSTR/TRTR column. A retention leaves the release gate closed.
-\cref{tab:selection} states how each method was chosen. The shared columns are retention and charged bytes.
+We introduce \textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE), the byte-budgeted tabular encoding and the generator that encoding writes.
+Retention, the shared utility column, is a null-normalized train-on-synthetic/train-on-real ratio~\citep{esteban2017rcgan}. A retention leaves the release gate closed.
 On $\NDopeCb$ informative PMLB regression lineages, fit seed $11$ and synthetic size $4n$, the CatBoost median retention is $\MedDopeCb$ (95\% lineage-bootstrap interval $\LoDopeCb$ to $\HiDopeCb$).
-Holm-adjusted Wilcoxon tests separate DOPE from a Gaussian copula ($\MedGaussCb$; \WtlGaussCb), a Chow--Liu tree ($\MedChowCb$), and independent marginals ($\MedIndCb$).
-The linear auditor leaves it unseparated from the copula (\WtlLinGauss; Holm $\HolmLinGauss$).
-The paired median difference on that comparison is $\DiffLinGauss$, with 95\% lineage-bootstrap interval $\LoDiffLinGauss$ to $\HiDiffLinGauss$.
-That interval contains zero. Equivalence stays unclaimed.
-Kumo large, Mitra, and TabICL repeat the same density block and stay unpooled from CatBoost.
-MFS-v2 and MFS-v3, the gated geometric release scores, are null on every method.
-Official tests stay sealed.
+The strongest full-panel baseline is author-default ARF. DOPE minus ARF has CatBoost paired median $\DiffArfCb$, with family-cluster bootstrap interval $\LoDiffArfCb$ to $\HiDiffArfCb$ ($n=\NDiffArfCb$; \WtlArfCb).
+The linear ARF interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.
+Inside the density block the strongest tuned baseline is the Gaussian copula. Its linear interval is $\LoDiffLinGauss$ to $\HiDiffLinGauss$ and contains zero. Equivalence stays unclaimed.
+Forest-Flow leads on its $\NForestCb$-lineage block, and that Holm test stays non-significant.
+Kumo large, Mitra, and TabICL stay unpooled from CatBoost.
+MFS-v2 and MFS-v3 stay null. Official tests stay sealed.
 The distance ledger stays outside differential privacy and outside HIPAA de-identification.
-The $10{,}240$-byte cap is a release gate. A retention comparison leaves that gate closed.
+The $10{,}240$-byte cap is a release gate.
 \end{abstract}
 
 \begin{figure}[H]
@@ -90,7 +88,10 @@ The $10{,}240$-byte cap is a release gate. A retention comparison leaves that ga
   The count in each panel title is that auditor's paired informative lineages. Points outside $[-1.5,\,1.5]$ stay in the title count and are clipped in the frame.
   The linear auditor's copula interval is $\LoDiffLinGauss$ to $\HiDiffLinGauss$ and contains zero. Equivalence stays unclaimed.
   CatBoost, the linear auditor, and the MLP stay unpooled. Forest-Flow is a separate block and stays off this figure.
-  No Holm test is drawn here. MFS-v2 and MFS-v3 stay null, and a retention leaves the $10{,}240$-byte gate closed.}
+  No Holm test is drawn here. MFS-v2 and MFS-v3 stay null, and a retention leaves the $10{,}240$-byte gate closed.
+  The strongest full-panel baseline is author-default ARF, kept off this density frame.
+  Its CatBoost paired median is $\DiffArfCb$, family-cluster bootstrap $\LoDiffArfCb$ to $\HiDiffArfCb$ ($n=\NDiffArfCb$).
+  The linear ARF interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.}
   \label{fig:teaser}
 \end{figure}
 
@@ -645,8 +646,13 @@ walls, the Forest-Flow sums, and the unsplit density attempt timers.
 
 \section{Results}
 \label{sec:results}
-\textbf{Strongest tuned baseline.} \cref{tab:headline} keeps, for each block and auditor, the tuned
-baseline with the highest paired median retention. The difference is DOPE
+\textbf{Strongest tuned baseline.} Author-default ARF is the strongest full-panel baseline at size $4n$.
+DOPE minus ARF has CatBoost paired median $\DiffArfCb$, family-cluster bootstrap $\LoDiffArfCb$ to $\HiDiffArfCb$
+($n=\NDiffArfCb$; \WtlArfCb). The linear interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.
+The MLP interval is $\LoDiffArfMlp$ to $\HiDiffArfMlp$ ($n=\NDiffArfMlp$; \WtlArfMlp).
+Those three intervals are the family-cluster bootstrap of the median. The legacy simultaneous median interval stays in \cref{tab:arfpaired}.
+\cref{tab:headline} keeps, for each block and auditor, the tuned
+baseline with the highest paired median retention inside that block. The difference is DOPE
 minus that baseline. Its interval is the paired lineage bootstrap already
 used in the block tables. W/T/L counts lineages with a positive, zero, or
 negative difference. Holm $p$ is the adjustment inside that block's existing
@@ -656,7 +662,7 @@ median difference stays distinct from the difference of the two medians.
 $\DiffGaussCb$ stays distinct from $\MedDopeCb$ minus $\MedGaussCb$.
 
 \begin{table}[t]
-\caption{\textbf{Strongest tuned baseline at $4n$.} The denominator is the paired informative lineages in the cell. W/T/L counts a positive, zero, or negative difference. A zero is the tie in that count. Equivalence stays unclaimed. Holm stays inside the block: nine density tests, six neural tests, or three Forest-Flow tests.}
+\caption{\textbf{Strongest tuned baseline inside each block at $4n$.} Author-default ARF is the full-panel baseline and stays outside this table. Its CatBoost family-cluster interval is $\LoDiffArfCb$ to $\HiDiffArfCb$. The denominator is the paired informative lineages in the cell. W/T/L counts a positive, zero, or negative difference. A zero is the tie in that count. Equivalence stays unclaimed. Holm stays inside the block: nine density tests, six neural tests, or three Forest-Flow tests.}
 \label{tab:headline}
 \centering
 \footnotesize
