@@ -10,10 +10,20 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = '36738416d2913c68c13a853d735011453e6740a40817032547ca702f9025528a'
+LOCK_SHA256 = 'cbe5312f155ef09751d5cea0d60031df4ebb2214760b940ddd7a6ec493153cbd'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
 CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
 CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
+PREFIX = 'research/benchmark/results/'
+PRIVACY_LEDGER = PREFIX + 'review-fixes-privacy-v1/scalar-cells.jsonl'
+PRIVACY_PANEL = PREFIX + 'review-fixes-privacy-v1/panel.json'
+TABSYN_LEDGER = PREFIX + 'review-fixes-tabsyn-v1/scalar-cells.jsonl'
+TABSYN_PANEL = PREFIX + 'review-fixes-tabsyn-v1/panel.json'
+TABSYN_BINDING = PREFIX + 'review-fixes-tabsyn-v1/binding.json'
+FIDELITY_LEDGER = PREFIX + 'review-fixes-tabsyn-fidelity-v1/scalar-cells.jsonl'
+FIDELITY_PANEL = PREFIX + 'review-fixes-fidelity-v1/panel.json'
+FIDELITY_RENDERER = 'docs/whitepaper/scripts/review_fidelity.py'
+JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER)
 
 
 def authenticated(path, digest, size=None):
@@ -37,7 +47,7 @@ def authenticated_graph():
     for name, pin in files.items():
         relative = Path(name)
         if (relative.is_absolute() or '..' in relative.parts or relative.as_posix() != name
-                or (relative.suffix != '.json' and name != CONTROL_LEDGER)
+                or (relative.suffix != '.json' and name not in JSONL_INPUTS)
                 or not name.startswith(('research/benchmark/results/', 'research/benchmark/review_fixes/'))):
             raise ValueError('invalid review paper input path')
         path = REPO / relative
@@ -48,6 +58,7 @@ def authenticated_graph():
         inputs[name] = authenticated(path, pin['sha256'], pin['bytes'])
     # Every public dependency is authenticated before decoding the build graph.
     graph = json.loads(inputs[graph_name])
+    replayed = set()
     for entry in graph['scripts']:
         args = entry.get('args', [])
         if len(args) != 2 or args[0] != '--from-panel' or args[1] not in files:
@@ -56,6 +67,18 @@ def authenticated_graph():
             if args[1] != CONTROL_PANEL or CONTROL_LEDGER not in inputs:
                 raise ValueError('control renderer requires the pinned scalar ledger and panel')
             authenticated_controls(inputs)
+        panel = args[1]
+        if panel in replayed:
+            continue
+        if panel == PRIVACY_PANEL:
+            authenticated_bound(inputs, 'privacy')
+        elif panel == TABSYN_PANEL:
+            authenticated_bound(inputs, 'tabsyn')
+        elif entry['path'] == FIDELITY_RENDERER:
+            if panel != FIDELITY_PANEL:
+                raise ValueError('fidelity renderer requires the pinned fidelity panel')
+            authenticated_fidelity(inputs)
+        replayed.add(panel)
     return graph
 
 
@@ -87,6 +110,43 @@ def authenticated_controls(inputs):
         raise ValueError('control scalar ledger does not reproduce the pinned panel')
 
 
+def closed_ledger(raw):
+    cells = [json.loads(line) for line in raw.splitlines()]
+    if not cells or any(not isinstance(c, dict) or c.get('official_tests_opened') is not False
+                        or c.get('formal_dp') is not False for c in cells):
+        raise ValueError('public scalar ledger official test or formal privacy flag refused')
+
+
+def authenticated_bound(inputs, kind):
+    ledger, panel = (PRIVACY_LEDGER, PRIVACY_PANEL) if kind == 'privacy' else (TABSYN_LEDGER, TABSYN_PANEL)
+    if ledger not in inputs:
+        raise ValueError('bound renderer requires its pinned scalar ledger')
+    closed_ledger(inputs[ledger])
+    if kind == 'tabsyn' and TABSYN_BINDING not in inputs:
+        raise ValueError('TabSyn renderer requires its pinned binding')
+    binding = json.loads(inputs[TABSYN_BINDING]) if kind == 'tabsyn' else None
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from research.benchmark.review_fixes.bind_review_cells import canonical, replay
+    recomputed = canonical(replay(kind, inputs[ledger], inputs, binding)).encode()
+    if recomputed != inputs[panel]:
+        raise ValueError('public scalar ledger does not reproduce its pinned panel')
+
+
+def authenticated_fidelity(inputs):
+    if FIDELITY_LEDGER not in inputs:
+        raise ValueError('fidelity renderer requires its pinned scalar ledger')
+    closed_ledger(inputs[FIDELITY_LEDGER])
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from docs.whitepaper.scripts.review_fidelity import INPUTS, payload_from_inputs
+    from research.benchmark.review_fixes.bind_review_cells import canonical
+    if any(name not in inputs for name in INPUTS):
+        raise ValueError('fidelity renderer requires every independently pinned source')
+    if canonical(payload_from_inputs(inputs)).encode() != inputs[FIDELITY_PANEL]:
+        raise ValueError('fidelity scalar sources do not reproduce the pinned panel')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true')
@@ -102,7 +162,7 @@ def main():
     if graph.get('format') != 'dope-review-paper-build-v1':
         raise ValueError('invalid review paper graph')
     if args.check_inputs:
-        print('review paper inputs authenticated; control scalar panel reproduced')
+        print('review paper inputs authenticated; control scalar panel reproduced; declared wave2 scalar panels reproduced')
         return
     declared = set()
     for entry in graph['scripts']:

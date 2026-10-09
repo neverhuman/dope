@@ -13,9 +13,9 @@ class SampleEvidenceTests(unittest.TestCase):
     def setUp(self):
         target = Path(__file__).resolve().parents[3] / 'target/sample-evidence-tests'
         target.mkdir(parents=True, exist_ok=True)
-        self.temp = tempfile.TemporaryDirectory(dir=target)
-        self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.workspace = tempfile.TemporaryDirectory(dir=target)
+        self.addCleanup(self.workspace.cleanup)
+        self.root = Path(self.workspace.name)
         self.dataset = 'ab' * 8
         self.fits = {'official_tests_opened': False, 'config_sha256': evidence.CONFIG_SHA256,
                      'cells': [{'dataset_id': self.dataset, 'status': 'fit_ok',

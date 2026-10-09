@@ -12,6 +12,10 @@ TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittes
   research.benchmark.review_fixes.test_source_pins \
   research.benchmark.review_fixes.test_fit_seed_singleton \
   research.benchmark.review_fixes.test_tabsyn_fidelity_cells \
-  research.benchmark.review_fixes.test_tabsyn_sample_evidence -q
+  research.benchmark.review_fixes.test_tabsyn_sample_evidence \
+  research.benchmark.review_fixes.test_bound_review_cells \
+  research.benchmark.review_fixes.test_review_fidelity -q
 TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
   -s docs/whitepaper/scripts -p 'test_paper_control_inputs.py' -q
+TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
+  -s docs/whitepaper/scripts -p 'test_paper_wave2_inputs.py' -q
