@@ -241,7 +241,18 @@ pub struct MasterFitnessV3Contract {
     pub privacy_soft_weight: f64,
     pub epsilon: f64,
     pub weights: FitnessWeightsV3,
+    #[serde(default)]
+    pub epsilon_rule: String,
+    #[serde(default)]
+    pub prerequisites: Vec<String>,
 }
+
+const V3_PREREQUISITES: [&str; 4] = [
+    "real_vs_real_control_complete",
+    "required_size_cells_complete",
+    "artifact_sampling_verified",
+    "metric_implementations_locked",
+];
 
 impl MasterFitnessV3Contract {
     pub fn is_frozen(&self) -> bool {
@@ -249,6 +260,12 @@ impl MasterFitnessV3Contract {
             && self.scalarization == "geometric_mean"
             && self.privacy_soft_weight == 0.0
             && self.epsilon == 1e-6
+            && self.epsilon_rule == "max_component_epsilon"
+            && self
+                .prerequisites
+                .iter()
+                .map(String::as_str)
+                .eq(V3_PREREQUISITES)
             && self.weights.is_valid()
             && self.weights
                 == FitnessWeightsV3 {
@@ -303,6 +320,10 @@ pub struct RepresentationObservation {
     pub normalizer: String,
     pub utility_protocol: String,
     pub utility_auditors: Vec<String>,
+    pub real_vs_real_control_complete: bool,
+    pub required_size_cells_complete: bool,
+    pub artifact_sampling_verified: bool,
+    pub metric_implementations_locked: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -358,14 +379,27 @@ pub fn evaluate_v3(
     );
     hard_gates.insert(
         "membership_auc".into(),
-        observation.membership_auc.is_finite() && observation.membership_auc <= 0.55,
+        observation.membership_auc.is_finite()
+            && (0.0..=0.55).contains(&observation.membership_auc),
     );
     hard_gates.insert(
         "attribute_inference".into(),
         observation.attribute_inference_advantage.is_finite()
-            && observation.attribute_inference_advantage <= 0.05,
+            && (0.0..=0.05).contains(&observation.attribute_inference_advantage),
     );
-    hard_gates.insert("tier_bytes".into(), observation.artifact_bytes <= 10_240);
+    hard_gates.insert(
+        "tier_bytes".into(),
+        (1..=10_240).contains(&observation.artifact_bytes),
+    );
+    for (key, passed) in V3_PREREQUISITES.into_iter().zip([
+        observation.real_vs_real_control_complete,
+        observation.required_size_cells_complete,
+        observation.artifact_sampling_verified,
+        observation.metric_implementations_locked,
+    ]) {
+        hard_gates.insert(key.into(), passed);
+    }
+    hard_gates.insert("frozen_contract".into(), contract.is_frozen());
     hard_gates.insert("shared_normalizer".into(), shared_map);
     hard_gates.insert("tabular_transfer".into(), tabular_ok);
     hard_gates.insert("representation_closeness".into(), closeness.is_some());
@@ -389,7 +423,7 @@ pub fn evaluate_v3(
         measured.and_then(|values| {
             let closeness = closeness?;
             let mut log_score =
-                contract.weights.representation_closeness * (contract.epsilon + closeness).ln();
+                contract.weights.representation_closeness * closeness.max(contract.epsilon).ln();
             let named = [
                 ("utility_transfer", values[0]),
                 ("driver_fidelity", values[1]),
@@ -406,7 +440,7 @@ pub fn evaluate_v3(
                     .find(|(key, _)| *key == name)
                     .map(|(_, weight)| weight)
                     .unwrap_or(0.0);
-                log_score += weight * (contract.epsilon + value).ln();
+                log_score += weight * value.max(contract.epsilon).ln();
             }
             let total = contract
                 .weights
@@ -414,7 +448,7 @@ pub fn evaluate_v3(
                 .iter()
                 .map(|(_, weight)| weight)
                 .sum::<f64>();
-            (total > 0.0).then_some(100.0 * (log_score / total).exp())
+            (total > 0.0).then_some((100.0 * (log_score / total).exp()).clamp(0.0, 100.0))
         })
     } else {
         None
@@ -528,6 +562,11 @@ mod tests {
             scalarization: "geometric_mean".into(),
             privacy_soft_weight: 0.0,
             epsilon: 1e-6,
+            epsilon_rule: "max_component_epsilon".into(),
+            prerequisites: V3_PREREQUISITES
+                .iter()
+                .map(|key| (*key).to_string())
+                .collect(),
             weights: FitnessWeightsV3 {
                 utility_transfer: 0.35,
                 representation_closeness: 0.15,
@@ -553,6 +592,10 @@ mod tests {
 
     fn passing_observation() -> RepresentationObservation {
         RepresentationObservation {
+            real_vs_real_control_complete: true,
+            required_size_cells_complete: true,
+            artifact_sampling_verified: true,
+            metric_implementations_locked: true,
             encoder: "kumo_tabular_l".into(),
             distance: 0.2,
             d_null: 0.5,
@@ -583,7 +626,93 @@ mod tests {
         );
         assert!(report.eligible);
         assert!((report.representation_closeness.unwrap() - 0.5).abs() < 1e-12);
-        assert!((report.score.unwrap() - 100.0 * (0.5 + 1e-6)).abs() < 1e-9);
+        assert!((report.score.unwrap() - 50.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn v3_perfect_profile_is_exactly_100() {
+        let mut components = passing_components();
+        components.utility_transfer = Some(1.0);
+        components.driver_fidelity = Some(1.0);
+        components.distribution_fidelity = Some(1.0);
+        components.structure_fidelity = Some(1.0);
+        components.coverage_realism = Some(1.0);
+        components.compactness = Some(1.0);
+        let mut observation = passing_observation();
+        observation.distance = 0.0;
+        assert_eq!(
+            evaluate_v3(&v3_contract(), &components, &observation).score,
+            Some(100.0)
+        );
+    }
+
+    #[test]
+    fn v3_positive_byte_boundaries_are_enforced() {
+        for bytes in [0, 10_241] {
+            let mut observation = passing_observation();
+            observation.artifact_bytes = bytes;
+            let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+            assert_eq!(report.score, None);
+            assert!(!report.hard_gates["tier_bytes"]);
+        }
+        for bytes in [1, 10_240] {
+            let mut observation = passing_observation();
+            observation.artifact_bytes = bytes;
+            assert!(evaluate_v3(&v3_contract(), &passing_components(), &observation).eligible);
+        }
+    }
+
+    #[test]
+    fn v3_each_missing_prerequisite_is_null() {
+        for key in V3_PREREQUISITES {
+            let mut observation = passing_observation();
+            match key {
+                "real_vs_real_control_complete" => {
+                    observation.real_vs_real_control_complete = false
+                }
+                "required_size_cells_complete" => observation.required_size_cells_complete = false,
+                "artifact_sampling_verified" => observation.artifact_sampling_verified = false,
+                "metric_implementations_locked" => {
+                    observation.metric_implementations_locked = false
+                }
+                _ => unreachable!(),
+            }
+            let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+            assert_eq!(report.score, None);
+            assert!(!report.hard_gates[key]);
+        }
+    }
+
+    #[test]
+    fn v3_membership_auc_has_a_probability_domain() {
+        for auc in [-1.0, 0.551, f64::NAN, f64::INFINITY] {
+            let mut observation = passing_observation();
+            observation.membership_auc = auc;
+            let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+            assert_eq!(report.score, None);
+            assert!(!report.hard_gates["membership_auc"]);
+        }
+        for auc in [0.0, 0.55] {
+            let mut observation = passing_observation();
+            observation.membership_auc = auc;
+            assert!(evaluate_v3(&v3_contract(), &passing_components(), &observation).eligible);
+        }
+    }
+
+    #[test]
+    fn v3_attribute_advantage_has_a_probability_domain() {
+        for advantage in [-1.0, 0.051, f64::NAN, f64::INFINITY] {
+            let mut observation = passing_observation();
+            observation.attribute_inference_advantage = advantage;
+            let report = evaluate_v3(&v3_contract(), &passing_components(), &observation);
+            assert_eq!(report.score, None);
+            assert!(!report.hard_gates["attribute_inference"]);
+        }
+        for advantage in [0.0, 0.05] {
+            let mut observation = passing_observation();
+            observation.attribute_inference_advantage = advantage;
+            assert!(evaluate_v3(&v3_contract(), &passing_components(), &observation).eligible);
+        }
     }
 
     #[test]

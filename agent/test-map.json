@@ -15,11 +15,11 @@
     },
     "research/benchmark/tests/test_mfs_v3_panel.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
-      "purpose": "lock the MFS-v3 panel cohort, shared map, null band, and GPU yield rule"
+      "purpose": "lock the MFS-v3 cohort, shared map, deterministic median-of-three matched null, declared near-copy quantile, and GPU yield rule"
     },
     "research/benchmark/mfs_v3_panel.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
-      "purpose": "lock the MFS-v3 panel cohort, shared map, null band, and GPU yield rule"
+      "purpose": "lock the MFS-v3 cohort, shared map, deterministic median-of-three matched null, declared near-copy quantile, and GPU yield rule"
     },
     "rust/mfs_v3_holdout.rs": {
       "command": "cargo test --locked --bin mfs-v3-holdout",
@@ -1224,6 +1224,54 @@
     "research/benchmark/results/work-order-b-dope-additional-four-seed-dispositions-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-dope-additional-four-seed-dispositions-v1/render.py --check",
       "purpose": "replay the 400 additional four-seed DOPE fit identities, 2400 receipt joins and separate partial cost bases; keep GPU backend, five-fit stability, historical attempts and gated quality unavailable"
+    },
+    "research/benchmark/fetch_pmlb.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
+    },
+    "research/benchmark/tests/test_fetch_pmlb.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
+    },
+    "ops/ci/paper-prepare.py": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "ops/ci/paper-review-outputs.py": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "ops/ci/paper-clean.sh": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "ops/ci/paper-inputs/": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "docs/whitepaper/scripts/test_paper_packaging.py": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "ops/ci/paper-review-inputs.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_review_inputs.py'",
+      "purpose": "authenticate the independent review graph and public panel input lock before decoding or rendering; reject drift, symlinks and missing pins without reading dataset rows"
+    },
+    "docs/whitepaper/scripts/test_paper_review_inputs.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_review_inputs.py'",
+      "purpose": "authenticate the independent review graph and public panel input lock before decoding or rendering; reject drift, symlinks and missing pins without reading dataset rows"
+    },
+    "research/benchmark/review_fixes/": {
+      "command": "bash ops/ci/check-review-fixes.sh",
+      "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
+    },
+    "ops/ci/check-review-fixes.sh": {
+      "command": "bash ops/ci/check-review-fixes.sh",
+      "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
+    },
+    "ops/ci/paper-architecture.tex": {
+      "command": "just paper-check",
+      "purpose": "rebuild the cropped architecture from tracked TikZ and generated macros, verify its source/PDF hashes, fonts and warning-free log without ICLR review line numbers"
     },
     "research/benchmark/beyondarena_train_screen.README.md": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_screen -v",

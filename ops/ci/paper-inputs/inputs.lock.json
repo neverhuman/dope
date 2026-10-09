@@ -1,0 +1,22 @@
+{
+  "captured_from_commit": "b77480779781c22f81e63a6018feada5dee88849",
+  "files": {
+    "compute-cost-receipts.json": {
+      "bytes": 73961,
+      "sha256": "16cd9f392d96d3cfabefe09777d32efd35aadf443b0f324805595e461d30ece9"
+    },
+    "licenses.json": {
+      "bytes": 3847,
+      "sha256": "fb857edbb49b3ac852b836cb5710c95531dc0ea619517a7f22498f991f0484c4"
+    },
+    "provenance.json": {
+      "bytes": 30845,
+      "sha256": "dea64ea61eaacac0e287298bba3ba76aa7900819aa00feb3a5d66cdcb4fb8a17"
+    },
+    "related.bib": {
+      "bytes": 16620,
+      "sha256": "b9e56a7ee5410a7568ce9ebdaa6e25b08c406e77ec2b1ba9f2973748de507c16"
+    }
+  },
+  "format": "dope-paper-static-inputs-v1"
+}

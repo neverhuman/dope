@@ -3,7 +3,7 @@ id = "rust-ts-vite-react-postgres-bounded-python"
 version = "0.1.0"
 
 [python]
-allowed_non_product_paths = ["src/dope_kernel/", "validation/external/", "research/benchmark/"]
+allowed_non_product_paths = ["src/dope_kernel/", "validation/external/", "research/benchmark/", "ops/ci/paper-prepare.py", "ops/ci/paper-review-outputs.py"]
 allowed_truth_paths = []
 
 [[streaming_exception]]

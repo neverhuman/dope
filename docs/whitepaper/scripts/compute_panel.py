@@ -41,12 +41,86 @@ ANCHORS = {
 }
 
 
+INPUT_SHA256 = {
+    "density-matched-population-validation.json": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a",
+    "expanded-validation-diagnostics.json": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb",
+    "mfs-v3-density-panel.json": "d2cbbb5c08d045c161e3809e150efeacafadcfbee5e2accde6ed39cc46fe9c25",
+    "s3-coreset-procedure.json": "73251e43cf7838687427569931bf6127f42e932374af33137c57fd8fe8544704",
+    "s3-data.lock.json": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
+    "s3-lineage-record.json": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7",
+    "s3-matched-forest-confirmation-validation.json": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f",
+    "sdv-matched-population-validation.json": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e",
+    "review-fixes-receipts-v1/panel.json": "f0ecf5929825f1f07d877d4e01714f1ebd55868db3b863482f46be0f27ffdf47"
+}
+
 def load(name):
-    return json.loads((RESULTS / name).read_text())
+    """Authenticate the complete input bytes before decoding a committed ledger."""
+    if name not in INPUT_SHA256:
+        raise ValueError("unregistered panel input")
+    path = RESULTS / name
+    if path.is_symlink() or path.resolve() != RESULTS.resolve() / name:
+        raise ValueError("symlinked panel input")
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != INPUT_SHA256[name]:
+        raise ValueError("panel input digest mismatch")
+    return json.loads(raw)
+
+
+KNOWN_METHODS = set(DENSITY_METHODS) | {"CTGAN", "TVAE", "ForestDiffusion/Forest-Flow"}
+
+
+def validate_rows(rows, sampled=False):
+    """Reject unknown methods and duplicate identities, including blank measurements."""
+    seen = set()
+    for row in rows:
+        if row.get("method") not in KNOWN_METHODS:
+            raise ValueError("unknown panel method")
+        # These reducers emit one value per lineage and do not aggregate fit seeds.
+        # Distinct fits at the same output key must never silently replace one another.
+        identity = tuple(row.get(key) for key in ("method", "dataset", "configuration", "size_multiplier"))
+        if sampled:
+            identity += (row.get("sample_seed"),)
+        if identity in seen:
+            raise ValueError("duplicate method-lineage-auditor identity")
+        seen.add(identity)
+
+
+HASH_INPUT_SHA256 = {
+    "docs/whitepaper/generated/beyond-fit.json": "a1447f908bc9c51876d345597039607c734b507bf85aa8e08db0639e80a1f036",
+    "docs/whitepaper/generated/fit-trace.json": "d8c31b9e4eb59cb1a087cf5dcdde4a91a73eca00f3704fbff647a7da6ce65522",
+    "docs/whitepaper/generated/loss-curves.json": "0124915497c98e560ef99c1e5ecf7ad876f9174439ff9c763cf1cf906b4aebe1",
+    "docs/whitepaper/generated/original-field-map.json": "5b164d434414d3389f639d3645f40b11a999b32c56daa2cfe36d25b2205082b6",
+    "docs/whitepaper/generated/provenance.json": "dea64ea61eaacac0e287298bba3ba76aa7900819aa00feb3a5d66cdcb4fb8a17",
+    "docs/whitepaper/generated/replay-cost.json": "faf77e7ce1ed1d22127701bf68bbfe2f8d183f89cbd3475dd80094888c36f086",
+    "docs/whitepaper/scripts/paper_receipts.py": "a2d6d45e3ff06a38ed61ab029fadfd14529978bcfc89618aa9ceb3fbe57238ee",
+    "research/benchmark/expanded_validation_metrics.py": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
+    "research/benchmark/methods.lock.json": "899c355cb55769710ed369fea6b082589b31858860fb74929bf4190de28aca33",
+    "research/benchmark/results/arf-native-closure-watch-v1.receipt.json": "7e8eeb1ba94ca747367e98d5a016d2ed3ed4c40c5a98ca76d7a5fe27ce9c173c",
+    "research/benchmark/results/beyondarena-s3-inventory.json": "504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64",
+    "research/benchmark/results/density-matched-population-validation.json": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a",
+    "research/benchmark/results/expanded-validation-diagnostics.json": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb",
+    "research/benchmark/results/paper-original-metadata-v1/index.json": "6d73d5f7b37849526a98a451b41a49e045ef21e911058d920940c5ea989f7fd9",
+    "research/benchmark/results/s3-coreset-procedure.json": "73251e43cf7838687427569931bf6127f42e932374af33137c57fd8fe8544704",
+    "research/benchmark/results/s3-data.lock.json": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
+    "research/benchmark/results/s3-lineage-record.json": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7",
+    "research/benchmark/results/s3-matched-forest-confirmation-validation.json": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f",
+    "research/benchmark/results/sdv-matched-population-validation.json": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+}
+
+
+def authenticate_hash_inventory():
+    """Pin the transitive disclosure inputs as well as the numerical ledgers."""
+    from expanded_panel import HASH_PATHS
+    if set(HASH_PATHS) != set(HASH_INPUT_SHA256):
+        raise ValueError("unregistered hash inventory input")
+    for relative, expected in HASH_INPUT_SHA256.items():
+        path = REPO / relative
+        if path.is_symlink() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            raise ValueError("hash inventory input digest mismatch")
 
 
 def finite(value):
-    return isinstance(value, (int, float)) and math.isfinite(value)
+    return type(value) in (int, float) and math.isfinite(value)
 
 
 def _generator(array, salt):
@@ -170,6 +244,9 @@ def paired_test(left, right, rng, family_size):
 def complete_map(rows, auditor, size, method="DOPE"):
     found = {}
     if method == "DOPE":
+        identities = [row["dataset"] for row in rows]
+        if len(set(identities)) != len(identities):
+            raise ValueError("duplicate lineage identity")
         for row in rows:
             group = row["sizes"][str(size)]["utility"][auditor]
             if group.get("complete_informative_sample_group") and finite(group.get("median_retention")):
@@ -183,6 +260,7 @@ def complete_map(rows, auditor, size, method="DOPE"):
 
 
 def summary_map(summary, method, configuration, size, auditor):
+    validate_rows(summary)
     found = {}
     for row in summary:
         if row.get("method") != method or row.get("configuration") != configuration:
@@ -268,6 +346,11 @@ def block_from_maps(method_maps, comparators, rng):
 
 
 def marginal_from_rows(record, rng):
+    expected = {row["dataset"] for row in record["rows"]}
+    if set(record["comparators"]) != set(DENSITY_COMPARATORS):
+        raise ValueError("unknown or missing comparator")
+    if any(set(rows) != expected for rows in record["comparators"].values()):
+        raise ValueError("missing comparator lineage")
     method_maps = {auditor: {} for auditor in AUDITORS}
     for auditor in AUDITORS:
         method_maps[auditor]["DOPE"] = complete_map(record["rows"], auditor, 4)
@@ -277,6 +360,7 @@ def marginal_from_rows(record, rng):
 
 
 def group_cells(cells, method, configuration, size):
+    validate_rows(cells, sampled=True)
     grouped = defaultdict(dict)
     for cell in cells:
         if cell.get("method") != method or cell.get("configuration") != configuration:
@@ -468,7 +552,11 @@ def write_density_table(density):
 
 
 def write_headline_table(blocks):
-    """One row per block and auditor: the tuned baseline with the highest paired median."""
+    """Within-block strongest tuned baseline, plus author-default ARF full-panel rows.
+
+    ARF intervals stay the family-cluster macros from the pinned review panel.
+    The Holm cell is that panel's size-4n family of six, formatted like the other rows.
+    """
     specs = (
         ("density", "Density", DENSITY_COMPARATORS, {
             "GaussianCopula": "Gaussian copula",
@@ -479,7 +567,21 @@ def write_headline_table(blocks):
         ("forest", "Forest", ("Forest-Flow",), {"Forest-Flow": "Forest-Flow"}),
     )
     auditor_labels = {"catboost": "CatBoost", "linear": "Linear", "mlp": "MLP"}
+    arf_stems = {"catboost": "Cb", "linear": "Lin", "mlp": "Mlp"}
     rows = []
+    import paper_emit
+    # Register and authenticate this new table dependency before formatting
+    # the macro-backed ARF rows, as for the original numerical ledgers.
+    load("review-fixes-receipts-v1/panel.json")
+    arf_rows = paper_emit.arf_author_default_rows()
+    for auditor in AUDITORS:
+        stem = arf_stems[auditor]
+        rows.append(
+            "Full panel & "
+            f"{auditor_labels[auditor]} & Author-default ARF & \\NDiffArf{stem} & "
+            f"\\DiffArf{stem} [\\LoDiffArf{stem}, \\HiDiffArf{stem}] & "
+            f"\\WtlArf{stem} & ${tex_p(arf_rows[auditor]['holm_p'])}$ \\\\"
+        )
     for block_id, label, comparators, names in specs:
         block = blocks[block_id]
         for auditor in AUDITORS:
@@ -631,9 +733,9 @@ def _paired_sufficiency(record, auditor):
 
 
 def _read_json(path):
-    if not path.exists():
-        return None
-    return json.loads(path.read_text())
+    if path.parent != RESULTS:
+        raise ValueError("unregistered panel input path")
+    return load(path.name)
 
 
 def _public_forest_cost(cost):
@@ -715,6 +817,9 @@ def main():
     density_cells = load("density-matched-population-validation.json")
     neural_doc = load("sdv-matched-population-validation.json")
     forest_doc = load("s3-matched-forest-confirmation-validation.json")
+    for doc in (density_cells, neural_doc, forest_doc):
+        validate_rows(doc["cells"], sampled=True)
+        validate_rows(doc["summary"])
     density = marginal_from_rows(record, rng)
     neural_maps = {auditor: {} for auditor in AUDITORS}
     for auditor in AUDITORS:
@@ -800,6 +905,8 @@ def main():
 
     diagnostics = load("expanded-validation-diagnostics.json")
     procedure = load("s3-coreset-procedure.json")
+    validate_rows(diagnostics["cells"], sampled=True)
+    authenticate_hash_inventory()
     expanded = build_expanded(REPO, record, density_cells, diagnostics, procedure, density)
     failures.extend(expanded["failures"])
     payload["expanded"] = {key: value for key, value in expanded.items() if key != "failures"}

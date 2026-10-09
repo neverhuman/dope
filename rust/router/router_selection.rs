@@ -298,6 +298,23 @@ mod tests {
     }
 
     #[test]
+    fn documented_sketch_decomposition_matches_emitted_width() {
+        // Paper §2.2: target/shape, across-column distributions, padded
+        // per-feature blocks, and global pairwise distribution.
+        let target_and_shape = 10;
+        let across_columns = 12 * 6;
+        let per_feature = 64 * 12;
+        let global_pairwise = 6;
+        let documented_width = target_and_shape + across_columns + per_feature + global_pairwise;
+        assert_eq!(documented_width, 856);
+        for width in [1, 12, 64, 65] {
+            let train = table(vec![vec![0.1, 0.4, 0.6, 0.8]; width]);
+            let sketch = DatasetSketch::from_train(&train, Task::Binary);
+            assert_eq!(sketch.values.len(), documented_width);
+        }
+    }
+
+    #[test]
     fn sketch_is_row_and_column_permutation_invariant() {
         let original = table(vec![
             vec![0.1, 0.4, f32::NAN, 0.8],
@@ -312,6 +329,44 @@ mod tests {
         assert_eq!(
             DatasetSketch::from_train(&original, Task::Binary),
             DatasetSketch::from_train(&permuted, Task::Binary)
+        );
+    }
+
+    #[test]
+    fn sketch_cutoff_tie_changes_columns_but_preserves_row_permutations() {
+        let mut columns = vec![vec![0.0, 0.0, 1.0, 1.0]; MAX_PAIRWISE_FEATURES];
+        columns.push(vec![0.0, 1.0, 0.0, 1.0]);
+        let mut original = table(columns);
+        original.target.fill(0.0);
+        let mut permuted = original.clone();
+        permuted.columns.swap(0, MAX_PAIRWISE_FEATURES);
+        let first = DatasetSketch::from_train(&original, Task::Regression);
+        let second = DatasetSketch::from_train(&permuted, Task::Regression);
+        let per_column_start = 10 + 12 * 6;
+        let pairwise_start = per_column_start + MAX_PAIRWISE_FEATURES * 12;
+        let expected_summary = [
+            0.0, 0.5, 0.25, 0.0, 0.0, 0.0, 0.5, 1.0, 1.0, 0.5, 1.0, 0.0,
+        ];
+        // Both A and B tie on all twelve summaries, including target association.
+        for summary in second.values[per_column_start..pairwise_start].chunks_exact(12) {
+            assert_eq!(summary, &expected_summary[..]);
+        }
+        assert_eq!(first.values.len(), 856);
+        assert_eq!(second.values.len(), 856);
+        assert_eq!(first.values[..pairwise_start], second.values[..pairwise_start]);
+        assert_eq!(first.values[pairwise_start..], [1.0; 6]);
+        assert_eq!(
+            second.values[pairwise_start..],
+            [0.0, 1.0, 1.0, 1.0, 1.0, 0.96875]
+        );
+        // A synchronous row permutation preserves alignment and the retained set.
+        for column in &mut permuted.columns {
+            column.reverse();
+        }
+        permuted.target.reverse();
+        assert_eq!(
+            second,
+            DatasetSketch::from_train(&permuted, Task::Regression)
         );
     }
 

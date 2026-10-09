@@ -372,7 +372,8 @@ def supplement_for_scan(text):
 
 def manuscript_for_scan(text):
     """Drop the vendored style filename. Its digits name the class file, not a measurement."""
-    return text.replace("iclr2027_conference", "iclrstyle")
+    text = text.replace("iclr2027_conference", "iclrstyle")
+    return re.sub(r"[pmb]\{[0-9.]+\\(?:line|text|column)width\}", "p{layoutwidth}", text)
 
 
 def check_inventory_caption():
@@ -470,7 +471,7 @@ def main(argv=None):
     if missing:
         failures.append("untraced numbers in dope-mfs.tex: " + ", ".join(missing[:30]))
     if SUPPLEMENT.is_file():
-        supplement_missing = untraced_numbers(supplement_for_scan(SUPPLEMENT.read_text()), allowed)
+        supplement_missing = untraced_numbers(manuscript_for_scan(supplement_for_scan(SUPPLEMENT.read_text())), allowed)
         if supplement_missing:
             failures.append("untraced numbers in supplement.tex: " + ", ".join(supplement_missing[:30]))
     else:

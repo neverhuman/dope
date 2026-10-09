@@ -1,0 +1,2608 @@
+{
+  "entries": [
+    {
+      "bytes": 577413,
+      "dataset_id": "02a45777900441ce",
+      "historical_projected_sha256": {
+        "test": "7de544bd29735a3487de40b44207e1b7ecdc3414fb4d4ef42df62d3d323b0c22",
+        "train": "0b0c6c691d51b713336bb1ad66ec83a6419c79a6c361a9c49345c36e434cd6b3",
+        "validation": "2abba07745e38a042ac6b03f8ec12f02a7ef3043c5d434f3b38b4a0db0809fd7"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "1ca82ca6ed5253a93edbdce28ce1c7f618ded08bd40d4a92d71c0773659b0c62",
+          "train": "dff0d00aa858effe1a0d54587da5d1b536ae01eb2ad7d0c414ecb69b73ed19d7",
+          "validation": "23af211663f32b8a22d4180d153099b2dd7a55b263914680636a73c4089c24de"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "215_2dplanes",
+      "sha256": "ae5fc47c8b6d2aa8022890876e7f5f29fbc0220857cf6e38fe484c71a4ca108d",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/215_2dplanes/215_2dplanes.tsv.gz"
+    },
+    {
+      "bytes": 7997,
+      "dataset_id": "047e62b52a3f4ede",
+      "historical_projected_sha256": {
+        "test": "84a2493e56456e668d987cb7f217311461411098ffe8371c22c501bfc065b9ff",
+        "train": "1d1485bda0abccbde19e0d12dac3c60f0958f4feec36694a3789de92f6c0b3ce",
+        "validation": "479c29361dd7532bfae2bc604534f99e98abd20ef3fd1bfcc1cf8b2e368dac14"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "d9c989b3ac894cbed0b25c7389ed26052a757c1798c9e2de523d0033ba78b92b",
+          "train": "c1d47e5aec7a9a48baa65d2030dfa3698ee7af556ad5db6123dafa28d13b2cf2",
+          "validation": "5da4966b8d84cdd0ae3a180b19c69256e0878845c1ba0f401afe4c9efc1404e7"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 40,
+          "train": 156,
+          "validation": 39
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "695_chatfield_4",
+      "sha256": "642076c10a6fdecb53994f6dde89cf74b445e23445035378e914c36b95cdc4f0",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/695_chatfield_4/695_chatfield_4.tsv.gz"
+    },
+    {
+      "bytes": 3923,
+      "dataset_id": "04c80944e971cb3e",
+      "historical_projected_sha256": {
+        "test": "ef6f565151fb1a78409dbaf9bfa7b4e8ea372c62f9707dee165c1c037814dc91",
+        "train": "8ebb0653b89020f3ec31c6f23b6c84b9bac8bfde9e89c4a01437beddeef9dc73",
+        "validation": "022861c7e25e3342cb75a049abcaf87bde8b18680c601a4eeb3d2dde0aa59367"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4d0b47edd01b55d2d31cf804f406078ee3459ef88d02d71831bf925706d4404e",
+          "train": "7cef50c09a433feded7351e20b86e23dfe69e22154513224aaf6573621efda58",
+          "validation": "f79ddf4575889da3d1b1def3585578fbde61d94e94dfcbb3e7ecd50004e95a05"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 40,
+          "train": 157,
+          "validation": 39
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "first_principles_supernovae_zr",
+      "sha256": "5910dd1ee08ef353c08e2c25b629f66d42565eb4c990656e06d1b575fe5880a7",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/first_principles_supernovae_zr/first_principles_supernovae_zr.tsv.gz"
+    },
+    {
+      "bytes": 19352,
+      "dataset_id": "0561d673cb73c27e",
+      "historical_projected_sha256": {
+        "test": "ead5e3fe0856b6afaedb1bb1cd6e5fffdad3e34aa44215b5e12d2b98e770dce3",
+        "train": "e7d6de5af43d110cead4a12b5571923a3c990d78f04ee9ad03053ab9839f8640",
+        "validation": "b7402aa864220669d8ec4325129d296da96d67078a79b81ebd95782e3455ff86"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "6981bdff7dabdcd9179a7ed803b2a3f9d296eaece7b2fd6e43b935b0bcda4a15",
+          "train": "8a8b29fad0180e65f6c6726a777f1d5cc645a5c41d5f17e601e62b425b256d8c",
+          "validation": "7dc90ccc8b360e042646e875fd872bb6714e74af416f24ef9acdd702eb0bb0b5"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 85,
+          "train": 339,
+          "validation": 84
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "666_rmftsa_ladata",
+      "sha256": "955f006886606699ceab5fb38693e4fe10f74f450a2fd6dfd75af09b8b134d31",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/666_rmftsa_ladata/666_rmftsa_ladata.tsv.gz"
+    },
+    {
+      "bytes": 232762,
+      "dataset_id": "060b9fff8092db17",
+      "historical_projected_sha256": {
+        "test": "64f4b63972f3b5a5dd7d59495a9babbc178ac4d7f4208bb5a2f14bbae02d78e3",
+        "train": "23fae13ab8e04e8a81095a9111bc92212146208ca3bda6034368bc204e7033e1",
+        "validation": "dcc174799037ec292e64df31feeb044ed43aad2c83cb5d0e78ff19b9e544eaf4"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "dd35f70af2103ed1fc8addfaec5cf910625a19103ffddd42f57007a828907b95",
+          "train": "de915f2095492f19e6b4322e8c1414079a7275b34352def2220eb491a067617c",
+          "validation": "89754277bf700fe4447d91286131576f3c088fb16885ac9624cb0ebc7798ec1c"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "589_fri_c2_1000_25",
+      "sha256": "3de46f4cd634b3e98a6fd4bd36f80f8037ca157236f4015920c92a2eee7ef254",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/589_fri_c2_1000_25/589_fri_c2_1000_25.tsv.gz"
+    },
+    {
+      "bytes": 19473045,
+      "dataset_id": "06b0312a585b436e",
+      "historical_projected_sha256": {
+        "test": "e4a321c8f12ca67d5a40039a0eec06a6955c974c0a2c1d83ed7bf7d36f207dbd",
+        "train": "4fb921a4c92914d626ebca17a59eba0bfb97b01e8148410ced240c090f2e302d",
+        "validation": "40d7c1dad19b7f49d5959cb4c1bff02225d12e586604ff88c6be6be0b6ae95ab"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "b48983b57483150cab18d3a3899b942530e84b1bcce4eda4c15bf3cfcc805b42",
+          "train": "e7607beeb8b0780d4e701db6e4d3bb5d8cc3140f6c55c141a3c361a8c0ea756e",
+          "validation": "8b9547b43ff68a74a05a26cfbc421fd2b59d4e6fe76711059e69ad2e621dcb9c"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "1196_BNG_pharynx",
+      "sha256": "e20f12ea5e9f58f140b092e4cacbc00ba745a6da5d4994484d68d34154edb772",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/1196_BNG_pharynx/1196_BNG_pharynx.tsv.gz"
+    },
+    {
+      "bytes": 1469,
+      "dataset_id": "0779d3fd5b3133a2",
+      "historical_projected_sha256": {
+        "test": "9e0bf405e32d3dd7ef47c5ba544ae840c4663c12bebe5dfd08e913732ececef1",
+        "train": "10ab4defa02cb72f242d744e1a8a111c75561e2167e690517f587ff76ccfd7c5",
+        "validation": "0e073b8064bab3524927fe2868ac35be25cda1565ec2affbf7cd1d7f7ac15fb3"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "bb46fd2ff6cff27d9944d607565e36d7532f06eab296bc147df3f849312a745e",
+          "train": "3363987b7c24cf0d0cae9a5b902977192beb0b35872380c08946bb747d7cea91",
+          "validation": "39f654b9d9f7e0afe414b0f2e9a48f548720acc1f4ff54863e5ff9c70944525b"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 61,
+          "train": 241,
+          "validation": 60
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "nikuradse_2",
+      "sha256": "0d43780ab866e54a2a78d8c86ba231ad0a5d55588450a33ed6fe52bee9638341",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/nikuradse_2/nikuradse_2.tsv.gz"
+    },
+    {
+      "bytes": 99700,
+      "dataset_id": "07f38946316c039b",
+      "historical_projected_sha256": {
+        "test": "3319d21f35088deab7c2d4de6ccf25ab92ecf2d5d1c719c07c7ded3f677c9b3e",
+        "train": "2bbf9af1651b0df60a5ed1eebe34a336f5d1dabd13534ef46d795174af0121c7",
+        "validation": "410866e8bed8c32cb26f3f4b1f6700e2c9936df7c070e6229121f40b379179ce"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "1e93873bea904c5769bd89c30a5f8d4e492ac7fc9283885eb4d4a6949faff3bc",
+          "train": "255cfb05733d434f418fc2003dd030a6132ce3783092073d2a9be4d5e4ff32a8",
+          "validation": "b8c1697944eb942892ca099ac386b720b826bcdf6498f6f18fe47d0759e976bd"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "593_fri_c1_1000_10",
+      "sha256": "e25c8392e2234206a80a2f9b9488906b9875b47f0bedbd055c36cf26e0a93bfd",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/593_fri_c1_1000_10/593_fri_c1_1000_10.tsv.gz"
+    },
+    {
+      "bytes": 504222,
+      "dataset_id": "0a8428ef25a69175",
+      "historical_projected_sha256": {
+        "test": "d32112da7be61a7e27bf26ab8504e13c1fbdb48120adfba63259556b5d162a02",
+        "train": "94ec743367acbf67d99831a4f80537ebfe6f18e571a5e514d837615eb74892be",
+        "validation": "48c3d32f86d0911768f7bc3f7028b9c91d13c536e0b81b2d5c4c7127eb64de16"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "2a7f588b63d672fc264e8cea1349d676763e9e1f21ddb947b2d6bcc5cc083ce8",
+          "train": "5da3f14224c6847e794b90fbf79df189550992b66b16576047be3c87fcde42fe",
+          "validation": "e7c718d2b0e85672e9f00837f6dad0ac25c2850e62fff2122745827e984bb6e9"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "537_houses",
+      "sha256": "d383fd58bb79760ffaf0b615942fd47d926a19e75a8f980b79fbe9ad479d9cbf",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/537_houses/537_houses.tsv.gz"
+    },
+    {
+      "bytes": 2024,
+      "dataset_id": "0d482c1dd7cc6592",
+      "historical_projected_sha256": {
+        "test": "0fe50250a715c204293da83d16c96911ce22bbb18acc2f2298b61a88ae29b1c9",
+        "train": "bcd487a656c6a32021da38eea6ed215e4e0405ffaff3b63393caf3140c21d66e",
+        "validation": "ca9164cd3fd17563f7059a669048e3e9f07d9c869c68e7b98fdf353795e0cf7f"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "edbc9da050cd826697bd199135cb1e464af59a07986bc86860c69fb3d001114b",
+          "train": "245f01d4f84a253c9681be1982469265b77329b1d05d9553028ed1d16234b596",
+          "validation": "6e68a7dcc533cc3e7b86a7daee7f34a25729427364b1714a1f69b80beb36f124"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 18,
+          "train": 72,
+          "validation": 18
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "210_cloud",
+      "sha256": "030e8ed8bc25b858a391eb1f9eb275c144de9bbe08ce0e5150c068903d8f8246",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/210_cloud/210_cloud.tsv.gz"
+    },
+    {
+      "bytes": 838,
+      "dataset_id": "0db59fd2579600d0",
+      "historical_projected_sha256": {
+        "test": "279196f6e5d0880c79157bacc86f4d7eddb51e67faa68c14e0b7bacb5b429ef1",
+        "train": "7547535a2aa692ddfdf994ce1f9065a893dbe416fcf707b8c5844d279f6e4bc7",
+        "validation": "2e6882cd563e6b9e62c131994c131904eb5c7b7083387b7cf61458839802ceb8"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "c07b31b794e7fed7c8509503a91bf6f95899632dfedd4347026df9ab97adcbe3",
+          "train": "24453eac6a416ab2acda3193078d6d4fd3cc69961a5c5c280ce7fdd32a9150e8",
+          "validation": "4c386a8227ca9b8e7d5e7e32494ce63b3c7fe5a68c258cefc62b354859af308f"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 25,
+          "train": 98,
+          "validation": 24
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "665_sleuth_case2002",
+      "sha256": "620f8815ffc7802d77bc942e005a23e107ed7b2ac91447cd094343faec537dd6",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/665_sleuth_case2002/665_sleuth_case2002.tsv.gz"
+    },
+    {
+      "bytes": 89244885,
+      "dataset_id": "0f86a714ec5f3ac6",
+      "historical_projected_sha256": {
+        "test": "e4e41dfb03a51823a13a1605066664921c039fafd97dc57f409030c55e3b37b5",
+        "train": "4eb161c1097099a8fde2fa209031644b3d4b4bd691c2756127abb733f7e2e930",
+        "validation": "9e9ad37455322a79d3dc9d1bfa250927d52993f09b2c6d1667a5057b17861b57"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "688edffb46380bac1f56ee0bdac7f3fc7fea2f32ad379f0970323700f0657ab4",
+          "train": "2bb67483633a144e10680e7416f92f2ef1133c12ec5e0e5872b0960577a31dbe",
+          "validation": "ebda629c49dc529cde10a99f9e769f624868e13528662ec620d62a9524452b3d"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "1191_BNG_pbc",
+      "sha256": "2e98f96cc6c78f69e806c52a43dd389f082e494e7c335fdbc7af16a399911dd1",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/1191_BNG_pbc/1191_BNG_pbc.tsv.gz"
+    },
+    {
+      "bytes": 15471,
+      "dataset_id": "167578f5deba4977",
+      "historical_projected_sha256": {
+        "test": "2d59cf6e435b6223594e0e6c58c51021cba26a44a535f8c8ab82e5f3dd9cdc7f",
+        "train": "3042f018846685f776067a87ae7582d0ec6599685232b51c0c9b588c1baa5079",
+        "validation": "62ee1d46c56dcb3ec4b02397086f2663f888ba21da72ad572405bff945efdae5"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4fed44fa9fca5a1151d99f767e94c1171d6a2e2d596d9a9f063847e0c3e0e74c",
+          "train": "d927153a8648b5f10955685046e27a8fb65e54f71c9b331bdf11c6ca8bd9fde8",
+          "validation": "b533b64e121744cb1e5e1a7c72d4d55f6042972a5a3d58df5ca5fb16ed4aa325"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 84,
+          "train": 333,
+          "validation": 83
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "547_no2",
+      "sha256": "e116f24d2cabc7388a0714f1d0bf3a85f7613e3fc2b88642c47154fece000c73",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/547_no2/547_no2.tsv.gz"
+    },
+    {
+      "bytes": 4425768,
+      "dataset_id": "19f2c3c2d67defd7",
+      "historical_projected_sha256": {
+        "test": "041df62167f3380ed0f0b55231a0f8fbb2bcfd854666f9175a8aa62b573562a9",
+        "train": "76dd7f2b0821b74f44db2b5c41e43eb90ad9b67d8faad254732020129ef6e909",
+        "validation": "b0544a3d01cd5d5d84f62aa03e8af901bc623eddf282609ec948ba1d583145a1"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "ed07c2bd68f930b7ed49dc3f271bdf6756514704e7b29ea20420455a7533c248",
+          "train": "e58f72909a595cbad78dfc8e36bf5e36db91e1f320268797925aea37fc88e93b",
+          "validation": "3761a4e1bfabbe4550eb7745b02a222d32a6c44250c607bd2b2ffc9357536556"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_II_11_27",
+      "sha256": "e55c7923a65dfda6c47698f7e6b8bd7faff78c19e0d733dea610c5fd22b1dec9",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_II_11_27/feynman_II_11_27.tsv.gz"
+    },
+    {
+      "bytes": 987,
+      "dataset_id": "19f4780b53b3fa41",
+      "historical_projected_sha256": {
+        "test": "9e88a71a71bc4a6a7e800393fd6c8d417b3fed20bc579a1ca53403284c94cef7",
+        "train": "419f6a21fca3f8ff9b8f327cd0272b1424346c053d31d47a33379d23f402459a",
+        "validation": "2cc247a823cf5d2dcee0650971491c196649acad4287f5e450253844dd38e7f3"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "3eb8c5c031ac28de545660901f4ea1d366f76c784d4eb2c17f077a3b9319af93",
+          "train": "acbfac310653cf3410c3036fde0fa280ace59cf3da30e850e7caeb0eb6ac8276",
+          "validation": "eb8f3e1e13fc876531726776571cf00772bdbb339518d6cb6130d702db8f85b3"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 19,
+          "train": 74,
+          "validation": 18
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "678_visualizing_environmental",
+      "sha256": "996db450c025b7586db095411d743fa8632c3e810f60435b6150c3869972c37f",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/678_visualizing_environmental/678_visualizing_environmental.tsv.gz"
+    },
+    {
+      "bytes": 6977307,
+      "dataset_id": "1a4456d1cc71a26a",
+      "historical_projected_sha256": {
+        "test": "8465c3607f3f33cf61bea3351c15f409e27ba42533819f2e4d0cfca608261265",
+        "train": "da12dce6a7daa3949c2dd5c4c17a0857553697c8b5cf35fed8e08596a3646afd",
+        "validation": "756ca4fd1de0c57093ec647b68b897118e98c567ff0aaf3c0ebe5dc822aa9c65"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "3f925179e93eabdf61e6839d8f5a9341a2effff3a4956348a913ded4a55233e0",
+          "train": "a3ff153c08f5606051de0d120b08dcb7287c70d53b0f5f92d09888cccb755535",
+          "validation": "11e9096ae3245637da196a42ba111b29664d594a635af5097975e1a98f6160b5"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_test_1",
+      "sha256": "b41780978c344f29cc340883e41610b4f2364845625d1d1e6f6c4e4510214b60",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_test_1/feynman_test_1.tsv.gz"
+    },
+    {
+      "bytes": 4388155,
+      "dataset_id": "1a803b27c2400dc4",
+      "historical_projected_sha256": {
+        "test": "e821d19315e493f3e40fbce79f3bbd535e19bf32022e18f801da366cad039e6a",
+        "train": "c9fbe55280dc90adb9b7575888a20fe0d784da47e7423b55e0300815f0e3407f",
+        "validation": "0ba082345ccbd0cf3bcb687ae9207b3c0b85d7828c2d641465434f183616eb47"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "a77d0eb3e2ccd117897a6a996f673cc7219161f6f55a4e9c4b7cb15bfaf5bfad",
+          "train": "2b685a504d274c8fd8d848e54ffb16fb5508150c9cd3ddd039b97aac84f3f85f",
+          "validation": "ef015a21859e473924ad1e4660f6b7347896e992f55e5cddf7cbf13ca81cb273"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_III_10_19",
+      "sha256": "e5fb0161067882da4cd9e001b3dcb41ea5ca4fd3d5a00387f0131515d65d3fd9",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_III_10_19/feynman_III_10_19.tsv.gz"
+    },
+    {
+      "bytes": 2118,
+      "dataset_id": "1cb97b1d7314d43d",
+      "historical_projected_sha256": {
+        "test": "477229f16c08fe214029224dea27e4e8a79729f3af1a3115c034fcc6402ba87e",
+        "train": "2153c876678f02d69b7e9b2c42792f31d48270fde7a2dea492e391497a561298",
+        "validation": "aa7b450ddb58fcab4fed76945ce4c5e9490b375ea8af765d97989182dbe0da5f"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "2c71dcb91b46b103fdb356dcb34c6190b6102767279a6193c7c2de6bd3e9b11a",
+          "train": "06e2573cc183927f9b2e7a1a5b71a11c89479438c47c2dd0f67d1731e71ecfeb",
+          "validation": "21ca8b6ee899a862d67f5de45e9e2e0ed2a92c596f2acb94c0d505fd18522842"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 34,
+          "train": 133,
+          "validation": 33
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "229_pwLinear",
+      "sha256": "b815690f48bb9680c2c997c9190b826099d93178f6d948c2b525b44b3672f0c1",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/229_pwLinear/229_pwLinear.tsv.gz"
+    },
+    {
+      "bytes": 100077,
+      "dataset_id": "205f4b4982b9ea49",
+      "historical_projected_sha256": {
+        "test": "a546012961f006ba05671edb6d9e8f579338195b00105043a846fe67bf7a326b",
+        "train": "078b1583e789b1629b824eda356eca7e747460e0bfe7dde1d5363c2705acc9dd",
+        "validation": "9126f7a55518851d74a0d90bba0f43b63d3f8aa40c894e20673eff6fe57ed325"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "e23e6a8e8ef6d1f26f7d5a4ab040d563d45b6541a8ac594a0e8ce83b7a1f3e81",
+          "train": "1eb987f55fed03602b90121dc88412cde5d26e0f1f27ceb2859bb78f8156a5c4",
+          "validation": "1e733daa4e0957931686cf648a46d45e4e53bb4f4f1c80bc6db402e5d38f55a5"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "608_fri_c3_1000_10",
+      "sha256": "09754d4c7db37ea29fddfcca840ceba97aae3b70905f25f8432fd9f48145c02e",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/608_fri_c3_1000_10/608_fri_c3_1000_10.tsv.gz"
+    },
+    {
+      "bytes": 117288,
+      "dataset_id": "26eff843be35d831",
+      "historical_projected_sha256": {
+        "test": "3a4cb942cc17f62e0c190f2c1d4ae44bdf62b46d2fcd2f50650f0506e5748d44",
+        "train": "864b978464d1e091ca1658d5fdeb4ac091620887444b28751298ddfef29dc4b2",
+        "validation": "7e3bac87df6a9485c0b19757d48e6f782b48f9b0a475eac1b07eabe84dc07263"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "b71a22bf6d045eda6289d760afc0f3bd32050b0e937f934c5534acb15c958638",
+          "train": "4dc26641dbf3eebd9535c887cf05fce6a12c27626524c82d3f55c27b34aaaada",
+          "validation": "b5ec653800a126ccc1f9ec757f698174b6f8c6d38778390af06cc8c9b0d1e969"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 84,
+          "train": 333,
+          "validation": 83
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "581_fri_c3_500_25",
+      "sha256": "c894c39ab4164e11c82c792b5774d990ee12da947e74348ebe96138643586278",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/581_fri_c3_500_25/581_fri_c3_500_25.tsv.gz"
+    },
+    {
+      "bytes": 99628,
+      "dataset_id": "282f8ddb43b5e677",
+      "historical_projected_sha256": {
+        "test": "23ddee4eff87f37a1eb37c9c53aa3763af7b4d21ffbd093c2c375c7a7701f38b",
+        "train": "660542bf4367c87b8e3cfcd53516d0ccf47f22c5800c64f41af661683aa433b8",
+        "validation": "593f57532f8062f033063f272a49c1dfa885f6da3238bcd5a3aa2628afb37070"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "955b3cf6ecc672d34fbc2298f9a7eb50365af833315f8b7b36d890d7040f5bcd",
+          "train": "b02d98d120102d33489b3568fb661b5a9f06ddfcc3886047831860f635d463ab",
+          "validation": "77313fe98b359e23c47f536587a88d2926b2c11fd7c7f50570c898275125bb4a"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "595_fri_c0_1000_10",
+      "sha256": "68f0a5b79e4bf5b23e812ca4a1fe431fc754d5c3955d02ce8d2951fae449ffdf",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/595_fri_c0_1000_10/595_fri_c0_1000_10.tsv.gz"
+    },
+    {
+      "bytes": 114965,
+      "dataset_id": "297b7688a045c583",
+      "historical_projected_sha256": {
+        "test": "38d47f92d11620b9120cb36edc94ae6519d4e0cc5459d35a0443b58ab5b2660d",
+        "train": "1a357cd0d1cf129bf2430ffee5aedcb4f97adbbc9e618c3a09ba74d37806a53b",
+        "validation": "9ccc2d0785b0f8436eaab286a06832ee2cdf2c50d36ea4236e6f407f90edf565"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4f87c5f359de23c12579daaa0065572f046a91f684ede1da2c1582c159f6e7c6",
+          "train": "cc589006353032987470ee43c8d9b89104ed423712e5815de9d515ec7fbc2ae1",
+          "validation": "488a1435d63dc2f0aae2a8e998374a1c59c7ede16ca98d14e6dbe07d1ec97656"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 42,
+          "train": 167,
+          "validation": 41
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "603_fri_c0_250_50",
+      "sha256": "cb25e211a213176acd9eb1fcf12bed4d8748b3165b8743d85f63690833ae32e6",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/603_fri_c0_250_50/603_fri_c0_250_50.tsv.gz"
+    },
+    {
+      "bytes": 2652626,
+      "dataset_id": "2c8d0985f3557d2b",
+      "historical_projected_sha256": {
+        "test": "3ee1938fffd0cbe7b63f066b535b4b1c98ba35d578a687835feabb031ad923a2",
+        "train": "6c6cfb9333e633b1687b5d0e0c1c26721b8d444eb63e4f6f86d969e83c3f0975",
+        "validation": "e4bbc1c7369dc94e39eef37d5b651e6a8e57248d7dbd6ad4508593133bddf617"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "6a6b42bc6c5dd4f5052a86e92ac709845c69fc42ad3149d2ef2d64ff06e4efc4",
+          "train": "ba6e620d6b460319b903d0cd1860a489b0d54f182c9182dd4fa3e143750ad49f",
+          "validation": "24fef3d270c9b2ae00aaff316c300ce6a1e30cf8f89c93c030b3f5dc17b8becf"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_II_11_28",
+      "sha256": "7559334251c5d6cceb345a17981cfa0978d033db5ce1eec43af780472c476d8b",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_II_11_28/feynman_II_11_28.tsv.gz"
+    },
+    {
+      "bytes": 231185,
+      "dataset_id": "30ca2887550f0d8d",
+      "historical_projected_sha256": {
+        "test": "698e08eeb1fb448a416f65fb371bc72ad0ed66eda3531b2aeb689bcbe268ecc4",
+        "train": "e3295f16d5613a1afa206705ba963cc487a41713a9f045820c2bf13f66ce1073",
+        "validation": "11fb91aecc799ec6cdc29d95a590a1e0ab367b1f69040605718f37ea3abe2a46"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "cd5a603776ad3396b8ebab6d53da457a3d09bc3fc6470dfa63dd957f5023e510",
+          "train": "9b7d6f4a13552bc2b5a538efa8ce6d347b71106cad6ab4884582d4d92dbc5203",
+          "validation": "9c562520a4191b1f1b50d2f030e947f485a4e0e540796ff54bf58bd1d3a5a740"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "201_pol",
+      "sha256": "bfd1b9c6e5f6314f6ddfc285ace11381570ad688c6c857562c3155a4e478530d",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/201_pol/201_pol.tsv.gz"
+    },
+    {
+      "bytes": 10670,
+      "dataset_id": "3408a6a513c627a3",
+      "historical_projected_sha256": {
+        "test": "030446c8ea4985c308b22ce429897722b0277c64020d16fcd6f65a3f60997876",
+        "train": "e751f33c138072be2907050cebff352cb7ba6697d508bc040b1084c1af4d2c7f",
+        "validation": "871c31030cd2ebdce979fbdbcefaebc821a4b469bc2b5c98d3a435919e9608b7"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "d8adca5d99e6a83975f0e851e78c38c7c5141861e84d97a14d23070d9837ab77",
+          "train": "47fd5639dda96893bb9346e8d439f02e5132e1736846fa292cac82e3a90b051d",
+          "validation": "9f3ea6d108240ef9b882151fd332663f6aee1ecc2e589326f967b7f3d7175b9a"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_barmag1",
+      "sha256": "5ebd813b1e30817354b31d0f51e4ad3a31dea6fa2f1eb85680112bea6ec63e9b",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_barmag1/strogatz_barmag1.tsv.gz"
+    },
+    {
+      "bytes": 2441382,
+      "dataset_id": "35a9aa9b88f0e4d1",
+      "historical_projected_sha256": {
+        "test": "0eb7ed2c5fc2d8bf3e8d67b2a21d1fcef243bf32805720ac398e5b739190b6b8",
+        "train": "9f8d2a2c182882a1bf40e86a4d3bec22fcdabe4d04dce7196ab917104c7897c8",
+        "validation": "29b3bdd7ecaca0f79442dde43421f938a28b106cea7083e807461ef020971770"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "a7f95923ccd8e146bb7b008490a44ab1088d80e8a282866c579144fc69e66776",
+          "train": "07dc4f2a2ff89dacd08782fdf295d4befff2588a1d6baccb6e71f0c968fefc06",
+          "validation": "02e8c6e2884629928e65336b73330f3d1ed558f4f2ff45abcf1243a22e6d1954"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "344_mv",
+      "sha256": "087be6d353160ac187935aae1bf246b787d88be3d84b44e1533ce71cc8c43cb6",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/344_mv/344_mv.tsv.gz"
+    },
+    {
+      "bytes": 55320,
+      "dataset_id": "3d3321e27d14f9aa",
+      "historical_projected_sha256": {
+        "test": "219a2daefd6144e1ea98104d4fcc0b4c30732294d65b5c42081685c07b448469",
+        "train": "9b66024b8921259e88ace8061f87377c5796cd473ff33f10b258ae12db70b7f4",
+        "validation": "01a4a3fc2c626a0948641a6d6475f65de9a29baed54eafd1c51b8aa16c032147"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "87acdd941d42ea9b1dc38146993ea7ff712630ebe69e2c43464f3b4848c2711a",
+          "train": "9a5c40cd4fc54de0c8acb1732f5e756e9fa4a528946ea49afa1a78b522707395",
+          "validation": "b8107f31ec98a9aa157a6c1b19df854586b00d9010abb65be1b3171862a08698"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "599_fri_c2_1000_5",
+      "sha256": "4f7c486b471f2a5dcd94c97f52089b487c3f4aa1bbee14c3ac19472e4144b2eb",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/599_fri_c2_1000_5/599_fri_c2_1000_5.tsv.gz"
+    },
+    {
+      "bytes": 14537,
+      "dataset_id": "44eaabe4cb923766",
+      "historical_projected_sha256": {
+        "test": "cabcb08a387cc94c5d28edf29f56d171fa1a76b143b4971529f2411f4c51c1e3",
+        "train": "59e38276757926ab4b36edff8888633655b6d6d57dfd4aa98f6a78d306fccb5b",
+        "validation": "4201a5684421ba5a16a2204a2803d40ee9c97a528cbb2c914ec489f2a887386b"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "8eb3e0781a4e58f3fd360a973060138af333a35e8924497697321cb5e6bb417e",
+          "train": "6727d7f45c5998d6b16d08faa9620cbe9d2f2a8840b963a373b89b192d7c67d5",
+          "validation": "a53f58df10877ef078bcd64430a7d6b11f8b899181e30491a96be9922df014d2"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 42,
+          "train": 167,
+          "validation": 41
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "613_fri_c3_250_5",
+      "sha256": "24776e0eb2ca28529d8913612c14fdb6eb822bd991628272034b3c3176b42c5b",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/613_fri_c3_250_5/613_fri_c3_250_5.tsv.gz"
+    },
+    {
+      "bytes": 232869,
+      "dataset_id": "46b25db9396c8209",
+      "historical_projected_sha256": {
+        "test": "551d3a2083da40efe23679864608627a17f98b6c4a4221def036f33f76e5348d",
+        "train": "012cecdf0d7a864001aaf5b3666b96413bdb6fb5f0ae45cd128802066348aea6",
+        "validation": "7862a5ff5a41a97dca3d093949553715146306e8a417ddc588e90544032f7507"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "8819c8238314d75b462e932421d279f1768adf451a582579c438eafbdc08a60b",
+          "train": "b1fab45b64551b8c7255a5dc32ad73a16a9ab816013905f0e3e0d9cec5ff8a2a",
+          "validation": "7fd04d5288beb3d0f523064efa0d76f4c4a25848c20a02a8cb08fcfe0c6ed96e"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "227_cpu_small",
+      "sha256": "2d1386a66ab4548b5bdfc95581a77d5fd21852094da5ad2a7844b04e47e1e612",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/227_cpu_small/227_cpu_small.tsv.gz"
+    },
+    {
+      "bytes": 772235,
+      "dataset_id": "46c5a59e5ae42037",
+      "historical_projected_sha256": {
+        "test": "5a93194c2d1389e7944a681d13f412b21a5f131c5967aec923794a2023d5906d",
+        "train": "cee45a16efb16ade0b895ecf4cdbb62090be12f1faa93270bcfd108ae4d3bde8",
+        "validation": "2666f7cf22ef2700612d924ba758f600fedc544ee5984cef52cdb4a4fba93e8e"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "f7ca3a26481e864000da3824e77fb124df5b0d2f607b6d9b0af3e9c87bca9ab2",
+          "train": "c52dd8c628cc3a4603e73a3da9c74ad1c999ddaeb448c427d03ba4a70d70e8d3",
+          "validation": "2d2c730605b696dee35dabd2c0b356a7e67344c49c50061b40112ea0c2e5ed3b"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "1193_BNG_lowbwt",
+      "sha256": "ec7968db175dda2a12e69f7d5688658210ed9c8bf484391c653d28b4b3c068e7",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/1193_BNG_lowbwt/1193_BNG_lowbwt.tsv.gz"
+    },
+    {
+      "bytes": 4362459,
+      "dataset_id": "471f11cc2d38853a",
+      "historical_projected_sha256": {
+        "test": "6e0510bef56fc209302c4af7c65524c849c2b722aa1ada3f119d328351ce232c",
+        "train": "8e5b45a9845c247c67f2ca190b47a02ae554cc83512b0edfb2f9fa322c8deab6",
+        "validation": "f5b13fdf9c87b61c8883d15c39858bc93a44f5b8f25bb2cfceb5a9610879abc1"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "2e591b36a4add21dbb3a82d136fef38e5bd4d330b377bbc29e0d43db8c4169f8",
+          "train": "e21b8467f741e6b1124ac1935b4fb0eefd9d7f69b6fb708d26fe07f2dc27511d",
+          "validation": "be90e74c44de51823cefce995a375d4150ca79341e2b108d84c5d701b0c98375"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_test_11",
+      "sha256": "90cfe4e2453845df0529ae884962c3e11cc5fbb18613f26775b8f16cbe566bf8",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_test_11/feynman_test_11.tsv.gz"
+    },
+    {
+      "bytes": 117155,
+      "dataset_id": "47c581af5de1136b",
+      "historical_projected_sha256": {
+        "test": "31de73516c58c312b2f1f9a1264c5fa0448ab2efd90932293fa7c4cda4ad5a4e",
+        "train": "5f4fc879865c4651e88e9f13889d4655e6ab3473d4e6bd2536bb9eb0fe390946",
+        "validation": "9780893e1576d7cd695df53c4bf99aeb06f2c00b8eba1e474c33551e622ccbd9"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "134ea3792ddc18a39dc4a020463573f81219e2810e8269f2433c8b483f30c1ef",
+          "train": "198bb31e344a614ec794a615cd8dcbb202b11c1c8c4901b3c9376c3c4ba501e5",
+          "validation": "45f9c5c02171ba18a87539ef801ef3c9809381b3c6ad3c01401352e314f47501"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 84,
+          "train": 333,
+          "validation": 83
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "582_fri_c1_500_25",
+      "sha256": "7e6adcc066efe13d876fc6fcb124846abff5cef3893a79267afb5224d963d90a",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/582_fri_c1_500_25/582_fri_c1_500_25.tsv.gz"
+    },
+    {
+      "bytes": 59307,
+      "dataset_id": "48b7a3bf81e5f3e5",
+      "historical_projected_sha256": {
+        "test": "4e8ad3b99e80669fe51be6f82444ddec0f2d3527f85c77f41c277fe5008891a9",
+        "train": "45e7562c3c15e3642be2d8a2f7291ad45d11dd7f5f3353b29f1eed32b6b49b9e",
+        "validation": "fcf9764ba6074f8008dbd29ba670d4e4d4fffd4b89b4020a9f40e8537e37f035"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "37b84b65027a425c9afc10467a7b949c1c2ca9f779b63621fd73b4af4ba04b21",
+          "train": "6fda4686ee27e1d12e0de86a5043a8cfe771259470b1be6ac5c58fb99a9ceccf",
+          "validation": "d5b7ba3772dc8f73466f07d68aa46e478af863632a6eea4e5c94bd7ac13e73d0"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 42,
+          "train": 167,
+          "validation": 41
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "605_fri_c2_250_25",
+      "sha256": "56f81f2a4cdd1968cc83d45bfdaa049c90cf7cdf3141b2db9979d31c000e3937",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/605_fri_c2_250_25/605_fri_c2_250_25.tsv.gz"
+    },
+    {
+      "bytes": 28305,
+      "dataset_id": "4a354d98c965b01f",
+      "historical_projected_sha256": {
+        "test": "9d141f2182e4d51369f257a6d1259bbbf110a2904796e3b02e71796f6f4397c4",
+        "train": "7cd0fb68c736173f54f259e1172724dc9716950a995cebc5ecfa3904b1d29952",
+        "validation": "5d0eb8bf0bf52e37d72d68cb449c822bd6cf637e2fc3b0a27b88c84a85a331b5"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "eca8c428aaebef9d5fc3f2fc402a36c095859dc7e0338069dc41a1ad76a46e42",
+          "train": "4250277d1eb69b754d2ec484d3f5041367755b6ee349c6c80e86ffd0d5de52ec",
+          "validation": "2b456f9ee8ba971669f7224feafcac87d72c2463d206d07a23feee1b58ba2a55"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 84,
+          "train": 333,
+          "validation": 83
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "597_fri_c2_500_5",
+      "sha256": "1a6dec52a56fc471f5bb8be372bdc25f65eb8b39542a25f4e3e590392dbceb27",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/597_fri_c2_500_5/597_fri_c2_500_5.tsv.gz"
+    },
+    {
+      "bytes": 4446539,
+      "dataset_id": "4aa84fff8ad0cd26",
+      "historical_projected_sha256": {
+        "test": "7516a0a78eab0ab0fa58d622fca67da6a41ef54fe1483fe374aabc8b6b89802d",
+        "train": "5be13f369fd168acb64814bc064b24ff100f3b86de6f3fcc37a9d4c400b49b2e",
+        "validation": "ce196b87200408fe69c09a435e4847598efd30280853baf1baf7047c034d4dd7"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "1465d0f86e0576395f289c4f182fa774cb406ed2bedbc93187e7a350b15d1085",
+          "train": "909b6e0efa2f0bda7553cbec4e1a5d9e5ba4ef6bb48cfd5434b1526a84313f8d",
+          "validation": "f1aaa904d5d516e3a293e078c9d78a0df843c21abd2d040ebd14711f0f8e0afa"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_III_13_18",
+      "sha256": "5f123396e5bd9bf37facd88266cee4b5d8df358a5d99a91c5e0ae131d66dde06",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_III_13_18/feynman_III_13_18.tsv.gz"
+    },
+    {
+      "bytes": 1681,
+      "dataset_id": "51730b348b1bbd14",
+      "historical_projected_sha256": {
+        "test": "42ec6b510abab4131dc1325ae082dc874ef7ab72be9c482f6dd0f8ce2e04198d",
+        "train": "b17127cf3a49e1d2707266793bfbe94908799b5607251cd01609003d5c1a6907",
+        "validation": "b54e9de8ed2a066b02bd1e55c5776ed39b565b21718b6c12ace4b09936f88534"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "b358f8307198a498806b8d2fc58d5b1e6819ee9af703d486cf3b3bc0e679deb0",
+          "train": "148bd32e1fb1a7a68b315c4acec956aaa8e8abcf703406bfae96644ed7a4fb35",
+          "validation": "fbb5ca50d7846ef6a129d4ac726f82424dc7ebcce5836695195aaa6ce8e35413"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 80,
+          "train": 316,
+          "validation": 79
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "557_analcatdata_apnea1",
+      "sha256": "39628a3401b9ebfe2b4da629e0182736917694bf6f793dd4be821343459fca1e",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/557_analcatdata_apnea1/557_analcatdata_apnea1.tsv.gz"
+    },
+    {
+      "bytes": 5240801,
+      "dataset_id": "54b221668673164c",
+      "historical_projected_sha256": {
+        "test": "d87e0f51311f90d3cfac0fd170a4cb765d42f459066cd9b824dd13156e44a90b",
+        "train": "a3ac71018e77e83ff41eba9e6a6690402bf9a9eebaf5421d49b35ed3d3990264",
+        "validation": "fb382f05d7a102c05ba7c64ebb48def2816ed8932f8eb62ba04fd167b79bc8e2"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "ae3fbdc2756eba4d4bffb94821445aff1e48284a114f74df20cfac67346df223",
+          "train": "817445fe035e5b8b267ba78a2d97607589b4308e97750ee18ade86f8fba62f44",
+          "validation": "9d9604744ba15e6d703c0b14f605ad4b9597eba62475a5ce22fbab84693cd93c"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_III_14_14",
+      "sha256": "1455bdeeda4f526c7547ae7cf47e91872b7e72c1d61904fe6d463bf1a626af9f",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_III_14_14/feynman_III_14_14.tsv.gz"
+    },
+    {
+      "bytes": 8977,
+      "dataset_id": "552665868f8f72ed",
+      "historical_projected_sha256": {
+        "test": "1d28833f91b3744292fbf81e209174fc05dc0efe22f8904425a952cd8ac0330d",
+        "train": "6fa49f73bb2e9c845f60995b7af1829ec1f33d0321d3022af4862c41bab9ebcb",
+        "validation": "e78eb12679ca8d5fd33dadcf95b3543da26b0c07ec2d963f508f937f0162f8c4"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "f5d7de9f0da212b575be36ffaca3260575906c483626775e4a08382a205cfbfa",
+          "train": "2b09736ddc46ff06d50d402358a8c9e282a3a399dfeb627e6b96babdc3e6016e",
+          "validation": "56ce45db02ae19016660f81a2c24a44b5ede431b29b75479e6ed4787deb3a2ad"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_vdp2",
+      "sha256": "789b632ebe707dd1acfbb9ab41641f028bb594677aa620ba76ef71662a514793",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_vdp2/strogatz_vdp2.tsv.gz"
+    },
+    {
+      "bytes": 10843,
+      "dataset_id": "585fef2a1cb6b33f",
+      "historical_projected_sha256": {
+        "test": "c8d5f17db1e2c89d34bb2631cae9afd368c2ec13ed24346adec3921634c1e508",
+        "train": "419028047021f90413b185684a85034ca27d4e6adce0d6826446d2b6d6a1ef77",
+        "validation": "d11c298556dc5a28d35cffa3c6222c9d826f393ac7e4846cce5a39254911aa3a"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "22474ba0b85acaa068206143cb2a925f40e47b788dc251dee579a4f575318ed8",
+          "train": "98a3ef1eca5d0697e0242b7abdec6fef93aa27d98eb09fb7e96ffc07026a234b",
+          "validation": "f93b90616e06052cf265c4421092e3602a4f46ec5c9949e64457189b29ab057e"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_lv2",
+      "sha256": "610a94a55c4ffbd15e1c33063b48ee19f4e1501fe941358417e4add861f6b2c9",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_lv2/strogatz_lv2.tsv.gz"
+    },
+    {
+      "bytes": 2630211,
+      "dataset_id": "642738a361f1c63a",
+      "historical_projected_sha256": {
+        "test": "4df581e70705ac1f8673cd72197daa5b6c41954010081c3e767fbc3406e2cdf5",
+        "train": "a1ad4a2a7fb19f481dfe8a13f378689b830c2fb405b3cae80042e1d084436d62",
+        "validation": "031e0637549e968a6bb4ac4e9ef789351c62acdba0364d9aebf40bcdf766f61f"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "b2048077c6082f52f1b4fe24d9893532ee0caeedac3fd770e12fa3083a4efc1f",
+          "train": "833ed64b7665bd94f21e98052620686fad26b6b3c732f44684ce95ba0db21d66",
+          "validation": "a78249d90b7b28c4c1398ee58e9b9ef3fbbfb103e8c8c1c0b25c703198b46cb1"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_I_12_1",
+      "sha256": "9e1ec477e8af8356c3b731f8815f19b57bb404bd7c1629a2020bc9d90b0c028a",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_I_12_1/feynman_I_12_1.tsv.gz"
+    },
+    {
+      "bytes": 10687,
+      "dataset_id": "64c64f0f9983c48f",
+      "historical_projected_sha256": {
+        "test": "f59fbaa0a32946813267b0abb156a1bb58f133631c7104c98605c42dd42b7535",
+        "train": "3b831210f7f41c4690bec36f476234b28f41592f08c9301cbaad3c69401b96e2",
+        "validation": "71d8c58c8af738afca79fe77903cba01fd4af196c8db7ff70ba74b57f5531c3e"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "232a0838a3c0f3d37622be9b3f77f1b6d437b3bf22d531c66c6aa2f7d5533517",
+          "train": "bad5d5aa8322f27652dc67c96ff3f8ddf27793f9e10bfe90ea3c42914f35a905",
+          "validation": "5fd7c3914ac7b3a70739ee10b082634effe9b5e4d9345910a891ec9322069089"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_bacres2",
+      "sha256": "c05520ed4bf8006852111ab68e7286b8bee59f4f9ab42735c4e81ea1bb86acca",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_bacres2/strogatz_bacres2.tsv.gz"
+    },
+    {
+      "bytes": 730076,
+      "dataset_id": "654566a1f91408aa",
+      "historical_projected_sha256": {
+        "test": "854a25bd920195e2518e8b71b65bc631c9ffc90807e05995ad5c10d2d1427c4e",
+        "train": "549b10c1788da3ad9794ae93e38125743efcc7a7abc7a5a05d5fc774bacb1079",
+        "validation": "cba3fcf19eb86e731cfab0713c27a8d167a42af525de6393539a3714b05c1579"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "0d6ab3ccbe58fe9e1585cfe08c78b69f663c923f4ac057ea208bf4155f5a7b50",
+          "train": "666df5735a20e3cc5cb8ac5bec660f94eba4b2893136bb4e616ddb02152d5878",
+          "validation": "1cad6f16a95a2b0131827cd14128021868bcaaf9bc7c509200cfaec8887d527a"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 177,
+          "train": 706,
+          "validation": 176
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "4544_GeographicalOriginalofMusic",
+      "sha256": "5b20048751e68b6dd76a7b66ada790fb90f9dd41bd8c82d448fe439f8d038969",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/4544_GeographicalOriginalofMusic/4544_GeographicalOriginalofMusic.tsv.gz"
+    },
+    {
+      "bytes": 4054,
+      "dataset_id": "693890aae9dc860b",
+      "historical_projected_sha256": {
+        "test": "6a8b0d253308ff2537cde8108e5bf2d06ccb55a51d84cb228c2ea0cc772c8f11",
+        "train": "68fd8cfe611d95435b1f5c419cb2b143e10d6ecc4be09165ea50ee9954b1c2a0",
+        "validation": "908af7725ee8eaae8f86fb9f306110caadef77396fca044e1bb2fddc187d878d"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "f4e32734de87720d4fbc798c2d39b8efdad105957085e9c1063dc0e68b4b4526",
+          "train": "75619f26f5d2675b5d56fdfd3fee155927a21fdf48a46f63aa696f0d23011c7d",
+          "validation": "8a70c4ce2f2eed199995060d631ca900d99d51053a163e44c406a58bf15d986f"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 41,
+          "train": 162,
+          "validation": 40
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "first_principles_supernovae_zg",
+      "sha256": "9f946159fb4fa4d6351952d89148572682de6c062f14b6c0f401b9479ad277de",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/first_principles_supernovae_zg/first_principles_supernovae_zg.tsv.gz"
+    },
+    {
+      "bytes": 6124119,
+      "dataset_id": "6cacb11611345a24",
+      "historical_projected_sha256": {
+        "test": "f6f9959a8ee070bf64e4af54fd6c23b3fa9102136da434580c64b7f37ca181a7",
+        "train": "38166ba8489c88d4520e6d6f6271e8e8e8d5f5986a208ad0676119316d901691",
+        "validation": "8110a34fa7a9a3f9b9f9166cb01dad894761cf659a7745e70c1f5d491bb976d6"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "d2feae73245e1b72583401fb61484fe58817fd8d43efd42c6674db1873007626",
+          "train": "2e804c93a7800f0679e5785bdf3e87b216b4404e9abbaed1b25147743ca77008",
+          "validation": "9eb44cb905befa620856c137f6d5f1e6d20b20fc9237b15f220e11ade2a3472f"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_I_11_19",
+      "sha256": "52570e7b3d0066899283c3ef1fbb4241f64ad3d0a1bd6c9cc179ebe2262c8e86",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_I_11_19/feynman_I_11_19.tsv.gz"
+    },
+    {
+      "bytes": 5247398,
+      "dataset_id": "7291b347fe0238fb",
+      "historical_projected_sha256": {
+        "test": "aa9c3205c9869538d8dcfebd9e92ed8da90217e44f17a9ad56ef4f2402744176",
+        "train": "0a5f453388dcf5293130bd43301887e7868017f9c240bee2db5e626393bb2235",
+        "validation": "34c537cd682c4d06368dd806c3fbeb6bebd2684cba5b253c5bae8c490af4e192"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "65cae12f35060d8db0e65ba07dac4268c9586e24e8044ac3a8a7d08b46248412",
+          "train": "3c5b87482cc5eb0b2bba8adb761aaf642c03c32b8b47f6e48009a6ddf8840e55",
+          "validation": "421ee8d7ea8e0fb6be02114fa065a845ee0ab2a1c88c39bb81696fc563ea11d3"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_II_11_20",
+      "sha256": "b03a7734f1cbb27d1deba0168d306d8e5902038c0aa5403901ecfa1d113adefe",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_II_11_20/feynman_II_11_20.tsv.gz"
+    },
+    {
+      "bytes": 10722,
+      "dataset_id": "7423783f7e38bb9b",
+      "historical_projected_sha256": {
+        "test": "caeea3a700b5065d675ec423056c57320cd2da5c7ea6b14712f31001623c737f",
+        "train": "f8e67cc602dd141db0d3ca291b6515f864463acc6cea11aef64ac60110a8fa6f",
+        "validation": "884fc9eee8fd46ee230200bfcb8f4b8651accfa71304eab884c8315a663022ba"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "fd7bd3fa8dcccc0b0f3a4baa2b0229c806b1726ffbc368979fce91319153f8ed",
+          "train": "9380afa5bb5df1e15cb4db14e6e1ebacff8a4c5c97cf2d375e8330ba24fa8bbe",
+          "validation": "bf98d3df0fda02c438813a6770bbe271c4105e3028a0b51a4624fdc87fb0a51e"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_shearflow1",
+      "sha256": "a71c05581e59bc83a6e500c66ea94ff9e355d5e457f0b094e10a61e7f13fdecc",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_shearflow1/strogatz_shearflow1.tsv.gz"
+    },
+    {
+      "bytes": 232727,
+      "dataset_id": "7a3d123dd555110d",
+      "historical_projected_sha256": {
+        "test": "7c437409202863c8de08e1ffa6428405a0e4c6b4c8892d78cf334ad6e67c2167",
+        "train": "1dabc6cd0a1f3317e0465918cb954509c7d15e1430f5587b731249be07373bc2",
+        "validation": "0c98bad3016050ad6d918f36852eb393657978f2858f04e9d9561cda7e5ceaf9"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "77594d89acf571404e3a76fa988dd6c0ebe364a5a6db2b1e995bd00058ddac69",
+          "train": "8dfb5c93e33e57a73f5566ee97363eec23738baf70272540e6faee76ef37fabd",
+          "validation": "c695958c0b0a2a9b44c5965c1807105c77f72f3591a8b570b628b9da13567fcb"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "598_fri_c0_1000_25",
+      "sha256": "89d2d744364e39e161145784d570fe04c1105d0bbc6ec364634d754eb8212e71",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/598_fri_c0_1000_25/598_fri_c0_1000_25.tsv.gz"
+    },
+    {
+      "bytes": 14469,
+      "dataset_id": "7c8943b160464add",
+      "historical_projected_sha256": {
+        "test": "9925eb76b32808e48832f93b90a83fcfb248da1be3f7b31630b9dd2607852bf2",
+        "train": "4c1f3b681bf3ad9ffb88bf107dd0f4a172fa8b3482c67c6bb9f12fcbe962129c",
+        "validation": "aa9533800211150217b9e98142f6f693224ce444ebcbb2886b1df17cf71acd10"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "262ad1e16e36e2ae9315757bf0dcd7496c128472f7356ad4e2870af8fc1b6534",
+          "train": "05ea14787cbca674c54f571af4997ade9cd5a57eab8590b58224fb63616fb787",
+          "validation": "84cdf70731a10c9391bfb2a1667f34add9cd436ffe81fa3fe275f25054ac3243"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 42,
+          "train": 167,
+          "validation": 41
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "601_fri_c1_250_5",
+      "sha256": "32bdeb725bc79d00349bcc66c41d306f463005cf6ac623cf8c15b5f3f7bbbb83",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/601_fri_c1_250_5/601_fri_c1_250_5.tsv.gz"
+    },
+    {
+      "bytes": 5292426,
+      "dataset_id": "7e51711baa1b1fb1",
+      "historical_projected_sha256": {
+        "test": "5150036996cf908eedabec93aa7e1e13b72eee60d6dc2db711ef9035f1c7aefd",
+        "train": "8b2ed756d330379df6a117d629d23d733fcbeef43728ba6e47bf400053cb5a03",
+        "validation": "76aef2c0f14059e64eead5bc7b37512fdffd801ddf77b222d74cbe53b57f9149"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "60f0f482efb0a9a88057b51b5b2143e3627d2d053017906851b9496e975c7963",
+          "train": "8d45e64538c9656929fec1a8d20cdc7bcaf9160f969b828283a6892370240564",
+          "validation": "5bdde36067cd8fbb705d1fe4bce9f7294f3a3909baba1445951281865428127a"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_I_12_11",
+      "sha256": "4f3e3e20b8bbb92e7f35d7eb0bb80dcfdf28bafc48a7fb51f0fd868d8ba64ed6",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_I_12_11/feynman_I_12_11.tsv.gz"
+    },
+    {
+      "bytes": 1161094,
+      "dataset_id": "80589368fa78f21a",
+      "historical_projected_sha256": {
+        "test": "f6d9fecb14b1df0076dea01f0cd4127ea87f376588114cd2cc2e094709d1154f",
+        "train": "b709e414dff6405379106d6af0a434a16b1322505aef458f0b6d3bf3977903d0",
+        "validation": "e63de86b2a0af4470ee3874a734d26ae7a2152c04417a84e4586486644a7bef6"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "1440c9c07c033fc3a07fa5b2b65b86c2f5987a7e18d90d35cb54ba46b51680c4",
+          "train": "eaddab8466ecc494951b7bec995894b2f6c2c24b6cb684b32eb4b24a0d2b93e5",
+          "validation": "0d5682cdfd6b2336c2b8df8c7d30147888dfb02b683deafed82a3a2a2fec4823"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "218_house_8L",
+      "sha256": "034378d7304b89725c914779ed819b6d22e62f60f15d1eac774c4a1244bbc790",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/218_house_8L/218_house_8L.tsv.gz"
+    },
+    {
+      "bytes": 4423080,
+      "dataset_id": "8164950b155f7f56",
+      "historical_projected_sha256": {
+        "test": "7aeef07e39dcab488dc8b2f99587528ec68132cae845466338585f4c116a7a31",
+        "train": "c95b37ee6a7550702479a77efb5f42d6a081215215d1240ed52e15042d82459d",
+        "validation": "fc74ff8ea3c8bae3d6cdb7486b1aafe6d5ed6da1fe853283749766245f4f79b8"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "108bbb6c95990da4555b54c1c7bd8a30cace435a18d615bf3d3eb1d0faab4f19",
+          "train": "0924c8e5378932895e1ee9e1810104b2d58b147b486dbca1fbfaee627da35ebc",
+          "validation": "048f0e81faa085b7fb7d3c30bee226fd456b27a989696c787c43fe6007dba8bd"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_I_12_2",
+      "sha256": "6fe281722cd1cf4da63248e09b84f5c11ddf73f13ef29e03e955cae8036548e3",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_I_12_2/feynman_I_12_2.tsv.gz"
+    },
+    {
+      "bytes": 3521049,
+      "dataset_id": "85a31ae409944a1b",
+      "historical_projected_sha256": {
+        "test": "5c6a3b94bb3d228a1e83a3a63c61d5e4cf119ef1009a7dc8297a73cd2174dc85",
+        "train": "bb1a4e5be9051fb1c0d9a09abaf025292c85af7d339310586e053c8f5809e9b0",
+        "validation": "ff7ca34e6a63d3fcbc9303377ed84a44f3e924aac9785207c24fe213c364b3c4"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "2a00fd451347970dfa4c3b5dc45771502327089dd12704d9d737fe8178593290",
+          "train": "32566eb9d606cf32bd56482174900322053a100eaf9b1770c9d5ac661cad9f52",
+          "validation": "0a7768af5aee19e3f80adab5d8588c649599f9e0c74f96b0253c18723f40bf39"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_II_10_9",
+      "sha256": "d38295e7c52e375c2ccbfd53e4ae560886b0d7f4e3114e6502b24d2b0d112c6a",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_II_10_9/feynman_II_10_9.tsv.gz"
+    },
+    {
+      "bytes": 3513975,
+      "dataset_id": "8d859cfa7b51a351",
+      "historical_projected_sha256": {
+        "test": "7101628ab9366ca2d092789727c938e78854afbd1882fd1257ac2a5434c84d38",
+        "train": "8cacfc0a66b26036947c5a2e4524ec5bceff29fbdabc864d4116ae2683c35a18",
+        "validation": "62d45a347c06a63b9b4f51e6d610efaff29be5b911c1dcf57f8b7746deb1bfa1"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4d92507584d573aac138ad6e8de783464b32356526b10355a9a1b6ae1e72ded8",
+          "train": "88365ed2ebef2cd195918ebb9c7688d2129b7fb814c120f626997f87802d1ee7",
+          "validation": "745751522f4fa08187b4bdb654eba2dbad6abd6796d3b92ac225052c3940ff93"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_III_15_12",
+      "sha256": "4c6187f4a30546bfa58b2b4f37a9ce49b9445452fb0b18b2d3d260e46646e9a4",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_III_15_12/feynman_III_15_12.tsv.gz"
+    },
+    {
+      "bytes": 2543403,
+      "dataset_id": "923483635406b213",
+      "historical_projected_sha256": {
+        "test": "4076500a118e970b49fa77730c7ad7e8597443b22328162b7fbf2ea12a6534c1",
+        "train": "5fb8ee46c30ace010a99a0be1876b9efc9d32fda08ac99024489502c61ac720c",
+        "validation": "4974676741f0d0c0697e7ba69e5567456aa34311ebfe33b8aa53923b19519718"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "9d5e0ec57c53834a275132e92464895ed01816999bc78773ab3ebf9293345a14",
+          "train": "d34c20540bad7cf2cf707d5b4df10ff0a8adee702caeed5ea71cae2e48d4e610",
+          "validation": "a802ba0537bb0bd792b6b84a20f50502dbe7e680dc1e58ecff5670f55fa3c903"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "1203_BNG_pwLinear",
+      "sha256": "d43ac1fbd282bf61b80107e45d2e27af6fb5464fc9338634a98482fbbf98ec04",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/1203_BNG_pwLinear/1203_BNG_pwLinear.tsv.gz"
+    },
+    {
+      "bytes": 8764,
+      "dataset_id": "9312d813229df035",
+      "historical_projected_sha256": {
+        "test": "e86db803abae8a1d28e2c73967c33984c6e400ef3205f677669faa77b332c571",
+        "train": "f2569c0dae7d31adde7fad6c64157834b55d6f8434fa61ba9dded85ac224e0f3",
+        "validation": "e92adb0de26eb4c34202a03238e6446d9eb88702d7f8826de4c1857683e28126"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "9cc0a1e153e4121ed8d93fa548f7c5252fd6c0ba8441499ea3bc1094eaacf4e6",
+          "train": "86ded848e379cbdef45ad66d0b6f2e9112e4563a8846601ab2d29c940f459381",
+          "validation": "0d4cf733b99001242ab1cf61e20652bf42d2a43db5bb8416b59b23f29e10164b"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 54,
+          "train": 216,
+          "validation": 53
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "690_visualizing_galaxy",
+      "sha256": "5fe909e08a622224135a2dcfd409bbe10abab4919f917a07b771c3fb00580852",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/690_visualizing_galaxy/690_visualizing_galaxy.tsv.gz"
+    },
+    {
+      "bytes": 14438,
+      "dataset_id": "94a00ea67f49bf84",
+      "historical_projected_sha256": {
+        "test": "e3e719b1de7b51eb6b1dd16cd88c5cbd80d1121aa4db12790c65207af09b08f9",
+        "train": "9fa31097081c401a0ba7729831c6b6b22ea5ed96f52b6c0e3bf8ad7e248b9e7c",
+        "validation": "fee031637144ceb6addd5d3b5c7259817b537c9c31ab85d1093e5931756750a9"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "eb7d99167d7ab7c6dd4e09797512a2b6ddcca0a8cef03085e609c2749e27d036",
+          "train": "c7913d774b5bee1cea1dde2a3d952b31625fc872c95e966f5cae73617a9f0038",
+          "validation": "ffe0b55304ece7e017ad772404aab87b4fb7d2db09b9c8fb176c9edafe4a3145"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 42,
+          "train": 167,
+          "validation": 41
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "596_fri_c2_250_5",
+      "sha256": "5940ac21f3c7e93dd1dca45266304d160c45256f0628419f001c8b54e1c98360",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/596_fri_c2_250_5/596_fri_c2_250_5.tsv.gz"
+    },
+    {
+      "bytes": 5250081,
+      "dataset_id": "94bd4520b8ceb3f0",
+      "historical_projected_sha256": {
+        "test": "91476f7fc3d5ea78c4a5c9848d4625666454fa3a7c6930e2e166e1258211d058",
+        "train": "45bbacf553cd2aae5767b600699104e0b2af55f6300c9ce7cf92ea54c05f3117",
+        "validation": "fdb1a10b56c4f6e1c1f3671f87022bd2b7980c6b164f796e6b730c5578164d62"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "d2d9c6c849d7a0c9b5841a5125a890d36ea79d8a52ca7d564ac7f5ec966bd7de",
+          "train": "9ec1f65ea6bd83c0b5b43a8eee0fa1784f57c05dcb1e68fd10c04c0cfe351ccb",
+          "validation": "78b0aaeacf6b386a57a50b7f212705776d8c25379a676ae5d08116124773f7c0"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_test_12",
+      "sha256": "5b90ff5f7bb9ecacbd257fe3fd3cda4cdb9dc197da93385fa5db0935b0525126",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_test_12/feynman_test_12.tsv.gz"
+    },
+    {
+      "bytes": 233079,
+      "dataset_id": "956d34f13e7af830",
+      "historical_projected_sha256": {
+        "test": "cf322cfd9b2128cd1be2675b0fe0c68b4f9b1a9b326a88b9c1495507906087a1",
+        "train": "b8f05a18e9933b4c192bc6b35428099a2486810c5dfe3a4e65ee111a0c37c566",
+        "validation": "10f842b4b3fe5ce0a5eb2c2ad289b7531164b08121e5d5c17eeeb79946695d94"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "fc20a419068129a2cd9fa24a3d753bcc29bd269a8ff4096a49aa816a8dc5f25c",
+          "train": "5c67107a91cd278ba16144297f26cfcfd963f0c75257ffa89437e131994ca333",
+          "validation": "c9c9507978f9a200397af7ae6631d068a55282d6a44f984ae498dbc4e4a78c65"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "586_fri_c3_1000_25",
+      "sha256": "30e1ff10a1b395027a93215492f6169ab6fef904da29bf16e88412c33a07d5d6",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/586_fri_c3_1000_25/586_fri_c3_1000_25.tsv.gz"
+    },
+    {
+      "bytes": 3588,
+      "dataset_id": "9a10c15885022034",
+      "historical_projected_sha256": {
+        "test": "266898d66496682cb5bd98f1e2ce0b75ecdfa8aa0d3c877f237bd9f9526cf947",
+        "train": "fe61850f06c4b355b764b0b410389557baacfa57457fce28c6870004c6934453",
+        "validation": "f6b3345e987d7949810c5381eb43d5d566387b79ed62d4c95c23ccfbd28c902f"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "15daefbc22d3d3767853979104d93eff0f8fe25e8836c17b3cd9d726fb16505d",
+          "train": "45d9e3550be599b7a01dbba97b9834802c16717e1ffe83f8eda22dbeca981186",
+          "validation": "423664de44631f419fc3823e62f89074fc5515f72f952e155e3523f7e846b5b7"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 27,
+          "train": 106,
+          "validation": 26
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "_deprecated_195_auto_price",
+      "sha256": "8898bcc4c12ea5dd87634bc8f1adce85bc654df872d43dc2ab5a019ae85d9dea",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/_deprecated_195_auto_price/_deprecated_195_auto_price.tsv.gz"
+    },
+    {
+      "bytes": 10921,
+      "dataset_id": "a04f964bc53281e0",
+      "historical_projected_sha256": {
+        "test": "b4f6eae484dd3e60d5fe5d31a4d059dfc8ed1267d63754f9c94cdbff283e08b5",
+        "train": "4e82cfb1ccd822e7c3cd8107c239de1d010a7a27cfdee73ce335806cf89c7d54",
+        "validation": "c66701545ce1036bb4d257dbd77a4638e78fd1150f3dc0ca1035fda10ae188a2"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "c523925f41852d48ac79fd94e3c796322cd0186571920cc863695880235ae967",
+          "train": "e261ff74ab66b958ab0679f5d97ff607c8f6cdab7dfa03e7a746b5e848b8a191",
+          "validation": "b84a4d477a50151e0fcc0d339c06e34723da31596ffb92bc51b003275c6d9f0d"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_lv1",
+      "sha256": "3617c04bc9113a437fdf8650b14878935e7feafc0785d75da2227646e337756b",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_lv1/strogatz_lv1.tsv.gz"
+    },
+    {
+      "bytes": 5300230,
+      "dataset_id": "a23f4bd626b76590",
+      "historical_projected_sha256": {
+        "test": "36fdc7790c39681402e0729cd2d61f96f6d2a9f76f78c7e47a51791fd19aa8dc",
+        "train": "de5db2806e6af6d828a6c101f74d6c40f9cc872e03c422484efe599b1478ce05",
+        "validation": "d6f731bfb48f7f8efa752d8ad0f9a343b3e432b1ee9aa932a3c19ffa567abc01"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4ef29faa0104d72948a7336486db2d62e379cecad8ea21a22c05d1049e22b9a7",
+          "train": "fe439270ccd74dcdc8709b00f4e2f3dd6947ae2079018bec57f9ec33db698b9c",
+          "validation": "fe49928d637858da0291476d1d57dcea591bcb938dd9f4beaa2aece1c9020899"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_test_13",
+      "sha256": "e34c16c743d459d6ae9274c46d2b539e5f34c148bfdcb5e1abcfcb8794ca486a",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_test_13/feynman_test_13.tsv.gz"
+    },
+    {
+      "bytes": 897731,
+      "dataset_id": "a32a69e7c701eb14",
+      "historical_projected_sha256": {
+        "test": "0eed24a043e52e35464a2c2b735124cfb6cd79f45f7af6ff52b00cf8760209f9",
+        "train": "9298b981c3c4b849601d4418f763398f14e30c82be0c9c36490c8fa016f48979",
+        "validation": "e0ef547c86aa61b6fe401196c43776acd8bea2fcf09bc25e30490b28a9dd2e63"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4497f9a597bc088dfdfec66fdf7174afd9040cdb95f2aa9712c6362fce1bdddf",
+          "train": "50bd0025a866604685fc5ee06e86e9f51efd9a0f5b1fa6751aea7b49fa2a3955",
+          "validation": "3471a9eed5ca8458869b9f86c397cece3562236591a0fdc4f5691c54d80ae90e"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "588_fri_c4_1000_100",
+      "sha256": "588ef519ce346285e4cb9cdd5780abbbac32cab9661625c6e517a9b70c87495d",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/588_fri_c4_1000_100/588_fri_c4_1000_100.tsv.gz"
+    },
+    {
+      "bytes": 25963,
+      "dataset_id": "a5ba682572f53add",
+      "historical_projected_sha256": {
+        "test": "aba7adc7be5477eb0a2bf05c2d579427d804aa325871bb2d088ce994b6025b5f",
+        "train": "353c93a6cc1d6d6a91fb2f9d6f5b395bf1bba661c91aad0d9f16abf6af69df58",
+        "validation": "09f2e649f32181d7b3df04e11ea7a16290e35e3e4f7348d58e97872cec1025f5"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "99ad8ef1bc2166133fd7727e74c0ede10bc1c7d9ed9c37bb777015cf0686c557",
+          "train": "2d3fd74f1e9ebbadae3c90660d0e83daaa3d0ac179a50e8c3156267f254efabc",
+          "validation": "81a30664e4acddfd4a954622484c5d88fff1f246ce270366f0f36b41e01aaa97"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 42,
+          "train": 167,
+          "validation": 41
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "602_fri_c3_250_10",
+      "sha256": "8a24109b1e1037d35f8deddb3ea6ee3ccf295fa8cf6a44b10338395378957140",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/602_fri_c3_250_10/602_fri_c3_250_10.tsv.gz"
+    },
+    {
+      "bytes": 564,
+      "dataset_id": "a863cd42be4d05d4",
+      "historical_projected_sha256": {
+        "test": "7bad6c2198cb3dc917269e500cc9d0b6cab9469574780009e0b6fb7be6ca2c29",
+        "train": "defc068c66613396d6a12b94070f5d1345e9d1062a77a98d2a5dd4423b2c240a",
+        "validation": "da7de3a943b039a039a48a7cca5d5f37f170f0f7af0cbc552c8fdf131fed3c8d"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "53ae871148d5fb23104eab23ff611cfbc725ba983b274138d07554f02e183c22",
+          "train": "39838e1ea20c61e2b883d418b2ba6c2df5d9e26b32f43da55ffe35187df181b6",
+          "validation": "a4f0a09e2f051f083e37ce0441197a476b671ed9386de4c48ce043f1dc69b2f9"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 20,
+          "train": 80,
+          "validation": 20
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "663_rabe_266",
+      "sha256": "361eae2fa7d1210720623958adc10debe35eadf7c23deace7fa71cd89df604bc",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/663_rabe_266/663_rabe_266.tsv.gz"
+    },
+    {
+      "bytes": 233351,
+      "dataset_id": "a97065df07a47eb0",
+      "historical_projected_sha256": {
+        "test": "141a38d9fdb228b00341660923f6119cf0ffca8cd0217e44501d5b258efde887",
+        "train": "661dfee812da83d6e6e5144349e96fc81e005f885f661ae1d0029569c89fee85",
+        "validation": "79cc0d90a0d9376eba5a25d07a1eb93a8702dd6be0632c686683d59b06d5a310"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4f2ff74e55032f4482cb082ac5e9ca3378a09b4b816522b167f02252f06a10a6",
+          "train": "06383e0869b309ccaeb72ee1779e13e85735b7728632f26144a328597e33eb10",
+          "validation": "6d10686bdfd08ee4668a645107d432b6bd5b965025a0f93ffcadb195713e4f6b"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "592_fri_c4_1000_25",
+      "sha256": "961a3859b8da7e721a1857f8f5467a9b6ebc3d735bbebff206ed1df36e628e1d",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/592_fri_c4_1000_25/592_fri_c4_1000_25.tsv.gz"
+    },
+    {
+      "bytes": 2548160,
+      "dataset_id": "ab279eded3b3c52b",
+      "historical_projected_sha256": {
+        "test": "fd96a556c5a2c36ac64ed36c0850f0a05af412140e95695d68ce9893f25e5b2f",
+        "train": "0df7901499b8543f56a25acbca44fb26d107ceeb00c988d5ac505a3707a60333",
+        "validation": "4a405ad7ebc04f00716bf7d872818617388830be8f6232748d7cfd4b61d817cc"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "c608d718c5b5108283243e1f307f44bedb74f434ccf007fe26475a98152c4cad",
+          "train": "f9a3770ad043883d4575b3edeb4fed20d0ac669b04da03f648ec5bbbb5e01d5b",
+          "validation": "755608e7be7cac107edda38a3c5f338cb10b11dfc66d781c7ec9252821e57744"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "574_house_16H",
+      "sha256": "a551e2941365201552a3a819f035c64f297467464f7c7c349d00711316ce3c57",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/574_house_16H/574_house_16H.tsv.gz"
+    },
+    {
+      "bytes": 13373,
+      "dataset_id": "aebf5d861a8365b4",
+      "historical_projected_sha256": {
+        "test": "ecb71c30512a690e34b624a949a3bd1dbbb87150acc2f07c00248025f004063e",
+        "train": "515661c3ea70a6df85a24a72cacf89b950e48a716b919182a6632f54b2bac88f",
+        "validation": "67acd34a5b4bfed52077e4b07dc9bb49492fcdb9402189b2292f0cc85f22132d"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "926e56006fcbfbc5371972c765f5d919a9aa6a2eb072692ffc8d1b8245d85ce8",
+          "train": "3afb68ac66d55b1c7cab7eca5b56f9a99d8b41ae2a6a880235de56a80e29b26b",
+          "validation": "eb122fa8ef80b50feec1bae3b825a29f8e24a3c955f924b2732ee494318daa15"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 84,
+          "train": 333,
+          "validation": 83
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "522_pm10",
+      "sha256": "ecbabaa5a989a8c11f5a57e874c135f386da5379d6689ae6d5d4264a652fa5e0",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/522_pm10/522_pm10.tsv.gz"
+    },
+    {
+      "bytes": 232869,
+      "dataset_id": "b6adf79118a58cea",
+      "historical_projected_sha256": {
+        "test": "87abc33e9075160d218e00578002400aebad78455cb08fc2baebca0f9574c858",
+        "train": "3ab24c418ec940aa8370a5c9719a62e5ed7c12507211c7e3ad42376e2eb2767b",
+        "validation": "6f4b69b1e5bfb73083ad19f5dd4ae43bc58f46e6df3c33bdee67994cef32d61f"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "de22120ebd23b07b10bb98ec38fd2efd80ff72880569b67e0fc44acde3588976",
+          "train": "ea489aee1d40cf3755fc2128481309fa2363b944b696ee71009874515ba855ba",
+          "validation": "dfc5bd66ca05d73620efd908a387d8cec4e2c11dbbad085c0d0d90efde5c26c0"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "562_cpu_small",
+      "sha256": "891b0de60356cecdfec651260529875adf7a1f0aa3ba5e3127b47464e3150cb6",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/562_cpu_small/562_cpu_small.tsv.gz"
+    },
+    {
+      "bytes": 454454,
+      "dataset_id": "b78d323566930bd7",
+      "historical_projected_sha256": {
+        "test": "3af580328112c829f8ea8cb02f2ce75fff7b1dc529d7144f9c59fa18c6b3230a",
+        "train": "0cc23a9862c0c45fb71068da38b6060e34e66eb76143095219b5ec65f128c905",
+        "validation": "92dd9a26861fca27e452cfb8cb0dc858deb06340352ab93e4598709cba543554"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "42f93e61057194db9cd19327f7658a34fa0eef96dc751baad9c0e0f158c1a9ef",
+          "train": "5be0d38b0a661e916897321809d5450770ae9fd83469116193d586085050936b",
+          "validation": "874d307a559247d6cece1bb84c980b29dd4ffb02d6692c40a3323b4d51a3ad1f"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "583_fri_c1_1000_50",
+      "sha256": "b0ba1f16f688d6af7323b4747c6fbfa88aa07cb3e4497d97cee120b9fed85415",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/583_fri_c1_1000_50/583_fri_c1_1000_50.tsv.gz"
+    },
+    {
+      "bytes": 10633,
+      "dataset_id": "b7f9774e2142a758",
+      "historical_projected_sha256": {
+        "test": "f59f50f56fc7a1af27e55bfef063e38a93e1f066fd54f9da56bb030158692797",
+        "train": "926b60a9c2af9c0c8de6d99d97865a573c707f2af0f4c0fe6641b98fcf51b7d6",
+        "validation": "fc5e5195c2c849d68115af798276f2a1580244965654afe6fafe68821de0f54d"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "0b9f470a4eec5deb711805665e3998a89056a325c298d9689372ab8b61bca27f",
+          "train": "d80e6289bf28cf130eafdadd8c96dd574db8ff9523c9b7f15c580f1f027c0a1c",
+          "validation": "61221e96fa2af141f01ef3d37a11310d94dc173e87f9ad25b6d5ece82ae81150"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_shearflow2",
+      "sha256": "1d1044351977e97152308049736d1414e38d8167b7499121cb44fcd562f41fc1",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_shearflow2/strogatz_shearflow2.tsv.gz"
+    },
+    {
+      "bytes": 455179,
+      "dataset_id": "bc85856c012bcc1b",
+      "historical_projected_sha256": {
+        "test": "2b43ce2cbfae2a7c868196c1f7ac05d9bc89d7fc18438873976b905e5421184d",
+        "train": "f37e7e6ff1add57e01bddbaa129ba7d494066d0c1726f049c8d54af828794a07",
+        "validation": "8399c355a89885f0ccff59fd9ae84cf37783cc54990aa7d2bd61c67aa0c37b2d"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4d579af7aea2fdcf67cecdb53b6a22c4ef62dc6fbae412aec3abb4728dfaebfe",
+          "train": "af94e15681b539fdecb904bac75eebaa64b77b76e2572830b1029fa4b6de6848",
+          "validation": "8b9ec5a868b7e534a1b5a3c2a30e4d0192be7feb086b7c8080eda15a3babf853"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "607_fri_c4_1000_50",
+      "sha256": "e751139de038aed25f02269b8ab8ce6798ece433601d6ddd4804a0c11329c0b4",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/607_fri_c4_1000_50/607_fri_c4_1000_50.tsv.gz"
+    },
+    {
+      "bytes": 117405,
+      "dataset_id": "c107ee39eb333a9d",
+      "historical_projected_sha256": {
+        "test": "0852cfe3534bc131e4c68255f1ccac3e06f0013539f2d62b815487a36a60fb86",
+        "train": "52f48a07ba5a61f5b6a800ccee14103a5e5c76c9ad58fa3ffb3140d7b343dc39",
+        "validation": "ed1b8f6b3a233a1448340ce43385f335a9af68da7871953c73289d3258a75abf"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "e5f44bfe6c23681629832590e136a019ba208b3b2d898a86c43fa4efe2c8f5f0",
+          "train": "d16b1d1d8ef6f89da52b31dcbaf34fe2989d30a05cdb9bd8c66ca3f80326d199",
+          "validation": "c9cd4dd6e7e7bede44618ac711e83abbfc48b5ce513338a998f093c72141bcd0"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 84,
+          "train": 333,
+          "validation": 83
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "584_fri_c4_500_25",
+      "sha256": "7a709393b5d54b8b08330c0f11921b9c5fd7b91ca835ac359aa239377cfdd1f5",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/584_fri_c4_500_25/584_fri_c4_500_25.tsv.gz"
+    },
+    {
+      "bytes": 14473,
+      "dataset_id": "c30ff9405c916718",
+      "historical_projected_sha256": {
+        "test": "2d4dd429e460c6e564cc32ac716cb27510de3dd7410daae2b4b1ccf8478c6938",
+        "train": "ca18afdfdddce37e477df3e320ef5dbb853ab670b6313de314a099cefc96485e",
+        "validation": "87f454624c6f6da11d95e31228fcae3e53497cc3b65ff694080b598f0960e03f"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "8db50d555400eed12dff6ace93db9cf1508f76e29cda4b1be35cbfa84f180d85",
+          "train": "842f0e3bda8dca571cbd2c7cca6d342e5c42d3327a4523474124b1fa6f5fc1be",
+          "validation": "87bc899c44c2cce6230de12537d645a2e01356bf304e47b6bae83787670f36f9"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 42,
+          "train": 167,
+          "validation": 41
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "579_fri_c0_250_5",
+      "sha256": "d32597bb1043df296ac3be1fff926646b26f268f89185310ea898e59b5fff896",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/579_fri_c0_250_5/579_fri_c0_250_5.tsv.gz"
+    },
+    {
+      "bytes": 454705,
+      "dataset_id": "c4f8e81b70d33a13",
+      "historical_projected_sha256": {
+        "test": "2ad6a75cebbcf7da279994ec300dc4235345b153118f50f252df8116df6c7e9d",
+        "train": "20b41325cd597a99863035a882e9698697caf1f94117457d82889ef0fd76fc2b",
+        "validation": "75d655ac32e6efaebab4771b9c418316dce3e58eb95446a4735f89584b09fd6c"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "9bd0b3038ee725e9800399250e4e43c773b5cdfe2447ac888f0b35f63887301c",
+          "train": "79af8ef3c12afab080340b5256ffacd2b43f62465d7b38880aa3564eb74352dc",
+          "validation": "ec921de5cdac9b8968bbb3dbff0a687916114018ee3e396cbdae52aadc314e43"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "590_fri_c0_1000_50",
+      "sha256": "eba9b09813cd0bc18c3b43f4e7bf9a8350dd0429228d1715cf98f72575914216",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/590_fri_c0_1000_50/590_fri_c0_1000_50.tsv.gz"
+    },
+    {
+      "bytes": 134956,
+      "dataset_id": "c649a4cee87c4321",
+      "historical_projected_sha256": {
+        "test": "6467179ba5b30610e40906f243dd31750557a9c23823b7b7ad6a829b4442146d",
+        "train": "e083700f51388581662facd5dab886d6288aabd2df2bc1a977785b8c4d72d9a8",
+        "validation": "f28d9ec4a6eb1cc8a45a068bb39c92fac56c2810d5c20345be1b7578cf213436"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4aa3ca6f7653112bc050c23e6b51c2759b7a9f5ba56f542cc4e7fa2cdd22d635",
+          "train": "327d75f8f8995a38750cf1064107573d2a85cf1e447bac9c990298f1c16c1f7f",
+          "validation": "7d7b120240cf348e4a41e4703d02281d6d9ad854630747226367072caedd1c38"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "529_pollen",
+      "sha256": "2e9414f0216e75296ba4211c567dd8a60d269273b38f8e00bd8fea3a37d2e654",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/529_pollen/529_pollen.tsv.gz"
+    },
+    {
+      "bytes": 1604,
+      "dataset_id": "cb5bf66ef2ee09ed",
+      "historical_projected_sha256": {
+        "test": "4e7bc4a805085a4a79bb3c2d1dcd3ed9be84c443ea785454fe1623ce123b143e",
+        "train": "edf17422fba17b39655be7cf9117eba65ab1fa858f301f0e588aca71fbd23963",
+        "validation": "77b2581fc7c8c424440997e5c5b82de35820c19dc6cfde147ba30401aa56b9e3"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "c19e411648c8572ebbfe1840ebf2406efc0843add599f97966646f5154bc926e",
+          "train": "c0c94089d72e564565f8c3841ca8d8fbd702eb9da15b3a191c8ff80fd8853ce8",
+          "validation": "e2f983494fd52366d599911dcd5094157af735258138276f77e365660dd86862"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 61,
+          "train": 241,
+          "validation": 60
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "nikuradse_1",
+      "sha256": "be6942e13096c21f10496a24056b01ff791e24d6172f5b7a09013c3307d38f28",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/nikuradse_1/nikuradse_1.tsv.gz"
+    },
+    {
+      "bytes": 1628,
+      "dataset_id": "cba8393879afd1dc",
+      "historical_projected_sha256": {
+        "test": "d9563b4110181f02841d0ce6c1fabbc1046e8c323506353b409ca42deff3f8f3",
+        "train": "e0bfd08d334b2bcba7242eb3aa14510b9f802aa841fc8aebf9e0ce089ccd2acf",
+        "validation": "705b54f278e37ce210a99a78a8bb86c55deaeb91ac2d143d477ed5b2126e05ac"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "23759de0674adf1fb008e4a866000025d030a7a57310de6f0599fe2b3b44577f",
+          "train": "692cfa407aac1a97a721b4524cbf5ce14a75de110e61d0abde12afba8c4cd3c3",
+          "validation": "a02f992b1aa63cf45114bdf740a8e815095f59456a7d8379815dc2593dcf4615"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 35,
+          "train": 140,
+          "validation": 34
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "230_machine_cpu",
+      "sha256": "937b0a23076f948343b8b7ac005bc70ea7080c391218fb4896462699b8cb59c4",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/230_machine_cpu/230_machine_cpu.tsv.gz"
+    },
+    {
+      "bytes": 10604,
+      "dataset_id": "ce1a79e2d658eb8a",
+      "historical_projected_sha256": {
+        "test": "facdeb6e9e2dfb80195f8e44918e3d91cbec93627276d8aed224b41e3bb2d1db",
+        "train": "6e084d1608d9493289e05ab729dc9d3242e630eccfc042f1ae942f7db2642e4b",
+        "validation": "21d3eb8631a773f02e4b0c7bb2845571f44c570562ee2b161998b3969890b027"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4bb40f46ed3a839bae38b98b7ace28d44da30e8702e24c87a37210248ad8f750",
+          "train": "43294fd72cf3add36b72f0e842d3d13e1531a9a327e863ea775ed96e546f9b05",
+          "validation": "d0ea6ad0d1af471ca7f9951a47520c2219e4bab361470f460b807b7759697007"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_glider2",
+      "sha256": "9a3bd7573b3d0379ccf288c6284298a71f9a351d70b996ede69b5a97e883d94d",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_glider2/strogatz_glider2.tsv.gz"
+    },
+    {
+      "bytes": 10839,
+      "dataset_id": "ce837ccd24a3a18c",
+      "historical_projected_sha256": {
+        "test": "983e73c6df089f1c3c9143f0efd8d811bb1f2c59dd274cc040070e0460ac0ff6",
+        "train": "1b4f7fa8e800ce3f32937874bec0be43b9037f5d56199b06538cd891e2eb4901",
+        "validation": "90985471f62bd488d3c28dbe597d306c8d69227261542fde2f353008a112fbf1"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "d16d8493dfcd84edc41ef2298372cdd54e4b967dba35577f2845ba2a86d1cd04",
+          "train": "ccc85025148254e7f63c9d55e538b40f4a5707dd3c31a6d025bf37b24aba8d3c",
+          "validation": "7ada76470c14b66e080c5f6773066ccec664ce3093995a239d574677d58a3d1c"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_bacres1",
+      "sha256": "f7d87339bd5bdb369062a4f658e4d9f6ee015ad7fa7b84c45a00412f10cb2199",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_bacres1/strogatz_bacres1.tsv.gz"
+    },
+    {
+      "bytes": 5276864,
+      "dataset_id": "cee6f811d0bf199d",
+      "historical_projected_sha256": {
+        "test": "08f7c9dca75993f5dacb9559dcc794dc17658eb6d0784d2b4a274e44e6634d64",
+        "train": "1388645d15bc3ea8404c6756001cafed3b8d4a245c7d992986e4f630869e0599",
+        "validation": "a2d4a63b966a1e99ecdb2f2ac504f1adc3a4d9dd86499bb622f99880527fb964"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "4686bfeadb0932678ced3199d0715623857feaaa521202404312b80206c006a4",
+          "train": "f142c8bc307b0841cd24a7eba0f94443c20278eb51611dde033656fca6ee9087",
+          "validation": "20d4e9eb06e53dad4dd6b73e6bb8f7af1267d48479bcf7a7b046bcf246dcdaf7"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_II_11_3",
+      "sha256": "0baa7b708956fd05b84d47b18a86f926335db5f42d2cd7e29ca83558c139aff3",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_II_11_3/feynman_II_11_3.tsv.gz"
+    },
+    {
+      "bytes": 2627452,
+      "dataset_id": "d255d3a2e1c8dbf4",
+      "historical_projected_sha256": {
+        "test": "5956b75210b89749a770eb81fbd6612ca13995a9ba8499213eed12fc4ddcef37",
+        "train": "7302fa902a990a6cb47505467faa414e44e78652d0f9fe784180b180f89d4bc7",
+        "validation": "dea69b17148e16348d895d7f749d8d2d3562d74dddd88000cd6626694601395d"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "f675452700fdfeb576f51b51d72d720b59acbdbd819680ba870e36fa013b6980",
+          "train": "b9239f7efcd0da218f5a44c3d4ed5d8d2781b527f355cfb440a29c8fe34cb9e7",
+          "validation": "67d1ae975c63a08064c489590cdfb4558a27e5cda8a7c84dc5b7be06c8e9825e"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_III_12_43",
+      "sha256": "6b32cddc122a712c549353d32a4b5269440d9fe71d336ff393feaeba3bcea210",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_III_12_43/feynman_III_12_43.tsv.gz"
+    },
+    {
+      "bytes": 3492271,
+      "dataset_id": "d52bfd2b6ab1c850",
+      "historical_projected_sha256": {
+        "test": "5ea20f1be540fa7e2f422ff01dd824734ebd3589d6655426807f70241024f386",
+        "train": "5042e6ff09cfa7a0867719df543b8405e7da4a38b2a2798d900f90165432439f",
+        "validation": "3f936e46543c81223ba6b1bfaa53d8dccb5c131d330ba84755649656b299dc64"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "dd1e2b08e1f1e335e451290c5929ca1d173849baec99a19329f0f39aad3d08b4",
+          "train": "2630fb67ed02bab44828ec2362e08328b1a3b125be1a61c82414e5a9b16f11c1",
+          "validation": "6b25f6615b26631e03ad77971db992c5c513523a00bd6395b69b6e5a8e9252e9"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_I_10_7",
+      "sha256": "56afdc436cd0b0a1ed510c2bd780fbeda80daa7006676d1d982f924a350cbe73",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_I_10_7/feynman_I_10_7.tsv.gz"
+    },
+    {
+      "bytes": 10551,
+      "dataset_id": "d9a3408a840c9f48",
+      "historical_projected_sha256": {
+        "test": "3cc7acb356dab8386d40380c5d90aa3d7231e54fc68b5c45829fc4a1fd3549d2",
+        "train": "7efd40fa70804f03b9dd0b7274025b57e6876348037cc01ed909417ac9ff20b3",
+        "validation": "9381617d6fabb46557dab8f97f46c0bdd1b9004c0f04f5ffda5b955e55ff2e9d"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "b02c8fc60558e42783b25d1e77a70e00f3ed733304946f003e1be5ccce0d02e5",
+          "train": "aa0a1e20e446e5f8c247186a03aca534a085f19192caacd7e0ce75a8b04b4142",
+          "validation": "414b225ed171dc2aa60734a598947d4580ef683053779b61f4d4a3ef6c368980"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 42,
+          "train": 168,
+          "validation": 42
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "560_bodyfat",
+      "sha256": "479f25b491115302fb2adaaa80f2670ab812154007d68ec5c566a45f6210d04d",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/560_bodyfat/560_bodyfat.tsv.gz"
+    },
+    {
+      "bytes": 3442514,
+      "dataset_id": "da290fae0d6c072f",
+      "historical_projected_sha256": {
+        "test": "e1b37166f647c3a2c89277a681159d3f641d76f244d8c42c62f88f51078a0417",
+        "train": "02137d0b427bb7a9d7acc951c19973f7f95015b9a109c7ca87de3b7a372df2a4",
+        "validation": "9617860d77d82cc00b58f3a8507c95d4868046743c516aaeb916e8d52a1667b3"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "bf370904035b85d17aece72a68cb14eca01d7ca1e89b7b5f36a1777187f5306f",
+          "train": "9b59d0d43d9688f31326f644be30acc89c1c989d48e1f1f8dfacc9107ceb3264",
+          "validation": "0082316d78720e40f0ff887893ecef247639888245828e14951047cf4b91a260"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "feynman_test_10",
+      "sha256": "64e543780687ce6bac7cdbb17b6d079bc6b98f52b2ea9f1d09ad107bbff5d824",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/feynman_test_10/feynman_test_10.tsv.gz"
+    },
+    {
+      "bytes": 1028443,
+      "dataset_id": "da78606950f100cd",
+      "historical_projected_sha256": {
+        "test": "c3fb6351c0874bcc7f6eff42b9cdc05598047ab4d4b3ea547263c9b9740f2956",
+        "train": "193be6666c8e5eccfd7ebc5f1f5d86faf40b149c984b94708b7671d33a19a714",
+        "validation": "5173fa3261697c0bc73253e77dcbbf181733cd5abff1bb69102f3c5037a724b4"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "db9205a236386afe6460e153e77ffe06e345fa8330615fe6217901bf97cecd0a",
+          "train": "7d691f0ec5eed5f9df71a093d05d4143deb2adbd480ff0b554252ad8e87bdfa3",
+          "validation": "8dc1c85a71b656b1c59152aefe5027967106ee288164b60139b7932c4dc4494c"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "1199_BNG_echoMonths",
+      "sha256": "30c2a018122b17c9022336f6b575194d740bc438821c2d813e9d3804d517b480",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/1199_BNG_echoMonths/1199_BNG_echoMonths.tsv.gz"
+    },
+    {
+      "bytes": 10829,
+      "dataset_id": "dd16ac872ffb8673",
+      "historical_projected_sha256": {
+        "test": "88924950674aef58553c0809f5f641a040e64bd883bc65adc2829fd4e93616ed",
+        "train": "25e6c931fac7ee9823691d697d50c01ef236685b7997763e35f591e3ab013098",
+        "validation": "cbfc3e409c55fcb5a040a4208a27c0cf05d84a65a647ef3daec3a4bf2b1913c4"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "543a94f42cd442511ecd248a16450792ca21ec0d2a85461bdf1f27ddb6efb100",
+          "train": "867953539d8b69efda707fc568c4fbc273934dfce4fab9a8d3e114f707eb972b",
+          "validation": "c4a1d17793c5296b932125e73c00f4cf152476df3ef25afad40af79dffd973b1"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_glider1",
+      "sha256": "7c4569a2a96861c3cd072b0914286c14a22057f81d1c2ff158a29e5dbc06e749",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_glider1/strogatz_glider1.tsv.gz"
+    },
+    {
+      "bytes": 1484936,
+      "dataset_id": "de2868ac837699fd",
+      "historical_projected_sha256": {
+        "test": "534b5fe3f49a8aee1dea7b0366741eda2a9e8135f8daa6375a6db51748bf41e8",
+        "train": "6d268afe0abde2647423c8db7069de0a9b3dda130818631529a704cc7a6cec67",
+        "validation": "e5435a98004480ccc3a349125cfc80391646e6142a83cdf82e19f3917eb8a19e"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "6a60d0e35e7ca036e51bd1a500d3fc8274a3edf7a9e317bcc6216208edb66df5",
+          "train": "90fd240bdad4e8c46ab2e2ab87cddc1a9087a2a96a60a869b2061ff825785327",
+          "validation": "b96e375dc438693069c1977571c602c4bcb96b4461d03881ae5a408e8e544624"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "564_fried",
+      "sha256": "f64bb4a6d214a59a50b70b0f3270e334725b6cc010443a484cc751b595a46fe9",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/564_fried/564_fried.tsv.gz"
+    },
+    {
+      "bytes": 657333,
+      "dataset_id": "e08f0b9931f93686",
+      "historical_projected_sha256": {
+        "test": "f44ad8fb2b4ea92007db09129ef3f95c89265d5c15852cb1d9877906eb562e47",
+        "train": "93d8f921a63d9cdb6ef516c4162a36ef1f4a7096567c5dd97945e89e27a5f0d0",
+        "validation": "40809f51fedd9f3b537537a2bea7d886a9f5b9656702b31f332af629c55944ea"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "0843535576df1b7679fcfaf8068aae2a5d5e60f1debd5700dec127eb97f9b409",
+          "train": "9035feb3a2094ffd65e8bf8355ea016421a49cecae6917467020c7791a06ce79",
+          "validation": "5b5e2884201935735acfb83ef53fa5d9f064fd2e13757f8376632b001f469781"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "225_puma8NH",
+      "sha256": "0be6203e167cc5e7b038368dbfe0a7790d5dc423c9d7e42887907c5c03f81c27",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/225_puma8NH/225_puma8NH.tsv.gz"
+    },
+    {
+      "bytes": 10724,
+      "dataset_id": "e18350fb51a9d1b0",
+      "historical_projected_sha256": {
+        "test": "059390935a440a61c2cff63d6791ae4355e0e759b7311b319f5e1c35deffe90a",
+        "train": "f8e2f6a1efaa1c82adfb55addb7494b17d92647d5024fed9487b58642725661e",
+        "validation": "1d2ba867a49dfe59ed107d4e9ae8fd81af130bbba36c40218bdbeaef566b05db"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "db2d5b3c4a08ac2146c03f8eeeb4a202c7f810ece98d5e1c7ba98635da287d49",
+          "train": "da5f30cb31e52d34f534e9cbe447fd65ae8e0966637a1a220741d4c0080c166a",
+          "validation": "fed2d4916033aa7c14082df275ad80fd58d205c7b892c6a52bb792b0b92bf426"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_barmag2",
+      "sha256": "8035290734d43191c1667a085688cb2578c3a2e76e3fa21406b850dda80bc497",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_barmag2/strogatz_barmag2.tsv.gz"
+    },
+    {
+      "bytes": 1743,
+      "dataset_id": "e5a3a7b3668a1cc2",
+      "historical_projected_sha256": {
+        "test": "4463b1433ae4afc71cf363474fe951eb759515e1424cf6c235cc55bad3322d6b",
+        "train": "5e1ac4ae14cb5899305aa439ff145e8140c06437382c25e724d8396b93d82a30",
+        "validation": "4bc6525e8560d99f7572a5faead6a19bdba67d9ac9eb7e91b9a4bcce522a5efe"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "f7e1c0e80fa34be262cfd3442e80d2fdc48f886efaa2de4545b3e7db0330097c",
+          "train": "b937f3914397369779cf473e6498dd925af99a4a721ed8bc356e5c8f4c107092",
+          "validation": "98e9ac60a20dcd08b66fa1dd55a3b29f7a0359c86e3174ed573c306128ed5bb6"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 80,
+          "train": 316,
+          "validation": 79
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "556_analcatdata_apnea2",
+      "sha256": "95cee5abe3479338a52c419567b944199c6c6cef629d1111de7b1d2afe0b2b08",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/556_analcatdata_apnea2/556_analcatdata_apnea2.tsv.gz"
+    },
+    {
+      "bytes": 381809,
+      "dataset_id": "e68fdd96cc63271b",
+      "historical_projected_sha256": {
+        "test": "86024f4e6739ae8c688ee58fa2b3d967debddd1eefbe21919c80d54d1e0d070d",
+        "train": "e93f749b85b50bc73654f5982dd698a2ee0d77756309b1192ee0a6c45ffde5f1",
+        "validation": "09deef3274425f980e8f0a2ea6e05f7cc65e91dd65ffcee3b7e787f9da82f2e1"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "29c5ab8d0c550634f244d2499e84b650796c1f2a15eaa058ea815f9a7b2e3897",
+          "train": "c0785ef83f08342edbaf879925962ebbef6f088dd114a0d5b7dbd9fe4809b9c8",
+          "validation": "8c965a662f0aba19f393b09e30e44fddea4da6bf28d96b1692514164956522c9"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "573_cpu_act",
+      "sha256": "39b3699aedee17aee7a01a460e325b5812df6d769b2a5b9f6bed35f04307b022",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/573_cpu_act/573_cpu_act.tsv.gz"
+    },
+    {
+      "bytes": 11001,
+      "dataset_id": "ed2efb82fce4b098",
+      "historical_projected_sha256": {
+        "test": "acd755e30a999aae3fd48c049d0fe0ddacf9a127e217aa18a6f7c4725ae2c180",
+        "train": "865fcc0384766823cd6fb2fbfa4928e9e9ec5f02613b2c79c7ad7250aa1c5d41",
+        "validation": "0b7519a1857049a965e3c6843f1e1d2c7091d1eb3448a9e5e029a34f50d8d874"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "7e28e13c4ea65aa55b23cc802160a6bd55309ba5993a9ff3141612a1651e0cb6",
+          "train": "e54a08e4c1383347c6077a54c5bb4e95786e3c887f7731845e7c3e5831fc1f15",
+          "validation": "121d13e00b0c36fe3f098738aa8b8e69c950e01abb8d52a5b8892ad573b2f0ca"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_vdp1",
+      "sha256": "fe71082adec0b48fe905dfc0d34b92e1d5560ad5ed9da80f9f6edd3ab924ff88",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_vdp1/strogatz_vdp1.tsv.gz"
+    },
+    {
+      "bytes": 55316,
+      "dataset_id": "edc9d41a298fdf60",
+      "historical_projected_sha256": {
+        "test": "b0d8f3047f24ede34e914f3eee1eb03160453905bd2be38f5cc208ba29641f99",
+        "train": "67146f7313b1370836a3ef027d40d853cbb4eb2a363ddcd19918f1acc564212c",
+        "validation": "030606c5ce6b234fe154fd65de1026883bde871ac5a44ad7826360a171e33a44"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "8bb9fcc4fd3a481cb5e27fbe371235dd9e16b72ddebd8f0818c969d286663a2d",
+          "train": "23043fb86c7e6dad09f02aa1d18078761639a11962629bbdaffcfa52981280f8",
+          "validation": "7fb6f958e907f1617a3dde7b8588005ea84314d2d4e7a2d9b55993dc27d79dce"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 167,
+          "train": 667,
+          "validation": 166
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "612_fri_c1_1000_5",
+      "sha256": "6b0ff453a469843fb4bcdc51dd602d0395b8fe3714326fd0e6eefa21f0683c9e",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/612_fri_c1_1000_5/612_fri_c1_1000_5.tsv.gz"
+    },
+    {
+      "bytes": 3588,
+      "dataset_id": "efd53e9c0f36d608",
+      "historical_projected_sha256": {
+        "test": "f249219d478861ec640c04dc0b4d49ee5e971bfca4a80160e2366ac061fae66e",
+        "train": "0f6516cd336cd1b430b3535b9dc5d2b7070e79d565ab502966f3c831ec94a546",
+        "validation": "4bced512c8e2d327fa60bf737c76d4ae6ff86bb1a3aa18f7b9291c06da1eb38b"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "abee7f78ad71de7c529c1cbe3f8efedeb10140796b48f7a4eb214da878958847",
+          "train": "f3cc0409b42d72a6847ac44f70f00f1ee02b494ed000d2eba89f99c245ddf021",
+          "validation": "6373178b3df616d28818398c29b6800de9b51af588458d7ab1048e07c6128f6b"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 27,
+          "train": 106,
+          "validation": 26
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "_deprecated_207_autoPrice",
+      "sha256": "05f06cd1bb8784c6f29982b9717b61c3d8a398b50bc1583d5069024ac300f4a0",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/_deprecated_207_autoPrice/_deprecated_207_autoPrice.tsv.gz"
+    },
+    {
+      "bytes": 50705,
+      "dataset_id": "f0a3d6881458f990",
+      "historical_projected_sha256": {
+        "test": "5a8ea07fd7bd118d9ede8d7118eb1cb4a19ebdbc507fc5c44f34b4f59d1f32de",
+        "train": "92936792c8e896015ccadbf25a17f59932e1788c233ff3e7667bf131462ec13a",
+        "validation": "c5ee55b132a329e0dfb7668f08d9d986a4b23e1f6cb930cd160e0c2463e7f695"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "c38b28739267f80b9d29298dccd739be05b4f8fb0ba50f83669b08ae4063572e",
+          "train": "74435d45fa8c32bdbc39dcf1ed13a37784b0724455c76713e8b89eced72753de",
+          "validation": "9a015a0174f74cfe44ec0a46c2bee3841a380e6d8a0d61dadf65df2f78a8c535"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 84,
+          "train": 333,
+          "validation": 83
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "604_fri_c4_500_10",
+      "sha256": "961c38abd7be4216ebf941f85633ac6bde68442ce804ed84ab1cfa7336e884ef",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/604_fri_c4_500_10/604_fri_c4_500_10.tsv.gz"
+    },
+    {
+      "bytes": 198141,
+      "dataset_id": "f24e9383331c43e2",
+      "historical_projected_sha256": {
+        "test": "80dabf3b9dc4155cd2606d6706672e4dc81c029e6af61aae17082b5d5371f2ce",
+        "train": "e655b7358ba403545849823c927d970a8d4e272a1cea5c4755e4b5afbd2a567b",
+        "validation": "4ded6f8881ffe2257508b97aaab7f422dacf09404306587f506a825c69c6e59c"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "3d8fe5d4acaa8fb517df3fabe66b16c0632d606982a97aa73f81c84f538901bb",
+          "train": "3add1c89579603ea28932471d0a066fd6265e88f3c00858fb4d1e0e3ae5104a1",
+          "validation": "7b263276c44cb6cdc2a69f366291ba13ca760f361f2d00383de429224b8cdf15"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "503_wind",
+      "sha256": "2cc1e040bdc20737674a00039cd80e16758c511e697e524ed17e4335ec93e9a6",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/503_wind/503_wind.tsv.gz"
+    },
+    {
+      "bytes": 11129,
+      "dataset_id": "f652ea96eff62654",
+      "historical_projected_sha256": {
+        "test": "8c009934d615faf6561148816ae4fd5e71fdd03f0037c53445ca8389b97253f3",
+        "train": "4ba0dd84c39092b1f4cc38bcdd41488d769bcee87861e72691172066a47328c5",
+        "validation": "4ffda286e0e7e88f39ddf51236a0eca5af4b49ba67209c07b23328c16bdc8a35"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "069165f0b30f546c895e7a5f01572033a077156670d4d93dda2bb68fd6fd9421",
+          "train": "33ca14ec03adbe51cdc221f932378cffa741eed342c304c234ba524aeaf7a223",
+          "validation": "f3a8ee1039c232e52fdbae9100082fed29554d49d4be2541c251c48836a4b9be"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_predprey1",
+      "sha256": "8d7f414e24783d53a20842e667b271a05930ec101a0f5202f04216c516bdb811",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_predprey1/strogatz_predprey1.tsv.gz"
+    },
+    {
+      "bytes": 10904,
+      "dataset_id": "f8cf362e371e8960",
+      "historical_projected_sha256": {
+        "test": "023f16b8b64f41c9cbae466de0ebf3f02e49ed63ef9420c42eb63bdcd6ec464a",
+        "train": "54a7ac746848387d7833b175e084ac745fe1ee058fe533169603b7cb4bf1ab67",
+        "validation": "201bbf20653fd97dcfa99ab7ab8cbc3c4835c3fdbade31f9a1da3c02d1a968ed"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "11b3bc3683ee088ec50e7acbc94a0cb194a83d3f166339b3960867286a1ecfa8",
+          "train": "804de294b7ce3e21b47e5e6a8f983738402a58a1e314f776e459b8f98a2b689b",
+          "validation": "2987fb6fd082ef08dabe33be7c0b61f736f6ebc80f6bce7c70082179550d6db4"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 67,
+          "train": 267,
+          "validation": 66
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "strogatz_predprey2",
+      "sha256": "a8a1931c568c9637e3671aa4919cc6a1a3acfa26358fd3f81ca89e4b01f96a72",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/strogatz_predprey2/strogatz_predprey2.tsv.gz"
+    },
+    {
+      "bytes": 381809,
+      "dataset_id": "fc3812567b5fdd64",
+      "historical_projected_sha256": {
+        "test": "06e4263fe7964ca5be0511088b7f43d80e59ddf654cc8c671fe5142683cda2ef",
+        "train": "46949e018fde4ddd944b88499c9e5a94c037d47ca2d62be9de133d525a5d7aef",
+        "validation": "0bf32e633fcf50457fb8f2be86711d715b9d8596cad67cee4e417e79fc87860e"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "56c7c81c3a940f12214a2bb22c042de00d15b20d9fb8a70648d1299dae197ecb",
+          "train": "d17fc44995f6a59a819f7f81bff394363c544b6a4df5483f234eb719b75661d8",
+          "validation": "c341efa97203f62e20638420d8e0b3e407f3b2da83fab66edbbddd01e4dad57a"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "197_cpu_act",
+      "sha256": "d00fd6bac2eda0821a04ff10277663d211127745a19a474c0feee41a16914fdc",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/197_cpu_act/197_cpu_act.tsv.gz"
+    },
+    {
+      "bytes": 2093764,
+      "dataset_id": "fe6d7ac3fcd3129e",
+      "historical_projected_sha256": {
+        "test": "1c12513e757d7b4661c6c45535e1612b03c5a8586c3e7664f279e52630ba9879",
+        "train": "43a0b59b88a67f0b5af94b744e6313436bf032ecdc0b11b6326e3b2fd0e3afbb",
+        "validation": "40a63cd9e01ffd8405116c13294f8ffa5d88298d556a56065efb2d1543ab30d4"
+      },
+      "historical_split": {
+        "hashes": {
+          "test": "516d9343c14809b687c54576fd507436f678025e4d4a6132ce4dfe4218f19c74",
+          "train": "d0c48b63cbc49c96c4890f82157179c36dba2b13dc17223b1e91dfc64abbe710",
+          "validation": "c52696589a9ac416a73be9244ab612a891395bb27afb54db40ec43bb57a57f0f"
+        },
+        "kind": "official_test_grouped_training_80_20",
+        "rows": {
+          "test": 999,
+          "train": 800,
+          "validation": 200
+        },
+        "seed": 1729
+      },
+      "pmlb_id": "1201_BNG_breastTumor",
+      "sha256": "04fff7b10bd53d73088db935026a3322ce4c9ad13de66affcc4daf6e08b22d94",
+      "url": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets/1201_BNG_breastTumor/1201_BNG_breastTumor.tsv.gz"
+    }
+  ],
+  "exact_historical_partitions_reconstructible": false,
+  "format": "dope-public-pmlb-sources-v1",
+  "historical_data_lock_sha256": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
+  "revision": "7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68"
+}

@@ -36,16 +36,16 @@ def used_bytes(root: Path) -> int:
     return total
 
 
-def fetch_object(key: str, destination: Path, profile: str) -> None:
+def fetch_object(key: str, destination: Path, profile: str | None) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
         return
-    subprocess.run(["aws", "--profile", profile, "s3", "cp",
-                    f"s3://{BUCKET}/{key}", str(destination), "--only-show-errors"],
+    command = ["aws"] + (["--profile", profile] if profile else [])
+    subprocess.run(command + ["s3", "cp", f"s3://{BUCKET}/{key}", str(destination), "--only-show-errors"],
                    check=True, capture_output=True, text=True, timeout=300)
 
 
-def fetch(dataset_hash: str, root: Path, profile: str) -> dict:
+def fetch(dataset_hash: str, root: Path, profile: str | None) -> dict:
     if root.resolve().is_relative_to(Path(__file__).resolve().parents[2]) or root.resolve().is_relative_to(Path("/tmp")):
         raise ValueError("data must live outside worktrees and /tmp")
     catalog_path = root / "catalog/v1/catalog.jsonl"
@@ -91,7 +91,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset_hash")
     parser.add_argument("root", type=Path)
-    parser.add_argument("--profile", default="veox-jepson-prod")
+    parser.add_argument("--profile", help="optional AWS profile; otherwise use the standard AWS credential chain")
     args = parser.parse_args()
     print(json.dumps(fetch(args.dataset_hash, args.root, args.profile), sort_keys=True))
 

@@ -13,7 +13,7 @@ from research.benchmark.representation import (
     midrank_quantile,
     write_local_lookup,
 )
-from research.benchmark.mfs_v3_score import evaluate_v3
+from research.benchmark.mfs_v3_score import PREREQUISITES, evaluate_v3
 from research.benchmark.score import CONTRACT, validate_contract
 
 
@@ -38,6 +38,7 @@ def _directory_outside_repo(repo: Path) -> Path:
 
 def passing():
     return {
+        **{key: True for key in PREREQUISITES},
         "encoder": "kumo_tabular_l",
         "distance": 0.2,
         "d_null": 0.5,
@@ -74,7 +75,58 @@ class MfsV3Tests(unittest.TestCase):
         report = evaluate_v3(passing())
         self.assertTrue(report["eligible"])
         self.assertAlmostEqual(report["representation_closeness"], 0.5)
-        self.assertAlmostEqual(report["score"], 100 * (0.5 + 1e-6))
+        self.assertAlmostEqual(report["score"], 50.0)
+
+    def test_perfect_profile_is_exactly_100(self):
+        evidence = passing()
+        evidence["distance"] = 0.0
+        evidence["mfs_components"] = {key: 1.0 for key in evidence["mfs_components"]}
+        self.assertEqual(evaluate_v3(evidence)["score"], 100.0)
+
+    def test_invalid_bytes_fail_closed(self):
+        for value in (-5, 0, 1.5, 1000.0, True, None, 10241):
+            with self.subTest(value=value):
+                evidence = passing()
+                evidence["artifact_bytes"] = value
+                report = evaluate_v3(evidence)
+                self.assertIsNone(report["score"])
+                self.assertIn("tier_bytes", report["failed_gates"])
+        for value in (1, 10240):
+            evidence = passing()
+            evidence["artifact_bytes"] = value
+            self.assertTrue(evaluate_v3(evidence)["eligible"])
+
+    def test_missing_or_false_prerequisites_fail_closed(self):
+        for key in PREREQUISITES:
+            for value in (None, False, 1):
+                with self.subTest(key=key, value=value):
+                    evidence = passing()
+                    if value is None:
+                        del evidence[key]
+                    else:
+                        evidence[key] = value
+                    report = evaluate_v3(evidence)
+                    self.assertIsNone(report["score"])
+                    self.assertIn(key, report["failed_gates"])
+
+    def test_attack_metrics_require_valid_probability_domains(self):
+        for field, gate, limit in (("membership_auc", "membership_auc", 0.55),
+                                   ("attribute_inference_advantage", "attribute_inference", 0.05)):
+            for value in (-1.0, limit + 0.001, 1.1, True, None, float("nan"), float("inf")):
+                with self.subTest(field=field, value=value):
+                    report = evaluate_v3(dict(passing(), **{field: value}))
+                    self.assertIsNone(report["score"])
+                    self.assertIn(gate, report["failed_gates"])
+            for value in (0.0, limit):
+                self.assertTrue(evaluate_v3(dict(passing(), **{field: value}))["eligible"])
+
+    def test_missing_or_invalid_components_are_reported(self):
+        for value in (None, -0.1, 1.1, True, float("nan")):
+            evidence = passing()
+            evidence["mfs_components"]["compactness"] = value
+            report = evaluate_v3(evidence)
+            self.assertIsNone(report["score"])
+            self.assertIn("mfs_components_complete", report["failed_gates"])
 
     def test_catboost_retention_cannot_fill_tabular_transfer(self):
         evidence = passing()

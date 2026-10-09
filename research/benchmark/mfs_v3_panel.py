@@ -1,8 +1,8 @@
-"""Cohort, shared map, and null band for the MFS-v3 panel.
+"""Cohort, shared map, and median-of-three null for the MFS-v3 panel.
 
 The null tables and their linear losses are fixed before any foundation-model
 forward. Official test files are refused. A caller cannot pass a distance into
-the null band.
+the null selection.
 """
 
 from __future__ import annotations
@@ -256,8 +256,17 @@ def build_nulls(fit: np.ndarray, holdout: np.ndarray, rows: int, seeds: tuple[in
     The first table is the independent null. The matched null is the median
     linear loss. Losses are computed here, before any encoder runs.
     """
+    from research.benchmark.mfs_v3_score import _v3_contract
+
+    specification = _v3_contract()["representation"]
+    if (specification["matched_null"] != "median_linear_mse_of_three"
+            or specification["matched_null_selection"]["candidate_indices"] != [0, 1, 2]
+            or len(seeds) != 3 or len(set(seeds)) != 3):
+        raise ValueError("matched null requires three declared distinct candidates")
     tables = [independent_table(fit, rows, seed) for seed in seeds]
     losses = [linear_mse(table, holdout) for table in tables]
+    if not np.isfinite(losses).all():
+        raise ValueError("matched null losses must be finite")
     match_index = sorted(range(3), key=lambda index: (losses[index], index))[1]
     return tables, losses, 0, match_index
 
@@ -276,22 +285,35 @@ def _squared_nearest(reference: np.ndarray, query: np.ndarray) -> np.ndarray:
     return nearest
 
 
-def min_distinct_squared(fit: np.ndarray) -> float | None:
+def distinct_nearest_quantile_squared(fit: np.ndarray) -> float | None:
+    """Declared quantile of nearest-other distances among distinct real rows."""
+    from research.benchmark.mfs_v3_score import _v3_contract
+
+    gates = _v3_contract()["release_gates"]
+    quantile = gates["near_copy_quantile"]
+    if (gates["near_copy_floor"] != "real_distinct_row_quantile"
+            or gates["near_copy_quantile_interpolation"] != "linear"
+            or type(quantile) not in (int, float) or not 0 <= quantile <= 1):
+        raise ValueError("invalid declared near-copy quantile")
+    if fit.ndim != 2 or not np.isfinite(fit).all():
+        return None
     unique = np.unique(np.ascontiguousarray(fit), axis=0)
     if unique.shape[0] < 2:
         return None
-    floor = np.inf
+    nearest = []
     for index in range(unique.shape[0]):
         delta = unique[index] - unique
         distance = np.sum(delta * delta, axis=1)
         distance[index] = np.inf
-        floor = min(floor, float(distance.min()))
-    return floor
+        nearest.append(float(distance.min()))
+    return float(np.quantile(nearest, quantile, method="linear"))
 
 
 def near_copy_ok(fit: np.ndarray, synthetic: np.ndarray) -> bool:
-    """True when no synthetic row is closer than distinct real fit rows are."""
-    floor = min_distinct_squared(fit)
+    """Require every synthetic distance to meet the contract's real-row quantile."""
+    if synthetic.ndim != 2 or not len(synthetic) or not np.isfinite(synthetic).all():
+        return False
+    floor = distinct_nearest_quantile_squared(fit)
     if floor is None or not np.isfinite(floor):
         return False
     return bool(np.all(_squared_nearest(fit, synthetic) >= floor))

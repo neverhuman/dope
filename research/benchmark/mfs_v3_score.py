@@ -29,6 +29,12 @@ V3_WEIGHTS = {
     "coverage_realism": 0.05,
     "compactness": 0.05,
 }
+PREREQUISITES = (
+    "real_vs_real_control_complete",
+    "required_size_cells_complete",
+    "artifact_sampling_verified",
+    "metric_implementations_locked",
+)
 
 
 def _v3_contract() -> dict:
@@ -41,13 +47,16 @@ def evaluate_v3(evidence: dict) -> dict:
     Representation closeness is computed here. A closeness number already sitting
     on the evidence is ignored.
     """
-    contract = _v3_contract()["master_fitness"]
+    document = _v3_contract()
+    contract = document["master_fitness"]
     weights = contract["weights"]
     frozen = (
         contract["version"] == 3
         and contract["scalarization"] == "geometric_mean"
         and contract["privacy_soft_weight"] == 0.0
         and contract["epsilon"] == 1e-6
+        and contract["epsilon_rule"] == "max_component_epsilon"
+        and contract["prerequisites"] == list(PREREQUISITES)
         and weights == V3_WEIGHTS
     )
     shared_map = evidence.get("normalizer") == NORMALIZER
@@ -78,29 +87,31 @@ def evaluate_v3(evidence: dict) -> dict:
     if not tabular_ok:
         vector["utility_transfer"] = None
     checks = {
-        "exact_row_match": evidence.get("exact_row_matches") == 0,
+        "exact_row_match": type(evidence.get("exact_row_matches")) is int and evidence["exact_row_matches"] == 0,
         "near_copy": evidence.get("near_copy_ok") is True,
         "cleartext_absent": evidence.get("cleartext_absent") is True,
         "clean_encoder": evidence.get("encoder") == HEADLINE_ENCODER,
-        "membership_auc": _bounded(evidence.get("membership_auc"), 0.55, "max"),
-        "attribute_inference": _bounded(evidence.get("attribute_inference_advantage"), 0.05, "max"),
-        "tier_bytes": _number(evidence.get("artifact_bytes")) and evidence["artifact_bytes"] <= 10240,
+        "membership_auc": _bounded(evidence.get("membership_auc"), 0.55, "max") and evidence["membership_auc"] >= 0,
+        "attribute_inference": _bounded(evidence.get("attribute_inference_advantage"), 0.05, "max") and evidence["attribute_inference_advantage"] >= 0,
+        "tier_bytes": type(evidence.get("artifact_bytes")) is int and 0 < evidence["artifact_bytes"] <= 10240,
         "shared_normalizer": shared_map,
         "tabular_transfer": tabular_ok,
         "representation_closeness": closeness is not None,
         "frozen_contract": frozen,
     }
+    checks.update({key: evidence.get(key) is True for key in PREREQUISITES})
     component_keys = [key for key in V3_WEIGHTS if key != "representation_closeness"]
     components_ok = all(_number(vector.get(key)) and 0 <= vector[key] <= 1 for key in component_keys)
+    checks["mfs_components_complete"] = components_ok
     eligible = frozen and components_ok and all(checks.values()) and closeness is not None
     score = None
     if eligible:
         measured = dict(vector)
         measured["representation_closeness"] = closeness
         total = sum(V3_WEIGHTS.values())
-        score = 100 * math.exp(
-            sum(weight * math.log(1e-6 + measured[key]) for key, weight in V3_WEIGHTS.items()) / total
-        )
+        score = min(100.0, max(0.0, 100 * math.exp(
+            sum(weight * math.log(max(contract["epsilon"], measured[key])) for key, weight in V3_WEIGHTS.items()) / total
+        )))
     return {
         "format": "dope-mfs-v3-report",
         "version": 3,

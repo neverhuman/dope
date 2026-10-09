@@ -5,10 +5,10 @@
               text width=\dimexpr\columnwidth-4.2pt\relax},
   arr/.style={-latex, line width=0.4pt}
 ]
-\node[box] (fit) {Official training rows. Grouped \ArchSplitMajor{}/\ArchSplitMinor{} split. Official test is not an input.};
+\node[box] (fit) {Official training rows. Grouped \ArchSplitMajor{}/\ArchSplitMinor{} split. Official test stays outside the inputs.};
 \node[box, below=of fit] (gen) {Residual generator. At most 12 inputs, width \ArchWidth{}, $\tanh$. AdamW, \ArchSteps{} steps, learning rate \ArchLr{}.};
 \node[box, below=of gen] (read) {Refit readout $a$, $\beta$, and $v$ on the frozen $\tanh$ features.};
-\node[box, below=of read] (sel) {Selection on each method's native objective. Not the shared retention.};
+\node[box, below=of read] (sel) {CTGAN and TVAE select on the validation auditors. Chow--Liu and the independent marginals report no search. Retention is the shared column.};
 \node[box, below=of sel] (meas) {Common measurement on validation rows. Auditors: CatBoost, linear, and MLP.};
 \node[box, below=of meas] (score) {Retention and charged bytes.};
 \draw[arr] (fit) -- (gen);

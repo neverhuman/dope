@@ -1,0 +1,88 @@
+{
+  "format": "dope-paper-licenses",
+  "methods": {
+    "ARF": {
+      "copyright": "Copyright (c) 2023 Kristin Blesch, Marvin Wright",
+      "evidence": "https://github.com/bips-hb/arfpy/blob/8b63c1b3999981125b4af2828ff52cba8e29169d/LICENSE",
+      "licensed_work": null,
+      "licensor": null,
+      "lock_sha256": "8f97b1e0e6c2a7c7b539e63e8a5c81c85d040556940a07b348596cd9674283ec",
+      "name": "MIT License",
+      "sha256": "8f97b1e0e6c2a7c7b539e63e8a5c81c85d040556940a07b348596cd9674283ec"
+    },
+    "CTGAN": {
+      "copyright": null,
+      "evidence": "https://github.com/sdv-dev/CTGAN/blob/826da23f8f9385ad15fd206ecad691e04cb0ccdc/LICENSE",
+      "licensed_work": "CTGAN",
+      "licensor": "DataCebo, Inc.",
+      "lock_sha256": "612a53c77c651d509c602b3202dd76904c762a4984471d3543e85d8248d5f10d",
+      "name": "Business Source License 1.1",
+      "sha256": "612a53c77c651d509c602b3202dd76904c762a4984471d3543e85d8248d5f10d"
+    },
+    "ForestDiffusion/Forest-Flow": {
+      "copyright": "Copyright (c) 2023 Samsung Electronics Co., Ltd. All Rights Reserved.",
+      "evidence": "https://github.com/SamsungSAILMontreal/ForestDiffusion/blob/818ac3b9c8df7b7c763470c9a0691dacca8d8b37/Python-Package/base-ForestDiffusion/LICENSE.txt",
+      "licensed_work": null,
+      "licensor": null,
+      "lock_sha256": "7a5d06dce31208b2378f0cd887ec4a387e73b242ef0104867626c47668aa62da",
+      "name": "MIT License",
+      "sha256": "7a5d06dce31208b2378f0cd887ec4a387e73b242ef0104867626c47668aa62da"
+    },
+    "GaussianCopula": {
+      "copyright": null,
+      "evidence": "https://github.com/sdv-dev/Copulas/blob/ffb8ce4b704e5cb6c9f3c0a7880c7f0a5f64ad22/LICENSE",
+      "fetched": "https://raw.githubusercontent.com/sdv-dev/Copulas/ffb8ce4b704e5cb6c9f3c0a7880c7f0a5f64ad22/LICENSE",
+      "licensed_work": "Copulas",
+      "licensor": "DataCebo, Inc.",
+      "lock_sha256": null,
+      "name": "Business Source License 1.1",
+      "sha256": "70e454da4a48a3d432cbb2afd99a580c821c92cae3aa53442fd73d21cd5aca8d"
+    },
+    "TVAE": {
+      "copyright": null,
+      "evidence": "https://github.com/sdv-dev/CTGAN/blob/826da23f8f9385ad15fd206ecad691e04cb0ccdc/LICENSE",
+      "licensed_work": "CTGAN",
+      "licensor": "DataCebo, Inc.",
+      "lock_sha256": "612a53c77c651d509c602b3202dd76904c762a4984471d3543e85d8248d5f10d",
+      "name": "Business Source License 1.1",
+      "sha256": "612a53c77c651d509c602b3202dd76904c762a4984471d3543e85d8248d5f10d"
+    },
+    "TabDDPM": {
+      "copyright": "Copyright (c) 2022 Akim Kotelnikov",
+      "evidence": "https://github.com/yandex-research/tab-ddpm/blob/b476257dd460b778ba09eb97f7a51d6490fa17f8/LICENSE.md",
+      "licensed_work": null,
+      "licensor": null,
+      "lock_sha256": "be701b4d15238cf3c2d730ead1b72868a99e397fe872da0e89e07ce50e68ca99",
+      "name": "MIT License",
+      "sha256": "be701b4d15238cf3c2d730ead1b72868a99e397fe872da0e89e07ce50e68ca99"
+    },
+    "TabSyn": {
+      "copyright": null,
+      "evidence": "https://github.com/amazon-science/tabsyn/blob/cb5ac0f74ec36ee88e7a974a393dfbef50d42da7/LICENSE",
+      "licensed_work": null,
+      "licensor": null,
+      "lock_sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b",
+      "name": "Apache License 2.0",
+      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+    }
+  },
+  "official_tests_opened": false,
+  "pmlb": {
+    "entries": 104,
+    "note": "source_license: MIT (PMLB)",
+    "spdx": "MIT"
+  },
+  "repository": {
+    "copyright": "Copyright (c) 2026 Dope contributors",
+    "evidence": "LICENSE",
+    "licensed_work": null,
+    "licensor": null,
+    "name": "MIT License",
+    "sha256": "9caa806154ad72c6afe2183419f92b169d66d46bfc3bf2de0cada1af2b765bd9"
+  },
+  "sdv": {
+    "name": null,
+    "note": "pinned source snapshot has no SDV LICENSE file"
+  },
+  "version": 1
+}

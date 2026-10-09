@@ -1,0 +1,55 @@
+% Wilcoxon and the TOST t-tests treat paired lineages as iid. The interval is the family-cluster bootstrap of the median. Holm families are separate for size n and size 4n (density 9, neural 6, ARF 6, Forest-Flow 3).
+\begin{tabular}{lllllrrllrl}
+\toprule
+Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
+\midrule
+1$n$ & catboost & GaussianCopula & native\_selected & 97 & 0.2178 & [0.1028, 0.3340] & 0.2483 & no & 90/0/7 & 0.000 \\
+1$n$ & catboost & Chow-Liu & native\_selected & 97 & 0.3635 & [0.2986, 0.5314] & 7.7460 & no & 93/0/4 & 0.000 \\
+1$n$ & catboost & independent\_marginals & native\_selected & 97 & 0.9238 & [0.8575, 1.0178] & 1.1580 & no & 97/0/0 & 0.000 \\
+1$n$ & linear & GaussianCopula & native\_selected & 92 & 0.0088 & [-0.0118, 0.0329] & 0.2382 & no & 53/0/39 & 0.071 \\
+1$n$ & linear & Chow-Liu & native\_selected & 92 & 0.3309 & [0.2275, 0.6482] & 1.5301 & no & 86/0/6 & 0.000 \\
+1$n$ & linear & independent\_marginals & native\_selected & 92 & 0.9955 & [0.9691, 1.0693] & 1.1054 & no & 92/0/0 & 0.000 \\
+1$n$ & mlp & GaussianCopula & native\_selected & 75 & 0.1453 & [0.0479, 0.2445] & 0.1971 & no & 64/0/11 & 0.000 \\
+1$n$ & mlp & Chow-Liu & native\_selected & 75 & 0.5339 & [0.3343, 0.8171] & 1.1319 & no & 75/0/0 & 0.000 \\
+1$n$ & mlp & independent\_marginals & native\_selected & 75 & 1.0462 & [0.9834, 1.2772] & 1.3698 & no & 75/0/0 & 0.000 \\
+4$n$ & catboost & GaussianCopula & native\_selected & 97 & 0.2237 & [0.0723, 0.3530] & 0.2613 & no & 86/0/11 & 0.000 \\
+4$n$ & catboost & Chow-Liu & native\_selected & 97 & 0.3370 & [0.2823, 0.5048] & 8.0937 & no & 94/0/3 & 0.000 \\
+4$n$ & catboost & independent\_marginals & native\_selected & 97 & 0.9556 & [0.8911, 0.9875] & 1.2876 & no & 96/0/1 & 0.000 \\
+4$n$ & linear & GaussianCopula & native\_selected & 92 & 0.0037 & [-0.0144, 0.0138] & 0.1832 & no & 49/0/43 & 0.373 \\
+4$n$ & linear & Chow-Liu & native\_selected & 92 & 0.3399 & [0.1947, 0.6595] & 1.4415 & no & 86/0/6 & 0.000 \\
+4$n$ & linear & independent\_marginals & native\_selected & 92 & 0.9879 & [0.9427, 1.0142] & 1.0440 & no & 92/0/0 & 0.000 \\
+4$n$ & mlp & GaussianCopula & native\_selected & 75 & 0.1850 & [0.0811, 0.2624] & 0.3295 & no & 65/0/10 & 0.000 \\
+4$n$ & mlp & Chow-Liu & native\_selected & 75 & 0.5301 & [0.3183, 0.8832] & 0.9903 & no & 74/0/1 & 0.000 \\
+4$n$ & mlp & independent\_marginals & native\_selected & 75 & 1.1043 & [1.0367, 1.3283] & 1.3100 & no & 75/0/0 & 0.000 \\
+1$n$ & catboost & CTGAN & native\_selected & 21 & 0.8816 & [0.7166, 1.4415] & 1.0872 & no & 21/0/0 & 0.000 \\
+1$n$ & catboost & TVAE & native\_selected & 21 & 0.2381 & [0.1133, 0.4819] & 0.2867 & no & 19/0/2 & 0.000 \\
+1$n$ & linear & CTGAN & native\_selected & 21 & 1.0516 & [0.8722, 1.3740] & 1.4244 & no & 21/0/0 & 0.000 \\
+1$n$ & linear & TVAE & native\_selected & 21 & 0.2510 & [0.1501, 0.4434] & 1.3010 & no & 20/0/1 & 0.000 \\
+1$n$ & mlp & CTGAN & native\_selected & 19 & 0.9336 & [0.6818, 2.0568] & 2.1780 & no & 19/0/0 & 0.000 \\
+1$n$ & mlp & TVAE & native\_selected & 19 & 0.2725 & [0.1706, 0.7092] & 0.5985 & no & 18/0/1 & 0.000 \\
+4$n$ & catboost & CTGAN & native\_selected & 21 & 0.8807 & [0.7020, 1.3326] & 1.0962 & no & 21/0/0 & 0.000 \\
+4$n$ & catboost & TVAE & native\_selected & 21 & 0.2361 & [0.0868, 0.4471] & 0.2673 & no & 19/0/2 & 0.000 \\
+4$n$ & linear & CTGAN & native\_selected & 21 & 1.0485 & [0.8718, 1.4642] & 1.3489 & no & 21/0/0 & 0.000 \\
+4$n$ & linear & TVAE & native\_selected & 21 & 0.2629 & [0.1298, 0.4183] & 1.0124 & no & 20/0/1 & 0.000 \\
+4$n$ & mlp & CTGAN & native\_selected & 19 & 1.0788 & [0.8605, 2.0296] & 1.8412 & no & 19/0/0 & 0.000 \\
+4$n$ & mlp & TVAE & native\_selected & 19 & 0.2842 & [0.1227, 0.8120] & 0.7771 & no & 17/0/2 & 0.000 \\
+1$n$ & catboost & ARF & author\_default & 97 & 0.1086 & [0.0026, 0.2394] & 0.1144 & no & 73/0/24 & 0.000 \\
+1$n$ & catboost & ARF & native\_selected & 97 & 0.1010 & [0.0236, 0.2404] & 0.1354 & no & 76/0/21 & 0.000 \\
+1$n$ & linear & ARF & author\_default & 92 & 0.0409 & [0.0049, 0.1752] & 0.1786 & no & 64/0/28 & 0.000 \\
+1$n$ & linear & ARF & native\_selected & 92 & 0.0649 & [0.0059, 0.2012] & 0.2123 & no & 68/0/24 & 0.000 \\
+1$n$ & mlp & ARF & author\_default & 75 & 0.1371 & [0.0311, 0.2860] & 0.2632 & no & 61/0/14 & 0.000 \\
+1$n$ & mlp & ARF & native\_selected & 75 & 0.1423 & [0.0464, 0.2643] & 0.3097 & no & 64/0/11 & 0.000 \\
+4$n$ & catboost & ARF & author\_default & 97 & 0.0767 & [0.0103, 0.1957] & 0.2059 & no & 69/0/28 & 0.000 \\
+4$n$ & catboost & ARF & native\_selected & 97 & 0.0954 & [0.0166, 0.2137] & 0.1737 & no & 70/0/27 & 0.000 \\
+4$n$ & linear & ARF & author\_default & 92 & 0.0274 & [-0.0020, 0.1195] & 0.0924 & no & 61/0/31 & 0.000 \\
+4$n$ & linear & ARF & native\_selected & 92 & 0.0369 & [0.0008, 0.1639] & 0.1249 & no & 65/0/27 & 0.000 \\
+4$n$ & mlp & ARF & author\_default & 75 & 0.1153 & [0.0340, 0.3709] & 0.2894 & no & 57/0/18 & 0.000 \\
+4$n$ & mlp & ARF & native\_selected & 75 & 0.1429 & [0.0283, 0.3673] & 0.3089 & no & 58/0/17 & 0.000 \\
+1$n$ & catboost & ForestDiffusion/Forest-Flow & native\_selected & 6 & -0.0198 & [-0.4355, 0.0060] & -0.0917 & no & 1/0/5 & 0.469 \\
+1$n$ & linear & ForestDiffusion/Forest-Flow & native\_selected & 5 & 0.0275 & [-0.1396, 0.0723] & -0.0040 & no & 3/0/2 & 1.000 \\
+1$n$ & mlp & ForestDiffusion/Forest-Flow & native\_selected & 4 & 0.0196 & [-0.0405, 0.2906] & 0.0723 & no & 2/0/2 & 1.000 \\
+4$n$ & catboost & ForestDiffusion/Forest-Flow & native\_selected & 6 & -0.0269 & [-0.4550, 0.0080] & -0.1089 & no & 1/0/5 & 0.375 \\
+4$n$ & linear & ForestDiffusion/Forest-Flow & native\_selected & 5 & 0.0115 & [-0.2599, 0.3016] & 0.0118 & no & 3/0/2 & 0.812 \\
+4$n$ & mlp & ForestDiffusion/Forest-Flow & native\_selected & 4 & -0.0317 & [-0.2275, -0.0102] & -0.0753 & no & 0/0/4 & 0.375 \\
+\bottomrule
+\end{tabular}

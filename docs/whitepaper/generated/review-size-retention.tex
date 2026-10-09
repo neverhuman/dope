@@ -1,0 +1,60 @@
+\begin{tabular}{lllllrr}
+\toprule
+Method & Configuration & Auditor & Size & $n$ & Median & Hierarchical 95\% CI \\
+\midrule
+DOPE & features12\_steps2048 & catboost & 1$n$ & 97 & 0.8856 & [0.8286, 0.9702] \\
+DOPE & features12\_steps2048 & catboost & 4$n$ & 97 & 0.9399 & [0.8964, 0.9832] \\
+DOPE & features12\_steps2048 & linear & 1$n$ & 92 & 0.9836 & [0.9675, 0.9944] \\
+DOPE & features12\_steps2048 & linear & 4$n$ & 92 & 0.9940 & [0.9718, 0.9967] \\
+DOPE & features12\_steps2048 & mlp & 1$n$ & 75 & 0.9713 & [0.9322, 0.9898] \\
+DOPE & features12\_steps2048 & mlp & 4$n$ & 75 & 1.0611 & [1.0048, 1.2671] \\
+GaussianCopula & native\_selected & catboost & 1$n$ & 99 & 0.6156 & [0.3080, 0.7886] \\
+GaussianCopula & native\_selected & catboost & 4$n$ & 99 & 0.6557 & [0.3517, 0.8501] \\
+GaussianCopula & native\_selected & linear & 1$n$ & 94 & 0.9613 & [0.9150, 0.9898] \\
+GaussianCopula & native\_selected & linear & 4$n$ & 94 & 0.9872 & [0.9629, 0.9959] \\
+GaussianCopula & native\_selected & mlp & 1$n$ & 76 & 0.8223 & [0.7178, 0.8767] \\
+GaussianCopula & native\_selected & mlp & 4$n$ & 76 & 0.9282 & [0.8548, 1.0012] \\
+Chow-Liu & native\_selected & catboost & 1$n$ & 99 & 0.4777 & [0.2629, 0.5820] \\
+Chow-Liu & native\_selected & catboost & 4$n$ & 99 & 0.5823 & [0.2709, 0.6510] \\
+Chow-Liu & native\_selected & linear & 1$n$ & 94 & 0.6361 & [0.2609, 0.7562] \\
+Chow-Liu & native\_selected & linear & 4$n$ & 94 & 0.6592 & [0.2824, 0.7633] \\
+Chow-Liu & native\_selected & mlp & 1$n$ & 76 & 0.4702 & [0.1653, 0.6383] \\
+Chow-Liu & native\_selected & mlp & 4$n$ & 76 & 0.6891 & [0.4387, 0.7726] \\
+independent\_marginals & native\_selected & catboost & 1$n$ & 99 & -0.0444 & [-0.0689, -0.0299] \\
+independent\_marginals & native\_selected & catboost & 4$n$ & 99 & -0.0117 & [-0.0418, -0.0000] \\
+independent\_marginals & native\_selected & linear & 1$n$ & 94 & -0.0501 & [-0.0820, -0.0149] \\
+independent\_marginals & native\_selected & linear & 4$n$ & 94 & 0.0021 & [-0.0268, 0.0191] \\
+independent\_marginals & native\_selected & mlp & 1$n$ & 76 & -0.1279 & [-0.3221, -0.0180] \\
+independent\_marginals & native\_selected & mlp & 4$n$ & 76 & -0.0273 & [-0.0922, -0.0001] \\
+CTGAN & native\_selected & catboost & 1$n$ & 21 & -0.0909 & [-0.4527, 0.1244] \\
+CTGAN & native\_selected & catboost & 4$n$ & 21 & -0.0813 & [-0.2047, 0.1056] \\
+CTGAN & native\_selected & linear & 1$n$ & 21 & -0.0564 & [-0.3837, 0.1182] \\
+CTGAN & native\_selected & linear & 4$n$ & 21 & -0.0335 & [-0.4545, 0.1241] \\
+CTGAN & native\_selected & mlp & 1$n$ & 19 & -0.0995 & [-1.0258, 0.3118] \\
+CTGAN & native\_selected & mlp & 4$n$ & 19 & -0.1487 & [-0.6644, 0.1280] \\
+TVAE & native\_selected & catboost & 1$n$ & 21 & 0.5977 & [0.4150, 0.7501] \\
+TVAE & native\_selected & catboost & 4$n$ & 21 & 0.6690 & [0.4711, 0.8259] \\
+TVAE & native\_selected & linear & 1$n$ & 21 & 0.7641 & [0.5516, 0.8617] \\
+TVAE & native\_selected & linear & 4$n$ & 21 & 0.7959 & [0.5806, 0.8750] \\
+TVAE & native\_selected & mlp & 1$n$ & 19 & 0.6765 & [0.3096, 0.8155] \\
+TVAE & native\_selected & mlp & 4$n$ & 19 & 0.7528 & [0.4781, 0.8551] \\
+ARF & author\_default & catboost & 1$n$ & 99 & 0.7423 & [0.5478, 0.8404] \\
+ARF & author\_default & catboost & 4$n$ & 99 & 0.8303 & [0.7000, 0.8947] \\
+ARF & author\_default & linear & 1$n$ & 94 & 0.9004 & [0.7511, 0.9683] \\
+ARF & author\_default & linear & 4$n$ & 94 & 0.9510 & [0.8541, 0.9832] \\
+ARF & author\_default & mlp & 1$n$ & 76 & 0.7998 & [0.6430, 0.9097] \\
+ARF & author\_default & mlp & 4$n$ & 76 & 0.9311 & [0.8438, 1.0093] \\
+ARF & native\_selected & catboost & 1$n$ & 99 & 0.7354 & [0.5273, 0.8462] \\
+ARF & native\_selected & catboost & 4$n$ & 99 & 0.8149 & [0.6468, 0.8909] \\
+ARF & native\_selected & linear & 1$n$ & 94 & 0.8880 & [0.6975, 0.9659] \\
+ARF & native\_selected & linear & 4$n$ & 94 & 0.9269 & [0.8465, 0.9775] \\
+ARF & native\_selected & mlp & 1$n$ & 76 & 0.8146 & [0.6548, 0.9183] \\
+ARF & native\_selected & mlp & 4$n$ & 76 & 0.9279 & [0.8370, 1.0283] \\
+ForestDiffusion/Forest-Flow & native\_selected & catboost & 1$n$ & 6 & 0.9694 & [0.7855, 0.9985] \\
+ForestDiffusion/Forest-Flow & native\_selected & catboost & 4$n$ & 6 & 1.0025 & [0.9256, 1.0362] \\
+ForestDiffusion/Forest-Flow & native\_selected & linear & 1$n$ & 5 & 0.9806 & [0.7538, 1.0827] \\
+ForestDiffusion/Forest-Flow & native\_selected & linear & 4$n$ & 5 & 0.9851 & [0.9772, 1.0007] \\
+ForestDiffusion/Forest-Flow & native\_selected & mlp & 1$n$ & 4 & 0.9805 & [0.3176, 1.0294] \\
+ForestDiffusion/Forest-Flow & native\_selected & mlp & 4$n$ & 4 & 1.0436 & [1.0035, 1.4676] \\
+\bottomrule
+\end{tabular}

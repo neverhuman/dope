@@ -21,7 +21,7 @@ from research.benchmark.representation import (
     TABULAR_PROTOCOL,
     representation_closeness,
 )
-from research.benchmark.mfs_v3_score import evaluate_v3
+from research.benchmark.mfs_v3_score import PREREQUISITES, evaluate_v3
 
 AUDITORS = ("kumo_tabular_l", "mitra_v2", "tabicl2")
 HEADLINE = "kumo_tabular_l"
@@ -32,19 +32,19 @@ def _finite(value) -> bool:
 
 
 def _min(values: list[float]) -> float | None:
-    if len(values) != len(SAMPLE_SEEDS) or any(not _finite(value) for value in values):
+    if len(values) != len(SAMPLE_SEEDS) or any(not _finite(value) or not 0 <= value <= 1 for value in values):
         return None
     return float(min(values))
 
 
 def _max(values: list[float]) -> float | None:
-    if len(values) != len(SAMPLE_SEEDS) or any(not _finite(value) for value in values):
+    if len(values) != len(SAMPLE_SEEDS) or any(not _finite(value) or not 0 <= value <= 1 for value in values):
         return None
     return float(max(values))
 
 
 def seed_retention(row: dict) -> float | None:
-    if not all(_finite(row.get(key)) for key in ("null_loss", "real_loss", "synthetic_loss")):
+    if not all(_finite(row.get(key)) and row[key] >= 0 for key in ("null_loss", "real_loss", "synthetic_loss")):
         return None
     return retention(float(row["null_loss"]), float(row["real_loss"]), float(row["synthetic_loss"]))
 
@@ -58,7 +58,9 @@ def lineage_retention(rows: list[dict]) -> float | None:
     return float(np.median(values))
 
 
-def distribution_fidelity(marginal: float, sliced: float, mmd: float) -> float:
+def distribution_fidelity(marginal: float, sliced: float, mmd: float) -> float | None:
+    if any(not _finite(value) or not 0 <= value <= 1 for value in (marginal, sliced, mmd)):
+        return None
     return 0.50 * marginal + 0.25 * sliced + 0.25 * mmd
 
 
@@ -69,7 +71,7 @@ def compactness(artifact_bytes: float) -> float | None:
 
 
 def _gap(row: dict | None) -> float | None:
-    if row is None or not _finite(row.get("distance")) or not _finite(row.get("d_null")):
+    if row is None or not all(_finite(row.get(key)) and 0 <= row[key] <= 1 for key in ("distance", "d_null")):
         return None
     return float(row["distance"]) - float(row["d_null"])
 
@@ -135,8 +137,9 @@ def score_lineage(seeds: list[dict], bound) -> dict:
     distribution = None
     if marginal is not None and sliced is not None and mmd is not None:
         distribution = distribution_fidelity(marginal, sliced, mmd)
-    bytes_known = [_finite(seed.get("artifact_bytes")) for seed in seeds]
-    artifact_bytes = max(float(seed["artifact_bytes"]) for seed in seeds) if all(bytes_known) and seeds else None
+    bytes_known = [type(seed.get("artifact_bytes")) is int and 0 < seed["artifact_bytes"] <= BYTE_CAP
+                   for seed in seeds]
+    artifact_bytes = max(seed["artifact_bytes"] for seed in seeds) if all(bytes_known) and seeds else None
     headline_rows = [seed.get("auditors", {}).get(HEADLINE) or {} for seed in seeds]
     headline_retentions = [seed_retention(row) for row in headline_rows]
     # The gate needs finite losses from every auditor. A noninformative retention
@@ -144,17 +147,21 @@ def score_lineage(seeds: list[dict], bound) -> dict:
     losses_ready = all(
         all(
             _finite((seed.get("auditors", {}).get(name) or {}).get(key))
+            and (seed["auditors"][name][key] >= 0)
             for key in ("null_loss", "real_loss", "synthetic_loss")
         )
         for seed in seeds
         for name in AUDITORS
     )
     evidence = {
+        **{key: len(seeds) == len(SAMPLE_SEEDS) and all(seed.get(key) is True for seed in seeds)
+           for key in PREREQUISITES},
         "normalizer": NORMALIZER,
         "utility_protocol": TABULAR_PROTOCOL,
         "utility_auditors": list(TABULAR_AUDITORS) if losses_ready else [],
         "encoder": HEADLINE,
-        "exact_row_matches": 0 if all(seed.get("exact_row_matches") == 0 for seed in seeds) else 1,
+        "exact_row_matches": 0 if seeds and all(type(seed.get("exact_row_matches")) is int
+                                               and seed["exact_row_matches"] == 0 for seed in seeds) else None,
         "near_copy_ok": all(seed.get("near_copy_ok") is True for seed in seeds),
         "cleartext_absent": all(seed.get("cleartext_absent") is True for seed in seeds),
         "membership_auc": _max([row.get("membership_auc") for row in holdouts]),
@@ -198,6 +205,7 @@ def compact_seed(seed: dict) -> dict:
         }
     holdout = seed.get("holdout") or {}
     return {
+        **{key: seed.get(key) for key in PREREQUISITES},
         "artifact_bytes": seed.get("artifact_bytes"),
         "auditors": auditors,
         "cleartext_absent": seed.get("cleartext_absent"),
@@ -233,6 +241,7 @@ def load_seeds(cohort_cell_dir: Path) -> list[dict]:
         holdout_path = base.with_name(base.name + ".holdout.json")
         seeds.append(
             {
+                **{key: prepared.get(key) for key in PREREQUISITES},
                 "artifact_bytes": prepared.get("artifact_bytes"),
                 "auditors": auditors,
                 "cleartext_absent": prepared.get("cleartext_absent"),

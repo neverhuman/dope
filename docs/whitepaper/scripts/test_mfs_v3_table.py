@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import mfs_v3_table
 from research.benchmark.mfs_v3_panel import KUMO_ESTIMATORS, REFUSED_ENCODERS, VECTOR_PIN
@@ -62,7 +64,8 @@ class MfsV3TableTest(unittest.TestCase):
             self.assertNotIn(refused, text)
         note = mfs_v3_table.scalar_tex(measured)
         self.assertIn(f"{KUMO_ESTIMATORS} inverse-transformed", note)
-        self.assertIn("scores 0 of 16", note)
+        self.assertIn("scores 0 of 16 method--lineage cells (4 lineages", note)
+        self.assertIn("Holm family: 3 tests per auditor", text)
         for name in TABULAR_AUDITORS:
             for part in VECTOR_PIN[name].split("_"):
                 self.assertIn(part, note)
@@ -78,14 +81,27 @@ class MfsV3TableTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             mfs_v3_table.require_receipt(receipt)
 
+    def test_duplicate_unknown_and_incomplete_matrix_raise(self):
+        import copy
+        rows = [_lineage(method, dataset, 0.1) for method in mfs_v3_table.METHODS for dataset in ("aa", "bb")]
+        for mutate in (lambda r: r.append(copy.deepcopy(r[0])),
+                       lambda r: r[0].update(method="unknown"),
+                       lambda r: r.pop()):
+            bad = copy.deepcopy(rows)
+            mutate(bad)
+            with self.assertRaises(ValueError):
+                mfs_v3_table.measure(_receipt(bad))
+
     def test_real_receipt_matches_its_lineage_retentions(self):
         path = mfs_v3_table.RECEIPT
         self.assertTrue(path.is_file(), "density receipt is missing")
-        receipt = json.loads(path.read_text())
+        receipt = mfs_v3_table.load_receipt()
         measured = mfs_v3_table.measure(receipt)
         self.assertEqual(measured["scored"], 0)
-        self.assertEqual(measured["lineages"], 388)
+        self.assertEqual(measured["method_lineage_cells"], 388)
         self.assertEqual(measured["cleartext_unscanned"], 388)
+        self.assertEqual(measured["n_lineages"], 97)
+        self.assertEqual(measured["n_methods"], 4)
         for auditor in TABULAR_AUDITORS:
             for comparator in mfs_v3_table.COMPARATORS:
                 pair = measured["block"][auditor]["pairs"][comparator]
@@ -93,15 +109,17 @@ class MfsV3TableTest(unittest.TestCase):
                 self.assertIsNotNone(pair["holm_p"])
         manuscript = Path(mfs_v3_table.REPO) / "docs" / "whitepaper" / "dope-mfs.tex"
         text = manuscript.read_text()
+        supplement = manuscript.with_name("supplement.tex").read_text()
+        package_text = text + supplement
         self.assertNotIn("are sensitivity checks", text)
-        self.assertIn("were not run", text)
-        self.assertIn("averaged into representation closeness", text)
-        self.assertIn("applied to absolute correlations with the target", text)
-        self.assertIn("permutation-importance auditor", text)
-        self.assertIn("not averaged into the bound", text)
+        self.assertIn("Official tests stay sealed", text)
+        self.assertIn("Neither is averaged into representation closeness", package_text)
+        self.assertIn("applied to absolute correlations with the target", package_text)
+        self.assertIn("permutation-importance auditor", package_text)
+        self.assertIn("Their retentions stay out of that bound", package_text)
         self.assertNotIn("Driver fidelity, distribution fidelity", text)
         self.assertNotIn("no clean-license tabular transfer has been measured", text)
-        self.assertIn("\\fittowidthfile{generated/mfs-v3-density-table.tex}", text)
+        self.assertIn("\\input{generated/mfs-v3-density-table.tex}", supplement)
         self.assertIn("\\input{generated/mfs-v3-scalar.tex}", text)
         self.assertIn("Downstream Objective-Preserving Encoding", text)
         self.assertNotIn("10{,}240-Byte Tabular Generator", text)
@@ -109,6 +127,27 @@ class MfsV3TableTest(unittest.TestCase):
         self.assertIn("BEGIN JOURNAL AVAILABILITY", text)
         self.assertIn("https://github.com/neverhuman/dope", text)
         self.assertIn("not a utility score", text)
+
+    def test_substituted_receipt_byte_refuses_before_a_table_write(self):
+        panel = mfs_v3_table.compute_panel
+        original = panel.RESULTS / mfs_v3_table.RECEIPT.name
+        raw = bytearray(original.read_bytes())
+        raw[0] ^= 0x01
+        with tempfile.TemporaryDirectory(dir=panel.REPO / "target") as directory:
+            root = Path(directory)
+            (root / mfs_v3_table.RECEIPT.name).write_bytes(raw)
+            generated = root / "generated"
+            figures = root / "figures"
+            generated.mkdir()
+            figures.mkdir()
+            with patch.object(panel, "RESULTS", root), \
+                    patch.object(mfs_v3_table, "GENERATED", generated), \
+                    patch.object(mfs_v3_table, "FIGURES", figures), \
+                    patch("mfs_v3_table.sys.argv", ["mfs_v3_table.py"]):
+                with self.assertRaisesRegex(ValueError, "digest mismatch"):
+                    mfs_v3_table.main()
+            self.assertEqual(list(generated.iterdir()), [])
+            self.assertEqual(list(figures.iterdir()), [])
 
 
 if __name__ == "__main__":
