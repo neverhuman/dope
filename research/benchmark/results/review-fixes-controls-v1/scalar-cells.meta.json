@@ -1,0 +1,9 @@
+{
+  "cell_count": 5700,
+  "format": "dope-review-fix-control-scalar-cells-v1",
+  "official_tests_opened": false,
+  "panel_sha256": "3d6f32bb8a1276993de2d2527b95633a4aadb2e0b622dc4f8a1f7574eff87e21",
+  "predeclaration_sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5",
+  "sha256": "559d7dd664bb77bc140c808660d05ac10842b4580c39a1efcf533fba20d5bf94",
+  "source": "scalar json documents only; synthetic csv tables are not in this ledger"
+}
