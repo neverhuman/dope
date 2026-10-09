@@ -18,8 +18,6 @@ from pathlib import Path
 
 import numpy as np
 
-from research.benchmark.review_fixes.sample_paths import resolve_sample_csv
-
 HERE = Path(__file__).resolve().parent
 EXPANDED_PATH = HERE.parent / "expanded_validation_metrics.py"
 WORKERS = Path("/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker")
@@ -35,6 +33,13 @@ PUBLISHED = (
     ("arf-matched-population-validation.json", "ARF", "native_selected"),
     ("s3-matched-forest-confirmation-validation.json", "ForestDiffusion/Forest-Flow", "native_selected"),
 )
+
+
+def _resolve_sample_csv(cell: dict):
+    spec = importlib.util.spec_from_file_location("review_fix_sample_paths", HERE / "sample_paths.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.resolve_sample_csv(cell)
 
 
 def _load_expanded():
@@ -128,7 +133,7 @@ def _index(results: Path) -> list[dict]:
                 "configuration": configuration,
                 "size": size,
                 "sample_seed": seed,
-                "csv": resolve_sample_csv(cell),
+                "csv": _resolve_sample_csv(cell),
                 "source": filename,
             })
     return jobs
