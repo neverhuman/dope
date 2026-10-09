@@ -173,8 +173,8 @@ def table_tex(measured: dict) -> str:
             pair = measured["block"][auditor]["pairs"][comparator]
             rows.append(
                 f"{AUDITOR_TEX[auditor]} & {COMPARATOR_TEX[comparator]} & {pair['n']} & "
-                f"{compute_panel.sig3(pair['dope_median'])} [{compute_panel.sig3(pair['dope_lo'])}, {compute_panel.sig3(pair['dope_hi'])}] & "
-                f"{compute_panel.sig3(pair['other_median'])} [{compute_panel.sig3(pair['other_lo'])}, {compute_panel.sig3(pair['other_hi'])}] & "
+                f"{compute_panel.paired_median_tex(pair['dope_median'], pair['lo'], pair['hi'], 'dope')} [{compute_panel.sig3(pair['dope_lo'])}, {compute_panel.sig3(pair['dope_hi'])}] & "
+                f"{compute_panel.paired_median_tex(pair['other_median'], pair['lo'], pair['hi'], 'other')} [{compute_panel.sig3(pair['other_lo'])}, {compute_panel.sig3(pair['other_hi'])}] & "
                 f"{compute_panel.sig3(pair['median_difference'])} [{compute_panel.sig3(pair['lo'])}, {compute_panel.sig3(pair['hi'])}] & "
                 f"{pair['wins']}/{pair['ties']}/{pair['losses']} & "
                 f"${compute_panel.tex_p(pair['holm_p'])}$ \\\\"

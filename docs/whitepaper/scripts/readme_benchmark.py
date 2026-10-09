@@ -8,6 +8,7 @@ The markdown cells are the density-table cells. The PNG is
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
@@ -28,7 +29,7 @@ def parse_density_rows(tex):
     """Return the eight-cell rows of the density table, in file order."""
     rows = []
     for line in tex.splitlines():
-        stripped = line.strip()
+        stripped = re.sub(r"\\textbf\{([^}]*)\}", r"\1", line.strip())
         if not stripped.endswith("\\\\"):
             continue
         if stripped.startswith("\\") or stripped.startswith("Auditor"):

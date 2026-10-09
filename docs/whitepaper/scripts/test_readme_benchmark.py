@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -23,7 +24,7 @@ class ReadmeBenchmark(unittest.TestCase):
         self.assertIn("fit seed $11$", (REPO / "docs/whitepaper/dope-mfs.tex").read_text())
 
     def test_png_source_matches_density_table(self):
-        tex = bench.DENSITY.read_text()
+        tex = re.sub(r"\\textbf\{([^}]*)\}", r"\1", bench.DENSITY.read_text())
         stats = json.loads(bench.PANEL.read_text())
         pairs = stats["blocks"]["density"]["catboost"]["pairs"]
         labels = {
