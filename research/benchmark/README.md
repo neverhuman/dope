@@ -1,5 +1,18 @@
 # Offline generator benchmark (research only)
 
+[Native fit progress through index094](results/work-order-b-native-through094-fit-progress-and-cost-v1/README.md)
+records 195 accepted fit identities out of 500 and 22 lineages with all five
+accepted fit seeds. Its nine detailed operations retain charged bytes, sampled
+GPU observations and exact grants. Fit identity coverage does not establish
+sample completeness, quality or stability; all gated scores remain unavailable.
+
+[Native indices011–014 progress and cost delta](results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/README.md)
+records three accepted GPU fits and one infrastructure-failed operation, with
+all four whole-parent costs charged. Its fixed snapshot has 115 accepted fits,
+two historical artifact caps, seven unresolved infrastructure slots and 376
+unstarted slots out of 500; subsequent live work is excluded. Quality,
+five-fit stability and gated scores remain unavailable.
+
 [Native indices009–010 GPU progress and cost delta](results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/README.md)
 records one accepted seed53 fit and one infrastructure-failed seed71 operation,
 with both whole-parent costs retained. Its dated snapshot follows index008;
