@@ -1,0 +1,251 @@
+{
+  "format": "dope-review-fix-predeclaration",
+  "version": 2,
+  "declared_utc": "2026-10-09T19:40:00Z",
+  "rule": "This file is the analysis contract for every review-fix result computed after it. It is committed and pushed before any job it governs starts. No estimand, margin, seed, family, budget, threshold, configuration, or inclusion rule is revised after a governed result is seen. Operational amendments (paths, adapter source pins, host moves) are committed as new files under review_fixes/predeclare_v2.amendments/ before the affected block starts; they cannot change anything this file fixes. A result weaker than an earlier one is reported unchanged. A missing or failed cell is never a DOPE win.",
+  "supersedes": {
+    "v1_path": "research/benchmark/review_fixes/predeclare.json",
+    "v1_sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5",
+    "v1_git_blob": "a0691b1efc848add288e17b22759169c515d4328",
+    "v1_commit": "c36d7f21b8ce62af81bc1f538e332c180e22eb95",
+    "v1_commit_on_main_history": "396eef3bafe575e9a81bf888840c19bc40b9c83f",
+    "v1_stays_frozen": true,
+    "inherited_unchanged": [
+      "auditors",
+      "informative_rule",
+      "families",
+      "uncertainty.draws",
+      "uncertainty.interval",
+      "delta_method",
+      "denominator_sensitivity",
+      "original_unit_rmse",
+      "real_bootstrap_4n",
+      "predictor_only"
+    ],
+    "superseded_for_v2_results": [
+      "tost",
+      "extra_generator_fit_seeds",
+      "tabsyn",
+      "tabddpm",
+      "sealed_test",
+      "tests.holm"
+    ],
+    "v1_sealed_disposition": "The v1 sealed run never executed. v2 holds the only authorized unseal. sealed-v1/started.json must never exist, and sealed_once.py refuses to run once this file is committed."
+  },
+  "binaries": {
+    "headline": {
+      "name": "B_hist",
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-preflight-v1/bin/dope-kernel",
+      "sha256": "5d5ef250dbcf2296ad9f0b897b17c8c579258ff943dd161f58102cd3f5bb5a3f",
+      "source_git_sha": "17331e4525935d90f669c7b3b63028ab2a4c393c",
+      "seed_flag": "--seed",
+      "cargo_features": ["gpu-training", "gpu-research-training"],
+      "research_profiles": ["features12_steps512", "features12_steps2048", "features24_steps512", "features24_steps2048"],
+      "runtime_lock": {
+        "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-runtime-preparation-v1/xbabe1.runtime.lock.json",
+        "sha256": "34f7805f40b523b2c20df86380ca8b533d45e6e922291365738ec11e26ff01db",
+        "drift_rule": "The runner hashes every library in the lock before the first fit and records checked, mismatched, and missing counts. Drift is reported, not repaired."
+      }
+    },
+    "diagnostic": {
+      "name": "B_new",
+      "path_on_xbabe1": "/home/ubuntu/dope-scratch-x1/dope-rf-seeds-src/target/release/dope-kernel",
+      "sha256_prefix": "4347249fa465149f7c6a",
+      "role": "Only the 2x2 diagnostic in seed_exchangeability. Never a headline binary."
+    },
+    "grid": {
+      "name": "B_grid",
+      "role": "Ablation grid only.",
+      "build_rule": "Built on xbabe1 from a pinned commit before block I starts; its sha256 is written into an amendment file before any grid retention is computed.",
+      "qualification": "B_grid qualifies only if its features12_steps2048 seed-11 artifact bytes equal B_hist's on at least 95 of 98 lineages. The check compares artifact bytes only, before any retention is computed. A failed qualification keeps every grid result in a separately labelled table."
+    },
+    "rule": "B_hist is the headline binary unconditionally, because it produced the published configuration."
+  },
+  "dope": {
+    "runner": "research/benchmark/review_fixes/fit_seeds_v2.py",
+    "fit_seeds": [11, 23, 37, 53, 71],
+    "sample_seeds": [101, 211, 307],
+    "sizes": [1, 4],
+    "host": "xbabe1",
+    "device": "cuda:0, NVIDIA GeForce RTX 4090, CUBLAS_WORKSPACE_CONFIG=:4096:8",
+    "order": "Seed-major, then dataset id. A cutoff drops whole seeds.",
+    "compile": {
+      "candidate": "compact_neural_residual_symbolic",
+      "tier": "l3",
+      "neural_target_weight": "2.0",
+      "neural_structural_penalty": "0.0",
+      "deadline_seconds": "600"
+    },
+    "arms": {
+      "headline": {
+        "research_profile": "features12_steps2048",
+        "role": "primary"
+      },
+      "product_default": {
+        "research_profile": null,
+        "role": "secondary: the untuned trainer default (width min(features,12) clamped to 4..12, 96 steps). It answers the confound that the headline profile was chosen among four research profiles at fit seed 11 on validation rows."
+      }
+    },
+    "historical_seed_11": "The historical fit-seed-11 population (hosts xbabe1 and xbabe2) stays a continuity row. It is never pooled with the v2 refits."
+  },
+  "evaluator": {
+    "utility": "research/benchmark/pilot_metrics.py",
+    "utility_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+    "diagnostics": "research/benchmark/expanded_validation_metrics.py",
+    "diagnostics_sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
+    "dependencies": {"numpy": "1.26.4", "scipy": "1.16.3", "scikit-learn": "1.7.2", "catboost": "1.2.10"},
+    "auditor_seed": 1729,
+    "threads": "BLAS and OpenMP at 1 thread in the scoring process. CatBoost keeps thread_count 4 from the evaluator.",
+    "no_producer_reported_values": "A metric cell enters a v2 table only if it carries implementation_sha256 equal to utility_sha256 and the declared dependency versions. A cell without them is refused by the binder.",
+    "replay": "The historical fit-seed-11 DOPE cells and the 2,400 four-seed cells are re-scored from their stored synthetic CSVs with this evaluator. Exact equality is expected. Any difference is reported with its maximum, and only re-scored values enter v2 tables.",
+    "cross_host_check": "200 seeded cells are scored on both xbabe1 and xbabe3. Bitwise disagreement is reported."
+  },
+  "headline_rule": "The abstract, Fig. 1 and Table 1 report the headline arm at size 4n under CatBoost, as the five-seed estimate below, against the strongest comparator. The strongest comparator is computed, never chosen: the comparator arm with the highest CatBoost 4n panel median among arms with at least 90 informative lineages paired with DOPE. Historical seed 11 alone and seeds 23-71 alone are sensitivity rows. The values are reported whatever they are.",
+  "seed_exchangeability": {
+    "rank_test": "For each lineage with all five headline fits complete (CatBoost, 4n), rank fit seed 11 among the five fit values. Count lineages where seed 11 is highest and report a one-sided binomial test against p = 0.2. Descriptive.",
+    "sensitivity": "The headline estimate recomputed on fit seeds 23, 37, 53, and 71 only.",
+    "two_by_two": "Binary (B_hist, B_new) by seed group (11; 23-71), CatBoost 4n medians on the common lineages. B_new seed 11 is refit on xbabe1 for this diagnostic. B_new seeds 23-71 use the stored four-seed CSVs re-scored with the pinned evaluator."
+  },
+  "methods": {
+    "primary": {
+      "ARF_author_default": {"seeds": [11, 23, 37, 53, 71], "lineages": 100, "status": "complete; re-scored by block K"},
+      "TabSyn": {"arm": "scaled_200_vae_1000_diffusion", "config_sha256": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc", "seeds": [11, 23, 37, 53, 71], "lineages": 100},
+      "TabDDPM": {"arm": "author_default", "seeds": [11, 23, 37, 53, 71], "lineages": 100, "round": "v6"},
+      "Forest-Flow": {"arm": "author_default_B1", "seeds": [11, 23, 37, 53, 71], "lineages": 100},
+      "GaussianCopula": {"arm": "native_selected", "seeds": [11, 23, 37, 53, 71], "lineages": 100},
+      "Chow-Liu": {"arm": "native_selected", "seeds": [11, 23, 37, 53, 71], "lineages": 100},
+      "independent_marginals": {"arm": "native_selected", "seeds": [11, 23, 37, 53, 71], "lineages": 100}
+    },
+    "secondary": {
+      "TabSyn_author_default": {"arm": "author_default_4000_vae_10001_diffusion", "seeds": [11], "lineages": 100, "stretch_seeds": [23, 37, 53, 71]},
+      "TabDiff": {"arm": "author_default", "seeds": [11], "lineages": 100, "subset_seeds": [23, 37]},
+      "GReaT": {"arm": "author_default_distilgpt2", "seeds": [11], "lineages": 100, "subset_seeds": [23, 37]},
+      "CTGAN": {"arm": "author_default", "seeds": [11], "lineages": 100, "subset_seeds": [23, 37]},
+      "TVAE": {"arm": "author_default", "seeds": [11], "lineages": 100, "subset_seeds": [23, 37]},
+      "ARF_native_selected": {"seeds": [11, 23, 37, 53, 71], "lineages": 100, "status": "complete"},
+      "synthpop_CART": {"arm": "author_default", "seeds": [11, 23, 37, 53, 71], "lineages": 100},
+      "SMOTE": {"arm": "k5_uniform_interpolation_on_features_and_target", "seeds": [11, 23, 37, 53, 71], "lineages": 100}
+    },
+    "controls": {
+      "predictor_only": "As in v1 predictor_only, all five fit seeds.",
+      "real_bootstrap_4n": "As in v1 real_bootstrap_4n. It is an oracle upper reference that reuses real rows, never a baseline."
+    },
+    "subset_rule": "The 30-lineage subset is stratified by name-prefix family in proportion (fri 8, feynman 6, strogatz 4, bng 2, other 10) and ordered within each family by sha256('review-fixes-v2|subset30|' + dataset id); the first members are taken.",
+    "seed_mapping": "Each adapter maps the protocol fit seed onto the method's own random number generators. A sampler that takes no seed is seeded through torch, numpy, and random immediately before sampling."
+  },
+  "budget": {
+    "B0": "Historical: 600 s per fit, 4 cores, one GPU of at most 16 GiB. Reported unchanged where it exists.",
+    "B1": "v2 author-default arm for every method: 1,800 s per fit, 900 s per sample, one 16-core slot, one GPU of at most 16 GiB. It applies to every lineage and seed and is never applied selectively. Forest-Flow refits all 500 fits under B1, not only the B0 timeouts.",
+    "native_arm": "At most 8 trials and 12 hours per method-dataset cell, chosen by the method's own objective on validation rows only. An uninformative objective keeps the default.",
+    "ledger": "Every fit records wall seconds, device, cores, GPU model, status, reason, and retries.",
+    "equal_budget_statement": "Every method receives the same per-fit opportunity under B1. Actual spend is reported per method. DOPE's headline profile was chosen among four research profiles at fit seed 11 on validation rows; that selection is disclosed, and the product_default arm and the sealed test bound its effect."
+  },
+  "estimands": {
+    "fit_value": "Median of the three sample-seed retentions of one fit. All three must be status ok and informative under the v1 rule.",
+    "lineage_value": "Median of the complete fit values of that lineage. A five-seed method needs at least 3 complete fits; a one-seed method needs its single fit. Sensitivity: lineages with all five fits.",
+    "panel_level": "Median of lineage values.",
+    "paired": "On lineages where both arms have a lineage value: the median of the lineage differences (DOPE minus comparator), for continuity with v1, and the Hodges-Lehmann pseudo-median of those differences, which is the location the Wilcoxon signed-rank test addresses.",
+    "uncertainty": "Nested bootstrap, 10,000 draws, percentile 95% interval: resample clusters (the four simulated name prefixes, every other lineage its own cluster), then lineages inside each drawn cluster, then fit seeds inside each drawn lineage separately for each method. RNG labels are sha256('review-fixes-v2|' + statistic label), first 8 bytes little-endian.",
+    "original_units": "Original-unit RMSE as in v1 original_unit_rmse, reported beside retention."
+  },
+  "equivalence": {
+    "margin_retention": 0.02,
+    "rule": "Equivalent only if the 90% nested-bootstrap interval of the Hodges-Lehmann paired difference lies inside [-0.02, 0.02]. Non-inferior only if its 5th percentile is above -0.02.",
+    "sensitivity": "A 20% trimmed-mean (Yuen) two one-sided test at the same margin.",
+    "continuity": "The v1 mean-difference TOST is printed only as a flagged continuity row.",
+    "reason_for_change": "The v1 estimand was the mean paired difference. Paired retention differences have heavy tails when the real-minus-null denominator is small; published v1 rows show means of 7.75 against medians of 0.34. This change is declared before any v2 result exists."
+  },
+  "tests": {
+    "difference": "DOPE headline arm minus comparator on the intersection of lineages with lineage values.",
+    "wilcoxon": "Two-sided Wilcoxon signed-rank on the lineage differences, zeros dropped, scipy method auto.",
+    "win_tie_loss": "A tie is an exact zero difference. The equivalence margin is never a tie band.",
+    "minimum_pairs": "A test with fewer than 6 paired lineages is not run and is printed as not identified. The family size stays as declared.",
+    "holm_families_per_size": {
+      "primary": "12 tests: ARF author-default, TabSyn, TabDDPM, Forest-Flow under B1, each with CatBoost, linear, and MLP",
+      "density": "9 tests: Gaussian copula, Chow-Liu, independent marginals by three auditors",
+      "deep_secondary": "12 tests: CTGAN, TVAE, TabDiff, GReaT by three auditors",
+      "other_secondary": "9 tests: ARF native-selected, synthpop-CART, SMOTE by three auditors",
+      "controls": "6 tests: predictor-only and real-bootstrap-4n by three auditors",
+      "descriptive_only": "TabSyn author-default sensitivity, product_default arm, ablations, stress suite, external panel"
+    },
+    "sizes_are_separate_families": true
+  },
+  "missing_and_stopping": {
+    "close_utc": "2026-10-22T05:59:00Z",
+    "close_local": "2026-10-21 23:59 MDT",
+    "final_dispositions": "Timeouts and method failures are final.",
+    "infrastructure_retry": "A host reboot, lost lease, foreign GPU owner, storage or admission refusal, or runtime-lock mismatch earns one retry at the same cap under a new attempt id. The failed attempt stays recorded.",
+    "missing_cells": "A missing comparator lineage drops out of that pair. For a DOPE-unfavourable sensitivity bound, the missing comparator value is filled with that comparator's best observed fit value on that lineage, or its best lineage value in the panel when the lineage has none.",
+    "monitoring": "Outcome-blind: only status, timing, and coverage counts are read until a block closes."
+  },
+  "privacy_v2": {
+    "P1_black_box_rows": "All methods, all completed fits, sizes n and 4n. Members: up to 200 unique training rows. Non-members: half of the unique validation rows; the other half is the attacker reference. Attacks: distance to closest record, the DOMIAS density ratio (expanded_validation_metrics implementation), and a kNN density score. Metrics: AUC per lineage, plus pooled TPR at 1% and 0.1% FPR after ranking scores within each lineage, with lineage-cluster bootstrap intervals. Real-bootstrap-4n is the positive control; a bootstrap of the attacker-reference half is the null control.",
+    "P2_shadow_targeted": "20 family-stratified lineages, 10 targets each (5 most outlying by local outlier factor, 5 at random), 16 shadow fits and 8 evaluation fits per target with and without the target. Random-forest attacker on distance, density, and summary-statistic features. Methods: DOPE, ARF author-default, the three density baselines, synthpop-CART; TabSyn on 5 lineages by 5 targets is a stretch. AUC and TPR at 1% and 0.1% FPR with Clopper-Pearson intervals.",
+    "P3_attribute_inference": "Sensitive columns: the target plus 2 features chosen by sha256('review-fixes-v2|attr|' + dataset id). Attacks: CatBoost trained on synthetic rows, and nearest-neighbour linkage. Metric: the member-versus-non-member error gap and the absolute risk against a model trained on the attacker reference.",
+    "P4_artifact": "DOPE artifacts only. Predictions are read from the .dpk with a new dope-predict binary target. Loss-threshold attack and offline LiRA with 32 shadow DOPE fits per lineage on random n-row subsets of train and validation. Reference points: the predictor-only Ridge and a CatBoost model trained on real rows. Static scan: count stored constants equal to a training cell value against a null, and report whether any full training row is reconstructable.",
+    "claims": "Empirical attacks only. No result is a differential-privacy guarantee or HIPAA de-identification."
+  },
+  "fidelity_v2": {
+    "metrics": "Marginal Kolmogorov-Smirnov and total variation, pairwise correlation fidelity, CatBoost C2ST, alpha-precision and beta-recall, from the pinned evaluators.",
+    "c2st": "One CatBoost detector for every method, rows_per_class = min(validation rows, synthetic rows, 800), five-fold grouped. A cell that cannot supply that count is unavailable.",
+    "intervals": "Nested bootstrap as in estimands."
+  },
+  "ablations": {
+    "binary": "B_grid",
+    "grid": "grid_features{6|12|24}_width{linear|8|16}_steps{512|2048|8192}_readout{on|off} at fit seed 11 on 100 lineages",
+    "one_axis_seeds": "The eight configurations that change one axis from the anchor (features12, width16, steps2048, readout on) at fit seeds 23 and 37",
+    "byte_budget": "--max-artifact-bytes in {512, 1024, 2048, 10240} at fit seeds 11, 23, and 37. A fit that cannot meet its cap is recorded as infeasible.",
+    "legacy_profiles": "The four B_hist research profiles at all five fit seeds, which tests whether the seed-11 profile choice holds.",
+    "role": "Descriptive. No configuration is selected from these results."
+  },
+  "stress_suite": {
+    "generators": ["sparse_linear", "additive_nonlinear", "product2", "product3", "xor", "parity3_binary", "parity4_binary", "tree_depth3", "heteroscedastic", "heavy_tailed", "multimodal_marginals", "nuisance24_relevant2", "rare_binary_5pct"],
+    "grid": "n in {200, 800}; p in {4, 12, 24} where the generator allows; Bayes R^2 in {0.5, 0.9}; data seeds 1, 2, 3; a 10,000-row audit split drawn from the same generator.",
+    "methods": "DOPE headline and product_default at all five fit seeds, ARF author-default, the density baselines, synthpop-CART, both controls, TabSyn scaled at seed 11.",
+    "outputs": "Retention under the three auditors and the share of oracle R^2 recovered on the interaction generators.",
+    "role": "Descriptive; it states where retention collapses."
+  },
+  "external_validity": {
+    "panel": "The public extension frozen in research/benchmark/PROTOCOL.md: up to ten OpenML-CC18 binary and ten OpenML-CTR23 regression tasks, 500 to 100,000 rows, 1 to 2,000 inputs, recorded redistribution rights, deduplicated, ordered by sha256 of the task id.",
+    "go_rule": "Go only if, by 2026-10-15 and without computing any retention: at least 16 of 20 tasks pass rights, fetch, and split receipts; DOPE seed-11 fits on the three largest tasks finish in under 600 s; binary scoring works end to end; at least 10 GPU-hours remain before close. Otherwise the panel is printed as not run.",
+    "methods_if_go": "DOPE headline at five fit seeds, ARF author-default, TabSyn scaled at seed 11, Gaussian copula, both controls.",
+    "pooling": "Never pooled with the PMLB panel or the headline.",
+    "beyondarena": "No-go: no qualified training exports and zero accepted cells."
+  },
+  "sealed_test_v2": {
+    "status": "not_unsealed",
+    "authorized_by": "owner decision 2026-10-09: one run, at the end, after every configuration is frozen and its hash committed",
+    "scope": "Every primary and secondary arm with completed fits, every completed fit seed, sizes n and 4n, sample seeds 101, 211, 307, both controls, and the external panel if Go.",
+    "manifest": "Every train-only sample is generated before the freeze. sealed-v2-manifest.jsonl lists method, arm, track, dataset, fit seed, size, sample seed, artifact inventory sha256, CSV path, CSV sha256 and shape, target position, validation receipt sha256, and binary and runtime pins. Its sha256 is committed, tagged sealed-v2-freeze, and hard-coded in the runner before the unseal.",
+    "regeneration_audit": "A seeded 5% of manifest rows per method is regenerated from the frozen artifacts before the freeze. Deterministic samplers must reproduce byte-identical files; nondeterministic GPU samplers are listed by name.",
+    "run": "Host xbabe3 only, DOPE_RF_UNSEAL=1, an exclusive fsynced registry marker, CPU-only scoring with the pinned evaluator. Every CSV hash and shape is checked before any test.csv is opened. Each test.csv must match its recorded official digest before it is parsed.",
+    "resume": "Decided by the owner at the freeze. Proposed: strictly one run; after a crash, resume only with the identical manifest hash and only to fill missing cells, printing the number of sessions.",
+    "reporting": "Sealed-test values become the headline. Validation values become development results. A sealed result weaker than validation is reported unchanged."
+  },
+  "launch_order": [
+    "A: DOPE headline and product_default at five fit seeds on xbabe1",
+    "A-prime: B_new seed-11 refit and four-seed re-scoring",
+    "B: TabSyn scaled seeds 23, 37, 53, 71",
+    "B-prime: TabSyn author-default seed 11",
+    "C: TabDDPM v6 after the v5 diagnosis",
+    "D: Forest-Flow under B1",
+    "E: density baselines, synthpop-CART, SMOTE at five seeds",
+    "F: CTGAN and TVAE author-default",
+    "G: TabDiff",
+    "H: GReaT",
+    "I: ablations",
+    "J: stress suite",
+    "K: common-evaluator re-audit",
+    "L: privacy v2",
+    "M: external panel if Go",
+    "S: sealed test v2"
+  ],
+  "claims": {
+    "formal_dp": false,
+    "hipaa_deidentification": false,
+    "mfs_v2": null,
+    "mfs_v3": null,
+    "ptf_v1": null,
+    "superiority": null
+  }
+}

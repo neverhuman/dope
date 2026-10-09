@@ -518,7 +518,17 @@ def _gate(args, manifest: list[dict], registry: Path | None = None) -> dict:
     return document
 
 
+SUPERSEDED_BY = HERE / "predeclare_v2.json"
+
+
+def _refuse_superseded(marker: Path = SUPERSEDED_BY) -> None:
+    """predeclare_v2 holds the only authorized unseal, so v1 never runs."""
+    if marker.exists():
+        raise SystemExit("predeclare_v2 supersedes the v1 sealed run")
+
+
 def main() -> None:
+    _refuse_superseded()
     parser = argparse.ArgumentParser()
     parser.add_argument("--predeclare", type=Path, required=True)
     parser.add_argument("--expect-sha256", required=True)
