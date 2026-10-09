@@ -109,6 +109,17 @@ class MfsV3Tests(unittest.TestCase):
                     self.assertIsNone(report["score"])
                     self.assertIn(key, report["failed_gates"])
 
+    def test_attack_metrics_require_valid_probability_domains(self):
+        for field, gate, limit in (("membership_auc", "membership_auc", 0.55),
+                                   ("attribute_inference_advantage", "attribute_inference", 0.05)):
+            for value in (-1.0, limit + 0.001, 1.1, True, None, float("nan"), float("inf")):
+                with self.subTest(field=field, value=value):
+                    report = evaluate_v3(dict(passing(), **{field: value}))
+                    self.assertIsNone(report["score"])
+                    self.assertIn(gate, report["failed_gates"])
+            for value in (0.0, limit):
+                self.assertTrue(evaluate_v3(dict(passing(), **{field: value}))["eligible"])
+
     def test_missing_or_invalid_components_are_reported(self):
         for value in (None, -0.1, 1.1, True, float("nan")):
             evidence = passing()
