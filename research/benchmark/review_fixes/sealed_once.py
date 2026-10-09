@@ -19,12 +19,14 @@ from pathlib import Path
 
 import numpy as np
 
+HERE = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parents[3]
+import sys
+sys.path.insert(0, str(REPO))
 from research.benchmark.review_fixes.sample_paths import resolve_sample_csv
 from research.benchmark.review_fixes.stats import cluster_of, median_ci
 
-HERE = Path(__file__).resolve().parent
 PILOT_PATH = HERE.parent / "pilot_metrics.py"
-REPO = HERE.parents[2]
 RESULTS = REPO / "research" / "benchmark" / "results"
 WORKERS = Path("/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker")
 EVALUATOR = Path("/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/evaluator")
