@@ -10,18 +10,15 @@ every hard gate passes.
 
 ## Build
 
-From this directory, with TeX Live and `IEEEtran`:
+From this directory:
 
 ```bash
-pdflatex -interaction=nonstopmode dope-mfs
-bibtex dope-mfs
-pdflatex -interaction=nonstopmode dope-mfs
-pdflatex -interaction=nonstopmode dope-mfs
+bash scripts/build_pdf.sh
 ```
 
-The citation style is numeric, in the sentence, through `\cite`. That is the
-IEEE convention: a claim about CTGAN points at Xu et al. as `[n]`, and the
-reference list is `references.bib`.
+The manuscript is a single-column `article` with `iclr2027_conference` and
+Times. Citations are natbib author-year (`\citep` / `\citet`). The class
+running header is cleared. `references.bib` is the reference list.
 
 ## What is allowed to change a number
 

@@ -32,6 +32,8 @@ FIGURES = (
     ROOT / "figures" / "mfs-v3-paired.pdf",
     ROOT / "figures" / "retained-matched-eight.pdf",
     ROOT / "figures" / "published-baseline-cohorts.pdf",
+    # Drawn at the 5.5in text width. The other plots stay 7.16in.
+    ROOT / "figures" / "teaser.pdf",
 )
 # A measurement typed into the prose. Integers and one-decimal illustration
 # values such as the MFS arithmetic example stay in the generator instead.
@@ -62,7 +64,22 @@ def strip_comments(text: str) -> str:
 
 def main() -> int:
     failures = []
-    tex = strip_comments(TEX.read_text())
+    raw_tex = TEX.read_text()
+    if "D.O.P.E." in raw_tex:
+        failures.append("D.O.P.E. remains in dope-mfs.tex")
+    if r"\documentclass{article}" not in raw_tex.split(r"\begin{document}", 1)[0]:
+        failures.append("dope-mfs.tex is not an article-class manuscript")
+    if "IEEEtran" in raw_tex.split(r"\begin{document}", 1)[0]:
+        failures.append("dope-mfs.tex preamble still uses IEEEtran")
+    if r"\fancyhead{}" not in raw_tex or r"\headrulewidth" not in raw_tex:
+        failures.append("the class running header is not cleared")
+    if "conference paper at ICLR" in raw_tex:
+        failures.append("dope-mfs.tex claims an ICLR venue")
+    if "figures/teaser.pdf" not in raw_tex:
+        failures.append("dope-mfs.tex does not include figures/teaser.pdf")
+    if r"\IfFileExists" in raw_tex or "The page-1 value figure is" in raw_tex:
+        failures.append("the teaser include has a missing-file fallback")
+    tex = strip_comments(raw_tex)
     # Drop verbatim-ish inputs of generated tables; those files are the generator.
     body = "\n".join(line for line in tex.splitlines() if "\\input{generated/" not in line)
     leaked = RAW_DECIMAL.findall(body)
@@ -104,6 +121,11 @@ def main() -> int:
         recorded_hashes.update(json.loads(mfs_hash_path.read_text()).get("pdf_sha256") or {})
     else:
         failures.append("generated/mfs-v3-figure-hashes.json is missing")
+    teaser_hash_path = ROOT / "generated" / "teaser-figure-hashes.json"
+    if teaser_hash_path.is_file():
+        recorded_hashes.update(json.loads(teaser_hash_path.read_text()).get("pdf_sha256") or {})
+    else:
+        failures.append("generated/teaser-figure-hashes.json is missing")
     for path in FIGURES:
         if not path.exists():
             failures.append(f"missing figure {path.name}")
@@ -121,8 +143,9 @@ def main() -> int:
             for line in info.splitlines():
                 if line.startswith("Page size:"):
                     width = float(line.split()[2]) / 72.0
-            if width is None or abs(width - 7.16) > 0.02:
-                failures.append(f"{path.name} width is not 7.16in")
+            expected = 5.5 if path.name == "teaser.pdf" else 7.16
+            if width is None or abs(width - expected) > 0.02:
+                failures.append(f"{path.name} width is not {expected:.2f}in")
     manuscript_texts = [TEX, ROOT / "supplement.tex"]
     manuscript_texts.extend(sorted((ROOT / "generated").glob("*.tex")))
     for path in manuscript_texts:
@@ -148,6 +171,17 @@ def main() -> int:
         hits = banned_hits(extracted)
         if hits:
             failures.append(f"{path.name} text contains a private token: {hits[0]}")
+        if path.name != "supplement.pdf":
+            info = subprocess.check_output(["pdfinfo", str(path)], text=True, errors="replace")
+            if "612 x 792" not in info:
+                failures.append(f"{path.name} is not US Letter")
+            if "conference paper at ICLR" in extracted or "Under review as a conference paper" in extracted:
+                failures.append(f"{path.name} claims an ICLR venue")
+        if path.name == "dope-mfs-anonymous.pdf":
+            if "Jepson" in extracted or "NEVERHUMAN" in extracted or "Alton" in extracted:
+                failures.append("anonymous PDF still names an author")
+        if path.name == "dope-mfs.pdf" and "DOPE" not in extracted:
+            failures.append("journal PDF does not show the DOPE title")
     for log in LOGS:
         if not log.is_file():
             failures.append(f"missing build log {log}")
