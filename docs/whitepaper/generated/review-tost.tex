@@ -1,0 +1,55 @@
+% Wilcoxon and the TOST t-tests treat paired lineages as iid. The interval is the family-cluster bootstrap of the median. Holm families are separate for size n and size 4n (density 9, neural 6, ARF 6, Forest-Flow 3).
+\begin{tabular}{lllrrrl}
+\toprule
+Size & Auditor & Comparator & Mean diff. & 90\% CI & TOST $p$ & Equivalent at $\pm 0.02$ \\
+\midrule
+1$n$ & catboost & GaussianCopula & 0.2483 & [0.1779, 0.3188] & 1.000 & no \\
+1$n$ & catboost & Chow-Liu & 7.7460 & [-3.7576, 19.2497] & 0.866 & no \\
+1$n$ & catboost & independent\_marginals & 1.1580 & [0.7097, 1.6062] & 1.000 & no \\
+1$n$ & linear & GaussianCopula & 0.2382 & [0.0337, 0.4427] & 0.960 & no \\
+1$n$ & linear & Chow-Liu & 1.5301 & [0.7702, 2.2899] & 0.999 & no \\
+1$n$ & linear & independent\_marginals & 1.1054 & [0.9906, 1.2202] & 1.000 & no \\
+1$n$ & mlp & GaussianCopula & 0.1971 & [0.1217, 0.2725] & 1.000 & no \\
+1$n$ & mlp & Chow-Liu & 1.1319 & [0.7996, 1.4642] & 1.000 & no \\
+1$n$ & mlp & independent\_marginals & 1.3698 & [1.1741, 1.5655] & 1.000 & no \\
+4$n$ & catboost & GaussianCopula & 0.2613 & [0.2007, 0.3220] & 1.000 & no \\
+4$n$ & catboost & Chow-Liu & 8.0937 & [-3.9560, 20.1434] & 0.866 & no \\
+4$n$ & catboost & independent\_marginals & 1.2876 & [0.6528, 1.9224] & 0.999 & no \\
+4$n$ & linear & GaussianCopula & 0.1832 & [0.0184, 0.3480] & 0.948 & no \\
+4$n$ & linear & Chow-Liu & 1.4415 & [0.7544, 2.1285] & 1.000 & no \\
+4$n$ & linear & independent\_marginals & 1.0440 & [0.9496, 1.1384] & 1.000 & no \\
+4$n$ & mlp & GaussianCopula & 0.3295 & [0.2309, 0.4282] & 1.000 & no \\
+4$n$ & mlp & Chow-Liu & 0.9903 & [0.6981, 1.2825] & 1.000 & no \\
+4$n$ & mlp & independent\_marginals & 1.3100 & [1.2007, 1.4194] & 1.000 & no \\
+1$n$ & catboost & CTGAN & 1.0872 & [0.8392, 1.3352] & 1.000 & no \\
+1$n$ & catboost & TVAE & 0.2867 & [0.1907, 0.3827] & 1.000 & no \\
+1$n$ & linear & CTGAN & 1.4244 & [0.9705, 1.8783] & 1.000 & no \\
+1$n$ & linear & TVAE & 1.3010 & [-0.2842, 2.8862] & 0.911 & no \\
+1$n$ & mlp & CTGAN & 2.1780 & [1.0282, 3.3279] & 0.998 & no \\
+1$n$ & mlp & TVAE & 0.5985 & [0.2704, 0.9265] & 0.997 & no \\
+4$n$ & catboost & CTGAN & 1.0962 & [0.8335, 1.3588] & 1.000 & no \\
+4$n$ & catboost & TVAE & 0.2673 & [0.1704, 0.3642] & 1.000 & no \\
+4$n$ & linear & CTGAN & 1.3489 & [0.9775, 1.7204] & 1.000 & no \\
+4$n$ & linear & TVAE & 1.0124 & [-0.1398, 2.1646] & 0.923 & no \\
+4$n$ & mlp & CTGAN & 1.8412 & [1.1388, 2.5436] & 1.000 & no \\
+4$n$ & mlp & TVAE & 0.7771 & [0.2190, 1.3353] & 0.985 & no \\
+1$n$ & catboost & ARF & 0.1144 & [0.0426, 0.1862] & 0.984 & no \\
+1$n$ & catboost & ARF & 0.1354 & [0.0651, 0.2057] & 0.996 & no \\
+1$n$ & linear & ARF & 0.1786 & [0.0606, 0.2965] & 0.986 & no \\
+1$n$ & linear & ARF & 0.2123 & [0.0869, 0.3378] & 0.994 & no \\
+1$n$ & mlp & ARF & 0.2632 & [0.1518, 0.3746] & 1.000 & no \\
+1$n$ & mlp & ARF & 0.3097 & [0.1406, 0.4789] & 0.997 & no \\
+4$n$ & catboost & ARF & 0.2059 & [0.0480, 0.3638] & 0.973 & no \\
+4$n$ & catboost & ARF & 0.1737 & [0.1098, 0.2376] & 1.000 & no \\
+4$n$ & linear & ARF & 0.0924 & [0.0269, 0.1579] & 0.965 & no \\
+4$n$ & linear & ARF & 0.1249 & [0.0554, 0.1943] & 0.993 & no \\
+4$n$ & mlp & ARF & 0.2894 & [0.1767, 0.4022] & 1.000 & no \\
+4$n$ & mlp & ARF & 0.3089 & [0.1650, 0.4527] & 0.999 & no \\
+1$n$ & catboost & ForestDiffusion/Forest-Flow & -0.0917 & [-0.2333, 0.0500] & 0.823 & no \\
+1$n$ & linear & ForestDiffusion/Forest-Flow & -0.0040 & [-0.0820, 0.0740] & 0.342 & no \\
+1$n$ & mlp & ForestDiffusion/Forest-Flow & 0.0723 & [-0.1050, 0.2497] & 0.731 & no \\
+4$n$ & catboost & ForestDiffusion/Forest-Flow & -0.1089 & [-0.2579, 0.0401] & 0.859 & no \\
+4$n$ & linear & ForestDiffusion/Forest-Flow & 0.0118 & [-0.1779, 0.2015] & 0.466 & no \\
+4$n$ & mlp & ForestDiffusion/Forest-Flow & -0.0753 & [-0.1953, 0.0447] & 0.821 & no \\
+\bottomrule
+\end{tabular}

@@ -204,8 +204,22 @@ def main() -> None:
                 drafted.append(item)
                 family.append(item["wilcoxon_p"])
         adjusted = holm(family)
+        family_n = len([p_value for p_value in family if p_value is not None])
+        if size == 1:
+            holm_note = (
+                "size-n family is the three predictor-only auditor tests; "
+                "real_bootstrap_4n has no size-n arm in the predeclaration"
+            )
+        else:
+            holm_note = (
+                "size-4n family is six tests: three auditors times "
+                "real_bootstrap_4n and predictor_only"
+            )
         for item, p_value in zip(drafted, adjusted):
             item["holm_p"] = p_value
+            item["holm_family_n"] = family_n
+            item["holm_note"] = holm_note
+            item["tests_treat_lineages_as_iid"] = True
             paired_rows.append(item)
     payload = {
         "format": "dope-review-fix-controls",
@@ -241,9 +255,17 @@ def main() -> None:
             f"{row['size']}$n$ & catboost & split {row['split_seed']} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
         )
-    write_tex("review-controls.tex", _table(
+    write_tex("review-controls.tex", (
+        "% Size n Holm family has 3 tests (predictor-only times three auditors). "
+        "real\\_bootstrap\\_4n has no size-n arm, so it is not a member of that family. "
+        "Size 4n Holm family has 6 tests. "
+        "Predictor fit seeds 23, 37, 53, and 71 are all reported and are not in the Holm family. "
+        "Split-seed rows are a separate sensitivity and are not pooled with fit seed 11. "
+        "Wilcoxon and TOST treat lineages as iid. The interval is the family-cluster bootstrap.\n"
+    ) + _table(
         "Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
         lines,
+        "lllrrrrllr",
     ))
     catboost = [row for row in paired_rows if row["auditor"] == "catboost"]
     for row in catboost:

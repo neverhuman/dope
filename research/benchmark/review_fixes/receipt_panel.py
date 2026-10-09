@@ -292,6 +292,35 @@ def fivefit_rows(panel_path: Path) -> list:
     return rows
 
 
+def stored_fidelity_rows(reductions, names) -> list:
+    """Stored logistic C2ST, marginal KS, and pair correlation.
+
+    Each row counts lineages with three finite stored values. The cohorts are
+    not matched across methods, and the C2ST column is not the GBDT detector.
+    """
+    rows = []
+    sources = list(DENSITY) + list(NEURAL) + list(ARF) + list(FOREST)
+    for method, configuration in sources:
+        reduced = reductions[(method, configuration)]
+        for size in (1, 4):
+            for field, key in (("c2st", "c2st"), ("ks", "ks"), ("pair", "pair")):
+                values = {}
+                for (dataset, row_size), row in reduced.items():
+                    if row_size == size and len(row[field]) == 3:
+                        values[dataset] = float(np.median(row[field]))
+                summary = marginal(values, names, f"fidelity|{method}|{configuration}|{size}|{field}")
+                summary.update({
+                    "method": method,
+                    "configuration": configuration,
+                    "size": size,
+                    "metric": key,
+                    "c2st_kind": "stored_logistic" if key == "c2st" else None,
+                    "coverage": "unmatched; lineages with three finite stored values",
+                })
+                rows.append(summary)
+    return rows
+
+
 def build(stop_after_anchor: bool = False) -> dict:
     predeclare_path = REPO / "research" / "benchmark" / "review_fixes" / "predeclare.json"
     predeclare = json.loads(predeclare_path.read_text())
@@ -540,18 +569,7 @@ def build(stop_after_anchor: bool = False) -> dict:
                     "task_counts": _task_counts(rmse_values, reduced, size, tasks),
                 })
 
-    fidelity_rows = []
-    for method, configuration in DENSITY:
-        reduced = reductions[(method, configuration)]
-        for size in (1, 4):
-            for field, key in (("c2st", "c2st"), ("ks", "ks"), ("pair", "pair")):
-                values = {}
-                for (dataset, row_size), row in reduced.items():
-                    if row_size == size and len(row[field]) == 3:
-                        values[dataset] = float(np.median(row[field]))
-                summary = marginal(values, names, f"fidelity|{method}|{configuration}|{size}|{field}")
-                summary.update({"method": method, "configuration": configuration, "size": size, "metric": key})
-                fidelity_rows.append(summary)
+    fidelity_rows = stored_fidelity_rows(reductions, names)
 
     seed_rows = fivefit_rows(RESULTS / "cpu-fivefit-validation-v1" / "arf" / "panel.json")
     seed_rows += fivefit_rows(RESULTS / "cpu-fivefit-validation-v1" / "forest" / "panel.json")
@@ -625,22 +643,71 @@ def _findings(payload) -> list:
         if row["auditor"] == "catboost" and row["tost"]["equivalent"]
     ]
     lines.append(
-        "CatBoost TOST at the pre-declared ±0.02 mean-difference margin passes for "
+        "CatBoost TOST at the pre-declared ±0.02 mean-difference margin, treating lineages as iid, passes for "
         + (", ".join(f"{row['method']} {row['configuration']} size {row['size']}n" for row in equivalents) or "no published comparator")
         + "."
     )
     return lines
 
 
-def _table(header: str, rows: list[str]) -> str:
+def _nfields(line: str) -> int:
+    body = line.strip()
+    if body.endswith("\\\\"):
+        body = body[:-2].rstrip()
+    return body.replace(r"\&", "").count("&") + 1
+
+
+def _table(header: str, rows: list[str], align: str) -> str:
+    expected = _nfields(header)
+    if len(align) != expected:
+        raise ValueError(f"column spec {align!r} does not match header fields {expected}: {header}")
+    for row in rows:
+        if row.lstrip().startswith("%"):
+            continue
+        got = _nfields(row)
+        if got != expected:
+            raise ValueError(f"row has {got} fields, header has {expected}: {row}")
     body = "\n".join(rows) if rows else "% no rows"
     return (
-        "\\begin{tabular}{@{}lllrll@{}}\n\\toprule\n"
+        f"\\begin{{tabular}}{{{align}}}\n\\toprule\n"
         f"{header} \\\\\n\\midrule\n{body}\n\\bottomrule\n\\end{{tabular}}\n"
     )
 
 
+def _metric_median(block) -> str:
+    if isinstance(block, dict):
+        return fmt(block.get("median"))
+    return fmt(block)
+
+
+def _measured_prefix(row) -> str:
+    block = row.get("catboost_retention")
+    measured = block.get("measured_datasets") if isinstance(block, dict) else None
+    datasets = row.get("datasets")
+    if isinstance(datasets, list):
+        datasets = len(datasets)
+    if measured is None:
+        return str(datasets)
+    return f"{measured}/{datasets}"
+
+
+def _metric_label(row) -> str:
+    if row.get("metric") == "c2st":
+        return "stored logistic C2ST"
+    if row.get("metric") == "ks":
+        return "marginal KS"
+    if row.get("metric") == "pair":
+        return "pair correlation"
+    return str(row.get("metric"))
+
+
 def emit_tex(payload) -> None:
+    note = (
+        "% Wilcoxon and the TOST t-tests treat paired lineages as iid. "
+        "The interval is the family-cluster bootstrap of the median. "
+        "Holm families are separate for size n and size 4n "
+        "(density 9, neural 6, ARF 6, Forest-Flow 3).\n"
+    )
     retention = [
         _row_retention(row["method"], row["configuration"], row["auditor"], row["size"], row)
         for row in payload["retention"]
@@ -648,6 +715,7 @@ def emit_tex(payload) -> None:
     write_tex("review-size-retention.tex", _table(
         "Method & Configuration & Auditor & Size & $n$ & Median & Hierarchical 95\\% CI",
         retention,
+        "lllllrr",
     ))
     paired_lines = []
     for row in payload["paired"]:
@@ -658,9 +726,10 @@ def emit_tex(payload) -> None:
             f"{tex_name(row['configuration'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} & "
             f"{fmt(row['mean'])} & {flag} & {row['wins']}/{row['ties']}/{row['losses']} & {fmt(row['holm_p'], 3)} \\\\"
         )
-    write_tex("review-paired.tex", _table(
+    write_tex("review-paired.tex", note + _table(
         "Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
         paired_lines,
+        "lllllrrllrl",
     ))
     tost_lines = []
     for row in payload["paired"]:
@@ -670,9 +739,10 @@ def emit_tex(payload) -> None:
             f"{fmt(tost['mean'])} & [{fmt(tost['ci90_lo'])}, {fmt(tost['ci90_hi'])}] & "
             f"{fmt(tost['p'], 3)} & {'yes' if tost['equivalent'] else 'no'} \\\\"
         )
-    write_tex("review-tost.tex", _table(
+    write_tex("review-tost.tex", note + _table(
         "Size & Auditor & Comparator & Mean diff. & 90\\% CI & TOST $p$ & Equivalent at $\\pm 0.02$",
         tost_lines,
+        "lllrrrl",
     ))
     family_lines = []
     for row in payload["family"]:
@@ -693,6 +763,7 @@ def emit_tex(payload) -> None:
     write_tex("review-family.tex", _table(
         "Family & Size & Auditor & Contrast & $n$ & Median & Hierarchical CI",
         family_lines,
+        "lllllrr",
     ))
     denom_lines = []
     for row in payload["denominator"]:
@@ -706,6 +777,7 @@ def emit_tex(payload) -> None:
     write_tex("review-denominator.tex", _table(
         "Method & Configuration & Size & Informative & Noninformative & Undefined & Capped & Sensitivity $n$ & Capped median",
         denom_lines,
+        "lllrrrrrr",
     ))
     rmse_lines = []
     for row in payload["rmse"]:
@@ -718,30 +790,41 @@ def emit_tex(payload) -> None:
     write_tex("review-rmse.tex", _table(
         "Method & Size & Regression lineages & Synthetic RMSE & Real TRTR RMSE",
         rmse_lines,
+        "llrrr",
     ))
     fidelity_lines = []
     for row in payload["fidelity_stored"]:
         fidelity_lines.append(
-            f"{tex_name(row['method'])} & {row['size']}$n$ & {tex_name(row['metric'])} & "
+            f"{tex_name(row['method'])} & {row['size']}$n$ & {tex_name(_metric_label(row))} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
         )
-    write_tex("review-fidelity-stored.tex", _table(
+    methods = ", ".join(sorted({str(row["method"]) for row in payload["fidelity_stored"]}))
+    fidelity_note = (
+        "% Stored logistic C2ST, marginal KS, and pair correlation from the population ledgers. "
+        "Each n counts lineages with three finite stored values. Cohorts are not matched, "
+        "and this table is not a cross-method ranking. The stored C2ST is not the GBDT detector. "
+        f"Methods in this file: {methods}. TabSyn is not in these ledgers.\n"
+    )
+    write_tex("review-fidelity-stored.tex", fidelity_note + _table(
         "Method & Size & Metric & $n$ lineages & Median & Hierarchical CI",
         fidelity_lines,
+        "lllrrr",
     ))
     seed_lines = []
     for row in payload["existing_multiseed"]:
-        datasets = row["datasets"]
-        if isinstance(datasets, list):
-            datasets = len(datasets)
         seed_lines.append(
             f"{tex_name(row['method'])} & {row['fit_seed']} & {row['row_multiplier']} & "
-            f"{datasets} & {fmt(row['catboost_retention'])} & {fmt(row['distance_mia_auc'])} & "
-            f"{fmt(row['dcr_validation_median'])} \\\\"
+            f"{_measured_prefix(row)} & {_metric_median(row.get('catboost_retention'))} & "
+            f"{_metric_median(row.get('distance_mia_auc'))} & "
+            f"{_metric_median(row.get('dcr_validation_median'))} \\\\"
         )
-    write_tex("review-seeds-existing.tex", _table(
-        "Method & Fit seed & Size & Datasets & CatBoost retention & Distance MIA AUC & Holdout DCR median",
+    write_tex("review-seeds-existing.tex", (
+        "% Existing cpu-fivefit prefix. It is not pooled with the 97-lineage table. "
+        "Measured/prefix counts finite CatBoost retentions over the prefix size.\n"
+    ) + _table(
+        "Method & Fit seed & Size & Measured/prefix & CatBoost retention & Distance MIA AUC & Holdout DCR median",
         seed_lines,
+        "llllrrr",
     ))
     _figure(payload["delta_method_points"])
 
@@ -750,6 +833,8 @@ def _figure(points) -> None:
     FIGURES.mkdir(parents=True, exist_ok=True)
     import matplotlib
     matplotlib.use("Agg")
+    matplotlib.rcParams["pdf.fonttype"] = 42
+    matplotlib.rcParams["ps.fonttype"] = 42
     import matplotlib.pyplot as plt
     figure, axis = plt.subplots(figsize=(4.2, 3.2))
     for size, marker in ((1, "o"), (4, "s")):
@@ -763,24 +848,113 @@ def _figure(points) -> None:
             alpha=0.8,
         )
     axis.set_xlabel("Absolute null minus real loss")
-    axis.set_ylabel("Delta-method retention SE")
+    axis.set_ylabel("Sample SD of three TSTR losses / |null-trtr|")
     axis.set_title("DOPE CatBoost, three sample seeds")
     axis.legend(frameon=False)
     figure.tight_layout()
-    figure.savefig(FIGURES / "review-retention-se.pdf")
+    figure.savefig(
+        FIGURES / "review-retention-se.pdf",
+        metadata={"CreationDate": None, "ModDate": None},
+    )
     plt.close(figure)
+
+
+def _require_anchor(payload) -> None:
+    predeclare = json.loads((REPO / "research" / "benchmark" / "review_fixes" / "predeclare.json").read_text())
+    expected_n = predeclare["parser_checks"]["dope_catboost_4n_n"]
+    expected = predeclare["parser_checks"]["dope_catboost_4n_median"]
+    anchor = payload.get("anchor") or {}
+    median = anchor.get("median")
+    if anchor.get("n") != expected_n or median is None or abs(float(median) - expected) > 1e-12:
+        raise SystemExit(f"panel anchor mismatch {anchor}")
+
+
+def _same_median(left, right) -> bool:
+    if left is None or right is None:
+        return left is None and right is None
+    return float(left) == float(right)
+
+
+def patch_stored_fidelity(panel_path: Path) -> None:
+    """Replace only the stored-fidelity rows. Other panel numbers stay put."""
+    payload = json.loads(panel_path.read_text())
+    _require_anchor(payload)
+    campaign = _load_reductions()
+    fresh = stored_fidelity_rows(campaign["reductions"], campaign["names"])
+    old = {
+        (row["method"], row["configuration"], row["size"], row["metric"]): row.get("median")
+        for row in payload.get("fidelity_stored") or []
+    }
+    for row in fresh:
+        key = (row["method"], row["configuration"], row["size"], row["metric"])
+        if key in old and not _same_median(old[key], row.get("median")):
+            raise SystemExit(f"stored fidelity drift {key}")
+    payload["fidelity_stored"] = fresh
+    payload["fidelity_coverage"] = (
+        "unmatched stored values; not a cross-method ranking; "
+        "stored C2ST is logistic; TabSyn is absent from these ledgers"
+    )
+    text = json.dumps(_clean(payload), indent=2, sort_keys=True) + "\n"
+    temporary = panel_path.with_suffix(".json.tmp")
+    temporary.write_text(text)
+    temporary.replace(panel_path)
+    print(f"patched fidelity rows {len(fresh)} anchor n={payload['anchor']['n']}")
+
+
+def _load_reductions() -> dict:
+    record, _record_sha = _load("s3-lineage-record.json")
+    density, _density_sha = _load("density-matched-population-validation.json")
+    sdv, _sdv_sha = _load("sdv-matched-population-validation.json")
+    arf, _arf_sha = _load("arf-matched-population-validation.json")
+    forest, _forest_sha = _load("s3-matched-forest-confirmation-validation.json")
+    names = names_of(record)
+    reductions = {}
+    for method, configuration in DENSITY:
+        reductions[(method, configuration)] = reduce_cells(density["cells"], method, configuration)
+    for method, configuration in NEURAL:
+        reductions[(method, configuration)] = reduce_cells(sdv["cells"], method, configuration)
+    for method, configuration in ARF:
+        reductions[(method, configuration)] = reduce_cells(arf["cells"], method, configuration)
+    for method, configuration in FOREST:
+        reductions[(method, configuration)] = reduce_cells(forest["cells"], method, configuration)
+    return {"names": names, "reductions": reductions}
+
+
+def emit_from_panel(panel_path: Path) -> None:
+    payload = json.loads(panel_path.read_text())
+    _require_anchor(payload)
+    for name, recorded in (payload.get("sources") or {}).items():
+        actual = _sha(RESULTS / name)
+        if actual != recorded:
+            raise SystemExit(f"source drift {name}")
+    text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    if text != panel_path.read_text():
+        raise SystemExit("panel is not canonical json; refuse to emit a second serialization")
+    (GENERATED / "review-receipts.json").write_text(text)
+    emit_tex(payload)
+    for line in payload.get("findings") or []:
+        print(line)
 
 
 def main() -> None:
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--check-parser", action="store_true")
+    parser.add_argument("--from-panel", type=Path)
+    parser.add_argument("--patch-fidelity", type=Path)
     args = parser.parse_args()
-    payload = build(stop_after_anchor=args.check_parser)
     if args.check_parser:
+        payload = build(stop_after_anchor=True)
         anchor = payload["anchor"]
         print(f"parser check ok n={anchor['n']} median={anchor['median']}")
         return
+    if args.patch_fidelity:
+        patch_stored_fidelity(args.patch_fidelity)
+        return
+    if args.from_panel:
+        emit_from_panel(args.from_panel)
+        return
+    payload = build(stop_after_anchor=False)
     out_dir = RESULTS / "review-fixes-receipts-v1"
     out_dir.mkdir(parents=True, exist_ok=True)
     text = json.dumps(payload, indent=2, sort_keys=True) + "\n"

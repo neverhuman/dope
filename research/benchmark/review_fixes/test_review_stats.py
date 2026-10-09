@@ -8,6 +8,7 @@ from research.benchmark.review_fixes.stats import (
     cluster_of,
     delta_method_se,
     family_of,
+    median_ci,
     tost_mean,
 )
 
@@ -39,6 +40,12 @@ class TostTests(unittest.TestCase):
         self.assertEqual(tost_mean([0.0, 0.0])["margin"], 0.02)
 
 
+class MedianTests(unittest.TestCase):
+    def test_cluster_ids_must_match_values(self):
+        with self.assertRaises(ValueError):
+            median_ci([1.0, 2.0, 1000.0], "length", ["a", "b"])
+
+
 class DeltaTests(unittest.TestCase):
     def test_se_blows_up_as_the_gap_shrinks(self):
         wide = delta_method_se([1.0, 1.2, 0.8], null_loss=2.0, trtr_loss=0.0)
@@ -47,6 +54,16 @@ class DeltaTests(unittest.TestCase):
 
     def test_zero_gap_is_undefined(self):
         self.assertIsNone(delta_method_se([1.0, 1.1], 1.0, 1.0))
+
+
+class TableTests(unittest.TestCase):
+    def test_column_spec_must_match_the_header_and_every_row(self):
+        from research.benchmark.review_fixes.receipt_panel import _table
+
+        with self.assertRaises(ValueError):
+            _table("A & B", ["1 \\\\"], "ll")
+        body = _table("A & B", ["1 & 2 \\\\"], "lr")
+        self.assertIn("\\begin{tabular}{lr}", body)
 
 
 if __name__ == "__main__":
