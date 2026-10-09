@@ -151,6 +151,81 @@ def _split_rows(cells, names) -> list[dict]:
     return rows
 
 
+def payload_from_cells(cells: list[dict]) -> dict:
+    """Reduce scalar control cells to the committed aggregate. Writes nothing."""
+    record, _record_sha = _load("s3-lineage-record.json")
+    density, _density_sha = _load("density-matched-population-validation.json")
+    names = names_of(record)
+    dope = primary_map(reduce_cells(density["cells"], "DOPE", "features12_steps2048"))
+    del density
+    controls = {
+        ("real_bootstrap_4n", "resample", 4): _median_map(cells, "real_bootstrap_4n", None, 4),
+        ("predictor_only", "fit_seed_11", 1): _median_map(cells, "predictor_only", 11, 1),
+        ("predictor_only", "fit_seed_11", 4): _median_map(cells, "predictor_only", 11, 4),
+    }
+    seed_rows = []
+    for fit_seed in (11, 23, 37, 53, 71):
+        for size in (1, 4):
+            mapped = _median_map(cells, "predictor_only", fit_seed, size)
+            for auditor in AUDITORS:
+                summary = median_ci(
+                    [mapped[auditor][key] for key in sorted(mapped[auditor])],
+                    f"predictor-seed|{fit_seed}|{size}|{auditor}",
+                    [cluster_of(names.get(key, key), key) for key in sorted(mapped[auditor])],
+                )
+                summary.update({"fit_seed": fit_seed, "size": size, "auditor": auditor, "kind": "predictor_only"})
+                seed_rows.append(summary)
+    paired_rows = []
+    for size in (1, 4):
+        drafted = []
+        family = []
+        specs = []
+        if size == 4:
+            specs.append(("real_bootstrap_4n", "resample", controls[("real_bootstrap_4n", "resample", 4)]))
+        specs.append(("predictor_only", "fit_seed_11", controls[("predictor_only", "fit_seed_11", size)]))
+        for auditor in AUDITORS:
+            for method, configuration, mapped in specs:
+                item = _paired(
+                    dope[size][auditor],
+                    mapped[auditor],
+                    names,
+                    f"paired|controls|{size}|{auditor}|{method}|{configuration}",
+                )
+                item.update({
+                    "size": size, "auditor": auditor, "method": method, "configuration": configuration,
+                })
+                drafted.append(item)
+                family.append(item["wilcoxon_p"])
+        adjusted = holm(family)
+        family_n = len(family)
+        if size == 1:
+            holm_note = (
+                "size-n family is the three predictor-only auditor tests; "
+                "real_bootstrap_4n has no size-n arm in the predeclaration"
+            )
+        else:
+            holm_note = (
+                "size-4n family is six tests: three auditors times "
+                "real_bootstrap_4n and predictor_only"
+            )
+        for item, p_value in zip(drafted, adjusted):
+            item["holm_p"] = p_value
+            item["holm_family_n"] = family_n
+            item["holm_note"] = holm_note
+            item["tests_treat_lineages_as_iid"] = True
+            paired_rows.append(item)
+    return {
+        "format": "dope-review-fix-controls",
+        "version": 1,
+        "cells": len(cells),
+        "predeclaration_sha256": _sha(REPO / "research" / "benchmark" / "review_fixes" / "predeclare.json"),
+        "paired": paired_rows,
+        "predictor_fit_seeds": seed_rows,
+        "split_seeds": _split_rows(cells, names),
+        "claims": {"formal_dp": False, "mfs_v2": None, "ptf_v1": None, "release_safe_l3": None, "superiority": None},
+    }
+
+
 def render_controls(payload: dict) -> str:
     lines = []
     for row in payload["paired"]:
@@ -216,84 +291,14 @@ def main() -> None:
     if not cells:
         print("controls not scored yet")
         return
-    record, _record_sha = _load("s3-lineage-record.json")
-    density, _density_sha = _load("density-matched-population-validation.json")
-    names = names_of(record)
-    dope = primary_map(reduce_cells(density["cells"], "DOPE", "features12_steps2048"))
-    del density
-    controls = {
-        ("real_bootstrap_4n", "resample", 4): _median_map(cells, "real_bootstrap_4n", None, 4),
-        ("predictor_only", "fit_seed_11", 1): _median_map(cells, "predictor_only", 11, 1),
-        ("predictor_only", "fit_seed_11", 4): _median_map(cells, "predictor_only", 11, 4),
-    }
-    seed_rows = []
-    for fit_seed in (11, 23, 37, 53, 71):
-        for size in (1, 4):
-            mapped = _median_map(cells, "predictor_only", fit_seed, size)
-            for auditor in AUDITORS:
-                summary = median_ci(
-                    [mapped[auditor][key] for key in sorted(mapped[auditor])],
-                    f"predictor-seed|{fit_seed}|{size}|{auditor}",
-                    [cluster_of(names.get(key, key), key) for key in sorted(mapped[auditor])],
-                )
-                summary.update({"fit_seed": fit_seed, "size": size, "auditor": auditor, "kind": "predictor_only"})
-                seed_rows.append(summary)
-    paired_rows = []
-    for size in (1, 4):
-        drafted = []
-        family = []
-        specs = []
-        if size == 4:
-            specs.append(("real_bootstrap_4n", "resample", controls[("real_bootstrap_4n", "resample", 4)]))
-        specs.append(("predictor_only", "fit_seed_11", controls[("predictor_only", "fit_seed_11", size)]))
-        for auditor in AUDITORS:
-            for method, configuration, mapped in specs:
-                item = _paired(
-                    dope[size][auditor],
-                    mapped[auditor],
-                    names,
-                    f"paired|controls|{size}|{auditor}|{method}|{configuration}",
-                )
-                item.update({
-                    "size": size, "auditor": auditor, "method": method, "configuration": configuration,
-                })
-                drafted.append(item)
-                family.append(item["wilcoxon_p"])
-        adjusted = holm(family)
-        family_n = len(family)
-        if size == 1:
-            holm_note = (
-                "size-n family is the three predictor-only auditor tests; "
-                "real_bootstrap_4n has no size-n arm in the predeclaration"
-            )
-        else:
-            holm_note = (
-                "size-4n family is six tests: three auditors times "
-                "real_bootstrap_4n and predictor_only"
-            )
-        for item, p_value in zip(drafted, adjusted):
-            item["holm_p"] = p_value
-            item["holm_family_n"] = family_n
-            item["holm_note"] = holm_note
-            item["tests_treat_lineages_as_iid"] = True
-            paired_rows.append(item)
-    payload = {
-        "format": "dope-review-fix-controls",
-        "version": 1,
-        "cells": len(cells),
-        "predeclaration_sha256": _sha(REPO / "research" / "benchmark" / "review_fixes" / "predeclare.json"),
-        "paired": paired_rows,
-        "predictor_fit_seeds": seed_rows,
-        "split_seeds": _split_rows(cells, names),
-        "claims": {"formal_dp": False, "mfs_v2": None, "ptf_v1": None, "release_safe_l3": None, "superiority": None},
-    }
+    payload = payload_from_cells(cells)
     out = RESULTS / "review-fixes-controls-v1"
     out.mkdir(parents=True, exist_ok=True)
     text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
     (out / "panel.json").write_text(text)
     (GENERATED / "review-controls.json").write_text(text)
     write_tex("review-controls.tex", render_controls(payload))
-    catboost = [row for row in paired_rows if row["auditor"] == "catboost"]
+    catboost = [row for row in payload["paired"] if row["auditor"] == "catboost"]
     for row in catboost:
         print(
             f"DOPE minus {row['method']} {row['configuration']} CatBoost size {row['size']}n: "

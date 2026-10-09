@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from docs.whitepaper.scripts import review_controls as controls
 from docs.whitepaper.scripts import review_privacy as privacy
+from research.benchmark.review_fixes import bind_control_cells as bind
 from research.benchmark.review_fixes import privacy_fidelity as producer
 
 
@@ -186,6 +187,105 @@ class ClassSizeTests(unittest.TestCase):
             ):
                 privacy.main()
         reduce.assert_not_called()
+
+
+def _scalar_cell(**overrides):
+    cell = {
+        "dataset": "aa",
+        "fit_seed": 11,
+        "kind": "predictor_only",
+        "metrics": {
+            "c2st_auc": 0.5,
+            "marginal_ks_mean": 0.1,
+            "null_loss": 0.2,
+            "pair_correlation_fidelity": 0.3,
+            "rows": {"synthetic": 4, "train": 2, "validation": 1},
+            "utility": {
+                auditor: {
+                    "informative": True,
+                    "low_signal_noninferior": None,
+                    "retention": 0.5,
+                    "trtr_loss": 0.2,
+                    "tstr_loss": 0.2,
+                }
+                for auditor in ("catboost", "linear", "mlp")
+            },
+        },
+        "official_tests_opened": False,
+        "reason": None,
+        "sample_seed": 101,
+        "size": 1,
+        "split_seed": None,
+        "status": "ok",
+        "synthetic_sha256": "ab" * 32,
+    }
+    cell.update(overrides)
+    return cell
+
+
+class ControlScalarBindTests(unittest.TestCase):
+    def test_official_test_flag_and_extra_key_are_refused(self):
+        with self.assertRaisesRegex(ValueError, "official test"):
+            bind.assert_public_scalar(_scalar_cell(official_tests_opened=True))
+        extra = _scalar_cell()
+        extra["train_rows"] = [1]
+        with self.assertRaisesRegex(ValueError, "public scalar set"):
+            bind.assert_public_scalar(extra)
+        missing = _scalar_cell()
+        missing["metrics"]["utility"]["catboost"]["retention"] = None
+        bind.assert_public_scalar(missing)
+        missing["metrics"]["utility"]["catboost"]["retention"] = "secret"
+        with self.assertRaisesRegex(ValueError, "retention"):
+            bind.assert_public_scalar(missing)
+
+    def test_directory_rejects_malformed_json_and_duplicate_identity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dataset = root / "aa"
+            dataset.mkdir()
+            (dataset / "cell.json").write_text("{")
+            with self.assertRaisesRegex(ValueError, "not json"):
+                bind.load_cell_dir(root)
+            (dataset / "cell.json").write_text(json.dumps(_scalar_cell()))
+            (dataset / "again.json").write_text(json.dumps(_scalar_cell()))
+            (dataset / "table.csv").write_text("secret,row\n")
+            with self.assertRaisesRegex(ValueError, "duplicated"):
+                bind.load_cell_dir(root)
+
+    def test_ledger_is_written_only_when_the_panel_matches(self):
+        panel = {"format": "dope-review-fix-controls", "paired": [], "predeclaration_sha256": "cd" * 32}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dataset = root / "aa"
+            dataset.mkdir()
+            (dataset / "cell.json").write_text(json.dumps(_scalar_cell()))
+            panel_path = root / "panel.json"
+            panel_path.write_text(json.dumps(panel))
+            ledger = root / "scalar-cells.jsonl"
+            argv = [
+                "bind_control_cells",
+                "--cells", str(dataset.parent),
+                "--panel", str(panel_path),
+                "--write-ledger", str(ledger),
+                "--check",
+            ]
+            with (
+                patch.object(bind.sys, "argv", argv),
+                patch("docs.whitepaper.scripts.review_controls.payload_from_cells", return_value={"format": "other"}),
+                self.assertRaises(SystemExit),
+            ):
+                bind.main()
+            self.assertFalse(ledger.exists())
+            with (
+                patch.object(bind.sys, "argv", argv),
+                patch("docs.whitepaper.scripts.review_controls.payload_from_cells", return_value=panel),
+            ):
+                bind.main()
+            self.assertTrue(ledger.is_file())
+            self.assertNotIn("secret", ledger.read_text())
+            meta = json.loads(ledger.with_suffix(".meta.json").read_text())
+            self.assertEqual(meta["cell_count"], 1)
+            self.assertFalse(meta["official_tests_opened"])
 
 
 if __name__ == "__main__":
