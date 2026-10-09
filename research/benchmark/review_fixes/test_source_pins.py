@@ -122,7 +122,9 @@ class PublishedSourcePinTests(unittest.TestCase):
                 "--expect-sha256", "0" * 64, "--expect-git-blob", "0" * 40,
                 "--controls", str(self.root / "never-read-controls"),
                 "--out", str(registry), "--host", sealed.APPROVED_HOST]
+        # predeclare_v2 makes the v1 run refuse first; this test checks the guards behind that refusal.
         with (
+            patch.object(sealed, "_refuse_superseded", return_value=None),
             patch.object(sys, "argv", argv),
             patch.object(sealed.os, "uname", return_value=types.SimpleNamespace(nodename=sealed.APPROVED_HOST)),
             patch.dict(os.environ, {"DOPE_RF_UNSEAL": "1"}),
