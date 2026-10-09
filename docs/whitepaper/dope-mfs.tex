@@ -1,9 +1,8 @@
-\documentclass[journal]{IEEEtran}
-\usepackage{cite}
-\usepackage{amsmath,amssymb,amsfonts}
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{graphicx}
+\documentclass{article} % For LaTeX2e
+\usepackage{iclr2027_conference,times}
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=blue}
 \usepackage{url}
 \makeatletter
 \g@addto@macro{\UrlBreaks}{\do\/\do\_\do\-\do\.\do\=\do\&\do\?\do\#%
@@ -12,94 +11,137 @@
   \do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M%
   \do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z}
 \makeatother
-\raggedbottom
-\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage[capitalise]{cleveref}
+\usepackage{subcaption}
+\usepackage{varwidth}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \emergencystretch=3em
-\usepackage{etoolbox}
 \makeatletter
-% Journal mode keeps the abstract in the first column. Place the stored
-% abstract in the full-width title box so it spans both columns.
-\apptocmd{\@maketitle}{%
-  \par\addvspace{\medskipamount}%
-  \@IEEEtitleabstractindextextbox{\@IEEEtitleabstractindextext}%
-  \par\addvspace{\smallskipamount}%
-}{}{\errmessage{dope-mfs: spanning abstract was not attached}}
+\let\dope@thebibliography\thebibliography
+\renewcommand{\thebibliography}[1]{%
+  \dope@thebibliography{#1}%
+  \raggedright
+}
 \makeatother
+% Flush-bottom pages in this class emit Underfull vbox warnings. The paper
+% check rejects those warnings, so the page bottoms stay ragged.
+\raggedbottom
 
+% Scale a generated tabular down to the line only when it is wider.
+% End-of-line characters are kept so row breaks in the generated file remain.
+\newcommand{\fittowidthfile}[1]{%
+  \begingroup
+  \setbox0=\hbox{\begin{varwidth}{40in}\input{#1}\end{varwidth}}%
+  \ifdim\wd0>\linewidth
+    \resizebox{\linewidth}{!}{\unhbox0}%
+  \else
+    \unhbox0
+  \fi
+  \endgroup
+}
+
+\title{\texorpdfstring{\raggedright DOPE: Downstream Objective-Preserving\\ Encoding for Synthetic Tabular Data}{DOPE: Downstream Objective-Preserving Encoding for Synthetic Tabular Data}}
+
+\author{Jepson Taylor$^1$, Alton Alexander$^1$\\[0.15cm]
+$^1$NEVERHUMAN Research}
+
+\iclrfinalcopy
 \begin{document}
 \input{generated/numbers.tex}
 
-\title{Downstream Objective-Preserving Encoding}
+\maketitle
+% The class header would claim an ICLR venue. This manuscript does not.
+\fancyhead{}
+\renewcommand{\headrulewidth}{0pt}
 
-\author{Jepson~Taylor and Alton~Alexander%
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.~Taylor and A.~Alexander are with NEVERHUMAN Research.}}
-
-\markboth{Taylor and Alexander}%
-{Objective-Preserving Encoding}
-
-\IEEEtitleabstractindextext{%
 \begin{abstract}
-Downstream Objective-Preserving Encoding (D.O.P.E.) measures how much of
-a real-trained regressor's improvement over a null is recovered by an
-auditor trained on synthetic rows. Each method is selected on its own
-objective. The shared column is retention, not that native score. On
-$\NDopeCb$ informative PMLB regression lineages, fit seed $11$ and
-synthetic size $4n$, the CatBoost median retention is $\MedDopeCb$
-(95\% lineage-bootstrap interval $\LoDopeCb$ to $\HiDopeCb$).
-Holm-adjusted Wilcoxon tests separate this generator from a Gaussian
-copula ($\MedGaussCb$; \WtlGaussCb), a Chow--Liu tree ($\MedChowCb$),
-and independent marginals ($\MedIndCb$). The linear auditor does not
-separate it from the copula (\WtlLinGauss; Holm $\HolmLinGauss$). That
-interval contains zero, and the result is not an equivalence test.
-Kumo large, Mitra, and TabICL repeat the same density block and are not
-pooled with CatBoost. MFS-v2 and MFS-v3, the gated geometric release
-scores, are null on every method. Official tests were not opened. The
-distance ledger is not differential privacy or HIPAA de-identification.
-The $10{,}240$-byte cap is a release gate. A retention comparison does
-not pass it.
+We introduce \textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE), a measurement of how much of a real-trained regressor's improvement over a null is recovered by an auditor trained on synthetic rows.
+Each method is selected on its own objective. The shared column is retention, not that native score.
+On $\NDopeCb$ informative PMLB regression lineages, fit seed $11$ and synthetic size $4n$, the CatBoost median retention is $\MedDopeCb$ (95\% lineage-bootstrap interval $\LoDopeCb$ to $\HiDopeCb$).
+Holm-adjusted Wilcoxon tests separate this generator from a Gaussian copula ($\MedGaussCb$; \WtlGaussCb), a Chow--Liu tree ($\MedChowCb$), and independent marginals ($\MedIndCb$).
+The linear auditor does not separate it from the copula (\WtlLinGauss; Holm $\HolmLinGauss$).
+That interval contains zero, and the result is not an equivalence test.
+Kumo large, Mitra, and TabICL repeat the same density block and are not pooled with CatBoost.
+MFS-v2 and MFS-v3, the gated geometric release scores, are null on every method.
+Official tests were not opened.
+The distance ledger is not differential privacy or HIPAA de-identification.
+The $10{,}240$-byte cap is a release gate. A retention comparison does not pass it.
 \end{abstract}
 
-\begin{IEEEkeywords}
-Synthetic tabular data, retention, release score, paired tests.
-\end{IEEEkeywords}}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.0\linewidth]{figures/teaser.pdf}
+  \caption{Median retention at synthetic size $4n$ on the density block, for CatBoost, the linear auditor, and the MLP.
+  Each bar is a paired-lineage median and the whiskers are 95\% lineage-bootstrap intervals.
+  Under CatBoost, DOPE sits above the Gaussian copula ($\MedGaussCb$; \WtlGaussCb), the Chow--Liu tree ($\MedChowCb$), and independent marginals ($\MedIndCb$).
+  The linear auditor does not separate DOPE from the copula (\WtlLinGauss; Holm $\HolmLinGauss$), and that result is not an equivalence.
+  The MLP panel is the same block and is not pooled with CatBoost.
+  Forest-Flow is a separate block and is not drawn.
+  MFS-v2 and MFS-v3 stay null, and a retention does not pass the $10{,}240$-byte gate.}
+  \label{fig:teaser}
+\end{figure}
 
-\maketitle
-
+\newpage
 \section{Introduction}
+\label{sec:intro}
+
+\vspace{-.1cm}
+
 A generator paper often reports the metric that also selected the
 configuration. Those native scores live on different scales: predictive
-efficacy for CTGAN and TVAE~\cite{xu2019ctgan}, held-out log density for a
-Gaussian copula~\cite{patki2016sdv}, a forest density for
-ARF~\cite{watson2023arf}, and a diffusion or CART objective for other
-families~\cite{kotelnikov2023tabddpm,nowok2016synthpop}. This paper separates
+efficacy for CTGAN and TVAE~\citep{xu2019ctgan}, held-out log density for a
+Gaussian copula~\citep{patki2016sdv}, a forest density for
+ARF~\citep{watson2023arf}, and a diffusion or CART objective for other
+families~\citep{kotelnikov2023tabddpm,nowok2016synthpop}. This paper separates
 selection from the common measurement. After each method has been selected
 on its own objective, the shared columns are retention and the bytes charged
 to the artifact.
 
+\subsection{Downstream objective-preserving encoding}
+\label{sec:intro-definition}
+
+\vspace{-.1cm}
+
+We introduce \textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE), a measurement of how much of a real-trained regressor's improvement over a null is recovered by an auditor trained on synthetic rows.
 The decision those columns can support is narrow. Retention is the
 measurement this paper can finish. It is not a declaration that one
 generator is best, and it is not a license to ship. Master Fitness
-v2 (MFS-v2) and MFS-v3, defined in Section~\ref{sec:kpi}, are the release
+v2 (MFS-v2) and MFS-v3, defined in \cref{sec:kpi}, are the release
 scores. Both are null on every method here. A missing component or a
 failed gate removes the scalar rather than publishing a small number.
 
-The contributions are:
-\begin{enumerate}
-\item The displayed residual and the generative procedure that samples a row
-from that artifact (Section~\ref{sec:method}, Fig.~\ref{fig:arch},
-\eqref{eq:residual}). That procedure is not the production default and it
-does not use the $4{,}168$-dimensional router.
-\item Retention on the validation panel, with lineage-bootstrap intervals,
-and the algebra of a retention value (Fig.~\ref{fig:bars}). Charged bytes
-are the compactness check in Fig.~\ref{fig:bytes}, not the result.
-\item Paired tests inside unpooled blocks: the density block, the neural
-block, and the $\NForestCb$-lineage Forest-Flow confirmation, including the
-linear non-separation and the Forest-Flow lead (Fig.~\ref{fig:pairs}).
-\item The release score in Section~\ref{sec:kpi}. It is a geometric mean
-that stays null when any hard gate or positive-weight component is missing,
-so a retention cannot be copied into \eqref{eq:mfs}.
+\subsection{Contributions}
+\label{sec:intro-contributions}
+
+\vspace{-.1cm}
+
+\begin{enumerate}[leftmargin=1.5em]
+  \setlength{\itemsep}{1pt}
+  \item \textbf{Displayed residual and sampling procedure.}
+  The displayed residual and the generative procedure that samples a row
+  from that artifact (\cref{sec:method}, \cref{fig:arch},
+  \eqref{eq:residual}). That procedure is not the production default and it
+  does not use the $4{,}168$-dimensional router.
+  \item \textbf{Retention with lineage-bootstrap intervals.}
+  Retention on the validation panel, with lineage-bootstrap intervals,
+  and the algebra of a retention value (\cref{fig:bars}). Charged bytes
+  are the compactness check in \cref{fig:bytes}, not the result.
+  \item \textbf{Paired tests inside unpooled blocks.}
+  Paired tests inside unpooled blocks: the density block, the neural
+  block, and the $\NForestCb$-lineage Forest-Flow confirmation, including the
+  linear non-separation and the Forest-Flow lead (\cref{fig:pairs}).
+  \item \textbf{A release score that stays null when a gate is missing.}
+  The release score in \cref{sec:kpi}. It is a geometric mean
+  that stays null when any hard gate or positive-weight component is missing,
+  so a retention cannot be copied into \eqref{eq:mfs}.
 \end{enumerate}
 \paragraph{Scope.}
 \label{sec:scope}
@@ -112,60 +154,8 @@ publication is \TabDDPMResult. The full Forest-Flow publication is
 \PrivacyAttackPanel. Fit-seed variance is \FitSeedVariance. The full
 ablation grid is \FullAblationGrid. A release at the
 10{,}240-byte tier is a separate claim from the byte cap, and it is not
-made here. Section~\ref{sec:threats} records what these limits do to the
+made here. \cref{sec:threats} records what these limits do to the
 estimates. An unexecuted method is not a win for DOPE.
-
-\section{Related Work}
-\label{sec:related}
-Tabular synthesis has moved from parametric copulas~\cite{patki2016sdv} and
-Chow--Liu trees~\cite{chow1968dependence} through conditional GANs, including
-TableGAN, and variational autoencoders~\cite{xu2019ctgan,park2018tablegan} to diffusion and score-based
-models~\cite{kotelnikov2023tabddpm,kim2023stasy,lee2023codi,zhang2024tabsyn,shi2025tabdiff,mueller2025cdtd,jolicoeurmartineau2024forestdiffusion,zagardo2026gatd}.
-Autoregressive and language-model generators~\cite{borisov2023great,solatorio2023realtabformer},
-prior-data fitted generators~\cite{ma2023tabpfgen,hollmann2025tabpfn},
-CTAB-GAN and CTAB-GAN+~\cite{zhao2021ctabgan,zhao2024ctabganplus}, and
-graphical neural generators~\cite{liu2023goggle} target the same mixed-type
-tables. ARF estimates density with a forest~\cite{watson2023arf}. CART
-synthesis is the synthpop line~\cite{nowok2016synthpop}. A recent survey
-collects these design choices~\cite{borisov2024survey}. This paper runs the
-Gaussian copula, a Chow--Liu baseline written for this comparison,
-independent marginals written for this comparison, CTGAN, TVAE,
-and a $\NForestCb$-lineage Forest-Flow confirmation. New retained panels
-also measure ARF and a scaled author-default TabSyn subset
-(Section~\ref{sec:retained}). The other families named above are cited
-and not measured; Table~\ref{tab:baselinecoverage} records that coverage.
-SMOTE~\cite{chawla2002smote} was not run.
-This panel scores regression retention, not classification oversampling.
-
-Differentially private Bayesian networks and marginal
-synthesizers~\cite{zhang2014privbayes,mckenna2021mst,mckenna2022aim,cai2021privmrf} optimize
-a privacy budget. Membership inference and shadow-model attacks are a
-separate detection literature~\cite{shokri2017membership,hayes2018logan,vanbreugel2023domias}.
-Formal differential privacy is a different claim from an empirical
-resemblance score~\cite{dwork2014foundations,abadi2016deep}. Utility reviews
-separate marginal fidelity from downstream
-prediction~\cite{snoke2018utility,raab2018practical}. Alpha-precision,
-beta-recall, SDMetrics, and synthcity are the usual fidelity
-reports~\cite{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}.
-The fidelity results add alpha-precision, beta-recall, a
-distance-to-closest-record share, and a DOMIAS AUC. ARF and the retained
-TabSyn subset have an additional fidelity, detection and empirical-privacy
-panel in Section~\ref{sec:retained}. The displayed-profile ARF
-publication median is \ArfResult.
-The pre-specified privacy-attack panel
-remains \PrivacyAttackPanel. Nothing in those fields is a formal privacy
-guarantee or a HIPAA de-identification claim.
-
-Tree models remain strong tabular predictors, which is why CatBoost is one
-of the three auditors~\cite{grinsztajn2022trees,prokhorenkova2018catboost,shwartz-ziv2022tabular}.
-TabZilla and TabArena show how brittle a single split can
-be~\cite{mcelfresh2023tabzilla,erickson2026tabarena}. The regression
-lineages come from PMLB~\cite{olson2017pmlb,romano2021pmlb}. Comparing
-several methods on the same lineages needs a rank test and a critical
-difference, or a Bayesian signed-rank alternative~\cite{demsar2006statistical,benavoli2017time}.
-This paper reports the frequentist procedure: a Friedman test and a Nemenyi
-critical difference on the common set, plus paired Wilcoxon tests. The
-Bayesian signed-rank procedure is not computed.
 
 \section{Method}
 \label{sec:method}
@@ -175,7 +165,7 @@ id is \texttt{features12\_\allowbreak{}steps2048}: at most 12 screened inputs,
 a hidden width of 16, a $\tanh$ activation, 2{,}048 AdamW steps at learning
 rate $0.002$, a refit readout, and no embedding. It is a compact neural
 residual, not a GAN, a diffusion model, or a transformer.
-Fig.~\ref{fig:arch} is the pipeline. Training screens the inputs, maps them
+\cref{fig:arch} is the pipeline. Training screens the inputs, maps them
 through the width-16 $\tanh$ layer, and runs AdamW on the regression
 mean-squared error, with gradient clipping at $5$. The hidden weights and
 biases are then frozen.
@@ -239,7 +229,7 @@ The full width-and-step grid is \FullAblationGrid.
 \begin{figure}[t]
 \centering
 \input{figures/architecture.tex}
-\caption{Displayed pipeline. The official test is not an input.}
+\caption{\textbf{Displayed pipeline.} The official test is not an input.}
 \label{fig:arch}
 \end{figure}
 
@@ -276,7 +266,7 @@ stores the 856-wide sketch. The longer vector is a route from one bundle.
 
 A neighbor found with the sketch is still fit with the displayed
 profile. The artifact is still charged in bytes, and it still faces the
-release score in Section~\ref{sec:kpi}.
+release score in \cref{sec:kpi}.
 The sketch is not a seventh fitness component. A router action that names a
 retention or a failure probability is a prediction from the bundle. It does
 not enter \eqref{eq:mfs}.
@@ -302,7 +292,7 @@ auditor. A value above $1$ means it beat that auditor. A negative value means
 it did worse than the null. A lineage is informative when the real
 improvement is at least $0.01$ times the absolute null loss and is not zero.
 Otherwise the lineage is omitted. It is not entered as zero. The three
-auditors are CatBoost~\cite{prokhorenkova2018catboost}, ordinary linear
+auditors are CatBoost~\citep{prokhorenkova2018catboost}, ordinary linear
 regression, and an MLP. The lineage score is the median of sample seeds
 $101$, $211$, and $307$. The panel score is the median of those lineage
 scores. Intervals below are percentile lineage-bootstrap intervals,
@@ -448,7 +438,7 @@ MFS-v2 requires the six components, a non-empty hard-gate map that passed,
 both the size-$n$ and size-$4n$ artifacts, real-versus-real controls,
 artifact-only sampling, and locked metric implementations. Emitting MFS-v3
 also requires the clean tabular transfer and the embedding distance under
-the shared map, and every hard gate has to pass. Table~\ref{tab:mfsv3}
+the shared map, and every hard gate has to pass. \cref{tab:mfsv3}
 reports the measured retentions. A retention is not the scalar. The
 cleartext scan is unscanned where the stored column codes are internal
 identifiers, and other gates fail on many lineages, so the scalar stays
@@ -463,7 +453,7 @@ columns in this paper stay retention and charged bytes.
 \label{sec:setup}
 \subsection{Partitions and provenance}
 The panel is the rights-cleared PMLB regression
-collection~\cite{olson2017pmlb,romano2021pmlb}. \OriginSentence\
+collection~\citep{olson2017pmlb,romano2021pmlb}. \OriginSentence\
 The data lock admits
 $\EligibleN$ MIT-licensed entries and prepares $\PreparedN$. $\ExcludedN$
 lineages have no split object because the same source-row digest appears in
@@ -478,17 +468,17 @@ a hybrid coreset that keeps the observed feature and target range. The
 supplement records that draw. Held-out validation rows are the grouped
 holdout of the official training file, and those source rows include the
 simulated generators named above.
-Table~\ref{tab:provenance} is the lock and the file-name count. Test-file
+\cref{tab:provenance} is the lock and the file-name count. Test-file
 contents were not read.
 
-\begin{table*}[t]
-\caption{Test-split provenance. File-name counts only.}
+\begin{table}[t]
+\caption{\textbf{Test-split provenance.} File-name counts only.}
 \label{tab:provenance}
 \centering
-\footnotesize
+\scriptsize
 \setlength{\tabcolsep}{3pt}
-\input{generated/provenance-table.tex}
-\end{table*}
+\fittowidthfile{generated/provenance-table.tex}
+\end{table}
 
 Fit seed $11$ defines the primary displayed DOPE and legacy comparison
 populations. Later retained panels state their own fit-seed coverage. Sizes $n$ and $4n$ are
@@ -496,7 +486,7 @@ both stored. The tables below are $4n$. The Gaussian copula row is Copulas
 0.14.1 \texttt{Gaussian\-Multivariate}, selected by held-out mean log
 density. CTGAN and TVAE are the author implementation, selected by the mean
 of linear and MLP training-mean skill on validation rows, the same skill
-defined in Section~\ref{sec:results}. Chow--Liu uses eight
+defined in \cref{sec:results}. Chow--Liu uses eight
 bins and Laplace smoothing $1.0$. It is an implementation written for this
 comparison, as are the independent marginals. The ARF watch log's last count is $\ArfWatchClosed$ closed
 and $\ArfWatchOk$ ok out of $\ArfWatchPlanned$ planned, then a sealing record.
@@ -527,34 +517,34 @@ single fit at seed $11$. Later ARF and Forest-Flow panels report between-fit
 variation separately. This primary interval does not include a new fit, a new
 split, a new population, or a change of auditor.
 These are descriptive validation tests. They are not the release KPI in
-Section~\ref{sec:scope}, and they do not authorize a release at the
+\cref{sec:scope}, and they do not authorize a release at the
 10{,}240-byte tier. MFS-v2 and PTF-v1 stay null.
 
 \subsection{Compute}
-Table~\ref{tab:cost} lists fit time, peak memory, the GPU models, GPU
+\cref{tab:cost} lists fit time, peak memory, the GPU models, GPU
 hours, and charged bytes for receipts that store a fit timer.
 Sample-timer medians (maxima) are \CtganSampMed\ (\CtganSampMax) for
 CTGAN, \TvaeSampMed\ (\TvaeSampMax) for TVAE, and \ForestSampMed\
 (\ForestSampMax) for Forest-Flow. The DOPE receipt stores no sample
 timer. No receipt stores a separate CPU timer. Gaussian copula,
 Chow--Liu, independent marginals, and ARF have no fit timer, so they
-are omitted; their byte medians are in Table~\ref{tab:bytes}. ARF
+are omitted; their byte medians are in \cref{tab:bytes}. ARF
 receipts do not record a GPU model. TabSyn and TabDDPM costs are
 \TabSynPanel\ and \TabDDPMPanel. The supplement states the replay
 walls, the Forest-Flow sums, and the unsplit density attempt timers.
 
-\begin{table*}[t]
-\caption{Fit time, memory, GPU, and charged bytes where a fit timer was stored.}
+\begin{table}[t]
+\caption{\textbf{Fit time, memory, GPU, and charged bytes where a fit timer was stored.}}
 \label{tab:cost}
 \centering
-\footnotesize
+\scriptsize
 \setlength{\tabcolsep}{1.5pt}
-\input{generated/compute-cost-table.tex}
-\end{table*}
+\fittowidthfile{generated/compute-cost-table.tex}
+\end{table}
 
 \section{Results}
 \label{sec:results}
-Table~\ref{tab:headline} keeps, for each block and auditor, the tuned
+\textbf{Strongest tuned baseline.} \cref{tab:headline} keeps, for each block and auditor, the tuned
 baseline with the highest paired median retention. The difference is DOPE
 minus that baseline. Its interval is the paired lineage bootstrap already
 used in the block tables. W/T/L counts lineages with a positive, zero, or
@@ -564,16 +554,16 @@ median with a small $p$-value still includes lineage losses. The paired
 median difference is not the difference of the two medians.
 $\DiffGaussCb$ is not $\MedDopeCb$ minus $\MedGaussCb$.
 
-\begin{table*}[t]
-\caption{Strongest tuned baseline at $4n$. W/T/L counts lineages. Holm stays inside the block.}
+\begin{table}[t]
+\caption{\textbf{Strongest tuned baseline at $4n$.} W/T/L counts lineages. Holm stays inside the block.}
 \label{tab:headline}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\input{generated/headline-table.tex}
-\end{table*}
+\fittowidthfile{generated/headline-table.tex}
+\end{table}
 
-Fig.~\ref{fig:bars} shows the level of that shared utility under CatBoost.
+\textbf{CatBoost retention.} \cref{fig:bars} shows the level of that shared utility under CatBoost.
 Retention is the fraction of a real-trained auditor's improvement over a
 null that an auditor trained on synthetic rows recovers. Higher is better.
 The value is not MFS-v2. MFS-v2 stays null on every method. Each bar is
@@ -583,18 +573,18 @@ $\NForestCb$-lineage block. Its CatBoost median is higher than the paired
 DOPE median on that block, the Holm test is not significant, and that
 block is not drawn here.
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/retention-bars.pdf}
-\caption{CatBoost retention at $4n$. Higher is better. Each bar is the paired-lineage median and its lineage-bootstrap interval. Density uses $\NDopeCb$ lineages. The neural panel uses $\NNeuCb$ and is not pooled. Forest-Flow, $\NForestCb$ lineages, is higher on its own block and is omitted.}
+\caption{\textbf{CatBoost retention at $4n$.} Higher is better. Each bar is the paired-lineage median and its lineage-bootstrap interval. Density uses $\NDopeCb$ lineages. The neural panel uses $\NNeuCb$ and is not pooled. Forest-Flow, $\NForestCb$ lineages, is higher on its own block and is omitted.}
 \label{fig:bars}
-\end{figure*}
+\end{figure}
 
 \subsection{Density block}
-Circles are DOPE, squares the Gaussian copula, triangles Chow--Liu, and
+\textbf{Density marks.} Circles are DOPE, squares the Gaussian copula, triangles Chow--Liu, and
 diamonds the independent marginals. Filled marks are lineages. Open marks
 are that method's median and its lineage-bootstrap interval.
-Table~\ref{tab:density} is the paired density block. Under CatBoost, DOPE's
+\cref{tab:density} is the paired density block. Under CatBoost, DOPE's
 median paired differences are positive against the Gaussian copula
 ($\DiffGaussCb$, interval $\LoDiffGaussCb$ to $\HiDiffGaussCb$), the
 Chow--Liu tree, and the independent marginals. The Holm-adjusted
@@ -605,27 +595,27 @@ losses against it are \WtlGaussCb\ under CatBoost and \WtlMlpGauss\ under
 the MLP.
 On the $\FriedmanNCb$ lineages common to all four methods, the Friedman
 $p$-value is $\FriedmanPCb$ and the critical difference is $\FriedmanCdCb$.
-All six CatBoost pairs exceed that difference. Fig.~\ref{fig:pairs} shows
+All six CatBoost pairs exceed that difference. \cref{fig:pairs} shows
 the sorted paired differences with the same four marks. The horizontal
 axis is the retention difference. The segment is the critical difference.
 
-\begin{table*}[t]
-\caption{Density block at $4n$. Each cell is a dimensionless retention. W/T/L counts lineages.}
+\begin{table}[t]
+\caption{\textbf{Density block at $4n$.} Each cell is a dimensionless retention. W/T/L counts lineages.}
 \label{tab:density}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\input{generated/density-table.tex}
-\end{table*}
+\fittowidthfile{generated/density-table.tex}
+\end{table}
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/paired-cdf.pdf}
-\caption{CatBoost paired differences, sorted, and the Nemenyi scale. Rank 1 is the higher retention. The segment length is the critical difference.}
+\caption{\textbf{CatBoost paired differences, sorted, and the Nemenyi scale.} Rank 1 is the higher retention. The segment length is the critical difference.}
 \label{fig:pairs}
-\end{figure*}
+\end{figure}
 
-Fig.~\ref{fig:bytes} plots the same density-block retention against
+\textbf{Retention against charged bytes.} \cref{fig:bytes} plots the same density-block retention against
 $\log_{10}$ charged bytes. The table intervals are the paired subsets.
 For CatBoost those two DOPE sets coincide. Paired differences outside
 $[-1.5, 1.5]$ are counted in the panel title and omitted from that frame.
@@ -634,47 +624,47 @@ $10{,}240$-byte release gate. Crossing it is not a retention of zero, and
 a retention above the line is not a release. Neural and Forest-Flow
 artifacts are not on this figure.
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/retention-bytes.pdf}
-\caption{Density-block retention at $4n$ against charged bytes. The dashed line is the release byte gate.}
+\caption{\textbf{Density-block retention at $4n$ against charged bytes.} The dashed line is the release byte gate.}
 \label{fig:bytes}
-\end{figure*}
+\end{figure}
 
-Table~\ref{tab:mfsv3} is the same density block scored by Kumo large, Mitra, and TabICL.
+\textbf{Clean-license tabular transfer.} \cref{tab:mfsv3} is the same density block scored by Kumo large, Mitra, and TabICL.
 The shared map and the three sample seeds are the ones named above.
 These auditors are not pooled with the CatBoost, linear, and MLP rows.
-Fig.~\ref{fig:mfsv3bars} shows the lineage medians.
-Fig.~\ref{fig:mfsv3pairs} shows the sorted paired differences.
+\cref{fig:mfsv3bars} shows the lineage medians.
+\cref{fig:mfsv3pairs} shows the sorted paired differences.
 Squares are the Gaussian copula, triangles are Chow--Liu, and diamonds are the independent marginals.
 
 \paragraph{Release scalar on this receipt.}
 \input{generated/mfs-v3-scalar.tex}
 
-\begin{table*}[t]
-\caption{Kumo large, Mitra, and TabICL on the density block at $4n$. Each cell is a dimensionless retention, not an MFS value. W/T/L counts lineages.}
+\begin{table}[t]
+\caption{\textbf{Kumo large, Mitra, and TabICL on the density block at $4n$.} Each cell is a dimensionless retention, not an MFS value. W/T/L counts lineages.}
 \label{tab:mfsv3}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\input{generated/mfs-v3-density-table.tex}
-\end{table*}
+\fittowidthfile{generated/mfs-v3-density-table.tex}
+\end{table}
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/mfs-v3-retention-bars.pdf}
-\caption{Kumo large, Mitra, and TabICL retention at $4n$. Higher is better. Each bar is the lineage median and its lineage-bootstrap interval. Hatches distinguish the methods. This panel is not an MFS value.}
+\caption{\textbf{Kumo large, Mitra, and TabICL retention at $4n$.} Higher is better. Each bar is the lineage median and its lineage-bootstrap interval. Hatches distinguish the methods. This panel is not an MFS value.}
 \label{fig:mfsv3bars}
-\end{figure*}
+\end{figure}
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/mfs-v3-paired.pdf}
-\caption{Paired retention differences for Kumo large, Mitra, and TabICL, sorted by lineage. Filled marks are lineages.}
+\caption{\textbf{Paired retention differences for Kumo large, Mitra, and TabICL, sorted by lineage.} Filled marks are lineages.}
 \label{fig:mfsv3pairs}
-\end{figure*}
+\end{figure}
 
-The linear auditor does not separate DOPE from the Gaussian copula
+\textbf{Linear non-separation.} The linear auditor does not separate DOPE from the Gaussian copula
 (\WtlLinGauss; Holm $\HolmLinGauss$; difference $\DiffLinGauss$, interval
 $\LoDiffLinGauss$ to $\HiDiffLinGauss$; rank-biserial $\RLinGauss$).
 The interval contains zero. That non-separation is not an equivalence test.
@@ -683,7 +673,7 @@ against critical difference $\FriedmanCdLin$. Chow--Liu and the independent
 marginals remain separated under the linear auditor and the MLP. A CatBoost
 separation is not a separation under every auditor.
 
-Table~\ref{tab:rmse} is the median raw loss on the same informative
+\textbf{Raw auditor loss.} \cref{tab:rmse} is the median raw loss on the same informative
 lineages. RMSE is the square root of the stored mean squared error.
 Training-mean skill is one minus that loss divided by the training-mean
 null loss. Conventional held-out $R^2$ uses the mean of the evaluation
@@ -693,15 +683,15 @@ CatBoost reads RMSE $\RmseRealCb$ and $\RmseSynCb$, with training-mean
 skill $\RtwoRealCb$ and $\RtwoSynCb$.
 
 \begin{table}[t]
-\caption{Raw auditor medians on the informative lineages.}
+\caption{\textbf{Raw auditor medians on the informative lineages.}}
 \label{tab:rmse}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\input{generated/loss-beside-retention.tex}
+\fittowidthfile{generated/loss-beside-retention.tex}
 \end{table}
 
-Table~\ref{tab:bytes} counts artifacts at or under the cap. The two displayed
+\textbf{Charged bytes.} \cref{tab:bytes} counts artifacts at or under the cap. The two displayed
 DOPE artifacts over the cap are \MissA\ at \MissABytes\ bytes and \MissB\ at
 \MissBBytes\ bytes. \NotInfName\ has a fit whose CatBoost group is not
 informative, so the CatBoost median uses $\NDopeCb$ lineages while the byte
@@ -710,19 +700,19 @@ the Chow--Liu baseline and still sit near retention zero. Smallness alone is not
 the result. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi.
 
 \begin{table}[t]
-\caption{Charged bytes at $4n$. Forest-Flow is not pooled.}
+\caption{\textbf{Charged bytes at $4n$.} Forest-Flow is not pooled.}
 \label{tab:bytes}
 \centering
 \footnotesize
-\input{generated/byte-table.tex}
+\fittowidthfile{generated/byte-table.tex}
 \end{table}
 
-On the density cells, the displayed profile has median classifier two-sample
+\textbf{Fidelity and empirical privacy.} On the density cells, the displayed profile has median classifier two-sample
 AUC $\CtwoDope$ (interval $\CtwoLo$ to $\CtwoHi$, $n=\CtwoN$), mean marginal
 Kolmogorov--Smirnov distance $\KsDope$ ($\KsLo$ to $\KsHi$), and pairwise
 correlation fidelity $\CorrDope$ ($\CorrLo$ to $\CorrHi$). A two-sample AUC
 near one half means a linear-time classifier has trouble telling the
-synthetic rows from the held-out validation rows. Table~\ref{tab:fidelity}
+synthetic rows from the held-out validation rows. \cref{tab:fidelity}
 adds alpha-precision, beta-recall, the unbalanced DCR share, and a DOMIAS
 AUC. The lower block is the neural lineages only. Holm families are 12 and
 8, separate from retention. The DCR column is the fraction of synthetic
@@ -739,17 +729,17 @@ that worse direction. The displayed-profile ARF publication median is
 \PrivacyAttackPanel. This is not differential privacy or HIPAA
 de-identification.
 
-\begin{table*}[t]
-\caption{Grouped-validation fidelity and empirical privacy. Not DP or HIPAA.}
+\begin{table}[t]
+\caption{\textbf{Grouped-validation fidelity and empirical privacy.} Not DP or HIPAA.}
 \label{tab:fidelity}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{2pt}
-\input{generated/fidelity-privacy-table.tex}
-\end{table*}
+\fittowidthfile{generated/fidelity-privacy-table.tex}
+\end{table}
 
 \subsection{Neural block}
-Table~\ref{tab:neural} is not pooled with Table~\ref{tab:density}. On the
+\textbf{Neural block.} \cref{tab:neural} is not pooled with \cref{tab:density}. On the
 $\NNeuCb$ CatBoost lineages, DOPE's median is $\MedDopeNeuCb$, CTGAN's is
 $\MedCtganCb$, and TVAE's is $\MedTvaeCb$. TVAE is the stronger neural
 baseline. Wins, ties, and losses against TVAE are \WtlTvaeCb,
@@ -759,17 +749,17 @@ over the cap ($\CtganWithin$ and $\TvaeWithin$). Runs that stopped at the
 recorded time limit are omitted. They are not counted as failures of a
 finished fit.
 
-\begin{table*}[t]
-\caption{Neural block at $4n$, not pooled. W/T/L counts lineages.}
+\begin{table}[t]
+\caption{\textbf{Neural block at $4n$, not pooled.} W/T/L counts lineages.}
 \label{tab:neural}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\input{generated/neural-table.tex}
-\end{table*}
+\fittowidthfile{generated/neural-table.tex}
+\end{table}
 
 \subsection{Forest-Flow}
-Table~\ref{tab:forest} is a $\NForestCb$-lineage confirmation, not pooled
+\textbf{Forest-Flow confirmation.} \cref{tab:forest} is a $\NForestCb$-lineage confirmation, not pooled
 with the density or neural blocks. The Forest-Flow CatBoost median is
 $\MedForestCb$ (interval $\LoForestCb$ to $\HiForestCb$) and the paired
 DOPE median is $\MedDopeForestCb$. Wins, ties, and losses are
@@ -781,65 +771,65 @@ $\ForestByteLo$ to $\ForestByteHi$ bytes (median $\ForestByteMedian$)
 against a DOPE median of $\DopeForestByteMedian$ on the same lineages.
 MFS-v2 on this block is null.
 
-Table~\ref{tab:publication} is the published matched-population receipt
+\cref{tab:publication} is the published matched-population receipt
 for ARF at $4n$ on the displayed profile. Complete-population TabDDPM,
 TabSyn, and Forest-Flow receipts are omitted; the completed retained
 TabSyn subset is reported separately below.
 
-\begin{table*}[t]
-\caption{Forest-Flow confirmation at $4n$, CatBoost. Not pooled.}
+\begin{table}[t]
+\caption{\textbf{Forest-Flow confirmation at $4n$, CatBoost.} Not pooled.}
 \label{tab:forest}
 \centering
 \footnotesize
-\input{generated/forest-table.tex}
-\end{table*}
+\fittowidthfile{generated/forest-table.tex}
+\end{table}
 
 \begin{table}[t]
-\caption{Published ARF matched receipts at $4n$, CatBoost.}
+\caption{\textbf{Published ARF matched receipts at $4n$, CatBoost.}}
 \label{tab:publication}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\input{generated/publication-rows.tex}
+\fittowidthfile{generated/publication-rows.tex}
 \end{table}
 
 \subsection{Retained validation evidence}
 \label{sec:retained}
-Tables~\ref{tab:retained100} and~\ref{tab:retained8} add the merged
+\textbf{Retained validation.} \cref{tab:retained100,tab:retained8} add the merged
 retained-sample evidence. Each lineage averages all three sample seeds
 before a lineage-bootstrap median and percentile interval are computed.
 This differs from the median-of-seed rule in the earlier blocks; those
 blocks and their numbers are preserved. A lineage enters a metric only
 when all three values exist. An unavailable outcome stays absent.
-Table~\ref{tab:retained100} covers the same prepared population for ARF,
+\cref{tab:retained100} covers the same prepared population for ARF,
 copula and Chow--Liu defaults and native-selected configurations.
-Table~\ref{tab:retained8} includes only the complete scaled author-default
+\cref{tab:retained8} includes only the complete scaled author-default
 TabSyn lineages and the classical methods on those identical inputs.
 It cannot establish a full-population TabSyn result or a native-tuned
 TabSyn comparison. These evaluations did not select a configuration.
 
-\begin{table*}[t]
-\caption{Retained classical validation at $4n$. Median [95\% lineage-bootstrap interval] (informative lineages). Native selection uses each method's own objective.}
+\begin{table}[t]
+\caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). Native selection uses each method's own objective.}
 \label{tab:retained100}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\input{generated/retained-classical100.tex}
-\end{table*}
+\fittowidthfile{generated/retained-classical100.tex}
+\end{table}
 
-\begin{table*}[t]
-\caption{Matched retained TabSyn subset at $4n$. Same inputs and real-data controls for every method; median [95\% interval] (lineages). Separate from the full classical population.}
+\begin{table}[t]
+\caption{\textbf{Matched retained TabSyn subset at $4n$.} Same inputs and real-data controls for every method; median [95\% interval] (lineages). Separate from the full classical population.}
 \label{tab:retained8}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\input{generated/retained-matched8.tex}
-\end{table*}
+\fittowidthfile{generated/retained-matched8.tex}
+\end{table}
 
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/retained-matched-eight.pdf}
-\caption{Matched retained subset: median and marginal lineage-bootstrap intervals. Privacy AUC is an empirical diagnostic; its interval is not a privacy guarantee.}
+\caption{\textbf{Matched retained subset: median and marginal lineage-bootstrap intervals.} Privacy AUC is an empirical diagnostic; its interval is not a privacy guarantee.}
 \label{fig:retained8}
-\end{figure*}
+\end{figure}
 
-Table~\ref{tab:retainedpairs} gives exploratory TabSyn-minus-comparator
+\cref{tab:retainedpairs} gives exploratory TabSyn-minus-comparator
 retention differences on shared lineages. The Holm family comprises
 four metrics (CatBoost retention, mean marginal KS/TV, CatBoost C2ST AUC
 and distance-MIA AUC) times six classical configurations. Conservative
@@ -848,31 +838,31 @@ Bonferroni correction over the entire family, conditional on independent
 lineages. This small cohort requires unbounded simultaneous intervals.
 Finite tail-adjusted bootstrap ranges are retained only as exploratory
 descriptions; they do not guarantee familywise coverage.
-Marginal intervals in Fig.~\ref{fig:retained8} are not simultaneous
+Marginal intervals in \cref{fig:retained8} are not simultaneous
 intervals. The machine-readable reduction includes every diagnostic
 contrast and all applicability exclusions. A raw AUC difference is not
 a directional utility or privacy win. Selection of the completed subset,
 one fit seed and its small lineage count limit this exploratory analysis.
 
-\begin{table*}[t]
-\caption{Exploratory matched-subset CatBoost differences. Conservative simultaneous median intervals and Holm $p$ over the entire four-metric family; the corrected intervals are unbounded.}
+\begin{table}[t]
+\caption{\textbf{Exploratory matched-subset CatBoost differences.} Conservative simultaneous median intervals and Holm $p$ over the entire four-metric family; the corrected intervals are unbounded.}
 \label{tab:retainedpairs}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\input{generated/retained-paired.tex}
-\end{table*}
+\fittowidthfile{generated/retained-paired.tex}
+\end{table}
 
-Table~\ref{tab:arfpaired} separately extends the published DOPE--ARF
+\cref{tab:arfpaired} separately extends the published DOPE--ARF
 retention comparison with lineage intervals. It preserves that receipt's
 median-of-three rule. Its six-test family contains two ARF configurations
 and three auditors. The shared-lineage intersections differ by auditor.
 These validation descriptions leave the release and superiority gates null.
 
-\begin{table*}[t]
-\caption{DOPE--ARF legacy matched receipt at $4n$: exploratory paired differences, conservative simultaneous median intervals and Holm $p$. Median-of-seed aggregation.}
+\begin{table}[t]
+\caption{\textbf{DOPE--ARF legacy matched receipt at $4n$: exploratory paired differences, conservative simultaneous median intervals and Holm $p$.} Median-of-seed aggregation.}
 \label{tab:arfpaired}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\input{generated/retained-arf-paired.tex}
-\end{table*}
+\fittowidthfile{generated/retained-arf-paired.tex}
+\end{table}
 
 The supplement prints the deterministic first-batch diagnostics per
 physical job. Incomplete seed groups and mixed research profiles prevent
@@ -883,12 +873,12 @@ The original receipt references are retained in
 \path{research/benchmark/results/retained-classical-validation/panel.json}
 and the first-batch publication recorded in that reduction.
 
-\begin{table*}[t]
-\caption{Baseline coverage from committed publications. Pending rows have no estimated result or completion date.}
+\begin{table}[t]
+\caption{\textbf{Baseline coverage from committed publications.} Pending rows have no estimated result or completion date.}
 \label{tab:baselinecoverage}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\input{generated/baseline-coverage.tex}
-\end{table*}
+\fittowidthfile{generated/baseline-coverage.tex}
+\end{table}
 
 The coverage table distinguishes Forest-Flow confirmation from the
 Forest-Diffusion pilot modes. No full-population diffusion result is
@@ -907,9 +897,9 @@ these inputs do not support a paired ranking.
 The ARF validation completion does not admit final official-test certification.
 
 \subsection{Release score}
-The scalars in \eqref{eq:mfs}, under the pinned v2 weights and under the
+\textbf{Release scalars stay null.} The scalars in \eqref{eq:mfs}, under the pinned v2 weights and under the
 pre-registered v3 weights, are null for every method in this paper.
-Table~\ref{tab:mfsv3} measures the clean-license tabular transfer, and the
+\cref{tab:mfsv3} measures the clean-license tabular transfer, and the
 same receipt records the embedding distance. Failed gates, including an
 unscanned cleartext check, keep every scalar null. The supplement shows
 the invented v2 arithmetic.
@@ -921,20 +911,20 @@ $\PreparedN$ PMLB lineages and is not pooled with them.\par}
 $\BeyondPrepared$ of $\BeyondFamilies$ families fit inside the cap.
 $\BeyondFailed$ did not prepare ($\BeyondFeatureRange$ outside the
 projected range, $\BeyondOverlap$ overlapping). The range was not raised.
-Table~\ref{tab:beyond} has no retention column. The supplement names all
+\cref{tab:beyond} has no retention column. The supplement names all
 $\BeyondInventory$ families.
 \begin{table}[t]
-\caption{BeyondArena families that prepared. No retention auditor.}
+\caption{\textbf{BeyondArena families that prepared.} No retention auditor.}
 \label{tab:beyond}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\input{generated/beyond-fit.tex}
+\fittowidthfile{generated/beyond-fit.tex}
 \end{table}
 
 \section{Ablations}
 \label{sec:ablation}
-\texttt{features12\_\allowbreak{}steps8192} is the same residual with four times as many
+\textbf{Step budget.} \texttt{features12\_\allowbreak{}steps8192} is the same residual with four times as many
 AdamW steps. It is a budget check, not the displayed model. Where both
 budgets have a complete three-seed group, the CatBoost median paired
 difference is $\DiffSufCb$ ($\NSufCb$ lineages). The supplement gives the
@@ -945,39 +935,79 @@ plots the logged replay. It is not a substitute for the scored artifacts.
 The lower loss at 8{,}192 steps does not replace the displayed profile.
 
 The primary informativeness threshold is $0.01$ times the absolute null
-loss. Table~\ref{tab:threshold} lists the CatBoost median by threshold and
+loss. \cref{tab:threshold} lists the CatBoost median by threshold and
 the informative counts. The middle row is the $0.01$ rule behind the
 retention tables. \ThrSentence\ Fit-seed variance across seeds other than
 $11$ is \FitSeedVariance.
 
 \begin{table}[t]
-\caption{Informativeness threshold and auditor counts.}
+\caption{\textbf{Informativeness threshold and auditor counts.}}
 \label{tab:threshold}
 \centering
 \footnotesize
-\input{generated/threshold-table.tex}
+\fittowidthfile{generated/threshold-table.tex}
 \medskip
-\input{generated/threshold-counts.tex}
+\fittowidthfile{generated/threshold-counts.tex}
 \end{table}
 
-\section{Discussion}
-CTGAN and TVAE do not match the CatBoost retention, and their successful
-size-$4n$ artifacts miss the cap. None of these comparisons emits MFS-v2,
-MFS-v3, PTF-v1, or a release at the 10{,}240-byte tier.
-Table~\ref{tab:mfsv3} is a retention table and does not emit those scores.
-A small Wilcoxon
-$p$-value does not flip that null. The 8{,}192-step budget moves the
-CatBoost median by $\DiffSufCb$ and is not the displayed model. BeyondArena
-fits $\BeyondPrepared$ further families inside the cap and does not show
-retention. The unmeasured publications and the null release scores are
-unchanged from Section~\ref{sec:scope}. An equal tuning budget across
-generators is not measured.
+\section{Related Work}
+\label{sec:related}
+Tabular synthesis has moved from parametric copulas~\citep{patki2016sdv} and
+Chow--Liu trees~\citep{chow1968dependence} through conditional GANs, including
+TableGAN, and variational autoencoders~\citep{xu2019ctgan,park2018tablegan} to diffusion and score-based
+models~\citep{kotelnikov2023tabddpm,kim2023stasy,lee2023codi,zhang2024tabsyn,shi2025tabdiff,mueller2025cdtd,jolicoeurmartineau2024forestdiffusion,zagardo2026gatd}.
+Autoregressive and language-model generators~\citep{borisov2023great,solatorio2023realtabformer},
+prior-data fitted generators~\citep{ma2023tabpfgen,hollmann2025tabpfn},
+CTAB-GAN and CTAB-GAN+~\citep{zhao2021ctabgan,zhao2024ctabganplus}, and
+graphical neural generators~\citep{liu2023goggle} target the same mixed-type
+tables. ARF estimates density with a forest~\citep{watson2023arf}. CART
+synthesis is the synthpop line~\citep{nowok2016synthpop}. A recent survey
+collects these design choices~\citep{borisov2024survey}. This paper runs the
+Gaussian copula, a Chow--Liu baseline written for this comparison,
+independent marginals written for this comparison, CTGAN, TVAE,
+and a $\NForestCb$-lineage Forest-Flow confirmation. New retained panels
+also measure ARF and a scaled author-default TabSyn subset
+(\cref{sec:retained}). The other families named above are cited
+and not measured; \cref{tab:baselinecoverage} records that coverage.
+SMOTE~\citep{chawla2002smote} was not run.
+This panel scores regression retention, not classification oversampling.
 
-\section{Threats to Validity}
+Differentially private Bayesian networks and marginal
+synthesizers~\citep{zhang2014privbayes,mckenna2021mst,mckenna2022aim,cai2021privmrf} optimize
+a privacy budget. Membership inference and shadow-model attacks are a
+separate detection literature~\citep{shokri2017membership,hayes2018logan,vanbreugel2023domias}.
+Formal differential privacy is a different claim from an empirical
+resemblance score~\citep{dwork2014foundations,abadi2016deep}. Utility reviews
+separate marginal fidelity from downstream
+prediction~\citep{snoke2018utility,raab2018practical}. Alpha-precision,
+beta-recall, SDMetrics, and synthcity are the usual fidelity
+reports~\citep{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}.
+The fidelity results add alpha-precision, beta-recall, a
+distance-to-closest-record share, and a DOMIAS AUC. ARF and the retained
+TabSyn subset have an additional fidelity, detection and empirical-privacy
+panel in \cref{sec:retained}. The displayed-profile ARF
+publication median is \ArfResult.
+The pre-specified privacy-attack panel
+remains \PrivacyAttackPanel. Nothing in those fields is a formal privacy
+guarantee or a HIPAA de-identification claim.
+
+Tree models remain strong tabular predictors, which is why CatBoost is one
+of the three auditors~\citep{grinsztajn2022trees,prokhorenkova2018catboost,shwartz-ziv2022tabular}.
+TabZilla and TabArena show how brittle a single split can
+be~\citep{mcelfresh2023tabzilla,erickson2026tabarena}. The regression
+lineages come from PMLB~\citep{olson2017pmlb,romano2021pmlb}. Comparing
+several methods on the same lineages needs a rank test and a critical
+difference, or a Bayesian signed-rank alternative~\citep{demsar2006statistical,benavoli2017time}.
+This paper reports the frequentist procedure: a Friedman test and a Nemenyi
+critical difference on the common set, plus paired Wilcoxon tests. The
+Bayesian signed-rank procedure is not computed.
+
+
+\section{Limitations}
 \label{sec:threats}
 \paragraph{Internal.}
 The primary displayed DOPE and legacy comparison fits use the coreset
-in Section~\ref{sec:setup} and fit seed $11$,
+in \cref{sec:setup} and fit seed $11$,
 and a training-derived validation cut of the official training rows. The
 scored retention panel is regression only. Other tasks are not a result
 of these tables. The
@@ -1018,14 +1048,14 @@ not pooled with the density block.
 
 \paragraph{Construct.}
 Retention is the reported utility. Both release scores in
-Section~\ref{sec:kpi} stay null. The linear auditor does not separate DOPE from the Gaussian copula,
+\cref{sec:kpi} stay null. The linear auditor does not separate DOPE from the Gaussian copula,
 and that result is not an equivalence. Shipping this artifact is not the
 same experiment as shipping the compact predictor itself. The panel does
 not contain that control, so it does not show that a recipient needs the
 synthetic rows rather than the predictor. Normalized-space RMSE is the loss
 the auditors stored. Original-unit error after inverting the training
 transform was not stored, and this paper does not report it.
-Table~\ref{tab:fidelity} is not a membership-inference certification. Its
+\cref{tab:fidelity} is not a membership-inference certification. Its
 unbalanced DCR share and DOMIAS AUC are empirical. Empirical resemblance is not
 differential privacy and is not HIPAA de-identification.
 
@@ -1033,6 +1063,19 @@ differential privacy and is not HIPAA de-identification.
 The rank tests are descriptive, not the pre-registered production
 superiority test. Density, neural, Forest-Flow, and BeyondArena stay
 unpooled. A small retention $p$-value does not flip the null scalar.
+
+\section{Discussion}
+CTGAN and TVAE do not match the CatBoost retention, and their successful
+size-$4n$ artifacts miss the cap. None of these comparisons emits MFS-v2,
+MFS-v3, PTF-v1, or a release at the 10{,}240-byte tier.
+\cref{tab:mfsv3} is a retention table and does not emit those scores.
+A small Wilcoxon
+$p$-value does not flip that null. The 8{,}192-step budget moves the
+CatBoost median by $\DiffSufCb$ and is not the displayed model. BeyondArena
+fits $\BeyondPrepared$ further families inside the cap and does not show
+retention. The unmeasured publications and the null release scores are
+unchanged from \cref{sec:scope}. An equal tuning budget across
+generators is not measured.
 
 \section{Conclusion}
 On $\NDopeCb$ regression lineages and fit seed $11$, generator
@@ -1042,9 +1085,9 @@ from the density comparators. The linear auditor does not separate it
 from the Gaussian copula, and that result is not an equivalence. The
 $\NForestCb$-lineage Forest-Flow block leads on CatBoost (\WtlForestCb)
 and the MLP (\WtlForestMlp). Those counts are not a certified win. The
-Kumo large, Mitra, and TabICL retentions are in Table~\ref{tab:mfsv3}
+Kumo large, Mitra, and TabICL retentions are in \cref{tab:mfsv3}
 and are not pooled with CatBoost. MFS-v2 and MFS-v3 stay null, as do the
-scores in Section~\ref{sec:scope}. Official tests stay sealed. The
+scores in \cref{sec:scope}. Official tests stay sealed. The
 $10{,}240$-byte cap remains a release gate: $\DopeWithinCap$ displayed
 artifacts are inside it, and a retention does not close the gate.
 
@@ -1059,7 +1102,7 @@ The implementation and the receipts behind these tables are at
 \noindent\mbox{\url{https://github.com/neverhuman/dope}}.
 % END JOURNAL AVAILABILITY
 
-\bibliographystyle{IEEEtran}
+\bibliographystyle{iclr2027_conference}
 \bibliography{references,generated/related}
 
 \end{document}

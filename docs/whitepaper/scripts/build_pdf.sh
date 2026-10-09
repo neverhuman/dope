@@ -16,8 +16,9 @@ build_one() {
 }
 build_one dope-mfs
 build_one supplement
-# The anonymous PDF changes the byline, the running header, and drops the
-# journal-only repository URL. The source dope-mfs.tex keeps the byline.
+# The anonymous PDF changes the byline and drops the journal-only repository
+# URL. The source dope-mfs.tex keeps the byline. Both copies clear the class
+# running header, so neither one names a venue.
 python3 - << 'PY'
 import sys
 from pathlib import Path
@@ -26,12 +27,11 @@ from public_hardware import strip_journal_availability
 src = Path("dope-mfs.tex").read_text()
 pairs = (
     (
-        "\\author{Jepson~Taylor and Alton~Alexander%\n"
-        "\\IEEEcompsocitemizethanks{\\IEEEcompsocthanksitem J.~Taylor and A.~Alexander are with NEVERHUMAN Research.}}",
-        "\\author{Anonymous%\n"
-        "\\IEEEcompsocitemizethanks{\\IEEEcompsocthanksitem Affiliation withheld for review.}}",
+        "\\author{Jepson Taylor$^1$, Alton Alexander$^1$\\\\[0.15cm]\n"
+        "$^1$NEVERHUMAN Research}",
+        "\\author{Anonymous\\\\[0.15cm]\n"
+        "Affiliation withheld for review.}",
     ),
-    ("\\markboth{Taylor and Alexander}%", "\\markboth{Anonymous}%"),
 )
 for old, new in pairs:
     if src.count(old) != 1:
