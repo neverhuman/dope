@@ -31,6 +31,7 @@ if [[ -s target/paper-clean/local-commits-before.txt ]]; then
 fi
 find docs/whitepaper/generated -type f -print > target/paper-clean/generated-before.txt
 rm -rf docs/whitepaper/generated
+rm -f docs/whitepaper/figures/architecture.pdf
 nice -n 10 ionice -c 3 just paper
 # Include absent/untracked files as well as tracked drift in the clean-rebuild gate.
 git diff --exit-code

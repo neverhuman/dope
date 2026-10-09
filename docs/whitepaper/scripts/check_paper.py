@@ -35,6 +35,7 @@ FIGURES = (
     ROOT / "figures" / "published-baseline-cohorts.pdf",
     # Drawn at the 5.5in text width. The other plots stay 7.16in.
     ROOT / "figures" / "teaser.pdf",
+    ROOT / "figures" / "architecture.pdf",
 )
 # A measurement typed into the prose. Integers and one-decimal illustration
 # values such as the MFS arithmetic example stay in the generator instead.
@@ -47,6 +48,7 @@ LOGS = (
     ROOT.parents[1] / "target/paper-build/dope-mfs-anonymous-3.log",
     ROOT.parents[1] / "target/paper-build/supplement-3.log",
     ROOT.parents[1] / "target/paper-build/supplement-anonymous-3.log",
+    ROOT.parents[1] / "target/paper-build/paper-architecture.log",
 )
 LOG_HITS = ("Warning", "undefined", "Undefined", "Overfull", "Underfull")
 
@@ -140,6 +142,17 @@ def main() -> int:
         recorded_hashes.update(json.loads(teaser_hash_path.read_text()).get("pdf_sha256") or {})
     else:
         failures.append("generated/teaser-figure-hashes.json is missing")
+    architecture_hash_path = ROOT / "generated" / "architecture-figure-hashes.json"
+    if architecture_hash_path.is_file():
+        architecture_hashes = json.loads(architecture_hash_path.read_text())
+        recorded_hashes.update(architecture_hashes.get("pdf_sha256") or {})
+        for name in ("figures/architecture.tex", "generated/numbers.tex", "../../ops/ci/paper-architecture.tex"):
+            source = ROOT / name
+            if (not source.is_file() or architecture_hashes.get("source_sha256", {}).get(name)
+                    != hashlib.sha256(source.read_bytes()).hexdigest()):
+                failures.append("architecture input hash mismatch: " + name)
+    else:
+        failures.append("generated/architecture-figure-hashes.json is missing")
     for path in FIGURES:
         if not path.exists():
             failures.append(f"missing figure {path.name}")
@@ -157,10 +170,11 @@ def main() -> int:
             for line in info.splitlines():
                 if line.startswith("Page size:"):
                     width = float(line.split()[2]) / 72.0
-            expected = 5.5 if path.name == "teaser.pdf" else 7.16
+            expected = 5.5 if path.name in ("teaser.pdf", "architecture.pdf") else 7.16
             if width is None or abs(width - expected) > 0.02:
                 failures.append(f"{path.name} width is not {expected:.2f}in")
     manuscript_texts = [TEX, ROOT / "supplement.tex"]
+    manuscript_texts.append(ROOT / "figures" / "architecture.tex")
     manuscript_texts.extend(sorted((ROOT / "generated").glob("*.tex")))
     for path in manuscript_texts:
         if not path.is_file():

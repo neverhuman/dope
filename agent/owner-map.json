@@ -321,6 +321,7 @@
     "docs/whitepaper/scripts/test_paper_review_inputs.py": "governance",
     "research/benchmark/review_fixes/": "external-evidence",
     "ops/ci/check-review-fixes.sh": "governance",
+    "ops/ci/paper-architecture.tex": "governance",
     "research/benchmark/bounded_auditors.py": "external-evidence",
     "research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/": "external-evidence"
   }

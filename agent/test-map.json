@@ -1253,6 +1253,10 @@
       "command": "bash ops/ci/check-review-fixes.sh",
       "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
     },
+    "ops/ci/paper-architecture.tex": {
+      "command": "just paper-check",
+      "purpose": "rebuild the cropped architecture from tracked TikZ and generated macros, verify its source/PDF hashes, fonts and warning-free log without ICLR review line numbers"
+    },
     "research/benchmark/bounded_auditors.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics research.benchmark.tests.test_real_test_utility -v",
       "purpose": "verify explicit four-thread feature-importance and prediction calls for future auditors while preserving historical measured harness identities and numerical equations"
