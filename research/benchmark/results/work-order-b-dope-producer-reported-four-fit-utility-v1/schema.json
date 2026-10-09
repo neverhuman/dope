@@ -1,0 +1,518 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "cells": {
+      "items": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "producer_reported_four_fit_sample_sd": {
+                  "type": "null"
+                },
+                "status": {
+                  "const": "incomplete_four_fit_group"
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "complete_fit_count": {
+                  "const": 4
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "producer_reported_four_fit_sample_sd": {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "status": {
+                  "const": "complete_producer_reported_description"
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "auditor": {
+            "enum": [
+              "catboost",
+              "linear",
+              "mlp"
+            ]
+          },
+          "complete_fit_count": {
+            "maximum": 4,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "dataset_lineage_id": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "fits": {
+            "items": {
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "else": {
+                    "properties": {
+                      "producer_reported_retention_median": {
+                        "type": "null"
+                      },
+                      "producer_reported_within_fit_retention_range": {
+                        "type": "null"
+                      }
+                    }
+                  },
+                  "if": {
+                    "properties": {
+                      "complete_three_sample_group": {
+                        "const": true
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "informative_finite_ok_count": {
+                        "const": 3
+                      },
+                      "producer_reported_retention_median": {
+                        "type": "number"
+                      },
+                      "producer_reported_within_fit_retention_range": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "maxItems": 2,
+                        "minItems": 2,
+                        "type": "array"
+                      }
+                    }
+                  }
+                }
+              ],
+              "properties": {
+                "complete_three_sample_group": {
+                  "type": "boolean"
+                },
+                "fit_seed": {
+                  "enum": [
+                    23,
+                    37,
+                    53,
+                    71
+                  ],
+                  "type": "integer"
+                },
+                "informative_finite_ok_count": {
+                  "maximum": 3,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "producer_reported_retention_median": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "producer_reported_within_fit_retention_range": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "items": {
+                        "type": "number"
+                      },
+                      "maxItems": 2,
+                      "minItems": 2,
+                      "type": "array"
+                    }
+                  ]
+                },
+                "samples": {
+                  "items": {
+                    "additionalProperties": false,
+                    "allOf": [
+                      {
+                        "else": {
+                          "properties": {
+                            "retention": {
+                              "type": "null"
+                            }
+                          }
+                        },
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "const": "ok"
+                            }
+                          }
+                        },
+                        "then": {
+                          "properties": {
+                            "retention": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "properties": {
+                      "producer_reported_low_signal_noninferior": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "retention": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "sample_seed": {
+                        "enum": [
+                          101,
+                          211,
+                          307
+                        ],
+                        "type": "integer"
+                      },
+                      "status": {
+                        "enum": [
+                          "ok",
+                          "not_informative",
+                          "missing_auditor",
+                          "auditor_failed",
+                          "receipt_not_ok",
+                          "invalid_utility"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "sample_seed",
+                      "status",
+                      "retention"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "fit_seed",
+                "samples",
+                "informative_finite_ok_count",
+                "complete_three_sample_group",
+                "producer_reported_retention_median",
+                "producer_reported_within_fit_retention_range"
+              ],
+              "type": "object"
+            },
+            "maxItems": 4,
+            "minItems": 4,
+            "type": "array"
+          },
+          "producer_reported_four_fit_sample_sd": {
+            "minimum": 0,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "size_multiplier": {
+            "enum": [
+              1,
+              4
+            ],
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "complete_producer_reported_description",
+              "incomplete_four_fit_group"
+            ]
+          }
+        },
+        "required": [
+          "dataset_lineage_id",
+          "size_multiplier",
+          "auditor",
+          "fits",
+          "complete_fit_count",
+          "producer_reported_four_fit_sample_sd",
+          "status"
+        ],
+        "type": "object"
+      },
+      "maxItems": 600,
+      "minItems": 600,
+      "type": "array"
+    },
+    "format": {
+      "const": "work-order-b-dope-producer-reported-four-fit-utility-v1"
+    },
+    "interpretation": {
+      "const": {
+        "historical_evaluator_and_runtime_parity_verified": false,
+        "post_hoc_descriptive_rule": true,
+        "preregistered_inferential_rule": false,
+        "producer_reported": true,
+        "retention_clipped": false,
+        "scope": "validation-only; no final campaign or official-test inference",
+        "seed11_joined": false
+      }
+    },
+    "native_or_paper_count_additions": {
+      "const": 0
+    },
+    "new_fits_or_evaluations": {
+      "const": 0
+    },
+    "null_claims": {
+      "const": {
+        "GPU_training_verified": null,
+        "MFS_v2": null,
+        "PTF_v1": null,
+        "actual_training_backend": null,
+        "five_fit_sample_sd": null,
+        "five_fit_variance": null,
+        "historical_auditor_versions": null,
+        "historical_evaluator_source_sha256": null,
+        "paired_comparison": null,
+        "privacy_certification": null,
+        "production_L3_charged_inventory_bytes": null,
+        "quality_winner": null,
+        "retained_storage_bytes": null,
+        "verified_common_auditor_variation": null
+      }
+    },
+    "panel": {
+      "const": {
+        "auditors": [
+          "catboost",
+          "linear",
+          "mlp"
+        ],
+        "fit_receipts": 400,
+        "fit_seeds": [
+          23,
+          37,
+          53,
+          71
+        ],
+        "lineages": 100,
+        "metric_receipts": 2400,
+        "sample_seeds": [
+          101,
+          211,
+          307
+        ],
+        "size_multipliers": [
+          1,
+          4
+        ]
+      }
+    },
+    "receipt_bindings": {
+      "additionalProperties": false,
+      "properties": {
+        "fits": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "dataset_lineage_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "fit_seed": {
+                "enum": [
+                  23,
+                  37,
+                  53,
+                  71
+                ],
+                "type": "integer"
+              },
+              "receipt_bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "receipt_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "dataset_lineage_id",
+              "fit_seed",
+              "receipt_bytes",
+              "receipt_sha256"
+            ],
+            "type": "object"
+          },
+          "maxItems": 400,
+          "minItems": 400,
+          "type": "array"
+        },
+        "sample_metrics": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "dataset_lineage_id": {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              "fit_seed": {
+                "enum": [
+                  23,
+                  37,
+                  53,
+                  71
+                ],
+                "type": "integer"
+              },
+              "receipt_bytes": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "receipt_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "sample_seed": {
+                "enum": [
+                  101,
+                  211,
+                  307
+                ],
+                "type": "integer"
+              },
+              "size_multiplier": {
+                "enum": [
+                  1,
+                  4
+                ],
+                "type": "integer"
+              },
+              "synthetic_sha256_declared": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "dataset_lineage_id",
+              "fit_seed",
+              "sample_seed",
+              "size_multiplier",
+              "receipt_bytes",
+              "receipt_sha256",
+              "synthetic_sha256_declared"
+            ],
+            "type": "object"
+          },
+          "maxItems": 2400,
+          "minItems": 2400,
+          "type": "array"
+        }
+      },
+      "required": [
+        "fits",
+        "sample_metrics"
+      ],
+      "type": "object"
+    },
+    "receipt_set_sha256": {
+      "const": {
+        "fits": "d5be30682d6f544b94ff2c5468b68c5e892cf086f9127368c35eb4bdba712550",
+        "sample_metrics": "e51eee26d1fff82cefbc4b4269d212ef147b807178219473b845836a4dc0bbd2"
+      }
+    },
+    "rendering": {
+      "const": {
+        "backend": "Agg",
+        "dpi": 100,
+        "figure_inches": [
+          8.4,
+          4.8
+        ],
+        "font_family": "DejaVu Sans",
+        "matplotlib_version": "3.6.3",
+        "metadata_date": null,
+        "numpy_version": "1.26.4",
+        "scope": "six descriptive median four-fit sample SDs only; complete/all100 counts; no retention or score axis",
+        "subplot_margins": {
+          "bottom": 0.23,
+          "left": 0.27,
+          "right": 0.96,
+          "top": 0.79
+        },
+        "svg_fonttype": "path",
+        "svg_hashsalt": "DOPE-producer-reported-four-fit-SD-v1"
+      }
+    },
+    "seed11_metadata_delta": {
+      "const": {
+        "additional_binary_sha256": "4347249fa465149f7c6ab07b4d1665ef82e5ddfe250b127160fba040c298525a",
+        "comparison_pairs": 400,
+        "compiled_generator_equivalence_verified": false,
+        "configuration_and_data_match_counts": {
+          "candidate": 400,
+          "profile_label": 400,
+          "projection_sha256": 400,
+          "requested_deadline": 400,
+          "structural_penalty": 400,
+          "target_weight": 400,
+          "train_sha256": 400,
+          "validation_sha256": 400
+        },
+        "five_fit_cohort_join": null,
+        "generator_binary_hash_mismatches": 400,
+        "historical_evaluator_runtime_parity_verified": false,
+        "interpretation": "Label and data-digest matches do not prove generator/compiler/evaluator equivalence. Different binary hashes do not prove different algorithms.",
+        "seed11_binary_sha256": "5d5ef250dbcf2296ad9f0b897b17c8c579258ff943dd161f58102cd3f5bb5a3f",
+        "seed11_status_counts": {
+          "charged_artifact_cap": 2,
+          "ok": 98
+        }
+      }
+    },
+    "statistics": {
+      "const": {
+        "four_fit_sample_sd": "sqrt(sum((fit_median - mean_of_four_fit_medians)^2) / (4 - 1))",
+        "group_retention_summary": "median over complete lineages of each lineage median of its four complete fit medians",
+        "group_spread_summary": "median over complete lineages of the four-fit sample SD",
+        "incomplete_group": "null, no zero imputation or lineage removal",
+        "per_fit_median": "median of three informative finite producer-reported retentions with finite null/TRTR/TSTR losses",
+        "required_complete_fits_for_sd": 4,
+        "required_informative_samples_per_fit": 3,
+        "sample_sd_denominator": 3,
+        "within_fit_samples_are_independent_lineages": false
+      }
+    }
+  },
+  "required": [
+    "native_or_paper_count_additions",
+    "new_fits_or_evaluations",
+    "null_claims",
+    "format",
+    "panel",
+    "interpretation",
+    "statistics",
+    "seed11_metadata_delta",
+    "receipt_set_sha256",
+    "rendering",
+    "cells",
+    "receipt_bindings"
+  ],
+  "title": "Producer-reported four-fit validation utility; strict unavailable claims",
+  "type": "object"
+}

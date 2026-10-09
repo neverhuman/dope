@@ -1,6 +1,7 @@
 {
   "workspace": "dope",
   "owners": {
+    "research/benchmark/results/work-order-b-dope-producer-reported-four-fit-utility-v1/": "external-evidence",
     "research/benchmark/results/work-order-b-native-through094-fit-progress-and-cost-v1/": "external-evidence",
     "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": "external-evidence",
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": "external-evidence",
