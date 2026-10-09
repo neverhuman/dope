@@ -39,3 +39,4 @@ why it cannot be done. If a new result weakens a claim, the paper weakens the cl
 | RS-02 | Tables 12–14 lack a DOPE row on the same cohort | Matched-cohort DOPE row from lane B | open: waiting on lane B |
 | RS-03 | C2ST classifier differs by method | One classifier and one n for every method | open: lane B rerun; manuscript text waits on that output |
 | RS-04 | DOPE called a measurement in the abstract and a generator in the figures | One definition | closed in prose: DOPE is the encoding and the generator it writes; retention is the measurement column; legends label that generator DOPE |
+| 11c | Negation density above 5 per 1,000 words | Keep every caveat and drop spaced " not " | closed in prose: local `pdftotext -layout` of `target/paper-build/dope-mfs.pdf` has 23 spaced " not " in 13705 words (1.678 per 1,000). The utility-score sentence keeps one required "not". Generated cost phrases still print "not measured" |
