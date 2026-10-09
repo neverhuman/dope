@@ -1080,7 +1080,8 @@ def _write_hashes(expanded, out):
     (out / "artifact-hashes.tex").write_text(
         "{\\footnotesize\n"
         "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{8.6cm}"
-        ">{\\raggedright\\arraybackslash}p{8.6cm}@{}}\n\\toprule\n"
+        ">{\\raggedright\\arraybackslash}p{8.6cm}@{}}\n"
+        "\\caption{Ledger and lock digests. No Holm family.}\\\\\n\\toprule\n"
         "Ledger or lock & SHA-256 \\\\\n\\midrule\n\\endhead\n"
         + "\n".join(rows)
         + "\n\\bottomrule\n\\end{longtable}\n}\n"

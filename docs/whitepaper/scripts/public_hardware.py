@@ -251,6 +251,7 @@ def origin_sentence(counts):
         "are not a claim of independent source families. Related names, including the "
         r"cpu\_small lineages, stay inside the one-row-per-lineage bootstrap. "
         "The resampling unit is the lineage, so related variants move together only "
-        "by chance. A source-family interval is not published, because a verified "
-        "parent map is not in the ledger."
+        "by chance. The printed family-cluster intervals resample lineages. A verified "
+        "parent map is absent from the ledger, so those intervals leave lineages that "
+        "share a parent in separate rows."
     )

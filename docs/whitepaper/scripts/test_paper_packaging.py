@@ -53,6 +53,20 @@ class PackagingTests(unittest.TestCase):
         self.assertIn(r'\input{generated/mfs-v3-examples.tex}', supplement)
         self.assertNotIn('100.0001', supplement)
 
+    def test_table_environment_must_declare_a_holm_family(self):
+        self.assertEqual(check_paper.table_family_failures(
+            "\\begin{table}\\caption{No Holm family.}\\end{table}"), [])
+        self.assertEqual(check_paper.table_family_failures(
+            "\\begin{longtable}\\caption{Holm family size is three.}\\end{longtable}"), [])
+        self.assertTrue(check_paper.table_family_failures(
+            "\\begin{table}\\caption{Inventory only.}\\end{table}"))
+        escaped = "\\begin{table}\\caption{Median at $95\\%$ coverage. No Holm family.}\\end{table}"
+        self.assertEqual(check_paper.table_family_failures(check_paper.strip_tex_comments(escaped)), [])
+        for path in (check_paper.TEX, check_paper.ROOT / "supplement.tex"):
+            self.assertEqual(check_paper.table_family_failures(path.read_text()), [], path.name)
+        for path in (check_paper.ROOT / "generated").glob("*.tex"):
+            self.assertEqual(check_paper.table_family_failures(path.read_text()), [], path.name)
+
 
 if __name__ == '__main__':
     unittest.main()

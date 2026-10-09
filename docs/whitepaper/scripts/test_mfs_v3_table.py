@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import mfs_v3_table
 from research.benchmark.mfs_v3_panel import KUMO_ESTIMATORS, REFUSED_ENCODERS, VECTOR_PIN
@@ -93,7 +95,7 @@ class MfsV3TableTest(unittest.TestCase):
     def test_real_receipt_matches_its_lineage_retentions(self):
         path = mfs_v3_table.RECEIPT
         self.assertTrue(path.is_file(), "density receipt is missing")
-        receipt = json.loads(path.read_text())
+        receipt = mfs_v3_table.load_receipt()
         measured = mfs_v3_table.measure(receipt)
         self.assertEqual(measured["scored"], 0)
         self.assertEqual(measured["method_lineage_cells"], 388)
@@ -125,6 +127,27 @@ class MfsV3TableTest(unittest.TestCase):
         self.assertIn("BEGIN JOURNAL AVAILABILITY", text)
         self.assertIn("https://github.com/neverhuman/dope", text)
         self.assertIn("not a utility score", text)
+
+    def test_substituted_receipt_byte_refuses_before_a_table_write(self):
+        panel = mfs_v3_table.compute_panel
+        original = panel.RESULTS / mfs_v3_table.RECEIPT.name
+        raw = bytearray(original.read_bytes())
+        raw[0] ^= 0x01
+        with tempfile.TemporaryDirectory(dir=panel.REPO / "target") as directory:
+            root = Path(directory)
+            (root / mfs_v3_table.RECEIPT.name).write_bytes(raw)
+            generated = root / "generated"
+            figures = root / "figures"
+            generated.mkdir()
+            figures.mkdir()
+            with patch.object(panel, "RESULTS", root), \
+                    patch.object(mfs_v3_table, "GENERATED", generated), \
+                    patch.object(mfs_v3_table, "FIGURES", figures), \
+                    patch("mfs_v3_table.sys.argv", ["mfs_v3_table.py"]):
+                with self.assertRaisesRegex(ValueError, "digest mismatch"):
+                    mfs_v3_table.main()
+            self.assertEqual(list(generated.iterdir()), [])
+            self.assertEqual(list(figures.iterdir()), [])
 
 
 if __name__ == "__main__":

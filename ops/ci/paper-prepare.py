@@ -56,7 +56,7 @@ def inventory_tex(document):
     if len(rows) != document['dataset_count'] or len({r['name'] for r in rows}) != len(rows):
         raise ValueError('invalid inventory matrix')
     lines = [r'\scriptsize', r'\begin{longtable}{>{\raggedright\arraybackslash}p{5.5cm}lrrll}',
-             r'\caption{All \BeyondInventory{} BeyondArena families.}\\', r'\toprule',
+             r'\caption{All \BeyondInventory{} BeyondArena families. No Holm family.}\\', r'\toprule',
              r'name & task & rows & cols & license & split\\', r'\midrule', r'\endfirsthead',
              r'\multicolumn{6}{l}{\tablename\ \thetable, continued}\\', r'\toprule',
              r'name & task & rows & cols & license & split\\', r'\midrule', r'\endhead',

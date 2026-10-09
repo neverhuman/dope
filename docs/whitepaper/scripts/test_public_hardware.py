@@ -73,6 +73,10 @@ class PublicHardware(unittest.TestCase):
         self.assertEqual(hardware.banned_hits(sentence), [])
         self.assertIn("20", sentence)
         self.assertIn("35", sentence)
+        self.assertIn("printed family-cluster intervals resample lineages", sentence)
+        self.assertNotIn("source-family interval is not published", sentence)
+        numbers = (REPO / "docs/whitepaper/generated/numbers.tex").read_text()
+        self.assertIn("\\newcommand{\\OriginSentence}{" + sentence + "}", numbers)
 
 
 class MfsIllustration(unittest.TestCase):

@@ -379,8 +379,13 @@ def check_outputs(measured: dict) -> None:
     print("mfs-v3 table matches the receipt")
 
 
+def load_receipt() -> dict:
+    """Authenticate the density-panel digest before any table or figure write."""
+    return compute_panel.load(RECEIPT.name)
+
+
 def main() -> None:
-    receipt = compute_panel.load(RECEIPT.name)
+    receipt = load_receipt()
     measured = measure(receipt)
     if "--check" in sys.argv:
         check_outputs(measured)
