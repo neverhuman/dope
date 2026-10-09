@@ -14,6 +14,7 @@ if str(ROOT) not in sys.path:
 from research.benchmark.review_fixes.receipt_tables import configured_tables  # noqa: E402
 
 RESULTS = ROOT / 'research/benchmark/results'
+REFERENCES = {'lineages': 100, 'holdout_median': 166, 'fit_median': 667, 'fit_to_holdout_median': 4.0}
 
 
 def load(name):
@@ -24,6 +25,7 @@ def load(name):
 
 
 TABSYN = load('review_tabsyn')
+PRIVACY = load('review_privacy')
 CHECK = load('check_paper')
 
 
@@ -62,6 +64,24 @@ class TabSynTableTests(unittest.TestCase):
         next(row for row in shifted['levels'] if row['method'] == 'DOPE')['n'] += 1
         with self.assertRaisesRegex(ValueError, 'same lineages'):
             TABSYN.render_tabsyn(shifted)
+
+
+class PrivacyTableTests(unittest.TestCase):
+    def test_caption_names_quantity_interval_references_and_claims(self):
+        payload = panel('review-fixes-privacy-v1')
+        tex = PRIVACY.render_privacy(payload, REFERENCES)
+        self.assertEqual(len(body_rows(tex)), len(payload['summaries']) + len(payload['matched_density']))
+        for phrase in ('median over lineages', '$n$ counts lineages', '95\\% family-cluster bootstrap',
+                       'validation rows', 'median 166 rows', 'median 667 rows', '4.0 times as many',
+                       'not formal differential privacy and not HIPAA de-identification', 'No Holm family'):
+            self.assertIn(phrase, tex)
+        self.assertEqual(CHECK.table_family_failures(CHECK.strip_tex_comments(tex)), [])
+
+    def test_repeated_privacy_row_is_refused(self):
+        payload = panel('review-fixes-privacy-v1')
+        payload['summaries'].append(dict(payload['summaries'][0]))
+        with self.assertRaisesRegex(ValueError, 'same identity'):
+            PRIVACY.render_privacy(payload, REFERENCES)
 
 
 class ConfiguredReceiptTableTests(unittest.TestCase):
