@@ -249,6 +249,8 @@ class AssembleScoreTest(unittest.TestCase):
 
         self.assertEqual(distribution_fidelity(1.0, 1.0, 1.0), 1.0)
         self.assertEqual(distribution_fidelity(0.0, 0.0, 0.0), 0.0)
+        self.assertIsNone(distribution_fidelity(-0.1, 1.0, 1.0))
+        self.assertIsNone(distribution_fidelity(1.0, 1.1, 1.0))
 
     def test_legacy_lineage_without_prerequisite_evidence_stays_null(self):
         from research.benchmark.mfs_v3_assemble import panel_receipt, score_lineage
@@ -277,6 +279,96 @@ class AssembleScoreTest(unittest.TestCase):
         self.assertIsNotNone(score_lineage(seeds, lambda values: 0.8)["score"])
         seeds[0]["artifact_bytes"] = 1000.5
         self.assertIn("tier_bytes", score_lineage(seeds, lambda values: 0.8)["failed_gates"])
+
+    def test_prepared_prerequisites_survive_loading_and_receipt_compaction(self):
+        import tempfile
+
+        from research.benchmark.mfs_v3_assemble import SAMPLE_SEEDS, compact_seed, load_seeds, score_lineage
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+
+        measured = dict(_measured_seed(), **{key: True for key in PREREQUISITES})
+        root = Path(__file__).resolve().parents[3] / "target"
+        with tempfile.TemporaryDirectory(dir=root) as directory:
+            folder = Path(directory)
+            for sample_seed in SAMPLE_SEEDS:
+                base = folder / f"seed{sample_seed}"
+                base.with_suffix(".json").write_text(json.dumps(measured))
+                for auditor, values in measured["auditors"].items():
+                    base.with_name(base.name + f".{auditor}.json").write_text(json.dumps(values))
+                base.with_name(base.name + ".holdout.json").write_text(json.dumps(measured["holdout"]))
+            loaded = load_seeds(folder)
+            self.assertIsNotNone(score_lineage(loaded, lambda values: 0.8)["score"])
+            for seed in loaded:
+                self.assertTrue(all(compact_seed(seed)[key] is True for key in PREREQUISITES))
+            prepared_path = folder / f"seed{SAMPLE_SEEDS[0]}.json"
+            measured.pop(PREREQUISITES[0])
+            measured[PREREQUISITES[1]] = False
+            prepared_path.write_text(json.dumps(measured))
+            loaded = load_seeds(folder)
+            self.assertIsNone(compact_seed(loaded[0])[PREREQUISITES[0]])
+            self.assertIs(compact_seed(loaded[0])[PREREQUISITES[1]], False)
+            report = score_lineage(loaded, lambda values: 0.8)
+            self.assertIsNone(report["score"])
+            self.assertTrue(set(PREREQUISITES[:2]).issubset(report["failed_gates"]))
+
+    def test_one_invalid_seed_cannot_be_hidden_by_lineage_aggregation(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+
+        for field, gate, values in (
+            ("artifact_bytes", "tier_bytes", (-1, 0, 10241, 1000.5, True, None)),
+            ("exact_row_matches", "exact_row_match", (False, 0.0, 1, None)),
+        ):
+            for value in values:
+                with self.subTest(field=field, value=value):
+                    seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+                    seeds[0][field] = value
+                    report = score_lineage(seeds, lambda values: 0.8)
+                    self.assertIsNone(report["score"])
+                    self.assertIn(gate, report["failed_gates"])
+        for field, gate in (("membership_auc", "membership_auc"),
+                            ("attribute_inference_advantage", "attribute_inference")):
+            seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+            seeds[0]["holdout"][field] = -1.0
+            report = score_lineage(seeds, lambda values: 0.8)
+            self.assertIsNone(report["score"])
+            self.assertIn(gate, report["failed_gates"])
+
+    def test_one_invalid_component_cannot_be_hidden_by_minimum_or_mixture(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+
+        fields = ("marginal_fidelity", "sliced_wasserstein_fidelity", "mmd_fidelity",
+                  "dependence_fidelity", "coverage_realism", "driver_fidelity")
+        for field in fields:
+            for value in (-0.1, 1.1):
+                with self.subTest(field=field, value=value):
+                    seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+                    seeds[0]["holdout"][field] = value
+                    report = score_lineage(seeds, lambda values: 0.8)
+                    self.assertIsNone(report["score"])
+                    self.assertIn("mfs_components_complete", report["failed_gates"])
+
+    def test_invalid_auditor_distances_and_losses_stay_null(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+
+        for auditor in ("kumo_tabular_l", "mitra_v2", "tabicl2"):
+            for field, value, gate in (
+                ("distance", -0.1, "representation_closeness"),
+                ("distance", 1.1, "representation_closeness"),
+                ("d_null", -0.1, "representation_closeness"),
+                ("d_null", 1.1, "representation_closeness"),
+                ("null_loss", -0.1, "tabular_transfer"),
+                ("real_loss", -0.1, "tabular_transfer"),
+                ("synthetic_loss", -0.1, "tabular_transfer"),
+            ):
+                with self.subTest(auditor=auditor, field=field, value=value):
+                    seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+                    seeds[0]["auditors"][auditor][field] = value
+                    report = score_lineage(seeds, lambda values: 0.8)
+                    self.assertIsNone(report["score"])
+                    self.assertIn(gate, report["failed_gates"])
 
     def test_retention_maps_keep_only_finite_lineage_medians(self):
         from research.benchmark.mfs_v3_assemble import retention_maps

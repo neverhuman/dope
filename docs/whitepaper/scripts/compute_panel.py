@@ -74,7 +74,9 @@ def validate_rows(rows, sampled=False):
     for row in rows:
         if row.get("method") not in KNOWN_METHODS:
             raise ValueError("unknown panel method")
-        identity = tuple(row.get(key) for key in ("method", "dataset", "configuration", "size_multiplier", "fit_seed"))
+        # These reducers emit one value per lineage and do not aggregate fit seeds.
+        # Distinct fits at the same output key must never silently replace one another.
+        identity = tuple(row.get(key) for key in ("method", "dataset", "configuration", "size_multiplier"))
         if sampled:
             identity += (row.get("sample_seed"),)
         if identity in seen:

@@ -59,6 +59,16 @@ class PanelInputTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             panel.group_cells([row, copy.deepcopy(row)], "DOPE", "frozen", 4)
 
+    def test_distinct_fit_seeds_cannot_overwrite_the_same_output_key(self):
+        row = {"method": "DOPE", "dataset": "aa", "configuration": "frozen", "size_multiplier": 4,
+               "fit_seed": 11, "utility": {}}
+        rows = [row, dict(row, fit_seed=23)]
+        with self.assertRaises(ValueError):
+            panel.summary_map(rows, "DOPE", "frozen", 4, "linear")
+        sampled = [dict(item, sample_seed=101) for item in rows]
+        with self.assertRaises(ValueError):
+            panel.group_cells(sampled, "DOPE", "frozen", 4)
+
     def test_missing_matched_lineage_raises_before_statistics(self):
         record = {"rows": [{"dataset": "aa"}],
                   "comparators": {name: {} for name in panel.DENSITY_COMPARATORS}}
