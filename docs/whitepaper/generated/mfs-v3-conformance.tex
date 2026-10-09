@@ -1,0 +1,11 @@
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.73\linewidth}@{}}
+\toprule
+Scalar & $100\exp(\sum_i w_i\log\max(s_i,\epsilon)/\sum_i w_i)$, clipped to $[0,100]$ \\
+Weights & compactness = 0.05, coverage\_realism = 0.05, distribution\_fidelity = 0.15, driver\_fidelity = 0.15, representation\_closeness = 0.15, structure\_fidelity = 0.1, utility\_transfer = 0.35 \\
+Epsilon & $1\times 10^{-6}$ \\
+Bytes & $b\in\mathbb{Z},\ 0<b\le 10240$ \\
+Prerequisites & Real-vs-real control; required sizes; artifact sampling; locked metric implementations. \\
+Matched null & Median linear MSE of three independent-marginal candidates; candidate-index tie break. \\
+Near-copy floor & $q=0.01$ of nearest-other distinct real-row squared distances; linear interpolation. \\
+\bottomrule
+\end{tabular}

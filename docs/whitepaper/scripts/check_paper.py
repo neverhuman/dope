@@ -24,6 +24,7 @@ FIGURES = (
     ROOT / "dope-mfs.pdf",
     ROOT / "dope-mfs-anonymous.pdf",
     ROOT / "supplement.pdf",
+    ROOT / "supplement-anonymous.pdf",
     ROOT / "figures" / "retention-bytes.pdf",
     ROOT / "figures" / "retention-bars.pdf",
     ROOT / "figures" / "paired-cdf.pdf",
@@ -45,6 +46,7 @@ LOGS = (
     ROOT.parents[1] / "target/paper-build/dope-mfs-3.log",
     ROOT.parents[1] / "target/paper-build/dope-mfs-anonymous-3.log",
     ROOT.parents[1] / "target/paper-build/supplement-3.log",
+    ROOT.parents[1] / "target/paper-build/supplement-anonymous-3.log",
 )
 LOG_HITS = ("Warning", "undefined", "Undefined", "Overfull", "Underfull")
 
@@ -62,9 +64,21 @@ def strip_comments(text: str) -> str:
     return "\n".join(line.split("%", 1)[0] for line in text.splitlines())
 
 
+def anonymous_leaks(text: str) -> list[str]:
+    """Scan visible text and PDF metadata, including identifying repository URLs."""
+    patterns = (r"\bJepson\b", r"\bAlton\b", r"\bNEVERHUMAN\b", r"jepsontaylor",
+                r"https?://[^\s<>]*(?:neverhuman|jepsontaylor)")
+    return [pattern for pattern in patterns if re.search(pattern, text, re.IGNORECASE)]
+
+
 def main() -> int:
     failures = []
     raw_tex = TEX.read_text()
+    supplement_source = (ROOT / "supplement.tex").read_text()
+    if (r"\documentclass{article}" not in supplement_source
+            or r"\usepackage{iclr2027_conference,times}" not in supplement_source
+            or "IEEEtran" in supplement_source):
+        failures.append("supplement is not in the main ICLR article style")
     if "D.O.P.E." in raw_tex:
         failures.append("D.O.P.E. remains in dope-mfs.tex")
     if r"\documentclass{article}" not in raw_tex.split(r"\begin{document}", 1)[0]:
@@ -155,7 +169,7 @@ def main() -> int:
         hits = banned_hits(path.read_text(errors="replace"))
         if hits:
             failures.append(f"{path.name} contains a private token: {hits[0]}")
-    for path in FIGURES[:3]:
+    for path in FIGURES[:4]:
         if not path.exists():
             continue
         try:
@@ -171,15 +185,18 @@ def main() -> int:
         hits = banned_hits(extracted)
         if hits:
             failures.append(f"{path.name} text contains a private token: {hits[0]}")
-        if path.name != "supplement.pdf":
+        info = subprocess.check_output(["pdfinfo", str(path)], text=True, errors="replace")
+        if "612 x 792" not in info:
+            failures.append(f"{path.name} is not US Letter")
+        if "conference paper at ICLR" in extracted or "Under review as a conference paper" in extracted:
+            failures.append(f"{path.name} claims an ICLR venue")
+        if path.name.endswith("-anonymous.pdf"):
             info = subprocess.check_output(["pdfinfo", str(path)], text=True, errors="replace")
-            if "612 x 792" not in info:
-                failures.append(f"{path.name} is not US Letter")
-            if "conference paper at ICLR" in extracted or "Under review as a conference paper" in extracted:
-                failures.append(f"{path.name} claims an ICLR venue")
-        if path.name == "dope-mfs-anonymous.pdf":
-            if "Jepson" in extracted or "NEVERHUMAN" in extracted or "Alton" in extracted:
-                failures.append("anonymous PDF still names an author")
+            links = subprocess.check_output(
+                ["pdftohtml", "-i", "-xml", "-stdout", str(path)], text=True, errors="replace"
+            )
+            if anonymous_leaks(extracted + "\n" + info + "\n" + links):
+                failures.append(path.name + " contains an identifying name or URL")
         if path.name == "dope-mfs.pdf" and "DOPE" not in extracted:
             failures.append("journal PDF does not show the DOPE title")
     for log in LOGS:
@@ -216,6 +233,7 @@ _LATEX = {
     "Paragraph",
     "Ref",
     "Section",
+    "Sigma",
     "Subsection",
     "Table",
     "Toprule",

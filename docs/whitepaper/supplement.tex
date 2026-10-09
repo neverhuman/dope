@@ -1,31 +1,21 @@
-\documentclass[journal]{IEEEtran}
-\usepackage{booktabs}
-\usepackage{longtable}
-\usepackage{array}
-\usepackage{graphicx}
-\usepackage{url}
-\usepackage{etoolbox}
-\makeatletter
-\apptocmd{\@maketitle}{%
-  \par\addvspace{\medskipamount}%
-  \@IEEEtitleabstractindextextbox{\@IEEEtitleabstractindextext}%
-  \par\addvspace{\smallskipamount}%
-}{}{\errmessage{dope-supplement: spanning abstract was not attached}}
-\makeatother
-
+\documentclass{article}
+\usepackage{iclr2027_conference,times}
+\usepackage{booktabs,longtable,array,graphicx,url,amsmath,amssymb}
+\usepackage{hyperref}
+\emergencystretch=3em
+\raggedbottom
+\title{\texorpdfstring{\raggedright Supplement: DOPE: Downstream Objective-Preserving\\ Encoding for Synthetic Tabular Data}{Supplement: DOPE: Downstream Objective-Preserving Encoding for Synthetic Tabular Data}}
+\author{Jepson Taylor$^1$, Alton Alexander$^1$\\[0.15cm]
+$^1$NEVERHUMAN Research}
+\iclrfinalcopy
 \begin{document}
 \input{generated/numbers.tex}
+\maketitle
+\fancyhead{}
+\renewcommand{\headrulewidth}{0pt}
 
-\title{Supplement: Lineage Tables for the 10{,}240-Byte Generator}
-
-\author{Jepson~Taylor and Alton~Alexander%
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.~Taylor and A.~Alexander are with NEVERHUMAN Research.}}
-
-\markboth{Taylor and Alexander}%
-{Supplement: Lineage Tables for the 10240-Byte Generator}
-
-\IEEEtitleabstractindextext{%
 \begin{abstract}
+\raggedright
 Lineage-level retention and byte charges for the displayed profile, the
 8{,}192-step sufficiency budget, and the \BeyondInventory{} BeyondArena
 family names. These tables are the rows behind the medians in the main
@@ -34,27 +24,32 @@ informative on all three sample seeds. It is not a zero. A lineage with
 no charged bytes and no retention is omitted. BeyondArena is not pooled
 with the PMLB panel. The release-score rows are arithmetic on invented
 components. They are not measurements on these lineages.
-\end{abstract}}
+\end{abstract}
 
-\maketitle
 
-\onecolumn
 \raggedbottom
-\appendices
+\appendix
+\raggedright
 \section{Displayed profile, all 100 lineages}
 \label{app:2048}
+\begingroup\scriptsize\setlength{\tabcolsep}{2pt}
 \input{generated/s3-2048-lineages.tex}
+\endgroup
 
 \section{Sufficiency budget}
 \label{app:8192}
+\begingroup\scriptsize\setlength{\tabcolsep}{2pt}
 \input{generated/s3-8192-lineages.tex}
+\endgroup
 
 \section{BeyondArena families in the dataset bucket}
 \label{app:beyond}
+\begingroup\setlength{\tabcolsep}{2pt}
 \input{generated/beyondarena-inventory.tex}
+\endgroup
 
 \section{Replay curves}
-The journal reports the median hidden-basis loss. The curves below are
+The main paper reports the median hidden-basis loss. The curves below are
 the logged replay of both step budgets, before the readout refit. The
 8{,}192-step panel is not the displayed model. The solid line is the
 training median and the dashed line is the validation median. Each
@@ -90,27 +85,21 @@ remain sealed and all gated scores remain null.
 
 \begin{center}
 \footnotesize
-\input{generated/retained-first12.tex}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-first12.tex}\end{minipage}}
 \end{center}
 
 \section{Release score that was not emitted}
 \label{app:score}
-Equation~(3) of the journal is a gated geometric mean. No artifact in the
-journal has a measured value, so this supplement does not print a column
-of nulls. Copying a retention number into that scalar would publish a
-value the contract refuses to emit. Table~\ref{tab:illustration} applies
-the printed formula to invented components
-$(0.90, 0.80, 0.85, 0.70, 0.75, 0.95)$. The first
-scalar is that formula rounded to two decimals. The all-ones row keeps the
-$\epsilon=10^{-6}$ offset, which is why the result is not exactly $100$.
-The zero-compactness row uses the same invented components with the
-compactness term set to $0$, the value of $\mathrm{clamp}(1 -
-\mathrm{bytes}/10240, 0, 1)$ at $10{,}240$ bytes. A failed byte gate is a
-different outcome: the implementation returns null and does not emit the
-formula. None of these rows was measured.
+MFS-v3 is a gated geometric mean. Every observed scalar remains null. Copying a retention number into that scalar would publish a
+value the contract refuses to emit. Table~\ref{tab:illustration} applies the bounded MFS-v3 implementation to
+invented all-ones components and to the same profile with compactness set to
+zero. The all-ones row is exactly $100$. At the byte ceiling, compactness is
+zero and the formula uses its epsilon floor. A failed byte gate returns null.
+These rows illustrate arithmetic only.
+\input{generated/mfs-v3-examples.tex}
 
 \begin{table}[t]
-\caption{Invented applications of the journal's score formula. Not a measurement.}
+\caption{Invented applications of the bounded MFS-v3 formula. These are arithmetic illustrations.}
 \label{tab:illustration}
 \centering
 \footnotesize
@@ -118,9 +107,8 @@ formula. None of these rows was measured.
 \toprule
 Invented input & Scalar \\
 \midrule
-Six components above, gates passed & \MfsClassic \\
-All six components equal to one & \MfsAllOnes \\
-Compactness component set to zero & \MfsZeroCompact \\
+All seven components equal to one & \MfsVThreePerfect \\
+Compactness component set to zero & \MfsVThreeZeroCompact \\
 Byte gate failed & null \\
 \bottomrule
 \end{tabular}
@@ -145,7 +133,7 @@ Gaussian copula, Chow--Liu, and independent-marginal attempts store one
 unsplit \texttt{wall\_seconds}. Medians are \GaussAttemptMed,
 \ChowAttemptMed, and \IndAttemptMed. Maxima are \GaussAttemptMax,
 \ChowAttemptMax, and \IndAttemptMax. BeyondArena medians remain
-\BeyondElapseA\ and \BeyondElapseB. Reading the journal threshold
+\BeyondElapseA\ and \BeyondElapseB. Reading the main paper threshold
 counts from top to bottom, CatBoost is \NThrLowCb, \NThrMidCb,
 \NThrHighCb; linear is \NThrLowLin, \NThrMidLin, \NThrHighLin; and the
 MLP is \NThrLowMlp, \NThrMidMlp, \NThrHighMlp.
@@ -160,6 +148,51 @@ The rows below are SHA-256 of each ledger and round lock the paper reads,
 plus the commit and the file hash of the harness that measured the
 grouped-validation fidelity ledger. Regenerating the macros does not
 rewrite a ledger hash.
-\input{generated/artifact-hashes.tex}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/artifact-hashes.tex}\end{minipage}}
+
+
+\section{Executable MFS-v3 conformance}
+\label{app:conformance}
+The release score uses the contract's weighted geometric mean with a component
+floor: $100\exp(\sum_i w_i\log\max(s_i,\epsilon)/\sum_i w_i)$, clipped to
+$[0,100]$. The components lie in $[0,1]$. A failed gate yields a null scalar.
+The matched null is the median linear-MSE candidate among three deterministic
+independent-marginal tables. Linear losses and candidate selection are fixed
+before any representation encoder forward. This is a median selector; a
+learnability band is outside this implementation.
+The near-copy floor is the declared quantile of nearest-other squared distances
+among distinct real fit rows in the shared map, with linear interpolation.
+Undefined floors fail the gate. The exact implementation and contract fields are:
+\begin{center}\small
+\input{generated/mfs-v3-conformance.tex}
+\end{center}
+The scorer tests in \path{research/benchmark/tests/test_mfs_v3.py} verify exact
+$100$ for a perfect profile, the byte boundary, and each prerequisite. The panel
+tests verify median null selection and the quantile floor.
+
+\section{Public data and scored-artifact availability}
+\label{app:public-kit}
+A credential-free upstream-data path is
+\path{python3 -m research.benchmark.fetch_pmlb --list} and
+\path{python3 -m research.benchmark.fetch_pmlb DATASET_ID OUTPUT_DIRECTORY}.
+It authenticates PMLB data against an upstream Git LFS SHA pin at a fixed public
+revision. The public manifest includes every prepared lineage's PMLB identifier
+and the historical train/validation/test split hashes from the committed data
+lock. Downloads stay upstream source data: the historical JopeDime staging
+used a separate hybrid coreset and target-stratified selection, whose exact
+selected row indices were omitted from the captured receipts. The public fetch
+therefore provides source datasets and historical split identities, while exact
+historical partition reconstruction requires the missing selection manifest.
+
+The originally scored model files and synthetic rows have no published bundle.
+The captured historical metadata has artifact digests and charges but omits a
+complete portable inventory binding every scored file to a retrievable public
+object. Publishing current scratch files under those identities would require
+an additional custody audit; logged replay fits have different artifact
+identities. The verified alternative for all displayed paper numbers is the
+committed validation ledgers, original metadata and compressed numeric logs,
+authenticated by the input pins and rebuilt by \texttt{just paper}. This
+reproduces paper reductions and figures; it leaves original model sampling and
+historical partition reconstruction as explicit packaging limitations.
 
 \end{document}

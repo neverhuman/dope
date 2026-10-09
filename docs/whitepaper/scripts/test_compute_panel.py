@@ -22,6 +22,18 @@ class PanelInputTests(unittest.TestCase):
                             panel.load(name)
                 self.assertIsInstance(panel.load(name), dict)
 
+    def test_every_transitive_hash_inventory_input_rejects_drift(self):
+        original_read = Path.read_bytes
+        panel.authenticate_hash_inventory()
+        for relative in panel.HASH_INPUT_SHA256:
+            target = panel.REPO / relative
+            def read(path):
+                raw = original_read(path)
+                return raw + b" " if path == target else raw
+            with self.subTest(relative=relative), patch.object(Path, "read_bytes", read):
+                with self.assertRaisesRegex(ValueError, "digest mismatch"):
+                    panel.authenticate_hash_inventory()
+
     def test_unregistered_missing_and_symlinked_inputs_fail(self):
         with self.assertRaisesRegex(ValueError, "unregistered"):
             panel.load("../unregistered.json")
