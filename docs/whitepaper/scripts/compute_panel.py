@@ -385,6 +385,23 @@ def check_anchors(density, neural):
     return failures
 
 
+def paired_median_tex(value, difference_lo, difference_hi, side):
+    """Bold one median when the paired difference interval excludes zero.
+
+    ``side`` is ``dope`` or ``other``. The difference is DOPE minus the
+    other method. An interval that contains zero, including the linear
+    auditor against the copula, stays plain. A privacy column never
+    reaches this helper.
+    """
+    text = sig3(value)
+    if difference_lo is None or difference_hi is None:
+        return text
+    higher = (side == "dope" and difference_lo > 0) or (side == "other" and difference_hi < 0)
+    if higher:
+        return f"\\textbf{{{text}}}"
+    return text
+
+
 def sig3(value):
     """Three decimals on the retention scale, three significant digits below 0.1."""
     if value is None or not finite(value):
@@ -435,8 +452,8 @@ def write_density_table(density):
             pair = density[auditor]["pairs"][comparator]
             rows.append(
                 f"{labels[auditor]} & {labels[comparator]} & {pair['n']} & "
-                f"{sig3(pair['dope_median'])} [{sig3(pair['dope_lo'])}, {sig3(pair['dope_hi'])}] & "
-                f"{sig3(pair['other_median'])} [{sig3(pair['other_lo'])}, {sig3(pair['other_hi'])}] & "
+                f"{paired_median_tex(pair['dope_median'], pair['lo'], pair['hi'], 'dope')} [{sig3(pair['dope_lo'])}, {sig3(pair['dope_hi'])}] & "
+                f"{paired_median_tex(pair['other_median'], pair['lo'], pair['hi'], 'other')} [{sig3(pair['other_lo'])}, {sig3(pair['other_hi'])}] & "
                 f"{sig3(pair['median_difference'])} [{sig3(pair['lo'])}, {sig3(pair['hi'])}] & "
                 f"{pair['wins']}/{pair['ties']}/{pair['losses']} & "
                 f"${tex_p(pair['holm_p'])}$ \\\\"
@@ -500,8 +517,8 @@ def write_neural_table(neural):
             pair = neural[auditor]["pairs"][comparator]
             rows.append(
                 f"{labels[auditor]} & {labels[comparator]} & {pair['n']} & "
-                f"{sig3(pair['dope_median'])} [{sig3(pair['dope_lo'])}, {sig3(pair['dope_hi'])}] & "
-                f"{sig3(pair['other_median'])} [{sig3(pair['other_lo'])}, {sig3(pair['other_hi'])}] & "
+                f"{paired_median_tex(pair['dope_median'], pair['lo'], pair['hi'], 'dope')} [{sig3(pair['dope_lo'])}, {sig3(pair['dope_hi'])}] & "
+                f"{paired_median_tex(pair['other_median'], pair['lo'], pair['hi'], 'other')} [{sig3(pair['other_lo'])}, {sig3(pair['other_hi'])}] & "
                 f"{sig3(pair['median_difference'])} [{sig3(pair['lo'])}, {sig3(pair['hi'])}] & "
                 f"{pair['wins']}/{pair['ties']}/{pair['losses']} & "
                 f"${tex_p(pair['holm_p'])}$ \\\\"
