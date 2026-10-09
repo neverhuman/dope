@@ -325,9 +325,14 @@ def inventory(jobs: list[dict], host: str, threads: int) -> dict:
             "resolvable_bytes": size}
 
 
+def _adapters_sha256() -> str:
+    return v1._sha256(Path(A.__file__).resolve())
+
+
 def write_plan(path: Path, ledger: dict, jobs: list[dict], host: str) -> None:
     header = {"format": PLAN_FORMAT, "ledger": ledger["name"], "file": ledger["file"],
-              "sha256": ledger["sha256"], "resolved_on": host, "jobs": len(jobs), "official_tests_opened": False}
+              "sha256": ledger["sha256"], "adapters_sha256": _adapters_sha256(), "resolved_on": host,
+              "jobs": len(jobs), "official_tests_opened": False}
     path.parent.mkdir(parents=True, exist_ok=True)
     staging = path.with_suffix(".jsonl.tmp")
     staging.write_text("".join(json.dumps(item, sort_keys=True) + "\n" for item in [header, *jobs]))
@@ -341,6 +346,8 @@ def load_plan(path: Path, ledger: dict) -> list[dict]:
     if (header.get("format") != PLAN_FORMAT or header.get("ledger") != ledger["name"]
             or header.get("sha256") != ledger["sha256"] or header.get("jobs") != len(jobs)):
         raise SystemExit(f"plan {path.name} does not match the committed ledger")
+    if header.get("adapters_sha256") != _adapters_sha256():
+        raise SystemExit(f"plan {path.name} was resolved by different adapter code")
     return jobs
 
 
