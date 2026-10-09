@@ -1,0 +1,566 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Fixed Forest400 receipt metadata only. Per-row uniqueness, four-seed coverage, timer sums and unknowns are independently checked by the pinned renderer.",
+  "properties": {
+    "cost_and_storage_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_coordinator_wait_exit_code": {
+          "type": "null"
+        },
+        "actual_peak_GPU_resident_mib": {
+          "type": "null"
+        },
+        "actual_peak_RSS_bytes": {
+          "type": "null"
+        },
+        "artifact_bytes_basis": {
+          "const": "historical_successful_receipt_declarations_not_current_retained_disk",
+          "type": "string"
+        },
+        "artifact_inventory_verified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "co_tenant_observed": {
+          "type": "null"
+        },
+        "fit_and_elapsed_timers_added": {
+          "const": false,
+          "type": "boolean"
+        },
+        "receipt_declared_cumulative_artifact_bytes": {
+          "const": 72869335252,
+          "type": "integer"
+        },
+        "retained_disk_bytes": {
+          "type": "null"
+        },
+        "shared_GPU_cost_observed": {
+          "type": "null"
+        },
+        "successful_elapsed_seconds_sum_ALTERNATE": {
+          "const": 54299.77247472573,
+          "type": "number"
+        },
+        "successful_fit_seconds_sum": {
+          "const": 49475.683213091455,
+          "type": "number"
+        },
+        "successful_timers_are_alternate_nonadditive": {
+          "const": true,
+          "type": "boolean"
+        },
+        "timeout_actual_elapsed_seconds_sum": {
+          "type": "null"
+        },
+        "timeout_artifact_bytes_sum": {
+          "type": "null"
+        },
+        "whole_round_parent_cost_seconds": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "actual_coordinator_wait_exit_code",
+        "actual_peak_GPU_resident_mib",
+        "actual_peak_RSS_bytes",
+        "artifact_bytes_basis",
+        "artifact_inventory_verified",
+        "co_tenant_observed",
+        "fit_and_elapsed_timers_added",
+        "receipt_declared_cumulative_artifact_bytes",
+        "retained_disk_bytes",
+        "shared_GPU_cost_observed",
+        "successful_elapsed_seconds_sum_ALTERNATE",
+        "successful_fit_seconds_sum",
+        "successful_timers_are_alternate_nonadditive",
+        "timeout_actual_elapsed_seconds_sum",
+        "timeout_artifact_bytes_sum",
+        "whole_round_parent_cost_seconds"
+      ],
+      "type": "object"
+    },
+    "coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "complete_four_additional_seed_lineages": {
+          "const": 71,
+          "type": "integer"
+        },
+        "completed_five_seed_lineages": {
+          "type": "null"
+        },
+        "fivefit_stability": {
+          "type": "null"
+        },
+        "historical_fit11_joined": {
+          "const": false,
+          "type": "boolean"
+        },
+        "per_seed_status_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "23": {
+              "additionalProperties": false,
+              "properties": {
+                "ok": {
+                  "const": 73,
+                  "type": "integer"
+                },
+                "timeout": {
+                  "const": 27,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "ok",
+                "timeout"
+              ],
+              "type": "object"
+            },
+            "37": {
+              "additionalProperties": false,
+              "properties": {
+                "ok": {
+                  "const": 73,
+                  "type": "integer"
+                },
+                "timeout": {
+                  "const": 27,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "ok",
+                "timeout"
+              ],
+              "type": "object"
+            },
+            "53": {
+              "additionalProperties": false,
+              "properties": {
+                "ok": {
+                  "const": 73,
+                  "type": "integer"
+                },
+                "timeout": {
+                  "const": 27,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "ok",
+                "timeout"
+              ],
+              "type": "object"
+            },
+            "71": {
+              "additionalProperties": false,
+              "properties": {
+                "ok": {
+                  "const": 72,
+                  "type": "integer"
+                },
+                "timeout": {
+                  "const": 28,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "ok",
+                "timeout"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "23",
+            "37",
+            "53",
+            "71"
+          ],
+          "type": "object"
+        },
+        "sample_evaluation_completeness": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "complete_four_additional_seed_lineages",
+        "completed_five_seed_lineages",
+        "fivefit_stability",
+        "historical_fit11_joined",
+        "per_seed_status_counts",
+        "sample_evaluation_completeness"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "work-order-b-forest400-additional-default-fit-dispositions-v1",
+      "type": "string"
+    },
+    "gated_claims": {
+      "additionalProperties": false,
+      "properties": {
+        "common_validation_utility": {
+          "type": "null"
+        },
+        "detection": {
+          "type": "null"
+        },
+        "empirical_privacy": {
+          "type": "null"
+        },
+        "fidelity": {
+          "type": "null"
+        },
+        "formal_privacy": {
+          "type": "null"
+        },
+        "mfs_v2": {
+          "type": "null"
+        },
+        "production_certified": {
+          "type": "null"
+        },
+        "ptf_v1": {
+          "type": "null"
+        },
+        "release_safe_l3": {
+          "type": "null"
+        },
+        "superiority": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "common_validation_utility",
+        "detection",
+        "empirical_privacy",
+        "fidelity",
+        "formal_privacy",
+        "mfs_v2",
+        "production_certified",
+        "ptf_v1",
+        "release_safe_l3",
+        "superiority"
+      ],
+      "type": "object"
+    },
+    "historical_checkpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "additional_default_ok": {
+          "const": 268,
+          "type": "integer"
+        },
+        "additional_default_timeouts": {
+          "const": 75,
+          "type": "integer"
+        },
+        "bytes": {
+          "const": 5130,
+          "type": "integer"
+        },
+        "earlier_13_published_cohorts_counted_in_this_leaf": {
+          "const": false,
+          "type": "boolean"
+        },
+        "kept_immutable": {
+          "const": true,
+          "type": "boolean"
+        },
+        "physical_closed": {
+          "const": 343,
+          "type": "integer"
+        },
+        "relative_path": {
+          "const": "research/benchmark/results/baseline-completion-20261008-v1/panel.json",
+          "type": "string"
+        },
+        "sha256": {
+          "const": "46abb42e01d02babe197c76e11017d8da6c309e2858a5899d6abce5b58c807dc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "additional_default_ok",
+        "additional_default_timeouts",
+        "bytes",
+        "earlier_13_published_cohorts_counted_in_this_leaf",
+        "kept_immutable",
+        "physical_closed",
+        "relative_path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "measured_fit_metadata": {
+      "items": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "receipt_declared_artifact_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "successful_elapsed_seconds": {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "successful_fit_seconds": {
+                  "minimum": 0,
+                  "type": "number"
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "timeout"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "receipt_declared_artifact_bytes": {
+                  "type": "null"
+                },
+                "successful_elapsed_seconds": {
+                  "type": "null"
+                },
+                "successful_fit_seconds": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "actual_peak_GPU_resident_mib": {
+            "type": "null"
+          },
+          "actual_peak_RSS_bytes": {
+            "type": "null"
+          },
+          "artifact_inventory_verified": {
+            "const": false,
+            "type": "boolean"
+          },
+          "dataset_lineage_id": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "fit_seed": {
+            "enum": [
+              23,
+              37,
+              53,
+              71
+            ],
+            "type": "integer"
+          },
+          "job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "receipt_declared_artifact_bytes": {
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "timeout"
+            ],
+            "type": "string"
+          },
+          "successful_elapsed_seconds": {
+            "minimum": 0,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "successful_fit_seconds": {
+            "minimum": 0,
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "actual_peak_GPU_resident_mib",
+          "actual_peak_RSS_bytes",
+          "artifact_inventory_verified",
+          "dataset_lineage_id",
+          "fit_seed",
+          "job_sha256",
+          "receipt_declared_artifact_bytes",
+          "status",
+          "successful_elapsed_seconds",
+          "successful_fit_seconds"
+        ],
+        "type": "object"
+      },
+      "maxItems": 400,
+      "minItems": 400,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "receipt_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "CPU_affinity_declared": {
+          "const": [
+            64,
+            65,
+            66,
+            67
+          ],
+          "type": "array"
+        },
+        "RAM_cap_declared_bytes": {
+          "const": 8589934592,
+          "type": "integer"
+        },
+        "fit_timeout_seconds": {
+          "const": 600,
+          "type": "integer"
+        },
+        "new_fits_or_evaluations_by_publication": {
+          "const": 0,
+          "type": "integer"
+        },
+        "round_sha256": {
+          "const": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3",
+          "type": "string"
+        },
+        "runtime_lock_sha256": {
+          "const": "e9fa7a4a05dc4f9e3502fde0481e2d78de6785b455136b3ea05cdcc711d6d221",
+          "type": "string"
+        },
+        "runtime_or_artifact_reopened_by_publication": {
+          "const": false,
+          "type": "boolean"
+        },
+        "timeout_policy": {
+          "const": "retain_original_600s_no_selective_higher_budget_retry",
+          "type": "string"
+        }
+      },
+      "required": [
+        "CPU_affinity_declared",
+        "RAM_cap_declared_bytes",
+        "fit_timeout_seconds",
+        "new_fits_or_evaluations_by_publication",
+        "round_sha256",
+        "runtime_lock_sha256",
+        "runtime_or_artifact_reopened_by_publication",
+        "timeout_policy"
+      ],
+      "type": "object"
+    },
+    "snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_additional_default_fits": {
+          "const": 291,
+          "type": "integer"
+        },
+        "additional_fit_seeds": {
+          "const": [
+            23,
+            37,
+            53,
+            71
+          ],
+          "type": "array"
+        },
+        "configuration": {
+          "const": "author_default",
+          "type": "string"
+        },
+        "dataset_lineages": {
+          "const": 100,
+          "type": "integer"
+        },
+        "fixed_snapshot": {
+          "const": true,
+          "type": "boolean"
+        },
+        "method": {
+          "const": "Forest-Flow",
+          "type": "string"
+        },
+        "native_selection_complete": {
+          "type": "null"
+        },
+        "new_tuning_trials": {
+          "const": 0,
+          "type": "integer"
+        },
+        "observed_utc": {
+          "const": "2026-10-08T17:40:32.221555+00:00",
+          "type": "string"
+        },
+        "official_tests_opened": {
+          "const": false,
+          "type": "boolean"
+        },
+        "other_dispositions": {
+          "const": 0,
+          "type": "integer"
+        },
+        "physical_closed": {
+          "const": 400,
+          "type": "integer"
+        },
+        "planned_additional_fit_slots": {
+          "const": 400,
+          "type": "integer"
+        },
+        "timeout_missing_artifacts": {
+          "const": 109,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "accepted_additional_default_fits",
+        "additional_fit_seeds",
+        "configuration",
+        "dataset_lineages",
+        "fixed_snapshot",
+        "method",
+        "native_selection_complete",
+        "new_tuning_trials",
+        "observed_utc",
+        "official_tests_opened",
+        "other_dispositions",
+        "physical_closed",
+        "planned_additional_fit_slots",
+        "timeout_missing_artifacts"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "cost_and_storage_scope",
+    "coverage",
+    "format",
+    "gated_claims",
+    "historical_checkpoint",
+    "measured_fit_metadata",
+    "receipt_scope",
+    "snapshot"
+  ],
+  "type": "object"
+}
