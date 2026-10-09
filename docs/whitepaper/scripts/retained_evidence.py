@@ -232,9 +232,8 @@ def render_figure(data):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    # The serif font ships with the pinned plotting dependency on every CI guest.
-    plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42,
-                         "font.family": "DejaVu Serif", "font.size": 8.1})
+    import figure_style
+    figure_style.apply(matplotlib, size=8.1)
 
     fig, axes = plt.subplots(1, 2, figsize=(7.16, 3.15))
     entries = [x for x in data["summaries"] if x["scope"] == "matched8" and x["size"] == 4]
@@ -242,14 +241,16 @@ def render_figure(data):
                                    ("Null-normalized retention", "Distance MIA AUC (empirical)")):
         for y, row in enumerate(entries):
             v = row["metrics"][metric]
-            axis.plot([v["lo"], v["hi"]], [y, y], color="black", linewidth=1)
-            axis.plot(v["median"], y, marker="o", color="black", markersize=3)
+            color = figure_style.COLORS.get(row["method"], figure_style.GAUSSIAN)
+            dominant = row["method"] == "DOPE"
+            axis.plot([v["lo"], v["hi"]], [y, y], color=color, linewidth=1.6 if dominant else 1.1, zorder=2)
+            axis.plot(v["median"], y, marker="o", color=color, markersize=4.5 if dominant else 3.5, zorder=3)
         axis.set_yticks(range(len(entries)), [LABELS[x["method"]].replace("--", "-") + " " +
                                             {"native_selected": "native", "author_default": "default", "scaled_author_default": "scaled"}[x["configuration"]] for x in entries])
         axis.invert_yaxis()
         axis.set_xlabel(label)
         axis.set_title("Matched eight, 4n; 95% lineage CI")
-        axis.grid(axis="x", alpha=.2)
+        figure_style.panel(axis, grid="x")
     fig.tight_layout()
     path = REPO / "docs/whitepaper/figures/retained-matched-eight.pdf"
     fig.savefig(path, metadata={"CreationDate": None, "ModDate": None})

@@ -1,9 +1,9 @@
 {
   "format": "dope-paper-figure-hashes",
   "pdf_sha256": {
-    "loss-curves.pdf": "73883588acb82aeb1fb8b8755ca5186e23267ab7aaf19be8477425a8eee02f00",
-    "paired-cdf.pdf": "95ac96004fcbea159730aa95e42345e325ee38394c1c2c8b144b760831e965c2",
-    "retention-bars.pdf": "d9f11579a7a57d5e653eb85460a4cb0386768d17708ae02575c5b73bdfbc1ee9",
-    "retention-bytes.pdf": "4c6fb964d0d5d71fa9f08d4f08d19ab08f734ed43faf0554800597313d7dd636"
+    "loss-curves.pdf": "538f4cab480a2686ef848139d8174d34fded388bb38f93a222b1c546cdcfd774",
+    "paired-cdf.pdf": "4420cbf101d29dd1bdfdce1e776892c61ff87010003ee47e620e409137bdae40",
+    "retention-bars.pdf": "edc82ddfe269aaadf3a40b5f5e96b0fb28d731abfd9f2b415a0242ebd4ec23f2",
+    "retention-bytes.pdf": "ae64be9869d0163ad16087a788f993fbcffed6a78cc2c4e00ee9156b5327b6a3"
   }
 }

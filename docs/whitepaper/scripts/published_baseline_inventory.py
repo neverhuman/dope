@@ -213,15 +213,19 @@ def render_figure(data, path):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    plt.rcParams.update({"pdf.fonttype":42,"ps.fonttype":42,"font.family":"DejaVu Serif","font.size":8.1})
+    import figure_style
+    figure_style.apply(matplotlib, size=8.1)
     labels=list(dict.fromkeys(p["cohort"] for p in data["figure_points"]))
     fig,axes=plt.subplots(1,4,figsize=(7.16,4.0),sharey=True)
     for axis,metric,title in zip(axes,METRICS,("CB retention","KS/TV error","C2ST CB AUC","MIA AUC")):
         for y,label in enumerate(labels):
             values=[p["value"] for p in data["figure_points"] if p["cohort"]==label and p["metric"]==metric and finite(p["value"])]
-            axis.scatter(values,[y]*len(values),s=5,color="#888888",alpha=.35,linewidths=0)
-            if values:axis.scatter([median(values)],[y],s=24,marker="D",color="#222222",linewidths=.4)
-        axis.set_title(title);axis.set_yticks(range(len(labels)),labels);axis.grid(axis="x",alpha=.2)
+            axis.scatter(values,[y]*len(values),s=5,color="#888888",alpha=.35,linewidths=0,zorder=2)
+            if values:
+                axis.scatter([median(values)],[y],s=28,marker="D",color=figure_style.cohort_color(label),linewidths=.4,zorder=3)
+        figure_style.panel(axis, grid="x")
+        axis.set_title(title)
+        axis.set_yticks(range(len(labels)), labels)
         if metric == "catboost_retention":
             # Preserve large negative ratios without hiding the central range.
             axis.set_xscale("symlog", linthresh=1)
