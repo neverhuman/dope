@@ -1,0 +1,156 @@
+{
+  "format": "dope-review-fix-predeclaration",
+  "version": 1,
+  "declared_utc": "2026-10-09T05:40:00Z",
+  "lane": "B",
+  "rule": "This file is the analysis contract. It is committed before any review-fix result is computed. Later result files must not change these choices. A mismatch with a published ledger is a parser bug and stops the run. No threshold, margin, seed, or configuration is revised after seeing a review-fix result.",
+  "published_configurations": {
+    "DOPE": "features12_steps2048",
+    "GaussianCopula": "native_selected",
+    "Chow-Liu": "native_selected",
+    "independent_marginals": "native_selected",
+    "CTGAN": "native_selected",
+    "TVAE": "native_selected",
+    "ARF_rows": ["author_default", "native_selected"],
+    "Forest-Flow": "native_selected",
+    "Forest-Flow_method_field": "ForestDiffusion/Forest-Flow",
+    "fit_seed_in_population_ledgers": 11,
+    "sample_seeds": [101, 211, 307],
+    "sizes": [1, 4],
+    "size_roles": "Size n and size 4n are co-primary. Both are reported. Neither is dropped after the results are seen. Size n is listed first because the protocol lists it first. For each published method and auditor, the paired median of size-n retention minus size-4n retention is also reported on the intersection, with a hierarchical interval. That contrast is descriptive and is not used to drop either size."
+  },
+  "auditors": ["catboost", "linear", "mlp"],
+  "informative_rule": "A sample seed is informative when null_loss - trtr_loss >= 0.01 * abs(null_loss) and the denominator is nonzero. A lineage enters the primary median only when all three sample seeds are status ok and informative. This is the rule already in research/benchmark/pilot_metrics.py.",
+  "parser_checks": {
+    "dope_catboost_4n_median": 0.939876353161328,
+    "dope_catboost_4n_n": 97,
+    "note": "These are the already published lineage-record anchor values. They check that the reader is on the published reduction. They are not targets."
+  },
+  "lineage_value": "Median of the three sample-seed retentions at fit seed 11. The fit-seed stage of the hierarchical bootstrap is not identified on the population ledgers, which contain one fit seed, and is reported as not_identified.",
+  "families": {
+    "rule": "Name-prefix clusters matching docs/whitepaper/scripts/public_hardware.py origin_counts: feynman, strogatz, fri, bng. Every remaining lineage is its own cluster. The four generator prefixes are not pooled into one super-cluster, and the remainder is not one super-cluster. This is a name-prefix sensitivity. It is not a verified parent-map genealogy.",
+    "simulated_prefixes": ["feynman", "strogatz", "fri", "bng"],
+    "excluding_simulated": "Drop the four generator prefixes and repeat the paired analysis on the remainder.",
+    "per_family": "Inside one prefix, resample lineages only. The family is fixed."
+  },
+  "uncertainty": {
+    "primary": "hierarchical cluster bootstrap of the median",
+    "also_reported": "lineage bootstrap of the median, which ignores the name prefixes",
+    "draws": 10000,
+    "interval": [0.025, 0.975],
+    "seed_label": "review-fixes-v1|<statistic label>",
+    "seed_method": "sha256 of the label, first 8 bytes little-endian, numpy Generator"
+  },
+  "tests": {
+    "difference": "DOPE minus comparator, on the intersection of primary lineages",
+    "wilcoxon": "two-sided Wilcoxon signed-rank on the paired differences, zeros dropped by scipy wilcox, method auto",
+    "win_tie_loss": "A tie is an exact zero. The equivalence margin is not a tie band.",
+    "holm": {
+      "density_per_size": "9 tests = 3 auditors x GaussianCopula, Chow-Liu, independent_marginals",
+      "neural_per_size": "6 tests = 3 auditors x CTGAN, TVAE",
+      "arf_per_size": "6 tests = 3 auditors x author_default, native_selected",
+      "forest_per_size": "3 tests = 3 auditors x Forest-Flow native_selected",
+      "controls_per_size": "6 tests = 3 auditors x real_bootstrap_4n, predictor_only",
+      "sizes_are_separate_families": true
+    },
+    "missing_baseline_cells": "A lineage absent for a baseline is excluded from that pair. It is not a DOPE win."
+  },
+  "tost": {
+    "margin_retention": 0.02,
+    "alpha": 0.05,
+    "estimand": "mean of the paired lineage differences",
+    "procedure": "Two one-sided one-sample t-tests of the mean against -margin and +margin. Equivalent only if both p-values are below alpha. The dual statement is that the 90 percent t interval for the mean lies inside [-0.02, 0.02]. Non-significant Wilcoxon tests are not called ties.",
+    "declared_before_computation": true
+  },
+  "delta_method": {
+    "retention": "(null - tstr) / (null - trtr)",
+    "per_lineage_se": "sample standard deviation of the three TSTR losses, divided by abs(null - trtr). TRTR and the null are treated as fixed because the real auditor seed is fixed. The SE is undefined when fewer than two TSTR losses exist or the denominator is zero.",
+    "purpose": "Show the SE increasing as abs(null - trtr) approaches zero. This does not replace the bootstrap interval for the median."
+  },
+  "denominator_sensitivity": {
+    "primary": "informative complete sample groups",
+    "sensitivity": "For every lineage with three status-ok seeds, recompute retention from the median of the three stored null, TRTR and TSTR losses. A zero denominator is excluded and counted as undefined. Every other recomputed retention is kept, and a value outside [-1, 2] is capped to that interval and counted. The cap is not used in the primary table."
+  },
+  "original_unit_rmse": {
+    "projection": "train min-max clip to [0, 1], target_map max and min from the worker projection.json",
+    "regression": "Lineage RMSE = sqrt(median of the three sample-seed TSTR mean squared errors) times (target_max - target_min). The reported number is the median of those lineage RMSEs. Target max and min are not written to any output.",
+    "trtr_column": "The same transform of the real-train auditor loss, so retention sits next to both losses.",
+    "binary": "The stored loss is log loss. It is not labeled RMSE."
+  },
+  "real_bootstrap_4n": {
+    "definition": "Draw the published training rows with replacement until the synthetic table has 4 times the training row count. No model is fit. Sample seeds 101, 211, 307 each get an independent draw from numpy Generator(sample_seed). Score with the auditors in research/benchmark/pilot_metrics.py at auditor seed 1729, on the published validation split. There is no fit seed.",
+    "output": "research/benchmark/results/review-fixes-controls-v1/"
+  },
+  "predictor_only": {
+    "definition": "No DOPE encoding. Regression: Ridge(alpha=1.0) fit on the published training rows, features sampled independently with replacement from each training marginal, Gaussian residual noise with the training residual standard deviation using ddof=1, no clipping. Binary: LogisticRegression(max_iter=1000, random_state=fit seed), features sampled the same way, labels drawn as Bernoulli(predicted probability). Primary fit seed 11 uses every training row. Fit seeds 23, 37, 53, and 71 each fit on a with-replacement bootstrap of the training rows of the same length, drawn with that seed, and are reported in full. None is selected after the fact. Sample seeds 101, 211, 307. Sizes n and 4n. Auditor seed 1729. Published train/validation split.",
+    "rng": "The training-row bootstrap uses numpy Generator(fit_seed). Synthetic feature and residual draws use numpy Generator([fit_seed, sample_seed, size]). Sizes are drawn independently. Size n is not a prefix of size 4n.",
+    "split_seeds": {
+      "seeds": [1729, 2027, 2999, 4099, 8191],
+      "role": "1729 is the published split and is not redone. The other four re-pool only the published train and validation rows, split 80/20 with that seed, stratified on a binary target, and refit predictor seed 11. The official test partition is not used. This sensitivity is only for the predictor-only control."
+    }
+  },
+  "privacy_and_fidelity": {
+    "implementation": "research/benchmark/expanded_validation_metrics.py privacy() and c2st(..., auditor=catboost)",
+    "max_rows": 800,
+    "c2st_n": "rows_per_class = min(validation rows, synthetic rows, 800), the same cap for every method. A cell that cannot supply that count is unavailable, not padded.",
+    "dcr": "dcr_validation is the holdout-referenced distance. dcr_fit is the train-referenced distance. Both are reported. The holdout reference is the validation partition.",
+    "nndr": "nndr_fit from the same function",
+    "mia": "distance_mia AUC. The lineage-bootstrap interval is taken across lineages after the median over sample seeds. This is an empirical attack AUC, not formal differential privacy and not HIPAA de-identification.",
+    "gbdt": "The CatBoost detector in c2st is the GBDT. Logistic C2ST already stored on the population cells is reported separately and is not relabeled as GBDT."
+  },
+  "tabsyn": {
+    "track": "scaled_200_vae_1000_diffusion",
+    "config_sha256": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc",
+    "do_not_refit": true,
+    "sample_seeds": [101, 211, 307],
+    "sizes": [1, 4],
+    "per_lineage_timeout_seconds": 180,
+    "host": "xbabe1",
+    "read_only_artifact_roots": [
+      "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/operations",
+      "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/artifact"
+    ],
+    "output_root": "/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-sample-v1",
+    "missing_or_timeout_is_not_a_win": true,
+    "parser_check": "Score the already published sample-101-4n.csv for dataset 02a45777900441ce and require the CatBoost retention to match the committed eight-lineage panel cell before any new TabSyn cell enters a table."
+  },
+  "tabddpm": {
+    "intent": "Extend the published retained fits to the remaining lineages only with the author budget already used for those fits, on xbabe3, with a 600 second per-lineage timeout. If no executable entry is found outside dl_final, sweep, and HOLD, record the gap and do not invent a shorter run.",
+    "missing_or_timeout_is_not_a_win": true,
+    "host": "xbabe3"
+  },
+  "extra_generator_fit_seeds": {
+    "population_ledgers": "Fit seed 11 only. The tables say so.",
+    "already_measured_prefix": "results/cpu-fivefit-validation-v1 is reported as a separate prefix. It is not pooled with the 97-lineage table.",
+    "new_fits": "Additional DOPE fit seeds 23, 37, 53, 71 are in scope only for features12_steps2048 and only if the published trainer can be invoked without changing the profile. They are not selected among."
+  },
+  "sealed_test": {
+    "status": "not_unsealed",
+    "unseal_count_authorized": 1,
+    "configuration_frozen_by_this_file": {
+      "method": "DOPE",
+      "profile": "features12_steps2048",
+      "fit_seed": 11,
+      "sample_seeds": [101, 211, 307],
+      "sizes": [1, 4],
+      "auditors": ["catboost", "linear", "mlp"],
+      "auditor_seed": 1729,
+      "partition": "official evaluator test.csv",
+      "comparators": ["GaussianCopula", "Chow-Liu", "independent_marginals", "real_bootstrap_4n", "predictor_only_fit_seed_11"]
+    },
+    "rule": "Hash this predeclaration, commit it, generate every control sample from training rows only, and only then open test.csv once. Do not open test.csv while developing loaders. If the result is weaker than the validation result, report it unchanged."
+  },
+  "outputs": [
+    "docs/whitepaper/generated/review-size-retention.tex",
+    "docs/whitepaper/generated/review-paired.tex",
+    "docs/whitepaper/generated/review-tost.tex",
+    "docs/whitepaper/generated/review-family.tex",
+    "docs/whitepaper/generated/review-denominator.tex",
+    "docs/whitepaper/generated/review-rmse.tex",
+    "docs/whitepaper/generated/review-fidelity-stored.tex",
+    "docs/whitepaper/generated/review-seeds-existing.tex",
+    "docs/whitepaper/generated/review-controls.tex",
+    "docs/whitepaper/generated/review-privacy.tex",
+    "docs/whitepaper/figures/review-retention-se.pdf"
+  ]
+}
