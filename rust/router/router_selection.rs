@@ -333,6 +333,44 @@ mod tests {
     }
 
     #[test]
+    fn sketch_cutoff_tie_changes_columns_but_preserves_row_permutations() {
+        let mut columns = vec![vec![0.0, 0.0, 1.0, 1.0]; MAX_PAIRWISE_FEATURES];
+        columns.push(vec![0.0, 1.0, 0.0, 1.0]);
+        let mut original = table(columns);
+        original.target.fill(0.0);
+        let mut permuted = original.clone();
+        permuted.columns.swap(0, MAX_PAIRWISE_FEATURES);
+        let first = DatasetSketch::from_train(&original, Task::Regression);
+        let second = DatasetSketch::from_train(&permuted, Task::Regression);
+        let per_column_start = 10 + 12 * 6;
+        let pairwise_start = per_column_start + MAX_PAIRWISE_FEATURES * 12;
+        let expected_summary = [
+            0.0, 0.5, 0.25, 0.0, 0.0, 0.0, 0.5, 1.0, 1.0, 0.5, 1.0, 0.0,
+        ];
+        // Both A and B tie on all twelve summaries, including target association.
+        for summary in second.values[per_column_start..pairwise_start].chunks_exact(12) {
+            assert_eq!(summary, &expected_summary[..]);
+        }
+        assert_eq!(first.values.len(), 856);
+        assert_eq!(second.values.len(), 856);
+        assert_eq!(first.values[..pairwise_start], second.values[..pairwise_start]);
+        assert_eq!(first.values[pairwise_start..], [1.0; 6]);
+        assert_eq!(
+            second.values[pairwise_start..],
+            [0.0, 1.0, 1.0, 1.0, 1.0, 0.96875]
+        );
+        // A synchronous row permutation preserves alignment and the retained set.
+        for column in &mut permuted.columns {
+            column.reverse();
+        }
+        permuted.target.reverse();
+        assert_eq!(
+            second,
+            DatasetSketch::from_train(&permuted, Task::Regression)
+        );
+    }
+
+    #[test]
     fn selection_expands_and_keeps_baseline() {
         let predictions: Vec<_> = (0..10)
             .map(|index| RouterPrediction {
