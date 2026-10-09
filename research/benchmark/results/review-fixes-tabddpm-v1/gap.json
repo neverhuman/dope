@@ -1,0 +1,10 @@
+{
+  "format": "dope-review-fix-tabddpm-gap",
+  "version": 1,
+  "status": "not_extended",
+  "missing_is_not_a_win": true,
+  "official_tests_opened": false,
+  "published_cohort": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation",
+  "reason": "No authorized executable entry was found outside dl_final, sweep, and HOLD. The population entry at work-order-b/tabddpm-population-v5-revision5 is disabled: execution_authorized, ordered_launch_authorized, real_queue_authorized, and source_initialization_authorized are false, and root_real_grant_required is true. Historical continuation directories were not relaunched. A shorter budget was not invented.",
+  "searched_utc": "2026-10-09T06:05:00Z"
+}
