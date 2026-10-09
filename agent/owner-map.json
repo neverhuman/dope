@@ -310,6 +310,13 @@
     "docs/whitepaper/scripts/test_readme_benchmark.py": "external-evidence",
     "docs/readme/retention-bars.png": "governance",
     "examples/readme-regression/": "governance",
+    "research/benchmark/fetch_pmlb.py": "external-evidence",
+    "research/benchmark/tests/test_fetch_pmlb.py": "external-evidence",
+    "ops/ci/paper-prepare.py": "governance",
+    "ops/ci/paper-review-outputs.py": "governance",
+    "ops/ci/paper-clean.sh": "governance",
+    "ops/ci/paper-inputs/": "governance",
+    "docs/whitepaper/scripts/test_paper_packaging.py": "governance",
     "research/benchmark/bounded_auditors.py": "external-evidence",
     "research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/": "external-evidence"
   }

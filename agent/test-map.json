@@ -11,11 +11,11 @@
     },
     "research/benchmark/tests/test_mfs_v3_panel.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
-      "purpose": "lock the MFS-v3 panel cohort, shared map, null band, and GPU yield rule"
+      "purpose": "lock the MFS-v3 cohort, shared map, deterministic median-of-three matched null, declared near-copy quantile, and GPU yield rule"
     },
     "research/benchmark/mfs_v3_panel.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
-      "purpose": "lock the MFS-v3 panel cohort, shared map, null band, and GPU yield rule"
+      "purpose": "lock the MFS-v3 cohort, shared map, deterministic median-of-three matched null, declared near-copy quantile, and GPU yield rule"
     },
     "rust/mfs_v3_holdout.rs": {
       "command": "cargo test --locked --bin mfs-v3-holdout",
@@ -1208,6 +1208,34 @@
     "examples/readme-regression/": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "regenerate the README toy tables from the documented unit-interval formula"
+    },
+    "research/benchmark/fetch_pmlb.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
+    },
+    "research/benchmark/tests/test_fetch_pmlb.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
+    },
+    "ops/ci/paper-prepare.py": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "ops/ci/paper-review-outputs.py": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "ops/ci/paper-clean.sh": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "ops/ci/paper-inputs/": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "docs/whitepaper/scripts/test_paper_packaging.py": {
+      "command": "just paper-check",
+      "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
     },
     "research/benchmark/bounded_auditors.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics research.benchmark.tests.test_real_test_utility -v",
