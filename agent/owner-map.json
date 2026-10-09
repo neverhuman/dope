@@ -324,6 +324,11 @@
     "docs/whitepaper/scripts/test_paper_review_inputs.py": "governance",
     "research/benchmark/review_fixes/": "external-evidence",
     "ops/ci/check-review-fixes.sh": "governance",
-    "ops/ci/paper-architecture.tex": "governance"
+    "ops/ci/paper-architecture.tex": "governance",
+    "research/benchmark/beyondarena_train_screen.README.md": "external-evidence",
+    "research/benchmark/beyondarena_train_screen.py": "external-evidence",
+    "research/benchmark/results/beyondarena-training-screen-policy-v1.json": "external-evidence",
+    "research/benchmark/tests/test_beyondarena_train_screen.py": "external-evidence",
+    "research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json": "external-evidence"
   }
 }

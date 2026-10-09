@@ -1268,6 +1268,26 @@
     "ops/ci/paper-architecture.tex": {
       "command": "just paper-check",
       "purpose": "rebuild the cropped architecture from tracked TikZ and generated macros, verify its source/PDF hashes, fonts and warning-free log without ICLR review line numbers"
+    },
+    "research/benchmark/beyondarena_train_screen.README.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_screen -v",
+      "purpose": "verify prospective training-only selection of at most12 complete raw inputs within the unchanged2000feature cap, protected target and raw-row groups, authenticated overlap receipts and finite catalog choices without fits or official TEST access"
+    },
+    "research/benchmark/beyondarena_train_screen.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_screen -v",
+      "purpose": "verify prospective training-only selection of at most12 complete raw inputs within the unchanged2000feature cap, protected target and raw-row groups, authenticated overlap receipts and finite catalog choices without fits or official TEST access"
+    },
+    "research/benchmark/results/beyondarena-training-screen-policy-v1.json": {
+      "command": "python3 -B -m jsonschema -i research/benchmark/results/beyondarena-training-screen-policy-v1.json research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json",
+      "purpose": "validate the frozen preparation policy and unavailable runtime claims against Draft2020-12 schema"
+    },
+    "research/benchmark/tests/test_beyondarena_train_screen.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_screen -v",
+      "purpose": "verify prospective training-only selection of at most12 complete raw inputs within the unchanged2000feature cap, protected target and raw-row groups, authenticated overlap receipts and finite catalog choices without fits or official TEST access"
+    },
+    "research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json": {
+      "command": "python3 -B -m jsonschema -i research/benchmark/results/beyondarena-training-screen-policy-v1.json research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json",
+      "purpose": "validate the frozen preparation policy and unavailable runtime claims against Draft2020-12 schema"
     }
   }
 }

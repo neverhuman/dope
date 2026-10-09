@@ -1,0 +1,366 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actual_byte_charges": {
+      "type": "null"
+    },
+    "actual_controls_wait_ref": {
+      "type": "null"
+    },
+    "actual_projection_refs": {
+      "type": "null"
+    },
+    "baseline_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "byte_charge": {
+      "const": "complete generator model plus stored private projection/target map plus framing; no charge inferred from width estimate",
+      "type": "string"
+    },
+    "current_evaluator_intersection_receipts": {
+      "type": "null"
+    },
+    "current_qualified_TRAIN_export_refs": {
+      "type": "null"
+    },
+    "current_supplied_catalog_ref": {
+      "type": "null"
+    },
+    "five_fit_coverage": {
+      "type": "null"
+    },
+    "format": {
+      "const": "dope-beyondarena-training-input-preparation-policy",
+      "type": "string"
+    },
+    "frozen_before_training_or_official_TEST_access": {
+      "const": true,
+      "type": "boolean"
+    },
+    "frozen_successor_order": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "family": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "license_spdx": {
+            "enum": [
+              "CC-BY-4.0",
+              "CC0-1.0",
+              "LicenseRef-Public-Domain",
+              "MIT"
+            ],
+            "type": "string"
+          },
+          "parquet_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "source_family_id_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "stratum": {
+            "enum": [
+              "iid",
+              "grouped",
+              "temporal"
+            ],
+            "type": "string"
+          },
+          "task": {
+            "enum": [
+              "binary_classification",
+              "regression"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "family",
+          "license_spdx",
+          "parquet_sha256",
+          "source_family_id_sha256",
+          "stratum",
+          "task"
+        ],
+        "type": "object"
+      },
+      "maxItems": 61,
+      "minItems": 61,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "group_split": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "const": "original split_official_training full raw-row grouped80_20"
+        },
+        "identical_groups_may_cross_inner_partitions": {
+          "const": false
+        },
+        "row_hash": {
+          "const": "SHA256 of UTF8 JSON full string row, sort_keys=True, compact separators, ensure_ascii=False; target and all raw inputs included"
+        },
+        "seed": {
+          "const": 1729
+        }
+      },
+      "required": [
+        "algorithm",
+        "identical_groups_may_cross_inner_partitions",
+        "row_hash",
+        "seed"
+      ],
+      "type": "object"
+    },
+    "inventory_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "mfs_v2": {
+      "type": "null"
+    },
+    "new_fits": {
+      "const": 0,
+      "type": "integer"
+    },
+    "official_tests_opened": {
+      "const": false,
+      "type": "boolean"
+    },
+    "original_lock_or_retention_publisher_changed": {
+      "const": false,
+      "type": "boolean"
+    },
+    "original_selected_count": {
+      "const": 73,
+      "type": "integer"
+    },
+    "overlap_families": {
+      "const": [
+        "heart_disease_va_long_beach",
+        "qsar_biodeg",
+        "hotel_booking_demand"
+      ],
+      "type": "array"
+    },
+    "overlap_removal": {
+      "const": "Only all TRAIN occurrences of exact groups from an externally pinned existing evaluator-owned TRAIN-intersection receipt; remove before inner split; no TEST decoding or TEST-only indices/values in worker",
+      "type": "string"
+    },
+    "panel_lock_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "projection_only_utility_cost": {
+      "type": "null"
+    },
+    "ptf_v1": {
+      "type": "null"
+    },
+    "real_families_repaired": {
+      "const": 0,
+      "type": "integer"
+    },
+    "release_safe": {
+      "type": "null"
+    },
+    "retention": {
+      "type": "null"
+    },
+    "rule": {
+      "const": "source_order12_full_input_width_budget_v1",
+      "type": "string"
+    },
+    "source_rule_amendment": {
+      "const": "New prospective source-order preparation rule; no equivalence to prior target-correlated top12 private proposal or paper winner claimed",
+      "type": "string"
+    },
+    "successor_rule": {
+      "additionalProperties": false,
+      "properties": {
+        "absence_scope": {
+          "const": "hash-bound supplied catalog datasets name list only"
+        },
+        "cohort": {
+          "const": "prospective successor is separate, not repair of original; original73 lock and denominator unchanged"
+        },
+        "each_candidate_used_once": {
+          "const": true
+        },
+        "must_be_named_in_supplied_catalog": {
+          "const": true
+        },
+        "order": {
+          "const": "SHA256_UTF8_source_family_id_ascending_then_family_name"
+        },
+        "pool": {
+          "const": "licensed binary/regression families in unchanged lock excluding original12 pilot"
+        },
+        "recorded_license_allowlist": {
+          "const": [
+            "CC-BY-4.0",
+            "CC0-1.0",
+            "LicenseRef-Public-Domain",
+            "MIT"
+          ]
+        },
+        "recorded_stratum_allowlist": {
+          "const": [
+            "iid",
+            "grouped",
+            "temporal"
+          ]
+        },
+        "request_order": {
+          "const": [
+            "heart_disease_va_long_beach",
+            "qsar_biodeg",
+            "hotel_booking_demand"
+          ]
+        },
+        "task_and_stratum_preservation_not_inferred": {
+          "const": true
+        }
+      },
+      "required": [
+        "absence_scope",
+        "cohort",
+        "each_candidate_used_once",
+        "must_be_named_in_supplied_catalog",
+        "order",
+        "pool",
+        "recorded_license_allowlist",
+        "recorded_stratum_allowlist",
+        "request_order",
+        "task_and_stratum_preservation_not_inferred"
+      ],
+      "type": "object"
+    },
+    "superiority": {
+      "type": "null"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "wide_families": {
+      "const": [
+        "early_learning_predictors",
+        "lending_club",
+        "kick",
+        "wine_world_cost"
+      ],
+      "type": "array"
+    },
+    "width_semantics": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_projector_output_width_check_still_required": {
+          "const": true
+        },
+        "all_missing": {
+          "const": "omit raw input"
+        },
+        "categorical": {
+          "const": "all distinct nonempty inner-fit levels; no level truncation"
+        },
+        "feature_cap_excludes_target": {
+          "const": 2000
+        },
+        "numeric": {
+          "const": "one feature if any finite inner-fit value and every other value empty or finite"
+        },
+        "numeric_output_row_width": {
+          "const": "projected feature width plus final target value"
+        },
+        "raw_input_cap_excludes_target": {
+          "const": 12
+        },
+        "selection": {
+          "const": "source-column order; keep at most12 complete raw inputs; skip entire input exceeding remaining width; continue later inputs until12 accepted"
+        },
+        "selection_learned_partition": {
+          "const": "inner_fit_only"
+        },
+        "source": {
+          "const": "manifest.fit_projection"
+        },
+        "source_sha256": {
+          "const": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e"
+        },
+        "target": {
+          "const": "retain once in original column order; separately mapped by original projector"
+        },
+        "target_values_used_for_ranking": {
+          "const": false
+        },
+        "validation_used_for_selection": {
+          "const": false
+        }
+      },
+      "required": [
+        "actual_projector_output_width_check_still_required",
+        "all_missing",
+        "categorical",
+        "feature_cap_excludes_target",
+        "numeric",
+        "numeric_output_row_width",
+        "raw_input_cap_excludes_target",
+        "selection",
+        "selection_learned_partition",
+        "source",
+        "source_sha256",
+        "target",
+        "target_values_used_for_ranking",
+        "validation_used_for_selection"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "actual_byte_charges",
+    "actual_controls_wait_ref",
+    "actual_projection_refs",
+    "baseline_commit",
+    "byte_charge",
+    "current_evaluator_intersection_receipts",
+    "current_qualified_TRAIN_export_refs",
+    "current_supplied_catalog_ref",
+    "five_fit_coverage",
+    "format",
+    "frozen_before_training_or_official_TEST_access",
+    "frozen_successor_order",
+    "group_split",
+    "inventory_sha256",
+    "mfs_v2",
+    "new_fits",
+    "official_tests_opened",
+    "original_lock_or_retention_publisher_changed",
+    "original_selected_count",
+    "overlap_families",
+    "overlap_removal",
+    "panel_lock_sha256",
+    "projection_only_utility_cost",
+    "ptf_v1",
+    "real_families_repaired",
+    "release_safe",
+    "retention",
+    "rule",
+    "source_rule_amendment",
+    "successor_rule",
+    "superiority",
+    "version",
+    "wide_families",
+    "width_semantics"
+  ],
+  "title": "Frozen prospective BeyondArena training input policy",
+  "type": "object"
+}
