@@ -1,0 +1,26 @@
+{
+  "cell_count": 594,
+  "dependencies": {
+    "catboost": "1.2.10",
+    "numpy": "1.26.4",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.16.3"
+  },
+  "formal_dp": false,
+  "format": "dope-review-fix-tabsyn-evaluator-replay-v1",
+  "host": "xbabe2",
+  "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+  "ledger_sha256": "b9fd4600ec54fc89b938eb627f31d6112176fc4137e040c3686c15efd17d2d62",
+  "matched": 594,
+  "mismatched": 0,
+  "official_tests_opened": false,
+  "partition_source": {
+    "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/scalar-cells.jsonl",
+    "sha256": "a9c9c6f63ed4439eca38402109beebdc2a5fec6c3be4a1037ec8754b4486578c"
+  },
+  "producer_sha256": "41460a1ed37bd68235623a4e60ab2ac753530dda894e972f3c04e9cfd6c98d58",
+  "rule": "a receipt exists only for a re-scored public cell byte-identical to its ledger line",
+  "sample_source": "xbabe1:/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-sample-v1; each CSV authenticated by the ledger synthetic_sha256 before decode",
+  "sha256": "ed6f8412fc8bb680c693587dd1b6e58d25b1a90f9312450b70ad889b2f6a59c8",
+  "threads": "OMP, OpenBLAS and MKL at 1; CatBoost thread_count 4 from the evaluator"
+}

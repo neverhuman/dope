@@ -1,0 +1,12 @@
+{
+  "cell_count": 594,
+  "evaluator_receipts_sha256": "ed6f8412fc8bb680c693587dd1b6e58d25b1a90f9312450b70ad889b2f6a59c8",
+  "formal_dp": false,
+  "format": "dope-review-fix-tabsyn-scalar-cells-v1",
+  "implementation_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+  "official_tests_opened": false,
+  "panel_sha256": "8e87a4b304588f6b3c2e6cf34c2a2ee9f4b4f0ea3d282f836f14cbc23a7dbfa3",
+  "parser_gate_sha256": "30322b1853f678ca5703e167865655d8649791d1809c53c87ab3b4f563003175",
+  "sha256": "b9fd4600ec54fc89b938eb627f31d6112176fc4137e040c3686c15efd17d2d62",
+  "source": "public utility scalars only; sample CSVs and partitions are not in this ledger"
+}

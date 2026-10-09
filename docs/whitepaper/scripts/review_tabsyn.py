@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """TabSyn retention next to DOPE on the lineages both actually measured.
 
-Reads metric JSON from the predeclared sample root. A lineage with no artifact
-stays absent. Absence is not a win. The published-sample parser check has to
-have matched before a table is emitted. Official test files are not opened.
+Reads metric JSON from the predeclared sample root, or the bound scalar ledger
+through payload_from_cells. A lineage with no artifact stays absent. Absence is
+not a win. The published-sample parser check has to have matched before a table
+is emitted. Every matched TabSyn row is printed above DOPE on the same lineages.
+Official test files are not opened.
 """
 
 from __future__ import annotations
@@ -22,7 +24,6 @@ from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
     RESULTS,
     _clean,
     _load,
-    _table,
     ci,
     fmt,
     marginal,
@@ -33,6 +34,7 @@ from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
     tex_name,
     write_tex,
 )
+from research.benchmark.review_fixes.review_tex import longtable  # noqa: E402
 from research.benchmark.review_fixes.stats import holm  # noqa: E402
 
 CONFIGURATION = "scaled_200_vae_1000_diffusion"
@@ -140,52 +142,83 @@ def _matched_dope(dope: dict, tabsyn: dict) -> dict:
     return matched
 
 
+LEVEL_ROWS = (
+    ("TabSyn", CONFIGURATION, "own lineages", "TabSyn, own lineages"),
+    ("TabSyn", CONFIGURATION, "matched lineages", "TabSyn, matched"),
+    ("DOPE", "features12_steps2048", "matched lineages", "DOPE, same lineages"),
+)
+
+
+def _level(row) -> str:
+    return f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
+
+
+def _contrast(row) -> str:
+    flag = "yes" if row["tost"]["equivalent"] else "no"
+    return (
+        f"{row['n']} & {fmt(row['median'])} & {ci(row)} & {fmt(row['mean'])} & {flag} & "
+        f"{row['wins']}/{row['ties']}/{row['losses']} & {fmt(row['holm_p'], 3)} \\\\"
+    )
+
+
 def render_tabsyn(payload: dict) -> str:
-    levels = []
+    """One captioned table: every matched TabSyn row sits above DOPE on the same lineages."""
+    levels = {}
     for row in payload["levels"]:
-        levels.append(
-            f"{tex_name(row['method'])} & {tex_name(row['configuration'])} & {tex_name(row['cohort'])} & "
-            f"{row['size']}$n$ & {tex_name(row['auditor'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
-        )
-    contrasts = []
+        key = (row["method"], row["configuration"], row["cohort"], row["size"], row["auditor"])
+        if key in levels:
+            raise ValueError(f"TabSyn panel repeats a level row: {key}")
+        levels[key] = row
+    contrasts = {}
     for row in payload["contrasts"]:
-        flag = "yes" if row["tost"]["equivalent"] else "no"
-        contrasts.append(
-            f"{row['size']}$n$ & {tex_name(row['auditor'])} & {tex_name(row['method'])} & "
-            f"{tex_name(row['configuration'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} & "
-            f"{fmt(row['mean'])} & {flag} & {row['wins']}/{row['ties']}/{row['losses']} & "
-            f"{fmt(row['holm_p'], 3)} \\\\"
-        )
+        if row["configuration"] != CONFIGURATION or (row["size"], row["auditor"]) in contrasts:
+            raise ValueError("TabSyn panel contrast is outside the scaled configuration or repeated")
+        contrasts[(row["size"], row["auditor"])] = row
+    lines = []
+    for size in (1, 4):
+        for auditor in AUDITORS:
+            found = [levels.get((m, c, cohort, size, auditor)) for m, c, cohort, _ in LEVEL_ROWS]
+            contrast = contrasts.get((size, auditor))
+            if any(row is None for row in found) or contrast is None:
+                raise ValueError(f"TabSyn table lacks a paired DOPE row at {size}n {auditor}")
+            if not found[1]["n"] == found[2]["n"] == contrast["n"]:
+                raise ValueError(f"TabSyn matched rows are not on the same lineages at {size}n {auditor}")
+            prefix = f"{size}$n$ & {tex_name(auditor)} & "
+            for (_m, _c, _cohort, label), row in zip(LEVEL_ROWS, found):
+                lines.append(prefix + f"{label} & " + _level(row))
+            lines.append(prefix + "DOPE $-$ TabSyn & " + _contrast(contrast))
     absent = ", ".join(payload["artifact_absent"]) or "none"
+    caption = (
+        "TabSyn in the scaled configuration (200 VAE epochs and 1{,}000 diffusion epochs, fit seed 11) "
+        "beside DOPE features12\\_\\allowbreak steps2048, validation retention. A level is the median over lineages "
+        "of each lineage's median retention over sample seeds 101, 211 and 307, all three informative; "
+        "$n$ counts lineages. Each matched TabSyn row is followed by DOPE on the same lineages and by "
+        "the paired DOPE minus TabSyn difference. Interval: 95\\% family-cluster bootstrap percentile "
+        "interval of the median, 10{,}000 draws. W/T/L counts paired lineages and a tie is an exact zero. "
+        "TOST is the predeclared mean-difference test at $\\pm 0.02$. Holm family: three tests per size "
+        "(DOPE minus TabSyn under CatBoost, linear and MLP), separate from every other comparator block. "
+        f"No TabSyn artifact for {tex_name(absent)}; absence is not a win."
+    )
     note = (
-        "% TabSyn track scaled\\_200\\_vae\\_1000\\_diffusion. Samples use seeds 101, 211, and 307 at size n and size 4n. "
-        "A lineage median requires three informative sample seeds. "
-        "Own-lineage rows use every informative TabSyn lineage. "
-        "Matched rows use the intersection with informative DOPE features12\\_steps2048. "
-        "DOPE minus TabSyn is that intersection. "
-        "Holm family is 3 per size (one method, three auditors) and is separate from the published comparator blocks. "
-        "The published-sample parser check matched before these cells were sampled. "
-        f"Lineages with no artifact under the predeclared roots: {absent}. "
-        "Absence is not a win. Official tests were not opened. Formal DP remains false.\n"
+        "% Validation partitions only. Official tests were not opened. Formal DP remains false. "
+        "The published-sample parser check matched before these cells were sampled.\n"
     )
-    return note + _table(
-        "Method & Configuration & Cohort & Size & Auditor & $n$ lineages & Median & Hierarchical CI",
-        levels,
-        "lllllrrr",
-    ) + _table(
-        "Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
-        contrasts,
-        "lllllrrllrl",
+    return longtable(
+        caption,
+        "Size & Auditor & Row & $n$ & Median & 95\\% CI & Mean & TOST & W/T/L & Holm $p$",
+        lines,
+        "lllrrrrlrr",
+        note,
     )
 
 
-def _payload(cells_root: Path, parser_check: Path) -> dict:
-    gate = json.loads(parser_check.read_text())
+def payload_from_cells(cells: list[dict], gate: dict) -> dict:
+    """Reduce TabSyn scalar cells and the parser gate to the committed aggregate. Writes nothing."""
     if gate.get("match") is not True or gate.get("official_tests_opened") is True:
         raise SystemExit("parser check did not match; refusing to emit a TabSyn table")
     record, _sha = _load("s3-lineage-record.json")
     names = names_of(record)
-    adapted, absent = _adapt(_metrics(cells_root), names)
+    adapted, absent = _adapt(cells, names)
     tabsyn = primary_map(reduce_cells(adapted, "TabSyn", CONFIGURATION))
     density, _density_sha = _load("density-matched-population-validation.json")
     dope = primary_map(reduce_cells(density["cells"], "DOPE", "features12_steps2048"))
@@ -218,6 +251,13 @@ def _payload(cells_root: Path, parser_check: Path) -> dict:
         "contrasts": _contrasts(dope, tabsyn, names),
         "claims": {"mfs_v2": None, "ptf_v1": None, "release_safe_l3": None, "superiority": None, "formal_dp": False},
     })
+
+
+def _payload(cells_root: Path, parser_check: Path) -> dict:
+    gate = json.loads(parser_check.read_text())
+    if gate.get("match") is not True or gate.get("official_tests_opened") is True:
+        raise SystemExit("parser check did not match; refusing to emit a TabSyn table")
+    return payload_from_cells(_metrics(cells_root), gate)
 
 
 def main() -> None:
