@@ -179,19 +179,26 @@ _REJECTED_MODULES = frozenset({
 })
 
 
-def _sink_reference(node: ast.AST, bound: set[str]) -> bool:
+def _sink_reference(node: ast.AST, bound: set[str], builtin_modules: set[str]) -> bool:
     """True when a name or builtin attribute refers to a rejected sink."""
     if isinstance(node, ast.Name):
         return node.id in bound
     if isinstance(node, ast.Attribute) and node.attr in _REJECTED_CALLS:
         receiver = node.value
-        return isinstance(receiver, ast.Name) and receiver.id in {"builtins", "__builtins__"} | bound
+        return isinstance(receiver, ast.Name) and receiver.id in builtin_modules | bound
     return False
+
+
+def _bind_names(node: ast.Assign, names: set[str]) -> None:
+    for target in node.targets:
+        if isinstance(target, ast.Name):
+            names.add(target.id)
 
 
 def _reject_adapter(tree: ast.AST) -> None:
     """Refuse sinks that are outside the pinned adapter's authenticated boundary."""
     bound = set(_REJECTED_CALLS)
+    builtin_modules = {"builtins", "__builtins__"}
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom):
             module = node.module or ""
@@ -205,11 +212,13 @@ def _reject_adapter(tree: ast.AST) -> None:
             for alias in node.names:
                 if alias.name.split(".", 1)[0] in _REJECTED_MODULES:
                     raise SystemExit("adapter import is outside the authenticated boundary")
-        elif isinstance(node, ast.Assign) and _sink_reference(node.value, bound):
-            for target in node.targets:
-                if isinstance(target, ast.Name):
-                    bound.add(target.id)
-        elif isinstance(node, ast.Call) and _sink_reference(node.func, bound):
+                if alias.name == "builtins":
+                    builtin_modules.add(alias.asname or alias.name)
+        elif isinstance(node, ast.Assign) and _sink_reference(node.value, bound, builtin_modules):
+            _bind_names(node, bound)
+        elif isinstance(node, ast.Assign) and isinstance(node.value, ast.Name) and node.value.id in builtin_modules:
+            _bind_names(node, builtin_modules)
+        elif isinstance(node, ast.Call) and _sink_reference(node.func, bound, builtin_modules):
             raise SystemExit("adapter call is outside the authenticated boundary")
 
 
@@ -248,7 +257,16 @@ def _load_allowlisted(tree: ast.AST, namespace: dict, work: Path) -> dict:
         os.fsync(descriptor)
     finally:
         os.close(descriptor)
-    spec = importlib.util.spec_from_file_location("captured_review_fix_tabsyn_adapter", work)
+
+    class FrozenPayloadLoader(importlib.machinery.SourceFileLoader):
+        def get_code(self, fullname):
+            # The authenticated payload is the only code. A later path read
+            # or a timestamp-valid bytecode cache is not consulted.
+            return self.source_to_code(payload, self.path)
+
+    loader = FrozenPayloadLoader("captured_review_fix_tabsyn_adapter", str(work))
+    spec = importlib.util.spec_from_file_location(
+        "captured_review_fix_tabsyn_adapter", work, loader=loader)
     if spec is None or spec.loader is None or work.is_symlink() or work.read_bytes() != payload:
         raise SystemExit("adapter bytes changed before load")
     loaded = importlib.util.module_from_spec(spec)

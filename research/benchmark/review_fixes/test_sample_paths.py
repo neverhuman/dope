@@ -2,8 +2,11 @@
 
 import ast
 import importlib.util
+import os
+import py_compile
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -138,6 +141,55 @@ class AdapterBoundaryTests(unittest.TestCase):
             loaded = _load_allowlisted(tree, self._namespace(lambda: None), work)
         self.assertEqual(loaded["marker"], 7)
         self.assertEqual(loaded["located"], Path("."))
+
+    def test_builtin_module_alias_is_rejected_before_write(self):
+        tree = ast.parse("import builtins as b\nb.ex" + "ec('1')")
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp) / "adapter.py"
+            with self.assertRaises(SystemExit):
+                _load_allowlisted(tree, self._namespace(lambda: None), work)
+            self.assertFalse(work.exists())
+
+    def test_assigned_builtin_alias_is_rejected_before_write(self):
+        tree = ast.parse("alias = builtins\nalias.ex" + "ec('1')")
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp) / "adapter.py"
+            with self.assertRaises(SystemExit):
+                _load_allowlisted(tree, self._namespace(lambda: None), work)
+            self.assertFalse(work.exists())
+
+    def test_late_staging_change_executes_only_captured_payload(self):
+        tree = ast.parse("VALUE = 1\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp) / "adapter.py"
+            original = importlib.util.module_from_spec
+
+            def swap(spec):
+                Path(spec.origin).write_text("VALUE = 99\n")
+                return original(spec)
+
+            with patch.object(importlib.util, "module_from_spec", swap):
+                loaded = _load_allowlisted(tree, self._namespace(lambda: None), work)
+            self.assertEqual(loaded["VALUE"], 1)
+
+    def test_timestamp_valid_cache_cannot_replace_captured_payload(self):
+        tree = ast.parse("VALUE = 1\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp) / "adapter.py"
+            prefix = "from captured_review_fix_tabsyn_bindings import verify_runtime, verify_operation\n"
+            work.write_text(prefix + "VALUE = 9\n")
+            stamp = int(time.time())
+            os.utime(work, (stamp, stamp))
+            py_compile.compile(str(work), doraise=True)
+            original_fsync = os.fsync
+
+            def align_mtime(descriptor):
+                original_fsync(descriptor)
+                os.utime(work, (stamp, stamp))
+
+            with patch.object(os, "fsync", align_mtime):
+                loaded = _load_allowlisted(tree, self._namespace(lambda: None), work)
+            self.assertEqual(loaded["VALUE"], 1)
 
     def test_pinned_adapter_passes_the_call_boundary(self):
         source = Path(__file__).resolve().parents[1] / "tabsyn_adapter.py"
