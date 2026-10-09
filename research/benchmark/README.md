@@ -1461,3 +1461,5 @@ preserves the target and complete TRAIN row groups, and limits successor
 planning to a supplied hash-bound catalog. Authenticated TRAIN exports and
 evaluator intersection receipts are still required. Real family preparation,
 retention and byte charges remain unmeasured; the 73-family lock is unchanged.
+
+The [four-fit producer-reported utility description](results/work-order-b-dope-producer-reported-four-fit-utility-v1/README.md) summarizes 400 additional fit receipts and 2,400 validation sample receipts across all 100 frozen lineages. It retains per-seed results, fixed denominators and unclipped retention, with a reproducible table and SVG. Historical evaluator/runtime identity and compiler equivalence remain unverified; the seed11 join, paired comparisons, production scores, GPU certification and complete artifact-byte claims remain null.
