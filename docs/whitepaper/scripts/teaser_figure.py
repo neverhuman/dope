@@ -26,6 +26,8 @@ matplotlib.use("Agg")
 from matplotlib.lines import Line2D
 
 import figure_style
+# The body figure draws this window and counts the points that fall outside it.
+from figure_spec import TEASER_ROWS_Y_LIM, TEASER_X_LIM
 from paper_emit import _REVIEW_PANEL_SHA256
 
 figure_style.apply(matplotlib, size=8.0)
@@ -51,8 +53,6 @@ COMPARATORS = (
     ("GaussianCopula", "native_selected", "panel", "Copula", "Gaussian copula", figure_style.GAUSSIAN, "s"),
     ("Chow-Liu", "native_selected", "panel", "Chow-Liu", "Chow-Liu", figure_style.CHOW, "^"),
 )
-# The body figure uses this window and counts the points that fall outside it.
-CLIP = 1.5
 
 
 def _interval(median, lo, hi, label):
@@ -158,7 +158,7 @@ def draw(panels, dest):
         for index, (_tick, _label, color, marker, values, median, lo, hi) in enumerate(rows):
             center = len(rows) - 1 - index
             ordered = sorted(values)
-            outside += sum(value < -CLIP or value > CLIP for value in ordered)
+            outside += sum(value < TEASER_X_LIM[0] or value > TEASER_X_LIM[1] for value in ordered)
             axis.scatter(
                 ordered,
                 _offsets(center, len(ordered)),
@@ -183,13 +183,13 @@ def draw(panels, dest):
                 zorder=4,
             )
         axis.axvline(0, color="#333333", linewidth=0.6, zorder=1)
-        axis.set_xlim(-CLIP, CLIP)
+        axis.set_xlim(*TEASER_X_LIM)
         axis.set_title(f"{_title}, {count}\n{outside} outside the frame", fontsize=7.2)
         figure_style.panel(axis, grid="x")
     ticks = [tick for tick, _label, _color, _marker, _values, _median, _lo, _hi in panels[0][2]]
     axes[0].set_yticks([0, 1, 2])
     axes[0].set_yticklabels(list(reversed(ticks)), fontsize=6.5)
-    axes[0].set_ylim(-0.55, 2.55)
+    axes[0].set_ylim(*TEASER_ROWS_Y_LIM)
     for axis in axes[1:]:
         axis.tick_params(labelleft=False)
     axes[1].set_xlabel("retention difference (dimensionless)", fontsize=7)

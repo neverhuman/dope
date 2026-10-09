@@ -29,6 +29,7 @@ from research.benchmark.representation import TABULAR_AUDITORS
 
 import compute_panel
 import figure_style
+from figure_spec import MFS_V3_BARS_Y_LIM, PAIRED_X_LIM
 
 RECEIPT = REPO / "research" / "benchmark" / "results" / "mfs-v3-density-panel.json"
 GENERATED = REPO / "docs" / "whitepaper" / "generated"
@@ -62,7 +63,7 @@ MARKS = (
     ("Chow-Liu", "Chow-Liu", figure_style.CHOW, "^"),
     ("independent_marginals", "Independent", figure_style.INDEPENDENT, "D"),
 )
-X_LIM = (-1.5, 1.5)
+X_LIM = PAIRED_X_LIM
 
 
 def _finite(value) -> bool:
@@ -294,7 +295,7 @@ def _bars(measured: dict, dest: Path) -> None:
         axis.set_title(f"{AUDITOR_TEX[auditor]}, {anchor['n']} lineages")
         figure_style.panel(axis, grid="y")
     axes[0].set_ylabel("retention (dimensionless)")
-    axes[0].set_ylim(-0.28, 1.18)
+    axes[0].set_ylim(*MFS_V3_BARS_Y_LIM)
     handles = [
         Patch(
             facecolor=BAR_STYLE[key][1],
