@@ -26,8 +26,8 @@ why it cannot be done. If a new result weakens a claim, the paper weakens the cl
 | CM-19 | compute_panel inputs not SHA-pinned | Pinned loader | closed at d75f10f: registered inputs are SHA-pinned before decode, including the author-default ARF headline rows |
 | CM-20 | C2ST n=98 vs 97; BeyondArena 12 vs 142 | Explicit denominators | closed: fidelity n is the complete three-seed group; BeyondFamilies is the fit check and BeyondInventory is the inventory |
 | CM-21 | Related-work taxonomy mixes families and evaluation | Restructure | closed: generators by family, then what was measured, then utility and privacy |
-| PR-05 | Size n + real-bootstrap ×4 control | Tables + claims state the size | size n is Table 2 of the main PDF. The real-bootstrap comparison remains in progress, wave 2, and this paper prints no number for it |
-| PR-06 | Predictor-only control | Control in all retention tables; paired CI | in progress, wave 2. The scalar cells are unbound, so this paper prints no number. Equivalence stays unclaimed |
+| PR-05 | Size n + real-bootstrap ×4 control | Tables + claims state the size | size n is Table 2 of the main PDF. The real-bootstrap comparison is the supplement control table, reduced from the bound scalar ledger |
+| PR-06 | Predictor-only control | Control in all retention tables; paired CI | the supplement inputs generated/review-controls.tex from the bound scalar ledger. Equivalence stays unclaimed |
 | PR-07 | One fit seed; no clustering; no final test | ≥5 seeds, hierarchical bootstrap, family sensitivity, one sealed run | family bootstrap and excluding-simulated sensitivity emitted in 3c63eec. Extra DOPE fit seeds and the sealed run are in progress, wave 2, with no number |
 | PR-08 | TabSyn on 8 lineages; TabDDPM not run | All 97 lineages + ledger | the matched TabSyn cohort and TabDDPM v5 remain in progress, wave 2. The retained subset stays a separate historical cohort. This paper prints no number for the matched cohort or for TabDDPM v5 |
 | PR-09 | No privacy/fidelity panel | DCR/NNDR/MIA with CI; fidelity; C2ST | the historical fidelity table stays in the supplement and stays outside formal DP and outside HIPAA de-identification. The review privacy panel remains in progress, wave 2, and this paper prints no number for it. The stored logistic file stays uninput |
@@ -54,7 +54,7 @@ Finished, with the number only in the generated file named here:
 
 In progress, wave 2. No number:
 
-- Predictor-only and real-bootstrap controls. The public panel stores an aggregate and the scalar cells are unbound.
+- Predictor-only and real-bootstrap controls. The supplement inputs the generated control table. The scalar ledger reproduces the committed aggregate. Equivalence stays unclaimed.
 - The review privacy panel. The same aggregate gap applies. Empirical privacy stays outside formal DP and outside HIPAA de-identification, and this paper prints no privacy-panel number.
 - The matched TabSyn cohort. It stays distinct from the retained subset. This paper prints no matched-cohort number.
 - TabDDPM population v5, unit `dope-rf-tabddpm-v5`, still running on xbabe3 at the pre-registered config. A failed or missing cell is not a win.
