@@ -312,6 +312,11 @@
     "examples/readme-regression/": "governance",
     "research/benchmark/bounded_auditors.py": "external-evidence",
     "research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/": "external-evidence",
-    "research/benchmark/results/work-order-b-dope-additional-four-seed-dispositions-v1/": "external-evidence"
+    "research/benchmark/results/work-order-b-dope-additional-four-seed-dispositions-v1/": "external-evidence",
+    "research/benchmark/beyondarena_train_screen.README.md": "external-evidence",
+    "research/benchmark/beyondarena_train_screen.py": "external-evidence",
+    "research/benchmark/results/beyondarena-training-screen-policy-v1.json": "external-evidence",
+    "research/benchmark/tests/test_beyondarena_train_screen.py": "external-evidence",
+    "research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json": "external-evidence"
   }
 }

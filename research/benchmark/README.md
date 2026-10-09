@@ -1452,3 +1452,12 @@ The [index008 GPU operation and progress ledger](results/work-order-b-native-ind
 ## Auditor resource profile
 
 For new measurements, `bounded_auditors._model`, `c2st` and `evaluate` keep CatBoost training, automatic feature importance and prediction on four threads. Their statistical equations and seed settings match the historical harnesses. Bind this new source and its two imported historical sources in the measurement receipt. Sealed utility records both the historical auditor hash and the resource-wrapper hash. The measured historical `pilot_metrics.py` and `expanded_validation_metrics.py` files retain their original bytes; existing results keep their original provenance.
+
+## BeyondArena training input preparation
+
+The [prospective input rule](beyondarena_train_screen.README.md) keeps at most
+12 complete raw predictors within the original 2,000-feature projection cap,
+preserves the target and complete TRAIN row groups, and limits successor
+planning to a supplied hash-bound catalog. Authenticated TRAIN exports and
+evaluator intersection receipts are still required. Real family preparation,
+retention and byte charges remain unmeasured; the 73-family lock is unchanged.
