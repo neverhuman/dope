@@ -64,5 +64,13 @@
     "multiplicity": "Holm_adjusted_paired_sign_tests_plus_Bonferroni_dataset_clustered_95_percent_intervals",
     "second_endpoint": "MFS_v2_only_when_both_pass_and_at_least_ten_paired_datasets",
     "missing_and_timeout": "retain_as_failures_and_report_separately"
+  },
+  "review_fixes": {
+    "predeclaration": "research/benchmark/review_fixes/predeclare.json",
+    "tost_margin_retention": 0.02,
+    "tost_alpha": 0.05,
+    "tost_estimand": "mean of paired lineage retention differences",
+    "sealed_test": "not_unsealed_until_the_predeclaration_commit_then_one_run",
+    "declared_before_review_fix_results": true
   }
 }
