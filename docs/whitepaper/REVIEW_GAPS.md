@@ -71,3 +71,31 @@ Remaining gaps, with no result number:
 The final exact-head local and hosted gate results are recorded in the external
 `WAVES_LEDGER.md` and `REVIEW_FIX_PROGRESS.md`; a historical green run never
 stands in for the final head.
+
+## Wave 3: literal rubric follow-up
+
+The frozen-rubric review of wave 2 found three publication descriptions that
+needed correction. The generated origin paragraph now distinguishes legacy
+lineage intervals from the source-family bootstrap and retains the missing
+parent-map limitation for other related lineages. The source-family sensitivity
+and informative-denominator tables now declare their descriptive multiplicity
+scope. Both document titles name encoding and generation. These changes leave
+the measured results and statistical procedures unchanged.
+
+Remaining work from that review:
+
+- The standalone retained-evidence reducer still needs an explicit unknown-method
+  refusal; the current pinned publication graph does not replace that check.
+- The page-1 paired figure still omits the measured Forest-Flow block. Adding it
+  requires its own short-cohort counts and the correct existing uncertainty.
+- The older retained-classical and retained-eight tables still lack matched DOPE
+  rows. The full numeric cohort cannot substitute for those historical cohorts.
+- Fit-reference NNDR does not complete holdout-referenced NNDR. Forest-Flow's
+  strong-classifier and alpha/beta cells remain unavailable.
+- Fit-seed uncertainty, new attribute and shipped-predictor attacks, additional
+  mechanism/stress units, equal tuning budgets and original-artifact packaging
+  require admitted evidence; prospective declarations alone supply no result.
+
+The official test and existing frozen jobs remain untouched. The external
+`WAVE3_PLAN.md` orders these units by points per effort. A wave-3 rubric score
+requires a new exact-head review against the unchanged frozen criteria.

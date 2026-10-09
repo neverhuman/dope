@@ -4,7 +4,7 @@
 \usepackage{hyperref}
 \emergencystretch=3em
 \raggedbottom
-\title{\texorpdfstring{\raggedright Supplement: DOPE: Downstream Objective-Preserving\\ Encoding for Synthetic Tabular Data}{Supplement: DOPE: Downstream Objective-Preserving Encoding for Synthetic Tabular Data}}
+\title{\texorpdfstring{\raggedright Supplement: DOPE: Downstream Objective-Preserving\\ Encoding and Generation for Synthetic Tabular Data}{Supplement: DOPE: Downstream Objective-Preserving Encoding and Generation for Synthetic Tabular Data}}
 \author{Jepson Taylor$^1$, Alton Alexander$^1$\\[0.15cm]
 $^1$NEVERHUMAN Research}
 \iclrfinalcopy
@@ -1013,7 +1013,8 @@ A row named for a comparator reports the median paired DOPE-minus-comparator
 retention difference on that family. The excluding-simulated cut uses the
 same level-versus-difference rule.
 The interval is the hierarchical CI.
-These rows are a sensitivity and stay unpooled from the headline.
+These descriptive sensitivity rows have no multiplicity family; their intervals
+are unadjusted and stay unpooled from the headline.
 \begingroup
 \scriptsize
 \setlength{\tabcolsep}{2pt}
@@ -1023,7 +1024,8 @@ These rows are a sensitivity and stay unpooled from the headline.
 \endgroup
 
 \subsection{Informative-lineage denominators}
-Informative, noninformative, and undefined lineage counts.
+Informative, noninformative, and undefined lineage counts. This descriptive
+table has no multiplicity family.
 The sensitivity column is the capped cohort.
 A different denominator is a different cohort.
 Forest-Flow's original cells omit the null-loss metadata required by this
