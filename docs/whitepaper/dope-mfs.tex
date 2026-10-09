@@ -69,7 +69,7 @@ $^1$NEVERHUMAN Research}
 We introduce \textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE), the byte-budgeted tabular encoding and the generator that encoding writes.
 Retention, the shared utility column, is a null-normalized train-on-synthetic/train-on-real ratio~\citep{esteban2017rcgan}. A retention leaves the release gate closed.
 On $\NDopeCb$ informative PMLB regression lineages, fit seed $11$ and synthetic size $4n$, the CatBoost median retention is $\MedDopeCb$ (95\% lineage-bootstrap interval $\LoDopeCb$ to $\HiDopeCb$).
-The strongest full-panel baseline is author-default ARF. DOPE minus ARF has CatBoost paired median $\DiffArfCb$, with family-cluster bootstrap interval $\LoDiffArfCb$ to $\HiDiffArfCb$ ($n=\NDiffArfCb$; \WtlArfCb).
+The strongest full-panel baseline is author-default ARF. The DOPE generator's retention minus ARF has CatBoost paired median $\DiffArfCb$, with family-cluster bootstrap interval $\LoDiffArfCb$ to $\HiDiffArfCb$ ($n=\NDiffArfCb$; \WtlArfCb).
 The linear ARF interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.
 Inside the density block the strongest tuned baseline is the Gaussian copula. Its linear interval is $\LoDiffLinGauss$ to $\HiDiffLinGauss$ and contains zero. Equivalence stays unclaimed.
 Forest-Flow leads on its $\NForestCb$-lineage block, and that Holm test stays non-significant.
@@ -82,7 +82,7 @@ The $10{,}240$-byte cap is a release gate.
 \begin{figure}[H]
   \centering
   \includegraphics[width=1.0\linewidth]{figures/teaser.pdf}
-  \caption{Paired retention differences at synthetic size $4n$ on the density block. The horizontal axis is DOPE minus the named comparator.
+  \caption{Paired retention differences at synthetic size $4n$ on the density block. DOPE in the legend is the generator this encoding writes. The horizontal axis is that generator's retention minus the named comparator.
   Each filled mark is one lineage. The open mark is the paired median and the bar is its 95\% lineage-bootstrap interval.
   Squares are the Gaussian copula, triangles are Chow--Liu, and diamonds are the independent marginals.
   The count in each panel title is that auditor's paired informative lineages. Points outside $[-1.5,\,1.5]$ stay in the title count and are clipped in the frame.
@@ -647,7 +647,7 @@ walls, the Forest-Flow sums, and the unsplit density attempt timers.
 \section{Results}
 \label{sec:results}
 \textbf{Strongest tuned baseline.} Author-default ARF is the strongest full-panel baseline at size $4n$.
-DOPE minus ARF has CatBoost paired median $\DiffArfCb$, family-cluster bootstrap $\LoDiffArfCb$ to $\HiDiffArfCb$
+The DOPE generator's retention minus ARF has CatBoost paired median $\DiffArfCb$, family-cluster bootstrap $\LoDiffArfCb$ to $\HiDiffArfCb$
 ($n=\NDiffArfCb$; \WtlArfCb). The linear interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.
 The MLP interval is $\LoDiffArfMlp$ to $\HiDiffArfMlp$ ($n=\NDiffArfMlp$; \WtlArfMlp).
 Those three intervals are the family-cluster bootstrap of the median. The legacy simultaneous median interval stays in \cref{tab:arfpaired}.
@@ -683,12 +683,12 @@ block stays off this figure.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/retention-bars.pdf}
-\caption{\textbf{CatBoost retention at $4n$.} Higher is better. Each bar is the paired-lineage median and its lineage-bootstrap interval. Density uses $\NDopeCb$ lineages. The neural panel uses $\NNeuCb$ and stays unpooled. Forest-Flow, $\NForestCb$ lineages, is higher on its own block and is omitted. No Holm family is drawn. The tests are in the tables.}
+\caption{\textbf{CatBoost retention at $4n$.} Higher is better. DOPE names the encoding's generator. Each bar is a method's paired-lineage retention median and its lineage-bootstrap interval. Density uses $\NDopeCb$ lineages. The neural panel uses $\NNeuCb$ and stays unpooled. Forest-Flow, $\NForestCb$ lineages, is higher on its own block and is omitted. No Holm family is drawn. The tests are in the tables.}
 \label{fig:bars}
 \end{figure}
 
 \subsection{Density block}
-\textbf{Density marks.} Circles are DOPE, squares the Gaussian copula, triangles Chow--Liu, and
+\textbf{Density marks.} Circles are the DOPE generator, squares the Gaussian copula, triangles Chow--Liu, and
 diamonds the independent marginals. Filled marks are lineages. Open marks
 are that method's median and its lineage-bootstrap interval.
 \cref{tab:density} is the paired density block. Under CatBoost, DOPE's
@@ -850,7 +850,7 @@ de-identification.
 
 \subsection{Neural block}
 \textbf{Neural block.} \cref{tab:neural} stays unpooled from \cref{tab:density}. On the
-$\NNeuCb$ CatBoost lineages, DOPE's median is $\MedDopeNeuCb$, CTGAN's is
+$\NNeuCb$ CatBoost lineages, the DOPE generator's retention median is $\MedDopeNeuCb$, CTGAN's is
 $\MedCtganCb$, and TVAE's is $\MedTvaeCb$. TVAE is the stronger neural
 baseline. Wins, ties, and losses against TVAE are \WtlTvaeCb,
 \WtlTvaeLin, and \WtlTvaeMlp. The median favors DOPE, and DOPE still loses
