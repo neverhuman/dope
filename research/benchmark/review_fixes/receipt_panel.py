@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 from collections import defaultdict
 from pathlib import Path
 
@@ -902,6 +903,12 @@ def patch_stored_fidelity(panel_path: Path) -> None:
 
 
 def _load_reductions() -> dict:
+    panel_path = RESULTS / "review-fixes-receipts-v1" / "panel.json"
+    if panel_path.is_file():
+        pins = json.loads(panel_path.read_text()).get("sources") or {}
+        for name, recorded in pins.items():
+            if _sha(RESULTS / name) != recorded:
+                raise SystemExit(f"source drift {name}")
     record, _record_sha = _load("s3-lineage-record.json")
     density, _density_sha = _load("density-matched-population-validation.json")
     sdv, _sdv_sha = _load("sdv-matched-population-validation.json")
@@ -954,6 +961,8 @@ def main() -> None:
     if args.from_panel:
         emit_from_panel(args.from_panel)
         return
+    if os.environ.get("DOPE_RF_REBUILD") != "1":
+        raise SystemExit("refusing a private ledger rebuild; pass --from-panel")
     payload = build(stop_after_anchor=False)
     out_dir = RESULTS / "review-fixes-receipts-v1"
     out_dir.mkdir(parents=True, exist_ok=True)

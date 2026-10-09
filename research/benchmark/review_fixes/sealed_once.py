@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import math
 import os
 import subprocess
 import time
@@ -28,11 +29,22 @@ from research.benchmark.review_fixes.stats import cluster_of, median_ci
 
 PILOT_PATH = HERE.parent / "pilot_metrics.py"
 RESULTS = REPO / "research" / "benchmark" / "results"
-REGISTRY = RESULTS / "review-fixes-sealed-v1"
+APPROVED_HOST = "xbabe3"
+CANONICAL_REGISTRY = Path("/mnt/fast-scratch/dope-benchmark/review-fixes-lane-b/sealed-v1")
+REGISTRY = CANONICAL_REGISTRY
+FREEZE_COMMIT = "c36d7f21b8ce62af81bc1f538e332c180e22eb95"
+FREEZE_BLOB = "a0691b1efc848add288e17b22759169c515d4328"
+FREEZE_SHA256 = "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5"
 WORKERS = Path("/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker")
 EVALUATOR = Path("/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/evaluator")
 AUDITORS = ("catboost", "linear", "mlp")
 SEEDS = (101, 211, 307)
+PUBLISHED_SPECS = (
+    ("DOPE", "features12_steps2048"),
+    ("GaussianCopula", "native_selected"),
+    ("Chow-Liu", "native_selected"),
+    ("independent_marginals", "native_selected"),
+)
 
 
 def _pilot():
@@ -102,6 +114,7 @@ def _retention(pilot, train, test, synthetic, task: str, seed: int = 1729) -> di
 
 def _published_samples() -> list[dict]:
     """Train-only published samples. Fit seed 11 only. Duplicates are refused."""
+    _assert_ledger_pins()
     found = {}
     specs = (
         ("density-matched-population-validation.json", "DOPE", "features12_steps2048"),
@@ -155,6 +168,157 @@ def _committed_blob(path: Path) -> str:
     return recorded
 
 
+def _assert_frozen_constants(document: dict) -> None:
+    frozen = document["sealed_test"]["configuration_frozen_by_this_file"]
+    if document["sealed_test"]["status"] != "not_unsealed":
+        raise SystemExit("predeclare sealed_test.status is no longer not_unsealed")
+    if tuple(frozen["auditors"]) != AUDITORS:
+        raise SystemExit("auditor set does not match the frozen configuration")
+    if tuple(frozen["sample_seeds"]) != SEEDS:
+        raise SystemExit("sample seeds do not match the frozen configuration")
+    if tuple(frozen["sizes"]) != (1, 4):
+        raise SystemExit("sizes do not match the frozen configuration")
+    if frozen["fit_seed"] != 11 or frozen["auditor_seed"] != 1729:
+        raise SystemExit("fit seed or auditor seed does not match the frozen configuration")
+    if frozen["profile"] != "features12_steps2048" or frozen["method"] != "DOPE":
+        raise SystemExit("profile does not match the frozen configuration")
+    expected = (
+        "GaussianCopula",
+        "Chow-Liu",
+        "independent_marginals",
+        "real_bootstrap_4n",
+        "predictor_only_fit_seed_11",
+    )
+    if tuple(frozen["comparators"]) != expected:
+        raise SystemExit("comparators do not match the frozen configuration")
+
+
+def _assert_original_freeze(path: Path, expect_sha256: str, expect_git_blob: str) -> dict:
+    """Bind the run to the original committed predeclare, not a later edit."""
+    if expect_sha256 != FREEZE_SHA256 or expect_git_blob != FREEZE_BLOB:
+        raise SystemExit("expect pins are not the original predeclare freeze")
+    if _sha256(path) != FREEZE_SHA256:
+        raise SystemExit("predeclare sha256 is not the original freeze")
+    if _committed_blob(path) != FREEZE_BLOB:
+        raise SystemExit("HEAD predeclare differs from the original freeze")
+    recorded = subprocess.check_output(
+        ["git", "rev-parse", f"{FREEZE_COMMIT}:research/benchmark/review_fixes/predeclare.json"],
+        cwd=REPO,
+        text=True,
+        stderr=subprocess.DEVNULL,
+    ).strip()
+    if recorded != FREEZE_BLOB:
+        raise SystemExit("freeze commit does not contain the original predeclare blob")
+    document = json.loads(path.read_text())
+    _assert_frozen_constants(document)
+    return document
+
+
+def _csv_shape(path: Path) -> tuple[int, int]:
+    if path.name == "test.csv":
+        raise ValueError("shape check refuses a test file")
+    rows = 0
+    cols = None
+
+    def consume(line: str) -> None:
+        nonlocal rows, cols
+        if not line.strip():
+            return
+        parts = [part.strip() for part in line.rstrip("\n").split(",")]
+        width = len(parts)
+        if cols is None:
+            cols = width
+        elif width != cols:
+            raise ValueError("ragged table")
+        for part in parts:
+            if not math.isfinite(float(part)):
+                raise ValueError("nonfinite table")
+        rows += 1
+
+    with path.open() as handle:
+        first = handle.readline()
+        if not first:
+            raise ValueError("empty table")
+        try:
+            float(first.split(",")[0].strip())
+        except ValueError:
+            first = None
+        if first is not None:
+            consume(first)
+        for line in handle:
+            consume(line)
+    if cols is None or rows < 1:
+        raise ValueError("empty table")
+    return rows, cols
+
+
+def _shape_problem(sample_rows: int, sample_cols: int, train_rows: int, train_cols: int, size: int) -> str | None:
+    if sample_cols != train_cols:
+        return "width"
+    if sample_rows != train_rows * size:
+        return "row_count"
+    if sample_rows < 1 or sample_cols < 2:
+        return "empty"
+    return None
+
+
+def cell_path(registry: Path, dataset: str, method: str, configuration: str, size: int, seed: int) -> Path:
+    return registry / "cells" / f"{dataset}__{method}__{configuration}__{size}__{seed}.json"
+
+
+def partition_path(registry: Path, dataset: str) -> Path:
+    return registry / "cells" / f"{dataset}__partition_missing.json"
+
+
+def write_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(".json.tmp")
+    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    temporary.replace(path)
+
+
+def read_checkpoint(path: Path) -> dict | None:
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text())
+
+
+def registry_mode(registry: Path, expect_sha256: str, expect_git_blob: str) -> str:
+    """panel.json refuses. A matching start marker resumes and is not deleted."""
+    if (registry / "panel.json").exists():
+        raise SystemExit("sealed registry already exists; refusing a second run")
+    started = registry / "started.json"
+    if not started.exists():
+        return "fresh"
+    try:
+        payload = json.loads(started.read_text())
+    except json.JSONDecodeError as error:
+        raise SystemExit("sealed start marker is unreadable; refusing to continue") from error
+    if (
+        payload.get("predeclaration_sha256") != expect_sha256
+        or payload.get("predeclaration_git_blob") != expect_git_blob
+    ):
+        raise SystemExit("sealed start marker does not match the committed predeclare; refusing to continue")
+    return "resume"
+
+
+def _control_identity(cell: dict, dataset: str, method: str, size: int, seed: int) -> str | None:
+    expected_kind = "real_bootstrap_4n" if method == "real_bootstrap_4n" else "predictor_only"
+    if cell.get("dataset") != dataset or cell.get("kind") != expected_kind:
+        return "control_identity"
+    if cell.get("sample_seed") != seed or cell.get("size") != size:
+        return "control_identity"
+    if cell.get("split_seed") not in (None,):
+        return "control_identity"
+    if method == "predictor_only_fit_seed_11" and cell.get("fit_seed") != 11:
+        return "control_identity"
+    if method == "real_bootstrap_4n" and cell.get("fit_seed") not in (None,):
+        return "control_identity"
+    if cell.get("status") != "ok":
+        return "control_not_ok"
+    return None
+
+
 def _control_record(controls: Path, dataset: str, method: str, size: int, seed: int) -> dict:
     if method == "real_bootstrap_4n" and size == 4:
         stem = f"real-bootstrap-sample{seed}"
@@ -167,31 +331,99 @@ def _control_record(controls: Path, dataset: str, method: str, size: int, seed: 
     if not cell_path.is_file() or not csv_path.is_file():
         raise SystemExit(f"missing control sample {dataset} {method} size {size} seed {seed}")
     cell = json.loads(cell_path.read_text())
-    if cell.get("status") != "ok" or cell.get("kind") == "split":
-        raise SystemExit(f"control sample is not an ok primary cell {cell_path.name}")
+    identity = _control_identity(cell, dataset, method, size, seed)
+    if identity is not None:
+        raise SystemExit(f"{identity} {cell_path.name}")
     expected = cell.get("synthetic_sha256")
-    if not isinstance(expected, str):
+    if not isinstance(expected, str) or len(expected) != 64:
         raise SystemExit(f"control sample has no synthetic_sha256 {cell_path.name}")
     return {"csv": str(csv_path), "expected_sha256": expected}
+
+
+def _assert_ledger_pins() -> None:
+    panel_path = RESULTS / "review-fixes-receipts-v1" / "panel.json"
+    if not panel_path.is_file():
+        raise SystemExit("receipt panel pin file is missing")
+    pins = json.loads(panel_path.read_text()).get("sources") or {}
+    names = (
+        "s3-lineage-record.json",
+        "density-matched-population-validation.json",
+        "sdv-matched-population-validation.json",
+        "arf-matched-population-validation.json",
+        "s3-matched-forest-confirmation-validation.json",
+    )
+    for name in names:
+        recorded = pins.get(name)
+        if not isinstance(recorded, str) or _sha256(RESULTS / name) != recorded:
+            raise SystemExit(f"source drift {name}")
+
+
+def _missing_published_grid(manifest: list[dict], datasets: list[str]) -> list[str]:
+    present = {
+        (row.get("method"), row.get("configuration"), row.get("dataset"), row.get("size"), row.get("sample_seed"))
+        for row in manifest
+        if row.get("method") in {spec[0] for spec in PUBLISHED_SPECS}
+    }
+    missing = []
+    for dataset in datasets:
+        for method, configuration in PUBLISHED_SPECS:
+            for size in (1, 4):
+                for seed in SEEDS:
+                    if (method, configuration, dataset, size, seed) not in present:
+                        missing.append(f"{method} {dataset} size {size} seed {seed}")
+    return missing
+
+
+def _published_problem(sample: dict) -> str | None:
+    """A published ok cell with no 64-hex sample pin cannot be scored."""
+    if sample.get("published_status") != "ok" or not isinstance(sample.get("csv"), str):
+        return None
+    expected = sample.get("expected_sha256")
+    if not isinstance(expected, str) or len(expected) != 64:
+        return (
+            f"published sample has no sha pin {sample.get('method')} {sample.get('dataset')} "
+            f"{sample.get('size')} {sample.get('sample_seed')}"
+        )
+    return None
 
 
 def _preflight(controls: Path, datasets: list[str]) -> list[dict]:
     """Hash every declared train-only sample. Do not open a test file."""
     manifest = []
     problems = []
+    train_shapes: dict[str, tuple[int, int]] = {}
     for sample in _published_samples():
         csv_path = sample.get("csv")
         expected = sample.get("expected_sha256")
         if sample.get("published_status") != "ok" or not isinstance(csv_path, str):
             manifest.append({**sample, "file_sha256": None, "ready": False, "reason": "published_sample_absent"})
             continue
+        problem = _published_problem(sample)
+        if problem is not None:
+            problems.append(problem)
+            continue
         path = Path(csv_path)
         if path.name == "test.csv" or not path.is_file():
             problems.append(f"published ok sample missing {sample['method']} {sample['dataset']} {sample['size']} {sample['sample_seed']}")
             continue
         digest = _sha256(path)
-        if expected is not None and digest != expected:
+        if digest != expected:
             problems.append(f"published sample sha mismatch {sample['method']} {sample['dataset']}")
+            continue
+        dataset = sample["dataset"]
+        try:
+            sample_rows, sample_cols = _csv_shape(path)
+            if dataset not in train_shapes:
+                train_shapes[dataset] = _csv_shape(WORKERS / dataset / "train.csv")
+            train_rows, train_cols = train_shapes[dataset]
+        except (OSError, ValueError) as error:
+            problems.append(
+                f"published sample shape {sample['method']} {dataset} {type(error).__name__}"
+            )
+            continue
+        shape = _shape_problem(sample_rows, sample_cols, train_rows, train_cols, int(sample["size"]))
+        if shape is not None:
+            problems.append(f"published sample {shape} {sample['method']} {dataset} size {sample['size']}")
             continue
         manifest.append({**sample, "file_sha256": digest, "ready": True, "reason": None})
     for dataset in datasets:
@@ -203,6 +435,18 @@ def _preflight(controls: Path, datasets: list[str]) -> list[dict]:
                     digest = _sha256(Path(record["csv"]))
                     if digest != record["expected_sha256"]:
                         problems.append(f"control sha mismatch {dataset} {method} {size} {seed}")
+                        continue
+                    try:
+                        sample_rows, sample_cols = _csv_shape(Path(record["csv"]))
+                        if dataset not in train_shapes:
+                            train_shapes[dataset] = _csv_shape(WORKERS / dataset / "train.csv")
+                        train_rows, train_cols = train_shapes[dataset]
+                    except (OSError, ValueError) as error:
+                        problems.append(f"control sample shape {dataset} {method} {type(error).__name__}")
+                        continue
+                    shape = _shape_problem(sample_rows, sample_cols, train_rows, train_cols, size)
+                    if shape is not None:
+                        problems.append(f"control sample {shape} {dataset} {method} size {size}")
                         continue
                     manifest.append({
                         "method": method,
@@ -216,34 +460,34 @@ def _preflight(controls: Path, datasets: list[str]) -> list[dict]:
                         "ready": True,
                         "reason": None,
                     })
+    problems.extend(_missing_published_grid(manifest, datasets))
     if problems:
         raise SystemExit("preflight refused before unsealing: " + "; ".join(problems[:8]))
     return manifest
 
 
-def _gate(args, manifest: list[dict]) -> dict:
-    if args.out.resolve() != REGISTRY.resolve():
-        raise SystemExit("sealed output must be research/benchmark/results/review-fixes-sealed-v1")
-    if (REGISTRY / "panel.json").exists() or (REGISTRY / "started.json").exists():
+def _gate(args, manifest: list[dict], registry: Path | None = None) -> dict:
+    registry = REGISTRY if registry is None else registry
+    if args.out.resolve() != registry.resolve():
+        raise SystemExit(
+            "sealed output must be /mnt/fast-scratch/dope-benchmark/review-fixes-lane-b/sealed-v1"
+        )
+    if (registry / "panel.json").exists() or (registry / "started.json").exists():
         raise SystemExit("sealed registry already exists; refusing a second run")
     if os.environ.get("DOPE_RF_UNSEAL") != "1":
         raise SystemExit("refusing: DOPE_RF_UNSEAL=1 is not set")
+    if getattr(args, "host", None) != APPROVED_HOST:
+        raise SystemExit(f"sealed host must be {APPROVED_HOST}")
     if args.predeclare.name == "test.csv":
         raise SystemExit("predeclare path is not a test file")
-    blob = _committed_blob(args.predeclare)
-    if blob != args.expect_git_blob:
-        raise SystemExit("predeclare git blob does not match --expect-git-blob")
-    digest = _sha256(args.predeclare)
-    if digest != args.expect_sha256:
-        raise SystemExit("predeclare sha256 does not match --expect-sha256")
-    document = json.loads(args.predeclare.read_text())
-    if document.get("sealed_test", {}).get("status") != "not_unsealed":
-        raise SystemExit("predeclare sealed_test.status is no longer not_unsealed")
+    document = _assert_original_freeze(args.predeclare, args.expect_sha256, args.expect_git_blob)
+    digest = FREEZE_SHA256
+    blob = FREEZE_BLOB
     ready = sum(1 for row in manifest if row.get("ready"))
     if ready == 0:
         raise SystemExit("preflight found no train-only samples")
-    REGISTRY.mkdir(parents=True, exist_ok=True)
-    started = REGISTRY / "started.json"
+    registry.mkdir(parents=True, exist_ok=True)
+    started = registry / "started.json"
     payload = {
         "started_unix": time.time(),
         "predeclaration_sha256": digest,
@@ -268,14 +512,15 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--host", required=True)
     args = parser.parse_args()
-    if os.uname().nodename != args.host:
-        raise SystemExit(f"refusing to run on {os.uname().nodename}")
+    if os.uname().nodename != APPROVED_HOST or args.host != APPROVED_HOST:
+        raise SystemExit(f"sealed host must be {APPROVED_HOST}")
     if os.environ.get("DOPE_RF_UNSEAL") != "1":
         raise SystemExit("refusing: DOPE_RF_UNSEAL=1 is not set")
     if args.out.resolve() != REGISTRY.resolve():
-        raise SystemExit("sealed output must be research/benchmark/results/review-fixes-sealed-v1")
-    if (REGISTRY / "panel.json").exists() or (REGISTRY / "started.json").exists():
-        raise SystemExit("sealed registry already exists; refusing a second run")
+        raise SystemExit(
+            "sealed output must be /mnt/fast-scratch/dope-benchmark/review-fixes-lane-b/sealed-v1"
+        )
+    mode = registry_mode(REGISTRY, args.expect_sha256, args.expect_git_blob)
     for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
         os.environ[key] = "1"
     names = {
@@ -283,7 +528,10 @@ def main() -> None:
         for row in json.loads((RESULTS / "s3-lineage-record.json").read_text())["rows"]
     }
     manifest = _preflight(args.controls, sorted(names))
-    document = _gate(args, manifest)
+    if mode == "fresh":
+        document = _gate(args, manifest)
+    else:
+        document = _assert_original_freeze(args.predeclare, args.expect_sha256, args.expect_git_blob)
     frozen = document["sealed_test"]["configuration_frozen_by_this_file"]
     pilot = _pilot()
     indexed = {
@@ -295,30 +543,53 @@ def main() -> None:
     ]
     control_methods = ("real_bootstrap_4n", "predictor_only_fit_seed_11")
     cells = []
-    opened = False
+    opened = mode == "resume"
     for dataset in sorted(names):
-        projection_path = WORKERS / dataset / "projection.json"
-        train_path = WORKERS / dataset / "train.csv"
-        test_path = EVALUATOR / dataset / "test.csv"
-        if not projection_path.is_file() or not train_path.is_file() or not test_path.is_file():
-            cells.append({"dataset": dataset, "status": "unavailable", "reason": "partition_missing"})
-            continue
-        task = json.loads(projection_path.read_text())["task"]
-        train = _read_numeric(train_path)
-        if not opened:
-            opened = True
-        test = _read_numeric(test_path)
+        jobs = []
         for method, configuration in methods:
             for size in frozen["sizes"]:
                 for seed in frozen["sample_seeds"]:
-                    sample = indexed.get((method, configuration, dataset, size, seed))
-                    cells.append(_one_cell(pilot, dataset, method, configuration, size, seed, sample, train, test, task))
+                    jobs.append((method, configuration, size, seed))
         for method in control_methods:
             sizes = (4,) if method == "real_bootstrap_4n" else tuple(frozen["sizes"])
             for size in sizes:
                 for seed in frozen["sample_seeds"]:
-                    sample = indexed.get((method, method, dataset, size, seed))
-                    cells.append(_one_cell(pilot, dataset, method, method, size, seed, sample, train, test, task))
+                    jobs.append((method, method, size, seed))
+        missing_marker = partition_path(REGISTRY, dataset)
+        stored_missing = read_checkpoint(missing_marker)
+        if stored_missing is not None:
+            cells.append(stored_missing)
+            continue
+        projection_path = WORKERS / dataset / "projection.json"
+        train_path = WORKERS / dataset / "train.csv"
+        test_path = EVALUATOR / dataset / "test.csv"
+        if not projection_path.is_file() or not train_path.is_file() or not test_path.is_file():
+            cell = {"dataset": dataset, "status": "unavailable", "reason": "partition_missing"}
+            write_json(missing_marker, cell)
+            cells.append(cell)
+            continue
+        pending = [
+            job for job in jobs
+            if read_checkpoint(cell_path(REGISTRY, dataset, job[0], job[1], job[2], job[3])) is None
+        ]
+        if not pending:
+            for method, configuration, size, seed in jobs:
+                cells.append(read_checkpoint(cell_path(REGISTRY, dataset, method, configuration, size, seed)))
+            continue
+        task = json.loads(projection_path.read_text())["task"]
+        train = _read_numeric(train_path)
+        test = _read_numeric(test_path)
+        opened = True
+        for method, configuration, size, seed in jobs:
+            path = cell_path(REGISTRY, dataset, method, configuration, size, seed)
+            stored = read_checkpoint(path)
+            if stored is None:
+                sample = indexed.get((method, configuration, dataset, size, seed))
+                stored = _one_cell(
+                    pilot, dataset, method, configuration, size, seed, sample, train, test, task,
+                )
+                write_json(path, stored)
+            cells.append(stored)
     summary = _summarize(cells, names)
     payload = {
         "format": "dope-review-fix-sealed-once",
