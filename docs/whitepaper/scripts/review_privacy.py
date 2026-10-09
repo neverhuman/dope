@@ -31,6 +31,8 @@ from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
 )
 from research.benchmark.review_fixes.stats import cluster_of, median_ci  # noqa: E402
 
+from research.benchmark.expanded_validation_metrics import MAX_ROWS  # noqa: E402
+
 METRICS = (
     "dcr_validation_median",
     "dcr_fit_median",
@@ -87,6 +89,23 @@ def _matched_density(grouped, names) -> list[dict]:
 
 def _finite(value) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def _c2st_rows(cell: dict) -> int | None:
+    if not _finite(cell.get("c2st_catboost_auc")):
+        return None
+    rows = cell.get("rows") or {}
+    validation = rows.get("validation")
+    synthetic = rows.get("synthetic")
+    count = cell.get("c2st_rows_per_class")
+    if (
+        type(validation) is not int or validation < 1
+        or type(synthetic) is not int or synthetic < 1
+        or type(count) is not int
+        or count != min(validation, synthetic, MAX_ROWS)
+    ):
+        raise ValueError("privacy C2ST class-n disagrees with declared rows")
+    return count
 
 
 def _cells(root: Path) -> list[dict]:
@@ -198,9 +217,12 @@ def main() -> None:
         if seed in grouped[key]:
             raise ValueError(f"duplicate privacy cell {key} {seed}")
         grouped[key][seed] = cell
-        if _finite(cell.get("c2st_rows_per_class")):
-            rows_per_class.append(int(cell["c2st_rows_per_class"]))
-            declared_rows[(cell.get("dataset"), size, seed)].add(int(cell["c2st_rows_per_class"]))
+        count = _c2st_rows(cell)
+        if count is not None:
+            rows_per_class.append(count)
+            declared_rows[(cell.get("dataset"), size, seed)].add(count)
+    if any(len(values) > 1 for values in declared_rows.values()):
+        raise ValueError("privacy C2ST class-n differs across methods for a dataset/size/seed")
     summaries = []
     for (method, configuration, size) in sorted({(key[0], key[1], key[3]) for key in grouped}):
         for metric in METRICS:

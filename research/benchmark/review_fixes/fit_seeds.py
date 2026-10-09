@@ -60,9 +60,9 @@ def _line_count(path: Path) -> int:
 def _atomic_json(path: Path, payload: dict) -> None:
     _refuse_test(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(payload, sort_keys=True) + "\n")
-    os.replace(temporary, path)
+    staging = path.with_suffix(path.suffix + ".tmp")
+    staging.write_text(json.dumps(payload, sort_keys=True) + "\n")
+    os.replace(staging, path)
 
 
 def _read_json(path: Path) -> dict | None:
@@ -380,6 +380,8 @@ def _score_one(pilot, cell: Path, worker: Path, dataset: str, fit_seed: int, sam
                 "status": "failed" if returncode != 124 else "timeout",
                 "reason": "sample",
                 "dataset": dataset,
+                "method": "DOPE",
+                "configuration": PROFILE,
                 "fit_seed": fit_seed,
                 "sample_seed": sample_seed,
                 "size": size,
@@ -430,6 +432,8 @@ def _score_one(pilot, cell: Path, worker: Path, dataset: str, fit_seed: int, sam
             "status": "failed",
             "reason": type(error).__name__,
             "dataset": dataset,
+            "method": "DOPE",
+            "configuration": PROFILE,
             "fit_seed": fit_seed,
             "sample_seed": sample_seed,
             "size": size,
