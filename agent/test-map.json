@@ -1,6 +1,14 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/results/work-order-b-native-through094-fit-progress-and-cost-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-through094-fit-progress-and-cost-v1/render.py --check",
+      "purpose": "replay the frozen through094 fit identity counts, observed GPU grants, distinct parent-cost bases and unavailable scores from public metadata only"
+    },
+    "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
+      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+    },
     "research/benchmark/tests/test_mfs_v3_panel.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
       "purpose": "lock the MFS-v3 cohort, shared map, deterministic median-of-three matched null, declared near-copy quantile, and GPU yield rule"
@@ -1200,6 +1208,14 @@
     "examples/readme-regression/": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "regenerate the README toy tables from the documented unit-interval formula"
+    },
+    "research/benchmark/bounded_auditors.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics research.benchmark.tests.test_real_test_utility -v",
+      "purpose": "verify explicit four-thread feature-importance and prediction calls for future auditors while preserving historical measured harness identities and numerical equations"
+    },
+    "research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/render.py --check",
+      "purpose": "replay 400 frozen Forest-Flow additional fit dispositions, four additional seed coverage, declared artifact bytes and alternate successful timer sums; keep five-fit coverage and quality scores null"
     },
     "research/benchmark/fetch_pmlb.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_pmlb -v",
