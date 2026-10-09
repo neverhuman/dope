@@ -76,6 +76,29 @@ def fit_values(cells: list[dict], names: dict[str, str]) -> dict:
     return grouped
 
 
+FIDELITY = ("marginal_ks_mean", "pair_correlation_fidelity", "c2st_auc_logistic")
+
+
+def fidelity_values(cells: list[dict], names: dict[str, str]) -> dict:
+    """(arm, size, metric) -> fit items; a fit value is the median over its three sample seeds."""
+    triples: dict[tuple, dict[int, float]] = defaultdict(dict)
+    for cell in cells:
+        arm = (cell["method"], cell["configuration"])
+        for metric in FIDELITY:
+            if cell.get(metric) is not None:
+                triples[(arm, cell["dataset"], cell["fit_seed"], cell["size"], metric)][cell["sample_seed"]] = cell[metric]
+    grouped: dict[tuple, list[dict]] = defaultdict(list)
+    for (arm, dataset, fit_seed, size, metric), samples in sorted(triples.items(), key=lambda kv: repr(kv[0])):
+        if set(samples) != set(SAMPLE_SEEDS):
+            continue
+        name = names.get(dataset, dataset)
+        grouped[(arm, size, metric)].append({
+            "dataset": dataset, "cluster": cluster_of(name, dataset),
+            "fit_seed": -1 if fit_seed is None else fit_seed,
+            "value": float(np.median([samples[seed] for seed in SAMPLE_SEEDS]))})
+    return grouped
+
+
 def _verdict(lo, hi) -> str | None:
     if lo is None or hi is None:
         return None
@@ -129,8 +152,12 @@ def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS) -> di
                     **S.nested_level(later.get((HEADLINE, size, auditor), []),
                                      f"level|seeds23-71|{size}|{auditor}", S.MIN_FITS_FIVE_SEED, draws)}
                    for size in SIZES for auditor in AUDITORS]
+    fidelity = []
+    for (arm, size, metric), items in sorted(fidelity_values(cells, names).items(), key=lambda kv: repr(kv[0])):
+        fidelity.append({"method": arm[0], "configuration": arm[1], "size": size, "metric": metric,
+                         **S.nested_level(items, f"fidelity|{arm}|{size}|{metric}", min_fits(arm), draws)})
     return {
-        "format": "dope-review-fix-v2-panel", "version": 1,
+        "format": "dope-review-fix-v2-panel", "version": 1, "fidelity": fidelity,
         "predeclare_sha256": hashlib.sha256(PREDECLARE.read_bytes()).hexdigest(),
         "draws": draws, "levels": levels, "contrasts": contrasts,
         "strongest": strongest(levels, contrasts),
@@ -191,6 +218,7 @@ def two_by_two(values: dict) -> dict:
         shared = [medians[key] for key in sorted(common)]
         out[name] = float(np.median(shared)) if shared else None
         out[name + "_own_n"] = len(medians)
+        out[name + "_own_median"] = float(np.median(list(medians.values()))) if medians else None
     return out
 
 

@@ -64,6 +64,22 @@ class BinderTests(unittest.TestCase):
             self.assertEqual(override[0]["configuration"], "headline_bnew")
 
 
+class FitLedgerTests(unittest.TestCase):
+    def test_charged_bytes_need_the_model_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cell = Path(tmp) / "aa00000000000001" / "headline" / "fit-11"
+            cell.mkdir(parents=True)
+            record = {"status": "ok", "dataset": "aa00000000000001", "fit_seed": 11, "arm": "headline",
+                      "artifact_bytes": 5, "projection_bytes": 7, "official_tests_opened": False}
+            (cell / "fit.json").write_text(json.dumps(record))
+            with self.assertRaises(ValueError):
+                B.collect_fits([(Path(tmp), "t", None)])
+            (cell / "model.dpk").write_bytes(b"12345")
+            fits = B.collect_fits([(Path(tmp), "t", None)])
+            self.assertEqual(fits[0]["charged_bytes"], 12)
+            self.assertEqual(fits[0]["configuration"], "headline")
+
+
 class PanelTests(unittest.TestCase):
     def test_reduce_pairs_headline_against_comparators(self):
         panel = P.reduce(ledger(), {}, draws=200)

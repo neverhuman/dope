@@ -126,6 +126,46 @@ def collect(roots: list[tuple[Path, str, str | None]], contract: dict) -> list[d
     return [cells[key] for key in sorted(cells)]
 
 
+def public_fit(raw: dict, model: Path, source: str) -> dict:
+    """One DOPE fit record: status and the charged bytes, model file plus projection."""
+    if raw.get("official_tests_opened") is not False:
+        raise ValueError("fit official test flag is not closed")
+    if raw.get("method", "DOPE") != "DOPE":
+        raise ValueError("only DOPE fit records are bound")
+    artifact = raw.get("artifact_bytes")
+    projection = raw.get("projection_bytes")
+    charged = None
+    if raw.get("status") == "ok":
+        if not model.is_file() or model.stat().st_size != artifact:
+            raise ValueError(f"model bytes differ from the fit record at {model}")
+        if type(projection) is not int or projection <= 0:
+            raise ValueError("projection bytes are missing")
+        charged = artifact + projection
+    return {"method": "DOPE", "configuration": raw.get("configuration") or raw.get("arm"),
+            "dataset": raw["dataset"], "fit_seed": raw["fit_seed"], "status": raw.get("status"),
+            "reason": raw.get("reason"), "artifact_bytes": artifact, "projection_bytes": projection,
+            "charged_bytes": charged, "elapsed_seconds": raw.get("elapsed_seconds"),
+            "model_sha256": raw.get("model_sha256"), "binary_sha256": raw.get("binary_sha256"),
+            "gpu": raw.get("gpu"), "source": source, "official_tests_opened": False}
+
+
+def collect_fits(roots: list[tuple[Path, str, str | None]]) -> list[dict]:
+    fits: dict[tuple, dict] = {}
+    for root, source, override in roots:
+        for path in sorted(root.rglob("fit.json")):
+            if path.is_symlink():
+                raise ValueError(f"refusing {path}")
+            raw = json.loads(path.read_text())
+            if override is not None:
+                raw = {**raw, "configuration": override}
+            record = public_fit(raw, path.parent / "model.dpk", source)
+            key = (record["configuration"], record["dataset"], record["fit_seed"])
+            if key in fits:
+                raise ValueError(f"duplicate fit identity {key}")
+            fits[key] = record
+    return [fits[key] for key in sorted(fits)]
+
+
 def write_ledger(cells: list[dict], out: Path, contract: dict) -> dict:
     lines = "".join(json.dumps(cell, sort_keys=True, separators=(",", ":")) + "\n" for cell in cells)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -150,6 +190,13 @@ def main() -> None:
         roots.append((Path(parts[0]), parts[1], parts[2] if len(parts) == 3 else None))
     contract = _contract()
     meta = write_ledger(collect(roots, contract), args.out, contract)
+    fits = collect_fits(roots)
+    fit_lines = "".join(json.dumps(item, sort_keys=True, separators=(",", ":")) + "\n" for item in fits)
+    fits_path = args.out.with_name("fits.jsonl")
+    fits_path.write_text(fit_lines)
+    meta["fits"] = len(fits)
+    meta["fits_sha256"] = hashlib.sha256(fit_lines.encode()).hexdigest()
+    args.out.with_suffix(".meta.json").write_text(json.dumps(meta, indent=1, sort_keys=True) + "\n")
     print(json.dumps(meta, sort_keys=True))
 
 
