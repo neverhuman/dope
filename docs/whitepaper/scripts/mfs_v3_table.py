@@ -35,6 +35,7 @@ GENERATED = REPO / "docs" / "whitepaper" / "generated"
 FIGURES = REPO / "docs" / "whitepaper" / "figures"
 TABLE_NAME = "mfs-v3-density-table.tex"
 SCALAR_NAME = "mfs-v3-scalar.tex"
+LAYERS_NAME = "mfs-v3-layers.tex"
 HASH_NAME = "mfs-v3-figure-hashes.json"
 BAR_NAME = "mfs-v3-retention-bars.pdf"
 PAIRED_NAME = "mfs-v3-paired.pdf"
@@ -211,20 +212,37 @@ def table_tex(measured: dict) -> str:
 
 
 def scalar_tex(measured: dict) -> str:
-    rows = "\n".join(
-        f"{AUDITOR_TEX[name]} & {_tt(VECTOR_PIN[name])} \\\\"
-        for name in TABULAR_AUDITORS
-    )
+    """The release-scalar sentence only. The vector pins are a separate float."""
     return (
         f"Kumo large averages {KUMO_ESTIMATORS} inverse-transformed quantile forecasts. "
         f"The receipt scores {measured['scored']} of {measured['method_lineage_cells']} method--lineage cells "
         f"({measured['n_lineages']} lineages $\\times$ {measured['n_methods']} methods), so the scalar is null. "
         f"Cleartext is unscanned on {measured['cleartext_unscanned']} method--lineage cells.\n"
-        "\\begin{center}\\scriptsize\n"
+    )
+
+
+def layers_tex() -> str:
+    """A captioned table float. An uncaptioned tabular would float into the body."""
+    rows = "\n".join(
+        f"{AUDITOR_TEX[name]} & {_tt(VECTOR_PIN[name])} \\\\"
+        for name in TABULAR_AUDITORS
+    )
+    return (
+        "\\begin{table}[t]\n"
+        "\\caption{\\textbf{Pinned representation vectors.} Each row names the activation "
+        "that the density-panel receipt reads as that auditor's table vector. "
+        "No Holm family.}\n"
+        "\\label{tab:mfs-v3-layers}\n"
+        "\\centering\n"
+        "\\scriptsize\n"
         "\\begin{tabular}{@{}l>{\\raggedright\\arraybackslash}p{2.15in}@{}}\n"
+        "\\toprule\n"
+        "Auditor & Pinned vector \\\\\n"
+        "\\midrule\n"
         f"{rows}\n"
+        "\\bottomrule\n"
         "\\end{tabular}\n"
-        "\\end{center}\n"
+        "\\end{table}\n"
     )
 
 
@@ -351,6 +369,7 @@ def write_outputs(measured: dict) -> None:
     FIGURES.mkdir(parents=True, exist_ok=True)
     (GENERATED / TABLE_NAME).write_text(table_tex(measured))
     (GENERATED / SCALAR_NAME).write_text(scalar_tex(measured))
+    (GENERATED / LAYERS_NAME).write_text(layers_tex())
     draw_figures(measured, FIGURES / BAR_NAME, FIGURES / PAIRED_NAME)
     payload = hash_document(FIGURES / BAR_NAME, FIGURES / PAIRED_NAME)
     (GENERATED / HASH_NAME).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
@@ -362,10 +381,13 @@ def check_outputs(measured: dict) -> None:
     expected_scalar = scalar_tex(measured)
     table_path = GENERATED / TABLE_NAME
     scalar_path = GENERATED / SCALAR_NAME
+    layers_path = GENERATED / LAYERS_NAME
     if table_path.read_text() != expected_table:
         raise SystemExit("mfs-v3 density table does not match the receipt")
     if scalar_path.read_text() != expected_scalar:
         raise SystemExit("mfs-v3 scalar note does not match the receipt")
+    if not layers_path.is_file() or layers_path.read_text() != layers_tex():
+        raise SystemExit("mfs-v3 layer table does not match the vector pins")
     recorded = json.loads((GENERATED / HASH_NAME).read_text())["pdf_sha256"]
     with tempfile.TemporaryDirectory() as tmp:
         bar_path = Path(tmp) / BAR_NAME
