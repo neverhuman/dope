@@ -22,6 +22,8 @@ STATIC = REPO / 'ops/ci/paper-inputs'
 OUT = REPO / 'docs/whitepaper/generated'
 LOCK_SHA256 = 'c1c7142eed329e15ebdd2cd5745817962c03d09a68786166655cc159e2f97b81'
 INVENTORY_SHA256 = '504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64'
+PREDECLARE = REPO / 'research/benchmark/review_fixes/predeclare.json'
+PREDECLARE_SHA256 = '921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5'
 
 
 def authenticated(path, digest):
@@ -31,6 +33,22 @@ def authenticated(path, digest):
     if hashlib.sha256(raw).hexdigest() != digest:
         raise ValueError('paper input digest mismatch')
     return raw
+
+
+def tost_protocol_tex():
+    """Emit protocol constants from the original, pre-result declaration."""
+    if PREDECLARE.resolve() != PREDECLARE.absolute():
+        raise ValueError('redirected TOST predeclaration')
+    document = json.loads(authenticated(PREDECLARE, PREDECLARE_SHA256))
+    protocol = document['tost']
+    if (document['format'] != 'dope-review-fix-predeclaration'
+            or protocol['declared_before_computation'] is not True):
+        raise ValueError('invalid TOST predeclaration')
+    return (
+        '% Protocol constants authenticated against the original pre-result declaration.\n'
+        + r'\newcommand{\TostEquivalenceMargin}{' + str(protocol['margin_retention']) + '}\n'
+        + r'\newcommand{\TostAlpha}{' + str(protocol['alpha']) + '}\n'
+    )
 
 
 def inventory_tex(document):
@@ -61,6 +79,7 @@ def main():
         if len(raw) != ref['bytes']:
             raise ValueError('static input length mismatch')
         (OUT / name).write_bytes(raw)
+    (OUT / 'tost-protocol.tex').write_text(tost_protocol_tex())
     record = load('s3-lineage-record.json')
     columns = displayed_columns()
     for kind, key, name in [('Displayed profile', 'rows', 's3-2048-lineages.tex'),
