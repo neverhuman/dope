@@ -8,11 +8,27 @@ build_root="$(realpath ../..)/target/paper-build"
 mkdir -p "$build_root"
 exec 9>"$(realpath ../..)/target/paper-latex.lock"
 flock 9
+# The supplement embeds this cropped figure. Rebuild from the tracked TikZ
+# source and generated architecture values under the same serial TeX lock.
+nice -n 10 ionice -c 3 pdflatex -output-directory="$build_root" -interaction=nonstopmode -halt-on-error -file-line-error ../../ops/ci/paper-architecture.tex
+cp "$build_root/paper-architecture.pdf" figures/architecture.pdf
+python3 - << 'PY'
+import hashlib
+import json
+from pathlib import Path
+sources = ("figures/architecture.tex", "generated/numbers.tex", "../../ops/ci/paper-architecture.tex")
+payload = {
+    "format": "dope-paper-architecture-hashes-v1",
+    "source_sha256": {name: hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in sources},
+    "pdf_sha256": {"architecture.pdf": hashlib.sha256(Path("figures/architecture.pdf").read_bytes()).hexdigest()},
+}
+Path("generated/architecture-figure-hashes.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+PY
 build_one() {
   local stem="$1"
   # latexmk reruns pdflatex and bibtex until the citation and reference labels settle.
   # A document with no bibliography does not invoke bibtex.
-  nice -n 10 ionice -c 3 latexmk -pdf -outdir="$build_root" -interaction=nonstopmode -halt-on-error -file-line-error "$stem"
+  nice -n 10 ionice -c 3 latexmk -pdf '-usepretex=\pdftrailerid{}\pdfsuppressptexinfo=-1' -outdir="$build_root" -interaction=nonstopmode -halt-on-error -file-line-error "$stem"
   cp "$build_root/$stem.log" "$build_root/$stem-3.log"
   cp "$build_root/$stem.pdf" "$stem.pdf"
 }

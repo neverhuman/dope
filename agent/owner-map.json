@@ -318,6 +318,7 @@
     "ops/ci/paper-review-inputs.json": "governance",
     "docs/whitepaper/scripts/test_paper_review_inputs.py": "governance",
     "research/benchmark/review_fixes/": "external-evidence",
-    "ops/ci/check-review-fixes.sh": "governance"
+    "ops/ci/check-review-fixes.sh": "governance",
+    "ops/ci/paper-architecture.tex": "governance"
   }
 }

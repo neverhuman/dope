@@ -1,0 +1,18 @@
+% Cropped architecture figure; all scientific values come from numbers.tex.
+\documentclass{article}
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
+\usepackage{times,tikz}
+\usetikzlibrary{positioning}
+\input{generated/numbers.tex}
+\pagestyle{empty}
+\newsavebox{\architecturebox}
+\begin{document}
+\setlength{\columnwidth}{5.5in}
+\savebox{\architecturebox}{\input{figures/architecture.tex}}
+\pdfpagewidth=5.5in
+\pdfpageheight=\dimexpr\ht\architecturebox+\dp\architecturebox\relax
+\hoffset=-1in
+\voffset=-1in
+\shipout\vbox{\offinterlineskip\hbox{\usebox{\architecturebox}}}
+\end{document}

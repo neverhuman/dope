@@ -1244,6 +1244,10 @@
     "ops/ci/check-review-fixes.sh": {
       "command": "bash ops/ci/check-review-fixes.sh",
       "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
+    },
+    "ops/ci/paper-architecture.tex": {
+      "command": "just paper-check",
+      "purpose": "rebuild the cropped architecture from tracked TikZ and generated macros, verify its source/PDF hashes, fonts and warning-free log without ICLR review line numbers"
     }
   }
 }
