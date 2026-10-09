@@ -66,6 +66,21 @@ def strip_comments(text: str) -> str:
     return "\n".join(line.split("%", 1)[0] for line in text.splitlines())
 
 
+def strip_tex_comments(text: str) -> str:
+    """Drop TeX comments while keeping an escaped percent sign."""
+    lines = []
+    for line in text.splitlines():
+        kept = []
+        index = 0
+        while index < len(line):
+            if line[index] == "%" and (index == 0 or line[index - 1] != "\\"):
+                break
+            kept.append(line[index])
+            index += 1
+        lines.append("".join(kept))
+    return "\n".join(lines)
+
+
 def anonymous_leaks(text: str) -> list[str]:
     """Scan visible text and PDF metadata, including identifying repository URLs."""
     patterns = (r"\bJepson\b", r"\bAlton\b", r"\bNEVERHUMAN\b", r"jepsontaylor",
@@ -100,6 +115,56 @@ def presentation_failures(layout: str) -> list[str]:
     return failures
 
 
+def _environments(text: str, kind: str) -> list[str]:
+    """Return each table or longtable body, without crossing a nested environment."""
+    opener = "\\begin{" + kind + "}"
+    closer = "\\end{" + kind + "}"
+    bodies = []
+    start = 0
+    while True:
+        begin = text.find(opener, start)
+        if begin < 0:
+            return bodies
+        end = text.find(closer, begin)
+        if end < 0:
+            bodies.append(text[begin:])
+            return bodies
+        bodies.append(text[begin:end])
+        start = end + len(closer)
+
+
+def _caption_bodies(environment: str) -> list[str]:
+    captions = []
+    token = "\\caption{"
+    start = 0
+    while True:
+        begin = environment.find(token, start)
+        if begin < 0:
+            return captions
+        index = begin + len(token)
+        depth = 1
+        while index < len(environment) and depth:
+            if environment[index] == "{":
+                depth += 1
+            elif environment[index] == "}":
+                depth -= 1
+            index += 1
+        captions.append(environment[begin + len(token):index - 1])
+        start = index
+
+
+def table_family_failures(text: str) -> list[str]:
+    """Every table states a Holm family size or says that it has no Holm family."""
+    failures = []
+    for kind in ("table", "table*", "longtable"):
+        for environment in _environments(text, kind):
+            captions = _caption_bodies(environment)
+            if not captions or not any("Holm" in caption for caption in captions):
+                preview = " ".join(environment.split())[:80]
+                failures.append("table environment lacks a Holm family declaration: " + preview)
+    return failures
+
+
 def main() -> int:
     failures = []
     raw_tex = TEX.read_text()
@@ -122,6 +187,10 @@ def main() -> int:
         failures.append("dope-mfs.tex does not include figures/teaser.pdf")
     if r"\IfFileExists" in raw_tex or "The page-1 value figure is" in raw_tex:
         failures.append("the teaser include has a missing-file fallback")
+    for source in (raw_tex, supplement_source):
+        failures.extend(table_family_failures(strip_tex_comments(source)))
+    for path in sorted((ROOT / "generated").glob("*.tex")):
+        failures.extend(table_family_failures(strip_tex_comments(path.read_text())))
     tex = strip_comments(raw_tex)
     # Drop verbatim-ish inputs of generated tables; those files are the generator.
     body = "\n".join(line for line in tex.splitlines() if "\\input{generated/" not in line)

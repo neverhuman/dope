@@ -66,14 +66,13 @@ $^1$NEVERHUMAN Research}
 \renewcommand{\headrulewidth}{0pt}
 
 \begin{abstract}
-We introduce \textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE), the byte-budgeted tabular encoding and the generator that encoding writes.
+A generator paper often reports the metric that also selected the configuration, and those native scores live on different scales.
+\textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE) is the byte-budgeted tabular encoding and the generator that encoding writes.
 Retention, the shared utility column, is a null-normalized train-on-synthetic/train-on-real ratio~\citep{esteban2017rcgan}. A retention leaves the release gate closed.
 On $\NDopeCb$ informative PMLB regression lineages, fit seed $11$ and synthetic size $4n$, the CatBoost median retention is $\MedDopeCb$ (95\% lineage-bootstrap interval $\LoDopeCb$ to $\HiDopeCb$).
 The strongest classical full-panel baseline is author-default ARF. The DOPE generator's retention minus ARF has CatBoost paired median $\DiffArfCb$, with family-cluster bootstrap interval $\LoDiffArfCb$ to $\HiDiffArfCb$ ($n=\NDiffArfCb$; \WtlArfCb).
-The linear ARF interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.
-Inside the density block the strongest tuned baseline is the Gaussian copula. Its linear interval is $\LoDiffLinGauss$ to $\HiDiffLinGauss$ and contains zero. Equivalence stays unclaimed.
+Inside the density block the strongest tuned baseline is the Gaussian copula. Equivalence stays unclaimed.
 Forest-Flow leads on its $\NForestCb$-lineage block, and that Holm test stays non-significant.
-Kumo large, Mitra, and TabICL stay unpooled from CatBoost.
 MFS-v2 and MFS-v3 stay null. Official tests stay sealed.
 The distance ledger stays outside differential privacy and outside HIPAA de-identification.
 The $10{,}240$-byte cap is a release gate.
@@ -81,16 +80,15 @@ The $10{,}240$-byte cap is a release gate.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=1.0\linewidth]{figures/teaser.pdf}
-  \caption{Paired retention differences at synthetic size $4n$. The horizontal axis is the DOPE generator's retention minus the named comparator.
-  Each filled mark is one lineage. The open mark is the stored paired median and the bar is its 95\% family-cluster bootstrap interval.
-  Circles are author-default ARF. Squares are the Gaussian copula and triangles are Chow--Liu, both on the density block.
-  The count in each panel title is that auditor's paired informative lineages. Points outside $[-1.5,\,1.5]$ stay in the title count and are clipped in the frame.
+  \includegraphics[width=\linewidth,height=0.30\textheight,keepaspectratio]{figures/teaser.pdf}
+  \caption{Paired retention differences at synthetic size $4n$. The axis is the DOPE generator's retention minus the named comparator.
+  Filled marks are lineages. The open mark is the paired median and the bar is its 95\% family-cluster bootstrap interval.
+  Circles are author-default ARF. Squares are the Gaussian copula and triangles are Chow--Liu.
+  The count in each panel title is that auditor's paired informative lineages.
   The CatBoost ARF paired median is $\DiffArfCb$, family-cluster bootstrap $\LoDiffArfCb$ to $\HiDiffArfCb$ ($n=\NDiffArfCb$).
-  The linear ARF interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero. The drawn linear copula bar contains zero.
-  The density-block linear copula lineage-bootstrap interval is $\LoDiffLinGauss$ to $\HiDiffLinGauss$, contains zero, and stays in the tables.
-  Equivalence stays unclaimed.
-  CatBoost, the linear auditor, and the MLP stay unpooled. Forest-Flow is a separate block and stays off this figure.
+  The linear ARF interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.
+  Equivalence stays unclaimed. The three auditors stay unpooled.
+  Forest-Flow is a separate block and stays off this figure.
   No Holm test is drawn here. MFS-v2 and MFS-v3 stay null, and a retention leaves the $10{,}240$-byte gate closed.}
   \label{fig:teaser}
 \end{figure}
@@ -146,7 +144,7 @@ failed gate removes the scalar rather than publishing a small number.
   That procedure stays off the production default and leaves the
   $4{,}168$-dimensional router unused.
   \item \textbf{Retention with lineage-bootstrap intervals.}
-  Retention on the validation panel, with lineage-bootstrap intervals.
+  The validation panel reports retention with a lineage-bootstrap interval.
   The algebra of a retention value is \cref{sec:retention}, \eqref{eq:retention}.
   The supplement draws the CatBoost level of that value. \cref{fig:teaser}
   shows the DOPE generator's retention minus author-default ARF, the
@@ -175,6 +173,11 @@ ablation grid is \FullAblationGrid. A release at the
 10{,}240-byte tier is a separate claim from the byte cap, and that claim stays
 unmade here. \cref{sec:threats} records what these limits do to the
 estimates. An unexecuted method stays outside any DOPE win.
+
+\paragraph{Nomenclature.}
+DOPE is the byte-budgeted encoding and the generator that encoding writes.
+Retention is the null-normalized ratio in \eqref{eq:retention}.
+MFS-v2, MFS-v3, and PTF-v1 are unscored release contracts.
 
 \section{Method}
 \label{sec:method}
@@ -302,8 +305,6 @@ distribution fidelity $0.20$, structure fidelity $0.15$, coverage realism
 $0.10$, and compactness $0.05$.
 
 The supplement states what each of the six components measures.
-Coverage realism, on a fixed embedding of holdout rows, is $0.25$ precision,
-$0.25$ recall, $0.20$ density capped at $1$, and $0.30$ coverage.
 Compactness is $\mathrm{clamp}(1 - \mathrm{bytes}/10240,\, 0,\, 1)$. An
 artifact past $10{,}240$ bytes fails the byte gate, and the scalar stays
 null. Crossing the cap is a failed gate, distinct from a retention of zero.
@@ -327,26 +328,17 @@ With $W=\sum_i w_i$,
 when the four prerequisites hold, every hard gate passed, and every
 positive-weight component is finite and inside $[0,1]$. Otherwise the
 scalar is null. A profile of all ones is $100$ under \eqref{eq:mfsv3}.
-\eqref{eq:mfs} adds $\epsilon$ inside the logarithm, so that historical
-formula leaves the same profile outside the v3 clip. The illustration
-stays arithmetic on \eqref{eq:mfs} and stays out of these tables.
-The supplement's generated rows use \eqref{eq:mfsv3}.
 The four prerequisites are a complete real-versus-real control, the
 required size cells, verified artifact-only sampling, and locked metric
 implementations. The Python scorer and the native Rust v3 evaluator both
 take $\max(c_i,\epsilon)$ inside the logarithm, clip the result to $[0,100]$,
 and withhold the scalar when a prerequisite or a hard gate is missing.
 The historical Rust path for \eqref{eq:mfs} remains that v2 formula.
-
-PTF-v1 is the other release KPI. It is null here, as are MFS-v2 and MFS-v3.
-The compile-time proxy $0.45u + 0.25d + 0.30j$ stays outside
+PTF-v1, MFS-v2, and MFS-v3 stay null on every method in these tables.
+The cleartext scan stays unscanned where the stored column codes are internal identifiers, so the scalar stays null.
+The supplement records the historical placement of $\epsilon$, keeps the illustration out of these tables, and applies the bounded formula to invented components.
+A retention stays distinct from the scalar. The compile-time proxy $0.45u + 0.25d + 0.30j$ stays outside
 \eqref{eq:mfs} and \eqref{eq:mfsv3}.
-No artifact in this paper has a measured MFS-v2 or MFS-v3 value.
-The cleartext scan is unscanned where the stored column codes are internal
-identifiers, and other gates fail on many lineages, so the scalar stays
-null. A retention stays distinct from the scalar.
-The supplement records what a later emission requires and applies the bounded formula to invented components.
-No method in the tables receives that score.
 
 \section{Experimental Setup}
 \label{sec:setup}
@@ -415,8 +407,11 @@ The DOPE generator's retention minus ARF has CatBoost paired median $\DiffArfCb$
 The MLP interval is $\LoDiffArfMlp$ to $\HiDiffArfMlp$ ($n=\NDiffArfMlp$; \WtlArfMlp).
 Those three intervals are the family-cluster bootstrap of the median. The legacy simultaneous median interval stays in the supplement.
 \cref{tab:headline} places those full-panel rows beside the strongest tuned baseline inside each block.
-\ArfResult\ is the displayed-profile publication median and answers a different row from the retained classical cohort.
-The Chow--Liu CatBoost median in this density block is $\MedChowCb$. The supplement's threshold table counts a different informative set.
+\ArfResult\ is the displayed-profile publication median on the paired informative lineages in that publication row.
+The author-default ARF CatBoost size-$4n$ cell in \cref{tab:sizen} is the hierarchical median on that file's own informative count, under the median-of-seeds rule.
+The retained-classical table averages the three sample seeds before its lineage-bootstrap median, on its own informative count, and that receipt stays separate from \cref{tab:sizen}.
+\MedDopeCb\ is the lineage-bootstrap median on the density-block paired set, and the DOPE CatBoost size-$4n$ cell in \cref{tab:sizen} is the hierarchical median on that file's own count.
+\MedChowCb\ is the density-block paired median. The Chow--Liu CatBoost size-$4n$ cell in \cref{tab:sizen} is the hierarchical median on that file's own count. The supplement's threshold table counts a different informative set.
 The paired median difference stays distinct from the difference of the two medians.
 $\DiffGaussCb$ stays distinct from $\MedDopeCb$ minus $\MedGaussCb$.
 

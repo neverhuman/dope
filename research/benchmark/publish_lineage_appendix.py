@@ -258,11 +258,13 @@ def lineage_caption(kind, rows, columns):
         "It is not a release certificate."
     )
     if omitted:
-        return (
+        text = (
             f"{kind}. {shown} lineages have a charged byte count or a retention. "
             f"{omitted} lineages have neither and are omitted. {cap}"
         )
-    return f"{kind}, all {len(rows)} lineages. {cap}"
+    else:
+        text = f"{kind}, all {len(rows)} lineages. {cap}"
+    return text + " No Holm family."
 
 
 def write_longtable(path, caption, rows, columns):
