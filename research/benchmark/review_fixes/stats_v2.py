@@ -67,19 +67,48 @@ def _clusters(lineages) -> list[list[str]]:
     return [members[key] for key in sorted(members)]
 
 
-def _draw_lineages(rng, clusters) -> list[str]:
-    drawn = []
-    for index in rng.integers(0, len(clusters), size=len(clusters)):
-        group = clusters[int(index)]
-        for member in rng.integers(0, len(group), size=len(group)):
-            drawn.append(group[int(member)])
-    return drawn
+class _Design:
+    """Padded arrays for a vectorized cluster -> lineage -> fit bootstrap."""
+
+    def __init__(self, order: list[str], clusters: list[list[str]]):
+        position = {dataset: index for index, dataset in enumerate(order)}
+        self.sizes = np.asarray([len(group) for group in clusters])
+        width = int(self.sizes.max())
+        self.members = np.zeros((len(clusters), width), dtype=int)
+        for row, group in enumerate(clusters):
+            self.members[row, :len(group)] = [position[dataset] for dataset in group]
+        self.columns = np.arange(width)[None, :]
+
+    def lineages(self, rng) -> np.ndarray:
+        chosen = rng.integers(0, len(self.sizes), size=len(self.sizes))
+        sizes = self.sizes[chosen][:, None]
+        picks = np.floor(rng.random((len(chosen), self.members.shape[1])) * sizes).astype(int)
+        return self.members[chosen[:, None], picks][self.columns < sizes]
 
 
-def _draw_value(rng, values: np.ndarray) -> float:
-    if values.size == 1:
-        return float(values[0])
-    return float(np.median(values[rng.integers(0, values.size, size=values.size)]))
+def _padded(values: list[np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
+    counts = np.asarray([item.size for item in values])
+    table = np.full((len(values), int(counts.max())), np.nan)
+    for row, item in enumerate(values):
+        table[row, :item.size] = item
+    return table, counts
+
+
+def _fit_medians(rng, table: np.ndarray, counts: np.ndarray, drawn: np.ndarray) -> np.ndarray:
+    """Median of a with-replacement fit resample inside each drawn lineage."""
+    width = table.shape[1]
+    sizes = counts[drawn]
+    picks = np.floor(rng.random((drawn.size, width)) * sizes[:, None]).astype(int)
+    values = table[drawn[:, None], picks]
+    values[np.arange(width)[None, :] >= sizes[:, None]] = np.inf
+    values.sort(axis=1)
+    rows = np.arange(drawn.size)
+    return (values[rows, (sizes - 1) // 2] + values[rows, sizes // 2]) / 2.0
+
+
+def _walsh_median(values: np.ndarray) -> float:
+    upper = np.triu_indices(values.size)
+    return float(np.median((values[upper[0]] + values[upper[1]]) / 2.0))
 
 
 def nested_level(items, label: str, min_fits: int = 1, draws: int = DRAWS) -> dict:
@@ -88,17 +117,19 @@ def nested_level(items, label: str, min_fits: int = 1, draws: int = DRAWS) -> di
     n = len(lineages)
     if n == 0:
         return {"n": 0, "n_fits": 0, "median": None, "lo": None, "hi": None}
-    arrays = {key: np.asarray(slot["values"]) for key, slot in lineages.items()}
-    point = float(np.median([np.median(values) for values in arrays.values()]))
-    n_fits = sum(values.size for values in arrays.values())
+    order = sorted(lineages)
+    arrays = [np.asarray(lineages[key]["values"]) for key in order]
+    point = float(np.median([np.median(values) for values in arrays]))
+    n_fits = sum(values.size for values in arrays)
     if n == 1:
         return {"n": 1, "n_fits": n_fits, "median": point, "lo": None, "hi": None,
                 "ci_status": "not_identified_single_lineage"}
     rng = rng_for(label + "|level")
-    clusters = _clusters(lineages)
+    design = _Design(order, _clusters(lineages))
+    table, counts = _padded(arrays)
     samples = np.empty(draws)
     for draw in range(draws):
-        samples[draw] = np.median([_draw_value(rng, arrays[key]) for key in _draw_lineages(rng, clusters)])
+        samples[draw] = np.median(_fit_medians(rng, table, counts, design.lineages(rng)))
     lo, hi = np.quantile(samples, [0.025, 0.975])
     return {"n": n, "n_fits": n_fits, "median": point, "lo": float(lo), "hi": float(hi)}
 
@@ -115,9 +146,9 @@ def nested_paired(left_items, right_items, label: str, min_fits_left: int = 1,
     for dataset in shared:
         if left[dataset]["cluster"] != right[dataset]["cluster"]:
             raise ValueError("paired lineages disagree on the cluster")
-    left_arrays = {key: np.asarray(left[key]["values"]) for key in shared}
-    right_arrays = {key: np.asarray(right[key]["values"]) for key in shared}
-    diffs = [float(np.median(left_arrays[key]) - np.median(right_arrays[key])) for key in shared]
+    left_arrays = [np.asarray(left[key]["values"]) for key in shared]
+    right_arrays = [np.asarray(right[key]["values"]) for key in shared]
+    diffs = [float(np.median(a) - np.median(b)) for a, b in zip(left_arrays, right_arrays)]
     result = {"n": len(shared), "median": None, "hl": None, "median_lo": None, "median_hi": None,
               "hl_lo": None, "hl_hi": None, "hl_lo90": None, "hl_hi90": None, "hl_p05": None,
               **win_tie_loss(diffs), "wilcoxon_p": wilcoxon_p(diffs), "differences": diffs,
@@ -130,14 +161,17 @@ def nested_paired(left_items, right_items, label: str, min_fits_left: int = 1,
         result["ci_status"] = "not_identified_single_lineage"
         return result
     rng = rng_for(label + "|paired")
-    clusters = _clusters({key: left[key] for key in shared})
+    design = _Design(shared, _clusters({key: left[key] for key in shared}))
+    left_table, left_counts = _padded(left_arrays)
+    right_table, right_counts = _padded(right_arrays)
     medians = np.empty(draws)
     walsh = np.empty(draws)
     for draw in range(draws):
-        sample = [_draw_value(rng, left_arrays[key]) - _draw_value(rng, right_arrays[key])
-                  for key in _draw_lineages(rng, clusters)]
+        drawn = design.lineages(rng)
+        sample = (_fit_medians(rng, left_table, left_counts, drawn)
+                  - _fit_medians(rng, right_table, right_counts, drawn))
         medians[draw] = np.median(sample)
-        walsh[draw] = hodges_lehmann(sample)
+        walsh[draw] = _walsh_median(sample)
     result["median_lo"], result["median_hi"] = (float(x) for x in np.quantile(medians, [0.025, 0.975]))
     result["hl_lo"], result["hl_hi"] = (float(x) for x in np.quantile(walsh, [0.025, 0.975]))
     result["hl_lo90"], result["hl_hi90"] = (float(x) for x in np.quantile(walsh, [0.05, 0.95]))
