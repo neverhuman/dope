@@ -20,7 +20,7 @@ from research.benchmark.publish_baseline_completion import build, load_sources, 
 
 STATIC = REPO / 'ops/ci/paper-inputs'
 OUT = REPO / 'docs/whitepaper/generated'
-LOCK_SHA256 = 'd174d61e40345ad121bfc752997abdc09d9bbddf4679c6fd474035ec1244f229'
+LOCK_SHA256 = 'c1c7142eed329e15ebdd2cd5745817962c03d09a68786166655cc159e2f97b81'
 INVENTORY_SHA256 = '504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64'
 
 
