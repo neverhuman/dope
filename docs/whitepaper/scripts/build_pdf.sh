@@ -28,7 +28,8 @@ build_one() {
   local stem="$1"
   # latexmk reruns pdflatex and bibtex until the citation and reference labels settle.
   # A document with no bibliography does not invoke bibtex.
-  nice -n 10 ionice -c 3 latexmk -pdf '-usepretex=\pdftrailerid{}\pdfsuppressptexinfo=-1' -outdir="$build_root" -interaction=nonstopmode -halt-on-error -file-line-error "$stem"
+  # Force a pass: latexmk can retain a PDF after only engine options change.
+  nice -n 10 ionice -c 3 latexmk -g -pdf '-usepretex=\pdftrailerid{}\pdfsuppressptexinfo=-1' -outdir="$build_root" -interaction=nonstopmode -halt-on-error -file-line-error "$stem"
   cp "$build_root/$stem.log" "$build_root/$stem-3.log"
   cp "$build_root/$stem.pdf" "$stem.pdf"
 }
