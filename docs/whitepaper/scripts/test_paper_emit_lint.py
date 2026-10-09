@@ -40,6 +40,20 @@ class PaperEmitLintTest(unittest.TestCase):
         manuscript = "TabSyn cost is \\TabSynPanel. TabDDPM cost is \\TabDDPMPanel."
         paper_emit.assert_no_adjacent_repeat(lines, manuscript)
 
+    def test_arf_macros_follow_the_review_panel(self):
+        rows = paper_emit.arf_author_default_rows()
+        cat = rows["catboost"]
+        linear = rows["linear"]
+        self.assertLess(cat["lo"], cat["median"])
+        self.assertLess(cat["median"], cat["hi"])
+        self.assertLess(linear["lo"], 0)
+        self.assertGreater(linear["hi"], 0)
+        lines = paper_emit.arf_paired_commands(lambda name, body: f"{name}={body}")
+        self.assertIn(f"DiffArfCb={float(cat['median']):.4f}", lines)
+        self.assertIn(f"LoDiffArfLin={float(linear['lo']):.4f}", lines)
+        self.assertIn(f"NDiffArfCb={int(cat['n'])}", lines)
+        self.assertNotIn(" not ", " ".join(lines))
+
     def test_committed_manuscript_has_no_repeated_phrase(self):
         text = MANUSCRIPT.read_text()
         self.assertNotIn("not measured and not measured", text)
