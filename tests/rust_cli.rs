@@ -20,6 +20,87 @@ fn text(path: &Path) -> String {
     path.to_string_lossy().into_owned()
 }
 
+#[test]
+fn explicit_fit_seed_preserves_historical_seed_11_artifact_bytes() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("target/cli-fit-seed-conformance")
+        .join(std::process::id().to_string());
+    fs::create_dir_all(&root).unwrap();
+    let train = (0..64)
+        .map(|row| {
+            let x = row as f64 / 63.0;
+            format!("{x},{},{}\n", x * x, 0.2 + 0.5 * x)
+        })
+        .collect::<String>();
+    fs::write(root.join("train.csv"), train).unwrap();
+    let fit = |flag: &str, seed: u64, name: &str| {
+        let out = root.join(name);
+        let mut command = Command::new(env!("CARGO_BIN_EXE_dope-kernel"));
+        command.env_remove("DOPE_RESEARCH_TARGET_PROFILE");
+        command.env_remove("DOPE_RESEARCH_TARGET_DEVICE");
+        command.env_remove("DOPE_RESEARCH_LOSS_LOG");
+        command.env_remove("DOPE_RESEARCH_VALIDATION_CSV");
+        // The research-runtime version exercises the actual frozen learned target.
+        // Ordinary builds verify the identical CLI-to-codec seed boundary.
+        #[cfg(feature = "gpu-research-training")]
+        command
+            .env("DOPE_RESEARCH_TARGET_PROFILE", "features12_steps2048")
+            .env("DOPE_RESEARCH_TARGET_DEVICE", "cpu")
+            .env("CUDA_VISIBLE_DEVICES", "")
+            .env("OMP_NUM_THREADS", "1")
+            .env("MKL_NUM_THREADS", "1");
+        #[cfg(all(feature = "gpu-training", not(feature = "gpu-research-training")))]
+        command.env("CUBLAS_WORKSPACE_CONFIG", ":4096:8");
+        let output = command
+            .args([
+                "compile",
+                "--dataset-dir",
+                &text(&root),
+                "--task",
+                "regression",
+                "--out",
+                &text(&out),
+                "--candidate",
+                "compact_neural_residual_symbolic",
+                "--tier",
+                "l0",
+                flag,
+                &seed.to_string(),
+            ])
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "fit failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        fs::read(out).unwrap()
+    };
+    let historical = fit("--seed", 11, "historical-11.dpk");
+    let explicit = fit("--fit-seed", 11, "explicit-11.dpk");
+    assert_eq!(historical, explicit);
+    let distinct = fit("--fit-seed", 23, "explicit-23.dpk");
+    assert_ne!(historical, distinct);
+    assert_eq!(fit("--fit-seed", 23, "replay-23.dpk"), distinct);
+    #[cfg(feature = "gpu-research-training")]
+    {
+        let target = |bytes: &[u8]| {
+            let loaded = dope_kernel::codec::decode_kernel(bytes).unwrap();
+            match loaded {
+                dope_kernel::codec::LoadedKernel::V2(kernel)
+                | dope_kernel::codec::LoadedKernel::V3(kernel) => {
+                    serde_json::to_value(kernel.symbolic().unwrap().1).unwrap()
+                }
+                dope_kernel::codec::LoadedKernel::V1(_) => {
+                    panic!("expected native learned artifact")
+                }
+            }
+        };
+        // Prove dispersion in fitted weights, separately from the encoded seed.
+        assert_ne!(target(&historical), target(&distinct));
+    }
+}
+
 #[cfg(not(feature = "gpu-training"))]
 #[test]
 fn explicit_cpu_research_request_cannot_fall_back_to_native_fixed_weights() {

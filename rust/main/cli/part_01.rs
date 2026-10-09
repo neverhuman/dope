@@ -157,7 +157,8 @@ enum Command {
         report: Option<PathBuf>,
         #[arg(long)]
         pareto_frontier: Option<PathBuf>,
-        #[arg(long)]
+        /// Fit seed, also stored in the encoded artifact; sampling uses its own seed.
+        #[arg(long, visible_alias = "fit-seed")]
         seed: Option<u64>,
         #[arg(long)]
         deadline_seconds: Option<f64>,
