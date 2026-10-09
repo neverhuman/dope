@@ -1264,14 +1264,6 @@
     "ops/ci/paper-architecture.tex": {
       "command": "just paper-check",
       "purpose": "rebuild the cropped architecture from tracked TikZ and generated macros, verify its source/PDF hashes, fonts and warning-free log without ICLR review line numbers"
-    },
-    "research/benchmark/bounded_auditors.py": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics research.benchmark.tests.test_real_test_utility -v",
-      "purpose": "verify explicit four-thread feature-importance and prediction calls for future auditors while preserving historical measured harness identities and numerical equations"
-    },
-    "research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/": {
-      "command": "python3 -I -S -B research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/render.py --check",
-      "purpose": "replay 400 frozen Forest-Flow additional fit dispositions, four additional seed coverage, declared artifact bytes and alternate successful timer sums; keep five-fit coverage and quality scores null"
     }
   }
 }
