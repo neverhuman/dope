@@ -18,6 +18,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO))
 
+from research.benchmark.review_fixes.review_tex import longtable  # noqa: E402
 from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
     GENERATED,
     RESULTS,
@@ -27,7 +28,6 @@ from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
     write_tex,
     _load,
     _sha,
-    _table,
     ci,
 )
 from research.benchmark.review_fixes.stats import cluster_of, median_ci  # noqa: E402
@@ -138,22 +138,25 @@ def render_privacy(payload: dict) -> str:
             f"{tex_name(row['method'])} & matched density & {row['size']}$n$ & "
             f"{tex_name(row['metric'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
         )
-    unavailable = " ".join(
-        f"{tex_name(row['method'])} {row['reason']} {row['n']}."
-        for row in payload["unavailable"]
+    unavailable = "; ".join(
+        f"{tex_name(row['method'])} {row['n']} ({tex_name(row['reason'])})" for row in payload["unavailable"]
+    ) or "none"
+    caption = (
+        "\\textbf{Holdout privacy and CatBoost detection, fit seed 11.} Each value is the median over lineages of "
+        "each lineage's median over three sample seeds, with the family-cluster bootstrap interval. Own rows use "
+        "each method's lineages whose synthetic row count equals fit rows times size; matched-density rows use the "
+        "lineages shared by DOPE, the Gaussian copula, Chow--Liu, and independent marginals. Fit DCR and NNDR use "
+        "the fit rows as the reference set and holdout DCR the validation rows, about a quarter as many. Distance "
+        "MIA AUC is an empirical membership attack, and c2st\\_catboost\\_auc is the CatBoost detector. These are "
+        "empirical attack scores, not formal differential privacy and not HIPAA de-identification. Unavailable "
+        f"cells are no wins: {unavailable}. No Holm family."
     )
-    return (
-        "% Empirical attack metrics only. Not formal differential privacy and not HIPAA de-identification. "
-        "c2st\\_catboost\\_auc is the GBDT detector. Stored logistic C2ST is a different table. "
-        "Unmatched rows keep each method's own lineages whose synthetic row count equals fit rows times size. "
-        "Matched density rows use the intersection of DOPE, GaussianCopula, Chow-Liu, and independent marginals. "
-        "Unavailable cells are not wins. "
-        + unavailable
-        + "\n"
-    ) + _table(
+    return longtable(
+        caption,
         "Method & Configuration & Size & Metric & $n$ lineages & Median & Hierarchical CI",
         lines,
         "lllllrr",
+        label="tab:review-privacy",
     )
 
 

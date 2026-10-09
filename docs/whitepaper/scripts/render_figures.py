@@ -18,6 +18,14 @@ import matplotlib
 
 matplotlib.use("Agg")
 import figure_style
+from figure_spec import (
+    LOSS_Y_LIM,
+    PAIRED_X_LIM,
+    RANK_X_LIM,
+    RANK_Y_LIM,
+    RETENTION_BARS_Y_LIM,
+    Y_LIM,
+)
 
 # Composed at 7.16in and placed at \textwidth (516pt). TeX reads that
 # PDF as 517.45pt, so 8.1pt here remains at least 8pt after placement.
@@ -41,7 +49,6 @@ METHODS = (
     ("Chow-Liu", "Chow-Liu", figure_style.CHOW, "^"),
     ("independent_marginals", "Independent", figure_style.INDEPENDENT, "D"),
 )
-Y_LIM = (-1.5, 1.6)
 
 
 def load_json(path):
@@ -156,14 +163,14 @@ def draw_paired(stats, dest=None):
         values = np.sort(np.asarray(pairs[key]["differences"], dtype=float))
         axis.scatter(values, np.arange(1, values.size + 1), s=14, c=color, marker=marker, linewidths=0)
         axis.axvline(0, color="#333333", linewidth=0.6)
-        axis.set_xlim(-1.5, 1.5)
+        axis.set_xlim(*PAIRED_X_LIM)
         # One shared phrase. Repeating it under every panel collides in DejaVu Sans.
         if column == 1:
             axis.set_xlabel("retention difference (dimensionless)", fontsize=7)
         if column == 0:
             axis.set_ylabel("sorted lineage index")
         lo, hi = pairs[key]["lo"], pairs[key]["hi"]
-        outside = int(np.sum((values < -1.5) | (values > 1.5)))
+        outside = int(np.sum((values < PAIRED_X_LIM[0]) | (values > PAIRED_X_LIM[1])))
         figure_style.panel(axis, grid="both")
         axis.set_title(
             f"{label}\n{pairs[key]['median_difference']:.3f} [{lo:.3f}, {hi:.3f}] ({outside} outside)",
@@ -184,8 +191,8 @@ def draw_paired(stats, dest=None):
     axis.plot([1.0, 1.0], [-0.52, -0.38], color="#222222", linewidth=1.0)
     axis.plot([1.0 + cd, 1.0 + cd], [-0.52, -0.38], color="#222222", linewidth=1.0)
     axis.text(1.0 + cd / 2, -0.62, f"critical difference {cd:.3f}", ha="center", va="top", fontsize=FONT_PT)
-    axis.set_xlim(0.8, 4.3)
-    axis.set_ylim(-0.9, 0.7)
+    axis.set_xlim(*RANK_X_LIM)
+    axis.set_ylim(*RANK_Y_LIM)
     axis.set_yticks([])
     axis.set_xlabel("average rank (1 is highest retention)")
     axis.set_title(f"CatBoost, {friedman['n']} lineages", pad=6)
@@ -245,7 +252,7 @@ def draw_loss(dest=None, summary_dest=None):
         axis.set_xlabel("AdamW step")
         axis.set_ylabel("hidden-basis MSE" if profile.endswith("2048") else "")
         axis.set_yscale("log")
-        axis.set_ylim(3e-4, 0.7)
+        axis.set_ylim(*LOSS_Y_LIM)
         title = "2,048 steps" if profile.endswith("2048") else "8,192 steps, not displayed"
         figure_style.panel(axis, grid="both")
         axis.set_title(f"{title}, {matrix.shape[0]} lineages")
@@ -363,7 +370,7 @@ def draw_retention_bars(stats, dest=None, *, readme=False):
             axis.set_xlabel("method")
     else:
         axes[0].set_ylabel("CatBoost retention (dimensionless)")
-    axes[0].set_ylim(-0.42, 1.22)
+    axes[0].set_ylim(*RETENTION_BARS_Y_LIM)
     figure.tight_layout(pad=0.45)
     path = Path(dest) if dest is not None else FIG / "retention-bars.pdf"
     if readme:

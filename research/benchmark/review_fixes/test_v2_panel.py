@@ -16,7 +16,7 @@ def raw(method, configuration, dataset, fit_seed, sample_seed, size, retention, 
                       "retention": retention if informative else None} for name in P.AUDITORS}
     return {"status": "ok", "method": method, "configuration": configuration, "dataset": dataset,
             "fit_seed": fit_seed, "sample_seed": sample_seed, "size": size, "official_tests_opened": False,
-            "synthetic_sha256": "a" * 64,
+            "synthetic_sha256": "a" * 64, "binary_sha256": CONTRACT["headline_binary"],
             "report": {"implementation_sha256": CONTRACT["implementation_sha256"],
                        "dependencies": CONTRACT["dependencies"], "null_loss": 1.0, "utility": utility}}
 
@@ -60,8 +60,8 @@ class BinderTests(unittest.TestCase):
             only = B.collect([(root / "a", "t", None)], CONTRACT)
             meta = B.write_ledger(only, Path(tmp) / "out" / "scalar-cells.jsonl", CONTRACT)
             self.assertEqual(meta["cells"], 1)
-            override = B.collect([(root / "b", "t", "headline_bnew")], CONTRACT)
-            self.assertEqual(override[0]["configuration"], "headline_bnew")
+            override = B.collect([(root / "b", "t", "fourseed_bnew")], CONTRACT)
+            self.assertEqual(override[0]["configuration"], "fourseed_bnew")
 
 
 class FitLedgerTests(unittest.TestCase):
@@ -96,6 +96,25 @@ class PanelTests(unittest.TestCase):
         cells = [cell for cell in ledger(n_lineages=6) if not (cell["method"] == "TabSyn" and cell["sample_seed"] == 307)]
         panel = P.reduce(cells, {}, draws=50)
         self.assertFalse(any(item["method"] == "TabSyn" for item in panel["contrasts"]))
+
+    def test_sample_identity_counts_fits_with_equal_digests(self):
+        cells = ledger(n_lineages=3)
+        copies = [dict(cell, configuration="headline_bnew") for cell in cells
+                  if cell["method"] == "DOPE" and cell["fit_seed"] == 11]
+        copies[0] = dict(copies[0], synthetic_sha256="b" * 64)
+        identity = P.sample_identity(cells + copies)
+        self.assertEqual(identity["headline_bnew"], {"fits": 3, "identical": 2})
+        self.assertEqual(identity["historical_seed11"], {"fits": 0, "identical": 0})
+
+    def test_dope_cells_must_come_from_ok_fits(self):
+        cells = ledger(n_lineages=2)
+        fits = [{"configuration": "headline", "dataset": f"{index:016x}", "fit_seed": seed, "status": "ok",
+                 "official_tests_opened": False} for index in range(2) for seed in (11, 23, 37)]
+        P.check_fits(cells, fits)
+        with self.assertRaisesRegex(ValueError, "no ok fit"):
+            P.check_fits(cells, fits[1:])
+        with self.assertRaisesRegex(ValueError, "no ok fit"):
+            P.check_fits(cells, [])
 
     def test_below_minimum_pairs_has_no_test(self):
         panel = P.reduce(ledger(n_lineages=4), {}, draws=50)

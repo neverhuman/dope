@@ -15,11 +15,14 @@ from pathlib import Path
 _SCRIPTS = Path(__file__).resolve().parent
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
+from paper_v2_guards import run_v2_lint
 from public_hardware import banned_hits
 
 ROOT = Path(__file__).resolve().parents[1]
 TEX = ROOT / "dope-mfs.tex"
 NUMBERS = ROOT / "generated" / "numbers.tex"
+FIGURE_MACROS = ROOT / "generated" / "figure-spec.tex"
+NUMBERS_V2 = ROOT / "generated" / "v2-numbers.tex"
 FIGURES = (
     ROOT / "dope-mfs.pdf",
     ROOT / "dope-mfs-anonymous.pdf",
@@ -36,7 +39,9 @@ FIGURES = (
     # Drawn at the 5.5in text width. The other plots stay 7.16in.
     ROOT / "figures" / "teaser.pdf",
     ROOT / "figures" / "architecture.pdf",
+    ROOT / "figures" / "pareto.pdf",
 )
+NARROW_FIGURES = ("teaser.pdf", "architecture.pdf", "pareto.pdf")
 # A measurement typed into the prose. Integers and one-decimal illustration
 # values such as the MFS arithmetic example stay in the generator instead.
 RAW_DECIMAL = re.compile(r"(?<![\w.\\])\d+\.\d{4,}(?![\w])")
@@ -205,13 +210,20 @@ def main() -> int:
         defined = set(MACRO_DEF.findall(number_sources))
         # Also accept commands defined with \def\Name
         defined.update(re.findall(r"\\def\\(\w+)", number_sources))
+        # Figure windows come from figure_spec.py through their own generated file.
+        if FIGURE_MACROS.is_file():
+            defined.update(MACRO_DEF.findall(FIGURE_MACROS.read_text()))
+        if NUMBERS_V2.exists():
+            defined.update(MACRO_DEF.findall(NUMBERS_V2.read_text()))
+        else:
+            failures.append("generated/v2-numbers.tex is missing")
         used = set(MACRO_USE.findall(body))
         missing = sorted(
             name for name in used
             if name not in defined and name not in _LATEX and not name.startswith("IEEE")
         )
         if missing:
-            failures.append("macros used but not defined in numbers.tex: " + ", ".join(missing))
+            failures.append("macros used but not defined in numbers.tex or v2-numbers.tex: " + ", ".join(missing))
     else:
         failures.append("generated/numbers.tex is missing")
     if NUMBERS.exists() and "\\newcommand{\\FigWidth}{7.16in}" not in NUMBERS.read_text():
@@ -237,6 +249,11 @@ def main() -> int:
         recorded_hashes.update(json.loads(mfs_hash_path.read_text()).get("pdf_sha256") or {})
     else:
         failures.append("generated/mfs-v3-figure-hashes.json is missing")
+    pareto_hash_path = ROOT / "generated" / "pareto-figure-hashes.json"
+    if pareto_hash_path.is_file():
+        recorded_hashes.update(json.loads(pareto_hash_path.read_text()).get("pdf_sha256") or {})
+    else:
+        failures.append("generated/pareto-figure-hashes.json is missing")
     teaser_hash_path = ROOT / "generated" / "teaser-figure-hashes.json"
     if teaser_hash_path.is_file():
         recorded_hashes.update(json.loads(teaser_hash_path.read_text()).get("pdf_sha256") or {})
@@ -270,7 +287,7 @@ def main() -> int:
             for line in info.splitlines():
                 if line.startswith("Page size:"):
                     width = float(line.split()[2]) / 72.0
-            expected = 5.5 if path.name in ("teaser.pdf", "architecture.pdf") else 7.16
+            expected = 5.5 if path.name in NARROW_FIGURES else 7.16
             if width is None or abs(width - expected) > 0.02:
                 failures.append(f"{path.name} width is not {expected:.2f}in")
     manuscript_texts = [TEX, ROOT / "supplement.tex"]
@@ -325,6 +342,7 @@ def main() -> int:
         hits = latex_warnings(log.read_text(errors="replace"))
         if hits:
             failures.append(log.name + ": " + " | ".join(hits[:6]))
+    failures.extend(run_v2_lint())
     if failures:
         print("\n".join(failures))
         return 1
@@ -350,6 +368,7 @@ _LATEX = {
     "Maketitle",
     "Midrule",
     "Paragraph",
+    "Phi",
     "Ref",
     "Section",
     "Sigma",

@@ -79,7 +79,7 @@ class EmitterTests(unittest.TestCase):
         text = E.macros(panel(), BYTES, [], PRIVACY)
         self.assertTrue("\\newcommand{\\VParetoSet}{DOPE (ours)}" in text)
         self.assertTrue("\\newcommand{\\VSizeRankSame}{is the same at both sizes}" in text)
-        self.assertTrue("\\newcommand{\\VEquivSentence}{No comparison meets that rule.}" in text)
+        self.assertTrue("\\newcommand{\\VEquivSentence}{No generator comparison meets that rule.}" in text)
 
     def test_missing_strongest_refuses(self):
         broken = panel()
@@ -91,7 +91,7 @@ class EmitterTests(unittest.TestCase):
         table = E.headline_table(panel(), BYTES)
         body = [line for line in table.splitlines() if line.endswith("\\\\") and "&" in line][1:]
         self.assertTrue(body[0].startswith("TabSyn (scaled schedule)"))
-        self.assertIn("\\shortstack", E.size_table(panel()))
+        self.assertIn("\\begin{tabular}[t]", E.size_table(panel()))
 
 
 if __name__ == "__main__":
