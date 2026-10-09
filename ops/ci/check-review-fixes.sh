@@ -14,6 +14,7 @@ TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittes
   research.benchmark.review_fixes.test_tabsyn_fidelity_cells \
   research.benchmark.review_fixes.test_tabsyn_sample_evidence \
   research.benchmark.review_fixes.test_stats_v2 \
-  research.benchmark.review_fixes.test_predeclare_v2 -q
+  research.benchmark.review_fixes.test_predeclare_v2 \
+  research.benchmark.review_fixes.test_rescore_cells -q
 TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
   -s docs/whitepaper/scripts -p 'test_paper_control_inputs.py' -q
