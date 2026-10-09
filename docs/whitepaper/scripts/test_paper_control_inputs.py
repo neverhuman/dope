@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 SPEC = importlib.util.spec_from_file_location(
     'paper_review_control_gate', ROOT / 'ops/ci/paper-review-outputs.py')
 GATE = importlib.util.module_from_spec(SPEC)

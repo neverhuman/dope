@@ -61,5 +61,7 @@ if ! command -v latexmk >/dev/null 2>&1 || ! command -v pdffonts >/dev/null 2>&1
   sudo apt-get update
   sudo apt-get -o DPkg::Lock::Timeout=300 install -y latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-pictures texlive-publishers
 fi
+# PDF admission replays scientific inputs using the provisioned V1 interpreter.
+export PATH="$PWD/target/ci-python/bin:$PATH"
 bash docs/whitepaper/scripts/build_pdf.sh
 python3 docs/whitepaper/scripts/check_paper.py
