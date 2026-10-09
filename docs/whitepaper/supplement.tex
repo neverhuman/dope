@@ -420,15 +420,15 @@ Representation closeness asks whether Kumo large places the mapped
 synthetic table near the mapped real table. The distance is half the
 Euclidean length between the two unit-length vectors, and it lies in
 $[0,1]$. Closeness is one minus that distance divided by the distance to a
-matched null. The synthetic table must also sit closer than an
+matched null, clamped to $[0,1]$. The synthetic table must also sit closer than an
 independent-marginal table of the same size, under the same map. The
-matched null is the median of three independent-marginal tables drawn on
+matched null is selected from three independent-marginal tables drawn on
 the shared map. The seed of each table is the first eight bytes,
 little-endian, of the SHA digest of the dataset, the method, the
 configuration, the sample seed, and the candidate index. The candidate
 indices are $0$, $1$, and $2$. The loss is ordinary linear mean squared
-error on the mapped holdout. The median loss selects the table, and a tie
-keeps the lower index. Those losses are fixed before any encoder runs.
+error on the mapped holdout. Candidates are ordered by loss, then by candidate
+index; the middle candidate is the matched null. Those losses are fixed before any encoder runs.
 Mitra and TabICL must show the same sign as Kumo large on the gap against
 the independent-marginal table. A sign flip, a zero match
 distance, or a missing vector makes the component null. The component is
@@ -1036,8 +1036,8 @@ The partial derivatives are
 \end{align*}
 If the three losses have covariance $\Sigma$, the delta-method variance of
 this one lineage's retention is $\nabla R^{\top} \Sigma \nabla R$.
-As $D$ approaches zero the gradient grows like $1/D$ and $1/D^{2}$, so that
-variance is unbounded. The informativeness rule therefore drops a lineage
+The inverse powers of $D$ in this gradient allow the variance to diverge
+as $D$ approaches zero. The informativeness rule therefore drops a lineage
 whose real improvement is zero or smaller than $0.01$ times the absolute
 null loss. The rule is a stability cut. A published standard error stays outside this rule.
 This appendix states the expansion. A numerical
