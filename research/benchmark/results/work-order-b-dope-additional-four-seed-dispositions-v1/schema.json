@@ -1,0 +1,551 @@
+{
+  "$id": "work-order-b-dope-additional-four-seed-dispositions-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "cost_and_storage_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "CPU_accounting_is_unit_report_not_fit_wall": {
+          "const": true
+        },
+        "actual_coordinator_parent_wait_exit_code": {
+          "const": null
+        },
+        "actual_peak_GPU_resident_mib": {
+          "const": null
+        },
+        "actual_peak_RSS_bytes": {
+          "const": null
+        },
+        "artifact_bytes_basis": {
+          "const": "last_compile_log_JSON_artifact_bytes_value_copied_by_producer"
+        },
+        "fit_wall_and_manager_CPU_added": {
+          "const": false
+        },
+        "manager_accounting_intervals": {
+          "const": 2
+        },
+        "manager_reported_CPU_seconds_sum": {
+          "const": 35351.298
+        },
+        "model_sample_binary_bytes_freshly_rehashed": {
+          "const": false
+        },
+        "production_L3_projection_runtime_charged_inventory_bytes": {
+          "const": null
+        },
+        "receipt_declared_compile_artifact_bytes_sum": {
+          "const": 462189
+        },
+        "retained_storage_bytes": {
+          "const": null
+        },
+        "sample_and_auditor_wall_seconds": {
+          "const": null
+        },
+        "successful_fit_parent_wall_seconds_sum": {
+          "const": 1560.362
+        },
+        "successful_fit_timer_count": {
+          "const": 400
+        },
+        "whole_coordinator_parent_cost_seconds": {
+          "const": null
+        }
+      },
+      "required": [
+        "CPU_accounting_is_unit_report_not_fit_wall",
+        "actual_coordinator_parent_wait_exit_code",
+        "actual_peak_GPU_resident_mib",
+        "actual_peak_RSS_bytes",
+        "artifact_bytes_basis",
+        "fit_wall_and_manager_CPU_added",
+        "manager_accounting_intervals",
+        "manager_reported_CPU_seconds_sum",
+        "model_sample_binary_bytes_freshly_rehashed",
+        "production_L3_projection_runtime_charged_inventory_bytes",
+        "receipt_declared_compile_artifact_bytes_sum",
+        "retained_storage_bytes",
+        "sample_and_auditor_wall_seconds",
+        "successful_fit_parent_wall_seconds_sum",
+        "successful_fit_timer_count",
+        "whole_coordinator_parent_cost_seconds"
+      ],
+      "type": "object"
+    },
+    "coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "completed_five_seed_lineages": {
+          "const": null
+        },
+        "five_seed_stability": {
+          "const": null
+        },
+        "historical_seed11_joined": {
+          "const": false
+        },
+        "lineages_with_all_four_additional_seed_receipts": {
+          "const": 100
+        },
+        "per_fit_seed": {
+          "additionalProperties": false,
+          "properties": {
+            "23": {
+              "additionalProperties": false,
+              "properties": {
+                "accepted_fit_receipts": {
+                  "const": 100
+                },
+                "sample_metric_receipts_accounted": {
+                  "const": 600
+                }
+              },
+              "required": [
+                "accepted_fit_receipts",
+                "sample_metric_receipts_accounted"
+              ],
+              "type": "object"
+            },
+            "37": {
+              "additionalProperties": false,
+              "properties": {
+                "accepted_fit_receipts": {
+                  "const": 100
+                },
+                "sample_metric_receipts_accounted": {
+                  "const": 600
+                }
+              },
+              "required": [
+                "accepted_fit_receipts",
+                "sample_metric_receipts_accounted"
+              ],
+              "type": "object"
+            },
+            "53": {
+              "additionalProperties": false,
+              "properties": {
+                "accepted_fit_receipts": {
+                  "const": 100
+                },
+                "sample_metric_receipts_accounted": {
+                  "const": 600
+                }
+              },
+              "required": [
+                "accepted_fit_receipts",
+                "sample_metric_receipts_accounted"
+              ],
+              "type": "object"
+            },
+            "71": {
+              "additionalProperties": false,
+              "properties": {
+                "accepted_fit_receipts": {
+                  "const": 100
+                },
+                "sample_metric_receipts_accounted": {
+                  "const": 600
+                }
+              },
+              "required": [
+                "accepted_fit_receipts",
+                "sample_metric_receipts_accounted"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "23",
+            "37",
+            "53",
+            "71"
+          ],
+          "type": "object"
+        },
+        "quality_values_reduced": {
+          "const": false
+        }
+      },
+      "required": [
+        "completed_five_seed_lineages",
+        "five_seed_stability",
+        "historical_seed11_joined",
+        "lineages_with_all_four_additional_seed_receipts",
+        "per_fit_seed",
+        "quality_values_reduced"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "work-order-b-dope-additional-four-seed-dispositions-v1"
+    },
+    "gated_claims": {
+      "additionalProperties": false,
+      "properties": {
+        "common_utility": {
+          "const": null
+        },
+        "five_seed_stability": {
+          "const": null
+        },
+        "formal_privacy": {
+          "const": null
+        },
+        "mfs_v2": {
+          "const": null
+        },
+        "native095_admission": {
+          "const": null
+        },
+        "paired_superiority": {
+          "const": null
+        },
+        "production_tier_certification": {
+          "const": null
+        },
+        "ptf_v1": {
+          "const": null
+        },
+        "release_safe": {
+          "const": null
+        }
+      },
+      "required": [
+        "common_utility",
+        "five_seed_stability",
+        "formal_privacy",
+        "mfs_v2",
+        "native095_admission",
+        "paired_superiority",
+        "production_tier_certification",
+        "ptf_v1",
+        "release_safe"
+      ],
+      "type": "object"
+    },
+    "hardware_and_admission_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "GPU_training_verified": {
+          "const": null
+        },
+        "actual_training_backend": {
+          "const": null
+        },
+        "co_tenant_or_exclusive_GPU_verified": {
+          "const": null
+        },
+        "current_host_capacity_used_as_training_proof": {
+          "const": false
+        },
+        "historical_native_admission_verified": {
+          "const": null
+        },
+        "historical_per_fit_GPU_observation": {
+          "const": null
+        },
+        "receipt_device_field_basis": {
+          "const": "producer_constant_not_measured_backend"
+        },
+        "requested_device": {
+          "const": "cuda"
+        }
+      },
+      "required": [
+        "GPU_training_verified",
+        "actual_training_backend",
+        "co_tenant_or_exclusive_GPU_verified",
+        "current_host_capacity_used_as_training_proof",
+        "historical_native_admission_verified",
+        "historical_per_fit_GPU_observation",
+        "receipt_device_field_basis",
+        "requested_device"
+      ],
+      "type": "object"
+    },
+    "historical_attempt_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "all_historical_attempts_accounted": {
+          "const": null
+        },
+        "failure_free_campaign_claim": {
+          "const": false
+        },
+        "retries_or_overwrites_reconciled": {
+          "const": null
+        },
+        "scope": {
+          "const": "current_closed_identity_snapshot_not_immutable_attempt_history"
+        },
+        "two_manager_intervals_are_full_attempt_ledger": {
+          "const": false
+        }
+      },
+      "required": [
+        "all_historical_attempts_accounted",
+        "failure_free_campaign_claim",
+        "retries_or_overwrites_reconciled",
+        "scope",
+        "two_manager_intervals_are_full_attempt_ledger"
+      ],
+      "type": "object"
+    },
+    "measured_fit_receipt_metadata": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "binary_sha256_declared": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "dataset_lineage_id": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "fit_exit_code": {
+            "const": 0
+          },
+          "fit_parent_wall_seconds": {
+            "maximum": 660,
+            "minimum": 0,
+            "type": "number"
+          },
+          "fit_receipt_bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "fit_receipt_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "fit_seed": {
+            "enum": [
+              23,
+              37,
+              53,
+              71
+            ],
+            "type": "integer"
+          },
+          "model_sha256_declared": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "projection_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "receipt_declared_compile_artifact_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "runner_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "sample_metric_identity_and_hash_set_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "sample_metric_receipts_accounted": {
+            "const": 6
+          },
+          "sample_metric_status_ok": {
+            "const": 6
+          },
+          "source_git_sha_declared": {
+            "const": "86e43c636802051de143c192b883ec84c8a0ca2b"
+          },
+          "status": {
+            "const": "ok"
+          },
+          "train_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "validation_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "binary_sha256_declared",
+          "dataset_lineage_id",
+          "fit_exit_code",
+          "fit_parent_wall_seconds",
+          "fit_receipt_bytes",
+          "fit_receipt_sha256",
+          "fit_seed",
+          "model_sha256_declared",
+          "projection_sha256",
+          "receipt_declared_compile_artifact_bytes",
+          "runner_sha256",
+          "sample_metric_identity_and_hash_set_sha256",
+          "sample_metric_receipts_accounted",
+          "sample_metric_status_ok",
+          "source_git_sha_declared",
+          "status",
+          "train_sha256",
+          "validation_sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 400,
+      "minItems": 400,
+      "type": "array"
+    },
+    "snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_fit_receipts": {
+          "const": 400
+        },
+        "additional_fit_seeds": {
+          "const": [
+            23,
+            37,
+            53,
+            71
+          ]
+        },
+        "candidate": {
+          "const": "compact_neural_residual_symbolic"
+        },
+        "configuration": {
+          "const": "features12_steps2048"
+        },
+        "dataset_lineages": {
+          "const": 100
+        },
+        "fit_deadline_seconds_requested": {
+          "const": 600
+        },
+        "fixed_snapshot": {
+          "const": true
+        },
+        "frozen_paper_cut_replaced": {
+          "const": false
+        },
+        "metadata_observed_UTC": {
+          "const": "2026-10-09T10:21:24Z"
+        },
+        "method": {
+          "const": "DOPE"
+        },
+        "native195_of500_count_increased_by_this_leaf": {
+          "const": false
+        },
+        "neural_structural_penalty": {
+          "const": 0.0
+        },
+        "neural_target_weight": {
+          "const": 2.0
+        },
+        "official_tests_opened": {
+          "const": false
+        },
+        "planned_additional_fit_slots": {
+          "const": 400
+        },
+        "sample_metric_receipts_accounted": {
+          "const": 2400
+        },
+        "sample_seeds": {
+          "const": [
+            101,
+            211,
+            307
+          ]
+        },
+        "sample_sizes": {
+          "const": [
+            1,
+            4
+          ]
+        },
+        "tier_requested": {
+          "const": "l3"
+        }
+      },
+      "required": [
+        "accepted_fit_receipts",
+        "additional_fit_seeds",
+        "candidate",
+        "configuration",
+        "dataset_lineages",
+        "fit_deadline_seconds_requested",
+        "fixed_snapshot",
+        "frozen_paper_cut_replaced",
+        "metadata_observed_UTC",
+        "method",
+        "native195_of500_count_increased_by_this_leaf",
+        "neural_structural_penalty",
+        "neural_target_weight",
+        "official_tests_opened",
+        "planned_additional_fit_slots",
+        "sample_metric_receipts_accounted",
+        "sample_seeds",
+        "sample_sizes",
+        "tier_requested"
+      ],
+      "type": "object"
+    },
+    "source_identity_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "binary_and_full_compilation_source_inventory_freshly_verified": {
+          "const": false
+        },
+        "binary_sha256_declared": {
+          "const": "4347249fa465149f7c6ab07b4d1665ef82e5ddfe250b127160fba040c298525a"
+        },
+        "lineage_record_sha256": {
+          "const": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
+        },
+        "runner_bytes": {
+          "const": 22009
+        },
+        "runner_file": {
+          "const": "research/benchmark/review_fixes/fit_seeds.py"
+        },
+        "runner_sha256": {
+          "const": "01f445f232b6570ecf481beaf00a3f710df8615b5610ea73a83932dfe2127884"
+        },
+        "source_git_sha_declared": {
+          "const": "86e43c636802051de143c192b883ec84c8a0ca2b"
+        },
+        "source_git_tag_basis": {
+          "const": "runner_argument_recorded_in_receipts_not_reauthenticated_full_compilation_tree"
+        }
+      },
+      "required": [
+        "binary_and_full_compilation_source_inventory_freshly_verified",
+        "binary_sha256_declared",
+        "lineage_record_sha256",
+        "runner_bytes",
+        "runner_file",
+        "runner_sha256",
+        "source_git_sha_declared",
+        "source_git_tag_basis"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "cost_and_storage_scope",
+    "coverage",
+    "format",
+    "gated_claims",
+    "hardware_and_admission_scope",
+    "historical_attempt_scope",
+    "measured_fit_receipt_metadata",
+    "snapshot",
+    "source_identity_scope"
+  ],
+  "type": "object"
+}

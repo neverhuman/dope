@@ -19,6 +19,13 @@ with both whole-parent costs retained. Its dated snapshot follows index008;
 partial five-fit coverage and observed residency do not establish stability
 or a gated production score.
 
+The [DOPE additional-four-seed receipt ledger](results/work-order-b-dope-additional-four-seed-dispositions-v1/README.md)
+accounts for 400 successful fit receipts and 2,400 sample metric receipts on
+100 lineages. Successful fit wall sums to 1,560.362 seconds; manager CPU
+accounting uses a separate basis. Seed 11 is unjoined, CUDA was requested
+without measured backend proof, and historical attempt completeness and
+gated quality scores remain unavailable. The frozen paper cut is unchanged.
+
 The [Forest-Flow additional-default fit ledger](results/work-order-b-forest400-additional-default-fit-dispositions-v1/README.md)
 records 400 closed slots: 291 accepted fit receipts and 109 timeouts. Seventy-one
 lineages have all four additional seeds accepted. Fit seed 11 is unjoined;
