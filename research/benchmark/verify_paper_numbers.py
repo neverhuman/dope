@@ -341,8 +341,11 @@ def protocol_tokens():
     _must_contain(root / "docs/whitepaper/scripts/compute_panel.py", "Q_NEMENYI_K4 = 2.569", failures)
     _must_contain(root / "docs/whitepaper/scripts/compute_panel.py", "DRAWS = 10_000", failures)
     _must_contain(root / "research/benchmark/publish_dope_population_validation.py", "SEEDS = (101,211,307)", failures)
-    _must_contain(root / "docs/whitepaper/scripts/render_figures.py", "Y_LIM = (-1.5, 1.6)", failures)
-    _must_contain(root / "docs/whitepaper/scripts/render_figures.py", "axis.set_xlim(-1.5, 1.5)", failures)
+    # The figure windows live in figure_spec.py, and the drawing code reads them there.
+    _must_contain(root / "docs/whitepaper/scripts/figure_spec.py", "Y_LIM = (-1.5, 1.6)", failures)
+    _must_contain(root / "docs/whitepaper/scripts/figure_spec.py", "PAIRED_X_LIM = (-1.5, 1.5)", failures)
+    _must_contain(root / "docs/whitepaper/scripts/render_figures.py", "axis.set_ylim(*Y_LIM)", failures)
+    _must_contain(root / "docs/whitepaper/scripts/render_figures.py", "axis.set_xlim(*PAIRED_X_LIM)", failures)
     _must_contain(root / "docs/whitepaper/scripts/compute_panel.py", "np.quantile(samples, [0.025, 0.975])", failures)
     _must_contain(root / "rust/fitness.rs", "(0.0..=1.0)", failures)
     _must_contain(root / "research/benchmark/results/s3-data.lock.json", "official_test_grouped_training_80_20", failures)

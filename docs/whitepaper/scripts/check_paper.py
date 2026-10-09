@@ -20,6 +20,7 @@ from public_hardware import banned_hits
 ROOT = Path(__file__).resolve().parents[1]
 TEX = ROOT / "dope-mfs.tex"
 NUMBERS = ROOT / "generated" / "numbers.tex"
+FIGURE_MACROS = ROOT / "generated" / "figure-spec.tex"
 FIGURES = (
     ROOT / "dope-mfs.pdf",
     ROOT / "dope-mfs-anonymous.pdf",
@@ -201,6 +202,9 @@ def main() -> int:
         defined = set(MACRO_DEF.findall(NUMBERS.read_text()))
         # Also accept commands defined with \def\Name
         defined.update(re.findall(r"\\def\\(\w+)", NUMBERS.read_text()))
+        # Figure windows come from figure_spec.py through their own generated file.
+        if FIGURE_MACROS.is_file():
+            defined.update(MACRO_DEF.findall(FIGURE_MACROS.read_text()))
         used = set(MACRO_USE.findall(body))
         missing = sorted(
             name for name in used
