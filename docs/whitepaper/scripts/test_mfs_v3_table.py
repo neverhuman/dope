@@ -103,6 +103,12 @@ class MfsV3TableTest(unittest.TestCase):
         self.assertNotIn("no clean-license tabular transfer has been measured", text)
         self.assertIn("\\input{generated/mfs-v3-density-table.tex}", text)
         self.assertIn("\\input{generated/mfs-v3-scalar.tex}", text)
+        self.assertIn("Downstream Objective-Preserving Encoding", text)
+        self.assertNotIn("10{,}240-Byte Tabular Generator", text)
+        self.assertNotIn("10240-Byte Tabular Generator", text)
+        self.assertIn("BEGIN JOURNAL AVAILABILITY", text)
+        self.assertIn("https://github.com/neverhuman/dope", text)
+        self.assertIn("not a utility score", text)
 
 
 if __name__ == "__main__":

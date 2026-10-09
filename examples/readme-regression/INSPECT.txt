@@ -1,0 +1,67 @@
+{
+  "format": "dope-kernel-v3",
+  "version": 3,
+  "artifact_bytes": 196,
+  "byte_accounting": {
+    "header_bytes": 56,
+    "sections": [
+      {
+        "tag": 1,
+        "framing_bytes": 2,
+        "raw_bytes": 19,
+        "encoded_bytes": 19,
+        "compressed": false
+      },
+      {
+        "tag": 2,
+        "framing_bytes": 2,
+        "raw_bytes": 37,
+        "encoded_bytes": 37,
+        "compressed": false
+      },
+      {
+        "tag": 3,
+        "framing_bytes": 2,
+        "raw_bytes": 1,
+        "encoded_bytes": 1,
+        "compressed": false
+      },
+      {
+        "tag": 4,
+        "framing_bytes": 2,
+        "raw_bytes": 52,
+        "encoded_bytes": 52,
+        "compressed": false
+      },
+      {
+        "tag": 5,
+        "framing_bytes": 2,
+        "raw_bytes": 21,
+        "encoded_bytes": 21,
+        "compressed": false
+      }
+    ],
+    "total_bytes": 196
+  },
+  "task": "regression",
+  "rows_fitted": 400,
+  "positional_features": 3,
+  "target_position": "last",
+  "decoder_id": 1,
+  "quantization_bits": 10,
+  "compliant": false,
+  "schema": [
+    "continuous",
+    "continuous",
+    "continuous"
+  ],
+  "marginals": [
+    "quantile_spline",
+    "quantile_spline",
+    "quantile_spline"
+  ],
+  "dependence": "independence",
+  "target": "mars",
+  "noise": "heteroscedastic",
+  "sexpr": "(dpk v=3 task=regression n=400 p=3 seed=15109496478743843154 (schema (continuous i=0) (continuous i=1) (continuous i=2)) (marginals (quantile_spline i=0) (quantile_spline i=1) (quantile_spline i=2)) (dependence kind=independence) (target kind=mars) (noise kind=heteroscedastic))"
+}

@@ -303,6 +303,10 @@
     "research/benchmark/tests/test_baseline_completion.py": "external-evidence",
     "research/benchmark/results/baseline-completion-20261008-v1/": "external-evidence",
     "docs/whitepaper/BASELINE_PROTOCOL.md": "external-evidence",
-    "docs/whitepaper/generated/baseline-budget.tex": "external-evidence"
+    "docs/whitepaper/generated/baseline-budget.tex": "external-evidence",
+    "docs/whitepaper/scripts/readme_benchmark.py": "external-evidence",
+    "docs/whitepaper/scripts/test_readme_benchmark.py": "external-evidence",
+    "docs/readme/retention-bars.png": "governance",
+    "examples/readme-regression/": "governance"
   }
 }

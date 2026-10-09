@@ -1,7 +1,70 @@
-# Dope Data Kernel
+# DOPE
 
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![Jankurai gate](https://img.shields.io/badge/Jankurai-requires%20score%2085-blue)](docs/audit.md)
+
+Downstream Objective-Preserving Encoding (D.O.P.E.) compiles a scaled numeric regression table into a small probabilistic program. The measurement is retention: train a regressor on synthetic rows, score it on real holdout rows, and divide by the same model's improvement over a null. The release score stays null until privacy, copy, fidelity, and representation gates all pass. This source tree is not a certified release. Version `0.3.0-alpha.1`. Licensed under the [MIT License](LICENSE).
+
+The manuscript is [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf). Source and receipts: https://github.com/neverhuman/dope
+
+## The comparison
+
+<!-- BEGIN BENCHMARK -->
+CatBoost retention on 97 lineages, synthetic size 4n, fit seed 11. Each cell is a dimensionless retention.
+
+| Comparator | n | DOPE | Other | Difference | W/T/L | Holm p |
+| --- | ---: | --- | --- | --- | ---: | ---: |
+| Gaussian copula | 97 | 0.940 [0.914, 0.976] | 0.656 [0.431, 0.803] | 0.224 [0.149, 0.290] | 86/0/11 | 1.35× 10^-13 |
+| Chow–Liu | 97 | 0.940 [0.914, 0.976] | 0.586 [0.465, 0.637] | 0.337 [0.282, 0.451] | 94/0/3 | 4.85× 10^-16 |
+| Independent marginals | 97 | 0.940 [0.914, 0.976] | -0.012 [-0.020, -0.00649] | 0.956 [0.918, 0.980] | 96/0/1 | 1.17× 10^-16 |
+
+The linear auditor does not separate DOPE from the Gaussian copula (n=92, difference 0.00366 [-0.00438, 0.012], W/T/L 49/0/43, Holm p 0.373). That interval contains zero. MFS-v2 and MFS-v3 are null on every method in the manuscript.
+<!-- END BENCHMARK -->
+
+![CatBoost retention medians for the density block and the neural block. The blocks are not pooled. Intervals are lineage-bootstrap intervals.](docs/readme/retention-bars.png)
+
+## Install
+
+```bash
+git clone https://github.com/neverhuman/dope.git
+cd dope
+cargo build --locked --release -p dope-kernel
+```
+
+That command writes `target/release/dope-kernel`.
+
+## Try it on a small regression problem
+
+The files in [examples/readme-regression](examples/readme-regression/) are a four-column toy with values already in `[0, 1]` and the target in the last column. `compile` reads `train.csv` only. `test.csv` is present because `certify` expects it; this example does not score it. The formula, the seed, and the row counts are in [examples/readme-regression/README.md](examples/readme-regression/README.md). This toy is not the 97-lineage result above.
+
+```bash
+target/release/dope-kernel compile \
+  --dataset-dir examples/readme-regression \
+  --task regression \
+  --out examples/readme-regression/toy.dpk
+target/release/dope-kernel inspect --kernel examples/readme-regression/toy.dpk
+target/release/dope-kernel sample \
+  --kernel examples/readme-regression/toy.dpk \
+  --rows 200 \
+  --out examples/readme-regression/synth.csv
+```
+
+`toy.dpk` and `synth.csv` stay local. Inspect of the artifact built for this page reports `artifact_bytes` 196, `rows_fitted` 400, three positional features, dependence `independence`, and target `mars`. `compliant` is false: compile sees `train.csv` only and does not certify a release. The transcript is [examples/readme-regression/INSPECT.txt](examples/readme-regression/INSPECT.txt).
+
+## What you do not get
+
+- Formal differential privacy.
+- A HIPAA de-identification claim.
+- An MFS-v2 or MFS-v3 score. Both stay null until their own gates pass.
+- A license to treat the toy artifact as the 97-lineage comparison.
+
+## Conformance
+
+Jankurai is this repository's conformance auditor. A passing audit means the build, tests, and boundary proofs cleared the release floor with no high finding. It is not a utility score, not an MFS value, and not a privacy certificate. The gate and what the auditor checks are in [docs/audit.md](docs/audit.md).
+
+<!-- JANKURAI_MEASUREMENT -->
+
+## Reference
 
 Start with [AGENTS.md](AGENTS.md) for ownership and proof commands.
 

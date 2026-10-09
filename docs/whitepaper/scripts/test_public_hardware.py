@@ -76,6 +76,23 @@ class PublicHardware(unittest.TestCase):
 
 
 class MfsIllustration(unittest.TestCase):
+    def test_one_repository_url_is_allowed(self):
+        url = "https://github.com/neverhuman/dope"
+        self.assertEqual(hardware.banned_hits(f"Receipts are at {url}."), [])
+        self.assertIn("neverhuman", hardware.banned_hits(f"{url} and neverhuman"))
+        self.assertIn("neverhuman", hardware.banned_hits(f"{url}\n{url}"))
+        self.assertIn("jepsontaylor", hardware.banned_hits(f"{url} jepsontaylor"))
+        self.assertIn("xbabe1", hardware.banned_hits(f"{url} on xbabe1"))
+        self.assertIn("pull request number", hardware.banned_hits(f"{url}. See PR #194."))
+        manuscript = (REPO / "docs/whitepaper/dope-mfs.tex").read_text()
+        self.assertEqual(manuscript.count(url), 1)
+        self.assertEqual(hardware.banned_hits(manuscript), [])
+        anonymous = hardware.strip_journal_availability(manuscript)
+        self.assertNotIn("neverhuman", anonymous)
+        self.assertNotIn("BEGIN JOURNAL AVAILABILITY", anonymous)
+        self.assertIn("not a utility score", anonymous)
+        self.assertEqual(hardware.banned_hits(anonymous), [])
+
     def test_formula_rows_are_computed(self):
         shown = paper_emit.mfs_illustrations()
         self.assertEqual(shown["classic"], "82.40")
