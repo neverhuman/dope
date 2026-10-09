@@ -1,0 +1,177 @@
+\begin{longtable}{@{}llp{1.25in}rllrlll@{}}
+\caption{\textbf{All DOPE-minus-comparator contrasts.} Nested bootstrap 95\% intervals. The Holm family size is in parentheses; families are declared per size in predeclare\_v2. HL eq.\ is the pre-declared equivalence rule (90\% interval of the Hodges--Lehmann difference inside $\pm 0.02$); Yuen eq.\ is the trimmed-mean sensitivity.}\label{tab:v2-contrasts}\\
+\toprule
+Size & Auditor & Comparator & $n$ & Median diff. & Hodges--Lehmann & W/T/L & Holm $p$ (family) & HL eq. & Yuen eq. \\
+\midrule
+\endfirsthead
+\toprule
+Size & Auditor & Comparator & $n$ & Median diff. & Hodges--Lehmann & W/T/L & Holm $p$ (family) & HL eq. & Yuen eq. \\
+\midrule
+\endhead
+$n$ & CatBoost & TabSyn (scaled schedule) & 98 & $0.000$ \scriptsize$[-0.040, 0.033]$ & $-0.003$ \scriptsize$[-0.053, 0.050]$ & 48/0/50 & $1.000$ (12) & no & no \\
+$n$ & Linear & TabSyn (scaled schedule) & 93 & $0.030$ \scriptsize$[0.006, 0.155]$ & $0.107$ \scriptsize$[0.012, 0.273]$ & 70/0/23 & $6.39\times 10^{-8}$ (12) & no & no \\
+$n$ & MLP & TabSyn (scaled schedule) & 87 & $0.041$ \scriptsize$[-0.002, 0.141]$ & $0.073$ \scriptsize$[0.003, 0.214]$ & 56/0/31 & $0.003$ (12) & no & no \\
+$n$ & CatBoost & ARF (author default) & 99 & $0.084$ \scriptsize$[0.004, 0.165]$ & $0.090$ \scriptsize$[0.006, 0.190]$ & 71/0/28 & $0.001$ (12) & no & no \\
+$n$ & Linear & ARF (author default) & 94 & $0.065$ \scriptsize$[0.003, 0.190]$ & $0.090$ \scriptsize$[0.008, 0.251]$ & 74/0/20 & $3.53\times 10^{-6}$ (12) & no & no \\
+$n$ & MLP & ARF (author default) & 88 & $0.111$ \scriptsize$[0.050, 0.226]$ & $0.144$ \scriptsize$[0.061, 0.332]$ & 74/0/14 & $6.04\times 10^{-8}$ (12) & no & no \\
+$n$ & CatBoost & ARF (native selected) & 99 & $0.083$ \scriptsize$[0.009, 0.201]$ & $0.109$ \scriptsize$[0.025, 0.220]$ & 71/0/28 & $1.71\times 10^{-4}$ (9) & no & no \\
+$n$ & Linear & ARF (native selected) & 94 & $0.077$ \scriptsize$[0.010, 0.198]$ & $0.104$ \scriptsize$[0.019, 0.256]$ & 76/0/18 & $1.10\times 10^{-7}$ (9) & no & no \\
+$n$ & MLP & ARF (native selected) & 88 & $0.142$ \scriptsize$[0.063, 0.274]$ & $0.175$ \scriptsize$[0.081, 0.363]$ & 76/0/12 & $3.06\times 10^{-10}$ (9) & no & no \\
+$n$ & CatBoost & Gaussian copula & 99 & $0.196$ \scriptsize$[0.090, 0.243]$ & $0.202$ \scriptsize$[0.110, 0.266]$ & 88/0/11 & $1.41\times 10^{-14}$ (9) & no & no \\
+$n$ & Linear & Gaussian copula & 94 & $0.008$ \scriptsize$[-0.005, 0.038]$ & $0.020$ \scriptsize$[-0.005, 0.049]$ & 59/0/35 & $0.010$ (9) & no & no \\
+$n$ & MLP & Gaussian copula & 88 & $0.132$ \scriptsize$[0.090, 0.185]$ & $0.157$ \scriptsize$[0.097, 0.242]$ & 73/0/15 & $2.68\times 10^{-9}$ (9) & no & no \\
+$n$ & CatBoost & Chow-Liu tree & 99 & $0.313$ \scriptsize$[0.240, 0.513]$ & $0.369$ \scriptsize$[0.268, 0.660]$ & 87/0/12 & $1.24\times 10^{-15}$ (9) & no & no \\
+$n$ & Linear & Chow-Liu tree & 94 & $0.342$ \scriptsize$[0.226, 0.624]$ & $0.481$ \scriptsize$[0.282, 0.819]$ & 91/0/3 & $1.97\times 10^{-15}$ (9) & no & no \\
+$n$ & MLP & Chow-Liu tree & 88 & $0.489$ \scriptsize$[0.340, 0.755]$ & $0.620$ \scriptsize$[0.406, 1.079]$ & 83/0/5 & $4.89\times 10^{-14}$ (9) & no & no \\
+$n$ & CatBoost & Independent marginals & 99 & $0.866$ \scriptsize$[0.767, 0.982]$ & $0.849$ \scriptsize$[0.745, 0.964]$ & 99/0/0 & $5.13\times 10^{-17}$ (9) & no & no \\
+$n$ & Linear & Independent marginals & 94 & $1.002$ \scriptsize$[0.974, 1.065]$ & $1.023$ \scriptsize$[0.975, 1.097]$ & 94/0/0 & $3.05\times 10^{-16}$ (9) & no & no \\
+$n$ & MLP & Independent marginals & 88 & $1.164$ \scriptsize$[1.039, 1.473]$ & $1.265$ \scriptsize$[1.078, 1.549]$ & 87/0/1 & $1.17\times 10^{-14}$ (9) & no & no \\
+$n$ & CatBoost & TVAE (native selected) & 21 & $0.195$ \scriptsize$[0.089, 0.395]$ & $0.221$ \scriptsize$[0.115, 0.347]$ & 19/0/2 & --- & no & no \\
+$n$ & Linear & TVAE (native selected) & 21 & $0.250$ \scriptsize$[0.128, 0.427]$ & $0.284$ \scriptsize$[0.158, 0.549]$ & 20/0/1 & --- & no & no \\
+$n$ & MLP & TVAE (native selected) & 20 & $0.221$ \scriptsize$[0.109, 0.507]$ & $0.254$ \scriptsize$[0.118, 0.596]$ & 17/0/3 & --- & no & no \\
+$n$ & CatBoost & CTGAN (native selected) & 21 & $0.785$ \scriptsize$[0.706, 1.342]$ & $0.880$ \scriptsize$[0.731, 1.204]$ & 21/0/0 & --- & no & no \\
+$n$ & Linear & CTGAN (native selected) & 21 & $1.052$ \scriptsize$[0.849, 1.342]$ & $1.104$ \scriptsize$[0.833, 1.732]$ & 21/0/0 & --- & no & no \\
+$n$ & MLP & CTGAN (native selected) & 20 & $1.135$ \scriptsize$[0.772, 1.776]$ & $1.295$ \scriptsize$[0.789, 2.228]$ & 19/0/1 & --- & no & no \\
+$n$ & CatBoost & Forest-Flow (historical) & 6 & $-0.045$ \scriptsize$[-0.463, 0.020]$ & $-0.206$ \scriptsize$[-0.385, 0.003]$ & 1/0/5 & --- & no & no \\
+$n$ & Linear & Forest-Flow (historical) & 5 & $0.024$ \scriptsize$[-0.005, 0.074]$ & $0.037$ \scriptsize$[-0.034, 0.074]$ & 5/0/0 & --- & no & no \\
+$n$ & MLP & Forest-Flow (historical) & 6 & $0.005$ \scriptsize$[-0.041, 0.123]$ & $0.010$ \scriptsize$[-0.086, 0.123]$ & 3/0/3 & --- & no & no \\
+$n$ & CatBoost & DOPE, untuned default & 99 & $0.101$ \scriptsize$[0.035, 0.155]$ & $0.127$ \scriptsize$[0.052, 0.186]$ & 89/0/10 & --- & no & no \\
+$n$ & Linear & DOPE, untuned default & 94 & $-0.002$ \scriptsize$[-0.016, 0.003]$ & $-0.007$ \scriptsize$[-0.027, 0.002]$ & 42/0/52 & --- & no & yes \\
+$n$ & MLP & DOPE, untuned default & 88 & $0.034$ \scriptsize$[0.003, 0.069]$ & $0.050$ \scriptsize$[0.008, 0.082]$ & 63/0/25 & --- & no & no \\
+$n$ & CatBoost & Predictor-only control & 99 & $0.215$ \scriptsize$[0.128, 0.271]$ & $0.214$ \scriptsize$[0.148, 0.269]$ & 93/0/6 & $4.36\times 10^{-15}$ (6) & no & no \\
+$n$ & Linear & Predictor-only control & 94 & $0.003$ \scriptsize$[-0.014, 0.041]$ & $0.016$ \scriptsize$[-0.022, 0.054]$ & 55/0/39 & $0.142$ (6) & no & no \\
+$n$ & MLP & Predictor-only control & 88 & $0.106$ \scriptsize$[0.044, 0.168]$ & $0.134$ \scriptsize$[0.067, 0.195]$ & 73/0/15 & $1.96\times 10^{-8}$ (6) & no & no \\
+$n$ & CatBoost & CTGAN (author default) & 17 & $1.093$ \scriptsize$[0.787, 1.446]$ & $1.108$ \scriptsize$[0.861, 1.707]$ & 17/0/0 & $1.53\times 10^{-4}$ (12) & no & no \\
+$n$ & CatBoost & Chow-Liu tree (default) & 99 & $0.239$ \scriptsize$[0.175, 0.313]$ & $0.261$ \scriptsize$[0.185, 0.352]$ & 86/0/13 & --- & no & no \\
+$n$ & CatBoost & DOPE, later binary, seeds 23-71 & 99 & $0.008$ \scriptsize$[0.000, 0.011]$ & $0.010$ \scriptsize$[0.000, 0.020]$ & 79/0/20 & --- & yes & yes \\
+$n$ & CatBoost & DOPE, later binary, seed 11 & 99 & $-0.020$ \scriptsize$[-0.058, -0.003]$ & $-0.033$ \scriptsize$[-0.074, -0.009]$ & 14/10/75 & --- & no & no \\
+$n$ & CatBoost & DOPE, historical seed 11 & 97 & $-0.022$ \scriptsize$[-0.060, -0.003]$ & $-0.034$ \scriptsize$[-0.076, -0.009]$ & 15/8/74 & --- & no & no \\
+$n$ & CatBoost & DOPE historical, 12 inputs, 512 steps & 97 & $0.032$ \scriptsize$[0.006, 0.092]$ & $0.060$ \scriptsize$[0.012, 0.143]$ & 72/0/25 & --- & no & no \\
+$n$ & CatBoost & DOPE historical, 24 inputs, 2048 steps & 93 & $-0.013$ \scriptsize$[-0.030, -0.001]$ & $-0.019$ \scriptsize$[-0.041, -0.006]$ & 24/6/63 & --- & no & no \\
+$n$ & CatBoost & DOPE historical, 24 inputs, 512 steps & 93 & $0.032$ \scriptsize$[0.006, 0.087]$ & $0.053$ \scriptsize$[0.012, 0.126]$ & 69/0/24 & --- & no & no \\
+$n$ & CatBoost & Forest-Flow default (historical) & 6 & $-0.045$ \scriptsize$[-0.463, 0.020]$ & $-0.206$ \scriptsize$[-0.366, 0.003]$ & 1/0/5 & --- & no & no \\
+$n$ & CatBoost & Gaussian copula (default) & 99 & $0.222$ \scriptsize$[0.092, 0.283]$ & $0.229$ \scriptsize$[0.121, 0.303]$ & 89/0/10 & --- & no & no \\
+$n$ & CatBoost & TVAE (author default) & 18 & $0.452$ \scriptsize$[0.329, 0.778]$ & $0.504$ \scriptsize$[0.365, 0.747]$ & 18/0/0 & $9.16\times 10^{-5}$ (12) & no & no \\
+$n$ & CatBoost & Independent marginals (default) & 99 & $0.875$ \scriptsize$[0.757, 0.981]$ & $0.842$ \scriptsize$[0.739, 0.962]$ & 99/0/0 & --- & no & no \\
+$n$ & CatBoost & Predictor-only, split 2027 & 98 & $0.214$ \scriptsize$[0.147, 0.281]$ & $0.230$ \scriptsize$[0.160, 0.301]$ & 92/0/6 & --- & no & no \\
+$n$ & CatBoost & Predictor-only, split 2999 & 99 & $0.200$ \scriptsize$[0.111, 0.263]$ & $0.216$ \scriptsize$[0.137, 0.287]$ & 86/0/13 & --- & no & no \\
+$n$ & CatBoost & Predictor-only, split 4099 & 99 & $0.223$ \scriptsize$[0.126, 0.275]$ & $0.226$ \scriptsize$[0.152, 0.299]$ & 86/0/13 & --- & no & no \\
+$n$ & CatBoost & Predictor-only, split 8191 & 99 & $0.179$ \scriptsize$[0.091, 0.252]$ & $0.199$ \scriptsize$[0.121, 0.263]$ & 85/0/14 & --- & no & no \\
+$n$ & Linear & CTGAN (author default) & 17 & $1.314$ \scriptsize$[0.981, 2.569]$ & $1.610$ \scriptsize$[1.151, 2.510]$ & 17/0/0 & $1.53\times 10^{-4}$ (12) & no & no \\
+$n$ & Linear & Chow-Liu tree (default) & 94 & $0.282$ \scriptsize$[0.177, 0.346]$ & $0.327$ \scriptsize$[0.202, 0.481]$ & 90/0/4 & --- & no & no \\
+$n$ & Linear & DOPE, later binary, seeds 23-71 & 94 & $0.000$ \scriptsize$[-0.002, 0.002]$ & $0.000$ \scriptsize$[-0.005, 0.006]$ & 44/0/50 & --- & yes & yes \\
+$n$ & Linear & DOPE, later binary, seed 11 & 94 & $0.000$ \scriptsize$[-0.001, 0.003]$ & $0.002$ \scriptsize$[-0.006, 0.013]$ & 40/19/35 & --- & yes & yes \\
+$n$ & Linear & DOPE, historical seed 11 & 92 & $0.000$ \scriptsize$[-0.002, 0.002]$ & $0.001$ \scriptsize$[-0.006, 0.011]$ & 38/16/38 & --- & yes & yes \\
+$n$ & Linear & DOPE historical, 12 inputs, 512 steps & 92 & $0.002$ \scriptsize$[-0.006, 0.007]$ & $0.001$ \scriptsize$[-0.010, 0.012]$ & 49/0/43 & --- & yes & yes \\
+$n$ & Linear & DOPE historical, 24 inputs, 2048 steps & 88 & $0.000$ \scriptsize$[-0.005, 0.001]$ & $0.000$ \scriptsize$[-0.012, 0.012]$ & 35/14/39 & --- & yes & yes \\
+$n$ & Linear & DOPE historical, 24 inputs, 512 steps & 88 & $0.003$ \scriptsize$[-0.005, 0.008]$ & $0.003$ \scriptsize$[-0.009, 0.012]$ & 48/0/40 & --- & yes & yes \\
+$n$ & Linear & Forest-Flow default (historical) & 5 & $0.024$ \scriptsize$[-0.005, 0.074]$ & $0.037$ \scriptsize$[-0.043, 0.074]$ & 5/0/0 & --- & no & no \\
+$n$ & Linear & Gaussian copula (default) & 94 & $0.048$ \scriptsize$[0.013, 0.150]$ & $0.104$ \scriptsize$[0.025, 0.224]$ & 71/0/23 & --- & no & no \\
+$n$ & Linear & TVAE (author default) & 18 & $0.593$ \scriptsize$[0.326, 1.897]$ & $0.628$ \scriptsize$[0.432, 12.069]$ & 18/0/0 & $9.16\times 10^{-5}$ (12) & no & no \\
+$n$ & Linear & Independent marginals (default) & 94 & $1.011$ \scriptsize$[0.969, 1.061]$ & $1.017$ \scriptsize$[0.965, 1.089]$ & 93/0/1 & --- & no & no \\
+$n$ & Linear & Predictor-only, split 2027 & 93 & $-0.006$ \scriptsize$[-0.032, 0.009]$ & $-0.010$ \scriptsize$[-0.043, 0.012]$ & 40/0/53 & --- & no & no \\
+$n$ & Linear & Predictor-only, split 2999 & 89 & $-0.007$ \scriptsize$[-0.023, 0.008]$ & $-0.006$ \scriptsize$[-0.034, 0.015]$ & 35/0/54 & --- & no & yes \\
+$n$ & Linear & Predictor-only, split 4099 & 91 & $-0.005$ \scriptsize$[-0.016, 0.012]$ & $-0.003$ \scriptsize$[-0.033, 0.025]$ & 40/0/51 & --- & no & yes \\
+$n$ & Linear & Predictor-only, split 8191 & 91 & $0.004$ \scriptsize$[-0.010, 0.027]$ & $0.007$ \scriptsize$[-0.016, 0.037]$ & 50/0/41 & --- & no & yes \\
+$n$ & MLP & CTGAN (author default) & 16 & $1.314$ \scriptsize$[0.891, 1.790]$ & $1.378$ \scriptsize$[1.030, 2.528]$ & 15/0/1 & $0.001$ (12) & no & no \\
+$n$ & MLP & Chow-Liu tree (default) & 88 & $0.389$ \scriptsize$[0.242, 0.502]$ & $0.490$ \scriptsize$[0.311, 0.769]$ & 82/0/6 & --- & no & no \\
+$n$ & MLP & DOPE, later binary, seeds 23-71 & 88 & $0.003$ \scriptsize$[-0.001, 0.006]$ & $0.003$ \scriptsize$[-0.005, 0.012]$ & 54/0/34 & --- & yes & yes \\
+$n$ & MLP & DOPE, later binary, seed 11 & 88 & $-0.003$ \scriptsize$[-0.010, 0.000]$ & $-0.007$ \scriptsize$[-0.021, 0.000]$ & 25/16/47 & --- & yes & yes \\
+$n$ & MLP & DOPE, historical seed 11 & 87 & $-0.003$ \scriptsize$[-0.011, 0.000]$ & $-0.007$ \scriptsize$[-0.023, 0.000]$ & 25/15/47 & --- & yes & yes \\
+$n$ & MLP & DOPE historical, 12 inputs, 512 steps & 87 & $0.007$ \scriptsize$[-0.004, 0.016]$ & $0.015$ \scriptsize$[-0.005, 0.038]$ & 50/0/37 & --- & no & no \\
+$n$ & MLP & DOPE historical, 24 inputs, 2048 steps & 84 & $-0.005$ \scriptsize$[-0.020, 0.000]$ & $-0.014$ \scriptsize$[-0.040, -0.003]$ & 21/13/50 & --- & no & no \\
+$n$ & MLP & DOPE historical, 24 inputs, 512 steps & 84 & $0.002$ \scriptsize$[-0.015, 0.014]$ & $0.010$ \scriptsize$[-0.015, 0.029]$ & 45/0/39 & --- & no & no \\
+$n$ & MLP & Forest-Flow default (historical) & 6 & $0.005$ \scriptsize$[-0.041, 0.123]$ & $0.010$ \scriptsize$[-0.074, 0.123]$ & 3/0/3 & --- & no & no \\
+$n$ & MLP & Gaussian copula (default) & 88 & $0.129$ \scriptsize$[0.069, 0.231]$ & $0.178$ \scriptsize$[0.085, 0.309]$ & 74/0/14 & --- & no & no \\
+$n$ & MLP & TVAE (author default) & 17 & $0.632$ \scriptsize$[0.270, 1.242]$ & $0.748$ \scriptsize$[0.378, 1.925]$ & 16/0/1 & $2.44\times 10^{-4}$ (12) & no & no \\
+$n$ & MLP & Independent marginals (default) & 88 & $1.121$ \scriptsize$[1.039, 1.441]$ & $1.229$ \scriptsize$[1.061, 1.449]$ & 86/0/2 & --- & no & no \\
+$n$ & MLP & Predictor-only, split 2027 & 78 & $0.104$ \scriptsize$[0.020, 0.162]$ & $0.128$ \scriptsize$[0.040, 0.198]$ & 61/0/17 & --- & no & no \\
+$n$ & MLP & Predictor-only, split 2999 & 82 & $0.074$ \scriptsize$[0.011, 0.159]$ & $0.121$ \scriptsize$[0.030, 0.191]$ & 61/0/21 & --- & no & no \\
+$n$ & MLP & Predictor-only, split 4099 & 84 & $0.098$ \scriptsize$[0.005, 0.159]$ & $0.119$ \scriptsize$[0.041, 0.197]$ & 58/0/26 & --- & no & no \\
+$n$ & MLP & Predictor-only, split 8191 & 81 & $0.101$ \scriptsize$[0.024, 0.170]$ & $0.133$ \scriptsize$[0.044, 0.201]$ & 67/0/14 & --- & no & no \\
+$4n$ & CatBoost & TabSyn (scaled schedule) & 98 & $-0.003$ \scriptsize$[-0.060, 0.039]$ & $-0.008$ \scriptsize$[-0.057, 0.042]$ & 47/0/51 & $1.000$ (12) & no & no \\
+$4n$ & Linear & TabSyn (scaled schedule) & 93 & $0.019$ \scriptsize$[0.002, 0.130]$ & $0.072$ \scriptsize$[0.004, 0.248]$ & 70/0/23 & $6.36\times 10^{-6}$ (12) & no & no \\
+$4n$ & MLP & TabSyn (scaled schedule) & 87 & $0.000$ \scriptsize$[-0.013, 0.166]$ & $0.069$ \scriptsize$[-0.014, 0.392]$ & 43/0/44 & $0.341$ (12) & no & no \\
+$4n$ & CatBoost & ARF (author default) & 99 & $0.035$ \scriptsize$[-0.021, 0.130]$ & $0.048$ \scriptsize$[-0.034, 0.149]$ & 60/0/39 & $0.258$ (12) & no & no \\
+$4n$ & Linear & ARF (author default) & 94 & $0.045$ \scriptsize$[-0.002, 0.155]$ & $0.062$ \scriptsize$[-0.011, 0.193]$ & 70/0/24 & $2.87\times 10^{-4}$ (12) & no & no \\
+$4n$ & MLP & ARF (author default) & 88 & $0.117$ \scriptsize$[0.020, 0.237]$ & $0.137$ \scriptsize$[0.041, 0.397]$ & 70/0/18 & $3.26\times 10^{-7}$ (12) & no & no \\
+$4n$ & CatBoost & ARF (native selected) & 99 & $0.051$ \scriptsize$[-0.005, 0.162]$ & $0.083$ \scriptsize$[0.006, 0.191]$ & 66/0/33 & $0.004$ (9) & no & no \\
+$4n$ & Linear & ARF (native selected) & 94 & $0.073$ \scriptsize$[0.003, 0.164]$ & $0.083$ \scriptsize$[0.006, 0.217]$ & 73/0/21 & $1.89\times 10^{-6}$ (9) & no & no \\
+$4n$ & MLP & ARF (native selected) & 88 & $0.106$ \scriptsize$[0.034, 0.306]$ & $0.191$ \scriptsize$[0.060, 0.431]$ & 71/0/17 & $2.48\times 10^{-8}$ (9) & no & no \\
+$4n$ & CatBoost & Gaussian copula & 99 & $0.164$ \scriptsize$[0.062, 0.242]$ & $0.191$ \scriptsize$[0.089, 0.273]$ & 83/0/16 & $1.46\times 10^{-13}$ (9) & no & no \\
+$4n$ & Linear & Gaussian copula & 94 & $0.002$ \scriptsize$[-0.014, 0.015]$ & $0.007$ \scriptsize$[-0.023, 0.030]$ & 53/0/41 & $0.183$ (9) & no & yes \\
+$4n$ & MLP & Gaussian copula & 88 & $0.170$ \scriptsize$[0.047, 0.264]$ & $0.234$ \scriptsize$[0.126, 0.390]$ & 77/0/11 & $9.26\times 10^{-13}$ (9) & no & no \\
+$4n$ & CatBoost & Chow-Liu tree & 99 & $0.270$ \scriptsize$[0.201, 0.517]$ & $0.356$ \scriptsize$[0.242, 0.728]$ & 91/0/8 & $5.59\times 10^{-15}$ (9) & no & no \\
+$4n$ & Linear & Chow-Liu tree & 94 & $0.333$ \scriptsize$[0.209, 0.659]$ & $0.495$ \scriptsize$[0.266, 0.816]$ & 91/0/3 & $1.91\times 10^{-15}$ (9) & no & no \\
+$4n$ & MLP & Chow-Liu tree & 88 & $0.566$ \scriptsize$[0.353, 0.795]$ & $0.658$ \scriptsize$[0.435, 1.166]$ & 88/0/0 & $2.24\times 10^{-15}$ (9) & no & no \\
+$4n$ & CatBoost & Independent marginals & 99 & $0.913$ \scriptsize$[0.826, 0.978]$ & $0.881$ \scriptsize$[0.790, 0.964]$ & 99/0/0 & $5.13\times 10^{-17}$ (9) & no & no \\
+$4n$ & Linear & Independent marginals & 94 & $0.982$ \scriptsize$[0.937, 1.014]$ & $0.982$ \scriptsize$[0.926, 1.008]$ & 94/0/0 & $3.05\times 10^{-16}$ (9) & no & no \\
+$4n$ & MLP & Independent marginals & 88 & $1.220$ \scriptsize$[1.094, 1.467]$ & $1.327$ \scriptsize$[1.143, 1.629]$ & 88/0/0 & $2.24\times 10^{-15}$ (9) & no & no \\
+$4n$ & CatBoost & TVAE (native selected) & 21 & $0.201$ \scriptsize$[0.080, 0.351]$ & $0.201$ \scriptsize$[0.097, 0.339]$ & 19/0/2 & --- & no & no \\
+$4n$ & Linear & TVAE (native selected) & 21 & $0.213$ \scriptsize$[0.130, 0.414]$ & $0.262$ \scriptsize$[0.145, 0.473]$ & 20/0/1 & --- & no & no \\
+$4n$ & MLP & TVAE (native selected) & 20 & $0.286$ \scriptsize$[0.141, 0.694]$ & $0.426$ \scriptsize$[0.189, 1.231]$ & 19/0/1 & --- & no & no \\
+$4n$ & CatBoost & CTGAN (native selected) & 21 & $0.792$ \scriptsize$[0.705, 1.302]$ & $0.912$ \scriptsize$[0.731, 1.298]$ & 21/0/0 & --- & no & no \\
+$4n$ & Linear & CTGAN (native selected) & 21 & $0.983$ \scriptsize$[0.843, 1.426]$ & $1.066$ \scriptsize$[0.812, 1.695]$ & 21/0/0 & --- & no & no \\
+$4n$ & MLP & CTGAN (native selected) & 20 & $1.086$ \scriptsize$[0.707, 2.268]$ & $1.439$ \scriptsize$[0.788, 2.272]$ & 20/0/0 & --- & no & no \\
+$4n$ & CatBoost & Forest-Flow (historical) & 6 & $-0.035$ \scriptsize$[-0.477, -0.004]$ & $-0.231$ \scriptsize$[-0.382, -0.005]$ & 0/0/6 & --- & no & no \\
+$4n$ & Linear & Forest-Flow (historical) & 5 & $0.000$ \scriptsize$[-0.060, 0.037]$ & $0.002$ \scriptsize$[-0.051, 0.117]$ & 3/0/2 & --- & no & no \\
+$4n$ & MLP & Forest-Flow (historical) & 6 & $-0.027$ \scriptsize$[-0.411, -0.001]$ & $-0.080$ \scriptsize$[-0.562, 0.004]$ & 1/0/5 & --- & no & no \\
+$4n$ & CatBoost & DOPE, untuned default & 99 & $0.110$ \scriptsize$[0.033, 0.166]$ & $0.134$ \scriptsize$[0.053, 0.208]$ & 87/0/12 & --- & no & no \\
+$4n$ & Linear & DOPE, untuned default & 94 & $-0.001$ \scriptsize$[-0.017, 0.006]$ & $-0.003$ \scriptsize$[-0.026, 0.005]$ & 43/0/51 & --- & no & yes \\
+$4n$ & MLP & DOPE, untuned default & 88 & $0.080$ \scriptsize$[0.028, 0.132]$ & $0.138$ \scriptsize$[0.052, 0.251]$ & 69/0/19 & --- & no & no \\
+$4n$ & CatBoost & Predictor-only control & 99 & $0.194$ \scriptsize$[0.069, 0.252]$ & $0.197$ \scriptsize$[0.112, 0.267]$ & 92/0/7 & $2.80\times 10^{-14}$ (6) & no & no \\
+$4n$ & Linear & Predictor-only control & 94 & $0.001$ \scriptsize$[-0.015, 0.031]$ & $0.008$ \scriptsize$[-0.027, 0.046]$ & 51/0/43 & $0.230$ (6) & no & yes \\
+$4n$ & MLP & Predictor-only control & 88 & $0.165$ \scriptsize$[0.077, 0.248]$ & $0.227$ \scriptsize$[0.118, 0.378]$ & 79/0/9 & $4.73\times 10^{-13}$ (6) & no & no \\
+$4n$ & CatBoost & Real rows resampled & 99 & $-0.132$ \scriptsize$[-0.222, -0.050]$ & $-0.179$ \scriptsize$[-0.276, -0.074]$ & 10/0/89 & $2.02\times 10^{-13}$ (6) & no & no \\
+$4n$ & Linear & Real rows resampled & 94 & $-0.008$ \scriptsize$[-0.023, 0.003]$ & $-0.008$ \scriptsize$[-0.046, 0.008]$ & 33/0/61 & $0.050$ (6) & no & yes \\
+$4n$ & MLP & Real rows resampled & 88 & $-0.032$ \scriptsize$[-0.067, 0.000]$ & $-0.037$ \scriptsize$[-0.101, 0.070]$ & 25/0/63 & $0.046$ (6) & no & no \\
+$4n$ & CatBoost & CTGAN (author default) & 17 & $0.978$ \scriptsize$[0.810, 1.489]$ & $1.097$ \scriptsize$[0.863, 1.760]$ & 17/0/0 & $1.53\times 10^{-4}$ (12) & no & no \\
+$4n$ & CatBoost & Chow-Liu tree (default) & 99 & $0.211$ \scriptsize$[0.096, 0.283]$ & $0.230$ \scriptsize$[0.125, 0.348]$ & 82/0/17 & --- & no & no \\
+$4n$ & CatBoost & DOPE, later binary, seeds 23-71 & 99 & $0.007$ \scriptsize$[0.000, 0.012]$ & $0.011$ \scriptsize$[0.000, 0.021]$ & 76/0/23 & --- & yes & yes \\
+$4n$ & CatBoost & DOPE, later binary, seed 11 & 99 & $-0.021$ \scriptsize$[-0.061, 0.000]$ & $-0.037$ \scriptsize$[-0.079, -0.008]$ & 19/15/65 & --- & no & no \\
+$4n$ & CatBoost & DOPE, historical seed 11 & 97 & $-0.028$ \scriptsize$[-0.061, 0.000]$ & $-0.037$ \scriptsize$[-0.081, -0.008]$ & 20/12/65 & --- & no & no \\
+$4n$ & CatBoost & DOPE historical, 12 inputs, 512 steps & 97 & $0.036$ \scriptsize$[0.008, 0.107]$ & $0.061$ \scriptsize$[0.013, 0.162]$ & 73/0/24 & --- & no & no \\
+$4n$ & CatBoost & DOPE historical, 24 inputs, 2048 steps & 93 & $-0.012$ \scriptsize$[-0.033, 0.000]$ & $-0.020$ \scriptsize$[-0.045, -0.004]$ & 27/11/55 & --- & no & no \\
+$4n$ & CatBoost & DOPE historical, 24 inputs, 512 steps & 93 & $0.033$ \scriptsize$[0.006, 0.075]$ & $0.051$ \scriptsize$[0.013, 0.137]$ & 70/0/23 & --- & no & no \\
+$4n$ & CatBoost & Forest-Flow default (historical) & 6 & $-0.035$ \scriptsize$[-0.477, -0.004]$ & $-0.231$ \scriptsize$[-0.408, -0.005]$ & 0/0/6 & --- & no & no \\
+$4n$ & CatBoost & Gaussian copula (default) & 99 & $0.201$ \scriptsize$[0.062, 0.264]$ & $0.215$ \scriptsize$[0.091, 0.302]$ & 84/0/15 & --- & no & no \\
+$4n$ & CatBoost & TVAE (author default) & 18 & $0.470$ \scriptsize$[0.299, 0.785]$ & $0.505$ \scriptsize$[0.357, 0.739]$ & 18/0/0 & $9.16\times 10^{-5}$ (12) & no & no \\
+$4n$ & CatBoost & Independent marginals (default) & 99 & $0.917$ \scriptsize$[0.819, 0.975]$ & $0.884$ \scriptsize$[0.790, 0.966]$ & 99/0/0 & --- & no & no \\
+$4n$ & CatBoost & Predictor-only, split 2027 & 98 & $0.215$ \scriptsize$[0.097, 0.296]$ & $0.229$ \scriptsize$[0.141, 0.300]$ & 92/0/6 & --- & no & no \\
+$4n$ & CatBoost & Predictor-only, split 2999 & 99 & $0.177$ \scriptsize$[0.062, 0.266]$ & $0.198$ \scriptsize$[0.107, 0.280]$ & 83/0/16 & --- & no & no \\
+$4n$ & CatBoost & Predictor-only, split 4099 & 99 & $0.188$ \scriptsize$[0.088, 0.262]$ & $0.209$ \scriptsize$[0.130, 0.291]$ & 89/0/10 & --- & no & no \\
+$4n$ & CatBoost & Predictor-only, split 8191 & 99 & $0.172$ \scriptsize$[0.086, 0.245]$ & $0.190$ \scriptsize$[0.099, 0.269]$ & 85/0/14 & --- & no & no \\
+$4n$ & Linear & CTGAN (author default) & 17 & $1.277$ \scriptsize$[0.987, 2.628]$ & $1.463$ \scriptsize$[1.093, 2.148]$ & 17/0/0 & $1.53\times 10^{-4}$ (12) & no & no \\
+$4n$ & Linear & Chow-Liu tree (default) & 94 & $0.259$ \scriptsize$[0.136, 0.355]$ & $0.317$ \scriptsize$[0.183, 0.466]$ & 87/0/7 & --- & no & no \\
+$4n$ & Linear & DOPE, later binary, seeds 23-71 & 94 & $0.000$ \scriptsize$[-0.001, 0.003]$ & $0.000$ \scriptsize$[-0.003, 0.007]$ & 45/0/49 & --- & yes & yes \\
+$4n$ & Linear & DOPE, later binary, seed 11 & 94 & $0.000$ \scriptsize$[-0.002, 0.000]$ & $0.000$ \scriptsize$[-0.010, 0.007]$ & 39/16/39 & --- & yes & yes \\
+$4n$ & Linear & DOPE, historical seed 11 & 92 & $0.000$ \scriptsize$[-0.003, 0.001]$ & $0.000$ \scriptsize$[-0.011, 0.006]$ & 38/14/40 & --- & yes & yes \\
+$4n$ & Linear & DOPE historical, 12 inputs, 512 steps & 92 & $0.001$ \scriptsize$[-0.005, 0.007]$ & $0.003$ \scriptsize$[-0.008, 0.013]$ & 49/0/43 & --- & yes & yes \\
+$4n$ & Linear & DOPE historical, 24 inputs, 2048 steps & 88 & $0.000$ \scriptsize$[-0.006, 0.004]$ & $0.000$ \scriptsize$[-0.015, 0.012]$ & 38/11/39 & --- & yes & yes \\
+$4n$ & Linear & DOPE historical, 24 inputs, 512 steps & 88 & $0.001$ \scriptsize$[-0.005, 0.009]$ & $0.003$ \scriptsize$[-0.010, 0.016]$ & 48/0/40 & --- & yes & yes \\
+$4n$ & Linear & Forest-Flow default (historical) & 5 & $0.000$ \scriptsize$[-0.033, 0.037]$ & $0.002$ \scriptsize$[-0.051, 0.117]$ & 3/0/2 & --- & no & no \\
+$4n$ & Linear & Gaussian copula (default) & 94 & $0.034$ \scriptsize$[0.003, 0.079]$ & $0.061$ \scriptsize$[0.008, 0.169]$ & 68/0/26 & --- & no & no \\
+$4n$ & Linear & TVAE (author default) & 18 & $0.562$ \scriptsize$[0.321, 0.832]$ & $0.575$ \scriptsize$[0.393, 7.242]$ & 18/0/0 & $9.16\times 10^{-5}$ (12) & no & no \\
+$4n$ & Linear & Independent marginals (default) & 94 & $0.978$ \scriptsize$[0.947, 1.012]$ & $0.982$ \scriptsize$[0.924, 1.008]$ & 92/0/2 & --- & no & no \\
+$4n$ & Linear & Predictor-only, split 2027 & 93 & $-0.009$ \scriptsize$[-0.034, 0.002]$ & $-0.015$ \scriptsize$[-0.060, 0.001]$ & 35/0/58 & --- & no & no \\
+$4n$ & Linear & Predictor-only, split 2999 & 89 & $-0.007$ \scriptsize$[-0.031, 0.009]$ & $-0.010$ \scriptsize$[-0.060, 0.013]$ & 34/0/55 & --- & no & no \\
+$4n$ & Linear & Predictor-only, split 4099 & 91 & $-0.003$ \scriptsize$[-0.018, 0.014]$ & $-0.002$ \scriptsize$[-0.028, 0.025]$ & 40/0/51 & --- & no & yes \\
+$4n$ & Linear & Predictor-only, split 8191 & 91 & $-0.004$ \scriptsize$[-0.020, 0.011]$ & $-0.004$ \scriptsize$[-0.031, 0.022]$ & 39/0/52 & --- & no & yes \\
+$4n$ & MLP & CTGAN (author default) & 16 & $1.454$ \scriptsize$[1.030, 2.301]$ & $1.541$ \scriptsize$[1.148, 2.552]$ & 16/0/0 & $2.14\times 10^{-4}$ (12) & no & no \\
+$4n$ & MLP & Chow-Liu tree (default) & 88 & $0.394$ \scriptsize$[0.209, 0.570]$ & $0.489$ \scriptsize$[0.284, 0.799]$ & 84/0/4 & --- & no & no \\
+$4n$ & MLP & DOPE, later binary, seeds 23-71 & 88 & $0.005$ \scriptsize$[0.000, 0.008]$ & $0.007$ \scriptsize$[-0.004, 0.019]$ & 56/0/32 & --- & yes & yes \\
+$4n$ & MLP & DOPE, later binary, seed 11 & 88 & $-0.012$ \scriptsize$[-0.018, 0.000]$ & $-0.020$ \scriptsize$[-0.042, -0.002]$ & 24/12/52 & --- & no & no \\
+$4n$ & MLP & DOPE, historical seed 11 & 87 & $-0.012$ \scriptsize$[-0.021, 0.000]$ & $-0.020$ \scriptsize$[-0.042, -0.001]$ & 24/11/52 & --- & no & no \\
+$4n$ & MLP & DOPE historical, 12 inputs, 512 steps & 87 & $0.025$ \scriptsize$[0.004, 0.071]$ & $0.058$ \scriptsize$[0.015, 0.142]$ & 62/0/25 & --- & no & no \\
+$4n$ & MLP & DOPE historical, 24 inputs, 2048 steps & 84 & $-0.011$ \scriptsize$[-0.033, 0.000]$ & $-0.023$ \scriptsize$[-0.050, 0.000]$ & 24/9/51 & --- & no & no \\
+$4n$ & MLP & DOPE historical, 24 inputs, 512 steps & 84 & $0.024$ \scriptsize$[0.002, 0.064]$ & $0.047$ \scriptsize$[0.005, 0.124]$ & 57/0/27 & --- & no & no \\
+$4n$ & MLP & Forest-Flow default (historical) & 6 & $-0.027$ \scriptsize$[-0.411, -0.001]$ & $-0.080$ \scriptsize$[-0.562, 0.004]$ & 1/0/5 & --- & no & no \\
+$4n$ & MLP & Gaussian copula (default) & 88 & $0.185$ \scriptsize$[0.100, 0.351]$ & $0.299$ \scriptsize$[0.144, 0.618]$ & 78/0/10 & --- & no & no \\
+$4n$ & MLP & TVAE (author default) & 17 & $0.761$ \scriptsize$[0.375, 1.880]$ & $0.932$ \scriptsize$[0.557, 2.021]$ & 17/0/0 & $1.53\times 10^{-4}$ (12) & no & no \\
+$4n$ & MLP & Independent marginals (default) & 88 & $1.188$ \scriptsize$[1.056, 1.411]$ & $1.305$ \scriptsize$[1.121, 1.580]$ & 88/0/0 & --- & no & no \\
+$4n$ & MLP & Predictor-only, split 2027 & 78 & $0.103$ \scriptsize$[0.034, 0.205]$ & $0.194$ \scriptsize$[0.067, 0.362]$ & 60/0/18 & --- & no & no \\
+$4n$ & MLP & Predictor-only, split 2999 & 82 & $0.144$ \scriptsize$[0.045, 0.263]$ & $0.202$ \scriptsize$[0.075, 0.413]$ & 64/0/18 & --- & no & no \\
+$4n$ & MLP & Predictor-only, split 4099 & 84 & $0.113$ \scriptsize$[0.011, 0.199]$ & $0.154$ \scriptsize$[0.041, 0.290]$ & 61/0/23 & --- & no & no \\
+$4n$ & MLP & Predictor-only, split 8191 & 81 & $0.122$ \scriptsize$[0.040, 0.219]$ & $0.178$ \scriptsize$[0.064, 0.319]$ & 67/0/14 & --- & no & no \\
+\bottomrule
+\end{longtable}

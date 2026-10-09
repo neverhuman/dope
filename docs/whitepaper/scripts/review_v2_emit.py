@@ -105,6 +105,7 @@ def macros(panel: dict, byte_stats: dict, fits: list[dict], privacy: dict) -> st
                   cmd("VEquiv" + name, "---" if equivalent is None else ("yes" if equivalent else "no"))]
     lines += _strongest(panel, byte_stats)
     lines += _seed_macros(panel)
+    lines += _binary_macros(panel, fits)
     lines += _byte_macros(byte_stats, fits)
     lines += _sentences(panel, byte_stats)
     lines += _privacy_macros(privacy)
@@ -137,6 +138,25 @@ def _strongest(panel, byte_stats) -> list[str]:
             cmd("VStrongHolm", pval(row.get("holm_p"))), cmd("VVerdictStrong", VERDICT[row["verdict"]]),
             cmd("VStrongBytes", human_bytes(stats["median"])),
             cmd("VStrongRatio", ratio(stats["median"] / dope["median"]))]
+
+
+def _binary_macros(panel, fits) -> list[str]:
+    """Byte identity of the historical-binary refit against the later binary and the historical population."""
+    models = {(fit["configuration"], fit["dataset"]): fit.get("model_sha256") for fit in fits
+              if fit["fit_seed"] == 11 and fit["status"] == "ok"}
+    shared = [dataset for configuration, dataset in models if configuration == "headline_bnew"
+              and ("headline", dataset) in models]
+    same = sum(1 for dataset in shared if models[("headline", dataset)] == models[("headline_bnew", dataset)])
+    identity = panel.get("sample_identity") or {}
+    later = identity.get("fourseed_bnew") or {"fits": 0, "identical": 0}
+    history = identity.get("historical_seed11") or {"fits": 0, "identical": 0}
+    agree = bool(shared) and same == len(shared) and later["fits"] > 0 and later["identical"] == later["fits"]
+    sentence = ("Identical artifacts and samples leave the seed, not the binary, as the source of the gap." if agree
+                else "The binaries differ on some fits; supplement~E compares them cell by cell.")
+    return [cmd("VSameArtifact", same), cmd("VSameArtifactN", len(shared)),
+            cmd("VSameLater", later["identical"]), cmd("VSameLaterN", later["fits"]),
+            cmd("VSameHist", history["identical"]), cmd("VSameHistN", history["fits"]),
+            cmd("VBinarySentence", sentence)]
 
 
 def _seed_macros(panel) -> list[str]:
@@ -207,7 +227,11 @@ def _sentences(panel, byte_stats) -> list[str]:
     sentence = ("No generator comparison meets that rule." if count == 0 else
                 ("One generator comparison meets that rule" if count == 1 else
                  f"{count} generator comparisons meet that rule") + "; supplement~E lists every rule outcome.")
-    return [cmd("VParetoSet", ", ".join(pareto)), cmd("VRatioMin", ratio(min(larger)) if larger else DASH),
+    results = ("No generator comparison is equivalent under the pre-declared rule" if count == 0 else
+               ("One generator comparison is" if count == 1 else f"{count} generator comparisons are")
+               + " equivalent under the pre-declared rule")
+    return [cmd("VEquivResults", results),
+            cmd("VParetoSet", ", ".join(pareto)), cmd("VRatioMin", ratio(min(larger)) if larger else DASH),
             cmd("VRatioMax", ratio(max(larger)) if larger else DASH),
             cmd("VSizeRankSame", "is the same at both sizes" if same else "changes between the two sizes"),
             cmd("VSizeLifted", f"{lifted} of {len(full) - 1}"), cmd("VEquivCount", count),

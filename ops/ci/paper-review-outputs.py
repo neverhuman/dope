@@ -11,7 +11,7 @@ from typing import Callable, NamedTuple
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = '6b35b5124c1216e75c1ca200c44a909986b5a265551a041676063843167729b2'
+LOCK_SHA256 = 'feee440df084c798af7b7bb69e9e638d8145b77f5f2433ca6f3a2c3e279157cb'
 
 
 class Replay(NamedTuple):

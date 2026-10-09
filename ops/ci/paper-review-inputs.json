@@ -4,6 +4,10 @@
       "bytes": 6807387,
       "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
     },
+    "research/benchmark/results/arf-s3-population-native.json": {
+      "bytes": 1472035,
+      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+    },
     "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json": {
       "bytes": 1751802,
       "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
@@ -52,6 +56,18 @@
       "bytes": 458523,
       "sha256": "b9fd4600ec54fc89b938eb627f31d6112176fc4137e040c3686c15efd17d2d62"
     },
+    "research/benchmark/results/review-fixes-v2/fits.jsonl": {
+      "bytes": 501159,
+      "sha256": "723a83226ffb2bd510a23a06cb6363d5c4fd25b230dc4fea0d42c2a08d634687"
+    },
+    "research/benchmark/results/review-fixes-v2/panel.json": {
+      "bytes": 536116,
+      "sha256": "075a2b549ce8f6866674dd4ae738156c20b39e5692eef3534fafbbba9e35f1f4"
+    },
+    "research/benchmark/results/review-fixes-v2/scalar-cells.jsonl": {
+      "bytes": 22171980,
+      "sha256": "db455b0aa6e45a9dbc9649ab220cc217fd60020f3db12eb468544bef6d3f124f"
+    },
     "research/benchmark/results/s3-lineage-record.json": {
       "bytes": 1834757,
       "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
@@ -64,17 +80,25 @@
       "bytes": 13567823,
       "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
     },
+    "research/benchmark/results/tabsyn-default100-scaled-cuda-fits.json": {
+      "bytes": 555911,
+      "sha256": "cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272"
+    },
     "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json": {
       "bytes": 582699,
       "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
     },
     "research/benchmark/review_fixes/paper-build.json": {
-      "bytes": 1903,
-      "sha256": "d18cb21b86a0250842501e8627fc1bdf7ed421f57c8b920f4487cb552bccfd1f"
+      "bytes": 2557,
+      "sha256": "f4123c6cf40096ae9f3d1ed445f262309cc291340ff7ec50b4374412b642037c"
     },
     "research/benchmark/review_fixes/predeclare.json": {
       "bytes": 12002,
       "sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5"
+    },
+    "research/benchmark/review_fixes/predeclare_v2.json": {
+      "bytes": 21730,
+      "sha256": "851215f70725b49cc74c8768aee45599b480881e5316ffe62d6b8b18862e9a47"
     }
   },
   "format": "dope-paper-review-inputs-v1"

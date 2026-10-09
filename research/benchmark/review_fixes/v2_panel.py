@@ -186,7 +186,7 @@ def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs:
         "draws": draws, "levels": levels, "contrasts": contrasts,
         "strongest": strongest(levels, contrasts),
         "seed_rank": S.seed_rank_test(seeds), "seeds_23_71": sensitivity,
-        "two_by_two": two_by_two(values),
+        "two_by_two": two_by_two(values), "sample_identity": sample_identity(cells),
         "official_tests_opened": False, "formal_dp": False, "mfs_v3": None, "superiority": None,
     }
 
@@ -257,6 +257,29 @@ def check_fits(cells: list[dict], fits: list[dict]) -> None:
         if cell["method"] == "DOPE" and cell["configuration"] in refit:
             if (cell["configuration"], cell["dataset"], cell["fit_seed"]) not in ok:
                 raise ValueError("a DOPE cell has no ok fit in the fit ledger")
+
+
+def sample_identity(cells: list[dict]) -> dict:
+    """Fits whose synthetic samples are byte-identical between the headline refit and a diagnostic DOPE arm.
+
+    A fit counts when it shares at least one sample cell with the other arm and every shared cell
+    has the same synthetic digest.
+    """
+    digests: dict[tuple, dict] = defaultdict(dict)
+    for cell in cells:
+        if cell["method"] == "DOPE":
+            key = (cell["dataset"], cell["fit_seed"], cell["sample_seed"], cell["size"])
+            digests[cell["configuration"]][key] = cell["synthetic_sha256"]
+    out = {}
+    for other in ("headline_bnew", "fourseed_bnew", "historical_seed11"):
+        shared: dict[tuple, bool] = {}
+        for key, digest in digests.get(other, {}).items():
+            mine = digests.get(HEADLINE[1], {}).get(key)
+            if mine is not None:
+                fit = key[:2]
+                shared[fit] = shared.get(fit, True) and mine == digest
+        out[other] = {"fits": len(shared), "identical": sum(shared.values())}
+    return out
 
 
 def load_ledger(path: Path) -> list[dict]:

@@ -357,6 +357,8 @@ def protocol_tokens():
     _must_contain(root / "research/benchmark/review_fixes/predeclare.json", '"track": "scaled_200_vae_1000_diffusion"', failures)
     _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", '"features12_steps512"', failures)
     _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", "1,800 s per fit", failures)
+    _must_contain(root / "research/benchmark/publish_tabsyn_population_fits.py",
+                  "'author_default_epochs': {'vae': 4000, 'diffusion': 10001}", failures)
     if failures:
         raise ValueError("; ".join(failures))
     tokens = {
@@ -365,7 +367,7 @@ def protocol_tokens():
         "0.002", "0.01", "0.05", "0.10", "0.15", "0.20", "0.25", "0.30", "0.35", "0.45",
         "0.70", "0.75", "0.80", "0.85", "0.90", "0.95", "1.0", "1.5", "1.6", "2.569",
         "82.40", "0.14", "101", "211", "307", "11", "95", "0", "20",
-        "9", "23", "71", "90", "200", "512", "1000", "1729", "1800",
+        "9", "23", "71", "90", "200", "512", "1000", "1729", "1800", "4000", "10001",
     }
     rounded = f"{illustration_value():.2f}"
     if rounded != "82.40":
