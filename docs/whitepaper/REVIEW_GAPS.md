@@ -35,12 +35,12 @@ why it cannot be done. If a new result weakens a claim, the paper weakens the cl
 | PR-11 | No stress suite or ablations | XOR/parity/product; k, blocks, budget | not started. No number |
 | PR-12 | Credentialed data path; profile default | PMLB fetch path; no default profile; artifact statement | open |
 | PR-13 | Novelty claimed on the metric; teaser shows marginal medians | Credit TSTR/TRTR; paired-difference teaser | closed: Esteban et al. TSTR/TRTR cited; claim is the encoding and the release gate; teaser draws the DOPE generator minus author-default ARF, the Gaussian copula, and Chow--Liu with stored family-cluster intervals |
-| RS-01 | ARF missing from abstract, Fig. 1, and the strongest-baseline sentence | Put the generated paired ARF difference in those places | closed: abstract, the within-block headline sentence, and Fig. 1 use author-default size-$4n$ family-cluster ARF from the pinned review panel. The teaser draws that series beside the copula and Chow--Liu |
+| RS-01 | ARF missing from abstract, Fig. 1, and the strongest-baseline sentence | Put the generated paired ARF difference in those places | closed: abstract, Fig. 1, the headline sentence, and `generated/headline-table.tex` use author-default size-$4n$ family-cluster ARF from the pinned review panel. The linear interval contains zero. The teaser draws that series beside the copula and Chow--Liu |
 | RS-02 | Tables 12–14 lack a DOPE row on the same cohort | Matched-cohort DOPE row from lane B | closed for placement: `generated/review-tabsyn.tex` is in the supplement on the informative intersection, with a DOPE row. The CatBoost hierarchical interval contains zero at both sizes. The TOST column is no. Distinct from the retained subset |
 | RS-03 | C2ST classifier differs by method | One classifier and one n for every method | CatBoost C2ST is in the supplement privacy panel for every scored method. Forest-Flow remains unscored. Lineage counts differ where a sample is absent. The stored logistic file stays uninput |
 | RS-04 | DOPE called a measurement in the abstract and a generator in the figures | One definition | closed: title, abstract, and captions name DOPE as the encoding and the generator it writes; retention is the measurement. Legend source files outside this lane still print the generator label |
-| 11c | Negation density above 5 per 1,000 words | Keep every caveat and drop spaced " not " | closed in prose: local `pdftotext -layout` of `target/paper-build/dope-mfs.pdf` has 5 spaced " not " in 5859 words (0.853 per 1,000). The utility-score sentence keeps one required "not" |
-| 11d | Main body before References over 10 pages | Move long displays into the supplement | local rebuild is 11 pages and the References heading is the first line of page 11. Body before References is 10 pages. The `docs/whitepaper` PDF copies are not refreshed. Slack before another main-text block is zero |
+| 11c | Negation density above 5 per 1,000 words | Keep every caveat and drop spaced " not " | closed in prose: local `pdftotext -layout` of `target/paper-build/dope-mfs.pdf` has 5 spaced " not " in 5811 words (0.860 per 1,000). The utility-score sentence keeps one required "not" |
+| 11d | Main body before References over 10 pages | Move long displays into the supplement | local rebuild is 11 pages and the References heading is the first line of page 11. Body before References is 10 pages. The `docs/whitepaper` PDF copies are not refreshed |
 
 ## Wave 1 / wave 2
 
@@ -58,8 +58,8 @@ In progress, wave 2. No number:
 
 - TabDDPM population v5, unit `dope-rf-tabddpm-v5`, still running on xbabe3 at the pre-registered config. A failed or missing cell is not a win.
 - DOPE fit seeds beyond published fit seed 11. f6665d9 exposes `compile --fit-seed`. The learned-runtime qualification passed on xbabe1. Release builds `dope-rf-seeds-build-x1` and `dope-rf-seeds-build-x3` are running. Fit units are not started. No number.
-- The sealed official-test run. It has not started. A start marker now refuses any later invocation, so an interrupted attempt stays incomplete.
+- The sealed official-test run has not started. In progress, wave 2. A resume can accept a matching start marker and skip the exclusive gate, so that guard stays open. No official-test number is reported.
 
-PR-11, the XOR/parity/product stress suite, was not started.
+PR-11, the XOR/parity/product stress suite, was not started. In progress, wave 2. No number.
 
 Lane A placement: the labeled review panels are in the manuscript. `review-tost.tex`, `review-rmse.tex`, `review-fidelity-stored.tex`, and `review-seeds-existing.tex` stay uninput because an ARF block repeats in each without an author-default versus native-selected column.

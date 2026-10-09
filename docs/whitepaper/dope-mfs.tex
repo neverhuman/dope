@@ -412,20 +412,14 @@ The DOPE generator's retention minus ARF has CatBoost paired median $\DiffArfCb$
 ($n=\NDiffArfCb$; \WtlArfCb). The linear interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.
 The MLP interval is $\LoDiffArfMlp$ to $\HiDiffArfMlp$ ($n=\NDiffArfMlp$; \WtlArfMlp).
 Those three intervals are the family-cluster bootstrap of the median. The legacy simultaneous median interval stays in the supplement.
-\ArfResult\ is the displayed-profile publication median. The retained classical cohort in the supplement uses another aggregation, so the two ARF levels answer different rows.
-The Chow--Liu CatBoost median in this density block is $\MedChowCb$ on the paired informative lineages. The supplement's threshold table counts a different informative set, so its Chow--Liu column is a different cohort.
-\cref{tab:headline} keeps, for each block and auditor, the tuned
-baseline with the highest paired median retention inside that block. The difference is DOPE
-minus that baseline. Its interval is the paired lineage bootstrap already
-used in the block tables. W/T/L counts lineages with a positive, zero, or
-negative difference. Holm $p$ is the adjustment inside that block's existing
-family. The family is the one already used in the block, and the blocks stay unpooled. A positive
-median with a small $p$-value still includes lineage losses. The paired
-median difference stays distinct from the difference of the two medians.
+\cref{tab:headline} places those full-panel rows beside the strongest tuned baseline inside each block.
+\ArfResult\ is the displayed-profile publication median and answers a different row from the retained classical cohort.
+The Chow--Liu CatBoost median in this density block is $\MedChowCb$. The supplement's threshold table counts a different informative set.
+The paired median difference stays distinct from the difference of the two medians.
 $\DiffGaussCb$ stays distinct from $\MedDopeCb$ minus $\MedGaussCb$.
 
 \begin{table}[t]
-\caption{\textbf{Strongest tuned baseline inside each block at $4n$.} Author-default ARF is the full-panel baseline and stays outside this table. Its CatBoost family-cluster interval is $\LoDiffArfCb$ to $\HiDiffArfCb$. The denominator is the paired informative lineages in the cell. W/T/L counts a positive, zero, or negative difference. A zero is the tie in that count. Equivalence stays unclaimed. Holm stays inside the block: nine density tests, six neural tests, or three Forest-Flow tests.}
+\caption{\textbf{Strongest baseline at $4n$.} The full-panel rows are author-default ARF, with the family-cluster interval. The other rows are the strongest tuned baseline inside one block, with the paired lineage-bootstrap interval. The linear ARF interval contains zero. Equivalence stays unclaimed. Holm for the ARF rows is the size-$4n$ family of six. Holm for the other rows stays inside the block: nine density tests, six neural tests, or three Forest-Flow tests. W/T/L counts a positive, zero, or negative difference. A zero is the tie in that count.}
 \label{tab:headline}
 \centering
 \footnotesize
@@ -550,15 +544,8 @@ $\ForestByteLo$ to $\ForestByteHi$ bytes (median $\ForestByteMedian$)
 against a DOPE median of $\DopeForestByteMedian$ on the same lineages.
 MFS-v2 on this block is null.
 
-The supplement holds the published matched-population receipt
-for ARF at $4n$ on the displayed profile. Complete-population TabDDPM,
-TabSyn, and Forest-Flow receipts are omitted; the completed retained
-TabSyn subset is reported separately below.
-
 \subsection{Retained validation evidence}
-The supplement records the retained classical rows, the matched TabSyn
-subset, the legacy DOPE--ARF intervals, and the coverage table.
-Those cohorts stay distinct from the density block above.
+The supplement records the retained classical rows, the matched TabSyn subset, the legacy DOPE--ARF intervals, and the coverage table. Those cohorts stay distinct from the density block. Complete-population TabDDPM and Forest-Flow receipts stay omitted.
 
 \subsection{Release score}
 \textbf{Release scalars stay null.} \eqref{eq:mfs} remains the historical formula.
@@ -579,9 +566,7 @@ The claim remains the byte-budgeted encoding and the release gate.
 (ii) The supplement reports a predictor-only control beside the synthetic rows. On CatBoost the paired difference favors the DOPE generator. On the linear auditor the interval contains zero. Equivalence stays unclaimed.
 (iii) CTGAN, TVAE, and the displayed profile's compile search select and score on the same validation rows.
 (iv) Related simulation lineages can shift an interval that treats lineages as independent.
-(v) The displayed generator uses fit seed $11$ alone, so the reported interval omits fitting uncertainty.
-
-The supplement records the validation-cut deviation and the sealed official test.
+(v) The displayed generator uses fit seed $11$ alone, so the reported interval omits fitting uncertainty. Extra fit seeds, TabDDPM v5, the sealed official test, and the stress suite remain in progress, wave 2. This paper prints no number for them. The supplement records the validation-cut deviation.
 
 \section{Conclusion}
 The claim is the byte-budgeted encoding and the release gate. Retention is
