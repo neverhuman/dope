@@ -284,22 +284,14 @@ def read_checkpoint(path: Path) -> dict | None:
 
 
 def registry_mode(registry: Path, expect_sha256: str, expect_git_blob: str) -> str:
-    """panel.json refuses. A matching start marker resumes and is not deleted."""
+    """A fresh registry is the only mode. An existing start marker is not a resume."""
+    if not isinstance(expect_sha256, str) or not isinstance(expect_git_blob, str):
+        raise SystemExit("sealed freeze pin is missing")
     if (registry / "panel.json").exists():
         raise SystemExit("sealed registry already exists; refusing a second run")
-    started = registry / "started.json"
-    if not started.exists():
-        return "fresh"
-    try:
-        payload = json.loads(started.read_text())
-    except json.JSONDecodeError as error:
-        raise SystemExit("sealed start marker is unreadable; refusing to continue") from error
-    if (
-        payload.get("predeclaration_sha256") != expect_sha256
-        or payload.get("predeclaration_git_blob") != expect_git_blob
-    ):
-        raise SystemExit("sealed start marker does not match the committed predeclare; refusing to continue")
-    return "resume"
+    if (registry / "started.json").exists():
+        raise SystemExit("sealed start marker already exists; refusing to reopen official tests")
+    return "fresh"
 
 
 def _control_identity(cell: dict, dataset: str, method: str, size: int, seed: int) -> str | None:
@@ -521,6 +513,8 @@ def main() -> None:
             "sealed output must be /mnt/fast-scratch/dope-benchmark/review-fixes-lane-b/sealed-v1"
         )
     mode = registry_mode(REGISTRY, args.expect_sha256, args.expect_git_blob)
+    if mode != "fresh":
+        raise SystemExit("sealed registry mode must be fresh")
     for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
         os.environ[key] = "1"
     names = {
@@ -528,10 +522,7 @@ def main() -> None:
         for row in json.loads((RESULTS / "s3-lineage-record.json").read_text())["rows"]
     }
     manifest = _preflight(args.controls, sorted(names))
-    if mode == "fresh":
-        document = _gate(args, manifest)
-    else:
-        document = _assert_original_freeze(args.predeclare, args.expect_sha256, args.expect_git_blob)
+    document = _gate(args, manifest)
     frozen = document["sealed_test"]["configuration_frozen_by_this_file"]
     pilot = _pilot()
     indexed = {
@@ -543,7 +534,7 @@ def main() -> None:
     ]
     control_methods = ("real_bootstrap_4n", "predictor_only_fit_seed_11")
     cells = []
-    opened = mode == "resume"
+    opened = False
     for dataset in sorted(names):
         jobs = []
         for method, configuration in methods:

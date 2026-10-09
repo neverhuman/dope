@@ -117,26 +117,32 @@ class SealedGateTests(unittest.TestCase):
                 else:
                     os.environ["DOPE_RF_UNSEAL"] = old
 
-    def test_resume_keeps_a_finished_cell_and_the_marker(self):
+    def test_started_marker_refuses_reopen_and_keeps_output(self):
         with tempfile.TemporaryDirectory() as tmp:
             registry = Path(tmp)
+            self.assertEqual(registry_mode(registry, FREEZE_SHA256, FREEZE_BLOB), "fresh")
             started = {
                 "predeclaration_sha256": FREEZE_SHA256,
                 "predeclaration_git_blob": FREEZE_BLOB,
             }
-            (registry / "started.json").write_text(json.dumps(started) + "\n")
-            self.assertEqual(registry_mode(registry, FREEZE_SHA256, FREEZE_BLOB), "resume")
+            marker = registry / "started.json"
+            marker.write_text(json.dumps(started) + "\n")
+            before = marker.read_text()
             path = cell_path(registry, "aa", "DOPE", "features12_steps2048", 1, 101)
             write_json(path, {"dataset": "aa", "status": "ok"})
+            with self.assertRaises(SystemExit) as caught:
+                registry_mode(registry, FREEZE_SHA256, FREEZE_BLOB)
+            self.assertIn("refusing to reopen", str(caught.exception))
+            self.assertEqual(marker.read_text(), before)
             self.assertEqual(read_checkpoint(path)["status"], "ok")
-            self.assertTrue((registry / "started.json").is_file())
             with self.assertRaises(SystemExit):
                 registry_mode(registry, "0" * 64, FREEZE_BLOB)
-            self.assertTrue((registry / "started.json").is_file())
+            self.assertEqual(marker.read_text(), before)
             (registry / "panel.json").write_text("{}\n")
             with self.assertRaises(SystemExit) as caught:
                 registry_mode(registry, FREEZE_SHA256, FREEZE_BLOB)
             self.assertIn("already exists", str(caught.exception))
+            self.assertEqual(marker.read_text(), before)
 
     def test_shape_problem_rejects_a_short_sample(self):
         self.assertEqual(_shape_problem(4, 3, 4, 3, 1), None)
