@@ -142,7 +142,6 @@ def unique_group_rows(x, seed):
 
 
 def c2st(real, synthetic, auditor):
-    from functools import partial
     import numpy as np
     from sklearn.metrics import roc_auc_score
     from sklearn.model_selection import StratifiedGroupKFold
@@ -169,17 +168,10 @@ def c2st(real, synthetic, auditor):
             from catboost import CatBoostClassifier
             model = CatBoostClassifier(iterations=100, depth=6, random_seed=SEED, thread_count=4,
                                        verbose=False, allow_writing_files=False, task_type="CPU")
-            # fit() computes feature importance with its own default thread count.
-            # Bind that calculation to the same budget as detector training.
-            model.get_feature_importance = partial(model.get_feature_importance, thread_count=4)
         else:
             raise ValueError("unknown_detection_auditor")
         model.fit(x[fit], y[fit])
-        if auditor == "catboost":
-            predictions = model.predict_proba(x[test], thread_count=4)
-        else:
-            predictions = model.predict_proba(x[test])
-        pred[test] = predictions[:, 1]
+        pred[test] = model.predict_proba(x[test])[:, 1]
         scores.append(float(roc_auc_score(y[test], pred[test])))
     return measured(float(np.mean(scores)), fold_aucs=scores, pooled_oof_auc=float(roc_auc_score(y, pred)),
                     folds=5, rows_per_class=n, auditor=auditor, duplicate_group_leakage=False)

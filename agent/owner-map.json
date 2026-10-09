@@ -309,6 +309,7 @@
     "docs/whitepaper/scripts/readme_benchmark.py": "external-evidence",
     "docs/whitepaper/scripts/test_readme_benchmark.py": "external-evidence",
     "docs/readme/retention-bars.png": "governance",
-    "examples/readme-regression/": "governance"
+    "examples/readme-regression/": "governance",
+    "research/benchmark/bounded_auditors.py": "external-evidence"
   }
 }

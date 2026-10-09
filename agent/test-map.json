@@ -1208,6 +1208,10 @@
     "examples/readme-regression/": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "regenerate the README toy tables from the documented unit-interval formula"
+    },
+    "research/benchmark/bounded_auditors.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics research.benchmark.tests.test_real_test_utility -v",
+      "purpose": "verify explicit four-thread feature-importance and prediction calls for future auditors while preserving historical measured harness identities and numerical equations"
     }
   }
 }

@@ -8,9 +8,7 @@ import unittest
 from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location("diagnostics", HERE / "expanded_validation_metrics.py")
-metrics = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(metrics)
+from research.benchmark import bounded_auditors as metrics
 
 
 def pinned_author_tree(relative_path, expected_sha256):
@@ -256,7 +254,7 @@ class Controls(unittest.TestCase):
                 raise AssertionError("numerical_dependency_initialized_before_caller_custody_check")
             return original(name, *args, **kwargs)
         with patch("builtins.__import__", side_effect=guarded):
-            isolated_spec = importlib.util.spec_from_file_location("isolated_diagnostics", HERE / "expanded_validation_metrics.py")
+            isolated_spec = importlib.util.spec_from_file_location("isolated_diagnostics", HERE / "bounded_auditors.py")
             isolated = importlib.util.module_from_spec(isolated_spec)
             isolated_spec.loader.exec_module(isolated)
 

@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import patch
 
-from research.benchmark import pilot_metrics, real_test_utility
+from research.benchmark import bounded_auditors, pilot_metrics, real_test_utility
 from research.benchmark.manifest import digest
 from research.benchmark.real_test_utility import evaluate, retention
 from research.benchmark.score import artifact_inventory, sha256
@@ -52,7 +52,7 @@ class RealTestUtilityTests(unittest.TestCase):
                 y = (x[:, 0] >= .5).astype(int) if task == "binary" else x[:, 0] ** 2
                 with patch.object(cls, "get_feature_importance", checked_importance), \
                         patch.object(cls, prediction_name, checked_prediction):
-                    model = pilot_metrics._model("catboost", task, 1729).fit(x, y)
+                    model = bounded_auditors._model("catboost", task, 1729).fit(x, y)
                     loss = pilot_metrics._loss(model, x, y, task)
                 self.assertTrue(math.isfinite(loss))
                 self.assertEqual(calls, {"importance": [4], "prediction": [4]})
