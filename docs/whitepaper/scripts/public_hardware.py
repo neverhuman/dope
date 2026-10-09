@@ -40,16 +40,39 @@ _BANNED = (
 )
 _PULL_REQUEST = re.compile(r"(?i)\b(?:PR|pull request)\s*#\s*\d+")
 _PRIVATE_PATH = ("/home/ubuntu", "/mnt/fast-scratch", ".agent", "worktree", "xbabe")
+_ALLOWED_REPO_URL = "https://github.com/neverhuman/dope"
+_JOURNAL_AVAILABILITY_BEGIN = "% BEGIN JOURNAL AVAILABILITY\n"
+_JOURNAL_AVAILABILITY_END = "% END JOURNAL AVAILABILITY\n"
 
 
 def banned_hits(text):
-    """Return banned tokens present in text. Longer host forms are listed first."""
+    """Return banned tokens present in text. Longer host forms are listed first.
+
+    Exactly one public repository URL is allowed. Any other ``neverhuman``,
+    including a second copy of that URL, is still a hit.
+    """
     if not isinstance(text, str):
         return []
-    found = [token for token in _BANNED if token in text]
-    if _PULL_REQUEST.search(text):
+    scanned = text
+    if text.count(_ALLOWED_REPO_URL) == 1:
+        scanned = text.replace(_ALLOWED_REPO_URL, "", 1)
+    found = [token for token in _BANNED if token in scanned]
+    if _PULL_REQUEST.search(scanned):
         found.append("pull request number")
     return found
+
+
+def strip_journal_availability(src):
+    """Drop the journal-only repository sentence. The Jankurai sentence stays."""
+    if not isinstance(src, str):
+        raise ValueError("journal availability markers are not unique")
+    if src.count(_JOURNAL_AVAILABILITY_BEGIN) != 1 or src.count(_JOURNAL_AVAILABILITY_END) != 1:
+        raise ValueError("journal availability markers are not unique")
+    begin = src.index(_JOURNAL_AVAILABILITY_BEGIN)
+    finish = src.index(_JOURNAL_AVAILABILITY_END)
+    if finish < begin:
+        raise ValueError("journal availability markers are out of order")
+    return src[:begin] + src[finish + len(_JOURNAL_AVAILABILITY_END):]
 
 
 def machine_label(host):

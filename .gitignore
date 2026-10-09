@@ -11,3 +11,9 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+# README toy outputs. The inspect transcript is committed; these are not.
+/examples/readme-regression/toy.dpk
+/examples/readme-regression/toy.dpk.report.json
+/examples/readme-regression/toy.dpk.pareto.json
+/examples/readme-regression/synth.csv

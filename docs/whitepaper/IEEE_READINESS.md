@@ -1,3 +1,9 @@
+# Historical note
+
+The page counts and the "not measured" sentences below are a snapshot. They
+are superseded by the manuscript on main, `docs/whitepaper/dope-mfs.tex`, and
+the PDFs built from it. Do not use this note as the current result.
+
 # IEEE review readiness
 
 ## Retained-evidence update, 2026-10-07

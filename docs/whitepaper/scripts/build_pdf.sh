@@ -16,10 +16,13 @@ build_one() {
 }
 build_one dope-mfs
 build_one supplement
-# The anonymous PDF changes only the byline and the running header.
-# The source dope-mfs.tex keeps Jepson Taylor and Alton Alexander.
+# The anonymous PDF changes the byline, the running header, and drops the
+# journal-only repository URL. The source dope-mfs.tex keeps the byline.
 python3 - << 'PY'
+import sys
 from pathlib import Path
+sys.path.insert(0, "scripts")
+from public_hardware import strip_journal_availability
 src = Path("dope-mfs.tex").read_text()
 pairs = (
     (
@@ -34,6 +37,9 @@ for old, new in pairs:
     if src.count(old) != 1:
         raise SystemExit("author marker is not unique: " + old)
     src = src.replace(old, new, 1)
+src = strip_journal_availability(src)
+if "neverhuman" in src:
+    raise SystemExit("anonymous manuscript still names the repository")
 Path("dope-mfs-anonymous.tex").write_text(src)
 PY
 build_one dope-mfs-anonymous

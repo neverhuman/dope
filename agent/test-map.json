@@ -1184,6 +1184,22 @@
     "docs/whitepaper/generated/baseline-budget.tex": {
       "command": "target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -v",
       "purpose": "regenerate fit-cap and timeout macros only from hash-bound original baseline receipts"
+    },
+    "docs/whitepaper/scripts/readme_benchmark.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
+      "purpose": "keep the README CatBoost table and retention figure on the committed density table"
+    },
+    "docs/whitepaper/scripts/test_readme_benchmark.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
+      "purpose": "keep the README CatBoost table and retention figure on the committed density table"
+    },
+    "docs/readme/retention-bars.png": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
+      "purpose": "keep the README CatBoost table and retention figure on the committed density table"
+    },
+    "examples/readme-regression/": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
+      "purpose": "regenerate the README toy tables from the documented unit-interval formula"
     }
   }
 }

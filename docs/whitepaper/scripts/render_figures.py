@@ -325,8 +325,12 @@ def _paired_bars(block, baseline_keys):
     return rows, int(anchor["n"])
 
 
-def draw_retention_bars(stats, dest=None):
-    """CatBoost retention medians. Density and neural blocks stay unpooled."""
+def draw_retention_bars(stats, dest=None, *, readme=False):
+    """CatBoost retention medians. Density and neural blocks stay unpooled.
+
+    ``readme=True`` is the same bars for the repository front page. It does
+    not redraw the paper PDF.
+    """
     panels = (
         (
             _paired_bars(
@@ -374,10 +378,20 @@ def draw_retention_bars(stats, dest=None):
         axis.set_axisbelow(True)
         axis.spines["top"].set_visible(False)
         axis.spines["right"].set_visible(False)
-    axes[0].set_ylabel("CatBoost retention (dimensionless)")
+    if readme:
+        axes[0].set_ylabel("retention (dimensionless)")
+        for axis in axes:
+            axis.set_xlabel("method")
+    else:
+        axes[0].set_ylabel("CatBoost retention (dimensionless)")
     axes[0].set_ylim(-0.42, 1.22)
     figure.tight_layout(pad=0.45)
     path = Path(dest) if dest is not None else FIG / "retention-bars.pdf"
+    if readme:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        figure.savefig(path, dpi=160)
+        plt.close(figure)
+        return path
     _save(figure, path)
     return path
 
