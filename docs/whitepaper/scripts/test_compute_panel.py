@@ -16,6 +16,7 @@ class PanelInputTests(unittest.TestCase):
                 original = panel.RESULTS / name
                 with tempfile.TemporaryDirectory(dir=panel.REPO / "target") as directory:
                     path = Path(directory) / name
+                    path.parent.mkdir(parents=True, exist_ok=True)
                     path.write_bytes(original.read_bytes() + b" ")
                     with patch.object(panel, "RESULTS", Path(directory)):
                         with self.assertRaisesRegex(ValueError, "digest mismatch"):
@@ -45,6 +46,16 @@ class PanelInputTests(unittest.TestCase):
                 (root / "s3-data.lock.json").symlink_to(__file__)
                 with self.assertRaisesRegex(ValueError, "symlinked"):
                     panel.load("s3-data.lock.json")
+
+    def test_redirected_nested_input_fails_even_when_bytes_match(self):
+        name = "review-fixes-receipts-v1/panel.json"
+        with tempfile.TemporaryDirectory(dir=panel.REPO / "target") as directory:
+            root = Path(directory)
+            (root / "review-fixes-receipts-v1").symlink_to(
+                panel.RESULTS / "review-fixes-receipts-v1", target_is_directory=True)
+            with patch.object(panel, "RESULTS", root):
+                with self.assertRaisesRegex(ValueError, "symlinked"):
+                    panel.load(name)
 
     def test_summary_duplicate_and_unknown_raise_even_for_blank_rows(self):
         row = {"method": "DOPE", "dataset": "aa", "configuration": "frozen", "size_multiplier": 4,

@@ -49,7 +49,8 @@ INPUT_SHA256 = {
     "s3-data.lock.json": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
     "s3-lineage-record.json": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7",
     "s3-matched-forest-confirmation-validation.json": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f",
-    "sdv-matched-population-validation.json": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+    "sdv-matched-population-validation.json": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e",
+    "review-fixes-receipts-v1/panel.json": "f0ecf5929825f1f07d877d4e01714f1ebd55868db3b863482f46be0f27ffdf47"
 }
 
 def load(name):
@@ -57,7 +58,7 @@ def load(name):
     if name not in INPUT_SHA256:
         raise ValueError("unregistered panel input")
     path = RESULTS / name
-    if path.is_symlink():
+    if path.is_symlink() or path.resolve() != RESULTS.resolve() / name:
         raise ValueError("symlinked panel input")
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != INPUT_SHA256[name]:
@@ -569,6 +570,9 @@ def write_headline_table(blocks):
     arf_stems = {"catboost": "Cb", "linear": "Lin", "mlp": "Mlp"}
     rows = []
     import paper_emit
+    # Register and authenticate this new table dependency before formatting
+    # the macro-backed ARF rows, as for the original numerical ledgers.
+    load("review-fixes-receipts-v1/panel.json")
     arf_rows = paper_emit.arf_author_default_rows()
     for auditor in AUDITORS:
         stem = arf_stems[auditor]
