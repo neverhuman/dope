@@ -4,7 +4,13 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research.benchmark.verify_paper_numbers import REPO, main, parse_watch, untraced_numbers
+from research.benchmark.verify_paper_numbers import (
+    REPO,
+    main,
+    manuscript_for_scan,
+    parse_watch,
+    untraced_numbers,
+)
 
 
 class VerifyPaperNumbers(unittest.TestCase):
@@ -24,6 +30,11 @@ class VerifyPaperNumbers(unittest.TestCase):
     def test_untraced_decimal_is_reported(self):
         missing = untraced_numbers("The median is $0.12345$. Width 16 stays.", {"16"})
         self.assertEqual(missing, ["0.12345"])
+
+    def test_style_filename_is_not_a_measurement(self):
+        tex = "\\usepackage{iclr2027_conference,times}\nWidth 16 stays.\n"
+        missing = untraced_numbers(manuscript_for_scan(tex), {"16"})
+        self.assertEqual(missing, [])
 
     def test_generated_inputs_are_not_scanned(self):
         tex = "\\input{generated/numbers.tex}\nSee $0.12345$ in the table.\n"

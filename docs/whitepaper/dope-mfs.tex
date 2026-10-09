@@ -37,9 +37,12 @@
 
 % Scale a generated tabular down to the line only when it is wider.
 % End-of-line characters are kept so row breaks in the generated file remain.
+% The ceiling is a layout register. It is wider than any generated tabular.
+\newlength{\fittowidthmax}
+\setlength{\fittowidthmax}{40in}
 \newcommand{\fittowidthfile}[1]{%
   \begingroup
-  \setbox0=\hbox{\begin{varwidth}{40in}\input{#1}\end{varwidth}}%
+  \setbox0=\hbox{\begin{varwidth}{\fittowidthmax}\input{#1}\end{varwidth}}%
   \ifdim\wd0>\linewidth
     \resizebox{\linewidth}{!}{\unhbox0}%
   \else

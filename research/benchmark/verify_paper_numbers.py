@@ -370,6 +370,11 @@ def supplement_for_scan(text):
     return text.replace("SHA-256", "SHA")
 
 
+def manuscript_for_scan(text):
+    """Drop the vendored style filename. Its digits name the class file, not a measurement."""
+    return text.replace("iclr2027_conference", "iclrstyle")
+
+
 def check_inventory_caption():
     """The family count is the generated macro, not a second typed copy."""
     failures = []
@@ -461,7 +466,7 @@ def main(argv=None):
     else:
         failures.extend(check_macros(evidence, numbers))
     allowed = protocol_tokens()
-    missing = untraced_numbers(TEX.read_text(), allowed)
+    missing = untraced_numbers(manuscript_for_scan(TEX.read_text()), allowed)
     if missing:
         failures.append("untraced numbers in dope-mfs.tex: " + ", ".join(missing[:30]))
     if SUPPLEMENT.is_file():
