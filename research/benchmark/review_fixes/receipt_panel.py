@@ -303,7 +303,6 @@ def build(stop_after_anchor: bool = False) -> dict:
     arf, arf_sha = _load("arf-matched-population-validation.json")
     forest, forest_sha = _load("s3-matched-forest-confirmation-validation.json")
     names = names_of(record)
-    tasks = load_tasks(names)
     reductions = {}
     for method, configuration in DENSITY:
         reductions[(method, configuration)] = reduce_cells(density["cells"], method, configuration)
@@ -339,6 +338,7 @@ def build(stop_after_anchor: bool = False) -> dict:
             "anchor": {"n": len(anchor_values), "median": anchor_median},
             "predeclaration_sha256": _sha(predeclare_path),
         })
+    tasks = load_tasks(names)
 
     compared = disagreements = 0
     for size in (1, 4):
