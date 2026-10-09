@@ -119,7 +119,7 @@ class PublishedSourcePinTests(unittest.TestCase):
         (self.root / "s3-lineage-record.json").write_bytes(b"opaque replacement")
         registry = self.root / "toy-registry-never-opened"
         argv = ["sealed-toy", "--predeclare", str(self.root / "never-read"),
-                "--expect-sha256", "unused", "--expect-git-blob", "unused",
+                "--expect-sha256", "0" * 64, "--expect-git-blob", "0" * 40,
                 "--controls", str(self.root / "never-read-controls"),
                 "--out", str(registry), "--host", sealed.APPROVED_HOST]
         with (
