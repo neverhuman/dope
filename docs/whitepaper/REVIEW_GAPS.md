@@ -17,7 +17,7 @@ why it cannot be done. If a new result weakens a claim, the paper weakens the cl
 | CM-10 | Supplement is in IEEE style; no anonymous supplement | ICLR-style supplement + anonymous build + leak grep | open |
 | CM-11 | `just paper` does not regenerate everything | Complete build graph + clean-rebuild CI job | open |
 | CM-12 | Byte charge includes projection.json but the text omits it | Define bytes as model + projection | closed: encoded model file plus projection.json |
-| CM-13 | MFS-v3 can exceed 100 | Clip; perfect profile = 100 test | prose closed: eq:mfsv3 clips to [0,100] and all-ones is 100; Python scorer clips in a4be7ed. Native rust/fitness.rs still adds epsilon (parity open) |
+| CM-13 | MFS-v3 can exceed 100 | Clip; perfect profile = 100 test | closed: eq:mfsv3 clips to [0,100]; the main text no longer prints the historical all-ones illustration. Native v3 uses max(c, epsilon) and the clip at f6665d9. The v2 path remains eq:mfs |
 | CM-14 | Negative bytes pass the tier gate | 0 < int bytes ≤ 10240; negative tests | closed in a4be7ed: integer bytes with 0 < x ≤ 10240 |
 | CM-15 | v3 scorer drops the v2 prerequisites | Port the checks | closed in a4be7ed: four prerequisites are required before a v3 scalar |
 | CM-16 | Matched null: band in the contract, median-of-3 in code | Make code and contract agree | closed: contract and panel use median_linear_mse_of_three (a4be7ed); manuscript describes that null. No learnability band |
