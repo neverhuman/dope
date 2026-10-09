@@ -54,7 +54,15 @@ def median_ci(values, label: str, cluster_ids=None) -> dict:
         array = finite_array(values)
         clusters = None
     else:
-        kept = [(float(value), cluster) for value, cluster in zip(values, cluster_ids) if np.isfinite(value)]
+        values = list(values)
+        cluster_ids = list(cluster_ids)
+        if len(values) != len(cluster_ids):
+            raise ValueError("cluster ids do not match values")
+        kept = [
+            (float(value), cluster)
+            for value, cluster in zip(values, cluster_ids)
+            if np.isfinite(value)
+        ]
         array = np.asarray([value for value, _cluster in kept], dtype=float)
         clusters = [cluster for _value, cluster in kept]
     n = int(array.size)

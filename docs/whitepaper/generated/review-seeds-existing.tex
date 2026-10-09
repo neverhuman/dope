@@ -1,0 +1,19 @@
+% Existing cpu-fivefit prefix. It is not pooled with the 97-lineage table. Measured/prefix counts finite CatBoost retentions over the prefix size.
+\begin{tabular}{llllrrr}
+\toprule
+Method & Fit seed & Size & Measured/prefix & CatBoost retention & Distance MIA AUC & Holdout DCR median \\
+\midrule
+ARF & 23 & 1 & 11/12 & 0.8333 & 0.5706 & 0.1116 \\
+ARF & 23 & 4 & 11/12 & 0.8996 & 0.5893 & 0.1149 \\
+ARF & 23 & 1 & 11/12 & 0.7469 & 0.5743 & 0.1187 \\
+ARF & 23 & 4 & 11/12 & 0.8966 & 0.5755 & 0.1235 \\
+Forest-Flow & 23 & 1 & 1/2 & 0.9646 & 0.7531 & 0.1134 \\
+Forest-Flow & 37 & 1 & 1/2 & 0.9674 & 0.7202 & 0.1140 \\
+Forest-Flow & 53 & 1 & 1/2 & 0.9681 & 0.7160 & 0.1129 \\
+Forest-Flow & 71 & 1 & 1/2 & 0.9655 & 0.7469 & 0.1112 \\
+Forest-Flow & 23 & 4 & 1/2 & 1.0371 & 0.9321 & 0.1074 \\
+Forest-Flow & 37 & 4 & 1/2 & 1.0368 & 0.9383 & 0.1062 \\
+Forest-Flow & 53 & 4 & 1/2 & 1.0421 & 0.9465 & 0.1064 \\
+Forest-Flow & 71 & 4 & 1/2 & 1.0463 & 0.9465 & 0.1037 \\
+\bottomrule
+\end{tabular}

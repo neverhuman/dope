@@ -1,0 +1,22 @@
+{
+  "format": "dope-review-paper-build-v1",
+  "scripts": [
+    {
+      "path": "docs/whitepaper/scripts/review_emit.py",
+      "args": ["--from-panel", "research/benchmark/results/review-fixes-receipts-v1/panel.json"],
+      "check_args": ["--check-parser"],
+      "outputs": [
+        "docs/whitepaper/generated/review-denominator.tex",
+        "docs/whitepaper/generated/review-family.tex",
+        "docs/whitepaper/generated/review-fidelity-stored.tex",
+        "docs/whitepaper/generated/review-paired.tex",
+        "docs/whitepaper/generated/review-receipts.json",
+        "docs/whitepaper/generated/review-rmse.tex",
+        "docs/whitepaper/generated/review-seeds-existing.tex",
+        "docs/whitepaper/generated/review-size-retention.tex",
+        "docs/whitepaper/generated/review-tost.tex",
+        "docs/whitepaper/figures/review-retention-se.pdf"
+      ]
+    }
+  ]
+}
