@@ -4,7 +4,7 @@
 privacy_fidelity.py writes one JSON document per method, configuration,
 lineage, size and sample seed, with the absolute scratch path of the scored
 sample CSV. This tool admits those documents only. It refuses a symlink, a
-temporary or non-JSON file, an open test or formal-privacy flag, a method or
+.tmp staging or non-JSON file, an open test or formal-privacy flag, a method or
 configuration outside the published set, a key outside the public schema, a
 misfiled or duplicated identity, and an unknown unavailable reason. It drops
 the scratch path, recomputes the panel in memory, and writes the ledger only
@@ -165,7 +165,7 @@ def load_cell_dir(root: Path) -> list[dict]:
         if path.is_dir():
             continue
         if path.name.endswith(".tmp"):
-            raise ValueError("privacy cell directory contains a temporary file")
+            raise ValueError("privacy cell directory contains a .tmp staging file")
         if path.suffix != ".json" or not path.is_file():
             raise ValueError("privacy cell directory contains a non-json file")
         try:
@@ -257,9 +257,9 @@ def write_ledger(cells: list[dict], ledger_path: Path, panel_path: Path) -> str:
         "source": "scalar json documents only; the absolute scratch csv path is dropped",
         "stripped_fields": list(STRIPPED),
     }
-    temporary = ledger_path.with_suffix(ledger_path.suffix + ".tmp")
-    temporary.write_text(text)
-    temporary.replace(ledger_path)
+    staging = ledger_path.with_suffix(ledger_path.suffix + ".tmp")
+    staging.write_text(text)
+    staging.replace(ledger_path)
     ledger_path.with_suffix(".meta.json").write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n")
     return digest
 
