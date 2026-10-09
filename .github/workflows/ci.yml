@@ -64,7 +64,7 @@ jobs:
       - name: Install paper toolchain in the disposable guest
         run: |
           sudo apt-get update
-          sudo apt-get -o DPkg::Lock::Timeout=300 install -y latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-pictures texlive-publishers just
+          sudo apt-get -o DPkg::Lock::Timeout=300 install -y latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-pictures texlive-publishers just ripgrep
           uv venv target/paper-python
           uv pip install --python target/paper-python/bin/python --constraint validation/requirements-v1.txt numpy scipy pandas 'matplotlib==3.10.8'
       - name: Authenticate, clean rebuild, and require zero output drift
