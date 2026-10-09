@@ -80,7 +80,7 @@ class PrivacyBinderTests(unittest.TestCase):
         path.write_text(json.dumps(raw_privacy(csv="relative/sample.csv")))
         self.refuse("scratch path")
 
-    def test_symlink_temporary_and_foreign_files_are_refused(self):
+    def test_symlink_staging_and_foreign_files_are_refused(self):
         outside = Path(self.tmp.name) / "outside.json"
         outside.write_text(json.dumps(raw_privacy(sample_seed=211)))
         link = self.root / privacy.expected_path(raw_privacy(sample_seed=211))
@@ -92,7 +92,7 @@ class PrivacyBinderTests(unittest.TestCase):
         (self.root / "DOPE" / "features12_steps2048" / "linked").unlink()
         tmp = self.root / "DOPE" / "cell.json.tmp"
         tmp.write_text("{}")
-        self.refuse("temporary")
+        self.refuse("staging file")
         tmp.unlink()
         (self.root / "DOPE" / "sample.csv").write_text("a,b\n")
         self.refuse("non-json")
