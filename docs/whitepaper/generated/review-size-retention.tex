@@ -1,7 +1,13 @@
-\begin{tabular}{lllllrr}
+\begin{longtable}{lllllrr}
+\caption{\textbf{Retention level by method, configuration, auditor, and size, fit seed 11.} Median over the informative lineages with the family-cluster bootstrap 95\% interval. No Holm family.}\label{tab:review-size}\\
 \toprule
 Method & Configuration & Auditor & Size & $n$ & Median & Hierarchical 95\% CI \\
 \midrule
+\endfirsthead
+\toprule
+Method & Configuration & Auditor & Size & $n$ & Median & Hierarchical 95\% CI \\
+\midrule
+\endhead
 DOPE & features12\_steps2048 & catboost & 1$n$ & 97 & 0.8856 & [0.8286, 0.9702] \\
 DOPE & features12\_steps2048 & catboost & 4$n$ & 97 & 0.9399 & [0.8964, 0.9832] \\
 DOPE & features12\_steps2048 & linear & 1$n$ & 92 & 0.9836 & [0.9675, 0.9944] \\
@@ -57,4 +63,4 @@ ForestDiffusion/Forest-Flow & native\_selected & linear & 4$n$ & 5 & 0.9851 & [0
 ForestDiffusion/Forest-Flow & native\_selected & mlp & 1$n$ & 4 & 0.9805 & [0.3176, 1.0294] \\
 ForestDiffusion/Forest-Flow & native\_selected & mlp & 4$n$ & 4 & 1.0436 & [1.0035, 1.4676] \\
 \bottomrule
-\end{tabular}
+\end{longtable}

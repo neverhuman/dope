@@ -91,8 +91,6 @@ class PublicHardware(unittest.TestCase):
         rows = json.loads(path.read_text())["rows"]
         sentence = hardware.origin_sentence(hardware.origin_counts(row["display_name"] for row in rows))
         numbers = (REPO / "docs/whitepaper/generated/numbers.tex").read_text()
-        if _LEGACY_CLUSTER_CLAUSE in numbers:
-            self.skipTest("numbers.tex predates the two-stage cluster sentence; the next paper build rewrites it")
         self.assertIn("\\newcommand{\\OriginSentence}{" + sentence + "}", numbers)
 
 

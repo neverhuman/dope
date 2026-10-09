@@ -36,14 +36,14 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
 | PR-06 | Predictor-only control | Paired CI in every retention table | closed: five predictor fit seeds in the v2 panel; supplement F keeps the split-seed rows |
 | PR-07 | One fit seed; no clustering; no final test | Five seeds, nested bootstrap, family sensitivity, sealed run | five DOPE fit seeds with the historical binary, a cluster→lineage→fit-seed bootstrap, and seed-exchangeability diagnostics are in the paper; the sealed run is CM-09 |
 | PR-08 | TabSyn on 8 lineages; TabDDPM not run | Full panel and a budget ledger | TabSyn's scaled-schedule full panel is in the main tables and names its epochs. TabDDPM v5 failed (472 attempt failures, no new success), so TabDDPM v6, TabDiff, GReaT, synthpop, SMOTE, the author-default TabSyn schedule, and Forest-Flow under the common budget are Stage 2 blocks with no number |
-| PR-09 | No privacy or fidelity panel | DCR/NNDR/MIA with CI; C2ST | closed for empirical black-box attacks: main Table 3 and supplement G for every method with samples. Shadow-model, attribute-inference, and artifact attacks (P2–P4) are Stage 2 |
+| PR-09 | No privacy or fidelity panel | DCR/NNDR/MIA with CI; C2ST | closed for empirical black-box attacks: main Table 3 and supplement G; supplement G also gives KS, pair fidelity, the CatBoost detector, and α-precision/β-recall for every method with samples. Shadow-model, attribute-inference, and artifact attacks (P2–P4) are Stage 2 |
 | PR-10 | "Ties" read off non-significant tests | Pre-declared equivalence | closed: the Hodges–Lehmann 90% rule of predeclare_v2 decides equivalence; the v1 mean TOST is a continuity table |
 | PR-11 | No stress suite or ablations | XOR/parity/product; k, blocks, budget | two axes are printed (step budget and the untuned default); the grid and stress suite are Stage 2 blocks I and J |
 | PR-12 | Credentialed data path | PMLB fetch path; artifact statement | closed in 62f93e0 |
 | PR-13 | Novelty claimed on the metric; marginal-median teaser | Credit TSTR/TRTR; paired teaser | closed: Fig. 1 is the paired forest plot of DOPE minus every comparator and control |
 | RS-01 | ARF missing from the abstract and Fig. 1 | Paired ARF difference in both | closed |
 | RS-02 | TabSyn tables lack a DOPE row on the same lineages | Matched DOPE rows | closed: supplement `tab:review-tabsyn` and every v2 contrast pair on shared lineages |
-| RS-03 | C2ST classifier differs by method | One classifier for every method | closed: one CatBoost detector in Table 3; Forest-Flow has no stored samples to score |
+| RS-03 | C2ST classifier differs by method | One classifier for every method | closed: one grouped CatBoost detector for every method with samples, TabSyn included (supplement G); Forest-Flow has no stored samples to score |
 | RS-04 | DOPE called a measurement and a generator | One definition | closed |
 | 11c | Negation density above 5 per 1,000 words | Lint | closed: `check_paper.py` enforces the density on the built PDF |
 | 11d | Main body over 10 pages | Page budget | closed: `check_paper.py` refuses a body over ten pages |
