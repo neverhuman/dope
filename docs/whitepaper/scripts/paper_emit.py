@@ -808,6 +808,8 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     manuscript = (Path(__file__).resolve().parents[1] / "dope-mfs.tex").read_text()
     assert_no_adjacent_repeat(lines, manuscript)
     (out / "numbers.tex").write_text("".join(lines))
+    import figure_spec
+    figure_spec.write_macros(out)
     (out / "byte-table.tex").write_text(
         "\\begin{tabular}{@{}lrr@{}}\n\\toprule\n"
         "Method & Median bytes & Within cap \\\\\n\\midrule\n"

@@ -40,6 +40,7 @@ CONTROL = "#A8A8A8"
 BAND = "#EDEDED"
 CAP = 10240
 FULL_PANEL = 90
+CLIP_WINDOW = (-0.3, 0.5)
 AUDITORS = (("catboost", "CatBoost"), ("linear", "Linear"), ("mlp", "MLP"))
 # The figures draw these arms only; every other arm stays in the supplement tables.
 FIGURE_CODES = ("TabSyn", "Arf", "Gauss", "Chow", "Ind", "Tvae", "Ctgan", "Forest", "TabDdpm", "TabDiff",
@@ -69,9 +70,9 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     margin = headline.get("margin", 0.02)
     height = 0.42 + 0.215 * len(rows)
     figure, axes = plt.subplots(1, 3, figsize=(width, height), sharey=True)
-    lo_all = min(arm["contrasts"][a]["hl_lo"] for arm in rows for a, _ in AUDITORS if arm["contrasts"][a])
-    hi_all = max(arm["contrasts"][a]["hl_hi"] for arm in rows for a, _ in AUDITORS if arm["contrasts"][a])
-    left, right = max(-1.0, min(-0.1, lo_all - 0.05)), min(1.2, max(0.2, hi_all + 0.05))
+    # A fixed window keeps the close comparisons readable; a row outside it is drawn at the edge
+    # with an arrow and its value printed, so nothing is dropped.
+    left, right = CLIP_WINDOW
     for axis, (auditor, title) in zip(axes, AUDITORS):
         figure_style.panel(axis, grid="x")
         axis.axvspan(-margin, margin, color=BAND, zorder=0, linewidth=0)
@@ -84,9 +85,19 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
             colour = CONTROL if arm["role"] == "control" else CONTEXT
             hollow = row["n"] < FULL_PANEL
             lo, hi = max(left, row["hl_lo"]), min(right, row["hl_hi"])
-            axis.plot([lo, hi], [y, y], color=colour, linewidth=1.4, solid_capstyle="round", zorder=2)
-            axis.plot([row["hl"]], [y], marker="o", markersize=4.6, zorder=3,
-                      markerfacecolor="white" if hollow else colour, markeredgecolor=colour, markeredgewidth=1.0)
+            if hi > lo:
+                axis.plot([lo, hi], [y, y], color=colour, linewidth=1.4, solid_capstyle="round", zorder=2)
+            point = row["hl"]
+            if left <= point <= right:
+                axis.plot([point], [y], marker="o", markersize=4.6, zorder=3,
+                          markerfacecolor="white" if hollow else colour, markeredgecolor=colour, markeredgewidth=1.0)
+            else:
+                edge = right if point > right else left
+                axis.plot([edge], [y], marker=">" if point > right else "<", markersize=5.0, zorder=3,
+                          color=colour)
+                axis.annotate(f"{point:.2f}", xy=(edge, y), xytext=(-3 if point > right else 3, 4),
+                              textcoords="offset points", ha="right" if point > right else "left",
+                              fontsize=6.0, color=figure_style.INK)
             if auditor == "mlp":
                 axis.annotate(f"n={row['n']}", xy=(1.0, y), xycoords=("axes fraction", "data"),
                               xytext=(3, 0), textcoords="offset points", va="center", fontsize=6.4,
@@ -121,8 +132,8 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
         level = arm["level"]
         if arm["role"] == "control":
             axis.axhline(level["median"], color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.9, zorder=1)
-            axis.annotate(arm["display"], xy=(1.0, level["median"]), xycoords=("axes fraction", "data"),
-                          xytext=(-3, 2), textcoords="offset points", ha="right", va="bottom",
+            axis.annotate(arm["display"], xy=(0.42, level["median"]), xycoords=("axes fraction", "data"),
+                          xytext=(0, 2), textcoords="offset points", ha="center", va="bottom",
                           fontsize=6.4, color=figure_style.INK)
             continue
         if arm["bytes"] is None or arm["role"] == "diagnostic":

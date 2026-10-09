@@ -169,7 +169,7 @@ class MfsV3TableTest(unittest.TestCase):
         supplement = manuscript.with_name("supplement.tex").read_text()
         package_text = text + supplement
         self.assertNotIn("are sensitivity checks", text)
-        self.assertIn("Official tests stay sealed", text)
+        self.assertIn("pre-registered run", text)
         self.assertIn("Neither is averaged into representation closeness", package_text)
         self.assertIn("applied to absolute correlations with the target", package_text)
         self.assertIn("permutation-importance auditor", package_text)
@@ -177,7 +177,8 @@ class MfsV3TableTest(unittest.TestCase):
         self.assertNotIn("Driver fidelity, distribution fidelity", text)
         self.assertNotIn("no clean-license tabular transfer has been measured", text)
         self.assertIn("\\input{generated/mfs-v3-density-table.tex}", supplement)
-        self.assertIn("\\input{generated/mfs-v3-scalar.tex}", text)
+        self.assertIn("\\input{generated/mfs-v3-scalar.tex}", supplement)
+        self.assertIn("\\input{generated/mfs-v3-layers.tex}", supplement)
         self.assertIn("Downstream Objective-Preserving Encoding", text)
         self.assertNotIn("10{,}240-Byte Tabular Generator", text)
         self.assertNotIn("10240-Byte Tabular Generator", text)
