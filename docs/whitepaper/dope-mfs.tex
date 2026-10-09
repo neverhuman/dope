@@ -149,11 +149,11 @@ failed gate removes the scalar rather than publishing a small number.
   The supplement draws the CatBoost level of that value. \cref{fig:teaser}
   shows the DOPE generator's retention minus author-default ARF, the
   Gaussian copula, and Chow--Liu. Charged bytes are the compactness check in
-  \cref{fig:bytes}. Bytes stay the compactness check.
+  \cref{fig:bytes}.
   \item \textbf{Paired tests inside unpooled blocks.}
-  Paired tests stay inside unpooled blocks: the density block,
-  the neural block, and the
-  $\NForestCb$-lineage Forest-Flow confirmation. Those tables and the sorted pairs are in the supplement.
+  The density block, the neural block, and the
+  $\NForestCb$-lineage Forest-Flow confirmation each keep their own pairs.
+  Those tables and the sorted pairs are in the supplement.
   The linear non-separation and the Forest-Flow lead are in those blocks.
   \item \textbf{A byte-budgeted release gate that stays null when a component is missing.}
   The release score in \cref{sec:kpi} is a geometric mean
@@ -442,10 +442,8 @@ DOPE median on that block, the Holm test stays non-significant, and that
 block stays off this figure.
 
 \subsection{Density block}
-\textbf{Density marks.} Circles are the DOPE generator, squares the Gaussian copula, triangles Chow--Liu, and
-diamonds the independent marginals. Filled marks are lineages. Open marks
-are that method's median and its lineage-bootstrap interval.
-The supplement holds the paired density block. Under CatBoost, DOPE's
+The supplement holds the paired density block, including the sorted pairs.
+Under CatBoost, DOPE's
 median paired differences are positive against the Gaussian copula
 ($\DiffGaussCb$, interval $\LoDiffGaussCb$ to $\HiDiffGaussCb$), the
 Chow--Liu tree, and the independent marginals. The Holm-adjusted
@@ -456,9 +454,7 @@ losses against it are \WtlGaussCb\ under CatBoost and \WtlMlpGauss\ under
 the MLP.
 On the $\FriedmanNCb$ lineages common to all four methods, the Friedman
 $p$-value is $\FriedmanPCb$ and the critical difference is $\FriedmanCdCb$.
-All six CatBoost pairs exceed that difference. The supplement shows
-the sorted paired differences with the same four marks. The horizontal
-axis is the retention difference. The segment is the critical difference.
+All six CatBoost pairs exceed that difference.
 
 \textbf{Retention against charged bytes.} Paired differences outside
 $[-1.5, 1.5]$ are counted in the panel title and omitted from that frame.
