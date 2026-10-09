@@ -40,7 +40,7 @@ python3 docs/whitepaper/scripts/local_receipts.py --check
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p test_paper_receipts.py -v
 python3 research/benchmark/verify_paper_numbers.py
 python3 docs/whitepaper/scripts/compute_cost.py
-uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'matplotlib==3.10.8'
+uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'matplotlib==3.10.8' 'catboost==1.2.10'
 target/ci-python/bin/python docs/whitepaper/scripts/retained_evidence.py
 target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py'
