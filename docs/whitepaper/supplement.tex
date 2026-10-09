@@ -931,10 +931,11 @@ Empirical distance and membership scores stay outside differential privacy and o
 Four generated files stay out of this section because an ARF block repeats there without an author-default versus native-selected column: the TOST-only file, the RMSE file, the stored logistic fidelity file, and the existing-seed file.
 
 \subsection{Paired differences at both sizes}
+\input{generated/tost-protocol.tex}
 The Wilcoxon and TOST calculations treat paired lineages as independent.
 The pre-declared TOST tests the mean paired retention difference against
-the equivalence margin $\pm0.02$, with two one-sided $t$ tests at
-unadjusted $\alpha=0.05$ per comparison. Its mean estimand stays distinct
+the equivalence margin $\pm\TostEquivalenceMargin$, with two one-sided $t$ tests at
+unadjusted $\alpha=\TostAlpha$ per comparison. Its mean estimand stays distinct
 from the median and its interval printed beside it.
 The printed interval is the family-cluster bootstrap of the median.
 Holm is split by size. Each size has nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests.

@@ -12,11 +12,42 @@ ROOT = Path(__file__).resolve().parents[3]
 SPEC = importlib.util.spec_from_file_location('paper_review_inputs', ROOT / 'ops/ci/paper-review-outputs.py')
 REVIEW = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(REVIEW)
+PREPARE_SPEC = importlib.util.spec_from_file_location('paper_prepare_inputs', ROOT / 'ops/ci/paper-prepare.py')
+PREPARE = importlib.util.module_from_spec(PREPARE_SPEC)
+PREPARE_SPEC.loader.exec_module(PREPARE)
 
 
 class CommittedInputTests(unittest.TestCase):
     def test_committed_graph_and_all_public_inputs_match_the_lock(self):
         self.assertEqual(REVIEW.authenticated_graph()['format'], 'dope-review-paper-build-v1')
+
+    def test_tost_constants_and_supplement_use_the_original_declaration(self):
+        text = PREPARE.tost_protocol_tex()
+        declaration = json.loads(PREPARE.authenticated(PREPARE.PREDECLARE, PREPARE.PREDECLARE_SHA256))
+        self.assertIn(r'\newcommand{\TostEquivalenceMargin}{' + str(declaration['tost']['margin_retention']) + '}', text)
+        self.assertIn(r'\newcommand{\TostAlpha}{' + str(declaration['tost']['alpha']) + '}', text)
+        self.assertEqual((ROOT / 'docs/whitepaper/generated/tost-protocol.tex').read_text(), text)
+        supplement = (ROOT / 'docs/whitepaper/supplement.tex').read_text()
+        self.assertIn(r'\input{generated/tost-protocol.tex}', supplement)
+        self.assertIn(r'\pm\TostEquivalenceMargin', supplement)
+        self.assertIn(r'\alpha=\TostAlpha', supplement)
+
+    def test_tost_declaration_drift_and_redirection_fail_before_decode(self):
+        target = ROOT / 'target/paper-review-input-tests'
+        target.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=target) as directory:
+            fixture = Path(directory) / 'predeclare.json'
+            fixture.write_bytes(PREPARE.PREDECLARE.read_bytes() + b' ')
+            with patch.object(PREPARE, 'PREDECLARE', fixture), patch.object(PREPARE.json, 'loads') as decode:
+                with self.assertRaises(ValueError):
+                    PREPARE.tost_protocol_tex()
+                decode.assert_not_called()
+            link = Path(directory) / 'redirect.json'
+            link.symlink_to(PREPARE.PREDECLARE)
+            with patch.object(PREPARE, 'PREDECLARE', link), patch.object(PREPARE.json, 'loads') as decode:
+                with self.assertRaises(ValueError):
+                    PREPARE.tost_protocol_tex()
+                decode.assert_not_called()
 
 
 class ReviewInputTests(unittest.TestCase):
