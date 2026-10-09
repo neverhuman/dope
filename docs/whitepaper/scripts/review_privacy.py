@@ -106,11 +106,65 @@ def _cells(root: Path) -> list[dict]:
     return found
 
 
+def render_privacy(payload: dict) -> str:
+    lines = []
+    for row in payload["summaries"]:
+        lines.append(
+            f"{tex_name(row['method'])} & {tex_name(row['configuration'])} & {row['size']}$n$ & "
+            f"{tex_name(row['metric'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
+        )
+    for row in payload["matched_density"]:
+        lines.append(
+            f"{tex_name(row['method'])} & matched density & {row['size']}$n$ & "
+            f"{tex_name(row['metric'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
+        )
+    unavailable = " ".join(
+        f"{tex_name(row['method'])} {row['reason']} {row['n']}."
+        for row in payload["unavailable"]
+    )
+    return (
+        "% Empirical attack metrics only. Not formal differential privacy and not HIPAA de-identification. "
+        "c2st\\_catboost\\_auc is the GBDT detector. Stored logistic C2ST is a different table. "
+        "Unmatched rows keep each method's own lineages whose synthetic row count equals fit rows times size. "
+        "Matched density rows use the intersection of DOPE, GaussianCopula, Chow-Liu, and independent marginals. "
+        "Unavailable cells are not wins. "
+        + unavailable
+        + "\n"
+    ) + _table(
+        "Method & Configuration & Size & Metric & $n$ lineages & Median & Hierarchical CI",
+        lines,
+        "lllllrr",
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cells", type=Path, required=True)
+    parser.add_argument("--cells", type=Path)
+    parser.add_argument("--from-panel", type=Path)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
+    if args.from_panel or (args.check and args.cells is None):
+        panel_path = args.from_panel or (RESULTS / "review-fixes-privacy-v1" / "panel.json")
+        payload = json.loads(panel_path.read_text())
+        rendered = render_privacy(payload)
+        tex_path = GENERATED / "review-privacy.tex"
+        json_path = GENERATED / "review-privacy.json"
+        text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        if args.check:
+            if not tex_path.is_file() or tex_path.read_text() != rendered:
+                raise SystemExit("review-privacy.tex does not match the panel")
+            if not json_path.is_file() or json_path.read_text() != text:
+                raise SystemExit("review-privacy.json does not match the panel")
+            print("privacy check ok")
+            return
+        if text != panel_path.read_text():
+            raise SystemExit("privacy panel is not canonical json")
+        (GENERATED / "review-privacy.json").write_text(text)
+        write_tex("review-privacy.tex", rendered)
+        return
+    if args.cells is None:
+        print("privacy cells not scored yet")
+        return
     cells = _cells(args.cells)
     if not cells:
         print("privacy cells not scored yet")
@@ -200,33 +254,7 @@ def main() -> None:
     text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
     (out / "panel.json").write_text(text)
     (GENERATED / "review-privacy.json").write_text(text)
-    lines = []
-    for row in summaries:
-        lines.append(
-            f"{tex_name(row['method'])} & {tex_name(row['configuration'])} & {row['size']}$n$ & "
-            f"{tex_name(row['metric'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
-        )
-    for row in matched:
-        lines.append(
-            f"{tex_name(row['method'])} & matched density & {row['size']}$n$ & "
-            f"{tex_name(row['metric'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
-        )
-    write_tex("review-privacy.tex", (
-        "% Empirical attack metrics only. Not formal differential privacy and not HIPAA de-identification. "
-        "c2st\\_catboost\\_auc is the GBDT detector. Stored logistic C2ST is a different table. "
-        "Unmatched rows keep each method's own lineages whose synthetic row count equals fit rows times size. "
-        "Matched density rows use the intersection of DOPE, GaussianCopula, Chow-Liu, and independent marginals. "
-        "Unavailable cells are not wins. "
-        + " ".join(
-            f"{tex_name(row['method'])} {row['reason']} {row['n']}."
-            for row in payload["unavailable"]
-        )
-        + "\n"
-    ) + _table(
-        "Method & Configuration & Size & Metric & $n$ lineages & Median & Hierarchical CI",
-        lines,
-        "lllllrr",
-    ))
+    write_tex("review-privacy.tex", render_privacy(payload))
     holdout = [row for row in summaries if row["metric"] == "dcr_validation_median" and row["method"] == "DOPE"]
     for row in holdout:
         print(
