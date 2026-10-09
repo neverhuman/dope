@@ -2,6 +2,9 @@
 \toprule
 Block & Auditor & Baseline & $n$ & Difference & W/T/L & Holm $p$ \\
 \midrule
+Full panel & CatBoost & Author-default ARF & \NDiffArfCb & \DiffArfCb [\LoDiffArfCb, \HiDiffArfCb] & \WtlArfCb & $1.31\times 10^{-5}$ \\
+Full panel & Linear & Author-default ARF & \NDiffArfLin & \DiffArfLin [\LoDiffArfLin, \HiDiffArfLin] & \WtlArfLin & $8.53\times 10^{-5}$ \\
+Full panel & MLP & Author-default ARF & \NDiffArfMlp & \DiffArfMlp [\LoDiffArfMlp, \HiDiffArfMlp] & \WtlArfMlp & $4.56\times 10^{-8}$ \\
 Density & CatBoost & Gaussian copula & 97 & 0.224 [0.149, 0.290] & 86/0/11 & $1.35\times 10^{-13}$ \\
 Density & Linear & Gaussian copula & 92 & 0.00366 [-0.00438, 0.012] & 49/0/43 & $0.373$ \\
 Density & MLP & Gaussian copula & 75 & 0.185 [0.128, 0.228] & 65/0/10 & $4.96\times 10^{-11}$ \\

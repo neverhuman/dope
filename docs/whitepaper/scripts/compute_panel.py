@@ -551,7 +551,11 @@ def write_density_table(density):
 
 
 def write_headline_table(blocks):
-    """One row per block and auditor: the tuned baseline with the highest paired median."""
+    """Within-block strongest tuned baseline, plus author-default ARF full-panel rows.
+
+    ARF intervals stay the family-cluster macros from the pinned review panel.
+    The Holm cell is that panel's size-4n family of six, formatted like the other rows.
+    """
     specs = (
         ("density", "Density", DENSITY_COMPARATORS, {
             "GaussianCopula": "Gaussian copula",
@@ -562,7 +566,18 @@ def write_headline_table(blocks):
         ("forest", "Forest", ("Forest-Flow",), {"Forest-Flow": "Forest-Flow"}),
     )
     auditor_labels = {"catboost": "CatBoost", "linear": "Linear", "mlp": "MLP"}
+    arf_stems = {"catboost": "Cb", "linear": "Lin", "mlp": "Mlp"}
     rows = []
+    import paper_emit
+    arf_rows = paper_emit.arf_author_default_rows()
+    for auditor in AUDITORS:
+        stem = arf_stems[auditor]
+        rows.append(
+            "Full panel & "
+            f"{auditor_labels[auditor]} & Author-default ARF & \\NDiffArf{stem} & "
+            f"\\DiffArf{stem} [\\LoDiffArf{stem}, \\HiDiffArf{stem}] & "
+            f"\\WtlArf{stem} & ${tex_p(arf_rows[auditor]['holm_p'])}$ \\\\"
+        )
     for block_id, label, comparators, names in specs:
         block = blocks[block_id]
         for auditor in AUDITORS:
