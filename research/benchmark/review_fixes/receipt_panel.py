@@ -15,6 +15,7 @@ from pathlib import Path
 
 import numpy as np
 
+from research.benchmark.review_fixes import denominator_view
 from research.benchmark.review_fixes.stats import (
     MARGIN,
     cap_retention,
@@ -766,19 +767,11 @@ def emit_tex(payload) -> None:
         family_lines,
         "lllllrr",
     ))
-    denom_lines = []
-    for row in payload["denominator"]:
-        if row["auditor"] != "catboost":
-            continue
-        denom_lines.append(
-            f"{tex_name(row['method'])} & {tex_name(row['configuration'])} & {row['size']}$n$ & "
-            f"{row['n_informative']} & {row['n_noninformative']} & {row['n_undefined']} & "
-            f"{row['n_capped']} & {row['sensitivity_n']} & {fmt(row['sensitivity_median'])} \\\\"
-        )
+    # Informative is the retention-row level n; the other counts are complete-loss rows.
     write_tex("review-denominator.tex", _table(
-        "Method & Configuration & Size & Informative & Noninformative & Undefined & Capped & Sensitivity $n$ & Capped median",
-        denom_lines,
-        "lllrrrrrr",
+        denominator_view.HEADER,
+        denominator_view.denominator_lines(payload, fmt, tex_name),
+        denominator_view.ALIGN,
     ))
     rmse_lines = []
     for row in payload["rmse"]:
