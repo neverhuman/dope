@@ -82,16 +82,16 @@ The $10{,}240$-byte cap is a release gate.
 \begin{figure}[H]
   \centering
   \includegraphics[width=1.0\linewidth]{figures/teaser.pdf}
-  \caption{Paired retention differences at synthetic size $4n$ on the density block. DOPE in the legend is the generator this encoding writes. The horizontal axis is that generator's retention minus the named comparator.
-  Each filled mark is one lineage. The open mark is the paired median and the bar is its 95\% lineage-bootstrap interval.
-  Squares are the Gaussian copula, triangles are Chow--Liu, and diamonds are the independent marginals.
+  \caption{Paired retention differences at synthetic size $4n$. The horizontal axis is the DOPE generator's retention minus the named comparator.
+  Each filled mark is one lineage. The open mark is the stored paired median and the bar is its 95\% family-cluster bootstrap interval.
+  Circles are author-default ARF. Squares are the Gaussian copula and triangles are Chow--Liu, both on the density block.
   The count in each panel title is that auditor's paired informative lineages. Points outside $[-1.5,\,1.5]$ stay in the title count and are clipped in the frame.
-  The linear auditor's copula interval is $\LoDiffLinGauss$ to $\HiDiffLinGauss$ and contains zero. Equivalence stays unclaimed.
+  The CatBoost ARF paired median is $\DiffArfCb$, family-cluster bootstrap $\LoDiffArfCb$ to $\HiDiffArfCb$ ($n=\NDiffArfCb$).
+  The linear ARF interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero. The drawn linear copula bar contains zero.
+  The density-block linear copula lineage-bootstrap interval is $\LoDiffLinGauss$ to $\HiDiffLinGauss$, contains zero, and stays in the tables.
+  Equivalence stays unclaimed.
   CatBoost, the linear auditor, and the MLP stay unpooled. Forest-Flow is a separate block and stays off this figure.
-  No Holm test is drawn here. MFS-v2 and MFS-v3 stay null, and a retention leaves the $10{,}240$-byte gate closed.
-  The strongest full-panel baseline is author-default ARF, kept off this density frame.
-  Its CatBoost paired median is $\DiffArfCb$, family-cluster bootstrap $\LoDiffArfCb$ to $\HiDiffArfCb$ ($n=\NDiffArfCb$).
-  The linear ARF interval is $\LoDiffArfLin$ to $\HiDiffArfLin$ and contains zero.}
+  No Holm test is drawn here. MFS-v2 and MFS-v3 stay null, and a retention leaves the $10{,}240$-byte gate closed.}
   \label{fig:teaser}
 \end{figure}
 
@@ -149,7 +149,8 @@ failed gate removes the scalar rather than publishing a small number.
   Retention on the validation panel, with lineage-bootstrap intervals.
   The algebra of a retention value is \cref{sec:retention}, \eqref{eq:retention}.
   \cref{fig:bars} shows the CatBoost level of that value. \cref{fig:teaser}
-  shows the paired differences. Charged bytes are the compactness check in
+  shows the DOPE generator's retention minus author-default ARF, the
+  Gaussian copula, and Chow--Liu. Charged bytes are the compactness check in
   \cref{fig:bytes}. Bytes stay the compactness check.
   \item \textbf{Paired tests inside unpooled blocks.}
   Paired tests stay inside unpooled blocks: the density block
