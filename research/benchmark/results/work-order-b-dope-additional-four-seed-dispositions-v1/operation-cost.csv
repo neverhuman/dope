@@ -1,0 +1,6 @@
+quantity,value,unit,basis,available
+successful_fit_parent_wall_seconds,1560.362,seconds,400 successful per-fit parent-wall receipt timers,true
+manager_reported_CPU_seconds,35351.298,seconds,two unit-manager accounting intervals; not additive with fit wall,true
+sample_and_auditor_wall_seconds,,seconds,not recorded in successful sample metric receipts,false
+whole_coordinator_parent_cost_seconds,,seconds,no genuine whole-coordinator parent-wait cost receipt,false
+receipt_declared_compile_artifact_bytes,462189,bytes,compile-log JSON declaration; not charged projection/runtime inventory,true

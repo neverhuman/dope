@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authenticated_runner_source": {
+      "const": {
+        "runner_bytes": 22009,
+        "runner_file": "research/benchmark/review_fixes/fit_seeds.py",
+        "runner_sha256": "01f445f232b6570ecf481beaf00a3f710df8615b5610ea73a83932dfe2127884"
+      }
+    },
+    "format": {
+      "const": "work-order-b-dope-additional-four-seed-public-source-proof-v1"
+    },
+    "frozen_receipt_metadata_manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "const": 4275415
+        },
+        "sha256": {
+          "const": "0ff6d15d6982b50af4ddf730451633c4096a349aee0236bdabc521c08c4df6a9"
+        }
+      },
+      "required": [
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "manager_accounting_observations": {
+      "additionalProperties": false,
+      "properties": {
+        "intervals": {
+          "const": 2
+        },
+        "parent_campaign_wait_not_inferred": {
+          "const": true
+        },
+        "reported_CPU_seconds": {
+          "const": 35351.298
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sha256",
+        "intervals",
+        "reported_CPU_seconds",
+        "parent_campaign_wait_not_inferred"
+      ],
+      "type": "object"
+    },
+    "no_private_inputs_or_science_reopened": {
+      "const": true
+    },
+    "public_files": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "file": {
+            "enum": [
+              "result.json",
+              "schema.json",
+              "seed-coverage.csv",
+              "operation-cost.csv",
+              "table.md",
+              "README.md",
+              "source-proof.schema.json"
+            ],
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "bytes",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 7,
+      "minItems": 7,
+      "type": "array"
+    },
+    "receipt_counts": {
+      "const": {
+        "fits": 400,
+        "sample_metrics": 2400
+      }
+    },
+    "receipt_digest_encoding": {
+      "const": {
+        "canonical_JSON": "UTF-8 json.dumps(records, sort_keys=True, separators=(\",\", \":\"), allow_nan=False, ensure_ascii=True); no trailing newline",
+        "digest_algorithm": "sha256",
+        "fit_record_fields": [
+          "dataset_lineage_id",
+          "fit_seed",
+          "receipt_bytes",
+          "receipt_sha256"
+        ],
+        "fit_sort_fields": [
+          "dataset_lineage_id",
+          "fit_seed"
+        ],
+        "metric_record_fields": [
+          "dataset_lineage_id",
+          "fit_seed",
+          "sample_seed",
+          "size_multiplier",
+          "receipt_bytes",
+          "receipt_sha256",
+          "synthetic_sha256_declared"
+        ],
+        "metric_sort_fields": [
+          "dataset_lineage_id",
+          "fit_seed",
+          "sample_seed",
+          "size_multiplier"
+        ],
+        "per_fit_metric_subset": "Filter complete metric records by dataset_lineage_id and fit_seed; retain every metric record field; use the same metric sort order."
+      }
+    },
+    "receipt_set_hashes": {
+      "additionalProperties": false,
+      "properties": {
+        "fits": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sample_metrics": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fits",
+        "sample_metrics"
+      ],
+      "type": "object"
+    },
+    "receipt_stats_stable_before_and_after": {
+      "const": true
+    }
+  },
+  "required": [
+    "format",
+    "frozen_receipt_metadata_manifest",
+    "receipt_counts",
+    "receipt_stats_stable_before_and_after",
+    "receipt_set_hashes",
+    "authenticated_runner_source",
+    "manager_accounting_observations",
+    "public_files",
+    "no_private_inputs_or_science_reopened",
+    "receipt_digest_encoding"
+  ],
+  "type": "object"
+}

@@ -1217,6 +1217,10 @@
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/render.py --check",
       "purpose": "replay 400 frozen Forest-Flow additional fit dispositions, four additional seed coverage, declared artifact bytes and alternate successful timer sums; keep five-fit coverage and quality scores null"
     },
+    "research/benchmark/results/work-order-b-dope-additional-four-seed-dispositions-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-dope-additional-four-seed-dispositions-v1/render.py --check",
+      "purpose": "replay the 400 additional four-seed DOPE fit identities, 2400 receipt joins and separate partial cost bases; keep GPU backend, five-fit stability, historical attempts and gated quality unavailable"
+    },
     "research/benchmark/fetch_pmlb.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_pmlb -v",
       "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
