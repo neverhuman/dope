@@ -12,4 +12,4 @@ TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittes
   research.benchmark.review_fixes.test_source_pins \
   research.benchmark.review_fixes.test_fit_seed_singleton -q
 TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
-  -s ops/ci -p 'test_paper_control_inputs.py' -q
+  -s docs/whitepaper/scripts -p 'test_paper_control_inputs.py' -q
