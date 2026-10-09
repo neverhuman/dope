@@ -932,6 +932,10 @@ Four generated files stay out of this section because an ARF block repeats there
 
 \subsection{Paired differences at both sizes}
 The Wilcoxon and TOST calculations treat paired lineages as independent.
+The pre-declared TOST tests the mean paired retention difference against
+the equivalence margin $\pm0.02$, with two one-sided $t$ tests at
+unadjusted $\alpha=0.05$ per comparison. Its mean estimand stays distinct
+from the median and its interval printed beside it.
 The printed interval is the family-cluster bootstrap of the median.
 Holm is split by size. Each size has nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests.
 The Holm column in this table is printed at three decimals. The main-text headline table prints the same ARF values in scientific notation.
@@ -947,7 +951,10 @@ The Holm column in this table is printed at three decimals. The main-text headli
 The predictor-only control, the real-row resample, the holdout privacy panel, and the matched TabSyn cohort remain in progress, wave 2. This paper prints no number for them. The retained TabSyn subset above is a different cohort. The stored logistic detector stays out of this section.
 
 \subsection{Source-family sensitivity}
-Per-source-family medians and an excluding-simulated cut.
+DOPE rows report median absolute retention within each source family.
+A row named for a comparator reports the median paired DOPE-minus-comparator
+retention difference on that family. The excluding-simulated cut uses the
+same level-versus-difference rule.
 The interval is the hierarchical CI.
 These rows are a sensitivity and stay unpooled from the headline.
 \begingroup
