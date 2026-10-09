@@ -1,0 +1,179 @@
+{
+  "canonical_receipt_set_sha256": {
+    "fits": "d5be30682d6f544b94ff2c5468b68c5e892cf086f9127368c35eb4bdba712550",
+    "sample_metrics": "e51eee26d1fff82cefbc4b4269d212ef147b807178219473b845836a4dc0bbd2"
+  },
+  "capture_actual_owned_child_wait": 0,
+  "capture_stable_inventory_signatures": true,
+  "captured_files": 2400,
+  "captured_raw_bytes": 3714482,
+  "evidence_anchors": [
+    {
+      "bytes": 4275415,
+      "role": "original_frozen_receipt_metadata",
+      "sha256": "0ff6d15d6982b50af4ddf730451633c4096a349aee0236bdabc521c08c4df6a9"
+    },
+    {
+      "bytes": 3317849,
+      "role": "original_inventory",
+      "sha256": "ed11b04c79c17e93dcb1c141055eb9e68b96c1c15419cf5153efc0c70f379ca7"
+    },
+    {
+      "bytes": 5746166,
+      "role": "verified_private_capture",
+      "sha256": "037cf4f56fa4cced004190bc0c24fd2d9f9d4fe91c3011edd406b9992eb08bc4"
+    },
+    {
+      "bytes": 1065,
+      "role": "verified_capture_status",
+      "sha256": "a38118cf2c18292e8ce1e990e72767a36aa7315c528f5ecc11c822ec68f8a513"
+    },
+    {
+      "bytes": 10909,
+      "role": "capture_controller",
+      "sha256": "e4a1426ba2b72e9516b7fee8d7e01334fbf8bbf7c4c55d53d4c894ae1b7fbf47"
+    },
+    {
+      "bytes": 11289,
+      "role": "capture_controller_independent_review",
+      "sha256": "798af3fc42e43cb092d37ed160ea34a5dc394e8d4c1ce8d230a810a4bc1a358e"
+    },
+    {
+      "bytes": 654,
+      "role": "acquisition_original_five_controls_wait",
+      "sha256": "fb237c6816f812fe14b8f99b7cc3c9abfd1fb3265efa885f71f5e5e6aabb13b0"
+    },
+    {
+      "bytes": 657,
+      "role": "acquisition_controller_two_controls_wait",
+      "sha256": "f982e7419f9c5795e9d8ad4b619563e834c7fcebe23e954f47b8d6224df584c6"
+    },
+    {
+      "bytes": 653,
+      "role": "actual_capture_wait",
+      "sha256": "f140dcb4357ed5525ca20a38bd54bc11bc9518db8350048281c7330e3ec5e375"
+    },
+    {
+      "bytes": 15050,
+      "role": "reducer_source",
+      "sha256": "b87a30742eb1d01f8836d6136ab506df1545955652271da82ee2acc6aab99f36"
+    },
+    {
+      "bytes": 12813,
+      "role": "reducer_independent_review",
+      "sha256": "1502a5240c72d177d81c01fe64a0bc8bd08700acb3d1ee1f7872198eaa60e07a"
+    },
+    {
+      "bytes": 545,
+      "role": "reducer_six_controls_wait",
+      "sha256": "6960b32c001738f2396570b8a8e223637cf3eb74697f3d3c6e205f68b30a07bc"
+    },
+    {
+      "bytes": 884,
+      "role": "reducer_six_controls_log",
+      "sha256": "167db46ef51d548354101703159005ede5b307cc069ac2c6f5eab824615bc4fd"
+    },
+    {
+      "bytes": 569,
+      "role": "actual_reduction_wait",
+      "sha256": "d12c7999ef96bec8b1c9ec2fe07801d97e232d3d8977a71af5454c273d802d03"
+    },
+    {
+      "bytes": 729,
+      "role": "actual_reduction_log",
+      "sha256": "4b16e3e29dcbfcd7bf16e20b354c9b31c9012ef493d028f2928eee4d0f73bea1"
+    },
+    {
+      "bytes": 2096174,
+      "role": "private_description",
+      "sha256": "ef6443508df1bb3c7d7cd2f593c96460e347105721bf4157eb3534ddf753ee33"
+    },
+    {
+      "bytes": 2796,
+      "role": "completed_six_group_rollup",
+      "sha256": "0d705848adc77153afe340f129da2bc0f495b54089fec8f1550aafd6e4214c1d"
+    },
+    {
+      "bytes": 10073,
+      "role": "seed11_metadata_feasibility_delta",
+      "sha256": "da202aa710ff667defba70c27ee7eb22956d1174ebc17cb75a98f902cc111a9d"
+    }
+  ],
+  "five_fit_cohort_join": null,
+  "format": "work-order-b-dope-four-fit-descriptive-public-source-proof-v1",
+  "historical_evaluator_runtime_parity_verified": false,
+  "no_new_fits_or_evaluations": true,
+  "no_source_rows_models_or_private_paths_in_public_leaf": true,
+  "post_hoc_descriptive_summary_rule": true,
+  "public_files": [
+    {
+      "bytes": 3090807,
+      "file": "result.json",
+      "sha256": "cdcc19e433ff4bd31bfd07c629452ce1e78f6e7dedab0c09be747ca64db68a42"
+    },
+    {
+      "bytes": 15431,
+      "file": "schema.json",
+      "sha256": "c9d9880a16cdd8c7c3467d72d06b895578c06eec0a4223a8c45a04ec505b278d"
+    },
+    {
+      "bytes": 587,
+      "file": "summary.csv",
+      "sha256": "19fb7a2a56d319a06228615b13cd4ec387f54efc96242b4b9b59a209263e1a6f"
+    },
+    {
+      "bytes": 59574,
+      "file": "summary.svg",
+      "sha256": "0bd965fae8cdc8b184a350b59046f7afd32cb933dcb892c46fee94642ee8caeb"
+    },
+    {
+      "bytes": 3454,
+      "file": "README.md",
+      "sha256": "c72dcb8c3efa7178fe889840f6216a8a4b7f1f3f7fbca0ed1fd19a1d8559e309"
+    },
+    {
+      "bytes": 7645,
+      "file": "source-proof.schema.json",
+      "sha256": "ae32502a7d8d1636069f7dddf3e14709754efce149bf2b46c2833b17d953e2be"
+    }
+  ],
+  "receipt_counts": {
+    "fits": 400,
+    "sample_metrics": 2400
+  },
+  "receipt_digest_encoding": {
+    "canonical_JSON": "UTF-8 json.dumps(records, sort_keys=True, separators=(\",\", \":\"), allow_nan=False, ensure_ascii=True); no trailing newline",
+    "digest_algorithm": "sha256",
+    "fit_record_fields": [
+      "dataset_lineage_id",
+      "fit_seed",
+      "receipt_bytes",
+      "receipt_sha256"
+    ],
+    "fit_sort_fields": [
+      "dataset_lineage_id",
+      "fit_seed"
+    ],
+    "metric_record_fields": [
+      "dataset_lineage_id",
+      "fit_seed",
+      "sample_seed",
+      "size_multiplier",
+      "receipt_bytes",
+      "receipt_sha256",
+      "synthetic_sha256_declared"
+    ],
+    "metric_sort_fields": [
+      "dataset_lineage_id",
+      "fit_seed",
+      "sample_seed",
+      "size_multiplier"
+    ],
+    "per_fit_metric_subset": "Filter complete metric records by dataset_lineage_id and fit_seed; retain every metric record field; use the same metric sort order."
+  },
+  "reducer_actual_owned_child_wait": 0,
+  "reducer_controls_passed": 6,
+  "renderer_normalization": "Replace exactly the PROOF_PIN assignment line with PROOF_PIN = (0, 'PENDING'); UTF-8 bytes, all other bytes unchanged.",
+  "renderer_normalized_sha256": "6de2396720ec76f498f71b5c3cf08342b356acf47a127011120442d5b32c5e52",
+  "upstream_metadata_publication": "work-order-b-dope-additional-four-seed-dispositions-v1"
+}

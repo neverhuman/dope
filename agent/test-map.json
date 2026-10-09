@@ -1,13 +1,17 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/results/work-order-b-dope-producer-reported-four-fit-utility-v1/": {
+      "command": "python3 -I -B research/benchmark/results/work-order-b-dope-producer-reported-four-fit-utility-v1/render.py --check",
+      "purpose": "reproduce the producer-reported four-fit validation description, fixed all100 denominators, post hoc sample SD, null parity/five-fit/paired/scores, and deterministic standalone SVG from committed public results only"
+    },
     "research/benchmark/results/work-order-b-native-through094-fit-progress-and-cost-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-through094-fit-progress-and-cost-v1/render.py --check",
       "purpose": "replay the frozen through094 fit identity counts, observed GPU grants, distinct parent-cost bases and unavailable scores from public metadata only"
     },
     "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay the frozen indices011–014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/tests/test_mfs_v3_panel.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
@@ -59,7 +63,7 @@
     },
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay frozen indices009–010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/render.py --check",
@@ -67,7 +71,7 @@
     },
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check",
-      "purpose": "replay hash-frozen closed indices006\u2013007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
+      "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
     },
     "research/benchmark/render_matched_linear_fit11_figure.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
