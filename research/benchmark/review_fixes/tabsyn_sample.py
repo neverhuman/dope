@@ -179,47 +179,79 @@ _REJECTED_MODULES = frozenset({
 })
 
 
-def _call_name(node: ast.AST) -> str | None:
+def _sink_reference(node: ast.AST, bound: set[str]) -> bool:
+    """True when a name or builtin attribute refers to a rejected sink."""
     if isinstance(node, ast.Name):
-        return node.id
-    if isinstance(node, ast.Attribute):
-        return node.attr
-    return None
+        return node.id in bound
+    if isinstance(node, ast.Attribute) and node.attr in _REJECTED_CALLS:
+        receiver = node.value
+        return isinstance(receiver, ast.Name) and receiver.id in {"builtins", "__builtins__"} | bound
+    return False
 
 
 def _reject_adapter(tree: ast.AST) -> None:
     """Refuse sinks that are outside the pinned adapter's authenticated boundary."""
+    bound = set(_REJECTED_CALLS)
     for node in ast.walk(tree):
-        if isinstance(node, ast.Call) and _call_name(node.func) in _REJECTED_CALLS:
-            raise SystemExit("adapter call is outside the authenticated boundary")
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                if alias.name.split(".", 1)[0] in _REJECTED_MODULES:
-                    raise SystemExit("adapter import is outside the authenticated boundary")
         if isinstance(node, ast.ImportFrom):
             module = node.module or ""
             if module.split(".", 1)[0] in _REJECTED_MODULES:
                 raise SystemExit("adapter import is outside the authenticated boundary")
+            for alias in node.names:
+                imported = alias.name.split(".", 1)[0]
+                if alias.name == "*" or imported in _REJECTED_MODULES or alias.name in _REJECTED_CALLS:
+                    raise SystemExit("adapter import is outside the authenticated boundary")
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".", 1)[0] in _REJECTED_MODULES:
+                    raise SystemExit("adapter import is outside the authenticated boundary")
+        elif isinstance(node, ast.Assign) and _sink_reference(node.value, bound):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    bound.add(target.id)
+        elif isinstance(node, ast.Call) and _sink_reference(node.func, bound):
+            raise SystemExit("adapter call is outside the authenticated boundary")
 
 
 def _load_allowlisted(tree: ast.AST, namespace: dict, work: Path) -> dict:
     """Load a stripped adapter only after the call and import boundary accepts it."""
     _reject_adapter(tree)
+    if work.is_symlink():
+        raise SystemExit("adapter staging path is a symlink")
     module = ast.Module(body=list(tree.body), type_ignores=[])
     ast.fix_missing_locations(module)
     work.parent.mkdir(parents=True, exist_ok=True)
+    if work.is_symlink():
+        raise SystemExit("adapter staging path is a symlink")
+    if work.exists():
+        work.unlink()
     binding = "captured_review_fix_tabsyn_bindings"
     bindings = types.ModuleType(binding)
     bindings.verify_runtime = namespace["verify_runtime"]
     bindings.verify_operation = namespace["verify_operation"]
     import sys
     sys.modules[binding] = bindings
-    prelude = "from captured_review_fix_tabsyn_bindings import verify_runtime, verify_operation\n"
-    work.write_text(prelude + ast.unparse(module))
+    payload = (
+        "from captured_review_fix_tabsyn_bindings import verify_runtime, verify_operation\n"
+        + ast.unparse(module)
+        + "\n"
+    ).encode()
+    flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
+    try:
+        descriptor = os.open(work, flags, 0o644)
+    except OSError as error:
+        raise SystemExit("adapter staging path is not exclusive") from error
+    try:
+        os.write(descriptor, payload)
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
     spec = importlib.util.spec_from_file_location("captured_review_fix_tabsyn_adapter", work)
+    if spec is None or spec.loader is None or work.is_symlink() or work.read_bytes() != payload:
+        raise SystemExit("adapter bytes changed before load")
     loaded = importlib.util.module_from_spec(spec)
-    if spec.loader is None:
-        raise SystemExit("adapter loader is missing")
     spec.loader.exec_module(loaded)
     loaded.__file__ = namespace["__file__"]
     return {key: value for key, value in loaded.__dict__.items() if key != "__builtins__"}
