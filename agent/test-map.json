@@ -1228,6 +1228,14 @@
     "docs/whitepaper/scripts/test_paper_packaging.py": {
       "command": "just paper-check",
       "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
+    },
+    "ops/ci/paper-review-inputs.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_review_inputs.py'",
+      "purpose": "authenticate the independent review graph and public panel input lock before decoding or rendering; reject drift, symlinks and missing pins without reading dataset rows"
+    },
+    "docs/whitepaper/scripts/test_paper_review_inputs.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_paper_review_inputs.py'",
+      "purpose": "authenticate the independent review graph and public panel input lock before decoding or rendering; reject drift, symlinks and missing pins without reading dataset rows"
     }
   }
 }

@@ -314,6 +314,8 @@
     "ops/ci/paper-review-outputs.py": "governance",
     "ops/ci/paper-clean.sh": "governance",
     "ops/ci/paper-inputs/": "governance",
-    "docs/whitepaper/scripts/test_paper_packaging.py": "governance"
+    "docs/whitepaper/scripts/test_paper_packaging.py": "governance",
+    "ops/ci/paper-review-inputs.json": "governance",
+    "docs/whitepaper/scripts/test_paper_review_inputs.py": "governance"
   }
 }

@@ -1,0 +1,45 @@
+{
+  "files": {
+    "research/benchmark/results/arf-matched-population-validation.json": {
+      "bytes": 6807387,
+      "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
+    },
+    "research/benchmark/results/density-matched-population-validation.json": {
+      "bytes": 21794615,
+      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+    },
+    "research/benchmark/results/review-fixes-controls-v1/panel.json": {
+      "bytes": 21280,
+      "sha256": "3d6f32bb8a1276993de2d2527b95633a4aadb2e0b622dc4f8a1f7574eff87e21"
+    },
+    "research/benchmark/results/review-fixes-privacy-v1/panel.json": {
+      "bytes": 48890,
+      "sha256": "2caa429ae03b5bbc61b30c4ce9391670f70ec9a991e2d398974a8bf3d76942f8"
+    },
+    "research/benchmark/results/review-fixes-receipts-v1/panel.json": {
+      "bytes": 306014,
+      "sha256": "f0ecf5929825f1f07d877d4e01714f1ebd55868db3b863482f46be0f27ffdf47"
+    },
+    "research/benchmark/results/s3-lineage-record.json": {
+      "bytes": 1834757,
+      "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
+    },
+    "research/benchmark/results/s3-matched-forest-confirmation-validation.json": {
+      "bytes": 1237153,
+      "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
+    },
+    "research/benchmark/results/sdv-matched-population-validation.json": {
+      "bytes": 13567823,
+      "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+    },
+    "research/benchmark/review_fixes/paper-build.json": {
+      "bytes": 1566,
+      "sha256": "6f58e460387ebf6b44b9f77cf61a4521deffac2a78b53d1a6d734b95bf42915d"
+    },
+    "research/benchmark/review_fixes/predeclare.json": {
+      "bytes": 12002,
+      "sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5"
+    }
+  },
+  "format": "dope-paper-review-inputs-v1"
+}
