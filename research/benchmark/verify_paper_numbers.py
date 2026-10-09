@@ -349,6 +349,12 @@ def protocol_tokens():
     _must_contain(root / "docs/whitepaper/scripts/compute_panel.py", "np.quantile(samples, [0.025, 0.975])", failures)
     _must_contain(root / "rust/fitness.rs", "(0.0..=1.0)", failures)
     _must_contain(root / "research/benchmark/results/s3-data.lock.json", "official_test_grouped_training_80_20", failures)
+    # predeclare_v2 literals typed in the manuscript: fit seeds, auditor seed, family size, cohort rule.
+    _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", '"fit_seeds": [11, 23, 37, 53, 71]', failures)
+    _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", '"auditor_seed": 1729', failures)
+    _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", '"density": "9 tests', failures)
+    _must_contain(root / "research/benchmark/review_fixes/v2_panel.py", "STRONGEST_MIN_LINEAGES = 90", failures)
+    _must_contain(root / "research/benchmark/review_fixes/predeclare.json", '"track": "scaled_200_vae_1000_diffusion"', failures)
     if failures:
         raise ValueError("; ".join(failures))
     tokens = {
@@ -357,6 +363,7 @@ def protocol_tokens():
         "0.002", "0.01", "0.05", "0.10", "0.15", "0.20", "0.25", "0.30", "0.35", "0.45",
         "0.70", "0.75", "0.80", "0.85", "0.90", "0.95", "1.0", "1.5", "1.6", "2.569",
         "82.40", "0.14", "101", "211", "307", "11", "95", "0", "20",
+        "9", "23", "71", "90", "200", "1000", "1729",
     }
     rounded = f"{illustration_value():.2f}"
     if rounded != "82.40":

@@ -1,12 +1,14 @@
 # DOPE white paper
 
-IEEE journal draft of the generator comparison. The measured DOPE model is
-the compact residual `features12_steps2048`: at most 12 inputs, hidden
-width 16, no embedding layer. Each method is selected on its own published
-objective. The shared measurements are null-normalized retention and charged
-artifact bytes, plotted in `figures/retention-bytes.pdf`. Master Fitness
-v2 is defined and left null until every required component is present and
-every hard gate passes.
+The paper (`dope-mfs.tex`) and its supplement (`supplement.tex`) report the
+DOPE generator against copula, tree, forest, neural, and diffusion baselines
+on 100 PMLB regression tables. The reported DOPE profile is the compact
+residual `features12_steps2048` (at most 12 inputs, hidden width 16) at five
+fit seeds. The shared measurements are null-normalized retention under three
+auditors at sizes n and 4n, two controls, and charged artifact bytes. The
+release score MFS-v3 is defined, conformance-tested, and printed as null until
+every required component is present and every hard gate passes. The analysis
+contract is `research/benchmark/review_fixes/predeclare_v2.json`.
 
 ## Build
 
