@@ -1435,3 +1435,7 @@ The [six-component coverage ledger](results/work-order-b-six-component-coverage-
 The [closed operations006–007 cost delta](results/work-order-b-native-indices006-007-cost-delta-v1/README.md) accounts for two infrastructure attempts and the exact 500-slot snapshot: 110 accepted, two historical caps, five unresolved infrastructure slots and 383 snapshot-unstarted. The 118 inclusive budget units and 117 canonical accounted slots use distinct count bases; historical-inclusive and new-parent clocks are alternatives. It adds no quality or production claim.
 
 The [index008 GPU operation and progress ledger](results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/README.md) records one measured accepted fit: 424.280 seconds, 5,723 charged artifact bytes and a frozen 111/500 accepted-fit count. Only two lineages have all five accepted seeds; resource observations are not true peaks and gated scores remain null.
+
+## Auditor resource profile
+
+For new measurements, `bounded_auditors._model`, `c2st` and `evaluate` keep CatBoost training, automatic feature importance and prediction on four threads. Their statistical equations and seed settings match the historical harnesses. Bind this new source and its two imported historical sources in the measurement receipt. Sealed utility records both the historical auditor hash and the resource-wrapper hash. The measured historical `pilot_metrics.py` and `expanded_validation_metrics.py` files retain their original bytes; existing results keep their original provenance.
