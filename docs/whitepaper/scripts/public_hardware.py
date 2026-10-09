@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import hashlib
 import re
+import sys
 from collections import Counter
+from pathlib import Path
 
 _PRIVATE_HOSTS = {
     "xbabe1": "fit-machine-1",
@@ -43,6 +45,7 @@ _PRIVATE_PATH = ("/home/ubuntu", "/mnt/fast-scratch", ".agent", "worktree", "xba
 _ALLOWED_REPO_URL = "https://github.com/neverhuman/dope"
 _JOURNAL_AVAILABILITY_BEGIN = "% BEGIN JOURNAL AVAILABILITY\n"
 _JOURNAL_AVAILABILITY_END = "% END JOURNAL AVAILABILITY\n"
+_REPO = Path(__file__).resolve().parents[3]
 
 
 def banned_hits(text):
@@ -234,6 +237,18 @@ def origin_counts(names):
     return dict(counts)
 
 
+def cluster_sentence():
+    """The family-cluster rule, rendered from stats.SIMULATED by the review code.
+
+    Imported on call, so banned_hits stays free of numerical dependencies.
+    """
+    if str(_REPO) not in sys.path:
+        sys.path.insert(0, str(_REPO))
+    from research.benchmark.review_fixes.cluster_text import describe_clusters
+
+    return describe_clusters()
+
+
 def origin_sentence(counts):
     """One manuscript sentence. Counts come from the lineage ledger."""
     required = ("feynman", "strogatz", "fri", "bng", "other")
@@ -251,7 +266,7 @@ def origin_sentence(counts):
         "are not a claim of independent source families. Related names, including the "
         r"cpu\_small lineages, stay inside the one-row-per-lineage bootstrap. "
         "The resampling unit is the lineage, so related variants move together only "
-        "by chance. The printed family-cluster intervals resample lineages. A verified "
-        "parent map is absent from the ledger, so those intervals leave lineages that "
-        "share a parent in separate rows."
+        "by chance. " + cluster_sentence() + " A verified parent map is absent from the "
+        "ledger, so those intervals put remainder lineages that share a parent in "
+        "separate clusters."
     )
