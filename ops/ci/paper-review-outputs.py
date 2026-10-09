@@ -10,7 +10,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = 'b89c850dc7f009610b594f0fd3d39fc8fa459b94d00016c0619b75d9fd2bed68'
+LOCK_SHA256 = '48cb30bd3628a8bbfcb84f214dc19fe43ff07c2f0b14494903096db69cb904f3'
 
 
 def authenticated(path, digest, size=None):
