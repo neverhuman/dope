@@ -1,0 +1,578 @@
+{
+  "actual_byte_charges": null,
+  "actual_controls_wait_ref": null,
+  "actual_projection_refs": null,
+  "baseline_commit": "e56a7869e5eb579503a92e4516d630953d277a17",
+  "byte_charge": "complete generator model plus stored private projection/target map plus framing; no charge inferred from width estimate",
+  "current_evaluator_intersection_receipts": null,
+  "current_qualified_TRAIN_export_refs": null,
+  "current_supplied_catalog_ref": null,
+  "five_fit_coverage": null,
+  "format": "dope-beyondarena-training-input-preparation-policy",
+  "frozen_before_training_or_official_TEST_access": true,
+  "frozen_successor_order": [
+    {
+      "family": "ljubljana_breast_cancer",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "5c749159c504c5fbd576468cb5e34640920425c1cccebcfd23206331206b41c0",
+      "source_family_id_sha256": "0dbba12c9907a25b34a2b992f2ae32050f1fbf3afc3dde61ac974b1b10d40f84",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "aps_failure",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "2879ed0c7dbaeca809b43dcefd5e94820bf0109482a8100a5d170a4f5a1fbb24",
+      "source_family_id_sha256": "0f64760dfd2edd4215be3952fa67d2b5a7ee0ffc45a33a6a59e7493413d98934",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "credit_card_clients_default",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "292e309bcaff0d0a2ca22263fb59764d4db0347ccc35b60d09b48653016e8ed7",
+      "source_family_id_sha256": "0f81964187a94602082838f3ffe65e7672dfeeb43f04f28532f8b4f5adf1612e",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "heart_failure_followup_survival",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "2295827c8d94fae2c67deb3184fdcfb112928ad3bb0b56da4fc943bac6af16e4",
+      "source_family_id_sha256": "23780fa85072d8098c3e674f62c2d39d39038fb6a50cd69713040cebd6104dab",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "sepsis_survival_minimal_clinical_records",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "ad3c2774d86fc4678e8a0447c30271d846ffcd4bed3c45c942aaf5da839035fc",
+      "source_family_id_sha256": "27b7baee176c95c5b0bbbdb75cf4162ffc44adbe1bc3a50450759e8f3bd1ee9c",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "in_vehicle_coupon_recommendation",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "5bad6f90e17e79791a411d06bc8c5e965d54a107516f61a33e798cb6e622193d",
+      "source_family_id_sha256": "2b3911349eb601f02cef5adc42c4fb29819a67aceb776db8010eb228490e191f",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "drug_induced_autoimmunity_prediction",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "2f82e17f1fec98c512309a01902189ae993731133a6b35a021f524d6b60decfd",
+      "source_family_id_sha256": "2cec22f20ddef28ab0baec0d88cd8a8ef665f67d66edcc87f2bbeccace0cabdb",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "concrete_compressive_strength",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "dcaae26abd84aa1a774cc815cd9d5089e33164423dc1e55084877c2b239d2c13",
+      "source_family_id_sha256": "2f4229d03fe2ca9ba4c659cce479f3935558e1a9694823058ebd80a89f483710",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "qsar_tid_11",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "e20f232e5a5d62c979b3b826997e4ac1ac9adc26e796ec039a911da71b2d3d33",
+      "source_family_id_sha256": "2f788475eedb53e5fc21874ee64b429900a4d169ccc1a852b0fe7ed7ea65180d",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "obesity_estimation",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "95dbe9e3250277ae96d425c8e24445cea453ffafa2c126cd9d4489b622d1745f",
+      "source_family_id_sha256": "30653043222f1553ecbd15cb494e97ae121dcce1975df2549a31433b0a133022",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "fiat_500",
+      "license_spdx": "CC0-1.0",
+      "parquet_sha256": "472ec1a2c1793560f015de5100cd357b783608c80eda5558bf7d06a75d446e9b",
+      "source_family_id_sha256": "356c259eb24740eaa274884d421455ffc019f2becee44a76cf23c6e637f54e4b",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "indian_liver_patient_dataset",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "ee2578f47a8f9a1d92c22d89e2fe30f52ce59efe13e255990f7f1a8ea099b989",
+      "source_family_id_sha256": "3d3ae10e56b8b871840d3c31dd05acceda8c6a1ef15c0c0584e93023d55ae8e1",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "blood_transfusion",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "3c6b662f1c9d29395ff3315eabd66447141b483d2690f36099933edb657c9b22",
+      "source_family_id_sha256": "3e84b07cf60c0932cb4f13fbf8dd453fc69e54fd6f421f3d6b6d90a868a58d2c",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "heart_disease_hungary",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "2a036b3f525f9d27a34cb750c5d6d4cde9923670295a9ccebd33c6e934646dc5",
+      "source_family_id_sha256": "46031bdd15a0d2f906a171b34987154cc0135431fa8bdad03d6dc0d0899becb5",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "naticusdroid_android_permissions_dataset",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "1c24fc1c0dfc8517ed32639a665a6f92826d305106b5940c17c2ed68dda7f5ae",
+      "source_family_id_sha256": "46f6c2680bb052fbf28f1fd21bc05bee2a1b6e8e0e0a951775c4359e7a19f835",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "taiwanese_bankruptcy_prediction",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "895ed08e417b0be8cf2c6fc759b7b329bd2161e7d09f72bd13732c399d302464",
+      "source_family_id_sha256": "4e12c626a03c5f4e010beac021970eb33a7e57d960aaf586026b4f969d2cb213",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "seismic_bumps",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "af2fc9b9660887d47e181e9605e862945e2ec7a539fb3c9869bf318643912a9b",
+      "source_family_id_sha256": "55963adf252f61f93f1aaef0c82b3fb5c03387a2853e031d546ffd863993bb8f",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "jm1",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "09973ec3f30c6c22c83cdaebb8a089e36fcd988a882c6d39891897a9e831ad27",
+      "source_family_id_sha256": "5a244a1ee95d20403bf462330ce06c6f22bf4aa263b7941511376e423c5ac535",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "customer_satisfaction_in_airline",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "bd7eba95d0c1a27e3ce641e69e745b07acf2bda5ed98b30cf5c3c06e22e0b320",
+      "source_family_id_sha256": "5b8e131398d0fb833a0feb8de913b3b77ae985c35d6b63c8b677e0df36448d69",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "amazon_employee_access",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "3e3b2da0fdc73ae0efc56ee21552a7fb3d5a0d89d2318a7e049963c099a79792",
+      "source_family_id_sha256": "5e19a71f487c81245f3edc813b7e1374cfc67f1a3db6fb46dbd885f9a6ed3827",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "diabetes_130_us",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "211c1ac03c827f7e66d2fc1fd2f44013249355ba2f9c29d849fadf34ce5020d8",
+      "source_family_id_sha256": "612ee7c3b42748297623c58d46d1f96b5afb7e6ed6a890f7000699bc7240fbaf",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "parkinsons_biomedical_voice_measurements",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "da290942eed7c2c644aba6bbc16cd8a1ec3a025fe421f1eb5cd59c13b8cc1e6b",
+      "source_family_id_sha256": "63ad78669294f0cacccdf26fed7a75fddf99e059e92121ca292892d735238426",
+      "stratum": "grouped",
+      "task": "binary_classification"
+    },
+    {
+      "family": "video_game_fps_prediction",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "2572c8df421a97198ed73f0429db1958c6ce9bd2dc78add9dc3f060ab57cfae0",
+      "source_family_id_sha256": "686a326a0ae6a4d4d03ad759fd921cf43a57a1c6c085e9ce382b3f4b9f6b1b4d",
+      "stratum": "grouped",
+      "task": "regression"
+    },
+    {
+      "family": "bad_customer_detection",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "23f778e4a470aa51a0323c265af24787c3955a8489c8dadb9d4a671a04e7159b",
+      "source_family_id_sha256": "695b51cd5666a9b44caec2290bb501deaab54bba4dcc633cb28a456e610b3f2e",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "physiochemical_protein",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "72551ee72ffa44ac59952418169c7b701adcd93fcfd16ef406a4c6931472db61",
+      "source_family_id_sha256": "6ffabd2286f52122031d5080c3d243758fd91506c36cd64c876294b3f224abf9",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "fitness_club",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "d6ebb63f773b551b5ec522a75595325b1c3e1f9078d381c9c135de9468c39458",
+      "source_family_id_sha256": "712c1a5234207ca3512d31afe0b29405fcdedfcc3b8a2bf66118c0cc022ae6e4",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "bank_customer_churn",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "0271e474b3d3ea88bdc7e799b5e896961554f872d68e4dc37b339b76b899ec9d",
+      "source_family_id_sha256": "73abb6e44da3acdf300f828577fff594482ca6c3016db64758421b5ec02ae917",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "blood_tests_drink_prediction",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "85c3a7ab8c112366aace504cf5e833c6760968e4fd40e4806c31339e57861a9f",
+      "source_family_id_sha256": "741aeba475f45c797482d7dee039cdf658c4785778bc47385e892fe8fb644846",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "churn",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "c40362db274730b95716a9c51dea0840858e12d639396b12133221ca78f08325",
+      "source_family_id_sha256": "749c232efc827327a49ddcde88e27ebfe5b38c572ef506d9717867d21d848955",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "mutual_funds_india",
+      "license_spdx": "CC0-1.0",
+      "parquet_sha256": "373c1e874fd7c8e05e148ba74f60a6c3f00dd5ae21e96d5ba79c21c07a0be860",
+      "source_family_id_sha256": "787330df394513a2e15f05e5ccce212689dbad0454cd0dc8d0e974f41c13bfb4",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "early_stage_diabetes_risk_prediction",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "f1bf9ba61b6b7bbeb4d1db0361c5a52c788a015561f663bc4cb7f63829e186c2",
+      "source_family_id_sha256": "799690d569b6ef973164aeebdb88eaf794669fba488bc1dcb5c30da4c388497c",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "heart_disease_cleveland",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "d21e96d2d191315e580408e7551aebab5b1445a327655507781c0a7da10e7aec",
+      "source_family_id_sha256": "7a0db3b02a0e259831ee1c874d93b543f8be02a300eb1f984bae747dc7a03677",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "superconductivity",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "9b48f31933228f5c8405e3bfed7da2aa94736a3b9fb120df11df599afed0d9ee",
+      "source_family_id_sha256": "7aed9e4a6d8cd1dc83ccb8e223edd20d1e081760d65eb58da508811a5ade9b9f",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "online_shoppers_purchasing_intention_dataset",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "681eee9141c54454bc7bdb0579624371a2e65b6b35a1ac2d5601a00cef441a42",
+      "source_family_id_sha256": "7b3fd371a61670582e10d5cc13fddcfdf330e440c1b6763d1fec861e70f49c29",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "kdd_cup_09_appetency",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "31b4e2f660b656e648698937d60b77819acc5a544d5a8e1501318e6afd215f8f",
+      "source_family_id_sha256": "80c19763270d081a06ea44f0e0a46d29b7316c916538997be92a591fd10f730e",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "student_portuguese_performance",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "4edb13167646b87fbc089984b671de7dbca49213b4d71626f05fdc298436097c",
+      "source_family_id_sha256": "83d6272488f65cfe3d2d25992ecbe25c15c79c99ccd834a839ab50778329e3e7",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "emscad",
+      "license_spdx": "CC0-1.0",
+      "parquet_sha256": "47b7760210751b5dd193917147eb3845ddb80936aefbcb3466bc7176801c7e33",
+      "source_family_id_sha256": "8972cef71852422db6816bab3adfdae95b0dbc4c995e14dfa63d403c9c78d870",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "hr_analytics",
+      "license_spdx": "CC0-1.0",
+      "parquet_sha256": "8d465702d7bac8798e8e9343b8407e4f70043c8100b0b275a57aad8d8e9406e7",
+      "source_family_id_sha256": "8d78f847533c6479c722a53d694955f9d63c7cfb9cfe3562cd842feae57f4cd1",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "diamonds",
+      "license_spdx": "MIT",
+      "parquet_sha256": "9dea0b02f7ed781839801827675dbb769f7d04bbf620494d5dbba4b9abf4ed47",
+      "source_family_id_sha256": "a09ab7b8141f4277480a5f1360205defacc40c486aafa0505a4ffba65ae335ea",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "tour_travels_churn",
+      "license_spdx": "CC0-1.0",
+      "parquet_sha256": "eb054d4686e862022185cec24f014ae3d404a10fa716e21b16400b9b277a014b",
+      "source_family_id_sha256": "a4362b8d6427c60af38997dea6b0db2cb839ced3e235f9c7e008a52df9f8ed20",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "hiva_agnostic",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "274d101e1e9e27cc5cc3e9d3da9389bd8874aa85652a7ee6352a952301e4ae0f",
+      "source_family_id_sha256": "a6574580fb5be87fe1d6506fd2723bf61b3ee241da5cb530ab94dfdccae8148c",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "forest_fires",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "125c6398c679ca4720164357aefeb126ae3b184eb58c95b306ed4dc3b54350ff",
+      "source_family_id_sha256": "a6ff6d0bd59beba9432897e5a437eb9bb2abe05ec1446975e734a184f6ab6832",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "iranian_churn",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "a60d4b4ee477060e5b7b3b98a48742d2652ac5fbf8a1e984c4c2d401d5e2426d",
+      "source_family_id_sha256": "a9afa2e32df54ab107757d6f5a5edde912dc66534ec6d9ac50a5a47f11b12ae8",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "bank_marketing",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "1c28d0abca4ba225c3b45d743f3353477f564c8cd396a76b6c9c69b22da644df",
+      "source_family_id_sha256": "aaad3f90f27fe22e5da7d15644bfb68da354d027c58508827ff7fba211326fbf",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "bioresponse",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "cdaf37dca32a4b2a90cafd7f0bf18c607c0dea91d0672944ac62b75e87d89037",
+      "source_family_id_sha256": "aef8b3e403d5046e7211707823935e1921c270334777118f30c8f31ae7ecefd0",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "credit_g",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "c70cb2b655fd6199a2ffc561057a16e25e70d3963fd22cec29552f035726024a",
+      "source_family_id_sha256": "b50a4db183a376e7d371bd2d1ec8a9a46f13563e2a551eb6f7a7fe002e5653c0",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "lung_cancer_epithelial_genexp",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "15f444ca2a12fb0c7851c52e4ed51c4ee6b4595eab97af80274ed67e9bbcd3da",
+      "source_family_id_sha256": "b99975aa6d166a236661063fb3a366e562b9403c99b9199a20863db4d0978ae7",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "marketing_campaign",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "9700b9fa7f7bd3176dd1f539ea95fc1d6cb58496f376b7ee92696209315ca9ff",
+      "source_family_id_sha256": "bda7a70808dcbfbebd9d460f64089ae893086f9dcc763c314f8c47ab777549a4",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "thyroid_discordant",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "850bd39b52987424abe2657ee2237fa7b8aff79cd98277a038d8acb76432eb85",
+      "source_family_id_sha256": "be2626337ab189f11fb054ec75c85934d1de00b6642302f31d26ba68cf8c6ce1",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "gallstone_disease",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "f9e0eb79c9473104578e63df9dd1cf64565034e06786cd4f5fb677fd2088dc7d",
+      "source_family_id_sha256": "c127693a582a6e4e86b4b47e6f56d6927b9aeb6928e4b0523f092e64be97529b",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "hepatitis_survival_prediction",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "688568174cfcf160833d0e0b0f561e5c3b55ba5fefa5a876725e875a45ce3362",
+      "source_family_id_sha256": "c4b0d4b6b2e61b3c9cb9e60741bc31abc5b72885a2d63f65d4ceb4c9b5675c3f",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "coil_2000",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "20a004a139c1e2b7dfa6f60d174bf30e64923708eb35d5dd6ac32e8dded19f52",
+      "source_family_id_sha256": "c509d762b1f18830293b303272df003989c9c6c08def3c7d690db2a0d25eab13",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "clock_protein_toxicity",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "1881448a8ae297542be1397e323abbe44156aec897f35cc9ac7c672ccdb11adc",
+      "source_family_id_sha256": "c6e5b05076aaf04e4afc3614266c3d3a73dd26012637a2c88d72b47fa85b715e",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "qsar_fish_toxicity",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "35cd656d0981d21211159bdffd6818f718947d3f7e813155458d7827de7fa54d",
+      "source_family_id_sha256": "d02b38c656785c4b1af2e4851b990a11faf4256f36a31b30a7f3730551f16b62",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "5g_energy_consumption",
+      "license_spdx": "MIT",
+      "parquet_sha256": "c4d4a20c8ff72fca12ffe83eda9e2324eadc7596ffa76471ec4ba6743cd5d83e",
+      "source_family_id_sha256": "d691b721e4c235600943adfc7ad90595e3e19793cb4e83a4c8ac3e4276a18ca1",
+      "stratum": "grouped",
+      "task": "regression"
+    },
+    {
+      "family": "wine_quality",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "d75c6f0f27351070935a66142960844cb54e8ea2e49b712851887736d758d777",
+      "source_family_id_sha256": "d9a9e98f2e90daf771ebb2a21c630e9a4af0bb3f9ad32dc799bd93ad220bbd2d",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "labour_inspection_compliance",
+      "license_spdx": "CC0-1.0",
+      "parquet_sha256": "f1de237b74e3d981d6f7d1441d37ece4633e9b50a6af3a3be776ba6a6667bef5",
+      "source_family_id_sha256": "da0d641c8dab2d21c4a25d6134df37b15956a388a390b4a37ac8e51754286905",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "qsar_aquatic_toxicity",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "b319dedd087e30c99dd03ec72ef848336b7832e89952fe474750af91dd571ca9",
+      "source_family_id_sha256": "dd55d829d3f8b6c684cba1b1219d2c47b36c12620c175627ecf82d369e0ec43b",
+      "stratum": "iid",
+      "task": "regression"
+    },
+    {
+      "family": "polish_companies_bankruptcy",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "900e15a61de45a7cd93412ab4706ae74bb0da1f0b5579647071da91832975bab",
+      "source_family_id_sha256": "ea686d7e0101ae24099a86ae1afa2476cca4e6452f000a4cc1c6acd4904dce2f",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "ecommerce_shipping",
+      "license_spdx": "LicenseRef-Public-Domain",
+      "parquet_sha256": "8e017db2e2f6a64536834f3ce5d4b166cd9468aea2de5229e2e10db5e0f8463a",
+      "source_family_id_sha256": "ec8494a7826e7d2a9b42b995e77b781c527f3a526330290ea656cc18183e38cb",
+      "stratum": "iid",
+      "task": "binary_classification"
+    },
+    {
+      "family": "credit_approval",
+      "license_spdx": "CC-BY-4.0",
+      "parquet_sha256": "0fbbd64c74da6a496b4f388c8204f9180c5677e0e6cef6ef47bfa9da96ecb197",
+      "source_family_id_sha256": "edaf45b8d5809facdaf23eb9cdf527927c6900a1fe9a73de68ff73200f9def89",
+      "stratum": "iid",
+      "task": "binary_classification"
+    }
+  ],
+  "group_split": {
+    "algorithm": "original split_official_training full raw-row grouped80_20",
+    "identical_groups_may_cross_inner_partitions": false,
+    "row_hash": "SHA256 of UTF8 JSON full string row, sort_keys=True, compact separators, ensure_ascii=False; target and all raw inputs included",
+    "seed": 1729
+  },
+  "inventory_sha256": "504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64",
+  "mfs_v2": null,
+  "new_fits": 0,
+  "official_tests_opened": false,
+  "original_lock_or_retention_publisher_changed": false,
+  "original_selected_count": 73,
+  "overlap_families": [
+    "heart_disease_va_long_beach",
+    "qsar_biodeg",
+    "hotel_booking_demand"
+  ],
+  "overlap_removal": "Only all TRAIN occurrences of exact groups from an externally pinned existing evaluator-owned TRAIN-intersection receipt; remove before inner split; no TEST decoding or TEST-only indices/values in worker",
+  "panel_lock_sha256": "8f99c356e8610aea895e82355a4279b30fe85f3836359f3b277e75183cf20a98",
+  "projection_only_utility_cost": null,
+  "ptf_v1": null,
+  "real_families_repaired": 0,
+  "release_safe": null,
+  "retention": null,
+  "rule": "source_order12_full_input_width_budget_v1",
+  "source_rule_amendment": "New prospective source-order preparation rule; no equivalence to prior target-correlated top12 private proposal or paper winner claimed",
+  "successor_rule": {
+    "absence_scope": "hash-bound supplied catalog datasets name list only",
+    "cohort": "prospective successor is separate, not repair of original; original73 lock and denominator unchanged",
+    "each_candidate_used_once": true,
+    "must_be_named_in_supplied_catalog": true,
+    "order": "SHA256_UTF8_source_family_id_ascending_then_family_name",
+    "pool": "licensed binary/regression families in unchanged lock excluding original12 pilot",
+    "recorded_license_allowlist": [
+      "CC-BY-4.0",
+      "CC0-1.0",
+      "LicenseRef-Public-Domain",
+      "MIT"
+    ],
+    "recorded_stratum_allowlist": [
+      "iid",
+      "grouped",
+      "temporal"
+    ],
+    "request_order": [
+      "heart_disease_va_long_beach",
+      "qsar_biodeg",
+      "hotel_booking_demand"
+    ],
+    "task_and_stratum_preservation_not_inferred": true
+  },
+  "superiority": null,
+  "version": 1,
+  "wide_families": [
+    "early_learning_predictors",
+    "lending_club",
+    "kick",
+    "wine_world_cost"
+  ],
+  "width_semantics": {
+    "actual_projector_output_width_check_still_required": true,
+    "all_missing": "omit raw input",
+    "categorical": "all distinct nonempty inner-fit levels; no level truncation",
+    "feature_cap_excludes_target": 2000,
+    "numeric": "one feature if any finite inner-fit value and every other value empty or finite",
+    "numeric_output_row_width": "projected feature width plus final target value",
+    "raw_input_cap_excludes_target": 12,
+    "selection": "source-column order; keep at most12 complete raw inputs; skip entire input exceeding remaining width; continue later inputs until12 accepted",
+    "selection_learned_partition": "inner_fit_only",
+    "source": "manifest.fit_projection",
+    "source_sha256": "e3f44001cbc52545b698fa1d2831349fe5ea6fd4f9c0c691d0526eb4bf5f271e",
+    "target": "retain once in original column order; separately mapped by original projector",
+    "target_values_used_for_ranking": false,
+    "validation_used_for_selection": false
+  }
+}
