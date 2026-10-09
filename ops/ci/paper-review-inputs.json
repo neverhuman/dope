@@ -20,6 +20,10 @@
       "bytes": 21280,
       "sha256": "3d6f32bb8a1276993de2d2527b95633a4aadb2e0b622dc4f8a1f7574eff87e21"
     },
+    "research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl": {
+      "bytes": 5382380,
+      "sha256": "559d7dd664bb77bc140c808660d05ac10842b4580c39a1efcf533fba20d5bf94"
+    },
     "research/benchmark/results/review-fixes-privacy-v1/panel.json": {
       "bytes": 48890,
       "sha256": "2caa429ae03b5bbc61b30c4ce9391670f70ec9a991e2d398974a8bf3d76942f8"
