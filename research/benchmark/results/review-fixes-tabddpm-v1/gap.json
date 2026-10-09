@@ -1,10 +1,28 @@
 {
   "format": "dope-review-fix-tabddpm-gap",
-  "version": 1,
-  "status": "not_extended",
+  "version": 2,
+  "status": "granted_and_started",
   "missing_is_not_a_win": true,
   "official_tests_opened": false,
   "published_cohort": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation",
-  "reason": "No authorized executable entry was found outside dl_final, sweep, and HOLD. The population entry at work-order-b/tabddpm-population-v5-revision5 is disabled: execution_authorized, ordered_launch_authorized, real_queue_authorized, and source_initialization_authorized are false, and root_real_grant_required is true. Historical continuation directories were not relaunched. A shorter budget was not invented.",
-  "searched_utc": "2026-10-09T06:05:00Z"
+  "grant": {
+    "grantor": "ENG:watcher for Jepson",
+    "granted_utc": "2026-10-09T06:15:00Z",
+    "message": "Root grant for work-order-b/tabddpm-population-v5-revision5 at its pre-registered config.",
+    "round_sha256": "ca48de8663a1a0fea05ad0d439050b6c964f94c03bf1c997c7794cc4dc1fb5b4",
+    "ordered_launch_grant_sha256": "1aad72354e2ebc7436444210141e53d20dfc6031813dacf602729b7f79d02b26",
+    "unit": "dope-rf-tabddpm-v5",
+    "requested_host": "xbabe1",
+    "launch_host": "xbabe3",
+    "launch_reason": "The frozen coordinator admission asserts hostname xbabe3, and the work-order tree is not on xbabe1. Child fits set CUDA_VISIBLE_DEVICES=0, the RTX 3090 on xbabe3. common.check passed before launch. The GPU lease is work-order-b/xbabe3.gpu.reservation, not dl_final, sweep, or HOLD.",
+    "whole_operation_timeout_seconds": 600,
+    "cell_wall_cap_seconds": 43200,
+    "deadline_utc": "2026-10-20T00:08:28.702171+00:00",
+    "new_fit_actions": 473,
+    "fit_seed": 11
+  },
+  "prior_status": "not_extended",
+  "reason": "The population entry was disabled until the root grant. The grant was recorded and the pre-registered coordinator was started. A missing or timed-out cell is not a win. Historical continuation directories were not relaunched. A shorter budget was not invented.",
+  "searched_utc": "2026-10-09T06:05:00Z",
+  "started_utc": "2026-10-09T06:47:00Z"
 }

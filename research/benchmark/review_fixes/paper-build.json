@@ -17,6 +17,15 @@
         "docs/whitepaper/generated/review-tost.tex",
         "docs/whitepaper/figures/review-retention-se.pdf"
       ]
+    },
+    {
+      "path": "docs/whitepaper/scripts/review_controls.py",
+      "args": ["--from-panel", "research/benchmark/results/review-fixes-controls-v1/panel.json"],
+      "check_args": ["--check"],
+      "outputs": [
+        "docs/whitepaper/generated/review-controls.json",
+        "docs/whitepaper/generated/review-controls.tex"
+      ]
     }
   ]
 }

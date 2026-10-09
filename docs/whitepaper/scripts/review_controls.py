@@ -151,11 +151,67 @@ def _split_rows(cells, names) -> list[dict]:
     return rows
 
 
+def render_controls(payload: dict) -> str:
+    lines = []
+    for row in payload["paired"]:
+        flag = "yes" if row["tost"]["equivalent"] else "no"
+        lines.append(
+            f"{row['size']}$n$ & {tex_name(row['auditor'])} & {tex_name(row['method'])} & "
+            f"{row['n']} & {fmt(row['median'])} & {ci(row)} & {fmt(row['mean'])} & {flag} & "
+            f"{row['wins']}/{row['ties']}/{row['losses']} & {fmt(row['holm_p'], 3)} \\\\"
+        )
+    for row in payload["predictor_fit_seeds"]:
+        if row["auditor"] != "catboost":
+            continue
+        lines.append(
+            f"{row['size']}$n$ & catboost & predictor fit {row['fit_seed']} & "
+            f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
+        )
+    for row in payload["split_seeds"]:
+        lines.append(
+            f"{row['size']}$n$ & catboost & split {row['split_seed']} & "
+            f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
+        )
+    return (
+        "% Size n Holm family has 3 tests (predictor-only times three auditors). "
+        "real\\_bootstrap\\_4n has no size-n arm, so it is not a member of that family. "
+        "Size 4n Holm family has 6 tests. "
+        "Predictor fit seeds 23, 37, 53, and 71 are all reported and are not in the Holm family. "
+        "Split-seed rows are a separate sensitivity and are not pooled with fit seed 11. "
+        "Wilcoxon and TOST treat lineages as iid. The interval is the family-cluster bootstrap.\n"
+        + _table(
+            "Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
+            lines,
+            "lllrrrrllr",
+        )
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cells", type=Path, required=True)
+    parser.add_argument("--cells", type=Path)
+    parser.add_argument("--from-panel", type=Path)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
+    if args.from_panel or (args.check and args.cells is None):
+        panel_path = args.from_panel or (RESULTS / "review-fixes-controls-v1" / "panel.json")
+        payload = json.loads(panel_path.read_text())
+        rendered = render_controls(payload)
+        tex_path = GENERATED / "review-controls.tex"
+        if args.check:
+            if not tex_path.is_file() or tex_path.read_text() != rendered:
+                raise SystemExit("review-controls.tex does not match the panel")
+            print("controls check ok")
+            return
+        text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        if text != panel_path.read_text():
+            raise SystemExit("controls panel is not canonical json")
+        (GENERATED / "review-controls.json").write_text(text)
+        write_tex("review-controls.tex", rendered)
+        return
+    if args.cells is None:
+        print("controls not scored yet")
+        return
     cells = _cells(args.cells)
     if not cells:
         print("controls not scored yet")
@@ -233,40 +289,10 @@ def main() -> None:
     }
     out = RESULTS / "review-fixes-controls-v1"
     out.mkdir(parents=True, exist_ok=True)
-    (out / "panel.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-    (GENERATED / "review-controls.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-    lines = []
-    for row in paired_rows:
-        flag = "yes" if row["tost"]["equivalent"] else "no"
-        lines.append(
-            f"{row['size']}$n$ & {tex_name(row['auditor'])} & {tex_name(row['method'])} & "
-            f"{row['n']} & {fmt(row['median'])} & {ci(row)} & {fmt(row['mean'])} & {flag} & "
-            f"{row['wins']}/{row['ties']}/{row['losses']} & {fmt(row['holm_p'], 3)} \\\\"
-        )
-    for row in seed_rows:
-        if row["auditor"] != "catboost":
-            continue
-        lines.append(
-            f"{row['size']}$n$ & catboost & predictor fit {row['fit_seed']} & "
-            f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
-        )
-    for row in payload["split_seeds"]:
-        lines.append(
-            f"{row['size']}$n$ & catboost & split {row['split_seed']} & "
-            f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
-        )
-    write_tex("review-controls.tex", (
-        "% Size n Holm family has 3 tests (predictor-only times three auditors). "
-        "real\\_bootstrap\\_4n has no size-n arm, so it is not a member of that family. "
-        "Size 4n Holm family has 6 tests. "
-        "Predictor fit seeds 23, 37, 53, and 71 are all reported and are not in the Holm family. "
-        "Split-seed rows are a separate sensitivity and are not pooled with fit seed 11. "
-        "Wilcoxon and TOST treat lineages as iid. The interval is the family-cluster bootstrap.\n"
-    ) + _table(
-        "Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
-        lines,
-        "lllrrrrllr",
-    ))
+    text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    (out / "panel.json").write_text(text)
+    (GENERATED / "review-controls.json").write_text(text)
+    write_tex("review-controls.tex", render_controls(payload))
     catboost = [row for row in paired_rows if row["auditor"] == "catboost"]
     for row in catboost:
         print(

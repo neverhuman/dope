@@ -93,13 +93,16 @@ def _cells(root: Path) -> list[dict]:
     if not root.is_dir():
         return []
     found = []
-    for path in sorted(root.glob("*/*/*/*.json")):
+    for path in sorted(root.rglob("*.json")):
+        if path.name.endswith(".tmp") or not path.is_file():
+            continue
         try:
             document = json.loads(path.read_text())
-        except json.JSONDecodeError:
-            continue
-        if isinstance(document, dict):
-            found.append(document)
+        except json.JSONDecodeError as error:
+            raise ValueError(f"malformed privacy cell {path}") from error
+        if not isinstance(document, dict):
+            raise ValueError(f"malformed privacy cell {path}")
+        found.append(document)
     return found
 
 
@@ -212,7 +215,13 @@ def main() -> None:
         "% Empirical attack metrics only. Not formal differential privacy and not HIPAA de-identification. "
         "c2st\\_catboost\\_auc is the GBDT detector. Stored logistic C2ST is a different table. "
         "Unmatched rows keep each method's own lineages whose synthetic row count equals fit rows times size. "
-        "Matched density rows use the intersection of DOPE, GaussianCopula, Chow-Liu, and independent marginals.\n"
+        "Matched density rows use the intersection of DOPE, GaussianCopula, Chow-Liu, and independent marginals. "
+        "Unavailable cells are not wins. "
+        + " ".join(
+            f"{tex_name(row['method'])} {row['reason']} {row['n']}."
+            for row in payload["unavailable"]
+        )
+        + "\n"
     ) + _table(
         "Method & Configuration & Size & Metric & $n$ lineages & Median & Hierarchical CI",
         lines,
