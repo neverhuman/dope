@@ -92,6 +92,31 @@ class Controls(unittest.TestCase):
         signed = self.np.array([[0., -0.], [-0., 0.]])
         self.assertEqual(*metrics.row_groups(signed))
 
+    def test_catboost_bounds_automatic_importance_and_prediction_threads(self):
+        from catboost import CatBoostClassifier
+        importance = CatBoostClassifier.get_feature_importance
+        predict = CatBoostClassifier.predict_proba
+        importance_calls, predict_calls = [], []
+
+        def checked_importance(model, *args, **kwargs):
+            self.assertEqual(kwargs.get("thread_count"), 4)
+            self.assertEqual(model.get_param("thread_count"), 4)
+            importance_calls.append(kwargs["thread_count"])
+            return importance(model, *args, **kwargs)
+
+        def checked_predict(model, *args, **kwargs):
+            self.assertEqual(kwargs.get("thread_count"), 4)
+            predict_calls.append(kwargs["thread_count"])
+            return predict(model, *args, **kwargs)
+
+        with patch.object(CatBoostClassifier, "get_feature_importance", checked_importance), \
+                patch.object(CatBoostClassifier, "predict_proba", checked_predict):
+            result = metrics.c2st(self.val, self.synth, "catboost")
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["folds"], 5)
+        self.assertEqual(importance_calls, [4] * 5)
+        self.assertEqual(predict_calls, [4] * 5)
+
     def test_duplicate_groups_span_detection_classes_and_real_null_is_disjoint(self):
         duplicated = self.np.repeat(self.val, 2, axis=0)
         copy = metrics.c2st(duplicated, duplicated.copy(), "logistic")

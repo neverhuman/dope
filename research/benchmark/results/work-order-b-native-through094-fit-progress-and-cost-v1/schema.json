@@ -1,0 +1,1066 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Strict snapshot shapes and scalar constants; all keys including histogram0 through5 are required. The source-proof pins exact result bytes and the publisher independently checks cost/count identities.",
+  "properties": {
+    "cost_basis": {
+      "additionalProperties": false,
+      "properties": {
+        "all100_cell_trial_counts_used": {
+          "const": true,
+          "type": "boolean"
+        },
+        "all_campaign_R_and_D_or_metadata_cost_complete": {
+          "const": false,
+          "type": "boolean"
+        },
+        "all_campaign_R_and_D_or_metadata_seconds": {
+          "type": "null"
+        },
+        "final_cell_trial_cap": {
+          "const": 8,
+          "type": "integer"
+        },
+        "final_cell_wall_cap_seconds": {
+          "const": 43200,
+          "type": "integer"
+        },
+        "historical_alternate_added_to_primary": {
+          "const": false,
+          "type": "boolean"
+        },
+        "increment_parent_seconds086_to094": {
+          "const": 818.8275812151842,
+          "type": "number"
+        },
+        "nested_operator_driver_metadata_time_added": {
+          "const": false,
+          "type": "boolean"
+        },
+        "new_operation_compute_ceiling_seconds": {
+          "const": 240000,
+          "type": "integer"
+        },
+        "new_operation_parent_seconds_through094": {
+          "const": 9102.965393944178,
+          "type": "number"
+        },
+        "previous_through085_parent_seconds": {
+          "const": 8284.137812728994,
+          "type": "number"
+        },
+        "primary_basis": {
+          "const": "inclusive_native_parent_wait_seconds",
+          "type": "string"
+        },
+        "selected_historical_inclusive_cell_seconds_ALTERNATE": {
+          "const": 9897.505446233554,
+          "type": "number"
+        },
+        "selected_historical_seed11_cell_seconds": {
+          "const": 794.540052289376,
+          "type": "number"
+        },
+        "stale_native_operations_started_field_used": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "all100_cell_trial_counts_used",
+        "all_campaign_R_and_D_or_metadata_cost_complete",
+        "all_campaign_R_and_D_or_metadata_seconds",
+        "final_cell_trial_cap",
+        "final_cell_wall_cap_seconds",
+        "historical_alternate_added_to_primary",
+        "increment_parent_seconds086_to094",
+        "nested_operator_driver_metadata_time_added",
+        "new_operation_compute_ceiling_seconds",
+        "new_operation_parent_seconds_through094",
+        "previous_through085_parent_seconds",
+        "primary_basis",
+        "selected_historical_inclusive_cell_seconds_ALTERNATE",
+        "selected_historical_seed11_cell_seconds",
+        "stale_native_operations_started_field_used"
+      ],
+      "type": "object"
+    },
+    "current_resource_and_runtime_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "GPU_grant_ceiling_upper_bound_mib": {
+          "const": 11324,
+          "type": "integer"
+        },
+        "RAM_grant_bytes": {
+          "const": 17179869184,
+          "type": "integer"
+        },
+        "binary_sha256": {
+          "const": "5d5ef250dbcf2296ad9f0b897b17c8c579258ff943dd161f58102cd3f5bb5a3f",
+          "type": "string"
+        },
+        "candidate": {
+          "const": "compact_neural_residual_symbolic",
+          "type": "string"
+        },
+        "declared_host_runtime_sha256": {
+          "const": "4a03b321a54b45ea672830c06d3c4d267b77a0790730c76b612c1b09cf9c8901",
+          "type": "string"
+        },
+        "detailed_operation_indices": {
+          "items": {
+            "enum": [
+              86,
+              87,
+              88,
+              89,
+              90,
+              91,
+              92,
+              93,
+              94
+            ],
+            "type": "integer"
+          },
+          "maxItems": 9,
+          "minItems": 9,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "fit_timeout_seconds": {
+          "const": 600,
+          "type": "integer"
+        },
+        "historical_source_runtime_equivalence_upgraded": {
+          "const": false,
+          "type": "boolean"
+        },
+        "host": {
+          "const": "xbabe2",
+          "type": "string"
+        },
+        "model_plus_projection_byte_cap": {
+          "const": 10240,
+          "type": "integer"
+        },
+        "official_tests_opened": {
+          "const": false,
+          "type": "boolean"
+        },
+        "research_profile": {
+          "const": "features12_steps2048",
+          "type": "string"
+        },
+        "reserved_CPU_slot": {
+          "items": {
+            "enum": [
+              80,
+              81,
+              82,
+              83,
+              84,
+              85,
+              86,
+              87,
+              88,
+              89,
+              90,
+              91,
+              92,
+              93,
+              94,
+              95
+            ],
+            "type": "integer"
+          },
+          "maxItems": 16,
+          "minItems": 16,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "scientific_execution_source_sha256": {
+          "additionalProperties": false,
+          "properties": {
+            "source/bootstrap.py": {
+              "const": "60fc70bd1797af7a667113f97269001ebd8844a9726a8e965eb34e4d9559e4b2",
+              "type": "string"
+            },
+            "source/coordinator.py": {
+              "const": "03bc418e23fd4e3e2f775406432d6d8db1586fd55d2473d9465c23be02591248",
+              "type": "string"
+            },
+            "source/custody.py": {
+              "const": "fc5a05a2732a679b42ea353beba7d6237d1ec059f78300d55464e58715a0c261",
+              "type": "string"
+            },
+            "source/lifecycle.py": {
+              "const": "7f413f9dccb0c48eb022679f239c941ca9da030857869f7052f567dbeebe90bd",
+              "type": "string"
+            },
+            "source/monitor.py": {
+              "const": "c653a5bd527fbb82fffa4c25add2d3290a9de3ca4de20c3ddd43643c2d258f41",
+              "type": "string"
+            },
+            "source/observer.py": {
+              "const": "171c199e031e5b2eaa6232191d4f04a335f19ade7f631f1b14202075c3f52384",
+              "type": "string"
+            },
+            "source/qos.py": {
+              "const": "7ac399e98709a3ebfed2e4338db286f0e45948b7d78f37028e459a6708d17d83",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source/bootstrap.py",
+            "source/coordinator.py",
+            "source/custody.py",
+            "source/lifecycle.py",
+            "source/monitor.py",
+            "source/observer.py",
+            "source/qos.py"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "GPU_grant_ceiling_upper_bound_mib",
+        "RAM_grant_bytes",
+        "binary_sha256",
+        "candidate",
+        "declared_host_runtime_sha256",
+        "detailed_operation_indices",
+        "fit_timeout_seconds",
+        "historical_source_runtime_equivalence_upgraded",
+        "host",
+        "model_plus_projection_byte_cap",
+        "official_tests_opened",
+        "research_profile",
+        "reserved_CPU_slot",
+        "scientific_execution_source_sha256"
+      ],
+      "type": "object"
+    },
+    "evidence_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "enum": [
+              197465,
+              9518,
+              54943,
+              151659
+            ],
+            "type": "integer"
+          },
+          "role": {
+            "enum": [
+              "through094_ROOT_verified_prefix",
+              "through094_independent_scalar_proof",
+              "index095_unpaid_stop_supplement",
+              "through094_compact_raw_metadata_join"
+            ],
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "role",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array"
+    },
+    "excluded_metadata_waits": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_retirement_or_new_admission_claim": {
+          "const": false,
+          "type": "boolean"
+        },
+        "all_metadata_wait_cost_complete": {
+          "const": false,
+          "type": "boolean"
+        },
+        "entire_service_wall_seconds": {
+          "type": "null"
+        },
+        "index095": {
+          "additionalProperties": false,
+          "properties": {
+            "closed_unpaid_attempts": {
+              "const": 20,
+              "type": "integer"
+            },
+            "driver_wait_seconds_NONADDITIVE": {
+              "const": 150.7615494756028,
+              "type": "number"
+            },
+            "method_failure_conclusion": {
+              "type": "null"
+            },
+            "new_paid_trials": {
+              "const": 0,
+              "type": "integer"
+            },
+            "operator_stop_type": {
+              "const": "bounded_unpaid_metadata_stop",
+              "type": "string"
+            }
+          },
+          "required": [
+            "closed_unpaid_attempts",
+            "driver_wait_seconds_NONADDITIVE",
+            "method_failure_conclusion",
+            "new_paid_trials",
+            "operator_stop_type"
+          ],
+          "type": "object"
+        },
+        "indices086_to094": {
+          "additionalProperties": false,
+          "properties": {
+            "attempts_by_index": {
+              "additionalProperties": false,
+              "properties": {
+                "90": {
+                  "const": 1,
+                  "type": "integer"
+                },
+                "92": {
+                  "const": 10,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "90",
+                "92"
+              ],
+              "type": "object"
+            },
+            "closed_unpaid_attempts": {
+              "const": 11,
+              "type": "integer"
+            },
+            "driver_wait_seconds_NONADDITIVE": {
+              "const": 79.21575790969655,
+              "type": "number"
+            },
+            "method_failure_conclusion": {
+              "type": "null"
+            },
+            "new_paid_trials": {
+              "const": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "attempts_by_index",
+            "closed_unpaid_attempts",
+            "driver_wait_seconds_NONADDITIVE",
+            "method_failure_conclusion",
+            "new_paid_trials"
+          ],
+          "type": "object"
+        },
+        "operator84_to95_wall_seconds_NONADDITIVE": {
+          "const": 2441.6204410917126,
+          "type": "number"
+        },
+        "operator_wall_overlaps_native_and_metadata": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "actor_retirement_or_new_admission_claim",
+        "all_metadata_wait_cost_complete",
+        "entire_service_wall_seconds",
+        "index095",
+        "indices086_to094",
+        "operator84_to95_wall_seconds_NONADDITIVE",
+        "operator_wall_overlaps_native_and_metadata"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "work-order-b-native-through094-fit-progress-and-cost-v1",
+      "type": "string"
+    },
+    "gated_claims": {
+      "additionalProperties": false,
+      "properties": {
+        "MFS_v2": {
+          "type": "null"
+        },
+        "PTF_v1": {
+          "type": "null"
+        },
+        "energy_joules": {
+          "type": "null"
+        },
+        "fivefit_stability": {
+          "type": "null"
+        },
+        "formal_privacy": {
+          "type": "null"
+        },
+        "hardware_model": {
+          "type": "null"
+        },
+        "production_runtime_certification": {
+          "type": "null"
+        },
+        "release_safe": {
+          "type": "null"
+        },
+        "sample_completeness": {
+          "type": "null"
+        },
+        "superiority": {
+          "type": "null"
+        },
+        "wall_completion_ETA_UTC": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "MFS_v2",
+        "PTF_v1",
+        "energy_joules",
+        "fivefit_stability",
+        "formal_privacy",
+        "hardware_model",
+        "production_runtime_certification",
+        "release_safe",
+        "sample_completeness",
+        "superiority",
+        "wall_completion_ETA_UTC"
+      ],
+      "type": "object"
+    },
+    "logical500": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted": {
+          "const": 195,
+          "type": "integer"
+        },
+        "accepted_historical_seed11_reuse": {
+          "const": 98,
+          "type": "integer"
+        },
+        "accepted_new_population_fits": {
+          "const": 97,
+          "type": "integer"
+        },
+        "dataset_lineages": {
+          "const": 100,
+          "type": "integer"
+        },
+        "distinct_accounted_slots": {
+          "const": 204,
+          "type": "integer"
+        },
+        "historical_artifact_caps": {
+          "const": 2,
+          "type": "integer"
+        },
+        "infrastructure_is_method_failure": {
+          "const": false,
+          "type": "boolean"
+        },
+        "physical_paid_trials": {
+          "const": 205,
+          "type": "integer"
+        },
+        "resolved_old_infrastructure_extra_trial": {
+          "const": 1,
+          "type": "integer"
+        },
+        "scheduled_slots": {
+          "const": 500,
+          "type": "integer"
+        },
+        "scientifically_unresolved_slots": {
+          "const": 303,
+          "type": "integer"
+        },
+        "snapshot_unstarted": {
+          "const": 296,
+          "type": "integer"
+        },
+        "unresolved_infrastructure_slots": {
+          "const": 7,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "accepted",
+        "accepted_historical_seed11_reuse",
+        "accepted_new_population_fits",
+        "dataset_lineages",
+        "distinct_accounted_slots",
+        "historical_artifact_caps",
+        "infrastructure_is_method_failure",
+        "physical_paid_trials",
+        "resolved_old_infrastructure_extra_trial",
+        "scheduled_slots",
+        "scientifically_unresolved_slots",
+        "snapshot_unstarted",
+        "unresolved_infrastructure_slots"
+      ],
+      "type": "object"
+    },
+    "measured_operations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "GPU_grant_resident_ceiling_mib": {
+            "const": 11324,
+            "type": "integer"
+          },
+          "GPU_observation_count": {
+            "enum": [
+              5,
+              4
+            ],
+            "type": "integer"
+          },
+          "attempt": {
+            "const": 1,
+            "type": "integer"
+          },
+          "charged_model_plus_projection_bytes": {
+            "enum": [
+              8147,
+              1005,
+              1000,
+              1007,
+              1010,
+              2746,
+              2747,
+              2753
+            ],
+            "type": "integer"
+          },
+          "co_tenant_observed": {
+            "const": false,
+            "type": "boolean"
+          },
+          "dataset_lineage_id": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "fit_seed": {
+            "enum": [
+              71,
+              23,
+              37,
+              53
+            ],
+            "type": "integer"
+          },
+          "full_system_runtime_closure_certified": {
+            "const": false,
+            "type": "boolean"
+          },
+          "gpu_target_operator_verified": {
+            "const": true,
+            "type": "boolean"
+          },
+          "host": {
+            "const": "xbabe2",
+            "type": "string"
+          },
+          "job_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "maximum_observed_own_GPU_resident_mib": {
+            "const": 430,
+            "type": "integer"
+          },
+          "maximum_observed_own_RSS_bytes": {
+            "enum": [
+              889409536,
+              903995392,
+              918138880,
+              903909376,
+              884224000,
+              883470336,
+              888954880,
+              889327616
+            ],
+            "type": "integer"
+          },
+          "minimum_observed_device_free_mib": {
+            "enum": [
+              23686,
+              23685
+            ],
+            "type": "integer"
+          },
+          "model_bytes": {
+            "enum": [
+              4385,
+              395,
+              390,
+              397,
+              400,
+              1101,
+              1102,
+              1108
+            ],
+            "type": "integer"
+          },
+          "nested_operation_seconds_NONADDITIVE": {
+            "enum": [
+              65.26691518910229,
+              74.83586322702467,
+              78.75527531374246,
+              66.36290995916352,
+              85.74752462701872,
+              177.60984333092347,
+              139.80832004221156,
+              64.59803844802082,
+              64.43157483171672
+            ],
+            "type": "number"
+          },
+          "observed_providers_verified": {
+            "const": true,
+            "type": "boolean"
+          },
+          "operation_index": {
+            "enum": [
+              86,
+              87,
+              88,
+              89,
+              90,
+              91,
+              92,
+              93,
+              94
+            ],
+            "type": "integer"
+          },
+          "parent_exit_code": {
+            "const": 0,
+            "type": "integer"
+          },
+          "parent_wait_seconds": {
+            "enum": [
+              65.41764693334699,
+              74.98626322904602,
+              78.90039508510381,
+              66.52236948395148,
+              85.91126554226503,
+              177.79354645079002,
+              139.96271472703665,
+              64.74000426242128,
+              64.59337550122291
+            ],
+            "type": "number"
+          },
+          "projection_bytes": {
+            "enum": [
+              3762,
+              610,
+              1645
+            ],
+            "type": "integer"
+          },
+          "receipts": {
+            "additionalProperties": false,
+            "properties": {
+              "budget_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "native_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "operator_terminal_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "outer_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "parent_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "request_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "budget_sha256",
+              "native_sha256",
+              "operator_terminal_sha256",
+              "outer_sha256",
+              "parent_sha256",
+              "request_sha256"
+            ],
+            "type": "object"
+          },
+          "shared_GPU_cost_observed": {
+            "const": false,
+            "type": "boolean"
+          },
+          "status": {
+            "const": "ok",
+            "type": "string"
+          },
+          "true_peak_RAM_bytes": {
+            "type": "null"
+          },
+          "true_peak_VRAM_mib": {
+            "type": "null"
+          },
+          "zero_impact_claim": {
+            "const": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "GPU_observation_count",
+          "attempt",
+          "charged_model_plus_projection_bytes",
+          "co_tenant_observed",
+          "dataset_lineage_id",
+          "fit_seed",
+          "full_system_runtime_closure_certified",
+          "gpu_target_operator_verified",
+          "host",
+          "job_sha256",
+          "maximum_observed_own_GPU_resident_mib",
+          "maximum_observed_own_RSS_bytes",
+          "minimum_observed_device_free_mib",
+          "model_bytes",
+          "nested_operation_seconds_NONADDITIVE",
+          "observed_providers_verified",
+          "operation_index",
+          "parent_exit_code",
+          "parent_wait_seconds",
+          "projection_bytes",
+          "receipts",
+          "shared_GPU_cost_observed",
+          "status",
+          "true_peak_RAM_bytes",
+          "true_peak_VRAM_mib",
+          "zero_impact_claim",
+          "GPU_grant_resident_ceiling_mib"
+        ],
+        "type": "object"
+      },
+      "maxItems": 9,
+      "minItems": 9,
+      "type": "array"
+    },
+    "observations_scope086_to094": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_operations": {
+          "const": 9,
+          "type": "integer"
+        },
+        "causal_zero_impact_identified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "charged_bytes_range": {
+          "items": {
+            "enum": [
+              1000,
+              8147
+            ],
+            "type": "integer"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "charged_model_plus_projection_bytes_sum": {
+          "const": 23161,
+          "type": "integer"
+        },
+        "co_tenant_observed_false_operations": {
+          "const": 9,
+          "type": "integer"
+        },
+        "co_tenant_observed_true_operations": {
+          "const": 0,
+          "type": "integer"
+        },
+        "full_system_runtime_closure_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "future_QoS_guaranteed": {
+          "const": false,
+          "type": "boolean"
+        },
+        "host": {
+          "const": "xbabe2",
+          "type": "string"
+        },
+        "max_of_observed_own_GPU_resident_mib": {
+          "const": 430,
+          "type": "integer"
+        },
+        "max_of_observed_own_RSS_bytes": {
+          "const": 918138880,
+          "type": "integer"
+        },
+        "min_of_observed_whole_device_free_mib": {
+          "const": 23685,
+          "type": "integer"
+        },
+        "nonempty_GPU_clock_operations": {
+          "const": 9,
+          "type": "integer"
+        },
+        "shared_GPU_cost_observed_false_operations": {
+          "const": 9,
+          "type": "integer"
+        },
+        "shared_GPU_cost_observed_true_operations": {
+          "const": 0,
+          "type": "integer"
+        },
+        "true_peak_RAM_bytes": {
+          "type": "null"
+        },
+        "true_peak_VRAM_mib": {
+          "type": "null"
+        },
+        "whole_system_exclusivity_certified": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "accepted_operations",
+        "causal_zero_impact_identified",
+        "charged_bytes_range",
+        "charged_model_plus_projection_bytes_sum",
+        "co_tenant_observed_false_operations",
+        "co_tenant_observed_true_operations",
+        "full_system_runtime_closure_certified",
+        "future_QoS_guaranteed",
+        "host",
+        "max_of_observed_own_GPU_resident_mib",
+        "max_of_observed_own_RSS_bytes",
+        "min_of_observed_whole_device_free_mib",
+        "nonempty_GPU_clock_operations",
+        "shared_GPU_cost_observed_false_operations",
+        "shared_GPU_cost_observed_true_operations",
+        "true_peak_RAM_bytes",
+        "true_peak_VRAM_mib",
+        "whole_system_exclusivity_certified"
+      ],
+      "type": "object"
+    },
+    "seed_coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_by_seed": {
+          "additionalProperties": false,
+          "properties": {
+            "11": {
+              "const": 98,
+              "type": "integer"
+            },
+            "23": {
+              "const": 24,
+              "type": "integer"
+            },
+            "37": {
+              "const": 26,
+              "type": "integer"
+            },
+            "53": {
+              "const": 24,
+              "type": "integer"
+            },
+            "71": {
+              "const": 23,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "11",
+            "23",
+            "37",
+            "53",
+            "71"
+          ],
+          "type": "object"
+        },
+        "accepted_seed_count_histogram": {
+          "additionalProperties": false,
+          "properties": {
+            "0": {
+              "const": 2,
+              "type": "integer"
+            },
+            "1": {
+              "const": 72,
+              "type": "integer"
+            },
+            "2": {
+              "const": 0,
+              "type": "integer"
+            },
+            "3": {
+              "const": 3,
+              "type": "integer"
+            },
+            "4": {
+              "const": 1,
+              "type": "integer"
+            },
+            "5": {
+              "const": 22,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "type": "object"
+        },
+        "all_five_lineage_ids": {
+          "items": {
+            "pattern": "^[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "maxItems": 22,
+          "minItems": 22,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "denominator_lineages": {
+          "const": 100,
+          "type": "integer"
+        },
+        "fivefit_stability": {
+          "type": "null"
+        },
+        "historical_reuse_runtime_upgraded": {
+          "const": false,
+          "type": "boolean"
+        },
+        "lineages_with_all_five_accepted_fit_identities": {
+          "const": 22,
+          "type": "integer"
+        },
+        "mixed_runtime_equivalence_certified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "sample_completeness": {
+          "type": "null"
+        },
+        "scheduled_fit_seeds": {
+          "items": {
+            "enum": [
+              11,
+              23,
+              37,
+              53,
+              71
+            ],
+            "type": "integer"
+          },
+          "maxItems": 5,
+          "minItems": 5,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "accepted_by_seed",
+        "accepted_seed_count_histogram",
+        "all_five_lineage_ids",
+        "denominator_lineages",
+        "fivefit_stability",
+        "historical_reuse_runtime_upgraded",
+        "lineages_with_all_five_accepted_fit_identities",
+        "mixed_runtime_equivalence_certified",
+        "sample_completeness",
+        "scheduled_fit_seeds"
+      ],
+      "type": "object"
+    },
+    "snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "fixed_snapshot": {
+          "const": true,
+          "type": "boolean"
+        },
+        "live_tip_tracking": {
+          "const": false,
+          "type": "boolean"
+        },
+        "observed_at_UTC": {
+          "const": "2026-10-08T11:15:50.529017+00:00",
+          "type": "string"
+        },
+        "subsequent_unpaid_metadata_stop_index": {
+          "const": 95,
+          "type": "integer"
+        },
+        "through_paid_queue_index": {
+          "const": 94,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "fixed_snapshot",
+        "live_tip_tracking",
+        "observed_at_UTC",
+        "subsequent_unpaid_metadata_stop_index",
+        "through_paid_queue_index"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "cost_basis",
+    "current_resource_and_runtime_scope",
+    "evidence_refs",
+    "excluded_metadata_waits",
+    "format",
+    "gated_claims",
+    "logical500",
+    "measured_operations",
+    "observations_scope086_to094",
+    "seed_coverage",
+    "snapshot"
+  ],
+  "title": "Fixed through094 native fit progress and cost snapshot",
+  "type": "object"
+}

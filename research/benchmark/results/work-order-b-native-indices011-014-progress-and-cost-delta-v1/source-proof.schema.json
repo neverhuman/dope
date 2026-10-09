@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_execution": {
+      "type": "string"
+    },
+    "format": {
+      "const": "native011014-rights-safe-source-proof-v1"
+    },
+    "prior121_result_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "private_input_join_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "public_files": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "file": {
+            "enum": [
+              "result.json",
+              "schema.json",
+              "README.md",
+              "operation-cost.csv",
+              "dataset-seed-coverage.csv",
+              "table.md",
+              "source-proof.schema.json"
+            ]
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "file",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 7,
+      "minItems": 7,
+      "type": "array"
+    },
+    "receipt_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "role": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bytes",
+          "role",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 16,
+      "minItems": 16,
+      "type": "array"
+    },
+    "root_input_receipt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "author_execution",
+    "format",
+    "prior121_result_sha256",
+    "private_input_join_sha256",
+    "public_files",
+    "receipt_refs",
+    "root_input_receipt_sha256"
+  ],
+  "type": "object"
+}

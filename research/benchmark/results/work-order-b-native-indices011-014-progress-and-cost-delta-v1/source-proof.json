@@ -1,0 +1,126 @@
+{
+  "author_execution": "metadata scalar preparation and AST parsing only; no renderer, controls, hosts, science or payload execution",
+  "format": "native011014-rights-safe-source-proof-v1",
+  "prior121_result_sha256": "cf8c6b787e0502f4199dbfa5a867357e6261f6246a4ab5423e2895fcff25a90e",
+  "private_input_join_sha256": "e762736b64a2ed5bab41da66b81d2280e77ac47525b0a73034030325ed4ead8a",
+  "public_files": [
+    {
+      "bytes": 47451,
+      "file": "result.json",
+      "sha256": "a58c1368eb9424ff638a0996338579dcf5ef94c7e444c4737822f7806bc76116"
+    },
+    {
+      "bytes": 19552,
+      "file": "schema.json",
+      "sha256": "46251806f476d4107c88987287e8867bd021ab986bf68a84dfde9bee3596441c"
+    },
+    {
+      "bytes": 3859,
+      "file": "README.md",
+      "sha256": "d11584f657b0bdcc86503b3198bb62cce7cc0021f891a17c19fb0ceee81c59ea"
+    },
+    {
+      "bytes": 834,
+      "file": "operation-cost.csv",
+      "sha256": "d44a98bd21b1a2f541072e6479eb5a0c3165d9a4bab3aca2992c0bba300067af"
+    },
+    {
+      "bytes": 17740,
+      "file": "dataset-seed-coverage.csv",
+      "sha256": "9df64ce713e8111934451dcc942375c93c53c7b4bbf74abf47f877a1d42cf863"
+    },
+    {
+      "bytes": 1448,
+      "file": "table.md",
+      "sha256": "c66ff5bae9e69315f7408049084ee1df22bdfc31f31b63a940d959084736169f"
+    },
+    {
+      "bytes": 2133,
+      "file": "source-proof.schema.json",
+      "sha256": "755d5c8027d482e673484aa2c4ccd6bfa9e3b58717b2ceb95a908b2dac12d857"
+    }
+  ],
+  "receipt_refs": [
+    {
+      "bytes": 23355,
+      "role": "index011_terminal_ref",
+      "sha256": "d7c55b429d8c6d4ee4c996733a2eda430c30cef1d8c281e76c73454de82a8723"
+    },
+    {
+      "bytes": 1863,
+      "role": "index011_actual_parent_ref",
+      "sha256": "061a98e49087f2e6eeeff3f1addcab9327bde39fb748ef19184607cae9211385"
+    },
+    {
+      "bytes": 118791,
+      "role": "index011_charged_budget_ref",
+      "sha256": "041b48a8affd4942dec83f7777c16de40047ee49606990ab0b9798cf3bdac9b5"
+    },
+    {
+      "bytes": 1035,
+      "role": "index011_outer_status_ref",
+      "sha256": "37dbe6b384425314c799ba3faa45d156a6730ccbf18232480edcb3da9bfc3e31"
+    },
+    {
+      "bytes": 35825,
+      "role": "index012_terminal_ref",
+      "sha256": "f9945b2408fa5b3439d9ee75c8c45106c0e98de142e54fd237f708c04a832847"
+    },
+    {
+      "bytes": 1863,
+      "role": "index012_actual_parent_ref",
+      "sha256": "8bcb5bf065d9d1cc43bc3c65e44aa7026c9de13827b6139929ab2be61001768a"
+    },
+    {
+      "bytes": 118792,
+      "role": "index012_charged_budget_ref",
+      "sha256": "8e4a9e1b7c0906449b82248b337da27f5f0a5878442a668ffeae876a800b6791"
+    },
+    {
+      "bytes": 1015,
+      "role": "index012_outer_status_ref",
+      "sha256": "16e66f2c2f51b23e50add1eebbc75cc5002f2ba28223c383980849e293daed00"
+    },
+    {
+      "bytes": 35827,
+      "role": "index013_terminal_ref",
+      "sha256": "1c47edf1bb1b93f0c8ff8b3f6a548de839dba135ad8aeef8376e6c7bca5d8059"
+    },
+    {
+      "bytes": 1862,
+      "role": "index013_actual_parent_ref",
+      "sha256": "826c54a1247da6e77d5c59024967cc4dd0b54647a2607079fa89b90622d62412"
+    },
+    {
+      "bytes": 118792,
+      "role": "index013_charged_budget_ref",
+      "sha256": "85c5bc6a865883f35d1da028a96b7a1e9ea2879254f84d4fb3636f28007982ec"
+    },
+    {
+      "bytes": 1014,
+      "role": "index013_outer_status_ref",
+      "sha256": "31fbce9ef280f756cbf03a5fdb1410aa9707395979563a45fdb8fc73e77f537d"
+    },
+    {
+      "bytes": 35825,
+      "role": "index014_terminal_ref",
+      "sha256": "f5dd6ea7a2fb6b3176534353fff2e8900b311ad25375c464a69af47bcce35945"
+    },
+    {
+      "bytes": 1862,
+      "role": "index014_actual_parent_ref",
+      "sha256": "083685fc794bf0d36c2da822f9080ae54f47bfb61fa313cb763b0e720cc6d430"
+    },
+    {
+      "bytes": 118792,
+      "role": "index014_charged_budget_ref",
+      "sha256": "3993d347b918403a2d5e18e9e05e22d77e95c5845c0f7671b76fcb97f991bb95"
+    },
+    {
+      "bytes": 1014,
+      "role": "index014_outer_status_ref",
+      "sha256": "10011d18d30267a5d15e9d9c7d9e9d34a1088b9b35eefe750c2fb380be37719c"
+    }
+  ],
+  "root_input_receipt_sha256": "214d7caa682157c359bfa0a367db5d22741b0cdf3d3a2273299de7038802b077"
+}

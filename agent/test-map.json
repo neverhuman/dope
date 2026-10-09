@@ -1,6 +1,14 @@
 {
   "workspace": "dope",
   "tests": {
+    "research/benchmark/results/work-order-b-native-through094-fit-progress-and-cost-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-through094-fit-progress-and-cost-v1/render.py --check",
+      "purpose": "replay the frozen through094 fit identity counts, observed GPU grants, distinct parent-cost bases and unavailable scores from public metadata only"
+    },
+    "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
+      "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
+      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+    },
     "research/benchmark/tests/test_mfs_v3_panel.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
       "purpose": "lock the MFS-v3 panel cohort, shared map, null band, and GPU yield rule"

@@ -39,10 +39,18 @@ def _model(name, task, seed):
                   "early_stopping": True, "n_iter_no_change": 15}
         return MLPClassifier(**common) if task == "binary" else MLPRegressor(**common)
     if name == "catboost":
+        from functools import partial
         from catboost import CatBoostClassifier, CatBoostRegressor
         common = {"iterations": 100, "depth": 6, "learning_rate": 0.05,
                   "random_seed": seed, "verbose": False, "thread_count": 4}
-        return CatBoostClassifier(**common) if task == "binary" else CatBoostRegressor(**common)
+        model = CatBoostClassifier(**common) if task == "binary" else CatBoostRegressor(**common)
+        # These operations have separate all-core defaults, including the one
+        # called automatically by fit(); retain the training thread budget.
+        model.get_feature_importance = partial(model.get_feature_importance, thread_count=4)
+        model.predict = partial(model.predict, thread_count=4)
+        if task == "binary":
+            model.predict_proba = partial(model.predict_proba, thread_count=4)
+        return model
     raise ValueError("unknown auditor")
 
 
