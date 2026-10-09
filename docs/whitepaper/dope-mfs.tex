@@ -396,15 +396,17 @@ With $W=\sum_i w_i$,
 \end{equation}
 when the four prerequisites hold, every hard gate passed, and every
 positive-weight component is finite and inside $[0,1]$. Otherwise the
-scalar is null. A profile of all ones is $100$. \eqref{eq:mfs} adds
-$\epsilon$ inside the logarithm, so the same all-ones profile illustrates
-as $\MfsAllOnes$, above $100$. That illustration is arithmetic on the
-historical formula. The supplement's generated rows use \eqref{eq:mfsv3}.
+scalar is null. A profile of all ones is $100$ under \eqref{eq:mfsv3}.
+\eqref{eq:mfs} adds $\epsilon$ inside the logarithm, so that historical
+formula leaves the same profile outside the v3 clip. The illustration
+stays arithmetic on \eqref{eq:mfs} and stays out of these tables.
+The supplement's generated rows use \eqref{eq:mfsv3}.
 The four prerequisites are a complete real-versus-real control, the
 required size cells, verified artifact-only sampling, and locked metric
-implementations. The Python scorer implements this clip. The native Rust
-evaluator still adds $\epsilon$ inside the logarithm and still omits these
-prerequisites, so the two implementations remain short of parity.
+implementations. The Python scorer and the native Rust v3 evaluator both
+take $\max(c_i,\epsilon)$ inside the logarithm, clip the result to $[0,100]$,
+and withhold the scalar when a prerequisite or a hard gate is missing.
+The historical Rust path for \eqref{eq:mfs} remains that v2 formula.
 
 Distribution fidelity, structure fidelity, coverage realism, and
 compactness keep their v2 definitions. The driver term stored beside
