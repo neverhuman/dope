@@ -220,11 +220,14 @@ def scalar_tex(measured: dict) -> str:
         f"The receipt scores {measured['scored']} of {measured['method_lineage_cells']} method--lineage cells "
         f"({measured['n_lineages']} lineages $\\times$ {measured['n_methods']} methods), so the scalar is null. "
         f"Cleartext is unscanned on {measured['cleartext_unscanned']} method--lineage cells.\n"
-        "\\begin{center}\\scriptsize\n"
+        "\\begin{table}[t]\\centering\\scriptsize\n"
+        "\\caption{Pinned representation vectors for the three tabular auditors. "
+        "These implementation identifiers define the representation boundary. "
+        "No Holm family.}\\label{tab:representation-vectors}\n"
         "\\begin{tabular}{@{}l>{\\raggedright\\arraybackslash}p{2.15in}@{}}\n"
         f"{rows}\n"
         "\\end{tabular}\n"
-        "\\end{center}\n"
+        "\\end{table}\n"
     )
 
 

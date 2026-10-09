@@ -1,0 +1,28 @@
+\begin{tabular}{lllrrr}
+\toprule
+Method / configuration & Cohort & Size & CatBoost & Linear & MLP \\
+\midrule
+DOPE / profile & matched & 1$n$ & \shortstack{0.8852 \\ {[0.8224, 0.9690] (96)}} & \shortstack{0.9812 \\ {[0.9659, 0.9942] (91)}} & \shortstack{0.9732 \\ {[0.9490, 0.9898] (72)}} \\
+DOPE / profile & matched & 4$n$ & \shortstack{0.9386 \\ {[0.8922, 0.9831] (96)}} & \shortstack{0.9940 \\ {[0.9718, 0.9967] (91)}} & \shortstack{1.0684 \\ {[1.0048, 1.2714] (72)}} \\
+DOPE / profile & own & 1$n$ & \shortstack{0.8856 \\ {[0.8286, 0.9702] (97)}} & \shortstack{0.9836 \\ {[0.9675, 0.9944] (92)}} & \shortstack{0.9713 \\ {[0.9322, 0.9898] (75)}} \\
+DOPE / profile & own & 4$n$ & \shortstack{0.9399 \\ {[0.8964, 0.9832] (97)}} & \shortstack{0.9940 \\ {[0.9718, 0.9967] (92)}} & \shortstack{1.0611 \\ {[1.0048, 1.2671] (75)}} \\
+ARF / default & own & 1$n$ & \shortstack{0.7423 \\ {[0.5478, 0.8404] (99)}} & \shortstack{0.9004 \\ {[0.7511, 0.9683] (94)}} & \shortstack{0.7998 \\ {[0.6430, 0.9097] (76)}} \\
+ARF / default & own & 4$n$ & \shortstack{0.8303 \\ {[0.7000, 0.8947] (99)}} & \shortstack{0.9510 \\ {[0.8541, 0.9832] (94)}} & \shortstack{0.9311 \\ {[0.8438, 1.0093] (76)}} \\
+ARF / selected & own & 1$n$ & \shortstack{0.7354 \\ {[0.5273, 0.8462] (99)}} & \shortstack{0.8880 \\ {[0.6975, 0.9659] (94)}} & \shortstack{0.8146 \\ {[0.6548, 0.9183] (76)}} \\
+ARF / selected & own & 4$n$ & \shortstack{0.8149 \\ {[0.6468, 0.8909] (99)}} & \shortstack{0.9269 \\ {[0.8465, 0.9775] (94)}} & \shortstack{0.9279 \\ {[0.8370, 1.0283] (76)}} \\
+TabSyn / scaled default & matched & 1$n$ & \shortstack{0.8599 \\ {[0.7076, 0.9459] (96)}} & \shortstack{0.9280 \\ {[0.7705, 0.9896] (91)}} & \shortstack{0.9438 \\ {[0.8201, 0.9857] (72)}} \\
+TabSyn / scaled default & matched & 4$n$ & \shortstack{0.9009 \\ {[0.8161, 0.9788] (96)}} & \shortstack{0.9595 \\ {[0.8310, 0.9897] (91)}} & \shortstack{1.0355 \\ {[0.9992, 1.1968] (72)}} \\
+GaussianCopula / selected & own & 1$n$ & \shortstack{0.6156 \\ {[0.3080, 0.7886] (99)}} & \shortstack{0.9613 \\ {[0.9150, 0.9898] (94)}} & \shortstack{0.8223 \\ {[0.7178, 0.8767] (76)}} \\
+GaussianCopula / selected & own & 4$n$ & \shortstack{0.6557 \\ {[0.3517, 0.8501] (99)}} & \shortstack{0.9872 \\ {[0.9629, 0.9959] (94)}} & \shortstack{0.9282 \\ {[0.8548, 1.0012] (76)}} \\
+Chow-Liu / selected & own & 1$n$ & \shortstack{0.4777 \\ {[0.2629, 0.5820] (99)}} & \shortstack{0.6361 \\ {[0.2609, 0.7562] (94)}} & \shortstack{0.4702 \\ {[0.1653, 0.6383] (76)}} \\
+Chow-Liu / selected & own & 4$n$ & \shortstack{0.5823 \\ {[0.2709, 0.6510] (99)}} & \shortstack{0.6592 \\ {[0.2824, 0.7633] (94)}} & \shortstack{0.6891 \\ {[0.4387, 0.7726] (76)}} \\
+Independent marginals / selected & own & 1$n$ & \shortstack{-0.0444 \\ {[-0.0689, -0.0299] (99)}} & \shortstack{-0.0501 \\ {[-0.0820, -0.0149] (94)}} & \shortstack{-0.1279 \\ {[-0.3221, -0.0180] (76)}} \\
+Independent marginals / selected & own & 4$n$ & \shortstack{-0.0117 \\ {[-0.0418, -0.0000] (99)}} & \shortstack{0.0021 \\ {[-0.0268, 0.0191] (94)}} & \shortstack{-0.0273 \\ {[-0.0922, -0.0001] (76)}} \\
+CTGAN / selected & own & 1$n$ & \shortstack{-0.0909 \\ {[-0.4527, 0.1244] (21)}} & \shortstack{-0.0564 \\ {[-0.3837, 0.1182] (21)}} & \shortstack{-0.0995 \\ {[-1.0258, 0.3118] (19)}} \\
+CTGAN / selected & own & 4$n$ & \shortstack{-0.0813 \\ {[-0.2047, 0.1056] (21)}} & \shortstack{-0.0335 \\ {[-0.4545, 0.1241] (21)}} & \shortstack{-0.1487 \\ {[-0.6644, 0.1280] (19)}} \\
+TVAE / selected & own & 1$n$ & \shortstack{0.5977 \\ {[0.4150, 0.7501] (21)}} & \shortstack{0.7641 \\ {[0.5516, 0.8617] (21)}} & \shortstack{0.6765 \\ {[0.3096, 0.8155] (19)}} \\
+TVAE / selected & own & 4$n$ & \shortstack{0.6690 \\ {[0.4711, 0.8259] (21)}} & \shortstack{0.7959 \\ {[0.5806, 0.8750] (21)}} & \shortstack{0.7528 \\ {[0.4781, 0.8551] (19)}} \\
+Forest-Flow / selected & own & 1$n$ & \shortstack{0.9694 \\ {[0.7855, 0.9985] (6)}} & \shortstack{0.9806 \\ {[0.7538, 1.0827] (5)}} & \shortstack{0.9805 \\ {[0.3176, 1.0294] (4)}} \\
+Forest-Flow / selected & own & 4$n$ & \shortstack{1.0025 \\ {[0.9256, 1.0362] (6)}} & \shortstack{0.9851 \\ {[0.9772, 1.0007] (5)}} & \shortstack{1.0436 \\ {[1.0035, 1.4676] (4)}} \\
+\bottomrule
+\end{tabular}

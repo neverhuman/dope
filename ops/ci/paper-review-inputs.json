@@ -4,6 +4,10 @@
       "bytes": 6807387,
       "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
     },
+    "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json": {
+      "bytes": 21453198,
+      "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
+    },
     "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json": {
       "bytes": 1751802,
       "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
@@ -16,6 +20,10 @@
       "bytes": 21794615,
       "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
     },
+    "research/benchmark/results/expanded-validation-diagnostics.json": {
+      "bytes": 1563417,
+      "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
+    },
     "research/benchmark/results/review-fixes-controls-v1/panel.json": {
       "bytes": 21280,
       "sha256": "3d6f32bb8a1276993de2d2527b95633a4aadb2e0b622dc4f8a1f7574eff87e21"
@@ -24,17 +32,49 @@
       "bytes": 5382380,
       "sha256": "559d7dd664bb77bc140c808660d05ac10842b4580c39a1efcf533fba20d5bf94"
     },
+    "research/benchmark/results/review-fixes-fidelity-v1/panel.json": {
+      "bytes": 47247,
+      "sha256": "b1c1890767b3ccd672fa1e95d3f6db9e26003760afc39214940ab308e7bff237"
+    },
     "research/benchmark/results/review-fixes-privacy-v1/panel.json": {
       "bytes": 48890,
       "sha256": "2caa429ae03b5bbc61b30c4ce9391670f70ec9a991e2d398974a8bf3d76942f8"
+    },
+    "research/benchmark/results/review-fixes-privacy-v1/scalar-cells.jsonl": {
+      "bytes": 2627173,
+      "sha256": "4702f9c48c543a311af198a5652e8b41904004ac22d94949ba455eef82a9521d"
     },
     "research/benchmark/results/review-fixes-receipts-v1/panel.json": {
       "bytes": 306014,
       "sha256": "f0ecf5929825f1f07d877d4e01714f1ebd55868db3b863482f46be0f27ffdf47"
     },
+    "research/benchmark/results/review-fixes-tabsyn-fidelity-v1/scalar-cells.jsonl": {
+      "bytes": 355773,
+      "sha256": "f7df39e9a45989fbe9cb8ff127134a3edd284ad72de3530cb63ee462fce50697"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-fidelity-v1/scalar-cells.meta.json": {
+      "bytes": 596,
+      "sha256": "a18ee597a4c596e8fe840c10ee33b5e977e0111f14b764589edb125d97e6d408"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/binding.json": {
+      "bytes": 165512,
+      "sha256": "dcbb2bc030ff9e903d7482e46348424ae12d1f0ea7552e62e9eaf14fd9a7f4c8"
+    },
     "research/benchmark/results/review-fixes-tabsyn-v1/panel.json": {
       "bytes": 12676,
       "sha256": "8e87a4b304588f6b3c2e6cf34c2a2ee9f4b4f0ea3d282f836f14cbc23a7dbfa3"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/sample-evidence.json": {
+      "bytes": 189857,
+      "sha256": "274b6eef4ce95545ded969763ffffa3e1154a2d9192c1e2867dd7ddcb719e0e3"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/sampling-receipts.json": {
+      "bytes": 163185,
+      "sha256": "e09c7eb22abb15a171a321b7f4c7b80b276509963898870a6f430965f665d88d"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/scalar-cells.jsonl": {
+      "bytes": 458523,
+      "sha256": "b9fd4600ec54fc89b938eb627f31d6112176fc4137e040c3686c15efd17d2d62"
     },
     "research/benchmark/results/s3-lineage-record.json": {
       "bytes": 1834757,
@@ -48,13 +88,25 @@
       "bytes": 13567823,
       "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
     },
+    "research/benchmark/results/tabsyn-default100-scaled-cuda-fits.json": {
+      "bytes": 555911,
+      "sha256": "cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272"
+    },
+    "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json": {
+      "bytes": 582699,
+      "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
+    },
     "research/benchmark/review_fixes/paper-build.json": {
-      "bytes": 1903,
-      "sha256": "d18cb21b86a0250842501e8627fc1bdf7ed421f57c8b920f4487cb552bccfd1f"
+      "bytes": 2958,
+      "sha256": "5d4382907d27011ea89fa2006f1984e1d2185c6bfd18207b68bdd584b683dda3"
     },
     "research/benchmark/review_fixes/predeclare.json": {
       "bytes": 12002,
       "sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5"
+    },
+    "research/benchmark/review_fixes/tabsyn-fidelity-predeclare.json": {
+      "bytes": 11711,
+      "sha256": "686742975a461e59ac486997a637ab0e817d89141159a1da0f48adfb6eaeaec0"
     }
   },
   "format": "dope-paper-review-inputs-v1"

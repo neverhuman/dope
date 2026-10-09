@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Page-1 teaser: the DOPE generator minus ARF, the copula, and Chow-Liu.
+"""Page-1 teaser: the DOPE generator minus ARF, TabSyn, the copula, and Chow-Liu.
 
 The open mark and bar are the stored family-cluster median and interval on
 the size-4n review receipt. Filled marks are the stored paired differences
 whose stored median equals that receipt. Author-default ARF points come from
 retained-evidence.json. Copula and Chow-Liu points come from the density
 block of panel-stats.json. No median is recomputed, and native-selected ARF
-stays off this figure.
+stays off this figure. Bound TabSyn points use its matched cohort, with a separate count.
 """
 
 from __future__ import annotations
@@ -39,6 +39,8 @@ RECEIPT_NAME = "review-receipts.json"
 EVIDENCE_NAME = "retained-evidence.json"
 PDF_NAME = "teaser.pdf"
 HASH_NAME = "teaser-figure-hashes.json"
+WAVE2_NAME = "review-wave2.json"
+WAVE2_SHA256 = "692becfe7766cd799936eee9d3b281036dfc7dfc9423d1766b4211ec22e492bb"
 AUDITORS = (
     ("catboost", "CatBoost"),
     ("linear", "Linear"),
@@ -48,6 +50,7 @@ AUDITORS = (
 # Order is the row order. ARF is the full-panel baseline.
 COMPARATORS = (
     ("ARF", "author_default", "retained", "ARF", "ARF", figure_style.ARF, "o"),
+    ("TabSyn", "scaled_200_vae_1000_diffusion", "wave2", "TabSyn", "TabSyn", figure_style.TABSYN, "D"),
     ("GaussianCopula", "native_selected", "panel", "Copula", "Gaussian copula", figure_style.GAUSSIAN, "s"),
     ("Chow-Liu", "native_selected", "panel", "Chow-Liu", "Chow-Liu", figure_style.CHOW, "^"),
 )
@@ -87,7 +90,10 @@ def _arf_author_default(evidence):
     return chosen
 
 
-def _point_row(source, auditor, method, arf_rows, density):
+def _point_row(source, auditor, method, arf_rows, density, tabsyn_rows):
+    if source == "wave2":
+        row = tabsyn_rows[auditor]
+        return row["differences"], row["summary"]["median"], row["summary"]["n"]
     if source == "retained":
         row = arf_rows.get(auditor)
         if row is None:
@@ -107,6 +113,13 @@ def paired_panels():
     if digest != _REVIEW_PANEL_SHA256:
         raise SystemExit("review receipt drift")
     review = _review_index(json.loads(raw))
+    wave2_raw = (GEN / WAVE2_NAME).read_bytes()
+    if hashlib.sha256(wave2_raw).hexdigest() != WAVE2_SHA256:
+        raise SystemExit("wave2 paired point receipt drift")
+    wave2 = json.loads(wave2_raw)
+    tabsyn_rows = {row["auditor"]: row for row in wave2["tabsyn_teaser"]}
+    for auditor, row in tabsyn_rows.items():
+        review[("TabSyn", "scaled_200_vae_1000_diffusion", auditor)] = row["summary"]
     evidence = json.loads((GEN / EVIDENCE_NAME).read_text())
     stats = json.loads((GEN / STATS_NAME).read_text())
     arf_rows = _arf_author_default(evidence)
@@ -120,7 +133,7 @@ def paired_panels():
             receipt = review.get(key)
             if receipt is None:
                 raise SystemExit(f"missing review row {key}")
-            values_raw, stored_median, stored_n = _point_row(source, auditor, method, arf_rows, density)
+            values_raw, stored_median, stored_n = _point_row(source, auditor, method, arf_rows, density, tabsyn_rows)
             values = [float(item) for item in values_raw]
             if len(values) != int(stored_n) or int(stored_n) != int(receipt["n"]):
                 raise SystemExit(f"{key} difference count does not match the review receipt")
@@ -129,11 +142,12 @@ def paired_panels():
             median, lo, hi = _interval(
                 receipt["median"], receipt["lo"], receipt["hi"], f"{key} family-cluster"
             )
-            counts.add(int(receipt["n"]))
+            if source != "wave2":
+                counts.add(int(receipt["n"]))
             rows.append((tick, label, color, marker, values, median, lo, hi))
         if len(counts) != 1:
             raise SystemExit(f"{auditor} comparators do not share one paired count")
-        panels.append((title, counts.pop(), rows))
+        panels.append((title, str(counts.pop()) + "/" + str(tabsyn_rows[auditor]["summary"]["n"]), rows))
     return panels
 
 
@@ -184,12 +198,12 @@ def draw(panels, dest):
             )
         axis.axvline(0, color="#333333", linewidth=0.6, zorder=1)
         axis.set_xlim(-CLIP, CLIP)
-        axis.set_title(f"{_title}, {count}\n{outside} outside the frame", fontsize=7.2)
+        axis.set_title(f"{_title}, n={count}\n{outside} outside the frame", fontsize=7.2)
         figure_style.panel(axis, grid="x")
     ticks = [tick for tick, _label, _color, _marker, _values, _median, _lo, _hi in panels[0][2]]
-    axes[0].set_yticks([0, 1, 2])
+    axes[0].set_yticks(list(range(len(ticks))))
     axes[0].set_yticklabels(list(reversed(ticks)), fontsize=6.5)
-    axes[0].set_ylim(-0.55, 2.55)
+    axes[0].set_ylim(-0.55, len(ticks) - 0.45)
     for axis in axes[1:]:
         axis.tick_params(labelleft=False)
     axes[1].set_xlabel("retention difference (dimensionless)", fontsize=7)
@@ -209,7 +223,7 @@ def draw(panels, dest):
     ]
     labels = [label for _tick, label, _color, _marker, _values, _median, _lo, _hi in panels[0][2]]
     figure.tight_layout(pad=0.35, rect=(0.02, 0.16, 1, 0.98))
-    figure_style.legend_below(figure, handles, labels, ncol=3)
+    figure_style.legend_below(figure, handles, labels, ncol=4)
     path = Path(dest)
     path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(path, metadata={"CreationDate": None, "ModDate": None})

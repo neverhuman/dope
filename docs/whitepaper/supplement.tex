@@ -10,6 +10,7 @@ $^1$NEVERHUMAN Research}
 \iclrfinalcopy
 \begin{document}
 \input{generated/numbers.tex}
+\input{generated/review-wave2-numbers.tex}
 \maketitle
 \fancyhead{}
 \renewcommand{\headrulewidth}{0pt}
@@ -191,9 +192,7 @@ object. Publishing current scratch files under those identities would require
 an additional custody audit; logged replay fits have different artifact
 identities. The committed validation ledgers, original metadata, and compressed numeric logs,
 authenticated by the input pins and rebuilt by \texttt{just paper}, reproduce the
-historical reductions and figures. The holdout-privacy and TabSyn
-cell-level reductions remain in progress, wave 2. This paper prints no number
-for them. Original model sampling and historical partition
+historical reductions and figures. The bound control, privacy and TabSyn scalar ledgers reproduce their committed aggregates before rendering. Original model sampling and historical partition
 reconstruction stay packaging limitations.
 
 
@@ -256,7 +255,7 @@ copula and Chow--Liu defaults and native-selected configurations.
 TabSyn lineages and the classical methods on those identical inputs.
 It cannot establish a full-population TabSyn result or a native-tuned
 TabSyn comparison. These evaluations leave the configuration unselected.
-The matched TabSyn cohort remains in progress, wave 2, and this paper prints no number for it. That cohort stays distinct from this retained subset.
+The bound TabSyn cohort reported below stays distinct from this retained subset.
 
 \begin{table}[t]
 \caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). The parenthetical count is the denominator. Native rows use the objective recorded for that configuration. No Holm family in this table.}
@@ -505,10 +504,9 @@ A differentially private synthesizer optimizes a privacy-budget constraint; the 
 \paragraph{What this paper measured.}
 The measured generators are the Gaussian copula, a Chow--Liu baseline written
 for this comparison, independent marginals written for this comparison, CTGAN,
-TVAE, ARF, a scaled author-default TabSyn subset (the retained-validation section of this supplement), and a
+TVAE, ARF, scaled author-default TabSyn on a bound validation cohort and a separate retained subset, and a
 $\NForestCb$-lineage Forest-Flow confirmation.
-TabSyn and TabDDPM are both in the diffusion family above. TabSyn's measured
-cells are the retained subset, with a full population still unmeasured. The TabDDPM population
+TabSyn and TabDDPM are both in the diffusion family above. TabSyn's admitted common-numeric cohort has $\WaveTabsynLineages$ lineages; one frozen-fit lineage lacks admitted samples. The retained subset uses a different cohort. The TabDDPM population
 publication is \TabDDPMResult. The other named generators are cited and stay
 unmeasured. the coverage table in this supplement records that coverage.
 This panel scores regression retention. Classification oversampling stays outside that score.
@@ -537,8 +535,7 @@ distance-to-closest-record share, and a DOMIAS AUC. ARF and the retained
 TabSyn subset have an additional fidelity, detection and empirical-privacy
 panel in the retained-validation section of this supplement. The displayed-profile ARF
 publication median is \ArfResult.
-The pre-specified privacy-attack panel
-remains \PrivacyAttackPanel. Nothing in those fields is a formal privacy
+Distance-MIA is reported below; attribute and predictor attacks remain unmeasured. Nothing in those fields is a formal privacy
 guarantee or a HIPAA de-identification claim.
 
 \paragraph{Auditors and rank tests.}
@@ -640,7 +637,7 @@ file plus \texttt{projection.json}. The publisher adds those two lengths.
 A baseline charge is the length stored for that method. This paper keeps that stored length. Before that encoding, the compiler quantizes the marginals, the
 dependence, the residual, and the noise model.
 
-The profile was fixed before the shared retention was inspected. Compile-time
+The reported rows use a fixed profile; disjoint profile-selection evidence is unavailable. Compile-time
 search records the proxy $0.45u + 0.25d + 0.30j$ and then keeps the candidate
 with the smallest normalized gate shortfall, then the smallest artifact, then
 the lowest candidate id. Every candidate record withholds a release
@@ -680,9 +677,10 @@ numeric projection. It stays distinct from the original DOMIAS training pipeline
 a membership-inference certificate. The DOMIAS AUC stays near one
 half. The density DCR contrast against independent marginals clears Holm in
 that worse direction. The displayed-profile ARF publication median is
-\ArfResult. The pre-specified privacy-attack panel remains
-\PrivacyAttackPanel. This stays outside differential privacy and outside HIPAA
-de-identification.
+\ArfResult. The bound distance and membership-attack panel appears in
+Appendix~\ref{app:wave2privacy}; attribute inference and attacks on the shipped
+predictor remain pending. These empirical diagnostics stay outside differential
+privacy and HIPAA de-identification.
 
 The supplement's compute table lists fit time, peak memory, the GPU models, GPU
 hours, and charged bytes for receipts that store a fit timer.
@@ -823,7 +821,7 @@ The main text keeps the headline table, the bytes figure, and the teaser.
 \toprule
 Method & Criterion & Data used & Budget \\
 \midrule
-DOPE displayed & Profile fixed before the shared retention was read. Compile search keeps the smallest gate shortfall, then the smallest artifact, then the lowest candidate id. Proxy $0.45u+0.25d+0.30j$. & Training-derived validation cut. Official test sealed. & At most 12 inputs, width 16, $2{,}048$ steps, seed $11$. \\
+DOPE displayed & Disjoint profile-selection evidence unavailable. Compile search keeps the smallest gate shortfall, then the smallest artifact, then the lowest candidate id. Proxy $0.45u+0.25d+0.30j$. & Training-derived validation cut. Official test sealed. & At most 12 inputs, width 16, $2{,}048$ steps, seed $11$. \\
 Gaussian copula & Held-out mean log density. Copulas $0.14.1$ \texttt{Gaussian\-Multivariate}. & Same validation cut. Distinct from the retention auditors. & One library configuration. \\
 CTGAN & Mean of linear and MLP training-mean skill. & Validation rows and those two auditors, the same ones used at scoring. & Author implementation. Stopped runs omitted. \\
 TVAE & Same skill as CTGAN. & Same rows and auditors as CTGAN. & Author implementation. Stopped runs omitted. \\
@@ -938,7 +936,7 @@ Every filled TOST cell in the paired-difference table is no.
 Equivalence stays unclaimed.
 A missing artifact stays out of the median.
 Empirical distance and membership scores stay outside differential privacy and outside HIPAA de-identification.
-Four generated files stay out of this section because an ARF block repeats there without an author-default versus native-selected column: the TOST-only file, the RMSE file, the stored logistic fidelity file, and the existing-seed file.
+The TOST-only, RMSE and existing-seed files stay out because their ARF blocks lack a configuration column. The stored fidelity file is superseded by the configuration-aware table below.
 
 \subsection{Paired differences at both sizes}
 \input{generated/tost-protocol.tex}
@@ -968,8 +966,46 @@ The real-row resample draws the published training rows with replacement until t
 \input{generated/review-controls.tex}
 \endgroup
 
-\subsection{Holdout privacy and the matched TabSyn cohort}
-The holdout privacy panel and the matched TabSyn cohort remain in progress, wave 2. This paper prints no number for them. The retained TabSyn subset above is a different cohort. The stored logistic detector stays out of this section.
+\subsection{Holdout privacy}
+\label{app:wave2privacy}
+The public scalar ledger reproduces the predeclared aggregate byte for byte. Fit DCR and validation-holdout DCR remain distinct; NNDR uses the fit reference. Distance-MIA AUC measures an empirical attack, outside formal differential privacy and HIPAA de-identification. Own-cohort rows and the matched density intersection remain separate. Each detector uses the same fixed grouped CatBoost protocol and the same per-class row rule from the declaration, with missing outcomes kept unavailable. Forest-Flow has no admitted CatBoost or distance cell. Attribute and predictor attacks remain unmeasured.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-privacy.tex}
+\endgroup
+
+\subsection{Configuration-aware fidelity and detectors}
+\label{app:wave2fidelity}
+The side-by-side columns use the common numeric projection and the published pilot KS and pair-fidelity formulas, including the projected target. Alpha-precision and beta-recall use the fixed unembedded equations. The stored logistic detector remains distinct from the shared grouped CatBoost detector: five disjoint row-group folds, the fixed iteration and depth budget, and the predeclared equal per-class cap. Every metric gives its own complete-three-seed lineage count and family-cluster interval. These marginal summaries use different availability cohorts and establish no cross-method ranking. ARF author-default and native-selected configurations stay separate. Forest-Flow and originally unmeasured size-$n$ alpha/beta entries retain unavailable cells. The retained mixed-type TabSyn alpha/beta cohort remains separate from the common-numeric cohort. No Holm family is applied to these descriptive tables.
+\begin{table}[t]
+\caption{\textbf{Fidelity and detection by configuration and size.} Median, hierarchical interval, and lineage count in each measured cell. Common-numeric cohorts, with separate availability by metric. Stored logistic AUC and grouped CatBoost AUC have distinct columns. AUC alone establishes neither privacy nor release safety. No Holm family.}
+\label{tab:wave2fidelity}
+\centering\scriptsize\setlength{\tabcolsep}{2pt}
+\resizebox{\linewidth}{!}{\input{generated/review-fidelity.tex}}
+\end{table}
+\begin{table}[t]
+\caption{\textbf{Alpha-precision and beta-recall.} Fixed unembedded equations, median over complete sample triples, then hierarchical interval and lineage count. Configuration and cohort are explicit; unavailable cells carry no scalar. The retained TabSyn subset remains separate. No Holm family.}
+\label{tab:wave2alpha}
+\centering\scriptsize\setlength{\tabcolsep}{2pt}
+\resizebox{0.97\linewidth}{!}{\input{generated/review-alpha-beta.tex}}
+\end{table}
+
+\subsection{Matched scaled-default TabSyn}
+\label{app:wave2tabsyn}
+The scaled arm uses $\WaveTabsynVaeEpochs$ VAE and $\WaveTabsynDiffusionEpochs$ diffusion epochs; it remains distinct from an author-epoch-default run.
+The independent CSV-byte evidence covers the complete frozen sampling grid. One registered lineage has absent sample paths. The six historical successes labeled \texttt{worker} and its later unavailable receipt are quarantined outside the admitted grid; their identities are preserved without relabeling or an inferred closed-test flag. The admitted utility cohort has $\WaveTabsynLineages$ lineages. Every table and figure uses its actual informative intersection with DOPE. The parser gate remains the predeclared published sample, and scalar cells replay the original aggregate exactly. The historical retained subset above remains separate.
+
+All paired family-cluster intervals include zero at both sizes. The size-$4n$ MLP median difference is $\WaveTabsynMlpDiff$, favoring TabSyn. Each size has its own Holm family of three iid Wilcoxon tests; those tests and TOST use independent-lineage assumptions, while the displayed median intervals resample source-family clusters. They estimate different quantities. Equivalence and general superiority remain unclaimed. No generator was refitted or retuned for this comparison.
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\let\tabular\longtable
+\let\endtabular\endlongtable
+\input{generated/review-tabsyn.tex}
+\endgroup
 
 \subsection{Source-family sensitivity}
 DOPE rows report median absolute retention within each source family.
@@ -990,6 +1026,9 @@ These rows are a sensitivity and stay unpooled from the headline.
 Informative, noninformative, and undefined lineage counts.
 The sensitivity column is the capped cohort.
 A different denominator is a different cohort.
+Forest-Flow's original cells omit the null-loss metadata required by this
+sensitivity, so its counters are unavailable here. Its reported retention
+cohort remains in the size table.
 \begingroup
 \scriptsize
 \setlength{\tabcolsep}{2pt}

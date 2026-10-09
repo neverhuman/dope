@@ -165,7 +165,7 @@ def render_tabsyn(payload: dict) -> str:
         "DOPE minus TabSyn is that intersection. "
         "Holm family is 3 per size (one method, three auditors) and is separate from the published comparator blocks. "
         "The published-sample parser check matched before these cells were sampled. "
-        f"Lineages with no artifact under the predeclared roots: {absent}. "
+        f"Lineages absent from the admitted scalar cohort: {absent}. "
         "Absence is not a win. Official tests were not opened. Formal DP remains false.\n"
     )
     return note + _table(
@@ -179,17 +179,16 @@ def render_tabsyn(payload: dict) -> str:
     )
 
 
-def _payload(cells_root: Path, parser_check: Path) -> dict:
-    gate = json.loads(parser_check.read_text())
+def payload_from_cells(cells: list[dict], gate: dict, sources=None) -> dict:
     if gate.get("match") is not True or gate.get("official_tests_opened") is True:
         raise SystemExit("parser check did not match; refusing to emit a TabSyn table")
-    record, _sha = _load("s3-lineage-record.json")
+    record = json.loads(sources["research/benchmark/results/s3-lineage-record.json"]) if sources is not None else _load("s3-lineage-record.json")[0]
     names = names_of(record)
-    adapted, absent = _adapt(_metrics(cells_root), names)
+    adapted, absent = _adapt(cells, names)
     tabsyn = primary_map(reduce_cells(adapted, "TabSyn", CONFIGURATION))
-    density, _density_sha = _load("density-matched-population-validation.json")
+    density = json.loads(sources["research/benchmark/results/density-matched-population-validation.json"]) if sources is not None else _load("density-matched-population-validation.json")[0]
     dope = primary_map(reduce_cells(density["cells"], "DOPE", "features12_steps2048"))
-    predeclare = json.loads((REPO / "research/benchmark/review_fixes/predeclare.json").read_text())
+    predeclare = json.loads(sources["research/benchmark/review_fixes/predeclare.json"]) if sources is not None else json.loads((REPO / "research/benchmark/review_fixes/predeclare.json").read_text())
     if predeclare["tabsyn"]["config_sha256"] != "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc":
         raise SystemExit("TabSyn config pin differs from the sampler")
     if predeclare["tabsyn"]["sample_seeds"] != [101, 211, 307] or predeclare["tabsyn"]["sizes"] != [1, 4]:
@@ -218,6 +217,10 @@ def _payload(cells_root: Path, parser_check: Path) -> dict:
         "contrasts": _contrasts(dope, tabsyn, names),
         "claims": {"mfs_v2": None, "ptf_v1": None, "release_safe_l3": None, "superiority": None, "formal_dp": False},
     })
+
+
+def _payload(cells_root: Path, parser_check: Path) -> dict:
+    return payload_from_cells(_metrics(cells_root), json.loads(parser_check.read_text()))
 
 
 def main() -> None:

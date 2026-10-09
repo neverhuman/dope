@@ -1,6 +1,9 @@
 """Checks for the pre-declared review-fix statistics. No ledger is required."""
 
 import unittest
+import hashlib
+import json
+from pathlib import Path
 
 import numpy as np
 
@@ -64,6 +67,31 @@ class TableTests(unittest.TestCase):
             _table("A & B", ["1 \\\\"], "ll")
         body = _table("A & B", ["1 & 2 \\\\"], "lr")
         self.assertIn("\\begin{tabular}{lr}", body)
+
+
+class HistoricalBootstrapConformance(unittest.TestCase):
+    def test_singleton_fast_path_preserves_frozen_intervals_and_rng_state(self):
+        from research.benchmark.review_fixes import stats
+        path = Path(__file__).with_name('stats-hier-conformance.json')
+        raw = path.read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),
+                         'f548379b386b9151e8854d351ac5d4aefec3bb9899b2fd956b66de66ae06da9e')
+        fixture = json.loads(raw)
+        self.assertEqual(stats.DRAWS, fixture['draws'])
+        for case in fixture['cases']:
+            with self.subTest(case=case['name']):
+                rng = stats.rng_for('hier-conformance|' + case['name'])
+                result = stats._hier_median_ci(np.asarray(case['values']), case['clusters'], rng)
+                self.assertEqual(result, case['result'])
+                state = json.dumps(rng.bit_generator.state, sort_keys=True, separators=(',', ':')).encode()
+                self.assertEqual(hashlib.sha256(state).hexdigest(), case['rng_state_sha256'])
+
+    def test_numpy_singleton_draw_consumes_no_random_state(self):
+        from research.benchmark.review_fixes import stats
+        rng = stats.rng_for('singleton-state-conformance')
+        before = json.dumps(rng.bit_generator.state, sort_keys=True)
+        self.assertTrue(np.array_equal(rng.integers(0, 1, size=37), np.zeros(37)))
+        self.assertEqual(json.dumps(rng.bit_generator.state, sort_keys=True), before)
 
 
 if __name__ == "__main__":

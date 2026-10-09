@@ -111,6 +111,12 @@ def _hier_median_ci(array: np.ndarray, cluster_ids, rng: np.random.Generator) ->
         cursor = 0
         for index in chosen:
             group = members[int(index)]
+            # NumPy's high=1 draw is deterministic and leaves the RNG unchanged.
+            # Preserve the historical stream while avoiding a call per singleton.
+            if len(group) == 1:
+                buffer[cursor] = group[0]
+                cursor += 1
+                continue
             take = rng.integers(0, len(group), size=len(group))
             nxt = cursor + len(group)
             buffer[cursor:nxt] = group[take]
