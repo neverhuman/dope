@@ -62,7 +62,7 @@ target/release/dope-kernel sample \
 
 Jankurai is this repository's conformance auditor. A passing audit means the build, tests, and boundary proofs cleared the release floor with no high finding. It is not a utility score, not an MFS value, and not a privacy certificate. The gate and what the auditor checks are in [docs/audit.md](docs/audit.md).
 
-<!-- JANKURAI_MEASUREMENT -->
+Jankurai 1.7.1 audited `9de944ea232d3434d1e47de51fb644f9d0a89b20` on a clean tree. The report is score 86, decision pass, caps 0, high findings 0, and critical findings 0. That run also recorded two medium findings, HLT-001 and HLT-018. GitHub Actions `jankurai-audit` re-runs on the commit that adds this paragraph. The quoted score belongs to `9de944ea232d3434d1e47de51fb644f9d0a89b20`.
 
 ## Reference
 
