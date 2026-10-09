@@ -211,6 +211,11 @@ class LayoutTests(unittest.TestCase):
             self.assertEqual(R.load_plan(path, LEDGER), jobs)
             with self.assertRaises(SystemExit):
                 R.load_plan(path, {**LEDGER, "sha256": "m" * 64})
+            lines = path.read_text().splitlines()
+            header = {**json.loads(lines[0]), "adapters_sha256": "s" * 64}
+            path.write_text("\n".join([json.dumps(header), *lines[1:]]) + "\n")
+            with self.assertRaises(SystemExit):
+                R.load_plan(path, LEDGER)
 
 
 class AdapterTests(unittest.TestCase):
