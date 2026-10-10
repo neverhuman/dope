@@ -70,6 +70,7 @@
     "AGENTS.md": "governance",
     "README.md": "governance",
     "CHANGELOG.md": "governance",
+    "CITATION.cff": "governance",
     "LICENSE": "governance",
     ".cargo/": "rust-core",
     ".gitignore": "governance",
