@@ -67,7 +67,9 @@ class PaperReceipts(unittest.TestCase):
         paper=(receipts.REPO/'docs/whitepaper/dope-mfs.tex').read_text()
         self.assertNotIn('The fits use one fit seed, 11',paper)
         self.assertNotIn('Fit seed $11$ is the population actually measured',paper)
-        self.assertIn('primary displayed DOPE and legacy comparison',paper)
+        # SCOPE-01: fit seed 11 is the historical population; the five-seed refit is the headline.
+        self.assertIn('historical fit-seed-$11$ population',paper)
+        self.assertIn('The five-seed median in the abstract is the estimate this paper stands on.',paper)
         macros=(receipts.REPO/'docs/whitepaper/generated/numbers.tex').read_text()
         self.assertIn('not measured for the displayed DOPE generator',macros)
 

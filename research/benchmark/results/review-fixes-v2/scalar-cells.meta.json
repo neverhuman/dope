@@ -1,0 +1,16 @@
+{
+ "cells": 27756,
+ "dependencies": {
+  "catboost": "1.2.10",
+  "numpy": "1.26.4",
+  "scikit-learn": "1.7.2",
+  "scipy": "1.16.3"
+ },
+ "evaluator_sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
+ "fits": 1100,
+ "fits_sha256": "723a83226ffb2bd510a23a06cb6363d5c4fd25b230dc4fea0d42c2a08d634687",
+ "format": "dope-review-fix-v2-scalar-ledger",
+ "official_tests_opened": false,
+ "predeclare_sha256": "851215f70725b49cc74c8768aee45599b480881e5316ffe62d6b8b18862e9a47",
+ "sha256": "db455b0aa6e45a9dbc9649ab220cc217fd60020f3db12eb468544bef6d3f124f"
+}

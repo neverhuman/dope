@@ -1,0 +1,18 @@
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.1in}>{\raggedright\arraybackslash}p{0.95in}>{\raggedright\arraybackslash}p{1.85in}@{}}
+\toprule
+Diagnostic & Count & Value \\
+\midrule
+Seed 11 highest of five (CatBoost, $4n$) & 47 of 99 & expected 19.8; one-sided $p=7.85\times 10^{-10}$ \\
+Seeds 23--71 only, CatBoost, $n$ & 99 lineages & $0.791$ $[0.692, 0.930]$ \\
+Seeds 23--71 only, Linear, $n$ & 94 lineages & $0.984$ $[0.961, 0.992]$ \\
+Seeds 23--71 only, MLP, $n$ & 88 lineages & $0.958$ $[0.875, 0.990]$ \\
+Seeds 23--71 only, CatBoost, $4n$ & 99 lineages & $0.862$ $[0.771, 0.958]$ \\
+Seeds 23--71 only, Linear, $4n$ & 94 lineages & $0.989$ $[0.970, 0.996]$ \\
+Seeds 23--71 only, MLP, $4n$ & 88 lineages & $1.125$ $[1.025, 1.235]$ \\
+2$\times$2 cell: historical binary, seed 11 & 97 common (99 own) & $0.949$ (own lineages $0.944$) \\
+2$\times$2 cell: historical binary, seeds 23--71 & 97 common (99 own) & $0.862$ (own lineages $0.862$) \\
+2$\times$2 cell: later binary, seed 11 & 97 common (99 own) & $0.949$ (own lineages $0.944$) \\
+2$\times$2 cell: later binary, seeds 23--71 & 97 common (99 own) & $0.862$ (own lineages $0.862$) \\
+2$\times$2 cell: historical seed-11 population & 97 common (97 own) & $0.949$ (own lineages $0.949$) \\
+\bottomrule
+\end{tabular}

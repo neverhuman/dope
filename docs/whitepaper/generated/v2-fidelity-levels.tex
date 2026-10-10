@@ -1,0 +1,25 @@
+\begin{longtable}{@{}p{1.6in}rlll@{}}
+\caption{\textbf{Fidelity of every arm at $4n$, five-seed cells.} Median over lineages with the 95\% nested bootstrap interval of the mean marginal Kolmogorov--Smirnov distance (lower is closer), the pairwise correlation fidelity (higher is closer), and a logistic two-sample AUC (one half is indistinguishable); $n$ counts lineages with a complete three-seed group. A five-seed arm needs three complete fits per lineage. No Holm family.}\label{tab:v2-fidelity}\\
+\toprule
+Arm & $n$ & KS distance & Pair correlation & Logistic C2ST \\
+\midrule
+\endfirsthead
+\toprule
+Arm & $n$ & KS distance & Pair correlation & Logistic C2ST \\
+\midrule
+\endhead
+DOPE (ours) & 100 & $0.117$ $[0.089, 0.165]$ & $0.953$ $[0.930, 0.964]$ & $0.531$ $[0.516, 0.548]$ \\
+DOPE, untuned default & 100 & $0.116$ $[0.090, 0.165]$ & $0.952$ $[0.932, 0.962]$ & $0.532$ $[0.512, 0.547]$ \\
+TabSyn (scaled schedule) & 99 & $0.120$ $[0.083, 0.135]$ & $0.958$ $[0.946, 0.963]$ & $0.549$ $[0.523, 0.587]$ \\
+ARF (author default) & 100 & $0.103$ $[0.084, 0.140]$ & $0.962$ $[0.948, 0.965]$ & $0.521$ $[0.505, 0.538]$ \\
+ARF (native selected) & 100 & $0.108$ $[0.084, 0.138]$ & $0.962$ $[0.946, 0.964]$ & $0.521$ $[0.506, 0.539]$ \\
+Gaussian copula & 100 & $0.134$ $[0.114, 0.211]$ & $0.963$ $[0.950, 0.969]$ & $0.520$ $[0.502, 0.563]$ \\
+Chow-Liu tree & 100 & $0.127$ $[0.085, 0.229]$ & $0.928$ $[0.891, 0.945]$ & $0.555$ $[0.516, 0.625]$ \\
+Independent marginals & 100 & $0.130$ $[0.081, 0.267]$ & $0.899$ $[0.826, 0.934]$ & $0.517$ $[0.494, 0.568]$ \\
+TVAE (native selected) & 22 & $0.138$ $[0.117, 0.243]$ & $0.926$ $[0.893, 0.945]$ & $0.582$ $[0.574, 0.629]$ \\
+CTGAN (native selected) & 22 & $0.230$ $[0.184, 0.301]$ & $0.912$ $[0.837, 0.943]$ & $0.770$ $[0.667, 0.858]$ \\
+Forest-Flow (historical) & 6 & $0.123$ $[0.056, 0.206]$ & $0.969$ $[0.932, 0.981]$ & $0.492$ $[0.462, 0.540]$ \\
+Predictor-only control & 100 & $0.105$ $[0.084, 0.141]$ & $0.945$ $[0.882, 0.961]$ & $0.510$ $[0.497, 0.527]$ \\
+Real rows resampled & 100 & $0.080$ $[0.069, 0.106]$ & $0.964$ $[0.954, 0.970]$ & $0.503$ $[0.482, 0.530]$ \\
+\bottomrule
+\end{longtable}

@@ -10,7 +10,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = 'cbe5312f155ef09751d5cea0d60031df4ebb2214760b940ddd7a6ec493153cbd'
+LOCK_SHA256 = 'edfa3899d9ade270a57074ed7dbee7db08bcbf121db0c47980637c330a12809f'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
 CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
 CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
@@ -23,7 +23,14 @@ TABSYN_BINDING = PREFIX + 'review-fixes-tabsyn-v1/binding.json'
 FIDELITY_LEDGER = PREFIX + 'review-fixes-tabsyn-fidelity-v1/scalar-cells.jsonl'
 FIDELITY_PANEL = PREFIX + 'review-fixes-fidelity-v1/panel.json'
 FIDELITY_RENDERER = 'docs/whitepaper/scripts/review_fidelity.py'
-JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER)
+V2_LEDGER = PREFIX + 'review-fixes-v2/scalar-cells.jsonl'
+V2_FITS = PREFIX + 'review-fixes-v2/fits.jsonl'
+V2_PANEL = PREFIX + 'review-fixes-v2/panel.json'
+V2_RECORD = PREFIX + 's3-lineage-record.json'
+V2_PREDECLARE = 'research/benchmark/review_fixes/predeclare_v2.json'
+V2_RENDERER = 'docs/whitepaper/scripts/review_v2_emit.py'
+JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, V2_LEDGER, V2_FITS)
+OUTPUT_PREFIXES = ('review-', 'v2-')
 
 
 def authenticated(path, digest, size=None):
@@ -78,6 +85,10 @@ def authenticated_graph():
             if panel != FIDELITY_PANEL:
                 raise ValueError('fidelity renderer requires the pinned fidelity panel')
             authenticated_fidelity(inputs)
+        elif entry['path'] == V2_RENDERER:
+            if panel != V2_PANEL:
+                raise ValueError('v2 renderer requires the pinned v2 panel')
+            authenticated_v2(inputs)
         replayed.add(panel)
     return graph
 
@@ -147,6 +158,26 @@ def authenticated_fidelity(inputs):
         raise ValueError('fidelity scalar sources do not reproduce the pinned panel')
 
 
+def authenticated_v2(inputs):
+    """Recompute the five-seed panel from its pinned scalar and fit ledgers before any v2 output is written."""
+    names = (V2_LEDGER, V2_FITS, V2_RECORD, V2_PREDECLARE)
+    if any(name not in inputs for name in names):
+        raise ValueError('v2 renderer requires its pinned ledgers, lineage record and predeclaration')
+    cells = [json.loads(line) for line in inputs[V2_LEDGER].splitlines()]
+    fits = [json.loads(line) for line in inputs[V2_FITS].splitlines()]
+    if not cells or any(not isinstance(item, dict) or item.get('official_tests_opened') is not False
+                        for item in cells + fits):
+        raise ValueError('v2 ledger official test flag is not closed')
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from research.benchmark.review_fixes import v2_panel
+    v2_panel.check_fits(cells, fits)
+    panel = v2_panel.reduce(cells, v2_panel.names_of(json.loads(inputs[V2_RECORD])),
+                            predeclare=inputs[V2_PREDECLARE])
+    if v2_panel.canonical(panel).encode() != inputs[V2_PANEL]:
+        raise ValueError('v2 scalar ledger does not reproduce the pinned panel')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true')
@@ -162,7 +193,7 @@ def main():
     if graph.get('format') != 'dope-review-paper-build-v1':
         raise ValueError('invalid review paper graph')
     if args.check_inputs:
-        print('review paper inputs authenticated; control scalar panel reproduced; declared wave2 scalar panels reproduced')
+        print('review paper inputs authenticated; control scalar panel reproduced; declared wave2 and v2 scalar panels reproduced')
         return
     declared = set()
     for entry in graph['scripts']:
@@ -177,13 +208,14 @@ def main():
         for relative in entry['outputs']:
             path = Path(relative)
             if (path.parent.as_posix() not in ('docs/whitepaper/generated', 'docs/whitepaper/figures')
-                    or not path.name.startswith('review-')):
+                    or not path.name.startswith(OUTPUT_PREFIXES)):
                 raise ValueError('invalid review output path')
             if not (REPO / path).is_file():
                 raise ValueError('missing declared review output')
             declared.add(path.as_posix())
     actual = {p.relative_to(REPO).as_posix() for directory in ('generated', 'figures')
-              for p in (REPO / 'docs/whitepaper' / directory).glob('review-*') if p.is_file()}
+              for prefix in OUTPUT_PREFIXES
+              for p in (REPO / 'docs/whitepaper' / directory).glob(prefix + '*') if p.is_file()}
     if actual != declared:
         raise ValueError('review build graph does not cover every committed output')
 
