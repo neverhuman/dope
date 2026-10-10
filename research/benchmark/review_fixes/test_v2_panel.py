@@ -133,6 +133,14 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(tabsyn[0]["n"], 7)
         self.assertIsNone(P.reduce(cells, {}, draws=50)["cap_sensitivity"])
 
+    def test_duplicate_samples_and_unknown_arms_are_refused(self):
+        cells = ledger(n_lineages=6)
+        with self.assertRaisesRegex(ValueError, "duplicate sample cell"):
+            P.fit_values(cells + [dict(cells[0])], {})
+        self.assertEqual(P.family_of_arm(("TVAE", "native_selected")), "descriptive")
+        with self.assertRaisesRegex(ValueError, "no declared family"):
+            P.family_of_arm(("Mystery", "default"))
+
     def test_below_minimum_pairs_has_no_test(self):
         panel = P.reduce(ledger(n_lineages=4), {}, draws=50)
         row = [item for item in panel["contrasts"] if item["method"] == "TabSyn"][0]

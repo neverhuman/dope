@@ -46,11 +46,25 @@ FIVE_SEED = {("DOPE", "headline"), ("DOPE", "product_default"), ("ARF", "author_
 NOT_A_COMPARATOR = {"predictor_only", "real_bootstrap_4n"}
 
 
+# Arms reported outside every Holm family; an arm in neither list is refused.
+DESCRIPTIVE = {
+    ("DOPE", "product_default"), ("DOPE", "headline_bnew"), ("DOPE", "fourseed_bnew"), ("DOPE", "historical_seed11"),
+    ("DOPE", "historical_seed11_features12_steps512"), ("DOPE", "historical_seed11_features24_steps512"),
+    ("DOPE", "historical_seed11_features24_steps2048"), ("CTGAN", "native_selected"), ("TVAE", "native_selected"),
+    ("GaussianCopula", "default"), ("Chow-Liu", "default"), ("independent_marginals", "default"),
+    ("ForestDiffusion/Forest-Flow", "default"), ("ForestDiffusion/Forest-Flow", "native_selected"),
+    ("predictor_only", "control_split2027"), ("predictor_only", "control_split2999"),
+    ("predictor_only", "control_split4099"), ("predictor_only", "control_split8191"),
+}
+
+
 def family_of_arm(arm: tuple[str, str]) -> str:
     for name, members in FAMILIES.items():
         if arm in members:
             return name
-    return "descriptive"
+    if arm in DESCRIPTIVE:
+        return "descriptive"
+    raise ValueError(f"arm {arm} is in no declared family and no descriptive list")
 
 
 def min_fits(arm: tuple[str, str]) -> int:
@@ -66,6 +80,8 @@ def fit_values(cells: list[dict], names: dict[str, str]) -> dict:
             row = cell["utility"].get(auditor) or {}
             value = row.get("retention") if row.get("informative") is True else None
             key = (arm, cell["dataset"], cell["fit_seed"], cell["size"], auditor)
+            if cell["sample_seed"] in triples[key]:
+                raise ValueError(f"duplicate sample cell for {key}")
             triples[key][cell["sample_seed"]] = value
     grouped: dict[tuple, list[dict]] = defaultdict(list)
     for (arm, dataset, fit_seed, size, auditor), samples in sorted(triples.items(), key=lambda kv: repr(kv[0])):
