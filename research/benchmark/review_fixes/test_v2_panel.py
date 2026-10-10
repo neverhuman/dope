@@ -116,6 +116,23 @@ class PanelTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "no ok fit"):
             P.check_fits(cells, [])
 
+    def test_cap_sensitivity_drops_over_cap_lineages(self):
+        cells = ledger(n_lineages=8)
+        fits = [{"configuration": "headline", "dataset": f"{index:016x}", "fit_seed": seed, "status": "ok",
+                 "charged_bytes": 20000 if index == 0 else 2000, "official_tests_opened": False}
+                for index in range(8) for seed in (11, 23, 37)]
+        self.assertEqual(P.over_cap(fits), [f"{0:016x}"])
+        panel = P.reduce(cells, {}, draws=50, fits=fits)
+        cap = panel["cap_sensitivity"]
+        self.assertEqual(cap["excluded"], [f"{0:016x}"])
+        self.assertEqual([row["n"] for row in cap["levels"]], [7, 7, 7])
+        self.assertEqual(cap["contrasts"], [])  # no comparator reaches the full panel in this fixture
+        values = P.fit_values(cells, {})
+        direct = P.cap_sensitivity(values, P.over_cap(fits), [("TabSyn", "scaled_200_vae_1000_diffusion")], 50)
+        tabsyn = [row for row in direct["contrasts"] if row["auditor"] == "catboost"]
+        self.assertEqual(tabsyn[0]["n"], 7)
+        self.assertIsNone(P.reduce(cells, {}, draws=50)["cap_sensitivity"])
+
     def test_below_minimum_pairs_has_no_test(self):
         panel = P.reduce(ledger(n_lineages=4), {}, draws=50)
         row = [item for item in panel["contrasts"] if item["method"] == "TabSyn"][0]

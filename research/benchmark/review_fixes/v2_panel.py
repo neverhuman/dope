@@ -29,6 +29,7 @@ SAMPLE_SEEDS = (101, 211, 307)
 HEADLINE = ("DOPE", "headline")
 MIN_PAIRS = 6
 STRONGEST_MIN_LINEAGES = 90
+CAP = 10240
 FAMILIES = {
     "primary": [("ARF", "author_default"), ("TabSyn", "scaled_200_vae_1000_diffusion"),
                 ("TabDDPM", "author_default"), ("ForestDiffusion/Forest-Flow", "author_default_B1")],
@@ -143,8 +144,32 @@ def _run(function, tasks: list, jobs: int) -> list:
         return list(pool.map(function, tasks, chunksize=4))
 
 
+def over_cap(fits: list[dict], cap: int = CAP) -> list[str]:
+    """Lineages with at least one ok headline fit charged above the release cap."""
+    return sorted({fit["dataset"] for fit in fits if fit["configuration"] == HEADLINE[1] and fit["status"] == "ok"
+                   and isinstance(fit.get("charged_bytes"), int) and fit["charged_bytes"] > cap})
+
+
+def cap_sensitivity(values: dict, excluded: list[str], comparators: list[tuple], draws: int) -> dict:
+    """Post hoc sensitivity requested in review: the headline level and contrasts without over-cap lineages."""
+    def keep(items):
+        return [item for item in items if item["dataset"] not in excluded]
+    levels = [{"size": 4, "auditor": auditor,
+               **S.nested_level(keep(values.get((HEADLINE, 4, auditor), [])), f"cap|level|{auditor}",
+                                S.MIN_FITS_FIVE_SEED, draws)} for auditor in AUDITORS]
+    contrasts = []
+    for arm in comparators:
+        for auditor in AUDITORS:
+            left, right = keep(values.get((HEADLINE, 4, auditor), [])), keep(values.get((arm, 4, auditor), []))
+            if left and right:
+                result = contrast(left, right, f"cap|paired|{arm}|{auditor}", arm, draws)
+                result.pop("differences")
+                contrasts.append({"method": arm[0], "configuration": arm[1], "size": 4, "auditor": auditor, **result})
+    return {"cap": CAP, "excluded": excluded, "levels": levels, "contrasts": contrasts}
+
+
 def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs: int | None = None,
-           predeclare: bytes | None = None) -> dict:
+           predeclare: bytes | None = None, fits: list[dict] | None = None) -> dict:
     jobs = min(os.cpu_count() or 1, 16) if jobs is None else jobs
     values = fit_values(cells, names)
     arms = sorted({key[0] for key in values})
@@ -180,11 +205,14 @@ def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs:
                     **S.nested_level(later.get((HEADLINE, size, auditor), []),
                                      f"level|seeds23-71|{size}|{auditor}", S.MIN_FITS_FIVE_SEED, draws)}
                    for size in SIZES for auditor in AUDITORS]
+    best = strongest(levels, contrasts)
+    comparators = ([] if best is None else [(best["method"], best["configuration"])]) + [("ARF", "author_default")]
+    cap_rows = None if fits is None else cap_sensitivity(values, over_cap(fits), comparators, draws)
     return {
-        "format": "dope-review-fix-v2-panel", "version": 1, "fidelity": fidelity,
+        "format": "dope-review-fix-v2-panel", "version": 1, "fidelity": fidelity, "cap_sensitivity": cap_rows,
         "predeclare_sha256": hashlib.sha256(PREDECLARE.read_bytes() if predeclare is None else predeclare).hexdigest(),
         "draws": draws, "levels": levels, "contrasts": contrasts,
-        "strongest": strongest(levels, contrasts),
+        "strongest": best,
         "seed_rank": S.seed_rank_test(seeds), "seeds_23_71": sensitivity,
         "two_by_two": two_by_two(values), "sample_identity": sample_identity(cells),
         "official_tests_opened": False, "formal_dp": False, "mfs_v3": None, "superiority": None,
@@ -305,7 +333,8 @@ def main() -> None:
     parser.add_argument("--jobs", type=int, default=None)
     args = parser.parse_args()
     names = names_of(json.loads(args.lineage_record.read_text()))
-    args.out.write_text(canonical(reduce(load_ledger(args.ledger), names, jobs=args.jobs)))
+    fits = [json.loads(line) for line in args.ledger.with_name("fits.jsonl").read_text().splitlines() if line.strip()]
+    args.out.write_text(canonical(reduce(load_ledger(args.ledger), names, jobs=args.jobs, fits=fits)))
     print(f"wrote {args.out} sha256 {hashlib.sha256(args.out.read_bytes()).hexdigest()}")
 
 

@@ -2,6 +2,8 @@
  "arms": [
   {
    "bytes": {
+    "fits_ok": 500,
+    "fits_within_cap": 490,
     "median": 1895.0,
     "n": 100,
     "q1": 1252.5,
@@ -29,6 +31,8 @@
   },
   {
    "bytes": {
+    "fits_ok": 500,
+    "fits_within_cap": 490,
     "median": 1660.5,
     "n": 100,
     "q1": 1068.0,
@@ -371,6 +375,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 42261045.5,
     "n": 100,
     "q1": 42178286.0,
@@ -425,6 +431,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 1438304.5,
     "n": 100,
     "q1": 378531.25,
@@ -479,6 +487,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 1627718.5,
     "n": 100,
     "q1": 460090.5,
@@ -533,6 +543,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 5464.5,
     "n": 100,
     "q1": 2458.5,
@@ -587,6 +599,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 29865.0,
     "n": 100,
     "q1": 7478.75,
@@ -641,6 +655,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 2549.5,
     "n": 100,
     "q1": 1606.5,
@@ -695,6 +711,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 730999.0,
     "n": 35,
     "q1": 643015.5,
@@ -749,6 +767,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 308629.5,
     "n": 34,
     "q1": 223829.75,
@@ -1091,6 +1111,8 @@
   },
   {
    "bytes": {
+    "fits_ok": null,
+    "fits_within_cap": null,
     "median": 325848913.5,
     "n": 6,
     "q1": 151532649.25,

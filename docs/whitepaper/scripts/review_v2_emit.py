@@ -106,6 +106,7 @@ def macros(panel: dict, byte_stats: dict, fits: list[dict], privacy: dict) -> st
     lines += _strongest(panel, byte_stats)
     lines += _seed_macros(panel)
     lines += _binary_macros(panel, fits)
+    lines += _cap_macros(panel, fits)
     lines += _byte_macros(byte_stats, fits)
     lines += _sentences(panel, byte_stats)
     lines += _privacy_macros(privacy)
@@ -159,11 +160,40 @@ def _binary_macros(panel, fits) -> list[str]:
             cmd("VBinarySentence", sentence)]
 
 
+def _cap_macros(panel, fits) -> list[str]:
+    """The over-cap lineages by name and the headline without them (post hoc, from the bound ledger)."""
+    cap = panel.get("cap_sensitivity")
+    if cap is None:
+        return []
+    record = json.loads((RESULTS / "s3-lineage-record.json").read_text())
+    names = {row["dataset"]: row["display_name"] for row in record["rows"]}
+    over = [fit["charged_bytes"] for fit in fits if fit["configuration"] == "headline" and fit["status"] == "ok"
+            and fit["dataset"] in cap["excluded"]]
+    shown = [names.get(dataset, dataset).replace("_", "\\_") for dataset in cap["excluded"]]
+    out = [cmd("VCapN", len(cap["excluded"])), cmd("VCapLineages", " and ".join(shown) if shown else DASH),
+           cmd("VCapFits", sum(1 for size in over if size > cap["cap"])),
+           cmd("VCapBytesLo", exact_bytes(min(over)) if over else DASH),
+           cmd("VCapBytesHi", exact_bytes(max(over)) if over else DASH)]
+    level = {row["auditor"]: row for row in cap["levels"]}["catboost"]
+    out += [cmd("VCapDopeCbFour", num(level["median"])), cmd("VCapDopeCbFourLo", num(level.get("lo"))),
+            cmd("VCapDopeCbFourHi", num(level.get("hi"))), cmd("VCapDopeCbFourN", level["n"])]
+    strongest = panel.get("strongest") or {}
+    for row in cap["contrasts"]:
+        if row["auditor"] != "catboost":
+            continue
+        name = "Strong" if (row["method"], row["configuration"]) == (strongest.get("method"), strongest.get("configuration")) \
+            else _code(row)
+        out += [cmd("VCap" + name + "Diff", num(row["hl"])), cmd("VCap" + name + "Lo", num(row["hl_lo"])),
+                cmd("VCap" + name + "Hi", num(row["hl_hi"])), cmd("VCap" + name + "N", row["n"]),
+                cmd("VCapVerdict" + name, VERDICT[row["verdict"]])]
+    return out
+
+
 def _seed_macros(panel) -> list[str]:
     seed = panel["seed_rank"]
     later = {(row["size"], row["auditor"]): row for row in panel["seeds_23_71"]}[(4, "catboost")]
     two = panel["two_by_two"]
-    out = [cmd("VSeedTop", seed["seed11_top"]), cmd("VSeedN", seed["n"]), cmd("VSeedP", pval(seed["p_one_sided"])),
+    out = [cmd("VSeedTop", seed["seed11_top"]), cmd("VSeedN", seed["n"]), cmd("VSeedExpected", num(seed["expected"], 1)),
            cmd("VLaterCbFour", num(later["median"])), cmd("VLaterCbFourLo", num(later.get("lo"))),
            cmd("VLaterCbFourHi", num(later.get("hi"))), cmd("VLaterCbFourN", later["n"]),
            cmd("VTwoN", two["n_common"])]
@@ -409,7 +439,8 @@ def fidelity_levels_table(panel) -> str:
 def seeds_table(panel) -> str:
     seed = panel["seed_rank"]
     two = panel["two_by_two"]
-    rows = [f"Seed 11 highest of five (CatBoost, $4n$) & {seed['seed11_top']} of {seed['n']} & expected {num(seed['expected'], 1)}; one-sided $p={pval(seed['p_one_sided'])}$ \\\\"]
+    rows = [f"Seed 11 highest of five (CatBoost, $4n$) & {seed['seed11_top']} of {seed['n']} & "
+            f"{num(seed['expected'], 1)} if seeds were exchangeable; descriptive, no $p$-value \\\\"]
     for row in panel["seeds_23_71"]:
         rows.append(f"Seeds 23--71 only, {M.AUDITOR_DISPLAY[row['auditor']]}, {'$n$' if row['size'] == 1 else '$4n$'} & "
                     f"{row['n']} lineages & ${num(row['median'])}$ ${interval(row.get('lo'), row.get('hi'))}$ \\\\")
@@ -435,7 +466,8 @@ def headline_json(panel, byte_stats) -> dict:
             "code": arm.code, "method": arm.method, "configuration": arm.configuration,
             "display": arm.display, "role": arm.role, "color": arm.color, "marker": arm.marker,
             "level": {key: level.get(key) for key in ("median", "lo", "hi", "n")},
-            "bytes": None if stats is None else {key: stats[key] for key in ("median", "q1", "q3", "n", "within_cap")},
+            "bytes": None if stats is None else {key: stats[key] for key in ("median", "q1", "q3", "n", "within_cap",
+                                                                            "fits_ok", "fits_within_cap") if key in stats},
             "contrasts": {auditor: None if (row := _contrast(panel, arm.code, auditor)) is None else
                           {key: row[key] for key in ("hl", "hl_lo", "hl_hi", "n", "wins", "ties", "losses", "verdict")}
                           for auditor in ("catboost", "linear", "mlp")}})

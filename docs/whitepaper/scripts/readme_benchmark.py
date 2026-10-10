@@ -51,7 +51,7 @@ def benchmark_block(headline: dict) -> str:
         "(simulated-family clusters, then lineages, then fit seeds). "
         "The difference column is DOPE minus the method on shared lineages (Hodges–Lehmann).",
         "",
-        "| Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Within 10,240 B |",
+        "| Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Lineage medians within 10,240 B |",
         "| --- | ---: | --- | --- | ---: | ---: | ---: |",
     ]
     for code in ORDER:
@@ -87,7 +87,8 @@ def benchmark_block(headline: dict) -> str:
         "training-derived cut; the official test split is reserved for one pre-registered run. Resampled real "
         "rows are an upper reference, not a generator. The release score (MFS-v3) is null for every method "
         "until its privacy and representation gates are measured. DOPE's median artifact is "
-        f"{size(dope['bytes']['median'])}.",
+        f"{size(dope['bytes']['median'])}, and {dope['bytes']['fits_within_cap']} of {dope['bytes']['fits_ok']} "
+        "individual DOPE fits are within the 10,240-byte release cap; the paper names the lineages above it.",
     ]
     return "\n".join(lines)
 
