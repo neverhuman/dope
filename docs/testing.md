@@ -8,13 +8,21 @@ shorten repeated locked checks. Local builds reuse their worktree target.
 `just check` adds Clippy with warnings denied and the Rust CLI fixtures.
 `just security` scans secrets, dependencies, workflow syntax, and writes an
 SPDX SBOM. `just score` regenerates Python boundary evidence, then runs the
-full pinned Jankurai audit; `diff-audit` is only a faster local aid.
+full pinned Jankurai audit.
 The audit workflow caches uv downloads in its disposable LAN guest. Audit
 dependencies use the pinned uv installer and V1 version constraints; cache
 restoration never replaces fresh boundary tests or changes the job quota.
 `just fast-audit` writes a changed-source advisory under `target/jankurai/`;
 its partial scope can produce boundary or release false positives and never
 supersedes the clean full gate.
+
+`just paper` regenerates every generated paper input, figure, README benchmark
+block, and PDF from committed, SHA-pinned ledgers; `just paper-check` verifies
+macros against those ledgers, figure hashes, the README block, and the build.
+`bash ops/ci/paper-clean.sh` is the CI form: it deletes `docs/whitepaper/generated`,
+runs `just paper`, and requires a zero diff. `bash ops/ci/check-review-fixes.sh`
+runs the review-fix and predeclare_v2 statistics, binder, and sealed-gate fixtures.
+`bash scripts/ci-local.sh cpu|security|audit` reproduces the hosted lanes locally.
 
 The CPU PR lane is required. The scheduled GPU lane uses CUDA 12.8, libtorch
 2.7, and `CUBLAS_WORKSPACE_CONFIG=:4096:8`; it checks repeated training,

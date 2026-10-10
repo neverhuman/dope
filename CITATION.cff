@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use DOPE or its benchmark receipts, please cite the paper below."
+title: "DOPE: Downstream Objective-Preserving Encoding"
+version: 0.3.0-alpha.1
+license: MIT
+repository-code: "https://github.com/neverhuman/dope"
+authors:
+  - family-names: Taylor
+    given-names: Jepson
+    affiliation: NEVERHUMAN Research
+  - family-names: Alexander
+    given-names: Alton
+    affiliation: NEVERHUMAN Research
+preferred-citation:
+  type: report
+  title: "DOPE: Downstream Objective-Preserving Encoding of Regression Tables into Kilobyte Generators"
+  authors:
+    - family-names: Taylor
+      given-names: Jepson
+    - family-names: Alexander
+      given-names: Alton
+  institution:
+    name: NEVERHUMAN Research
+  year: 2026
+  url: "https://github.com/neverhuman/dope"
