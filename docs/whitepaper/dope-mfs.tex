@@ -76,14 +76,13 @@ $^1$NEVERHUMAN Research}
 
 \begin{abstract}
 Synthetic tables ship as rows or as multi-megabyte neural generators, often scored by the metric that selected them.
-We introduce \textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE), which compiles a numeric regression table into a generator under a $10{,}240$-byte release cap (median $\VDopeBytes$ bytes; $\VDopeWithin$ fits within it): quantized marginals, a dependence model, a twelve-input neural residual for the target, and a noise model.
-Rows are sampled from the artifact alone.
+We introduce \textbf{D}ownstream \textbf{O}bjective-\textbf{P}reserving \textbf{E}ncoding (DOPE), which compiles a numeric regression table into a generator under a $10{,}240$-byte release cap (median $\VDopeBytes$ bytes; $\VDopeWithin$ fits within it): quantized marginals, a dependence model, a twelve-input neural residual for the target, and a noise model; sampling reads only the artifact.
 We score retention, a null-normalized train-on-synthetic/train-on-real ratio~\citep{esteban2017rcgan}, under three auditors on $\PreparedN$ PMLB regression tables with paired, family-clustered intervals.
-DOPE's profile was chosen at one fit seed, so we refit at five.
-Under CatBoost at synthetic size $4n$, DOPE's median retention is $\VDopeCbFour$ ($\VDopeCbFourLo$ to $\VDopeCbFourHi$).
-DOPE \VVerdictStrong\ \VStrongestName, the strongest full-panel generator (Hodges--Lehmann difference $\VStrongDiff$, $\VStrongLo$ to $\VStrongHi$), whose $\VStrongBytes$ median artifact is $\VStrongRatio$ times DOPE's, and \VVerdictArfCbFour\ author-default ARF ($\VDiffArfCbFour$).
-On a separate block of $\VNForestCbFour$ lineages, DOPE \VVerdictForestCbFour\ Forest-Flow ($\VDiffForestCbFour$).
-It \VVerdictPredCbFour\ a predictor-only sampler ($\VDiffPredCbFour$) and \VVerdictBootCbFour\ four-fold resampled real rows ($\VDiffBootCbFour$).
+DOPE's profile was chosen at one fit seed; we refit at five.
+Under CatBoost at synthetic size $4n$, DOPE's median retention is $\VDopeCbFour$ [$\VDopeCbFourLo$, $\VDopeCbFourHi$].
+DOPE \VVerdictStrong\ \VStrongestName, the strongest full-panel generator (Hodges--Lehmann difference $\VStrongDiff$ [$\VStrongLo$, $\VStrongHi$]), whose $\VStrongBytes$ median artifact is $\VStrongRatio$ times DOPE's, and \VVerdictArfCbFour\ author-default ARF ($\VDiffArfCbFour$ [$\VLoArfCbFour$, $\VHiArfCbFour$]).
+On a separate $\VNForestCbFour$-lineage block, DOPE \VVerdictForestCbFour\ Forest-Flow ($\VDiffForestCbFour$ [$\VLoForestCbFour$, $\VHiForestCbFour$]).
+It \VVerdictPredCbFour\ a predictor-only sampler ($\VDiffPredCbFour$ [$\VLoPredCbFour$, $\VHiPredCbFour$]) and \VVerdictBootCbFour\ four-fold resampled real rows ($\VDiffBootCbFour$ [$\VLoBootCbFour$, $\VHiBootCbFour$]).
 All estimates use a validation cut; the official test split is reserved for one pre-registered run.
 \end{abstract}
 
