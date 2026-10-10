@@ -61,12 +61,14 @@ class DeltaTests(unittest.TestCase):
 
 class TableTests(unittest.TestCase):
     def test_column_spec_must_match_the_header_and_every_row(self):
-        from research.benchmark.review_fixes.receipt_panel import _table
+        from research.benchmark.review_fixes.review_tex import longtable
 
         with self.assertRaises(ValueError):
-            _table("A & B", ["1 \\\\"], "ll")
-        body = _table("A & B", ["1 & 2 \\\\"], "lr")
-        self.assertIn("\\begin{tabular}{lr}", body)
+            longtable("Caption. No Holm family.", "A & B", ["1 \\\\"], "ll")
+        with self.assertRaises(ValueError):
+            longtable("Caption without the family.", "A & B", ["1 & 2 \\\\"], "lr")
+        body = longtable("Caption. No Holm family.", "A & B", ["1 & 2 \\\\"], "lr")
+        self.assertIn("\\begin{longtable}{lr}\n\\caption{Caption. No Holm family.}", body)
 
 
 class HistoricalBootstrapConformance(unittest.TestCase):
