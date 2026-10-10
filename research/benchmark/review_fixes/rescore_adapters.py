@@ -25,6 +25,9 @@ FOREST = "ForestDiffusion/Forest-Flow"
 HEADLINE_PROFILE = "features12_steps2048"
 # The frozen TabSyn fit registry admits fit seed 11 only (tabsyn_sample_evidence.py).
 TABSYN_FIT_SEED = 11
+# Block B fits seeds 23-71 into its own root (predeclare_v2.amendments/B-tabsyn-seeds.json).
+TABSYN_SEEDS = Path("/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-seeds-v2")
+TABSYN_NEW_SEEDS = (23, 37, 53, 71)
 LOCATIONS = (
     ("/mnt/fast-scratch/", "fast-scratch"),
     ("/home/ubuntu/dope-scratch-x1/", "xbabe1"),
@@ -245,6 +248,27 @@ def tabsyn(path: Path, roots: dict) -> list[dict]:
         csv = Path(roots["tabsyn"]) / row["dataset"] / f"sample-{row['sample_seed']}-{row['size']}n.csv"
         jobs.append(job(*common, csv=csv, sha=row["synthetic_sha256"], has_header=True,
                         stored=retention(row.get("utility"))))
+    return jobs
+
+
+def tabsyn_seeds(path: Path, roots: dict) -> list[dict]:
+    """Block B sample ledger (tabsyn_seeds_v2.py): fresh cells, so there is no stored value to replay.
+
+    It joins LEDGERS as "tabsyn-seeds" in the commit that adds the ledger file.
+    """
+    binding = read_json(path.parent / "binding.json")
+    jobs = []
+    for row in read_jsonl(path):
+        if row["fit_seed"] not in TABSYN_NEW_SEEDS:
+            raise ValueError("block B ledger row is not at fit seed 23, 37, 53, or 71")
+        common = ("tabsyn-seeds", "TabSyn", binding["configuration"], row["dataset"], row["fit_seed"],
+                  row["sample_seed"], row["size"])
+        if row["status"] != "ok" or not row.get("synthetic_sha256"):
+            jobs.append(job(*common, blocked=_ledger_gap(row)))
+            continue
+        csv = (Path(roots.get("tabsyn-seeds", TABSYN_SEEDS)) / row["dataset"] / f"fit-{row['fit_seed']}"
+               / f"sample-{row['sample_seed']}-{row['size']}n.csv")
+        jobs.append(job(*common, csv=csv, sha=row["synthetic_sha256"], has_header=True))
     return jobs
 
 
