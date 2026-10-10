@@ -17,7 +17,8 @@
   which the profile was chosen, ranks first of five on 47 of 99 lineages.
   The v2 and retained-evidence reducers refuse any undeclared method or
   configuration before grouping, and the statistics text states that the
-  Wilcoxon p-values treat lineages as independent.
+  Wilcoxon p-values treat lineages as independent. The supplement prints the
+  first version's headline contrasts as a labeled traceability table.
 
 - Add tiered compact kernels, measured release gates, and versioned MFS-v2
   evidence on the single PR branch. No production release is declared.

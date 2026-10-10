@@ -1,7 +1,7 @@
 # Deep-review gap ledger
 
 An external adversarial review of `dope-mfs.pdf` at b774807 found the gaps below, and the
-2026-10-09 grade of the wave-1 paper added three more (G-01 to G-03). Each row closes with
+later grades and audits added G-01 to G-05. Each row closes with
 the change that fixed it or states what is still open and why. When a new result weakens a
 claim, the paper weakens the claim; the v2 prose takes every data-dependent word from
 `generated/v2-numbers.tex`, so a verdict cannot outrun its interval.
@@ -33,6 +33,7 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
 | G-02 | Text described Fig. 2 clipping that the figure does not do | Figure windows from one spec | closed: `figure_spec.py` holds every window and emits the macros the text uses |
 | G-03 | Forest-Flow informative count printed as 0 | Level n from the retention rows | closed: `denominator_view.py` prints the level n beside the complete-loss rows |
 | G-04 | Owner audit 2026-10-09 23:09: byte-cap universality, iid seed p-value, missing Forest-Flow abstract contrast, retention versus privacy sample custody | Name the over-cap lineages with a sensitivity; descriptive seed count; qualified six-lineage abstract sentence; route-specific custody wording | closed: §5.4 names both over-cap lineages and gives the headline without them from the bound ledger (no rerun); the seed count carries no p-value; the abstract adds the Forest-Flow block; main §5.5 and supplement E state which runs read the Forest-Flow samples |
+| G-05 | Independent frozen-rubric score of f47197b (2026-10-10): the first version's headline set H (Forest-Flow median 1.003, 1/0/5, the 2,067-byte DOPE median on those lineages, linear critical difference 0.489) was generated but no longer printed; `v2_panel.reduce` admitted undeclared arms that never reached a contrast; stale README and RS-03 notes | Print H with its historical label; validate every cell before grouping; correct the notes | closed: supplement `tab:hist-headline` and the historical-block paragraph print every H value from the committed ledgers through `verify_paper_numbers.py` macros; the roster check and its `reduce()` regression are in place; `docs/whitepaper/README.md` names the five-seed panel as the displayed result |
 | PR-05 | Size n and a real-row ×4 control | Tables state the size | closed: both controls are in main Tables 1–2, the abstract, and Fig. 1 |
 | PR-06 | Predictor-only control | Paired CI in every retention table | closed: five predictor fit seeds in the v2 panel; supplement F keeps the split-seed rows |
 | PR-07 | One fit seed; no clustering; no final test | Five seeds, nested bootstrap, family sensitivity, sealed run | five DOPE fit seeds with the historical binary, a cluster→lineage→fit-seed bootstrap, and seed-exchangeability diagnostics are in the paper; the sealed run is CM-09 |
@@ -52,6 +53,10 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
 ## Open, with no printed number
 
 - The sealed official-test run (CM-09).
+- Publication of the scored DOPE artifacts, the fit and validation partitions, and the synthetic-row bundle
+  (Stage 4 of the plan, each step confirmed by the owner). Until then supplement C states that they are
+  unpublished and that the committed ledgers reproduce every reduction; it gives no reason for withholding them.
+- A five-seed source-family sensitivity table; the printed one is the fit-seed-11 table.
 - Stage 2 blocks of `predeclare_v2.json`: TabDDPM v6, TabSyn author-default and four more TabSyn seeds,
   Forest-Flow under the 1,800-second budget, density and synthpop at five seeds, SMOTE, the SDV rerun,
   TabDiff and GReaT adapters, the ablation grid and stress suite, privacy P2–P4, and the OpenML extension
