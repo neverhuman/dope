@@ -85,8 +85,8 @@
       "sha256": "723a83226ffb2bd510a23a06cb6363d5c4fd25b230dc4fea0d42c2a08d634687"
     },
     "research/benchmark/results/review-fixes-v2/panel.json": {
-      "bytes": 536116,
-      "sha256": "075a2b549ce8f6866674dd4ae738156c20b39e5692eef3534fafbbba9e35f1f4"
+      "bytes": 555919,
+      "sha256": "4b3f1307a22d2c2ea43b91c253e88d03597b9c3e3951fc948f7cd96b4207d14b"
     },
     "research/benchmark/results/review-fixes-v2/scalar-cells.jsonl": {
       "bytes": 22171980,
