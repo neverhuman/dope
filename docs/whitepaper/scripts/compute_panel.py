@@ -579,7 +579,7 @@ def write_headline_table(blocks):
         rows.append(
             "Full panel & "
             f"{auditor_labels[auditor]} & Author-default ARF & \\NDiffArf{stem} & "
-            f"\\DiffArf{stem} [\\LoDiffArf{stem}, \\HiDiffArf{stem}] & "
+            f"\\DiffArf{stem}{{}} [\\LoDiffArf{stem}, \\HiDiffArf{stem}] & "
             f"\\WtlArf{stem} & ${tex_p(arf_rows[auditor]['holm_p'])}$ \\\\"
         )
     for block_id, label, comparators, names in specs:
