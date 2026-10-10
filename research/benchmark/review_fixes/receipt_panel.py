@@ -15,6 +15,7 @@ from pathlib import Path
 
 import numpy as np
 
+from research.benchmark.review_fixes import denominator_view
 from research.benchmark.review_fixes.stats import (
     MARGIN,
     cap_retention,
@@ -703,20 +704,18 @@ def _metric_label(row) -> str:
 
 
 def emit_tex(payload) -> None:
-    note = (
-        "% Wilcoxon and the TOST t-tests treat paired lineages as iid. "
-        "The interval is the family-cluster bootstrap of the median. "
-        "Holm families are separate for size n and size 4n "
-        "(density 9, neural 6, ARF 6, Forest-Flow 3).\n"
-    )
+    from research.benchmark.review_fixes.review_tex import longtable
     retention = [
         _row_retention(row["method"], row["configuration"], row["auditor"], row["size"], row)
         for row in payload["retention"]
     ]
-    write_tex("review-size-retention.tex", _table(
+    write_tex("review-size-retention.tex", longtable(
+        "\\textbf{Retention level by method, configuration, auditor, and size, fit seed 11.} Median over the "
+        "informative lineages with the family-cluster bootstrap 95\\% interval. No Holm family.",
         "Method & Configuration & Auditor & Size & $n$ & Median & Hierarchical 95\\% CI",
         retention,
         "lllllrr",
+        label="tab:review-size",
     ))
     paired_lines = []
     for row in payload["paired"]:
@@ -727,23 +726,15 @@ def emit_tex(payload) -> None:
             f"{tex_name(row['configuration'])} & {row['n']} & {fmt(row['median'])} & {ci(row)} & "
             f"{fmt(row['mean'])} & {flag} & {row['wins']}/{row['ties']}/{row['losses']} & {fmt(row['holm_p'], 3)} \\\\"
         )
-    write_tex("review-paired.tex", note + _table(
+    write_tex("review-paired.tex", longtable(
+        "\\textbf{DOPE minus comparator at both sizes, fit seed 11.} Median paired retention difference with its "
+        "family-cluster bootstrap 95\\% interval, the mean difference, and the v1 mean-difference equivalence test "
+        "at $\\pm 0.02$. W/T/L counts lineages. The Wilcoxon and equivalence tests treat lineages as independent. "
+        "Holm families are separate per size: density 9, neural 6, ARF 6, and Forest-Flow 3 tests.",
         "Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
         paired_lines,
         "lllllrrllrl",
-    ))
-    tost_lines = []
-    for row in payload["paired"]:
-        tost = row["tost"]
-        tost_lines.append(
-            f"{row['size']}$n$ & {tex_name(row['auditor'])} & {tex_name(row['method'])} & "
-            f"{fmt(tost['mean'])} & [{fmt(tost['ci90_lo'])}, {fmt(tost['ci90_hi'])}] & "
-            f"{fmt(tost['p'], 3)} & {'yes' if tost['equivalent'] else 'no'} \\\\"
-        )
-    write_tex("review-tost.tex", note + _table(
-        "Size & Auditor & Comparator & Mean diff. & 90\\% CI & TOST $p$ & Equivalent at $\\pm 0.02$",
-        tost_lines,
-        "lllrrrl",
+        label="tab:review-paired",
     ))
     family_lines = []
     for row in payload["family"]:
@@ -761,76 +752,30 @@ def emit_tex(payload) -> None:
             f"excluding simulated & {row['size']}$n$ & catboost & {tex_name(row['method'])} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
         )
-    write_tex("review-family.tex", _table(
+    write_tex("review-family.tex", longtable(
+        "\\textbf{Source-family sensitivity, fit seed 11.} A DOPE row is the median DOPE retention within one "
+        "source family; a comparator row is the median DOPE-minus-comparator difference on that family, under "
+        "CatBoost. The excluding-simulated rows drop the four simulated families. Intervals are the family-cluster "
+        "bootstrap. These rows are a sensitivity, printed without Holm $p$-values.",
         "Family & Size & Auditor & Contrast & $n$ & Median & Hierarchical CI",
         family_lines,
         "lllllrr",
+        label="tab:review-family",
     ))
-    denom_lines = []
-    for row in payload["denominator"]:
-        if row["auditor"] != "catboost":
-            continue
-        counts = [row[key] for key in ("n_informative", "n_noninformative", "n_undefined",
-                                      "n_capped", "sensitivity_n")]
-        # Empty sensitivity coverage cannot establish an informative count.
-        # Forest-Flow's original receipts omit the required null-loss metadata.
-        displayed = ["---"] * len(counts) if not any(counts) else list(map(str, counts))
-        denom_lines.append(
-            f"{tex_name(row['method'])} & {tex_name(row['configuration'])} & {row['size']}$n$ & "
-            + " & ".join(displayed) + f" & {fmt(row['sensitivity_median'])} \\\\"
-        )
-    write_tex("review-denominator.tex", _table(
-        "Method & Configuration & Size & Informative & Noninformative & Undefined & Capped & Sensitivity $n$ & Capped median",
-        denom_lines,
-        "lllrrrrrr",
+    # Informative is the retention-row level n; the other counts are complete-loss rows.
+    write_tex("review-denominator.tex", longtable(
+        "\\textbf{Informative-lineage denominators, fit seed 11, CatBoost.} Informative is the lineage count behind "
+        "each retention level. Complete-loss rows have three finite stored null, TRTR, and TSTR losses, and the "
+        "noninformative, undefined, capped, and sensitivity counts are taken among them. No Holm family.",
+        denominator_view.HEADER,
+        denominator_view.denominator_lines(payload, fmt, tex_name),
+        denominator_view.ALIGN,
+        label="tab:review-denominator",
     ))
-    rmse_lines = []
-    for row in payload["rmse"]:
-        if row["auditor"] != "catboost":
-            continue
-        rmse_lines.append(
-            f"{tex_name(row['method'])} & {row['size']}$n$ & {row['n_regression']} & "
-            f"{fmt(row['synthetic_rmse_median'])} & {fmt(row['real_rmse_median'])} \\\\"
-        )
-    write_tex("review-rmse.tex", _table(
-        "Method & Size & Regression lineages & Synthetic RMSE & Real TRTR RMSE",
-        rmse_lines,
-        "llrrr",
-    ))
-    fidelity_lines = []
-    for row in payload["fidelity_stored"]:
-        fidelity_lines.append(
-            f"{tex_name(row['method'])} & {row['size']}$n$ & {tex_name(_metric_label(row))} & "
-            f"{row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
-        )
-    methods = ", ".join(sorted({str(row["method"]) for row in payload["fidelity_stored"]}))
-    fidelity_note = (
-        "% Stored logistic C2ST, marginal KS, and pair correlation from the population ledgers. "
-        "Each n counts lineages with three finite stored values. Cohorts are not matched, "
-        "and this table is not a cross-method ranking. The stored C2ST is not the GBDT detector. "
-        f"Methods in this file: {methods}. TabSyn is not in these ledgers.\n"
-    )
-    write_tex("review-fidelity-stored.tex", fidelity_note + _table(
-        "Method & Size & Metric & $n$ lineages & Median & Hierarchical CI",
-        fidelity_lines,
-        "lllrrr",
-    ))
-    seed_lines = []
-    for row in payload["existing_multiseed"]:
-        seed_lines.append(
-            f"{tex_name(row['method'])} & {row['fit_seed']} & {row['row_multiplier']} & "
-            f"{_measured_prefix(row)} & {_metric_median(row.get('catboost_retention'))} & "
-            f"{_metric_median(row.get('distance_mia_auc'))} & "
-            f"{_metric_median(row.get('dcr_validation_median'))} \\\\"
-        )
-    write_tex("review-seeds-existing.tex", (
-        "% Existing cpu-fivefit prefix. It is not pooled with the 97-lineage table. "
-        "Measured/prefix counts finite CatBoost retentions over the prefix size.\n"
-    ) + _table(
-        "Method & Fit seed & Size & Measured/prefix & CatBoost retention & Distance MIA AUC & Holdout DCR median",
-        seed_lines,
-        "llllrrr",
-    ))
+    # TOST, RMSE, stored fidelity and existing seeds name each configuration.
+    from research.benchmark.review_fixes.receipt_tables import configured_tables
+    for name, body in configured_tables(payload).items():
+        write_tex(name, body)
     _figure(payload["delta_method_points"])
 
 
