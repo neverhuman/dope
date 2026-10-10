@@ -428,19 +428,18 @@ def _write_availability(out):
         "\\texttt{generated/original-field-map.json}. Those original metadata snapshots were captured "
         "after the historical runs; they leave historical custody and the scored artifacts in place. "
         "Pinned LICENSE extracts are reread when their local store is available. "
-        "Official test files stay sealed. "
+        "Official test files are sealed until the single pre-registered run. "
         "The catalog hash is \\CatalogSha. The grouped training split uses seed $\\SplitSeed$. "
-        "The primary displayed DOPE and legacy comparison fits use seed 11 and sample seeds 101, 211, and 307. "
-        "Later retained panels document additional ARF and Forest-Flow fit seeds and the measured "
+        "The historical DOPE and legacy comparison fits use fit seed 11 and sample seeds 101, 211, and 307; "
+        "the five-seed DOPE refit and its pins are in "
+        "\\path{research/benchmark/review_fixes/predeclare_v2.json}. "
+        "Retained panels document the additional ARF and Forest-Flow fit seeds and the measured "
         "TabSyn and TabDDPM subsets separately. "
         "\\texttt{python3 research/benchmark/verify\\_paper\\_numbers.py} exits nonzero when a "
-        "displayed macro disagrees with those ledgers. Full neural baseline coverage, the "
-        "pre-specified privacy-attack panel, displayed-DOPE fit-seed variance, and the full ablation grid "
-        "stay named in the prose and stay out of the tables until those runs exist. The fidelity "
-        "table is a separate "
-        "empirical ledger on the grouped validation split. It stands apart from the pre-specified "
-        "privacy-attack panel. Empirical resemblance stays outside differential privacy and outside "
-        "HIPAA de-identification.\n\n"
+        "displayed macro disagrees with those ledgers. The remaining baselines, the shadow-model and "
+        "artifact attacks, and the full ablation grid enter the tables only after their runs close. "
+        "The fidelity table is a separate empirical ledger on the grouped validation split. "
+        "Empirical resemblance is no differential-privacy guarantee and no HIPAA de-identification.\n\n"
         "PMLB is MIT. Every dataset entry in the data lock records SPDX MIT and the note that "
         "the source license is MIT (PMLB). "
         f"CTGAN and TVAE share one pinned LICENSE file: {ctgan}. "
@@ -809,6 +808,8 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     manuscript = (Path(__file__).resolve().parents[1] / "dope-mfs.tex").read_text()
     assert_no_adjacent_repeat(lines, manuscript)
     (out / "numbers.tex").write_text("".join(lines))
+    import figure_spec
+    figure_spec.write_macros(out)
     (out / "byte-table.tex").write_text(
         "\\begin{tabular}{@{}lrr@{}}\n\\toprule\n"
         "Method & Median bytes & Within cap \\\\\n\\midrule\n"
