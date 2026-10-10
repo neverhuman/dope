@@ -31,6 +31,14 @@ class RetainedEvidence(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "sample group"):
             evidence.groups_from_rows(rows + [rows[0]])
 
+    def test_undeclared_method_or_configuration_is_rejected(self):
+        rows = self.docs["classical"]["rows"]
+        trio = [rows[int(p.rsplit("/", 1)[1])] for p in self.generated["groups"][0]["source_pointers"]]
+        for change in ({"method": "Mystery"}, {"selection_binding": "undeclared"}):
+            with self.subTest(change=sorted(change)):
+                with self.assertRaisesRegex(ValueError, "undeclared method"):
+                    evidence.groups_from_rows(rows + [{**row, **change} for row in trio])
+
     def test_changed_receipt_pin_fails_before_metric_reduction(self):
         relative, _ = evidence.SOURCES["classical"]
         with patch.dict(evidence.SOURCES, {"classical": (relative, "0" * 64)}):
