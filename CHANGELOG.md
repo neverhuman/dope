@@ -19,6 +19,8 @@
   configuration before grouping, and the statistics text states that the
   Wilcoxon p-values treat lineages as independent. The supplement prints the
   first version's headline contrasts as a labeled traceability table.
+  Captions and text now state the loss space, every interval type, and each
+  inclusion rule where its count is printed.
 
 - Add tiered compact kernels, measured release gates, and versioned MFS-v2
   evidence on the single PR branch. No production release is declared.
