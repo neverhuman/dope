@@ -10,7 +10,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = 'edfa3899d9ade270a57074ed7dbee7db08bcbf121db0c47980637c330a12809f'
+LOCK_SHA256 = '49cf19ab42257408dbbeaeffcbaedabcebd2352df1f930ecb74b430e91c0120c'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
 CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
 CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
@@ -173,7 +173,7 @@ def authenticated_v2(inputs):
     from research.benchmark.review_fixes import v2_panel
     v2_panel.check_fits(cells, fits)
     panel = v2_panel.reduce(cells, v2_panel.names_of(json.loads(inputs[V2_RECORD])),
-                            predeclare=inputs[V2_PREDECLARE])
+                            predeclare=inputs[V2_PREDECLARE], fits=fits)
     if v2_panel.canonical(panel).encode() != inputs[V2_PANEL]:
         raise ValueError('v2 scalar ledger does not reproduce the pinned panel')
 

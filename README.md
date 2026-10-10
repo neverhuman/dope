@@ -12,7 +12,7 @@ Version `0.3.0-alpha.1`, [MIT License](LICENSE). This source tree is a research 
 <!-- BEGIN BENCHMARK -->
 Validation panel: 100 PMLB regression tables, CatBoost auditor, synthetic size 4n. DOPE uses five fit seeds; intervals are 95% nested bootstrap intervals (simulated-family clusters, then lineages, then fit seeds). The difference column is DOPE minus the method on shared lineages (Hodges–Lehmann).
 
-| Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Within 10,240 B |
+| Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Lineage medians within 10,240 B |
 | --- | ---: | --- | --- | ---: | ---: | ---: |
 | **DOPE (ours)** | 99 | 0.898 [0.804, 0.972] | — | — | 1.9 KB | 98% |
 | TabSyn (scaled schedule) | 98 | 0.897 [0.816, 0.979] | −0.008 [−0.057, 0.042] | 47/0/51 | 42.3 MB | 0% |
@@ -31,7 +31,7 @@ Validation panel: 100 PMLB regression tables, CatBoost auditor, synthetic size 4
 
 ![DOPE minus each comparator, Hodges–Lehmann retention difference with 95% nested intervals, under the CatBoost, linear, and MLP auditors.](docs/readme/paired.png)
 
-The strongest full-panel comparator is TabSyn (scaled schedule). These are validation estimates on a training-derived cut; the official test split is reserved for one pre-registered run. Resampled real rows are an upper reference, not a generator. The release score (MFS-v3) is null for every method until its privacy and representation gates are measured. DOPE's median artifact is 1.9 KB.
+The strongest full-panel comparator is TabSyn (scaled schedule). These are validation estimates on a training-derived cut; the official test split is reserved for one pre-registered run. Resampled real rows are an upper reference, not a generator. The release score (MFS-v3) is null for every method until its privacy and representation gates are measured. DOPE's median artifact is 1.9 KB, and 490 of 500 individual DOPE fits are within the 10,240-byte release cap; the paper names the lineages above it.
 <!-- END BENCHMARK -->
 
 ## What the artifact stores
