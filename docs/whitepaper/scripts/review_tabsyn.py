@@ -16,13 +16,13 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO))
 
+from research.benchmark.review_fixes.review_tex import longtable  # noqa: E402
 from research.benchmark.review_fixes.receipt_panel import (  # noqa: E402
     AUDITORS,
     GENERATED,
     RESULTS,
     _clean,
     _load,
-    _table,
     ci,
     fmt,
     marginal,
@@ -157,25 +157,31 @@ def render_tabsyn(payload: dict) -> str:
             f"{fmt(row['holm_p'], 3)} \\\\"
         )
     absent = ", ".join(payload["artifact_absent"]) or "none"
-    note = (
-        "% TabSyn track scaled\\_200\\_vae\\_1000\\_diffusion. Samples use seeds 101, 211, and 307 at size n and size 4n. "
-        "A lineage median requires three informative sample seeds. "
-        "Own-lineage rows use every informative TabSyn lineage. "
-        "Matched rows use the intersection with informative DOPE features12\\_steps2048. "
-        "DOPE minus TabSyn is that intersection. "
-        "Holm family is 3 per size (one method, three auditors) and is separate from the published comparator blocks. "
-        "The published-sample parser check matched before these cells were sampled. "
-        f"Lineages absent from the admitted scalar cohort: {absent}. "
-        "Absence is not a win. Official tests were not opened. Formal DP remains false.\n"
+    levels_caption = (
+        "\\textbf{TabSyn and DOPE retention levels, fit seed 11.} TabSyn runs the scaled schedule (200 VAE and "
+        "1{,}000 diffusion epochs). A lineage median needs three informative sample seeds at size $n$ or $4n$; "
+        "own-lineage rows use every informative TabSyn lineage, and matched rows use the lineages shared with "
+        "informative DOPE features12\\_\\allowbreak steps2048. Intervals are the family-cluster bootstrap. "
+        f"Lineages absent from the admitted cohort: {tex_name(absent)}; absence is no win. No Holm family."
     )
-    return note + _table(
+    contrasts_caption = (
+        "\\textbf{DOPE minus TabSyn, fit seed 11.} Median paired retention difference on the matched lineages "
+        "with its family-cluster bootstrap interval, the mean difference, the v1 mean-difference equivalence test at "
+        "$\\pm 0.02$, and W/T/L. The Holm family has three tests per size (one comparator, three auditors), separate "
+        "from every other comparator block; the Wilcoxon and equivalence tests treat lineages as independent."
+    )
+    return longtable(
+        levels_caption,
         "Method & Configuration & Cohort & Size & Auditor & $n$ lineages & Median & Hierarchical CI",
         levels,
         "lllllrrr",
-    ) + _table(
+        label="tab:review-tabsyn",
+    ) + longtable(
+        contrasts_caption,
         "Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
         contrasts,
         "lllllrrllrl",
+        label="tab:review-tabsyn-contrasts",
     )
 
 
