@@ -24,6 +24,7 @@ import matplotlib
 matplotlib.use("Agg")
 
 import figure_style
+from figure_spec import TEASER_ROW_PAD, TEASER_X_LIM
 
 figure_style.apply(matplotlib, size=7.6)
 import matplotlib.pyplot as plt  # noqa: E402
@@ -35,12 +36,17 @@ README_DIR = REPO / "docs" / "readme"
 HEADLINE = GEN / "v2-headline.json"
 ACCENT = "#76B900"
 ACCENT_EDGE = "#3F6B00"
+DEFAULT_GREEN = "#A6D96A"
 CONTEXT = "#7A7A7A"
 CONTROL = "#A8A8A8"
-BAND = "#EDEDED"
+BAND = "#D6D6D6"
 CAP = 10240
 FULL_PANEL = 90
+FOREST_TICKS = (-0.2, 0.0, 0.2, 0.4)
 AUDITORS = (("catboost", "CatBoost"), ("linear", "Linear"), ("mlp", "MLP"))
+# The figures draw these arms only; every other arm stays in the supplement tables.
+FIGURE_CODES = ("TabSyn", "Arf", "Gauss", "Chow", "Ind", "Tvae", "Ctgan", "Forest", "TabDdpm", "TabDiff",
+                "Great", "Synthpop", "Smote", "Pred", "Boot")
 OUTPUTS = {
     "teaser.pdf": (FIG, "teaser-figure-hashes.json"),
     "pareto.pdf": (FIG, "pareto-figure-hashes.json"),
@@ -51,7 +57,7 @@ OUTPUTS = {
 
 def _rows(headline: dict) -> list[dict]:
     """Comparator rows for the forest plot: full panel, smaller cohorts, then controls."""
-    rows = [arm for arm in headline["arms"] if arm["code"] != "Dope" and arm["contrasts"]["catboost"]]
+    rows = [arm for arm in headline["arms"] if arm["code"] in FIGURE_CODES and arm["contrasts"]["catboost"]]
     rank = {"generator": 0, "diagnostic": 2, "control": 3}
 
     def key(arm):
@@ -66,9 +72,9 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     margin = headline.get("margin", 0.02)
     height = 0.42 + 0.215 * len(rows)
     figure, axes = plt.subplots(1, 3, figsize=(width, height), sharey=True)
-    lo_all = min(arm["contrasts"][a]["hl_lo"] for arm in rows for a, _ in AUDITORS if arm["contrasts"][a])
-    hi_all = max(arm["contrasts"][a]["hl_hi"] for arm in rows for a, _ in AUDITORS if arm["contrasts"][a])
-    left, right = max(-1.0, min(-0.1, lo_all - 0.05)), min(1.2, max(0.2, hi_all + 0.05))
+    # A fixed window keeps the close comparisons readable; a row outside it is drawn at the edge
+    # with an arrow and its value printed, so nothing is dropped.
+    left, right = TEASER_X_LIM
     for axis, (auditor, title) in zip(axes, AUDITORS):
         figure_style.panel(axis, grid="x")
         axis.axvspan(-margin, margin, color=BAND, zorder=0, linewidth=0)
@@ -79,20 +85,40 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
                 continue
             y = len(rows) - 1 - index
             colour = CONTROL if arm["role"] == "control" else CONTEXT
-            hollow = row["n"] < FULL_PANEL
+            # Hollow marks a small cohort; an auditor's own count drops uninformative lineages.
+            cohort = arm["contrasts"]["catboost"]["n"]
+            hollow = cohort < FULL_PANEL
             lo, hi = max(left, row["hl_lo"]), min(right, row["hl_hi"])
-            axis.plot([lo, hi], [y, y], color=colour, linewidth=1.4, solid_capstyle="round", zorder=2)
-            axis.plot([row["hl"]], [y], marker="o", markersize=4.6, zorder=3,
-                      markerfacecolor="white" if hollow else colour, markeredgecolor=colour, markeredgewidth=1.0)
+            if hi > lo:
+                axis.plot([lo, hi], [y, y], color=colour, linewidth=1.4, solid_capstyle="round", zorder=2)
+            # An interval cut by the window ends in an arrowhead at that edge.
+            for bound, edge, sign in ((row["hl_hi"], right, 1), (row["hl_lo"], left, -1)):
+                if sign * (bound - edge) > 0 and left <= row["hl"] <= right:
+                    axis.annotate("", xy=(edge, y), xytext=(edge - sign * 0.06, y),
+                                  arrowprops={"arrowstyle": "-|>", "color": colour, "lw": 1.0,
+                                              "shrinkA": 0, "shrinkB": 0, "mutation_scale": 7}, zorder=2)
+            point = row["hl"]
+            if left <= point <= right:
+                axis.plot([point], [y], marker="o", markersize=4.6, zorder=3,
+                          markerfacecolor="white" if hollow else colour, markeredgecolor=colour, markeredgewidth=1.0)
+            else:
+                edge = right if point > right else left
+                axis.plot([edge], [y], marker=">" if point > right else "<", markersize=5.0, zorder=3,
+                          color=colour)
+                axis.annotate(f"{point:.2f}", xy=(edge, y), xytext=(-6 if point > right else 6, 0),
+                              textcoords="offset points", ha="right" if point > right else "left", va="center",
+                              fontsize=6.0, color=figure_style.INK,
+                              bbox={"boxstyle": "square,pad=0.1", "facecolor": "white", "edgecolor": "none"})
             if auditor == "mlp":
-                axis.annotate(f"n={row['n']}", xy=(1.0, y), xycoords=("axes fraction", "data"),
+                axis.annotate(f"n={cohort}", xy=(1.0, y), xycoords=("axes fraction", "data"),
                               xytext=(3, 0), textcoords="offset points", va="center", fontsize=6.4,
                               color=figure_style.INK)
         axis.set_xlim(left, right)
+        axis.set_xticks(FOREST_TICKS)
         axis.set_title(title)
     axes[0].set_yticks(range(len(rows)))
     axes[0].set_yticklabels([arm["display"] for arm in reversed(rows)])
-    axes[0].set_ylim(-0.6, len(rows) - 0.4)
+    axes[0].set_ylim(-TEASER_ROW_PAD, len(rows) - 1 + TEASER_ROW_PAD)
     figure.supxlabel("DOPE minus comparator, Hodges-Lehmann retention difference (95% nested interval)",
                      fontsize=figure_style_size(), y=0.01)
     figure.subplots_adjust(left=0.27, right=0.93, bottom=0.2, top=0.9, wspace=0.08)
@@ -103,47 +129,97 @@ def figure_style_size() -> float:
     return matplotlib.rcParams["axes.labelsize"]
 
 
+# Candidate label offsets in points, tried in order; the first that clears every placed label wins.
+LABEL_OFFSETS = ((4, 3, "left", "bottom"), (4, -3, "left", "top"), (-4, 3, "right", "bottom"),
+                 (-4, -3, "right", "top"), (0, 7, "center", "bottom"), (0, -7, "center", "top"),
+                 (6, 9, "left", "bottom"), (6, -9, "left", "top"), (-6, 9, "right", "bottom"),
+                 (-6, -9, "right", "top"))
+CONTROL_POSITIONS = (0.02, 0.98, 0.5, 0.26, 0.74)
+
+
+def _place(axis, text: str, anchors, placed: list, avoid=(), **style):
+    """Annotate at the first anchor and offset whose box stays in the axes and clears placed labels and marks."""
+    renderer = axis.figure.canvas.get_renderer()
+    frame = axis.get_window_extent(renderer)
+    first = None
+    for xy, xycoords, offsets in anchors:
+        for dx, dy, ha, va in offsets:
+            label = axis.annotate(text, xy=xy, xycoords=xycoords, xytext=(dx, dy), textcoords="offset points",
+                                  ha=ha, va=va, **style)
+            box = label.get_window_extent(renderer).expanded(1.04, 1.1)
+            inside = (box.x0 >= frame.x0 and box.x1 <= frame.x1 and box.y0 >= frame.y0 and box.y1 <= frame.y1)
+            if inside and not any(box.overlaps(other) for other in (*placed, *avoid)):
+                placed.append(box)
+                if first is not None:
+                    first.remove()
+                return label
+            if first is None:
+                first = label
+            else:
+                label.remove()
+    # Nothing clears: keep the first candidate rather than drop the label.
+    placed.append(first.get_window_extent(renderer))
+    return first
+
+
 def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None = None) -> Path:
     figure, axis = plt.subplots(figsize=(width, 2.7))
+    # The frame is final before any label is measured.
+    figure.subplots_adjust(left=0.1, right=0.98, bottom=0.17, top=0.95)
     figure_style.panel(axis, grid="both")
     axis.set_xscale("log")
     axis.axvline(CAP, color=figure_style.SPINE, linestyle=(0, (4, 3)), linewidth=0.8, zorder=1)
-    axis.annotate("10,240-byte cap", xy=(CAP, 1.0), xycoords=("data", "axes fraction"), xytext=(3, -9),
-                  textcoords="offset points", fontsize=6.4, color=figure_style.INK)
-    xs = [arm["bytes"][key] for arm in headline["arms"] if arm["bytes"] and arm["role"] in {"headline", "generator"}
-          for key in ("q1", "q3")]
-    right_edge = 10 ** (math.ceil(math.log10(max(xs))) + 0.3) if xs else None
-    for arm in headline["arms"]:
-        level = arm["level"]
-        if arm["role"] == "control":
-            axis.axhline(level["median"], color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.9, zorder=1)
-            axis.annotate(arm["display"], xy=(1.0, level["median"]), xycoords=("axes fraction", "data"),
-                          xytext=(-3, 2), textcoords="offset points", ha="right", va="bottom",
-                          fontsize=6.4, color=figure_style.INK)
-            continue
-        if arm["bytes"] is None or arm["role"] == "diagnostic":
-            continue
-        size = arm["bytes"]["median"]
-        is_dope = arm["code"] == "Dope"
-        colour = ACCENT if is_dope else CONTEXT
-        hollow = (level["n"] or 0) < FULL_PANEL
-        axis.plot([arm["bytes"]["q1"], arm["bytes"]["q3"]], [level["median"]] * 2, color=colour,
-                  linewidth=1.1, alpha=0.8, zorder=2)
-        if level["lo"] is not None:
-            axis.plot([size, size], [level["lo"], level["hi"]], color=colour, linewidth=1.1, zorder=2)
-        axis.plot([size], [level["median"]], marker="o", markersize=6.5 if is_dope else 4.8, zorder=3,
-                  markerfacecolor="white" if hollow else colour,
-                  markeredgecolor=ACCENT_EDGE if is_dope else colour, markeredgewidth=1.0)
-        near_right = right_edge is not None and size > right_edge / 40
-        axis.annotate(arm["display"], xy=(size, level["median"]), xytext=(-4 if near_right else 4, 3),
-                      textcoords="offset points", ha="right" if near_right else "left",
-                      fontsize=6.6 if is_dope else 6.2, color=figure_style.INK,
-                      fontweight="bold" if is_dope else "normal")
+    # The untuned default sits beside the reported profile, so the byte axis shows what the profile choice adds.
+    drawn = [arm for arm in headline["arms"] if arm["code"] in ("Dope", "DopeDef") or arm["code"] in FIGURE_CODES]
+    plotted = [arm for arm in drawn if (arm["role"] in {"headline", "generator"} or arm["code"] == "DopeDef")
+               and arm["bytes"] is not None]
+    controls = [arm for arm in drawn if arm["role"] == "control"]
+    xs = [arm["bytes"][key] for arm in plotted for key in ("q1", "q3")]
+    ys = [value for arm in plotted for value in (arm["level"]["lo"], arm["level"]["hi"], arm["level"]["median"])
+          if value is not None] + [arm["level"]["median"] for arm in controls]
     if xs:
-        axis.set_xlim(10 ** math.floor(math.log10(min(xs)) - 0.2), right_edge)
+        axis.set_xlim(10 ** math.floor(math.log10(min(xs)) - 0.2), 10 ** (math.ceil(math.log10(max(xs))) + 0.3))
+    if ys:
+        pad = 0.08 * (max(ys) - min(ys) or 1.0)
+        axis.set_ylim(min(ys) - pad, max(ys) + 2.2 * pad)
+    for arm in controls:
+        axis.axhline(arm["level"]["median"], color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.9, zorder=1)
+    marks: dict[str, list] = {}
+    for arm in plotted:
+        level, size = arm["level"], arm["bytes"]["median"]
+        is_dope = arm["code"] == "Dope"
+        colour = ACCENT if is_dope else (DEFAULT_GREEN if arm["code"] == "DopeDef" else CONTEXT)
+        hollow = (level["n"] or 0) < FULL_PANEL
+        drawn_marks = axis.plot([arm["bytes"]["q1"], arm["bytes"]["q3"]], [level["median"]] * 2, color=colour,
+                                linewidth=1.1, alpha=0.8, zorder=2)
+        if level["lo"] is not None:
+            drawn_marks += axis.plot([size, size], [level["lo"], level["hi"]], color=colour, linewidth=1.1, zorder=2)
+        drawn_marks += axis.plot([size], [level["median"]], marker="o", markersize=6.5 if is_dope else 4.8, zorder=3,
+                                 markerfacecolor="white" if hollow else colour,
+                                 markeredgecolor=ACCENT_EDGE if is_dope else colour, markeredgewidth=1.0)
+        marks[arm["code"]] = drawn_marks
+    renderer = figure.canvas.get_renderer()
+    boxes = {code: [line.get_window_extent(renderer) for line in lines] for code, lines in marks.items()}
+    # Labels go on after every mark and limit is fixed, DOPE first, then by retention.
+    placed: list = []
+    _place(axis, "10,240-byte cap", [((CAP, 1.0), ("data", "axes fraction"), ((3, -3, "left", "top"),))],
+           placed, fontsize=6.4, color=figure_style.INK)
+    order = sorted(plotted, key=lambda arm: (arm["code"] != "Dope", -(arm["level"]["median"] or 0.0)))
+    for arm in order:
+        is_dope = arm["code"] == "Dope"
+        others = [box for code, owned in boxes.items() if code != arm["code"] for box in owned]
+        _place(axis, arm["display"], [((arm["bytes"]["median"], arm["level"]["median"]), "data", LABEL_OFFSETS)],
+               placed, avoid=others, fontsize=6.6 if is_dope else 6.2, color=figure_style.INK,
+               fontweight="bold" if is_dope else "normal")
+    for arm in controls:
+        anchors = [((fraction, arm["level"]["median"]), ("axes fraction", "data"),
+                    ((0, 2, "left" if fraction < 0.1 else ("right" if fraction > 0.9 else "center"), "bottom"),
+                     (0, -2, "left" if fraction < 0.1 else ("right" if fraction > 0.9 else "center"), "top")))
+                   for fraction in CONTROL_POSITIONS]
+        _place(axis, arm["display"], anchors, placed, avoid=[box for owned in boxes.values() for box in owned],
+               fontsize=6.4, color=figure_style.INK)
     axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)")
     axis.set_ylabel("CatBoost retention at 4n")
-    figure.subplots_adjust(left=0.1, right=0.98, bottom=0.17, top=0.95)
     return _save(figure, path, dpi)
 
 
