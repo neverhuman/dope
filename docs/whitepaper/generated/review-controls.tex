@@ -1,8 +1,13 @@
-% Size n Holm family has 3 tests (predictor-only times three auditors). real\_bootstrap\_4n has no size-n arm, so it is not a member of that family. Size 4n Holm family has 6 tests. Predictor fit seeds 23, 37, 53, and 71 are all reported and are not in the Holm family. Split-seed rows are a separate sensitivity and are not pooled with fit seed 11. Wilcoxon and TOST treat lineages as iid. The interval is the family-cluster bootstrap.
-\begin{tabular}{lllrrrrllr}
+\begin{longtable}{lllrrrrllr}
+\caption{\textbf{DOPE minus each control, fit seed 11.} A paired row is the median DOPE-minus-control retention difference with its family-cluster bootstrap 95\% interval, the mean difference, the v1 mean-difference equivalence test at $\pm 0.02$, and W/T/L over lineages; the Wilcoxon and equivalence tests treat lineages as independent. Predictor fit-seed and split-seed rows give the control's own CatBoost retention level. The size-$n$ Holm family is the three predictor-only tests, because the real-row control exists at $4n$ only; the size-$4n$ family has six tests. Fit-seed and split-seed rows are outside both Holm families.}\label{tab:review-controls}\\
 \toprule
 Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
 \midrule
+\endfirsthead
+\toprule
+Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
+\midrule
+\endhead
 1$n$ & catboost & predictor\_only & 97 & 0.2528 & [0.1449, 0.3903] & 0.2286 & no & 87/0/10 & 0.000 \\
 1$n$ & linear & predictor\_only & 92 & -0.0026 & [-0.0176, 0.0137] & 0.0156 & no & 42/0/50 & 0.523 \\
 1$n$ & mlp & predictor\_only & 73 & 0.0739 & [-0.0009, 0.1498] & 0.1331 & no & 52/0/21 & 0.000 \\
@@ -31,4 +36,4 @@ Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean 
 1$n$ & catboost & split 8191 & 100 & 0.6108 & [0.3366, 0.7559] & --- & --- & --- & --- \\
 4$n$ & catboost & split 8191 & 100 & 0.6767 & [0.3594, 0.7694] & --- & --- & --- & --- \\
 \bottomrule
-\end{tabular}
+\end{longtable}

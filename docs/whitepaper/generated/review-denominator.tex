@@ -1,24 +1,30 @@
-\begin{tabular}{lllrrrrrr}
+\begin{longtable}{lllrrrrrrr}
+\caption{\textbf{Informative-lineage denominators, fit seed 11, CatBoost.} Informative is the lineage count behind each retention level. Complete-loss rows have three finite stored null, TRTR, and TSTR losses, and the noninformative, undefined, capped, and sensitivity counts are taken among them. No Holm family.}\label{tab:review-denominator}\\
 \toprule
-Method & Configuration & Size & Informative & Noninformative & Undefined & Capped & Sensitivity $n$ & Capped median \\
+Method & Configuration & Size & Informative & \shortstack[r]{Complete-\\loss rows} & \shortstack[r]{Non-\\informative} & Undefined & Capped & \shortstack[r]{Sensitivity\\$n$} & \shortstack[r]{Capped\\median} \\
 \midrule
-DOPE & features12\_steps2048 & 1$n$ & 97 & 1 & 0 & 1 & 98 & 0.8862 \\
-DOPE & features12\_steps2048 & 4$n$ & 97 & 1 & 0 & 1 & 98 & 0.9359 \\
-GaussianCopula & native\_selected & 1$n$ & 99 & 1 & 0 & 1 & 100 & 0.5996 \\
-GaussianCopula & native\_selected & 4$n$ & 99 & 1 & 0 & 1 & 100 & 0.6658 \\
-Chow-Liu & native\_selected & 1$n$ & 99 & 1 & 0 & 12 & 100 & 0.4809 \\
-Chow-Liu & native\_selected & 4$n$ & 99 & 1 & 0 & 11 & 100 & 0.5782 \\
-independent\_marginals & native\_selected & 1$n$ & 99 & 1 & 0 & 3 & 100 & -0.0440 \\
-independent\_marginals & native\_selected & 4$n$ & 99 & 1 & 0 & 1 & 100 & -0.0120 \\
-CTGAN & native\_selected & 1$n$ & 21 & 1 & 0 & 2 & 22 & -0.0889 \\
-CTGAN & native\_selected & 4$n$ & 21 & 1 & 0 & 2 & 22 & -0.0801 \\
-TVAE & native\_selected & 1$n$ & 21 & 1 & 0 & 0 & 22 & 0.6094 \\
-TVAE & native\_selected & 4$n$ & 21 & 1 & 0 & 0 & 22 & 0.6582 \\
-ARF & author\_default & 1$n$ & 99 & 1 & 0 & 1 & 100 & 0.7505 \\
-ARF & author\_default & 4$n$ & 99 & 1 & 0 & 1 & 100 & 0.8314 \\
-ARF & native\_selected & 1$n$ & 99 & 1 & 0 & 1 & 100 & 0.7410 \\
-ARF & native\_selected & 4$n$ & 99 & 1 & 0 & 1 & 100 & 0.8237 \\
-ForestDiffusion/Forest-Flow & native\_selected & 1$n$ & --- & --- & --- & --- & --- & --- \\
-ForestDiffusion/Forest-Flow & native\_selected & 4$n$ & --- & --- & --- & --- & --- & --- \\
+\endfirsthead
+\toprule
+Method & Configuration & Size & Informative & \shortstack[r]{Complete-\\loss rows} & \shortstack[r]{Non-\\informative} & Undefined & Capped & \shortstack[r]{Sensitivity\\$n$} & \shortstack[r]{Capped\\median} \\
+\midrule
+\endhead
+DOPE & features12\_steps2048 & 1$n$ & 97 & 98 & 1 & 0 & 1 & 98 & 0.8862 \\
+DOPE & features12\_steps2048 & 4$n$ & 97 & 98 & 1 & 0 & 1 & 98 & 0.9359 \\
+GaussianCopula & native\_selected & 1$n$ & 99 & 100 & 1 & 0 & 1 & 100 & 0.5996 \\
+GaussianCopula & native\_selected & 4$n$ & 99 & 100 & 1 & 0 & 1 & 100 & 0.6658 \\
+Chow-Liu & native\_selected & 1$n$ & 99 & 100 & 1 & 0 & 12 & 100 & 0.4809 \\
+Chow-Liu & native\_selected & 4$n$ & 99 & 100 & 1 & 0 & 11 & 100 & 0.5782 \\
+independent\_marginals & native\_selected & 1$n$ & 99 & 100 & 1 & 0 & 3 & 100 & -0.0440 \\
+independent\_marginals & native\_selected & 4$n$ & 99 & 100 & 1 & 0 & 1 & 100 & -0.0120 \\
+CTGAN & native\_selected & 1$n$ & 21 & 22 & 1 & 0 & 2 & 22 & -0.0889 \\
+CTGAN & native\_selected & 4$n$ & 21 & 22 & 1 & 0 & 2 & 22 & -0.0801 \\
+TVAE & native\_selected & 1$n$ & 21 & 22 & 1 & 0 & 0 & 22 & 0.6094 \\
+TVAE & native\_selected & 4$n$ & 21 & 22 & 1 & 0 & 0 & 22 & 0.6582 \\
+ARF & author\_default & 1$n$ & 99 & 100 & 1 & 0 & 1 & 100 & 0.7505 \\
+ARF & author\_default & 4$n$ & 99 & 100 & 1 & 0 & 1 & 100 & 0.8314 \\
+ARF & native\_selected & 1$n$ & 99 & 100 & 1 & 0 & 1 & 100 & 0.7410 \\
+ARF & native\_selected & 4$n$ & 99 & 100 & 1 & 0 & 1 & 100 & 0.8237 \\
+ForestDiffusion/Forest-Flow & native\_selected & 1$n$ & 6 & 0 & 0 & 0 & 0 & 0 & --- \\
+ForestDiffusion/Forest-Flow & native\_selected & 4$n$ & 6 & 0 & 0 & 0 & 0 & 0 & --- \\
 \bottomrule
-\end{tabular}
+\end{longtable}
