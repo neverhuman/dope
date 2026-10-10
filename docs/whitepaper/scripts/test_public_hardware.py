@@ -6,8 +6,11 @@ from pathlib import Path
 
 import paper_emit
 import public_hardware as hardware
+from research.benchmark.review_fixes.stats import SIMULATED
 
 REPO = Path(__file__).resolve().parents[3]
+# The pre-fix sentence said the family-cluster intervals resample lineages.
+_LEGACY_CLUSTER_CLAUSE = "The printed family-cluster intervals resample lineages."
 
 
 class PublicHardware(unittest.TestCase):
@@ -73,8 +76,20 @@ class PublicHardware(unittest.TestCase):
         self.assertEqual(hardware.banned_hits(sentence), [])
         self.assertIn("20", sentence)
         self.assertIn("35", sentence)
-        self.assertIn("printed family-cluster intervals resample lineages", sentence)
+        self.assertNotIn(_LEGACY_CLUSTER_CLAUSE, sentence)
         self.assertNotIn("source-family interval is not published", sentence)
+        # The family-cluster interval is a two-stage draw over the simulated name families.
+        clusters = hardware.cluster_sentence()
+        self.assertIn(clusters, sentence)
+        tail = sentence[sentence.index("two-stage"):]
+        for prefix in SIMULATED:
+            self.assertIn(prefix, tail)
+        self.assertIn("singleton cluster", tail)
+
+    def test_committed_numbers_carry_the_origin_sentence(self):
+        path = REPO / "research/benchmark/results/s3-lineage-record.json"
+        rows = json.loads(path.read_text())["rows"]
+        sentence = hardware.origin_sentence(hardware.origin_counts(row["display_name"] for row in rows))
         numbers = (REPO / "docs/whitepaper/generated/numbers.tex").read_text()
         self.assertIn("\\newcommand{\\OriginSentence}{" + sentence + "}", numbers)
 
