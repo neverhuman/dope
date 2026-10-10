@@ -13,6 +13,7 @@ the runtime path is switched.
 
 import ast
 import csv
+import errno
 import hashlib
 import importlib.abc
 import importlib.machinery
@@ -153,6 +154,32 @@ def write_sample(path: Path, matrix) -> None:
     staging.replace(path)
 
 
+def runtime_lock(q: dict) -> bytes:
+    """The pinned runtime lock; a changed or missing lock is the listed runtime-lock mismatch."""
+    try:
+        return checked(q["runtime"]["path"], q["runtime"]["sha256"])
+    except (ValueError, OSError):
+        raise RuntimeError("runtime_lock_mismatch") from None
+
+
+def listed_cause(error: BaseException) -> str | None:
+    """The predeclared infrastructure cause an exception names, if any; everything else is the operation's own."""
+    if isinstance(error, OSError) and error.errno in (errno.ENOSPC, errno.EDQUOT):
+        return "storage_refusal"
+    if isinstance(error, RuntimeError) and str(error) in ("foreign_gpu_owner", "runtime_lock_mismatch"):
+        return str(error)
+    return None
+
+
+def failure_receipt(error: BaseException, started: float, request_sha: str, cuda_ready: bool) -> dict:
+    """A worker claim only: the controller retries a listed cause after confirming it on its own."""
+    cause = listed_cause(error)
+    return {"status": "infrastructure_failure" if cause else "operation_failed", "cause": cause,
+            "exception_type": type(error).__name__, "cuda_initialized": cuda_ready,
+            "operation_seconds": time.monotonic() - started, "request_sha256": request_sha,
+            "official_tests_opened": False}
+
+
 def _gpu_owned_only() -> None:
     import subprocess
     result = subprocess.run(["/usr/bin/nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader,nounits"],
@@ -172,7 +199,7 @@ class Operation:
         self.started, self.end = self.q["operation_started_monotonic"], self.q["deadline_monotonic"]
         self.worker = Path(self.q["worker"]["path"])
         self.grant = {"operation_path": str(self.request_path), "operation_sha256": self.request_sha}
-        self.runtime = json.loads(checked(self.q["runtime"]["path"], self.q["runtime"]["sha256"]))
+        self.runtime = json.loads(runtime_lock(self.q))
 
     def own(self) -> None:
         q = self.q
@@ -204,7 +231,7 @@ class Operation:
 
     def verify_runtime(self, *_args) -> dict:
         self.own()
-        checked(self.q["runtime"]["path"], self.q["runtime"]["sha256"])
+        runtime_lock(self.q)
         checked(self.q["adapter"]["path"], self.q["adapter"]["sha256"])
         return self.runtime
 
@@ -316,22 +343,31 @@ def sample_mode(adapter: dict, operation: Operation) -> list[dict]:
 
 
 def main(argv: list[str]) -> int:
-    operation = Operation(argv)
+    root, started = Path(argv[1]), time.monotonic()
+    try:
+        operation = Operation(argv)
+    except BaseException as error:
+        put(root, "request.failure.receipt.json", failure_receipt(error, started, argv[3], False))
+        return 2
+    return run(operation)
+
+
+def run(operation: Operation) -> int:
     q, root = operation.q, operation.root
-    operation.check_runtime()
-    runtime = operation.runtime
-    sys.path[:] = [runtime["source"], runtime["package_site"], runtime["stdlib"], runtime["dynload"]]
-    sys.meta_path.insert(0, InventoryGuard(runtime))
-    operation.own()
-    _gpu_owned_only()
-    put(root, "worker.before-imports.receipt.json", {
-        "pid": os.getpid(), "start_ticks": start_ticks(os.getpid()), "request_sha256": operation.request_sha,
-        "mode": q["mode"], "official_tests_opened": False})
     staging = root / "adapter.allowlisted.py"
-    tree = transform(checked(q["adapter"]["path"], q["adapter"]["sha256"]), q["admitted_fit_seeds"])
-    adapter = load_adapter(tree, staging, operation)
     cuda_ready = False
     try:
+        operation.check_runtime()
+        runtime = operation.runtime
+        sys.path[:] = [runtime["source"], runtime["package_site"], runtime["stdlib"], runtime["dynload"]]
+        sys.meta_path.insert(0, InventoryGuard(runtime))
+        operation.own()
+        _gpu_owned_only()
+        put(root, "worker.before-imports.receipt.json", {
+            "pid": os.getpid(), "start_ticks": start_ticks(os.getpid()), "request_sha256": operation.request_sha,
+            "mode": q["mode"], "official_tests_opened": False})
+        tree = transform(checked(q["adapter"]["path"], q["adapter"]["sha256"]), q["admitted_fit_seeds"])
+        adapter = load_adapter(tree, staging, operation)
         import numpy as np
         import torch
         torch.cuda.set_per_process_memory_fraction(16 * 2**30 / torch.cuda.get_device_properties(0).total_memory, 0)
@@ -349,10 +385,8 @@ def main(argv: list[str]) -> int:
             "operation_seconds": time.monotonic() - operation.started, "official_tests_opened": False})
         return 0
     except BaseException as error:
-        put(root, f"{q['mode']}.failure.receipt.json", {
-            "status": "operation_failed" if cuda_ready else "infrastructure_failure",
-            "exception_type": type(error).__name__, "operation_seconds": time.monotonic() - operation.started,
-            "request_sha256": operation.request_sha, "official_tests_opened": False})
+        put(root, f"{q['mode']}.failure.receipt.json",
+            failure_receipt(error, operation.started, operation.request_sha, cuda_ready))
         frames = [{"function": frame.name, "line": frame.lineno} for frame in traceback.extract_tb(error.__traceback__)
                   if frame.filename == str(staging)]
         print(json.dumps({"exception_type": type(error).__name__, "adapter_frames": frames}), file=sys.stderr)

@@ -114,7 +114,7 @@
   "sample_operation_seconds": 180,
   "basis": "These are the caps this arm ran under at fit seed 11: a 600 s whole fit operation (the 100 seed-11 fits measured 51 s median and 75 s maximum) and 180 s for one lineage's six samples in tabsyn_sample.py. predeclare_v2 budget.B1 names the author-default arms; the scaled arm keeps its seed-11 caps so that the five fits of one lineage share one budget."
  },
- "retry": "As predeclare_v2 missing_and_stopping: an operation whose worker failed before CUDA initialised, or left no receipt, is an infrastructure failure and earns one retry at the same cap in a new attempt directory. Every other failure and every timeout is final. All attempts stay on disk.",
+ "retry": "As predeclare_v2 missing_and_stopping, which it does not widen. An operation earns one retry, at the same cap in a new attempt directory, only for a listed infrastructure cause that the controller confirms on its own: a host reboot (the boot id changed while the attempt left no final receipt), a foreign GPU owner (a compute process remains after the worker exits), a storage refusal (the worker's ENOSPC or EDQUOT with under 1 GiB free), or a runtime-lock mismatch (the lock no longer matches its pin). A worker's own report of a cause is a claim, not a confirmation. An attempt that leaves no final receipt in the same boot is recorded as unknown and is final. Every other failure and every timeout is final. Every attempt stays on disk, and an attempt key is never reused.",
  "scoring": {
   "runner": "research/benchmark/review_fixes/rescore_ledger.py",
   "adapter": "rescore_adapters.tabsyn_seeds, registered as ledger tabsyn-seeds with the committed sample ledger",
@@ -126,6 +126,7 @@
   "host": "xbabe1, CPU only, after the GPU block closes"
  },
  "close_utc": "2026-10-22T05:59:00Z",
+ "close_rule": "No operation starts at or after close_utc: the controller checks before waiting for the host, again after it takes the GPU lock, and before every sample operation. Each operation's deadline is the earlier of its cap and close_utc.",
  "monitoring": "Outcome-blind: the runner reads status, timing, and counts only. No retention exists until rescore_ledger.py runs after the last fit.",
  "official_tests_opened": false
 }
