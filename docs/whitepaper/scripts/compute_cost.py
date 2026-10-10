@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Reduce fit and sample receipts to the committed compute-cost ledger.
+"""Reduce the pinned compute-cost receipt bundle to the committed cost ledger.
 
-When scratch is mounted, refresh the committed receipt bundle from those
-files. The cost JSON is always reduced from that bundle, including in CI,
-where scratch is absent. A missing bundle is an error. The reducer does not
-invent a missing timer, host, or device. Official test files are not opened.
+ops/ci/paper-prepare.py materializes generated/compute-cost-receipts.json from
+its locked copy. This reducer reads that bundle and the two committed ledgers it
+needs only through their registered lengths and digests (pinned_inputs.py), so
+a changed, substituted, or redirected body is refused before it is decoded.
+Rebuilding the bundle from scratch receipts is held: those receipts have no
+pinned inventory, so a scratch mount is never read. The reducer does not invent
+a missing timer, host, or device. Official test files are not opened.
 """
 
 from __future__ import annotations
@@ -12,64 +15,36 @@ from __future__ import annotations
 import copy
 import json
 import statistics
-import sys
 from collections import defaultdict
 from pathlib import Path
 
+from pinned_inputs import present, read_pinned
 from public_hardware import banned_hits, redact_bundle, seal_cost_row
 
 REPO = Path(__file__).resolve().parents[3]
 RESULTS = REPO / "research" / "benchmark" / "results"
 GENERATED = REPO / "docs" / "whitepaper" / "generated"
 OUT = GENERATED / "compute-cost.json"
-RECEIPTS = GENERATED / "compute-cost-receipts.json"
-SCRATCH = Path("/mnt/fast-scratch/dope-benchmark")
+BUNDLE = "compute-cost-receipts.json"
+FOREST_LEDGER = "s3-matched-forest-confirmation-validation.json"
+ARF_LEDGER = "arf-s3-population-native.json"
+# Byte length and sha256 of every input. The bundle digest equals its entry in
+# ops/ci/paper-inputs/inputs.lock.json; a test holds the two together.
+BUNDLE_PINS = {BUNDLE: (73961, "16cd9f392d96d3cfabefe09777d32efd35aadf443b0f324805595e461d30ece9")}
+LEDGER_PINS = {
+    FOREST_LEDGER: (1237153, "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"),
+    ARF_LEDGER: (1472035, "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"),
+}
 
 
-def _load(path):
-    path = Path(path)
-    if not path.is_file():
-        raise FileNotFoundError(path)
-    resolved = path.resolve()
-    under_scratch = SCRATCH.resolve() in resolved.parents or resolved == SCRATCH.resolve()
-    under_results = str(resolved).startswith(str(RESULTS.resolve()))
-    if not under_scratch and not under_results:
-        raise ValueError(f"refusing path outside receipts and ledgers: {path}")
-    return json.loads(path.read_text())
+def _ledger(name):
+    return json.loads(read_pinned(RESULTS, name, LEDGER_PINS))
 
 
 def _median(values):
     if not values:
         return None
     return float(statistics.median(values))
-
-
-def _gpu_name(fitted, directory, host):
-    """One GPU name from the fit receipt, or None when the receipt does not record one.
-
-    Admission snapshots contribute only the snapshot whose host equals the fit
-    host. A fit.json ``gpu`` string or ``gpu.name`` is the same receipt. Two
-    different names are an error, not a choice.
-    """
-    found = []
-    if directory is not None and host:
-        for path in sorted(Path(directory).glob("fit*.admission-*.json")):
-            document = _load(path)
-            for snap in document.get("owner_snapshots") or []:
-                if snap.get("host") != host:
-                    continue
-                for gpu in (snap.get("inventory") or {}).get("gpus") or []:
-                    if isinstance(gpu, dict) and isinstance(gpu.get("name"), str):
-                        found.append(gpu["name"])
-    gpu = fitted.get("gpu") if isinstance(fitted, dict) else None
-    if isinstance(gpu, str):
-        found.append(gpu)
-    elif isinstance(gpu, dict) and isinstance(gpu.get("name"), str):
-        found.append(gpu["name"])
-    unique = sorted(set(found))
-    if len(unique) > 1:
-        raise ValueError(f"conflicting GPU names: {unique}")
-    return unique[0] if unique else None
 
 
 def _assign_gpu(row, observations):
@@ -142,80 +117,6 @@ def _finish(row, fit_walls, sample_walls, attempt_walls, rams, vrams, gpu_second
     return row
 
 
-def _int_or_none(value):
-    return value if isinstance(value, int) else None
-
-
-def _host(value):
-    return value if isinstance(value, str) else None
-
-
-def _collect_density():
-    ledger = _load(RESULTS / "density-matched-population-validation.json")
-    wanted = {
-        "DOPE": "features12_steps2048",
-        "GaussianCopula": "native_selected",
-        "Chow-Liu": "native_selected",
-        "independent_marginals": "native_selected",
-    }
-    dope = []
-    seen = set()
-    attempts = {name: [] for name in wanted if name != "DOPE"}
-    seen_attempts = {name: set() for name in attempts}
-    for cell in ledger["cells"]:
-        config = wanted.get(cell.get("method"))
-        if config is None:
-            continue
-        if cell.get("configuration") != config or cell.get("size_multiplier") != 4:
-            continue
-        if cell.get("status") != "ok":
-            continue
-        if cell["method"] == "DOPE":
-            receipt_path = cell["fit_receipt"]["path"]
-            if receipt_path in seen:
-                continue
-            seen.add(receipt_path)
-            directory = Path(receipt_path).parent
-            receipt = _load(receipt_path)
-            if receipt.get("official_tests_opened"):
-                raise ValueError("DOPE fit receipt opened an official test")
-            if (directory / "fit.json").is_file():
-                fitted_path = directory / "fit.json"
-                admission_dir = directory
-            else:
-                reuse = _load(directory / "reuse.json")
-                if reuse.get("new_gpu_fit_started") is not False:
-                    raise ValueError("DOPE reuse receipt is not a prior fit")
-                fitted_path = Path(reuse["prior_fit"]["receipt"])
-                admission_dir = fitted_path.parent
-            fitted = _load(fitted_path)
-            if fitted.get("official_tests_opened"):
-                raise ValueError("DOPE fit.json opened an official test")
-            if not isinstance(fitted.get("elapsed_seconds"), (int, float)):
-                continue
-            host = _host(fitted.get("host"))
-            dope.append({
-                "fit_path": str(fitted_path),
-                "elapsed_seconds": float(fitted["elapsed_seconds"]),
-                "host": host,
-                "gpu": _gpu_name(fitted, admission_dir, host),
-                "peak_resident_bytes": _int_or_none(fitted.get("peak_resident_bytes")),
-                "peak_gpu_used_mib": _int_or_none(fitted.get("peak_gpu_used_mib")),
-                "gpu_process_observed": fitted.get("gpu_process_observed") is True,
-            })
-        else:
-            attempt_path = cell.get("fit_attempt_receipt_path")
-            name = cell["method"]
-            if not isinstance(attempt_path, str) or attempt_path in seen_attempts[name]:
-                continue
-            seen_attempts[name].add(attempt_path)
-            attempt = _load(attempt_path)
-            if not isinstance(attempt.get("wall_seconds"), (int, float)):
-                continue
-            attempts[name].append(float(attempt["wall_seconds"]))
-    return {"dope": dope, "attempts": attempts}
-
-
 def _reduce_dope(records):
     row = _blank("DOPE")
     row["fit_field"] = "fit.json elapsed_seconds"
@@ -250,56 +151,6 @@ def _reduce_attempt(name, walls):
     return _finish(row, [], [], [float(value) for value in walls], [], [], [], None)
 
 
-def _monitor_record(monitor):
-    return {
-        "peak_resident_bytes": _int_or_none(monitor.get("peak_resident_bytes")),
-        "peak_gpu_used_mib": _int_or_none(monitor.get("peak_gpu_used_mib")),
-        "gpu_process_observed": monitor.get("gpu_process_observed") is True,
-    }
-
-
-def _collect_neural():
-    ledger = _load(RESULTS / "sdv-matched-population-validation.json")
-    rows = {name: [] for name in ("CTGAN", "TVAE")}
-    seen = {name: set() for name in rows}
-    for cell in ledger["cells"]:
-        name = cell.get("method")
-        if name not in rows:
-            continue
-        if cell.get("configuration") != "native_selected" or cell.get("size_multiplier") != 4:
-            continue
-        if cell.get("status") != "ok":
-            continue
-        sample_path = (cell.get("sample_evidence") or {}).get("path")
-        if not isinstance(sample_path, str):
-            continue
-        directory = Path(sample_path).parent
-        if str(directory) in seen[name]:
-            continue
-        seen[name].add(str(directory))
-        fit_op = _load(directory / "fit.operation.json")
-        sample_op = _load(directory / "sample.operation.json")
-        fitted = _load(directory / "fit.json")
-        if fit_op.get("official_tests_opened") or sample_op.get("official_tests_opened"):
-            raise ValueError(f"{name} receipt opened an official test")
-        if not isinstance(fit_op.get("elapsed_seconds"), (int, float)):
-            raise ValueError(f"{name} fit operation has no elapsed_seconds")
-        if not isinstance(sample_op.get("elapsed_seconds"), (int, float)):
-            raise ValueError(f"{name} sample operation has no elapsed_seconds")
-        host = _host(fitted.get("host")) or _host(fit_op.get("host"))
-        monitors = []
-        for monitor_name in ("fit.monitor.json", "sample.monitor.json"):
-            monitors.append(_monitor_record(_load(directory / monitor_name)))
-        rows[name].append({
-            "fit_seconds": float(fit_op["elapsed_seconds"]),
-            "sample_seconds": float(sample_op["elapsed_seconds"]),
-            "host": host,
-            "gpu": _gpu_name(fitted, directory, host),
-            "monitors": monitors,
-        })
-    return rows
-
-
 def _reduce_neural(name, records):
     row = _blank(name)
     row["fit_field"] = "fit.operation.json elapsed_seconds"
@@ -327,44 +178,6 @@ def _reduce_neural(name, records):
         gpu_seconds,
         "fit.operation.json and sample.operation.json elapsed_seconds",
     )
-
-
-def _collect_forest():
-    ledger = _load(RESULTS / "s3-matched-forest-confirmation-validation.json")
-    attempts = []
-    for attempt in ledger["native_attempts"]:
-        directory = Path(attempt["receipt"]["path"]).parent
-        receipt = _load(directory / "receipt.json")
-        fitted = _load(directory / "fit.json")
-        if receipt.get("official_tests_opened") or fitted.get("official_tests_opened"):
-            raise ValueError("Forest-Flow receipt opened an official test")
-        fit_op = _load(directory / "fit.operation.json")
-        sample_op = _load(directory / "sample.operation.json")
-        if not isinstance(fit_op.get("elapsed_seconds"), (int, float)):
-            raise ValueError("Forest-Flow fit operation has no elapsed_seconds")
-        if not isinstance(sample_op.get("elapsed_seconds"), (int, float)):
-            raise ValueError("Forest-Flow sample operation has no elapsed_seconds")
-        if not isinstance(fitted.get("fit_seconds"), (int, float)):
-            raise ValueError("Forest-Flow fit.json has no fit_seconds")
-        host = _host(fitted.get("host")) or _host(fit_op.get("host"))
-        operations = []
-        for operation in receipt.get("operations") or []:
-            if operation.get("new_operation_started") and isinstance(operation.get("elapsed_seconds"), (int, float)):
-                operations.append(float(operation["elapsed_seconds"]))
-        monitors = [
-            _monitor_record(_load(directory / name))
-            for name in ("fit.monitor.json", "sample.monitor.json", "native.monitor.json")
-        ]
-        attempts.append({
-            "fit_seconds": float(fitted["fit_seconds"]),
-            "fit_op_seconds": float(fit_op["elapsed_seconds"]),
-            "sample_op_seconds": float(sample_op["elapsed_seconds"]),
-            "host": host,
-            "gpu": _gpu_name(fitted, directory, host),
-            "operations": operations,
-            "monitors": monitors,
-        })
-    return attempts
 
 
 def _reduce_forest(attempts, expected_cost):
@@ -413,11 +226,10 @@ def _arf():
     Peak resident bytes include the coordinator, so they are not job peak RAM.
     """
     row = _blank("ARF")
-    path = RESULTS / "arf-s3-population-native.json"
-    if not path.is_file():
+    if not present(RESULTS, ARF_LEDGER):
         row["notes"] = ["population native ledger is absent"]
         return row
-    document = _load(path)
+    document = _ledger(ARF_LEDGER)
     if document.get("official_tests_opened"):
         raise ValueError("ARF population ledger opened an official test")
     hosts = sorted({
@@ -452,26 +264,21 @@ def _arf():
     return row
 
 
-def _dump(path, payload):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-
-
-def _load_bundle():
-    if not RECEIPTS.is_file():
-        raise FileNotFoundError(
-            "scratch is not mounted and committed compute-cost receipts are missing"
-        )
-    bundle = json.loads(RECEIPTS.read_text())
+def _load_bundle(root=GENERATED):
+    if not present(root, BUNDLE):
+        raise FileNotFoundError("the pinned compute-cost receipt bundle is missing; run ops/ci/paper-prepare.py")
+    bundle = json.loads(read_pinned(root, BUNDLE, BUNDLE_PINS))
     if bundle.get("format") != "dope-paper-compute-cost-receipts" or bundle.get("version") != 1:
         raise ValueError("compute-cost receipts bundle is not the required format")
     if bundle.get("official_tests_opened"):
         raise ValueError("compute-cost receipts opened an official test")
+    if redact_bundle(copy.deepcopy(bundle)) != bundle or banned_hits(json.dumps(bundle)):
+        raise ValueError("compute-cost receipts still contain a private token")
     return bundle
 
 
 def _methods_from_bundle(bundle):
-    forest_ledger = _load(RESULTS / "s3-matched-forest-confirmation-validation.json")
+    forest_ledger = _ledger(FOREST_LEDGER)
     density = bundle["density"]
     neural = bundle["neural"]
     return {
@@ -488,44 +295,8 @@ def _methods_from_bundle(bundle):
     }
 
 
-def _fresh_bundle():
-    return {
-        "format": "dope-paper-compute-cost-receipts",
-        "version": 1,
-        "official_tests_opened": False,
-        "density": _collect_density(),
-        "neural": _collect_neural(),
-        "forest": _collect_forest(),
-    }
-
-
-def _science(bundle):
-    """Redacted JSON text. Host names and fit paths do not affect the compare."""
-    redacted = redact_bundle(copy.deepcopy(bundle))
-    return json.dumps(redacted, sort_keys=True)
-
-
-def build():
-    committed = json.loads(RECEIPTS.read_text()) if RECEIPTS.is_file() else None
-    if SCRATCH.is_dir():
-        fresh = _fresh_bundle()
-        if committed is not None and _science(fresh) != _science(committed):
-            print(
-                "scratch receipts differ from the committed bundle; keeping committed numbers",
-                file=sys.stderr,
-            )
-            bundle = committed
-        else:
-            bundle = fresh
-    else:
-        bundle = _load_bundle()
-        print("scratch absent; reducing committed compute-cost receipts")
-    bundle = redact_bundle(bundle)
-    rendered = json.dumps(bundle)
-    if banned_hits(rendered):
-        raise ValueError("compute-cost receipts still contain a private token")
-    _dump(RECEIPTS, bundle)
-    methods = _methods_from_bundle(bundle)
+def build(root=GENERATED, out=OUT):
+    methods = _methods_from_bundle(_load_bundle(root))
     for row in methods.values():
         row["cpu_model"] = None
         row["cpu_hours"] = None
@@ -540,9 +311,9 @@ def build():
     rendered_cost = json.dumps(payload)
     if banned_hits(rendered_cost):
         raise ValueError("compute-cost ledger still contains a private token")
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-    print(f"wrote {OUT}")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    print(f"wrote {out}")
     return 0
 
 

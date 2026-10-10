@@ -4,9 +4,13 @@
 The receipt schema is the ARF matched publication from PR 123
 (``publish_arf_population_matched.py``): ``version`` 1, ``cells``, and
 ``paired_descriptive``. Each method has one JSON file under
-``research/benchmark/results/``. A missing file becomes the words
-``not measured``. This module only reads those files. It does not fit,
-sample, or write a receipt.
+``research/benchmark/results/``. A file that is absent and unregistered
+becomes the words ``not measured``. A present file is read only through its
+registered length and digest (pinned_inputs.py), so an unregistered,
+substituted, or redirected receipt is refused before it is decoded, and a
+registered receipt that has gone missing is refused rather than shown as not
+measured. This module only reads those files. It does not fit, sample, or
+write a receipt.
 """
 
 from __future__ import annotations
@@ -15,6 +19,8 @@ import json
 import math
 import sys
 from pathlib import Path
+
+from pinned_inputs import PinRefused, check_name, present, read_pinned
 
 REPO = Path(__file__).resolve().parents[3]
 RESULTS = REPO / "research" / "benchmark" / "results"
@@ -47,6 +53,12 @@ PUBLICATIONS = (
         "dope-complete-original-arf-matched-population-validation",
     ),
 )
+
+# Byte length and sha256 of every admitted publication under RESULTS.
+PINS = {
+    "arf-matched-population-validation.json": (
+        6807387, "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"),
+}
 
 # The manuscript's displayed generator. Other profiles in a receipt are not rows.
 DISPLAYED_CONFIGURATION = "features12_steps2048"
@@ -87,19 +99,16 @@ def _spec(display):
     raise KeyError(display)
 
 
-def locate(results_dir, filename):
-    """Return a receipt inside ``results_dir``, or None when it is absent."""
+def locate(results_dir, filename, registry=PINS):
+    """Return a receipt path inside ``results_dir``, or None when it is absent and unregistered."""
     if Path(filename).name != filename or filename in ("", ".", ".."):
         raise ValueError(f"receipt filename escapes the results directory: {filename}")
-    directory = Path(results_dir)
-    path = directory / filename
-    if path.is_symlink():
-        resolved = path.resolve()
-        if resolved.parent != directory.resolve():
-            raise ValueError(f"receipt symlink leaves the results directory: {filename}")
-    if not path.is_file():
+    check_name(filename)
+    if not present(results_dir, filename):
+        if filename in registry:
+            raise PinRefused("a registered publication is missing")
         return None
-    return path
+    return Path(results_dir) / filename
 
 
 def _require(condition, message):
@@ -129,9 +138,10 @@ def _tex(text):
     return str(text).replace("_", r"\_")
 
 
-def load_publication(path, method, format_name):
-    """Validate one receipt. ``path`` is read and not written."""
-    document = json.loads(Path(path).read_text())
+def load_publication(path, method, format_name, registry=PINS):
+    """Validate one receipt from its authenticated bytes. ``path`` is read once and not written."""
+    path = Path(path)
+    document = json.loads(read_pinned(path.parent, path.name, registry))
     _require(document.get("format") == format_name, "publication format differs")
     _require(document.get("version") == 1, "publication version differs")
     cells = document.get("cells")
@@ -179,13 +189,13 @@ def _phrase_from_pairs(pairs):
     return _sig3(pairs[0]["reference_median_retention"])
 
 
-def phrase(display, results_dir=RESULTS):
-    """CatBoost receipt median, or ``not measured`` when the file is absent."""
+def phrase(display, results_dir=RESULTS, registry=PINS):
+    """CatBoost receipt median, or ``not measured`` when the file is absent and unregistered."""
     _display, filename, method, format_name = _spec(display)
-    path = locate(results_dir, filename)
+    path = locate(results_dir, filename, registry)
     if path is None:
         return NOT_MEASURED
-    return _phrase_from_pairs(load_publication(path, method, format_name))
+    return _phrase_from_pairs(load_publication(path, method, format_name, registry))
 
 
 def _row(display, configuration, lineages, dope, receipt, difference):
@@ -193,14 +203,14 @@ def _row(display, configuration, lineages, dope, receipt, difference):
     return f"{label} & {lineages} & {dope} & {receipt} & {difference} \\\\"
 
 
-def rows_for(display, results_dir=RESULTS):
-    """One LaTeX row per size-4 CatBoost pair. A missing receipt adds no row."""
+def rows_for(display, results_dir=RESULTS, registry=PINS):
+    """One LaTeX row per size-4 CatBoost pair. An absent, unregistered receipt adds no row."""
     _display, filename, method, format_name = _spec(display)
-    path = locate(results_dir, filename)
+    path = locate(results_dir, filename, registry)
     if path is None:
         return []
     lines = []
-    for row in load_publication(path, method, format_name):
+    for row in load_publication(path, method, format_name, registry):
         lines.append(_row(
             display,
             row["reference_configuration"],
@@ -212,7 +222,7 @@ def rows_for(display, results_dir=RESULTS):
     return lines
 
 
-def render(results_dir=RESULTS):
+def render(results_dir=RESULTS, registry=PINS):
     body = [
         r"\begin{tabular}{@{}lrrrr@{}}",
         r"\toprule",
@@ -220,7 +230,7 @@ def render(results_dir=RESULTS):
         r"\midrule",
     ]
     for display, _filename, _method, _format_name in PUBLICATIONS:
-        body.extend(rows_for(display, results_dir))
+        body.extend(rows_for(display, results_dir, registry))
     body.extend([r"\bottomrule", r"\end{tabular}", ""])
     return "\n".join(body)
 
