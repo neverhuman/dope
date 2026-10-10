@@ -305,7 +305,7 @@ def _arf_byte_commands(lines, command, arf, tex_bytes):
     lines.append(command("ArfByteLo", f"{int(minimum):,}".replace(",", "{,}")))
     lines.append(command("ArfByteHi", f"{int(maximum):,}".replace(",", "{,}")))
     lines.append(command("ArfByteMedian", _byte_median(median, tex_bytes)))
-    return f"ARF & {_byte_median(median, tex_bytes)} & {within}/{count} \\\\"
+    return f"ARF (native selected) & {_byte_median(median, tex_bytes)} & {within}/{count} \\\\"
 
 
 def _write_compute_cost(out, lines, command, tex_bytes):

@@ -307,7 +307,7 @@ def headline_table(panel, byte_stats) -> str:
         diffs = " & ".join("---" if row is None else _centered(row["hl"], row["hl_lo"], row["hl_hi"]) for row in cells)
         lead_row = cells[0]
         rows.append(f"{arm.display} & {lead_row['n']} & {diffs} & {lead_row['wins']}/{lead_row['ties']}/{lead_row['losses']}"
-                    f" & ${pval(lead_row.get('holm_p'))}$ & {'---' if stats is None else '$' + human_bytes(stats['median']) + '$'} \\\\")
+                    f" & ${pval(lead_row.get('holm_p'))}$ & {'---' if stats is None else _bytes_cell(stats)} \\\\")
     head = ("\\begin{tabular}{@{}lrcccrrr@{}}\n\\toprule\n"
             "Comparator & $n$ & CatBoost & Linear & MLP & W/T/L & Holm $p$ & Bytes \\\\\n\\midrule\n")
     return head + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n"
@@ -364,6 +364,11 @@ def _longtable(columns: str, head: str, rows: list[str], caption: str, label: st
 def _cell(value, bracket: str, align: str) -> str:
     """Value over its interval in a top-aligned inner tabular, so the value sits on the row's baseline."""
     return f"\\begin{{tabular}}[t]{{@{{}}{align}@{{}}}}${num(value)}$\\\\\\tiny${bracket}$\\end{{tabular}}"
+
+
+def _bytes_cell(stats) -> str:
+    """Median charged bytes over the lineage count behind it, which can differ from the scored cohort."""
+    return f"\\begin{{tabular}}[t]{{@{{}}r@{{}}}}${human_bytes(stats['median'])}$\\\\\\tiny$({stats['n']})$\\end{{tabular}}"
 
 
 def _centered(value, lo, hi) -> str:
