@@ -8,9 +8,12 @@ after the data are seen. Output floats are unrounded; emitters format them.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
+import os
 from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -120,30 +123,55 @@ def contrast(left: list[dict], right: list[dict], label: str, right_arm: tuple, 
     return paired
 
 
-def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS) -> dict:
+def _level_task(task: tuple) -> dict:
+    kind, key, items, label, minimum, draws = task
+    return {"kind": kind, "key": key, **S.nested_level(items, label, minimum, draws)}
+
+
+def _contrast_task(task: tuple) -> dict:
+    key, left, right, label, arm, draws = task
+    result = contrast(left, right, label, arm, draws)
+    result.pop("differences")
+    return {"key": key, **result}
+
+
+def _run(function, tasks: list, jobs: int) -> list:
+    """Every statistic seeds its own generator from its label, so order and workers never change a value."""
+    if jobs <= 1 or len(tasks) < 2:
+        return [function(task) for task in tasks]
+    with ProcessPoolExecutor(max_workers=jobs) as pool:
+        return list(pool.map(function, tasks, chunksize=4))
+
+
+def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs: int | None = None,
+           predeclare: bytes | None = None) -> dict:
+    jobs = min(os.cpu_count() or 1, 16) if jobs is None else jobs
     values = fit_values(cells, names)
     arms = sorted({key[0] for key in values})
-    levels, contrasts = [], []
-    for arm in arms:
-        for size in SIZES:
-            for auditor in AUDITORS:
-                items = values.get((arm, size, auditor), [])
-                if not items:
-                    continue
-                level = S.nested_level(items, f"level|{arm}|{size}|{auditor}", min_fits(arm), draws)
-                levels.append({"method": arm[0], "configuration": arm[1], "size": size,
-                               "auditor": auditor, **level})
-    for arm in [item for item in arms if item != HEADLINE]:
-        for size in SIZES:
-            for auditor in AUDITORS:
-                left = values.get((HEADLINE, size, auditor), [])
-                right = values.get((arm, size, auditor), [])
-                if not left or not right:
-                    continue
-                result = contrast(left, right, f"paired|{arm}|{size}|{auditor}", arm, draws)
-                result.pop("differences")
-                contrasts.append({"method": arm[0], "configuration": arm[1], "size": size,
-                                  "auditor": auditor, "family": family_of_arm(arm), **result})
+    level_tasks = [("level", (arm, size, auditor), values[(arm, size, auditor)], f"level|{arm}|{size}|{auditor}",
+                    min_fits(arm), draws)
+                   for arm in arms for size in SIZES for auditor in AUDITORS if values.get((arm, size, auditor))]
+    fidelity_items = fidelity_values(cells, names)
+    level_tasks += [("fidelity", key, items, f"fidelity|{key[0]}|{key[1]}|{key[2]}", min_fits(key[0]), draws)
+                    for key, items in sorted(fidelity_items.items(), key=lambda kv: repr(kv[0]))]
+    contrast_tasks = [((arm, size, auditor), values[(HEADLINE, size, auditor)], values[(arm, size, auditor)],
+                       f"paired|{arm}|{size}|{auditor}", arm, draws)
+                      for arm in arms if arm != HEADLINE for size in SIZES for auditor in AUDITORS
+                      if values.get((HEADLINE, size, auditor)) and values.get((arm, size, auditor))]
+    levels, fidelity = [], []
+    for result in _run(_level_task, level_tasks, jobs):
+        kind, key = result.pop("kind"), result.pop("key")
+        if kind == "level":
+            arm, size, auditor = key
+            levels.append({"method": arm[0], "configuration": arm[1], "size": size, "auditor": auditor, **result})
+        else:
+            arm, size, metric = key
+            fidelity.append({"method": arm[0], "configuration": arm[1], "size": size, "metric": metric, **result})
+    contrasts = []
+    for result in _run(_contrast_task, contrast_tasks, jobs):
+        arm, size, auditor = result.pop("key")
+        contrasts.append({"method": arm[0], "configuration": arm[1], "size": size, "auditor": auditor,
+                          "family": family_of_arm(arm), **result})
     _holm(contrasts)
     seeds = [item for item in values.get((HEADLINE, 4, "catboost"), [])]
     later = {key: [item for item in items if item["fit_seed"] != 11]
@@ -152,17 +180,13 @@ def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS) -> di
                     **S.nested_level(later.get((HEADLINE, size, auditor), []),
                                      f"level|seeds23-71|{size}|{auditor}", S.MIN_FITS_FIVE_SEED, draws)}
                    for size in SIZES for auditor in AUDITORS]
-    fidelity = []
-    for (arm, size, metric), items in sorted(fidelity_values(cells, names).items(), key=lambda kv: repr(kv[0])):
-        fidelity.append({"method": arm[0], "configuration": arm[1], "size": size, "metric": metric,
-                         **S.nested_level(items, f"fidelity|{arm}|{size}|{metric}", min_fits(arm), draws)})
     return {
         "format": "dope-review-fix-v2-panel", "version": 1, "fidelity": fidelity,
-        "predeclare_sha256": hashlib.sha256(PREDECLARE.read_bytes()).hexdigest(),
+        "predeclare_sha256": hashlib.sha256(PREDECLARE.read_bytes() if predeclare is None else predeclare).hexdigest(),
         "draws": draws, "levels": levels, "contrasts": contrasts,
         "strongest": strongest(levels, contrasts),
         "seed_rank": S.seed_rank_test(seeds), "seeds_23_71": sensitivity,
-        "two_by_two": two_by_two(values),
+        "two_by_two": two_by_two(values), "sample_identity": sample_identity(cells),
         "official_tests_opened": False, "formal_dp": False, "mfs_v3": None, "superiority": None,
     }
 
@@ -222,8 +246,68 @@ def two_by_two(values: dict) -> dict:
     return out
 
 
+def check_fits(cells: list[dict], fits: list[dict]) -> None:
+    """Every DOPE cell refit under v2 comes from an ok fit in the fit ledger, so bytes and retention share fits."""
+    ok = {(fit["configuration"], fit["dataset"], fit["fit_seed"]) for fit in fits
+          if fit.get("official_tests_opened") is False and fit["status"] == "ok"}
+    if not ok:
+        raise ValueError("fit ledger has no ok fit")
+    refit = {fit["configuration"] for fit in fits}
+    for cell in cells:
+        if cell["method"] == "DOPE" and cell["configuration"] in refit:
+            if (cell["configuration"], cell["dataset"], cell["fit_seed"]) not in ok:
+                raise ValueError("a DOPE cell has no ok fit in the fit ledger")
+
+
+def sample_identity(cells: list[dict]) -> dict:
+    """Fits whose synthetic samples are byte-identical between the headline refit and a diagnostic DOPE arm.
+
+    A fit counts when it shares at least one sample cell with the other arm and every shared cell
+    has the same synthetic digest.
+    """
+    digests: dict[tuple, dict] = defaultdict(dict)
+    for cell in cells:
+        if cell["method"] == "DOPE":
+            key = (cell["dataset"], cell["fit_seed"], cell["sample_seed"], cell["size"])
+            digests[cell["configuration"]][key] = cell["synthetic_sha256"]
+    out = {}
+    for other in ("headline_bnew", "fourseed_bnew", "historical_seed11"):
+        shared: dict[tuple, bool] = {}
+        for key, digest in digests.get(other, {}).items():
+            mine = digests.get(HEADLINE[1], {}).get(key)
+            if mine is not None:
+                fit = key[:2]
+                shared[fit] = shared.get(fit, True) and mine == digest
+        out[other] = {"fits": len(shared), "identical": sum(shared.values())}
+    return out
+
+
 def load_ledger(path: Path) -> list[dict]:
     cells = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
     if any(cell.get("official_tests_opened") is not False for cell in cells):
         raise ValueError("ledger official test flag is not closed")
     return cells
+
+
+def names_of(record: dict) -> dict[str, str]:
+    return {row["dataset"]: row["display_name"] for row in record["rows"]}
+
+
+def canonical(panel: dict) -> str:
+    return json.dumps(panel, indent=1, sort_keys=True, allow_nan=False) + "\n"
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Write the pinned v2 panel from the v2 scalar ledger.")
+    parser.add_argument("--ledger", type=Path, required=True)
+    parser.add_argument("--lineage-record", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--jobs", type=int, default=None)
+    args = parser.parse_args()
+    names = names_of(json.loads(args.lineage_record.read_text()))
+    args.out.write_text(canonical(reduce(load_ledger(args.ledger), names, jobs=args.jobs)))
+    print(f"wrote {args.out} sha256 {hashlib.sha256(args.out.read_bytes()).hexdigest()}")
+
+
+if __name__ == "__main__":
+    main()

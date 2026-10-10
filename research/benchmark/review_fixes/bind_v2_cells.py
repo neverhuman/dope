@@ -26,12 +26,29 @@ METHODS = {
 UTILITY_FIELDS = ("trtr_loss", "tstr_loss", "informative", "retention")
 
 
+HEADLINE_BINARY_ARMS = {"headline", "product_default"}
+DIAGNOSTIC_BINARY_ARMS = {"headline_bnew"}
+
+
 def _contract() -> dict:
     document = json.loads(PREDECLARE.read_text())
     evaluator = document["evaluator"]
+    binaries = document["binaries"]
     return {"sha256": hashlib.sha256(PREDECLARE.read_bytes()).hexdigest(),
             "implementation_sha256": evaluator["utility_sha256"],
-            "dependencies": evaluator["dependencies"]}
+            "dependencies": evaluator["dependencies"],
+            "headline_binary": binaries["headline"]["sha256"],
+            "diagnostic_prefix": binaries["diagnostic"]["sha256_prefix"]}
+
+
+def _check_binary(method: str, configuration: str, binary, contract: dict) -> None:
+    """A refit DOPE cell names the binary its arm was pre-declared to use."""
+    if method != "DOPE":
+        return
+    if configuration in HEADLINE_BINARY_ARMS and binary != contract["headline_binary"]:
+        raise ValueError("a headline-binary DOPE cell names another binary")
+    if configuration in DIAGNOSTIC_BINARY_ARMS and not str(binary).startswith(contract["diagnostic_prefix"]):
+        raise ValueError("a diagnostic-binary DOPE cell names another binary")
 
 
 def _finite_or_none(value):
@@ -84,6 +101,8 @@ def public_cell(raw: dict, contract: dict, source: str) -> dict:
     digest = raw.get("synthetic_sha256")
     if not isinstance(digest, str) or len(digest) != 64:
         raise ValueError("cell synthetic digest is missing")
+    _check_binary(method, configuration, raw.get("binary_sha256"), contract)
+    # The evaluator digest and the binary are checked above and stay in the ledger meta and fit ledger.
     return {
         "method": method, "configuration": configuration, "dataset": dataset,
         "fit_seed": fit_seed, "sample_seed": raw["sample_seed"], "size": raw["size"],
@@ -91,9 +110,7 @@ def public_cell(raw: dict, contract: dict, source: str) -> dict:
         "marginal_ks_mean": _finite_or_none(report.get("marginal_ks_mean")),
         "pair_correlation_fidelity": _finite_or_none(report.get("pair_correlation_fidelity")),
         "c2st_auc_logistic": _finite_or_none(report.get("c2st_auc")),
-        "synthetic_sha256": digest, "implementation_sha256": report["implementation_sha256"],
-        "binary_sha256": raw.get("binary_sha256"), "source": source,
-        "official_tests_opened": False,
+        "synthetic_sha256": digest, "source": source, "official_tests_opened": False,
     }
 
 
@@ -172,7 +189,8 @@ def write_ledger(cells: list[dict], out: Path, contract: dict) -> dict:
     out.write_text(lines)
     meta = {"format": "dope-review-fix-v2-scalar-ledger", "cells": len(cells),
             "sha256": hashlib.sha256(lines.encode()).hexdigest(),
-            "predeclare_sha256": contract["sha256"], "official_tests_opened": False}
+            "predeclare_sha256": contract["sha256"], "evaluator_sha256": contract["implementation_sha256"],
+            "dependencies": contract["dependencies"], "official_tests_opened": False}
     out.with_suffix(".meta.json").write_text(json.dumps(meta, indent=1, sort_keys=True) + "\n")
     return meta
 
