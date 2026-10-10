@@ -271,7 +271,16 @@ The tables below are the fit-seed-$11$ review panels that preceded the five-seed
 
 \subsection{Historical block tables}
 \label{app:blocks}
-The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ receipts behind the first version of this paper; their intervals are lineage-bootstrap intervals of the median, and they are kept for continuity. The paired median difference is distinct from the difference of two medians. The two DOPE artifacts above the cap in that population are \MissA\ at \MissABytes\ bytes and \MissB\ at \MissBBytes\ bytes, and \NotInfName\ has a fit whose CatBoost group is uninformative, so the CatBoost median uses $\NDopeCb$ lineages while the byte count uses $\PreparedN$. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi. CatBoost reads RMSE $\RmseRealCb$ for the real-trained auditor and $\RmseSynCb$ for the synthetic-trained one, with training-mean skill $\RtwoRealCb$ and $\RtwoSynCb$; RMSE is the square root of the stored mean squared error, and conventional held-out $R^2$ is unstored for these rows.
+The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ receipts behind the first version of this paper; their intervals are lineage-bootstrap intervals of the median, and they are kept for continuity. The paired median difference is distinct from the difference of two medians. The two DOPE artifacts above the cap in that population are \MissA\ at \MissABytes\ bytes and \MissB\ at \MissBBytes\ bytes, and \NotInfName\ has a fit whose CatBoost group is uninformative, so the CatBoost median uses $\NDopeCb$ lineages while the byte count uses $\PreparedN$. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi. CatBoost reads RMSE $\RmseRealCb$ for the real-trained auditor and $\RmseSynCb$ for the synthetic-trained one, with training-mean skill $\RtwoRealCb$ and $\RtwoSynCb$; RMSE is the square root of the stored mean squared error, and conventional held-out $R^2$ is unstored for these rows. \cref{tab:hist-headline} collects the first version's headline contrasts. On its $\NForestCb$ Forest-Flow lineages the CatBoost medians are $\MedDopeForestCb$ for DOPE, whose artifacts have a median of \DopeForestByteMedian\ bytes, and $\MedForestCb$ [$\LoForestCb$, $\HiForestCb$] for Forest-Flow. The Nemenyi critical differences for the four density methods are $\FriedmanCdCb$ under CatBoost and $\FriedmanCdLin$ under the linear auditor.
+
+\begin{table}[t]
+\caption{\textbf{First-version headline contrasts at $4n$, fit seed 11.} Paired median DOPE-minus-baseline retention difference with W/T/L over lineages; a tie is a difference of zero. The ARF rows use the family-cluster interval of the review panel and its size-$4n$ Holm family of six. The density, neural, and Forest-Flow rows show each block's highest-median baseline with a lineage-bootstrap interval and the block's Holm family (nine, six, and three tests). The five-seed panel supersedes these rows; they are the traceability record of the first version.}
+\label{tab:hist-headline}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/headline-table.tex}\end{minipage}}
+\end{table}
 
 \begin{table}[t]
 \caption{\textbf{Density block at $4n$, fit seed 11.} Each cell is a retention; the denominator is the paired informative lineages in that row. Holm family size is nine. W/T/L counts lineages; a tie is a difference of zero.}
