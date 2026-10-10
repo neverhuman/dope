@@ -53,8 +53,9 @@ def rmse_table(payload: dict) -> str:
     ]
     return longtable(
         "\\textbf{CatBoost auditor RMSE, fit seed 11.} Median over regression lineages of the validation RMSE of the "
-        "auditor trained on synthetic rows and of the auditor trained on the real fit rows. RMSE is in each "
-        "lineage's target units, so a median mixes scales and is no cross-method ranking. No Holm family.",
+        "auditor trained on synthetic rows and of the auditor trained on the real fit rows. RMSE is on each "
+        "lineage's target min--max projected to $[0,1]$ by its training split, so a median mixes lineage "
+        "ranges and is no cross-method ranking. No Holm family.",
         "Method & Configuration & Size & Regression lineages & Synthetic RMSE & Real TRTR RMSE",
         lines,
         "lllrrr",
