@@ -327,7 +327,7 @@ The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ re
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Charged bytes, fit seed 11.} For DOPE artifacts the charge is the encoded model file plus \texttt{projection.json}. The denominator is the artifacts with a stored charge. No Holm family.}
+\caption{\textbf{Charged bytes, fit seed 11.} For DOPE artifacts the charge is the encoded model file plus \texttt{projection.json}. The DOPE, density, Forest-Flow, and ARF rows count every artifact with a stored charge; the CTGAN and TVAE rows count native-selected fits whose three $4n$ sample cells all succeeded, so main Table~1, which counts every charged lineage, prints different medians for them. No Holm family.}
 \label{tab:bytes}
 \centering
 \footnotesize
@@ -366,7 +366,7 @@ The real-row control draws the published training rows with replacement until th
 
 \section{Fidelity and empirical privacy}
 \label{app:privacy}
-\cref{tab:fidelity-hist} is the grouped-validation fidelity ledger of the fit-seed-$11$ population. On the density cells, DOPE has median logistic two-sample AUC $\CtwoDope$ ($\CtwoLo$ to $\CtwoHi$, $n=\CtwoN$), mean marginal Kolmogorov--Smirnov distance $\KsDope$ ($\KsLo$ to $\KsHi$, $n=\KsN$), and pairwise correlation fidelity $\CorrDope$ ($\CorrLo$ to $\CorrHi$, $n=\CorrN$); each count is the lineages with a complete three-seed fidelity group. A logistic detector near one half can still miss nonlinear differences, which is why the main paper reports a CatBoost detector. The DCR column of that ledger is the fraction of synthetic queries whose nearest reference is in the fit view, with ties scored one half. \DcrExchange\ The DOMIAS column is the isolated kernel density-ratio equation from the pinned author expression, evaluated on this numeric projection, which differs from the original DOMIAS training pipeline.
+\cref{tab:fidelity-hist} gives the alpha-precision, beta-recall, DCR-share, and DOMIAS columns of the grouped-validation fidelity ledger of the fit-seed-$11$ population. On the density cells of the same ledger, DOPE has median logistic two-sample AUC $\CtwoDope$ (95\% lineage-bootstrap interval $\CtwoLo$ to $\CtwoHi$, $n=\CtwoN$), mean marginal Kolmogorov--Smirnov distance $\KsDope$ ($\KsLo$ to $\KsHi$, $n=\KsN$), and pairwise correlation fidelity $\CorrDope$ ($\CorrLo$ to $\CorrHi$, $n=\CorrN$); each count is the lineages with a complete three-seed fidelity group, and \cref{tab:review-fidelity} prints the same medians with family-cluster intervals. A logistic detector near one half can still miss nonlinear differences, which is why the main paper reports a CatBoost detector. The DCR column of that ledger is the fraction of synthetic queries whose nearest reference is in the fit view, with ties scored one half. \DcrExchange\ The DOMIAS column is the isolated kernel density-ratio equation from the pinned author expression, evaluated on this numeric projection, which differs from the original DOMIAS training pipeline.
 
 \cref{tab:review-privacy} is the review privacy panel behind Table~3 of the main paper: for every method on the fit-seed-$11$ samples, a CatBoost two-sample detector with at most $200$ rows per class, the median distance to the closest fit row and to the closest validation row, the nearest-neighbour distance ratio against the fit rows, and a distance-based membership AUC. The fit reference holds about four times as many rows as the validation reference, so the distance to the fit rows is smaller by construction. None of these numbers is a differential-privacy guarantee or a HIPAA de-identification claim. Shadow-model attacks, attribute inference, and an attack on the shipped artifact are defined in predeclare\_v2 and are scheduled. \cref{tab:v2-fidelity} compares every arm's marginal, pairwise, and logistic-detector fidelity on the five-seed cells, and \cref{tab:review-fidelity} adds the stored fidelity of the fit-seed-$11$ population ledgers.
 
@@ -379,7 +379,7 @@ The real-row control draws the published training rows with replacement until th
 \endgroup
 
 \begin{table}[t]
-\caption{\textbf{Grouped-validation fidelity and empirical privacy, fit seed 11.} The fidelity denominator is the complete three-seed group count, distinct from the $\NDopeCb$ retention lineages. Holm families are 12 density tests and 8 neural tests, separate from retention.}
+\caption{\textbf{Grouped-validation fidelity and empirical privacy, fit seed 11.} Each cell is a median with its 95\% lineage-bootstrap interval. The fidelity denominator is the complete three-seed group count, distinct from the $\NDopeCb$ retention lineages. Holm families are 12 density tests and 8 neural tests, separate from retention.}
 \label{tab:fidelity-hist}
 \centering
 \footnotesize
@@ -405,7 +405,7 @@ The side-by-side columns use the common numeric projection and the published pil
 
 \section{Ablations and replay}
 \label{sec:ablation}
-\textbf{Step budget.} \texttt{features12\_\allowbreak{}steps8192} is the same residual with four times as many AdamW steps. Where both budgets have a complete three-seed group, the CatBoost median paired difference is $\DiffSufCb$ ($\NSufCb$ lineages); the linear medians are $\MedSufALin$ and $\MedSufBLin$ ($\NSufLin$ lineages; difference $\DiffSufLin$) and the MLP medians $\MedSufAMlp$ and $\MedSufBMlp$ ($\NSufMlp$ lineages; difference $\DiffSufMlp$). \cref{app:8192} lists every lineage. \textbf{Profile and default.} The main paper's untuned trainer default is a second axis (width and step budget together). The full width, step, readout, screening-size, and byte-budget grid, and the interaction stress suite (XOR, parity, products, many relevant features), are defined in predeclare\_v2 and scheduled.
+\textbf{Step budget.} \texttt{features12\_\allowbreak{}steps8192} is the same residual with four times as many AdamW steps. Where both budgets have a complete three-seed group, the CatBoost median paired difference, longer budget minus shorter, is $\DiffSufCb$ ($\NSufCb$ lineages); the linear medians are $\MedSufALin$ and $\MedSufBLin$ ($\NSufLin$ lineages; difference $\DiffSufLin$) and the MLP medians $\MedSufAMlp$ and $\MedSufBMlp$ ($\NSufMlp$ lineages; difference $\DiffSufMlp$). \cref{app:8192} lists every lineage. \textbf{Profile and default.} The main paper's untuned trainer default is a second axis (width and step budget together). The full width, step, readout, screening-size, and byte-budget grid, and the interaction stress suite (XOR, parity, products, many relevant features), are defined in predeclare\_v2 and scheduled.
 
 \textbf{Replay.} The scored runs did not store per-step losses; a later logged replay of both step budgets, before the readout refit, did. All $\ReplayN$ lineages finished. Median training loss starts at $\LossTrainStart$ and ends at $\LossTrainEndA$ and $\LossTrainEndB$; median validation loss starts at $\LossValStart$ and ends at $\LossValEndA$ and $\LossValEndB$. The replay files are distinct from the scored artifacts.
 
@@ -473,7 +473,7 @@ The side-by-side columns use the common numeric projection and the published pil
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-first12.tex}\end{minipage}}
 \end{table}
 
-\textbf{BeyondArena} (\texttt{\BeyondRevision}) is a separate fit check outside the $\PreparedN$ PMLB lineages. $\BeyondPrepared$ of the $\BeyondFamilies$ families in that check finished inside the cap, and $\BeyondFailed$ did not prepare ($\BeyondFeatureRange$ outside the projected range, $\BeyondOverlap$ overlapping); BeyondArena medians are \BeyondElapseA\ and \BeyondElapseB. The inventory of all $\BeyondInventory$ families is in \cref{app:beyond}. No retention auditor ran on BeyondArena.
+\textbf{BeyondArena} (\texttt{\BeyondRevision}) is a separate fit check outside the $\PreparedN$ PMLB lineages. $\BeyondPrepared$ of the $\BeyondFamilies$ families in that check finished inside the cap, and $\BeyondFailed$ did not prepare ($\BeyondFeatureRange$ outside the projected range, $\BeyondOverlap$ overlapping); the median elapsed times per family are \BeyondElapseA\ seconds for \texttt{steps2048} and \BeyondElapseB\ seconds for \texttt{steps8192}. The inventory of all $\BeyondInventory$ families is in \cref{app:beyond}. No retention auditor ran on BeyondArena.
 
 \begin{table}[t]
 \caption{\textbf{BeyondArena families that prepared.} The denominator is the $\BeyondFamilies$-family fit check, distinct from the $\BeyondInventory$-family inventory. No retention auditor and no Holm family.}
