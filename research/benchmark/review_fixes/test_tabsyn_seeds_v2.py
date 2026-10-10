@@ -5,11 +5,15 @@ is the repository copy, whose digest the amendment pins.
 """
 
 import ast
+import collections
+import datetime
+import errno
 import hashlib
 import json
 import os
 import struct
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -137,8 +141,8 @@ class TransformTests(unittest.TestCase):
         imported |= {node.module.split(".")[0] for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)}
         # numpy and torch load only after the runtime path switch, through the inventory guard.
         self.assertEqual(imported - {"numpy", "torch", "subprocess"}, {
-            "ast", "csv", "hashlib", "importlib", "json", "os", "struct", "sys", "time", "traceback", "types",
-            "pathlib"})
+            "ast", "csv", "errno", "hashlib", "importlib", "json", "os", "struct", "sys", "time", "traceback",
+            "types", "pathlib"})
         self.assertNotIn("exec(", (HERE / "tabsyn_seeds_worker.py").read_text())
 
     def test_the_loaded_adapter_admits_the_declared_seeds_and_no_other(self):
@@ -254,23 +258,41 @@ class ResumeTests(unittest.TestCase):
         attempt.mkdir(parents=True, exist_ok=True)
         (attempt / name).write_text(json.dumps(fields))
 
-    def test_fit_status_reads_exit_codes_and_receipts(self):
+    def test_outcome_retries_only_a_confirmed_listed_cause(self):
+        confirmed = {"foreign_gpu_owner"}
+
+        def confirm(cause, _attempt):
+            return cause in confirmed
+
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.receipt(root / "ok", "fit.complete.receipt.json", status="ok")
             self.receipt(root / "deadline", "fit.failure.receipt.json", status="operation_failed",
-                         exception_type="TimeoutError")
-            self.receipt(root / "cuda", "fit.failure.receipt.json", status="infrastructure_failure",
-                         exception_type="RuntimeError")
+                         exception_type="TimeoutError", cause=None)
+            self.receipt(root / "gpu", "fit.failure.receipt.json", status="infrastructure_failure",
+                         exception_type="RuntimeError", cause="foreign_gpu_owner")
+            self.receipt(root / "claimed", "fit.failure.receipt.json", status="infrastructure_failure",
+                         exception_type="OSError", cause="storage_refusal")
+            self.receipt(root / "invented", "fit.failure.receipt.json", status="infrastructure_failure",
+                         exception_type="RuntimeError", cause="cosmic_ray")
             self.receipt(root / "nan", "fit.failure.receipt.json", status="operation_failed",
-                         exception_type="ValueError")
-            (root / "silent").mkdir()
-            self.assertEqual(T.fit_status(root / "ok", 0), ("ok", None))
-            self.assertEqual(T.fit_status(root / "ok", 124), ("timeout", "wall"))
-            self.assertEqual(T.fit_status(root / "deadline", 2), ("timeout", "deadline"))
-            self.assertEqual(T.fit_status(root / "cuda", 2), ("infrastructure_failure", "RuntimeError"))
-            self.assertEqual(T.fit_status(root / "nan", 2), ("failed", "ValueError"))
-            self.assertEqual(T.fit_status(root / "silent", -9), ("infrastructure_failure", "no_receipt"))
+                         exception_type="ValueError", cause=None)
+            self.receipt(root / "request", "request.failure.receipt.json", status="infrastructure_failure",
+                         exception_type="RuntimeError", cause="foreign_gpu_owner")
+            self.receipt(root / "post-cuda", "worker.CUDA-initialized.receipt.json", pid=1)
+            cases = {("ok", 0): ("ok", None), ("ok", 124): ("timeout", "wall"),
+                     ("deadline", 2): ("timeout", "deadline"),
+                     ("gpu", 2): ("infrastructure_failure", "foreign_gpu_owner"),
+                     ("claimed", 2): ("failed", "OSError"), ("invented", 2): ("failed", "RuntimeError"),
+                     ("nan", 2): ("failed", "ValueError"),
+                     ("request", 2): ("infrastructure_failure", "foreign_gpu_owner"),
+                     ("post-cuda", -9): ("unknown", "no_final_receipt"),
+                     ("post-cuda", 0): ("unknown", "no_final_receipt")}
+            for (name, code), expected in cases.items():
+                with self.subTest(name=name, code=code):
+                    self.assertEqual(T.outcome(root / name, "fit", code, confirm), expected)
+            confirmed.add("host_reboot")
+            self.assertEqual(T.outcome(root / "post-cuda", "fit", None, confirm), ("infrastructure_failure", "host_reboot"))
 
     def test_charged_bytes_leave_out_intermediate_diffusion_checkpoints(self):
         inventory = {"files": {"diffusion.safetensors": {"bytes": 50}, "diffusion-epoch-0.safetensors": {"bytes": 50},
@@ -281,7 +303,7 @@ class ResumeTests(unittest.TestCase):
         self.assertTrue(T.needs_attempt(None))
         self.assertTrue(T.needs_attempt({"status": "infrastructure_failure", "attempts": 1}))
         self.assertFalse(T.needs_attempt({"status": "infrastructure_failure", "attempts": 2}))
-        for status in ("ok", "failed", "timeout", "done"):
+        for status in ("ok", "failed", "timeout", "done", "unknown"):
             self.assertFalse(T.needs_attempt({"status": status, "attempts": 1}))
 
     def test_a_killed_sample_operation_keeps_the_cells_it_finished(self):
@@ -293,8 +315,122 @@ class ResumeTests(unittest.TestCase):
             self.receipt(attempt, W.cell_receipt_name(cells[0]), **cells[0], status="ok", reason=None,
                          synthetic_sha256="a" * 64)
             statuses = T.sample_status(attempt, cells, 124)
+            silent = T.sample_status(attempt, cells, -9)
+            self.receipt(attempt, "sample.failure.receipt.json", status="operation_failed", cause=None)
+            failed = T.sample_status(attempt, cells, 2)
         self.assertEqual([item["status"] for item in statuses], ["ok"] + ["timeout"] * 5)
+        self.assertEqual([item["status"] for item in silent], ["ok"] + ["unknown"] * 5)
+        self.assertEqual([item["status"] for item in failed], ["ok"] + ["failed"] * 5)
         self.assertTrue(all("path" not in item for item in statuses))
+
+
+class FakeProcess:
+    """A worker that exits 0 at once without writing a receipt."""
+
+    pid = 0
+
+    def __init__(self, argv, **_kwargs):
+        self.argv = argv
+
+    def wait(self, timeout=None):
+        return 0
+
+
+class ControllerTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.amendment = T.load_amendment()
+        self.close = datetime.datetime.fromisoformat(self.amendment["close_utc"].replace("Z", "+00:00")).timestamp()
+        self.now = [self.close - 100.0]
+        self.controller = T.Controller(self.amendment, self.root / "out", "c" * 40, [],
+                                       runtime={"python": "/bin/false", "LD_LIBRARY_PATH": ""},
+                                       clock=lambda: self.now[0], boot=lambda: "boot-a")
+        self.row = {"dataset": DATASET, "train_rows": 2, "files": {}, "projection_sha256": "p" * 64,
+                    "joint_train_sha256": "t" * 64, "joint_validation_sha256": "v" * 64}
+        self.cell = self.root / "out" / DATASET / "fit-23"
+        self.lock = self.root / "gpu.lock"
+        quiet = patch.object(T, "gpu_name", lambda: None)
+        quiet.start()
+        self.addCleanup(quiet.stop)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_a_gpu_lock_released_after_close_starts_no_worker(self):
+        def wait(_units):
+            self.now[0] = self.close + 5
+
+        with patch.object(T.v1, "_wait_to_fit", wait), \
+                patch.object(T.subprocess, "Popen", side_effect=AssertionError("spawned after close")):
+            self.controller.run([(23, self.row)], self.lock)
+        self.assertEqual(list(self.cell.glob("attempt-*")), [])
+
+    def test_a_fit_that_crosses_close_starts_no_sample(self):
+        def fit(*_args):
+            self.now[0] = self.close + 5
+            return {"status": "ok", "attempts": 1}
+
+        with patch.object(T.v1, "_wait_to_fit", lambda _units: None), patch.object(self.controller, "fit", fit), \
+                patch.object(self.controller, "sample", side_effect=AssertionError("sampled after close")):
+            self.controller.run([(23, self.row)], self.lock)
+
+    def test_every_operation_deadline_is_cut_at_close_and_a_silent_exit_is_unknown(self):
+        with patch.object(T.subprocess, "Popen", FakeProcess):
+            record = self.controller.fit(23, self.row, self.cell, None)
+        request = json.loads((self.cell / "attempt-1" / "fit" / "operation.request.json").read_text())
+        self.assertEqual((request["cap_seconds"], request["operation_seconds"]), (600, 100))
+        self.assertEqual((request["boot_id"], request["close_utc"]), ("boot-a", self.amendment["close_utc"]))
+        self.assertEqual((record["status"], record["reason"]), ("unknown", "no_final_receipt"))
+        self.assertFalse(T.needs_attempt(record))
+
+    def test_a_stopped_controllers_attempt_is_adopted_and_its_key_never_reused(self):
+        attempt = self.cell / "attempt-1" / "fit"
+        attempt.mkdir(parents=True)
+        (attempt / "operation.request.json").write_text(json.dumps({"boot_id": "boot-a"}))
+        same_boot = self.controller.adopt(23, self.row, self.cell, "fit")
+        self.assertEqual((same_boot["status"], same_boot["attempts"]), ("unknown", 1))
+        self.controller.boot = lambda: "boot-b"
+        rebooted = self.controller.adopt(23, self.row, self.cell, "fit")
+        self.assertEqual((rebooted["status"], rebooted["reason"]), ("infrastructure_failure", "host_reboot"))
+        self.assertTrue(T.needs_attempt(rebooted))
+        with patch.object(T.subprocess, "Popen", FakeProcess):
+            retried = self.controller.fit(23, self.row, self.cell, rebooted)
+        self.assertEqual(retried["attempts"], 2)
+        self.assertFalse(T.needs_attempt(retried))
+        self.assertIsNone(self.controller.adopt(37, self.row, self.root / "out" / DATASET / "fit-37", "fit"))
+
+    def test_a_listed_cause_is_confirmed_by_the_controllers_own_observation(self):
+        attempt = self.root / "attempt"
+        attempt.mkdir()
+        usage = collections.namedtuple("usage", "total used free")
+        for pids, expected in (({1234}, True), (set(), False), (None, False)):
+            with self.subTest(pids=pids), patch.object(T.v1, "_compute_pids", lambda pids=pids: pids):
+                self.assertIs(self.controller.confirm("foreign_gpu_owner", attempt), expected)
+        for free, expected in ((0, True), (1 << 40, False)):
+            with self.subTest(free=free), patch.object(T.shutil, "disk_usage", lambda _p, free=free: usage(1, 1, free)):
+                self.assertIs(self.controller.confirm("storage_refusal", attempt), expected)
+        lock = self.root / "runtime.lock.json"
+        lock.write_bytes(b"x")
+        self.controller.amendment = {**self.amendment, "runtime": {"path": str(lock), "sha256": sha(b"x")}}
+        self.assertFalse(self.controller.confirm("runtime_lock_mismatch", attempt))
+        lock.write_bytes(b"y")
+        self.assertTrue(self.controller.confirm("runtime_lock_mismatch", attempt))
+        self.assertFalse(self.controller.confirm("cosmic_ray", attempt))
+
+    def test_the_worker_names_only_predeclared_causes(self):
+        self.assertEqual(W.listed_cause(OSError(errno.ENOSPC, "full")), "storage_refusal")
+        self.assertEqual(W.listed_cause(RuntimeError("foreign_gpu_owner")), "foreign_gpu_owner")
+        self.assertEqual(W.listed_cause(RuntimeError("runtime_lock_mismatch")), "runtime_lock_mismatch")
+        for error in (RuntimeError("operation_identity_differs"), ValueError("x"), OSError(errno.EIO, "io")):
+            self.assertIsNone(W.listed_cause(error))
+        receipt = W.failure_receipt(RuntimeError("joint_input_differs"), time.monotonic(), "r", True)
+        self.assertEqual((receipt["status"], receipt["cause"], receipt["cuda_initialized"]),
+                         ("operation_failed", None, True))
+        lock = self.root / "lock.json"
+        lock.write_bytes(b"x")
+        with self.assertRaisesRegex(RuntimeError, "runtime_lock_mismatch"):
+            W.runtime_lock({"runtime": {"path": str(lock), "sha256": "0" * 64}})
 
 
 class LedgerTests(unittest.TestCase):

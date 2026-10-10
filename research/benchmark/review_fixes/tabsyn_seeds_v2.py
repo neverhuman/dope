@@ -16,9 +16,11 @@ from __future__ import annotations
 import argparse
 import datetime
 import fcntl
+import functools
 import hashlib
 import json
 import os
+import shutil
 import signal
 import subprocess
 import time
@@ -133,25 +135,48 @@ def child_env(runtime: dict) -> dict[str, str]:
             "PYTHONDONTWRITEBYTECODE": "1"}
 
 
-def fit_status(attempt: Path, code: int) -> tuple[str, str | None]:
-    """Final status of one fit operation from its exit code and receipts."""
-    complete, failure = attempt / "fit.complete.receipt.json", attempt / "fit.failure.receipt.json"
-    if code == 0 and complete.is_file():
+LISTED_CAUSES = ("host_reboot", "foreign_gpu_owner", "storage_refusal", "runtime_lock_mismatch")
+LOW_DISK_BYTES = 1 << 30
+
+
+def boot_id() -> str:
+    return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+
+
+def failure_receipt(attempt: Path, mode: str) -> dict | None:
+    for name in (f"{mode}.failure.receipt.json", "request.failure.receipt.json"):
+        receipt = v1._read_json(attempt / name)
+        if receipt is not None:
+            return receipt
+    return None
+
+
+def outcome(attempt: Path, mode: str, code: int | None, confirm) -> tuple[str, str | None]:
+    """Status of one operation from its exit code and receipts.
+
+    A retryable infrastructure failure needs a predeclared cause that ``confirm``
+    establishes on the controller's side; the worker's receipt alone is a claim.
+    An operation that leaves no final receipt in the same boot is unknown and final.
+    """
+    if code in (0, None) and (attempt / f"{mode}.complete.receipt.json").is_file():
         return "ok", None
     if code == 124:
         return "timeout", "wall"
-    if failure.is_file():
-        receipt = json.loads(failure.read_text())
-        if receipt["exception_type"] == "TimeoutError":
+    receipt = failure_receipt(attempt, mode)
+    if receipt is not None:
+        if receipt.get("exception_type") == "TimeoutError":
             return "timeout", "deadline"
-        if receipt["status"] == "infrastructure_failure":
-            return "infrastructure_failure", receipt["exception_type"]
-        return "failed", receipt["exception_type"]
-    return "infrastructure_failure", "no_receipt"
+        cause = receipt.get("cause")
+        if cause in LISTED_CAUSES and confirm(cause, attempt):
+            return "infrastructure_failure", cause
+        return "failed", receipt.get("exception_type")
+    if confirm("host_reboot", attempt):
+        return "infrastructure_failure", "host_reboot"
+    return "unknown", "no_final_receipt"
 
 
 def needs_attempt(record: dict | None) -> bool:
-    """Run when absent; one retry after an infrastructure failure; every other status is final."""
+    """Run when absent; one retry after a confirmed infrastructure failure; every other status is final."""
     if record is None:
         return True
     return record["status"] == "infrastructure_failure" and record["attempts"] < 2
@@ -162,9 +187,10 @@ def sample_cells(row: dict, cell: Path, sizes: list[int], seeds: list[int]) -> l
              "path": str(cell / f"sample-{seed}-{size}n.csv")} for size in sizes for seed in seeds]
 
 
-def sample_status(attempt: Path, cells: list[dict], code: int) -> list[dict]:
-    """Per-cell status from the worker's per-cell receipt; a cell without one failed with the operation."""
-    unfinished = "timeout" if code == 124 else "failed"
+def sample_status(attempt: Path, cells: list[dict], code: int | None) -> list[dict]:
+    """Per-cell status from the worker's per-cell receipt; a cell without one shares the operation's end."""
+    ended = (attempt / "sample.complete.receipt.json").is_file() or failure_receipt(attempt, "sample") is not None
+    unfinished = "timeout" if code == 124 else ("failed" if ended else "unknown")
     statuses = []
     for item in cells:
         receipt = v1._read_json(attempt / W.cell_receipt_name(item))
@@ -173,18 +199,45 @@ def sample_status(attempt: Path, cells: list[dict], code: int) -> list[dict]:
     return statuses
 
 
+def attempt_number(path: Path) -> int:
+    return int(path.name.rsplit("-", 1)[1])
+
+
 class Controller:
-    def __init__(self, amendment: dict, out: Path, git_sha: str, yield_units: list[str]):
+    def __init__(self, amendment: dict, out: Path, git_sha: str, yield_units: list[str], *,
+                 runtime: dict | None = None, clock=time.time, boot=boot_id):
         self.amendment, self.out, self.git_sha, self.yield_units = amendment, out, git_sha, yield_units
-        self.runtime = json.loads(W.checked(amendment["runtime"]["path"], amendment["runtime"]["sha256"]))
+        self.runtime = runtime if runtime is not None else json.loads(
+            W.checked(amendment["runtime"]["path"], amendment["runtime"]["sha256"]))
+        self.clock, self.boot = clock, boot
+        self.close = datetime.datetime.fromisoformat(amendment["close_utc"].replace("Z", "+00:00")).timestamp()
         self.ticks = W.start_ticks(os.getpid())
         self.worker_sha = v1._sha256(WORKER)
 
-    def request(self, mode: str, seed: int, row: dict, attempt: int, seconds: int) -> dict:
+    def bounded(self, cap: int) -> int:
+        """An operation's seconds: its cap, cut at the campaign close."""
+        return min(cap, int(self.close - self.clock()))
+
+    def confirm(self, cause: str, attempt: Path) -> bool:
+        """Establish a listed cause independently of the worker's own report."""
+        if cause == "host_reboot":
+            request = v1._read_json(attempt / "operation.request.json") or {}
+            return bool(request.get("boot_id")) and request["boot_id"] != self.boot()
+        if cause == "foreign_gpu_owner":
+            # The worker has exited, so any compute process still on the GPU is foreign.
+            return bool(v1._compute_pids())
+        if cause == "storage_refusal":
+            return shutil.disk_usage(self.out).free < LOW_DISK_BYTES
+        if cause == "runtime_lock_mismatch":
+            path = Path(self.amendment["runtime"]["path"])
+            return not path.is_file() or v1._sha256(path) != self.amendment["runtime"]["sha256"]
+        return False
+
+    def request(self, mode: str, seed: int, row: dict, attempt: int, cap: int) -> dict:
         amendment = self.amendment
         return {"format": "dope-review-fix-tabsyn-seed-operation", "mode": mode, "fit_seed": seed,
                 "attempt": attempt, "host": amendment["host"], "cpu_slot": amendment["cpu_slot"],
-                "controller_pid": os.getpid(), "controller_start_ticks": self.ticks,
+                "controller_pid": os.getpid(), "controller_start_ticks": self.ticks, "boot_id": self.boot(),
                 "admitted_fit_seeds": amendment["admitted_fit_seeds"], "config": amendment["config"],
                 "runtime": amendment["runtime"], "adapter": amendment["adapter"],
                 "worker_code_sha256": self.worker_sha,
@@ -192,10 +245,11 @@ class Controller:
                 "train_rows": row["train_rows"], "projection_sha256": row["projection_sha256"],
                 "joint_train_sha256": row["joint_train_sha256"],
                 "joint_validation_sha256": row["joint_validation_sha256"],
-                "operation_seconds": seconds, "official_tests_opened": False}
+                "cap_seconds": cap, "close_utc": amendment["close_utc"], "operation_seconds": self.bounded(cap),
+                "official_tests_opened": False}
 
     def operate(self, attempt: Path, request: dict) -> tuple[int, float, dict]:
-        """Run one worker operation under its cap; the process group is killed at the cap."""
+        """Run one worker operation until the earlier of its cap and the close; then kill its process group."""
         attempt.mkdir(parents=True, exist_ok=False)
         started = time.monotonic()
         request = {**request, "operation_started_monotonic": started,
@@ -217,17 +271,15 @@ class Controller:
                 code = 124
         return code, time.monotonic() - started, ref
 
-    def fit(self, seed: int, row: dict, cell: Path, previous: dict | None) -> dict:
-        number = 1 + (previous["attempts"] if previous else 0)
-        attempt = cell / f"attempt-{number}" / "fit"
-        request = self.request("fit", seed, row, number, self.amendment["caps"]["fit_operation_seconds"])
-        code, elapsed, ref = self.operate(attempt, request)
-        status, reason = fit_status(attempt, code)
+    def fit_record(self, seed: int, row: dict, cell: Path, attempt: Path, code: int | None,
+                   elapsed: float | None) -> dict:
+        status, reason = outcome(attempt, "fit", code, self.confirm)
+        request_path = attempt / "operation.request.json"
+        ref = {"path": str(request_path), "sha256": v1._sha256(request_path)} if request_path.is_file() else None
         record = {"method": "TabSyn", "configuration": self.amendment["configuration"], "dataset": row["dataset"],
-                  "fit_seed": seed, "status": status, "reason": reason, "attempts": number,
-                  "returncode": code, "elapsed_seconds": round(elapsed, 3), "request": ref,
-                  "attempt_dir": str(attempt), "gpu": gpu_name(),
-                  "official_tests_opened": False}
+                  "fit_seed": seed, "status": status, "reason": reason, "attempts": attempt_number(attempt.parent),
+                  "returncode": code, "elapsed_seconds": None if elapsed is None else round(elapsed, 3),
+                  "request": ref, "attempt_dir": str(attempt), "gpu": gpu_name(), "official_tests_opened": False}
         if status == "ok":
             receipt = json.loads((attempt / "fit.complete.receipt.json").read_text())["result"]
             fitted, inventory = receipt["result"], receipt["inventory"]
@@ -241,6 +293,29 @@ class Controller:
         print(f"fit {status} {row['dataset']} {seed}", flush=True)
         return record
 
+    def sample_record(self, seed: int, row: dict, cell: Path, attempt: Path, code: int | None,
+                      elapsed: float | None) -> dict:
+        cells = sample_cells(row, cell, self.amendment["sizes"], self.amendment["sample_seeds"])
+        status, reason = outcome(attempt, "sample", code, self.confirm)
+        request_path = attempt / "operation.request.json"
+        record = {"dataset": row["dataset"], "fit_seed": seed, "attempts": attempt_number(attempt),
+                  "returncode": code, "status": "infrastructure_failure" if status == "infrastructure_failure"
+                  else "done", "reason": reason,
+                  "elapsed_seconds": None if elapsed is None else round(elapsed, 3),
+                  "request": {"path": str(request_path), "sha256": v1._sha256(request_path)}
+                  if request_path.is_file() else None,
+                  "cells": sample_status(attempt, cells, code), "official_tests_opened": False}
+        v1._atomic_json(cell / SAMPLE_RECORD, record)
+        print(f"sample {record['status']} {row['dataset']} {seed}", flush=True)
+        return record
+
+    def fit(self, seed: int, row: dict, cell: Path, previous: dict | None) -> dict:
+        number = 1 + (previous["attempts"] if previous else 0)
+        attempt = cell / f"attempt-{number}" / "fit"
+        code, elapsed, _ref = self.operate(
+            attempt, self.request("fit", seed, row, number, self.amendment["caps"]["fit_operation_seconds"]))
+        return self.fit_record(seed, row, cell, attempt, code, elapsed)
+
     def sample(self, seed: int, row: dict, cell: Path, fit: dict, previous: dict | None) -> dict:
         number = 1 + (previous["attempts"] if previous else 0)
         attempt = cell / f"attempt-{fit['attempts']}" / f"sample-{number}"
@@ -248,39 +323,47 @@ class Controller:
         request = {**self.request("sample", seed, row, number, self.amendment["caps"]["sample_operation_seconds"]),
                    "artifact_path": fit["artifact"], "artifact_inventory": fit["inventory"],
                    "fit_ref": fit["request"], "samples": cells}
-        code, elapsed, ref = self.operate(attempt, request)
-        failure = attempt / "sample.failure.receipt.json"
-        infrastructure = failure.is_file() and json.loads(failure.read_text())["status"] == "infrastructure_failure"
-        record = {"dataset": row["dataset"], "fit_seed": seed, "attempts": number, "returncode": code,
-                  "status": "infrastructure_failure" if infrastructure else "done",
-                  "elapsed_seconds": round(elapsed, 3), "request": ref, "cells": sample_status(attempt, cells, code),
-                  "official_tests_opened": False}
-        v1._atomic_json(cell / SAMPLE_RECORD, record)
-        print(f"sample {record['status']} {row['dataset']} {seed}", flush=True)
-        return record
+        code, elapsed, _ref = self.operate(attempt, request)
+        return self.sample_record(seed, row, cell, attempt, code, elapsed)
+
+    def adopt(self, seed: int, row: dict, cell: Path, mode: str) -> dict | None:
+        """Record the last attempt a stopped controller left without a record; no attempt key is reused."""
+        pattern = "attempt-*/fit" if mode == "fit" else "attempt-*/sample-*"
+        found = sorted(cell.glob(pattern), key=lambda path: (
+            attempt_number(path.parent if mode == "fit" else path), str(path)))
+        if not found:
+            return None
+        writer = self.fit_record if mode == "fit" else self.sample_record
+        return writer(seed, row, cell, found[-1], None, None)
+
+    def locked(self, gpu_lock: Path, operation):
+        """Wait for the host, take the GPU lock, and start the operation only while the campaign is open."""
+        if self.bounded(1) < 1:
+            print("close reached; no new operation starts", flush=True)
+            return None
+        v1._wait_to_fit(self.yield_units)
+        with gpu_lock.open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            if self.bounded(1) < 1:
+                print("close reached while waiting; no new operation starts", flush=True)
+                return None
+            return operation()
 
     def run(self, plan: list[tuple[int, dict]], gpu_lock: Path) -> None:
-        close = datetime.datetime.fromisoformat(self.amendment["close_utc"].replace("Z", "+00:00"))
         for seed, row in plan:
-            if datetime.datetime.now(datetime.timezone.utc) >= close:
-                print("close reached; no new operation starts", flush=True)
-                return
             cell = self.out / row["dataset"] / f"fit-{seed}"
             cell.mkdir(parents=True, exist_ok=True)
-            fit = v1._read_json(cell / FIT_RECORD)
+            fit = v1._read_json(cell / FIT_RECORD) or self.adopt(seed, row, cell, "fit")
             if needs_attempt(fit):
-                v1._wait_to_fit(self.yield_units)
-                with gpu_lock.open("a") as lock:
-                    fcntl.flock(lock, fcntl.LOCK_EX)
-                    fit = self.fit(seed, row, cell, fit)
+                fit = self.locked(gpu_lock, functools.partial(self.fit, seed, row, cell, fit))
+                if fit is None:
+                    return
             if fit["status"] != "ok":
                 continue
-            samples = v1._read_json(cell / SAMPLE_RECORD)
-            if needs_attempt(samples):
-                v1._wait_to_fit(self.yield_units)
-                with gpu_lock.open("a") as lock:
-                    fcntl.flock(lock, fcntl.LOCK_EX)
-                    self.sample(seed, row, cell, fit, samples)
+            samples = v1._read_json(cell / SAMPLE_RECORD) or self.adopt(seed, row, cell, "sample")
+            if needs_attempt(samples) and self.locked(
+                    gpu_lock, functools.partial(self.sample, seed, row, cell, fit, samples)) is None:
+                return
 
 
 def ledger(plan: list[tuple[int, dict]], out: Path, amendment: dict) -> tuple[list[dict], list[dict]]:
