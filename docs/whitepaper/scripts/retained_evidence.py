@@ -33,6 +33,10 @@ FIELDS = ("catboost_retention", "linear_retention", "mlp_retention",
           "dcr_fit_median", "dcr_validation_median", "nndr_fit_median",
           "distance_mia_auc", "domias_kde_auc")
 PAIR_FIELDS = ("catboost_retention", "marginal_error_mean", "c2st_catboost_auc", "distance_mia_auc")
+# Every (method, selection binding) the pinned classical panel may hold; any other row is refused before grouping.
+ARMS = {("ARF", "author_default"), ("ARF", "native_selected"), ("Chow-Liu", "author_default"),
+        ("Chow-Liu", "native_selected"), ("GaussianCopula", "author_default"),
+        ("GaussianCopula", "native_selected"), ("TabSyn", "scaled_author_default")}
 LABELS = {"ARF": "ARF", "Chow-Liu": "Chow--Liu", "GaussianCopula": "Copula", "TabSyn": "TabSyn"}
 
 
@@ -58,6 +62,8 @@ def finite(value):
 def groups_from_rows(rows):
     groups = defaultdict(list)
     for index, row in enumerate(rows):
+        if (row.get("method"), row.get("selection_binding")) not in ARMS:
+            raise ValueError("undeclared method or configuration")
         if row["fit_seed"] != 11:
             raise ValueError("unexpected fit seed")
         key = (row["method"], row["selection_binding"], row["row_multiplier"], row["dataset"])

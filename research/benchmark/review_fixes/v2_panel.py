@@ -58,6 +58,9 @@ DESCRIPTIVE = {
 }
 
 
+ROSTER = frozenset({HEADLINE, *DESCRIPTIVE, *(arm for members in FAMILIES.values() for arm in members)})
+
+
 def family_of_arm(arm: tuple[str, str]) -> str:
     for name, members in FAMILIES.items():
         if arm in members:
@@ -67,12 +70,21 @@ def family_of_arm(arm: tuple[str, str]) -> str:
     raise ValueError(f"arm {arm} is in no declared family and no descriptive list")
 
 
+def check_roster(cells: list[dict]) -> None:
+    """Refuse any cell outside the declared arms before grouping, whatever its utility or fidelity content."""
+    for cell in cells:
+        arm = (cell.get("method"), cell.get("configuration"))
+        if arm not in ROSTER:
+            raise ValueError(f"arm {arm} is in no declared family and no descriptive list")
+
+
 def min_fits(arm: tuple[str, str]) -> int:
     return S.MIN_FITS_FIVE_SEED if arm in FIVE_SEED else 1
 
 
 def fit_values(cells: list[dict], names: dict[str, str]) -> dict:
     """(arm, size, auditor) -> fit items. A fit needs three ok informative sample seeds."""
+    check_roster(cells)
     triples: dict[tuple, dict[int, float | None]] = defaultdict(dict)
     for cell in cells:
         arm = (cell["method"], cell["configuration"])
@@ -101,6 +113,7 @@ FIDELITY = ("marginal_ks_mean", "pair_correlation_fidelity", "c2st_auc_logistic"
 
 def fidelity_values(cells: list[dict], names: dict[str, str]) -> dict:
     """(arm, size, metric) -> fit items; a fit value is the median over its three sample seeds."""
+    check_roster(cells)
     triples: dict[tuple, dict[int, float]] = defaultdict(dict)
     for cell in cells:
         arm = (cell["method"], cell["configuration"])
@@ -187,6 +200,7 @@ def cap_sensitivity(values: dict, excluded: list[str], comparators: list[tuple],
 def reduce(cells: list[dict], names: dict[str, str], draws: int = S.DRAWS, jobs: int | None = None,
            predeclare: bytes | None = None, fits: list[dict] | None = None) -> dict:
     jobs = min(os.cpu_count() or 1, 16) if jobs is None else jobs
+    check_roster(cells)
     values = fit_values(cells, names)
     arms = sorted({key[0] for key in values})
     level_tasks = [("level", (arm, size, auditor), values[(arm, size, auditor)], f"level|{arm}|{size}|{auditor}",
