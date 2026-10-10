@@ -1,7 +1,13 @@
-\begin{tabular}{lllllrr}
+\begin{longtable}{lllllrr}
+\caption{\textbf{Source-family sensitivity, fit seed 11.} A DOPE row is the median DOPE retention within one source family; a comparator row is the median DOPE-minus-comparator difference on that family, under CatBoost. The excluding-simulated rows drop the four simulated families. Intervals are the family-cluster bootstrap. These rows are a sensitivity, printed without Holm $p$-values.}\label{tab:review-family}\\
 \toprule
 Family & Size & Auditor & Contrast & $n$ & Median & Hierarchical CI \\
 \midrule
+\endfirsthead
+\toprule
+Family & Size & Auditor & Contrast & $n$ & Median & Hierarchical CI \\
+\midrule
+\endhead
 feynman & 1$n$ & catboost & DOPE & 20 & 0.9703 & [0.9454, 0.9906] \\
 feynman & 1$n$ & catboost & GaussianCopula & 20 & 0.2002 & [0.1097, 0.2549] \\
 feynman & 1$n$ & catboost & Chow-Liu & 20 & 0.3253 & [0.2200, 0.4252] \\
@@ -69,4 +75,4 @@ excluding simulated & 4$n$ & catboost & GaussianCopula & 33 & 0.1912 & [0.0762, 
 excluding simulated & 4$n$ & catboost & Chow-Liu & 33 & 0.4514 & [0.2957, 0.6687] \\
 excluding simulated & 4$n$ & catboost & independent\_marginals & 33 & 0.9293 & [0.8699, 1.0026] \\
 \bottomrule
-\end{tabular}
+\end{longtable}

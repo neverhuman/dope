@@ -1,8 +1,13 @@
-% Wilcoxon and the TOST t-tests treat paired lineages as iid. The interval is the family-cluster bootstrap of the median. Holm families are separate for size n and size 4n (density 9, neural 6, ARF 6, Forest-Flow 3).
-\begin{tabular}{lllllrrllrl}
+\begin{longtable}{lllllrrllrl}
+\caption{\textbf{DOPE minus comparator at both sizes, fit seed 11.} Median paired retention difference with its family-cluster bootstrap 95\% interval, the mean difference, and the v1 mean-difference equivalence test at $\pm 0.02$. W/T/L counts lineages. The Wilcoxon and equivalence tests treat lineages as independent. Holm families are separate per size: density 9, neural 6, ARF 6, and Forest-Flow 3 tests.}\label{tab:review-paired}\\
 \toprule
 Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
 \midrule
+\endfirsthead
+\toprule
+Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
+\midrule
+\endhead
 1$n$ & catboost & GaussianCopula & native\_selected & 97 & 0.2178 & [0.1028, 0.3340] & 0.2483 & no & 90/0/7 & 0.000 \\
 1$n$ & catboost & Chow-Liu & native\_selected & 97 & 0.3635 & [0.2986, 0.5314] & 7.7460 & no & 93/0/4 & 0.000 \\
 1$n$ & catboost & independent\_marginals & native\_selected & 97 & 0.9238 & [0.8575, 1.0178] & 1.1580 & no & 97/0/0 & 0.000 \\
@@ -52,4 +57,4 @@ Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical 
 4$n$ & linear & ForestDiffusion/Forest-Flow & native\_selected & 5 & 0.0115 & [-0.2599, 0.3016] & 0.0118 & no & 3/0/2 & 0.812 \\
 4$n$ & mlp & ForestDiffusion/Forest-Flow & native\_selected & 4 & -0.0317 & [-0.2275, -0.0102] & -0.0753 & no & 0/0/4 & 0.375 \\
 \bottomrule
-\end{tabular}
+\end{longtable}
