@@ -25,7 +25,7 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
 | CM-15 | v3 scorer drops the v2 prerequisites | Port the checks | closed in a4be7ed |
 | CM-16 | Matched null: band in the contract, median-of-3 in code | Agree | closed in a4be7ed |
 | CM-17 | Near-copy floor: quantile vs minimum | Agree | closed in a4be7ed |
-| CM-18 | Reducer overwrites duplicate keys | Fail closed | closed; every v2 binder refuses a duplicate identity |
+| CM-18 | Reducer overwrites duplicate keys | Fail closed | closed; every v2 binder refuses a duplicate identity, and `v2_panel.reduce` refuses a duplicate sample cell and any arm outside its declared roster before grouping |
 | CM-19 | compute_panel inputs not SHA-pinned | Pinned loader | closed at d75f10f; the v2 ledger, fit ledger, panel, and byte ledgers are in the review input lock |
 | CM-20 | C2ST n=98 vs 97; BeyondArena 12 vs 142 | Explicit denominators | closed; `paper_consistency.check_v2` checks every paired n against both level counts |
 | CM-21 | Related-work taxonomy mixes families and evaluation | Restructure | closed: generators, compact program models, evaluation |
@@ -44,7 +44,7 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
 | PR-13 | Novelty claimed on the metric; marginal-median teaser | Credit TSTR/TRTR; paired teaser | closed: Fig. 1 is the paired forest plot of DOPE minus every comparator and control |
 | RS-01 | ARF missing from the abstract and Fig. 1 | Paired ARF difference in both | closed |
 | RS-02 | TabSyn tables lack a DOPE row on the same lineages | Matched DOPE rows | closed: supplement `tab:review-tabsyn` and every v2 contrast pair on shared lineages |
-| RS-03 | C2ST classifier differs by method | One classifier for every method | closed: one grouped CatBoost detector for every method with samples, TabSyn included (supplement G); Forest-Flow has no stored samples to score |
+| RS-03 | C2ST classifier differs by method | One classifier for every method | closed: one grouped CatBoost detector for every method with samples, TabSyn included (supplement G); Forest-Flow's stored samples feed its retention re-score, but the detector and privacy runs record its cells as unavailable, so it has no detector row |
 | RS-04 | DOPE called a measurement and a generator | One definition | closed |
 | 11c | Negation density above 5 per 1,000 words | Lint | closed: `check_paper.py` enforces the density on the built PDF |
 | 11d | Main body over 10 pages | Page budget | closed: `check_paper.py` refuses a body over ten pages |
@@ -59,10 +59,18 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
 
 ## Main wave-3 follow-up (53f6558), reconciled with v2
 
-Main's wave-3 commit edited the wave-2 sources that this v2 rewrite replaces.
-The v2 origin sentence renders the two-stage family-cluster rule from
-`cluster_text`, the v2 supplement has no source-family sensitivity table, and
-both v2 titles name the encoding and the generator. The other wave-3 items
-(unknown-method refusal in the retained-evidence reducer, matched DOPE rows for
-the older retained tables, holdout-referenced NNDR) stay open with no printed
-number unless a row above closes them.
+Main's wave-3 commit edited wave-2 sources that the v2 rewrite replaces. Each of its items, checked
+against this tree:
+
+| Wave-3 item | Status in v2 |
+|---|---|
+| Origin paragraph separates the lineage bootstrap from the family-cluster bootstrap and keeps the parent-map limitation | closed: `\OriginSentence` renders both, the cluster rule from `cluster_text.describe_clusters` |
+| Wilcoxon and TOST keep independent-lineage assumptions | closed: main §4 and supplement D say the Wilcoxon, Yuen, and v1 mean tests treat lineages as independent and that every verdict reads the clustered interval |
+| Source-family sensitivity and denominator tables declare their multiplicity scope | closed: the supplement keeps the historical fit-seed-11 source-family table (`tab:review-family`, `generated/review-family.tex`), captioned as a sensitivity without Holm p-values, and the denominator table has no Holm family. No five-seed source-family table exists yet |
+| Both titles name the encoding and the generator | closed: both v2 titles read "Encoding of Regression Tables into Kilobyte Generators" |
+| Unknown-method refusal in the retained-evidence reducer | closed: `retained_evidence.groups_from_rows` refuses any method or selection binding outside the pinned panel's seven arms; `v2_panel.reduce` checks every cell against the v2 roster before grouping, including incomplete, noninformative, and fidelity-only cells |
+| Page-1 paired figure omits Forest-Flow | closed: Fig. 1 draws the six-lineage Forest-Flow contrast as a small-cohort row |
+| Retained-classical and eight-lineage tables lack matched DOPE rows | open: those historical cohorts print no DOPE row; the matched DOPE contrasts for ARF, the density baselines, and TabSyn are in the v2 panel (main Table 1, supplement `tab:v2-contrasts`), a different cohort |
+| Fit-referenced NNDR is not holdout-referenced NNDR | open: main Table 3 names its NNDR as fit-referenced; holdout-referenced NNDR is part of privacy P1 in Stage 2 block L |
+| Forest-Flow CatBoost-detector and alpha/beta cells | open: supplement G prints them as unavailable; only the stored logistic detector, KS, and pair fidelity have Forest-Flow values (RS-03) |
+| Fit-seed uncertainty, attribute and shipped-predictor attacks, stress units, equal budgets, artifact packaging | fit-seed uncertainty is closed for DOPE and ARF (five seeds, nested bootstrap); the rest are the Stage 2 blocks above and Stage 4 publication |

@@ -140,6 +140,28 @@ class PanelTests(unittest.TestCase):
         self.assertEqual(P.family_of_arm(("TVAE", "native_selected")), "descriptive")
         with self.assertRaisesRegex(ValueError, "no declared family"):
             P.family_of_arm(("Mystery", "default"))
+        with self.assertRaisesRegex(ValueError, "duplicate sample cell"):
+            P.reduce(cells + [dict(cells[0])], {}, draws=20)
+
+    def test_reduce_refuses_undeclared_arms_that_never_reach_a_contrast(self):
+        cells = ledger(n_lineages=6)
+        stray = [cell for cell in cells if cell["method"] == "TabSyn" and cell["dataset"] == f"{0:016x}"]
+        closed = {auditor: {"trtr_loss": 0.1, "tstr_loss": 0.2, "informative": False, "retention": None}
+                  for auditor in P.AUDITORS}
+        fidelity = {"marginal_ks_mean": 0.1, "pair_correlation_fidelity": 0.9, "c2st_auc_logistic": 0.6}
+        paths = {"incomplete": [cell for cell in stray if cell["sample_seed"] != 307],
+                 "noninformative": [dict(cell, utility=closed) for cell in stray],
+                 "fidelity_only": [dict(cell, utility={}, **fidelity) for cell in stray]}
+        for arm in (("TabSyn", "undeclared_configuration"), ("Mystery", "default")):
+            for path, extra in paths.items():
+                with self.subTest(arm=arm, path=path):
+                    with self.assertRaisesRegex(ValueError, "no declared family"):
+                        P.reduce(cells + [dict(cell, method=arm[0], configuration=arm[1]) for cell in extra],
+                                 {}, draws=20)
+        panel = P.reduce(cells, {}, draws=20)
+        self.assertEqual({(row["method"], row["configuration"]) for row in panel["levels"]},
+                         {P.HEADLINE, ("TabSyn", "scaled_200_vae_1000_diffusion")})
+        self.assertLessEqual({(row["method"], row["configuration"]) for row in panel["levels"]}, P.ROSTER)
 
     def test_below_minimum_pairs_has_no_test(self):
         panel = P.reduce(ledger(n_lineages=4), {}, draws=50)

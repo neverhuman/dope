@@ -15,6 +15,9 @@
   retention at 4n is 0.898, against 0.949 for the earlier fit-seed-11
   population: both binaries write identical artifacts, and seed 11, the seed at
   which the profile was chosen, ranks first of five on 47 of 99 lineages.
+  The v2 and retained-evidence reducers refuse any undeclared method or
+  configuration before grouping, and the statistics text states that the
+  Wilcoxon p-values treat lineages as independent.
 
 - Add tiered compact kernels, measured release gates, and versioned MFS-v2
   evidence on the single PR branch. No production release is declared.
