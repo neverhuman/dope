@@ -56,3 +56,13 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
   Forest-Flow under the 1,800-second budget, density and synthpop at five seeds, SMOTE, the SDV rerun,
   TabDiff and GReaT adapters, the ablation grid and stress suite, privacy P2–P4, and the OpenML extension
   under its Go rule. A failed or missing cell is never a DOPE win.
+
+## Main wave-3 follow-up (53f6558), reconciled with v2
+
+Main's wave-3 commit edited the wave-2 sources that this v2 rewrite replaces.
+The v2 origin sentence renders the two-stage family-cluster rule from
+`cluster_text`, the v2 supplement has no source-family sensitivity table, and
+both v2 titles name the encoding and the generator. The other wave-3 items
+(unknown-method refusal in the retained-evidence reducer, matched DOPE rows for
+the older retained tables, holdout-referenced NNDR) stay open with no printed
+number unless a row above closes them.
