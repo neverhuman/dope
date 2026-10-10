@@ -105,6 +105,8 @@ def macros(panel: dict, byte_stats: dict, fits: list[dict], privacy: dict) -> st
                   cmd("VEquiv" + name, "---" if equivalent is None else ("yes" if equivalent else "no"))]
     lines += _strongest(panel, byte_stats)
     lines += _seed_macros(panel)
+    lines += _binary_macros(panel, fits)
+    lines += _cap_macros(panel, fits)
     lines += _byte_macros(byte_stats, fits)
     lines += _sentences(panel, byte_stats)
     lines += _privacy_macros(privacy)
@@ -139,11 +141,59 @@ def _strongest(panel, byte_stats) -> list[str]:
             cmd("VStrongRatio", ratio(stats["median"] / dope["median"]))]
 
 
+def _binary_macros(panel, fits) -> list[str]:
+    """Byte identity of the historical-binary refit against the later binary and the historical population."""
+    models = {(fit["configuration"], fit["dataset"]): fit.get("model_sha256") for fit in fits
+              if fit["fit_seed"] == 11 and fit["status"] == "ok"}
+    shared = [dataset for configuration, dataset in models if configuration == "headline_bnew"
+              and ("headline", dataset) in models]
+    same = sum(1 for dataset in shared if models[("headline", dataset)] == models[("headline_bnew", dataset)])
+    identity = panel.get("sample_identity") or {}
+    later = identity.get("fourseed_bnew") or {"fits": 0, "identical": 0}
+    history = identity.get("historical_seed11") or {"fits": 0, "identical": 0}
+    agree = bool(shared) and same == len(shared) and later["fits"] > 0 and later["identical"] == later["fits"]
+    sentence = ("Identical artifacts and samples leave the seed, not the binary, as the source of the gap." if agree
+                else "The binaries differ on some fits; supplement~E compares them cell by cell.")
+    return [cmd("VSameArtifact", same), cmd("VSameArtifactN", len(shared)),
+            cmd("VSameLater", later["identical"]), cmd("VSameLaterN", later["fits"]),
+            cmd("VSameHist", history["identical"]), cmd("VSameHistN", history["fits"]),
+            cmd("VBinarySentence", sentence)]
+
+
+def _cap_macros(panel, fits) -> list[str]:
+    """The over-cap lineages by name and the headline without them (post hoc, from the bound ledger)."""
+    cap = panel.get("cap_sensitivity")
+    if cap is None:
+        return []
+    record = json.loads((RESULTS / "s3-lineage-record.json").read_text())
+    names = {row["dataset"]: row["display_name"] for row in record["rows"]}
+    over = [fit["charged_bytes"] for fit in fits if fit["configuration"] == "headline" and fit["status"] == "ok"
+            and fit["dataset"] in cap["excluded"]]
+    shown = [names.get(dataset, dataset).replace("_", "\\_") for dataset in cap["excluded"]]
+    out = [cmd("VCapN", len(cap["excluded"])), cmd("VCapLineages", " and ".join(shown) if shown else DASH),
+           cmd("VCapFits", sum(1 for size in over if size > cap["cap"])),
+           cmd("VCapBytesLo", exact_bytes(min(over)) if over else DASH),
+           cmd("VCapBytesHi", exact_bytes(max(over)) if over else DASH)]
+    level = {row["auditor"]: row for row in cap["levels"]}["catboost"]
+    out += [cmd("VCapDopeCbFour", num(level["median"])), cmd("VCapDopeCbFourLo", num(level.get("lo"))),
+            cmd("VCapDopeCbFourHi", num(level.get("hi"))), cmd("VCapDopeCbFourN", level["n"])]
+    strongest = panel.get("strongest") or {}
+    for row in cap["contrasts"]:
+        if row["auditor"] != "catboost":
+            continue
+        name = "Strong" if (row["method"], row["configuration"]) == (strongest.get("method"), strongest.get("configuration")) \
+            else _code(row)
+        out += [cmd("VCap" + name + "Diff", num(row["hl"])), cmd("VCap" + name + "Lo", num(row["hl_lo"])),
+                cmd("VCap" + name + "Hi", num(row["hl_hi"])), cmd("VCap" + name + "N", row["n"]),
+                cmd("VCapVerdict" + name, VERDICT[row["verdict"]])]
+    return out
+
+
 def _seed_macros(panel) -> list[str]:
     seed = panel["seed_rank"]
     later = {(row["size"], row["auditor"]): row for row in panel["seeds_23_71"]}[(4, "catboost")]
     two = panel["two_by_two"]
-    out = [cmd("VSeedTop", seed["seed11_top"]), cmd("VSeedN", seed["n"]), cmd("VSeedP", pval(seed["p_one_sided"])),
+    out = [cmd("VSeedTop", seed["seed11_top"]), cmd("VSeedN", seed["n"]), cmd("VSeedExpected", num(seed["expected"], 1)),
            cmd("VLaterCbFour", num(later["median"])), cmd("VLaterCbFourLo", num(later.get("lo"))),
            cmd("VLaterCbFourHi", num(later.get("hi"))), cmd("VLaterCbFourN", later["n"]),
            cmd("VTwoN", two["n_common"])]
@@ -182,7 +232,7 @@ def _simulated_count() -> list[str]:
 
 def _sentences(panel, byte_stats) -> list[str]:
     levels = {(_code(row), row["auditor"], row["size"]): row for row in panel["levels"]}
-    generators = [arm for arm in M.ARMS if arm.role in {"headline", "generator"}
+    generators = [arm for arm in M.ARMS if (arm.role in {"headline", "generator"} or arm.code == "DopeDef")
                   and f"{arm.method}|{arm.configuration}" in byte_stats
                   and byte_stats[f"{arm.method}|{arm.configuration}"] is not None
                   and (arm.code, "catboost", 4) in levels]
@@ -193,20 +243,30 @@ def _sentences(panel, byte_stats) -> list[str]:
                          for _, other_size, other_value in points)]
     dope_bytes = byte_stats["DOPE|headline"]["median"]
     heavy = {"CTGAN", "TVAE", "TabSyn", "ARF", "ForestDiffusion/Forest-Flow", "TabDDPM", "TabDiff", "GReaT"}
-    larger = [math.log10(size / dope_bytes) for arm, size, _ in points if arm.method in heavy]
-    full = [arm.code for arm in generators if levels[(arm.code, "catboost", 4)]["n"] >= 90]
+    larger = [size / dope_bytes for arm, size, _ in points if arm.method in heavy]
+    # The untuned default joins the Pareto points only; it is no comparator in the size ranking.
+    full = [arm.code for arm in generators if arm.code != "DopeDef" and levels[(arm.code, "catboost", 4)]["n"] >= 90]
     order = {size: sorted(full, key=lambda code: -levels[(code, "catboost", size)]["median"])
              for size in (1, 4) if all((code, "catboost", size) in levels for code in full)}
     same = len(order) == 2 and order[1] == order[4]
     lifted = sum(1 for code in full if code != "Dope"
                  and levels[(code, "catboost", 4)]["median"] > levels[(code, "catboost", 1)]["median"])
-    equivalent = [row for row in panel["contrasts"] if (row.get("equivalence") or {}).get("equivalent")]
-    return [cmd("VParetoSet", ", ".join(pareto)), cmd("VOrdersLo", f"{min(larger):.1f}" if larger else "---"),
-            cmd("VOrdersHi", f"{max(larger):.1f}" if larger else "---"),
+    # Equivalence is reported for generator comparisons; controls and diagnostic DOPE arms are not comparators.
+    equivalent = [row for row in panel["contrasts"] if (row.get("equivalence") or {}).get("equivalent")
+                  and M.arm(row["method"], row["configuration"]).role == "generator"]
+    count = len(equivalent)
+    sentence = ("No generator comparison meets that rule." if count == 0 else
+                ("One generator comparison meets that rule" if count == 1 else
+                 f"{count} generator comparisons meet that rule") + "; supplement~E lists every rule outcome.")
+    results = ("No generator comparison is equivalent under the pre-declared rule" if count == 0 else
+               ("One generator comparison is" if count == 1 else f"{count} generator comparisons are")
+               + " equivalent under the pre-declared rule")
+    return [cmd("VEquivResults", results),
+            cmd("VParetoSet", "; ".join(pareto)), cmd("VRatioMin", ratio(min(larger)) if larger else DASH),
+            cmd("VRatioMax", ratio(max(larger)) if larger else DASH),
             cmd("VSizeRankSame", "is the same at both sizes" if same else "changes between the two sizes"),
-            cmd("VSizeLifted", f"{lifted} of {len(full) - 1}"), cmd("VEquivCount", len(equivalent)),
-            cmd("VEquivSentence", "No comparison meets that rule." if not equivalent else
-                f"{len(equivalent)} comparisons meet that rule; supplement~E lists them.")]
+            cmd("VSizeLifted", f"{lifted} of {len(full) - 1}"), cmd("VEquivCount", count),
+            cmd("VEquivSentence", sentence)]
 
 
 def _privacy_macros(privacy) -> list[str]:
@@ -226,8 +286,8 @@ def _fidelity_macros(panel) -> list[str]:
     out = []
     keys = {"marginal_ks_mean": "Ks", "pair_correlation_fidelity": "Corr", "c2st_auc_logistic": "Logit"}
     for row in panel.get("fidelity", []):
-        if (row["method"], row["configuration"], row["size"]) == ("DOPE", "headline", 4):
-            base = "V" + keys[row["metric"]] + "Dope"
+        if row["size"] == 4:
+            base = "V" + keys[row["metric"]] + _code(row)
             out += [cmd(base, num(row["median"])), cmd(base + "Lo", num(row.get("lo"))),
                     cmd(base + "Hi", num(row.get("hi")))]
     return out
@@ -244,12 +304,11 @@ def headline_table(panel, byte_stats) -> str:
             continue
         arm = M.BY_CODE[code]
         stats = byte_stats.get(f"{arm.method}|{arm.configuration}")
-        diffs = " & ".join("---" if row is None else f"${num(row['hl'])}$ \\scriptsize$[{num(row['hl_lo'])},{num(row['hl_hi'])}]$"
-                           for row in cells)
+        diffs = " & ".join("---" if row is None else _centered(row["hl"], row["hl_lo"], row["hl_hi"]) for row in cells)
         lead_row = cells[0]
         rows.append(f"{arm.display} & {lead_row['n']} & {diffs} & {lead_row['wins']}/{lead_row['ties']}/{lead_row['losses']}"
-                    f" & ${pval(lead_row.get('holm_p'))}$ & {'---' if stats is None else '$' + human_bytes(stats['median']) + '$'} \\\\")
-    head = ("\\begin{tabular}{@{}lrlllrrr@{}}\n\\toprule\n"
+                    f" & ${pval(lead_row.get('holm_p'))}$ & {'---' if stats is None else _bytes_cell(stats)} \\\\")
+    head = ("\\begin{tabular}{@{}lrcccrrr@{}}\n\\toprule\n"
             "Comparator & $n$ & CatBoost & Linear & MLP & W/T/L & Holm $p$ & Bytes \\\\\n\\midrule\n")
     return head + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n"
 
@@ -265,7 +324,7 @@ def size_table(panel) -> str:
             for size in (1, 4):
                 row = levels.get((code, auditor, size))
                 cells.append("---" if row is None else
-                             f"\\shortstack{{${num(row['median'])}$\\\\\\tiny$[{num(row.get('lo'), 2)},{num(row.get('hi'), 2)}]$}}")
+                             _cell(row["median"], f"[{num(row.get('lo'), 2)},{num(row.get('hi'), 2)}]", "c"))
         rows.append(f"{M.BY_CODE[code].display} & {levels[(code, 'catboost', 4)]['n']} & " + " & ".join(cells) + " \\\\")
     head = ("\\begin{tabular}{@{}lrcccccc@{}}\n\\toprule\n"
             " & & \\multicolumn{2}{c}{CatBoost} & \\multicolumn{2}{c}{Linear} & \\multicolumn{2}{c}{MLP} \\\\\n"
@@ -288,7 +347,8 @@ def fidelity_table(privacy) -> str:
         for metric in metrics:
             row = index.get((key, metric))
             cells.append("---" if row is None else f"${num(row['median'])}$ \\scriptsize$[{num(row['lo'], 2)},{num(row['hi'], 2)}]$")
-        count = (index.get((key, "c2st_catboost_auc")) or {}).get("n", "---")
+        counts = sorted({row["n"] for row in (index.get((key, metric)) for metric in metrics) if row is not None})
+        count = "---" if not counts else (str(counts[0]) if len(counts) == 1 else f"{counts[0]}--{counts[-1]}")
         rows.append(f"{name} & {count} & " + " & ".join(cells) + " \\\\")
     head = ("\\begin{tabular}{@{}lrlllll@{}}\n\\toprule\n"
             "Method & $n$ & C2ST & DCR fit & DCR val. & NNDR & MIA AUC \\\\\n\\midrule\n")
@@ -301,18 +361,38 @@ def _longtable(columns: str, head: str, rows: list[str], caption: str, label: st
             + "\n".join(rows) + "\n\\bottomrule\n\\end{longtable}\n")
 
 
+def _cell(value, bracket: str, align: str) -> str:
+    """Value over its interval in a top-aligned inner tabular, so the value sits on the row's baseline."""
+    return f"\\begin{{tabular}}[t]{{@{{}}{align}@{{}}}}${num(value)}$\\\\\\tiny${bracket}$\\end{{tabular}}"
+
+
+def _bytes_cell(stats) -> str:
+    """Median charged bytes over the lineage count behind it, which can differ from the scored cohort."""
+    return f"\\begin{{tabular}}[t]{{@{{}}r@{{}}}}${human_bytes(stats['median'])}$\\\\\\tiny$({stats['n']})$\\end{{tabular}}"
+
+
+def _centered(value, lo, hi) -> str:
+    """A centered value over its interval, as the size table prints levels."""
+    return _cell(value, interval(lo, hi), "c")
+
+
+def _stacked(value, lo, hi) -> str:
+    """A value over its interval, so a wide table keeps its column count inside the text width."""
+    return _cell(value, interval(lo, hi), "l")
+
+
 def contrasts_table(panel) -> str:
     rows = []
     order = {code: index for index, code in enumerate(HEADLINE_ORDER)}
-    for row in sorted(panel["contrasts"], key=lambda r: (r["size"], order.get(_code(r), 99), r["auditor"])):
+    for row in sorted(panel["contrasts"], key=lambda r: (r["size"], order.get(_code(r), 99), _code(r), r["auditor"])):
         arm = M.arm(row["method"], row["configuration"])
         equivalence = row.get("equivalence") or {}
         yuen = (row.get("yuen") or {}).get("equivalent")
         holm = "---" if row.get("holm_p") is None else f"${pval(row['holm_p'])}$ ({row['holm_family_n']})"
         rows.append(" & ".join([
             "$n$" if row["size"] == 1 else "$4n$", M.AUDITOR_DISPLAY[row["auditor"]], arm.display, str(row["n"]),
-            f"${num(row['median'])}$ \\scriptsize${interval(row['median_lo'], row['median_hi'])}$",
-            f"${num(row['hl'])}$ \\scriptsize${interval(row['hl_lo'], row['hl_hi'])}$",
+            _stacked(row["median"], row["median_lo"], row["median_hi"]),
+            _stacked(row["hl"], row["hl_lo"], row["hl_hi"]),
             f"{row['wins']}/{row['ties']}/{row['losses']}", holm,
             "---" if equivalence.get("equivalent") is None else ("yes" if equivalence["equivalent"] else "no"),
             "---" if yuen is None else ("yes" if yuen else "no")]) + " \\\\")
@@ -321,7 +401,8 @@ def contrasts_table(panel) -> str:
                "is in parentheses; families are declared per size in predeclare\\_v2. HL eq.\\ is the pre-declared "
                "equivalence rule (90\\% interval of the Hodges--Lehmann difference inside $\\pm 0.02$); Yuen eq.\\ is the "
                "trimmed-mean sensitivity.")
-    return _longtable("@{}llp{1.25in}rllrlll@{}", head, rows, caption, "tab:v2-contrasts")
+    return _longtable("@{}ll>{\\raggedright\\arraybackslash}p{1.1in}rllrlll@{}", head, rows, caption,
+                      "tab:v2-contrasts")
 
 
 def levels_table(panel) -> str:
@@ -338,10 +419,33 @@ def levels_table(panel) -> str:
     return _longtable("@{}p{1.6in}llrrrl@{}", head, rows, caption, "tab:v2-levels")
 
 
+def fidelity_levels_table(panel) -> str:
+    """Marginal, pairwise, and logistic-detector fidelity of every arm at 4n from the five-seed cells."""
+    metrics = ("marginal_ks_mean", "pair_correlation_fidelity", "c2st_auc_logistic")
+    index = {(_code(row), row["metric"]): row for row in panel.get("fidelity", []) if row["size"] == 4}
+    order = {code: position for position, code in enumerate(LEVEL_ORDER)}
+    codes = sorted({code for code, _ in index if code in order}, key=lambda code: order[code])
+    rows = []
+    for code in codes:
+        cells = [index.get((code, metric)) for metric in metrics]
+        count = next((row["n"] for row in cells if row is not None), "---")
+        rows.append(" & ".join([M.BY_CODE[code].display, str(count)] + [
+            "---" if row is None else f"${num(row['median'])}$ ${interval(row.get('lo'), row.get('hi'))}$"
+            for row in cells]) + " \\\\")
+    head = "Arm & $n$ & KS distance & Pair correlation & Logistic C2ST"
+    caption = ("\\textbf{Fidelity of every arm at $4n$, five-seed cells.} Median over lineages with the 95\\% nested "
+               "bootstrap interval of the mean marginal Kolmogorov--Smirnov distance (lower is closer), the pairwise "
+               "correlation fidelity (higher is closer), and a logistic two-sample AUC (one half is indistinguishable); "
+               "$n$ counts lineages with a complete three-seed group. A five-seed arm needs three complete fits per "
+               "lineage. No Holm family.")
+    return _longtable("@{}p{1.6in}rlll@{}", head, rows, caption, "tab:v2-fidelity")
+
+
 def seeds_table(panel) -> str:
     seed = panel["seed_rank"]
     two = panel["two_by_two"]
-    rows = [f"Seed 11 highest of five (CatBoost, $4n$) & {seed['seed11_top']} of {seed['n']} & expected {num(seed['expected'], 1)}; one-sided $p={pval(seed['p_one_sided'])}$ \\\\"]
+    rows = [f"Seed 11 highest of five (CatBoost, $4n$) & {seed['seed11_top']} of {seed['n']} & "
+            f"{num(seed['expected'], 1)} if seeds were exchangeable; descriptive, no $p$-value \\\\"]
     for row in panel["seeds_23_71"]:
         rows.append(f"Seeds 23--71 only, {M.AUDITOR_DISPLAY[row['auditor']]}, {'$n$' if row['size'] == 1 else '$4n$'} & "
                     f"{row['n']} lineages & ${num(row['median'])}$ ${interval(row.get('lo'), row.get('hi'))}$ \\\\")
@@ -350,7 +454,8 @@ def seeds_table(panel) -> str:
                        ("historical_seed11", "historical seed-11 population")):
         rows.append(f"2$\\times$2 cell: {label} & {two['n_common']} common ({two.get(key + '_own_n', 0)} own) & "
                     f"${num(two.get(key))}$ (own lineages ${num(two.get(key + '_own_median'))}$) \\\\")
-    return ("\\begin{tabular}{@{}p{2.6in}ll@{}}\n\\toprule\nDiagnostic & Count & Value \\\\\n\\midrule\n"
+    return ("\\begin{tabular}{@{}>{\\raggedright\\arraybackslash}p{2.1in}>{\\raggedright\\arraybackslash}p{0.95in}"
+            ">{\\raggedright\\arraybackslash}p{1.85in}@{}}\n\\toprule\nDiagnostic & Count & Value \\\\\n\\midrule\n"
             + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
 
 
@@ -366,33 +471,50 @@ def headline_json(panel, byte_stats) -> dict:
             "code": arm.code, "method": arm.method, "configuration": arm.configuration,
             "display": arm.display, "role": arm.role, "color": arm.color, "marker": arm.marker,
             "level": {key: level.get(key) for key in ("median", "lo", "hi", "n")},
-            "bytes": None if stats is None else {key: stats[key] for key in ("median", "q1", "q3", "n", "within_cap")},
+            "bytes": None if stats is None else {key: stats[key] for key in ("median", "q1", "q3", "n", "within_cap",
+                                                                            "fits_ok", "fits_within_cap") if key in stats},
             "contrasts": {auditor: None if (row := _contrast(panel, arm.code, auditor)) is None else
                           {key: row[key] for key in ("hl", "hl_lo", "hl_hi", "n", "wins", "ties", "losses", "verdict")}
                           for auditor in ("catboost", "linear", "mlp")}})
     return out
 
 
+def outputs(panel, fits, privacy) -> dict[str, str]:
+    byte_stats = v2_bytes.all_arms(fits)
+    return {
+        "v2-numbers.tex": macros(panel, byte_stats, fits, privacy),
+        "v2-headline-table.tex": headline_table(panel, byte_stats),
+        "v2-size-table.tex": size_table(panel),
+        "v2-fidelity-table.tex": fidelity_table(privacy),
+        "v2-contrasts.tex": contrasts_table(panel),
+        "v2-levels.tex": levels_table(panel),
+        "v2-seeds.tex": seeds_table(panel),
+        "v2-fidelity-levels.tex": fidelity_levels_table(panel),
+        "v2-headline.json": json.dumps(headline_json(panel, byte_stats), indent=1, sort_keys=True) + "\n",
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--from-panel", type=Path, default=PANEL)
     parser.add_argument("--out", type=Path, default=GENERATED)
+    parser.add_argument("--check", action="store_true", help="fail when a committed output differs")
     args = parser.parse_args()
     panel = json.loads(args.from_panel.read_text())
     if panel.get("official_tests_opened") is not False:
         raise SystemExit("v2 panel official test flag is not closed")
     fits = [json.loads(line) for line in FITS.read_text().splitlines() if line.strip()]
     privacy = json.loads(PRIVACY.read_text())
-    byte_stats = v2_bytes.all_arms(fits)
+    texts = outputs(panel, fits, privacy)
+    if args.check:
+        stale = sorted(name for name, text in texts.items()
+                       if not (args.out / name).is_file() or (args.out / name).read_text() != text)
+        if stale:
+            raise SystemExit("v2 outputs differ from the panel: " + ", ".join(stale))
+        return
     args.out.mkdir(parents=True, exist_ok=True)
-    (args.out / "v2-numbers.tex").write_text(macros(panel, byte_stats, fits, privacy))
-    (args.out / "v2-headline-table.tex").write_text(headline_table(panel, byte_stats))
-    (args.out / "v2-size-table.tex").write_text(size_table(panel))
-    (args.out / "v2-fidelity-table.tex").write_text(fidelity_table(privacy))
-    (args.out / "v2-contrasts.tex").write_text(contrasts_table(panel))
-    (args.out / "v2-levels.tex").write_text(levels_table(panel))
-    (args.out / "v2-seeds.tex").write_text(seeds_table(panel))
-    (args.out / "v2-headline.json").write_text(json.dumps(headline_json(panel, byte_stats), indent=1, sort_keys=True) + "\n")
+    for name, text in texts.items():
+        (args.out / name).write_text(text)
 
 
 if __name__ == "__main__":

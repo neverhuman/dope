@@ -46,7 +46,7 @@ def labels(method, config):
               'independent_marginals': 'Independent marginals'}.get(method, method)
     config = {'features12_steps2048': 'DOPE profile', 'author_default': 'author default',
               'native_selected': 'native selected',
-              'scaled_200_vae_1000_diffusion': 'scaled author default'}.get(config, config)
+              'scaled_200_vae_1000_diffusion': 'scaled schedule'}.get(config, config)
     return tex_name(method), tex_name(config)
 
 

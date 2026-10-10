@@ -341,11 +341,24 @@ def protocol_tokens():
     _must_contain(root / "docs/whitepaper/scripts/compute_panel.py", "Q_NEMENYI_K4 = 2.569", failures)
     _must_contain(root / "docs/whitepaper/scripts/compute_panel.py", "DRAWS = 10_000", failures)
     _must_contain(root / "research/benchmark/publish_dope_population_validation.py", "SEEDS = (101,211,307)", failures)
-    _must_contain(root / "docs/whitepaper/scripts/render_figures.py", "Y_LIM = (-1.5, 1.6)", failures)
-    _must_contain(root / "docs/whitepaper/scripts/render_figures.py", "axis.set_xlim(-1.5, 1.5)", failures)
+    # The figure windows live in figure_spec.py, and the drawing code reads them there.
+    _must_contain(root / "docs/whitepaper/scripts/figure_spec.py", "Y_LIM = (-1.5, 1.6)", failures)
+    _must_contain(root / "docs/whitepaper/scripts/figure_spec.py", "PAIRED_X_LIM = (-1.5, 1.5)", failures)
+    _must_contain(root / "docs/whitepaper/scripts/render_figures.py", "axis.set_ylim(*Y_LIM)", failures)
+    _must_contain(root / "docs/whitepaper/scripts/render_figures.py", "axis.set_xlim(*PAIRED_X_LIM)", failures)
     _must_contain(root / "docs/whitepaper/scripts/compute_panel.py", "np.quantile(samples, [0.025, 0.975])", failures)
     _must_contain(root / "rust/fitness.rs", "(0.0..=1.0)", failures)
     _must_contain(root / "research/benchmark/results/s3-data.lock.json", "official_test_grouped_training_80_20", failures)
+    # predeclare_v2 literals typed in the manuscript: fit seeds, auditor seed, family size, cohort rule.
+    _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", '"fit_seeds": [11, 23, 37, 53, 71]', failures)
+    _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", '"auditor_seed": 1729', failures)
+    _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", '"density": "9 tests', failures)
+    _must_contain(root / "research/benchmark/review_fixes/v2_panel.py", "STRONGEST_MIN_LINEAGES = 90", failures)
+    _must_contain(root / "research/benchmark/review_fixes/predeclare.json", '"track": "scaled_200_vae_1000_diffusion"', failures)
+    _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", '"features12_steps512"', failures)
+    _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", "1,800 s per fit", failures)
+    _must_contain(root / "research/benchmark/publish_tabsyn_population_fits.py",
+                  "'author_default_epochs': {'vae': 4000, 'diffusion': 10001}", failures)
     if failures:
         raise ValueError("; ".join(failures))
     tokens = {
@@ -354,6 +367,7 @@ def protocol_tokens():
         "0.002", "0.01", "0.05", "0.10", "0.15", "0.20", "0.25", "0.30", "0.35", "0.45",
         "0.70", "0.75", "0.80", "0.85", "0.90", "0.95", "1.0", "1.5", "1.6", "2.569",
         "82.40", "0.14", "101", "211", "307", "11", "95", "0", "20",
+        "9", "23", "71", "90", "200", "512", "1000", "1729", "1800", "4000", "10001",
     }
     rounded = f"{illustration_value():.2f}"
     if rounded != "82.40":

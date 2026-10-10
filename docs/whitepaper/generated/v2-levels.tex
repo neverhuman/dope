@@ -1,0 +1,183 @@
+\begin{longtable}{@{}p{1.6in}llrrrl@{}}
+\caption{\textbf{Retention level of every arm.} Median of lineage values; a five-seed arm needs three complete fits per lineage. No Holm family.}\label{tab:v2-levels}\\
+\toprule
+Arm & Size & Auditor & Lineages & Fits & Median & 95\% nested interval \\
+\midrule
+\endfirsthead
+\toprule
+Arm & Size & Auditor & Lineages & Fits & Median & 95\% nested interval \\
+\midrule
+\endhead
+DOPE (ours) & $n$ & CatBoost & 99 & 495 & $0.824$ & $[0.725, 0.942]$ \\
+DOPE (ours) & $n$ & Linear & 94 & 470 & $0.986$ & $[0.964, 0.993]$ \\
+DOPE (ours) & $n$ & MLP & 88 & 440 & $0.969$ & $[0.895, 0.992]$ \\
+DOPE (ours) & $4n$ & CatBoost & 99 & 495 & $0.898$ & $[0.804, 0.972]$ \\
+DOPE (ours) & $4n$ & Linear & 94 & 470 & $0.991$ & $[0.972, 0.997]$ \\
+DOPE (ours) & $4n$ & MLP & 88 & 440 & $1.133$ & $[1.029, 1.246]$ \\
+DOPE, untuned default & $n$ & CatBoost & 99 & 495 & $0.636$ & $[0.387, 0.825]$ \\
+DOPE, untuned default & $n$ & Linear & 94 & 470 & $0.986$ & $[0.974, 0.992]$ \\
+DOPE, untuned default & $n$ & MLP & 88 & 440 & $0.887$ & $[0.801, 0.957]$ \\
+DOPE, untuned default & $4n$ & CatBoost & 99 & 495 & $0.704$ & $[0.424, 0.877]$ \\
+DOPE, untuned default & $4n$ & Linear & 94 & 470 & $0.993$ & $[0.983, 0.998]$ \\
+DOPE, untuned default & $4n$ & MLP & 88 & 440 & $0.991$ & $[0.960, 1.058]$ \\
+TabSyn (scaled schedule) & $n$ & CatBoost & 98 & 98 & $0.856$ & $[0.696, 0.946]$ \\
+TabSyn (scaled schedule) & $n$ & Linear & 93 & 93 & $0.911$ & $[0.763, 0.989]$ \\
+TabSyn (scaled schedule) & $n$ & MLP & 87 & 87 & $0.917$ & $[0.741, 0.984]$ \\
+TabSyn (scaled schedule) & $4n$ & CatBoost & 98 & 98 & $0.897$ & $[0.816, 0.979]$ \\
+TabSyn (scaled schedule) & $4n$ & Linear & 93 & 93 & $0.958$ & $[0.830, 0.990]$ \\
+TabSyn (scaled schedule) & $4n$ & MLP & 87 & 87 & $1.031$ & $[0.969, 1.186]$ \\
+ARF (author default) & $n$ & CatBoost & 99 & 495 & $0.718$ & $[0.570, 0.844]$ \\
+ARF (author default) & $n$ & Linear & 94 & 470 & $0.903$ & $[0.794, 0.965]$ \\
+ARF (author default) & $n$ & MLP & 88 & 440 & $0.828$ & $[0.631, 0.886]$ \\
+ARF (author default) & $4n$ & CatBoost & 99 & 495 & $0.822$ & $[0.689, 0.894]$ \\
+ARF (author default) & $4n$ & Linear & 94 & 470 & $0.938$ & $[0.846, 0.982]$ \\
+ARF (author default) & $4n$ & MLP & 88 & 440 & $0.991$ & $[0.886, 1.090]$ \\
+ARF (native selected) & $n$ & CatBoost & 99 & 495 & $0.671$ & $[0.551, 0.827]$ \\
+ARF (native selected) & $n$ & Linear & 94 & 470 & $0.894$ & $[0.742, 0.966]$ \\
+ARF (native selected) & $n$ & MLP & 88 & 440 & $0.805$ & $[0.583, 0.897]$ \\
+ARF (native selected) & $4n$ & CatBoost & 99 & 495 & $0.804$ & $[0.647, 0.885]$ \\
+ARF (native selected) & $4n$ & Linear & 94 & 470 & $0.920$ & $[0.828, 0.977]$ \\
+ARF (native selected) & $4n$ & MLP & 88 & 440 & $0.966$ & $[0.843, 1.027]$ \\
+Gaussian copula & $n$ & CatBoost & 99 & 99 & $0.610$ & $[0.310, 0.778]$ \\
+Gaussian copula & $n$ & Linear & 94 & 94 & $0.961$ & $[0.915, 0.990]$ \\
+Gaussian copula & $n$ & MLP & 88 & 88 & $0.800$ & $[0.618, 0.890]$ \\
+Gaussian copula & $4n$ & CatBoost & 99 & 99 & $0.669$ & $[0.369, 0.867]$ \\
+Gaussian copula & $4n$ & Linear & 94 & 94 & $0.987$ & $[0.963, 0.996]$ \\
+Gaussian copula & $4n$ & MLP & 88 & 88 & $0.978$ & $[0.892, 1.072]$ \\
+Chow-Liu tree & $n$ & CatBoost & 99 & 99 & $0.466$ & $[0.246, 0.578]$ \\
+Chow-Liu tree & $n$ & Linear & 94 & 94 & $0.636$ & $[0.267, 0.756]$ \\
+Chow-Liu tree & $n$ & MLP & 88 & 88 & $0.454$ & $[0.180, 0.631]$ \\
+Chow-Liu tree & $4n$ & CatBoost & 99 & 99 & $0.576$ & $[0.294, 0.638]$ \\
+Chow-Liu tree & $4n$ & Linear & 94 & 94 & $0.659$ & $[0.282, 0.763]$ \\
+Chow-Liu tree & $4n$ & MLP & 88 & 88 & $0.660$ & $[0.347, 0.804]$ \\
+Independent marginals & $n$ & CatBoost & 99 & 99 & $-0.046$ & $[-0.083, -0.027]$ \\
+Independent marginals & $n$ & Linear & 94 & 94 & $-0.050$ & $[-0.082, -0.015]$ \\
+Independent marginals & $n$ & MLP & 88 & 88 & $-0.215$ & $[-0.484, -0.069]$ \\
+Independent marginals & $4n$ & CatBoost & 99 & 99 & $-0.012$ & $[-0.040, -0.002]$ \\
+Independent marginals & $4n$ & Linear & 94 & 94 & $0.002$ & $[-0.029, 0.019]$ \\
+Independent marginals & $4n$ & MLP & 88 & 88 & $-0.049$ & $[-0.161, -0.018]$ \\
+TVAE (native selected) & $n$ & CatBoost & 21 & 21 & $0.606$ & $[0.412, 0.739]$ \\
+TVAE (native selected) & $n$ & Linear & 21 & 21 & $0.764$ & $[0.552, 0.862]$ \\
+TVAE (native selected) & $n$ & MLP & 20 & 20 & $0.721$ & $[0.254, 0.796]$ \\
+TVAE (native selected) & $4n$ & CatBoost & 21 & 21 & $0.674$ & $[0.452, 0.776]$ \\
+TVAE (native selected) & $4n$ & Linear & 21 & 21 & $0.796$ & $[0.581, 0.875]$ \\
+TVAE (native selected) & $4n$ & MLP & 20 & 20 & $0.812$ & $[0.644, 0.877]$ \\
+CTGAN (native selected) & $n$ & CatBoost & 21 & 21 & $-0.074$ & $[-0.477, 0.118]$ \\
+CTGAN (native selected) & $n$ & Linear & 21 & 21 & $-0.056$ & $[-0.384, 0.118]$ \\
+CTGAN (native selected) & $n$ & MLP & 20 & 20 & $-0.247$ & $[-1.072, 0.104]$ \\
+CTGAN (native selected) & $4n$ & CatBoost & 21 & 21 & $-0.080$ & $[-0.282, 0.223]$ \\
+CTGAN (native selected) & $4n$ & Linear & 21 & 21 & $-0.033$ & $[-0.454, 0.124]$ \\
+CTGAN (native selected) & $4n$ & MLP & 20 & 20 & $0.033$ & $[-0.338, 0.328]$ \\
+Forest-Flow (historical) & $n$ & CatBoost & 6 & 6 & $0.977$ & $[0.807, 0.999]$ \\
+Forest-Flow (historical) & $n$ & Linear & 5 & 5 & $0.981$ & $[0.754, 1.083]$ \\
+Forest-Flow (historical) & $n$ & MLP & 6 & 6 & $0.885$ & $[0.578, 1.000]$ \\
+Forest-Flow (historical) & $4n$ & CatBoost & 6 & 6 & $1.011$ & $[0.905, 1.041]$ \\
+Forest-Flow (historical) & $4n$ & Linear & 5 & 5 & $0.985$ & $[0.977, 1.001]$ \\
+Forest-Flow (historical) & $4n$ & MLP & 6 & 6 & $1.054$ & $[0.929, 2.732]$ \\
+Predictor-only control & $n$ & CatBoost & 99 & 495 & $0.596$ & $[0.340, 0.726]$ \\
+Predictor-only control & $n$ & Linear & 94 & 470 & $0.970$ & $[0.916, 0.994]$ \\
+Predictor-only control & $n$ & MLP & 88 & 440 & $0.849$ & $[0.729, 0.913]$ \\
+Predictor-only control & $4n$ & CatBoost & 99 & 495 & $0.631$ & $[0.375, 0.784]$ \\
+Predictor-only control & $4n$ & Linear & 94 & 470 & $0.981$ & $[0.955, 0.997]$ \\
+Predictor-only control & $4n$ & MLP & 88 & 440 & $0.947$ & $[0.883, 1.018]$ \\
+Real rows resampled & $4n$ & CatBoost & 99 & 99 & $1.018$ & $[1.005, 1.028]$ \\
+Real rows resampled & $4n$ & Linear & 94 & 94 & $0.998$ & $[0.991, 1.000]$ \\
+Real rows resampled & $4n$ & MLP & 88 & 88 & $1.174$ & $[1.051, 1.234]$ \\
+Chow-Liu tree (default) & $n$ & CatBoost & 99 & 99 & $0.564$ & $[0.455, 0.677]$ \\
+Chow-Liu tree (default) & $n$ & Linear & 94 & 94 & $0.661$ & $[0.608, 0.787]$ \\
+Chow-Liu tree (default) & $n$ & MLP & 88 & 88 & $0.523$ & $[0.393, 0.684]$ \\
+Chow-Liu tree (default) & $4n$ & CatBoost & 99 & 99 & $0.636$ & $[0.545, 0.754]$ \\
+Chow-Liu tree (default) & $4n$ & Linear & 94 & 94 & $0.727$ & $[0.640, 0.810]$ \\
+Chow-Liu tree (default) & $4n$ & MLP & 88 & 88 & $0.755$ & $[0.649, 0.949]$ \\
+CTGAN (author default) & $n$ & CatBoost & 17 & 17 & $-0.284$ & $[-0.562, -0.054]$ \\
+CTGAN (author default) & $n$ & Linear & 17 & 17 & $-0.322$ & $[-1.564, -0.070]$ \\
+CTGAN (author default) & $n$ & MLP & 16 & 16 & $-0.399$ & $[-0.817, -0.147]$ \\
+CTGAN (author default) & $4n$ & CatBoost & 17 & 17 & $-0.237$ & $[-0.509, -0.022]$ \\
+CTGAN (author default) & $4n$ & Linear & 17 & 17 & $-0.294$ & $[-1.606, -0.031]$ \\
+CTGAN (author default) & $4n$ & MLP & 16 & 16 & $-0.170$ & $[-0.658, -0.003]$ \\
+DOPE, later binary, seed 11 & $n$ & CatBoost & 99 & 99 & $0.883$ & $[0.820, 0.970]$ \\
+DOPE, later binary, seed 11 & $n$ & Linear & 94 & 94 & $0.979$ & $[0.964, 0.994]$ \\
+DOPE, later binary, seed 11 & $n$ & MLP & 88 & 88 & $0.988$ & $[0.924, 0.995]$ \\
+DOPE, later binary, seed 11 & $4n$ & CatBoost & 99 & 99 & $0.944$ & $[0.893, 0.985]$ \\
+DOPE, later binary, seed 11 & $4n$ & Linear & 94 & 94 & $0.994$ & $[0.972, 0.998]$ \\
+DOPE, later binary, seed 11 & $4n$ & MLP & 88 & 88 & $1.175$ & $[1.044, 1.349]$ \\
+DOPE, later binary, seeds 23-71 & $n$ & CatBoost & 99 & 396 & $0.791$ & $[0.686, 0.930]$ \\
+DOPE, later binary, seeds 23-71 & $n$ & Linear & 94 & 376 & $0.984$ & $[0.960, 0.992]$ \\
+DOPE, later binary, seeds 23-71 & $n$ & MLP & 88 & 352 & $0.958$ & $[0.883, 0.990]$ \\
+DOPE, later binary, seeds 23-71 & $4n$ & CatBoost & 99 & 396 & $0.862$ & $[0.772, 0.960]$ \\
+DOPE, later binary, seeds 23-71 & $4n$ & Linear & 94 & 376 & $0.989$ & $[0.970, 0.996]$ \\
+DOPE, later binary, seeds 23-71 & $4n$ & MLP & 88 & 352 & $1.125$ & $[1.026, 1.229]$ \\
+DOPE, historical seed 11 & $n$ & CatBoost & 97 & 97 & $0.880$ & $[0.822, 0.971]$ \\
+DOPE, historical seed 11 & $n$ & Linear & 92 & 92 & $0.984$ & $[0.968, 0.994]$ \\
+DOPE, historical seed 11 & $n$ & MLP & 87 & 87 & $0.988$ & $[0.923, 0.996]$ \\
+DOPE, historical seed 11 & $4n$ & CatBoost & 97 & 97 & $0.949$ & $[0.893, 0.987]$ \\
+DOPE, historical seed 11 & $4n$ & Linear & 92 & 92 & $0.994$ & $[0.972, 0.997]$ \\
+DOPE, historical seed 11 & $4n$ & MLP & 87 & 87 & $1.174$ & $[1.045, 1.349]$ \\
+DOPE historical, 12 inputs, 512 steps & $n$ & CatBoost & 97 & 97 & $0.750$ & $[0.415, 0.923]$ \\
+DOPE historical, 12 inputs, 512 steps & $n$ & Linear & 92 & 92 & $0.982$ & $[0.957, 0.990]$ \\
+DOPE historical, 12 inputs, 512 steps & $n$ & MLP & 87 & 87 & $0.960$ & $[0.831, 0.988]$ \\
+DOPE historical, 12 inputs, 512 steps & $4n$ & CatBoost & 97 & 97 & $0.801$ & $[0.445, 0.958]$ \\
+DOPE historical, 12 inputs, 512 steps & $4n$ & Linear & 92 & 92 & $0.984$ & $[0.966, 0.994]$ \\
+DOPE historical, 12 inputs, 512 steps & $4n$ & MLP & 87 & 87 & $1.046$ & $[0.998, 1.201]$ \\
+DOPE historical, 24 inputs, 512 steps & $n$ & CatBoost & 93 & 93 & $0.762$ & $[0.416, 0.924]$ \\
+DOPE historical, 24 inputs, 512 steps & $n$ & Linear & 88 & 88 & $0.982$ & $[0.964, 0.991]$ \\
+DOPE historical, 24 inputs, 512 steps & $n$ & MLP & 84 & 84 & $0.964$ & $[0.868, 0.993]$ \\
+DOPE historical, 24 inputs, 512 steps & $4n$ & CatBoost & 93 & 93 & $0.802$ & $[0.457, 0.958]$ \\
+DOPE historical, 24 inputs, 512 steps & $4n$ & Linear & 88 & 88 & $0.986$ & $[0.968, 0.996]$ \\
+DOPE historical, 24 inputs, 512 steps & $4n$ & MLP & 84 & 84 & $1.035$ & $[0.999, 1.204]$ \\
+DOPE historical, 24 inputs, 2048 steps & $n$ & CatBoost & 93 & 93 & $0.884$ & $[0.747, 0.971]$ \\
+DOPE historical, 24 inputs, 2048 steps & $n$ & Linear & 88 & 88 & $0.977$ & $[0.953, 0.995]$ \\
+DOPE historical, 24 inputs, 2048 steps & $n$ & MLP & 84 & 84 & $0.990$ & $[0.949, 0.999]$ \\
+DOPE historical, 24 inputs, 2048 steps & $4n$ & CatBoost & 93 & 93 & $0.931$ & $[0.814, 0.985]$ \\
+DOPE historical, 24 inputs, 2048 steps & $4n$ & Linear & 88 & 88 & $0.990$ & $[0.967, 0.997]$ \\
+DOPE historical, 24 inputs, 2048 steps & $4n$ & MLP & 84 & 84 & $1.124$ & $[1.045, 1.266]$ \\
+Forest-Flow default (historical) & $n$ & CatBoost & 6 & 6 & $0.977$ & $[0.807, 0.999]$ \\
+Forest-Flow default (historical) & $n$ & Linear & 5 & 5 & $0.981$ & $[0.754, 1.083]$ \\
+Forest-Flow default (historical) & $n$ & MLP & 6 & 6 & $0.885$ & $[0.578, 1.000]$ \\
+Forest-Flow default (historical) & $4n$ & CatBoost & 6 & 6 & $1.011$ & $[0.905, 1.041]$ \\
+Forest-Flow default (historical) & $4n$ & Linear & 5 & 5 & $0.985$ & $[0.977, 1.001]$ \\
+Forest-Flow default (historical) & $4n$ & MLP & 6 & 6 & $1.054$ & $[0.929, 2.732]$ \\
+Gaussian copula (default) & $n$ & CatBoost & 99 & 99 & $0.565$ & $[0.260, 0.809]$ \\
+Gaussian copula (default) & $n$ & Linear & 94 & 94 & $0.921$ & $[0.742, 0.962]$ \\
+Gaussian copula (default) & $n$ & MLP & 88 & 88 & $0.786$ & $[0.573, 0.931]$ \\
+Gaussian copula (default) & $4n$ & CatBoost & 99 & 99 & $0.605$ & $[0.305, 0.879]$ \\
+Gaussian copula (default) & $4n$ & Linear & 94 & 94 & $0.956$ & $[0.878, 0.983]$ \\
+Gaussian copula (default) & $4n$ & MLP & 88 & 88 & $0.935$ & $[0.851, 1.033]$ \\
+Independent marginals (default) & $n$ & CatBoost & 99 & 99 & $-0.044$ & $[-0.077, -0.028]$ \\
+Independent marginals (default) & $n$ & Linear & 94 & 94 & $-0.049$ & $[-0.092, -0.005]$ \\
+Independent marginals (default) & $n$ & MLP & 88 & 88 & $-0.184$ & $[-0.449, -0.053]$ \\
+Independent marginals (default) & $4n$ & CatBoost & 99 & 99 & $-0.016$ & $[-0.040, -0.006]$ \\
+Independent marginals (default) & $4n$ & Linear & 94 & 94 & $0.001$ & $[-0.027, 0.021]$ \\
+Independent marginals (default) & $4n$ & MLP & 88 & 88 & $-0.047$ & $[-0.132, -0.018]$ \\
+Predictor-only, split 2027 & $n$ & CatBoost & 99 & 99 & $0.530$ & $[0.322, 0.729]$ \\
+Predictor-only, split 2027 & $n$ & Linear & 97 & 97 & $0.990$ & $[0.951, 0.998]$ \\
+Predictor-only, split 2027 & $n$ & MLP & 84 & 84 & $0.828$ & $[0.731, 0.910]$ \\
+Predictor-only, split 2027 & $4n$ & CatBoost & 99 & 99 & $0.600$ & $[0.365, 0.778]$ \\
+Predictor-only, split 2027 & $4n$ & Linear & 97 & 97 & $0.998$ & $[0.987, 1.001]$ \\
+Predictor-only, split 2027 & $4n$ & MLP & 84 & 84 & $0.950$ & $[0.883, 1.031]$ \\
+Predictor-only, split 2999 & $n$ & CatBoost & 100 & 100 & $0.570$ & $[0.339, 0.722]$ \\
+Predictor-only, split 2999 & $n$ & Linear & 92 & 92 & $0.993$ & $[0.972, 0.999]$ \\
+Predictor-only, split 2999 & $n$ & MLP & 86 & 86 & $0.844$ & $[0.764, 0.937]$ \\
+Predictor-only, split 2999 & $4n$ & CatBoost & 100 & 100 & $0.647$ & $[0.368, 0.777]$ \\
+Predictor-only, split 2999 & $4n$ & Linear & 92 & 92 & $0.998$ & $[0.979, 1.002]$ \\
+Predictor-only, split 2999 & $4n$ & MLP & 86 & 86 & $0.963$ & $[0.882, 1.065]$ \\
+Predictor-only, split 4099 & $n$ & CatBoost & 100 & 100 & $0.562$ & $[0.308, 0.716]$ \\
+Predictor-only, split 4099 & $n$ & Linear & 95 & 95 & $0.987$ & $[0.961, 0.995]$ \\
+Predictor-only, split 4099 & $n$ & MLP & 86 & 86 & $0.837$ & $[0.732, 0.942]$ \\
+Predictor-only, split 4099 & $4n$ & CatBoost & 100 & 100 & $0.640$ & $[0.362, 0.777]$ \\
+Predictor-only, split 4099 & $4n$ & Linear & 95 & 95 & $0.993$ & $[0.974, 0.999]$ \\
+Predictor-only, split 4099 & $4n$ & MLP & 86 & 86 & $0.965$ & $[0.917, 1.021]$ \\
+Predictor-only, split 8191 & $n$ & CatBoost & 100 & 100 & $0.611$ & $[0.337, 0.752]$ \\
+Predictor-only, split 8191 & $n$ & Linear & 96 & 96 & $0.978$ & $[0.960, 0.996]$ \\
+Predictor-only, split 8191 & $n$ & MLP & 85 & 85 & $0.810$ & $[0.727, 0.903]$ \\
+Predictor-only, split 8191 & $4n$ & CatBoost & 100 & 100 & $0.677$ & $[0.359, 0.787]$ \\
+Predictor-only, split 8191 & $4n$ & Linear & 96 & 96 & $0.996$ & $[0.969, 0.999]$ \\
+Predictor-only, split 8191 & $4n$ & MLP & 85 & 85 & $0.951$ & $[0.884, 1.018]$ \\
+TVAE (author default) & $n$ & CatBoost & 18 & 18 & $0.300$ & $[0.072, 0.547]$ \\
+TVAE (author default) & $n$ & Linear & 18 & 18 & $0.354$ & $[-0.480, 0.657]$ \\
+TVAE (author default) & $n$ & MLP & 17 & 17 & $0.179$ & $[-1.050, 0.569]$ \\
+TVAE (author default) & $4n$ & CatBoost & 18 & 18 & $0.283$ & $[0.175, 0.596]$ \\
+TVAE (author default) & $4n$ & Linear & 18 & 18 & $0.429$ & $[0.156, 0.682]$ \\
+TVAE (author default) & $4n$ & MLP & 17 & 17 & $0.333$ & $[-0.417, 0.612]$ \\
+\bottomrule
+\end{longtable}

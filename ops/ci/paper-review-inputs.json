@@ -4,6 +4,10 @@
       "bytes": 6807387,
       "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
     },
+    "research/benchmark/results/arf-s3-population-native.json": {
+      "bytes": 1472035,
+      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+    },
     "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json": {
       "bytes": 21453198,
       "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
@@ -76,6 +80,18 @@
       "bytes": 458523,
       "sha256": "b9fd4600ec54fc89b938eb627f31d6112176fc4137e040c3686c15efd17d2d62"
     },
+    "research/benchmark/results/review-fixes-v2/fits.jsonl": {
+      "bytes": 501159,
+      "sha256": "723a83226ffb2bd510a23a06cb6363d5c4fd25b230dc4fea0d42c2a08d634687"
+    },
+    "research/benchmark/results/review-fixes-v2/panel.json": {
+      "bytes": 555919,
+      "sha256": "4b3f1307a22d2c2ea43b91c253e88d03597b9c3e3951fc948f7cd96b4207d14b"
+    },
+    "research/benchmark/results/review-fixes-v2/scalar-cells.jsonl": {
+      "bytes": 22171980,
+      "sha256": "db455b0aa6e45a9dbc9649ab220cc217fd60020f3db12eb468544bef6d3f124f"
+    },
     "research/benchmark/results/s3-lineage-record.json": {
       "bytes": 1834757,
       "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
@@ -97,12 +113,16 @@
       "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
     },
     "research/benchmark/review_fixes/paper-build.json": {
-      "bytes": 2958,
-      "sha256": "5d4382907d27011ea89fa2006f1984e1d2185c6bfd18207b68bdd584b683dda3"
+      "bytes": 3672,
+      "sha256": "0669d30d0a5bb5fbef3196a4f6425954b674000d189f07cac8e5b86397e02973"
     },
     "research/benchmark/review_fixes/predeclare.json": {
       "bytes": 12002,
       "sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5"
+    },
+    "research/benchmark/review_fixes/predeclare_v2.json": {
+      "bytes": 21730,
+      "sha256": "851215f70725b49cc74c8768aee45599b480881e5316ffe62d6b8b18862e9a47"
     },
     "research/benchmark/review_fixes/tabsyn-fidelity-predeclare.json": {
       "bytes": 11711,

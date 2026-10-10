@@ -2,105 +2,91 @@
 \usepackage{iclr2027_conference,times}
 \usepackage{booktabs,longtable,array,graphicx,url,amsmath,amssymb}
 \usepackage{hyperref}
+\usepackage[capitalise]{cleveref}
 \emergencystretch=3em
 \raggedbottom
-\title{\texorpdfstring{\raggedright Supplement: DOPE: Downstream Objective-Preserving\\ Encoding and Generation for Synthetic Tabular Data}{Supplement: DOPE: Downstream Objective-Preserving Encoding and Generation for Synthetic Tabular Data}}
+\title{\texorpdfstring{\raggedright Supplement: DOPE: Downstream Objective-Preserving Encoding\\ of Regression Tables into Kilobyte Generators}{Supplement: DOPE: Downstream Objective-Preserving Encoding of Regression Tables into Kilobyte Generators}}
 \author{Jepson Taylor$^1$, Alton Alexander$^1$\\[0.15cm]
 $^1$NEVERHUMAN Research}
 \iclrfinalcopy
 \begin{document}
 \input{generated/numbers.tex}
-\input{generated/review-wave2-numbers.tex}
+\input{generated/figure-spec.tex}
+\input{generated/v2-numbers.tex}
 \maketitle
 \fancyhead{}
 \renewcommand{\headrulewidth}{0pt}
 
 \begin{abstract}
 \raggedright
-Lineage-level retention and byte charges for the displayed profile, the
-8{,}192-step sufficiency budget, and the \BeyondInventory{} BeyondArena
-family names. These tables are the rows behind the medians in the main
-paper. A blank retention is an unavailable fit or an auditor that is not
-informative on all three sample seeds. It is not a zero. A lineage with
-no charged bytes and no retention is omitted. BeyondArena is not pooled
-with the PMLB panel. The release-score rows are arithmetic on invented
-components. They are not measurements on these lineages.
+This supplement holds the method details, the release-gate specification and its conformance test, the data and selection protocol, the statistics, every five-seed contrast and level behind the main paper, the controls, the fidelity and empirical-privacy panels, the ablations, the baseline coverage, the per-lineage tables, and the extended related work. A blank retention cell is an unavailable fit or an auditor that is uninformative on one of the three sample seeds; it is never a zero. BeyondArena is a separate fit check and is never pooled with the PMLB panel.
 \end{abstract}
-
 
 \raggedbottom
 \appendix
 \raggedright
-\section{Displayed profile, all 100 lineages}
-\label{app:2048}
-\begingroup\scriptsize\setlength{\tabcolsep}{2pt}
-\input{generated/s3-2048-lineages.tex}
-\endgroup
 
-\section{Sufficiency budget}
-\label{app:8192}
-\begingroup\scriptsize\setlength{\tabcolsep}{2pt}
-\input{generated/s3-8192-lineages.tex}
-\endgroup
+\section{Method details}
+\label{app:method}
+\subsection{Artifact contents and sampling}
+\label{app:sampling}
+Equation~(1) of the main paper is the conditional mean; the joint draw is separate. The profile reported in the main paper samples with the symbolic kernel stored in the artifact; the separate neural-joint sampler is unused. The stored dependence is one choice from the compile search: independence, a Chow--Liu tree, a triangular autoregression, a sparse Gaussian copula, a factor model, a truncated vine, or a two-component mixture, and the reported artifacts span several of these families.
 
-\section{BeyondArena families in the dataset bucket}
-\label{app:beyond}
-\begingroup\setlength{\tabcolsep}{2pt}
-\input{generated/beyondarena-inventory.tex}
-\endgroup
+Training screens the inputs by absolute rank correlation with the target and keeps at most twelve. The artifact stores a marginal and a transform for each feature, the selected dependence, the residual, a noise model, and a per-feature missing rate. A draw samples a latent vector from the stored dependence, maps each coordinate through the standard normal distribution function, inverts the marginal, and inverts the feature transform; the residual then supplies $\hat{y}$. When the training target is not binary, the stored noise is heteroscedastic: a linear fit of the log absolute residual on up to four screened features, with the scale clamped between the lower and upper deciles of those absolute residuals. The sampled target adds Gaussian noise of that scale and is clamped to the unit interval of the training transform. Each feature is then replaced, independently, by a missing mark with its stored probability. Before encoding, the compiler quantizes the marginals, the dependence, the residual, and the noise model. The charged byte count of a DOPE artifact is the encoded model file plus \texttt{projection.json}; a baseline is charged the files its sampler reads, as listed in \cref{app:bytes}.
 
-\section{Replay curves}
-The main paper reports the median hidden-basis loss. The curves below are
-the logged replay of both step budgets, before the readout refit. The
-8{,}192-step panel is not the displayed model. The solid line is the
-training median and the dashed line is the validation median. Each
-band is a 95\% lineage-bootstrap interval. All $\ReplayN$ lineages finished. Median
-training loss starts at $\LossTrainStart$ and ends at $\LossTrainEndA$
-and $\LossTrainEndB$. Median validation loss starts at $\LossValStart$
-and ends at $\LossValEndA$ and $\LossValEndB$. Where both budgets have a
-complete three-seed group, the linear medians are $\MedSufALin$ and
-$\MedSufBLin$ ($\NSufLin$ lineages; difference $\DiffSufLin$). The MLP
-medians are $\MedSufAMlp$ and $\MedSufBMlp$ ($\NSufMlp$ lineages;
-difference $\DiffSufMlp$).
+\subsection{Training freeze, compile search, and the reported profile}
+\label{app:compile}
+Training maps the screened inputs through the width-16 $\tanh$ layer and runs AdamW on the regression mean-squared error, with gradient clipping at $5$. The hidden weights and biases are then frozen, and the intercept, the linear skip, and the hidden readout are refit on the frozen features. Coefficients whose absolute value is below $10^{-5}$ are dropped from the skip.
+
+The compile search records the proxy $0.45u + 0.25d + 0.30j$ and keeps the candidate with the smallest normalized gate shortfall, then the smallest artifact, then the lowest candidate id. It reads the fit rows only. A candidate record carries no release certificate, and no global DOPE family has been selected.
+
+The reported research profile, \texttt{features12\_\allowbreak{}steps2048}, was chosen among four bounded research profiles (twelve or twenty-four screened inputs, $512$ or $2{,}048$ steps) on a six-lineage discovery panel and checked on six disjoint confirmation lineages, by validation retention at fit seed $11$. Those twelve lineages belong to the hundred-lineage panel, so the reported profile carries a mild selection on validation rows. The untuned trainer default, used for any other profile, sets the hidden width between \ProductionWidthLo\ and \ProductionWidthHi\ and trains for \ProductionSteps\ steps; the main paper reports it as a separate arm. Other neural shapes (micro-TVAEs, TinyMAT, joint TVAE, a masked transformer, and a TabSyn candidate) are outside this measurement, and the direct-rank TabDDPM candidate is a research comparator with no claim on the $10{,}240$-byte tier.
+
+\subsection{Dataset sketch and router vector}
+\label{app:sketch}
+An index can store a fixed sketch of a training table, which a separate dataset-action router consumes; neither enters the generator reported in the main paper. \texttt{embed-dataset} min-max normalizes each training column onto the unit interval, leaves a missing entry missing, and never reads the official test. Each column becomes twelve content summaries: a missing rate, moments, quantiles, a unique-value share, a tail ratio, and the absolute association with the target. Columns are sorted by those summaries, variance first. A ten-number header records the task, the log row count, the log column count, and the shape of the target. Each of the twelve summaries is then reduced across columns to a six-number distribution (minimum, lower quartile, median, upper quartile, maximum, and mean), which is the $12\times 6$ block. The sketch then keeps the first $64$ columns and stores each column's twelve summaries, padding a shorter table with zeros, and absolute correlations among the kept columns collapse to one further six-number distribution. The width is therefore $10 + 12\times 6 + 64\times 12 + 6 = 856$. The router vector appends $24$ candidate states, each a hidden state of width $128$ plus $10$ action predictions, to that sketch, for $856 + 24\times(128+10) = 4{,}168$ dimensions. A neighbour found with the sketch is still fit with the reported profile and still charged in bytes.
+
 \begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/loss-curves.pdf}
-\caption{Logged replay of both step budgets before the readout refit. The solid line is the training median and the dashed line is the validation median. Each band is a 95\% lineage-bootstrap interval. The longer budget is not the displayed model.}
-\label{fig:replay}
+\includegraphics[width=\textwidth]{figures/architecture.pdf}
+\caption{\textbf{Pipeline of the reported profile.} The official test is outside the inputs. No lineage denominator and no Holm family.}
+\label{fig:arch}
 \end{figure}
 
-\section{Authenticated first-batch diagnostics}
-The canonical-job batch is incomplete at population and sample-group
-level. The following values are individual physical evaluations. Logical
-aliases share one evaluation and its cost. DOPE jobs in this batch use
-the frozen research profiles named in the source receipt; they do not
-replace the displayed profile. No population interval or ranking is
-computed. Pearson entries are the pinned source mean; alpha and beta
-use its pinned unembedded variant, and MIA is an empirical distance attack.
-Per-column marginals, all detection folds, DCR/NNDR, applicability reasons,
-costs and full job digests are in
-the first-batch source listed in
-\path{docs/whitepaper/generated/retained-evidence.json}.
-The operation-clock sum excludes training and sampling. Official tests
-remain sealed and all gated scores remain null.
+\section{Release gate}
+\label{app:gate}
+\subsection{MFS-v2, the historical formula}
+MFS-v2 is the release score that historical receipts pin. With component $c_i\in[0,1]$, weight $w_i>0$, $\epsilon=10^{-6}$, and $W=\sum_i w_i$,
+\[
+\mathrm{MFS\text{-}v2} = 100\exp\!\left(\frac{1}{W}\sum_i w_i\ln(\epsilon+c_i)\right)
+\]
+when the hard-gate map is non-empty, every hard gate passed, and every positive-weight component is finite and inside $[0,1]$; otherwise the scalar is null. Its weights are utility transfer $0.30$, driver fidelity $0.20$, distribution fidelity $0.20$, structure fidelity $0.15$, coverage realism $0.10$, and compactness $0.05$. Privacy has soft weight zero, and a membership failure, an attribute failure, or a copied row is a gate that utility cannot offset. Compactness is $\mathrm{clamp}(1-\mathrm{bytes}/10240,0,1)$, and an artifact past $10{,}240$ bytes fails the byte gate.
 
-\begin{center}
-\footnotesize
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-first12.tex}\end{minipage}}
-\end{center}
+\subsection{What the components measure}
+Utility transfer is a one-sided lower bound on retention, clamped into $[0,1]$; it is distinct from the median retention in the main paper. Driver fidelity is an equal mixture of feature-importance rank agreement and top-feature-set overlap between the real and the synthetic table. Distribution fidelity is half the minimum marginal fidelity, plus a quarter of the sliced-Wasserstein fidelity and a quarter of the maximum-mean-discrepancy fidelity. Structure fidelity is the minimum dependence fidelity. The driver term stored beside the panel is the same equal mixture, applied to absolute correlations with the target; it differs from the permutation-importance auditor in the v2 definition, and this paper reports no component value from it.
 
-\section{Release score that was not emitted}
-\label{app:score}
-MFS-v3 is a gated geometric mean. Every observed scalar remains null. Copying a retention number into that scalar would publish a
-value the contract refuses to emit. Table~\ref{tab:illustration} applies the bounded MFS-v3 implementation to
-invented all-ones components and to the same profile with compactness set to
-zero. The all-ones row is exactly $100$. At the byte ceiling, compactness is
-zero and the formula uses its epsilon floor. A failed byte gate returns null.
-These rows illustrate arithmetic only.
-\input{generated/mfs-v3-examples.tex}
+\subsection{MFS-v3 and representation closeness}
+MFS-v3 adds representation closeness to the geometric mean, as in equation~(2) of the main paper. v3 utility transfer is the same one-sided bound on the Kumo large retention: the model is conditioned on the synthetic rows and scored on real holdout rows. Mitra and TabICL must be measured on the same mapped tables for the gate. Their retentions stay out of that bound, and a CatBoost retention cannot fill this component. Real fit rows, real holdout rows, and synthetic rows share one map, fit on the real fit rows only: numeric columns go to the open unit interval by an empirical mid-rank quantile, categorical levels are pre-encoded to fixed codes in that interval, and column names become HMAC digests. The map withholds the minimum and the maximum, and a second fit on the synthetic rows is a protocol failure.
+
+Representation closeness asks whether Kumo large places the mapped synthetic table near the mapped real table. The distance is half the Euclidean length between the two unit-length vectors, so it lies in $[0,1]$, and closeness is one minus that distance divided by the distance to a matched null, clamped to $[0,1]$. The synthetic table must also sit closer than an independent-marginal table of the same size under the same map. The matched null is chosen among three independent-marginal tables drawn on the shared map, seeded by the first eight bytes, little-endian, of the SHA digest of the dataset, the method, the configuration, the sample seed, and the candidate index $0$, $1$, or $2$; candidates are ordered by ordinary linear mean squared error on the mapped holdout, then by index, and the middle candidate is the matched null. Those losses are fixed before any encoder runs. Mitra and TabICL must show the same sign as Kumo large on the gap against the independent-marginal table; a sign flip, a zero match distance, or a missing vector makes the component null. Neither is averaged into representation closeness. The licensed encoder set is Kumo large (OpenMDW and Apache), Mitra (Apache), and TabICL (BSD); Foundation, TabPFN, TabDPT, the project's Hyperion, and target-aware blocks are refused. TabDPT is refused because its pretraining tables overlap this panel; whether the pretraining corpora of the three admitted encoders overlap PMLB is unknown, so their retentions are reported as transfer measurements rather than as independent evidence.
+
+A recipient keeps the generator and a hash manifest: a salt identifier, the normalizer name, the encoder pin, one digest per column, a dtype code, and the byte length. The manifest carries no row, header, category string, extremum, or encoder weight. A public sidecar that echoes a source string or an extremum fails the cleartext gate, and an exact copy of a real row fails its own gate. The near-copy floor is the $0.01$ quantile, with linear interpolation, of squared Euclidean distances from each distinct real fit row to the nearest other distinct real fit row on the shared map; a synthetic row below that floor, an undefined floor, or a charge above $10{,}240$ bytes makes the scalar null.
+
+\subsection{Executable conformance}
+\label{app:conformance}
+The release score uses the contract's weighted geometric mean with a component floor, clipped to $[0,100]$; the components lie in $[0,1]$ and a failed gate yields a null scalar. The matched null is the median linear-MSE candidate among three deterministic independent-marginal tables. This is a median selector; a learnability band is outside this implementation. The near-copy floor is the declared quantile of nearest-other squared distances among distinct real fit rows on the shared map, with linear interpolation, and undefined floors fail the gate. The scorer tests in \path{research/benchmark/tests/test_mfs_v3.py} verify exactly $100$ for a perfect profile, the byte boundary, and each prerequisite; the panel tests verify median null selection and the quantile floor. \cref{tab:conformance} lists the implemented fields, and \cref{tab:illustration} applies the bounded formula to invented components.
 
 \begin{table}[t]
-\caption{Invented applications of the bounded MFS-v3 formula. These are arithmetic illustrations. No Holm family.}
+\caption{\textbf{MFS-v3 contract fields as implemented.} Each row is read from \texttt{production/\allowbreak{}kpi-contract-v3.json} by the scorer. No Holm family.}
+\label{tab:conformance}
+\centering
+\small
+\input{generated/mfs-v3-conformance.tex}
+\end{table}
+
+\input{generated/mfs-v3-examples.tex}
+\begin{table}[t]
+\caption{\textbf{Invented applications of the bounded MFS-v3 formula.} Arithmetic illustrations only. No Holm family.}
 \label{tab:illustration}
 \centering
 \footnotesize
@@ -115,92 +101,41 @@ Byte gate failed & null \\
 \end{tabular}
 \end{table}
 
-\section{Reproducibility}
-\input{generated/availability.tex}
+\subsection{Clean-license transfer on the density block}
+\label{app:transfer}
+The density block was also scored by Kumo large, Mitra, and TabICL on the shared map, with the three sample seeds of the main panel. These auditors are separate from the CatBoost, linear, and MLP rows, and their Holm adjustment is one family per auditor of size three (that auditor against the three density comparators). \input{generated/mfs-v3-scalar.tex}
 
-Peak RAM in the compute table is resident bytes, shown in mebibytes to
-one decimal, and peak VRAM is \texttt{peak\_gpu\_used\_mib}. The hardware
-cell names the GPU models recorded on the fit receipts and does not name
-a machine. GPU hours sum walls on which the receipt recorded a GPU
-process, and each DOPE fit file is counted once. Receipts with no fit
-timer are omitted from that table. CPU hours are omitted as well: no
-receipt stores a separate CPU timer. The logged replay medians \ReplayMedA\ and \ReplayMedB\ are not
-the elapsed time of the scored runs (\CampaignElapsed). Forest-Flow medians use the
-\ForestTimeN\ native-grid operation walls. Its bytes are the
-$\NForestCb$ selected artifacts. \ForestFitCore\ sums
-\texttt{fit\_seconds} and \ForestSampleOp\ sums receipt operations.
-Neither sum is that median. Whole-device energy is not job energy.
-Gaussian copula, Chow--Liu, and independent-marginal attempts store one
-unsplit \texttt{wall\_seconds}. Medians are \GaussAttemptMed,
-\ChowAttemptMed, and \IndAttemptMed. Maxima are \GaussAttemptMax,
-\ChowAttemptMax, and \IndAttemptMax. BeyondArena medians remain
-\BeyondElapseA\ and \BeyondElapseB. Reading the main paper threshold
-counts from top to bottom, CatBoost is \NThrLowCb, \NThrMidCb,
-\NThrHighCb; linear is \NThrLowLin, \NThrMidLin, \NThrHighLin; and the
-MLP is \NThrLowMlp, \NThrMidMlp, \NThrHighMlp.
+\begin{table}[t]
+\caption{\textbf{Kumo large, Mitra, and TabICL on the density block at $4n$.} Each cell is a retention; the denominator is the paired informative lineages in that row. Holm family size is three per auditor. W/T/L counts lineages; a tie is a difference of zero.}
+\label{tab:mfsv3}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/mfs-v3-density-table.tex}\end{minipage}}
+\end{table}
 
-\section{Fit coresets}
-\label{app:coreset}
+\input{generated/mfs-v3-layers.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/mfs-v3-retention-bars.pdf}
+\caption{\textbf{Kumo large, Mitra, and TabICL retention at $4n$.} Each bar is the lineage median and its lineage-bootstrap interval; the denominator is the paired informative lineages in that panel. Holm family size is three per auditor.}
+\label{fig:mfsv3bars}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/mfs-v3-paired.pdf}
+\caption{\textbf{Paired retention differences for Kumo large, Mitra, and TabICL, sorted by lineage.} The denominator is the paired informative lineages in that panel. Holm family size is three per auditor.}
+\label{fig:mfsv3pairs}
+\end{figure}
+
+\section{Data, selection, cost, and availability}
+\label{app:data}
+\subsection{Data lock and partitions}
+The data lock admits $\EligibleN$ MIT-licensed entries and prepares $\PreparedN$. $\ExcludedN$ lineages have no split object because the same source-row digest appears in two partitions (\texttt{check\_nonoverlap} raises on that overlap), and another $\UnknownRights$ catalog entries lack a redistribution grant and are excluded. The prepared cut is a grouped $80/20$ split of the official training rows, seed $\SplitSeed$. Worker directories hold \texttt{train.csv} and \texttt{validation.csv} only; the official test is held elsewhere and its contents are unread. The fit view has \CoreMin\ to \CoreMax\ rows; sources above the quota use a hybrid coreset that keeps the observed feature and target range. \OriginSentence
+
 \input{generated/coreset-paragraph.tex}
-
-\section{Artifact hashes}
-\label{app:hashes}
-The rows below are SHA-256 of each ledger and round lock the paper reads,
-plus the commit and the file hash of the harness that measured the
-grouped-validation fidelity ledger. Regenerating the macros does not
-rewrite a ledger hash.
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/artifact-hashes.tex}\end{minipage}}
-
-
-\section{Executable MFS-v3 conformance}
-\label{app:conformance}
-The release score uses the contract's weighted geometric mean with a component
-floor: $100\exp(\sum_i w_i\log\max(s_i,\epsilon)/\sum_i w_i)$, clipped to
-$[0,100]$. The components lie in $[0,1]$. A failed gate yields a null scalar.
-The matched null is the median linear-MSE candidate among three deterministic
-independent-marginal tables. Linear losses and candidate selection are fixed
-before any representation encoder forward. This is a median selector; a
-learnability band is outside this implementation.
-The near-copy floor is the declared quantile of nearest-other squared distances
-among distinct real fit rows in the shared map, with linear interpolation.
-Undefined floors fail the gate. The exact implementation and contract fields are:
-\begin{center}\small
-\input{generated/mfs-v3-conformance.tex}
-\end{center}
-The scorer tests in \path{research/benchmark/tests/test_mfs_v3.py} verify exact
-$100$ for a perfect profile, the byte boundary, and each prerequisite. The panel
-tests verify median null selection and the quantile floor.
-
-\section{Public data and scored-artifact availability}
-\label{app:public-kit}
-A credential-free upstream-data path is
-\path{python3 -m research.benchmark.fetch_pmlb --list} and
-\path{python3 -m research.benchmark.fetch_pmlb DATASET_ID OUTPUT_DIRECTORY}.
-It authenticates PMLB data against an upstream Git LFS SHA pin at a fixed public
-revision. The public manifest includes every prepared lineage's PMLB identifier
-and the historical train/validation/test split hashes from the committed data
-lock. Downloads stay upstream source data: the historical JopeDime staging
-used a separate hybrid coreset and target-stratified selection, whose exact
-selected row indices were omitted from the captured receipts. The public fetch
-therefore provides source datasets and historical split identities, while exact
-historical partition reconstruction requires the missing selection manifest.
-
-The originally scored model files and synthetic rows have no published bundle.
-The captured historical metadata has artifact digests and charges but omits a
-complete portable inventory binding every scored file to a retrievable public
-object. Publishing current scratch files under those identities would require
-an additional custody audit; logged replay fits have different artifact
-identities. The committed validation ledgers, original metadata, and compressed numeric logs,
-authenticated by the input pins and rebuilt by \texttt{just paper}, reproduce the
-historical reductions and figures. The bound control, privacy and TabSyn scalar ledgers reproduce their committed aggregates before rendering. Original model sampling and historical partition
-reconstruction stay packaging limitations.
-
-
-\section{Detail moved from the main text}
-The sections below keep the long tables, the component definitions,
-and the delta-method expansion. A caveat here is the same caveat.
-The main text keeps the equations, the primary comparisons, and the
-release gate.
 
 \begin{table}[t]
 \caption{\textbf{Test-split provenance.} File-name counts only. No retention denominator and no Holm family.}
@@ -211,608 +146,12 @@ release gate.
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/provenance-table.tex}\end{minipage}}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/paired-cdf.pdf}
-\caption{\textbf{CatBoost paired differences, sorted, and the Nemenyi scale.} The denominator is the sorted paired lineages. Rank 1 is the higher retention. The segment length is the critical difference. This display stays outside the nine-test Holm family.}
-\label{fig:pairs}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/mfs-v3-retention-bars.pdf}
-\caption{\textbf{Kumo large, Mitra, and TabICL retention at $4n$.} Higher is better. Each bar is the lineage median and its lineage-bootstrap interval. The denominator is the paired informative lineages in that panel. Hatches distinguish the methods. Holm family size is three per auditor and is reported in the main paper. This panel stays outside MFS.}
-\label{fig:mfsv3bars}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/mfs-v3-paired.pdf}
-\caption{\textbf{Paired retention differences for Kumo large, Mitra, and TabICL, sorted by lineage.} Filled marks are lineages. The denominator is the paired informative lineages in that panel. Holm family size is three per auditor, in the main paper.}
-\label{fig:mfsv3pairs}
-\end{figure}
+\subsection{Selection rule for each method}
+\label{app:selection}
+\cref{tab:selection} states what chose each configuration and which rows it read. Only DOPE's compile search and the density baselines' fixed or density-selected configurations avoid the scoring auditors; CTGAN and TVAE select on the same validation rows and the same linear and MLP auditors that score retention, and DOPE's research profile was chosen on a discovery panel inside the evaluated lineages. The sealed test run removes all of these overlaps for its estimate.
 
 \begin{table}[t]
-\caption{\textbf{Grouped-validation fidelity and empirical privacy.} The fidelity denominator is the complete three-seed group count and stays distinct from the $\NDopeCb$ retention lineages. Holm families are 12 density tests and 8 neural tests, separate from retention. Outside DP and HIPAA.}
-\label{tab:fidelity}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{2pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/fidelity-privacy-table.tex}\end{minipage}}
-\end{table}
-
-\subsection{Retained validation evidence}
-\label{sec:retained}
-\textbf{Retained validation.} \ref{tab:retained100} and \ref{tab:retained8} add the merged
-retained-sample evidence. Each lineage averages all three sample seeds
-before a lineage-bootstrap median and percentile interval are computed.
-This differs from the median-of-seed rule in the earlier blocks; those
-blocks and their numbers are preserved. A lineage enters a metric only
-when all three values exist. An unavailable outcome stays absent.
-\ref{tab:retained100} covers the same prepared population for ARF,
-copula and Chow--Liu defaults and native-selected configurations.
-\ref{tab:retained8} includes only the complete scaled author-default
-TabSyn lineages and the classical methods on those identical inputs.
-It cannot establish a full-population TabSyn result or a native-tuned
-TabSyn comparison. These evaluations leave the configuration unselected.
-The bound TabSyn cohort reported below stays distinct from this retained subset.
-
-\begin{table}[t]
-\caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). The parenthetical count is the denominator. Native rows use the objective recorded for that configuration. No Holm family in this table.}
-\label{tab:retained100}
-\centering\footnotesize\setlength{\tabcolsep}{3pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-classical100.tex}\end{minipage}}
-\end{table}
-
-\begin{table}[t]
-\caption{\textbf{Matched retained TabSyn subset at $4n$.} Same inputs and real-data controls for every method; median [95\% interval] (lineages). The parenthetical count is the denominator. Separate from the full classical population. No Holm family in this table.}
-\label{tab:retained8}
-\centering\footnotesize\setlength{\tabcolsep}{3pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-matched8.tex}\end{minipage}}
-\end{table}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/retained-matched-eight.pdf}
-\caption{\textbf{Matched retained subset: median and marginal lineage-bootstrap intervals.} The denominator is the matched retained lineages in each panel. No Holm family. Privacy AUC is an empirical diagnostic; its interval stays outside a privacy guarantee.}
-\label{fig:retained8}
-\end{figure}
-
-\ref{tab:retainedpairs} gives exploratory TabSyn-minus-comparator
-retention differences on shared lineages. The Holm family comprises
-four metrics (CatBoost retention, mean marginal KS/TV, CatBoost C2ST AUC
-and distance-MIA AUC) times six classical configurations. Conservative
-binomial/order-statistic intervals for the median difference use
-Bonferroni correction over the entire family, conditional on independent
-lineages. This small cohort requires unbounded simultaneous intervals.
-Finite tail-adjusted bootstrap ranges are retained only as exploratory
-descriptions; familywise coverage stays outside those descriptions.
-Marginal intervals in \ref{fig:retained8} stay short of simultaneous
-intervals. The machine-readable reduction includes every diagnostic
-contrast and all applicability exclusions. A raw AUC difference stays outside
-a directional utility or privacy win. Selection of the completed subset,
-one fit seed and its small lineage count limit this exploratory analysis.
-
-\begin{table}[t]
-\caption{\textbf{Exploratory matched-subset CatBoost differences.} The denominator is the shared lineages in the cell. Holm family size is four metrics times six configurations. Conservative simultaneous median intervals; the corrected intervals are unbounded. A non-significant test leaves equivalence unclaimed.}
-\label{tab:retainedpairs}
-\centering\footnotesize\setlength{\tabcolsep}{3pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-paired.tex}\end{minipage}}
-\end{table}
-
-\ref{tab:arfpaired} separately extends the published DOPE--ARF
-retention comparison with lineage intervals. It preserves that receipt's
-median-of-three rule. Its six-test family contains two ARF configurations
-and three auditors. The shared-lineage intersections differ by auditor.
-These validation descriptions leave the release and superiority gates null.
-
-\begin{table}[t]
-\caption{\textbf{DOPE--ARF legacy matched receipt at $4n$: exploratory paired differences, conservative simultaneous median intervals and Holm $p$.} The denominator is the shared-lineage intersection for that auditor. Holm family size is six. Median-of-seed aggregation. A non-significant test leaves equivalence unclaimed.}
-\label{tab:arfpaired}
-\centering\footnotesize\setlength{\tabcolsep}{3pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-arf-paired.tex}\end{minipage}}
-\end{table}
-
-The supplement prints the deterministic first-batch diagnostics per
-physical job. Incomplete seed groups and mixed research profiles prevent
-population confidence intervals or method rankings for that batch.
-All reductions trace to committed receipt paths, source digests and JSON
-pointers in \path{docs/whitepaper/generated/retained-evidence.json}.
-The original receipt references are retained in
-\path{research/benchmark/results/retained-classical-validation/panel.json}
-and the first-batch publication recorded in that reduction.
-
-\begin{table}[t]
-\caption{\textbf{Baseline coverage from committed publications.} The denominator is the committed publication named in the row. Pending rows have no estimated result or completion date. No Holm family.}
-\label{tab:baselinecoverage}
-\centering\footnotesize\setlength{\tabcolsep}{3pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/baseline-coverage.tex}\end{minipage}}
-\end{table}
-
-The coverage table distinguishes Forest-Flow confirmation from the
-Forest-Diffusion pilot modes. No full-population diffusion result is
-inferred from the Flow subset. Additional native-scored fits and published
-common-metric cells are counted separately. Pending publication withholds any claim that a method failed. Receipt paths and digests are recorded in
-\path{docs/whitepaper/generated/baseline-coverage.json}.
-The ARF follow-on now supplies complete five-fit common measurements on the
-same validation lineages. Its between-fit standard deviation is descriptive
-and stays outside a confidence interval. TabSyn's additional retained n-sized evaluations
-include incomplete sample groups; those groups have no aggregate figure value.
-The supplementary descriptive figure inputs in
-\path{docs/whitepaper/generated/published-baseline-kpis.csv} retain a
-receipt path and JSON pointer for every value. Cohorts and fit counts differ;
-these inputs withhold a paired ranking.
-The ARF validation completion withholds final official-test certification.
-
-\subsection{BeyondArena}
-{\raggedright BeyondArena (\texttt{\BeyondRevision}) stays outside the
-$\PreparedN$ PMLB lineages and stays unpooled from them.\par}
-$\BeyondPrepared$ of the $\BeyondFamilies$ families in this fit check finished inside the cap.
-$\BeyondFailed$ stayed unprepared ($\BeyondFeatureRange$ outside the
-projected range, $\BeyondOverlap$ overlapping). The range stayed at its recorded bound.
-Those $\BeyondFamilies$ families are the fit check. The inventory is a separate list.
-The supplement names all $\BeyondInventory$ inventory families.
-\ref{tab:beyond} has no retention column.
-\begin{table}[t]
-\caption{\textbf{BeyondArena families that prepared.} The denominator is the $\BeyondFamilies$-family fit check and stays distinct from the $\BeyondInventory$-family inventory. No retention auditor and no Holm family.}
-\label{tab:beyond}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/beyond-fit.tex}\end{minipage}}
-\end{table}
-
-\section{Ablations}
-\label{sec:ablation}
-\textbf{Step budget.} \texttt{features12\_\allowbreak{}steps8192} is the same residual with four times as many
-AdamW steps. It is a budget check and stays distinct from the displayed model. Where both
-budgets have a complete three-seed group, the CatBoost median paired
-difference is $\DiffSufCb$ ($\NSufCb$ lineages). The supplement gives the
-linear and MLP differences and lists all $\PreparedN$ lineages. A blank
-cell is an unavailable fit or an uninformative auditor. The cell
-stays blank, and a zero stays unwritten. The scored fits leave the per-step series unstored. The replay section
-above plots the logged replay. The replay stays distinct from the scored artifacts.
-The lower loss at 8{,}192 steps leaves the displayed profile in place.
-
-The primary informativeness threshold is $0.01$ times the absolute null
-loss. \ref{tab:threshold} lists the CatBoost median by threshold and
-the informative counts. That Chow--Liu column uses its own informative count.
-The density-block Chow--Liu CatBoost median in the main paper is $\MedChowCb$
-on the paired informative lineages, so the two columns are different cohorts.
-The middle row is the $0.01$ rule behind the
-retention tables. \ThrSentence\ Fit-seed variance across seeds other than
-$11$ is \FitSeedVariance.
-
-\begin{table}[t]
-\caption{\textbf{Informativeness threshold and auditor counts.} The denominator for each median is the informative count printed beside it. No Holm family.}
-\label{tab:threshold}
-\centering
-\footnotesize
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/threshold-table.tex}\end{minipage}}
-\medskip
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/threshold-counts.tex}\end{minipage}}
-\end{table}
-
-Distribution fidelity, structure fidelity, coverage realism, and
-compactness keep their v2 definitions. The driver term stored beside
-this panel is the same equal mixture of rank agreement and top-feature-set
-overlap, applied to absolute correlations with the target. It stays distinct from the
-permutation-importance auditor in the v2 definition, and this paper
-withholds it as a component value. v2 utility transfer
-remains the one-sided lower bound on
-retention for the CatBoost, linear, and MLP auditors in the tables below.
-v3 utility transfer is that same bound on the Kumo large retention.
-The model is conditioned on the synthetic rows and scored
-on real holdout rows. Mitra and TabICL must be measured on the same mapped
-tables for the gate. Their retentions stay out of that bound.
-A CatBoost retention cannot fill this component.
-
-Real fit rows, real holdout rows, and synthetic rows share one map. The
-map is fit on the real fit rows only. Numeric columns go to the open unit
-interval by an empirical mid-rank quantile. Categorical levels are
-pre-encoded to fixed codes in that same interval. Column names become HMAC
-digests. The map withholds the minimum and the maximum. A second fit on
-the synthetic rows is a protocol failure. The tabular auditors and the
-embedding distance both see this mapped pair.
-
-Representation closeness asks whether Kumo large places the mapped
-synthetic table near the mapped real table. The distance is half the
-Euclidean length between the two unit-length vectors, and it lies in
-$[0,1]$. Closeness is one minus that distance divided by the distance to a
-matched null, clamped to $[0,1]$. The synthetic table must also sit closer than an
-independent-marginal table of the same size, under the same map. The
-matched null is selected from three independent-marginal tables drawn on
-the shared map. The seed of each table is the first eight bytes,
-little-endian, of the SHA digest of the dataset, the method, the
-configuration, the sample seed, and the candidate index. The candidate
-indices are $0$, $1$, and $2$. The loss is ordinary linear mean squared
-error on the mapped holdout. Candidates are ordered by loss, then by candidate
-index; the middle candidate is the matched null. Those losses are fixed before any encoder runs.
-Mitra and TabICL must show the same sign as Kumo large on the gap against
-the independent-marginal table. A sign flip, a zero match
-distance, or a missing vector makes the component null. The component is
-required. It stays separate from the tabular transfer.
-
-The headline encoder is Kumo large. Its loss is the structured-data-model
-regressor's mean of the inverse-transformed quantile forecasts. A single
-in-context prediction is a different scale and stays outside this loss. Mitra and
-TabICL repeat that transfer on the same mapped tables. Both are required
-for the tabular gate. Neither is averaged into representation closeness.
-Mitra is the zero-shot regressor. TabICL restores the context scale before
-the squared error. Kumo small and the project encoder a0 stay unscored.
-Kumo is available under the OpenMDW
-license and the Apache license. Mitra is Apache-licensed. TabICL is
-BSD-licensed. The chase score refuses
-Foundation and TabPFN, whose licenses stay outside the clean set for this
-release. It also refuses the target encoder, the historical context
-assembly, Hyperion, TabDPT, and the target-aware blocks. TabDPT's weights
-are Apache-licensed and still refused, because that model was trained on
-real tables that overlap this panel. Hyperion is the project's and still
-refused, because one training arm saw labels. The $4{,}168$-dimensional
-vector remains the router embedding. It stays outside the historical formula.
-The shipped generator remains \texttt{features12\_\allowbreak{}steps2048}.
-
-The object a recipient keeps is that generator together with a hash
-manifest: a salt identifier, the normalizer name, the encoder pin, one
-digest per column, a dtype code, and the byte length. The manifest carries
-no row, header, category string, extremum, or encoder weight. The salt and
-the hash-to-label map stay in a local file the recipient holds. A public
-sidecar that echoes a source string or an extremum fails the cleartext
-gate. An exact copy of a real row fails its own gate. The near-copy floor
-is the $0.01$ quantile, with linear interpolation, of squared Euclidean
-distances from each distinct real fit row to the nearest other distinct
-real fit row on the shared map. A synthetic row whose squared distance
-falls below that floor fails the gate. An undefined floor fails the gate.
-Crossing $10{,}240$ bytes fails the byte gate. In each case the scalar
-stays null.
-
-The tabular error and the embedding distance answer different questions.
-Tabular transfer asks whether a clean tabular model conditioned on the
-synthetic rows recovers the improvement that the same model obtained from
-real fit rows. Representation closeness asks whether the mapped synthetic
-table sits near the mapped real table. A release needs both measurements.
-A copied row, a cleartext string, or a byte-cap failure still removes the
-score.
-
-\section{Related work}
-\paragraph{Generators, by family.}
-Parametric copulas~\citep{patki2016sdv} and Chow--Liu trees~\citep{chow1968dependence}
-are the classical density models.
-Conditional GANs and variational autoencoders, including CTGAN, TVAE, TableGAN,
-CTAB-GAN, and CTAB-GAN+, are a second family~\citep{xu2019ctgan,park2018tablegan,zhao2021ctabgan,zhao2024ctabganplus}.
-Diffusion and score-based models are a third family. TabDDPM and TabSyn sit
-in that family with STASy, CoDi, TabDiff, CDTD, Forest-Diffusion, and
-GATD~\citep{kotelnikov2023tabddpm,zhang2024tabsyn,kim2023stasy,lee2023codi,shi2025tabdiff,mueller2025cdtd,jolicoeurmartineau2024forestdiffusion,zagardo2026gatd}.
-Autoregressive and language-model generators, and prior-data fitted
-generators, are a fourth family~\citep{borisov2023great,solatorio2023realtabformer,ma2023tabpfgen,hollmann2025tabpfn}.
-Graphical neural generators are separate from those four~\citep{liu2023goggle}.
-ARF estimates density with a forest~\citep{watson2023arf}.
-CART synthesis is the synthpop line~\citep{nowok2016synthpop}.
-A survey collects these design choices~\citep{borisov2024survey}.
-SMOTE is an oversampling method and stays unrun~\citep{chawla2002smote}.
-A parametric copula optimizes a joint density; the encoding differs because the shipped object is the byte-budgeted residual and the release gate stays closed on a retention.
-A Chow--Liu tree optimizes a tree-structured dependence model; the encoding differs because the artifact is the residual the encoding writes, under that byte budget and release gate.
-A conditional GAN optimizes an adversarial match to the training rows; the encoding differs because it ships that residual and keeps the release score null until the gates pass.
-A VAE optimizes reconstruction and a latent regularizer; the encoding differs because its artifact is the same byte-budgeted residual, with the release gate separate from the latent objective.
-A diffusion model optimizes a denoising or score objective; the encoding differs because the displayed generator is the byte-budgeted residual, and the release gate stays a separate null score.
-An autoregressive language-model generator optimizes serialized-row likelihood; the encoding differs because it stores a screened residual of fixed width and a release gate.
-A forest density model, including ARF, optimizes axis-aligned splits of the training table; the encoding differs because the shipped file is the byte-budgeted residual and the release score stays null.
-CART synthesis optimizes sequential conditional draws; the encoding differs because the artifact is that residual under the byte budget, with the release gate left closed.
-A prior-data fitted network optimizes a pretraining objective on other tables; the encoding differs because this paper's artifact is fit on the lineage under the byte budget, and the release score stays null.
-A differentially private synthesizer optimizes a privacy-budget constraint; the encoding differs because its release gate is the MFS contract, and an empirical distance stays outside differential privacy.
-
-\paragraph{What this paper measured.}
-The measured generators are the Gaussian copula, a Chow--Liu baseline written
-for this comparison, independent marginals written for this comparison, CTGAN,
-TVAE, ARF, scaled author-default TabSyn on a bound validation cohort and a separate retained subset, and a
-$\NForestCb$-lineage Forest-Flow confirmation.
-TabSyn and TabDDPM are both in the diffusion family above. TabSyn's admitted common-numeric cohort has $\WaveTabsynLineages$ lineages; one frozen-fit lineage lacks admitted samples. The retained subset uses a different cohort. The TabDDPM population
-publication is \TabDDPMResult. The other named generators are cited and stay
-unmeasured. the coverage table in this supplement records that coverage.
-This panel scores regression retention. Classification oversampling stays outside that score.
-
-\paragraph{Utility ratios, fidelity, and privacy.}
-Retention in the retention ratio is a null-normalized TSTR/TRTR ratio.
-Esteban, Hyland, and R{\"a}tsch named train-on-synthetic, test-on-real and
-train-on-real, test-on-real for synthetic series~\citep{esteban2017rcgan}.
-The numerator is the synthetic-trained auditor's improvement over a null.
-The denominator is the real-trained auditor's improvement over that null.
-The ratio is the measurement column. The claim in this paper is the
-byte-budgeted encoding and the release gate in the main paper, which stays
-null on every method in these tables.
-Utility reviews separate marginal fidelity from downstream
-prediction~\citep{snoke2018utility,raab2018practical}. Alpha-precision,
-beta-recall, SDMetrics, and synthcity are the usual fidelity
-reports~\citep{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}.
-Differentially private Bayesian networks and marginal
-synthesizers optimize a privacy budget~\citep{zhang2014privbayes,mckenna2021mst,mckenna2022aim,cai2021privmrf}.
-Membership inference and shadow-model attacks are a separate detection
-literature~\citep{shokri2017membership,hayes2018logan,vanbreugel2023domias}.
-Formal differential privacy is a different claim from an empirical
-resemblance score~\citep{dwork2014foundations,abadi2016deep}.
-The fidelity results add alpha-precision, beta-recall, a
-distance-to-closest-record share, and a DOMIAS AUC. ARF and the retained
-TabSyn subset have an additional fidelity, detection and empirical-privacy
-panel in the retained-validation section of this supplement. The displayed-profile ARF
-publication median is \ArfResult.
-Distance-MIA is reported below; attribute and predictor attacks remain unmeasured. Nothing in those fields is a formal privacy
-guarantee or a HIPAA de-identification claim.
-
-\paragraph{Auditors and rank tests.}
-Tree models remain strong tabular predictors, which is why CatBoost is one
-of the three auditors~\citep{grinsztajn2022trees,prokhorenkova2018catboost,shwartz-ziv2022tabular}.
-TabZilla and TabArena show how brittle a single split can
-be~\citep{mcelfresh2023tabzilla,erickson2026tabarena}. The regression
-lineages come from PMLB~\citep{olson2017pmlb,romano2021pmlb}. Comparing
-several methods on the same lineages needs a rank test and a critical
-difference, or a Bayesian signed-rank alternative~\citep{demsar2006statistical,benavoli2017time}.
-This paper reports the frequentist procedure: a Friedman test and a Nemenyi
-critical difference on the common set, plus paired Wilcoxon tests. The
-Bayesian signed-rank procedure stays uncomputed.
-
-\section{Discussion}
-CTGAN and TVAE fall short of the CatBoost retention, and their successful
-size-$4n$ artifacts miss the cap. None of these comparisons emits MFS-v2,
-MFS-v3, PTF-v1, or a release at the 10{,}240-byte tier.
-The Kumo, Mitra, and TabICL table in this supplement is a retention table and leaves those scores unemitted.
-A small Wilcoxon
-$p$-value leaves that null in place. The 8{,}192-step budget moves the
-CatBoost median by $\DiffSufCb$ and stays distinct from the displayed model. BeyondArena
-fits $\BeyondPrepared$ further families inside the cap and leaves
-retention unshown. The unmeasured publications and the null release scores are
-unchanged from the scope paragraph of the main text. An equal tuning budget across
-generators stays unmeasured.
-
-\subsection{What the six release-score components measure}
-Utility transfer is a one-sided lower bound on retention, clamped into
-$[0,1]$. It is the bound inside the historical formula, and it is distinct from the
-median of the retention ratio in the figures of the main text.
-Driver fidelity is an equal mixture of feature-importance rank agreement and
-top-feature-set overlap between the real table and the synthetic table.
-Distribution fidelity is half the minimum marginal fidelity, plus a quarter
-of the sliced-Wasserstein fidelity and a quarter of the maximum mean
-discrepancy fidelity.
-Structure fidelity is the minimum dependence fidelity.
-
-\section{Procedures moved from the main text}
-\subsection{Data lock, retention algebra, and rank procedure}
-The data lock admits
-$\EligibleN$ MIT-licensed entries and prepares $\PreparedN$. $\ExcludedN$
-lineages have no split object because the same source-row digest appears in
-two partitions (\texttt{check\_nonoverlap} raises on that overlap). Another
-$\UnknownRights$ catalog entries lack a redistribution grant and stay
-out of the prepared set. The prepared cut is a grouped 80/20 of the official training
-rows, seed $\SplitSeed$. Worker directories hold \texttt{train.csv} and
-\texttt{validation.csv}. \texttt{test.csv} stays out of those directories.
-The fit view has \CoreMin\ to \CoreMax\ rows. Sources above the quota use
-a hybrid coreset that keeps the observed feature and target range.
-Held-out validation rows are the grouped holdout of the official training file.
-Test-file contents stay unread.
-
-The ARF watch log's last count is $\ArfWatchClosed$ closed
-and $\ArfWatchOk$ ok out of $\ArfWatchPlanned$ planned, then a sealing record.
-
-Rearrangement of the retention ratio, with $r$ the retention, is algebra on the three losses named in the main text:
-\[
-L_{\mathrm{synthetic}}
-= L_{\mathrm{real}} + (1-r)\bigl(L_{\mathrm{null}}-L_{\mathrm{real}}\bigr).
-\]
-\RetentionAlgebra
-
-On CatBoost the Holm sign-test values are
-$\SignHolmGaussCb$, $\SignHolmChowCb$, and $\SignHolmIndCb$.
-A Friedman test and a Nemenyi
-critical difference use the four density methods on their common
-complete-informative set, with rank 1 assigned to the higher retention.
-
-The procedures below are the sampling draw, the lineage-name inventory,
-the fidelity readout, the compute timers, and the longer limitation record.
-A caveat here is the same caveat.
-
-\subsection{Joint draw and compile search}
-The residual equation in the main text is the conditional mean. The joint draw is separate.
-Sampling for this profile uses the symbolic kernel stored in the artifact.
-The separate neural-joint sampler stays unused. The dependence stored
-with an artifact is one choice from the compile search: independence, a
-Chow--Liu tree, a triangular autoregression, a sparse Gaussian copula, a
-factor model, a truncated vine, or a two-component mixture. The displayed
-artifacts span several dependence families.
-
-Training fits the residual. Sampling draws a row from the stored artifact.
-Training screens the inputs, ahead of sampling, by absolute rank correlation with
-the target and keeps at most 12. The artifact stores a marginal and a
-transform for each feature, the selected dependence, the residual, a noise
-model, and a per-feature missingness rate. A draw samples a latent vector
-from the stored dependence, maps each coordinate through the standard normal
-distribution function, inverts the marginal, and inverts the feature
-transform. The residual then supplies $\hat{y}$. When the training target falls outside an all-zero or all-one column, the stored noise is heteroscedastic: a linear
-fit of the log absolute residual on up to four screened features, with the
-scale clamped between the lower and upper deciles of those absolute
-residuals. The sampled target adds Gaussian noise of that scale and then
-clamps the sum to the unit interval of the training transform. The returned
-target stays on that unit interval. Each feature is then
-replaced, independently, by a missing mark with its stored probability. For
-the displayed DOPE artifacts, the charged byte count is the encoded model
-file plus \texttt{projection.json}. The publisher adds those two lengths.
-A baseline charge is the length stored for that method. This paper keeps that stored length. Before that encoding, the compiler quantizes the marginals, the
-dependence, the residual, and the noise model.
-
-The reported rows use a fixed profile; disjoint profile-selection evidence is unavailable. Compile-time
-search records the proxy $0.45u + 0.25d + 0.30j$ and then keeps the candidate
-with the smallest normalized gate shortfall, then the smallest artifact, then
-the lowest candidate id. Every candidate record withholds a release
-certificate. The compile record stays outside a release certificate. No global DOPE
-family has been selected. The production default, used for a profile other than
-this research profile, clamps the hidden width from \ProductionWidthLo\ to
-\ProductionWidthHi\ and trains for \ProductionSteps\ steps. That default stays
-outside this result. Other shapes stay outside this measurement: micro-TVAEs, TinyMAT,
-joint TVAE, a masked transformer, and a TabSyn candidate. A direct-rank
-TabDDPM candidate is a research comparator with no claim on the
-10{,}240-byte tier. The scored runs leave the per-step loss unstored. A
-later logged replay stores one. The supplement plots that replay. The
-replay files stay distinct from the scored artifacts, and a lower
-hidden-basis loss at 8{,}192 steps leaves the displayed profile in place.
-The full width-and-step grid is \FullAblationGrid.
-
-\OriginSentence
-
-\textbf{Fidelity and empirical privacy.} On the density cells, the displayed profile has median classifier two-sample
-AUC $\CtwoDope$ (interval $\CtwoLo$ to $\CtwoHi$, $n=\CtwoN$), mean marginal
-Kolmogorov--Smirnov distance $\KsDope$ ($\KsLo$ to $\KsHi$, $n=\KsN$), and pairwise
-correlation fidelity $\CorrDope$ ($\CorrLo$ to $\CorrHi$, $n=\CorrN$).
-Each of those counts is the number of lineages with a complete three-seed
-fidelity group. It stays distinct from the $\NDopeCb$ informative CatBoost retention
-lineages and from $\PreparedN$. A two-sample AUC
-near one half means a linear-time classifier has trouble telling the
-synthetic rows from the held-out validation rows. The supplement
-adds alpha-precision, beta-recall, the unbalanced DCR share, and a DOMIAS
-AUC. The lower block is the neural lineages only. Holm families are 12 and
-8, separate from retention. The DCR column is the fraction of synthetic
-queries whose nearest reference is in the fit view, with ties scored one
-half. A balanced variant was computed in the harness and stays outside this column.
-\DcrExchange\ Higher values of that share, and higher DOMIAS AUC, sit nearer
-the fit view and stay short of a quality win. DOMIAS here is the isolated kernel
-density-ratio equation from the pinned author expression, evaluated on this
-numeric projection. It stays distinct from the original DOMIAS training pipeline and from
-a membership-inference certificate. The DOMIAS AUC stays near one
-half. The density DCR contrast against independent marginals clears Holm in
-that worse direction. The displayed-profile ARF publication median is
-\ArfResult. The bound distance and membership-attack panel appears in
-Appendix~\ref{app:wave2privacy}; attribute inference and attacks on the shipped
-predictor remain pending. These empirical diagnostics stay outside differential
-privacy and HIPAA de-identification.
-
-The supplement's compute table lists fit time, peak memory, the GPU models, GPU
-hours, and charged bytes for receipts that store a fit timer.
-Sample-timer medians (maxima) are \CtganSampMed\ (\CtganSampMax) for
-CTGAN, \TvaeSampMed\ (\TvaeSampMax) for TVAE, and \ForestSampMed\
-(\ForestSampMax) for Forest-Flow. The DOPE receipt stores no sample
-timer. No receipt stores a separate CPU timer. Gaussian copula,
-Chow--Liu, independent marginals, and ARF have no fit timer, so they
-are omitted; their byte medians are in the supplement. ARF
-receipts leave the GPU model unrecorded. TabSyn cost is \TabSynPanel.
-TabDDPM cost is \TabDDPMPanel. The supplement states the replay
-walls, the Forest-Flow sums, and the unsplit density attempt timers.
-
-\paragraph{Internal.}
-The primary displayed DOPE and legacy comparison fits use the coreset
-in the experimental setup in the main text and fit seed $11$,
-and a training-derived validation cut of the official training rows. The
-scored retention panel is regression only. Other tasks stay outside the result
-of these tables. The
-supplement records the draw. The official test stayed out of
-training, selection, and the numbers in this paper. The registered endpoint
-partition is \texttt{untouched\_real\_test}. This paper scores the
-training-derived validation cut and leaves that partition sealed. The
-deviation is disclosed here. The result remains a validation estimate. The informativeness rule
-drops a negligible real-versus-null gap. \ThrSentence\ Incomplete groups
-are omitted. A zero for an omitted group stays unwritten. Chow--Liu and independent marginals are
-implementations written for this comparison. CTGAN and TVAE use the
-lineages that finished. Runs that stopped at the recorded time limit are
-omitted. They stay outside the failure count of a finished fit.
-
-The supplementary budget protocol retains the frozen \BaselineForestFitLimit-second Forest-Flow
-fit cap and all timed-out attempt receipts. Timeout cells have missing quality
-metrics and confer no DOPE win; coverage denominators include their recorded
-dispositions. The October 8 disposition addendum was written after \BaselineForestTimeouts\ observed
-timeouts and stays short of retroactive preregistration. A longer-budget sensitivity
-track would require a separate prospective freeze and comparable method
-budgets, with both tracks' costs retained. The supplement's
-\path{BASELINE_PROTOCOL.md} links the frozen completion checkpoint and
-every timeout disposition.
-
-The validation cut also supplies native tuning signals. These are
-post-selection validation estimates. Independent official-test
-estimates stay sealed. Lineage intervals hold the split and fitted artifact fixed;
-they omit fitting uncertainty. Related simulation lineages can violate
-the independence assumption behind both bootstrap and order-statistic
-intervals. The retained-subset results therefore remain exploratory.
-
-\paragraph{External.}
-The primary displayed DOPE fits leave behavior on the full
-tables used by the diffusion papers, across five fit seeds, and on the
-official test unestablished. The additional ARF and Forest-Flow fit seeds leave
-DOPE fitting uncertainty unestablished.
-Generalization past seed $\SplitSeed$ is \FitSeedVariance. Forest-Flow's
-byte comparison uses $\NForestCb$ lineages and the hash-checked fit files.
-BeyondArena is a separate fit check. It stays outside the retention panel and
-stays unpooled from the density block.
-
-\paragraph{Construct.}
-Retention is the reported utility. Both release scores in
-the release-score section of the main text stay null. The linear auditor leaves DOPE unseparated from the Gaussian copula,
-and equivalence stays unclaimed. Shipping this artifact stays a different
-experiment from shipping the compact predictor itself. The supplement's control table reports the predictor-only control and the real-row resample.
-Equivalence stays unclaimed. Normalized-space RMSE is the loss
-the auditors stored. Original-unit error after inverting the training
-transform stays unstored, and this paper leaves it unreported.
-The supplement's fidelity table stays outside a membership-inference certification. Its
-unbalanced DCR share and DOMIAS AUC are empirical. Empirical resemblance stays outside
-differential privacy and outside HIPAA de-identification.
-
-\paragraph{Statistical.}
-The rank tests are descriptive. The pre-registered production
-superiority test stays null. Density, neural, Forest-Flow, and BeyondArena stay
-unpooled. A small retention $p$-value leaves the null scalar in place.
-A non-significant test leaves equivalence unclaimed. The supplement
-gives the delta-method variance of one lineage's retention and the reason a
-small denominator is dropped. The intervals in the tables remain the lineage
-bootstrap of the median. Those intervals omit the delta-method term.
-
-\subsection{Training freeze, router vector, and emission requirements}
-Training screens the inputs, maps them
-through the width-16 $\tanh$ layer, and runs AdamW on the regression
-mean-squared error, with gradient clipping at $5$. The hidden weights and
-biases are then frozen.
-The intercept, the linear skip, and the hidden readout are refit on those
-frozen features. Coefficients whose absolute value is below $10^{-5}$ are
-dropped from the skip.
-
-The $4{,}168$-dimensional vector appends 24 candidate states from one router
-bundle onto the 856-wide sketch in the main text. A second bundle moves the same table. An index
-stores the 856-wide sketch. The longer vector is a route from one bundle.
-A neighbor found with the sketch is still fit with the displayed
-profile. The artifact is still charged in bytes, and it still faces the
-release score in the main text.
-The sketch stays outside the fitness components. A router action that names a
-retention or a failure probability is a prediction from the bundle. It stays
-outside the historical formula.
-
-PTF-v1 hard gates include joint fidelity,
-membership and attribute attacks, copy checks, and feature-importance
-agreement on a sealed holdout. PTF-v1 is null here, as are MFS-v2 and MFS-v3.
-Compile-time search records the proxy $0.45u + 0.25d + 0.30j$ and then keeps the
-candidate with the smallest gate shortfall, then the smallest artifact.
-That record withholds a release certificate. The proxy stays outside both release-score formulas.
-
-Emitting MFS-v2 requires the six components, a non-empty hard-gate map that passed,
-both the size-$n$ and size-$4n$ artifacts, real-versus-real controls,
-artifact-only sampling, and locked metric implementations. Emitting MFS-v3
-requires the bounded formula in the main text: the four prerequisites named there, the clean
-tabular transfer, the embedding distance under the shared map, and a pass
-on every hard gate. The Kumo, Mitra, and TabICL table
-reports the measured retentions. A retention stays distinct from the scalar.
-A retention win leaves those inputs empty. Copying a retention number into the historical formula would publish a value
-the contract refuses to emit. The generated rows apply the bounded formula to
-invented components, including a zero compactness term. Those rows are
-arithmetic on the bounded formula. They show the shape of the product.
-CTGAN and TVAE select on the validation auditors. Chow--Liu and the independent
-marginals report no search. The shared columns in this paper stay retention and charged bytes.
-
-\section{Tables and figures moved from the main text}
-The displays below are the selection rule, the compute ledger, and the
-block tables named from the main text. A caveat here is the same caveat.
-The main text keeps the headline table, the bytes figure, and the teaser.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/architecture.pdf}
-\caption{\textbf{Displayed pipeline.} The official test stays outside the inputs. No lineage denominator and no Holm family.}
-\label{fig:arch}
-\end{figure}
-
-\begin{table}[t]
-\caption{\textbf{Selection rule for each method.} The scored column is retention on the validation cut. CTGAN and TVAE use the same validation rows and the same linear and MLP auditors as that score. No Holm family. The budget column is the rule recorded for the method. A matched compute ledger stays outside that column.}
+\caption{\textbf{Selection rule for each method.} The scored column is retention on the validation cut. No Holm family.}
 \label{tab:selection}
 \centering
 \scriptsize
@@ -821,19 +160,25 @@ The main text keeps the headline table, the bytes figure, and the teaser.
 \toprule
 Method & Criterion & Data used & Budget \\
 \midrule
-DOPE displayed & Disjoint profile-selection evidence unavailable. Compile search keeps the smallest gate shortfall, then the smallest artifact, then the lowest candidate id. Proxy $0.45u+0.25d+0.30j$. & Training-derived validation cut. Official test sealed. & At most 12 inputs, width 16, $2{,}048$ steps, seed $11$. \\
-Gaussian copula & Held-out mean log density. Copulas $0.14.1$ \texttt{Gaussian\-Multivariate}. & Same validation cut. Distinct from the retention auditors. & One library configuration. \\
-CTGAN & Mean of linear and MLP training-mean skill. & Validation rows and those two auditors, the same ones used at scoring. & Author implementation. Stopped runs omitted. \\
-TVAE & Same skill as CTGAN. & Same rows and auditors as CTGAN. & Author implementation. Stopped runs omitted. \\
-Chow--Liu & No search. & Fit view, eight bins, Laplace smoothing $1.0$. Written for this comparison. & Fixed. \\
-Independent marginals & No search. & Fit-view marginals. Written for this comparison. & Fixed. \\
-ARF & Author-default and native-objective rows stay separate. Median \ArfResult. & Matched validation publication. Left on that receipt. & See the publication receipt. \\
-Forest-Flow & Author regression objective on a frozen grid. & $\NForestCb$ confirmation lineages. Separate block. & Fit cap \BaselineForestFitLimit\ seconds. \\
-TabSyn & No configuration selected. & Scaled author default on the complete lineages in the supplement. & Cost is \TabSynPanel. \\
-TabDDPM & No scored population selection. & Publication is \TabDDPMResult. & Cost is \TabDDPMPanel. \\
+DOPE & Profile chosen on a six-lineage discovery panel and checked on six confirmation lineages; compile search keeps the smallest gate shortfall, then the smallest artifact. & Discovery and confirmation lineages' validation cut; compile search reads fit rows only. & At most twelve inputs, width 16, $2{,}048$ steps, five fit seeds. \\
+DOPE untuned default & No selection. & Fit rows only. & Trainer default, five fit seeds. \\
+Gaussian copula & Held-out mean log density. Copulas $0.14.1$ \texttt{Gaussian\-Multivariate}. & Validation cut, distinct from the retention auditors. & One library configuration. \\
+CTGAN & Mean of linear and MLP training-mean skill. & The validation rows and the two auditors used at scoring. & Author implementation; stopped runs omitted. \\
+TVAE & Same skill as CTGAN. & Same rows and auditors as CTGAN. & Author implementation; stopped runs omitted. \\
+Chow--Liu & Native: held-out mean log density over a fixed trial set. Default: no search. & Native: validation cut. Default: fit view, eight bins, Laplace smoothing $1.0$. Written for this comparison. & Fixed trial set. \\
+Independent marginals & Native: held-out mean log density over a fixed trial set. Default: no search. & Native: validation cut. Default: fit-view marginals. Written for this comparison. & Fixed trial set. \\
+ARF & Author default; separately, the native objective. & Author default reads no validation rows; the native arm reads the validation cut. & Five fit seeds. \\
+TabSyn & No selection. & Author architecture with a scaled schedule. & $200$ VAE and $1{,}000$ diffusion epochs, fit seed $11$. \\
+Forest-Flow & Author regression objective on a frozen grid. & $\NForestCb$ confirmation lineages. & Fit cap \BaselineForestFitLimit\ seconds. \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsection{Compute ledger and budget protocol}
+\label{app:bytes}
+\cref{tab:cost} lists fit time, peak memory, GPU models, GPU hours, and charged bytes for receipts that store a fit timer. Peak RAM is resident bytes in mebibytes, peak VRAM is \texttt{peak\_gpu\_used\_mib}, and GPU hours sum the walls on which the receipt recorded a GPU process. No receipt stores a separate CPU timer. Sample-timer medians (maxima) are \CtganSampMed\ (\CtganSampMax) for CTGAN, \TvaeSampMed\ (\TvaeSampMax) for TVAE, and \ForestSampMed\ (\ForestSampMax) for Forest-Flow. Gaussian copula, Chow--Liu, and independent-marginal attempts store one unsplit \texttt{wall\_seconds}, with medians \GaussAttemptMed, \ChowAttemptMed, and \IndAttemptMed\ and maxima \GaussAttemptMax, \ChowAttemptMax, and \IndAttemptMax. The logged replay medians \ReplayMedA\ and \ReplayMedB\ are replay walls, distinct from the scored runs. Forest-Flow medians use the \ForestTimeN\ native-grid operation walls; \ForestFitCore\ sums \texttt{fit\_seconds} and \ForestSampleOp\ sums receipt operations. Byte charges count the files a sampler reads: the DOPE model plus \texttt{projection.json}; every TabSyn file except intermediate diffusion-epoch checkpoints, which the sampler never reads; and the stored per-lineage charge for every other baseline.
+
+The frozen Forest-Flow budget keeps the \BaselineForestFitLimit-second fit cap and every timed-out attempt receipt; a timeout cell has missing quality metrics and counts as no DOPE win. The October 8 disposition addendum was written after \BaselineForestTimeouts\ observed timeouts and is therefore no retroactive pre-registration. predeclare\_v2 instead fixes a common budget (\texttt{B1}: $1{,}800$ seconds per fit on one 16-core slot and one GPU) for every method and every lineage, applied non-selectively; \path{docs/whitepaper/BASELINE_PROTOCOL.md} links the frozen checkpoint and every disposition.
 
 \begin{table}[t]
 \caption{\textbf{Fit time, memory, GPU, and charged bytes where a fit timer was stored.} The denominator is the receipts that stored a timer. No Holm family.}
@@ -844,15 +189,101 @@ TabDDPM & No scored population selection. & Publication is \TabDDPMResult. & Cos
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/compute-cost-table.tex}\end{minipage}}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/retention-bars.pdf}
-\caption{\textbf{CatBoost retention at $4n$.} Higher is better. DOPE names the encoding's generator. Each bar is a method's paired-lineage retention median and its lineage-bootstrap interval. Density uses $\NDopeCb$ lineages. The neural panel uses $\NNeuCb$ and stays unpooled. Forest-Flow, $\NForestCb$ lineages, is higher on its own block and is omitted. No Holm family is drawn. The tests are in the tables.}
-\label{fig:bars}
-\end{figure}
+\subsection{Public data and artifact availability}
+\label{app:public-kit}
+A credential-free path to the source data is
+\par\smallskip\noindent{\footnotesize
+\hspace*{1.5em}\verb|python3 -m research.benchmark.fetch_pmlb --list|\\
+\hspace*{1.5em}\verb|python3 -m research.benchmark.fetch_pmlb DATASET_ID OUTPUT_DIRECTORY|\par}\smallskip
+\noindent
+It authenticates PMLB data against an upstream Git LFS SHA pin at a fixed public revision. The public manifest lists every prepared lineage's PMLB identifier and the historical train, validation, and test split hashes from the committed data lock. The historical staging used a hybrid coreset and target-stratified selection whose exact row indices were never captured, so the public fetch reproduces the source datasets and the split identities but cannot rebuild the exact historical partitions; publishing the fit and validation partitions themselves (PMLB is MIT-licensed) closes that gap and is scheduled with the artifact release. The originally scored model files and synthetic rows have no published bundle yet; the committed validation ledgers, the original metadata, and the compressed numeric logs, authenticated by the input pins and rebuilt by \texttt{just paper}, reproduce every reduction and figure.
+
+\subsection{Reproducibility and hashes}
+\input{generated/availability.tex}
+
+The rows below are the SHA-256 digests of each ledger and lock the paper reads, plus the commit and the file hash of the harness that measured the grouped-validation fidelity ledger. Regenerating the macros never rewrites a ledger hash.
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/artifact-hashes.tex}\end{minipage}}
+
+\section{Statistics}
+\label{app:stats}
+\subsection{Retention algebra and variance}
+\label{app:retention-variance}
+With $r$ the retention, the ratio rearranges to
+\[
+L_{\mathrm{synthetic}} = L_{\mathrm{real}} + (1-r)\bigl(L_{\mathrm{null}}-L_{\mathrm{real}}\bigr).
+\]
+\RetentionAlgebra\ Let $D = L_{\mathrm{null}} - L_{\mathrm{real}}$, so $R = (L_{\mathrm{null}} - L_{\mathrm{synthetic}}) / D$ when $D \neq 0$. The partial derivatives are
+\begin{align*}
+\frac{\partial R}{\partial L_{\mathrm{null}}} &= \frac{L_{\mathrm{synthetic}} - L_{\mathrm{real}}}{D^{2}}, &
+\frac{\partial R}{\partial L_{\mathrm{synthetic}}} &= -\frac{1}{D}, &
+\frac{\partial R}{\partial L_{\mathrm{real}}} &= \frac{R}{D}.
+\end{align*}
+If the three losses have covariance $\Sigma$, the delta-method variance of one lineage's retention is $\nabla R^{\top} \Sigma \nabla R$, which diverges as $D$ approaches zero. The informativeness rule drops a lineage whose real improvement is below $0.01$ times the absolute null loss as a stability cut; the tables report bootstrap intervals rather than this standard error.
+
+\subsection{Informativeness threshold}
+The primary threshold is $0.01$ times the absolute null loss. \cref{tab:threshold} lists the CatBoost median by threshold and the informative counts; each column uses its own informative count, so the Chow--Liu column differs from the density-block paired median of $\MedChowCb$ in \cref{tab:density}. \ThrSentence\ Reading the threshold counts from top to bottom, CatBoost is \NThrLowCb, \NThrMidCb, \NThrHighCb; linear is \NThrLowLin, \NThrMidLin, \NThrHighLin; and the MLP is \NThrLowMlp, \NThrMidMlp, \NThrHighMlp.
 
 \begin{table}[t]
-\caption{\textbf{Density block at $4n$.} Each cell is a dimensionless retention. The denominator is the paired informative lineages in that row. Holm family size is nine. W/T/L counts lineages. A tie is a difference of zero. Equivalence stays unclaimed.}
+\caption{\textbf{Informativeness threshold and auditor counts.} The denominator for each median is the informative count beside it. No Holm family.}
+\label{tab:threshold}
+\centering
+\footnotesize
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/threshold-table.tex}\end{minipage}}
+\medskip
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/threshold-counts.tex}\end{minipage}}
+\end{table}
+
+\subsection{Bootstrap, families, and equivalence}
+\input{generated/tost-protocol.tex}
+The v2 analyses follow \path{research/benchmark/review_fixes/predeclare_v2.json}, committed before any five-seed result existed. A fit value is the median of its three sample-seed retentions; a lineage value is the median of its complete fits (at least three for a five-seed arm); the panel level is the median of lineage values. Paired contrasts use the Hodges--Lehmann pseudo-median of lineage differences, which is the location the two-sided Wilcoxon signed-rank test addresses, and report the median difference beside it. Intervals come from a nested percentile bootstrap with $10{,}000$ draws: the four simulated name prefixes are clusters and every other lineage is its own cluster; a draw resamples clusters, then lineages inside each drawn cluster, then fit seeds inside each drawn lineage, separately for each arm. Holm families are declared per size: the primary family of $12$ tests, the density family of $9$, a deep-generator family of $12$, an other-generator family of $9$, and a control family of $6$; a member without data keeps its slot. The fit-seed-$11$ tables of supplement E keep the first version's per-size families (nine density, six neural, six ARF, and three Forest-Flow tests), which each caption names. Equivalence requires the $90\%$ nested interval of the Hodges--Lehmann difference to lie inside $\pm\VMargin$; a $20\%$ trimmed-mean (Yuen) test is a sensitivity. The v1 contract tested the mean paired difference with two one-sided $t$ tests at $\pm\TostEquivalenceMargin$ and unadjusted $\alpha=\TostAlpha$; paired retention differences have heavy tails when the denominator is small, so that estimand is kept only as a continuity column below. The Wilcoxon, Yuen, and v1 mean tests treat lineages as independent; only the bootstrap intervals resample the family clusters, and every verdict reads those intervals.
+
+A Friedman test and a Nemenyi critical difference compare the four density methods on their common complete-informative set, with rank $1$ for the higher retention; on CatBoost the Holm sign-test values are $\SignHolmGaussCb$, $\SignHolmChowCb$, and $\SignHolmIndCb$. A Bayesian signed-rank procedure would be an alternative to these frequentist tests and is not computed here.
+
+\section{Five-seed panel}
+\label{app:v2}
+\cref{tab:v2-levels} gives the retention level of every arm, auditor, and size, and \cref{tab:v2-contrasts} every DOPE-minus-comparator contrast with its family-adjusted $p$-value and both equivalence rules. \cref{tab:v2-seeds} gives the seed-exchangeability diagnostics: how often seed $11$ is the best of five, the estimate from seeds $23$ to $71$ alone, and the binary-by-seed diagnostic on the lineages common to every cell. The historical-binary refit reproduces the samples of the historical seed-$11$ population byte for byte on $\VSameHist$ of $\VSameHistN$ lineages. The later binary is the one an earlier four-seed run used; it writes the same seed-$11$ artifacts as the historical binary on $\VSameArtifact$ of $\VSameArtifactN$ lineages, and its samples match the refit at seeds $23$ to $71$ on $\VSameLater$ of $\VSameLaterN$ fits. Every retention cell in these tables, for DOPE and for every baseline including Forest-Flow, was scored again from its stored synthetic sample file by one pinned evaluator with auditor seed $1729$; a cell whose sample file was missing stays out. Each statistic draws its own bootstrap stream, so two rows built from identical samples, such as the seeds-$23$-to-$71$ sensitivity and the later-binary four-seed arm, can differ in the third decimal of an interval. The fit-seed-$11$ privacy and detector panels in \cref{app:privacy} come from separate earlier runs, which record the Forest-Flow cells as unavailable. The historical density, SDV, Forest-Flow, and fit-seed-$11$ DOPE receipts had used the sample seed as the auditor seed, while the ARF, TabSyn, and control receipts had used $1729$; the uniform re-score removes that difference, so the five-seed tables and the historical block tables below differ slightly for this reason as well as for the extra fit seeds.
+
+{\scriptsize\setlength{\tabcolsep}{2pt}
+\input{generated/v2-levels.tex}
+\input{generated/v2-contrasts.tex}}
+
+\begin{table}[t]
+\caption{\textbf{Seed exchangeability and the binary-by-seed diagnostic, CatBoost.} The count of lineages where seed $11$ is the best of five is descriptive: a seed acts on every lineage at once, so the lineages are not independent trials and no $p$-value is given. The 2$\times$2 cells are medians on the lineages common to all cells, with the median on each cell's own lineages beside it. No Holm family.}
+\label{tab:v2-seeds}
+\centering
+\footnotesize
+\input{generated/v2-seeds.tex}
+\end{table}
+
+\subsection{Fit-seed-11 review panels}
+The tables below are the fit-seed-$11$ review panels that preceded the five-seed refit. A method with two configurations keeps one row per configuration. Their intervals are the family-cluster bootstrap of the median, their equivalence column is the v1 mean-difference test, and their Holm families are split by size: nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests per size. Forest-Flow cells store no null loss, so its loss-path columns in \cref{tab:review-denominator} are empty while its informative count matches the size table. The sensitivity column of that table is the capped cohort, a different denominator from the headline.
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\input{generated/review-paired.tex}
+\input{generated/review-tabsyn.tex}
+\input{generated/review-tost.tex}
+\input{generated/review-family.tex}
+\input{generated/review-denominator.tex}
+\input{generated/review-rmse.tex}
+\endgroup
+
+\subsection{Historical block tables}
+\label{app:blocks}
+The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ receipts behind the first version of this paper; their intervals are lineage-bootstrap intervals of the median, and they are kept for continuity. The paired median difference is distinct from the difference of two medians. The two DOPE artifacts above the cap in that population are \MissA\ at \MissABytes\ bytes and \MissB\ at \MissBBytes\ bytes, and \NotInfName\ has a fit whose CatBoost group is uninformative, so the CatBoost median uses $\NDopeCb$ lineages while the byte count uses $\PreparedN$. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi. CatBoost reads RMSE $\RmseRealCb$ for the real-trained auditor and $\RmseSynCb$ for the synthetic-trained one, with training-mean skill $\RtwoRealCb$ and $\RtwoSynCb$; RMSE is the square root of the stored mean squared error, and conventional held-out $R^2$ is unstored for these rows. \cref{tab:hist-headline} collects the first version's headline contrasts. On its $\NForestCb$ Forest-Flow lineages the CatBoost medians are $\MedDopeForestCb$ for DOPE, whose artifacts have a median of \DopeForestByteMedian\ bytes, and $\MedForestCb$ [$\LoForestCb$, $\HiForestCb$] for Forest-Flow. The Nemenyi critical differences for the four density methods are $\FriedmanCdCb$ under CatBoost and $\FriedmanCdLin$ under the linear auditor.
+
+\begin{table}[t]
+\caption{\textbf{First-version headline contrasts at $4n$, fit seed 11.} Paired median DOPE-minus-baseline retention difference with W/T/L over lineages; a tie is a difference of zero. The ARF rows use the family-cluster interval of the review panel and its size-$4n$ Holm family of six. The density, neural, and Forest-Flow rows show each block's highest-median baseline with a lineage-bootstrap interval and the block's Holm family (nine, six, and three tests). The five-seed panel supersedes these rows; they are the traceability record of the first version.}
+\label{tab:hist-headline}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/headline-table.tex}\end{minipage}}
+\end{table}
+
+\begin{table}[t]
+\caption{\textbf{Density block at $4n$, fit seed 11.} Each cell is a retention; the denominator is the paired informative lineages in that row. Holm family size is nine. W/T/L counts lineages; a tie is a difference of zero.}
 \label{tab:density}
 \centering
 \footnotesize
@@ -861,49 +292,7 @@ TabDDPM & No scored population selection. & Publication is \TabDDPMResult. & Cos
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Kumo large, Mitra, and TabICL on the density block at $4n$.} Each cell is a dimensionless retention and stays outside MFS. The denominator is the paired informative lineages in that row. Holm family size is three per auditor, separate from the nine-test family in the statistics section of the main paper. W/T/L counts lineages. A tie is a difference of zero. Equivalence stays unclaimed.}
-\label{tab:mfsv3}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/mfs-v3-density-table.tex}\end{minipage}}
-\end{table}
-
-RMSE is the square root of the stored mean squared error.
-Training-mean skill is one minus that loss divided by the training-mean
-null loss. Conventional held-out $R^2$ uses the mean of the evaluation
-targets and stays unstored for these rows. Retention
-is the median of the per-lineage ratios and stays distinct from the ratio of these medians.
-CatBoost reads RMSE $\RmseRealCb$ and $\RmseSynCb$, with training-mean
-skill $\RtwoRealCb$ and $\RtwoSynCb$.
-
-\begin{table}[t]
-\caption{\textbf{Raw auditor medians on the informative lineages.} The denominator is the informative lineages for that auditor. No Holm family.}
-\label{tab:rmse}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/loss-beside-retention.tex}\end{minipage}}
-\end{table}
-
-The two displayed
-DOPE artifacts over the cap are \MissA\ at \MissABytes\ bytes and \MissB\ at
-\MissBBytes\ bytes. \NotInfName\ has a fit whose CatBoost group stays
-uninformative, so the CatBoost median uses $\NDopeCb$ lineages while the byte
-count uses $\PreparedN$. Independent marginals pass the cap more often than
-the Chow--Liu baseline and still sit near retention zero. Smallness alone stays outside
-the result. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi.
-
-\begin{table}[t]
-\caption{\textbf{Charged bytes at $4n$.} For displayed DOPE artifacts the charge is the encoded model file plus \texttt{projection.json}. The denominator is the artifacts with a stored charge. CatBoost retention uses $\NDopeCb$ lineages. Forest-Flow stays unpooled. No Holm family.}
-\label{tab:bytes}
-\centering
-\footnotesize
-\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/byte-table.tex}\end{minipage}}
-\end{table}
-
-\begin{table}[t]
-\caption{\textbf{Neural block at $4n$, unpooled.} The denominator is the paired informative lineages in the cell. CatBoost uses $\NNeuCb$. Holm family size is six. W/T/L counts lineages. A tie is a difference of zero. Equivalence stays unclaimed.}
+\caption{\textbf{Neural block at $4n$, fit seed 11.} The denominator is the paired informative lineages in the cell; CatBoost uses $\NNeuCb$. Holm family size is six. W/T/L counts lineages; a tie is a difference of zero.}
 \label{tab:neural}
 \centering
 \footnotesize
@@ -912,7 +301,7 @@ the result. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi.
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Forest-Flow confirmation at $4n$, CatBoost.} The denominator is $\NForestCb$ lineages. Holm family size is three. Unpooled. A non-significant test leaves equivalence unclaimed.}
+\caption{\textbf{Forest-Flow confirmation at $4n$, CatBoost, fit seed 11.} The denominator is $\NForestCb$ lineages. Holm family size is three.}
 \label{tab:forest}
 \centering
 \footnotesize
@@ -928,54 +317,75 @@ the result. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi.
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/publication-rows.tex}\end{minipage}}
 \end{table}
 
-\section{Review panels}
-\label{sec:review-panels}
-The panels below come from the pinned review receipts.
-A method with two configurations keeps a separate row for each configuration.
-Every filled TOST cell in the paired-difference table is no.
-Equivalence stays unclaimed.
-A missing artifact stays out of the median.
-Empirical distance and membership scores stay outside differential privacy and outside HIPAA de-identification.
-The TOST-only, RMSE and existing-seed files stay out because their ARF blocks lack a configuration column. The stored fidelity file is superseded by the configuration-aware table below.
+\begin{table}[t]
+\caption{\textbf{Raw auditor medians on the informative lineages, fit seed 11.} The denominator is the informative lineages for that auditor. No Holm family.}
+\label{tab:rmse}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/loss-beside-retention.tex}\end{minipage}}
+\end{table}
 
-\subsection{Paired differences at both sizes}
-\input{generated/tost-protocol.tex}
-The Wilcoxon and TOST calculations treat paired lineages as independent.
-The pre-declared TOST tests the mean paired retention difference against
-the equivalence margin $\pm\TostEquivalenceMargin$, with two one-sided $t$ tests at
-unadjusted $\alpha=\TostAlpha$ per comparison. Its mean estimand stays distinct
-from the median and its interval printed beside it.
-The printed interval is the family-cluster bootstrap of the median.
-Holm is split by size. Each size has nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests.
-The Holm column in this table is printed at three decimals. The main-text headline table prints the same ARF values in scientific notation.
+\begin{table}[t]
+\caption{\textbf{Charged bytes, fit seed 11.} For DOPE artifacts the charge is the encoded model file plus \texttt{projection.json}. The DOPE, density, Forest-Flow, and ARF rows count every artifact with a stored charge; the CTGAN and TVAE rows count native-selected fits whose three $4n$ sample cells all succeeded, so main Table~1, which counts every charged lineage, prints different medians for them. No Holm family.}
+\label{tab:bytes}
+\centering
+\footnotesize
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/byte-table.tex}\end{minipage}}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/retention-bars.pdf}
+\caption{\textbf{CatBoost retention at $4n$, fit seed 11.} Each bar is a method's paired-lineage retention median and its lineage-bootstrap interval. Density uses $\NDopeCb$ lineages and the neural panel $\NNeuCb$; the panels are separate cohorts. No Holm family.}
+\label{fig:bars}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/retention-bytes.pdf}
+\caption{\textbf{Density-block retention at $4n$ against charged bytes, per lineage, fit seed 11.} Each point is one lineage's \FigScatterQuantity\ (vertical) against its charged bytes on a log axis. Values outside $[\FigScatterYLo, \FigScatterYHi]$ are counted in the panel title and omitted from the frame. The dashed line is the $10{,}240$-byte cap. No Holm family.}
+\label{fig:bytes}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/paired-cdf.pdf}
+\caption{\textbf{CatBoost paired differences, sorted, and the Nemenyi scale, fit seed 11.} Rank 1 is the higher retention; the segment length is the critical difference. This display is outside the nine-test Holm family.}
+\label{fig:pairs}
+\end{figure}
+
+\section{Controls}
+\label{app:controls}
+The real-row control draws the published training rows with replacement until the table has four times the training row count. The predictor-only control fits a ridge regression on the training rows, samples each feature independently from its training marginal, and adds Gaussian residual noise; neither control uses the DOPE encoding, and the predictor-only gap bundles DOPE's dependence model with DOPE's nonlinear residual. The paired column is DOPE minus the control. In the fit-seed-$11$ control table below, the size-$n$ Holm family is the three predictor-only auditor tests, because the real-row control is defined at $4n$ only, and the size-$4n$ family has six tests; the five-seed panel keeps all six declared control slots at each size. Extra predictor fit seeds are reported and are outside the Holm family, and split-seed rows are a separate sensitivity.
 \begingroup
 \scriptsize
 \setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
-\input{generated/review-paired.tex}
-\endgroup
-
-\subsection{Controls}
-The real-row resample draws the published training rows with replacement until the table has four times the training row count. The predictor-only control fits the compact predictor on those training rows, samples each feature from its training marginal, and adds residual noise. Neither control uses the DOPE encoding. The paired column is DOPE minus the control. The size-$n$ Holm family is the three predictor-only auditor tests. The real-row resample has no size-$n$ arm, so it stays outside that family. The size-$4n$ Holm family has six tests. Extra predictor fit seeds stay in the table and stay outside the Holm family. Split-seed rows are a separate sensitivity. Wilcoxon and TOST treat lineages as independent. Equivalence stays unclaimed.
-\begingroup
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
 \input{generated/review-controls.tex}
 \endgroup
 
-\subsection{Holdout privacy}
-\label{app:wave2privacy}
-The public scalar ledger reproduces the predeclared aggregate byte for byte. Fit DCR and validation-holdout DCR remain distinct; NNDR uses the fit reference. Distance-MIA AUC measures an empirical attack, outside formal differential privacy and HIPAA de-identification. Own-cohort rows and the matched density intersection remain separate. Each detector uses the same fixed grouped CatBoost protocol and the same per-class row rule from the declaration, with missing outcomes kept unavailable. Forest-Flow has no admitted CatBoost or distance cell. Attribute and predictor attacks remain unmeasured.
+\section{Fidelity and empirical privacy}
+\label{app:privacy}
+\cref{tab:fidelity-hist} gives the alpha-precision, beta-recall, DCR-share, and DOMIAS columns of the grouped-validation fidelity ledger of the fit-seed-$11$ population. On the density cells of the same ledger, DOPE has median logistic two-sample AUC $\CtwoDope$ (95\% lineage-bootstrap interval $\CtwoLo$ to $\CtwoHi$, $n=\CtwoN$), mean marginal Kolmogorov--Smirnov distance $\KsDope$ ($\KsLo$ to $\KsHi$, $n=\KsN$), and pairwise correlation fidelity $\CorrDope$ ($\CorrLo$ to $\CorrHi$, $n=\CorrN$); each count is the lineages with a complete three-seed fidelity group, and \cref{tab:review-fidelity} prints the same medians with family-cluster intervals. A logistic detector near one half can still miss nonlinear differences, which is why the main paper reports a CatBoost detector. The DCR column of that ledger is the fraction of synthetic queries whose nearest reference is in the fit view, with ties scored one half. \DcrExchange\ The DOMIAS column is the isolated kernel density-ratio equation from the pinned author expression, evaluated on this numeric projection, which differs from the original DOMIAS training pipeline.
+
+\cref{tab:review-privacy} is the review privacy panel behind Table~3 of the main paper: for every method on the fit-seed-$11$ samples, a CatBoost two-sample detector with at most $200$ rows per class, the median distance to the closest fit row and to the closest validation row, the nearest-neighbour distance ratio against the fit rows, and a distance-based membership AUC. The fit reference holds about four times as many rows as the validation reference, so the distance to the fit rows is smaller by construction. None of these numbers is a differential-privacy guarantee or a HIPAA de-identification claim. Shadow-model attacks, attribute inference, and an attack on the shipped artifact are defined in predeclare\_v2 and are scheduled. \cref{tab:v2-fidelity} compares every arm's marginal, pairwise, and logistic-detector fidelity on the five-seed cells, and \cref{tab:review-fidelity} adds the stored fidelity of the fit-seed-$11$ population ledgers.
+
 \begingroup
 \scriptsize
 \setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
+\input{generated/v2-fidelity-levels.tex}
 \input{generated/review-privacy.tex}
+\input{generated/review-fidelity-stored.tex}
 \endgroup
+
+\begin{table}[t]
+\caption{\textbf{Grouped-validation fidelity and empirical privacy, fit seed 11.} Each cell is a median with its 95\% lineage-bootstrap interval. The fidelity denominator is the complete three-seed group count, distinct from the $\NDopeCb$ retention lineages. Holm families are 12 density tests and 8 neural tests, separate from retention.}
+\label{tab:fidelity-hist}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/fidelity-privacy-table.tex}\end{minipage}}
+\end{table}
 
 \subsection{Configuration-aware fidelity and detectors}
 \label{app:wave2fidelity}
@@ -990,78 +400,127 @@ The side-by-side columns use the common numeric projection and the published pil
 \caption{\textbf{Alpha-precision and beta-recall.} Fixed unembedded equations, median over complete sample triples, then hierarchical interval and lineage count. Configuration and cohort are explicit; unavailable cells carry no scalar. The retained TabSyn subset remains separate. No Holm family.}
 \label{tab:wave2alpha}
 \centering\scriptsize\setlength{\tabcolsep}{2pt}
-\resizebox{0.97\linewidth}{!}{\input{generated/review-alpha-beta.tex}}
+\resizebox{0.9\linewidth}{!}{\input{generated/review-alpha-beta.tex}}
 \end{table}
 
-\subsection{Matched scaled-default TabSyn}
-\label{app:wave2tabsyn}
-The scaled arm uses $\WaveTabsynVaeEpochs$ VAE and $\WaveTabsynDiffusionEpochs$ diffusion epochs; it remains distinct from an author-epoch-default run.
-The independent CSV-byte evidence covers the complete frozen sampling grid. One registered lineage has absent sample paths. The six historical successes labeled \texttt{worker} and its later unavailable receipt are quarantined outside the admitted grid; their identities are preserved without relabeling or an inferred closed-test flag. The admitted utility cohort has $\WaveTabsynLineages$ lineages. Every table and figure uses its actual informative intersection with DOPE. The parser gate remains the predeclared published sample, and scalar cells replay the original aggregate exactly. The historical retained subset above remains separate.
+\section{Ablations and replay}
+\label{sec:ablation}
+\textbf{Step budget.} \texttt{features12\_\allowbreak{}steps8192} is the same residual with four times as many AdamW steps. Where both budgets have a complete three-seed group, the CatBoost median paired difference, longer budget minus shorter, is $\DiffSufCb$ ($\NSufCb$ lineages); the linear medians are $\MedSufALin$ and $\MedSufBLin$ ($\NSufLin$ lineages; difference $\DiffSufLin$) and the MLP medians $\MedSufAMlp$ and $\MedSufBMlp$ ($\NSufMlp$ lineages; difference $\DiffSufMlp$). \cref{app:8192} lists every lineage. \textbf{Profile and default.} The main paper's untuned trainer default is a second axis (width and step budget together). The full width, step, readout, screening-size, and byte-budget grid, and the interaction stress suite (XOR, parity, products, many relevant features), are defined in predeclare\_v2 and scheduled.
 
-All paired family-cluster intervals include zero at both sizes. The size-$4n$ MLP median difference is $\WaveTabsynMlpDiff$, favoring TabSyn. Each size has its own Holm family of three iid Wilcoxon tests; those tests and TOST use independent-lineage assumptions, while the displayed median intervals resample source-family clusters. They estimate different quantities. Equivalence and general superiority remain unclaimed. No generator was refitted or retuned for this comparison.
-\begingroup
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
-\input{generated/review-tabsyn.tex}
+\textbf{Replay.} The scored runs did not store per-step losses; a later logged replay of both step budgets, before the readout refit, did. All $\ReplayN$ lineages finished. Median training loss starts at $\LossTrainStart$ and ends at $\LossTrainEndA$ and $\LossTrainEndB$; median validation loss starts at $\LossValStart$ and ends at $\LossValEndA$ and $\LossValEndB$. The replay files are distinct from the scored artifacts.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/loss-curves.pdf}
+\caption{\textbf{Logged replay of both step budgets before the readout refit.} The solid line is the training median and the dashed line the validation median; each band is a 95\% lineage-bootstrap interval. The longer budget is not the reported model.}
+\label{fig:replay}
+\end{figure}
+
+\section{Baseline coverage and retained evidence}
+\label{sec:retained}
+\cref{tab:baselinecoverage} records which baseline publications exist and on how many lineages. The ARF follow-on supplies complete five-fit measurements on the same validation lineages. TabSyn's full scaled-schedule panel is in the main paper; the earlier eight-lineage TabSyn subset below is a different cohort. Forest-Flow confirmation is distinct from the Forest-Diffusion pilot modes, and no full-population diffusion result is inferred from the Flow subset. Receipt paths and digests are in \path{docs/whitepaper/generated/baseline-coverage.json} and \path{docs/whitepaper/generated/retained-evidence.json}.
+
+\begin{table}[t]
+\caption{\textbf{Baseline coverage from committed publications.} Each row summarizes the retained publication for its method, whose path and digest are in \texttt{baseline-coverage.json}; that publication is the row's denominator. The TabSyn row is the earlier retained run; main Tables~1 and~2 report the later full scaled-schedule panel. No Holm family.}
+\label{tab:baselinecoverage}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/baseline-coverage.tex}\end{minipage}}
+\end{table}
+
+\textbf{Retained validation.} \cref{tab:retained100,tab:retained8} add the merged retained-sample evidence. Each lineage averages all three sample seeds before a lineage-bootstrap median, which differs from the median-of-seeds rule of the main tables. \cref{tab:retained100} covers ARF and the copula and Chow--Liu defaults and native configurations; \cref{tab:retained8} includes only the eight complete scaled-schedule TabSyn lineages of an earlier run and the classical methods on identical inputs. \cref{tab:retainedpairs} gives exploratory TabSyn-minus-comparator differences on those lineages, with conservative simultaneous intervals (Bonferroni over four metrics times six configurations), which are unbounded at this count. \cref{tab:arfpaired} extends the published DOPE--ARF comparison with lineage intervals under its six-test family.
+
+\begin{table}[t]
+\caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). No Holm family in this table.}
+\label{tab:retained100}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-classical100.tex}\end{minipage}}
+\end{table}
+
+\begin{table}[t]
+\caption{\textbf{Earlier eight-lineage TabSyn subset at $4n$.} Same inputs and real-data controls for every method; median [95\% interval] (lineages). A separate cohort from the full TabSyn panel. No Holm family in this table.}
+\label{tab:retained8}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-matched8.tex}\end{minipage}}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/retained-matched-eight.pdf}
+\caption{\textbf{Earlier eight-lineage TabSyn subset: medians and marginal lineage-bootstrap intervals.} No Holm family. Privacy AUC is an empirical diagnostic.}
+\label{fig:retained8}
+\end{figure}
+
+\begin{table}[t]
+\caption{\textbf{Exploratory eight-lineage subset differences, CatBoost.} The denominator is the shared lineages in the cell. Holm family size is four metrics times six configurations. The corrected simultaneous intervals are unbounded.}
+\label{tab:retainedpairs}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-paired.tex}\end{minipage}}
+\end{table}
+
+\begin{table}[t]
+\caption{\textbf{DOPE--ARF legacy matched receipt at $4n$: exploratory paired differences with conservative simultaneous median intervals.} The denominator is the shared-lineage intersection for that auditor. Holm family size is six. Median-of-seed aggregation.}
+\label{tab:arfpaired}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-arf-paired.tex}\end{minipage}}
+\end{table}
+
+\textbf{First-batch diagnostics.} The canonical-job batch below is incomplete at population and sample-group level, so its values are individual physical evaluations without a population interval or ranking. DOPE jobs in this batch use frozen research profiles that differ from the reported profile. Pearson entries are the pinned source mean, alpha and beta use its pinned unembedded variant, and MIA is an empirical distance attack. Per-column marginals, detection folds, DCR and NNDR, costs, and job digests are in the first-batch source listed in \path{docs/whitepaper/generated/retained-evidence.json}.
+\begin{table}[t]
+\caption{\textbf{First-batch diagnostics, one row per physical job.} Individual evaluations without a population interval. No Holm family.}
+\label{tab:first12}
+\centering
+\footnotesize
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-first12.tex}\end{minipage}}
+\end{table}
+
+\textbf{BeyondArena} (\texttt{\BeyondRevision}) is a separate fit check outside the $\PreparedN$ PMLB lineages. $\BeyondPrepared$ of the $\BeyondFamilies$ families in that check finished inside the cap, and $\BeyondFailed$ did not prepare ($\BeyondFeatureRange$ outside the projected range, $\BeyondOverlap$ overlapping); the median elapsed times per family are \BeyondElapseA\ seconds for \texttt{steps2048} and \BeyondElapseB\ seconds for \texttt{steps8192}. The inventory of all $\BeyondInventory$ families is in \cref{app:beyond}. No retention auditor ran on BeyondArena.
+
+\begin{table}[t]
+\caption{\textbf{BeyondArena families that prepared.} The denominator is the $\BeyondFamilies$-family fit check, distinct from the $\BeyondInventory$-family inventory. No retention auditor and no Holm family.}
+\label{tab:beyond}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/beyond-fit.tex}\end{minipage}}
+\end{table}
+
+\section{Per-lineage tables}
+The tables below list every prepared lineage of the fit-seed-$11$ population, the sufficiency budget, and the BeyondArena inventory. They are the rows behind the medians of the historical block tables, and a blank cell is an unavailable fit or an uninformative auditor rather than a zero. The five-seed v2 cells are in the committed scalar ledger \path{research/benchmark/results/review-fixes-v2/scalar-cells.jsonl}, which holds one row per fit, sample seed, size, and auditor for every arm.
+
+\subsection{Reported profile, all 100 lineages (fit seed 11)}
+\label{app:2048}
+These rows are the historical fit-seed-$11$ population of the reported profile. The cap column marks charged bytes at or under $10{,}240$; it is a byte check, not a release certificate. Retention columns are CatBoost at $n$ and $4n$, linear at $4n$, and the MLP at $4n$, each the median of the three sample seeds; the identifier is the lineage's dataset hash prefix and the name is its PMLB name.
+\begingroup\scriptsize\setlength{\tabcolsep}{2pt}
+\input{generated/s3-2048-lineages.tex}
 \endgroup
 
-\subsection{Source-family sensitivity}
-DOPE rows report median absolute retention within each source family.
-A row named for a comparator reports the median paired DOPE-minus-comparator
-retention difference on that family. The excluding-simulated cut uses the
-same level-versus-difference rule.
-The interval is the hierarchical CI.
-These descriptive sensitivity rows have no multiplicity family; their intervals
-are unadjusted and stay unpooled from the headline.
-\begingroup
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
-\input{generated/review-family.tex}
+\subsection{Sufficiency budget (fit seed 11)}
+\label{app:8192}
+These rows are the \texttt{features12\_\allowbreak{}steps8192} budget check on the lineages where it produced a charged byte count or a retention; the remaining lineages have neither and are omitted. The columns match the reported-profile table, so the two tables can be read side by side for the step-budget axis of \cref{sec:ablation}. The longer budget is a check on the reported profile and is not the reported model.
+\begingroup\scriptsize\setlength{\tabcolsep}{2pt}
+\input{generated/s3-8192-lineages.tex}
 \endgroup
 
-\subsection{Informative-lineage denominators}
-Informative, noninformative, and undefined lineage counts. This descriptive
-table has no multiplicity family.
-The sensitivity column is the capped cohort.
-A different denominator is a different cohort.
-Forest-Flow's original cells omit the null-loss metadata required by this
-sensitivity, so its counters are unavailable here. Its reported retention
-cohort remains in the size table.
-\begingroup
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\let\tabular\longtable
-\let\endtabular\endlongtable
-\input{generated/review-denominator.tex}
+\subsection{BeyondArena families in the dataset bucket}
+\label{app:beyond}
+The inventory below lists every BeyondArena family name in the dataset bucket with its task, row count, feature count, recorded license, and split type. Only the families with a cleared license entered the fit check of \cref{sec:retained}, and none of them was scored for retention. The inventory is a list of candidate tables for later panels and makes no claim about any of them.
+\begingroup\setlength{\tabcolsep}{2pt}
+\input{generated/beyondarena-inventory.tex}
 \endgroup
 
-\section{Delta-method variance of retention}
-\label{app:retention-variance}
-Let $D = L_{\mathrm{null}} - L_{\mathrm{real}}$ and write the retention ratio as
-$R = (L_{\mathrm{null}} - L_{\mathrm{synthetic}}) / D$ when $D \neq 0$.
-The partial derivatives are
-\begin{align*}
-\frac{\partial R}{\partial L_{\mathrm{null}}}
-  &= \frac{L_{\mathrm{synthetic}} - L_{\mathrm{real}}}{D^{2}}, \\
-\frac{\partial R}{\partial L_{\mathrm{synthetic}}}
-  &= -\frac{1}{D}, \\
-\frac{\partial R}{\partial L_{\mathrm{real}}}
-  &= \frac{R}{D}.
-\end{align*}
-If the three losses have covariance $\Sigma$, the delta-method variance of
-this one lineage's retention is $\nabla R^{\top} \Sigma \nabla R$.
-The inverse powers of $D$ in this gradient allow the variance to diverge
-as $D$ approaches zero. The informativeness rule therefore drops a lineage
-whose real improvement is zero or smaller than $0.01$ times the absolute
-null loss. The rule is a stability cut. A published standard error stays outside this rule.
-This appendix states the expansion. A numerical
-covariance stays unplugged, and the lineage-bootstrap intervals in the tables stay in place.
+\section{Extended related work}
+\label{app:related}
+\textbf{Generators by family.} Parametric copulas~\citep{patki2016sdv} and Chow--Liu trees~\citep{chow1968dependence} are the classical density models, and pair-copula constructions~\citep{aas2009paircopula} generalize them. Conditional GANs and variational autoencoders form a second family: CTGAN, TVAE, TableGAN, CTAB-GAN, and CTAB-GAN+~\citep{xu2019ctgan,park2018tablegan,zhao2021ctabgan,zhao2024ctabganplus}. Diffusion and score-based models form a third: TabDDPM, TabSyn, STASy, CoDi, TabDiff, CDTD, Forest-Diffusion, and GATD~\citep{kotelnikov2023tabddpm,zhang2024tabsyn,kim2023stasy,lee2023codi,shi2025tabdiff,mueller2025cdtd,jolicoeurmartineau2024forestdiffusion,zagardo2026gatd}. Autoregressive and language-model generators, and prior-data fitted generators, form a fourth~\citep{borisov2023great,solatorio2023realtabformer,ma2023tabpfgen,hollmann2025tabpfn}. Graphical neural generators are separate~\citep{liu2023goggle}; ARF estimates density with a forest~\citep{watson2023arf}; CART synthesis is the synthpop line~\citep{nowok2016synthpop}; SMOTE interpolates between neighbouring rows~\citep{chawla2002smote}; and a survey collects these design choices~\citep{borisov2024survey}. Probabilistic-program synthesis~\citep{saad2019bayesian} and CrossCat~\citep{mansinghka2016crosscat} produce small, inspectable joint models.
 
-\clearpage
+\textbf{How DOPE differs from each line.} A parametric copula or a Chow--Liu tree optimizes a joint density of a fixed form; DOPE adds an explicit model of the target's conditional mean and charges the result against a byte cap. A conditional GAN optimizes adversarial agreement and a VAE reconstruction plus a latent regularizer; both ship weights orders of magnitude larger than DOPE's cap. A diffusion model optimizes a denoising or score objective over the joint table; DOPE optimizes the target's conditional mean directly. A language-model generator optimizes serialized-row likelihood with a pretrained backbone; DOPE stores a screened residual of fixed width. A forest density model such as ARF optimizes axis-aligned splits of the joint table; CART synthesis optimizes sequential conditional draws, which also model the target given the features but store the trees. A prior-data fitted network optimizes a pretraining objective on other tables, whereas DOPE is fit on the lineage alone. A probabilistic-program synthesizer targets posterior inference over the joint distribution. A differentially private synthesizer optimizes under a privacy budget; DOPE's privacy evidence is empirical, and its release gate is the MFS contract.
+
+\textbf{What this paper measured.} The measured generators are the Gaussian copula, a Chow--Liu baseline and independent marginals written for this comparison, CTGAN, TVAE, ARF at five fit seeds, TabSyn on the full panel with a scaled schedule, and a historical Forest-Flow block; TabDDPM, TabDiff, a language-model generator, synthpop CART, and SMOTE are scheduled under a common budget in predeclare\_v2. This panel scores regression retention.
+
+\textbf{Utility ratios, fidelity, and privacy.} Retention is a null-normalized TSTR/TRTR ratio; Esteban, Hyland, and R{\"a}tsch introduced train-on-synthetic, test-on-real and train-on-real, test-on-real~\citep{esteban2017rcgan}. Utility reviews separate marginal fidelity from downstream prediction~\citep{snoke2018utility,raab2018practical}; alpha-precision, beta-recall, SDMetrics, and synthcity are the usual fidelity reports~\citep{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}. Differentially private Bayesian networks and marginal synthesizers optimize a privacy budget~\citep{zhang2014privbayes,mckenna2021mst,mckenna2022aim,cai2021privmrf}. Membership inference, shadow-model attacks, and holdout-referenced distances form the empirical privacy literature~\citep{shokri2017membership,hayes2018logan,vanbreugel2023domias,stadler2022groundhog,platzer2021holdout}; formal differential privacy is a different claim from an empirical resemblance score~\citep{dwork2014foundations,abadi2016deep}.
+
+\textbf{Auditors and rank tests.} Tree models remain strong tabular predictors, which is why CatBoost is one of the three auditors~\citep{grinsztajn2022trees,prokhorenkova2018catboost,shwartz-ziv2022tabular}. TabZilla and TabArena show how brittle a single split can be~\citep{mcelfresh2023tabzilla,erickson2026tabarena}. The regression lineages come from PMLB~\citep{olson2017pmlb,romano2021pmlb}. Comparing several methods on the same lineages needs a rank test and a critical difference, or a Bayesian signed-rank alternative~\citep{demsar2006statistical,benavoli2017time}.
+
 \bibliographystyle{iclr2027_conference}
 \bibliography{references,generated/related}
+
 \end{document}

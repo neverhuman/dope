@@ -1,0 +1,96 @@
+{
+ "format": "dope-review-fix-v2-provenance",
+ "official_tests_opened": false,
+ "sources": {
+  "aprime_bnew": {
+   "arms": [
+    "headline_bnew"
+   ],
+   "binary": "B_new (predeclare_v2 binaries.diagnostic)",
+   "commit": "c41b876781d3ffdf31c20f6a11ac53adfdbdad76",
+   "host": "xbabe1",
+   "runner": "research/benchmark/review_fixes/fit_seeds_v2.py"
+  },
+  "aprime_replay": {
+   "arms": [
+    "fourseed_bnew"
+   ],
+   "commit": "c41b876781d3ffdf31c20f6a11ac53adfdbdad76",
+   "host": "xbabe1",
+   "note": "re-scores the stored four-seed samples; no refit",
+   "runner": "research/benchmark/review_fixes/rescore_cells.py",
+   "runner_sha256": "9fae43e16a149f2637090fee4934d7576952450e5084e53f1446a91622c897e2"
+  },
+  "block_a": {
+   "arms": [
+    "headline",
+    "product_default"
+   ],
+   "binary": "B_hist (predeclare_v2 binaries.headline)",
+   "commit": "b288c648d9f0a1f44649f76b6cf3905807e85c0c",
+   "host": "xbabe1",
+   "runner": "research/benchmark/review_fixes/fit_seeds_v2.py",
+   "runner_sha256": "0159c0373836b046c21d1b4344f94c4fbcc4a44d2ad01f712bee7e06899acc25"
+  },
+  "k0": {
+   "adapters": "research/benchmark/review_fixes/rescore_adapters.py",
+   "adapters_sha256": "f6e71a6ad148edbbf183f3b40f58c25087d0a39f0774c707c08be0ca8b268ef7",
+   "auditor_seed": 1729,
+   "commit": "56ec6d2",
+   "host": "xbabe3",
+   "manifests": {
+    "manifest-arf.json": {
+     "cells": 6000,
+     "finished_utc": "2026-10-09T20:38:11Z",
+     "ledger": "arf-tabsyn-followon-validation-v1/panel.json",
+     "ledger_sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a",
+     "sha256": "41be8972b3d7895c489581d6713fd4fc1765993c8e63fa6af759a7aedf0b59ea"
+    },
+    "manifest-controls.json": {
+     "cells": 5700,
+     "finished_utc": "2026-10-09T20:38:11Z",
+     "ledger": "review-fixes-controls-v1/scalar-cells.jsonl",
+     "ledger_sha256": "559d7dd664bb77bc140c808660d05ac10842b4580c39a1efcf533fba20d5bf94",
+     "sha256": "077fac955aee367e8b0fb319cf791e6121304cbc0cec5418a9b3eeb088f0dc63"
+    },
+    "manifest-density.json": {
+     "cells": 3600,
+     "finished_utc": "2026-10-09T20:38:10Z",
+     "ledger": "density-matched-population-validation.json",
+     "ledger_sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a",
+     "sha256": "1b447d40e0057adcc250026eebe949fd8dbaf08f14dcd02e08928b435e397b80"
+    },
+    "manifest-dope-historical.json": {
+     "cells": 2400,
+     "finished_utc": "2026-10-09T20:38:11Z",
+     "ledger": "dope-s3-population-validation.json",
+     "ledger_sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4",
+     "sha256": "27fceb32250e06c96615c617f2515aac1440f513c91935672e9ba53941d64b0d"
+    },
+    "manifest-forest.json": {
+     "cells": 72,
+     "finished_utc": "2026-10-09T20:38:11Z",
+     "ledger": "s3-matched-forest-confirmation-validation.json",
+     "ledger_sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f",
+     "sha256": "d38d67f9acdb48b83aec41dafb7540f8e09ed827eef832df559373acfcbbd608"
+    },
+    "manifest-sdv.json": {
+     "cells": 2400,
+     "finished_utc": "2026-10-09T20:38:11Z",
+     "ledger": "sdv-matched-population-validation.json",
+     "ledger_sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e",
+     "sha256": "567677b0716cf6eaf6e4d1328d2cc849159e7383995bda912c9ff8efd1c39e30"
+    },
+    "manifest-tabsyn.json": {
+     "cells": 594,
+     "finished_utc": "2026-10-09T20:22:07Z",
+     "ledger": "review-fixes-tabsyn-v1/scalar-cells.jsonl",
+     "ledger_sha256": "b9fd4600ec54fc89b938eb627f31d6112176fc4137e040c3686c15efd17d2d62",
+     "sha256": "ebaa43b5df0c97e44b42706a10aeda54ae0296928f9be07ce7b4ceb7910228c2"
+    }
+   },
+   "runner": "research/benchmark/review_fixes/rescore_ledger.py",
+   "runner_sha256": "5e9467d60bbbab9641b8743ccc51bbf1a52d99cda0cc0e807d3ca251ca906a51"
+  }
+ }
+}

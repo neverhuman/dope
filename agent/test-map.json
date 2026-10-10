@@ -41,6 +41,34 @@
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_mfs_v3_table.py -v",
       "purpose": "recompute the Kumo, Mitra, and TabICL density table from lineage retentions"
     },
+    "docs/whitepaper/scripts/figure_spec.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_figure_spec.py -v",
+      "purpose": "keep every paper figure window in one spec that the drawing scripts and the prose macros read"
+    },
+    "docs/whitepaper/scripts/test_figure_spec.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_figure_spec.py -v",
+      "purpose": "keep every paper figure window in one spec that the drawing scripts and the prose macros read"
+    },
+    "docs/whitepaper/scripts/paper_lint.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_paper_lint.py -v",
+      "purpose": "lint manuscript prose, uncaptioned tabulars, path spacing, and printed public-data commands"
+    },
+    "docs/whitepaper/scripts/paper_v2_guards.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_paper_lint.py -v",
+      "purpose": "lint manuscript prose, uncaptioned tabulars, path spacing, and printed public-data commands"
+    },
+    "docs/whitepaper/scripts/test_paper_lint.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_paper_lint.py -v",
+      "purpose": "lint manuscript prose, uncaptioned tabulars, path spacing, and printed public-data commands"
+    },
+    "docs/whitepaper/scripts/paper_consistency.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_paper_consistency.py -v",
+      "purpose": "check that paired, level, and informative counts agree across generated paper artifacts"
+    },
+    "docs/whitepaper/scripts/test_paper_consistency.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_paper_consistency.py -v",
+      "purpose": "check that paired, level, and informative counts agree across generated paper artifacts"
+    },
     "research/benchmark/tests/test_mfs_v3.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3 research.benchmark.tests.test_score -v",
       "purpose": "score MFS-v3 only from frozen weights and measured gates, and keep the v2 pin unchanged"
@@ -396,6 +424,10 @@
     "CHANGELOG.md": {
       "command": "just fast",
       "purpose": "verify release change record"
+    },
+    "CITATION.cff": {
+      "command": "just fast",
+      "purpose": "verify citation metadata"
     },
     "LICENSE": {
       "command": "just fast",

@@ -1,12 +1,14 @@
 # DOPE white paper
 
-IEEE journal draft of the generator comparison. The measured DOPE model is
-the compact residual `features12_steps2048`: at most 12 inputs, hidden
-width 16, no embedding layer. Each method is selected on its own published
-objective. The shared measurements are null-normalized retention and charged
-artifact bytes, plotted in `figures/retention-bytes.pdf`. Master Fitness
-v2 is defined and left null until every required component is present and
-every hard gate passes.
+The paper (`dope-mfs.tex`) and its supplement (`supplement.tex`) report the
+DOPE generator against copula, tree, forest, neural, and diffusion baselines
+on 100 PMLB regression tables. The reported DOPE profile is the compact
+residual `features12_steps2048` (at most 12 inputs, hidden width 16) at five
+fit seeds. The shared measurements are null-normalized retention under three
+auditors at sizes n and 4n, two controls, and charged artifact bytes. The
+release score MFS-v3 is defined, conformance-tested, and printed as null until
+every required component is present and every hard gate passes. The analysis
+contract is `research/benchmark/review_fixes/predeclare_v2.json`.
 
 ## Build
 
@@ -53,6 +55,9 @@ The loss PDF and bootstrap summary now regenerate from committed inputs on
 machines without campaign scratch. `local_receipts.py --check` rejects a
 changed original or aggregate before its values can enter the paper.
 
-Fit seed 11 describes the primary displayed DOPE and legacy comparisons.
-The retained ARF and Forest-Flow five-fit appendices have their own coverage;
-their additional seeds do not establish DOPE fit variance or a release score.
+The primary displayed DOPE results come from the five-seed v2 panel (fit seeds
+11, 23, 37, 53, and 71 with the historical binary), reduced by
+`research/benchmark/review_fixes/v2_panel.py`. Fit seed 11 describes the
+first-version tables that the supplement keeps for traceability. ARF also has
+five fit seeds; every other comparator has one. No displayed result is a
+release score.

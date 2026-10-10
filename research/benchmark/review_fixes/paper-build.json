@@ -94,6 +94,22 @@
         "docs/whitepaper/generated/review-wave2-size-retention.tex"
       ],
       "path": "docs/whitepaper/scripts/review_wave2.py"
+    },
+    {
+      "path": "docs/whitepaper/scripts/review_v2_emit.py",
+      "args": ["--from-panel", "research/benchmark/results/review-fixes-v2/panel.json"],
+      "check_args": ["--check"],
+      "outputs": [
+        "docs/whitepaper/generated/v2-contrasts.tex",
+        "docs/whitepaper/generated/v2-fidelity-levels.tex",
+        "docs/whitepaper/generated/v2-fidelity-table.tex",
+        "docs/whitepaper/generated/v2-headline-table.tex",
+        "docs/whitepaper/generated/v2-headline.json",
+        "docs/whitepaper/generated/v2-levels.tex",
+        "docs/whitepaper/generated/v2-numbers.tex",
+        "docs/whitepaper/generated/v2-seeds.tex",
+        "docs/whitepaper/generated/v2-size-table.tex"
+      ]
     }
   ]
 }

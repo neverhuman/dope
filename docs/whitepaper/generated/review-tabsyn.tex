@@ -1,8 +1,13 @@
-% TabSyn track scaled\_200\_vae\_1000\_diffusion. Samples use seeds 101, 211, and 307 at size n and size 4n. A lineage median requires three informative sample seeds. Own-lineage rows use every informative TabSyn lineage. Matched rows use the intersection with informative DOPE features12\_steps2048. DOPE minus TabSyn is that intersection. Holm family is 3 per size (one method, three auditors) and is separate from the published comparator blocks. The published-sample parser check matched before these cells were sampled. Lineages absent from the admitted scalar cohort: 02a45777900441ce. Absence is not a win. Official tests were not opened. Formal DP remains false.
-\begin{tabular}{lllllrrr}
+\begin{longtable}{lllllrrr}
+\caption{\textbf{TabSyn and DOPE retention levels, fit seed 11.} TabSyn runs the scaled schedule (200 VAE and 1{,}000 diffusion epochs). A lineage median needs three informative sample seeds at size $n$ or $4n$; own-lineage rows use every informative TabSyn lineage, and matched rows use the lineages shared with informative DOPE features12\_\allowbreak steps2048. Intervals are the family-cluster bootstrap. Lineages absent from the admitted cohort: 02a45777900441ce; absence is no win. No Holm family.}\label{tab:review-tabsyn}\\
 \toprule
 Method & Configuration & Cohort & Size & Auditor & $n$ lineages & Median & Hierarchical CI \\
 \midrule
+\endfirsthead
+\toprule
+Method & Configuration & Cohort & Size & Auditor & $n$ lineages & Median & Hierarchical CI \\
+\midrule
+\endhead
 TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 1$n$ & catboost & 98 & 0.8557 & [0.6955, 0.9459] \\
 TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 1$n$ & linear & 93 & 0.9107 & [0.7705, 0.9890] \\
 TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 1$n$ & mlp & 87 & 0.9170 & [0.7414, 0.9844] \\
@@ -22,11 +27,17 @@ DOPE & features12\_steps2048 & matched lineages & 4$n$ & catboost & 96 & 0.9386 
 DOPE & features12\_steps2048 & matched lineages & 4$n$ & linear & 91 & 0.9940 & [0.9718, 0.9967] \\
 DOPE & features12\_steps2048 & matched lineages & 4$n$ & mlp & 72 & 1.0684 & [1.0048, 1.2714] \\
 \bottomrule
-\end{tabular}
-\begin{tabular}{lllllrrllrl}
+\end{longtable}
+\begin{longtable}{lllllrrllrl}
+\caption{\textbf{DOPE minus TabSyn, fit seed 11.} Median paired retention difference on the matched lineages with its family-cluster bootstrap interval, the mean difference, the v1 mean-difference equivalence test at $\pm 0.02$, and W/T/L. The Holm family has three tests per size (one comparator, three auditors), separate from every other comparator block; the Wilcoxon and equivalence tests treat lineages as independent.}\label{tab:review-tabsyn-contrasts}\\
 \toprule
 Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
 \midrule
+\endfirsthead
+\toprule
+Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
+\midrule
+\endhead
 1$n$ & catboost & TabSyn & scaled\_200\_vae\_1000\_diffusion & 96 & 0.0122 & [-0.0033, 0.0851] & 0.0338 & no & 59/0/37 & 0.042 \\
 1$n$ & linear & TabSyn & scaled\_200\_vae\_1000\_diffusion & 91 & 0.0348 & [-0.0008, 0.1265] & 58.8632 & no & 61/0/30 & 0.000 \\
 1$n$ & mlp & TabSyn & scaled\_200\_vae\_1000\_diffusion & 72 & 0.0333 & [-0.0078, 0.1272] & 0.2127 & no & 43/0/29 & 0.011 \\
@@ -34,4 +45,4 @@ Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical 
 4$n$ & linear & TabSyn & scaled\_200\_vae\_1000\_diffusion & 91 & 0.0199 & [-0.0018, 0.1364] & 68.9447 & no & 60/0/31 & 0.000 \\
 4$n$ & mlp & TabSyn & scaled\_200\_vae\_1000\_diffusion & 72 & -0.0041 & [-0.0384, 0.0738] & 0.1739 & no & 33/0/39 & 0.682 \\
 \bottomrule
-\end{tabular}
+\end{longtable}

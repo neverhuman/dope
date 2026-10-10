@@ -1,8 +1,13 @@
-% Empirical attack metrics only. Not formal differential privacy and not HIPAA de-identification. c2st\_catboost\_auc is the GBDT detector. Stored logistic C2ST is a different table. Unmatched rows keep each method's own lineages whose synthetic row count equals fit rows times size. Matched density rows use the intersection of DOPE, GaussianCopula, Chow-Liu, and independent marginals. Unavailable cells are not wins. CTGAN sample_csv_unresolved 468. DOPE sample_csv_unresolved 12. ForestDiffusion/Forest-Flow sample_csv_absent 36. TVAE sample_csv_unresolved 468.
-\begin{tabular}{lllllrr}
+\begin{longtable}{lllllrr}
+\caption{\textbf{Holdout privacy and CatBoost detection, fit seed 11.} Each value is the median over lineages of each lineage's median over three sample seeds, with the family-cluster bootstrap interval. Own rows use each method's lineages whose synthetic row count equals fit rows times size; matched-density rows use the lineages shared by DOPE, the Gaussian copula, Chow--Liu, and independent marginals. Fit DCR and NNDR use the fit rows as the reference set and holdout DCR the validation rows, about a quarter as many. Distance MIA AUC is an empirical membership attack, and c2st\_catboost\_auc is the CatBoost detector. These are empirical attack scores, not formal differential privacy and not HIPAA de-identification. Unavailable cells are no wins: CTGAN 468 (sample\_csv\_unresolved); DOPE 12 (sample\_csv\_unresolved); ForestDiffusion/Forest-Flow 36 (sample\_csv\_absent); TVAE 468 (sample\_csv\_unresolved). No Holm family.}\label{tab:review-privacy}\\
 \toprule
 Method & Configuration & Size & Metric & $n$ lineages & Median & Hierarchical CI \\
 \midrule
+\endfirsthead
+\toprule
+Method & Configuration & Size & Metric & $n$ lineages & Median & Hierarchical CI \\
+\midrule
+\endhead
 ARF & author\_default & 1$n$ & dcr\_validation\_median & 100 & 0.1095 & [0.0532, 0.1639] \\
 ARF & author\_default & 1$n$ & dcr\_fit\_median & 100 & 0.0826 & [0.0332, 0.1257] \\
 ARF & author\_default & 1$n$ & nndr\_fit\_median & 100 & 0.8983 & [0.8617, 0.9278] \\
@@ -124,4 +129,4 @@ GaussianCopula & matched density & 4$n$ & c2st\_catboost\_auc & 96 & 0.7348 & [0
 Chow-Liu & matched density & 4$n$ & c2st\_catboost\_auc & 96 & 0.7062 & [0.6017, 0.9302] \\
 independent\_marginals & matched density & 4$n$ & c2st\_catboost\_auc & 96 & 0.8578 & [0.7555, 0.9727] \\
 \bottomrule
-\end{tabular}
+\end{longtable}

@@ -16,7 +16,7 @@ def raw(method, configuration, dataset, fit_seed, sample_seed, size, retention, 
                       "retention": retention if informative else None} for name in P.AUDITORS}
     return {"status": "ok", "method": method, "configuration": configuration, "dataset": dataset,
             "fit_seed": fit_seed, "sample_seed": sample_seed, "size": size, "official_tests_opened": False,
-            "synthetic_sha256": "a" * 64,
+            "synthetic_sha256": "a" * 64, "binary_sha256": CONTRACT["headline_binary"],
             "report": {"implementation_sha256": CONTRACT["implementation_sha256"],
                        "dependencies": CONTRACT["dependencies"], "null_loss": 1.0, "utility": utility}}
 
@@ -60,8 +60,8 @@ class BinderTests(unittest.TestCase):
             only = B.collect([(root / "a", "t", None)], CONTRACT)
             meta = B.write_ledger(only, Path(tmp) / "out" / "scalar-cells.jsonl", CONTRACT)
             self.assertEqual(meta["cells"], 1)
-            override = B.collect([(root / "b", "t", "headline_bnew")], CONTRACT)
-            self.assertEqual(override[0]["configuration"], "headline_bnew")
+            override = B.collect([(root / "b", "t", "fourseed_bnew")], CONTRACT)
+            self.assertEqual(override[0]["configuration"], "fourseed_bnew")
 
 
 class FitLedgerTests(unittest.TestCase):
@@ -96,6 +96,72 @@ class PanelTests(unittest.TestCase):
         cells = [cell for cell in ledger(n_lineages=6) if not (cell["method"] == "TabSyn" and cell["sample_seed"] == 307)]
         panel = P.reduce(cells, {}, draws=50)
         self.assertFalse(any(item["method"] == "TabSyn" for item in panel["contrasts"]))
+
+    def test_sample_identity_counts_fits_with_equal_digests(self):
+        cells = ledger(n_lineages=3)
+        copies = [dict(cell, configuration="headline_bnew") for cell in cells
+                  if cell["method"] == "DOPE" and cell["fit_seed"] == 11]
+        copies[0] = dict(copies[0], synthetic_sha256="b" * 64)
+        identity = P.sample_identity(cells + copies)
+        self.assertEqual(identity["headline_bnew"], {"fits": 3, "identical": 2})
+        self.assertEqual(identity["historical_seed11"], {"fits": 0, "identical": 0})
+
+    def test_dope_cells_must_come_from_ok_fits(self):
+        cells = ledger(n_lineages=2)
+        fits = [{"configuration": "headline", "dataset": f"{index:016x}", "fit_seed": seed, "status": "ok",
+                 "official_tests_opened": False} for index in range(2) for seed in (11, 23, 37)]
+        P.check_fits(cells, fits)
+        with self.assertRaisesRegex(ValueError, "no ok fit"):
+            P.check_fits(cells, fits[1:])
+        with self.assertRaisesRegex(ValueError, "no ok fit"):
+            P.check_fits(cells, [])
+
+    def test_cap_sensitivity_drops_over_cap_lineages(self):
+        cells = ledger(n_lineages=8)
+        fits = [{"configuration": "headline", "dataset": f"{index:016x}", "fit_seed": seed, "status": "ok",
+                 "charged_bytes": 20000 if index == 0 else 2000, "official_tests_opened": False}
+                for index in range(8) for seed in (11, 23, 37)]
+        self.assertEqual(P.over_cap(fits), [f"{0:016x}"])
+        panel = P.reduce(cells, {}, draws=50, fits=fits)
+        cap = panel["cap_sensitivity"]
+        self.assertEqual(cap["excluded"], [f"{0:016x}"])
+        self.assertEqual([row["n"] for row in cap["levels"]], [7, 7, 7])
+        self.assertEqual(cap["contrasts"], [])  # no comparator reaches the full panel in this fixture
+        values = P.fit_values(cells, {})
+        direct = P.cap_sensitivity(values, P.over_cap(fits), [("TabSyn", "scaled_200_vae_1000_diffusion")], 50)
+        tabsyn = [row for row in direct["contrasts"] if row["auditor"] == "catboost"]
+        self.assertEqual(tabsyn[0]["n"], 7)
+        self.assertIsNone(P.reduce(cells, {}, draws=50)["cap_sensitivity"])
+
+    def test_duplicate_samples_and_unknown_arms_are_refused(self):
+        cells = ledger(n_lineages=6)
+        with self.assertRaisesRegex(ValueError, "duplicate sample cell"):
+            P.fit_values(cells + [dict(cells[0])], {})
+        self.assertEqual(P.family_of_arm(("TVAE", "native_selected")), "descriptive")
+        with self.assertRaisesRegex(ValueError, "no declared family"):
+            P.family_of_arm(("Mystery", "default"))
+        with self.assertRaisesRegex(ValueError, "duplicate sample cell"):
+            P.reduce(cells + [dict(cells[0])], {}, draws=20)
+
+    def test_reduce_refuses_undeclared_arms_that_never_reach_a_contrast(self):
+        cells = ledger(n_lineages=6)
+        stray = [cell for cell in cells if cell["method"] == "TabSyn" and cell["dataset"] == f"{0:016x}"]
+        closed = {auditor: {"trtr_loss": 0.1, "tstr_loss": 0.2, "informative": False, "retention": None}
+                  for auditor in P.AUDITORS}
+        fidelity = {"marginal_ks_mean": 0.1, "pair_correlation_fidelity": 0.9, "c2st_auc_logistic": 0.6}
+        paths = {"incomplete": [cell for cell in stray if cell["sample_seed"] != 307],
+                 "noninformative": [dict(cell, utility=closed) for cell in stray],
+                 "fidelity_only": [dict(cell, utility={}, **fidelity) for cell in stray]}
+        for arm in (("TabSyn", "undeclared_configuration"), ("Mystery", "default")):
+            for path, extra in paths.items():
+                with self.subTest(arm=arm, path=path):
+                    with self.assertRaisesRegex(ValueError, "no declared family"):
+                        P.reduce(cells + [dict(cell, method=arm[0], configuration=arm[1]) for cell in extra],
+                                 {}, draws=20)
+        panel = P.reduce(cells, {}, draws=20)
+        self.assertEqual({(row["method"], row["configuration"]) for row in panel["levels"]},
+                         {P.HEADLINE, ("TabSyn", "scaled_200_vae_1000_diffusion")})
+        self.assertLessEqual({(row["method"], row["configuration"]) for row in panel["levels"]}, P.ROSTER)
 
     def test_below_minimum_pairs_has_no_test(self):
         panel = P.reduce(ledger(n_lineages=4), {}, draws=50)

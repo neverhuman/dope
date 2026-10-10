@@ -1,101 +1,83 @@
-# Deep-review gap ledger (paper-review-fixes)
+# Deep-review gap ledger
 
-An external adversarial review of `dope-mfs.pdf` at b774807 found the gaps below. Each row closes with a commit or with a stated reason
-why it cannot be done. If a new result weakens a claim, the paper weakens the claim.
+An external adversarial review of `dope-mfs.pdf` at b774807 found the gaps below, and the
+later grades and audits added G-01 to G-07. Each row closes with
+the change that fixed it or states what is still open and why. When a new result weakens a
+claim, the paper weakens the claim; the v2 prose takes every data-dependent word from
+`generated/v2-numbers.tex`, so a verdict cannot outrun its interval.
 
 | ID | Gap | Fix / acceptance | Status |
 |---|---|---|---|
-| CM-01 | "0 of 388 lineages": 388 counts method×lineage records | Report method–lineage cells; assert n_records = methods × lineages | closed in a4be7ed: scalar text says 0 of 388 method–lineage cells (97 lineages × 4 methods) |
-| CM-02 | The abstract refers to "that interval" but never gives one | State the CI inline | closed: abstract states DiffLinGauss with LoDiffLinGauss to HiDiffLinGauss |
-| CM-03 | "not measured and not measured" | Distinct macro wording; lint for repeated adjacent phrases | wording closed; measured costs still open under PR-08 |
-| CM-04 | Sketch width 10+64×12+6 = 784 ≠ 856 | Document the 72-wide distribution block; test the sum | closed: text is 10+12×6+64×12+6=856; rust test documented_sketch_decomposition_matches_emitted_width in a4be7ed |
-| CM-05 | Contribution bullets point at the wrong figures; bullet 1 has no verb | Repoint; rewrite | closed |
-| CM-06 | "Each method selected on its own objective" overstates | Per-method selection table | closed: tab:selection |
-| CM-07 | Table 5 Holm family undocumented | Declare family_size per table | closed: sec:stats and captions state the family; density-table footnote in a4be7ed is 3 tests per auditor |
-| CM-08 | Pre-registered size-n endpoint not reported | Report size n next to 4n | closed: the main table inputs `generated/review-wave2-size-retention.tex` at size n and size 4n, including TabSyn and same-cohort DOPE rows. Author-default and native-selected ARF remain separate configurations |
-| CM-09 | Endpoint is validation; official test sealed | One sealed run of the frozen config | in progress, wave 2. The sealed run has not started. No official-test number is reported |
-| CM-10 | Supplement is in IEEE style; no anonymous supplement | ICLR-style supplement + anonymous build + leak grep | closed: ICLR-style supplement, anonymous source build, and leak checks are part of the paper gate. Hosted clean-rebuild passed at 2bf3578; the final wave-2 head needs its own green run |
-| CM-11 | `just paper` does not regenerate everything | Complete build graph + clean-rebuild CI job | closed: the complete authenticated scalar graph precedes rendering and source PDF builds. Hosted clean-rebuild passed at 2bf3578; final wave-2 CI is recorded separately |
-| CM-12 | Byte charge includes projection.json but the text omits it | Define bytes as model + projection | closed: encoded model file plus projection.json |
-| CM-13 | MFS-v3 can exceed 100 | Clip; perfect profile = 100 test | closed: eq:mfsv3 clips to [0,100]; the main text no longer prints the historical all-ones illustration. Native v3 uses max(c, epsilon) and the clip at f6665d9. The v2 path remains eq:mfs |
-| CM-14 | Negative bytes pass the tier gate | 0 < int bytes ≤ 10240; negative tests | closed in a4be7ed: integer bytes with 0 < x ≤ 10240 |
-| CM-15 | v3 scorer drops the v2 prerequisites | Port the checks | closed in a4be7ed: four prerequisites are required before a v3 scalar |
-| CM-16 | Matched null: band in the contract, median-of-3 in code | Make code and contract agree | closed: contract and panel use median_linear_mse_of_three (a4be7ed); manuscript describes that null. No learnability band |
-| CM-17 | Near-copy floor: quantile in the contract, minimum in code | Make code and contract agree | closed: q=0.01 linear squared-L2 nearest-distinct-row floor (a4be7ed); manuscript states that floor |
-| CM-18 | Table 5 reducer overwrites duplicate keys | Fail closed | closed in a4be7ed: a duplicate method-lineage-auditor key raises |
-| CM-19 | compute_panel inputs not SHA-pinned | Pinned loader | closed at d75f10f: registered inputs are SHA-pinned before decode, including the author-default ARF headline rows |
-| CM-20 | C2ST n=98 vs 97; BeyondArena 12 vs 142 | Explicit denominators | closed: fidelity n is the complete three-seed group; BeyondFamilies is the fit check and BeyondInventory is the inventory |
-| CM-21 | Related-work taxonomy mixes families and evaluation | Restructure | closed: generators by family, then what was measured, then utility and privacy |
-| PR-05 | Size n + real-bootstrap ×4 control | Tables + claims state the size | closed: both sizes appear in the main retention table, and the real-bootstrap control is reduced from the bound 5700-cell scalar ledger in the supplement |
-| PR-06 | Predictor-only control | Control in all retention tables; paired CI | closed: the supplement inputs generated/review-controls.tex from the bound scalar ledger. Every declared aggregate is reproduced before rendering; equivalence stays unclaimed |
-| PR-07 | One fit seed; no clustering; no final test | ≥5 seeds, hierarchical bootstrap, family sensitivity, one sealed run | family bootstrap and excluding-simulated sensitivity emitted in 3c63eec. Extra DOPE fit seeds and the sealed run are in progress, wave 2, with no number |
-| PR-08 | TabSyn on 8 lineages; TabDDPM not run | All 97 lineages + ledger | TabSyn closed: independently captured sample hashes and frozen fit receipts admit 594 scalar cells on 99 lineages, reproducing the published aggregate. Both sizes, matched DOPE rows, paired intervals, and actual auditor denominators are generated. All paired family intervals include zero; size-4n MLP favors TabSyn at the median. TabDDPM v5 remains pending with no number; the retained subset remains separate |
-| PR-09 | No privacy/fidelity panel | DCR/NNDR/MIA with CI; fidelity; C2ST | partly closed: bound privacy cells reproduce the original DCR, NNDR, and membership-attack panel. Configuration-aware KS, correlation, logistic and common CatBoost detectors, and alpha/beta tables are generated from pinned ledgers. Missing Forest-Flow detector/alpha cells remain unavailable; attribute inference and predictor attacks remain pending. Empirical diagnostics stay outside formal DP and HIPAA de-identification |
-| PR-10 | "Ties" read off non-significant tests | Pre-declared TOST; delta-method variance | paired-difference table placed in the supplement; every filled TOST cell is no. Equivalence stays unclaimed. The TOST-only file stays uninput because its ARF rows lack a configuration column. Delta-method appendix remains |
-| PR-11 | No stress suite or ablations | XOR/parity/product; k, blocks, budget | not started. No number |
-| PR-12 | Credentialed data path; profile default | PMLB fetch path; no default profile; artifact statement | closed: public credential-free PMLB fetch, no default AWS profile, artifact custody statement, and source clean-build gate |
-| PR-13 | Novelty claimed on the metric; teaser shows marginal medians | Credit TSTR/TRTR; paired-difference teaser | closed: Esteban et al. TSTR/TRTR cited; claim is the encoding and the release gate. The teaser draws paired generator differences against author-default ARF, the Gaussian copula, Chow--Liu, and matched TabSyn, with family-cluster intervals and separate cohort counts |
-| RS-01 | ARF missing from abstract, Fig. 1, and the strongest-baseline sentence | Put the generated paired ARF difference in those places | closed: abstract, Fig. 1, the headline sentence, and `generated/headline-table.tex` use author-default size-$4n$ family-cluster ARF from the pinned review panel. The linear interval contains zero. The teaser draws that series beside the copula and Chow--Liu |
-| RS-02 | Tables 12–14 lack a DOPE row on the same cohort | Matched-cohort DOPE row from lane B | closed: both size factors show DOPE and TabSyn on each auditor’s actual informative intersection in the main table and supplement. The matched 99-lineage source cohort stays distinct from the retained subset |
-| RS-03 | C2ST classifier differs by method | One classifier and one n for every method | partly closed: the shared grouped CatBoost detector is reported beside distinct historical logistic AUC cells with explicit per-metric n. TabSyn is scored by the same fixed implementation. One TabSyn CatBoost cell is unavailable; Forest-Flow remains unavailable. Unequal cohorts prevent a cross-method ranking |
-| RS-04 | DOPE called a measurement in the abstract and a generator in the figures | One definition | closed: title, abstract, and captions name DOPE as the encoding and the generator it writes; retention is the measurement. Legend source files outside this lane still print the generator label |
-| 11c | Negation density above 5 per 1,000 words | Keep every caveat and drop spaced " not " | closed: the wave-2 source PDF passes check_paper against the fixed maximum of 5 spaced " not " per 1,000 words |
-| 11d | Main body before References over 10 pages | Move long displays into the supplement | closed: both source main PDFs have 10 pages, with References beginning on page 9. The main body passes check_paper; the large privacy and fidelity displays remain in the supplement |
+| CM-01 | "0 of 388 lineages": 388 counts method×lineage records | Report method–lineage cells | closed in a4be7ed |
+| CM-02 | The abstract refers to "that interval" but never gives one | State the CI inline | closed: every abstract estimate carries its interval macro |
+| CM-03 | "not measured and not measured" | Distinct wording; lint for repeated phrases | closed: `paper_lint.py` refuses a repeated five-word sentence |
+| CM-04 | Sketch width 10+64×12+6 = 784 ≠ 856 | Document the 72-wide distribution block; test the sum | closed in a4be7ed; the sketch now lives in supplement A |
+| CM-05 | Contribution bullets point at the wrong figures | Repoint; rewrite | closed: four contributions, each with its section |
+| CM-06 | "Each method selected on its own objective" overstates | Per-method selection rule | closed: `method_registry.py` holds each arm's selection rule; supplement C prints it |
+| CM-07 | Holm family undocumented | Declare the family per table | closed: every caption states its Holm family or that it has none; `review_tex.longtable` refuses a caption without one |
+| CM-08 | Pre-registered size-n endpoint not reported | Report size n next to 4n | closed: main Table 2 prints every arm at n and 4n |
+| CM-09 | Endpoint is validation; official test sealed | One sealed run of the frozen configuration | authorized 2026-10-09 as one run after the Stage 2 freeze (`predeclare_v2.json`, `sealed_test_v2`); not run, so no official-test number is printed |
+| CM-10 | Supplement style; no anonymous supplement | ICLR-style supplement and anonymous build | closed in 62f93e0 |
+| CM-11 | `just paper` does not regenerate everything | Complete build graph and a clean-rebuild CI job | closed: `paper-clean` deletes `generated/`, rebuilds, and requires a zero diff; the v2 panel replays from its scalar ledger |
+| CM-12 | Byte charge omits projection.json | Bytes are model plus projection | closed; the v2 fit ledger checks each model file's size |
+| CM-13 | MFS-v3 can exceed 100 | Clip; perfect profile is 100 | closed |
+| CM-14 | Negative bytes pass the tier gate | 0 < bytes ≤ 10240 | closed in a4be7ed |
+| CM-15 | v3 scorer drops the v2 prerequisites | Port the checks | closed in a4be7ed |
+| CM-16 | Matched null: band in the contract, median-of-3 in code | Agree | closed in a4be7ed |
+| CM-17 | Near-copy floor: quantile vs minimum | Agree | closed in a4be7ed |
+| CM-18 | Reducer overwrites duplicate keys | Fail closed | closed; every v2 binder refuses a duplicate identity, and `v2_panel.reduce` refuses a duplicate sample cell and any arm outside its declared roster before grouping |
+| CM-19 | compute_panel inputs not SHA-pinned | Pinned loader | closed at d75f10f; the v2 ledger, fit ledger, panel, and byte ledgers are in the review input lock |
+| CM-20 | C2ST n=98 vs 97; BeyondArena 12 vs 142 | Explicit denominators | closed; `paper_consistency.check_v2` checks every paired n against both level counts |
+| CM-21 | Related-work taxonomy mixes families and evaluation | Restructure | closed: generators, compact program models, evaluation |
+| G-01 | An uncaptioned MFS-v3 layer table floated into the main body | Captioned float in the supplement; lint | closed: `mfs_v3_table.py` writes a scalar note and a captioned layer table; `paper_lint.py` refuses an uncaptioned tabular |
+| G-02 | Text described Fig. 2 clipping that the figure does not do | Figure windows from one spec | closed: `figure_spec.py` holds every window and emits the macros the text uses |
+| G-03 | Forest-Flow informative count printed as 0 | Level n from the retention rows | closed: `denominator_view.py` prints the level n beside the complete-loss rows |
+| G-04 | Owner audit 2026-10-09 23:09: byte-cap universality, iid seed p-value, missing Forest-Flow abstract contrast, retention versus privacy sample custody | Name the over-cap lineages with a sensitivity; descriptive seed count; qualified six-lineage abstract sentence; route-specific custody wording | closed: §5.4 names both over-cap lineages and gives the headline without them from the bound ledger (no rerun); the seed count carries no p-value; the abstract adds the Forest-Flow block; main §5.5 and supplement E state which runs read the Forest-Flow samples |
+| G-05 | Independent frozen-rubric score of f47197b (2026-10-10): the first version's headline set H (Forest-Flow median 1.003, 1/0/5, the 2,067-byte DOPE median on those lineages, linear critical difference 0.489) was generated but no longer printed; `v2_panel.reduce` admitted undeclared arms that never reached a contrast; stale README and RS-03 notes | Print H with its historical label; validate every cell before grouping; correct the notes | closed: supplement `tab:hist-headline` and the historical-block paragraph print every H value from the committed ledgers through `verify_paper_numbers.py` macros; the roster check and its `reduce()` regression are in place; `docs/whitepaper/README.md` names the five-seed panel as the displayed result |
+| G-06 | Independent frozen-rubric score of c6647d4 (2026-10-10, 75/100): main Table 3 gave no inclusion rule for its n; supplement G cited the α/β table for logistic AUC, KS, and pair fidelity and left their second interval unexplained; the byte table's stated denominator was wrong for CTGAN and TVAE; the BeyondArena medians named no quantity; the loss space was unstated and the RMSE caption said target units | State each rule and unit where the number is printed | closed: Table 3 states its sample-file rule; supplement G names the lineage-bootstrap interval and points to `tab:review-fidelity` for the family-cluster one; the byte caption gives both counting rules; the BeyondArena sentence gives elapsed seconds per profile; main §4.2 and the RMSE caption state the training-split min–max projection to [0, 1] |
+| G-07 | Independent frozen-rubric score of fbf52f4 (2026-10-10, 73/100): abstract verdicts for ARF, Forest-Flow, and both controls printed without their intervals; the baseline-coverage TabSyn row read as the current panel; the architecture figure said the density baselines report no search; the first version's Holm families were declared only in captions | Print every abstract interval; label the coverage row; state the selection rule; declare the families in supplement D | closed: the abstract prints each contrast with its 95% nested interval (199 rendered words); the coverage caption names the earlier run and points to main Tables 1–2; the figure says the native density baselines select by held-out log density; supplement D names the first version's per-size families |
+| PR-05 | Size n and a real-row ×4 control | Tables state the size | closed: both controls are in main Tables 1–2, the abstract, and Fig. 1 |
+| PR-06 | Predictor-only control | Paired CI in every retention table | closed: five predictor fit seeds in the v2 panel; supplement F keeps the split-seed rows |
+| PR-07 | One fit seed; no clustering; no final test | Five seeds, nested bootstrap, family sensitivity, sealed run | five DOPE fit seeds with the historical binary, a cluster→lineage→fit-seed bootstrap, and seed-exchangeability diagnostics are in the paper; the sealed run is CM-09 |
+| PR-08 | TabSyn on 8 lineages; TabDDPM not run | Full panel and a budget ledger | TabSyn's scaled-schedule full panel is in the main tables and names its epochs. TabDDPM v5 failed (472 attempt failures, no new success), so TabDDPM v6, TabDiff, GReaT, synthpop, SMOTE, the author-default TabSyn schedule, and Forest-Flow under the common budget are Stage 2 blocks with no number |
+| PR-09 | No privacy or fidelity panel | DCR/NNDR/MIA with CI; C2ST | closed for empirical black-box attacks: main Table 3 and supplement G; supplement G also gives KS, pair fidelity, the CatBoost detector, and α-precision/β-recall for every method with samples. Shadow-model, attribute-inference, and artifact attacks (P2–P4) are Stage 2 |
+| PR-10 | "Ties" read off non-significant tests | Pre-declared equivalence | closed: the Hodges–Lehmann 90% rule of predeclare_v2 decides equivalence; the v1 mean TOST is a continuity table |
+| PR-11 | No stress suite or ablations | XOR/parity/product; k, blocks, budget | two axes are printed (step budget and the untuned default); the grid and stress suite are Stage 2 blocks I and J |
+| PR-12 | Credentialed data path | PMLB fetch path; artifact statement | closed in 62f93e0 |
+| PR-13 | Novelty claimed on the metric; marginal-median teaser | Credit TSTR/TRTR; paired teaser | closed: Fig. 1 is the paired forest plot of DOPE minus every comparator and control |
+| RS-01 | ARF missing from the abstract and Fig. 1 | Paired ARF difference in both | closed |
+| RS-02 | TabSyn tables lack a DOPE row on the same lineages | Matched DOPE rows | closed: supplement `tab:review-tabsyn` and every v2 contrast pair on shared lineages |
+| RS-03 | C2ST classifier differs by method | One classifier for every method | closed: one grouped CatBoost detector for every method with samples, TabSyn included (supplement G); Forest-Flow's stored samples feed its retention re-score, but the detector and privacy runs record its cells as unavailable, so it has no detector row |
+| RS-04 | DOPE called a measurement and a generator | One definition | closed |
+| 11c | Negation density above 5 per 1,000 words | Lint | closed: `check_paper.py` enforces the density on the built PDF |
+| 11d | Main body over 10 pages | Page budget | closed: `check_paper.py` refuses a body over ten pages |
 
-## Wave 2 admission and remaining work
+## Open, with no printed number
 
-Every displayed result comes from a committed generated file and an authenticated
-scalar source. The build authenticates the complete graph before decoding and
-replays the controls, privacy, TabSyn utility, and fidelity aggregates before any
-render. Hash mismatch, missing pins, duplicate cells, malformed identities, or an
-opened official-test flag refuse emission.
+- The sealed official-test run (CM-09).
+- Publication of the scored DOPE artifacts, the fit and validation partitions, and the synthetic-row bundle
+  (Stage 4 of the plan, each step confirmed by the owner). Until then supplement C states that they are
+  unpublished and that the committed ledgers reproduce every reduction; it gives no reason for withholding them.
+- A five-seed source-family sensitivity table; the printed one is the fit-seed-11 table.
+- Stage 2 blocks of `predeclare_v2.json`: TabDDPM v6, TabSyn author-default and four more TabSyn seeds,
+  Forest-Flow under the 1,800-second budget, density and synthpop at five seeds, SMOTE, the SDV rerun,
+  TabDiff and GReaT adapters, the ablation grid and stress suite, privacy P2–P4, and the OpenML extension
+  under its Go rule. A failed or missing cell is never a DOPE win.
 
-Finished public units:
+## Main wave-3 follow-up (53f6558), reconciled with v2
 
-- Controls: `generated/review-controls.tex` is reproduced from the bound scalar ledger. Equivalence remains unclaimed.
-- Privacy: `generated/review-privacy.tex` is reproduced from the bound public DCR/NNDR/membership cells. These are empirical diagnostics, outside formal DP and HIPAA de-identification.
-- TabSyn: `generated/review-tabsyn.tex`, `review-wave2-size-retention.tex`, and the teaser use the bound full cohort and actual matched auditor intersections. All paired family intervals include zero. The retained subset remains a separate cohort.
-- Fidelity: `generated/review-fidelity.tex` separates ARF configurations, historical logistic AUC, and shared CatBoost AUC; `review-alpha-beta.tex` identifies the numeric full cohort and retained mixed-type cohort. Every metric has its own denominator and family-cluster interval. Forest-Flow alpha/beta and detector cells remain unavailable.
-- Custody: the frozen sample grid has six unavailable cells; six foreign `worker` operations and a legacy unavailable operation with an unknown official-test flag are quarantined in the original sampling receipt. They never enter the admitted cohort. Missing cells are excluded explicitly, with no imputed result.
-- Singleton bootstrap optimization: frozen conformance fixtures preserve the original interval endpoints and RNG state. Draw count, clustering, configuration, and statistical estimands stay unchanged.
+Main's wave-3 commit edited wave-2 sources that the v2 rewrite replaces. Each of its items, checked
+against this tree:
 
-Remaining gaps, with no result number:
-
-- Attribute-inference and shipped-predictor attacks require their own committed predeclarations before execution.
-- Extra DOPE fit seeds have no admitted result in this historical-validation integration. Existing and separately declared v2 jobs remain untouched; no extra-seed median is printed.
-- TabDDPM population v5 lacks an admitted finished unit for this paper. No result is printed and no existing job is touched.
-- Selection and scoring still share validation rows. The sealed official-test run stays untouched; no official-test result or disjoint-selection claim is printed.
-- Equal tuning budgets are unestablished by the current receipts. No budget-parity claim is printed.
-- The full XOR/parity/product stress suite and a complete three-axis ablation suite remain pending. No result is imputed.
-
-The final exact-head local and hosted gate results are recorded in the external
-`WAVES_LEDGER.md` and `REVIEW_FIX_PROGRESS.md`; a historical green run never
-stands in for the final head.
-
-## Wave 3: literal rubric follow-up
-
-The frozen-rubric review of wave 2 found three publication descriptions that
-needed correction. The generated origin paragraph now distinguishes legacy
-lineage intervals from the source-family bootstrap and retains the missing
-parent-map limitation for other related lineages. The source-family sensitivity
-and informative-denominator tables now declare their descriptive multiplicity
-scope. Both document titles name encoding and generation. These changes leave
-the measured results and statistical procedures unchanged.
-
-Remaining work from that review:
-
-- The standalone retained-evidence reducer still needs an explicit unknown-method
-  refusal; the current pinned publication graph does not replace that check.
-- The page-1 paired figure still omits the measured Forest-Flow block. Adding it
-  requires its own short-cohort counts and the correct existing uncertainty.
-- The older retained-classical and retained-eight tables still lack matched DOPE
-  rows. The full numeric cohort cannot substitute for those historical cohorts.
-- Fit-reference NNDR does not complete holdout-referenced NNDR. Forest-Flow's
-  strong-classifier and alpha/beta cells remain unavailable.
-- Fit-seed uncertainty, new attribute and shipped-predictor attacks, additional
-  mechanism/stress units, equal tuning budgets and original-artifact packaging
-  require admitted evidence; prospective declarations alone supply no result.
-
-The official test and existing frozen jobs remain untouched. The external
-`WAVE3_PLAN.md` orders these units by points per effort. A wave-3 rubric score
-requires a new exact-head review against the unchanged frozen criteria.
+| Wave-3 item | Status in v2 |
+|---|---|
+| Origin paragraph separates the lineage bootstrap from the family-cluster bootstrap and keeps the parent-map limitation | closed: `\OriginSentence` renders both, the cluster rule from `cluster_text.describe_clusters` |
+| Wilcoxon and TOST keep independent-lineage assumptions | closed: main §4 and supplement D say the Wilcoxon, Yuen, and v1 mean tests treat lineages as independent and that every verdict reads the clustered interval |
+| Source-family sensitivity and denominator tables declare their multiplicity scope | closed: the supplement keeps the historical fit-seed-11 source-family table (`tab:review-family`, `generated/review-family.tex`), captioned as a sensitivity without Holm p-values, and the denominator table has no Holm family. No five-seed source-family table exists yet |
+| Both titles name the encoding and the generator | closed: both v2 titles read "Encoding of Regression Tables into Kilobyte Generators" |
+| Unknown-method refusal in the retained-evidence reducer | closed: `retained_evidence.groups_from_rows` refuses any method or selection binding outside the pinned panel's seven arms; `v2_panel.reduce` checks every cell against the v2 roster before grouping, including incomplete, noninformative, and fidelity-only cells |
+| Page-1 paired figure omits Forest-Flow | closed: Fig. 1 draws the six-lineage Forest-Flow contrast as a small-cohort row |
+| Retained-classical and eight-lineage tables lack matched DOPE rows | open: those historical cohorts print no DOPE row; the matched DOPE contrasts for ARF, the density baselines, and TabSyn are in the v2 panel (main Table 1, supplement `tab:v2-contrasts`), a different cohort |
+| Fit-referenced NNDR is not holdout-referenced NNDR | open: main Table 3 names its NNDR as fit-referenced; holdout-referenced NNDR is part of privacy P1 in Stage 2 block L |
+| Forest-Flow CatBoost-detector and alpha/beta cells | open: supplement G prints them as unavailable; only the stored logistic detector, KS, and pair fidelity have Forest-Flow values (RS-03) |
+| Fit-seed uncertainty, attribute and shipped-predictor attacks, stress units, equal budgets, artifact packaging | fit-seed uncertainty is closed for DOPE and ARF (five seeds, nested bootstrap); the rest are the Stage 2 blocks above and Stage 4 publication |

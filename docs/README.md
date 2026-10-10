@@ -10,7 +10,9 @@ argument for the generator comparison.
 | [audit.md](audit.md) | Jankurai gate and exceptions |
 | [audit-rubric.md](audit-rubric.md) | Finding severity |
 | [release.md](release.md) | Certification and publication gates |
-| [whitepaper/](whitepaper/README.md) | IEEE draft: native selection, then MFS-v2 |
+| [whitepaper/](whitepaper/README.md) | The paper, its supplement, and the scripts that regenerate every number |
 
-The white paper cites `research/benchmark/RESULTS_STATUS.md`. That ledger is
-the source of every number in the draft. A null fitness score stays null.
+Every number in the paper is a macro emitted from a committed, SHA-pinned
+ledger under `research/benchmark/results/`; the analysis contract is
+`research/benchmark/review_fixes/predeclare_v2.json`. A null release score
+is printed as null.
