@@ -44,6 +44,7 @@ uv pip install --python target/ci-python/bin/python --constraint validation/requ
 target/ci-python/bin/python docs/whitepaper/scripts/retained_evidence.py
 target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py'
+target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_public_hardware.py'
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_published_baseline_inventory.py'
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_publication_rows.py'
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_compute_panel.py'
