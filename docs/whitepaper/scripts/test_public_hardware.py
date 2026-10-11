@@ -78,6 +78,9 @@ class PublicHardware(unittest.TestCase):
         self.assertIn("35", sentence)
         self.assertNotIn(_LEGACY_CLUSTER_CLAUSE, sentence)
         self.assertNotIn("source-family interval is not published", sentence)
+        self.assertIn("legacy lineage-bootstrap intervals resample lineages independently", sentence)
+        self.assertNotIn("related variants move together only by chance", sentence)
+        self.assertIn("Wilcoxon and TOST retain independent-lineage assumptions", sentence)
         # The family-cluster interval is a two-stage draw over the simulated name families.
         clusters = hardware.cluster_sentence()
         self.assertIn(clusters, sentence)
