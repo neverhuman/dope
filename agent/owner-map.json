@@ -331,6 +331,10 @@
     "research/benchmark/beyondarena_train_screen.py": "external-evidence",
     "research/benchmark/results/beyondarena-training-screen-policy-v1.json": "external-evidence",
     "research/benchmark/tests/test_beyondarena_train_screen.py": "external-evidence",
-    "research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json": "external-evidence"
+    "research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json": "external-evidence",
+    "production/behavior-contract-v1.json": "feedback-contracts-evidence",
+    "schemas/behavior-contract-v1.schema.json": "feedback-contracts-evidence",
+    "docs/vnext/DECISIONS.md": "feedback-contracts-evidence",
+    "docs/vnext/CLAIMS.md": "feedback-contracts-evidence"
   }
 }
