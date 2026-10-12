@@ -485,6 +485,38 @@ fn unresolved_protocol_and_same_principal_cannot_mint_capability() {
             .is_err()
     );
     assert_eq!(reused.finish(child, 0)["events"], json!([]));
+    let corrupt = Fixture::new(false, true, 2);
+    let mut setup: Value =
+        serde_json::from_slice(&fs::read(corrupt.root.join("setup.json")).unwrap()).unwrap();
+    setup["declaration"]["query_hash"] = json!("e".repeat(64));
+    fs::write(
+        corrupt.root.join("setup.json"),
+        serde_json::to_vec(&setup).unwrap(),
+    )
+    .unwrap();
+    let (child, socket) = corrupt.start(0, false);
+    assert!(
+        EvaluationCapability::connect(&socket, 0)
+            .and_then(|capability| evaluate_frozen_batch(
+                capability,
+                std::slice::from_ref(&corrupt.frozen)
+            ))
+            .is_err()
+    );
+    let summary = corrupt.finish(child, 0);
+    assert_eq!(
+        summary["events"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|e| e["kind"] == "query_opened")
+            .count(),
+        1
+    );
+    assert_eq!(
+        summary["events"].as_array().unwrap().last().unwrap()["kind"],
+        "rejected"
+    );
     let own = fixture.root.join("own.sock");
     let _listener = UnixListener::bind(&own).unwrap();
     assert!(EvaluationCapability::connect(&own, unsafe { libc::geteuid() }).is_err());

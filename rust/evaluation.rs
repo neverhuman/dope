@@ -524,11 +524,6 @@ pub fn serve_frozen_batch(listener: &UnixListener, root: &Path) -> Result<()> {
         let result = (|| {
             let fit_bytes = read_regular(&root.join("train.csv"), Some(uid), true)?;
             let query_bytes = read_regular(&root.join("test.csv"), Some(uid), true)?;
-            if sha(&fit_bytes) != declaration.fit_hash
-                || sha(&query_bytes) != declaration.query_hash
-            {
-                return Err(denied());
-            }
             events.push(event(
                 &mut ledger,
                 &declaration,
@@ -536,6 +531,11 @@ pub fn serve_frozen_batch(listener: &UnixListener, root: &Path) -> Result<()> {
                 "query_opened",
                 0,
             )?);
+            if sha(&fit_bytes) != declaration.fit_hash
+                || sha(&query_bytes) != declaration.query_hash
+            {
+                return Err(denied());
+            }
             let task = decode_kernel(frozen.artifact())?.task;
             let fit = table(&fit_bytes, task, &frozen.policy)?;
             let query = table(&query_bytes, task, &frozen.policy)?;
