@@ -170,7 +170,7 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
                 potential &= cell.status == "unresolved"
                 continue
             observed = cell.z <= 0
-            qualified = (observed and cell.bound is not None and cell.bound.upper_z <= 0
+            qualified = (feasible and observed and cell.bound is not None and cell.bound.upper_z <= 0
                          and verify_bound is not None and verify_bound(task, key, cell.bound) is True)
             counts["qualified" if qualified else "observed_only" if observed else "harmful"] += 1
             passed &= qualified if supported else observed

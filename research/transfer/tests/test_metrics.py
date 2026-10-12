@@ -91,6 +91,8 @@ class MetricsTests(unittest.TestCase):
             self.assertEqual(observed_coverage([task(cells=cells)])["coverage"], 0.)
         self.assertEqual(observed_coverage([task(artifact_bytes=101)])["coverage"], 0.)
         self.assertEqual(observed_coverage([task(artifact_bytes=1)])["coverage"], 1.)
+        with self.assertRaises(ValueError):
+            TrainingScale(None, "unknown")
 
     def test_observed_supported_and_verifier_binding(self):
         b = BoundEvidence(-0.1, "a/n", "protocol", "receipt")
@@ -142,6 +144,7 @@ class MetricsTests(unittest.TestCase):
                 contract.losses(["unknown"], [[0.5, 0.5]])
             with self.assertRaises(ValueError):
                 contract.losses(["yes"], [[0.7, 0.7]])
+            self.assertTrue(math.isfinite(contract.losses(["yes"], [[1., 0.]])[0]))
 
 
 if __name__ == "__main__":
