@@ -17,6 +17,7 @@ fast:
     cargo check -p dope-kernel --locked
     cargo test --locked --lib
     PYTHONPATH=src python3 -m pytest -q tests
+    python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
 
 focus filter:
     cargo check -p dope-kernel --locked
