@@ -1,8 +1,10 @@
 """Transfer diagnostics and scheduled reliability, with bytes as a constraint.
 
-BoundEvidence is a local PR01/PR02 interface stub. A trusted verifier must be
-injected to count supported coverage; this module neither verifies receipts nor
-authorizes release. Missing verification defaults to observed-only evidence.
+BoundEvidence is the typed bound-evidence record consumed alongside verified
+PR01/PR02 evaluation receipts. The trusted verifier checks the task, contrast,
+protocol and receipt identities before a bound counts toward supported coverage.
+Missing verification defaults to observed-only evidence. These diagnostics do
+not authorize release.
 """
 
 from __future__ import annotations
