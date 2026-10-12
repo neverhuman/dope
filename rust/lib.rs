@@ -13,6 +13,7 @@ pub mod data;
 pub mod deep_campaign;
 pub mod embedding;
 pub mod error;
+pub mod evidence;
 pub mod fitness;
 pub mod fitness_metrics;
 pub mod inspect;

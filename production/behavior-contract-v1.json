@@ -1,0 +1,165 @@
+{
+  "format": "dope-behavior-contract",
+  "version": 1,
+  "status": "draft",
+  "protocol_frozen": false,
+  "confirmation_allowed": false,
+  "active_production_tier": false,
+  "primary_scope": "task_replacement",
+  "scopes": {
+    "task_replacement": {
+      "workload": "declared numeric regression targets",
+      "qualification": "original-unit real losses across independent source and learner holdouts"
+    },
+    "reusable_table": {
+      "workload": "alternate targets and analytical queries",
+      "qualification": "separate hidden targets/queries, joint support, tails and missingness campaign"
+    },
+    "augmentation": {
+      "workload": "real plus synthetic training",
+      "qualification": "separate matched mixing and compute experiment"
+    },
+    "relational_replacement": {
+      "workload": "linked entities, events and tables",
+      "qualification": "separate topology, cardinality, joins, entity/time tasks and privacy campaign"
+    },
+    "foundation_pretraining": {
+      "workload": "generator bank or curriculum",
+      "qualification": "separate equal-compute, source-disjoint pretraining experiment with purpose grants"
+    }
+  },
+  "workload": {
+    "table_schema_hash": null,
+    "task_manifest_hash": null,
+    "analytical_workload_hash": null,
+    "population_history_hash": null,
+    "task_kind": "numeric_regression",
+    "loss_space": "original_target_units",
+    "losses": [
+      "mse",
+      "rmse",
+      "mae"
+    ],
+    "target_transform_policy": "fit_only_invert_before_loss",
+    "sampling_mode": "population",
+    "teaching_context_policy_hash": null
+  },
+  "endpoints": {
+    "development_fitness": "development-only family/learner-balanced excess risk with declared tail penalty",
+    "scientific_endpoint": "paired original-unit risk gap and all-required-cell tolerance coverage",
+    "release_authority": "separate scoped authorization and conjunction of applicable verified gates",
+    "bytes_policy": "exact serialized sampling bytes are a constraint and a frontier axis",
+    "score_implies_release": false
+  },
+  "margins": {
+    "noninferiority": null,
+    "catastrophic_harm": null
+  },
+  "learners": {
+    "required_families": [
+      "tree",
+      "linear",
+      "foundation_tabular"
+    ],
+    "held_out_families": []
+  },
+  "budgets": {
+    "sampling_payload_bytes": null,
+    "downstream_context_rows": null,
+    "fit_seconds": 600,
+    "memory_bytes": 17179869184,
+    "campaign_spend": null
+  },
+  "disclosure": {
+    "protected_unit": null,
+    "adversary_access": [
+      "rows",
+      "black_box_samples",
+      "artifact_and_sidecars"
+    ],
+    "auxiliary_information_hash": null,
+    "repeated_release_policy_hash": null,
+    "privacy_route": "unreviewed",
+    "legal_route": "unreviewed",
+    "purpose_grants": []
+  },
+  "freeze_requirements": {
+    "margin_justification": null,
+    "checkpoint_manifest": null,
+    "rights_manifest": null,
+    "cohort_manifest": null,
+    "learner_portfolio": null,
+    "power_validation": null,
+    "pilot_cost": null,
+    "retry_policy": null,
+    "resource_policy": null,
+    "evaluator_isolation": null,
+    "multiplicity_policy": null,
+    "projection_policy": null,
+    "operator_authority": null
+  },
+  "states": {
+    "execution": [
+      "complete",
+      "unsupported",
+      "timeout",
+      "oom",
+      "invalid_output",
+      "byte_infeasible",
+      "protocol_violation",
+      "unresolved"
+    ],
+    "transfer": [
+      "observed_within_tolerance",
+      "supported",
+      "harmful",
+      "inconclusive",
+      "unmeasured"
+    ],
+    "empirical_privacy": [
+      "passed",
+      "failed",
+      "inconclusive",
+      "unmeasured"
+    ],
+    "formal_mechanism": [
+      "none",
+      "reviewed_dp",
+      "unverified"
+    ],
+    "legal_route": [
+      "unreviewed",
+      "scoped",
+      "expired",
+      "revoked"
+    ],
+    "release": [
+      "restricted_local",
+      "eligible",
+      "blocked",
+      "published",
+      "withdrawn"
+    ]
+  },
+  "release_gate_conjunction": [
+    "verified_identity_and_inventory",
+    "frozen_nonadaptive_evaluation",
+    "scoped_transfer_qualification",
+    "applicable_privacy_mechanism_evidence",
+    "scoped_rights_and_legal_route",
+    "owner_recipient_use_authorization",
+    "software_security_audit_gates"
+  ],
+  "historical_contract_sha256": {
+    "production/kpi-contract-v1.json": "fe3abcd1cf4653c99a5d0c9505b7645a5fd968f86805dd5b7573ad29ac052760",
+    "production/kpi-contract.json": "d04a2672ed25e92baeb89bec51ea5ccddb04165701cb44d2e1d53ca32f6e219b",
+    "production/kpi-contract-v3.json": "40cd035d838657de3bd5d27bb940d771cbae697ac90efb5beeab53a5bf7adcbb"
+  },
+  "migration": {
+    "predecessors_immutable": true,
+    "new_identifier_required": true,
+    "post_outcome_amendment": "new_exploratory_identity",
+    "historical_receipt_policy": "decode_with_original_contract",
+    "rollback": "retain_immutable_ancestry_withdraw_new_authority"
+  }
+}
