@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/neverhuman/dope/schemas/source-family-v1.schema.json",
+  "title": "DOPE source-family registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "custody", "final_label_custody", "families"],
+  "properties": {
+    "format": {"const": "dope-source-family-registry-v1"},
+    "custody": {"const": "development_only"},
+    "final_label_custody": {"const": "external"},
+    "families": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/family"}
+    }
+  },
+  "$defs": {
+    "permission": {"enum": ["granted", "denied", "unknown"]},
+    "exposure": {"enum": ["clean", "exposed", "unknown"]},
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family_id",
+        "parent_lineage_id",
+        "relation",
+        "suite",
+        "roles",
+        "rights",
+        "exposure",
+        "split",
+        "alias_of"
+      ],
+      "properties": {
+        "family_id": {"type": "string", "minLength": 1, "pattern": "^[a-z0-9-]+$"},
+        "parent_lineage_id": {"type": "string", "minLength": 1, "pattern": "^[a-z0-9-]+$"},
+        "relation": {
+          "enum": [
+            "original",
+            "variant",
+            "alternate_target",
+            "alias",
+            "simulated_derivative",
+            "repeated_entity_extract"
+          ]
+        },
+        "suite": {"enum": ["development", "historical"]},
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["fit", "selection", "audit"]}
+        },
+        "rights": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["acquisition", "redistribution", "training"],
+          "properties": {
+            "acquisition": {"$ref": "#/$defs/permission"},
+            "redistribution": {"$ref": "#/$defs/permission"},
+            "training": {"$ref": "#/$defs/permission"}
+          }
+        },
+        "exposure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["prior_design", "model_contamination"],
+          "properties": {
+            "prior_design": {"$ref": "#/$defs/exposure"},
+            "model_contamination": {"$ref": "#/$defs/exposure"}
+          }
+        },
+        "split": {"$ref": "#/$defs/split"},
+        "alias_of": {"type": ["string", "null"], "pattern": "^[a-z0-9-]+$"}
+      }
+    },
+    "split": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "split_id",
+        "kind",
+        "rationale",
+        "meta_partition",
+        "fit_view",
+        "selection_view",
+        "audit_view",
+        "labels_in_repository"
+      ],
+      "properties": {
+        "split_id": {"type": "string", "minLength": 1, "pattern": "^[a-z0-9-]+$"},
+        "kind": {"enum": ["entity", "time", "entity_time"]},
+        "rationale": {"type": "string", "minLength": 1},
+        "meta_partition": {"type": "string", "minLength": 1, "pattern": "^[a-z0-9-]+$"},
+        "fit_view": {"const": "producer"},
+        "selection_view": {"const": "producer"},
+        "audit_view": {"const": "external"},
+        "labels_in_repository": {"const": false}
+      }
+    }
+  }
+}

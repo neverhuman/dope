@@ -1,0 +1,196 @@
+{
+  "format": "dope-source-family-registry-v1",
+  "custody": "development_only",
+  "final_label_custody": "external",
+  "families": [
+    {
+      "family_id": "dev-lineage-alpha",
+      "parent_lineage_id": "dev-lineage-alpha",
+      "relation": "original",
+      "suite": "development",
+      "roles": ["fit", "selection"],
+      "rights": {
+        "acquisition": "unknown",
+        "redistribution": "unknown",
+        "training": "unknown"
+      },
+      "exposure": {
+        "prior_design": "unknown",
+        "model_contamination": "unknown"
+      },
+      "split": {
+        "split_id": "part-alpha",
+        "kind": "entity_time",
+        "rationale": "Development rows follow the entity and time grain of this parent collection. Audit labels are not stored in the producer repository.",
+        "meta_partition": "part-alpha",
+        "fit_view": "producer",
+        "selection_view": "producer",
+        "audit_view": "external",
+        "labels_in_repository": false
+      },
+      "alias_of": null
+    },
+    {
+      "family_id": "dev-lineage-alpha-alias",
+      "parent_lineage_id": "dev-lineage-alpha",
+      "relation": "alias",
+      "suite": "development",
+      "roles": ["fit", "selection"],
+      "rights": {
+        "acquisition": "unknown",
+        "redistribution": "unknown",
+        "training": "unknown"
+      },
+      "exposure": {
+        "prior_design": "unknown",
+        "model_contamination": "unknown"
+      },
+      "split": {
+        "split_id": "part-alpha",
+        "kind": "entity_time",
+        "rationale": "This name repeats the parent collection and is not a second independent source.",
+        "meta_partition": "part-alpha",
+        "fit_view": "producer",
+        "selection_view": "producer",
+        "audit_view": "external",
+        "labels_in_repository": false
+      },
+      "alias_of": "dev-lineage-alpha"
+    },
+    {
+      "family_id": "dev-lineage-alpha-variant",
+      "parent_lineage_id": "dev-lineage-alpha",
+      "relation": "variant",
+      "suite": "development",
+      "roles": ["fit", "selection"],
+      "rights": {
+        "acquisition": "unknown",
+        "redistribution": "unknown",
+        "training": "unknown"
+      },
+      "exposure": {
+        "prior_design": "unknown",
+        "model_contamination": "unknown"
+      },
+      "split": {
+        "split_id": "part-alpha",
+        "kind": "entity_time",
+        "rationale": "A transformed view of the same parent collection stays inside the parent meta partition.",
+        "meta_partition": "part-alpha",
+        "fit_view": "producer",
+        "selection_view": "producer",
+        "audit_view": "external",
+        "labels_in_repository": false
+      },
+      "alias_of": null
+    },
+    {
+      "family_id": "dev-lineage-alpha-alt",
+      "parent_lineage_id": "dev-lineage-alpha",
+      "relation": "alternate_target",
+      "suite": "development",
+      "roles": ["fit", "selection"],
+      "rights": {
+        "acquisition": "unknown",
+        "redistribution": "unknown",
+        "training": "unknown"
+      },
+      "exposure": {
+        "prior_design": "unknown",
+        "model_contamination": "unknown"
+      },
+      "split": {
+        "split_id": "part-alpha",
+        "kind": "entity_time",
+        "rationale": "An alternate target on the same entities stays inside the parent meta partition.",
+        "meta_partition": "part-alpha",
+        "fit_view": "producer",
+        "selection_view": "producer",
+        "audit_view": "external",
+        "labels_in_repository": false
+      },
+      "alias_of": null
+    },
+    {
+      "family_id": "dev-lineage-alpha-sim",
+      "parent_lineage_id": "dev-lineage-alpha",
+      "relation": "simulated_derivative",
+      "suite": "development",
+      "roles": ["fit"],
+      "rights": {
+        "acquisition": "unknown",
+        "redistribution": "unknown",
+        "training": "unknown"
+      },
+      "exposure": {
+        "prior_design": "unknown",
+        "model_contamination": "unknown"
+      },
+      "split": {
+        "split_id": "part-alpha",
+        "kind": "entity_time",
+        "rationale": "A simulation derived from the parent stays inside the parent meta partition.",
+        "meta_partition": "part-alpha",
+        "fit_view": "producer",
+        "selection_view": "producer",
+        "audit_view": "external",
+        "labels_in_repository": false
+      },
+      "alias_of": null
+    },
+    {
+      "family_id": "dev-lineage-alpha-repeat",
+      "parent_lineage_id": "dev-lineage-alpha",
+      "relation": "repeated_entity_extract",
+      "suite": "development",
+      "roles": ["audit"],
+      "rights": {
+        "acquisition": "unknown",
+        "redistribution": "unknown",
+        "training": "unknown"
+      },
+      "exposure": {
+        "prior_design": "unknown",
+        "model_contamination": "unknown"
+      },
+      "split": {
+        "split_id": "part-alpha",
+        "kind": "entity_time",
+        "rationale": "A repeated extract of the same entities is audit-only here and is not a new source.",
+        "meta_partition": "part-alpha",
+        "fit_view": "producer",
+        "selection_view": "producer",
+        "audit_view": "external",
+        "labels_in_repository": false
+      },
+      "alias_of": null
+    },
+    {
+      "family_id": "dev-lineage-beta",
+      "parent_lineage_id": "dev-lineage-beta",
+      "relation": "original",
+      "suite": "development",
+      "roles": ["fit", "selection"],
+      "rights": {
+        "acquisition": "unknown",
+        "redistribution": "unknown",
+        "training": "unknown"
+      },
+      "exposure": {
+        "prior_design": "unknown",
+        "model_contamination": "unknown"
+      },
+      "split": {
+        "split_id": "part-beta",
+        "kind": "entity_time",
+        "rationale": "This parent collection is a separate development lineage. Its final labels stay external.",
+        "meta_partition": "part-beta",
+        "fit_view": "producer",
+        "selection_view": "producer",
+        "audit_view": "external",
+        "labels_in_repository": false
+      },
+      "alias_of": null
+    }
+  ]
+}
