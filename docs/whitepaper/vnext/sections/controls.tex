@@ -1,0 +1,24 @@
+\section{Controls}
+Each control is scored later in original-unit loss under the same byte constraint and the same withheld cells.
+A control that explains the change narrows the hypothesis.
+The control is kept either way.
+
+\paragraph{Direct predictor.}
+Ship the development predictor instead of a generator.
+The gap is \TBD{direct-predictor-control}.
+If the gap is negligible once measured, synthetic retraining did not add transfer beyond that predictor.
+
+\paragraph{Coreset.}
+Transmit compressed real rows under the same byte constraint.
+The gap is \TBD{coreset-control}.
+This asks whether generation beats sending a subset of the development rows.
+
+\paragraph{Distillation.}
+Transmit synthetic prototypes together with the labels, weights, and recipe those prototypes require.
+The gap is \TBD{distillation-control}.
+The prototypes are a control, not a silent component of the generator.
+
+\paragraph{Circuit.}
+Transmit the symbolic dependence program, including a dependence tree and a pair-copula construction, under the same constraint.
+The gap is \TBD{circuit-control}.
+The circuit is the structured baseline for the decoded program.

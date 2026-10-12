@@ -1,0 +1,33 @@
+% Falsifiable vNext skeleton. Measurements are \TBD placeholders.
+% Build from this directory with latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+\documentclass{article}
+\newcommand{\TBD}[1]{[unbound: #1]}
+\usepackage[numbers]{natbib}
+\usepackage[hidelinks]{hyperref}
+\newenvironment{vnextnonclaims}{\begin{quote}\noindent\textbf{Non-claims.} }{\end{quote}}
+\title{Byte allocation for numeric regression transfer}
+\author{DOPE vNext draft}
+\date{}
+\begin{document}
+\maketitle
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+\begin{vnextnonclaims}
+This draft does not claim a state-of-the-art result.
+This draft does not claim equivalence.
+This draft does not claim a privacy result, a differential-privacy guarantee, or a HIPAA determination.
+This draft does not claim a causal result.
+This draft does not claim a pretraining result.
+This draft does not claim to be the first method of this kind.
+\end{vnextnonclaims}
+\input{sections/introduction}
+\input{sections/related}
+\input{sections/method}
+\input{sections/controls}
+\input{sections/claims}
+\input{sections/limitations}
+\input{sections/reproduction}
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
