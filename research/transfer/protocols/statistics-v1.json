@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "protocol_id": "transfer-statistics-v1-development",
+  "frozen_for_confirmation": false,
+  "estimands": {
+    "fixed_artifact": "Conditional on one declared fit/sample/learner workflow per task; resample paired query/entity clusters only.",
+    "method_new_source": "Equal source-family means, equal canonical tasks per family, equal fits/samples/learners per task; crossed family/global-seed draws, nested independent fit/sample/learner draws and shared task query-cluster draws."
+  },
+  "endpoint": "Paired Z = synthetic loss - real loss - frozen relative * real loss - frozen absolute_scaled * fit-only scale. Constant/near-constant scales require an explicit raw absolute rule.",
+  "family_lineage_interface": "Caller supplies canonical task/family IDs from PR05; duplicate run identities are refused. Aliases must use the same canonical task ID.",
+  "receipt_interface": "No verified evidence is constructed here. PR02 must verify bound/contrast/protocol/receipt identity before qualified coverage can be counted.",
+  "randomness": {
+    "prospective": "SHA256(master seed, canonical task, algorithm/component namespace) independent task substreams",
+    "historical": "Preserve global seed IDs and explicit coupling namespaces; sample each namespace once per bootstrap draw across all affected tasks. Equal integers in different namespaces are independent.",
+    "query_clusters": "Sample entity clusters with replacement, retaining every member row and shared paired indices across workflows. Target is row-mean risk; unequal cluster sizes retain their sampled row mass."
+  },
+  "inference": {
+    "method": "Bonferroni one-sided basic-bootstrap upper/lower bounds for all predeclared required methods, without silently dropping failed contrasts",
+    "alpha": 0.05,
+    "default_draws": 1999,
+    "minimum_expected_draws_per_tail": 5,
+    "noninferiority": "upper bound on Z <= 0 with complete valid evidence and declared multiplicity",
+    "equivalence": "both bounds strictly inside a separately declared symmetric practical margin; p > 0.05 is insufficient",
+    "limitations": "Approximate bootstrap inference under finite-variance independent source families and declared seed/query dependencies; no finite-sample distribution-free guarantee. Small source/seed axes refuse inference or require further calibration."
+  },
+  "missingness": "CrossedDesign requires all declared scheduled keys and every run disposition, including an entirely failed fit. PR02 must authenticate the schedule. Any missing method, failed run, unbalanced replication grid, or missing crossed seed refuses inferential bounds. Complete-case estimates are labeled sensitivity only; no loss imputation.",
+  "heavy_tail_policy": "Retain unclipped raw/query losses and weighted tail metrics. Finite-variance Student t(5) development stress is implemented. Infinite-variance or heavier unknown laws need separate robust sensitivity/calibration and cannot inherit qualification.",
+  "sensitivities": ["family-level paired effects", "leave-one-global-seed-out estimates", "complete-case estimates with scheduled failure counts", "unclipped raw/tail losses"],
+  "development_validation": {
+    "repetitions": 120,
+    "bootstrap_draws": 399,
+    "families": 24,
+    "global_seeds": 12,
+    "query_clusters": 12,
+    "nominal_ucb_coverage": 0.95,
+    "absolute_coverage_tolerance": 0.05,
+    "absolute_false_positive_tolerance": 0.05,
+    "monte_carlo_precision": "Report Monte Carlo standard error and Wilson 95% interval for every rate; 120 repetitions are development smoke validation, not confirmation calibration.",
+    "scenarios": ["null", "true inferiority", "true equivalence", "finite-variance heavy tails", "correlated global seed shocks", "unequal family/query sizes", "missing fits", "small query sets", "duplicate aliases", "independent task fits"],
+    "confirmation_calibration": "At least 2000 repetitions, exact final design and multiplicity, adequate tail draws, coverage/false-positive tolerances justified and frozen before outcomes. Missing-fit simulations must demonstrate refusal."
+  },
+  "unresolved_before_freeze": ["application margins", "required learner/contrast family", "source rights/lineage and query estimand", "exact final cohort and replication sizes", "full-design Monte Carlo receipt", "heavy-tail robust sensitivity", "budget reservation and verifier integration"]
+}
