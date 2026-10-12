@@ -1,0 +1,21 @@
+\section{Scoped prior art}
+The comparisons below are alternatives and historical anchors.
+This draft does not rank them.
+
+Conditional generative adversarial networks and variational autoencoders for tables are the historical neural anchors \citep{xu-ctgan}.
+Tabular diffusion of the Kotelnikov, Baranchuk, Rubachev, and Babenko construction is a neural generator with its own training recipe \citep{kotelnikov-tabddpm}.
+Adversarial random forests are a structured generator aimed at density and sampling \citep{watson-arf}.
+Dependence trees \citep{chow-liu} and pair-copula constructions \citep{aas-paircopula} are circuit baselines: they encode a dependence program rather than a large neural sample.
+synthpop is a tree-based synthesizer and is not treated as an interchangeable joint generator \citep{nowok-synthpop}.
+CatBoost is one example of a downstream learner, not a definition of utility \citep{prokhorenkova-catboost}.
+
+The Penn Machine Learning Benchmarks collection is a historical source pool \citep{olson-pmlb,romano-pmlb}.
+Renaming its splits does not create an untouched family.
+TabSyn, TabDiff, and Forest-Flow are candidates named for later adapter work.
+This skeleton does not score them.
+
+A direct predictor, a real-row coreset, and distilled prototypes are alternatives to spending the byte constraint on a generator.
+They are specified as controls in the next sections, not as unscored leaderboard rows.
+Stadler, Oprisanu, and Troncoso show that a synthetic release is not de-identification \citep{stadler-groundhog}.
+That citation limits what this draft is allowed to say.
+It is not a result about the compiler.
