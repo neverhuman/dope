@@ -42,7 +42,7 @@ class TrainingScale:
 
     def __post_init__(self):
         if self.value is None:
-            if self.status is None:
+            if not isinstance(self.status, DegenerateScale):
                 raise ValueError("undefined scale requires a disposition")
         elif finite_number(self.value) <= 0 or self.status is not None:
             raise ValueError("scale must be positive and nondegenerate")
@@ -128,7 +128,7 @@ class ClassificationContract:
 
     def __post_init__(self):
         object.__setattr__(self, "classes", tuple(self.classes))
-        if len(self.classes) < 2 or len(set(self.classes)) != len(self.classes):
+        if any(not isinstance(c, str) or not c for c in self.classes) or len(self.classes) < 2 or len(set(self.classes)) != len(self.classes):
             raise ValueError("class mapping must be unique")
         if self.loss_space not in (LossSpace.LOG_LOSS, LossSpace.BRIER):
             raise ValueError("classification loss contract required")

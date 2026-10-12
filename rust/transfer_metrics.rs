@@ -221,6 +221,11 @@ impl Margin {
         {
             return Err(MetricError::InvalidEvidence);
         }
+        if let Some(raw) = self.absolute_raw
+            && finite(raw)? < 0.0
+        {
+            return Err(MetricError::InvalidEvidence);
+        }
         let tolerance = match scale {
             TrainingScale::Positive(value) if finite(value)? > 0.0 => {
                 finite(self.relative * real + self.absolute_scaled * value)?
@@ -269,6 +274,34 @@ pub fn weighted_cvar(values: &[f64], weights: &[f64], alpha: f64) -> Result<f64,
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn shared_python_rust_golden_corpus() {
+        let corpus: serde_json::Value =
+            serde_json::from_str(include_str!("../schemas/metric-golden-v1.json")).unwrap();
+        for case in corpus["cases"].as_array().unwrap() {
+            let pairs = PairedLosses::new(
+                vec![case["real"].as_f64().unwrap()],
+                vec![case["synthetic"].as_f64().unwrap()],
+                vec![case["null"].as_f64().unwrap()],
+            )
+            .unwrap();
+            let scale = case["scale"]
+                .as_f64()
+                .map_or(TrainingScale::Degenerate, TrainingScale::Positive);
+            let summary = loss_summary(&pairs, scale).unwrap();
+            assert_eq!(summary.gap, case["gap"].as_f64().unwrap());
+            assert_eq!(summary.normalized_gap, case["normalized_gap"].as_f64());
+            assert_eq!(summary.retention, case["retention"].as_f64());
+            let ratio = match case["ratio_status"].as_str().unwrap() {
+                "finite" => GuardedRatio::Finite(case["ratio"].as_f64().unwrap()),
+                "both_zero" => GuardedRatio::BothZero,
+                "unbounded" => GuardedRatio::Unbounded,
+                _ => panic!("unknown golden ratio disposition"),
+            };
+            assert_eq!(summary.ratio, ratio);
+        }
+    }
 
     #[test]
     fn retention_does_not_hide_elevenfold_mse() {
