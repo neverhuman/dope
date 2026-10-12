@@ -1440,6 +1440,10 @@
     "docs/vnext/REPRODUCE.md": {
       "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
       "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
+    },
+    "todo/": {
+      "command": "test -z \"$(git ls-files -- todo/)\"",
+      "purpose": "verify local external-feedback planning packets remain untracked and outside committed product evidence; this route certifies no planning claims"
     }
   }
 }

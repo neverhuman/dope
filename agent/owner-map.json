@@ -360,6 +360,7 @@
     "docs/whitepaper/vnext/": "governance",
     "docs/whitepaper/scripts/vnext_paper.py": "governance",
     "docs/vnext/RELATED_WORK.md": "governance",
-    "docs/vnext/REPRODUCE.md": "governance"
+    "docs/vnext/REPRODUCE.md": "governance",
+    "todo/": "governance"
   }
 }
