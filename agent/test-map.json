@@ -1345,6 +1345,10 @@
       "command": "cargo test --locked --lib evidence::tests",
       "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
     },
+    "rust/evidence/": {
+      "command": "cargo test --locked --lib evidence::tests",
+      "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
+    },
     "rust/lib.rs": {
       "command": "cargo test --locked --lib evidence::tests",
       "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"

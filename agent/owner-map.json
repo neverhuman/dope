@@ -337,6 +337,7 @@
     "docs/vnext/DECISIONS.md": "governance",
     "docs/vnext/CLAIMS.md": "governance",
     "rust/evidence.rs": "rust-core",
+    "rust/evidence/": "rust-core",
     "rust/lib.rs": "rust-core",
     "schemas/transfer-run-v1.schema.json": "external-evidence",
     "schemas/freeze-v1.schema.json": "external-evidence",
