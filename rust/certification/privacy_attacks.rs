@@ -167,6 +167,29 @@ pub fn certify_kernel_with_policy(
     supported_datasets: usize,
     policy: &ReleasePolicy,
 ) -> Result<CertificationReport> {
+    certify_inputs(CertificationInputs {
+        real_dir,
+        kernel_path,
+        out,
+        seed,
+        runtime_dictionary_bytes,
+        supported_datasets,
+        policy,
+        tables: None,
+    })
+}
+
+fn certify_inputs(inputs: CertificationInputs<'_>) -> Result<CertificationReport> {
+    let CertificationInputs {
+        real_dir,
+        kernel_path,
+        out,
+        seed,
+        runtime_dictionary_bytes,
+        supported_datasets,
+        policy,
+        tables,
+    } = inputs;
     policy.validate()?;
     let artifact_bytes = fs::metadata(kernel_path)
         .map_err(|error| io_error(kernel_path, error))?
@@ -185,14 +208,19 @@ pub fn certify_kernel_with_policy(
             ));
         }
     };
-    let train = Table::read_dataset_dir_with_policy(real_dir, source.task, policy)?;
-    let test_path = real_dir.join("test.csv");
-    if !test_path.is_file() {
-        return Err(DopeError::Data(
-            "guarded certification requires an evaluator-owned test.csv".into(),
-        ));
-    }
-    let test = Table::read_csv_with_policy(&test_path, source.task, policy)?;
+    let (train, test) = if let Some(tables) = tables {
+        tables
+    } else {
+        let train = Table::read_dataset_dir_with_policy(real_dir, source.task, policy)?;
+        let test_path = real_dir.join("test.csv");
+        if !test_path.is_file() {
+            return Err(DopeError::Data(
+                "guarded certification requires an evaluator-owned test.csv".into(),
+            ));
+        }
+        let test = Table::read_csv_with_policy(&test_path, source.task, policy)?;
+        (train, test)
+    };
     if train.features != test.features {
         return Err(DopeError::Data(
             "real train.csv and evaluator test.csv have different widths".into(),

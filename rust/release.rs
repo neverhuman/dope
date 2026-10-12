@@ -4,19 +4,19 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use crate::certification::{CertificationReport, certify_kernel_with_policy};
+use crate::certification::CertificationReport;
 use crate::codec::LoadedKernel;
 use crate::codec::{decode_kernel, encode_kernel};
-use crate::compiler::{
-    CandidateReport, CompileOptions, CompileReport, compile_kernel_from_arrays,
-    compile_kernel_from_dir,
-};
+use crate::compiler::{CandidateReport, CompileOptions, CompileReport, compile_kernel_from_arrays};
 use crate::contract::{
     FormalDpConfiguration, FrozenBackend, ReleasePolicy, auditor_specs, empirical_backends,
     formal_dp_configurations,
 };
 use crate::data::Table;
 use crate::error::{DopeError, Result, io_error};
+use crate::evaluation::{
+    EvaluationCapability, EvaluationEvent, SelectionView, evaluate_frozen_batch,
+};
 use crate::model::{KernelProgram, Target, Task};
 use crate::sample::{SampleOptions, sample_kernel, sample_kernel_to_csv};
 
@@ -100,6 +100,10 @@ pub struct ConversionReport {
     pub checksums: BTreeMap<String, String>,
     pub failures: Vec<String>,
     pub sealed_test_open_count: usize,
+    #[serde(default)]
+    pub frozen_selection_hash: String,
+    #[serde(default)]
+    pub evaluation_events: Vec<EvaluationEvent>,
 }
 
 #[derive(Clone, Debug)]
@@ -177,69 +181,79 @@ pub fn convert_release(
     let mut compile_options = options.compile_options.clone();
     compile_options.release_policy.validate()?;
     compile_options.seed = Some(options.seed);
-    let compiled = compile_kernel_from_dir(dataset_dir, task, &compile_options)?;
-    let evidence_dir = out.with_extension("candidate-evidence");
-    fs::create_dir_all(&evidence_dir).map_err(|error| io_error(&evidence_dir, error))?;
-    let mut evaluated_candidates = Vec::new();
-    let mut passing = Vec::new();
-    for candidate in &compiled.candidates {
-        let artifact = compiled
-            .candidate_artifacts
-            .get(&candidate.candidate_id)
-            .ok_or_else(|| DopeError::Data("compiler omitted a candidate artifact".into()))?;
-        let identity = blake3::hash(artifact).to_hex().to_string();
-        let candidate_path = evidence_dir.join(format!("{identity}.dpk"));
-        let report_path = evidence_dir.join(format!("{identity}.certification.json"));
-        fs::write(&candidate_path, artifact).map_err(|error| io_error(&candidate_path, error))?;
-        let report = certify_kernel_with_policy(
-            real_holdout_dir,
-            &candidate_path,
-            &report_path,
-            options.seed,
-            options.runtime_dictionary_bytes,
-            options.supported_datasets,
-            &compile_options.release_policy,
-        )?;
-        evaluated_candidates.push(candidate.candidate_id.clone());
-        if report.certified {
-            passing.push((candidate.clone(), artifact.clone(), report));
-        }
-    }
-    passing.sort_by(|left, right| {
-        left.1
-            .len()
-            .cmp(&right.1.len())
-            .then_with(|| {
-                right
-                    .2
-                    .minimum_gold_one_sided_95_retention
-                    .unwrap_or(f64::NEG_INFINITY)
-                    .total_cmp(
-                        &left
-                            .2
-                            .minimum_gold_one_sided_95_retention
-                            .unwrap_or(f64::NEG_INFINITY),
-                    )
-            })
-            .then_with(|| {
-                right
-                    .2
-                    .fidelity
-                    .worst_joint_fidelity
-                    .total_cmp(&left.2.fidelity.worst_joint_fidelity)
-            })
-            .then_with(|| left.0.candidate_id.cmp(&right.0.candidate_id))
-    });
-    let certified_candidates = passing
+    // Selection has only the development training view. Final outcomes are never
+    // inputs to candidate ranking, tie breaks, or an optimizer retry.
+    let view = SelectionView::open(
+        &dataset_dir.join("train.csv"),
+        task,
+        &compile_options.release_policy,
+    )?;
+    let compiled = view.select(&compile_options)?;
+    let winner = compiled
+        .candidates
         .iter()
-        .map(|entry| entry.0.candidate_id.clone())
-        .collect::<Vec<_>>();
-    let (winner, artifact, certification) = passing.into_iter().next().ok_or_else(|| {
-        DopeError::Data(format!(
-            "no evaluated candidate passed every release gate; evidence: {}",
-            evidence_dir.display()
-        ))
-    })?;
+        .find(|candidate| candidate.candidate_id == compiled.report.selected_candidate)
+        .cloned()
+        .ok_or_else(|| DopeError::Data("development selection is absent".into()))?;
+    let frozen = view.freeze(
+        &compiled,
+        &compile_options,
+        options.seed,
+        options.runtime_dictionary_bytes,
+        options.supported_datasets,
+    )?;
+    let frozen_selection_hash = frozen.identity()?;
+    let evidence_dir = out.with_extension("candidate-evidence");
+    use std::io::Write;
+    use std::os::unix::fs::{DirBuilderExt, MetadataExt, OpenOptionsExt};
+    fs::DirBuilder::new()
+        .mode(0o700)
+        .create(&evidence_dir)
+        .map_err(|error| io_error(&evidence_dir, error))?;
+    let freeze_path = evidence_dir.join("frozen-selection.json");
+    let mut freeze_file = fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(&freeze_path)
+        .map_err(|error| io_error(&freeze_path, error))?;
+    freeze_file
+        .write_all(&crate::evidence::canonical_json(&serde_json::to_value(
+            &frozen,
+        )?)?)
+        .and_then(|_| freeze_file.sync_all())
+        .map_err(|error| io_error(&freeze_path, error))?;
+    fs::File::open(&evidence_dir)
+        .and_then(|file| file.sync_all())
+        .map_err(|error| io_error(&evidence_dir, error))?;
+    let socket = real_holdout_dir.join("evaluator.sock");
+    let evaluator_uid = std::env::var("DOPE_EVALUATOR_UID")
+        .ok()
+        .and_then(|value| value.parse::<u32>().ok())
+        .ok_or_else(|| DopeError::Data("trusted evaluator UID is required".into()))?;
+    if fs::symlink_metadata(&socket)
+        .map_err(|_| DopeError::Data("evaluator endpoint unavailable".into()))?
+        .uid()
+        != evaluator_uid
+    {
+        return Err(DopeError::Data("evaluator principal mismatch".into()));
+    }
+    let evaluation = evaluate_frozen_batch(
+        EvaluationCapability::connect(&socket, evaluator_uid)?,
+        std::slice::from_ref(&frozen),
+    )?;
+    let mut reports = evaluation.reports;
+    let certification = reports
+        .pop()
+        .ok_or_else(|| DopeError::Data("frozen evaluation is absent".into()))?;
+    if !certification.certified {
+        return Err(DopeError::Data(
+            "frozen candidate failed final audit; no alternate candidate is eligible".into(),
+        ));
+    }
+    let evaluated_candidates = vec![winner.candidate_id.clone()];
+    let certified_candidates = evaluated_candidates.clone();
+    let artifact = frozen.artifact().to_vec();
     let staging = out.with_extension(format!("staging-{}", std::process::id()));
     fs::create_dir(&staging).map_err(|error| io_error(&staging, error))?;
     let kernel_path = staging.join("kernel.dpk");
@@ -409,7 +423,9 @@ pub fn convert_release(
         minimum_gold_one_sided_95_retention: certification.minimum_gold_one_sided_95_retention,
         checksums,
         failures: failures.into_iter().collect(),
-        sealed_test_open_count: 1,
+        sealed_test_open_count: evaluation.sealed_test_open_count,
+        frozen_selection_hash,
+        evaluation_events: evaluation.events,
     };
     let report_path = staging.join("conversion-report.json");
     fs::write(&report_path, serde_json::to_vec_pretty(&report)?)

@@ -1,6 +1,34 @@
 {
   "workspace": "dope",
   "tests": {
+    "docs/release.md": {
+      "command": "cargo test --locked --test vnext_custody",
+      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+    },
+    "rust/certification/privacy_attacks.rs": {
+      "command": "cargo test --locked --test vnext_custody",
+      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+    },
+    "rust/certification.rs": {
+      "command": "cargo test --locked --test vnext_custody",
+      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+    },
+    "rust/access.rs": {
+      "command": "cargo test --locked --test vnext_custody",
+      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+    },
+    "rust/release.rs": {
+      "command": "cargo test --locked --test vnext_custody",
+      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+    },
+    "tests/vnext_custody.rs": {
+      "command": "cargo test --locked --test vnext_custody",
+      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+    },
+    "rust/evaluation.rs": {
+      "command": "cargo test --locked --test vnext_custody",
+      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+    },
     "research/benchmark/results/work-order-b-dope-producer-reported-four-fit-utility-v1/": {
       "command": "python3 -I -B research/benchmark/results/work-order-b-dope-producer-reported-four-fit-utility-v1/render.py --check",
       "purpose": "reproduce the producer-reported four-fit validation description, fixed all100 denominators, post hoc sample SD, null parity/five-fit/paired/scores, and deterministic standalone SVG from committed public results only"
