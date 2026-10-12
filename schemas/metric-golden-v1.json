@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "loss_space": "original_mse",
+  "cases": [
+    {
+      "name": "retention_masks_elevenfold_mse",
+      "real": 1.0,
+      "synthetic": 11.0,
+      "null": 101.0,
+      "scale": 100.0,
+      "gap": 10.0,
+      "normalized_gap": 0.1,
+      "retention": 0.9,
+      "ratio": 11.0,
+      "ratio_status": "finite"
+    },
+    {
+      "name": "worse_than_null",
+      "real": 1.0,
+      "synthetic": 120.0,
+      "null": 101.0,
+      "scale": 100.0,
+      "gap": 119.0,
+      "normalized_gap": 1.19,
+      "retention": -0.19,
+      "ratio": 120.0,
+      "ratio_status": "finite"
+    },
+    {
+      "name": "better_than_real",
+      "real": 2.0,
+      "synthetic": 0.0,
+      "null": 12.0,
+      "scale": 10.0,
+      "gap": -2.0,
+      "normalized_gap": -0.2,
+      "retention": 1.2,
+      "ratio": 0.0,
+      "ratio_status": "finite"
+    },
+    {
+      "name": "zero_real",
+      "real": 0.0,
+      "synthetic": 1.0,
+      "null": 2.0,
+      "scale": 1.0,
+      "gap": 1.0,
+      "normalized_gap": 1.0,
+      "retention": 0.5,
+      "ratio": null,
+      "ratio_status": "unbounded"
+    },
+    {
+      "name": "both_zero",
+      "real": 0.0,
+      "synthetic": 0.0,
+      "null": 0.0,
+      "scale": 1.0,
+      "gap": 0.0,
+      "normalized_gap": 0.0,
+      "retention": null,
+      "ratio": 1.0,
+      "ratio_status": "both_zero"
+    },
+    {
+      "name": "low_signal",
+      "real": 100.5,
+      "synthetic": 102.0,
+      "null": 101.0,
+      "scale": 100.0,
+      "gap": 1.5,
+      "normalized_gap": 0.015,
+      "retention": null,
+      "ratio": 1.0149253731343284,
+      "ratio_status": "finite"
+    },
+    {
+      "name": "constant_target",
+      "real": 0.0,
+      "synthetic": 4.0,
+      "null": 0.0,
+      "scale": null,
+      "gap": 4.0,
+      "normalized_gap": null,
+      "retention": null,
+      "ratio": null,
+      "ratio_status": "unbounded"
+    }
+  ],
+  "rank_reversal": {
+    "targets": [
+      0.0,
+      1.0,
+      1000.0
+    ],
+    "real_predictions": [
+      1.0,
+      1.0,
+      1000.0
+    ],
+    "synthetic_predictions": [
+      0.0,
+      1.0,
+      900.0
+    ],
+    "raw_real_mse": 0.3333333333333333,
+    "raw_synthetic_mse": 3333.3333333333335
+  },
+  "weighted_tail": {
+    "values": [
+      0.0,
+      10.0,
+      20.0
+    ],
+    "weights": [
+      0.85,
+      0.1,
+      0.05
+    ],
+    "alpha": 0.9,
+    "cvar": 15.0
+  },
+  "classification": {
+    "classes": [
+      "no",
+      "yes"
+    ],
+    "labels": [
+      "yes"
+    ],
+    "probabilities": [
+      [
+        0.2,
+        0.8
+      ]
+    ],
+    "probability_floor": 1e-09,
+    "log_loss": 0.2231435513142097,
+    "brier_sum_over_classes": 0.08
+  }
+}
