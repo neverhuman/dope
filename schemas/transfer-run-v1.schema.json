@@ -1,0 +1,852 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:transfer-run:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "identity",
+    "executor_hash",
+    "freeze_hash",
+    "dependencies",
+    "sampling_payload_bytes",
+    "paired_evidence_hash",
+    "loss",
+    "loss_space",
+    "loss_unit",
+    "losses",
+    "execution",
+    "attempt",
+    "projection",
+    "release",
+    "transfer",
+    "empirical_privacy",
+    "formal_mechanism",
+    "legal_route"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-transfer-run"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_hash",
+        "source_family_hash",
+        "task_hash",
+        "data_hash",
+        "split_hash",
+        "schema_hash",
+        "feature_transform_hash",
+        "target_transform_hash",
+        "generator_hash",
+        "configuration_hash",
+        "fit_hash",
+        "artifact_inventory_hash",
+        "sample_hash",
+        "query_hash",
+        "learner_hash",
+        "checkpoint_hash",
+        "recipe_hash",
+        "metric_hash",
+        "environment_hash",
+        "evaluation_code_hash",
+        "partition_role",
+        "global_seed",
+        "generator_fit_seed",
+        "sample_seed",
+        "learner_seed",
+        "produced_rows",
+        "consumed_rows",
+        "context_rows",
+        "fit_rows",
+        "requested_rows",
+        "query_rows",
+        "ensemble_count",
+        "precision",
+        "determinism",
+        "source_hash"
+      ],
+      "properties": {
+        "protocol_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_family_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "task_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "data_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "split_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "schema_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "feature_transform_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "target_transform_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "generator_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "configuration_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "fit_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "artifact_inventory_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sample_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "query_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "learner_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checkpoint_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recipe_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "metric_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "environment_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evaluation_code_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "partition_role": {
+          "enum": [
+            "selection",
+            "confirmation",
+            "exploratory"
+          ]
+        },
+        "global_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "generator_fit_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sample_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "learner_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "produced_rows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "consumed_rows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "context_rows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "fit_rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "requested_rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "query_rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "ensemble_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "precision": {
+          "enum": [
+            "float32",
+            "float64",
+            "bfloat16"
+          ]
+        },
+        "determinism": {
+          "enum": [
+            "deterministic",
+            "seeded_best_effort"
+          ]
+        },
+        "source_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "executor_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "freeze_hash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sha256",
+          "path",
+          "bytes",
+          "kind",
+          "requires"
+        ],
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "kind": {
+            "enum": [
+              "protocol",
+              "source_family",
+              "task",
+              "data",
+              "split",
+              "schema",
+              "feature_transform",
+              "target_transform",
+              "generator",
+              "configuration",
+              "fit",
+              "fit_state",
+              "artifact_inventory",
+              "artifact",
+              "sample",
+              "query",
+              "learner",
+              "checkpoint",
+              "recipe",
+              "metric",
+              "environment",
+              "evaluation_code",
+              "executor",
+              "paired_evidence",
+              "freeze",
+              "selection_receipt",
+              "access_ledger",
+              "policy",
+              "source"
+            ]
+          },
+          "requires": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "sampling_payload_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "paired_evidence_hash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "loss": {
+      "enum": [
+        "mse",
+        "mae"
+      ]
+    },
+    "loss_space": {
+      "const": "original_target_units"
+    },
+    "loss_unit": {
+      "enum": [
+        "target_units_squared",
+        "target_units"
+      ]
+    },
+    "losses": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "real",
+            "synthetic",
+            "null"
+          ],
+          "properties": {
+            "real": {
+              "type": "number",
+              "minimum": 0
+            },
+            "synthetic": {
+              "type": "number",
+              "minimum": 0
+            },
+            "null": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "execution": {
+      "enum": [
+        "complete",
+        "unsupported",
+        "timeout",
+        "oom",
+        "invalid_output",
+        "byte_infeasible",
+        "protocol_violation",
+        "unresolved"
+      ]
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_id",
+        "parent_attempt_id",
+        "exit_code",
+        "wall_time_ms",
+        "cpu_time_ms",
+        "peak_memory_bytes"
+      ],
+      "properties": {
+        "attempt_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "parent_attempt_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exit_code": {
+          "type": "integer",
+          "minimum": -255,
+          "maximum": 255
+        },
+        "wall_time_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "cpu_time_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "peak_memory_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "projection": {
+      "enum": [
+        "private",
+        "sanitized_public"
+      ]
+    },
+    "release": {
+      "const": "restricted_local"
+    },
+    "transfer": {
+      "const": "unmeasured"
+    },
+    "empirical_privacy": {
+      "const": "unmeasured"
+    },
+    "formal_mechanism": {
+      "const": "none"
+    },
+    "legal_route": {
+      "const": "unreviewed"
+    }
+  },
+  "$defs": {
+    "EvaluationIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_hash",
+        "source_family_hash",
+        "task_hash",
+        "data_hash",
+        "split_hash",
+        "schema_hash",
+        "feature_transform_hash",
+        "target_transform_hash",
+        "generator_hash",
+        "configuration_hash",
+        "fit_hash",
+        "artifact_inventory_hash",
+        "sample_hash",
+        "query_hash",
+        "learner_hash",
+        "checkpoint_hash",
+        "recipe_hash",
+        "metric_hash",
+        "environment_hash",
+        "evaluation_code_hash",
+        "partition_role",
+        "global_seed",
+        "generator_fit_seed",
+        "sample_seed",
+        "learner_seed",
+        "produced_rows",
+        "consumed_rows",
+        "context_rows",
+        "fit_rows",
+        "requested_rows",
+        "query_rows",
+        "ensemble_count",
+        "precision",
+        "determinism",
+        "source_hash"
+      ],
+      "properties": {
+        "protocol_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_family_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "task_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "data_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "split_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "schema_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "feature_transform_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "target_transform_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "generator_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "configuration_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "fit_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "artifact_inventory_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sample_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "query_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "learner_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checkpoint_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recipe_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "metric_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "environment_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evaluation_code_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "partition_role": {
+          "enum": [
+            "selection",
+            "confirmation",
+            "exploratory"
+          ]
+        },
+        "global_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "generator_fit_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sample_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "learner_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "produced_rows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "consumed_rows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "context_rows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "fit_rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "requested_rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "query_rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "ensemble_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "precision": {
+          "enum": [
+            "float32",
+            "float64",
+            "bfloat16"
+          ]
+        },
+        "determinism": {
+          "enum": [
+            "deterministic",
+            "seeded_best_effort"
+          ]
+        },
+        "source_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "Dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "path",
+        "bytes",
+        "kind",
+        "requires"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "kind": {
+          "enum": [
+            "protocol",
+            "source_family",
+            "task",
+            "data",
+            "split",
+            "schema",
+            "feature_transform",
+            "target_transform",
+            "generator",
+            "configuration",
+            "fit",
+            "fit_state",
+            "artifact_inventory",
+            "artifact",
+            "sample",
+            "query",
+            "learner",
+            "checkpoint",
+            "recipe",
+            "metric",
+            "environment",
+            "evaluation_code",
+            "executor",
+            "paired_evidence",
+            "freeze",
+            "selection_receipt",
+            "access_ledger",
+            "policy",
+            "source"
+          ]
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "const": "complete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "losses": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "real",
+              "synthetic",
+              "null"
+            ],
+            "properties": {
+              "real": {
+                "type": "number",
+                "minimum": 0
+              },
+              "synthetic": {
+                "type": "number",
+                "minimum": 0
+              },
+              "null": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "paired_evidence_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "attempt": {
+            "properties": {
+              "exit_code": {
+                "const": 0
+              },
+              "wall_time_ms": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "peak_memory_bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "losses": {
+            "type": "null"
+          },
+          "paired_evidence_hash": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "loss": {
+            "const": "mse"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "loss_unit": {
+            "const": "target_units_squared"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "loss_unit": {
+            "const": "target_units"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "identity": {
+            "properties": {
+              "partition_role": {
+                "const": "confirmation"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "freeze_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  ]
+}

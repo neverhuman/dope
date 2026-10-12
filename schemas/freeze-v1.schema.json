@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:freeze:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "protocol_hash",
+    "artifact_inventory_hash",
+    "configuration_hash",
+    "split_hash",
+    "selection_receipt_hash",
+    "executor_hash",
+    "evaluation_code_hash",
+    "access_ledger_hash",
+    "cell_hash",
+    "parent_freeze_hash",
+    "protocol_frozen",
+    "confirmation_allowed"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-freeze"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "protocol_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifact_inventory_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "configuration_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "split_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "selection_receipt_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "executor_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evaluation_code_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "access_ledger_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "cell_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "parent_freeze_hash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "protocol_frozen": {
+      "const": true
+    },
+    "confirmation_allowed": {
+      "const": true
+    }
+  }
+}

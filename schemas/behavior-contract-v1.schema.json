@@ -1,0 +1,1003 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:behavior-contract:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "status",
+    "protocol_frozen",
+    "confirmation_allowed",
+    "active_production_tier",
+    "primary_scope",
+    "scopes",
+    "workload",
+    "endpoints",
+    "margins",
+    "learners",
+    "budgets",
+    "disclosure",
+    "freeze_requirements",
+    "states",
+    "release_gate_conjunction",
+    "historical_contract_sha256",
+    "migration"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-behavior-contract"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "frozen"
+      ]
+    },
+    "protocol_frozen": {
+      "type": "boolean"
+    },
+    "confirmation_allowed": {
+      "type": "boolean"
+    },
+    "active_production_tier": {
+      "const": false
+    },
+    "primary_scope": {
+      "enum": [
+        "task_replacement",
+        "reusable_table",
+        "augmentation",
+        "relational_replacement",
+        "foundation_pretraining"
+      ]
+    },
+    "scopes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_replacement",
+        "reusable_table",
+        "augmentation",
+        "relational_replacement",
+        "foundation_pretraining"
+      ],
+      "properties": {
+        "task_replacement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workload",
+            "qualification"
+          ],
+          "properties": {
+            "workload": {
+              "type": "string",
+              "minLength": 1
+            },
+            "qualification": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "reusable_table": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workload",
+            "qualification"
+          ],
+          "properties": {
+            "workload": {
+              "type": "string",
+              "minLength": 1
+            },
+            "qualification": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "augmentation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workload",
+            "qualification"
+          ],
+          "properties": {
+            "workload": {
+              "type": "string",
+              "minLength": 1
+            },
+            "qualification": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "relational_replacement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workload",
+            "qualification"
+          ],
+          "properties": {
+            "workload": {
+              "type": "string",
+              "minLength": 1
+            },
+            "qualification": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "foundation_pretraining": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workload",
+            "qualification"
+          ],
+          "properties": {
+            "workload": {
+              "type": "string",
+              "minLength": 1
+            },
+            "qualification": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "table_schema_hash",
+        "task_manifest_hash",
+        "analytical_workload_hash",
+        "population_history_hash",
+        "task_kind",
+        "loss_space",
+        "losses",
+        "target_transform_policy",
+        "sampling_mode",
+        "teaching_context_policy_hash"
+      ],
+      "properties": {
+        "table_schema_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "task_manifest_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "analytical_workload_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "population_history_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "task_kind": {
+          "enum": [
+            "numeric_regression"
+          ]
+        },
+        "loss_space": {
+          "const": "original_target_units"
+        },
+        "losses": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "mse",
+              "rmse",
+              "mae"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "target_transform_policy": {
+          "const": "fit_only_invert_before_loss"
+        },
+        "sampling_mode": {
+          "enum": [
+            "population",
+            "teaching_context"
+          ]
+        },
+        "teaching_context_policy_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "endpoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "development_fitness",
+        "scientific_endpoint",
+        "release_authority",
+        "bytes_policy",
+        "score_implies_release"
+      ],
+      "properties": {
+        "development_fitness": {
+          "const": "development-only family/learner-balanced excess risk with declared tail penalty"
+        },
+        "scientific_endpoint": {
+          "const": "paired original-unit risk gap and all-required-cell tolerance coverage"
+        },
+        "release_authority": {
+          "const": "separate scoped authorization and conjunction of applicable verified gates"
+        },
+        "bytes_policy": {
+          "const": "exact serialized sampling bytes are a constraint and a frontier axis"
+        },
+        "score_implies_release": {
+          "const": false
+        }
+      }
+    },
+    "margins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "noninferiority",
+        "catastrophic_harm"
+      ],
+      "properties": {
+        "noninferiority": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "catastrophic_harm": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "learners": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_families",
+        "held_out_families"
+      ],
+      "properties": {
+        "required_families": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "held_out_families": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sampling_payload_bytes",
+        "downstream_context_rows",
+        "fit_seconds",
+        "memory_bytes",
+        "campaign_spend"
+      ],
+      "properties": {
+        "sampling_payload_bytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "downstream_context_rows": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fit_seconds": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "memory_bytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "campaign_spend": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protected_unit",
+        "adversary_access",
+        "auxiliary_information_hash",
+        "repeated_release_policy_hash",
+        "privacy_route",
+        "legal_route",
+        "purpose_grants"
+      ],
+      "properties": {
+        "protected_unit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "adversary_access": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "rows",
+              "black_box_samples",
+              "artifact_and_sidecars",
+              "rare_entities",
+              "repeated_releases"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "auxiliary_information_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "repeated_release_policy_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "privacy_route": {
+          "enum": [
+            "unreviewed",
+            "scoped",
+            "expired",
+            "revoked"
+          ]
+        },
+        "legal_route": {
+          "enum": [
+            "unreviewed",
+            "scoped",
+            "expired",
+            "revoked"
+          ]
+        },
+        "purpose_grants": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "customer_modeling",
+              "named_recipient_sharing",
+              "public_artifact",
+              "cross_customer_research_corpus",
+              "foundation_pretraining"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "freeze_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "margin_justification",
+        "checkpoint_manifest",
+        "rights_manifest",
+        "cohort_manifest",
+        "learner_portfolio",
+        "power_validation",
+        "pilot_cost",
+        "retry_policy",
+        "resource_policy",
+        "evaluator_isolation",
+        "multiplicity_policy",
+        "projection_policy",
+        "operator_authority"
+      ],
+      "properties": {
+        "margin_justification": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "checkpoint_manifest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rights_manifest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cohort_manifest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "learner_portfolio": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "power_validation": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pilot_cost": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retry_policy": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resource_policy": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evaluator_isolation": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "multiplicity_policy": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "projection_policy": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operator_authority": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "states": {
+      "const": {
+        "execution": [
+          "complete",
+          "unsupported",
+          "timeout",
+          "oom",
+          "invalid_output",
+          "byte_infeasible",
+          "protocol_violation",
+          "unresolved"
+        ],
+        "transfer": [
+          "observed_within_tolerance",
+          "supported",
+          "harmful",
+          "inconclusive",
+          "unmeasured"
+        ],
+        "empirical_privacy": [
+          "passed",
+          "failed",
+          "inconclusive",
+          "unmeasured"
+        ],
+        "formal_mechanism": [
+          "none",
+          "reviewed_dp",
+          "unverified"
+        ],
+        "legal_route": [
+          "unreviewed",
+          "scoped",
+          "expired",
+          "revoked"
+        ],
+        "release": [
+          "restricted_local",
+          "eligible",
+          "blocked",
+          "published",
+          "withdrawn"
+        ]
+      }
+    },
+    "release_gate_conjunction": {
+      "const": [
+        "verified_identity_and_inventory",
+        "frozen_nonadaptive_evaluation",
+        "scoped_transfer_qualification",
+        "applicable_privacy_mechanism_evidence",
+        "scoped_rights_and_legal_route",
+        "owner_recipient_use_authorization",
+        "software_security_audit_gates"
+      ]
+    },
+    "historical_contract_sha256": {
+      "const": {
+        "production/kpi-contract-v1.json": "fe3abcd1cf4653c99a5d0c9505b7645a5fd968f86805dd5b7573ad29ac052760",
+        "production/kpi-contract.json": "d04a2672ed25e92baeb89bec51ea5ccddb04165701cb44d2e1d53ca32f6e219b",
+        "production/kpi-contract-v3.json": "40cd035d838657de3bd5d27bb940d771cbae697ac90efb5beeab53a5bf7adcbb"
+      }
+    },
+    "migration": {
+      "const": {
+        "predecessors_immutable": true,
+        "new_identifier_required": true,
+        "post_outcome_amendment": "new_exploratory_identity",
+        "historical_receipt_policy": "decode_with_original_contract",
+        "rollback": "retain_immutable_ancestry_withdraw_new_authority"
+      }
+    }
+  },
+  "$defs": {
+    "ClaimScope": {
+      "enum": [
+        "task_replacement",
+        "reusable_table",
+        "augmentation",
+        "relational_replacement",
+        "foundation_pretraining"
+      ]
+    },
+    "ContractMigrationDiff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_sha256",
+        "to_sha256",
+        "new_identifier",
+        "semantic_changes",
+        "migration_evidence_hash"
+      ],
+      "properties": {
+        "from_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "to_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "new_identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "semantic_changes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "migration_evidence_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "protocol_frozen": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "frozen"
+          },
+          "protocol_frozen": {
+            "const": true
+          },
+          "confirmation_allowed": {
+            "const": true
+          },
+          "freeze_requirements": {
+            "properties": {
+              "margin_justification": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "checkpoint_manifest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "rights_manifest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "cohort_manifest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "learner_portfolio": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "power_validation": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "pilot_cost": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "retry_policy": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "resource_policy": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "evaluator_isolation": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "multiplicity_policy": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "projection_policy": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "operator_authority": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "margins": {
+            "properties": {
+              "noninferiority": {
+                "type": "number",
+                "minimum": 0
+              },
+              "catastrophic_harm": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "budgets": {
+            "properties": {
+              "sampling_payload_bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "downstream_context_rows": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "fit_seconds": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "memory_bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "campaign_spend": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "workload": {
+            "properties": {
+              "table_schema_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "task_manifest_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "population_history_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "learners": {
+            "properties": {
+              "held_out_families": {
+                "minItems": 1
+              }
+            }
+          },
+          "disclosure": {
+            "properties": {
+              "protected_unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "auxiliary_information_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "repeated_release_policy_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "privacy_route": {
+                "const": "scoped"
+              },
+              "legal_route": {
+                "const": "scoped"
+              },
+              "purpose_grants": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "status": {
+            "const": "draft"
+          },
+          "confirmation_allowed": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workload": {
+            "properties": {
+              "sampling_mode": {
+                "const": "teaching_context"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "workload": {
+            "properties": {
+              "teaching_context_policy_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "title": "BehaviorContractV1"
+}

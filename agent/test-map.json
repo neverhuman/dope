@@ -11,7 +11,7 @@
     },
     "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay the frozen indices011–014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/tests/test_mfs_v3_panel.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3_panel -v",
@@ -91,7 +91,7 @@
     },
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay frozen indices009–010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/render.py --check",
@@ -99,7 +99,7 @@
     },
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check",
-      "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
+      "purpose": "replay hash-frozen closed indices006\u2013007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
     },
     "research/benchmark/render_matched_linear_fit11_figure.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_matched_linear_fit11_figure -v",
@@ -1324,6 +1324,130 @@
     "research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json": {
       "command": "python3 -B -m jsonschema -i research/benchmark/results/beyondarena-training-screen-policy-v1.json research/benchmark/results/beyondarena-training-screen-policy-v1.schema.json",
       "purpose": "validate the frozen preparation policy and unavailable runtime claims against Draft2020-12 schema"
+    },
+    "production/behavior-contract-v1.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "validate fail-closed behavior contract, historical byte pins and scoped evidence/authority boundaries"
+    },
+    "schemas/behavior-contract-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "validate fail-closed behavior contract, historical byte pins and scoped evidence/authority boundaries"
+    },
+    "docs/vnext/DECISIONS.md": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "validate fail-closed behavior contract, historical byte pins and scoped evidence/authority boundaries"
+    },
+    "docs/vnext/CLAIMS.md": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "validate fail-closed behavior contract, historical byte pins and scoped evidence/authority boundaries"
+    },
+    "rust/evidence.rs": {
+      "command": "cargo test --locked --lib evidence::tests",
+      "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
+    },
+    "rust/evidence/": {
+      "command": "cargo test --locked --lib evidence::tests",
+      "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
+    },
+    "rust/lib.rs": {
+      "command": "cargo test --locked --lib evidence::tests",
+      "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
+    },
+    "schemas/transfer-run-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
+    },
+    "schemas/freeze-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
+    },
+    "research/transfer/evidence.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
+    },
+    "research/transfer/tests/test_evidence.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
+    },
+    "research/transfer/__init__.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
+    },
+    "research/transfer/tests/__init__.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
+      "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
+    },
+    "rust/transfer_metrics.rs": {
+      "command": "mkdir -p target/vnext && rustc --edition=2024 --test rust/transfer_metrics.rs -o target/vnext/transfer-metrics-tests && target/vnext/transfer-metrics-tests",
+      "purpose": "run independent original-unit metric golden tests; module registration follows this owned source landing from PR04"
+    },
+    "research/transfer/losses.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "validate original-unit losses, full required-cell coverage, weighted tail harm and bytes as a separate constraint"
+    },
+    "research/transfer/metrics.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "validate original-unit losses, full required-cell coverage, weighted tail harm and bytes as a separate constraint"
+    },
+    "research/transfer/tests/test_metrics.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "validate original-unit losses, full required-cell coverage, weighted tail harm and bytes as a separate constraint"
+    },
+    "schemas/metric-golden-v1.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "validate original-unit losses, full required-cell coverage, weighted tail harm and bytes as a separate constraint"
+    },
+    "research/transfer/statistics.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
+      "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
+    },
+    "research/transfer/power.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
+      "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
+    },
+    "research/transfer/tests/test_statistics.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
+      "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
+    },
+    "research/transfer/protocols/statistics-v1.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
+      "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
+    },
+    "research/transfer/lineage.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
+      "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+    },
+    "research/transfer/registries/sources.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
+      "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+    },
+    "research/transfer/tests/test_lineage.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
+      "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+    },
+    "schemas/source-family-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
+      "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+    },
+    "docs/whitepaper/vnext/": {
+      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
+      "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
+    },
+    "docs/whitepaper/scripts/vnext_paper.py": {
+      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
+      "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
+    },
+    "docs/vnext/RELATED_WORK.md": {
+      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
+      "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
+    },
+    "docs/vnext/REPRODUCE.md": {
+      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
+      "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
+    },
+    "todo/": {
+      "command": "test -z \"$(git ls-files -- todo/)\"",
+      "purpose": "verify local external-feedback planning packets remain untracked and outside committed product evidence; this route certifies no planning claims"
     }
   }
 }
