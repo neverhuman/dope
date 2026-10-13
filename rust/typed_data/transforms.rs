@@ -268,13 +268,21 @@ impl FittedTransforms {
                 }
                 Ok(cell.clone())
             }
-            Cell::Boolean(_) if column.dtype == ColumnType::Boolean => Ok(cell.clone()),
+            Cell::Boolean(value) if column.dtype == ColumnType::Boolean => {
+                check_numeric_domain(u8::from(*value) as f64, &column.domain, |code| {
+                    SchemaError::new(code, None, None)
+                })?;
+                Ok(cell.clone())
+            }
             Cell::Number(value)
                 if matches!(
                     column.dtype,
                     ColumnType::Continuous | ColumnType::Integer | ColumnType::Ordinal
                 ) =>
             {
+                validate_numeric_cell(*value, column.dtype, &column.domain, |code| {
+                    SchemaError::new(code, None, None)
+                })?;
                 Ok(Cell::Number(self.transform_numeric(id, &[*value])?[0]))
             }
             _ => Err(SchemaError::new("cell_type_or_mask_mismatch", None, None)),

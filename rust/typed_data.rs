@@ -259,15 +259,7 @@ fn parse_cell(value: &str, column: &ColumnSchemaV1, row: usize, index: usize) ->
                 }
                 integer as f64
             };
-            if !number.is_finite() {
-                return Err(error("nonfinite_numeric_value"));
-            }
-            if column.dtype != ColumnType::Continuous
-                && (number.fract() != 0.0 || number.abs() > 9_007_199_254_740_991.0)
-            {
-                return Err(error("integer_precision_or_type_mismatch"));
-            }
-            check_numeric_domain(number, column, error)?;
+            validate_numeric_cell(number, column.dtype, &column.domain, error)?;
             Ok(Cell::Number(number))
         }
         ColumnType::Boolean => {
@@ -276,7 +268,7 @@ fn parse_cell(value: &str, column: &ColumnSchemaV1, row: usize, index: usize) ->
                 "1" | "true" => true,
                 _ => return Err(error("invalid_boolean_value")),
             };
-            check_numeric_domain(u8::from(boolean) as f64, column, error)?;
+            check_numeric_domain(u8::from(boolean) as f64, &column.domain, error)?;
             Ok(Cell::Boolean(boolean))
         }
         ColumnType::Nominal => {
@@ -291,12 +283,29 @@ fn parse_cell(value: &str, column: &ColumnSchemaV1, row: usize, index: usize) ->
     }
 }
 
-fn check_numeric_domain(
+fn validate_numeric_cell(
     number: f64,
-    column: &ColumnSchemaV1,
+    dtype: ColumnType,
+    domain: &Option<ColumnDomain>,
     error: impl Fn(&'static str) -> SchemaError,
 ) -> Result<()> {
-    if let Some(ColumnDomain::Numeric { lower, upper }) = &column.domain {
+    if !number.is_finite() {
+        return Err(error("nonfinite_numeric_value"));
+    }
+    if matches!(dtype, ColumnType::Integer | ColumnType::Ordinal)
+        && (number.fract() != 0.0 || number.abs() > 9_007_199_254_740_991.0)
+    {
+        return Err(error("integer_precision_or_type_mismatch"));
+    }
+    check_numeric_domain(number, domain, error)
+}
+
+fn check_numeric_domain(
+    number: f64,
+    domain: &Option<ColumnDomain>,
+    error: impl Fn(&'static str) -> SchemaError,
+) -> Result<()> {
+    if let Some(ColumnDomain::Numeric { lower, upper }) = domain {
         if lower.is_some_and(|bound| number < bound) || upper.is_some_and(|bound| number > bound) {
             return Err(error("outside_declared_domain"));
         }

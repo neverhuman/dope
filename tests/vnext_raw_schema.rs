@@ -261,6 +261,133 @@ fn fit_errors_follow_csv_column_positions_after_header_reordering() {
 }
 
 #[test]
+fn retained_raw_cells_enforce_numeric_types_and_declared_domains() {
+    for dtype in ["continuous", "integer", "ordinal"] {
+        let mut value = declaration();
+        value["columns"][0]["dtype"] = json!(dtype);
+        value["columns"][0]["domain"] = json!({"kind":"numeric", "lower":0, "upper":10});
+        let data = table("private_measurement,private_outcome\n1,1\n3,3\n", &value).unwrap();
+        let retained = fit_transform(&data, &[0, 1])
+            .unwrap()
+            .sampling_state_bytes()
+            .unwrap();
+        drop(data);
+        let loaded = FittedTransforms::reload(&retained).unwrap();
+        for number in [-1.0, 11.0] {
+            assert_eq!(
+                loaded
+                    .transform_cell("c0001", &Cell::Number(number))
+                    .unwrap_err()
+                    .code,
+                "outside_declared_domain"
+            );
+        }
+        for number in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+            assert_eq!(
+                loaded
+                    .transform_cell("c0001", &Cell::Number(number))
+                    .unwrap_err()
+                    .code,
+                "nonfinite_numeric_value"
+            );
+        }
+        if dtype != "continuous" {
+            for number in [1.5, 9_007_199_254_740_992.0, -9_007_199_254_740_992.0] {
+                assert_eq!(
+                    loaded
+                        .transform_cell("c0001", &Cell::Number(number))
+                        .unwrap_err()
+                        .code,
+                    "integer_precision_or_type_mismatch"
+                );
+            }
+        }
+        assert_eq!(
+            loaded.transform_cell("c0001", &Cell::Number(9.0)).unwrap(),
+            Cell::Number(4.0)
+        );
+        assert_eq!(loaded.inverse_transform("c0001", &[6.0]).unwrap(), [13.0]);
+    }
+    let mut value = declaration();
+    value["columns"][0]["dtype"] = json!("boolean");
+    value["columns"][0]["domain"] = json!({"kind":"numeric", "lower":0, "upper":0});
+    let data = table("private_measurement,private_outcome\nfalse,1\n", &value).unwrap();
+    let loaded = FittedTransforms::reload(
+        &fit_transform(&data, &[0])
+            .unwrap()
+            .sampling_state_bytes()
+            .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        loaded
+            .transform_cell("c0001", &Cell::Boolean(true))
+            .unwrap_err()
+            .code,
+        "outside_declared_domain"
+    );
+    assert_eq!(
+        loaded
+            .transform_cell("c0001", &Cell::Boolean(false))
+            .unwrap(),
+        Cell::Boolean(false)
+    );
+}
+
+#[test]
+fn raw_json_duplicate_fields_and_duplicate_column_identities_are_refused() {
+    let schema_bytes = serde_json::to_string(&declaration()).unwrap();
+    for (field, repeated) in [
+        (
+            "\"role\":\"feature\"",
+            "\"role\":\"excluded_sensitive_identifier\",\"role\":\"feature\"",
+        ),
+        ("\"id\":\"c0001\"", "\"id\":\"c9999\",\"id\":\"c0001\""),
+        (
+            "\"source_name\":\"private_measurement\"",
+            "\"source_name\":\"other\",\"source_name\":\"private_measurement\"",
+        ),
+        ("\"version\":1", "\"version\":2,\"version\":1"),
+    ] {
+        assert!(schema_bytes.contains(field));
+        let duplicated = schema_bytes.replacen(field, repeated, 1);
+        let error = TableSchemaV1::from_private_json(duplicated.as_bytes())
+            .err()
+            .unwrap();
+        assert_eq!(error.code, "invalid_schema_json");
+    }
+    for (field, code) in [
+        ("id", "ambiguous_column_id"),
+        ("source_name", "ambiguous_source_name"),
+    ] {
+        let mut value = declaration();
+        value["columns"][1][field] = value["columns"][0][field].clone();
+        assert_eq!(parse(&value).err().unwrap().code, code);
+    }
+    let state_bytes = String::from_utf8(
+        fit_transform(&numeric_table(), &[0, 1])
+            .unwrap()
+            .sampling_state_bytes()
+            .unwrap(),
+    )
+    .unwrap();
+    for (field, repeated) in [
+        ("\"scale\":10.0", "\"scale\":20.0,\"scale\":10.0"),
+        ("\"offset\":10.0", "\"offset\":20.0,\"offset\":10.0"),
+        ("\"version\":1", "\"version\":2,\"version\":1"),
+    ] {
+        assert!(state_bytes.contains(field));
+        let duplicated = state_bytes.replacen(field, repeated, 1);
+        assert_eq!(
+            FittedTransforms::reload(duplicated.as_bytes())
+                .unwrap_err()
+                .code,
+            "invalid_transform_state"
+        );
+    }
+}
+
+#[test]
 fn type_errors_have_positions_without_echoing_input() {
     for (dtype, field, code) in [
         ("continuous", "private_value_987", "invalid_numeric_value"),
