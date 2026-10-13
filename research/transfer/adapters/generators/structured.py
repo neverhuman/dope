@@ -245,7 +245,9 @@ class ExportState:
             components.append(StateComponent(item["name"], item["role"], payload))
             position += size
         _require(position == len(body), "unlisted_state_bytes")
-        return cls(header["metadata"], tuple(components))
+        state = cls(header["metadata"], tuple(components))
+        _require(state.to_bytes() == body, "noncanonical_state")
+        return state
 
 
 class _StructuredGenerator:
@@ -340,7 +342,7 @@ class _StructuredGenerator:
         return loaded
 
     def as_pr09(self, identity, admission, cohort_sha256, auditors_sha256):
-        """Bind the merged PR09 API lazily; no alternate PR09 implementation."""
+        """Bind PR09 lazily; its recipe pin must cover the complete spec SHA256."""
         try:
             base = importlib.import_module("research.transfer.adapters.base")
         except ModuleNotFoundError:
@@ -352,13 +354,25 @@ class _StructuredGenerator:
         profile = self.spec.value["profile"]
         _require(identity.code_revision == profile["source"]["revision"] and identity.code_sha256 == profile["code_sha256"]
                  and identity.preprocessing_sha256 == profile["preprocessing_sha256"]
-                 and identity.recipe_sha256 == profile["recipe_sha256"]
+                 and identity.recipe_sha256 == self.spec.sha256
                  and digest([list(pin) for pin in identity.dependencies]) == profile["dependencies_sha256"]
                  and digest([list(pin) for pin in identity.licenses]) == profile["license_sha256"]
                  and admission.native_reference_sha256 == profile["native_reference_sha256"], "identity_mismatch")
         engine = self
 
         class Bridge(base.GeneratorAdapter):
+            def __init__(self, identity, admission):
+                super().__init__(identity, admission)
+                self._engine_fit = None
+
+            def _ready(self):
+                super()._ready()
+                base._require(self._engine_fit is not None and self._engine_fit is engine._metadata, "structured_fit_changed")
+
+            def cache_key(self, request_sha256, seed, requested_rows):
+                invocation = super().cache_key(request_sha256, seed, requested_rows)
+                return digest({"invocation": invocation, "fit_sha256": self._engine_fit["fit_sha256"]})
+
             def _invoke(self, method, *args):
                 try:
                     return getattr(engine, method)(*args)
@@ -366,12 +380,15 @@ class _StructuredGenerator:
                     raise base.AdapterUnavailable("backend_unavailable") from None
 
             def _fit_backend(self, training, seed, mode):
+                self._engine_fit = None
                 rows = tuple((*features, target) for features, target in zip(training.features.rows, training.targets))
                 usage = self._invoke("fit", FitView(rows, training.features.schema_sha256, cohort_sha256, auditors_sha256, training.role), seed)
+                self._engine_fit = engine._metadata
                 return base.ResourceUsage(usage.consumed_rows, usage.memory_bytes, usage.gpu_bytes)
 
             def _sample_backend(self, rows, seed):
                 result = self._invoke("sample", rows, seed)
+                self._ready()
                 ids = tuple(digest({"invocation": engine.cache_key(rows, seed), "row": i}) for i in range(rows))
                 data = base.TrainingBatch(base.FeatureBatch(ids, tuple(r[:-1] for r in result.rows), engine._metadata["schema_sha256"]),
                                           tuple(r[-1] for r in result.rows), "synthetic_train")

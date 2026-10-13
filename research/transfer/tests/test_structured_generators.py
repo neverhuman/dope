@@ -1,5 +1,6 @@
 """Contract fixtures only: no author model fit, vendor installation or dataset access."""
 import copy
+from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
@@ -64,6 +65,24 @@ class StructuredTests(unittest.TestCase):
         cls = {"arf": S.ARFAdapter, "forest": S.ForestFlowAdapter, "tabpc": S.TabPCAdapter,
                "compact_density": S.CompactDensityControls}[declaration.value["profile"]["family"]]
         return cls(declaration, backend, **limits), backend
+
+    def bridge_fixture(self, regime="native_recipe", variant="native"):
+        from research.transfer.adapters import base as B
+        from research.transfer.tests.test_adapters import identity, registry
+        profile = spec().value["profile"]
+        model = identity(name=profile["name"], code_revision=profile["source"]["revision"],
+                         code_sha256=profile["code_sha256"], preprocessing_sha256=profile["preprocessing_sha256"])
+        profile["dependencies_sha256"] = S.digest([list(pin) for pin in model.dependencies])
+        profile["license_sha256"] = S.digest([list(pin) for pin in model.licenses])
+        profile["native_reference_sha256"] = B.AdapterAdmission.from_registry(registry(model, "generator"), model, "generator").native_reference_sha256
+        declaration = S.GeneratorSpec(profile, regime, variant)
+        model = replace(model, recipe_sha256=declaration.sha256)
+        admission = B.AdapterAdmission.from_registry(registry(model, "generator"), model, "generator")
+        backend = SpyBackend(declaration.sha256)
+        engine = S.ARFAdapter(declaration, backend)
+        fitting = B.TrainingBatch(B.FeatureBatch(("1" * 64, "2" * 64), ((1.0,), (3.0,)), PIN),
+                                  (10.0, 20.0), "development_train")
+        return B, engine, backend, model, admission, fitting
 
     def test_all_nine_author_and_control_profiles_are_unresolved(self):
         declared = S.load_specs()
@@ -303,6 +322,25 @@ class StructuredTests(unittest.TestCase):
                 S.ExportState.from_bytes(struct.pack(">Q", len(raw)) + raw + body[8 + length:])
             self.assertNotIn("private", str(caught.exception))
 
+    def test_stored_state_requires_canonical_header_and_component_order(self):
+        engine, _backend = self.engine()
+        engine.fit(view(), 1)
+        exported = engine.export()
+        body = exported.to_bytes()
+        length = struct.unpack(">Q", body[:8])[0]
+        header = json.loads(body[8:8 + length])
+        padded = body[8:8 + length] + b" " * 64
+        reversed_header = {**header, "files": list(reversed(header["files"]))}
+        reordered = S._json(reversed_header)
+        for raw, payload in ((padded, body[8 + length:]),
+                             (reordered, b"".join(c.data for c in reversed(exported.components)))):
+            with self.subTest(header=raw[:16]):
+                with self.assertRaisesRegex(S.StructuredError, "noncanonical_state"):
+                    S.ExportState.from_bytes(struct.pack(">Q", len(raw)) + raw + payload)
+        loaded = S.ExportState.from_bytes(body)
+        self.assertEqual(loaded.to_bytes(), body)
+        self.assertEqual(loaded.charged_bytes, len(body))
+
     def test_reload_identity_and_reusing_fitted_backend_refuse(self):
         engine, backend = self.engine()
         engine.fit(view(), 1)
@@ -367,24 +405,8 @@ class StructuredTests(unittest.TestCase):
                 engine.as_pr09(None, None, PIN, PIN)
 
     def test_merged_pr09_bridge_fits_and_samples_original_units(self):
-        from research.transfer.adapters import base as B
-        from research.transfer.tests.test_adapters import identity, registry
-
-        profile = spec().value["profile"]
-        model = identity(name=profile["name"], code_revision=profile["source"]["revision"],
-                         code_sha256=profile["code_sha256"],
-                         preprocessing_sha256=profile["preprocessing_sha256"],
-                         recipe_sha256=profile["recipe_sha256"])
-        admission = B.AdapterAdmission.from_registry(registry(model, "generator"), model, "generator")
-        profile["dependencies_sha256"] = S.digest([list(pin) for pin in model.dependencies])
-        profile["license_sha256"] = S.digest([list(pin) for pin in model.licenses])
-        profile["native_reference_sha256"] = admission.native_reference_sha256
-        declaration = S.GeneratorSpec(profile)
-        backend = SpyBackend(declaration.sha256)
-        engine = S.ARFAdapter(declaration, backend)
+        B, engine, backend, model, admission, fitting = self.bridge_fixture()
         bridge = engine.as_pr09(model, admission, "b" * 64, "c" * 64)
-        fitting = B.TrainingBatch(B.FeatureBatch(("1" * 64, "2" * 64), ((1.0,), (3.0,)), PIN),
-                                  (10.0, 20.0), "development_train")
         bridge.fit(fitting, 7)
         result = bridge.sample(2, 13)
         self.assertEqual(result.data.targets, (15.0, 15.0))
@@ -395,6 +417,68 @@ class StructuredTests(unittest.TestCase):
         self.assertEqual(backend.calls[0][1].rows, ((1.0, 10.0), (3.0, 20.0)))
         with self.assertRaises(B.AdapterError):
             bridge.fit(B.TrainingBatch(fitting.features, fitting.targets, "synthetic_train"), 7)
+
+    def test_pr09_bridge_identity_and_cache_bind_full_regime_and_variant(self):
+        from research.transfer.tests.test_adapters import registry
+        keys, identities = set(), set()
+        for regime, variant in (("native_recipe", "native"), ("resource_matched", "native"),
+                                ("common_transfer", "native"), ("native_recipe", "pruned"), ("native_recipe", "quantized")):
+            B, engine, backend, model, admission, fitting = self.bridge_fixture(regime, variant)
+            legacy = replace(model, recipe_sha256=engine.spec.value["profile"]["recipe_sha256"])
+            legacy_admission = B.AdapterAdmission.from_registry(registry(legacy, "generator"), legacy, "generator")
+            with self.assertRaisesRegex(S.StructuredError, "identity_mismatch"):
+                engine.as_pr09(legacy, legacy_admission, PIN, PIN)
+            with self.assertRaises(B.AdapterError):
+                engine.as_pr09(model, legacy_admission, PIN, PIN)
+            self.assertEqual(backend.calls, [])
+            bridge = engine.as_pr09(model, admission, PIN, PIN)
+            bridge.fit(fitting, 7)
+            identities.add(model.sha256)
+            keys.add(bridge.cache_key(PIN, 13, 2))
+        self.assertEqual(len(identities), 5)
+        self.assertEqual(len(keys), 5)
+
+    def test_pr09_bridge_refits_reject_stale_cache_and_samples_before_backend(self):
+        B, engine, backend, model, admission, fitting = self.bridge_fixture()
+        old = engine.as_pr09(model, admission, PIN, PIN)
+        other = engine.as_pr09(model, admission, PIN, PIN)
+        changed = B.TrainingBatch(fitting.features, (100.0, 200.0), "development_train")
+        def failed_refit():
+            with self.assertRaises(S.StructuredError):
+                engine.fit(None, 7)
+        for refit in (lambda: other.fit(changed, 7), lambda: engine.fit(view(), 7),
+                      lambda: other.fit(fitting, 7), failed_refit):
+            old.fit(fitting, 7)
+            refit()
+            before = len(backend.calls)
+            with self.assertRaisesRegex(B.AdapterError, "structured_fit_changed"):
+                old.cache_key(PIN, 13, 2)
+            with self.assertRaisesRegex(B.AdapterError, "structured_fit_changed"):
+                old.sample(2, 13)
+            self.assertEqual(len(backend.calls), before)
+        old.fit(fitting, 7)
+        self.assertEqual(old.sample(2, 13).data.targets, (15.0, 15.0))
+
+    def test_pr09_bridge_rejects_refit_during_sample(self):
+        B, engine, backend, model, admission, fitting = self.bridge_fixture()
+        bridge = engine.as_pr09(model, admission, PIN, PIN)
+        bridge.fit(fitting, 7)
+        sample = backend.sample
+        def refitting_sample(rows, seed):
+            result = sample(rows, seed)
+            engine.fit(view(), 7)
+            return result
+        with patch.object(backend, "sample", refitting_sample), self.assertRaises(B.AdapterError):
+            bridge.sample(2, 13)
+
+    def test_pr09_bridge_cache_binds_cohort_and_auditors(self):
+        _B, engine, _backend, model, admission, fitting = self.bridge_fixture()
+        keys = set()
+        for cohort, auditors in ((PIN, PIN), ("b" * 64, PIN), (PIN, "c" * 64)):
+            bridge = engine.as_pr09(model, admission, cohort, auditors)
+            bridge.fit(fitting, 7)
+            keys.add(bridge.cache_key(PIN, 13, 2))
+        self.assertEqual(len(keys), 3)
 
 
 if __name__ == "__main__":
