@@ -730,9 +730,10 @@ class ScoringTests(unittest.TestCase):
         self.assertEqual(fits, [])
         P.check_roster(cells)
 
-    def test_tabsyn_stays_a_one_fit_arm_until_block_b_is_bound(self):
-        # FIVE_SEED lists arms whose five fit seeds are bound; TabSyn's scaled arm has only seed 11 bound.
-        self.assertNotIn(("TabSyn", CONFIGURATION), P.FIVE_SEED)
+    def test_tabsyn_is_a_five_seed_arm_once_block_b_is_bound(self):
+        # Block B bound seeds 23 to 71 beside seed 11, so a TabSyn lineage needs three complete fits.
+        self.assertIn(("TabSyn", CONFIGURATION), P.FIVE_SEED)
+        self.assertEqual(P.min_fits(("TabSyn", CONFIGURATION)), 3)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = '3794ced8967151d7c86bdd14566121bdfeb4a551a98f3009017b7418dc4f6d3c'
+LOCK_SHA256 = '0005c543252ca8e72b477ceb882c7b0548fa782cf68f2978cfc1976953003f80'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
 CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
 CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
@@ -28,13 +28,15 @@ FIDELITY_PANEL = PREFIX + 'review-fixes-fidelity-v1/panel.json'
 FIDELITY_RENDERER = 'docs/whitepaper/scripts/review_fidelity.py'
 V2_LEDGER = PREFIX + 'review-fixes-v2/scalar-cells.jsonl'
 V2_FITS = PREFIX + 'review-fixes-v2/fits.jsonl'
+TABSYN_SEEDS_FITS = PREFIX + 'review-fixes-tabsyn-seeds-v2/fits.jsonl'
 V2_PANEL = PREFIX + 'review-fixes-v2/panel.json'
 V2_RECORD = PREFIX + 's3-lineage-record.json'
 V2_PREDECLARE = 'research/benchmark/review_fixes/predeclare_v2.json'
 V2_RENDERER = 'docs/whitepaper/scripts/review_v2_emit.py'
 V2_FAMILY = PREFIX + 'review-fixes-v2/family.json'
 V2_FAMILY_RENDERER = 'docs/whitepaper/scripts/review_v2_family.py'
-JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, V2_LEDGER, V2_FITS)
+JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, V2_LEDGER, V2_FITS,
+                TABSYN_SEEDS_FITS)
 OUTPUT_PREFIXES = ('review-', 'v2-')
 _ADMISSION = object()
 AUXILIARY_OUTPUTS = (
