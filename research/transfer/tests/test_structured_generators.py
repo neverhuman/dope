@@ -1,6 +1,7 @@
 """Contract fixtures only: no author model fit, vendor installation or dataset access."""
 import copy
 from dataclasses import replace
+import gc
 import hashlib
 import json
 from pathlib import Path
@@ -8,6 +9,7 @@ import struct
 import tempfile
 import unittest
 from unittest.mock import patch
+import weakref
 
 from research.transfer.adapters.generators import structured as S
 
@@ -34,6 +36,7 @@ class SpyBackend:
     """A recording fixture, not an ARF or other author implementation."""
     def __init__(self, identity, consumed=2):
         self.identity_sha256, self.consumed = identity, consumed
+        self.state_token = object()
         self.calls, self.level = [], 0.0
 
     def fit(self, fitting, seed, profile):
@@ -479,6 +482,101 @@ class StructuredTests(unittest.TestCase):
             bridge.fit(fitting, 7)
             keys.add(bridge.cache_key(PIN, 13, 2))
         self.assertEqual(len(keys), 3)
+
+    def test_cross_engine_backend_alias_refuses_before_refit(self):
+        B, engine, backend, model, admission, fitting = self.bridge_fixture()
+        bridge = engine.as_pr09(model, admission, PIN, PIN)
+        bridge.fit(fitting, 7)
+        key = bridge.cache_key(PIN, 13, 2)
+        targets = bridge.sample(2, 13).data.targets
+        state = engine.export().to_bytes()
+        for alias in (backend, copy.copy(backend)):
+            for refit in (view(((1.0, 100.0), (3.0, 200.0))), None):
+                with self.subTest(alias=alias is backend, valid=refit is not None):
+                    before = len(backend.calls)
+                    with self.assertRaisesRegex(S.StructuredError, "backend_state_already_owned"):
+                        second = S.ARFAdapter(engine.spec, alias)
+                        second.fit(refit, 7)
+                    self.assertEqual(len(backend.calls), before)
+                    self.assertEqual(bridge.cache_key(PIN, 13, 2), key)
+                    self.assertEqual(bridge.sample(2, 13).data.targets, targets)
+                    self.assertEqual(engine.export().to_bytes(), state)
+
+    def test_backend_ownership_lasts_through_failed_refit_and_bridge_lifetime(self):
+        B, engine, backend, model, admission, fitting = self.bridge_fixture()
+        bridge = engine.as_pr09(model, admission, PIN, PIN)
+        bridge.fit(fitting, 7)
+        with patch.object(backend, "fit", side_effect=RuntimeError("private_value")):
+            with self.assertRaisesRegex(S.StructuredError, "backend_failed"):
+                engine.fit(view(), 8)
+        with self.assertRaisesRegex(S.StructuredError, "backend_state_already_owned"):
+            S.ARFAdapter(engine.spec, backend)
+        with self.assertRaisesRegex(B.AdapterError, "structured_fit_changed"):
+            bridge.sample(2, 13)
+        declaration = engine.spec
+        owner = weakref.ref(engine)
+        del engine
+        gc.collect()
+        self.assertIsNotNone(owner())
+        with self.assertRaisesRegex(S.StructuredError, "backend_state_already_owned"):
+            S.ARFAdapter(declaration, backend)
+        del bridge
+        gc.collect()
+        self.assertIsNone(owner())
+        replacement = S.ARFAdapter(declaration, backend)
+        replacement.fit(view(), 9)
+        self.assertEqual(replacement.sample(2, 13).rows, ((13.0, 15.0), (14.0, 15.0)))
+
+    def test_reload_refuses_distinct_backend_with_shared_mutable_state(self):
+        engine, backend = self.engine()
+        engine.fit(view(), 7)
+        state = engine.export()
+        alias = copy.copy(backend)
+        self.assertIsNot(alias, backend)
+        with patch.object(backend, "reload", return_value=alias):
+            with self.assertRaisesRegex(S.StructuredError, "backend_state_already_owned"):
+                engine.reload(state)
+        loaded = engine.reload(state)
+        self.assertIsNot(loaded.backend.state_token, backend.state_token)
+        loaded.fit(view(((1.0, 100.0), (3.0, 200.0))), 8)
+        self.assertEqual(engine.sample(2, 13).rows, ((13.0, 15.0), (14.0, 15.0)))
+
+    def test_backend_ownership_protocol_refuses_missing_or_changed_tokens(self):
+        declaration = spec()
+        for token in (None, "private_value", 1):
+            backend = SpyBackend(declaration.sha256)
+            backend.state_token = token
+            with self.assertRaisesRegex(S.StructuredError, "backend_ownership_unavailable"):
+                S.ARFAdapter(declaration, backend)
+            self.assertEqual(backend.calls, [])
+        backend = SpyBackend(declaration.sha256)
+        del backend.state_token
+        with self.assertRaisesRegex(S.StructuredError, "backend_ownership_unavailable"):
+            S.ARFAdapter(declaration, backend)
+        B, engine, backend, model, admission, fitting = self.bridge_fixture()
+        bridge = engine.as_pr09(model, admission, PIN, PIN)
+        bridge.fit(fitting, 7)
+        backend.state_token = object()
+        before = len(backend.calls)
+        for operation in (lambda: engine.sample(2, 13), lambda: engine.cache_key(2, 13), engine.export):
+            with self.assertRaisesRegex(S.StructuredError, "backend_ownership_changed"):
+                operation()
+        for operation in (lambda: bridge.sample(2, 13), lambda: bridge.cache_key(PIN, 13, 2)):
+            with self.assertRaisesRegex(B.AdapterError, "backend_ownership_changed"):
+                operation()
+        self.assertEqual(len(backend.calls), before)
+
+    def test_backend_token_change_during_sample_refuses_output(self):
+        engine, backend = self.engine()
+        engine.fit(view(), 7)
+        sample = backend.sample
+        def changed_token(rows, seed):
+            result = sample(rows, seed)
+            backend.state_token = object()
+            return result
+        with patch.object(backend, "sample", changed_token):
+            with self.assertRaisesRegex(S.StructuredError, "backend_ownership_changed"):
+                engine.sample(2, 13)
 
 
 if __name__ == "__main__":

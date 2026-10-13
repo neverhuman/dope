@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import struct
 import time
+import weakref
 
 from research.transfer.evidence import EvidenceError, digest, parse_json
 
@@ -24,6 +25,7 @@ STATUSES = {"complete", "unsupported", "timeout", "oom", "invalid", "byte_infeas
 ROLES = {"weights", "preprocessor", "inverse_transform", "dictionary", "decoder", "recipe"}
 MAX_STATE = 64 << 20
 MAX_MANIFEST = 1 << 20
+_BACKEND_OWNERS = weakref.WeakValueDictionary()
 
 
 class StructuredError(ValueError):
@@ -251,6 +253,13 @@ class ExportState:
 
 
 class _StructuredGenerator:
+    """Sequential, exclusive backend ownership for the engine's live lifetime.
+
+    Backends must expose an opaque object `state_token`, shared by every alias
+    of their mutable state. Reload must allocate independent state and a fresh
+    token. The custodian must enforce this protocol and route backend operations
+    through the owning engine; arbitrary Python backends are not sandboxed.
+    """
     families = ()
 
     def __init__(self, spec, backend, *, wall_seconds=600.0, memory_bytes=16 << 30, gpu_bytes=0):
@@ -262,16 +271,26 @@ class _StructuredGenerator:
         self.spec, self.backend = spec, backend
         self._limits = (float(wall_seconds), memory_bytes, gpu_bytes)
         self._elapsed, self._metadata = 0.0, None
+        self._backend_token = None
         self._backend_identity()
 
     def _backend_identity(self):
         try:
             identity = getattr(self.backend, "identity_sha256", None)
+            token = getattr(self.backend, "state_token", None)
         except KeyboardInterrupt:
             raise KeyboardInterrupt() from None
         except BaseException:
             raise StructuredError("backend_failed") from None
         _require(identity == self.spec.sha256, "backend_identity_mismatch")
+        _require(type(token) is object, "backend_ownership_unavailable")
+        if self._backend_token is None:
+            _require(_BACKEND_OWNERS.get(id(token)) is None, "backend_state_already_owned")
+            self._backend_token = token
+            _BACKEND_OWNERS[id(token)] = self
+        else:
+            _require(token is self._backend_token and _BACKEND_OWNERS.get(id(token)) is self,
+                     "backend_ownership_changed")
 
     def _call(self, name, *args):
         self._backend_identity()
@@ -368,6 +387,7 @@ class _StructuredGenerator:
             def _ready(self):
                 super()._ready()
                 base._require(self._engine_fit is not None and self._engine_fit is engine._metadata, "structured_fit_changed")
+                self._invoke("_ready")
 
             def cache_key(self, request_sha256, seed, requested_rows):
                 invocation = super().cache_key(request_sha256, seed, requested_rows)
@@ -378,6 +398,8 @@ class _StructuredGenerator:
                     return getattr(engine, method)(*args)
                 except StructuredUnavailable:
                     raise base.AdapterUnavailable("backend_unavailable") from None
+                except StructuredError as error:
+                    raise base.AdapterError(str(error)) from None
 
             def _fit_backend(self, training, seed, mode):
                 self._engine_fit = None
