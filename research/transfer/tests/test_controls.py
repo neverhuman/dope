@@ -91,6 +91,37 @@ class ControlTests(unittest.TestCase):
         self.assertEqual(str(raised.exception), "uncharged_dependency")
         self.assertNotIn("99991", str(raised.exception))
 
+    def test_parameter_mutation_cannot_leave_the_parameter_hash_stale(self):
+        teacher = Teacher("nonlinear", {"quadratic": 1, "linear": 1, "bias": 1}, 0, "float64")
+        before_hash = teacher.parameter_sha256
+        before_value = teacher.value(2, 0)
+        with self.assertRaises(TypeError):
+            teacher.parameters["bias"] = 99991
+        self.assertEqual(teacher.parameter_sha256, before_hash)
+        self.assertEqual(teacher.value(2, 0), before_value)
+
+    def test_shuffled_constant_labels_preserve_the_label_multiset(self):
+        teacher = Teacher("linear", {"quadratic": 0, "linear": 0, "bias": 5}, 0, "float64")
+        factor = MatchedTeacherFactorial(
+            teacher, PLAN["search_budget"], PLAN["byte_budget"], PLAN["controls"],
+        )
+        draws, noises = (0, 1, 2), (0, 0, 0)
+        base = factor.cell("linear", "independent", "real_n", draws, noises)
+        shuffled = factor.cell("linear", "independent", "shuffled_label", draws, noises)
+        self.assertEqual(shuffled["label_sha256"], base["label_sha256"])
+        self.assertEqual(shuffled["support_sha256"], base["support_sha256"])
+
+    def test_direct_predictor_rejects_a_draw_noise_length_mismatch(self):
+        teacher = factorial().teacher_for("direct_predictor", "nonlinear")
+        with self.assertRaises(ControlError) as raised:
+            DirectPredictorControl(teacher, (99991, 4), (0,))
+        self.assertEqual(str(raised.exception), "invalid_draws")
+        self.assertNotIn("99991", str(raised.exception))
+        predictor = DirectPredictorControl(teacher, (0, 1), (0, 1))
+        with self.assertRaises(ControlError) as diagnostic:
+            predictor.empirical_diagnostic((0, 1, 2), (0,))
+        self.assertEqual(str(diagnostic.exception), "invalid_draws")
+
     def test_control_errors_do_not_echo_draw_values(self):
         factor = factorial()
         with self.assertRaises(ControlError) as raised:

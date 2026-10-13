@@ -1,5 +1,7 @@
 """Exact-teacher, predictor, and coreset controls. No source rows are stored here."""
 
+from types import MappingProxyType
+
 from research.transfer.evidence import digest
 
 
@@ -16,6 +18,11 @@ class ControlError(ValueError):
 
 def _fail(code):
     raise ControlError(code)
+
+
+def _pairs(draws, noises):
+    _fail("invalid_draws") if len(draws) != len(noises) else None
+    return tuple(zip(draws, noises))
 
 
 def _rows(draws, noises):
@@ -38,10 +45,12 @@ class Teacher:
         _fail("invalid_parameters") if any(type(parameters[key]) is not int for key in parameters) else None
         _fail("invalid_noise") if type(noise_scale) is not int else None
         self.form = form
-        self.parameters = dict(parameters)
+        self.parameters = MappingProxyType(dict(parameters))
         self.noise_scale = noise_scale
         self.precision = precision
-        self.parameter_sha256 = digest({"form": form, "precision": precision, "parameters": self.parameters})
+        self.parameter_sha256 = digest({
+            "form": form, "precision": precision, "parameters": dict(self.parameters),
+        })
         self.noise_sha256 = digest({"noise_scale": noise_scale, "precision": precision})
 
     def value(self, x, noise):
@@ -73,8 +82,7 @@ class MatchedTeacherFactorial:
         rows = _rows(draws, noises)
         values = tuple(teacher.value(row["x"], row["noise"]) for row in rows)
         if control == "shuffled_label":
-            shifted = values[-1:] + values[:-1]
-            label_values = shifted if shifted != values else tuple(value + 1 for value in values)
+            label_values = values[-1:] + values[:-1]
         elif control == "postquantization":
             label_values = tuple((value // 10) * 10 for value in values)
         else:
@@ -106,13 +114,13 @@ class DirectPredictorControl:
 
     def __init__(self, teacher, draws, noises):
         self.teacher = teacher
-        self.outputs = tuple(teacher.value(x, noise) for x, noise in zip(draws, noises))
+        self.outputs = tuple(teacher.value(x, noise) for x, noise in _pairs(draws, noises))
         self.charged_bytes = _ROW_BYTES * len(teacher.parameters)
         self.retained_real_rows = False
         self.output_sha256 = digest({"outputs": list(self.outputs)})
 
     def empirical_diagnostic(self, draws, noises):
-        values = tuple(self.teacher.value(x, noise) for x, noise in zip(draws, noises))
+        values = tuple(self.teacher.value(x, noise) for x, noise in _pairs(draws, noises))
         return digest({"outputs": list(values)})
 
 
