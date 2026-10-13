@@ -219,5 +219,13 @@ class PublicationRows(unittest.TestCase):
                 rows.render(Registry(link, _pins(real)))
 
 
+    def test_an_absent_receipt_behind_a_redirected_root_is_refused_not_unmeasured(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            empty, link = Path(tmp) / "empty", Path(tmp) / "results"
+            empty.mkdir()
+            link.symlink_to(empty, target_is_directory=True)
+            with self.assertRaisesRegex(PinRefused, "symlink"):
+                rows.render(Registry(link))
+
 if __name__ == "__main__":
     unittest.main()

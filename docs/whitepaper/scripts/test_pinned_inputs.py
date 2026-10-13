@@ -63,6 +63,20 @@ class PinnedInputTests(unittest.TestCase):
             with self.subTest(name), self.assertRaisesRegex(PinRefused, "symlink"):
                 read_pinned(Registry(root, {name: pin(BODY)}), name)
 
+    def test_presence_takes_the_same_walk_and_refuses_a_redirected_ancestor(self):
+        empty = self.base / "empty"
+        empty.mkdir()
+        (self.root / "sub").symlink_to(empty, target_is_directory=True)
+        (self.base / "alias").symlink_to(empty, target_is_directory=True)
+        cases = {"sub/ledger.json": self.registry, "ledger.json": Registry(self.base / "alias", self.registry.files)}
+        for name, registry in cases.items():
+            with self.subTest(name), self.assertRaisesRegex(PinRefused, "symlink"):
+                present(registry, name)
+        self.assertFalse(present(self.registry, "gone.json"))
+        self.assertFalse(present(self.registry, "missing-dir/ledger.json"))
+        (self.root / "leaf.json").symlink_to(self.root / "ledger.json")
+        self.assertTrue(present(self.registry, "leaf.json"))
+
     def test_an_ancestor_swapped_mid_walk_cannot_redirect_the_read(self):
         (self.root / "sub").mkdir()
         (self.root / "sub" / "ledger.json").write_bytes(BODY)

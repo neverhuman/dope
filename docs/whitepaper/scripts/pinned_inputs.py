@@ -1,15 +1,18 @@
 """Read one registered paper input: exactly the bytes whose length and digest are declared in advance.
 
 A Registry binds one declared root to the files admitted under it, each a
-relative path with its byte length and sha256. A caller names a registry and a
-relative path; it cannot supply a different root. A read refuses, before any
+relative path with its byte length and sha256. Each paper script declares its
+registries next to their roots; a read names a registry and a relative path,
+and the path can never leave that registry's root. A read refuses, before any
 byte is decoded: a name absent from the registry; an empty, absolute, or
 traversing name; a symlink at any component from the filesystem root to the
 leaf; a leaf that is not a regular file; and a length or digest that differs.
 The walk holds each directory open and opens the next component relative to it
 without following links, so no component can be swapped between the check and
-the read. The body is read once, bounded by its declared length, and the caller
-parses those same bytes. Error messages name the rule, never file contents.
+the read. The presence probe takes the same walk, so a redirected ancestor is
+refused rather than reported absent. The body is read once, bounded by its
+declared length, and the caller parses those same bytes. Error messages name
+the rule, never file contents.
 """
 
 from __future__ import annotations
@@ -57,43 +60,71 @@ def declared(registry: Registry, relative: str) -> tuple[int, str]:
     return length, digest
 
 
-def present(registry: Registry, relative: str) -> bool:
-    """Whether a safe name exists under the registry's root; it follows no symlink and reads no bytes."""
-    check_name(relative)
+def _components(registry: Registry, relative: str) -> list[str]:
+    base = PurePosixPath(os.path.abspath(registry.root))
+    return [*base.parts[1:], *PurePosixPath(relative).parts]
+
+
+def _open_component(part: str, flags: int, parent: int) -> int:
+    """Open one component beneath a held directory without following a link."""
     try:
-        os.lstat(Path(registry.root) / relative)
-    except FileNotFoundError:
-        return False
-    return True
+        return os.open(part, flags | NOFOLLOW, dir_fd=parent)
+    except OSError as error:
+        if error.errno == errno.ENOENT:
+            raise FileNotFoundError(errno.ENOENT, "registered input is absent") from None
+        if error.errno in (errno.ELOOP, errno.ENOTDIR, errno.EMLINK):
+            raise PinRefused("input path has a symlink or a non-directory ancestor") from None
+        raise
 
 
-def _open_beneath(components: list[str]) -> int:
-    """Open the last component from "/" holding every directory, following no link; return its descriptor."""
+def _hold_parent(components: list[str]) -> int:
+    """Open every directory above the leaf from "/", holding each and following no link; return the parent."""
     held = [os.open("/", os.O_RDONLY | DIRECTORY)]
     try:
-        for index, part in enumerate(components):
-            last = index == len(components) - 1
-            # A FIFO leaf must not block the open; fstat then refuses it as not regular.
-            flags = os.O_RDONLY | NOFOLLOW | (os.O_NONBLOCK if last else DIRECTORY)
-            try:
-                held.append(os.open(part, flags, dir_fd=held[-1]))
-            except OSError as error:
-                if error.errno == errno.ENOENT:
-                    raise FileNotFoundError(errno.ENOENT, "registered input is absent") from None
-                if error.errno in (errno.ELOOP, errno.ENOTDIR, errno.EMLINK):
-                    raise PinRefused("input path has a symlink or a non-directory ancestor") from None
-                raise
+        for part in components[:-1]:
+            held.append(_open_component(part, os.O_RDONLY | DIRECTORY, held[-1]))
         return held.pop()
     finally:
         for descriptor in held:
             os.close(descriptor)
 
 
+def present(registry: Registry, relative: str) -> bool:
+    """Whether a safe name exists beneath real directories under the registry's root; it reads no bytes.
+
+    A missing leaf or ancestor is absent. A symlinked or non-directory ancestor
+    is refused, never reported absent. A leaf that is itself a symlink counts as
+    present, so the read that follows refuses it.
+    """
+    check_name(relative)
+    components = _components(registry, relative)
+    try:
+        parent = _hold_parent(components)
+    except FileNotFoundError:
+        return False
+    try:
+        os.stat(components[-1], dir_fd=parent, follow_symlinks=False)
+    except FileNotFoundError:
+        return False
+    finally:
+        os.close(parent)
+    return True
+
+
+def _open_beneath(components: list[str]) -> int:
+    """Open the last component from "/" holding every directory, following no link; return its descriptor."""
+    parent = _hold_parent(components)
+    try:
+        # A FIFO leaf must not block the open; fstat then refuses it as not regular.
+        return _open_component(components[-1], os.O_RDONLY | os.O_NONBLOCK, parent)
+    finally:
+        os.close(parent)
+
+
 def read_pinned(registry: Registry, relative: str) -> bytes:
     """Return the authenticated bytes of one registered file under the registry's root."""
     length, digest = declared(registry, relative)
-    base = PurePosixPath(os.path.abspath(registry.root))
-    descriptor = _open_beneath([*base.parts[1:], *PurePosixPath(relative).parts])
+    descriptor = _open_beneath(_components(registry, relative))
     try:
         info = os.fstat(descriptor)
         if not stat.S_ISREG(info.st_mode):

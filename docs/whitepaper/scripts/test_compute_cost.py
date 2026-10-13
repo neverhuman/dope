@@ -75,6 +75,15 @@ class ComputeCostPinTests(unittest.TestCase):
                 self.assertRaisesRegex(PinRefused, "length differs"):
             C._arf()
 
+    def test_a_redirected_results_directory_refuses_instead_of_reading_as_absent(self):
+        empty = Path(self.tmp.name) / "empty"
+        empty.mkdir()
+        link = Path(self.tmp.name) / "results-link"
+        link.symlink_to(empty, target_is_directory=True)
+        with patch.object(C, "LEDGER_PINS", Registry(link, C.LEDGER_PINS.files)), \
+                self.assertRaisesRegex(PinRefused, "symlink"):
+            C._arf()
+
     def test_parsing_uses_the_authenticated_bytes_and_never_rereads_a_path(self):
         def refuse(*_args, **_kwargs):
             raise AssertionError("second read of a path")
