@@ -371,6 +371,11 @@
     "docs/whitepaper/scripts/vnext_paper.py": "governance",
     "docs/vnext/RELATED_WORK.md": "governance",
     "docs/vnext/REPRODUCE.md": "governance",
-    "todo/": "governance"
+    "todo/": "governance",
+    "research/transfer/adapters/base.py": "external-evidence",
+    "research/transfer/registries/models.json": "external-evidence",
+    "research/transfer/registries/generators.json": "external-evidence",
+    "research/transfer/tests/test_adapters.py": "external-evidence",
+    "docs/vnext/ADAPTERS.md": "governance"
   }
 }
