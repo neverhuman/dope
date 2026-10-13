@@ -153,11 +153,13 @@ fn walk(
     let mut entry_count = 0usize;
     let mut name_bytes = 0usize;
     loop {
-        // SAFETY: `directory` is an owned directory descriptor. `buffer` is
-        // writable for 8192 bytes. `getdents64` fills only that buffer and
-        // returns the byte count or -1.
-        let read =
-            unsafe { getdents64(directory.as_raw_fd(), buffer.0.as_mut_ptr(), buffer.0.len()) };
+        let fd = directory.as_raw_fd();
+        let ptr = buffer.0.as_mut_ptr();
+        let len = buffer.0.len();
+        // SAFETY: `fd` is an owned directory descriptor. `ptr` points at `len`
+        // writable bytes. `getdents64` fills only that buffer and returns the
+        // byte count or -1.
+        let read = unsafe { getdents64(fd, ptr, len) };
         if read < 0 {
             if errno() == EINTR {
                 continue;

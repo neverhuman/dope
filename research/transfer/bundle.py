@@ -251,52 +251,86 @@ def _read_bytes(root, path, limit):
             os.close(directory)
 
 
-def _inventory(root, declared):
+def _directory_names(directory):
+    """Yield one name at a time from an already opened directory fd."""
+    duplicate = None
+    try:
+        duplicate = os.dup(directory)
+        with os.scandir("/proc/self/fd/%d" % duplicate) as entries:
+            for entry in entries:
+                yield entry.name
+    except BundleError:
+        raise
+    except OSError:
+        _fail("dependency_io_failed")
+    finally:
+        if duplicate is not None:
+            os.close(duplicate)
+
+
+def _scan_open_directory(directory, declared, max_entries, max_name_bytes):
     prefixes = set()
     for path in declared:
         parts = path.split("/")
         for index in range(1, len(parts)):
             prefixes.add("/".join(parts[:index]))
     found = set()
-    directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+    _walk_directory(directory, "", declared, prefixes, found, max_entries, max_name_bytes)
+    return found
 
-    def walk(relative, directory):
+
+def _walk_directory(directory, relative, declared, prefixes, found, max_entries, max_name_bytes):
+    directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+    entry_count = 0
+    name_bytes = 0
+    for name in _directory_names(directory):
+        if name in (".", ".."):
+            continue
+        raw_name = os.fsencode(name)
         try:
-            entries = os.listdir(directory)
-        except OSError:
+            raw_name.decode("utf-8")
+        except UnicodeDecodeError:
+            _fail("unsafe_path")
+        entry_count += 1
+        name_bytes += len(raw_name)
+        if entry_count > max_entries or name_bytes > max_name_bytes:
+            _fail("too_many_components")
+        if name == "" or "/" in name or "\\" in name or "\x00" in name:
+            _fail("unsafe_path")
+        child = name if relative == "" else relative + "/" + name
+        try:
+            mode = os.stat(name, dir_fd=directory, follow_symlinks=False).st_mode
+        except OSError as exc:
+            if exc.errno == 40:
+                _fail("symlink_component")
             _fail("dependency_io_failed")
-        for name in entries:
-            if name in ("", ".", "..") or "/" in name or "\\" in name or "\x00" in name:
-                _fail("unsafe_path")
-            child = name if relative == "" else relative + "/" + name
+        if stat.S_ISLNK(mode):
+            _fail("symlink_component")
+        if stat.S_ISDIR(mode):
+            if child not in prefixes:
+                _fail("undeclared_component")
             try:
-                mode = os.stat(name, dir_fd=directory, follow_symlinks=False).st_mode
+                child_directory = os.open(name, directory_flags, dir_fd=directory)
             except OSError as exc:
                 if exc.errno == 40:
                     _fail("symlink_component")
                 _fail("dependency_io_failed")
-            if stat.S_ISLNK(mode):
-                _fail("symlink_component")
-            if stat.S_ISDIR(mode):
-                if child not in prefixes:
-                    _fail("undeclared_component")
-                try:
-                    child_directory = os.open(name, directory_flags, dir_fd=directory)
-                except OSError as exc:
-                    if exc.errno == 40:
-                        _fail("symlink_component")
-                    _fail("dependency_io_failed")
-                try:
-                    walk(child, child_directory)
-                finally:
-                    os.close(child_directory)
-            elif stat.S_ISREG(mode):
-                if child not in declared:
-                    _fail("undeclared_component")
-                found.add(child)
-            else:
-                _fail("dependency_not_regular_file")
+            try:
+                _walk_directory(
+                    child_directory, child, declared, prefixes, found, max_entries, max_name_bytes
+                )
+            finally:
+                os.close(child_directory)
+        elif stat.S_ISREG(mode):
+            if child not in declared:
+                _fail("undeclared_component")
+            found.add(child)
+        else:
+            _fail("dependency_not_regular_file")
 
+
+def _inventory(root, declared, max_entries, max_name_bytes):
+    directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
     try:
         root_directory = os.open(root, directory_flags)
     except OSError as exc:
@@ -304,10 +338,10 @@ def _inventory(root, declared):
             _fail("symlink_component")
         _fail("dependency_io_failed")
     try:
-        walk("", root_directory)
+        found = _scan_open_directory(root_directory, declared, max_entries, max_name_bytes)
     finally:
         os.close(root_directory)
-    if found != declared:
+    if found != set(declared):
         _fail("unresolved_dependency")
 
 
@@ -634,7 +668,8 @@ def verify_bundle(root, expected_manifest_sha256, limits=None):
         _fail("manifest_digest_mismatch")
     handler, count, framing, components = _manifest(manifest, limits)
     declared = {MANIFEST_NAME} | {component["path"] for component in components}
-    _inventory(root, declared)
+    max_entries = limits.max_components + 1
+    _inventory(root, declared, max_entries, max_entries * 64)
     payload = None
     features = None
     total = size
