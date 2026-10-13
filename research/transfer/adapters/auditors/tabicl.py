@@ -9,7 +9,7 @@ from pathlib import Path
 
 from research.transfer.adapters.base import _count, _require
 from research.transfer.adapters.auditors.conventional import (
-    ObservedLearner, validate_task, require_native_dependency, recipe_digest as digest,
+    ObservedLearner, validate_task, require_native_dependency, port_source_sha256, recipe_digest as digest,
 )
 
 
@@ -45,6 +45,7 @@ class TabICLRecipe:
     @property
     def sha256(self):
         return digest({"format": "dope-tabicl-recipe-v1", "revision": CODE_REVISION,
+                       "adapter_source_sha256": port_source_sha256(__file__),
                        "n_jobs": 1, "use_amp": False, "use_fa3": False, "offload_mode": False,
                        "allow_auto_download": False, "outlier_threshold": 4.0,
                        "softmax_temperature": 0.9, "average_logits": True,

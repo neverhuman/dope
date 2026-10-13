@@ -12,7 +12,7 @@ from pathlib import Path
 
 from research.transfer.adapters.base import AdapterUnavailable, _count, _hash, _require
 from research.transfer.adapters.auditors.conventional import (
-    ObservedLearner, validate_task, require_native_dependency, recipe_digest as digest,
+    ObservedLearner, validate_task, require_native_dependency, port_source_sha256, recipe_digest as digest,
 )
 
 
@@ -47,6 +47,7 @@ class MitraRecipe:
     @property
     def sha256(self):
         return digest({"format": "dope-mitra-recipe-v1", "revision": self.code_revision,
+                       "adapter_source_sha256": port_source_sha256(__file__),
                        "autogluon_revision": AUTOGLUON_REVISION, "fine_tune_steps": 0 if self.task == "classification" else 50,
                        "regression_route": "MitraFinetune.predict_mean_one_bagged_fit_per_call",
                        "in_process": True, "validation": "native_training_only",

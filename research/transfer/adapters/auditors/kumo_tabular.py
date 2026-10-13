@@ -2,9 +2,9 @@
 
 The offline loader mirrors the pinned SDK's checkpoint assignment using public
 PyTorch state loading. An architecture is constructed on meta, and strict
-verified weight loading is mandatory before use. There is no random-weight
-fallback, downloader monkeypatch, or workstation path. Official checkpoint
-parity/license admission remains a separate custodian gate.
+verified weight loading is mandatory before use. Missing weights produce typed
+unavailability. Official checkpoint parity/license admission remains a separate
+custodian gate.
 """
 from dataclasses import asdict, dataclass
 import json
@@ -13,7 +13,8 @@ from pathlib import Path
 
 from research.transfer.adapters.base import PredictionResult, _count, _require
 from research.transfer.adapters.auditors.conventional import (
-    ObservedLearner, output_rows, validate_task, require_native_dependency, recipe_digest as digest,
+    ObservedLearner, output_rows, validate_task, require_native_dependency,
+    port_source_sha256, recipe_digest as digest,
 )
 
 
@@ -46,6 +47,7 @@ class KumoRecipe:
     @property
     def sha256(self):
         return digest({"format": "dope-kumo-recipe-v1", "sdk_revision": CODE_REVISION,
+                       "adapter_source_sha256": port_source_sha256(__file__),
                        "native_recipe": "KumoTabular.default_recipe", **asdict(self)})
 
     @property

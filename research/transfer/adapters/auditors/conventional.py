@@ -27,7 +27,7 @@ def recipe_digest(value):
 
 
 def require_native_dependency(identity, package, exact=None):
-    """Native loaders must use the declared primary distribution, not a fallback."""
+    """Native loaders require the declared primary distribution."""
     pins = {p[0]: p[1] for p in identity.dependencies}
     if package not in pins or (exact is not None and pins[package] != exact):
         raise AdapterUnavailable("native_dependency_pin_unavailable")
@@ -51,6 +51,18 @@ def file_sha256(path):
             return hasher.hexdigest()
     except (OSError, TypeError, ValueError):
         raise AdapterUnavailable("artifact_unavailable") from None
+
+
+def port_source_sha256(module_file):
+    """Bind executed first-party wrappers as well as the external code archive.
+
+    The executor verifies installation and prevents source replacement. These
+    relative-path byte pins also invalidate a recipe after a wrapper change.
+    """
+    transfer = Path(__file__).resolve().parents[2]
+    files = {Path(module_file).resolve(), Path(__file__).resolve(),
+             transfer / "adapters/base.py", transfer / "evidence.py"}
+    return {str(p.relative_to(transfer)): file_sha256(p) for p in sorted(files)}
 
 
 @dataclass(frozen=True, repr=False)
@@ -249,7 +261,8 @@ class ConventionalLearnerRecipe:
 
     @property
     def sha256(self):
-        return recipe_digest({"format": "dope-conventional-recipe-v1", **asdict(self)})
+        return recipe_digest({"format": "dope-conventional-recipe-v1",
+                              "adapter_source_sha256": port_source_sha256(__file__), **asdict(self)})
 
     @property
     def preprocessing_sha256(self):

@@ -15,7 +15,7 @@ from research.transfer.adapters.base import (
 )
 from research.transfer.adapters.auditors.conventional import (
     ConventionalAdapter, ConventionalLearnerRecipe, OfflineArtifacts, OfflineRuntime,
-    file_sha256, select_conventional_recipe,
+    file_sha256, port_source_sha256, select_conventional_recipe,
 )
 from research.transfer.adapters.auditors.mitra import MitraAdapter, MitraRecipe
 from research.transfer.adapters.auditors.tabicl import CODE_REVISION, TabICLAdapter, TabICLRecipe
@@ -222,6 +222,21 @@ class OtherAuditorTests(unittest.TestCase):
                         replace(fixture.identity, weights_sha256=pin("different weights"))):
             self.assertNotEqual(changed.sha256, fixture.identity.sha256)
         self.assertNotEqual(old, port.cache_key(query().sha256, 9, 2))
+
+    def test_recipe_binds_actual_first_party_bytes_and_refuses_stale_wrapper_identity(self):
+        recipe = TabICLRecipe("regression")
+        fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
+        from research.transfer.adapters.auditors import tabicl
+        pins = port_source_sha256(tabicl.__file__)
+        self.assertIn("adapters/base.py", pins)
+        self.assertIn("adapters/auditors/conventional.py", pins)
+        self.assertIn("adapters/auditors/tabicl.py", pins)
+        self.assertTrue(all(not p.startswith("/") for p in pins))
+        original = recipe.sha256
+        with patch("research.transfer.adapters.auditors.tabicl.port_source_sha256", return_value={"changed.py": "0" * 64}):
+            self.assertNotEqual(original, recipe.sha256)
+            with self.assertRaisesRegex(AdapterError, "recipe_pin_mismatch"):
+                fixture.adapter(TabICLAdapter, recipe)
 
     def test_mitra_classifier_v2_is_frozen_with_explicit_seed_and_raw_context(self):
         recipe = MitraRecipe("classification", pin("{}"), class_order=("b", "a"))
