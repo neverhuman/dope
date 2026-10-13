@@ -281,11 +281,25 @@ fn retained_raw_cells_enforce_numeric_types_and_declared_domains() {
                     .code,
                 "outside_declared_domain"
             );
+            assert_eq!(
+                loaded
+                    .transform_numeric("c0001", &[number])
+                    .unwrap_err()
+                    .code,
+                "outside_declared_domain"
+            );
         }
         for number in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
             assert_eq!(
                 loaded
                     .transform_cell("c0001", &Cell::Number(number))
+                    .unwrap_err()
+                    .code,
+                "nonfinite_numeric_value"
+            );
+            assert_eq!(
+                loaded
+                    .transform_numeric("c0001", &[number])
                     .unwrap_err()
                     .code,
                 "nonfinite_numeric_value"
@@ -300,12 +314,20 @@ fn retained_raw_cells_enforce_numeric_types_and_declared_domains() {
                         .code,
                     "integer_precision_or_type_mismatch"
                 );
+                assert_eq!(
+                    loaded
+                        .transform_numeric("c0001", &[number])
+                        .unwrap_err()
+                        .code,
+                    "integer_precision_or_type_mismatch"
+                );
             }
         }
         assert_eq!(
             loaded.transform_cell("c0001", &Cell::Number(9.0)).unwrap(),
             Cell::Number(4.0)
         );
+        assert_eq!(loaded.transform_numeric("c0001", &[9.0]).unwrap(), [4.0]);
         assert_eq!(loaded.inverse_transform("c0001", &[6.0]).unwrap(), [13.0]);
     }
     let mut value = declaration();
@@ -332,6 +354,20 @@ fn retained_raw_cells_enforce_numeric_types_and_declared_domains() {
             .unwrap(),
         Cell::Boolean(false)
     );
+    assert_eq!(loaded.transform_numeric("c0001", &[0.0]).unwrap(), [0.0]);
+    assert_eq!(
+        loaded.transform_numeric("c0001", &[1.0]).unwrap_err().code,
+        "outside_declared_domain"
+    );
+    for number in [-1.0, 0.5, 2.0] {
+        assert_eq!(
+            loaded
+                .transform_numeric("c0001", &[number])
+                .unwrap_err()
+                .code,
+            "invalid_boolean_value"
+        );
+    }
 }
 
 #[test]

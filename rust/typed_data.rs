@@ -292,6 +292,9 @@ fn validate_numeric_cell(
     if !number.is_finite() {
         return Err(error("nonfinite_numeric_value"));
     }
+    if dtype == ColumnType::Boolean && number != 0.0 && number != 1.0 {
+        return Err(error("invalid_boolean_value"));
+    }
     if matches!(dtype, ColumnType::Integer | ColumnType::Ordinal)
         && (number.fract() != 0.0 || number.abs() > 9_007_199_254_740_991.0)
     {

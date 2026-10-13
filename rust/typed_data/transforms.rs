@@ -209,6 +209,7 @@ impl FittedTransforms {
             .ok_or_else(|| SchemaError::new("unknown_column_id", None, None))
     }
 
+    /// Validate original-unit inputs, then apply the fitted affine map.
     pub fn transform_numeric(&self, id: &str, values: &[f64]) -> Result<Vec<f64>> {
         self.numeric_map(id, values, false)
     }
@@ -231,6 +232,11 @@ impl FittedTransforms {
             .iter()
             .enumerate()
             .map(|(row, value)| {
+                if !inverse {
+                    validate_numeric_cell(*value, column.dtype, &column.domain, |code| {
+                        SchemaError::new(code, Some(row + 1), None)
+                    })?;
+                }
                 let result = if inverse {
                     value * column.scale + column.offset
                 } else {
