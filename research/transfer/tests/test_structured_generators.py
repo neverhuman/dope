@@ -359,6 +359,36 @@ class StructuredTests(unittest.TestCase):
             with self.assertRaisesRegex(S.StructuredUnavailable, "pr09_unavailable"):
                 engine.as_pr09(None, None, PIN, PIN)
 
+    def test_merged_pr09_bridge_fits_and_samples_original_units(self):
+        from research.transfer.adapters import base as B
+        from research.transfer.tests.test_adapters import identity, registry
+
+        profile = spec().value["profile"]
+        model = identity(name=profile["name"], code_revision=profile["source"]["revision"],
+                         code_sha256=profile["code_sha256"],
+                         preprocessing_sha256=profile["preprocessing_sha256"],
+                         recipe_sha256=profile["recipe_sha256"])
+        admission = B.AdapterAdmission.from_registry(registry(model, "generator"), model, "generator")
+        profile["dependencies_sha256"] = S.digest([list(pin) for pin in model.dependencies])
+        profile["license_sha256"] = S.digest([list(pin) for pin in model.licenses])
+        profile["native_reference_sha256"] = admission.native_reference_sha256
+        declaration = S.GeneratorSpec(profile)
+        backend = SpyBackend(declaration.sha256)
+        engine = S.ARFAdapter(declaration, backend)
+        bridge = engine.as_pr09(model, admission, "b" * 64, "c" * 64)
+        fitting = B.TrainingBatch(B.FeatureBatch(("1" * 64, "2" * 64), ((1.0,), (3.0,)), PIN),
+                                  (10.0, 20.0), "development_train")
+        bridge.fit(fitting, 7)
+        result = bridge.sample(2, 13)
+        self.assertEqual(result.data.targets, (15.0, 15.0))
+        self.assertEqual(result.data.role, "synthetic_train")
+        self.assertEqual(result.data.features.schema_sha256, PIN)
+        self.assertEqual(result.usage.consumed_rows, 2)
+        self.assertFalse(set(result.data.features.row_ids).intersection(fitting.features.row_ids))
+        self.assertEqual(backend.calls[0][1].rows, ((1.0, 10.0), (3.0, 20.0)))
+        with self.assertRaises(B.AdapterError):
+            bridge.fit(B.TrainingBatch(fitting.features, fitting.targets, "synthetic_train"), 7)
+
 
 if __name__ == "__main__":
     unittest.main()
