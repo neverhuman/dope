@@ -1,0 +1,199 @@
+{
+  "format": "dope-structured-generators",
+  "version": 1,
+  "profiles": [
+    {
+      "name": "arf_default",
+      "family": "arf",
+      "source": {
+        "url": "https://github.com/bips-hb/arfpy",
+        "revision": "8b63c1b3999981125b4af2828ff52cba8e29169d",
+        "scope": "Python arfpy author package"
+      },
+      "mode": "author_default",
+      "native_objective": "heldout_forde_log_density",
+      "native_direction": "maximize",
+      "status": "unresolved",
+      "history": [],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    },
+    {
+      "name": "arf_native",
+      "family": "arf",
+      "source": {
+        "url": "https://github.com/bips-hb/arfpy",
+        "revision": "8b63c1b3999981125b4af2828ff52cba8e29169d",
+        "scope": "Python arfpy author package"
+      },
+      "mode": "native_selection",
+      "native_objective": "heldout_forde_log_density",
+      "native_direction": "maximize",
+      "status": "unresolved",
+      "history": [],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    },
+    {
+      "name": "forest_flow",
+      "family": "forest",
+      "source": {
+        "url": "https://github.com/SamsungSAILMontreal/ForestDiffusion",
+        "revision": "818ac3b9c8df7b7c763470c9a0691dacca8d8b37",
+        "scope": "original Python package only; repository experiments not admitted"
+      },
+      "mode": "flow",
+      "native_objective": "author_native_selection",
+      "native_direction": "minimize",
+      "status": "unresolved",
+      "history": [
+        "historical Forest-Flow adverse comparison retained; no receipt rewritten"
+      ],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    },
+    {
+      "name": "forest_diffusion",
+      "family": "forest",
+      "source": {
+        "url": "https://github.com/SamsungSAILMontreal/ForestDiffusion",
+        "revision": "818ac3b9c8df7b7c763470c9a0691dacca8d8b37",
+        "scope": "original Python package only; repository experiments not admitted"
+      },
+      "mode": "vp_diffusion",
+      "native_objective": "author_native_selection",
+      "native_direction": "minimize",
+      "status": "unresolved",
+      "history": [
+        "historical Forest-Flow adverse comparison retained; no receipt rewritten"
+      ],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    },
+    {
+      "name": "tabpc",
+      "family": "tabpc",
+      "source": {
+        "url": "https://github.com/april-tools/tabpc",
+        "revision": "b821a47a9ca9f674f1083d1309b1e7e548657c0d",
+        "scope": "TabPC author code; Cirkit runtime eligibility separate"
+      },
+      "mode": "author_default",
+      "native_objective": "heldout_transformed_mean_nll",
+      "native_direction": "minimize",
+      "status": "unresolved",
+      "history": [],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    },
+    {
+      "name": "gaussian_copula",
+      "family": "compact_density",
+      "source": {
+        "url": "https://github.com/neverhuman/dope",
+        "revision": null,
+        "scope": "historical controls; new portable backend pins pending"
+      },
+      "mode": "native_selection",
+      "native_objective": "heldout_log_density",
+      "native_direction": "maximize",
+      "status": "unresolved",
+      "history": [],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    },
+    {
+      "name": "chow_liu",
+      "family": "compact_density",
+      "source": {
+        "url": "https://github.com/neverhuman/dope",
+        "revision": null,
+        "scope": "historical controls; new portable backend pins pending"
+      },
+      "mode": "native_selection",
+      "native_objective": "heldout_log_density",
+      "native_direction": "maximize",
+      "status": "unresolved",
+      "history": [],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    },
+    {
+      "name": "independent_marginals",
+      "family": "compact_density",
+      "source": {
+        "url": "https://github.com/neverhuman/dope",
+        "revision": null,
+        "scope": "historical controls; new portable backend pins pending"
+      },
+      "mode": "native_selection",
+      "native_objective": "heldout_log_density",
+      "native_direction": "maximize",
+      "status": "unresolved",
+      "history": [],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    },
+    {
+      "name": "cart_synthpop",
+      "family": "compact_density",
+      "source": {
+        "url": "https://github.com/neverhuman/dope",
+        "revision": null,
+        "scope": "historical controls; new portable backend pins pending"
+      },
+      "mode": "author_default",
+      "native_objective": "declared_backend_objective",
+      "native_direction": "minimize",
+      "status": "unresolved",
+      "history": [],
+      "code_sha256": null,
+      "dependencies_sha256": null,
+      "license_sha256": null,
+      "native_reference_sha256": null,
+      "export_reload_sha256": null,
+      "preprocessing_sha256": null,
+      "recipe_sha256": null
+    }
+  ]
+}
