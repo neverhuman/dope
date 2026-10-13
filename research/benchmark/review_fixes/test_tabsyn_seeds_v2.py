@@ -11,11 +11,15 @@ import errno
 import hashlib
 import json
 import os
+import signal
 import struct
+import subprocess
+import sys
 import tempfile
 import time
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from research.benchmark.review_fixes import bind_v2_cells as B
@@ -314,14 +318,63 @@ class ResumeTests(unittest.TestCase):
                              [(101, 1, 10), (211, 1, 10), (307, 1, 10), (101, 4, 40)])
             self.receipt(attempt, W.cell_receipt_name(cells[0]), **cells[0], status="ok", reason=None,
                          synthetic_sha256="a" * 64)
-            statuses = T.sample_status(attempt, cells, 124)
-            silent = T.sample_status(attempt, cells, -9)
+            def status(at, code):
+                return T.sample_status(at, cells, T.outcome(at, "sample", code, lambda *_: False)[0], code)
+
+            statuses, silent = status(attempt, 124), status(attempt, -9)
             self.receipt(attempt, "sample.failure.receipt.json", status="operation_failed", cause=None)
-            failed = T.sample_status(attempt, cells, 2)
+            failed = status(attempt, 2)
+            deadline = Path(tmp) / "deadline"
+            self.receipt(deadline, W.cell_receipt_name(cells[0]), **cells[0], status="ok", reason=None,
+                         synthetic_sha256="a" * 64)
+            self.receipt(deadline, "sample.failure.receipt.json", status="operation_failed", cause=None,
+                         exception_type="TimeoutError")
+            cut = status(deadline, 2)
         self.assertEqual([item["status"] for item in statuses], ["ok"] + ["timeout"] * 5)
         self.assertEqual([item["status"] for item in silent], ["ok"] + ["unknown"] * 5)
         self.assertEqual([item["status"] for item in failed], ["ok"] + ["failed"] * 5)
+        self.assertEqual([item["status"] for item in cut], ["ok"] + ["timeout"] * 5)
         self.assertTrue(all("path" not in item for item in statuses))
+
+    def test_the_next_attempt_key_passes_every_directory_present(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cell = Path(tmp)
+            for name in ("attempt-1/fit", "attempt-3/fit", "attempt-3/sample-1", "attempt-3/sample-4"):
+                (cell / name).mkdir(parents=True)
+            self.assertEqual(T.A.next_number(cell, "fit", {"attempts": 1}), 4)
+            self.assertEqual(T.A.next_number(cell, "sample", None), 5)
+            self.assertEqual(T.A.next_number(cell / "fit-37", "fit", None), 1)
+
+    def test_a_half_written_receipt_is_no_success_and_no_failure_claim(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            attempt = Path(tmp) / "attempt"
+            self.receipt(attempt, "fit.complete.receipt.json")
+            (attempt / "fit.complete.receipt.json").write_text('{"status": "ok", "res')
+            self.assertEqual(T.outcome(attempt, "fit", 0, lambda *_: False), ("unknown", "no_final_receipt"))
+            (attempt / "fit.failure.receipt.json").write_text('{"exception_type": "Timeo')
+            self.assertEqual(T.outcome(attempt, "fit", 2, lambda *_: False), ("unknown", "no_final_receipt"))
+
+    def test_a_listed_cause_inside_a_sample_cell_ends_the_operation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            operation = SimpleNamespace(
+                q={"runtime": {"path": "r", "sha256": "s"}, "artifact_inventory": {},
+                   "fit_ref": {"path": "f", "sha256": "g"}}, end=time.monotonic() + 60, grant={}, root=root)
+            cell = {"seed": 101, "size": 1, "rows": 2, "path": str(root / "sample-101-1n.csv")}
+
+            def raising(error):
+                def sample(*_args, **_kwargs):
+                    raise error
+                return {"sample": sample}
+
+            for error in (RuntimeError("foreign_gpu_owner"), RuntimeError("runtime_lock_mismatch"),
+                          OSError(errno.ENOSPC, "full"), OSError(errno.EDQUOT, "quota")):
+                with self.subTest(error=error), self.assertRaises(type(error)):
+                    W.sample_cell(raising(error), operation, root / "artifact", cell)
+                self.assertFalse((root / W.cell_receipt_name(cell)).exists())
+            entry = W.sample_cell(raising(ValueError("nan")), operation, root / "artifact", cell)
+            self.assertEqual((entry["status"], entry["reason"]), ("failed", "ValueError"))
+            self.assertTrue((root / W.cell_receipt_name(cell)).is_file())
 
 
 class FakeProcess:
@@ -381,6 +434,9 @@ class ControllerTests(unittest.TestCase):
         request = json.loads((self.cell / "attempt-1" / "fit" / "operation.request.json").read_text())
         self.assertEqual((request["cap_seconds"], request["operation_seconds"]), (600, 100))
         self.assertEqual((request["boot_id"], request["close_utc"]), ("boot-a", self.amendment["close_utc"]))
+        spawned = json.loads(T.A.controller_record(self.cell / "attempt-1" / "fit").read_text())
+        self.assertEqual((spawned["boot_id"], spawned["request_sha256"], spawned["deadline_monotonic"]),
+                         ("boot-a", record["request"]["sha256"], request["deadline_monotonic"]))
         self.assertEqual((record["status"], record["reason"]), ("unknown", "no_final_receipt"))
         self.assertFalse(T.needs_attempt(record))
 
@@ -407,17 +463,84 @@ class ControllerTests(unittest.TestCase):
         attempt = self.cell / "attempt-1" / "fit"
         attempt.mkdir(parents=True)
         (attempt / "operation.request.json").write_text(json.dumps({"boot_id": "boot-a"}))
-        same_boot = self.controller.adopt(23, self.row, self.cell, "fit")
+        same_boot = self.controller.current(23, self.row, self.cell, "fit")
         self.assertEqual((same_boot["status"], same_boot["attempts"]), ("unknown", 1))
         self.controller.boot = lambda: "boot-b"
-        rebooted = self.controller.adopt(23, self.row, self.cell, "fit")
+        rebooted = self.controller.adopt(23, self.row, self.cell, "fit", attempt)
         self.assertEqual((rebooted["status"], rebooted["reason"]), ("infrastructure_failure", "host_reboot"))
         self.assertTrue(T.needs_attempt(rebooted))
         with patch.object(T.subprocess, "Popen", FakeProcess):
             retried = self.controller.fit(23, self.row, self.cell, rebooted)
         self.assertEqual(retried["attempts"], 2)
         self.assertFalse(T.needs_attempt(retried))
-        self.assertIsNone(self.controller.adopt(37, self.row, self.root / "out" / DATASET / "fit-37", "fit"))
+        self.assertIsNone(self.controller.current(37, self.row, self.root / "out" / DATASET / "fit-37", "fit"))
+
+    def test_an_attempt_left_during_the_retry_is_adopted_before_any_new_key(self):
+        T.v1._atomic_json(self.cell / T.FIT_RECORD, {"status": "infrastructure_failure", "attempts": 1})
+        sampled = self.root / "out" / DATASET / "fit-37"
+        T.v1._atomic_json(sampled / T.FIT_RECORD, {"status": "ok", "attempts": 1, "artifact": "a", "inventory": {},
+                                                   "request": None})
+        T.v1._atomic_json(sampled / T.SAMPLE_RECORD, {"status": "infrastructure_failure", "attempts": 1})
+        for orphan in (self.cell / "attempt-2" / "fit", sampled / "attempt-1" / "sample-2"):
+            orphan.mkdir(parents=True)
+            (orphan / "operation.request.json").write_text(json.dumps({"boot_id": "boot-a"}))
+        with patch.object(T.v1, "_wait_to_fit", lambda _units: None), \
+                patch.object(T.subprocess, "Popen", side_effect=AssertionError("a new attempt started")):
+            self.controller.run([(23, self.row), (37, self.row)], self.lock)
+        fit = json.loads((self.cell / T.FIT_RECORD).read_text())
+        samples = json.loads((sampled / T.SAMPLE_RECORD).read_text())
+        self.assertEqual((fit["status"], fit["attempts"]), ("unknown", 2))
+        self.assertEqual((samples["status"], samples["attempts"]), ("done", 2))
+        self.assertFalse(T.needs_attempt(fit) or T.needs_attempt(samples))
+
+    def test_a_reboot_is_confirmed_from_the_controllers_record_not_the_request(self):
+        attempt = self.cell / "attempt-1" / "fit"
+        attempt.mkdir(parents=True)
+        (attempt / "operation.request.json").write_text(json.dumps({"boot_id": "boot-x"}))
+        T.v1._atomic_json(T.A.controller_record(attempt), {"boot_id": "boot-a", "pid": None})
+        self.assertFalse(self.controller.confirm("host_reboot", attempt))
+        self.controller.boot = lambda: "boot-b"
+        self.assertTrue(self.controller.confirm("host_reboot", attempt))
+
+    def test_a_controller_started_after_close_never_waits_for_the_host(self):
+        self.now[0] = self.close + 1
+        with patch.object(T.v1, "_wait_to_fit", side_effect=AssertionError("waited after close")), \
+                patch.object(T.subprocess, "Popen", side_effect=AssertionError("spawned after close")):
+            self.controller.run([(23, self.row)], self.lock)
+        self.assertFalse(self.cell.joinpath("attempt-1").exists())
+
+    def test_a_delay_after_publication_and_before_the_spawn_starts_no_worker(self):
+        real_open, real_env, real_monotonic = Path.open, T.child_env, time.monotonic
+        offset = [0.0]
+        for point in ("worker.stdout.log", "worker.stderr.log", "environment"):
+            for clock in ("wall", "monotonic"):
+                self.now[0], offset[0] = self.close - 100.0, 0.0
+
+                def advance(point=point, clock=clock, name=None):
+                    if name == point:
+                        if clock == "wall":
+                            self.now[0] = self.close + 1
+                        else:
+                            offset[0] = 10_000.0
+
+                def slow_open(path, *args, **kwargs):
+                    advance(name=path.name)
+                    return real_open(path, *args, **kwargs)
+
+                def slow_env(runtime):
+                    advance(name="environment")
+                    return real_env(runtime)
+
+                attempt = self.root / point / clock / "fit"
+                request = self.controller.request("fit", 23, self.row, 1, 600)
+                with self.subTest(point=point, clock=clock), patch.object(Path, "open", slow_open), \
+                        patch.object(T, "child_env", slow_env), \
+                        patch.object(T.time, "monotonic", lambda: real_monotonic() + offset[0]), \
+                        patch.object(T.subprocess, "Popen", side_effect=AssertionError("spawned after close")):
+                    code, _elapsed, _ref = self.controller.operate(attempt, request)
+                    self.assertIsNone(code)
+                    self.assertEqual(T.outcome(attempt, "fit", code, self.controller.confirm),
+                                     ("not_started", "campaign_close"))
 
     def test_a_listed_cause_is_confirmed_by_the_controllers_own_observation(self):
         attempt = self.root / "attempt"
@@ -450,6 +573,54 @@ class ControllerTests(unittest.TestCase):
         lock.write_bytes(b"x")
         with self.assertRaisesRegex(RuntimeError, "runtime_lock_mismatch"):
             W.runtime_lock({"runtime": {"path": str(lock), "sha256": "0" * 64}})
+
+
+class OrphanTests(unittest.TestCase):
+    """A worker a stopped controller left running, as a real child process in its own session."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.attempt = Path(self.tmp.name) / "attempt-1" / "fit"
+        self.attempt.mkdir(parents=True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def start(self, script: str, deadline: float, boot: str = "boot-a") -> subprocess.Popen:
+        process = subprocess.Popen([sys.executable, "-c", script, str(self.attempt)], start_new_session=True)
+        self.addCleanup(lambda: (process.poll() is None and os.killpg(process.pid, signal.SIGKILL), process.wait()))
+        T.v1._atomic_json(T.A.controller_record(self.attempt), {
+            "boot_id": boot, "deadline_monotonic": deadline, "pid": process.pid,
+            "start_ticks": W.start_ticks(process.pid)})
+        return process
+
+    def test_adoption_waits_for_a_running_worker_and_reads_its_late_receipt(self):
+        fitted = {"vae_selected_epoch": 1, "diffusion_selected_epoch": 1, "completed_diffusion_epochs": 1,
+                  "diffusion_stopping_reason": "budget", "peak_allocated_vram_bytes": 1,
+                  "whole_fit_elapsed_seconds": 1.0}
+        inventory = {"artifact_bytes": 1, "projection_bytes": 1, "files": {"model.json": {"bytes": 1}}}
+        receipt = json.dumps({"status": "ok", "result": {"result": fitted, "inventory": inventory}})
+        script = ("import pathlib, sys, time; time.sleep(0.5); "
+                  f"pathlib.Path(sys.argv[1], 'fit.complete.receipt.json').write_text({receipt!r})")
+        self.start(script, time.monotonic() + 60)
+        controller = T.Controller(T.load_amendment(), Path(self.tmp.name) / "out", "c" * 40, [],
+                                  runtime={"python": "/bin/false", "LD_LIBRARY_PATH": ""}, boot=lambda: "boot-a")
+        with patch.object(T, "gpu_name", lambda: None):
+            record = controller.adopt(23, {"dataset": DATASET}, Path(self.tmp.name), "fit", self.attempt)
+        self.assertEqual((record["status"], record["attempts"], record.get("charged_bytes")), ("ok", 1, 1))
+
+    def test_a_worker_past_its_deadline_is_stopped_and_recorded_as_a_timeout(self):
+        process = self.start("import time; time.sleep(60)", time.monotonic() - 2 * T.A.GRACE_SECONDS)
+        self.assertEqual(T.A.settle(self.attempt, "boot-a"), 124)
+        self.assertEqual(process.wait(timeout=10), -signal.SIGTERM)
+        self.assertEqual(T.outcome(self.attempt, "fit", 124, lambda *_: False), ("timeout", "wall"))
+
+    def test_a_record_from_another_boot_names_no_live_worker(self):
+        process = self.start("import time; time.sleep(60)", time.monotonic() + 60, boot="boot-x")
+        began = time.monotonic()
+        self.assertIsNone(T.A.settle(self.attempt, "boot-a"))
+        self.assertLess(time.monotonic() - began, 1)
+        self.assertIsNone(process.poll())
 
 
 class LedgerTests(unittest.TestCase):
@@ -560,7 +731,7 @@ class ScoringTests(unittest.TestCase):
         P.check_roster(cells)
 
     def test_tabsyn_stays_a_one_fit_arm_until_block_b_is_bound(self):
-        # The commit that binds the block B cells adds the arm to FIVE_SEED and flips this test.
+        # FIVE_SEED lists arms whose five fit seeds are bound; TabSyn's scaled arm has only seed 11 bound.
         self.assertNotIn(("TabSyn", CONFIGURATION), P.FIVE_SEED)
 
 
