@@ -82,17 +82,27 @@ fn component_path_allow_manifest(path: &str) -> Result<(), BundleError> {
     component_path(path)
 }
 
-fn ensure_real_directory(path: &Path) -> Result<(), BundleError> {
-    let name = c_string(path.as_os_str().as_bytes())?;
-    // SAFETY: `name` is NUL-terminated. `open` uses O_DIRECTORY, O_NOFOLLOW, and
-    // O_CLOEXEC. The descriptor is dropped after the directory check.
-    let fd = owned_fd(unsafe { open(name.as_ptr(), O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC, 0) })?;
-    drop(fd);
-    Ok(())
+#[repr(C, align(8))]
+struct DirBuf([u8; 8192]);
+
+#[repr(C, align(8))]
+struct StatxBuf([u8; 256]);
+
+#[derive(Clone, Copy)]
+enum EntryKind {
+    File,
+    Directory,
+    Symlink,
+    Other,
+    Unknown,
 }
 
 fn inventory(root: &Path, declared: &BTreeSet<String>) -> Result<(), BundleError> {
-    ensure_real_directory(root)?;
+    let root_name = c_string(root.as_os_str().as_bytes())?;
+    let directory_flags = O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC;
+    // SAFETY: `root_name` is NUL-terminated. `open` uses O_DIRECTORY, O_NOFOLLOW,
+    // and O_CLOEXEC, and returns a new descriptor or -1. `owned_fd` keeps it.
+    let root_fd = owned_fd(unsafe { open(root_name.as_ptr(), directory_flags, 0) })?;
     let mut prefixes = BTreeSet::new();
     for path in declared {
         let pieces: Vec<&str> = path.split('/').collect();
@@ -101,7 +111,7 @@ fn inventory(root: &Path, declared: &BTreeSet<String>) -> Result<(), BundleError
         }
     }
     let mut found = BTreeSet::new();
-    walk(root, "", declared, &prefixes, &mut found)?;
+    walk(root_fd, "", declared, &prefixes, &mut found)?;
     if found != *declared {
         return Err(err("unresolved_dependency"));
     }
@@ -109,50 +119,145 @@ fn inventory(root: &Path, declared: &BTreeSet<String>) -> Result<(), BundleError
 }
 
 fn walk(
-    root: &Path,
+    directory: OwnedFd,
     relative: &str,
     declared: &BTreeSet<String>,
     prefixes: &BTreeSet<String>,
     found: &mut BTreeSet<String>,
 ) -> Result<(), BundleError> {
-    let location = if relative.is_empty() {
-        root.to_path_buf()
-    } else {
-        root.join(relative)
-    };
-    ensure_real_directory(&location)?;
-    let entries = fs::read_dir(&location).map_err(|_| err("dependency_io_failed"))?;
-    for entry in entries {
-        let entry = entry.map_err(|_| err("dependency_io_failed"))?;
-        let name = entry.file_name();
-        let name = name.to_str().ok_or_else(|| err("unsafe_path"))?;
+    for (name, observed) in directory_entries(directory.as_raw_fd())? {
         if name.is_empty() || name.contains(['/', '\\', '\0']) {
             return Err(err("unsafe_path"));
         }
+        let kind = if matches!(observed, EntryKind::Unknown) {
+            entry_kind_at(directory.as_raw_fd(), &name)?
+        } else {
+            observed
+        };
         let child = if relative.is_empty() {
-            name.to_string()
+            name.clone()
         } else {
             format!("{relative}/{name}")
         };
-        let kind = entry.file_type().map_err(|_| err("dependency_io_failed"))?;
-        if kind.is_symlink() {
-            return Err(err("symlink_component"));
-        }
-        if kind.is_dir() {
-            if !prefixes.contains(&child) {
-                return Err(err("undeclared_component"));
+        match kind {
+            EntryKind::Symlink => return Err(err("symlink_component")),
+            EntryKind::Directory => {
+                if !prefixes.contains(&child) {
+                    return Err(err("undeclared_component"));
+                }
+                let segment = c_string(name.as_bytes())?;
+                let child_fd = owned_fd({
+                    // SAFETY: `segment` is one NUL-terminated path segment. `openat`
+                    // is relative to the owned directory descriptor and uses
+                    // O_DIRECTORY plus O_NOFOLLOW.
+                    unsafe {
+                        openat(
+                            directory.as_raw_fd(),
+                            segment.as_ptr(),
+                            O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC,
+                            0,
+                        )
+                    }
+                })?;
+                walk(child_fd, &child, declared, prefixes, found)?;
             }
-            walk(root, &child, declared, prefixes, found)?;
-        } else if kind.is_file() {
-            if !declared.contains(&child) {
-                return Err(err("undeclared_component"));
+            EntryKind::File => {
+                if !declared.contains(&child) {
+                    return Err(err("undeclared_component"));
+                }
+                found.insert(child);
             }
-            found.insert(child);
-        } else {
-            return Err(err("dependency_not_regular_file"));
+            EntryKind::Other | EntryKind::Unknown => {
+                return Err(err("dependency_not_regular_file"));
+            }
         }
     }
     Ok(())
+}
+
+fn directory_entries(dirfd: i32) -> Result<Vec<(String, EntryKind)>, BundleError> {
+    let mut entries = Vec::new();
+    let mut buffer = DirBuf([0u8; 8192]);
+    loop {
+        // SAFETY: `dirfd` is an owned directory descriptor. `buffer` is writable
+        // for 8192 bytes. `getdents64` fills only that buffer and returns the
+        // byte count or -1.
+        let read = unsafe { getdents64(dirfd, buffer.0.as_mut_ptr(), buffer.0.len()) };
+        if read < 0 {
+            if errno() == EINTR {
+                continue;
+            }
+            return Err(err("dependency_io_failed"));
+        }
+        if read == 0 {
+            break;
+        }
+        let mut offset = 0usize;
+        let total = read as usize;
+        while offset < total {
+            if offset + 19 > total {
+                return Err(err("dependency_io_failed"));
+            }
+            let reclen =
+                u16::from_ne_bytes([buffer.0[offset + 16], buffer.0[offset + 17]]) as usize;
+            if reclen < 20 || offset + reclen > total {
+                return Err(err("dependency_io_failed"));
+            }
+            let d_type = buffer.0[offset + 18];
+            let name_end = buffer.0[offset + 19..offset + reclen]
+                .iter()
+                .position(|byte| *byte == 0)
+                .map(|index| offset + 19 + index)
+                .ok_or_else(|| err("dependency_io_failed"))?;
+            let name = std::str::from_utf8(&buffer.0[offset + 19..name_end])
+                .map_err(|_| err("unsafe_path"))?;
+            if name != "." && name != ".." {
+                entries.push((name.to_string(), kind_from_dtype(d_type)));
+            }
+            offset += reclen;
+        }
+    }
+    Ok(entries)
+}
+
+fn kind_from_dtype(d_type: u8) -> EntryKind {
+    match d_type {
+        4 => EntryKind::Directory,
+        8 => EntryKind::File,
+        10 => EntryKind::Symlink,
+        0 => EntryKind::Unknown,
+        _ => EntryKind::Other,
+    }
+}
+
+fn entry_kind_at(dirfd: i32, name: &str) -> Result<EntryKind, BundleError> {
+    let segment = c_string(name.as_bytes())?;
+    let mut buffer = StatxBuf([0u8; 256]);
+    // SAFETY: `segment` is one NUL-terminated path segment. `statx` uses
+    // AT_SYMLINK_NOFOLLOW and writes the fixed 256-byte statx record.
+    let status = unsafe {
+        statx(
+            dirfd,
+            segment.as_ptr(),
+            AT_SYMLINK_NOFOLLOW,
+            STATX_TYPE,
+            buffer.0.as_mut_ptr(),
+        )
+    };
+    if status != 0 {
+        return Err(if errno() == ELOOP {
+            err("symlink_component")
+        } else {
+            err("dependency_io_failed")
+        });
+    }
+    let mode = u16::from_ne_bytes([buffer.0[28], buffer.0[29]]);
+    Ok(match mode & 0o170000u16 {
+        0o120000u16 => EntryKind::Symlink,
+        0o040000u16 => EntryKind::Directory,
+        0o100000u16 => EntryKind::File,
+        _ => EntryKind::Other,
+    })
 }
 
 fn read_varint(data: &[u8], mut offset: usize) -> Result<(u64, usize), BundleError> {

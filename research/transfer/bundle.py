@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import re
 import stat
+from types import MappingProxyType
 
 from research.transfer.evidence import EvidenceError, canonical_json, parse_json
 
@@ -46,6 +47,7 @@ EXECUTABLE_SUFFIXES = frozenset({
 SEGMENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 IDENTIFIER = re.compile(r"^[a-z][a-z0-9-]{0,63}$")
 SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
+_VERIFIED = object()
 MANIFEST_KEYS = frozenset({
     "amortization_count",
     "bundle_id",
@@ -102,10 +104,22 @@ class BundleLimits:
 
 
 class VerifiedBundle:
-    def __init__(self, accounting, payload, features):
-        self.accounting = accounting
-        self._payload = payload
-        self.features = features
+    """Issued only by verify_bundle. Accounting is a private snapshot."""
+
+    def __init__(self, accounting, payload, features, token=None):
+        if token is not _VERIFIED:
+            _fail("verification_required")
+        self._accounting = MappingProxyType(dict(accounting))
+        self._payload = None if payload is None else bytes(payload)
+        self._features = features
+
+    @property
+    def accounting(self):
+        return self._accounting
+
+    @property
+    def features(self):
+        return self._features
 
     @property
     def retained_payload(self):
@@ -244,38 +258,55 @@ def _inventory(root, declared):
         for index in range(1, len(parts)):
             prefixes.add("/".join(parts[:index]))
     found = set()
+    directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
 
-    def walk(relative):
-        location = root if relative == "" else root / relative
-        try:
-            directory = os.open(location, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
-        except OSError as exc:
-            if exc.errno == 40:
-                _fail("symlink_component")
-            _fail("dependency_io_failed")
+    def walk(relative, directory):
         try:
             entries = os.listdir(directory)
-        finally:
-            os.close(directory)
+        except OSError:
+            _fail("dependency_io_failed")
         for name in entries:
             if name in ("", ".", "..") or "/" in name or "\\" in name or "\x00" in name:
                 _fail("unsafe_path")
             child = name if relative == "" else relative + "/" + name
-            full = root / child
-            if full.is_symlink():
+            try:
+                mode = os.stat(name, dir_fd=directory, follow_symlinks=False).st_mode
+            except OSError as exc:
+                if exc.errno == 40:
+                    _fail("symlink_component")
+                _fail("dependency_io_failed")
+            if stat.S_ISLNK(mode):
                 _fail("symlink_component")
-            if full.is_dir():
+            if stat.S_ISDIR(mode):
                 if child not in prefixes:
                     _fail("undeclared_component")
-                walk(child)
-            elif full.is_file():
+                try:
+                    child_directory = os.open(name, directory_flags, dir_fd=directory)
+                except OSError as exc:
+                    if exc.errno == 40:
+                        _fail("symlink_component")
+                    _fail("dependency_io_failed")
+                try:
+                    walk(child, child_directory)
+                finally:
+                    os.close(child_directory)
+            elif stat.S_ISREG(mode):
                 if child not in declared:
                     _fail("undeclared_component")
                 found.add(child)
             else:
                 _fail("dependency_not_regular_file")
 
-    walk("")
+    try:
+        root_directory = os.open(root, directory_flags)
+    except OSError as exc:
+        if exc.errno == 40:
+            _fail("symlink_component")
+        _fail("dependency_io_failed")
+    try:
+        walk("", root_directory)
+    finally:
+        os.close(root_directory)
     if found != declared:
         _fail("unresolved_dependency")
 
@@ -537,7 +568,15 @@ def _component(value):
 
 def _manifest(value, limits):
     _exact_keys(value, MANIFEST_KEYS)
-    if value["format"] != FORMAT or value["version"] != VERSION:
+    if value["format"] != FORMAT:
+        _fail("unknown_version")
+    # Floats are invalid manifest scalars. Booleans and other non-integers are
+    # the wrong version type, matching the native parser's two codes.
+    version = value["version"]
+    if type(version) is float:
+        _fail("invalid_manifest")
+    version = _u64(version, "unknown_version")
+    if version != VERSION:
         _fail("unknown_version")
     _identifier(value["bundle_id"])
     handler = value["sampling_handler"]
@@ -617,4 +656,4 @@ def verify_bundle(root, expected_manifest_sha256, limits=None):
     if total > limits.max_total_bytes:
         _fail("total_bytes_exceeded")
     accounting = account_inventory(components, size, count, framing)
-    return VerifiedBundle(accounting, payload, features)
+    return VerifiedBundle(accounting, payload, features, _VERIFIED)

@@ -19,16 +19,21 @@ const HEADER_BYTES: usize = 56;
 const NEURAL_CAP: usize = 16 * 1024 * 1024;
 const MANIFEST_NAME: &str = "manifest.json";
 const ELOOP: i32 = 40;
+const EINTR: i32 = 4;
 const O_NOFOLLOW: i32 = 0x20000;
 const O_DIRECTORY: i32 = 0x10000;
 const O_CLOEXEC: i32 = 0x80000;
 const O_NONBLOCK: i32 = 0x800;
+const AT_SYMLINK_NOFOLLOW: i32 = 0x100;
+const STATX_TYPE: u32 = 1;
 
 // SAFETY: these are the Linux libc entry points. Callers pass NUL-terminated
 // paths and directory descriptors they own, and they check the returned fd.
 unsafe extern "C" {
     fn open(path: *const c_char, flags: i32, mode: u32) -> i32;
     fn openat(dirfd: i32, path: *const c_char, flags: i32, mode: u32) -> i32;
+    fn getdents64(fd: i32, dirp: *mut u8, count: usize) -> isize;
+    fn statx(dirfd: i32, pathname: *const c_char, flags: i32, mask: u32, statxbuf: *mut u8) -> i32;
     fn __errno_location() -> *mut i32;
 }
 

@@ -14,7 +14,9 @@ from research.transfer.bundle import (
     ROLES,
     BundleError,
     BundleLimits,
+    VerifiedBundle,
     account_inventory,
+    charged_sampling_bytes,
     checked_sum,
     preflight_dpk,
     verify_bundle,
@@ -44,6 +46,8 @@ class BundleGoldenTests(unittest.TestCase):
     def test_schema_is_closed_and_matches_the_inventory_vocabulary(self):
         self.assertIs(SCHEMA["additionalProperties"], False)
         self.assertEqual(SCHEMA["properties"]["format"]["const"], FORMAT)
+        self.assertEqual(SCHEMA["properties"]["version"]["type"], "integer")
+        self.assertEqual(SCHEMA["properties"]["version"]["const"], 1)
         self.assertEqual(set(SCHEMA["properties"]["sampling_handler"]["enum"]), HANDLERS)
         self.assertEqual(set(SCHEMA["properties"]["capabilities"]["items"]["enum"]), CAPABILITIES)
         self.assertEqual(set(SCHEMA["$defs"]["component"]["properties"]["role"]["enum"]), ROLES)
@@ -311,6 +315,34 @@ class BundleGoldenTests(unittest.TestCase):
         limits = BundleLimits()
         self.assertEqual(limits.max_expanded_section_bytes, 16 * 1024 * 1024)
         self.assertEqual(limits.max_features, 4096)
+
+    def test_noninteger_version_is_rejected(self):
+        case = GOLDEN["cases"][0]
+        for value, code in ((True, "unknown_version"), (1.0, "invalid_manifest")):
+            with self.subTest(version_type=type(value).__name__):
+                directory, root, digest = stage(
+                    case, lambda manifest, value=value: manifest.__setitem__("version", value)
+                )
+                with directory, self.assertRaises(BundleError) as raised:
+                    verify_bundle(root, digest)
+                self.assertEqual(raised.exception.code, code)
+
+    def test_verified_type_requires_verification(self):
+        with self.assertRaises(BundleError) as raised:
+            VerifiedBundle({"charged_sampling_bytes": 0}, None, None)
+        self.assertEqual(raised.exception.code, "verification_required")
+
+    def test_report_accounting_cannot_change_verified_charge(self):
+        directory, root, digest = stage(GOLDEN["cases"][0])
+        with directory:
+            value = verify_bundle(root, digest)
+            before = charged_sampling_bytes(value)
+            try:
+                value.accounting["charged_sampling_bytes"] = 0
+            except (TypeError, AttributeError):
+                pass
+            self.assertEqual(before, 2121)
+            self.assertEqual(charged_sampling_bytes(value), before)
 
 
 if __name__ == "__main__":
