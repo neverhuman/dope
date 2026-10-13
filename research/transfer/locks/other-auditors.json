@@ -1,0 +1,173 @@
+{
+  "format": "dope-other-auditors-lock-v1",
+  "status": "unqualified",
+  "admission": "registry remains unresolved; locks are not admissions",
+  "mitra": {
+    "family_group": "mitra_architecture",
+    "source": {
+      "repo": "autogluon/autogluon",
+      "revision": "152343642ce605c95333b2b1e27e5d47675a5c13",
+      "files": {
+        "mitra-model.py": "51d350328e0ae30f94fb103e7f16820fe49df3d66b1e932b4704e1c23a683b79",
+        "mitra-sklearn.py": "086002d406504363a1e428585f518f9ef4c6c8acb5bf54a03a087c2675b6481f"
+      },
+      "artifact_closure_sha256": null
+    },
+    "finetune_source": {
+      "repo": "autogluon/mitra-finetune",
+      "revision": "b4701e8148dc33b00ed15d7086ff59816957cde4",
+      "files": {
+        "mitra-api.py": "c92c4fb0029329383a336168d3ce2c8be45186eed3f650dc59100d7cd2d3128c",
+        "mitra-modes.py": "3c0d0dc4e814cbd64049399627344be7f2069e92a3686251fcd307b8a5de6661",
+        "mitra-checkpoint.py": "cc24fa650a08e7e549c50b6b74602f122fbed1f9f8262e29e8916ba349afa9de",
+        "mitra-runner.py": "fbf912da747348a549ad33a2f33fd75d5d0a1982eccc863bc616345d1d0d761e",
+        "mitra-distribution.py": "95824cdd6c0af8e969f0e2ff51eece648cc0606f3de16daedeb52e05418d7ea6"
+      },
+      "artifact_closure_sha256": null
+    },
+    "checkpoints": {
+      "classification": {
+        "repo": "autogluon/mitra-classifier-2",
+        "revision": "edada0d20759c58ada8c8605c25f22f6e98ea5f0",
+        "declared_license": "apache-2.0",
+        "files": {
+          "model.safetensors": {
+            "bytes": 302717904,
+            "sha256": "5ffab0e2cf52f61c5b7c7eb1e8542996736d1023a0212190cc09abc2119a1e09",
+            "verification": "upstream LFS metadata only"
+          }
+        },
+        "local_verification": false
+      },
+      "regression": {
+        "repo": "autogluon/mitra-regressor-2",
+        "revision": "246c7d310fff04296a2388df5f448e3ffe809283",
+        "declared_license": "apache-2.0",
+        "files": {
+          "model.safetensors": {
+            "bytes": 306776952,
+            "sha256": "8c90b8f281a793f9feb19f8fc3c5529c58ac844dd7ffc690a0fdbb96fae0967c",
+            "verification": "upstream LFS metadata only"
+          }
+        },
+        "local_verification": false
+      }
+    },
+    "primary_distribution": {
+      "autogluon.tabular": "1.6.1"
+    },
+    "modes": {
+      "classification": "frozen_context",
+      "regression": "fine_tuning/transductive, one 50-step eight-fold bagged fit per prediction call"
+    },
+    "precision": "bfloat16",
+    "context_cap": 8192,
+    "query_batch_cap": 1024,
+    "missing_config": "config.json must be separately acquired, hashed and bound in recipe",
+    "native_retries": "native OOM support reduction is not accepted as full context; executor must count all attempts and reject changed consumption",
+    "environment": "MITRA_* overrides refused; pinned default support/fit/heldout/memo behavior only",
+    "cost_receipts": "port records requested child fits and returned/failed native calls; actual child fits, native retries and consumed per-child rows require executor observations and are never inferred as measured zero"
+  },
+  "tabicl": {
+    "family_group": "tabicl_architecture",
+    "source": {
+      "repo": "soda-inria/tabicl",
+      "revision": "10719e21fd72b8945d4a4f9ae077e350ba8650d9",
+      "files": {
+        "tabicl-classifier.py": "fd578aef086353b47834f29a719191944ab528f04123ecef01be3e48a7ecc84b",
+        "tabicl-regressor.py": "6ae77f1ab6bb76dc7d4e0c03cc9bf1dc29f7398d5bf071dff051c7497a0cea10"
+      },
+      "artifact_closure_sha256": null
+    },
+    "checkpoint": {
+      "repo": "jingang/TabICL",
+      "revision": "4dcd344ece2c00be9e831fdd35bed57b5ad83e19",
+      "declared_license": "bsd-3-clause",
+      "files": {
+        "tabicl-classifier-v1-20250208.ckpt": {
+          "bytes": 108317991,
+          "sha256": "04c5c1d261c1f782dc9b263990dcfa5152b1949ed8451ad16c010cdafbea07e0",
+          "verification": "upstream LFS metadata only"
+        },
+        "tabicl-classifier-v1.1-20250506.ckpt": {
+          "bytes": 108318621,
+          "sha256": "bb42d1733b49fab3a7a9e42db648c8ff64d8d5705d93c039179add3bfb2db32b",
+          "verification": "upstream LFS metadata only"
+        },
+        "tabicl-classifier-v2-20260212.ckpt": {
+          "bytes": 110368038,
+          "sha256": "bdc7dbd5e4ff21f8f0456fcf90c6b7cdf72dbea960f2d05b19bec19f9b3d4ed0",
+          "verification": "upstream LFS metadata only"
+        },
+        "tabicl-regressor-v2-20260212.ckpt": {
+          "bytes": 114324594,
+          "sha256": "0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a",
+          "verification": "upstream LFS metadata only"
+        }
+      },
+      "local_verification": false
+    },
+    "primary_distribution": {
+      "tabicl": "2.0.3"
+    },
+    "mode": "frozen_context",
+    "target_inverse": "native regressor original-unit output; no second inverse",
+    "query_behavior": "one provided batch in provided order; native ensemble batch is separately explicit",
+    "offline": "explicit model_path and allow_auto_download=False"
+  },
+  "conventional": {
+    "family_groups": {
+      "catboost": "catboost_oblivious_trees",
+      "histogram_boosting": "sklearn_histogram_trees",
+      "mlp": "sklearn_mlp",
+      "linear": "linear_diagnostic"
+    },
+    "primary_distributions": {
+      "catboost": "1.2.10",
+      "scikit-learn": "1.7.2"
+    },
+    "development_search": "select_conventional_recipe, one declared candidate grid; immutable selected recipe reused across real/synthetic contexts",
+    "example_catboost_grid": [
+      {
+        "iterations": 500,
+        "depth": 4,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 3
+      },
+      {
+        "iterations": 500,
+        "depth": 6,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 3
+      },
+      {
+        "iterations": 500,
+        "depth": 8,
+        "learning_rate": 0.03,
+        "l2_leaf_reg": 3
+      }
+    ],
+    "threads": "catboost/linear n_jobs or thread_count=1; all conventional fit/predict calls also use threadpoolctl(limits=1)",
+    "equal_resources": "identical selected recipe, candidate grid, context cap and query policy on real/synthetic; all development fit attempts retained",
+    "native_precision": {
+      "catboost": "float32 native feature computation with float64 returned predictions",
+      "histogram_boosting": "float64 numeric interface",
+      "mlp": "float64 numeric interface",
+      "linear": "float64 numeric interface"
+    }
+  },
+  "exact_dependency_closure": null,
+  "unmeasured_gates": [
+    "custodian_code_and_weights_license_compatibility",
+    "complete_exact_offline_dependency_artifacts",
+    "immutable_installed_source_and_environment_verification",
+    "official_checkpoint_minimal_example_parity",
+    "independent_native_resource_and_actual_context_observations"
+  ],
+  "acquisition": {
+    "phase": "explicitly authorized custodian acquisition, separate from adapter execution",
+    "api": "huggingface_hub.snapshot_download(repo_id=checkpoint.repo, revision=checkpoint.revision, local_dir=executor_cache, allow_patterns=declared_files)",
+    "after_fetch": "verify all local bytes and exact license texts; record complete dependency closure and independent native parity; then immutable offline executor with network denied",
+    "status": "not performed; no checkpoint or license compatibility claimed"
+  }
+}
