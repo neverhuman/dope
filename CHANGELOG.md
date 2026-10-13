@@ -8,6 +8,9 @@
   which matches bit for bit across xbabe1 and xbabe3 on 200 seeded cells, and
   it enters the v2 panel as a five-seed arm. The paper's TabSyn rows,
   intervals, bytes, and seed text follow the panel.
+- The pre-declared all-five-fits lineage sensitivity (`v2_all_five.py`) is
+  printed for every five-seed arm and DOPE-minus contrast, outside every
+  Holm family; CI recomputes it from the pinned ledger.
 
 - Paper v2 (wave 2): a pre-declared v2 analysis contract
   (`research/benchmark/review_fixes/predeclare_v2.json`) committed before any v2

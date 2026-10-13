@@ -222,13 +222,15 @@ def main() -> int:
             defined.update(MACRO_DEF.findall(NUMBERS_V2_FAMILY.read_text()))
         else:
             failures.append("generated/v2-family-numbers.tex is missing")
+        for path in sorted((ROOT / "generated").glob("v2-*-numbers.tex")):
+            defined.update(MACRO_DEF.findall(path.read_text()))
         used = set(MACRO_USE.findall(body))
         missing = sorted(
             name for name in used
             if name not in defined and name not in _LATEX and not name.startswith("IEEE")
         )
         if missing:
-            failures.append("macros used but not defined in numbers.tex, v2-numbers.tex or v2-family-numbers.tex: "
+            failures.append("macros used but not defined in numbers.tex or any generated v2 numbers file: "
                             + ", ".join(missing))
     else:
         failures.append("generated/numbers.tex is missing")

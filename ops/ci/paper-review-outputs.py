@@ -13,7 +13,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = '0005c543252ca8e72b477ceb882c7b0548fa782cf68f2978cfc1976953003f80'
+LOCK_SHA256 = 'f3477fb08ed5636626847e21cbceead5de44f9c2fc95449fb107065e218b4d7a'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
 CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
 CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
@@ -35,6 +35,8 @@ V2_PREDECLARE = 'research/benchmark/review_fixes/predeclare_v2.json'
 V2_RENDERER = 'docs/whitepaper/scripts/review_v2_emit.py'
 V2_FAMILY = PREFIX + 'review-fixes-v2/family.json'
 V2_FAMILY_RENDERER = 'docs/whitepaper/scripts/review_v2_family.py'
+V2_ALL_FIVE = PREFIX + 'review-fixes-v2/all-five.json'
+V2_ALL_FIVE_RENDERER = 'docs/whitepaper/scripts/review_v2_all_five.py'
 JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, V2_LEDGER, V2_FITS,
                 TABSYN_SEEDS_FITS)
 OUTPUT_PREFIXES = ('review-', 'v2-')
@@ -176,7 +178,8 @@ def _authenticated_graph():
 def replay_graph(graph, inputs):
     replayed = set()
     required_panels = {CONTROL_RENDERER: CONTROL_PANEL, FIDELITY_RENDERER: FIDELITY_PANEL,
-                       V2_RENDERER: V2_PANEL, V2_FAMILY_RENDERER: V2_FAMILY}
+                       V2_RENDERER: V2_PANEL, V2_FAMILY_RENDERER: V2_FAMILY,
+                       V2_ALL_FIVE_RENDERER: V2_ALL_FIVE}
     for entry in graph['scripts']:
         panel = entry['args'][1]
         renderer = entry['path']
@@ -194,6 +197,10 @@ def replay_graph(graph, inputs):
             if V2_PANEL not in inputs:
                 raise ValueError('v2 family renderer requires the pinned family file and v2 panel')
             kind = 'v2-family'
+        elif renderer == V2_ALL_FIVE_RENDERER:
+            if V2_PANEL not in inputs:
+                raise ValueError('v2 all-five renderer requires the pinned all-five file and v2 panel')
+            kind = 'v2-all-five'
         elif panel == PRIVACY_PANEL:
             kind = 'privacy'
         elif panel == TABSYN_PANEL:
@@ -213,6 +220,8 @@ def replay_graph(graph, inputs):
             authenticated_fidelity(inputs)
         elif kind == 'v2':
             authenticated_v2(inputs)
+        elif kind == 'v2-all-five':
+            authenticated_v2_reduction(inputs, 'v2_all_five', V2_ALL_FIVE)
         else:
             authenticated_v2_family(inputs)
         replayed.add(key)
@@ -477,6 +486,25 @@ def authenticated_v2_family(inputs):
                               predeclare=inputs[V2_PREDECLARE])
     if v2_panel.canonical(family).encode() != inputs[V2_FAMILY]:
         raise ValueError('v2 scalar ledger does not reproduce the pinned family file')
+
+
+def authenticated_v2_reduction(inputs, module, output):
+    """Recompute one v2 sensitivity file from the pinned v2 scalar ledger before it is rendered."""
+    names = (V2_LEDGER, V2_RECORD, V2_PREDECLARE)
+    if any(name not in inputs for name in names):
+        raise ValueError('v2 sensitivity renderer requires its pinned ledger, lineage record and predeclaration')
+    cells = [json.loads(line) for line in inputs[V2_LEDGER].splitlines()]
+    if not cells or any(not isinstance(item, dict) or item.get('official_tests_opened') is not False
+                        for item in cells):
+        raise ValueError('v2 ledger official test flag is not closed')
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    import importlib
+    from research.benchmark.review_fixes import v2_panel
+    reducer = importlib.import_module(f'research.benchmark.review_fixes.{module}')
+    result = reducer.reduce(cells, v2_panel.names_of(json.loads(inputs[V2_RECORD])), predeclare=inputs[V2_PREDECLARE])
+    if v2_panel.canonical(result).encode() != inputs[output]:
+        raise ValueError(f'v2 scalar ledger does not reproduce the pinned {module} output')
 
 
 def main():
