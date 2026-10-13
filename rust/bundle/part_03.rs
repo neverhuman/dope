@@ -339,7 +339,7 @@ pub fn preflight_dpk(artifact: &[u8], limits: &BundleLimits) -> Result<DpkSummar
         return Err(err("component_cap_exceeded"));
     }
     let v3 = if artifact.starts_with(crate::codec::MAGIC) {
-        if artifact[4] != 3 || !matches!(artifact[5], 2 | 3) {
+        if artifact[4] != 3 || artifact[5] > 3 {
             return Err(err("unsupported_dpk_version"));
         }
         true

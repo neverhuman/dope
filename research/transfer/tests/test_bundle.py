@@ -31,12 +31,19 @@ GOLDEN = json.loads((ROOT / "schemas/bundle-golden-v1.json").read_bytes())
 SCHEMA = json.loads((ROOT / "schemas/generator-bundle-v1.schema.json").read_text())
 
 
+def workspace_temp():
+    # A fresh checkout has no cargo target/ yet. TemporaryDirectory does not create its parent.
+    parent = ROOT / "target"
+    parent.mkdir(parents=True, exist_ok=True)
+    return tempfile.TemporaryDirectory(dir=parent)
+
+
 def stage(case, mutate=None):
     manifest = copy.deepcopy(case["manifest"])
     if mutate is not None:
         mutate(manifest)
     raw = canonical_json(manifest)
-    directory = tempfile.TemporaryDirectory(dir=ROOT / "target")
+    directory = workspace_temp()
     root = Path(directory.name)
     (root / "manifest.json").write_bytes(raw)
     for name, encoded in case["files_hex"].items():
@@ -224,9 +231,11 @@ class BundleGoldenTests(unittest.TestCase):
         with self.assertRaises(BundleError) as raised:
             checked_sum([2**64 - 1, 1])
         self.assertEqual(raised.exception.code, "integer_overflow")
-        source = (ROOT / "research/transfer/bundle.py").read_text()
-        for token in ("subprocess", "socket", "urllib", "pickle", "requests"):
-            self.assertNotIn(token, source)
+        for name in ("bundle.py", "bundle_io.py"):
+            source = (ROOT / "research/transfer" / name).read_text()
+            for token in ("subprocess", "socket", "urllib", "pickle", "requests"):
+                self.assertNotIn(token, source)
+            self.assertLessEqual(source.count("\n"), 500)
 
     def test_dpk_preflight_rejects_bombs_flags_and_bad_dimensions(self):
         def header(features=1, flags=0, payload=b"", minor=2):
@@ -265,6 +274,29 @@ class BundleGoldenTests(unittest.TestCase):
             preflight_dpk(header(payload=payload))
         self.assertEqual(raised.exception.code, "nonfinite_value")
         self.assertNotIn("NaN", str(raised.exception))
+        for minor in (0, 1, 2, 3):
+            summary = preflight_dpk(header(minor=minor))
+            self.assertEqual(summary["minor"], minor)
+            self.assertIs(summary["v3"], True)
+        with self.assertRaises(BundleError) as raised:
+            preflight_dpk(header(minor=4))
+        self.assertEqual(raised.exception.code, "unsupported_dpk_version")
+
+        def v2(minor):
+            artifact = bytearray(header(minor=minor))
+            artifact[:4] = b"DPK2"
+            artifact[4] = 2
+            return bytes(artifact)
+
+        self.assertIs(preflight_dpk(v2(0))["v3"], False)
+        self.assertEqual(preflight_dpk(v2(1))["minor"], 1)
+        with self.assertRaises(BundleError) as raised:
+            preflight_dpk(v2(2))
+        self.assertEqual(raised.exception.code, "unsupported_dpk_version")
+        with self.assertRaises(BundleError) as raised:
+            preflight_dpk(header(minor=1, payload=bytes([0x06, 0x00])))
+        self.assertEqual(raised.exception.code, "unknown_section")
+        self.assertEqual(preflight_dpk(header(minor=2, payload=bytes([0x06, 0x00])))["minor"], 2)
 
     def test_native_payload_is_retained_after_replacement(self):
         payload = bytearray(56)
@@ -298,7 +330,7 @@ class BundleGoldenTests(unittest.TestCase):
             "version": 1,
         }
         raw = canonical_json(manifest)
-        with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:
+        with workspace_temp() as directory:
             root = Path(directory)
             (root / "manifest.json").write_bytes(raw)
             (root / "payload.dpk").write_bytes(payload)
@@ -355,7 +387,7 @@ class BundleGoldenTests(unittest.TestCase):
             self.assertEqual(charged_sampling_bytes(value), before)
 
     def test_directory_stream_stops_on_the_first_undeclared_or_cap(self):
-        directory = tempfile.TemporaryDirectory(dir=ROOT / "target")
+        directory = workspace_temp()
         root = Path(directory.name)
         (root / "extra.bin").write_bytes(b"x")
         flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -384,7 +416,7 @@ class BundleGoldenTests(unittest.TestCase):
                 os.close(fd)
 
     def test_replaced_directory_path_does_not_change_the_fd_listing(self):
-        directory = tempfile.TemporaryDirectory(dir=ROOT / "target")
+        directory = workspace_temp()
         base = Path(directory.name)
         real = base / "real"
         decoy = base / "decoy"
@@ -408,6 +440,63 @@ class BundleGoldenTests(unittest.TestCase):
             finally:
                 os.close(fd)
         self.assertEqual(found, {"manifest.json", "keep.bin"})
+
+    def test_optional_payload_dependency_stays_in_the_sampling_budget(self):
+        def measured(identity, role, size, required, depends_on):
+            return {
+                "id": identity,
+                "role": role,
+                "measured_bytes": size,
+                "required": required,
+                "depends_on": depends_on,
+            }
+
+        def charge(components):
+            return account_inventory(components, 10, 1, "unmeasured")["charged_sampling_bytes"]
+
+        evidence = measured("evidence", "evidence_authorization", 7, False, [])
+        self.assertEqual(
+            charge([measured("payload", "sampling_payload", 4, True, ["evidence"]), evidence]),
+            21,
+        )
+        self.assertEqual(
+            charge([measured("payload", "sampling_payload", 4, True, []), evidence]),
+            14,
+        )
+        self.assertEqual(
+            charge([
+                measured("payload", "sampling_payload", 4, True, ["rows"]),
+                measured("rows", "materialized_rows", 9, False, []),
+            ]),
+            23,
+        )
+        dictionary = account_inventory(
+            [
+                measured("payload", "sampling_payload", 4, True, ["dictionary"]),
+                measured("dictionary", "dictionary", 5, False, []),
+            ],
+            10,
+            1,
+            "unmeasured",
+        )
+        self.assertEqual(dictionary["charged_sampling_bytes"], 19)
+        self.assertEqual(dictionary["dictionary_bytes"], 5)
+
+    def test_either_import_order_loads_bundle_io(self):
+        import subprocess
+        import sys
+        for statement in (
+            "import research.transfer.bundle_io, research.transfer.bundle",
+            "import research.transfer.bundle, research.transfer.bundle_io",
+        ):
+            completed = subprocess.run(
+                [sys.executable, "-B", "-c", statement],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
 
 
 if __name__ == "__main__":

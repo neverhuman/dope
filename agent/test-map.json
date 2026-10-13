@@ -1473,6 +1473,10 @@
       "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
       "purpose": "verify offline bundle inventory parity, path rejection, and byte accounting"
     },
+    "research/transfer/bundle_io.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify offline bundle inventory parity, path rejection, and byte accounting"
+    },
     "research/transfer/tests/test_bundle.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
       "purpose": "verify offline bundle inventory parity, path rejection, and byte accounting"
