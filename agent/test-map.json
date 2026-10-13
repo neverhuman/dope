@@ -1576,6 +1576,42 @@
     "research/transfer/tests/test_neural_generators.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
       "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
+    },
+    "research/transfer/adapters/auditors/kumo_tabular.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_kumo_tabular -v",
+      "purpose": "verify portable offline native learner interface, raw units, recipe pins, artifact/dependency failure, query-label exclusion and observed budgets; vendor qualification remains unmeasured"
+    },
+    "research/transfer/adapters/auditors/mitra.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_other_auditors -v",
+      "purpose": "verify portable offline native learner interface, raw units, recipe pins, artifact/dependency failure, query-label exclusion and observed budgets; vendor qualification remains unmeasured"
+    },
+    "research/transfer/adapters/auditors/tabicl.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_other_auditors -v",
+      "purpose": "verify portable offline native learner interface, raw units, recipe pins, artifact/dependency failure, query-label exclusion and observed budgets; vendor qualification remains unmeasured"
+    },
+    "research/transfer/adapters/auditors/conventional.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_other_auditors -v",
+      "purpose": "verify portable offline native learner interface, raw units, recipe pins, artifact/dependency failure, query-label exclusion and observed budgets; vendor qualification remains unmeasured"
+    },
+    "research/transfer/locks/kumo-tabular.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_kumo_tabular -v",
+      "purpose": "verify portable offline native learner interface, raw units, recipe pins, artifact/dependency failure, query-label exclusion and observed budgets; vendor qualification remains unmeasured"
+    },
+    "research/transfer/locks/other-auditors.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_other_auditors -v",
+      "purpose": "verify portable offline native learner interface, raw units, recipe pins, artifact/dependency failure, query-label exclusion and observed budgets; vendor qualification remains unmeasured"
+    },
+    "research/transfer/tests/test_kumo_tabular.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_kumo_tabular -v",
+      "purpose": "verify portable offline native learner interface, raw units, recipe pins, artifact/dependency failure, query-label exclusion and observed budgets; vendor qualification remains unmeasured"
+    },
+    "research/transfer/tests/test_other_auditors.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_other_auditors -v",
+      "purpose": "verify portable offline native learner interface, raw units, recipe pins, artifact/dependency failure, query-label exclusion and observed budgets; vendor qualification remains unmeasured"
+    },
+    ".gitleaksignore": {
+      "command": "gitleaks detect --source . --no-banner --redact",
+      "purpose": "verify the exact historical public-source SHA256 exception while all other secret findings remain enforced"
     }
   }
 }
