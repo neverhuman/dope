@@ -8,33 +8,43 @@
       "repo": "autogluon/autogluon",
       "revision": "152343642ce605c95333b2b1e27e5d47675a5c13",
       "files": {
-        "mitra-model.py": "51d350328e0ae30f94fb103e7f16820fe49df3d66b1e932b4704e1c23a683b79",
-        "mitra-sklearn.py": "086002d406504363a1e428585f518f9ef4c6c8acb5bf54a03a087c2675b6481f"
+        "mitra-model.py": {
+          "sha256": "51d350328e0ae30f94fb103e7f16820fe49df3d66b1e932b4704e1c23a683b79",
+          "url": "https://raw.githubusercontent.com/autogluon/autogluon/152343642ce605c95333b2b1e27e5d47675a5c13/tabular/src/autogluon/tabular/models/mitra/mitra_model.py"
+        },
+        "mitra-sklearn.py": {
+          "sha256": "086002d406504363a1e428585f518f9ef4c6c8acb5bf54a03a087c2675b6481f",
+          "url": "https://raw.githubusercontent.com/autogluon/autogluon/152343642ce605c95333b2b1e27e5d47675a5c13/tabular/src/autogluon/tabular/models/mitra/sklearn_interface.py"
+        }
       },
-      "artifact_closure_sha256": null,
-      "file_urls": {
-        "mitra-model.py": "https://raw.githubusercontent.com/autogluon/autogluon/152343642ce605c95333b2b1e27e5d47675a5c13/tabular/src/autogluon/tabular/models/mitra/mitra_model.py",
-        "mitra-sklearn.py": "https://raw.githubusercontent.com/autogluon/autogluon/152343642ce605c95333b2b1e27e5d47675a5c13/tabular/src/autogluon/tabular/models/mitra/sklearn_interface.py"
-      }
+      "artifact_closure_sha256": null
     },
     "finetune_source": {
       "repo": "autogluon/mitra-finetune",
       "revision": "b4701e8148dc33b00ed15d7086ff59816957cde4",
       "files": {
-        "mitra-api.py": "c92c4fb0029329383a336168d3ce2c8be45186eed3f650dc59100d7cd2d3128c",
-        "mitra-modes.py": "3c0d0dc4e814cbd64049399627344be7f2069e92a3686251fcd307b8a5de6661",
-        "mitra-checkpoint.py": "cc24fa650a08e7e549c50b6b74602f122fbed1f9f8262e29e8916ba349afa9de",
-        "mitra-runner.py": "fbf912da747348a549ad33a2f33fd75d5d0a1982eccc863bc616345d1d0d761e",
-        "mitra-distribution.py": "95824cdd6c0af8e969f0e2ff51eece648cc0606f3de16daedeb52e05418d7ea6"
+        "mitra-api.py": {
+          "sha256": "c92c4fb0029329383a336168d3ce2c8be45186eed3f650dc59100d7cd2d3128c",
+          "url": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/api.py"
+        },
+        "mitra-modes.py": {
+          "sha256": "3c0d0dc4e814cbd64049399627344be7f2069e92a3686251fcd307b8a5de6661",
+          "url": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/modes.py"
+        },
+        "mitra-checkpoint.py": {
+          "sha256": "cc24fa650a08e7e549c50b6b74602f122fbed1f9f8262e29e8916ba349afa9de",
+          "url": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/checkpoint.py"
+        },
+        "mitra-runner.py": {
+          "sha256": "fbf912da747348a549ad33a2f33fd75d5d0a1982eccc863bc616345d1d0d761e",
+          "url": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/runner.py"
+        },
+        "mitra-distribution.py": {
+          "sha256": "95824cdd6c0af8e969f0e2ff51eece648cc0606f3de16daedeb52e05418d7ea6",
+          "url": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/distribution.py"
+        }
       },
-      "artifact_closure_sha256": null,
-      "file_urls": {
-        "mitra-api.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/api.py",
-        "mitra-modes.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/modes.py",
-        "mitra-checkpoint.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/checkpoint.py",
-        "mitra-runner.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/runner.py",
-        "mitra-distribution.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/distribution.py"
-      }
+      "artifact_closure_sha256": null
     },
     "checkpoints": {
       "classification": {
@@ -46,6 +56,12 @@
             "bytes": 302717904,
             "sha256": "5ffab0e2cf52f61c5b7c7eb1e8542996736d1023a0212190cc09abc2119a1e09",
             "verification": "upstream LFS metadata only"
+          },
+          "config.json": {
+            "bytes": 86,
+            "sha256": "2c96c24dd25f64e92753f6f2ba00cc7833b9923459403dcd8504e8700c0995df",
+            "verification": "public configuration metadata acquired and hashed at pinned revision; model weights not acquired",
+            "url": "https://huggingface.co/autogluon/mitra-classifier-2/resolve/edada0d20759c58ada8c8605c25f22f6e98ea5f0/config.json"
           }
         },
         "local_verification": false
@@ -59,6 +75,12 @@
             "bytes": 306776952,
             "sha256": "8c90b8f281a793f9feb19f8fc3c5529c58ac844dd7ffc690a0fdbb96fae0967c",
             "verification": "upstream LFS metadata only"
+          },
+          "config.json": {
+            "bytes": 84,
+            "sha256": "f760c38c8884757f6141c1fd2e841e93a470be052dc5a4b489790097a002f0e6",
+            "verification": "public configuration metadata acquired and hashed at pinned revision; model weights not acquired",
+            "url": "https://huggingface.co/autogluon/mitra-regressor-2/resolve/246c7d310fff04296a2388df5f448e3ffe809283/config.json"
           }
         },
         "local_verification": false
@@ -74,7 +96,7 @@
     "precision": "bfloat16",
     "context_cap": 8192,
     "query_batch_cap": 1024,
-    "missing_config": "config.json must be separately acquired, hashed and bound in recipe",
+    "missing_config": "config.json digest is pinned with the task checkpoint; only config.json and model.safetensors are permitted in the supplied vendor snapshot directory",
     "native_retries": "native OOM support reduction is not accepted as full context; executor must count all attempts and reject changed consumption",
     "environment": "MITRA_* overrides refused; pinned default support/fit/heldout/memo behavior only",
     "cost_receipts": "port records requested child fits and returned/failed native calls; actual child fits, native retries and consumed per-child rows require executor observations and are never inferred as measured zero"
@@ -85,14 +107,16 @@
       "repo": "soda-inria/tabicl",
       "revision": "10719e21fd72b8945d4a4f9ae077e350ba8650d9",
       "files": {
-        "tabicl-classifier.py": "fd578aef086353b47834f29a719191944ab528f04123ecef01be3e48a7ecc84b",
-        "tabicl-regressor.py": "6ae77f1ab6bb76dc7d4e0c03cc9bf1dc29f7398d5bf071dff051c7497a0cea10"
+        "tabicl-classifier.py": {
+          "sha256": "fd578aef086353b47834f29a719191944ab528f04123ecef01be3e48a7ecc84b",
+          "url": "https://raw.githubusercontent.com/soda-inria/tabicl/10719e21fd72b8945d4a4f9ae077e350ba8650d9/src/tabicl/sklearn/classifier.py"
+        },
+        "tabicl-regressor.py": {
+          "sha256": "6ae77f1ab6bb76dc7d4e0c03cc9bf1dc29f7398d5bf071dff051c7497a0cea10",
+          "url": "https://raw.githubusercontent.com/soda-inria/tabicl/10719e21fd72b8945d4a4f9ae077e350ba8650d9/src/tabicl/sklearn/regressor.py"
+        }
       },
-      "artifact_closure_sha256": null,
-      "file_urls": {
-        "tabicl-classifier.py": "https://raw.githubusercontent.com/soda-inria/tabicl/10719e21fd72b8945d4a4f9ae077e350ba8650d9/src/tabicl/sklearn/classifier.py",
-        "tabicl-regressor.py": "https://raw.githubusercontent.com/soda-inria/tabicl/10719e21fd72b8945d4a4f9ae077e350ba8650d9/src/tabicl/sklearn/regressor.py"
-      }
+      "artifact_closure_sha256": null
     },
     "checkpoint": {
       "repo": "jingang/TabICL",

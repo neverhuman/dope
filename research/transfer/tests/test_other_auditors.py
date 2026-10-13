@@ -66,14 +66,15 @@ class PortFixture:
         root = Path(directory.name)
         def artifact(name, payload):
             path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(payload)
             return path
         code = artifact("code", b"fixture code, not vendor source")
         dependency = artifact("dependency", b"fixture dependency, not installed closure")
         license_code = artifact("license-code", b"fixture code license")
-        weights = artifact("model.safetensors", b"fixture weights, not pretrained") if mode != "scratch" else None
+        weights = artifact("checkpoint/model.safetensors", b"fixture weights, not pretrained") if mode != "scratch" else None
         license_weights = artifact("license-weights", b"fixture weights license") if weights else None
-        self.config = artifact("config.json", b"{}")
+        self.config = artifact("checkpoint/config.json" if weights else "config.json", b"{}")
         licenses = (("code", "fixture_license", file_sha256(license_code)),)
         if weights:
             licenses += (("weights", "fixture_license", file_sha256(license_weights)),)
@@ -248,7 +249,8 @@ class OtherAuditorTests(unittest.TestCase):
         self.assertEqual((kwargs["fine_tune_steps"], kwargs["seed"]), (0, 11))
         self.assertEqual(kwargs["hf_model"], str(fixture.artifacts.weights.parent))
         self.assertEqual(port.predict(query(), 12).values, ((.7, .3), (.2, .8)))
-        self.assertEqual(port.attempts, ())
+        self.assertEqual(port.attempts[0]["operation"], "frozen_classifier_fit")
+        self.assertEqual(port.attempts[0]["status"], "returned")
 
     def test_mitra_regression_charges_prediction_time_fits_and_refuses_frozen_mode(self):
         recipe = MitraRecipe("regression", pin("{}"))
@@ -259,8 +261,9 @@ class OtherAuditorTests(unittest.TestCase):
         self.assertEqual(fixture.kwargs[0]["num_bag_folds"], 8)
         self.assertEqual(port.predict(query(), 12).values, ((70.,), (90.,)))
         port.predict(query(), 13)
-        self.assertEqual(len(port.attempts), 2)
-        self.assertTrue(all(a["requested_child_fits"] == 8 for a in port.attempts))
+        self.assertEqual(port.attempts[0]["operation"], "regression_context_registration")
+        self.assertEqual(len(port.attempts), 3)
+        self.assertTrue(all(a["requested_child_fits"] == 8 for a in port.attempts[1:]))
         self.assertEqual(fixture.events, ["prepare", "predict", "predict"])
         frozen = replace(fixture.identity, mode="frozen_context", query_policy="batch")
         with self.assertRaisesRegex(AdapterUnavailable, "frozen_v2_regression_unavailable"):
@@ -268,7 +271,7 @@ class OtherAuditorTests(unittest.TestCase):
         with patch.object(fixture.native, "predict", side_effect=RuntimeError("source_secret")):
             with self.assertRaisesRegex(AdapterError, "backend_failed"):
                 port.predict(query(), 14)
-        self.assertEqual(len(port.attempts), 3)
+        self.assertEqual(len(port.attempts), 4)
         self.assertEqual(port.attempts[-1]["status"], "failed")
         port.attempts[0]["status"] = "mutated"
         self.assertEqual(port.attempts[0]["status"], "returned")
@@ -325,6 +328,36 @@ class OtherAuditorTests(unittest.TestCase):
             with self.assertRaises(AdapterUnavailable):
                 fixture.adapter(MitraAdapter, recipe).prepare(batch(), 7)
         self.assertEqual(fixture.kwargs, [])
+
+    def test_mitra_refuses_undeclared_snapshot_entries_before_vendor_loading(self):
+        recipe = MitraRecipe("regression", pin("{}"))
+        for kind in ("file", "directory", "symlink"):
+            with self.subTest(kind=kind):
+                fixture = PortFixture(self, recipe, "mitra_v2", recipe.code_revision, mode="fine_tuning")
+                extra = fixture.config.with_name("source_secret")
+                if kind == "file":
+                    extra.write_bytes(b"undeclared")
+                elif kind == "directory":
+                    extra.mkdir()
+                else:
+                    extra.symlink_to(fixture.config)
+                with self.assertRaises(AdapterUnavailable) as caught:
+                    fixture.adapter(MitraAdapter, recipe).prepare(batch(), 7)
+                self.assertNotIn("source_secret", str(caught.exception))
+                self.assertEqual(fixture.kwargs, [])
+
+    def test_mitra_native_config_is_tied_to_public_checkpoint_before_import(self):
+        recipe = MitraRecipe("classification", pin("{}"), class_order=("a", "b"))
+        fixture = PortFixture(self, recipe, "mitra_v2", recipe.code_revision)
+        lock = json.loads((ROOT / "research/transfer/locks/other-auditors.json").read_text())
+        pins = lock["mitra"]["checkpoints"]["classification"]["files"]
+        model = replace(fixture.identity, weights_sha256=pins["model.safetensors"]["sha256"],
+                        dependencies=(("autogluon.tabular", "1.6.1", fixture.identity.dependencies[0][2]),))
+        port = fixture.adapter(MitraAdapter, recipe, model, replace(fixture.runtime, factory=None))
+        # Exercise loader preflight independently of byte verification: no
+        # official model weights are acquired or imported for this negative test.
+        with self.assertRaisesRegex(AdapterUnavailable, "checkpoint_config_unavailable"):
+            port._create_backend(7)
 
     def test_tuning_rejects_overlap_mutable_parameters_and_reserved_resource_overrides(self):
         with self.assertRaisesRegex(AdapterError, "invalid_parameters"):

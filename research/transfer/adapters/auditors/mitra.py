@@ -87,6 +87,24 @@ class MitraAdapter(ObservedLearner):
     def attempts(self):
         return tuple(dict(a) for a in self._attempts)
 
+    def _verify_snapshot(self, weights):
+        """Bounded inventory: the vendor receives exactly the two pinned files."""
+        expected, seen = {"config.json", "model.safetensors"}, set()
+        try:
+            fd = os.open(Path(weights).parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            try:
+                with os.scandir(fd) as entries:
+                    for entry in entries:
+                        if entry.name not in expected or not entry.is_file(follow_symlinks=False):
+                            raise AdapterUnavailable("checkpoint_inventory_unavailable")
+                        seen.add(entry.name)
+            finally:
+                os.close(fd)
+        except OSError:
+            raise AdapterUnavailable("checkpoint_inventory_unavailable") from None
+        if seen != expected or Path(weights).name != "model.safetensors":
+            raise AdapterUnavailable("checkpoint_inventory_unavailable")
+
     def _create_backend(self, seed):
         # The pinned finetune package reads numerous MITRA_* switches. Its
         # defaults are code-pinned; custom overrides need a separate recipe.
@@ -94,6 +112,7 @@ class MitraAdapter(ObservedLearner):
             raise AdapterUnavailable("environment_override_unavailable")
         weights = self._runtime.artifacts.weights
         _require(weights is not None, "missing_weights")
+        self._verify_snapshot(weights)
         config = Path(weights).with_name("config.json")
         _require(self._runtime.artifacts.ancillary == ((config, self.recipe.config_sha256),), "config_pin_mismatch")
         if self.recipe.task == "classification":
@@ -111,6 +130,8 @@ class MitraAdapter(ObservedLearner):
         pins = json.loads(LOCK.read_text())["mitra"]["checkpoints"][self.recipe.task]
         _require(Path(weights).name == "model.safetensors" and
                  self.identity.weights_sha256 == pins["files"]["model.safetensors"]["sha256"], "checkpoint_task_mismatch")
+        if self.recipe.config_sha256 != pins["files"]["config.json"]["sha256"]:
+            raise AdapterUnavailable("checkpoint_config_unavailable")
         if self.recipe.task == "classification":
             from autogluon.tabular.models.mitra.sklearn_interface import MitraClassifier
             return MitraClassifier(**kwargs)
@@ -119,10 +140,22 @@ class MitraAdapter(ObservedLearner):
         return MitraFinetune(**kwargs)
 
     def _fit_native(self, model, x, y):
-        if self.recipe.task == "classification":
-            model.fit(X=x, y=y, time_limit=self.identity.resources.wall_seconds)
-        else:
-            model.fit(x, y)
+        attempt = {"event": "prepare", "requested_context_rows": len(y), "status": "started",
+                   "operation": "frozen_classifier_fit" if self.recipe.task == "classification" else
+                   "regression_context_registration"}
+        self._attempts.append(attempt)
+        try:
+            if self.recipe.task == "classification":
+                model.fit(X=x, y=y, time_limit=self.identity.resources.wall_seconds)
+            else:
+                # Pinned MitraFinetune.fit registers context; its bagged
+                # parameter updates occur in each predict call. Registration
+                # still has observed wall/memory costs through _Adapter._call.
+                model.fit(x, y)
+        except BaseException:
+            attempt["status"] = "failed"
+            raise
+        attempt["status"] = "returned"
 
     def _native_classes(self):
         # Pinned MitraClassifier returns ascending contiguous target codes;
