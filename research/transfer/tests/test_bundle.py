@@ -31,12 +31,19 @@ GOLDEN = json.loads((ROOT / "schemas/bundle-golden-v1.json").read_bytes())
 SCHEMA = json.loads((ROOT / "schemas/generator-bundle-v1.schema.json").read_text())
 
 
+def workspace_temp():
+    # A fresh checkout has no cargo target/ yet. TemporaryDirectory does not create its parent.
+    parent = ROOT / "target"
+    parent.mkdir(parents=True, exist_ok=True)
+    return tempfile.TemporaryDirectory(dir=parent)
+
+
 def stage(case, mutate=None):
     manifest = copy.deepcopy(case["manifest"])
     if mutate is not None:
         mutate(manifest)
     raw = canonical_json(manifest)
-    directory = tempfile.TemporaryDirectory(dir=ROOT / "target")
+    directory = workspace_temp()
     root = Path(directory.name)
     (root / "manifest.json").write_bytes(raw)
     for name, encoded in case["files_hex"].items():
@@ -323,7 +330,7 @@ class BundleGoldenTests(unittest.TestCase):
             "version": 1,
         }
         raw = canonical_json(manifest)
-        with tempfile.TemporaryDirectory(dir=ROOT / "target") as directory:
+        with workspace_temp() as directory:
             root = Path(directory)
             (root / "manifest.json").write_bytes(raw)
             (root / "payload.dpk").write_bytes(payload)
@@ -380,7 +387,7 @@ class BundleGoldenTests(unittest.TestCase):
             self.assertEqual(charged_sampling_bytes(value), before)
 
     def test_directory_stream_stops_on_the_first_undeclared_or_cap(self):
-        directory = tempfile.TemporaryDirectory(dir=ROOT / "target")
+        directory = workspace_temp()
         root = Path(directory.name)
         (root / "extra.bin").write_bytes(b"x")
         flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -409,7 +416,7 @@ class BundleGoldenTests(unittest.TestCase):
                 os.close(fd)
 
     def test_replaced_directory_path_does_not_change_the_fd_listing(self):
-        directory = tempfile.TemporaryDirectory(dir=ROOT / "target")
+        directory = workspace_temp()
         base = Path(directory.name)
         real = base / "real"
         decoy = base / "decoy"
