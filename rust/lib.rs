@@ -32,7 +32,9 @@ pub mod release;
 pub mod representation;
 pub mod router;
 pub mod sample;
+pub mod schema;
 pub mod transfer_metrics;
+pub mod typed_data;
 
 pub use auditor::{AuditorBackend, auditor_backend};
 pub use calibration::{
