@@ -10,7 +10,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = '49cf19ab42257408dbbeaeffcbaedabcebd2352df1f930ecb74b430e91c0120c'
+LOCK_SHA256 = '3794ced8967151d7c86bdd14566121bdfeb4a551a98f3009017b7418dc4f6d3c'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
 CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
 CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
@@ -29,6 +29,8 @@ V2_PANEL = PREFIX + 'review-fixes-v2/panel.json'
 V2_RECORD = PREFIX + 's3-lineage-record.json'
 V2_PREDECLARE = 'research/benchmark/review_fixes/predeclare_v2.json'
 V2_RENDERER = 'docs/whitepaper/scripts/review_v2_emit.py'
+V2_FAMILY = PREFIX + 'review-fixes-v2/family.json'
+V2_FAMILY_RENDERER = 'docs/whitepaper/scripts/review_v2_family.py'
 JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, V2_LEDGER, V2_FITS)
 OUTPUT_PREFIXES = ('review-', 'v2-')
 
@@ -89,6 +91,10 @@ def authenticated_graph():
             if panel != V2_PANEL:
                 raise ValueError('v2 renderer requires the pinned v2 panel')
             authenticated_v2(inputs)
+        elif entry['path'] == V2_FAMILY_RENDERER:
+            if panel != V2_FAMILY or V2_PANEL not in inputs:
+                raise ValueError('v2 family renderer requires the pinned family file and v2 panel')
+            authenticated_v2_family(inputs)
         replayed.add(panel)
     return graph
 
@@ -178,6 +184,24 @@ def authenticated_v2(inputs):
         raise ValueError('v2 scalar ledger does not reproduce the pinned panel')
 
 
+def authenticated_v2_family(inputs):
+    """Recompute the source-family sensitivity from the pinned v2 scalar ledger before it is rendered."""
+    names = (V2_LEDGER, V2_RECORD, V2_PREDECLARE)
+    if any(name not in inputs for name in names):
+        raise ValueError('v2 family renderer requires its pinned ledger, lineage record and predeclaration')
+    cells = [json.loads(line) for line in inputs[V2_LEDGER].splitlines()]
+    if not cells or any(not isinstance(item, dict) or item.get('official_tests_opened') is not False
+                        for item in cells):
+        raise ValueError('v2 ledger official test flag is not closed')
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from research.benchmark.review_fixes import v2_family, v2_panel
+    family = v2_family.reduce(cells, v2_panel.names_of(json.loads(inputs[V2_RECORD])),
+                              predeclare=inputs[V2_PREDECLARE])
+    if v2_panel.canonical(family).encode() != inputs[V2_FAMILY]:
+        raise ValueError('v2 scalar ledger does not reproduce the pinned family file')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true')
@@ -193,7 +217,7 @@ def main():
     if graph.get('format') != 'dope-review-paper-build-v1':
         raise ValueError('invalid review paper graph')
     if args.check_inputs:
-        print('review paper inputs authenticated; control scalar panel reproduced; declared wave2 and v2 scalar panels reproduced')
+        print('review paper inputs authenticated; control scalar panel reproduced; declared wave2 and v2 scalar panels and v2 family file reproduced')
         return
     declared = set()
     for entry in graph['scripts']:

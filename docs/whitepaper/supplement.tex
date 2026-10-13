@@ -13,6 +13,7 @@ $^1$NEVERHUMAN Research}
 \input{generated/numbers.tex}
 \input{generated/figure-spec.tex}
 \input{generated/v2-numbers.tex}
+\input{generated/v2-family-numbers.tex}
 \maketitle
 \fancyhead{}
 \renewcommand{\headrulewidth}{0pt}
@@ -254,6 +255,10 @@ A Friedman test and a Nemenyi critical difference compare the four density metho
 \footnotesize
 \input{generated/v2-seeds.tex}
 \end{table}
+
+\cref{tab:v2-family} repeats the first version's source-family sensitivity on the five-seed panel under the inherited family rule: the excluding-simulated rows drop the four simulated families, and inside one family the family is fixed while its lineages, and each lineage's fit seeds, are resampled.
+{\scriptsize\setlength{\tabcolsep}{2pt}
+\input{generated/v2-family-table.tex}}
 
 \subsection{Fit-seed-11 review panels}
 The tables below are the fit-seed-$11$ review panels that preceded the five-seed refit. A method with two configurations keeps one row per configuration. Their intervals are the family-cluster bootstrap of the median, their equivalence column is the v1 mean-difference test, and their Holm families are split by size: nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests per size. Forest-Flow cells store no null loss, so its loss-path columns in \cref{tab:review-denominator} are empty while its informative count matches the size table. The sensitivity column of that table is the capped cohort, a different denominator from the headline.

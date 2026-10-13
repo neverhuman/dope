@@ -1,0 +1,92 @@
+\begin{longtable}{lllllrll}
+\caption{\textbf{Source-family sensitivity, five-seed panel.} A DOPE row is DOPE's median retention within the scope; a comparator row is the Hodges--Lehmann DOPE-minus-comparator difference on the lineages both arms complete there. The excluding-simulated rows drop the four simulated families; inside one family the family is fixed and its lineages are resampled, and fit seeds are resampled inside each lineage separately for each arm. A one-seed comparator contributes its single fit. Linear and MLP contrasts are in the family file. These rows are a sensitivity outside every Holm family.}\label{tab:v2-family}\\
+\toprule
+Scope & Size & Auditor & Row & $n$ & Estimate & 95\% nested CI & W/T/L \\
+\midrule
+\endfirsthead
+\toprule
+Scope & Size & Auditor & Row & $n$ & Estimate & 95\% nested CI & W/T/L \\
+\midrule
+\endhead
+excl.\ simulated & $n$ & CatBoost & DOPE (ours) & 34 & $0.839$ & $[0.728, 0.913]$ & --- \\
+excl.\ simulated & $n$ & CatBoost & $-$ ARF (author default) & 34 & $0.055$ & $[-0.036, 0.117]$ & 20/0/14 \\
+excl.\ simulated & $n$ & CatBoost & $-$ TabSyn (scaled schedule) & 33 & $-0.023$ & $[-0.089, 0.034]$ & 14/0/19 \\
+excl.\ simulated & $n$ & CatBoost & $-$ Gaussian copula & 34 & $0.140$ & $[0.076, 0.201]$ & 30/0/4 \\
+excl.\ simulated & $n$ & CatBoost & $-$ Chow-Liu tree & 34 & $0.471$ & $[0.346, 0.656]$ & 33/0/1 \\
+excl.\ simulated & $n$ & CatBoost & $-$ Independent marginals & 34 & $0.866$ & $[0.788, 0.923]$ & 34/0/0 \\
+excl.\ simulated & $n$ & Linear & DOPE (ours) & 32 & $0.992$ & $[0.961, 0.996]$ & --- \\
+excl.\ simulated & $n$ & MLP & DOPE (ours) & 31 & $0.946$ & $[0.892, 0.994]$ & --- \\
+excl.\ simulated & $4n$ & CatBoost & DOPE (ours) & 34 & $0.900$ & $[0.785, 0.968]$ & --- \\
+excl.\ simulated & $4n$ & CatBoost & $-$ ARF (author default) & 34 & $0.015$ & $[-0.069, 0.081]$ & 17/0/17 \\
+excl.\ simulated & $4n$ & CatBoost & $-$ TabSyn (scaled schedule) & 33 & $-0.035$ & $[-0.096, 0.016]$ & 14/0/19 \\
+excl.\ simulated & $4n$ & CatBoost & $-$ Gaussian copula & 34 & $0.142$ & $[0.073, 0.203]$ & 25/0/9 \\
+excl.\ simulated & $4n$ & CatBoost & $-$ Chow-Liu tree & 34 & $0.488$ & $[0.330, 0.696]$ & 34/0/0 \\
+excl.\ simulated & $4n$ & CatBoost & $-$ Independent marginals & 34 & $0.876$ & $[0.782, 0.950]$ & 34/0/0 \\
+excl.\ simulated & $4n$ & Linear & DOPE (ours) & 32 & $0.992$ & $[0.970, 1.000]$ & --- \\
+excl.\ simulated & $4n$ & MLP & DOPE (ours) & 31 & $1.160$ & $[1.019, 1.257]$ & --- \\
+feynman & $n$ & CatBoost & DOPE (ours) & 20 & $0.951$ & $[0.927, 0.983]$ & --- \\
+feynman & $n$ & CatBoost & $-$ ARF (author default) & 20 & $0.064$ & $[0.026, 0.101]$ & 18/0/2 \\
+feynman & $n$ & CatBoost & $-$ TabSyn (scaled schedule) & 20 & $-0.006$ & $[-0.048, 0.010]$ & 8/0/12 \\
+feynman & $n$ & CatBoost & $-$ Gaussian copula & 20 & $0.170$ & $[0.112, 0.236]$ & 20/0/0 \\
+feynman & $n$ & CatBoost & $-$ Chow-Liu tree & 20 & $0.325$ & $[0.236, 0.540]$ & 20/0/0 \\
+feynman & $n$ & CatBoost & $-$ Independent marginals & 20 & $0.994$ & $[0.958, 1.021]$ & 20/0/0 \\
+feynman & $n$ & Linear & DOPE (ours) & 20 & $0.990$ & $[0.984, 0.999]$ & --- \\
+feynman & $n$ & MLP & DOPE (ours) & 20 & $0.971$ & $[0.944, 0.994]$ & --- \\
+feynman & $4n$ & CatBoost & DOPE (ours) & 20 & $0.980$ & $[0.954, 0.993]$ & --- \\
+feynman & $4n$ & CatBoost & $-$ ARF (author default) & 20 & $0.048$ & $[0.013, 0.089]$ & 18/0/2 \\
+feynman & $4n$ & CatBoost & $-$ TabSyn (scaled schedule) & 20 & $-0.015$ & $[-0.068, 0.002]$ & 7/0/13 \\
+feynman & $4n$ & CatBoost & $-$ Gaussian copula & 20 & $0.159$ & $[0.106, 0.210]$ & 20/0/0 \\
+feynman & $4n$ & CatBoost & $-$ Chow-Liu tree & 20 & $0.297$ & $[0.214, 0.490]$ & 20/0/0 \\
+feynman & $4n$ & CatBoost & $-$ Independent marginals & 20 & $0.976$ & $[0.945, 0.988]$ & 20/0/0 \\
+feynman & $4n$ & Linear & DOPE (ours) & 20 & $0.994$ & $[0.984, 0.998]$ & --- \\
+feynman & $4n$ & MLP & DOPE (ours) & 20 & $1.018$ & $[0.997, 1.136]$ & --- \\
+strogatz & $n$ & CatBoost & DOPE (ours) & 14 & $0.775$ & $[0.493, 0.975]$ & --- \\
+strogatz & $n$ & CatBoost & $-$ ARF (author default) & 14 & $0.006$ & $[-0.126, 0.191]$ & 8/0/6 \\
+strogatz & $n$ & CatBoost & $-$ TabSyn (scaled schedule) & 14 & $0.015$ & $[-0.095, 0.353]$ & 8/0/6 \\
+strogatz & $n$ & CatBoost & $-$ Gaussian copula & 14 & $0.239$ & $[0.063, 0.546]$ & 10/0/4 \\
+strogatz & $n$ & CatBoost & $-$ Chow-Liu tree & 14 & $1.127$ & $[0.386, 2.814]$ & 11/0/3 \\
+strogatz & $n$ & CatBoost & $-$ Independent marginals & 14 & $0.844$ & $[0.654, 1.033]$ & 14/0/0 \\
+strogatz & $n$ & Linear & DOPE (ours) & 13 & $0.968$ & $[0.818, 0.996]$ & --- \\
+strogatz & $n$ & MLP & DOPE (ours) & 11 & $0.974$ & $[0.895, 1.008]$ & --- \\
+strogatz & $4n$ & CatBoost & DOPE (ours) & 14 & $0.836$ & $[0.541, 0.975]$ & --- \\
+strogatz & $4n$ & CatBoost & $-$ ARF (author default) & 14 & $-0.034$ & $[-0.132, 0.097]$ & 5/0/9 \\
+strogatz & $4n$ & CatBoost & $-$ TabSyn (scaled schedule) & 14 & $0.021$ & $[-0.112, 0.690]$ & 7/0/7 \\
+strogatz & $4n$ & CatBoost & $-$ Gaussian copula & 14 & $0.287$ & $[0.044, 0.624]$ & 10/0/4 \\
+strogatz & $4n$ & CatBoost & $-$ Chow-Liu tree & 14 & $1.534$ & $[0.364, 2.959]$ & 12/0/2 \\
+strogatz & $4n$ & CatBoost & $-$ Independent marginals & 14 & $0.877$ & $[0.672, 1.084]$ & 14/0/0 \\
+strogatz & $4n$ & Linear & DOPE (ours) & 13 & $0.942$ & $[0.778, 0.997]$ & --- \\
+strogatz & $4n$ & MLP & DOPE (ours) & 11 & $1.384$ & $[1.019, 1.859]$ & --- \\
+fri & $n$ & CatBoost & DOPE (ours) & 25 & $0.632$ & $[0.553, 0.786]$ & --- \\
+fri & $n$ & CatBoost & $-$ ARF (author default) & 25 & $0.282$ & $[0.134, 0.440]$ & 20/0/5 \\
+fri & $n$ & CatBoost & $-$ TabSyn (scaled schedule) & 25 & $-0.026$ & $[-0.140, 0.115]$ & 13/0/12 \\
+fri & $n$ & CatBoost & $-$ Gaussian copula & 25 & $0.324$ & $[0.236, 0.400]$ & 24/0/1 \\
+fri & $n$ & CatBoost & $-$ Chow-Liu tree & 25 & $0.223$ & $[0.124, 0.318]$ & 19/0/6 \\
+fri & $n$ & CatBoost & $-$ Independent marginals & 25 & $0.682$ & $[0.599, 0.771]$ & 25/0/0 \\
+fri & $n$ & Linear & DOPE (ours) & 24 & $0.973$ & $[0.904, 0.999]$ & --- \\
+fri & $n$ & MLP & DOPE (ours) & 21 & $0.817$ & $[0.636, 0.983]$ & --- \\
+fri & $4n$ & CatBoost & DOPE (ours) & 25 & $0.774$ & $[0.613, 0.847]$ & --- \\
+fri & $4n$ & CatBoost & $-$ ARF (author default) & 25 & $0.245$ & $[0.079, 0.411]$ & 17/0/8 \\
+fri & $4n$ & CatBoost & $-$ TabSyn (scaled schedule) & 25 & $-0.014$ & $[-0.140, 0.117]$ & 13/0/12 \\
+fri & $4n$ & CatBoost & $-$ Gaussian copula & 25 & $0.338$ & $[0.246, 0.421]$ & 25/0/0 \\
+fri & $4n$ & CatBoost & $-$ Chow-Liu tree & 25 & $0.203$ & $[0.099, 0.299]$ & 21/0/4 \\
+fri & $4n$ & CatBoost & $-$ Independent marginals & 25 & $0.757$ & $[0.664, 0.852]$ & 25/0/0 \\
+fri & $4n$ & Linear & DOPE (ours) & 24 & $0.996$ & $[0.981, 1.022]$ & --- \\
+fri & $4n$ & MLP & DOPE (ours) & 21 & $1.245$ & $[0.973, 1.584]$ & --- \\
+bng & $n$ & CatBoost & DOPE (ours) & 6 & $0.923$ & $[0.095, 0.990]$ & --- \\
+bng & $n$ & CatBoost & $-$ ARF (author default) & 6 & $0.110$ & $[-0.322, 0.197]$ & 5/0/1 \\
+bng & $n$ & CatBoost & $-$ TabSyn (scaled schedule) & 6 & $0.164$ & $[-0.004, 0.304]$ & 5/0/1 \\
+bng & $n$ & CatBoost & $-$ Gaussian copula & 6 & $0.082$ & $[-0.038, 0.316]$ & 4/0/2 \\
+bng & $n$ & CatBoost & $-$ Chow-Liu tree & 6 & $0.159$ & $[-0.007, 0.445]$ & 4/0/2 \\
+bng & $n$ & CatBoost & $-$ Independent marginals & 6 & $0.944$ & $[0.664, 1.184]$ & 6/0/0 \\
+bng & $n$ & Linear & DOPE (ours) & 5 & $0.984$ & $[0.855, 0.999]$ & --- \\
+bng & $n$ & MLP & DOPE (ours) & 5 & $1.149$ & $[0.975, 1.624]$ & --- \\
+bng & $4n$ & CatBoost & DOPE (ours) & 6 & $0.962$ & $[0.246, 1.018]$ & --- \\
+bng & $4n$ & CatBoost & $-$ ARF (author default) & 6 & $-0.042$ & $[-0.461, 0.103]$ & 3/0/3 \\
+bng & $4n$ & CatBoost & $-$ TabSyn (scaled schedule) & 6 & $0.170$ & $[0.067, 0.273]$ & 6/0/0 \\
+bng & $4n$ & CatBoost & $-$ Gaussian copula & 6 & $-0.024$ & $[-0.112, 0.068]$ & 3/0/3 \\
+bng & $4n$ & CatBoost & $-$ Chow-Liu tree & 6 & $0.077$ & $[-0.035, 0.493]$ & 4/0/2 \\
+bng & $4n$ & CatBoost & $-$ Independent marginals & 6 & $0.980$ & $[0.568, 1.118]$ & 6/0/0 \\
+bng & $4n$ & Linear & DOPE (ours) & 5 & $0.983$ & $[0.883, 1.003]$ & --- \\
+bng & $4n$ & MLP & DOPE (ours) & 5 & $1.134$ & $[1.026, 3.107]$ & --- \\
+\bottomrule
+\end{longtable}
