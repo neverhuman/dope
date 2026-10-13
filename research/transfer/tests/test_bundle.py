@@ -475,6 +475,22 @@ class BundleGoldenTests(unittest.TestCase):
         self.assertEqual(dictionary["charged_sampling_bytes"], 19)
         self.assertEqual(dictionary["dictionary_bytes"], 5)
 
+    def test_either_import_order_loads_bundle_io(self):
+        import subprocess
+        import sys
+        for statement in (
+            "import research.transfer.bundle_io, research.transfer.bundle",
+            "import research.transfer.bundle, research.transfer.bundle_io",
+        ):
+            completed = subprocess.run(
+                [sys.executable, "-B", "-c", statement],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
