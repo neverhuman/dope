@@ -152,7 +152,11 @@ pub(crate) fn opaque_id(id: &str) -> bool {
     id.len() == 5 && id.starts_with('c') && id.as_bytes()[1..].iter().all(u8::is_ascii_digit)
 }
 
-pub(crate) fn validate_domain(dtype: ColumnType, domain: &Option<ColumnDomain>) -> bool {
+pub(crate) fn validate_domain(
+    dtype: ColumnType,
+    domain: &Option<ColumnDomain>,
+    max_token_bytes: usize,
+) -> bool {
     match domain {
         None => true,
         Some(ColumnDomain::Numeric { lower, upper }) => {
@@ -164,7 +168,9 @@ pub(crate) fn validate_domain(dtype: ColumnType, domain: &Option<ColumnDomain>) 
             dtype == ColumnType::Nominal
                 && !values.is_empty()
                 && values.len() <= 4096
-                && values.iter().all(|x| !x.is_empty() && x.len() <= 4096)
+                && values
+                    .iter()
+                    .all(|x| !x.is_empty() && x.len() <= max_token_bytes)
                 && values.iter().collect::<BTreeSet<_>>().len() == values.len()
         }
     }
@@ -212,7 +218,7 @@ impl TableSchemaV1 {
             if matches!(c.dtype, ColumnType::DateTime | ColumnType::Text) {
                 return Err(error("unsupported_logical_type"));
             }
-            if !validate_domain(c.dtype, &c.domain) {
+            if !validate_domain(c.dtype, &c.domain, MAX_SCHEMA_BYTES) {
                 return Err(error("invalid_declared_domain"));
             }
             let mut tokens = BTreeSet::new();

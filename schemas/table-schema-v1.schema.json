@@ -187,7 +187,8 @@
           "items": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 4096
+            "maxLength": 2097152,
+            "description": "The complete private schema is bounded to 2 MiB. At CSV intake, each categorical token must also fit InputLimits.max_field_bytes; retained state uses the stored fitting limit."
           }
         }
       }

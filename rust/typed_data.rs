@@ -76,6 +76,15 @@ impl TypedTable {
         {
             return Err(SchemaError::new("invalid_input_limits", None, None));
         }
+        for (index, column) in schema.columns.iter().enumerate() {
+            if !validate_domain(column.dtype, &column.domain, limits.max_field_bytes) {
+                return Err(SchemaError::new(
+                    "invalid_declared_domain",
+                    None,
+                    Some(index + 1),
+                ));
+            }
+        }
         let cap = limits
             .max_bytes
             .checked_add(1)

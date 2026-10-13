@@ -564,6 +564,121 @@ fn retained_field_limit_defaults_for_prior_v1_states_and_refuses_zero() {
 }
 
 #[test]
+fn declared_category_tokens_follow_the_fitting_field_byte_limit() {
+    for field_limit in [4, 8192] {
+        let token = "é".repeat(field_limit / 2);
+        assert_eq!(token.len(), field_limit);
+        let mut value = declaration();
+        value["columns"][0]["dtype"] = json!("nominal");
+        value["columns"][0]["domain"] = json!({"kind":"categorical", "values":[token]});
+        let csv = format!("private_measurement,private_outcome\n{token},1\n");
+        let data = TypedTable::read_csv(
+            csv.as_bytes(),
+            parse(&value).unwrap(),
+            InputLimits {
+                max_field_bytes: field_limit,
+                ..InputLimits::default()
+            },
+        )
+        .unwrap();
+        let bytes = fit_transform(&data, &[0])
+            .unwrap()
+            .sampling_state_bytes()
+            .unwrap();
+        drop(data);
+        let loaded = FittedTransforms::reload(&bytes).unwrap();
+        assert_eq!(loaded.required_sampling_bytes().unwrap(), bytes.len());
+        let too_long = format!("{token}a");
+        let cell = Cell::Category(token);
+        assert_eq!(loaded.transform_cell("c0001", &cell).unwrap(), cell);
+        assert_eq!(
+            loaded
+                .transform_cell("c0001", &Cell::Category(too_long))
+                .unwrap_err()
+                .code,
+            "field_bytes_exceeded"
+        );
+        assert_eq!(
+            loaded
+                .transform_cell("c0001", &Cell::Category("z".into()))
+                .unwrap(),
+            Cell::Mask(MaskState::UnknownCategory)
+        );
+    }
+}
+
+#[test]
+fn domain_token_over_the_input_limit_is_refused_before_csv_read() {
+    struct UnreadInput;
+    impl std::io::Read for UnreadInput {
+        fn read(&mut self, _: &mut [u8]) -> std::io::Result<usize> {
+            panic!("domain validation must precede source reads")
+        }
+    }
+    let mut value = declaration();
+    value["columns"][0]["dtype"] = json!("nominal");
+    value["columns"][0]["domain"] = json!({"kind":"categorical", "values":["abcde"]});
+    let error = TypedTable::read_csv(
+        UnreadInput,
+        parse(&value).unwrap(),
+        InputLimits {
+            max_field_bytes: 4,
+            ..InputLimits::default()
+        },
+    )
+    .unwrap_err();
+    assert_eq!(error.code, "invalid_declared_domain");
+    assert!(!error.to_string().contains("abcde"));
+}
+
+#[test]
+fn reload_domain_tokens_use_stored_and_prior_v1_byte_limits() {
+    let token = "é".repeat(2048);
+    let mut value = declaration();
+    value["columns"][0]["dtype"] = json!("nominal");
+    value["columns"][0]["domain"] = json!({"kind":"categorical", "values":[token]});
+    let csv = format!("private_measurement,private_outcome\n{token},1\n");
+    let data = TypedTable::read_csv(
+        csv.as_bytes(),
+        parse(&value).unwrap(),
+        InputLimits {
+            max_field_bytes: 8192,
+            ..InputLimits::default()
+        },
+    )
+    .unwrap();
+    let mut retained: Value = serde_json::from_slice(
+        &fit_transform(&data, &[0])
+            .unwrap()
+            .sampling_state_bytes()
+            .unwrap(),
+    )
+    .unwrap();
+    retained["max_field_bytes"] = json!(4095);
+    assert_eq!(
+        FittedTransforms::reload(&serde_json::to_vec(&retained).unwrap())
+            .unwrap_err()
+            .code,
+        "invalid_transform_state"
+    );
+    retained.as_object_mut().unwrap().remove("max_field_bytes");
+    let loaded = FittedTransforms::reload(&serde_json::to_vec(&retained).unwrap()).unwrap();
+    assert_eq!(
+        loaded
+            .transform_cell("c0001", &Cell::Category(token.clone()))
+            .unwrap(),
+        Cell::Category(token.clone())
+    );
+    retained["columns"][0]["domain"]["values"][0] = json!(format!("{token}a"));
+    assert_eq!(
+        FittedTransforms::reload(&serde_json::to_vec(&retained).unwrap())
+            .unwrap_err()
+            .code,
+        "invalid_transform_state"
+    );
+}
+
+#[test]
 fn target_lookup_returns_an_error_when_the_role_is_missing() {
     let mut data = numeric_table();
     for column in &mut data.schema.columns {

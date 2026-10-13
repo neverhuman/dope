@@ -165,7 +165,7 @@ impl FittedTransforms {
                 || !column.offset.is_finite()
                 || !column.scale.is_finite()
                 || column.scale <= 0.0
-                || !validate_domain(column.dtype, &column.domain)
+                || !validate_domain(column.dtype, &column.domain, self.max_field_bytes)
                 || column
                     .units
                     .iter()
