@@ -384,6 +384,25 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual((record["status"], record["reason"]), ("unknown", "no_final_receipt"))
         self.assertFalse(T.needs_attempt(record))
 
+    def test_a_request_published_after_close_spawns_no_worker(self):
+        real_put = T.W.put
+
+        def delayed_put(root, name, value):
+            if name == "operation.request.json":
+                self.now[0] = self.close + 1
+            return real_put(root, name, value)
+
+        with patch.object(T.W, "put", delayed_put), patch.object(T.v1, "_wait_to_fit", lambda _units: None), \
+                patch.object(T.subprocess, "Popen", side_effect=AssertionError("spawned after close")), \
+                patch.object(self.controller, "sample", side_effect=AssertionError("sampled after close")):
+            self.controller.run([(23, self.row), (37, self.row)], self.lock)
+        attempt = self.cell / "attempt-1" / "fit"
+        self.assertTrue((attempt / T.REFUSED).is_file())
+        record = json.loads((self.cell / T.FIT_RECORD).read_text())
+        self.assertEqual((record["status"], record["reason"]), ("not_started", "campaign_close"))
+        self.assertFalse(T.needs_attempt(record))
+        self.assertFalse((self.root / "out" / DATASET / "fit-37" / "attempt-1").exists())
+
     def test_a_stopped_controllers_attempt_is_adopted_and_its_key_never_reused(self):
         attempt = self.cell / "attempt-1" / "fit"
         attempt.mkdir(parents=True)
