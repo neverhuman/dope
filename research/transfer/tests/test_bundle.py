@@ -3,6 +3,7 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -14,7 +15,10 @@ from research.transfer.bundle import (
     ROLES,
     BundleError,
     BundleLimits,
+    VerifiedBundle,
+    _scan_open_directory,
     account_inventory,
+    charged_sampling_bytes,
     checked_sum,
     preflight_dpk,
     verify_bundle,
@@ -44,6 +48,8 @@ class BundleGoldenTests(unittest.TestCase):
     def test_schema_is_closed_and_matches_the_inventory_vocabulary(self):
         self.assertIs(SCHEMA["additionalProperties"], False)
         self.assertEqual(SCHEMA["properties"]["format"]["const"], FORMAT)
+        self.assertEqual(SCHEMA["properties"]["version"]["type"], "integer")
+        self.assertEqual(SCHEMA["properties"]["version"]["const"], 1)
         self.assertEqual(set(SCHEMA["properties"]["sampling_handler"]["enum"]), HANDLERS)
         self.assertEqual(set(SCHEMA["properties"]["capabilities"]["items"]["enum"]), CAPABILITIES)
         self.assertEqual(set(SCHEMA["$defs"]["component"]["properties"]["role"]["enum"]), ROLES)
@@ -311,6 +317,97 @@ class BundleGoldenTests(unittest.TestCase):
         limits = BundleLimits()
         self.assertEqual(limits.max_expanded_section_bytes, 16 * 1024 * 1024)
         self.assertEqual(limits.max_features, 4096)
+
+    def test_noninteger_version_is_rejected(self):
+        case = GOLDEN["cases"][0]
+        for value, code in ((True, "unknown_version"), (1.0, "invalid_manifest")):
+            with self.subTest(version_type=type(value).__name__):
+                directory, root, digest = stage(
+                    case, lambda manifest, value=value: manifest.__setitem__("version", value)
+                )
+                with directory, self.assertRaises(BundleError) as raised:
+                    verify_bundle(root, digest)
+                self.assertEqual(raised.exception.code, code)
+
+    def test_verified_type_requires_verification(self):
+        with self.assertRaises(BundleError) as raised:
+            VerifiedBundle({"charged_sampling_bytes": 0}, None, None)
+        self.assertEqual(raised.exception.code, "verification_required")
+
+        class Forged(VerifiedBundle):
+            def __init__(self):
+                self._accounting = {"charged_sampling_bytes": 0}
+
+        with self.assertRaises(BundleError) as raised:
+            charged_sampling_bytes(Forged())
+        self.assertEqual(raised.exception.code, "verification_required")
+
+    def test_report_accounting_cannot_change_verified_charge(self):
+        directory, root, digest = stage(GOLDEN["cases"][0])
+        with directory:
+            value = verify_bundle(root, digest)
+            before = charged_sampling_bytes(value)
+            try:
+                value.accounting["charged_sampling_bytes"] = 0
+            except (TypeError, AttributeError):
+                pass
+            self.assertEqual(before, 2121)
+            self.assertEqual(charged_sampling_bytes(value), before)
+
+    def test_directory_stream_stops_on_the_first_undeclared_or_cap(self):
+        directory = tempfile.TemporaryDirectory(dir=ROOT / "target")
+        root = Path(directory.name)
+        (root / "extra.bin").write_bytes(b"x")
+        flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+        with directory:
+            fd = os.open(root, flags)
+            try:
+                with self.assertRaises(BundleError) as raised:
+                    _scan_open_directory(fd, set(), 8, 8 * 64)
+                self.assertEqual(raised.exception.code, "undeclared_component")
+                self.assertNotIn("extra.bin", str(raised.exception))
+            finally:
+                os.close(fd)
+            fd = os.open(root, flags)
+            try:
+                with self.assertRaises(BundleError) as raised:
+                    _scan_open_directory(fd, set(), 0, 64)
+                self.assertEqual(raised.exception.code, "too_many_components")
+            finally:
+                os.close(fd)
+            fd = os.open(root, flags)
+            try:
+                with self.assertRaises(BundleError) as raised:
+                    _scan_open_directory(fd, set(), 8, 1)
+                self.assertEqual(raised.exception.code, "too_many_components")
+            finally:
+                os.close(fd)
+
+    def test_replaced_directory_path_does_not_change_the_fd_listing(self):
+        directory = tempfile.TemporaryDirectory(dir=ROOT / "target")
+        base = Path(directory.name)
+        real = base / "real"
+        decoy = base / "decoy"
+        real.mkdir()
+        decoy.mkdir()
+        (real / "manifest.json").write_bytes(b"{}")
+        (real / "keep.bin").write_bytes(b"ab")
+        (decoy / "manifest.json").write_bytes(b"{}")
+        (decoy / "keep.bin").write_bytes(b"ab")
+        (decoy / "secret.bin").write_bytes(b"hidden")
+        flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+        with directory:
+            fd = os.open(real, flags)
+            try:
+                os.rename(real, base / "real.moved")
+                os.symlink(decoy, real)
+                self.assertTrue(real.is_symlink())
+                found = _scan_open_directory(
+                    fd, {"manifest.json", "keep.bin"}, 33, 33 * 64
+                )
+            finally:
+                os.close(fd)
+        self.assertEqual(found, {"manifest.json", "keep.bin"})
 
 
 if __name__ == "__main__":
