@@ -1,6 +1,6 @@
 # Benchmarking section plan: block B and the five-seed results
 
-- Local plan. Updated 2026-10-13 against main `d47bd2b`. No PR. The prior tip is `b6dc72d` (the 15:16Z refresh of `66e86b6`). That refresh still described an open run.
+- Local plan. Updated 2026-10-13 against main `9cbb4e4` (#232). No PR. That merge does not change the panel, the scalar ledger, or the Block B ledger; those objects are the `d47bd2b` tree. The prior tip is `2f99fe4`, which replaced `b6dc72d` (the 15:16Z refresh of `66e86b6`).
 - Checked on `d47bd2b`:
   - `predeclare_v2.json` and `predeclare_v2.amendments/B-tabsyn-seeds.json`;
   - `research/benchmark/results/review-fixes-v2/panel.json` (sha256 prefix `4b3f1307a22d2c2e`, unchanged);
