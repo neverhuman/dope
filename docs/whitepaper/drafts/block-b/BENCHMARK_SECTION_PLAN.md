@@ -1,16 +1,17 @@
 # Benchmarking section plan: block B and the five-seed results
 
-- Local draft by paper_claude, 2026-10-13. No PR is opened until the queue clears.
-- Inputs, all on main `d620f0c`:
+- Local plan. Updated 2026-10-13 against main `d47bd2b`. No PR. The prior tip is `b6dc72d` (the 15:16Z refresh of `66e86b6`). That refresh still described an open run.
+- Checked on `d47bd2b`:
   - `predeclare_v2.json` and `predeclare_v2.amendments/B-tabsyn-seeds.json`;
-  - `research/benchmark/results/review-fixes-v2/panel.json` (sha256 prefix `4b3f1307a22d2c2e`);
-  - `research/benchmark/review_fixes/v2_panel.py`;
-  - `docs/whitepaper/dope-mfs.tex` §4–§6.
-- Block B is still running. This plan uses only what is already published, and the run's status, timing and counts. No block B retention exists yet. Every block B value below is a slot.
+  - `research/benchmark/results/review-fixes-v2/panel.json` (sha256 prefix `4b3f1307a22d2c2e`, unchanged);
+  - `research/benchmark/review_fixes/v2_panel.py` (`FIVE_SEED` still omits TabSyn);
+  - `research/benchmark/results/review-fixes-tabsyn-seeds-v2/` from #230 (`98120d7`);
+  - the scalar ledger is still 27,756 lines, with TabSyn scores only at fit seed 11 (594 cells).
+- The Block B run is closed. The P-BB1 ledger is on main. The five-seed score rebind is not. This plan does not copy unpublished panel numbers.
 
 ## 1. Where the section stands on main
 
-All numbers below are CatBoost at size 4n, with 95% nested-bootstrap intervals, from the v2 panel.
+All numbers below are CatBoost at size 4n, with 95% nested-bootstrap intervals, from the v2 panel on `d47bd2b`. They are the published seed-11 TabSyn contrast, not the five-seed rebind.
 
 | Row | Value | Source |
 |---|---|---|
@@ -23,48 +24,40 @@ All numbers below are CatBoost at size 4n, with 95% nested-bootstrap intervals, 
 | Seed-11 rank test | DOPE seed 11 is the top fit on 47 of 99 lineages, against 19.8 expected | `\VSeedTop` |
 | TabSyn charged bytes | median 42.3 MB over 100 seed-11 fits; DOPE 1.9 KB | `\VStrongBytes` |
 
+Five-seed source-family sensitivity is already in the supplement on main (#227). It is not the TabSyn five-seed rebind.
+
 Primary Holm family slots on main:
 - ARF author-default: present (five seeds).
 - TabSyn: present, **one seed**.
 - TabDDPM: **absent**.
 - Forest-Flow under B1: **absent**.
 
-Untested slots keep their place: `v2_panel._holm` uses count = 12 and skips the empty slots. Every primary Holm p printed today is therefore a fixed-m value that changes when the empty slots fill.
+Untested slots keep their place: `v2_panel._holm` uses count = 12 and skips the empty slots. Every primary Holm p printed today is a fixed-m value that changes when the empty slots fill.
 
 ## 2. What block B adds, and how it enters the panel
 
-**Block B** is TabSyn's scaled arm (200 VAE and 1,000 diffusion epochs) at fit seeds 23, 37, 53 and 71:
+**Block B** is TabSyn's scaled arm (200 VAE and at most 1,000 diffusion epochs) at fit seeds 23, 37, 53 and 71:
 - 100 lineages, 400 fits, three sample seeds at n and 4n;
 - caps of 600 s per fit and 180 s per lineage's six samples;
-- run on xbabe1 from 41a47ab, with a close of 2026-10-22T05:59Z.
+- source git `41a47ab`, host `xbabe1`, recorded in `binding.json`.
 
-**Status at 15:16Z:**
-- Fits: 275 of 400 ok, 4 in infrastructure_failure (seed 53), 121 not run. Seeds 23 and 37 are complete.
-- Sample cells: 1,614 ok and 6 in timeout. Another 30 cells are in infrastructure_failure (5 sample operations), and 24 are blocked behind infrastructure-failed fits.
-- **The 6 timeouts** are one seed-23 lineage, whose six samples ran 185 s against the 180 s cap. That fit therefore has no complete sample seed. The lineage still qualifies if at least 3 of its other 4 fits complete.
-- **The infrastructure failures** are foreign GPU processes (recurring Blender renders on xbabe1). The controller confirmed each one on its own side, so each is non-final at attempt 1. `Controller.run` makes one pass over the plan, so each failure gets its one predeclared retry only from a second `run` invocation after this unit exits.
-  - That decision belongs to the watcher and the owner.
-  - The ledger and the coverage table must show the first attempt and the retry outcome for each one.
+**Ledger on main (`98120d7`).** `binding.json` reports fits ok 400 and cells ok 2,394 / timeout 6. `medians_not_computed` is true.
+- Fits: 100 ok at each seed. The 15:16Z infrastructure failures were attempt 1. In the committed ledger those 4 seed-53 fits are status ok at attempt 2, and every other fit is attempt 1. The fit rows record that final attempt number. They do not carry the attempt-1 failure receipt. There is no fit timeout in the final ledger.
+- Completed diffusion epochs: 399 fits at the 1,000-epoch budget (`declared_epoch_budget_complete`) and 1 fit at 785 (`author_patience_500`). The manuscript says "at most 1,000". It does not say every fit reached 1,000.
+- Sample cells: 2,400 rows, ok 594/600/600/600 and timeout 6/0/0/0 by seed 23, 37, 53, 71. All 6 timeouts are one seed-23 lineage. They are final and were not retried. Do not name that lineage.
+- Cell rows have no attempt field. Sample-retry custody is unrecorded, not measured zero.
+- The ledger does not contain the cross-host comparison, and it does not contain retention scores. `official_tests_opened` is false.
+- Do not quote an `artifact_bytes` median as the charged-byte median. The published charged median remains the seed-11 figure, 42.3 MB, until `v2_bytes.tabsyn()` is rebuilt on all 500 fits under the charged-bytes rule. This update does not compute a Block B byte or epoch median.
 
 **Binding path.** Each step is pinned and replayable; no number is hand-copied.
-1. When the unit exits, record the final status counts. Then run `tabsyn_seeds_v2 ledger` and commit `research/benchmark/results/review-fixes-tabsyn-seeds-v2/sample-cells.jsonl`. It holds status, paths and sha256 only, with no retention.
-   - Label from receipts, without editing any receipt: a cell whose receipt says `failed`/`TimeoutError` is a deadline cut and is counted as **timeout**. Put that rule in the ledger code, not only in a display script.
-   - Run the ledger only after any retry pass has ended. Each infrastructure_failure record then shows its final attempt.
-2. Rescore on xbabe1 CPU, after the GPU block closes, as the amendment's `scoring` says:
-   - `rescore_ledger.py` with adapter `rescore_adapters.tabsyn_seeds`;
-   - auditor seed 1729;
-   - evaluator `pilot_metrics` `6c038926…` and the v2 ledger's dependency set (catboost 1.2.10, numpy 1.26.4, scikit-learn 1.7.2, scipy 1.16.3).
-   - Refuse any cell whose evaluator pin differs from the seed-11 TabSyn cells already in the v2 ledger.
-3. Extend the v2 scalar ledger:
-   - add the new cells to `scalar-cells.jsonl` and the 400 fits to `fits.jsonl`;
-   - add a `block_b` source to `provenance.json` (commit 41a47ab, host, runner sha, unit, campaign receipt);
-   - recompute `scalar-cells.meta.json`.
-4. Change `v2_panel.py`: add `("TabSyn", "scaled_200_vae_1000_diffusion")` to `FIVE_SEED`.
+1. Done on main: the ledger commit. A cell whose receipt says `failed`/`TimeoutError` is a deadline cut and is counted as **timeout**.
+2. Not in this tree: the K0 rescore. The amendment still requires `rescore_ledger.py`, auditor seed 1729, and the same evaluator and dependency set as the seed-11 cells. Refuse a cell whose evaluator pin differs.
+3. Not on main: extending `scalar-cells.jsonl` and joining the 400 fits into the v2 `fits.jsonl`, the `block_b` provenance source, and a recomputed `scalar-cells.meta.json`.
+4. Not on main: add `("TabSyn", "scaled_200_vae_1000_diffusion")` to `FIVE_SEED`.
    - This **implements** the predeclaration: methods.primary.TabSyn has seeds 11–71, and estimands.lineage_value requires at least 3 complete fits. It is not a new choice.
    - Without it, `min_fits` stays 1, and a TabSyn lineage with a single complete fit would count.
-5. Add the sensitivity rows: a generalized `seeds_23_71` and an all-five-fits row. See §3.
+5. Add the sensitivity rows: a generalized `seeds_23_71` and an all-five-fits row. See §3. The all-five reducer is local prep on `2321aec` and is not on main.
 6. Change `v2_bytes.tabsyn()`: read the charged bytes of all 500 fits (seed 11 plus block B) under the **same charged-bytes rule**. That rule takes each saved file except intermediate diffusion-epoch checkpoints, and is not `artifact_bytes`.
-   - The seed-23 artifact_bytes median, 84.4 MB, is not comparable with the published charged median of 42.3 MB.
 7. Rebuild and pin:
    - `v2_panel.py` → `panel.json`;
    - `review_v2_emit.py`, then `v2_figures.py`, `readme_benchmark.py` and `paper_consistency.py`;
@@ -86,17 +79,17 @@ All data-dependent words come from verdict macros ("is above / is below / cannot
 | **Pareto figure** | The TabSyn point uses the five-seed level and the 500-fit charged-byte median and IQR. |
 | **§5.6 Seeds** (text) | Add two sentences. (a) TabSyn's seed-11 level against its seeds-23–71 level, as a descriptive row. (b) **DOPE seeds 23–71 minus TabSyn seeds 23–71**: neither arm uses fit seed 11, the seed at which DOPE's profile was chosen. This row is descriptive, has no Holm family, and its interval is printed. |
 | **Supplement E** | Per-seed TabSyn levels; the all-five-fits sensitivity for DOPE and TabSyn; original-unit RMSE beside retention (estimands.original_units). |
-| **Supplement C** (coverage) | One row per seed with one column per controller status (ok, timeout, failed, unknown, infrastructure_failure, not_started), plus retries and planned against observed fits and cells (100 and 600 per seed). Give counts only; the lineage identities stay in the ledger, not the paper. Add the 5ad517e disclosure. |
+| **Supplement C** (coverage) | One row per seed with one column per controller status (ok, timeout, failed, unknown, infrastructure_failure, not_started), plus retries and planned against observed fits and cells (100 and 600 per seed). Do not name the timeout lineage. Sample retries stay unrecorded where the cell row has no attempt. Add the 5ad517e disclosure. |
 | **Limitations** | "Seeds": TabSyn now contributes five fit seeds, so remove it from the one-seed list. "Baselines": remove "five-seed TabSyn" from the pending list; the TabSyn author-default schedule stays pending. |
 | **Abstract and conclusion** | No new words; the macros carry the change. |
 
-Not in the paper: per-seed retention grids and fit-progress bars. Those are monitoring views.
+Not in the paper: per-seed retention grids and fit-progress bars. Those are monitoring views. The local Block B draft on this lane renders coverage from the ledger and leaves levels, contrasts, bytes, epochs, and retention unpinned until the rebind is on main.
 
 ## 4. What block B and the five-seed results can and cannot claim
 
-**Can claim**, reported whatever the values are:
+**Can claim**, reported whatever the values are, once the rebind is on main:
 1. The five-seed DOPE minus five-seed TabSyn (scaled) paired difference at n and 4n, under three auditors.
-   - Its nested interval includes fitting variance on **both** sides; today it omits TabSyn's.
+   - Its nested interval includes fitting variance on **both** sides; the published panel omits TabSyn's.
    - Its Holm p sits in the 12-test primary family. The verdict wording is "is above", "is below" or "cannot be separated from".
 2. Which comparator is the computed strongest. TabSyn stays strongest only if its five-seed CatBoost 4n median stays highest among comparators paired on 90 or more lineages; ARF author-default is next at 0.822.
 3. Whether TabSyn's seed 11 was typical for TabSyn: the seed-11 level against the seeds-23–71 level. This is descriptive and has no test.
@@ -118,11 +111,11 @@ Not in the paper: per-seed retention grids and fit-progress bars. Those are moni
 
 ## 5. Still unmeasured after block B
 
-The arms below are those predeclare_v2 declares that are absent from the v2 panel on main d620f0c.
+The arms below are those predeclare_v2 declares that are absent from the v2 panel on main `d47bd2b`.
 
 | Family | Missing | Consequence |
 |---|---|---|
-| Primary | TabDDPM author-default (v6); Forest-Flow under B1 | The primary Holm p stays provisional (fixed m = 12, 6 slots empty). Forest-Flow stays a 6-lineage historical block. |
+| Primary | TabDDPM author-default (v6); Forest-Flow under B1 | The primary Holm p stays provisional (fixed m = 12, empty slots remain). Forest-Flow stays a historical block. |
 | Deep secondary | TabDiff; GReaT | CTGAN and TVAE author-default cover only 17–18 lineages. |
 | Other secondary | synthpop-CART; SMOTE | — |
 | Secondary | TabSyn author-default (B′) | The "scaled schedule" caveat stays. |
@@ -134,13 +127,15 @@ The arms below are those predeclare_v2 declares that are absent from the v2 pane
 
 ## 6. Order of work
 
-1. **Now until the last fit (about 17:20Z):** outcome-blind monitoring only. Draft code paths and tests against fixtures (§2, steps 3–7), with no block B values.
-2. **After the unit exits:** final status counts; the ledger commit with the timeout labels; the rescore; then the bind and rebuild.
-3. **The PR**, opened when the queue reaches it. Its review checklist:
+1. **Done:** the run has exited and the P-BB1 ledger is on main. The local Block B draft tracks that ledger. Scores stay unpinned.
+2. **Not this lane:** P-BB2 is paper_claude's rebind (`adb9a62`), queue slot 2 after codex_2 PR13. It is the step that extends the scalar ledger and adds TabSyn to `FIVE_SEED`.
+3. **The PR**, opened by that lane when its slot is open and the open-PR count is 0. Review checklist:
    - the evaluator pins are equal;
    - `FIVE_SEED` includes TabSyn;
    - the charged-bytes rule is unchanged;
    - the Holm family is still 12 slots;
    - zero-diff rebuild and the paper gates pass;
    - the 5ad517e disclosure is present;
+   - the text says "at most 1,000" diffusion epochs;
+   - the timeout lineage is not named, and missing sample attempts are unrecorded;
    - no claim from §4 "cannot" appears in the text.
