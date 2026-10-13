@@ -1,0 +1,62 @@
+{
+  "format": "dope-adapter-registry-v1",
+  "kind": "learner",
+  "entries": [
+    {
+      "name": "kumo_tabular",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "mitra_v2",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "tabicl_v2",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "catboost",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "independent_boosting",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "independent_neural",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "linear",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    }
+  ]
+}

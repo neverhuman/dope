@@ -1504,6 +1504,26 @@
     "todo/": {
       "command": "test -z \"$(git ls-files -- todo/)\"",
       "purpose": "verify local external-feedback planning packets remain untracked and outside committed product evidence; this route certifies no planning claims"
+    },
+    "research/transfer/adapters/base.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v",
+      "purpose": "verify offline portable adapter admission, original-unit alignment, context counts, complete cache pins and feature-only query boundaries without vendor qualification"
+    },
+    "research/transfer/registries/models.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v",
+      "purpose": "verify offline portable adapter admission, original-unit alignment, context counts, complete cache pins and feature-only query boundaries without vendor qualification"
+    },
+    "research/transfer/registries/generators.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v",
+      "purpose": "verify offline portable adapter admission, original-unit alignment, context counts, complete cache pins and feature-only query boundaries without vendor qualification"
+    },
+    "research/transfer/tests/test_adapters.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v",
+      "purpose": "verify offline portable adapter admission, original-unit alignment, context counts, complete cache pins and feature-only query boundaries without vendor qualification"
+    },
+    "docs/vnext/ADAPTERS.md": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v",
+      "purpose": "verify offline portable adapter admission, original-unit alignment, context counts, complete cache pins and feature-only query boundaries without vendor qualification"
     }
   }
 }

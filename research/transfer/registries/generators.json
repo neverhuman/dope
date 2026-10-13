@@ -1,0 +1,62 @@
+{
+  "format": "dope-adapter-registry-v1",
+  "kind": "generator",
+  "entries": [
+    {
+      "name": "dope",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "tabsyn",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "tabdiff",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "tabddpm",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "efficient_circuit",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "forest",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "compact_density",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    }
+  ]
+}
