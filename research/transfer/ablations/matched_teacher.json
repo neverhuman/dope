@@ -1,0 +1,22 @@
+{
+  "format": "dope-matched-teacher-v1",
+  "precision": "float64",
+  "search_budget": 1,
+  "byte_budget": 128,
+  "teacher": {
+    "form": "nonlinear",
+    "parameters": {"bias": 0, "linear": 0, "quadratic": 1},
+    "noise_scale": 1
+  },
+  "controls": [
+    "real_n",
+    "real_bootstrap_4n",
+    "shuffled_label",
+    "no_noise",
+    "prequantization",
+    "postquantization",
+    "direct_predictor",
+    "coreset",
+    "distillation"
+  ]
+}
