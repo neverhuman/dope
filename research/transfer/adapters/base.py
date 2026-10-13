@@ -49,6 +49,14 @@ def _choice(value, choices):
     return type(value) is str and value in choices
 
 
+def _backend_failure(error):
+    if isinstance(error, (ModuleNotFoundError, FileNotFoundError)):
+        return AdapterUnavailable("dependency_unavailable")
+    if isinstance(error, AdapterUnavailable):
+        return AdapterUnavailable("backend_unavailable")
+    return AdapterError("backend_failed")
+
+
 def _cells(rows):
     _require(type(rows) is tuple and bool(rows), "invalid_rows")
     width = len(rows[0]) if type(rows[0]) is tuple else 0
@@ -316,12 +324,12 @@ class _Adapter(ABC):
         started = time.monotonic()
         try:
             result = operation(*args)
-        except (ModuleNotFoundError, FileNotFoundError):
-            raise AdapterUnavailable("dependency_unavailable") from None
-        except AdapterUnavailable:
-            raise AdapterUnavailable("backend_unavailable") from None
-        except Exception:
-            raise AdapterError("backend_failed") from None
+        except BaseException as error:
+            # Native libraries can exit with a source-bearing message. Contain
+            # that exit, while retaining operator cancellation without payload.
+            if isinstance(error, KeyboardInterrupt):
+                raise KeyboardInterrupt() from None
+            raise _backend_failure(error) from None
         finally:
             self._wall_seconds += time.monotonic() - started
         _require(self._wall_seconds <= self.identity.resources.wall_seconds, "wall_budget_exceeded")

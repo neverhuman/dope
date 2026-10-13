@@ -266,10 +266,24 @@ class AdapterTests(unittest.TestCase):
             self.adapter.predict(self.query, 8)
 
     def test_missing_offline_dependency_is_typed_and_redacts_path(self):
-        for failure in (ModuleNotFoundError("private module"), FileNotFoundError("private checkpoint path")):
+        cases = ((ModuleNotFoundError("private module"), "dependency_unavailable"),
+                 (FileNotFoundError("private checkpoint path"), "dependency_unavailable"),
+                 (AdapterUnavailable("private backend diagnostic"), "backend_unavailable"))
+        for failure, code in cases:
             with patch.object(self.adapter, "_predict_backend", side_effect=failure):
-                with self.assertRaisesRegex(AdapterUnavailable, "^dependency_unavailable$") as caught:
+                with self.assertRaisesRegex(AdapterUnavailable, f"^{code}$") as caught:
                     self.adapter.predict(self.query, 8)
+                self.assertTrue(caught.exception.__suppress_context__)
+
+    def test_backend_exit_cannot_terminate_caller_or_echo_source(self):
+        cases = ((SystemExit, AdapterError, "backend_failed"),
+                 (KeyboardInterrupt, KeyboardInterrupt, ""))
+        for fault, outcome, diagnostic in cases:
+            with self.subTest(fault=fault), patch.object(self.adapter, "_predict_backend",
+                                                       side_effect=fault("secret source value")):
+                with self.assertRaises(outcome) as caught:
+                    self.adapter.predict(self.query, 8)
+                self.assertEqual(str(caught.exception), diagnostic)
                 self.assertTrue(caught.exception.__suppress_context__)
 
     def test_fit_resource_usage_and_failed_call_time_are_checked(self):

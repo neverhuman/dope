@@ -53,6 +53,9 @@ Backend ports implement the declared mode and prove its behavior against their
 native reference. Declaring a mode does not attest that a vendor obeys it.
 Pretraining data rights, source-family exposure and protected-partition custody
 remain independent gates. Preparation errors invalidate prior prepared state.
+Backend exits become stable errors; keyboard cancellation remains a cancellation
+with its diagnostic payload suppressed. Backend messages never become public
+adapter diagnostics.
 
 Context policy `all` rejects an input exceeding the declared cap. Policy `head`
 selects a declared prefix before backend preparation. Identity records the cap
