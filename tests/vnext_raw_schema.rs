@@ -41,7 +41,7 @@ fn numeric_table() -> TypedTable {
 #[test]
 fn named_target_and_header_order_preserve_original_units() {
     let table = numeric_table();
-    assert_eq!(table.target_id(), "c0002");
+    assert_eq!(table.target_id().unwrap(), "c0002");
     assert_eq!(table.cell(0, "c0001").unwrap(), &Cell::Number(10.0));
     assert_eq!(table.cell(2, "c0002").unwrap(), &Cell::Number(9999.0));
     let state = fit_transform(&table, &[0, 1]).unwrap();
@@ -473,6 +473,107 @@ fn schema_and_headers_fail_closed() {
         parse(&unsupported).err().unwrap().code,
         "unsupported_logical_type"
     );
+}
+
+#[test]
+fn reload_rejects_whitespace_units_and_labels_like_schema_intake() {
+    let mut value = declaration();
+    value["metadata_visibility"] = json!("approved_semantic_labels");
+    let data = table("private_measurement,private_outcome\n1,2\n", &value).unwrap();
+    let retained = fit_transform(&data, &[0])
+        .unwrap()
+        .sampling_state_bytes()
+        .unwrap();
+    for (schema_field, retained_field) in [("units", "units"), ("semantic_label", "label")] {
+        let mut bad_schema = value.clone();
+        bad_schema["columns"][0][schema_field] = json!(" \t\n");
+        assert_eq!(
+            parse(&bad_schema).err().unwrap().code,
+            "invalid_metadata_label"
+        );
+        let mut bad_state: Value = serde_json::from_slice(&retained).unwrap();
+        bad_state["columns"][0][retained_field] = json!(" \t\n");
+        assert_eq!(
+            FittedTransforms::reload(&serde_json::to_vec(&bad_state).unwrap())
+                .unwrap_err()
+                .code,
+            "invalid_transform_state"
+        );
+    }
+}
+
+#[test]
+fn retained_nominal_cells_use_the_csv_field_byte_limit() {
+    let mut value = declaration();
+    value["columns"][0]["dtype"] = json!("nominal");
+    for field_limit in [8192, 4] {
+        let category = "n".repeat(field_limit);
+        let csv = format!("private_measurement,private_outcome\n{category},1\n");
+        let limits = InputLimits {
+            max_field_bytes: field_limit,
+            ..InputLimits::default()
+        };
+        let data = TypedTable::read_csv(csv.as_bytes(), parse(&value).unwrap(), limits).unwrap();
+        let retained = fit_transform(&data, &[0])
+            .unwrap()
+            .sampling_state_bytes()
+            .unwrap();
+        drop(data);
+        let loaded = FittedTransforms::reload(&retained).unwrap();
+        let cell = Cell::Category(category.clone());
+        assert_eq!(loaded.transform_cell("c0001", &cell).unwrap(), cell);
+        let too_long = format!("{category}n");
+        let csv = format!("private_measurement,private_outcome\n{too_long},1\n");
+        assert_eq!(
+            TypedTable::read_csv(csv.as_bytes(), parse(&value).unwrap(), limits)
+                .unwrap_err()
+                .code,
+            "field_bytes_exceeded"
+        );
+        assert_eq!(
+            loaded
+                .transform_cell("c0001", &Cell::Category(too_long))
+                .unwrap_err()
+                .code,
+            "field_bytes_exceeded"
+        );
+    }
+}
+
+#[test]
+fn retained_field_limit_defaults_for_prior_v1_states_and_refuses_zero() {
+    let state = fit_transform(&numeric_table(), &[0, 1]).unwrap();
+    let mut retained: Value =
+        serde_json::from_slice(&state.sampling_state_bytes().unwrap()).unwrap();
+    retained.as_object_mut().unwrap().remove("max_field_bytes");
+    let loaded = FittedTransforms::reload(&serde_json::to_vec(&retained).unwrap()).unwrap();
+    assert_eq!(loaded.inverse_transform("c0002", &[2.0]).unwrap(), [500.0]);
+    let bytes = loaded.sampling_state_bytes().unwrap();
+    assert_eq!(loaded.required_sampling_bytes().unwrap(), bytes.len());
+    assert_eq!(
+        serde_json::from_slice::<Value>(&bytes).unwrap()["max_field_bytes"],
+        json!(4096)
+    );
+    retained["max_field_bytes"] = json!(0);
+    assert_eq!(
+        FittedTransforms::reload(&serde_json::to_vec(&retained).unwrap())
+            .unwrap_err()
+            .code,
+        "invalid_transform_state"
+    );
+}
+
+#[test]
+fn target_lookup_returns_an_error_when_the_role_is_missing() {
+    let mut data = numeric_table();
+    for column in &mut data.schema.columns {
+        if column.role == schema::ColumnRole::Target {
+            column.role = schema::ColumnRole::Feature;
+        }
+    }
+    let lookup = std::panic::catch_unwind(|| data.target_id());
+    assert!(lookup.is_ok(), "target lookup must return a typed reason");
+    assert_eq!(lookup.unwrap().unwrap_err().code, "missing_target_role");
 }
 
 #[test]
