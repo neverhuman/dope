@@ -58,6 +58,6 @@ changed original or aggregate before its values can enter the paper.
 The primary displayed DOPE results come from the five-seed v2 panel (fit seeds
 11, 23, 37, 53, and 71 with the historical binary), reduced by
 `research/benchmark/review_fixes/v2_panel.py`. Fit seed 11 describes the
-first-version tables that the supplement keeps for traceability. ARF also has
-five fit seeds; every other comparator has one. No displayed result is a
+first-version tables that the supplement keeps for traceability. ARF and TabSyn
+also have five fit seeds; every other comparator has one. No displayed result is a
 release score.

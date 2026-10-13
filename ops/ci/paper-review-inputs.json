@@ -60,6 +60,10 @@
       "bytes": 596,
       "sha256": "a18ee597a4c596e8fe840c10ee33b5e977e0111f14b764589edb125d97e6d408"
     },
+    "research/benchmark/results/review-fixes-tabsyn-seeds-v2/fits.jsonl": {
+      "bytes": 173775,
+      "sha256": "1201f94e088b2e0e46053e9d863705fcc3cecfb9002564d657b8cb96db3db350"
+    },
     "research/benchmark/results/review-fixes-tabsyn-v1/binding.json": {
       "bytes": 165512,
       "sha256": "dcbb2bc030ff9e903d7482e46348424ae12d1f0ea7552e62e9eaf14fd9a7f4c8"
@@ -81,20 +85,20 @@
       "sha256": "b9fd4600ec54fc89b938eb627f31d6112176fc4137e040c3686c15efd17d2d62"
     },
     "research/benchmark/results/review-fixes-v2/family.json": {
-      "bytes": 210317,
-      "sha256": "e47c24f110103534bd48903ebf14182f71832fbfd0bf65e67afd4ed2595af072"
+      "bytes": 210453,
+      "sha256": "244665a35f19791ef763eadbd0f3c102e8954ad0f626103f676686b66e12bd40"
     },
     "research/benchmark/results/review-fixes-v2/fits.jsonl": {
       "bytes": 501159,
       "sha256": "723a83226ffb2bd510a23a06cb6363d5c4fd25b230dc4fea0d42c2a08d634687"
     },
     "research/benchmark/results/review-fixes-v2/panel.json": {
-      "bytes": 555919,
-      "sha256": "4b3f1307a22d2c2ea43b91c253e88d03597b9c3e3951fc948f7cd96b4207d14b"
+      "bytes": 556137,
+      "sha256": "049e81158c6d2265f52a474bdd4532a09be3c3d734f034a36ecc7de2bbb610d5"
     },
     "research/benchmark/results/review-fixes-v2/scalar-cells.jsonl": {
-      "bytes": 22171980,
-      "sha256": "db455b0aa6e45a9dbc9649ab220cc217fd60020f3db12eb468544bef6d3f124f"
+      "bytes": 24121982,
+      "sha256": "ea4168621dfaadfb5735d5df74d384e57f46f8e16b8053402b663a6960a94745"
     },
     "research/benchmark/results/s3-lineage-record.json": {
       "bytes": 1834757,

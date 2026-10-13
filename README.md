@@ -15,7 +15,7 @@ Validation panel: 100 PMLB regression tables, CatBoost auditor, synthetic size 4
 | Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Lineage medians within 10,240 B |
 | --- | ---: | --- | --- | ---: | ---: | ---: |
 | **DOPE (ours)** | 99 | 0.898 [0.804, 0.972] | — | — | 1.9 KB | 98% |
-| TabSyn (scaled schedule) | 98 | 0.897 [0.816, 0.979] | −0.008 [−0.057, 0.042] | 47/0/51 | 42.3 MB | 0% |
+| TabSyn (scaled schedule) | 99 | 0.924 [0.814, 0.965] | −0.003 [−0.053, 0.053] | 53/0/46 | 42.3 MB | 0% |
 | ARF (author default) | 99 | 0.822 [0.689, 0.894] | +0.048 [−0.034, 0.149] | 60/0/39 | 1.4 MB | 0% |
 | ARF (native selected) | 99 | 0.804 [0.647, 0.885] | +0.083 [0.006, 0.191] | 66/0/33 | 1.6 MB | 0% |
 | Gaussian copula | 99 | 0.669 [0.369, 0.867] | +0.191 [0.089, 0.273] | 83/0/16 | 5.5 KB | 62% |
