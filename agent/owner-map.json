@@ -377,6 +377,11 @@
     "research/transfer/registries/models.json": "external-evidence",
     "research/transfer/registries/generators.json": "external-evidence",
     "research/transfer/tests/test_adapters.py": "external-evidence",
-    "docs/vnext/ADAPTERS.md": "governance"
+    "docs/vnext/ADAPTERS.md": "governance",
+    "rust/schema.rs": "rust-core",
+    "rust/typed_data.rs": "rust-core",
+    "rust/typed_data/transforms.rs": "rust-core",
+    "schemas/table-schema-v1.schema.json": "governance",
+    "tests/vnext_raw_schema.rs": "rust-core"
   }
 }
