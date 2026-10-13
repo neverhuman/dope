@@ -1378,8 +1378,8 @@
       "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
     },
     "rust/lib.rs": {
-      "command": "cargo test --locked --lib evidence::tests",
-      "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
+      "command": "cargo test --locked --lib",
+      "purpose": "execute all registered Rust library API tests, including evidence, transfer metrics and sampling bundles"
     },
     "schemas/transfer-run-v1.schema.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
@@ -1406,8 +1406,8 @@
       "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
     },
     "rust/transfer_metrics.rs": {
-      "command": "mkdir -p target/vnext && rustc --edition=2024 --test rust/transfer_metrics.rs -o target/vnext/transfer-metrics-tests && target/vnext/transfer-metrics-tests",
-      "purpose": "run independent original-unit metric golden tests; module registration follows this owned source landing from PR04"
+      "command": "cargo test --locked --lib transfer_metrics::tests",
+      "purpose": "run original-unit metric golden tests through the registered Rust library"
     },
     "research/transfer/losses.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
@@ -1456,6 +1456,34 @@
     "schemas/source-family-v1.schema.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
       "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+    },
+    "rust/bundle.rs": {
+      "command": "cargo test --locked --test vnext_bundle",
+      "purpose": "verify source-free sampling bundle inventory, caps, and retained DPK sampling"
+    },
+    "rust/bundle/": {
+      "command": "cargo test --locked --test vnext_bundle",
+      "purpose": "verify source-free sampling bundle inventory, caps, and retained DPK sampling"
+    },
+    "tests/vnext_bundle.rs": {
+      "command": "cargo test --locked --test vnext_bundle",
+      "purpose": "verify source-free sampling bundle inventory, caps, and retained DPK sampling"
+    },
+    "research/transfer/bundle.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify offline bundle inventory parity, path rejection, and byte accounting"
+    },
+    "research/transfer/tests/test_bundle.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify offline bundle inventory parity, path rejection, and byte accounting"
+    },
+    "schemas/generator-bundle-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify the closed generator-bundle schema against the inventory vocabulary"
+    },
+    "schemas/bundle-golden-v1.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify golden amortized and included sampling-byte accounts"
     },
     "docs/whitepaper/vnext/": {
       "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",

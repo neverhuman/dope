@@ -2,6 +2,7 @@
 
 pub mod access;
 pub mod auditor;
+pub mod bundle;
 pub mod calibration;
 pub mod campaign;
 pub mod certification;
@@ -31,6 +32,7 @@ pub mod release;
 pub mod representation;
 pub mod router;
 pub mod sample;
+pub mod transfer_metrics;
 
 pub use auditor::{AuditorBackend, auditor_backend};
 pub use calibration::{
