@@ -126,7 +126,7 @@
   "host": "xbabe1, CPU only, after the GPU block closes"
  },
  "close_utc": "2026-10-22T05:59:00Z",
- "close_rule": "No operation starts at or after close_utc: the controller checks before waiting for the host, again after it takes the GPU lock, and before every sample operation. Each operation's deadline is the earlier of its cap and close_utc.",
+ "close_rule": "No operation starts at or after close_utc. The controller checks before waiting for the host, again after it takes the GPU lock, and again after publishing the request, immediately before the spawn. A request published after close gets a spawn-refused receipt, no worker runs, and the attempt is recorded as not_started, which is final. Each operation's seconds are fixed at spawn time as the earlier of its cap and close_utc.",
  "monitoring": "Outcome-blind: the runner reads status, timing, and counts only. No retention exists until rescore_ledger.py runs after the last fit.",
  "official_tests_opened": false
 }

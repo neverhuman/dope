@@ -135,6 +135,8 @@ def child_env(runtime: dict) -> dict[str, str]:
             "PYTHONDONTWRITEBYTECODE": "1"}
 
 
+# Written when the close passed between taking the GPU lock and the spawn; no worker ran.
+REFUSED = "spawn.refused.receipt.json"
 LISTED_CAUSES = ("host_reboot", "foreign_gpu_owner", "storage_refusal", "runtime_lock_mismatch")
 LOW_DISK_BYTES = 1 << 30
 
@@ -158,6 +160,8 @@ def outcome(attempt: Path, mode: str, code: int | None, confirm) -> tuple[str, s
     establishes on the controller's side; the worker's receipt alone is a claim.
     An operation that leaves no final receipt in the same boot is unknown and final.
     """
+    if (attempt / REFUSED).is_file():
+        return "not_started", "campaign_close"
     if code in (0, None) and (attempt / f"{mode}.complete.receipt.json").is_file():
         return "ok", None
     if code == 124:
@@ -190,7 +194,10 @@ def sample_cells(row: dict, cell: Path, sizes: list[int], seeds: list[int]) -> l
 def sample_status(attempt: Path, cells: list[dict], code: int | None) -> list[dict]:
     """Per-cell status from the worker's per-cell receipt; a cell without one shares the operation's end."""
     ended = (attempt / "sample.complete.receipt.json").is_file() or failure_receipt(attempt, "sample") is not None
-    unfinished = "timeout" if code == 124 else ("failed" if ended else "unknown")
+    if (attempt / REFUSED).is_file():
+        unfinished = "not_started"
+    else:
+        unfinished = "timeout" if code == 124 else ("failed" if ended else "unknown")
     statuses = []
     for item in cells:
         receipt = v1._read_json(attempt / W.cell_receipt_name(item))
@@ -245,16 +252,24 @@ class Controller:
                 "train_rows": row["train_rows"], "projection_sha256": row["projection_sha256"],
                 "joint_train_sha256": row["joint_train_sha256"],
                 "joint_validation_sha256": row["joint_validation_sha256"],
-                "cap_seconds": cap, "close_utc": amendment["close_utc"], "operation_seconds": self.bounded(cap),
-                "official_tests_opened": False}
+                "cap_seconds": cap, "close_utc": amendment["close_utc"], "official_tests_opened": False}
 
-    def operate(self, attempt: Path, request: dict) -> tuple[int, float, dict]:
-        """Run one worker operation until the earlier of its cap and the close; then kill its process group."""
+    def operate(self, attempt: Path, request: dict) -> tuple[int | None, float, dict]:
+        """Run one worker operation until the earlier of its cap and the close; then kill its process group.
+
+        The seconds are fixed at spawn time from the cap and the original close, and the close
+        is checked again after the request is published, immediately before the spawn.
+        """
         attempt.mkdir(parents=True, exist_ok=False)
         started = time.monotonic()
-        request = {**request, "operation_started_monotonic": started,
-                   "deadline_monotonic": started + request["operation_seconds"]}
+        seconds = self.bounded(request["cap_seconds"])
+        request = {**request, "operation_seconds": seconds, "operation_started_monotonic": started,
+                   "deadline_monotonic": started + seconds}
         ref = W.put(attempt, "operation.request.json", request)
+        if seconds < 1 or self.bounded(1) < 1 or time.monotonic() >= started + seconds:
+            W.put(attempt, REFUSED, {"reason": "campaign_close", "close_utc": self.amendment["close_utc"],
+                                     "official_tests_opened": False})
+            return None, time.monotonic() - started, ref
         argv = [self.runtime["python"], "-I", "-S", "-B", str(WORKER), str(attempt), ref["path"], ref["sha256"]]
         with (attempt / "worker.stdout.log").open("xb") as log, (attempt / "worker.stderr.log").open("xb") as err:
             process = subprocess.Popen(argv, env=child_env(self.runtime), stdout=log, stderr=err, cwd=attempt,
@@ -299,7 +314,7 @@ class Controller:
         status, reason = outcome(attempt, "sample", code, self.confirm)
         request_path = attempt / "operation.request.json"
         record = {"dataset": row["dataset"], "fit_seed": seed, "attempts": attempt_number(attempt),
-                  "returncode": code, "status": "infrastructure_failure" if status == "infrastructure_failure"
+                  "returncode": code, "status": status if status in ("infrastructure_failure", "not_started")
                   else "done", "reason": reason,
                   "elapsed_seconds": None if elapsed is None else round(elapsed, 3),
                   "request": {"path": str(request_path), "sha256": v1._sha256(request_path)}
@@ -356,14 +371,15 @@ class Controller:
             fit = v1._read_json(cell / FIT_RECORD) or self.adopt(seed, row, cell, "fit")
             if needs_attempt(fit):
                 fit = self.locked(gpu_lock, functools.partial(self.fit, seed, row, cell, fit))
-                if fit is None:
+                if fit is None or fit["status"] == "not_started":
                     return
             if fit["status"] != "ok":
                 continue
             samples = v1._read_json(cell / SAMPLE_RECORD) or self.adopt(seed, row, cell, "sample")
-            if needs_attempt(samples) and self.locked(
-                    gpu_lock, functools.partial(self.sample, seed, row, cell, fit, samples)) is None:
-                return
+            if needs_attempt(samples):
+                samples = self.locked(gpu_lock, functools.partial(self.sample, seed, row, cell, fit, samples))
+                if samples is None or samples["status"] == "not_started":
+                    return
 
 
 def ledger(plan: list[tuple[int, dict]], out: Path, amendment: dict) -> tuple[list[dict], list[dict]]:
