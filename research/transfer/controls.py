@@ -44,14 +44,26 @@ class Teacher:
         _fail("invalid_parameters") if set(parameters) != {"quadratic", "linear", "bias"} else None
         _fail("invalid_parameters") if any(type(parameters[key]) is not int for key in parameters) else None
         _fail("invalid_noise") if type(noise_scale) is not int else None
-        self.form = form
-        self.parameters = MappingProxyType(dict(parameters))
-        self.noise_scale = noise_scale
+        self._form = form
+        self._parameters = MappingProxyType(dict(parameters))
+        self._noise_scale = noise_scale
         self.precision = precision
         self.parameter_sha256 = digest({
-            "form": form, "precision": precision, "parameters": dict(self.parameters),
+            "form": form, "precision": precision, "parameters": dict(self._parameters),
         })
         self.noise_sha256 = digest({"noise_scale": noise_scale, "precision": precision})
+
+    @property
+    def form(self):
+        return self._form
+
+    @property
+    def parameters(self):
+        return self._parameters
+
+    @property
+    def noise_scale(self):
+        return self._noise_scale
 
     def value(self, x, noise):
         quadratic, linear, bias = (self.parameters["quadratic"], self.parameters["linear"], self.parameters["bias"])

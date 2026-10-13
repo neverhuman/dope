@@ -100,6 +100,21 @@ class ControlTests(unittest.TestCase):
         self.assertEqual(teacher.parameter_sha256, before_hash)
         self.assertEqual(teacher.value(2, 0), before_value)
 
+    def test_teacher_attribute_replacement_cannot_leave_hashes_stale(self):
+        teacher = Teacher("nonlinear", {"quadratic": 1, "linear": 1, "bias": 1}, 2, "float64")
+        before_parameter = teacher.parameter_sha256
+        before_noise = teacher.noise_sha256
+        before_value = teacher.value(2, 1)
+        with self.assertRaises(AttributeError):
+            teacher.parameters = {"quadratic": 0, "linear": 0, "bias": 99991}
+        with self.assertRaises(AttributeError):
+            teacher.noise_scale = 99991
+        with self.assertRaises(AttributeError):
+            teacher.form = "linear"
+        self.assertEqual(teacher.parameter_sha256, before_parameter)
+        self.assertEqual(teacher.noise_sha256, before_noise)
+        self.assertEqual(teacher.value(2, 1), before_value)
+
     def test_shuffled_constant_labels_preserve_the_label_multiset(self):
         teacher = Teacher("linear", {"quadratic": 0, "linear": 0, "bias": 5}, 0, "float64")
         factor = MatchedTeacherFactorial(
