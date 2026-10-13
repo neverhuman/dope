@@ -1,0 +1,32 @@
+{
+ "adapter_sha256": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
+ "amendment_sha256": "a82256a90616a907a13b8f15ff11e5a0112e9c10c17f09bb32b07c162e7d7702",
+ "cells": {
+  "ok": 2394,
+  "timeout": 6
+ },
+ "cells_sha256": "de73c322b600dbcb3d97c8daf2a6874f0734178f26e049f08b75027c6b8908e0",
+ "config_sha256": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc",
+ "configuration": "scaled_200_vae_1000_diffusion",
+ "fit_seeds": [
+  23,
+  37,
+  53,
+  71
+ ],
+ "fits": {
+  "ok": 400
+ },
+ "fits_sha256": "1201f94e088b2e0e46053e9d863705fcc3cecfb9002564d657b8cb96db3db350",
+ "format": "dope-review-fix-tabsyn-seeds-binding",
+ "host": "xbabe1",
+ "medians_not_computed": true,
+ "method": "TabSyn",
+ "official_tests_opened": false,
+ "plan_sha256": "ec3169e0d8881170139a8fbe1b3f8e6c0485325c3ab1cea18774a68169b5a4f4",
+ "predeclare_sha256": "851215f70725b49cc74c8768aee45599b480881e5316ffe62d6b8b18862e9a47",
+ "runner_sha256": "70af20940d53ddc90529f8d2c90526daa384fc6aaf8e81ad0b946b00bc86ec1f",
+ "runtime_sha256": "7f64e393995119c7da62a395405dc6d825a98d56cfc885829b8a8253f3d53ede",
+ "source_git_sha": "41a47abf8afb5c62f0226ece1da402f97f0ffc69",
+ "worker_sha256": "bea3a09ef5a3251c9664df4aea3c2e4cf7349644bb3ab8a7edfb6a5b0e1d3ba2"
+}

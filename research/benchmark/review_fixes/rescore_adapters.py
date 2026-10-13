@@ -41,7 +41,8 @@ HOST_HOMES = ("xbabe1", "xbabe2", "xbabe3")
 # values differ from a seed-1729 replay by construction; at the sample seed they replay
 # bit for bit on xbabe2. ARF, TabSyn and the controls used 1729.
 STORED_AUDITOR_SEED = {"density": "sample_seed", "sdv": "sample_seed", "forest": "sample_seed",
-                       "dope-historical": "sample_seed", "arf": 1729, "tabsyn": 1729, "controls": 1729}
+                       "dope-historical": "sample_seed", "arf": 1729, "tabsyn": 1729, "controls": 1729,
+                       "tabsyn-seeds": None}
 
 
 class Refused(ValueError):
@@ -254,8 +255,8 @@ def tabsyn(path: Path, roots: dict) -> list[dict]:
 def tabsyn_seeds(path: Path, roots: dict) -> list[dict]:
     """Block B sample ledger (tabsyn_seeds_v2.py): fresh cells, so there is no stored value to replay.
 
-    It is not in LEDGERS: LEDGERS names only ledger files that are committed, and no
-    block B sample ledger exists until the run has sampled.
+    Its stored auditor seed is None for the same reason. A cell whose operation ended
+    in a non-ok status stays in the ledger as a blocked job; it is never imputed.
     """
     binding = read_json(path.parent / "binding.json")
     jobs = []
@@ -328,6 +329,7 @@ LEDGERS = {
     "tabsyn": ("review-fixes-tabsyn-v1/scalar-cells.jsonl", tabsyn),
     "controls": ("review-fixes-controls-v1/scalar-cells.jsonl", controls),
     "dope-historical": ("dope-s3-population-validation.json", dope_historical),
+    "tabsyn-seeds": ("review-fixes-tabsyn-seeds-v2/sample-cells.jsonl", tabsyn_seeds),
 }
 
 
