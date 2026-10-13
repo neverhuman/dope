@@ -18,7 +18,7 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
-from pinned_inputs import present, read_pinned
+from pinned_inputs import Registry, present, read_pinned
 from public_hardware import banned_hits, redact_bundle, seal_cost_row
 
 REPO = Path(__file__).resolve().parents[3]
@@ -30,15 +30,17 @@ FOREST_LEDGER = "s3-matched-forest-confirmation-validation.json"
 ARF_LEDGER = "arf-s3-population-native.json"
 # Byte length and sha256 of every input. The bundle digest equals its entry in
 # ops/ci/paper-inputs/inputs.lock.json; a test holds the two together.
-BUNDLE_PINS = {BUNDLE: (73961, "16cd9f392d96d3cfabefe09777d32efd35aadf443b0f324805595e461d30ece9")}
-LEDGER_PINS = {
+BUNDLE_PINS = Registry(GENERATED, {
+    BUNDLE: (73961, "16cd9f392d96d3cfabefe09777d32efd35aadf443b0f324805595e461d30ece9"),
+})
+LEDGER_PINS = Registry(RESULTS, {
     FOREST_LEDGER: (1237153, "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"),
     ARF_LEDGER: (1472035, "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"),
-}
+})
 
 
-def _ledger(name):
-    return json.loads(read_pinned(RESULTS, name, LEDGER_PINS))
+def _ledger(name, registry=None):
+    return json.loads(read_pinned(registry or LEDGER_PINS, name))
 
 
 def _median(values):
@@ -226,7 +228,7 @@ def _arf():
     Peak resident bytes include the coordinator, so they are not job peak RAM.
     """
     row = _blank("ARF")
-    if not present(RESULTS, ARF_LEDGER):
+    if not present(LEDGER_PINS, ARF_LEDGER):
         row["notes"] = ["population native ledger is absent"]
         return row
     document = _ledger(ARF_LEDGER)
@@ -264,10 +266,11 @@ def _arf():
     return row
 
 
-def _load_bundle(root=GENERATED):
-    if not present(root, BUNDLE):
+def _load_bundle(registry=None):
+    registry = registry or BUNDLE_PINS
+    if not present(registry, BUNDLE):
         raise FileNotFoundError("the pinned compute-cost receipt bundle is missing; run ops/ci/paper-prepare.py")
-    bundle = json.loads(read_pinned(root, BUNDLE, BUNDLE_PINS))
+    bundle = json.loads(read_pinned(registry, BUNDLE))
     if bundle.get("format") != "dope-paper-compute-cost-receipts" or bundle.get("version") != 1:
         raise ValueError("compute-cost receipts bundle is not the required format")
     if bundle.get("official_tests_opened"):
@@ -295,8 +298,8 @@ def _methods_from_bundle(bundle):
     }
 
 
-def build(root=GENERATED, out=OUT):
-    methods = _methods_from_bundle(_load_bundle(root))
+def build(registry=None, out=OUT):
+    methods = _methods_from_bundle(_load_bundle(registry))
     for row in methods.values():
         row["cpu_model"] = None
         row["cpu_hours"] = None

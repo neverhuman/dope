@@ -1,24 +1,40 @@
 """Read one registered paper input: exactly the bytes whose length and digest are declared in advance.
 
-A registry maps a relative path under one root to its byte length and sha256.
-A read refuses, before any byte is decoded: a name absent from the registry; an
-empty, absolute, or traversing name; a symlink at the leaf or at any directory
-between the root and the leaf; a root reached through a symlink; anything that
-is not a regular file; and a length or digest that differs. The body is read
-once, bounded by its declared length, and the caller parses those same bytes.
-Error messages name the rule, never file contents.
+A Registry binds one declared root to the files admitted under it, each a
+relative path with its byte length and sha256. A caller names a registry and a
+relative path; it cannot supply a different root. A read refuses, before any
+byte is decoded: a name absent from the registry; an empty, absolute, or
+traversing name; a symlink at any component from the filesystem root to the
+leaf; a leaf that is not a regular file; and a length or digest that differs.
+The walk holds each directory open and opens the next component relative to it
+without following links, so no component can be swapped between the check and
+the read. The body is read once, bounded by its declared length, and the caller
+parses those same bytes. Error messages name the rule, never file contents.
 """
 
 from __future__ import annotations
 
+import errno
 import hashlib
 import os
 import stat
+from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
+
+NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
+DIRECTORY = getattr(os, "O_DIRECTORY", 0)
 
 
 class PinRefused(ValueError):
     """A registered-input refusal; the message is a fixed rule name."""
+
+
+@dataclass(frozen=True)
+class Registry:
+    """A declared root and the files admitted under it: relative path -> (bytes, sha256)."""
+
+    root: Path
+    files: dict = field(default_factory=dict)
 
 
 def check_name(relative: str) -> None:
@@ -30,46 +46,59 @@ def check_name(relative: str) -> None:
         raise PinRefused("input name is absolute or traverses")
 
 
-def declared(relative: str, registry: dict) -> tuple[int, str]:
+def declared(registry: Registry, relative: str) -> tuple[int, str]:
     """The declared length and digest of a syntactically safe, registered name."""
     check_name(relative)
-    if relative not in registry:
+    if relative not in registry.files:
         raise PinRefused("input name is not registered")
-    length, digest = registry[relative]
+    length, digest = registry.files[relative]
     if type(length) is not int or length <= 0 or not isinstance(digest, str) or len(digest) != 64:
         raise PinRefused("registry entry is malformed")
     return length, digest
 
 
-def present(root: Path, relative: str) -> bool:
-    """Whether a safe name exists under ``root``; it follows no symlink and reads no bytes."""
+def present(registry: Registry, relative: str) -> bool:
+    """Whether a safe name exists under the registry's root; it follows no symlink and reads no bytes."""
     check_name(relative)
     try:
-        os.lstat(Path(root) / relative)
+        os.lstat(Path(registry.root) / relative)
     except FileNotFoundError:
         return False
     return True
 
 
-def read_pinned(root: Path, relative: str, registry: dict) -> bytes:
-    """Return the authenticated bytes of one registered file under ``root``."""
-    length, digest = declared(relative, registry)
-    base = Path(os.path.abspath(root))
-    if os.path.realpath(base) != str(base):
-        raise PinRefused("input root is reached through a symlink")
-    current = base
-    mode = None
-    for part in PurePosixPath(relative).parts:
-        current = current / part
-        mode = os.lstat(current).st_mode
-        if stat.S_ISLNK(mode):
-            raise PinRefused("input path has a symlink")
-    if mode is None or not stat.S_ISREG(mode):
-        raise PinRefused("input is not a regular file")
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
-    descriptor = os.open(current, flags)
+def _open_beneath(components: list[str]) -> int:
+    """Open the last component from "/" holding every directory, following no link; return its descriptor."""
+    held = [os.open("/", os.O_RDONLY | DIRECTORY)]
     try:
-        if os.fstat(descriptor).st_size != length:
+        for index, part in enumerate(components):
+            last = index == len(components) - 1
+            # A FIFO leaf must not block the open; fstat then refuses it as not regular.
+            flags = os.O_RDONLY | NOFOLLOW | (os.O_NONBLOCK if last else DIRECTORY)
+            try:
+                held.append(os.open(part, flags, dir_fd=held[-1]))
+            except OSError as error:
+                if error.errno == errno.ENOENT:
+                    raise FileNotFoundError(errno.ENOENT, "registered input is absent") from None
+                if error.errno in (errno.ELOOP, errno.ENOTDIR, errno.EMLINK):
+                    raise PinRefused("input path has a symlink or a non-directory ancestor") from None
+                raise
+        return held.pop()
+    finally:
+        for descriptor in held:
+            os.close(descriptor)
+
+
+def read_pinned(registry: Registry, relative: str) -> bytes:
+    """Return the authenticated bytes of one registered file under the registry's root."""
+    length, digest = declared(registry, relative)
+    base = PurePosixPath(os.path.abspath(registry.root))
+    descriptor = _open_beneath([*base.parts[1:], *PurePosixPath(relative).parts])
+    try:
+        info = os.fstat(descriptor)
+        if not stat.S_ISREG(info.st_mode):
+            raise PinRefused("input is not a regular file")
+        if info.st_size != length:
             raise PinRefused("input length differs from its declaration")
         chunks, remaining = [], length + 1
         while remaining > 0:
