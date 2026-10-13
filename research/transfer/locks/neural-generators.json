@@ -1,0 +1,99 @@
+{
+  "format": "dope-neural-generator-lock-v1",
+  "generators": {
+    "tabsyn": {
+      "code_revision": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7",
+      "code_sha256": "7c327eea3fc84e8b8d8e7fbeb021d7d44d1fc272c98d7ca81628c25bc3101bb0",
+      "license": ["code", "Apache-2.0", "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"],
+      "native_transform": "author numeric VAE and latent diffusion; no shared DOPE transform",
+      "precision": "float32",
+      "context_cap": 100000,
+      "resources": {"wall_seconds": 600.0, "memory_bytes": 17179869184, "gpu_bytes": 17179869184},
+      "recorded_attempts": [
+        {"recipe": "native_full", "status": "timeout", "cause": "wall_budget", "eligible": false, "lane": "unrestricted_quality", "within_budget": false}
+      ],
+      "recipes": {
+        "scaled": {
+          "schedule": {"diffusion_epochs": 1000, "sampling_steps": 50, "vae_epochs": 200},
+          "full_schedule": false,
+          "lane": "resource_matched",
+          "within_budget": true,
+          "selection": "scaled_population",
+          "sampling_dependencies": ["author_sampler", "learned_latent"]
+        },
+        "common_transfer": {
+          "schedule": {"diffusion_epochs": 1000, "sampling_steps": 50, "vae_epochs": 200},
+          "full_schedule": false,
+          "lane": "common_transfer",
+          "within_budget": true,
+          "selection": "common_fidelity",
+          "sampling_dependencies": ["author_sampler", "learned_latent"]
+        },
+        "native_full": {
+          "schedule": {"diffusion_epochs": 10001, "sampling_steps": 50, "vae_epochs": 4000},
+          "full_schedule": true,
+          "lane": "unrestricted_quality",
+          "within_budget": false,
+          "selection": "author_default",
+          "sampling_dependencies": ["author_sampler", "learned_latent"]
+        }
+      }
+    },
+    "tabdiff": {
+      "code_revision": "5ecdb3356261aea72716cc9a779f31d7ad083bf4",
+      "code_sha256": "f4965fdc1ae1659154f0264e0dcc91812e1041dff1ba0a9a429bb4e9b3321bb7",
+      "license": ["code", "MIT", "0ec2178fd0353f41dded18d337749e83a284155c5f760429170ea4029d4784b9"],
+      "native_transform": "author numeric diffusion; no shared DOPE transform",
+      "precision": "float32",
+      "context_cap": 100000,
+      "resources": {"wall_seconds": 600.0, "memory_bytes": 17179869184, "gpu_bytes": 17179869184},
+      "recorded_attempts": [],
+      "recipes": {
+        "resource_matched": {
+          "schedule": {"author_steps_not_run": 1, "sampling_steps": 50},
+          "full_schedule": false,
+          "lane": "resource_matched",
+          "within_budget": true,
+          "selection": "resource_matched",
+          "sampling_dependencies": ["author_sampler"]
+        },
+        "native_full": {
+          "schedule": {"sampling_steps": 50, "training_steps": 8000},
+          "full_schedule": true,
+          "lane": "unrestricted_quality",
+          "within_budget": false,
+          "selection": "author_default",
+          "sampling_dependencies": ["author_sampler"]
+        }
+      }
+    },
+    "tabddpm": {
+      "code_revision": "b476257dd460b778ba09eb97f7a51d6490fa17f8",
+      "code_sha256": "f98c933a6a258f90396c791c53ea7848890c7547f760e22c07ad702da3eef08a",
+      "license": ["code", "MIT", "be701b4d15238cf3c2d730ead1b72868a99e397fe872da0e89e07ce50e68ca99"],
+      "native_transform": "author numeric diffusion; learned quantiles stay charged",
+      "precision": "float32",
+      "context_cap": 100000,
+      "resources": {"wall_seconds": 600.0, "memory_bytes": 17179869184, "gpu_bytes": 17179869184},
+      "recorded_attempts": [],
+      "recipes": {
+        "resource_matched": {
+          "schedule": {"author_steps_not_run": 1, "num_timesteps": 1000},
+          "full_schedule": false,
+          "lane": "resource_matched",
+          "within_budget": true,
+          "selection": "resource_matched",
+          "sampling_dependencies": ["author_sampler", "learned_quantiles"]
+        },
+        "native_full": {
+          "schedule": {"num_timesteps": 1000, "training_steps": 1000},
+          "full_schedule": true,
+          "lane": "unrestricted_quality",
+          "within_budget": false,
+          "selection": "author_default",
+          "sampling_dependencies": ["author_sampler", "learned_quantiles"]
+        }
+      }
+    }
+  }
+}
