@@ -143,6 +143,23 @@ class ControlTests(unittest.TestCase):
         )
         self.assertEqual(factor.teacher_for("real_n", "nonlinear").precision, "float64")
 
+    def test_deleting_the_parameter_hash_cannot_unfreeze_the_teacher(self):
+        teacher = Teacher("nonlinear", {"quadratic": 1, "linear": 0, "bias": 0}, 1, "float64")
+        self.assertEqual(teacher.value(2, 1), 5)
+        saved_parameter = teacher.parameter_sha256
+        saved_noise = teacher.noise_sha256
+        with self.assertRaises(AttributeError) as raised:
+            del teacher.parameter_sha256
+        self.assertEqual(str(raised.exception), "frozen_teacher")
+        with self.assertRaises(AttributeError):
+            teacher._parameters = {"quadratic": 2, "linear": 0, "bias": 0}
+        with self.assertRaises(AttributeError):
+            teacher.parameter_sha256 = saved_parameter
+        self.assertEqual(teacher.value(2, 1), 5)
+        self.assertEqual(teacher.parameters["quadratic"], 1)
+        self.assertEqual(teacher.parameter_sha256, saved_parameter)
+        self.assertEqual(teacher.noise_sha256, saved_noise)
+
     def test_shuffled_constant_labels_preserve_the_label_multiset(self):
         teacher = Teacher("linear", {"quadratic": 0, "linear": 0, "bias": 5}, 0, "float64")
         factor = MatchedTeacherFactorial(
