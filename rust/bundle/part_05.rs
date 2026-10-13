@@ -251,4 +251,124 @@ mod tests {
         .unwrap_err();
         assert_eq!(error.code(), "too_many_components");
     }
+
+    fn dpk_header(magic: &[u8], major: u8, minor: u8) -> Vec<u8> {
+        let mut artifact = vec![0u8; HEADER_BYTES];
+        artifact[..4].copy_from_slice(magic);
+        artifact[4] = major;
+        artifact[5] = minor;
+        artifact[6] = 1;
+        artifact[8] = 8;
+        artifact[12] = 1;
+        artifact
+    }
+
+    fn with_payload(mut artifact: Vec<u8>, payload: &[u8]) -> Vec<u8> {
+        artifact[32..40].copy_from_slice(&(payload.len() as u64).to_le_bytes());
+        artifact.extend_from_slice(payload);
+        artifact
+    }
+
+    #[test]
+    fn preflight_accepts_historical_dpk3_minors_through_three() {
+        for minor in [0u8, 1, 2, 3] {
+            let summary =
+                preflight_dpk(&dpk_header(b"DPK3", 3, minor), &BundleLimits::default()).unwrap();
+            assert_eq!(summary.minor, minor);
+            assert!(summary.v3);
+        }
+        assert_eq!(
+            preflight_dpk(&dpk_header(b"DPK3", 3, 4), &BundleLimits::default())
+                .unwrap_err()
+                .code(),
+            "unsupported_dpk_version"
+        );
+        assert!(
+            !preflight_dpk(&dpk_header(b"DPK2", 2, 0), &BundleLimits::default())
+                .unwrap()
+                .v3
+        );
+        assert!(preflight_dpk(&dpk_header(b"DPK2", 2, 1), &BundleLimits::default()).is_ok());
+        assert_eq!(
+            preflight_dpk(&dpk_header(b"DPK2", 2, 2), &BundleLimits::default())
+                .unwrap_err()
+                .code(),
+            "unsupported_dpk_version"
+        );
+        let early = with_payload(dpk_header(b"DPK3", 3, 1), &[0x06, 0x00]);
+        assert_eq!(
+            preflight_dpk(&early, &BundleLimits::default())
+                .unwrap_err()
+                .code(),
+            "unknown_section"
+        );
+        let current = with_payload(dpk_header(b"DPK3", 3, 2), &[0x06, 0x00]);
+        assert!(preflight_dpk(&current, &BundleLimits::default()).is_ok());
+    }
+
+    fn measured(
+        id: &str,
+        role: Role,
+        bytes: u64,
+        required: bool,
+        depends_on: &[&str],
+    ) -> Component {
+        Component {
+            id: id.to_string(),
+            role,
+            path: format!("{id}.bin"),
+            sha256: "ab".repeat(32),
+            bytes,
+            kind: Kind::Opaque,
+            required,
+            consumed_by_sampler: role == Role::Payload,
+            depends_on: depends_on.iter().map(|item| (*item).to_string()).collect(),
+            measured_bytes: bytes,
+        }
+    }
+
+    #[test]
+    fn optional_payload_dependency_stays_in_the_sampling_budget() {
+        let linked = vec![
+            measured("payload", Role::Payload, 4, true, &["evidence"]),
+            measured("evidence", Role::Evidence, 7, false, &[]),
+        ];
+        let accounting = account_inventory(&linked, 10, 1, TransportFraming::Unmeasured).unwrap();
+        assert_eq!(accounting.charged_sampling_bytes, 21);
+
+        let detached = vec![
+            measured("payload", Role::Payload, 4, true, &[]),
+            measured("evidence", Role::Evidence, 7, false, &[]),
+        ];
+        let accounting = account_inventory(&detached, 10, 1, TransportFraming::Unmeasured).unwrap();
+        assert_eq!(accounting.charged_sampling_bytes, 14);
+
+        let rows = vec![
+            measured("payload", Role::Payload, 4, true, &["rows"]),
+            measured("rows", Role::Rows, 9, false, &[]),
+        ];
+        let accounting = account_inventory(&rows, 10, 1, TransportFraming::Unmeasured).unwrap();
+        assert_eq!(accounting.charged_sampling_bytes, 23);
+
+        let dictionary = vec![
+            measured("payload", Role::Payload, 4, true, &["dictionary"]),
+            measured("dictionary", Role::Dictionary, 5, false, &[]),
+        ];
+        let accounting =
+            account_inventory(&dictionary, 10, 1, TransportFraming::Unmeasured).unwrap();
+        assert_eq!(accounting.charged_sampling_bytes, 19);
+        assert_eq!(accounting.dictionary_bytes, 5);
+    }
+
+    #[test]
+    fn open_flags_come_from_libc_not_x86_64_literals() {
+        let source = include_str!("../bundle.rs");
+        assert!(source.contains("libc::O_NOFOLLOW"));
+        assert!(source.contains("libc::O_DIRECTORY"));
+        assert!(source.contains("libc::O_CLOEXEC"));
+        assert!(source.contains("libc::O_NONBLOCK"));
+        assert!(source.contains("libc::AT_SYMLINK_NOFOLLOW"));
+        assert!(!source.contains("const O_NOFOLLOW: i32 = 0x20000"));
+        assert!(!source.contains("const O_DIRECTORY: i32 = 0x10000"));
+    }
 }

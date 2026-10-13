@@ -22,12 +22,22 @@ const NEURAL_CAP: usize = 16 * 1024 * 1024;
 const MANIFEST_NAME: &str = "manifest.json";
 const ELOOP: i32 = 40;
 const EINTR: i32 = 4;
-const O_NOFOLLOW: i32 = 0x20000;
-const O_DIRECTORY: i32 = 0x10000;
-const O_CLOEXEC: i32 = 0x80000;
-const O_NONBLOCK: i32 = 0x800;
-const AT_SYMLINK_NOFOLLOW: i32 = 0x100;
+const O_NOFOLLOW: i32 = libc::O_NOFOLLOW;
+const O_DIRECTORY: i32 = libc::O_DIRECTORY;
+const O_CLOEXEC: i32 = libc::O_CLOEXEC;
+const O_NONBLOCK: i32 = libc::O_NONBLOCK;
+const AT_SYMLINK_NOFOLLOW: i32 = libc::AT_SYMLINK_NOFOLLOW;
 const STATX_TYPE: u32 = 1;
+
+// Linux x86_64 values. Other architectures take the libc constants above.
+#[cfg(target_arch = "x86_64")]
+const _: () = {
+    assert!(libc::O_NOFOLLOW == 0x20000);
+    assert!(libc::O_DIRECTORY == 0x10000);
+    assert!(libc::O_CLOEXEC == 0x80000);
+    assert!(libc::O_NONBLOCK == 0x800);
+    assert!(libc::AT_SYMLINK_NOFOLLOW == 0x100);
+};
 
 // SAFETY: these are the Linux libc entry points. Callers pass NUL-terminated
 // paths and directory descriptors they own, and they check the returned fd.

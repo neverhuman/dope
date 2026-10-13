@@ -224,9 +224,11 @@ class BundleGoldenTests(unittest.TestCase):
         with self.assertRaises(BundleError) as raised:
             checked_sum([2**64 - 1, 1])
         self.assertEqual(raised.exception.code, "integer_overflow")
-        source = (ROOT / "research/transfer/bundle.py").read_text()
-        for token in ("subprocess", "socket", "urllib", "pickle", "requests"):
-            self.assertNotIn(token, source)
+        for name in ("bundle.py", "bundle_io.py"):
+            source = (ROOT / "research/transfer" / name).read_text()
+            for token in ("subprocess", "socket", "urllib", "pickle", "requests"):
+                self.assertNotIn(token, source)
+            self.assertLessEqual(source.count("\n"), 500)
 
     def test_dpk_preflight_rejects_bombs_flags_and_bad_dimensions(self):
         def header(features=1, flags=0, payload=b"", minor=2):
@@ -265,6 +267,29 @@ class BundleGoldenTests(unittest.TestCase):
             preflight_dpk(header(payload=payload))
         self.assertEqual(raised.exception.code, "nonfinite_value")
         self.assertNotIn("NaN", str(raised.exception))
+        for minor in (0, 1, 2, 3):
+            summary = preflight_dpk(header(minor=minor))
+            self.assertEqual(summary["minor"], minor)
+            self.assertIs(summary["v3"], True)
+        with self.assertRaises(BundleError) as raised:
+            preflight_dpk(header(minor=4))
+        self.assertEqual(raised.exception.code, "unsupported_dpk_version")
+
+        def v2(minor):
+            artifact = bytearray(header(minor=minor))
+            artifact[:4] = b"DPK2"
+            artifact[4] = 2
+            return bytes(artifact)
+
+        self.assertIs(preflight_dpk(v2(0))["v3"], False)
+        self.assertEqual(preflight_dpk(v2(1))["minor"], 1)
+        with self.assertRaises(BundleError) as raised:
+            preflight_dpk(v2(2))
+        self.assertEqual(raised.exception.code, "unsupported_dpk_version")
+        with self.assertRaises(BundleError) as raised:
+            preflight_dpk(header(minor=1, payload=bytes([0x06, 0x00])))
+        self.assertEqual(raised.exception.code, "unknown_section")
+        self.assertEqual(preflight_dpk(header(minor=2, payload=bytes([0x06, 0x00])))["minor"], 2)
 
     def test_native_payload_is_retained_after_replacement(self):
         payload = bytearray(56)
@@ -408,6 +433,47 @@ class BundleGoldenTests(unittest.TestCase):
             finally:
                 os.close(fd)
         self.assertEqual(found, {"manifest.json", "keep.bin"})
+
+    def test_optional_payload_dependency_stays_in_the_sampling_budget(self):
+        def measured(identity, role, size, required, depends_on):
+            return {
+                "id": identity,
+                "role": role,
+                "measured_bytes": size,
+                "required": required,
+                "depends_on": depends_on,
+            }
+
+        def charge(components):
+            return account_inventory(components, 10, 1, "unmeasured")["charged_sampling_bytes"]
+
+        evidence = measured("evidence", "evidence_authorization", 7, False, [])
+        self.assertEqual(
+            charge([measured("payload", "sampling_payload", 4, True, ["evidence"]), evidence]),
+            21,
+        )
+        self.assertEqual(
+            charge([measured("payload", "sampling_payload", 4, True, []), evidence]),
+            14,
+        )
+        self.assertEqual(
+            charge([
+                measured("payload", "sampling_payload", 4, True, ["rows"]),
+                measured("rows", "materialized_rows", 9, False, []),
+            ]),
+            23,
+        )
+        dictionary = account_inventory(
+            [
+                measured("payload", "sampling_payload", 4, True, ["dictionary"]),
+                measured("dictionary", "dictionary", 5, False, []),
+            ],
+            10,
+            1,
+            "unmeasured",
+        )
+        self.assertEqual(dictionary["charged_sampling_bytes"], 19)
+        self.assertEqual(dictionary["dictionary_bytes"], 5)
 
 
 if __name__ == "__main__":
