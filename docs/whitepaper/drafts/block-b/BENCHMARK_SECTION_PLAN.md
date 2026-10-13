@@ -38,14 +38,18 @@ Untested slots keep their place: `v2_panel._holm` uses count = 12 and skips the 
 - caps of 600 s per fit and 180 s per lineage's six samples;
 - run on xbabe1 from 41a47ab, with a close of 2026-10-22T05:59Z.
 
-**Status at 12:47Z:**
-- Fits: 188 of 400 ok (seed 23 complete, seed 37 in progress); no fit timeouts or failures.
-- Sample cells: 1,116 ok and 6 in timeout. All 6 timeouts are lineage `a04f964bc53281e0` at seed 23, whose sample operation ran 185 s against the 180 s cap.
-- That fit therefore has no complete sample seed. The lineage still qualifies if at least 3 of its other 4 fits complete.
+**Status at 15:16Z:**
+- Fits: 275 of 400 ok, 4 in infrastructure_failure (seed 53), 121 not run. Seeds 23 and 37 are complete.
+- Sample cells: 1,614 ok and 6 in timeout. Another 30 cells are in infrastructure_failure (5 sample operations), and 24 are blocked behind infrastructure-failed fits.
+- **The 6 timeouts** are one seed-23 lineage, whose six samples ran 185 s against the 180 s cap. That fit therefore has no complete sample seed. The lineage still qualifies if at least 3 of its other 4 fits complete.
+- **The infrastructure failures** are foreign GPU processes (recurring Blender renders on xbabe1). The controller confirmed each one on its own side, so each is non-final at attempt 1. `Controller.run` makes one pass over the plan, so each failure gets its one predeclared retry only from a second `run` invocation after this unit exits.
+  - That decision belongs to the watcher and the owner.
+  - The ledger and the coverage table must show the first attempt and the retry outcome for each one.
 
 **Binding path.** Each step is pinned and replayable; no number is hand-copied.
 1. When the unit exits, record the final status counts. Then run `tabsyn_seeds_v2 ledger` and commit `research/benchmark/results/review-fixes-tabsyn-seeds-v2/sample-cells.jsonl`. It holds status, paths and sha256 only, with no retention.
    - Label from receipts, without editing any receipt: a cell whose receipt says `failed`/`TimeoutError` is a deadline cut and is counted as **timeout**. Put that rule in the ledger code, not only in a display script.
+   - Run the ledger only after any retry pass has ended. Each infrastructure_failure record then shows its final attempt.
 2. Rescore on xbabe1 CPU, after the GPU block closes, as the amendment's `scoring` says:
    - `rescore_ledger.py` with adapter `rescore_adapters.tabsyn_seeds`;
    - auditor seed 1729;
@@ -82,7 +86,7 @@ All data-dependent words come from verdict macros ("is above / is below / cannot
 | **Pareto figure** | The TabSyn point uses the five-seed level and the 500-fit charged-byte median and IQR. |
 | **§5.6 Seeds** (text) | Add two sentences. (a) TabSyn's seed-11 level against its seeds-23–71 level, as a descriptive row. (b) **DOPE seeds 23–71 minus TabSyn seeds 23–71**: neither arm uses fit seed 11, the seed at which DOPE's profile was chosen. This row is descriptive, has no Holm family, and its interval is printed. |
 | **Supplement E** | Per-seed TabSyn levels; the all-five-fits sensitivity for DOPE and TabSyn; original-unit RMSE beside retention (estimands.original_units). |
-| **Supplement C** (coverage) | One row per seed with one column per controller status (ok, timeout, failed, unknown, infrastructure_failure, not_started), plus retries and planned against observed fits and cells (100 and 600 per seed). Name the timeout lineage. Add the 5ad517e disclosure. |
+| **Supplement C** (coverage) | One row per seed with one column per controller status (ok, timeout, failed, unknown, infrastructure_failure, not_started), plus retries and planned against observed fits and cells (100 and 600 per seed). Give counts only; the lineage identities stay in the ledger, not the paper. Add the 5ad517e disclosure. |
 | **Limitations** | "Seeds": TabSyn now contributes five fit seeds, so remove it from the one-seed list. "Baselines": remove "five-seed TabSyn" from the pending list; the TabSyn author-default schedule stays pending. |
 | **Abstract and conclusion** | No new words; the macros carry the change. |
 
