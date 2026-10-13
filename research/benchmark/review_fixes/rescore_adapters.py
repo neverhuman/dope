@@ -254,7 +254,8 @@ def tabsyn(path: Path, roots: dict) -> list[dict]:
 def tabsyn_seeds(path: Path, roots: dict) -> list[dict]:
     """Block B sample ledger (tabsyn_seeds_v2.py): fresh cells, so there is no stored value to replay.
 
-    It joins LEDGERS as "tabsyn-seeds" in the commit that adds the ledger file.
+    It is not in LEDGERS: LEDGERS names only ledger files that are committed, and no
+    block B sample ledger exists until the run has sampled.
     """
     binding = read_json(path.parent / "binding.json")
     jobs = []

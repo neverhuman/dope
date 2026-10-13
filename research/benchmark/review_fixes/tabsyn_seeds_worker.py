@@ -314,7 +314,12 @@ def fit_mode(adapter: dict, operation: Operation, np) -> dict:
 
 
 def sample_cell(adapter: dict, operation: Operation, artifact: Path, cell: dict) -> dict:
-    """One sample cell; a refused or failed cell is recorded and the next cell still runs, as for seed 11."""
+    """One sample cell; a refused or failed cell is recorded and the next cell still runs, as for seed 11.
+
+    A listed infrastructure cause (a foreign GPU owner, a runtime-lock mismatch, a
+    storage refusal) is not the cell's own failure: it ends the operation, so its
+    failure receipt carries the cause for the controller to confirm.
+    """
     q, path, begun = operation.q, Path(cell["path"]), time.monotonic()
     if path.name == "test.csv":
         raise ValueError("refused_path")
@@ -328,6 +333,8 @@ def sample_cell(adapter: dict, operation: Operation, artifact: Path, cell: dict)
             write_sample(path, matrix)
             status, sha = "ok", digest(path.read_bytes())
         except (ValueError, RuntimeError, OSError) as error:
+            if listed_cause(error):
+                raise
             status, reason = "failed", type(error).__name__
     entry = {**cell, "status": status, "reason": reason, "synthetic_sha256": sha,
              "seconds": round(time.monotonic() - begun, 3), "official_tests_opened": False}
