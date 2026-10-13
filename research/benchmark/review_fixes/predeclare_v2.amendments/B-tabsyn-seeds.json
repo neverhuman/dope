@@ -1,0 +1,132 @@
+{
+ "format": "dope-review-fix-predeclaration-amendment",
+ "version": 1,
+ "block": "B",
+ "amends": {
+  "path": "research/benchmark/review_fixes/predeclare_v2.json",
+  "sha256": "851215f70725b49cc74c8768aee45599b480881e5316ffe62d6b8b18862e9a47"
+ },
+ "rule": "Operational only. It fixes the paths, pins, host, CPU slot, and the operation caps this arm already ran under at fit seed 11. It changes no estimand, margin, seed, family, threshold, configuration, or inclusion rule of predeclare_v2. It is committed and pushed before block B starts.",
+ "method": "TabSyn",
+ "configuration": "scaled_200_vae_1000_diffusion",
+ "config_sha256": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc",
+ "config": {
+  "attention_heads": 1,
+  "batch_size": 4096,
+  "config_sha256": "a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc",
+  "diffusion_epochs": 1000,
+  "diffusion_hidden_dimension": 1024,
+  "diffusion_lr": 0.001,
+  "factor": 32,
+  "lambd": 0.7,
+  "max_beta": 0.01,
+  "min_beta": 1e-05,
+  "sampling_steps": 50,
+  "token_dimension": 4,
+  "transformer_layers": 2,
+  "vae_epochs": 200,
+  "vae_lr": 0.001,
+  "weight_decay": 0
+ },
+ "fit_seeds": [
+  23,
+  37,
+  53,
+  71
+ ],
+ "admitted_fit_seeds": [
+  11,
+  23,
+  37,
+  53,
+  71
+ ],
+ "order": "seed-major: every lineage at seed 23, then 37, 53, and 71, so a cutoff drops whole seeds",
+ "sample_seeds": [
+  101,
+  211,
+  307
+ ],
+ "sizes": [
+  1,
+  4
+ ],
+ "plan": {
+  "path": "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/canonical.plan.json",
+  "sha256": "ec3169e0d8881170139a8fbe1b3f8e6c0485325c3ab1cea18774a68169b5a4f4",
+  "lineages": 100,
+  "role": "The seed-11 lineage list, worker file pins, and joint TRAIN and validation digests. Each new fit must reproduce the seed-11 joint input digests."
+ },
+ "workers": "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/workers",
+ "runtime": {
+  "path": "/mnt/fast-scratch/dope-benchmark/tabsyn-x2-runtime-v1/runtime.lock.json",
+  "sha256": "7f64e393995119c7da62a395405dc6d825a98d56cfc885829b8a8253f3d53ede"
+ },
+ "adapter": {
+  "path": "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py",
+  "sha256": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
+  "repository_copy": "research/benchmark/tabsyn_adapter.py",
+  "author_commit": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7"
+ },
+ "adapter_edits": [
+  "The four research.benchmark.tabsyn_runtime_guard and tabsyn_admission imports become in-process guards, as in the seed-11 owner entry and tabsyn_sample.py.",
+  "fit's seed admission `seed == 11` becomes `seed in [11, 23, 37, 53, 71]`. No model, loss, epoch, optimizer, or sampler statement changes; sample's [101, 211, 307] and native_objective's seed 11 stay as captured."
+ ],
+ "seed_mapping": "fit(seed=s) seeds Python random, numpy, torch, and CUDA with s before the encoder, decoder, and loaders are built, as at seed 11. Each sample call reseeds with its sample seed.",
+ "host": "xbabe1",
+ "device": "cuda:0",
+ "gpu_memory_cap_bytes": 17179869184,
+ "cpu_slot": [
+  80,
+  81,
+  82,
+  83,
+  84,
+  85,
+  86,
+  87,
+  88,
+  89,
+  90,
+  91,
+  92,
+  93,
+  94,
+  95
+ ],
+ "gpu_lock": "/home/ubuntu/dope-scratch-x1/.gpu-fit.lock",
+ "output": "/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-seeds-v2",
+ "environment": {
+  "PATH": "/usr/bin:/bin",
+  "LC_ALL": "C",
+  "LD_LIBRARY_PATH": "from the runtime lock",
+  "CUDA_VISIBLE_DEVICES": "0",
+  "CUDA_CACHE_DISABLE": "1",
+  "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONDONTWRITEBYTECODE": "1",
+  "python_flags": "-I -S -B"
+ },
+ "caps": {
+  "fit_operation_seconds": 600,
+  "sample_operation_seconds": 180,
+  "basis": "These are the caps this arm ran under at fit seed 11: a 600 s whole fit operation (the 100 seed-11 fits measured 51 s median and 75 s maximum) and 180 s for one lineage's six samples in tabsyn_sample.py. predeclare_v2 budget.B1 names the author-default arms; the scaled arm keeps its seed-11 caps so that the five fits of one lineage share one budget."
+ },
+ "retry": "As predeclare_v2 missing_and_stopping, which it does not widen. An operation earns one retry, at the same cap in a new attempt directory, only for a listed infrastructure cause that the controller confirms on its own: a host reboot (the boot id changed while the attempt left no final receipt), a foreign GPU owner (a compute process remains after the worker exits), a storage refusal (the worker's ENOSPC or EDQUOT with under 1 GiB free), or a runtime-lock mismatch (the lock no longer matches its pin). A worker's own report of a cause is a claim, not a confirmation. An attempt that leaves no final receipt in the same boot is recorded as unknown and is final. Every other failure and every timeout is final. Every attempt stays on disk, and an attempt key is never reused.",
+ "scoring": {
+  "runner": "research/benchmark/review_fixes/rescore_ledger.py",
+  "adapter": "rescore_adapters.tabsyn_seeds, registered as ledger tabsyn-seeds with the committed sample ledger",
+  "ledger": "research/benchmark/results/review-fixes-tabsyn-seeds-v2/sample-cells.jsonl",
+  "auditor_seed": 1729,
+  "header": "stripped into a temporary copy, as for the seed-11 TabSyn cells",
+  "workers": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker",
+  "workers_note": "rescore_ledger.WORKERS, as for the seed-11 TabSyn cells. Each fit worker is the same file with one header row added; the plan action checks this on every lineage.",
+  "host": "xbabe1, CPU only, after the GPU block closes"
+ },
+ "close_utc": "2026-10-22T05:59:00Z",
+ "close_rule": "No operation starts at or after close_utc. The controller checks before waiting for the host, again after it takes the GPU lock, and again after publishing the request, immediately before the spawn. A request published after close gets a spawn-refused receipt, no worker runs, and the attempt is recorded as not_started, which is final. Each operation's seconds are fixed at spawn time as the earlier of its cap and close_utc.",
+ "monitoring": "Outcome-blind: the runner reads status, timing, and counts only. No retention exists until rescore_ledger.py runs after the last fit.",
+ "official_tests_opened": false
+}

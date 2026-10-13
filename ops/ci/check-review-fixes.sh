@@ -23,7 +23,8 @@ TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittes
   research.benchmark.review_fixes.test_bound_review_cells \
   research.benchmark.review_fixes.test_review_fidelity \
   research.benchmark.review_fixes.test_bind_v2_cells \
-  research.benchmark.review_fixes.test_rmse_units -q
+  research.benchmark.review_fixes.test_rmse_units \
+  research.benchmark.review_fixes.test_tabsyn_seeds_v2 -q
 for pattern in test_paper_control_inputs.py test_paper_wave2_inputs.py; do
   TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest discover \
     -s docs/whitepaper/scripts -p "$pattern" -q
