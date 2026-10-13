@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Block B: TabSyn's scaled arm (200 VAE and 1,000 diffusion epochs) is
+  fit at seeds 23, 37, 53, and 71 under its seed-11 caps, scored by the
+  pinned evaluator, and enters the v2 panel as a five-seed arm; the paper's
+  TabSyn rows, intervals, and seed text follow the panel.
+
 - Paper v2 (wave 2): a pre-declared v2 analysis contract
   (`research/benchmark/review_fixes/predeclare_v2.json`) committed before any v2
   result; DOPE refit at five fit seeds with the historical binary plus an
