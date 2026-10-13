@@ -210,6 +210,57 @@ fn nominal_equality_unknown_categories_and_excluded_keys_are_explicit() {
 }
 
 #[test]
+fn reloaded_transforms_apply_declared_unknown_category_semantics() {
+    let mut value = declaration();
+    value["columns"][0]["dtype"] = json!("nominal");
+    value["columns"][0]["domain"] = json!({"kind":"categorical", "values":["red","blue"]});
+    let data = table("private_measurement,private_outcome\nred,1\n", &value).unwrap();
+    let state = fit_transform(&data, &[0]).unwrap();
+    let retained = state.sampling_state_bytes().unwrap();
+    drop(data);
+    drop(state);
+    let loaded = FittedTransforms::reload(&retained).unwrap();
+    assert_eq!(
+        loaded
+            .transform_cell("c0001", &Cell::Category("green".into()))
+            .unwrap(),
+        Cell::Mask(MaskState::UnknownCategory)
+    );
+    assert_eq!(
+        loaded
+            .transform_cell("c0001", &Cell::Category("red".into()))
+            .unwrap(),
+        Cell::Category("red".into())
+    );
+}
+
+#[test]
+fn fit_errors_follow_csv_column_positions_after_header_reordering() {
+    for (csv, code) in [
+        (
+            "private_outcome,private_measurement\n1,\n2,ABSENT\n",
+            "fit_column_not_observed",
+        ),
+        (
+            "private_outcome,private_measurement\n1,-1.7e308\n2,1.7e308\n",
+            "affine_range_not_representable",
+        ),
+    ] {
+        let data = table(csv, &declaration()).unwrap();
+        let error = fit_transform(&data, &[0, 1]).unwrap_err();
+        assert_eq!((error.code, error.row, error.column), (code, None, Some(2)));
+    }
+    let mut value = declaration();
+    value["columns"][1]["dtype"] = json!("nominal");
+    let data = table("private_outcome,private_measurement\nlabel,10\n", &value).unwrap();
+    let error = fit_transform(&data, &[0]).unwrap_err();
+    assert_eq!(
+        (error.code, error.row, error.column),
+        ("fit_target_not_numeric", None, Some(1))
+    );
+}
+
+#[test]
 fn type_errors_have_positions_without_echoing_input() {
     for (dtype, field, code) in [
         ("continuous", "private_value_987", "invalid_numeric_value"),

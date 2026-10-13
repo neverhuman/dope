@@ -51,12 +51,13 @@ pub fn fit_transform(table: &TypedTable, fit_rows: &[usize]) -> Result<FittedTra
     }
     let mut columns = Vec::new();
     for (index, column) in table.schema.columns.iter().enumerate() {
+        let input_column = table.input_positions[index] + 1;
         if column.role == ColumnRole::Target {
             if !column.dtype.numeric() {
                 return Err(SchemaError::new(
                     "fit_target_not_numeric",
                     None,
-                    Some(index + 1),
+                    Some(input_column),
                 ));
             }
             for row in fit_rows {
@@ -64,7 +65,7 @@ pub fn fit_transform(table: &TypedTable, fit_rows: &[usize]) -> Result<FittedTra
                     return Err(SchemaError::new(
                         "fit_target_not_observed",
                         Some(row + 2),
-                        Some(table.input_positions[index] + 1),
+                        Some(input_column),
                     ));
                 }
             }
@@ -85,7 +86,7 @@ pub fn fit_transform(table: &TypedTable, fit_rows: &[usize]) -> Result<FittedTra
                     return Err(SchemaError::new(
                         "fit_target_not_observed",
                         Some(row + 2),
-                        Some(index + 1),
+                        Some(input_column),
                     ));
                 }
             }
@@ -93,7 +94,7 @@ pub fn fit_transform(table: &TypedTable, fit_rows: &[usize]) -> Result<FittedTra
                 return Err(SchemaError::new(
                     "fit_column_not_observed",
                     None,
-                    Some(index + 1),
+                    Some(input_column),
                 ));
             }
             let scale = if low == high { 1.0 } else { high - low };
@@ -101,7 +102,7 @@ pub fn fit_transform(table: &TypedTable, fit_rows: &[usize]) -> Result<FittedTra
                 return Err(SchemaError::new(
                     "affine_range_not_representable",
                     None,
-                    Some(index + 1),
+                    Some(input_column),
                 ));
             }
             (low, scale)
@@ -260,6 +261,11 @@ impl FittedTransforms {
                     && !value.is_empty()
                     && value.len() <= 4096 =>
             {
+                if let Some(ColumnDomain::Categorical { values }) = &column.domain {
+                    if !values.contains(value) {
+                        return Ok(Cell::Mask(MaskState::UnknownCategory));
+                    }
+                }
                 Ok(cell.clone())
             }
             Cell::Boolean(_) if column.dtype == ColumnType::Boolean => Ok(cell.clone()),
