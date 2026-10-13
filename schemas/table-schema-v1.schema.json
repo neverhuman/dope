@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dope.local/schemas/table-schema-v1.schema.json",
+  "title": "Private declared raw-table schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "columns"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-table-schema"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "metadata_visibility": {
+      "enum": [
+        "opaque_ids",
+        "approved_semantic_labels"
+      ],
+      "default": "opaque_ids"
+    },
+    "columns": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4096,
+      "items": {
+        "$ref": "#/$defs/column"
+      },
+      "contains": {
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "const": "target"
+          }
+        }
+      },
+      "minContains": 1,
+      "maxContains": 1,
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "role"
+            ],
+            "properties": {
+              "role": {
+                "const": "feature"
+              }
+            }
+          },
+          "minContains": 1
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "optional_label": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_name",
+        "role",
+        "dtype"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^c[0-9]{4}$"
+        },
+        "source_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "role": {
+          "enum": [
+            "feature",
+            "target",
+            "entity_key",
+            "timestamp",
+            "group_split_key",
+            "excluded_sensitive_identifier"
+          ]
+        },
+        "dtype": {
+          "enum": [
+            "continuous",
+            "integer",
+            "ordinal",
+            "nominal",
+            "boolean",
+            "date_time",
+            "text"
+          ]
+        },
+        "units": {
+          "$ref": "#/$defs/optional_label"
+        },
+        "semantic_label": {
+          "$ref": "#/$defs/optional_label"
+        },
+        "domain": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/numeric_domain"
+            },
+            {
+              "$ref": "#/$defs/category_domain"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mask_tokens": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/mask_token"
+          }
+        }
+      }
+    },
+    "numeric_domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "const": "numeric"
+        },
+        "lower": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "upper": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "category_domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "values"
+      ],
+      "properties": {
+        "kind": {
+          "const": "categorical"
+        },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        }
+      }
+    },
+    "mask_token": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token",
+        "state"
+      ],
+      "properties": {
+        "token": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "state": {
+          "enum": [
+            "missing",
+            "unknown_category",
+            "structural_absence",
+            "padding",
+            "censored"
+          ]
+        }
+      }
+    }
+  }
+}
