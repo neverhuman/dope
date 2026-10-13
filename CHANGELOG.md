@@ -22,6 +22,9 @@
   Captions and text now state the loss space, every interval type, and each
   inclusion rule where its count is printed, and the abstract prints the
   interval of every contrast it reports.
+  The supplement RMSE table states original target units, as its producer
+  computes them, and the compute-cost and publication-row reducers read every
+  input through a declared length and digest before decoding it.
 
 - Add tiered compact kernels, measured release gates, and versioned MFS-v2
   evidence on the single PR branch. No production release is declared.
