@@ -1,5 +1,6 @@
-//! Headered raw input. This path preserves original values and mask semantics;
-//! it does not invoke the historical unit-interval Table clipping path.
+//! Headered raw input preserves original values and mask semantics.
+//! Forward transforms enforce declared types and domains;
+//! inverse point predictions are unclipped.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
@@ -52,6 +53,7 @@ pub struct TypedTable {
     pub(crate) schema: TableSchemaV1,
     pub(crate) columns: Vec<Vec<Cell>>,
     pub(crate) input_positions: Vec<usize>,
+    max_field_bytes: usize,
     rows: usize,
 }
 
@@ -161,6 +163,7 @@ impl TypedTable {
             schema,
             columns,
             input_positions: positions,
+            max_field_bytes: limits.max_field_bytes,
             rows,
         })
     }
@@ -199,14 +202,13 @@ impl TypedTable {
             .ok_or_else(|| SchemaError::new("row_out_of_range", None, None))
     }
 
-    pub fn target_id(&self) -> &str {
-        &self
-            .schema
+    pub fn target_id(&self) -> Result<&str> {
+        self.schema
             .columns
             .iter()
             .find(|c| c.role == ColumnRole::Target)
-            .expect("validated target role")
-            .id
+            .map(|column| column.id.as_str())
+            .ok_or_else(|| SchemaError::new("missing_target_role", None, None))
     }
 
     /// Create an owner-only local source-name map. Existing paths are refused.

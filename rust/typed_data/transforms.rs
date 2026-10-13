@@ -24,8 +24,14 @@ pub struct FittedTransforms {
     format: String,
     version: u32,
     fit_rows: usize,
+    #[serde(default = "default_max_field_bytes")]
+    max_field_bytes: usize,
     visibility: MetadataVisibility,
     columns: Vec<RetainedColumn>,
+}
+
+fn default_max_field_bytes() -> usize {
+    InputLimits::default().max_field_bytes
 }
 
 impl fmt::Debug for FittedTransforms {
@@ -127,6 +133,7 @@ pub fn fit_transform(table: &TypedTable, fit_rows: &[usize]) -> Result<FittedTra
         format: "dope-affine-state".into(),
         version: 1,
         fit_rows: fit_rows.len(),
+        max_field_bytes: table.max_field_bytes,
         visibility: table.schema.metadata_visibility,
         columns,
     };
@@ -139,6 +146,7 @@ impl FittedTransforms {
         if self.format != "dope-affine-state"
             || self.version != 1
             || self.fit_rows == 0
+            || self.max_field_bytes == 0
             || self.columns.len() < 2
             || self.columns.len() > MAX_COLUMNS
         {
@@ -162,7 +170,7 @@ impl FittedTransforms {
                     .units
                     .iter()
                     .chain(&column.label)
-                    .any(|x| x.is_empty() || x.len() > 128)
+                    .any(|x| x.trim().is_empty() || x.len() > 128)
                 || (self.visibility == MetadataVisibility::OpaqueIds && column.label.is_some())
                 || matches!(column.dtype, ColumnType::DateTime | ColumnType::Text)
                 || column.mask_states.iter().collect::<BTreeSet<_>>().len()
@@ -262,11 +270,10 @@ impl FittedTransforms {
         let column = self.column(id)?;
         match cell {
             Cell::Mask(state) if column.mask_states.contains(state) => Ok(cell.clone()),
-            Cell::Category(value)
-                if column.dtype == ColumnType::Nominal
-                    && !value.is_empty()
-                    && value.len() <= 4096 =>
-            {
+            Cell::Category(value) if column.dtype == ColumnType::Nominal && !value.is_empty() => {
+                if value.len() > self.max_field_bytes {
+                    return Err(SchemaError::new("field_bytes_exceeded", None, None));
+                }
                 if let Some(ColumnDomain::Categorical { values }) = &column.domain {
                     if !values.contains(value) {
                         return Ok(Cell::Mask(MaskState::UnknownCategory));
