@@ -163,13 +163,20 @@ class StructuredTests(unittest.TestCase):
 
     def test_backend_errors_are_redacted_and_unavailable_is_typed(self):
         engine, backend = self.engine()
-        for error, code, kind in [(RuntimeError("private_value_999"), "backend_failed", S.StructuredError),
-                                  (SystemExit("private_header"), "backend_failed", S.StructuredError),
-                                  (ModuleNotFoundError("secret_path"), "backend_unavailable", S.StructuredUnavailable)]:
-            with patch.object(backend, "fit", side_effect=error), self.assertRaises(kind) as caught:
-                engine.fit(view(), 1)
-            self.assertEqual(str(caught.exception), code)
-            self.assertTrue(caught.exception.__suppress_context__)
+        cases = ((RuntimeError, "private_value_999", "backend_failed", S.StructuredError),
+                 (SystemExit, "private_header", "backend_failed", S.StructuredError),
+                 (ModuleNotFoundError, "secret_path", "backend_unavailable", S.StructuredUnavailable))
+        for fault, payload, code, kind in cases:
+            with self.subTest(fault=fault):
+                engine.fit(view(), 0)
+                with patch.object(backend, "fit", side_effect=fault(payload)) as fit:
+                    with self.assertRaises(kind) as caught:
+                        engine.fit(view(), 1)
+                    fit.assert_called_once()
+                self.assertEqual(str(caught.exception), code)
+                self.assertTrue(caught.exception.__suppress_context__)
+                with self.assertRaisesRegex(S.StructuredError, "generator_not_fitted"):
+                    engine.sample(1, 1)
 
     def test_resource_limits_counts_and_actual_wall_clock_are_enforced(self):
         engine, backend = self.engine(memory_bytes=100, gpu_bytes=0, wall_seconds=2)
