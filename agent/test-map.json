@@ -1457,6 +1457,34 @@
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
       "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
     },
+    "rust/bundle.rs": {
+      "command": "cargo test --locked --test vnext_bundle",
+      "purpose": "verify source-free sampling bundle inventory, caps, and retained DPK sampling"
+    },
+    "rust/bundle/": {
+      "command": "cargo test --locked --test vnext_bundle",
+      "purpose": "verify source-free sampling bundle inventory, caps, and retained DPK sampling"
+    },
+    "tests/vnext_bundle.rs": {
+      "command": "cargo test --locked --test vnext_bundle",
+      "purpose": "verify source-free sampling bundle inventory, caps, and retained DPK sampling"
+    },
+    "research/transfer/bundle.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify offline bundle inventory parity, path rejection, and byte accounting"
+    },
+    "research/transfer/tests/test_bundle.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify offline bundle inventory parity, path rejection, and byte accounting"
+    },
+    "schemas/generator-bundle-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify the closed generator-bundle schema against the inventory vocabulary"
+    },
+    "schemas/bundle-golden-v1.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_bundle -v",
+      "purpose": "verify golden amortized and included sampling-byte accounts"
+    },
     "docs/whitepaper/vnext/": {
       "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
       "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"

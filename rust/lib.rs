@@ -2,6 +2,7 @@
 
 pub mod access;
 pub mod auditor;
+pub mod bundle;
 pub mod calibration;
 pub mod campaign;
 pub mod certification;
