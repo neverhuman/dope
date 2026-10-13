@@ -6,7 +6,9 @@
 //! closure, not utility, privacy, or release authority.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs::{self, File};
+#[cfg(test)]
+use std::fs;
+use std::fs::File;
 use std::io::{ErrorKind, Read};
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
 use std::os::unix::ffi::OsStrExt;

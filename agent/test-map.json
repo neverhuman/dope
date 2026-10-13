@@ -1378,8 +1378,8 @@
       "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
     },
     "rust/lib.rs": {
-      "command": "cargo test --locked --lib evidence::tests",
-      "purpose": "verify vNext trust pins, finite canonical JSON, complete scientific cache identity, actual dependency bytes, DAG, splits, sums and atomic completion without changing historical receipts"
+      "command": "cargo test --locked --lib",
+      "purpose": "execute all registered Rust library API tests, including evidence, transfer metrics and sampling bundles"
     },
     "schemas/transfer-run-v1.schema.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
