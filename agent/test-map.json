@@ -1528,6 +1528,26 @@
     "docs/vnext/ADAPTERS.md": {
       "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v",
       "purpose": "verify offline portable adapter admission, original-unit alignment, context counts, complete cache pins and feature-only query boundaries without vendor qualification"
+    },
+    "rust/schema.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema",
+      "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
+    },
+    "rust/typed_data.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema",
+      "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
+    },
+    "rust/typed_data/transforms.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema",
+      "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
+    },
+    "schemas/table-schema-v1.schema.json": {
+      "command": "cargo test --locked --test vnext_raw_schema",
+      "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
+    },
+    "tests/vnext_raw_schema.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema",
+      "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
     }
   }
 }
