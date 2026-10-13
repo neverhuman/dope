@@ -25,6 +25,10 @@
   The supplement RMSE table states original target units, as its producer
   computes them, and the compute-cost and publication-row reducers read every
   input through a declared length and digest before decoding it.
+  The supplement repeats the source-family sensitivity on the five-seed
+  panel (`v2_family.py`): excluding the four simulated families and within
+  each family, with fit seeds resampled inside each lineage, as rows outside
+  every Holm family; CI recomputes the family file from the pinned ledger.
 
 - Add tiered compact kernels, measured release gates, and versioned MFS-v2
   evidence on the single PR branch. No production release is declared.

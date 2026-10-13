@@ -23,6 +23,7 @@ TEX = ROOT / "dope-mfs.tex"
 NUMBERS = ROOT / "generated" / "numbers.tex"
 FIGURE_MACROS = ROOT / "generated" / "figure-spec.tex"
 NUMBERS_V2 = ROOT / "generated" / "v2-numbers.tex"
+NUMBERS_V2_FAMILY = ROOT / "generated" / "v2-family-numbers.tex"
 FIGURES = (
     ROOT / "dope-mfs.pdf",
     ROOT / "dope-mfs-anonymous.pdf",
@@ -217,13 +218,18 @@ def main() -> int:
             defined.update(MACRO_DEF.findall(NUMBERS_V2.read_text()))
         else:
             failures.append("generated/v2-numbers.tex is missing")
+        if NUMBERS_V2_FAMILY.exists():
+            defined.update(MACRO_DEF.findall(NUMBERS_V2_FAMILY.read_text()))
+        else:
+            failures.append("generated/v2-family-numbers.tex is missing")
         used = set(MACRO_USE.findall(body))
         missing = sorted(
             name for name in used
             if name not in defined and name not in _LATEX and not name.startswith("IEEE")
         )
         if missing:
-            failures.append("macros used but not defined in numbers.tex or v2-numbers.tex: " + ", ".join(missing))
+            failures.append("macros used but not defined in numbers.tex, v2-numbers.tex or v2-family-numbers.tex: "
+                            + ", ".join(missing))
     else:
         failures.append("generated/numbers.tex is missing")
     if NUMBERS.exists() and "\\newcommand{\\FigWidth}{7.16in}" not in NUMBERS.read_text():
