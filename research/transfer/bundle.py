@@ -203,13 +203,17 @@ def _sorted_unique(values, code):
     return values
 
 
-# Loaded after the names above so this module can finish initializing.
-from research.transfer.bundle_io import (
-    _inventory,
-    _read_bytes,
-    _scan_open_directory,
-    preflight_dpk,
-)
+_IO_EXPORTS = frozenset({"_inventory", "_read_bytes", "_scan_open_directory", "preflight_dpk"})
+
+
+def __getattr__(name):
+    # bundle_io imports this module, so these helpers cannot load while it is initializing.
+    if name not in _IO_EXPORTS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    from research.transfer import bundle_io
+    value = getattr(bundle_io, name)
+    globals()[name] = value
+    return value
 
 
 def _role_total(components, role):
@@ -424,6 +428,8 @@ def _manifest(value, limits):
 
 
 def verify_bundle(root, expected_manifest_sha256, limits=None):
+    from research.transfer.bundle_io import _inventory, _read_bytes, preflight_dpk
+
     limits = limits or BundleLimits()
     root = Path(root)
     if type(expected_manifest_sha256) is not str or SHA256_HEX.fullmatch(expected_manifest_sha256) is None:
