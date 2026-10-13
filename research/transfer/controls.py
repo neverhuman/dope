@@ -38,6 +38,16 @@ def _rows(draws, noises):
 class Teacher:
     """Frozen target and noise parameters. The form is part of the target hash."""
 
+    __slots__ = (
+        "_form", "_parameters", "_noise_scale", "precision", "parameter_sha256", "noise_sha256",
+    )
+    _FROZEN = frozenset({"_form", "_parameters", "_noise_scale", "precision"})
+
+    def __setattr__(self, name, value):
+        if name in self._FROZEN and hasattr(self, "parameter_sha256"):
+            raise AttributeError("frozen_teacher")
+        object.__setattr__(self, name, value)
+
     def __init__(self, form, parameters, noise_scale, precision):
         _fail("invalid_target_form") if form not in ("linear", "nonlinear") else None
         _fail("invalid_precision") if precision != "float64" else None

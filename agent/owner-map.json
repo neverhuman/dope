@@ -382,6 +382,13 @@
     "rust/typed_data.rs": "rust-core",
     "rust/typed_data/transforms.rs": "rust-core",
     "schemas/table-schema-v1.schema.json": "governance",
-    "tests/vnext_raw_schema.rs": "rust-core"
+    "tests/vnext_raw_schema.rs": "rust-core",
+    "research/transfer/ablations/matched_teacher.json": "external-evidence",
+    "research/transfer/adapters/generators/distillation.py": "external-evidence",
+    "research/transfer/adapters/generators/neural.py": "external-evidence",
+    "research/transfer/controls.py": "external-evidence",
+    "research/transfer/locks/neural-generators.json": "external-evidence",
+    "research/transfer/tests/test_controls.py": "external-evidence",
+    "research/transfer/tests/test_neural_generators.py": "external-evidence"
   }
 }

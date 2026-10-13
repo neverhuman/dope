@@ -115,6 +115,34 @@ class ControlTests(unittest.TestCase):
         self.assertEqual(teacher.noise_sha256, before_noise)
         self.assertEqual(teacher.value(2, 1), before_value)
 
+    def test_private_teacher_fields_and_precision_cannot_leave_hashes_stale(self):
+        teacher = Teacher("nonlinear", {"quadratic": 1, "linear": 0, "bias": 0}, 1, "float64")
+        self.assertEqual(teacher.value(2, 1), 5)
+        before_parameter = teacher.parameter_sha256
+        before_noise = teacher.noise_sha256
+        writes = (
+            ("_form", "linear"),
+            ("_parameters", {"quadratic": 2, "linear": 0, "bias": 0}),
+            ("_noise_scale", 9),
+            ("precision", "float32"),
+        )
+        for name, value in writes:
+            with self.assertRaises(AttributeError) as raised:
+                setattr(teacher, name, value)
+            self.assertEqual(str(raised.exception), "frozen_teacher")
+            self.assertNotIn("float32", str(raised.exception))
+        self.assertEqual(teacher.value(2, 1), 5)
+        self.assertEqual(teacher.form, "nonlinear")
+        self.assertEqual(teacher.parameters["quadratic"], 1)
+        self.assertEqual(teacher.noise_scale, 1)
+        self.assertEqual(teacher.precision, "float64")
+        self.assertEqual(teacher.parameter_sha256, before_parameter)
+        self.assertEqual(teacher.noise_sha256, before_noise)
+        factor = MatchedTeacherFactorial(
+            teacher, PLAN["search_budget"], PLAN["byte_budget"], PLAN["controls"],
+        )
+        self.assertEqual(factor.teacher_for("real_n", "nonlinear").precision, "float64")
+
     def test_shuffled_constant_labels_preserve_the_label_multiset(self):
         teacher = Teacher("linear", {"quadratic": 0, "linear": 0, "bias": 5}, 0, "float64")
         factor = MatchedTeacherFactorial(

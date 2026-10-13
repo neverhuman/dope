@@ -1548,6 +1548,34 @@
     "tests/vnext_raw_schema.rs": {
       "command": "cargo test --locked --test vnext_raw_schema",
       "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
+    },
+    "research/transfer/ablations/matched_teacher.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
+      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+    },
+    "research/transfer/adapters/generators/distillation.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
+      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+    },
+    "research/transfer/adapters/generators/neural.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
+      "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
+    },
+    "research/transfer/controls.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
+      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+    },
+    "research/transfer/locks/neural-generators.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
+      "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
+    },
+    "research/transfer/tests/test_controls.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
+      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+    },
+    "research/transfer/tests/test_neural_generators.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
+      "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
     }
   }
 }
