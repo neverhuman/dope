@@ -379,6 +379,19 @@ class OtherAuditorTests(unittest.TestCase):
             select_conventional_recipe((candidate,), batch(), validation,
                                        lambda *_: (1., ResourceUsage(3, 1025, 0)), ResourceLimits(60., 1024, 0))
 
+    def test_selection_identity_ignores_measured_elapsed_and_peak_variation(self):
+        candidate = ConventionalLearnerRecipe("linear", "regression", ())
+        validation = batch((3., 4.), (70., 90.), "validation")
+        results = []
+        for elapsed, memory in ((1., 128), (2., 256)):
+            with patch("research.transfer.adapters.auditors.conventional.time.monotonic",
+                       side_effect=(0., 0., elapsed, elapsed)):
+                results.append(select_conventional_recipe((candidate,), batch(), validation,
+                               lambda *_: (1., ResourceUsage(3, memory, 0)), ResourceLimits(60., 1024, 0)))
+        self.assertEqual(results[0][0].sha256, results[1][0].sha256)
+        self.assertNotEqual(results[0][1]["elapsed_seconds"], results[1][1]["elapsed_seconds"])
+        self.assertNotEqual(results[0][1]["attempts"], results[1][1]["attempts"])
+
     def test_development_search_retains_all_candidates_and_freezes_selected_recipe(self):
         candidates = tuple(ConventionalLearnerRecipe("catboost", "regression", (("depth", d),), precision="float32") for d in (4, 6, 8))
         train, validation = batch(), batch((3., 4.), (70., 90.), "validation")

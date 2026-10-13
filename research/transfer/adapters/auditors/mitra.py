@@ -48,7 +48,9 @@ class MitraRecipe:
     def sha256(self):
         return digest({"format": "dope-mitra-recipe-v1", "revision": self.code_revision,
                        "adapter_source_sha256": port_source_sha256(__file__),
-                       "autogluon_revision": AUTOGLUON_REVISION, "fine_tune_steps": 0 if self.task == "classification" else 50,
+                       "autogluon_revision": AUTOGLUON_REVISION,
+                       "classification_fine_tune_steps": 0,
+                       "regression_requested_native_baseline_step_cap": 50,
                        "regression_route": "MitraFinetune.predict_mean_one_bagged_fit_per_call",
                        "in_process": True, "validation": "native_training_only",
                        "classification_shuffle_classes": True, "classification_shuffle_features": True,
@@ -137,7 +139,11 @@ class MitraAdapter(ObservedLearner):
             return MitraClassifier(**kwargs)
         require_native_dependency(self.identity, "mitra-finetune")
         from mitra_finetune import MitraFinetune
-        return MitraFinetune(**kwargs)
+        model = MitraFinetune(**kwargs)
+        # The pinned API has no steps constructor argument: it selects the
+        # frozen BASELINE ViewSpec (50-step cap), with MITRA_* overrides refused.
+        _require(model._view.steps == 50, "native_schedule_mismatch")
+        return model
 
     def _fit_native(self, model, x, y):
         attempt = {"event": "prepare", "requested_context_rows": len(y), "status": "started",

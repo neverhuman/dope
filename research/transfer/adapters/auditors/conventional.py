@@ -39,7 +39,12 @@ def immutable_parameter(value):
 
 
 def file_sha256(path):
-    """Stream a regular local artifact; diagnostics never contain its path."""
+    """Stream a regular final file; diagnostics never contain its path.
+
+    O_NOFOLLOW covers the final component. The executor verifies and freezes
+    ancestor directories as part of immutable snapshot admission; this helper
+    does not establish filesystem isolation.
+    """
     try:
         fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
         with os.fdopen(fd, "rb") as source:
@@ -311,10 +316,16 @@ def select_conventional_recipe(candidates, training, validation, fit_and_score, 
         _require(time.monotonic() - start <= limits.wall_seconds, "wall_budget_exceeded")
         attempts.append({"recipe_sha256": candidate.sha256, "loss": float(loss), "usage": asdict(usage)})
     winner = min(range(len(attempts)), key=lambda i: (attempts[i]["loss"], i))
+    selection = {"format": "dope-development-selection-v1", "training_sha256": training.sha256,
+                 "validation_sha256": validation.sha256,
+                 "candidates": [{"recipe_sha256": a["recipe_sha256"], "loss": a["loss"]} for a in attempts],
+                 "winner": winner, "limits": asdict(limits)}
+    selection_sha256 = digest(selection)
     receipt = {"format": "dope-development-tuning-v1", "training_sha256": training.sha256,
                "validation_sha256": validation.sha256, "attempts": attempts,
-               "winner": winner, "limits": asdict(limits), "elapsed_seconds": time.monotonic() - start}
-    return replace(candidates[winner], selection_sha256=digest(receipt)), receipt
+               "winner": winner, "limits": asdict(limits), "selection_sha256": selection_sha256,
+               "elapsed_seconds": time.monotonic() - start}
+    return replace(candidates[winner], selection_sha256=selection_sha256), receipt
 
 
 class ConventionalAdapter(ObservedLearner):
