@@ -1,7 +1,6 @@
 """Offline interface regressions; fixture factories do not qualify vendor weights."""
 import ast
 from dataclasses import FrozenInstanceError, replace
-import hashlib
 import json
 from pathlib import Path
 import tempfile

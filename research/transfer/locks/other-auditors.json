@@ -11,7 +11,11 @@
         "mitra-model.py": "51d350328e0ae30f94fb103e7f16820fe49df3d66b1e932b4704e1c23a683b79",
         "mitra-sklearn.py": "086002d406504363a1e428585f518f9ef4c6c8acb5bf54a03a087c2675b6481f"
       },
-      "artifact_closure_sha256": null
+      "artifact_closure_sha256": null,
+      "file_urls": {
+        "mitra-model.py": "https://raw.githubusercontent.com/autogluon/autogluon/152343642ce605c95333b2b1e27e5d47675a5c13/tabular/src/autogluon/tabular/models/mitra/mitra_model.py",
+        "mitra-sklearn.py": "https://raw.githubusercontent.com/autogluon/autogluon/152343642ce605c95333b2b1e27e5d47675a5c13/tabular/src/autogluon/tabular/models/mitra/sklearn_interface.py"
+      }
     },
     "finetune_source": {
       "repo": "autogluon/mitra-finetune",
@@ -23,7 +27,14 @@
         "mitra-runner.py": "fbf912da747348a549ad33a2f33fd75d5d0a1982eccc863bc616345d1d0d761e",
         "mitra-distribution.py": "95824cdd6c0af8e969f0e2ff51eece648cc0606f3de16daedeb52e05418d7ea6"
       },
-      "artifact_closure_sha256": null
+      "artifact_closure_sha256": null,
+      "file_urls": {
+        "mitra-api.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/api.py",
+        "mitra-modes.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/modes.py",
+        "mitra-checkpoint.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/checkpoint.py",
+        "mitra-runner.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/runner.py",
+        "mitra-distribution.py": "https://huggingface.co/autogluon/mitra-finetune/resolve/b4701e8148dc33b00ed15d7086ff59816957cde4/src/mitra_finetune/distribution.py"
+      }
     },
     "checkpoints": {
       "classification": {
@@ -77,7 +88,11 @@
         "tabicl-classifier.py": "fd578aef086353b47834f29a719191944ab528f04123ecef01be3e48a7ecc84b",
         "tabicl-regressor.py": "6ae77f1ab6bb76dc7d4e0c03cc9bf1dc29f7398d5bf071dff051c7497a0cea10"
       },
-      "artifact_closure_sha256": null
+      "artifact_closure_sha256": null,
+      "file_urls": {
+        "tabicl-classifier.py": "https://raw.githubusercontent.com/soda-inria/tabicl/10719e21fd72b8945d4a4f9ae077e350ba8650d9/src/tabicl/sklearn/classifier.py",
+        "tabicl-regressor.py": "https://raw.githubusercontent.com/soda-inria/tabicl/10719e21fd72b8945d4a4f9ae077e350ba8650d9/src/tabicl/sklearn/regressor.py"
+      }
     },
     "checkpoint": {
       "repo": "jingang/TabICL",

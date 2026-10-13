@@ -13,7 +13,16 @@
       "sdm-pyproject.toml": "121a3fd925cb1692842bf60402164a164a70b8da3b5a2014434ff822f998cbf6",
       "sdm-row-embedding.py": "c3409abf12862174eee67b1cbac89faae0722e3dfb803975673fa628fa13de49"
     },
-    "artifact_closure_sha256": null
+    "artifact_closure_sha256": null,
+    "file_urls": {
+      "sdm-kumo.py": "https://raw.githubusercontent.com/NVIDIA/structured-data-models/d50589692dbbbad4852eb1d9627f3b40c2673b63/sdm/models/kumo/tabular/model.py",
+      "sdm-base.py": "https://raw.githubusercontent.com/NVIDIA/structured-data-models/d50589692dbbbad4852eb1d9627f3b40c2673b63/sdm/models/base.py",
+      "sdm-recipe.py": "https://raw.githubusercontent.com/NVIDIA/structured-data-models/d50589692dbbbad4852eb1d9627f3b40c2673b63/sdm/models/kumo/tabular/recipe.py",
+      "sdm-table.py": "https://raw.githubusercontent.com/NVIDIA/structured-data-models/d50589692dbbbad4852eb1d9627f3b40c2673b63/sdm/tensor/table.py",
+      "sdm-huggingface.py": "https://raw.githubusercontent.com/NVIDIA/structured-data-models/d50589692dbbbad4852eb1d9627f3b40c2673b63/sdm/models/_huggingface.py",
+      "sdm-pyproject.toml": "https://raw.githubusercontent.com/NVIDIA/structured-data-models/d50589692dbbbad4852eb1d9627f3b40c2673b63/pyproject.toml",
+      "sdm-row-embedding.py": "https://raw.githubusercontent.com/NVIDIA/structured-data-models/d50589692dbbbad4852eb1d9627f3b40c2673b63/sdm/models/kumo/tabular/row_embedding.py"
+    }
   },
   "checkpoint": {
     "repo": "nvidia/Kumo-Tabular",
