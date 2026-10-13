@@ -144,4 +144,111 @@ mod tests {
             }
         }
     }
+
+    fn open_directory(path: &Path) -> OwnedFd {
+        let name = c_string(path.as_os_str().as_bytes()).unwrap();
+        owned_fd({
+            // SAFETY: `name` is a NUL-terminated path this test created. `open`
+            // uses O_DIRECTORY, O_NOFOLLOW, and O_CLOEXEC.
+            unsafe { open(name.as_ptr(), O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC, 0) }
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn replaced_directory_path_does_not_change_the_fd_listing() {
+        let base = Path::new(env!("CARGO_MANIFEST_DIR")).join("target/vnext/pr07-fd-walk");
+        let _ = fs::remove_dir_all(&base);
+        fs::create_dir_all(base.join("real")).unwrap();
+        fs::create_dir_all(base.join("decoy")).unwrap();
+        fs::write(base.join("real/manifest.json"), b"{}").unwrap();
+        fs::write(base.join("real/keep.bin"), b"ab").unwrap();
+        fs::write(base.join("decoy/manifest.json"), b"{}").unwrap();
+        fs::write(base.join("decoy/keep.bin"), b"ab").unwrap();
+        fs::write(base.join("decoy/secret.bin"), b"hidden").unwrap();
+        let real = base.join("real");
+        let directory = open_directory(&real);
+        fs::rename(&real, base.join("real.moved")).unwrap();
+        std::os::unix::fs::symlink(base.join("decoy"), &real).unwrap();
+        assert!(real.symlink_metadata().unwrap().file_type().is_symlink());
+        let declared = BTreeSet::from(["manifest.json".to_string(), "keep.bin".to_string()]);
+        let prefixes = BTreeSet::new();
+        let mut found = BTreeSet::new();
+        walk(
+            directory,
+            "",
+            &mut WalkLists {
+                declared: &declared,
+                prefixes: &prefixes,
+                found: &mut found,
+            },
+            WalkBudget {
+                max_entries: 33,
+                max_name_bytes: 33 * 64,
+            },
+        )
+        .unwrap();
+        assert_eq!(found, declared);
+        assert!(!found.contains("secret.bin"));
+    }
+
+    #[test]
+    fn directory_stream_stops_on_the_first_undeclared_or_cap() {
+        let base = Path::new(env!("CARGO_MANIFEST_DIR")).join("target/vnext/pr07-fd-cap");
+        let _ = fs::remove_dir_all(&base);
+        fs::create_dir_all(&base).unwrap();
+        fs::write(base.join("extra.bin"), b"x").unwrap();
+        let declared = BTreeSet::new();
+        let prefixes = BTreeSet::new();
+        let mut found = BTreeSet::new();
+        let error = walk(
+            open_directory(&base),
+            "",
+            &mut WalkLists {
+                declared: &declared,
+                prefixes: &prefixes,
+                found: &mut found,
+            },
+            WalkBudget {
+                max_entries: 8,
+                max_name_bytes: 8 * 64,
+            },
+        )
+        .unwrap_err();
+        assert_eq!(error.code(), "undeclared_component");
+        assert!(found.is_empty());
+        assert!(!error.to_string().contains("extra.bin"));
+
+        let error = walk(
+            open_directory(&base),
+            "",
+            &mut WalkLists {
+                declared: &declared,
+                prefixes: &prefixes,
+                found: &mut found,
+            },
+            WalkBudget {
+                max_entries: 0,
+                max_name_bytes: 64,
+            },
+        )
+        .unwrap_err();
+        assert_eq!(error.code(), "too_many_components");
+
+        let error = walk(
+            open_directory(&base),
+            "",
+            &mut WalkLists {
+                declared: &declared,
+                prefixes: &prefixes,
+                found: &mut found,
+            },
+            WalkBudget {
+                max_entries: 8,
+                max_name_bytes: 1,
+            },
+        )
+        .unwrap_err();
+        assert_eq!(error.code(), "too_many_components");
+    }
 }

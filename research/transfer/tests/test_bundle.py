@@ -332,6 +332,14 @@ class BundleGoldenTests(unittest.TestCase):
             VerifiedBundle({"charged_sampling_bytes": 0}, None, None)
         self.assertEqual(raised.exception.code, "verification_required")
 
+        class Forged(VerifiedBundle):
+            def __init__(self):
+                self._accounting = {"charged_sampling_bytes": 0}
+
+        with self.assertRaises(BundleError) as raised:
+            charged_sampling_bytes(Forged())
+        self.assertEqual(raised.exception.code, "verification_required")
+
     def test_report_accounting_cannot_change_verified_charge(self):
         directory, root, digest = stage(GOLDEN["cases"][0])
         with directory:

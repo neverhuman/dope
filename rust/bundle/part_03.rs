@@ -97,7 +97,23 @@ enum EntryKind {
     Unknown,
 }
 
-fn inventory(root: &Path, declared: &BTreeSet<String>) -> Result<(), BundleError> {
+#[derive(Clone, Copy)]
+struct WalkBudget {
+    max_entries: usize,
+    max_name_bytes: usize,
+}
+
+struct WalkLists<'a> {
+    declared: &'a BTreeSet<String>,
+    prefixes: &'a BTreeSet<String>,
+    found: &'a mut BTreeSet<String>,
+}
+
+fn inventory(
+    root: &Path,
+    declared: &BTreeSet<String>,
+    budget: WalkBudget,
+) -> Result<(), BundleError> {
     let root_name = c_string(root.as_os_str().as_bytes())?;
     let directory_flags = O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC;
     // SAFETY: `root_name` is NUL-terminated. `open` uses O_DIRECTORY, O_NOFOLLOW,
@@ -111,7 +127,16 @@ fn inventory(root: &Path, declared: &BTreeSet<String>) -> Result<(), BundleError
         }
     }
     let mut found = BTreeSet::new();
-    walk(root_fd, "", declared, &prefixes, &mut found)?;
+    walk(
+        root_fd,
+        "",
+        &mut WalkLists {
+            declared,
+            prefixes: &prefixes,
+            found: &mut found,
+        },
+        budget,
+    )?;
     if found != *declared {
         return Err(err("unresolved_dependency"));
     }
@@ -121,68 +146,18 @@ fn inventory(root: &Path, declared: &BTreeSet<String>) -> Result<(), BundleError
 fn walk(
     directory: OwnedFd,
     relative: &str,
-    declared: &BTreeSet<String>,
-    prefixes: &BTreeSet<String>,
-    found: &mut BTreeSet<String>,
+    lists: &mut WalkLists<'_>,
+    budget: WalkBudget,
 ) -> Result<(), BundleError> {
-    for (name, observed) in directory_entries(directory.as_raw_fd())? {
-        if name.is_empty() || name.contains(['/', '\\', '\0']) {
-            return Err(err("unsafe_path"));
-        }
-        let kind = if matches!(observed, EntryKind::Unknown) {
-            entry_kind_at(directory.as_raw_fd(), &name)?
-        } else {
-            observed
-        };
-        let child = if relative.is_empty() {
-            name.clone()
-        } else {
-            format!("{relative}/{name}")
-        };
-        match kind {
-            EntryKind::Symlink => return Err(err("symlink_component")),
-            EntryKind::Directory => {
-                if !prefixes.contains(&child) {
-                    return Err(err("undeclared_component"));
-                }
-                let segment = c_string(name.as_bytes())?;
-                let child_fd = owned_fd({
-                    // SAFETY: `segment` is one NUL-terminated path segment. `openat`
-                    // is relative to the owned directory descriptor and uses
-                    // O_DIRECTORY plus O_NOFOLLOW.
-                    unsafe {
-                        openat(
-                            directory.as_raw_fd(),
-                            segment.as_ptr(),
-                            O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC,
-                            0,
-                        )
-                    }
-                })?;
-                walk(child_fd, &child, declared, prefixes, found)?;
-            }
-            EntryKind::File => {
-                if !declared.contains(&child) {
-                    return Err(err("undeclared_component"));
-                }
-                found.insert(child);
-            }
-            EntryKind::Other | EntryKind::Unknown => {
-                return Err(err("dependency_not_regular_file"));
-            }
-        }
-    }
-    Ok(())
-}
-
-fn directory_entries(dirfd: i32) -> Result<Vec<(String, EntryKind)>, BundleError> {
-    let mut entries = Vec::new();
     let mut buffer = DirBuf([0u8; 8192]);
+    let mut entry_count = 0usize;
+    let mut name_bytes = 0usize;
     loop {
-        // SAFETY: `dirfd` is an owned directory descriptor. `buffer` is writable
-        // for 8192 bytes. `getdents64` fills only that buffer and returns the
-        // byte count or -1.
-        let read = unsafe { getdents64(dirfd, buffer.0.as_mut_ptr(), buffer.0.len()) };
+        // SAFETY: `directory` is an owned directory descriptor. `buffer` is
+        // writable for 8192 bytes. `getdents64` fills only that buffer and
+        // returns the byte count or -1.
+        let read =
+            unsafe { getdents64(directory.as_raw_fd(), buffer.0.as_mut_ptr(), buffer.0.len()) };
         if read < 0 {
             if errno() == EINTR {
                 continue;
@@ -212,12 +187,78 @@ fn directory_entries(dirfd: i32) -> Result<Vec<(String, EntryKind)>, BundleError
             let name = std::str::from_utf8(&buffer.0[offset + 19..name_end])
                 .map_err(|_| err("unsafe_path"))?;
             if name != "." && name != ".." {
-                entries.push((name.to_string(), kind_from_dtype(d_type)));
+                entry_count += 1;
+                name_bytes += name.len();
+                if entry_count > budget.max_entries || name_bytes > budget.max_name_bytes {
+                    return Err(err("too_many_components"));
+                }
+                accept_entry(
+                    &directory,
+                    relative,
+                    name,
+                    kind_from_dtype(d_type),
+                    lists,
+                    budget,
+                )?;
             }
             offset += reclen;
         }
     }
-    Ok(entries)
+    Ok(())
+}
+
+fn accept_entry(
+    directory: &OwnedFd,
+    relative: &str,
+    name: &str,
+    observed: EntryKind,
+    lists: &mut WalkLists<'_>,
+    budget: WalkBudget,
+) -> Result<(), BundleError> {
+    if name.is_empty() || name.contains(['/', '\\', '\0']) {
+        return Err(err("unsafe_path"));
+    }
+    let kind = if matches!(observed, EntryKind::Unknown) {
+        entry_kind_at(directory.as_raw_fd(), name)?
+    } else {
+        observed
+    };
+    let child = if relative.is_empty() {
+        name.to_string()
+    } else {
+        format!("{relative}/{name}")
+    };
+    match kind {
+        EntryKind::Symlink => Err(err("symlink_component")),
+        EntryKind::Directory => {
+            if !lists.prefixes.contains(&child) {
+                return Err(err("undeclared_component"));
+            }
+            let segment = c_string(name.as_bytes())?;
+            let child_fd = owned_fd({
+                // SAFETY: `segment` is one NUL-terminated path segment. `openat`
+                // is relative to the owned directory descriptor and uses
+                // O_DIRECTORY plus O_NOFOLLOW.
+                unsafe {
+                    openat(
+                        directory.as_raw_fd(),
+                        segment.as_ptr(),
+                        O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC,
+                        0,
+                    )
+                }
+            })?;
+            walk(child_fd, &child, lists, budget)
+        }
+        EntryKind::File => {
+            if !lists.declared.contains(&child) {
+                return Err(err("undeclared_component"));
+            }
+            lists.found.insert(child);
+            Ok(())
+        }
+        EntryKind::Other | EntryKind::Unknown => Err(err("dependency_not_regular_file")),
+    }
 }
 
 fn kind_from_dtype(d_type: u8) -> EntryKind {

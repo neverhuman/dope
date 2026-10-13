@@ -148,7 +148,7 @@ def within_budget(charged, cap):
 
 
 def charged_sampling_bytes(bundle):
-    if not isinstance(bundle, VerifiedBundle):
+    if type(bundle) is not VerifiedBundle:
         _fail("verification_required")
     return bundle.accounting["charged_sampling_bytes"]
 

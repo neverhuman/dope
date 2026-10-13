@@ -381,7 +381,15 @@ pub fn verify_bundle(
     for component in &components {
         declared.insert(component.path.clone());
     }
-    inventory(root, &declared)?;
+    let max_entries = limits.max_components.saturating_add(1);
+    inventory(
+        root,
+        &declared,
+        WalkBudget {
+            max_entries,
+            max_name_bytes: max_entries.saturating_mul(64),
+        },
+    )?;
     let mut payload = None;
     let mut features = None;
     let mut total = manifest_bytes.len() as u64;
