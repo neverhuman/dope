@@ -233,10 +233,22 @@ fn account_inventory(
     let amortized = [payload, transform, dictionary, manifest_bytes, shared_share]
         .into_iter()
         .try_fold(0u64, checked_add)?;
+    let mut edges = BTreeMap::<String, Vec<String>>::new();
+    for component in components {
+        edges.insert(component.id.clone(), component.depends_on.clone());
+    }
+    let mut reachable = BTreeSet::new();
+    for component in components
+        .iter()
+        .filter(|component| component.role == Role::Payload)
+    {
+        reachable.extend(closure(&component.id, &edges));
+    }
     let conditional = components
         .iter()
         .filter(|component| {
-            component.required && matches!(component.role, Role::Evidence | Role::Rows)
+            matches!(component.role, Role::Evidence | Role::Rows)
+                && (component.required || reachable.contains(&component.id))
         })
         .try_fold(0u64, |total, component| {
             checked_add(total, component.measured_bytes)

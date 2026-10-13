@@ -366,6 +366,7 @@
     "schemas/generator-bundle-v1.schema.json": "external-evidence",
     "schemas/bundle-golden-v1.json": "external-evidence",
     "research/transfer/bundle.py": "external-evidence",
+    "research/transfer/bundle_io.py": "external-evidence",
     "research/transfer/tests/test_bundle.py": "external-evidence",
     "docs/whitepaper/vnext/": "governance",
     "docs/whitepaper/scripts/vnext_paper.py": "governance",
