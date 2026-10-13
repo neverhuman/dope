@@ -1,5 +1,5 @@
 {
- "cells": 27756,
+ "cells": 30150,
  "dependencies": {
   "catboost": "1.2.10",
   "numpy": "1.26.4",
@@ -12,5 +12,5 @@
  "format": "dope-review-fix-v2-scalar-ledger",
  "official_tests_opened": false,
  "predeclare_sha256": "851215f70725b49cc74c8768aee45599b480881e5316ffe62d6b8b18862e9a47",
- "sha256": "db455b0aa6e45a9dbc9649ab220cc217fd60020f3db12eb468544bef6d3f124f"
+ "sha256": "ea4168621dfaadfb5735d5df74d384e57f46f8e16b8053402b663a6960a94745"
 }
