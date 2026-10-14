@@ -83,6 +83,8 @@ fn run(command: Command) -> Result<()> {
                     "name":"dope-kernel","implementation":"native_rust","version":DEVELOPMENT_VERSION,
                     "executable_sha256":format!("{:x}", sha2::Sha256::digest(&bytes)),
                     "executable_bytes":bytes.len(),"os":std::env::consts::OS,"architecture":std::env::consts::ARCH,
+                    "build_cargo_lock_sha256":format!("{:x}", sha2::Sha256::digest(include_bytes!("../Cargo.lock"))),
+                    "declared_rust_toolchain_sha256":format!("{:x}", sha2::Sha256::digest(include_bytes!("../rust-toolchain.toml"))),
                     "cpu_sampling":"available","gpu_training":cfg!(feature="gpu-training"),
                 "raw_profile":"raw-numeric-symbolic-v1","v1_artifact_decode":"read_only_compatible",
                     "source_free_isolation":if cfg!(all(target_os="linux",target_arch="x86_64")) {"linux_x86_64_fresh_worker"} else {"unavailable"},

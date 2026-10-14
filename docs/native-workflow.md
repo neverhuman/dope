@@ -1,5 +1,24 @@
 # Native raw-unit workflow
 
+The Linux x86-64 default native installer ships `share/dope-kernel/LICENSE`
+and `THIRD_PARTY_NOTICES` alongside the unchanged binary checksum receipt.
+`installed.sha256` binds the binary, receipt and both legal files to fixed owned
+paths. Uninstall validates the entire set before removing any member and preserves
+unrelated files and old V1 environments. Historical two-file installs still uninstall
+through their original binary receipt.
+
+The notice inventory is frozen from the existing locked normal/build Cargo graph
+and the pinned toolchain's local library legal inputs. `python3 -B
+scripts/native-notices.py --check` verifies regeneration from that offline cache;
+plain `python3 -B scripts/native-notices.py` is the maintainer regeneration command
+after an admitted package-input change. Install needs neither Cargo nor Python.
+It checks the shipped legal pins and the binary's embedded Cargo-lock and declared
+toolchain-config digests before creating a destination. Default CPU packaging is
+the supported profile; GPU/research adapters and separately provisioned OS runtime
+require their own package notices. The declared toolchain digest binds build config,
+not a compiler attestation or signed release. Added legal files are runtime/package
+bytes, separately charged from a dataset's learned carrier bytes.
+
 The native product is the Rust `dope-kernel` executable. Run its absolute path
 or place its installation prefix first in `PATH`; an activated Python V1
 environment must not choose the implementation. `dope-kernel doctor` reports
