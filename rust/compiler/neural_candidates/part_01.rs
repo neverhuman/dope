@@ -133,6 +133,8 @@ fn compile_neural_table(
         contains_row_payloads: false,
         contains_row_references: false,
         probe_failures: BTreeMap::new(),
+        search_history: Vec::new(),
+        residual_fitting: BTreeMap::new(),
     };
     Ok(CompileResult {
         candidate_artifacts: BTreeMap::from([(candidate_id, artifact.clone())]),

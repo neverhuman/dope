@@ -10,12 +10,18 @@ decodable; V1 Python remains a compatibility implementation.
 Build the pinned CPU product with `cargo build --locked --release`. Install an
 already built binary with `scripts/install-native.sh BINARY SHA256 PREFIX`.
 The installer checks the checksum and native identity before copying and refuses
-to overwrite an existing command. This installer currently admits Linux x86-64;
+to overwrite an existing command. `--dry-run` verifies the pin and identity without
+writing a destination. Copies are checked in a retained pending file and promoted
+by a non-overwriting rename, so interruption cannot publish a partial binary.
+This installer currently admits Linux x86-64;
 other architectures and OS targets need actual platform qualification. The
 installer uses standard Unix tools without installing a Python, research or GPU
-environment. To remove a
-dedicated installation, remove its `bin/dope-kernel` and
-`share/dope-kernel/native.sha256`; preserve the old V1 environment separately.
+environment. To remove a dedicated installation, use
+`scripts/uninstall-native.sh PREFIX [--dry-run]`. It verifies the recorded
+checksum and native identity, refuses a changed binary and removes only the
+installed command and checksum receipt. Directories, unrelated files and the
+V1 environment are preserved. Migrate using a new prefix and explicit native
+path, keeping V1 available under its compatibility command.
 
 `compile-raw --csv FIT.csv --schema PRIVATE_SCHEMA.json --out MODEL.raw`
 fits the declared headered columns in fitting rows only. Use a separate query
@@ -25,9 +31,12 @@ complete-artifact cap. `--candidate`, `--seed`, `--deadline-seconds` and
 `--max-complete-bytes` name changes explicitly. This raw profile is distinct
 from historical rank-space paper and certification profiles.
 
-The current `raw-continuous-symbolic-v1` profile accepts fully observed continuous
-regression features and target. Nominal, integer, Boolean and missing-mask
-capabilities refuse explicitly. Source names, source rows and entity-key maps
+The current `raw-numeric-symbolic-v1` profile accepts fully observed continuous, integer, ordinal and Boolean
+predictors with a declared continuous regression target. Nominal and missing-mask
+capabilities refuse explicitly. Integer/ordinal samples round to the nearest
+integer; Boolean samples use a fixed 0.5 threshold. The sampling receipt counts
+these repairs. Any violation of a declared physical domain refuses without
+clipping or retrying a draw. Source names, source rows and entity-key maps
 are not retained. Fit-only affine transforms, units, domain declarations and any
 approved semantic labels are private dataset-specific state, charged in full;
 their retention is not a privacy guarantee. A constant column uses scale 1 and

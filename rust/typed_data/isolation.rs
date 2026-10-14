@@ -81,13 +81,17 @@ pub fn seal_sampling_process() -> Result<()> {
             ));
         }
     }
-    // SAFETY: closes the fresh worker's inherited descriptors, never its two
-    // write-only output streams. No file descriptor objects survive this call.
+    // SAFETY: close_range takes only scalar arguments and cannot dereference
+    // Rust memory. The fresh worker has already read and closed its artifact;
+    // the range starts at 3, preserving the checked output descriptors 1 and 2.
     if unsafe { libc::syscall(libc::SYS_close_range, 3u32, u32::MAX, 0u32) } != 0 {
         return Err(DopeError::Unsupported(
             "sampling_fd_closure_unavailable".into(),
         ));
     }
+    // SAFETY: close takes a scalar descriptor and cannot dereference Rust
+    // memory. This dedicated worker never reads stdin; an already closed fd 0
+    // returns EBADF, which does not affect the sealed sampling boundary.
     unsafe {
         libc::close(0);
     }
@@ -144,7 +148,11 @@ pub fn seal_sampling_process() -> Result<()> {
         len: filter.len() as u16,
         filter: filter.as_mut_ptr(),
     };
-    // SAFETY: kernel copies the bounded BPF program and synchronizes all threads.
+    // SAFETY: the scalar prctl arguments set only NO_NEW_PRIVS. program points
+    // to filter's contiguous initialized sock_filter entries; its u16 length
+    // matches this bounded vector. Neither allocation moves or mutates during
+    // the synchronous seccomp call, which copies the program before returning.
+    // TSYNC applies the same restrictions to the already initialized CPU pool.
     let status = unsafe {
         if libc::prctl(libc::PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) != 0 {
             -1

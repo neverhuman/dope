@@ -191,6 +191,38 @@ fn constant_target_is_explicit_and_mixed_capability_refuses() {
         .err()
         .unwrap()
         .to_string();
-    assert!(error.contains("raw_profile_requires_continuous_columns"));
+    assert!(error.contains("raw_profile_requires_numeric_columns"));
     assert!(!error.contains("secret_cat") && !error.contains("private_x"));
+}
+
+#[test]
+fn numeric_predictor_types_survive_reload_with_counted_repairs() {
+    let declaration = json!({"format":"dope-table-schema","version":1,"columns":[
+        {"id":"c0001","source_name":"frequency","role":"feature","dtype":"integer","domain":{"kind":"numeric","lower":0}},
+        {"id":"c0002","source_name":"flag","role":"feature","dtype":"boolean"},
+        {"id":"c0003","source_name":"target","role":"target","dtype":"continuous"}
+    ]});
+    let csv = "frequency,flag,target\n10,true,10\n11,false,20\n13,true,30\n19,false,40\n";
+    let table = TypedTable::read_csv(
+        csv.as_bytes(),
+        TableSchemaV1::from_private_json(&serde_json::to_vec(&declaration).unwrap()).unwrap(),
+        InputLimits::default(),
+    )
+    .unwrap();
+    let result = compile_raw(&table, &[0, 1, 2, 3], &options(), 32768).unwrap();
+    assert_eq!(result.inspection.profile, "raw-numeric-symbolic-v1");
+    let detailed =
+        dope_kernel::typed_data::workflow::sample_raw_detailed(&result.artifact, 128, Some(87))
+            .unwrap();
+    assert!(
+        detailed
+            .values
+            .chunks_exact(3)
+            .all(|row| row[0].fract() == 0.0 && row[0] >= 0.0 && (row[1] == 0.0 || row[1] == 1.0))
+    );
+    assert_eq!(detailed.physical_domain_rejections, 0);
+    assert_eq!(
+        detailed.values,
+        sample_raw(&result.artifact, 128, Some(87)).unwrap()
+    );
 }

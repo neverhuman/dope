@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 # Install a caller-selected, checksum-pinned already-built native binary.
 set -euo pipefail
-if [[ $# != 3 ]]; then
-  printf '%s\n' 'usage: install-native.sh BINARY SHA256 PREFIX' >&2
+if [[ $# != 3 && $# != 4 ]]; then
+  printf '%s\n' 'usage: install-native.sh BINARY SHA256 PREFIX [--dry-run]' >&2
   exit 2
 fi
 binary=$1
 expected=$2
 prefix=$3
+if [[ $# == 4 && "$4" != --dry-run ]]; then
+  printf '%s\n' 'native_install_option_invalid' >&2
+  exit 2
+fi
 if [[ ! "$expected" =~ ^[0-9a-f]{64}$ || ! -f "$binary" || -L "$binary" || ! -x "$binary" ]]; then
   printf '%s\n' 'native_install_input_invalid' >&2
   exit 1
@@ -33,11 +37,26 @@ if [[ "$identity" != *'"implementation":"native_rust"'* || "$identity" != *'"nam
   printf '%s\n' 'native_install_identity_mismatch' >&2
   exit 1
 fi
+if [[ $# == 4 ]]; then
+  printf '%s\n' '{"operation":"would_install","implementation":"native_rust","network":false}'
+  exit 0
+fi
 mkdir -p -- "$prefix/bin" "$prefix/share/dope-kernel"
-install -m 0755 -- "$binary" "$prefix/bin/dope-kernel"
-installed=$(sha256sum -- "$prefix/bin/dope-kernel")
+candidate="$prefix/bin/.dope-kernel-$expected.pending"
+if ! (set -o noclobber; : > "$candidate") 2>/dev/null; then
+  printf '%s\n' 'native_install_candidate_exists_preserve_prior_attempt' >&2
+  exit 1
+fi
+cat -- "$binary" > "$candidate"
+chmod 0755 -- "$candidate"
+installed=$(sha256sum -- "$candidate")
 if [[ "${installed%% *}" != "$expected" ]]; then
   printf '%s\n' 'native_install_copied_checksum_mismatch' >&2
+  exit 1
+fi
+mv -T --no-clobber -- "$candidate" "$prefix/bin/dope-kernel"
+if [[ -e "$candidate" ]]; then
+  printf '%s\n' 'native_install_destination_appeared_preserve_candidate' >&2
   exit 1
 fi
 printf '%s\n' "$expected" > "$prefix/share/dope-kernel/native.sha256"

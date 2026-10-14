@@ -10,7 +10,7 @@ fn pinned_native_install_and_doctor_work_with_an_activated_v1_environment() {
     let binary = std::path::Path::new(env!("CARGO_BIN_EXE_dope-kernel"));
     let bytes = fs::read(binary).unwrap();
     let checksum = dope_kernel::bundle::content_fingerprint(&bytes);
-    let prefix = root.join("native");
+    let prefix = root.join("native prefix with spaces");
     let installer =
         std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("scripts/install-native.sh");
     let failed = Command::new(&installer)
@@ -20,6 +20,15 @@ fn pinned_native_install_and_doctor_work_with_an_activated_v1_environment() {
         .output()
         .unwrap();
     assert!(!failed.status.success());
+    assert!(!prefix.exists());
+    let dry_run = Command::new(&installer)
+        .arg(binary)
+        .arg(&checksum)
+        .arg(&prefix)
+        .arg("--dry-run")
+        .output()
+        .unwrap();
+    assert!(dry_run.status.success());
     assert!(!prefix.exists());
     let installed = Command::new(&installer)
         .arg(binary)
@@ -63,6 +72,41 @@ fn pinned_native_install_and_doctor_work_with_an_activated_v1_environment() {
         .output()
         .unwrap();
     assert!(!duplicate.status.success());
-    assert_eq!(fs::read(installed_binary).unwrap(), bytes);
+    assert_eq!(fs::read(&installed_binary).unwrap(), bytes);
     fs::write(root.join("install-doctor.json"), installed.stdout).unwrap();
+    let uninstaller =
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("scripts/uninstall-native.sh");
+    let unrelated = prefix.join("bin/unrelated");
+    fs::write(&unrelated, b"preserved").unwrap();
+    assert!(
+        Command::new(&uninstaller)
+            .arg(&prefix)
+            .arg("--dry-run")
+            .status()
+            .unwrap()
+            .success()
+    );
+    assert!(installed_binary.exists());
+    let receipt = prefix.join("share/dope-kernel/native.sha256");
+    fs::write(&receipt, "0".repeat(64)).unwrap();
+    assert!(
+        !Command::new(&uninstaller)
+            .arg(&prefix)
+            .status()
+            .unwrap()
+            .success()
+    );
+    assert!(installed_binary.exists());
+    fs::write(&receipt, format!("{checksum}\n")).unwrap();
+    assert!(
+        Command::new(&uninstaller)
+            .arg(&prefix)
+            .status()
+            .unwrap()
+            .success()
+    );
+    assert!(!installed_binary.exists());
+    assert!(!receipt.exists());
+    assert_eq!(fs::read(unrelated).unwrap(), b"preserved");
+    assert!(activated.join("bin/dope-kernel").exists());
 }
