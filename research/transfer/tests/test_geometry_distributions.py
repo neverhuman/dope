@@ -493,3 +493,24 @@ class Step5ControlTests(unittest.TestCase):
             "label_shuffle_control", "tail_deletion_control", "context_query_control", "geometry_plot_hook",
         ):
             self.assertFalse(hasattr(geometry, name))
+
+    def test_repeated_lineage_is_not_resampled_as_separate_units(self):
+        sentinel = "99999.5"
+        repeated = [
+            _cluster(fit, [[0.0], [float(index)]], [[0.0], [0.0]], lineage_id=sentinel, entity_id="entity-" + fit)
+            for index, fit in enumerate(("fit-a", "fit-b", "fit-c"))
+        ]
+        with self.assertRaises(ValueError) as refused:
+            _band(repeated)
+        self.assertEqual(str(refused.exception), "duplicate lineage")
+        self.assertNotIn(sentinel, str(refused.exception))
+        distinct = [
+            _cluster(fit, [[0.0], [0.0]], [[float(index)], [float(index)]])
+            for index, fit in enumerate(("fit-a", "fit-b", "fit-c"))
+        ]
+        report = _band(distinct)
+        self.assertEqual(report["independent_units"], 3)
+        self.assertEqual(report["lineage_ids"], ("lineage-fit-a", "lineage-fit-b", "lineage-fit-c"))
+        self.assertEqual(len(set(report["lineage_ids"])), report["independent_units"])
+        self.assertEqual(report["protocol"]["lineage_rule"], "refuse_repeated_lineage")
+        self.assertFalse(report["qualifies_transfer"])
