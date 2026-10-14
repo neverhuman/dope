@@ -11,6 +11,54 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Report this native executable and supported runtime profiles without data,
+    /// optional imports, network access, or automatic weight installation.
+    Doctor,
+    /// Fit a headered, declared continuous schema using fit rows only.
+    CompileRaw {
+        #[arg(long)]
+        csv: PathBuf,
+        #[arg(long)]
+        schema: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        report: Option<PathBuf>,
+        #[arg(long, default_value_t = 1729)]
+        seed: u64,
+        #[arg(long, default_value = "chow_liu")]
+        candidate: String,
+        #[arg(long, default_value_t = 32768)]
+        max_complete_bytes: usize,
+        #[arg(long, default_value_t = 60.0)]
+        deadline_seconds: f64,
+    },
+    /// Sample original-unit values from a complete retained raw-state artifact.
+    SampleRaw {
+        #[arg(long)]
+        artifact: PathBuf,
+        #[arg(long)]
+        rows: usize,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        seed: Option<u64>,
+    },
+    /// Inspect complete sampling bytes and explicit raw profile limitations.
+    InspectRaw {
+        #[arg(long)]
+        artifact: PathBuf,
+    },
+    /// Fresh Linux worker: verified bytes only, closed inherited FDs, no new
+    /// filesystem/network/process access. Redirect stdout and stderr to pipes/files.
+    SampleRawIsolated {
+        #[arg(long)]
+        artifact: PathBuf,
+        #[arg(long)]
+        rows: usize,
+        #[arg(long, default_value_t = 1729)]
+        seed: u64,
+    },
     /// Print the immutable release identity and contract digests.
     Version {
         #[arg(long)]
