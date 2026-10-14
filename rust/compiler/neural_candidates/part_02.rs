@@ -73,7 +73,11 @@ fn compile_symbolic_table(
     } else {
         "full_fit_binary_calibration_unqualified"
     };
-    let mut target_models = vec![(baseline_name, target_model.clone(), (noise.clone(), baseline_rule))];
+    let mut target_models = vec![(
+        baseline_name,
+        target_model.clone(),
+        (noise.clone(), baseline_rule),
+    )];
     let gam = fit_gam_target(table, &completed, &screen, task);
     target_models.push((
         "sparse_gam",
@@ -166,6 +170,36 @@ fn compile_symbolic_table(
             .then_with(|| left.2.cmp(&right.2))
             .then_with(|| left.3.cmp(&right.3))
     });
+    let proposed_ids = specs
+        .iter()
+        .map(|spec| {
+            options.backend_id.clone().unwrap_or_else(|| {
+                format!(
+                    "k{}-{}-{}-q{}",
+                    KNOT_LADDER[spec.0],
+                    dependence_name(spec.1),
+                    target_models[spec.2].0,
+                    spec.3
+                )
+            })
+        })
+        .collect::<std::collections::BTreeSet<_>>();
+    let search_preparation_seconds = started.elapsed().as_secs_f64();
+    let mut adaptive = if options.adaptive_allocation {
+        let bits = *options
+            .quantization_profiles
+            .iter()
+            .min()
+            .expect("validated nonempty profiles");
+        Some(AdaptiveAllocation::new(
+            specs.clone(),
+            beam_width,
+            seed,
+            (0, 0, 0, bits, 0.0),
+        ))
+    } else {
+        None
+    };
     let mut selected_specs = if restricted_profile.is_none() {
         fair_candidate_specs(specs, beam_width, seed)
     } else {
@@ -185,9 +219,25 @@ fn compile_symbolic_table(
             selected_specs.insert(0, (baseline.0, baseline.1, baseline.2, baseline.3, 0.0));
         }
     }
+    let mut fixed_specs = selected_specs.into_iter();
     let mut smallest_observed = None::<usize>;
     let mut search_history = Vec::new();
-    for (knot_index, dependence_family, target_index, bits, _) in selected_specs {
+    loop {
+        let next = if let Some(search) = &mut adaptive {
+            search.next()
+        } else {
+            fixed_specs.next()
+        };
+        let Some(spec @ (knot_index, dependence_family, target_index, bits, _)) = next else {
+            break;
+        };
+        let parent_candidate_id = adaptive.as_ref().and_then(|search| search.parent(spec));
+        let allocation = match adaptive.as_ref() {
+            None => "fixed_family_round_robin",
+            Some(search) if search.exploration => "adaptive_family_exploration",
+            Some(_) => "adaptive_encoded_racing_uncalibrated",
+        }
+        .to_string();
         let candidate_id = options.backend_id.clone().unwrap_or_else(|| {
             format!(
                 "k{}-{}-{}-q{bits}",
@@ -202,6 +252,9 @@ fn compile_symbolic_table(
                 disposition: "unvisited_deadline".into(),
                 actual_artifact_bytes: None,
                 elapsed_seconds: None,
+                pruned_encoded_zero_terms: None,
+                parent_candidate_id,
+                allocation,
             });
             continue;
         }
@@ -296,6 +349,12 @@ fn compile_symbolic_table(
             noise: noise.clone(),
         };
         kernel = quantized_kernel(&kernel, bits);
+        let pruned_encoded_zero_terms = if options.adaptive_allocation {
+            let (_, target, noise) = kernel.symbolic_mut().expect("symbolic allocation");
+            Some(prune_encoded_zero_support(target, noise))
+        } else {
+            None
+        };
         // Promotion and ranking consume the same decoded bytes as the shipped
         // sampler. In-memory quantized coefficients are not the final object.
         kernel.compliant = false;
@@ -335,6 +394,9 @@ fn compile_symbolic_table(
                 disposition: "encoded_over_cap".into(),
                 actual_artifact_bytes: Some(artifact.len()),
                 elapsed_seconds: Some(attempt_started.elapsed().as_secs_f64()),
+                parent_candidate_id,
+                allocation,
+                pruned_encoded_zero_terms,
             });
             continue;
         }
@@ -347,6 +409,9 @@ fn compile_symbolic_table(
             disposition: "encoded_accepted_development_only".into(),
             actual_artifact_bytes: Some(artifact.len()),
             elapsed_seconds: Some(attempt_started.elapsed().as_secs_f64()),
+            parent_candidate_id,
+            allocation,
+            pruned_encoded_zero_terms,
         });
         let score = 0.45 * utility + 0.25 * driver_agreement + 0.30 * proxy_joint_fidelity;
         let record = CandidateReport {
@@ -365,6 +430,9 @@ fn compile_symbolic_table(
             proxy_membership_auc,
             failed_gates,
         };
+        if let Some(search) = &mut adaptive {
+            search.observe(spec, candidate_id.clone(), score, artifact.len());
+        }
         artifacts.insert(candidate_id, artifact);
         candidates.push(record);
     }
@@ -388,6 +456,11 @@ fn compile_symbolic_table(
         .unwrap()
         .clone();
     let artifact = artifacts.get(&selected.candidate_id).unwrap().clone();
+    let offered_ids = search_history
+        .iter()
+        .map(|attempt| attempt.candidate_id.clone())
+        .collect::<std::collections::BTreeSet<_>>();
+    let unvisited_beam_candidates = proposed_ids.difference(&offered_ids).cloned().collect();
     let report = CompileReport {
         format: "dope-kernel-compile-report".into(),
         version: 3,
@@ -410,6 +483,14 @@ fn compile_symbolic_table(
         contains_row_references: false,
         probe_failures: BTreeMap::new(),
         search_history,
+        allocation_policy: if options.adaptive_allocation {
+            "adaptive_encoded_development_uncalibrated"
+        } else {
+            "fixed_family_round_robin"
+        }
+        .into(),
+        search_preparation_seconds: Some(search_preparation_seconds),
+        unvisited_beam_candidates,
         residual_fitting: target_models
             .iter()
             .map(|(name, _, (_, rule))| ((*name).into(), (*rule).into()))

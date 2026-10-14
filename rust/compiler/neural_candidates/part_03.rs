@@ -99,6 +99,7 @@ mod tests {
             backend_id: None,
             neural_target_weight: 2.0,
             neural_structural_penalty: 0.0,
+            adaptive_allocation: false,
             release_policy: ReleasePolicy::new(AnonymizationTier::L0, None, false).unwrap(),
         };
         let result =

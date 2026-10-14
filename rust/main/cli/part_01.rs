@@ -218,6 +218,9 @@ enum Command {
         neural_target_weight: f64,
         #[arg(long, default_value_t = 0.0)]
         neural_structural_penalty: f64,
+        /// Development-only encoded-feedback allocation; does not certify improvement.
+        #[arg(long)]
+        adaptive_allocation: bool,
         #[arg(long, default_value = "l3")]
         tier: String,
         #[arg(long)]

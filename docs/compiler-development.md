@@ -13,6 +13,17 @@ time and deadline-unvisited states. Unvisited families are not inferior results.
 The raw-unit envelope reserves its retained transform/schema/framing charge
 before allocating a native-payload cap.
 
+`compile --adaptive-allocation` opts into development racing over the same fitted
+target/dependence pool, knot/precision ladder and offer budget. Frozen empirical
+`--candidate` profiles refuse this mode. Families receive an initial opportunity
+before racing; one of every four later offers explores the least visited family.
+Encoded observations maintain quality/byte tradeoffs and comparison parents.
+Only exact zero support is pruned after quantization, preserving nonzero fitted
+signals. Every offered encoded rejection remains charged, shared fitting time is
+separate, and unvisited beam/deadline candidates remain unavailable. The exploration
+bonus is a heuristic. It is not calibrated uncertainty, an attributable transfer
+gain, or qualification of unsupported mask/architecture refinements.
+
 Ga2m fitting now consumes an independent pair screen. Up to 64 predictors it
 tests every pair; wider inputs receive a fixed, bounded 2,048-proposal exploration
 budget. Four row-index-hash folds are independent of target values and candidate

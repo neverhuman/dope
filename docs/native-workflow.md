@@ -71,3 +71,9 @@ objects. Sampling then produces a deterministic sample digest. This irreversible
 requires a dedicated fresh process and refuses unsupported platforms. Its
 positive and negative fixture proof is local CPU evidence, not an arbitrary-code
 isolation claim or protected evaluator deployment.
+
+The native evidence library also exposes separate learner-role v2 and calibration
+receipt v1 entries. Held-out learner families cannot win development selection.
+A matching development-protocol digest authenticates its binding while remaining
+unmeasured for N13b, qualified coverage, confirmation and release. Historical
+behavior-contract-v1 validation stays separate and retains its overlap refusal.
