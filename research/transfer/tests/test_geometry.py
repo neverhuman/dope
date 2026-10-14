@@ -3,7 +3,8 @@ import unittest
 import numpy as np
 
 from research.transfer.geometry import (
-    closeness_qualifies, coordinate_distance, ecdf, energy_distance_unbiased, fit_minmax,
+    closeness_qualifies, coordinate_distance, dependence_aware_ecdf, ecdf, energy_distance_unbiased,
+    euclidean_role_distributions, fit_minmax,
     frozen_column_digest, frozen_geometry_commitment, held_out_status, matched_neighbor_references, mmd2_unbiased,
     nearest_other_entity_distance, null_cloud,
     other_entity_row_count, real_real_calibration, shared_frozen_geometry, shared_geometry_claim,
@@ -435,6 +436,49 @@ class GeometryTests(unittest.TestCase):
             )
         self.assertEqual(str(echoed.exception), "invalid frozen scaler")
         self.assertNotIn(marker, str(echoed.exception))
+
+    def test_euclidean_roles_and_dependence_aware_ecdf(self):
+        real = np.array([[0.0], [3.0]])
+        synthetic = np.array([[10.0], [10.0]])
+        report = euclidean_role_distributions(real, synthetic, space="row_activation", encoder_id="enc-a")
+        self.assertEqual(report["roles"], ("real_real", "real_synthetic", "synthetic_synthetic"))
+        self.assertEqual(report["distances"]["real_real"], (3.0,))
+        self.assertEqual(report["distances"]["synthetic_synthetic"], (0.0,))
+        self.assertEqual(report["distances"]["real_synthetic"], (7.0, 7.0, 10.0, 10.0))
+        self.assertEqual(report["row_counts"], {"real": 2, "synthetic": 2})
+        self.assertEqual(report["pair_counts"], {"real_real": 1, "real_synthetic": 4, "synthetic_synthetic": 1})
+        self.assertNotEqual(report["distances"]["real_real"][0], report["row_counts"]["real"])
+        self.assertIsNone(report["independent_units"])
+        self.assertIsNone(report["band"])
+        self.assertFalse(report["qualifies_transfer"])
+        self.assertFalse(report["privacy_result"])
+        self.assertFalse(report["formal_dp"])
+        self.assertFalse(report["hipaa"])
+        other_space = euclidean_role_distributions(
+            real, synthetic, space="action_representation", encoder_id="enc-a",
+        )
+        self.assertNotEqual(report["space"], other_space["space"])
+        with self.assertRaises(ValueError) as mismatched:
+            euclidean_role_distributions(
+                real, np.array([[0.0, 1.0], [1.0, 1.0]]), space="row_activation", encoder_id="enc-a",
+            )
+        self.assertEqual(str(mismatched.exception), "invalid clouds")
+        self.assertNotIn("10.0", str(mismatched.exception))
+        band = dependence_aware_ecdf(
+            report["distances"]["real_synthetic"], space="row_activation", row_count=2, fit_count=1,
+        )
+        self.assertEqual(band["probabilities"], (0.25, 0.5, 0.75, 1.0))
+        self.assertEqual(band["independent_units"], 1)
+        self.assertEqual(band["distance_count"], 4)
+        self.assertIsNone(band["band"])
+        self.assertEqual(band["band_status"], "unmeasured")
+        self.assertFalse(band["pair_count_is_independent"])
+        self.assertFalse(band["qualifies_transfer"])
+        self.assertFalse(band["formal_dp"])
+        with self.assertRaises(ValueError) as pairs:
+            dependence_aware_ecdf((0.0, 1.0, 2.0, 3.0, 4.0, 5.0), space="row_activation", row_count=4, fit_count=6)
+        self.assertEqual(str(pairs.exception), "dependent_pairs_are_not_units")
+        self.assertNotIn("5.0", str(pairs.exception))
 
     def test_energy_and_sliced_wasserstein_do_not_qualify(self):
         negative = energy_distance_unbiased(np.array([[0.0], [1.0]]), np.array([[0.0], [1.0]]))
