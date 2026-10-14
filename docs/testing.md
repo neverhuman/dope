@@ -12,6 +12,12 @@ for both manifests, at most 120 seconds each with no retries. Setup may fetch
 current locked public crates; the subsequent feature-boundary proof stays
 offline and unfiltered. Metadata JSON lives under ignored target output, and
 Cargo failures retain bounded stderr without exposing it in GitHub receipts.
+Hosted CPU also runs the complete offline `research/transfer/tests/test_*.py`
+discovery once, using its provisioned V1 interpreter after all fixture packages
+are installed. Temporary files stay in `target/transfer-test-tmp`, and native
+learner fixtures use one CPU thread. These fixtures preserve identity, coverage,
+statistics and adapter contracts; they do not qualify official vendor weights
+or a protected scientific campaign. Local fast/check retain their full discovery.
 `just security` scans secrets, dependencies, workflow syntax, and writes an
 SPDX SBOM. `just score` regenerates Python boundary evidence, then runs the
 full pinned Jankurai audit.

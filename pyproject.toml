@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.scripts]
-dope-kernel = "dope_kernel.cli:main"
+dope-kernel-v1 = "dope_kernel.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

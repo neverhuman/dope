@@ -1638,8 +1638,8 @@
       "purpose": "prove pinned isolated tool dependencies and require independent lock advisory coverage in the canonical security lane"
     },
     "ops/ci/cpu.sh": {
-      "command": "just check",
-      "purpose": "preserve existing CPU checks and require isolated native guard format/clippy/tests; CI retains all paper and product gates"
+      "command": "just fast && just check",
+      "purpose": "retain all product/native/paper CPU checks and add complete offline transfer fixture discovery after provisioned dependencies; same full suite runs in local fast/check with no exclusions"
     },
     "docs/merge-guard.md": {
       "command": "just native-guard-check",
