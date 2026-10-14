@@ -4,6 +4,7 @@ import math
 from pathlib import Path
 import unittest
 
+from research.transfer.calibration_receipt import development_protocol, verify_calibration_receipt
 from research.transfer.evidence import digest
 from research.transfer.losses import (
     ClassificationContract, DegenerateScale, LossSpace, PairedLosses, TrainingScale, training_variance,
@@ -163,9 +164,14 @@ class MetricsTests(unittest.TestCase):
             "pin_source": "external", "task_id": "t", "contrast_id": "a/n",
             "protocol_id": "protocol", "receipt_id": "receipt", "upper_z": 0.2, "lower_z": 0.1,
         }
-        self.assertEqual(qualified_coverage(
+        uncalibrated_harm = qualified_coverage(
             [harmful], verify_bound=lambda task, key, bound: authenticate_bound(task, key, bound, expected),
-        )["cell_counts"]["harmful"], 1)
+        )
+        self.assertTrue(authenticate_bound(harmful, "a/n", bound, expected))
+        self.assertEqual(uncalibrated_harm["cell_counts"]["harmful"], 0)
+        self.assertEqual(uncalibrated_harm["cell_counts"]["qualified"], 0)
+        self.assertEqual(uncalibrated_harm["cell_counts"]["observed_outside"], 1)
+        self.assertEqual(uncalibrated_harm["scheduled_cells"], 4)
         self.assertFalse(authenticate_bound(harmful, "a/n", bound, legacy))
         self.assertFalse(authenticate_bound(harmful, "a/n", BoundEvidence(0.4, "a/n", "protocol", "receipt", 0.1), expected))
         swapped = task(name="other", cells={"a/n": measured(11., bound)}, artifacts=(artifact,))
@@ -282,6 +288,7 @@ class MetricsTests(unittest.TestCase):
         forged_flag = {"authenticated": True, "qualifies": True, "calibration": "measured"}
         flagged = qualified_coverage([owner_task], verify_bound=lambda *args: forged_flag)
         self.assertEqual(flagged["cell_counts"]["qualified"], 0)
+        self.assertEqual(flagged["cell_counts"]["harmful"], 0)
         self.assertEqual(flagged["coverage"], 0.)
         point_with_content = TaskEvaluation(
             "f", "t", (cell_id,), {cell_id: cell}, len(content), 100, True, (committed,),
@@ -290,6 +297,105 @@ class MetricsTests(unittest.TestCase):
         content_expected = {**content_record, "trust": "recomputed", "binding_digest": digest(content_record)}
         self.assertEqual(content_record["artifact_commitment"], "content_sha256")
         self.assertFalse(bound_qualification(point_with_content, cell_id, cell.bound, content_expected)["qualifies"])
+
+    def test_uncalibrated_bounds_are_not_inferential(self):
+        def owner_case(synthetic, upper, lower):
+            cell_id = "a/n"
+            bound = BoundEvidence(upper, cell_id, "protocol", "receipt", lower_z=lower)
+            cell = CellResult("measured", pairs(synthetic=synthetic), TrainingScale(100.), Margin(0., 0.01), bound)
+            artifact = FitArtifact(cell_id, "fit-0", 10)
+            evaluation = TaskEvaluation("f", "t", (cell_id,), {cell_id: cell}, 10, 100, True, (artifact,))
+            analysis = {
+                "learner_id": "a", "endpoint": "z", "schedule_id": "schedule-1",
+                "code_digest": digest({"code": "owner-analysis-v1"}), "rng_id": "rng-1",
+                "draws": 1, "multiplicity": "cell",
+            }
+            record = bound_binding_record(evaluation, cell_id, bound, analysis)
+            expected = {**record, "trust": "owner", "binding_digest": digest(record)}
+            return evaluation, expected
+
+        def counts(evaluation, verifier):
+            report = qualified_coverage([evaluation], verify_bound=verifier)
+            return report["cell_counts"], report
+
+        positive, positive_expected = owner_case(11., 0.2, 0.1)
+        self.assertGreater(positive.cells["a/n"].z, 0)
+        self.assertTrue(authenticate_bound(positive, "a/n", positive.cells["a/n"].bound, positive_expected))
+        positive_counts, positive_report = counts(
+            positive, lambda task, key, bound: authenticate_bound(task, key, bound, positive_expected),
+        )
+        self.assertEqual(positive_counts["observed_outside"], 1)
+        self.assertEqual(positive_counts["harmful"], 0)
+        self.assertEqual(positive_counts["qualified"], 0)
+        self.assertEqual(positive_report["coverage"], 0.)
+        self.assertEqual(positive_report["scheduled_cells"], 1)
+        self.assertIsNone(positive_report["confidence_interval"])
+        inside, inside_expected = owner_case(1., 0.2, 0.1)
+        self.assertLessEqual(inside.cells["a/n"].z, 0)
+        inside_counts, inside_qualified = counts(
+            inside, lambda task, key, bound: authenticate_bound(task, key, bound, inside_expected),
+        )
+        self.assertEqual(inside_counts["observed_only"], 1)
+        self.assertEqual(inside_counts["harmful"], 0)
+        self.assertEqual(inside_counts["qualified"], 0)
+        self.assertEqual(inside_qualified["coverage"], 0.)
+        self.assertEqual(observed_coverage([inside])["coverage"], 1.)
+        benefit, benefit_expected = owner_case(1., -0.2, -0.5)
+        benefit_counts, benefit_report = counts(
+            benefit, lambda task, key, bound: bound_qualification(task, key, bound, benefit_expected),
+        )
+        self.assertTrue(bound_qualification(benefit, "a/n", benefit.cells["a/n"].bound, benefit_expected)["authenticated"])
+        self.assertEqual(benefit_counts["observed_only"], 1)
+        self.assertEqual(benefit_counts["qualified"], 0)
+        self.assertEqual(benefit_counts["harmful"], 0)
+        self.assertEqual(benefit_report["coverage"], 0.)
+        outside_benefit, _ = owner_case(11., -0.05, -0.2)
+        outside_counts, _ = counts(outside_benefit, lambda *args: True)
+        self.assertEqual(outside_counts["observed_outside"], 1)
+        self.assertEqual(outside_counts["qualified"], 0)
+        self.assertEqual(outside_counts["harmful"], 0)
+        forged = {
+            "authenticated": True, "qualifies": True, "calibration": "measured",
+            "harmful": True, "uncertainty": "present",
+        }
+        forged_counts, _ = counts(positive, lambda *args: forged)
+        self.assertEqual(forged_counts["harmful"], 0)
+        self.assertEqual(forged_counts["qualified"], 0)
+        self.assertEqual(forged_counts["observed_outside"], 1)
+        protocol = development_protocol()
+        receipt = {
+            "format": "dope-calibration-receipt", "version": 1,
+            "protocol_id": protocol["protocol_id"], "protocol_digest": digest(protocol),
+            "repetitions": protocol["development_validation"]["repetitions"],
+            "bootstrap_draws": protocol["development_validation"]["bootstrap_draws"],
+            "frozen_for_confirmation": protocol["frozen_for_confirmation"],
+            "manifest_digest": None, "tolerances_frozen_before_outcomes": False,
+            "mcse_reported": False, "wilson_reported": False,
+        }
+        receipt["binding_digest"] = digest(receipt)
+        decision = verify_calibration_receipt(receipt)
+        self.assertIs(decision["authenticates"], True)
+        self.assertIs(decision["n13b"], False)
+        self.assertIs(decision["qualifies"], False)
+        self.assertEqual(decision["calibration"], "unmeasured")
+        with_receipt = {**forged, "calibration_receipt": receipt}
+        receipt_counts, _ = counts(positive, lambda *args: with_receipt)
+        self.assertEqual(receipt_counts["harmful"], 0)
+        self.assertEqual(receipt_counts["qualified"], 0)
+        self.assertEqual(receipt_counts["observed_only"], 0)
+        self.assertEqual(receipt_counts["observed_outside"], 1)
+        broken_counts, _ = counts(positive, lambda *args: {**forged, "calibration_receipt": {"version": 1}})
+        self.assertEqual(broken_counts["harmful"], 0)
+        self.assertEqual(broken_counts["qualified"], 0)
+        self.assertEqual(broken_counts["observed_outside"], 1)
+        tampered = {**positive_expected, "binding_digest": "b" * 64}
+        tampered_counts, _ = counts(
+            positive, lambda task, key, bound: authenticate_bound(task, key, bound, tampered),
+        )
+        self.assertFalse(authenticate_bound(positive, "a/n", positive.cells["a/n"].bound, tampered))
+        self.assertEqual(tampered_counts["harmful"], 0)
+        self.assertEqual(tampered_counts["qualified"], 0)
+        self.assertEqual(tampered_counts["observed_outside"], 1)
 
     def test_separate_classification_contract(self):
         case = GOLDEN["classification"]

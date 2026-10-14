@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 import hashlib
 import math
 
+from .calibration_receipt import verify_calibration_receipt
 from .evidence import digest
 from .losses import PairedLosses, TrainingScale, finite_number
 
@@ -338,6 +339,28 @@ def bound_qualification(task, cell_id, bound, expected) -> dict:
     }
 
 
+def _admissible_uncertainty(decision) -> bool:
+    """Caller flags are not a calibration manifest.
+
+    Both inferential directions stay closed unless a receipt verifies as
+    measured N13b. The development protocol does not.
+    """
+    if not isinstance(decision, dict):
+        return False
+    receipt = decision.get("calibration_receipt")
+    if not isinstance(receipt, dict):
+        return False
+    try:
+        verified = verify_calibration_receipt(receipt)
+    except ValueError:
+        return False
+    return (
+        verified.get("n13b") is True
+        and verified.get("qualifies") is True
+        and verified.get("calibration") == "measured"
+    )
+
+
 def _task_feasible(task) -> bool:
     if task.artifact_bytes > task.byte_budget or not task.resources_within_budget:
         return False
@@ -369,16 +392,16 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
                 potential &= cell.status == "unresolved"
                 continue
             observed = cell.z <= 0
-            authenticated = False
+            admissible = False
             if cell.bound is not None and verify_bound is not None:
-                decision = verify_bound(task, key, cell.bound)
-                if isinstance(decision, dict):
-                    authenticated = decision.get("authenticated") is True
-                else:
-                    authenticated = decision is True
-            inferential_harm = authenticated and cell.bound.lower_z is not None and cell.bound.lower_z > 0
-            qualified = False
-            if qualified:
+                admissible = _admissible_uncertainty(verify_bound(task, key, cell.bound))
+            inferential_harm = (
+                admissible and cell.bound is not None and cell.bound.lower_z is not None and cell.bound.lower_z > 0
+            )
+            inferential_benefit = (
+                admissible and observed and cell.bound is not None and cell.bound.upper_z <= 0 and not inferential_harm
+            )
+            if inferential_benefit:
                 counts["qualified"] += 1
             elif inferential_harm:
                 counts["harmful"] += 1
@@ -386,8 +409,8 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
                 counts["observed_only"] += 1
             else:
                 counts["observed_outside"] += 1
-            passed &= qualified if supported else observed
-            potential &= qualified if supported else observed
+            passed &= inferential_benefit if supported else observed
+            potential &= inferential_benefit if supported else observed
         families[task.family_id].append((int(passed), int(potential)))
     lower = math.fsum(math.fsum(v[0] for v in members) / len(members) for members in families.values()) / len(families)
     upper = math.fsum(math.fsum(v[1] for v in members) / len(members) for members in families.values()) / len(families)
