@@ -1,6 +1,7 @@
 # Read-only merge guard
 
-`agent/merge_guard.py` inspects GitHub using GET requests through the existing
+`dope-merge-guard`, a standalone Rust executable under `ops/merge_guard/`,
+inspects GitHub using GET requests through the existing
 `gh` identity. It does not approve, enqueue, merge, change rules, switch accounts,
 retry jobs or qualify a release. The installed `gh-role` remains the sanctioned
 credential and eligibility helper. Its participation exclusion applies here too:
@@ -8,16 +9,40 @@ the eligible reviewer is `neverhumanbot`, distinct from `jepsontaylor`, the PR
 opener and every associated commit author and committer. Unknown commit
 provenance blocks readiness.
 
+The binary is an independent Cargo package with its own workspace and lock;
+it does not import the product Rust library. Its dependencies use existing
+root-locked versions. Root Cargo.toml and Cargo.lock retain their prior bytes.
+The native quality recipe is required by local fast/check and the CPU lane;
+its permanent negative tests reject root feature leakage, workspace membership,
+and cross-package dependencies. Lock consistency uses current package pins,
+so unrelated authorized root dependency changes do not freeze a historic hash.
+the existing security lane audits both product and tool locks. Run these
+commands from the repository root; builds reuse its existing target directory.
+Its scenarios replay all 51 original tests and rejection subcases in inert JSON,
+plus native parser, hashing and process boundary cases; the resulting tool and
+tests require no Python execution. Runtime governance Python has been removed;
+historical source and failed audit receipts remain in git and preserved evidence.
+
 Run the synthetic adversarial fixtures without GitHub access:
 
 ```bash
-rtk proxy python3 -B -m unittest discover -s agent/tests -p test_merge_guard.py -v
+rtk proxy cargo test --locked --manifest-path ops/merge_guard/Cargo.toml --target-dir target --bin dope-merge-guard
 ```
+
+Receipt hashes retain version 1 canonical sorted ASCII JSON (including Unicode
+surrogate pairs); review body hashes use actual UTF8. The existing pinned
+serde_json 1.0.150 float_roundtrip feature preserves floating-point receipt
+parsing inside the independent tool only. Product features remain unchanged.
+Timestamps are validated RFC3339 instants with offsets and Python datetime
+microsecond precision; invalid dates or missing timezones refuse inspection.
+The transport uses literal process argv, a 45-second request deadline, bounded
+stdout/stderr and no retry. Timeout cleanup is confined to its own request
+process group.
 
 Capture actual controls without inventing an approval or touching a real PR:
 
 ```bash
-rtk proxy python3 -B agent/merge_guard.py --controls-only --base FULL_CURRENT_MAIN_SHA
+rtk proxy cargo run --quiet --locked --manifest-path ops/merge_guard/Cargo.toml --target-dir target --bin dope-merge-guard -- --controls-only --base FULL_CURRENT_MAIN_SHA
 ```
 
 Preserve stdout under `target/` or the dispatched lane's ignored evidence
@@ -62,7 +87,7 @@ approval; a dismissed or superseding non-comment review and outstanding changes
 requested do block readiness.
 
 ```bash
-rtk proxy python3 -B agent/merge_guard.py --pr PR_NUMBER \
+rtk proxy cargo run --quiet --locked --manifest-path ops/merge_guard/Cargo.toml --target-dir target --bin dope-merge-guard -- --pr PR_NUMBER \
   --source FULL_SOURCE_SHA --base FULL_CURRENT_MAIN_SHA \
   --review-receipt target/review/exact-source.json
 ```
@@ -121,7 +146,7 @@ are not signatures or a substitute for trusted independent review.
 ## Actual merge verification
 
 ```bash
-rtk proxy python3 -B agent/merge_guard.py --pr PR_NUMBER \
+rtk proxy cargo run --quiet --locked --manifest-path ops/merge_guard/Cargo.toml --target-dir target --bin dope-merge-guard -- --pr PR_NUMBER \
   --source FULL_SOURCE_SHA --base ORIGINAL_FULL_BASE_SHA \
   --verify-merge target/review/premerge-guard.json
 ```

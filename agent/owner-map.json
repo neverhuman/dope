@@ -399,8 +399,9 @@
     "research/transfer/tests/test_kumo_tabular.py": "external-evidence",
     "research/transfer/tests/test_other_auditors.py": "external-evidence",
     ".gitleaksignore": "governance",
-    "agent/merge_guard.py": "governance",
-    "agent/tests/test_merge_guard.py": "governance",
-    "docs/merge-guard.md": "governance"
+    "docs/merge-guard.md": "governance",
+    "ops/merge_guard/": "governance",
+    "ops/merge_guard/Cargo.toml": "governance",
+    "ops/merge_guard/Cargo.lock": "governance"
   }
 }

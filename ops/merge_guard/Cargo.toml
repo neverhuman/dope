@@ -1,0 +1,20 @@
+[package]
+name = "dope-merge-guard"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+autobins = false
+autotests = false
+
+[workspace]
+
+[[bin]]
+name = "dope-merge-guard"
+path = "main.rs"
+
+[dependencies]
+clap = { version = "=4.6.2", features = ["derive"] }
+libc = { version = "=0.2.186" }
+serde_json = { version = "=1.0.150", features = ["float_roundtrip"] }
+sha2 = { version = "=0.10.9" }

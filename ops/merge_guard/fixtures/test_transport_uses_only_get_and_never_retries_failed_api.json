@@ -1,0 +1,52 @@
+[
+  {
+    "args": [
+      "user"
+    ],
+    "expected": {
+      "login": "fixture"
+    },
+    "kwargs": {},
+    "operation": "get",
+    "transport": [
+      {
+        "argv": [
+          "rtk",
+          "proxy",
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "user"
+        ],
+        "exit": 0,
+        "stdout": "{\"login\":\"fixture\"}",
+        "timeout": 45
+      }
+    ]
+  },
+  {
+    "args": [
+      "user"
+    ],
+    "kwargs": {},
+    "operation": "get",
+    "refused": "api_unavailable",
+    "transport": [
+      {
+        "argv": [
+          "rtk",
+          "proxy",
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "user"
+        ],
+        "exit": 1,
+        "stdout": "{\"status\":\"403\"}",
+        "timeout": 45
+      }
+    ]
+  }
+]

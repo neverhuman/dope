@@ -1,0 +1,76 @@
+[
+  {
+    "args": [
+      "protection"
+    ],
+    "expected": null,
+    "kwargs": {
+      "optional": true
+    },
+    "operation": "get",
+    "transport": [
+      {
+        "argv": [
+          "rtk",
+          "proxy",
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "protection"
+        ],
+        "exit": 1,
+        "stdout": "{\"status\":\"404\"}",
+        "timeout": 45
+      }
+    ]
+  },
+  {
+    "args": [
+      "reviews"
+    ],
+    "kwargs": {},
+    "operation": "get",
+    "refused": "api_unavailable",
+    "transport": [
+      {
+        "argv": [
+          "rtk",
+          "proxy",
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "reviews"
+        ],
+        "exit": 1,
+        "stdout": "{\"status\":\"404\"}",
+        "timeout": 45
+      }
+    ]
+  },
+  {
+    "args": [
+      "user"
+    ],
+    "kwargs": {},
+    "operation": "get",
+    "refused": "api_unavailable",
+    "transport": [
+      {
+        "argv": [
+          "rtk",
+          "proxy",
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "user"
+        ],
+        "exit": 0,
+        "stdout": "not-json",
+        "timeout": 45
+      }
+    ]
+  }
+]

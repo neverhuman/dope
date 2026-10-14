@@ -1,0 +1,307 @@
+[
+  {
+    "api": [
+      {
+        "args": [
+          "runs?per_page=100&page=1"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "total_count": 101,
+          "workflow_runs": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      {
+        "args": [
+          "runs?per_page=100&page=2"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "total_count": 101,
+          "workflow_runs": [
+            2
+          ]
+        }
+      }
+    ],
+    "args": [
+      "runs",
+      "workflow_runs"
+    ],
+    "expected": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "kwargs": {},
+    "operation": "listing"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "runs?per_page=100&page=1"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "total_count": 1000,
+          "workflow_runs": []
+        }
+      }
+    ],
+    "args": [
+      "runs",
+      "workflow_runs"
+    ],
+    "kwargs": {},
+    "operation": "listing",
+    "refused": "api_listing_truncated"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "runs?per_page=100&page=1"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "total_count": 4,
+          "workflow_runs": [
+            1
+          ]
+        }
+      }
+    ],
+    "args": [
+      "runs",
+      "workflow_runs"
+    ],
+    "kwargs": {},
+    "operation": "listing",
+    "refused": "api_listing_truncated"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "runs?per_page=100&page=1"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "workflow_runs": []
+        }
+      }
+    ],
+    "args": [
+      "runs",
+      "workflow_runs"
+    ],
+    "kwargs": {},
+    "operation": "listing",
+    "refused": "api_shape_invalid"
+  }
+]
