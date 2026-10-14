@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:calibration-receipt:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "protocol_id",
+    "protocol_digest",
+    "repetitions",
+    "bootstrap_draws",
+    "frozen_for_confirmation",
+    "manifest_digest",
+    "tolerances_frozen_before_outcomes",
+    "mcse_reported",
+    "wilson_reported",
+    "binding_digest"
+  ],
+  "properties": {
+    "format": {"const": "dope-calibration-receipt"},
+    "version": {"const": 1},
+    "protocol_id": {"type": "string", "minLength": 1},
+    "protocol_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "repetitions": {"type": "integer", "minimum": 1},
+    "bootstrap_draws": {"type": "integer", "minimum": 1},
+    "frozen_for_confirmation": {"type": "boolean"},
+    "manifest_digest": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      ]
+    },
+    "tolerances_frozen_before_outcomes": {"type": "boolean"},
+    "mcse_reported": {"type": "boolean"},
+    "wilson_reported": {"type": "boolean"},
+    "binding_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "description": "Structural calibration receipt. It has no qualifies or calibration field. The development protocol transfer-statistics-v1-development is not N13b. A matching digest does not qualify coverage, a frontier, or a release, and this schema does not admit a measured campaign."
+}
