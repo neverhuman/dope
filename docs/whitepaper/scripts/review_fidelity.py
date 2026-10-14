@@ -180,9 +180,10 @@ def cell(row):
     if row is None:
         return '---'
     if row['median'] is None:
-        return r'\shortstack{unavailable \\ $n=' + str(row['n']) + '$}'
-    return (r'\shortstack{' + fmt(row['median']) + r' \\ {' + ci(row) + '}'
-            + r' \\ $n=' + str(row['n']) + '$}')
+        return r'\begin{tabular}[t]{@{}c@{}}unavailable \\ $n=' + str(row['n']) + r'$\end{tabular}'
+    # Top-aligned, so the row label sits on the median line rather than on the count.
+    return (r'\begin{tabular}[t]{@{}c@{}}' + fmt(row['median']) + r' \\ {' + ci(row) + '}'
+            + r' \\ $n=' + str(row['n']) + r'$\end{tabular}')
 
 
 def render(payload):

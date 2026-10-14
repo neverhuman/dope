@@ -17,7 +17,7 @@ class HeroFigureTests(unittest.TestCase):
     def setUp(self):
         self.headline = json.loads(v2_figures.HEADLINE.read_text())
 
-    def draw(self, headline):
+    def draw(self, headline, drawer=None):
         captured = {}
         original = v2_figures._save
 
@@ -31,10 +31,16 @@ class HeroFigureTests(unittest.TestCase):
             captured["outside"] = [edge for edge, cut in (("left", tight.x0 < 0), ("bottom", tight.y0 < 0),
                                                           ("right", tight.x1 > width), ("top", tight.y1 > height))
                                    if cut]
+            # Point labels and control labels are the axes' own texts; their boxes must not touch.
+            renderer = figure.canvas.get_renderer()
+            boxes = [(label.get_text(), label.get_window_extent(renderer)) for axis in figure.axes
+                     for label in axis.texts if label.get_visible() and label.get_text().strip()]
+            captured["overlaps"] = [(a, b) for i, (a, box) in enumerate(boxes) for b, other in boxes[i + 1:]
+                                    if box.overlaps(other)]
             return original(figure, path, dpi)
 
         with tempfile.TemporaryDirectory() as tmp, mock.patch.object(v2_figures, "_save", save):
-            v2_figures.draw_hero(headline, Path(tmp) / "teaser.pdf")
+            (drawer or v2_figures.draw_hero)(headline, Path(tmp) / "figure.pdf")
         return captured
 
     def test_every_hero_label_meets_the_floor_inside_the_canvas_at_text_width(self):
@@ -43,7 +49,17 @@ class HeroFigureTests(unittest.TestCase):
         small = [(text, size) for text, size in drawn["texts"] if size < v2_figures.HERO_MIN_POINTS]
         self.assertEqual(small, [])
         self.assertEqual(drawn["outside"], [])
+        self.assertEqual(drawn["overlaps"], [])
         self.assertGreater(len(drawn["texts"]), 40)
+
+    def test_results_pareto_keeps_the_floor_without_overlapping_labels(self):
+        """The paper's Pareto figure prints at the text width; the README PNG keeps its own drawing."""
+        drawn = self.draw(self.headline, lambda headline, path: v2_figures.draw_pareto(
+            headline, path, floor=v2_figures.HERO_MIN_POINTS))
+        self.assertAlmostEqual(drawn["size"][0], figure_style.TEASER_WIDTH_IN)
+        self.assertEqual([(text, size) for text, size in drawn["texts"] if size < v2_figures.HERO_MIN_POINTS], [])
+        self.assertEqual(drawn["overlaps"], [])
+        self.assertEqual(drawn["outside"], [])
 
     def test_manuscript_places_the_hero_at_its_drawn_width(self):
         """Scale 1: the text width equals the drawing width and the include adds no height cap."""

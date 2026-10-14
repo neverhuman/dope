@@ -15,6 +15,7 @@ from pathlib import Path
 _SCRIPTS = Path(__file__).resolve().parent
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
+from claim_registry import publication_failures
 from paper_v2_guards import run_v2_lint
 from public_hardware import banned_hits
 
@@ -351,6 +352,7 @@ def main() -> int:
         if hits:
             failures.append(log.name + ": " + " | ".join(hits[:6]))
     failures.extend(run_v2_lint())
+    failures.extend(publication_failures())
     if failures:
         print("\n".join(failures))
         return 1

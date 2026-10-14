@@ -64,6 +64,12 @@ class ClaimRegistryTests(unittest.TestCase):
         self.assertIn("panel official_tests_opened is True", failures)
         self.assertIn("panel mfs_v3 is no longer null", failures)
 
+    def test_the_publication_check_runs_the_same_compilation(self):
+        import check_paper
+        self.assertIs(check_paper.publication_failures, C.publication_failures)
+        self.assertEqual(C.publication_failures(), [])
+        self.assertIsNotNone(self.inputs[6], "CITATION.cff is checked in the repository")
+
     def test_forbidden_language_in_readme_prose_or_title_is_refused(self):
         readme = self.inputs[5].replace("small **sampling program**", "**kilobyte-scale** generator", 1)
         self.assertIn("README uses forbidden language", self.failures(readme=readme))
