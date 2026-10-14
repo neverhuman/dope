@@ -1,5 +1,3 @@
-
-
 fn decode_target(data: &[u8], features: usize) -> Result<Target> {
     let mut reader = Reader::new(data);
     let tag = reader.byte()?;
@@ -207,6 +205,30 @@ fn decode_noise(data: &[u8]) -> Result<Noise> {
                     .map(|_| reader.unit())
                     .collect::<Result<Vec<_>>>()?,
             }
+        }
+        4 => {
+            if reader.byte()? != 1 {
+                return Err(DopeError::Codec("unsupported residual version".into()));
+            }
+            let distribution = match reader.byte()? {
+                0 => ResidualV1::NoNoise,
+                1 => ResidualV1::StudentT4 {
+                    location: reader.fixed()?,
+                    scale: reader.fixed()?,
+                },
+                2 => ResidualV1::GaussianMixture2 {
+                    weight: reader.unit()?,
+                    locations: [reader.fixed()?, reader.fixed()?],
+                    scales: [reader.fixed()?, reader.fixed()?],
+                },
+                3 => ResidualV1::MonotoneQuantile17 {
+                    values: (0..17)
+                        .map(|_| reader.fixed())
+                        .collect::<Result<Vec<_>>>()?,
+                },
+                _ => return Err(DopeError::Codec("unsupported residual profile".into())),
+            };
+            Noise::ResidualV1 { distribution }
         }
         tag => return Err(DopeError::Codec(format!("unknown noise opcode {tag}"))),
     };

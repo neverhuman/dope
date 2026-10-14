@@ -97,6 +97,7 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
                     }
                     .to_string(),
                     match noise {
+                        Noise::ResidualV1 { .. } => "development_residual_v1",
                         Noise::Homoscedastic { .. } => "homoscedastic",
                         Noise::BernoulliCalibration { .. } => "bernoulli_calibration",
                         Noise::Heteroscedastic { .. } => "heteroscedastic",

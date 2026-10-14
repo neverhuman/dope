@@ -86,7 +86,7 @@ fn run(command: Command) -> Result<()> {
                     "build_cargo_lock_sha256":format!("{:x}", sha2::Sha256::digest(include_bytes!("../Cargo.lock"))),
                     "declared_rust_toolchain_sha256":format!("{:x}", sha2::Sha256::digest(include_bytes!("../rust-toolchain.toml"))),
                     "cpu_sampling":"available","gpu_training":cfg!(feature="gpu-training"),
-                "raw_profile":"raw-numeric-symbolic-v1","v1_artifact_decode":"read_only_compatible",
+                "raw_profile":"raw-numeric-symbolic-v1","raw_residual_profile":"raw-numeric-residual-v1","v1_artifact_decode":"read_only_compatible",
                     "source_free_isolation":if cfg!(all(target_os="linux",target_arch="x86_64")) {"linux_x86_64_fresh_worker"} else {"unavailable"},
                     "certification":"requires_measured_external_gates","weights_downloaded":false
                 })
@@ -130,6 +130,7 @@ fn run(command: Command) -> Result<()> {
             report,
             seed,
             candidate,
+            residual_profile,
             max_complete_bytes,
             deadline_seconds,
         } => {
@@ -138,6 +139,17 @@ fn run(command: Command) -> Result<()> {
                 || deadline_seconds == 0.0
             {
                 return Err(DopeError::Data("raw_deadline_invalid".into()));
+            }
+            let residual = residual_profile
+                .map(|profile| {
+                    dope_kernel::model::ResidualProfile::parse(&profile)
+                        .ok_or_else(|| DopeError::Data("raw_residual_profile_invalid".into()))
+                })
+                .transpose()?;
+            if (candidate == "development_symbolic") != residual.is_some() {
+                return Err(DopeError::Unsupported(
+                    "raw_residual_requires_explicit_development_candidate".into(),
+                ));
             }
             let schema_bytes =
                 fs::read(&schema).map_err(|_| DopeError::Data("raw_schema_read_failed".into()))?;
@@ -153,16 +165,28 @@ fn run(command: Command) -> Result<()> {
             .map_err(|e| DopeError::Data(e.to_string()))?;
             let options = CompileOptions {
                 seed: Some(seed),
-                backend_id: Some(candidate),
+                backend_id: residual.is_none().then_some(candidate),
+                beam_width: residual.map(|_| 42),
                 deadline: Some(Duration::from_secs_f64(deadline_seconds)),
                 ..CompileOptions::default()
             };
-            let result = dope_kernel::typed_data::workflow::compile_raw(
-                &table,
-                &(0..table.rows()).collect::<Vec<_>>(),
-                &options,
-                max_complete_bytes,
-            )?;
+            let rows = (0..table.rows()).collect::<Vec<_>>();
+            let result = if let Some(profile) = residual {
+                dope_kernel::typed_data::workflow::compile_raw_residual(
+                    &table,
+                    &rows,
+                    &options,
+                    max_complete_bytes,
+                    profile,
+                )?
+            } else {
+                dope_kernel::typed_data::workflow::compile_raw(
+                    &table,
+                    &rows,
+                    &options,
+                    max_complete_bytes,
+                )?
+            };
             fs::write(&out, &result.artifact).map_err(|e| dope_kernel::error::io_error(&out, e))?;
             if let Some(path) = report {
                 write_json(

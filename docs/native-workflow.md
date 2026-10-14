@@ -50,6 +50,25 @@ complete-artifact cap. `--candidate`, `--seed`, `--deadline-seconds` and
 `--max-complete-bytes` name changes explicitly. This raw profile is distinct
 from historical rank-space paper and certification profiles.
 
+An explicit residual comparison uses `--candidate development_symbolic` with
+`--residual-profile no_noise_v1`, `student_t4_v1`, `gaussian_mixture2_v1`, or
+`monotone_quantile17_v1`. This selects the named, unqualified
+`raw-numeric-residual-v1` successor, with a 42-offer symbolic tournament and the
+same complete-byte/deadline controls. Its `DOPERAW2` carrier contains DPK3.3
+residual opcode4/version1; old `DOPERAW1` and DPK3.2 defaults keep their decoding
+and behavior. A frozen backend cannot silently gain a residual profile.
+`compile_raw_residual` exposes the same explicit library entry. All residual
+parameters are encoded before candidate cap checks and included in inspection's
+`native-raw-complete-residual-v1` charge.
+
+Except for the explicit no-noise control, fitting uses at most256 permitted fit
+rows in three fixed row folds and refuses unavailable OOF fitting. Student-t
+uses fixed4 degrees of freedom with a second-moment scale; the compact mixture
+uses lower/upper-half moments, without claiming an EM optimum. The17-knot
+monotone quantile operator interpolates within its fitted OOF range. These are
+development comparisons, not tail, calibration, privacy or transfer results.
+Conditional masks and nominal columns remain explicitly unsupported here.
+
 The current `raw-numeric-symbolic-v1` profile accepts fully observed continuous, integer, ordinal and Boolean
 predictors with a declared continuous regression target. Nominal and missing-mask
 capabilities refuse explicitly. Integer/ordinal samples round to the nearest

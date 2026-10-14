@@ -1,4 +1,3 @@
-
 fn append_section(payload: &mut Writer, tag: u8, raw: &[u8]) -> Result<()> {
     let compressed = if raw.len() >= 64 {
         let candidate = rans_encode(raw);
@@ -54,6 +53,10 @@ pub fn encode_kernel(kernel: &Kernel) -> Result<Vec<u8>> {
     artifact.extend_from_slice(&[
         VERSION_MAJOR,
         match &kernel.program {
+            KernelProgram::Symbolic {
+                noise: Noise::ResidualV1 { .. },
+                ..
+            } => VERSION_MINOR,
             KernelProgram::NeuralJoint(generator)
                 if !generator.profile.is_full()
                     || generator.architecture == crate::model::NeuralArchitecture::TabDdpm =>

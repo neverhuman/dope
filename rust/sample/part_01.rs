@@ -10,7 +10,7 @@ use crate::codec::LoadedKernel;
 use crate::error::{DopeError, Result, io_error};
 use crate::model::{
     AdditiveTerm, Dependence, InteractionTerm, JointGenerator, Kernel, KernelProgram, Marginal,
-    Noise, Target, Task, Transform,
+    Noise, ResidualV1, Target, Task, Transform,
 };
 
 #[derive(Clone, Copy, Debug)]

@@ -7,8 +7,8 @@ use serde_json::Value;
 use crate::error::{DopeError, Result, io_error};
 use crate::model::{
     AdditiveTerm, ColumnSchema, CopulaEdge, Dependence, FactorLoading, InteractionTerm, Kernel,
-    KernelProgram, LinearTerm, Marginal, MarsFactor, MarsTerm, Noise, SchemaKind, Target, Task,
-    Transform, TriangularTerm, VineEdge,
+    KernelProgram, LinearTerm, Marginal, MarsFactor, MarsTerm, Noise, ResidualV1, SchemaKind,
+    Target, Task, Transform, TriangularTerm, VineEdge,
 };
 
 pub const MAGIC: &[u8; 4] = b"DPK3";
