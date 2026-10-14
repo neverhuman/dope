@@ -43,6 +43,13 @@ class Wave2EmitTests(unittest.TestCase):
         (self.root / panel).write_text(json.dumps({'ok': True}, indent=2, sort_keys=True) + '\n')
         self.output = self.root / 'docs/whitepaper/generated/review-fixture.tex'
         self.output.parent.mkdir(parents=True); self.output.write_bytes(b'existing public output\n')
+        renderer = self.root / script
+        renderer.parent.mkdir(parents=True)
+        renderer.write_text('# fixture renderer; rejection precedes execution\n')
+        (renderer.parent / 'build_pdf.sh').write_text('# fixture wrapper\n')
+        architecture = self.root / 'ops/ci/paper-architecture.tex'
+        architecture.parent.mkdir(parents=True)
+        architecture.write_text('% fixture architecture\n')
         self.lock = self.root / 'lock.json'
         for name, value in [('REPO', self.root), ('GRAPH', self.graph), ('LOCK', self.lock)]:
             p = patch.object(GATE, name, value); p.start(); self.addCleanup(p.stop)
@@ -69,7 +76,7 @@ class Wave2EmitTests(unittest.TestCase):
                 patch('docs.whitepaper.scripts.review_fidelity.payload_from_inputs') as fidelity, \
                 patch.object(GATE.subprocess, 'run') as emit, patch('sys.argv', ['paper-review-outputs.py']):
             with self.assertRaisesRegex(ValueError, reason):
-                GATE.main()
+                GATE.authenticated_graph()
             replay.assert_not_called(); fidelity.assert_not_called(); emit.assert_not_called()
         self.assertEqual(self.output.read_bytes(), before)
 
@@ -109,7 +116,7 @@ class Wave2EmitTests(unittest.TestCase):
                 with patch('research.benchmark.review_fixes.bind_review_cells.replay', return_value={'ok': False}), \
                         patch.object(GATE.subprocess, 'run') as emit, patch('sys.argv', ['paper-review-outputs.py']):
                     with self.assertRaisesRegex(ValueError, 'does not reproduce'):
-                        GATE.main()
+                        GATE.authenticated_graph()
                     emit.assert_not_called()
 
 

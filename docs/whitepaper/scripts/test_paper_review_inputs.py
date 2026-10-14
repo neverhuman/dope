@@ -61,8 +61,16 @@ class ReviewInputTests(unittest.TestCase):
         self.panel_name = 'research/benchmark/results/review-fixes-fixture/panel.json'
         self.graph = {'format': 'dope-review-paper-build-v1', 'scripts': [{
             'path': 'docs/whitepaper/scripts/review_fixture.py',
-            'args': ['--from-panel', self.panel_name], 'check_args': ['--check'], 'outputs': [],
+            'args': ['--from-panel', self.panel_name], 'check_args': ['--check'],
+            'outputs': ['docs/whitepaper/generated/review-fixture.tex'],
         }]}
+        script = self.root / self.graph['scripts'][0]['path']
+        script.parent.mkdir(parents=True)
+        script.write_text('# fixture renderer\n')
+        (script.parent / 'build_pdf.sh').write_text('# fixture wrapper\n')
+        architecture = self.root / 'ops/ci/paper-architecture.tex'
+        architecture.parent.mkdir(parents=True)
+        architecture.write_text('% fixture architecture\n')
         self.panel = self.root / self.panel_name
         self.panel.parent.mkdir(parents=True)
         self.panel.write_bytes(b'{"median": 0.5}\n')

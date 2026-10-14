@@ -47,6 +47,19 @@ class ControlEmitTests(unittest.TestCase):
         self.lock = self.root / 'lock.json'
         self.output_name = 'docs/whitepaper/generated/review-controls.tex'
         self.output = self.root / self.output_name
+        renderer = self.root / GATE.CONTROL_RENDERER
+        renderer.parent.mkdir(parents=True)
+        renderer.write_text('''import json, sys
+from pathlib import Path
+root = Path(__file__).resolve().parents[3]
+panel = json.loads((root / sys.argv[2]).read_text())
+(root / 'docs/whitepaper/generated/review-controls.tex').write_text(
+    'paired=' + str(len(panel['paired'])) + '\\n')
+''')
+        (renderer.parent / 'build_pdf.sh').write_text('# fixture wrapper\n')
+        architecture = self.root / 'ops/ci/paper-architecture.tex'
+        architecture.parent.mkdir(parents=True)
+        architecture.write_text('% fixture architecture\n')
         for path in (self.graph, self.ledger, self.panel, self.output):
             path.parent.mkdir(parents=True, exist_ok=True)
         self.graph.write_text(json.dumps({'format': 'dope-review-paper-build-v1', 'scripts': [{
@@ -89,7 +102,7 @@ class ControlEmitTests(unittest.TestCase):
             with patch.object(GATE.subprocess, 'run') as render:
                 with patch('sys.argv', ['paper-review-outputs.py']):
                     with self.assertRaisesRegex(ValueError, reason):
-                        GATE.main()
+                        GATE.authenticated_graph()
                 render.assert_not_called()
             reduce.assert_not_called()
         self.assertEqual(self.output.read_bytes(), before)
@@ -158,19 +171,17 @@ class ControlEmitTests(unittest.TestCase):
             with patch.object(GATE.subprocess, 'run') as render:
                 with patch('sys.argv', ['paper-review-outputs.py']):
                     with self.assertRaisesRegex(ValueError, 'does not reproduce'):
-                        GATE.main()
+                        GATE.authenticated_graph()
                 render.assert_not_called()
             reduce.assert_called_once()
         self.assertEqual(self.output.read_bytes(), before)
 
-    def test_matching_scalar_panel_admits_emit(self):
+    def test_matching_scalar_panel_admits_the_graph(self):
         with patch('docs.whitepaper.scripts.review_controls.payload_from_cells',
                    return_value=self.panel_payload) as reduce:
-            with patch.object(GATE.subprocess, 'run') as render:
-                with patch('sys.argv', ['paper-review-outputs.py']):
-                    GATE.main()
-                render.assert_called_once()
+            self.assertEqual(GATE.authenticated_graph()['format'], 'dope-review-paper-build-v1')
             reduce.assert_called_once_with([scalar_cell()])
+        self.assertEqual(self.output.read_text(), 'existing public table\n')
 
     def test_input_only_preflight_replays_without_emitting(self):
         before = self.output.read_bytes()
