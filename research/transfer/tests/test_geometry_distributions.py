@@ -351,7 +351,9 @@ class Step5ControlTests(unittest.TestCase):
             real, synthetic, labels, space="row_activation", encoder_id="enc-a", seed=0,
         )
         plain = euclidean_role_distributions(real, synthetic, space="row_activation", encoder_id="enc-a")
-        self.assertTrue(control["distances_unchanged"])
+        self.assertNotIn("distances_unchanged", control)
+        self.assertNotIn("label_distances", control)
+        self.assertNotIn("shuffled_label_distances", control)
         self.assertEqual(control["distances"], plain["distances"])
         self.assertFalse(control["labels_are_coordinates"])
         self.assertFalse(control["labels_consumed"])
@@ -387,7 +389,7 @@ class Step5ControlTests(unittest.TestCase):
         self.assertEqual(constant["label_effect"], "degenerate_labels")
         self.assertFalse(constant["label_coordinate_changes_distances"])
         self.assertFalse(constant["shuffle_changes_label_distances"])
-        self.assertTrue(constant["distances_unchanged"])
+        self.assertNotIn("label_distances", constant)
         self.assertEqual(constant["distances"], plain["distances"])
         self.assertFalse(constant["qualifies_transfer"])
         self.assertFalse(constant["formal_dp"])
@@ -403,11 +405,17 @@ class Step5ControlTests(unittest.TestCase):
             rows, rows, ("a", "b", "c"), space="row_activation", encoder_id="enc-a", seed=1,
         )
         shuffled_codes = codes[np.random.default_rng(0).permutation(3)]
-        self.assertEqual(moved["label_distances"], _role_oracle(coded, coded))
-        self.assertEqual(
-            moved["shuffled_label_distances"],
-            _role_oracle(np.column_stack([rows, shuffled_codes]), np.column_stack([rows, shuffled_codes])),
+        coded_oracle = _role_oracle(coded, coded)
+        shuffled_oracle = _role_oracle(
+            np.column_stack([rows, shuffled_codes]), np.column_stack([rows, shuffled_codes]),
         )
+        plain_rows = euclidean_role_distributions(
+            rows, rows, space="row_activation", encoder_id="enc-a",
+        )["distances"]
+        self.assertNotIn("label_distances", moved)
+        self.assertNotIn("shuffled_label_distances", moved)
+        self.assertEqual(moved["label_coordinate_changes_distances"], plain_rows != coded_oracle)
+        self.assertEqual(moved["shuffle_changes_label_distances"], coded_oracle != shuffled_oracle)
         self.assertTrue(moved["label_coordinate_changes_distances"])
         self.assertTrue(moved["shuffle_changes_label_distances"])
         self.assertEqual(moved["label_effect"], "detected")

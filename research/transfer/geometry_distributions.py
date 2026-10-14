@@ -67,8 +67,10 @@ _PLOT_ESTIMANDS = frozenset({
 def _require_pair_budget(left_rows: int, right_rows: int, max_pairs: int, width: int = 1) -> None:
     """Refuse before the rows-by-rows-by-width broadcast.
 
-    max_pairs bounds that temporary element count. Pair counts alone do not.
-    The product is a Python int. Width 1 keeps the historical pair bound.
+    max_pairs bounds that one temporary's element count. The squared copy is a
+    second array of the same shape, so a traced peak is about two broadcasts,
+    roughly max_pairs times 16 bytes. Pair counts alone do not bound it. The
+    product is a Python int. Width 1 keeps the historical pair bound.
     """
     if type(max_pairs) is not int or max_pairs < 1 or max_pairs > PAIR_ALLOCATION_LIMIT:
         raise ValueError("invalid_distance_budget")
@@ -111,8 +113,9 @@ def euclidean_role_distributions(
 
     The two clouds have the same row count and the same width. Each call is one
     space and one encoder. Pair counts are not row counts. The temporary
-    broadcast is rows by rows by width. That element count is refused before
-    the broadcast when it exceeds max_pairs. Pairs are not subsampled.
+    broadcast is rows by rows by width, and the squared copy doubles that
+    peak. The element count is refused before the broadcast when it exceeds
+    max_pairs. Pairs are not subsampled.
     """
     if space not in SPACES:
         raise ValueError("unknown coordinate space")
@@ -526,8 +529,11 @@ def label_shuffle_control(
     labels and do not depend on the seed. The seed permutes the code column only.
     Constant labels are degenerate. A non-constant column is a measured change.
     Three or more rows can make that shuffled column change the distance multiset.
-    Consumed labels make the geometry selection-exposed. Held-out relevance stays
-    unmeasured. Qualification flags stay false. Label strings are not returned.
+    The returned distances are the coordinate-only multiset. Label-coded
+    distances stay inside the comparison, because those multisets show how many
+    pairs share a label. Consumed labels make the geometry selection-exposed.
+    Held-out relevance stays unmeasured. Qualification flags stay false. Label
+    strings are not returned.
     """
     if type(labels_consumed) is not bool or type(seed) is not int or seed < 0:
         raise ValueError("invalid labels")
@@ -560,9 +566,6 @@ def label_shuffle_control(
         _append_code(real, shuffled_codes), _append_code(synthetic, shuffled_codes),
         space=space, encoder_id=encoder_id, max_pairs=max_pairs,
     )
-    again = euclidean_role_distributions(
-        real, synthetic, space=space, encoder_id=encoder_id, max_pairs=max_pairs,
-    )
     label_coordinate_changes_distances = report["distances"] != coded["distances"]
     shuffle_changes_label_distances = coded["distances"] != shuffled["distances"]
     if not label_coordinate_changes_distances and not shuffle_changes_label_distances:
@@ -574,7 +577,6 @@ def label_shuffle_control(
         "space": space,
         "encoder_id": encoder_id,
         "seed": seed,
-        "distances_unchanged": report["distances"] == again["distances"],
         "labels_are_coordinates": False,
         "label_coordinate_changes_distances": label_coordinate_changes_distances,
         "shuffle_changes_label_distances": shuffle_changes_label_distances,
@@ -582,8 +584,6 @@ def label_shuffle_control(
         "labels_consumed": labels_consumed,
         "selection_exposed": labels_consumed,
         "distances": report["distances"],
-        "label_distances": coded["distances"],
-        "shuffled_label_distances": shuffled["distances"],
         **_qualification(),
     }
 
