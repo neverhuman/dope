@@ -4,12 +4,17 @@ import numpy as np
 
 from research.transfer.geometry import (
     closeness_qualifies, coordinate_distance, ecdf, energy_distance_unbiased, fit_minmax,
-    frozen_geometry_commitment, held_out_status, matched_neighbor_references, mmd2_unbiased,
+    frozen_column_digest, frozen_geometry_commitment, held_out_status, matched_neighbor_references, mmd2_unbiased,
     nearest_other_entity_distance, null_cloud,
     other_entity_row_count, real_real_calibration, shared_frozen_geometry, shared_geometry_claim,
     shared_null_realizations,
     sliced_wasserstein,
 )
+
+
+def bound_scaler(*columns):
+    columns = tuple(columns)
+    return {"frozen_id": frozen_column_digest(columns), "columns": columns}
 
 
 class GeometryTests(unittest.TestCase):
@@ -43,8 +48,9 @@ class GeometryTests(unittest.TestCase):
         self.assertFalse(equal_ranges["shared_geometry"])
         self.assertEqual(equal_ranges["reason"], "equal_ranges")
         frozen = shared_geometry_claim(("fit-scale-a", "fit-scale-a"), frozen_id="fit-scale-a")
-        self.assertTrue(frozen["shared_geometry"])
-        self.assertEqual(frozen["reason"], "common_frozen_scaler")
+        self.assertFalse(frozen["shared_geometry"])
+        self.assertEqual(frozen["reason"], "unverified_label")
+        self.assertIs(frozen["label_verified"], False)
         named_but_refit = shared_geometry_claim(
             [fit_minmax([[0], [1]]), fit_minmax([[0], [1]])], frozen_id="fit-scale-a",
         )
@@ -91,10 +97,10 @@ class GeometryTests(unittest.TestCase):
         unit = {"kind": "continuous", "minimum": 0.0, "maximum": 1.0}
         near = nearest_other_entity_distance(
             flipped, flipped, reference_entities=entities, query_entities=entities,
-            frozen_scaler={"frozen_id": "fit-scale-a", "columns": (unit, unit)},
+            frozen_scaler=bound_scaler(unit, unit),
         )
         self.assertEqual(near["estimand"], "nearest_other_entity_distance")
-        self.assertEqual(near["frozen_id"], "fit-scale-a")
+        self.assertEqual(near["frozen_id"], frozen_column_digest((unit, unit)))
         self.assertEqual(near["distances"], (1.0, 2.0 ** 0.5, 1.0))
         self.assertNotEqual(near["distances"], counted["counts"])
         self.assertEqual(counted["counts"], (1, 1, 2))
@@ -106,15 +112,16 @@ class GeometryTests(unittest.TestCase):
         wide["maximum"] = 2.0
         scaled = nearest_other_entity_distance(
             flipped, flipped, reference_entities=entities, query_entities=entities,
-            frozen_scaler={"frozen_id": "fit-scale-a", "columns": (wide, wide)},
+            frozen_scaler=bound_scaler(wide, wide),
         )
-        self.assertEqual(scaled["frozen_id"], "fit-scale-a")
+        self.assertEqual(scaled["frozen_id"], frozen_column_digest((wide, wide)))
+        self.assertNotEqual(scaled["frozen_id"], near["frozen_id"])
         self.assertAlmostEqual(scaled["distances"][0], 0.5)
         self.assertAlmostEqual(scaled["distances"][1], (0.5 ** 2 + 0.5 ** 2) ** 0.5)
         tied = nearest_other_entity_distance(
             [[1.0, 0.0], [-1.0, 0.0]], [[0.0, 0.0]],
             reference_entities=("b", "c"), query_entities=("a",),
-            frozen_scaler={"frozen_id": "fit-scale-a", "columns": (unit, unit)},
+            frozen_scaler=bound_scaler(unit, unit),
         )
         self.assertEqual(tied["statuses"], ("tie",))
         self.assertEqual(tied["tie_counts"], (2,))
@@ -122,7 +129,7 @@ class GeometryTests(unittest.TestCase):
         self.assertNotIn("neighbor_index", tied)
         missing = nearest_other_entity_distance(
             [[0.0, 0.0]], [[0.0, 0.0]], reference_entities=("a",), query_entities=("a",),
-            frozen_scaler={"frozen_id": "fit-scale-a", "columns": (unit, unit)},
+            frozen_scaler=bound_scaler(unit, unit),
         )
         self.assertEqual(missing["statuses"], ("missing_neighbor",))
         self.assertEqual(missing["distances"], (None,))
@@ -131,7 +138,7 @@ class GeometryTests(unittest.TestCase):
         mixed = nearest_other_entity_distance(
             [(0.0, "red")], [(1.0, "blue")],
             reference_entities=("b",), query_entities=("a",),
-            frozen_scaler={"frozen_id": "fit-scale-a", "columns": (unit, nominal)},
+            frozen_scaler=bound_scaler(unit, nominal),
         )
         self.assertAlmostEqual(mixed["distances"][0], 2.0 ** 0.5)
         self.assertEqual(mixed["statuses"], ("measured",))
@@ -140,7 +147,7 @@ class GeometryTests(unittest.TestCase):
             nearest_other_entity_distance(
                 [(0.0, marker)], [(0.0, "red")],
                 reference_entities=("b",), query_entities=("a",),
-                frozen_scaler={"frozen_id": "fit-scale-a", "columns": (unit, nominal)},
+                frozen_scaler=bound_scaler(unit, nominal),
             )
         self.assertEqual(str(refused.exception), "nominal_outside_frozen_levels")
         self.assertNotIn(marker, str(refused.exception))
@@ -148,14 +155,14 @@ class GeometryTests(unittest.TestCase):
             nearest_other_entity_distance(
                 [[float("nan"), 0.0]], [[0.0, 0.0]],
                 reference_entities=("b",), query_entities=("a",),
-                frozen_scaler={"frozen_id": "fit-scale-a", "columns": (unit, unit)},
+                frozen_scaler=bound_scaler(unit, unit),
             )
         self.assertEqual(str(missing_value.exception), "missing_value")
         with self.assertRaises(ValueError) as nonfinite:
             nearest_other_entity_distance(
                 [[float("inf"), 0.0]], [[0.0, 0.0]],
                 reference_entities=("b",), query_entities=("a",),
-                frozen_scaler={"frozen_id": "fit-scale-a", "columns": (unit, unit)},
+                frozen_scaler=bound_scaler(unit, unit),
             )
         self.assertEqual(str(nonfinite.exception), "nonfinite_geometry")
         with self.assertRaises(ValueError) as constant:
@@ -191,7 +198,7 @@ class GeometryTests(unittest.TestCase):
         flipped = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
         entities = ("a", "a", "b")
         unit = {"kind": "continuous", "minimum": 0.0, "maximum": 1.0}
-        scaler = {"frozen_id": "fit-scale-a", "columns": (unit, unit)}
+        scaler = bound_scaler(unit, unit)
         heldout = np.array([[0.0, 0.0], [2.0, 0.0], [0.0, 2.0]])
         matched = matched_neighbor_references(
             flipped, heldout, flipped, fit_entities=entities, heldout_entities=entities,
@@ -260,9 +267,40 @@ class GeometryTests(unittest.TestCase):
             self.assertNotEqual(left["state_digest"], other["state_digest"])
             self.assertIs(refused["label_verified"], False)
         legacy = shared_geometry_claim(("label", "label"), frozen_id="label")
-        self.assertTrue(legacy["shared_geometry"])
-        self.assertEqual(legacy["reason"], "common_frozen_scaler")
+        self.assertFalse(legacy["shared_geometry"])
+        self.assertEqual(legacy["reason"], "unverified_label")
         self.assertNotIn("state_digest", legacy)
+        same_columns = shared_geometry_claim((bound_scaler(unit, nominal), bound_scaler(unit, nominal)))
+        self.assertTrue(same_columns["shared_geometry"])
+        self.assertEqual(same_columns["reason"], "common_frozen_state")
+        different_columns = shared_geometry_claim((
+            {"frozen_id": "frozen-1", "columns": (unit, unit)},
+            {"frozen_id": "frozen-1", "columns": (wide, wide)},
+        ))
+        self.assertFalse(different_columns["shared_geometry"])
+        self.assertEqual(different_columns["reason"], "unverified_label")
+        bound_pair = shared_geometry_claim((bound_scaler(unit, unit), bound_scaler(wide, wide)))
+        self.assertFalse(bound_pair["shared_geometry"])
+        self.assertEqual(bound_pair["reason"], "different_frozen_state")
+        rows = np.array([[0.0, 0.0], [1.0, 0.0]])
+        pair = ("a", "b")
+        hundred = {"kind": "continuous", "minimum": 0.0, "maximum": 100.0}
+        narrow_distance = nearest_other_entity_distance(
+            rows, rows, reference_entities=pair, query_entities=pair, frozen_scaler=bound_scaler(unit, unit),
+        )
+        wide_distance = nearest_other_entity_distance(
+            rows, rows, reference_entities=pair, query_entities=pair, frozen_scaler=bound_scaler(hundred, hundred),
+        )
+        self.assertNotEqual(narrow_distance["frozen_id"], wide_distance["frozen_id"])
+        self.assertAlmostEqual(narrow_distance["distances"][0], 1.0)
+        self.assertAlmostEqual(wide_distance["distances"][0], 0.01)
+        with self.assertRaises(ValueError) as label:
+            nearest_other_entity_distance(
+                rows, rows, reference_entities=pair, query_entities=pair,
+                frozen_scaler={"frozen_id": "fit-scale-a", "columns": (unit, unit)},
+            )
+        self.assertEqual(str(label.exception), "unverified_frozen_label")
+        self.assertNotIn("fit-scale-a", str(label.exception))
         marker = "secret-level-99999"
         with self.assertRaises(ValueError) as echoed:
             frozen_geometry_commitment(

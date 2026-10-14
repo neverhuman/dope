@@ -97,6 +97,21 @@ class LearningDensityTests(unittest.TestCase):
         self.assertEqual(pair["denominator_weight"], 2)
         self.assertEqual(pair["points"][0]["coverage"], 0.5)
         self.assertEqual(pair["points"][1]["coverage"], 1.0)
+        unqualified = task("plain", bytes_=16, qualified=False, outcomes=((32, True), (64, True)))
+        unqualified_report = b_star_tested([unqualified], (32, 64), quality=1)
+        self.assertEqual(unqualified_report["points"][0]["coverage"], 0.0)
+        self.assertEqual(unqualified_report["points"][1]["coverage"], 0.0)
+        self.assertEqual(unqualified_report["denominator_weight"], 1)
+        unqualified_old = tested_budget_frontier([unqualified], (32, 64))
+        self.assertEqual(unqualified_old["tested"]["32"]["rate"], 0.0)
+        self.assertEqual(unqualified_old["tested"]["64"]["rate"], 0.0)
+        self.assertEqual(unqualified_old["tested"]["64"]["denominator_weight"], 1)
+        looks_small = tested_budget_frontier(
+            [task("empty-bytes", bytes_=0, qualified=False, empty_generator=True)], (64,),
+        )
+        self.assertFalse(looks_small["censored_below_grid"])
+        self.assertEqual(looks_small["tested"]["64"]["rate"], 0.0)
+        self.assertEqual(looks_small["tested"]["64"]["denominator_weight"], 1)
 
     def test_padding_moves_the_budget_and_not_a_density(self):
         plain = b_star_tested([task("fit", bytes_=40)], (16, 64, 256), quality=1)
@@ -136,7 +151,7 @@ class LearningDensityTests(unittest.TestCase):
         self.assertIsNone(empty_report["qld"]["value"])
         old = tested_budget_frontier([empty], (64, 128))
         self.assertEqual(old["tested"]["64"]["rate"], 0.0)
-        self.assertTrue(old["censored_below_grid"])
+        self.assertFalse(old["censored_below_grid"])
         trivial = task("t", bytes_=4, trivial_target=True, outcomes=((64, True),))
         trivial_report = b_star_tested([trivial], (64,), quality=1)
         self.assertEqual(trivial_report["points"][0]["coverage"], 0.0)
