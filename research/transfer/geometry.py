@@ -216,6 +216,7 @@ def nearest_other_entity_distance(reference, query, *, reference_entities, query
     Continuous columns use the frozen min/max. Nominal columns add a mismatch
     of one. The result is a neighbor distance, not an other-entity row count
     and not a privacy result. A per-table refit cannot supply the scaler.
+    The reported state digest is the column digest. A caller label is refused.
     """
     frozen_id, columns = _frozen_columns(frozen_scaler)
     content_id = frozen_column_digest(columns)
@@ -253,6 +254,7 @@ def nearest_other_entity_distance(reference, query, *, reference_entities, query
     return MappingProxyType({
         "estimand": "nearest_other_entity_distance",
         "frozen_id": frozen_id,
+        "state_digest": frozen_id,
         "distances": tuple(distances),
         "tie_counts": tuple(tie_counts),
         "unique_neighbor": tuple(unique),
@@ -269,7 +271,7 @@ def matched_neighbor_references(fit_reference, heldout_reference, query, *, fit_
 
     Each side uses nearest_other_entity_distance, so the same entity and a
     same-index self row stay out. Unequal reference lengths are refused.
-    The distances are not row counts.
+    The distances are not row counts. The state digest is the column digest.
     """
     fit_rows = _row_tuples(fit_reference)
     held_rows = _row_tuples(heldout_reference)
@@ -287,9 +289,13 @@ def matched_neighbor_references(fit_reference, heldout_reference, query, *, fit_
         heldout_reference, query, reference_entities=heldout_entities,
         query_entities=query_entities, frozen_scaler=frozen_scaler,
     )
+    if fit["state_digest"] != held["state_digest"]:
+        raise ValueError("invalid frozen scaler")
     return MappingProxyType({
         "estimand": "matched_neighbor_references",
         "reference_rows": len(fit_rows),
+        "frozen_id": fit["frozen_id"],
+        "state_digest": fit["state_digest"],
         "fit_distances": fit["distances"],
         "heldout_distances": held["distances"],
         "fit_statuses": fit["statuses"],
@@ -405,6 +411,66 @@ def _commitment_column(column):
     return {"kind": "nominal", "levels": list(column["levels"])}
 
 
+def _stored_columns(columns):
+    if isinstance(columns, (str, bytes)) or not isinstance(columns, (tuple, list)) or not columns:
+        raise ValueError("invalid frozen scaler")
+    stored = []
+    for column in columns:
+        if not isinstance(column, Mapping):
+            raise ValueError("invalid frozen scaler")
+        if column.get("kind") == "nominal":
+            levels = column.get("levels")
+            if isinstance(levels, list):
+                levels = tuple(levels)
+            stored.append({"kind": "nominal", "levels": levels})
+        elif column.get("kind") == "continuous":
+            stored.append({
+                "kind": "continuous",
+                "minimum": column.get("minimum"),
+                "maximum": column.get("maximum"),
+            })
+        else:
+            stored.append({"kind": column.get("kind")})
+    return tuple(stored)
+
+
+def _geometry_state_body(encoder_id, schema_id, columns):
+    return {
+        "format": "dope-frozen-geometry-state",
+        "version": 1,
+        "encoder_id": encoder_id,
+        "schema_id": schema_id,
+        "columns": [_commitment_column(column) for column in columns],
+    }
+
+
+def _hex_digest(value) -> bool:
+    return type(value) is str and len(value) == 64 and all(character in "0123456789abcdef" for character in value)
+
+
+def _verified_geometry_state(record):
+    if (
+        isinstance(record, (str, bytes))
+        or not isinstance(record, Mapping)
+        or record.get("format") != "dope-frozen-geometry-state"
+        or record.get("version") != 1
+        or record.get("label_verified") is not False
+        or type(record.get("frozen_id")) is not str
+        or not record.get("frozen_id")
+        or type(record.get("encoder_id")) is not str
+        or not record.get("encoder_id")
+        or type(record.get("schema_id")) is not str
+        or not record.get("schema_id")
+        or not _hex_digest(record.get("state_digest"))
+    ):
+        raise ValueError("invalid frozen scaler")
+    columns = _stored_columns(record.get("columns"))
+    _frozen_columns({"frozen_id": record["frozen_id"], "columns": columns})
+    if digest(_geometry_state_body(record["encoder_id"], record["schema_id"], columns)) != record["state_digest"]:
+        raise ValueError("unverified_state_digest")
+    return record["state_digest"], record["frozen_id"]
+
+
 def frozen_column_digest(columns) -> str:
     """Identity of frozen columns. A caller label is not this digest."""
     columns = tuple(columns)
@@ -422,18 +488,16 @@ def frozen_geometry_commitment(*, frozen_id: str, encoder_id: str, schema_id: st
     """
     if type(encoder_id) is not str or not encoder_id or type(schema_id) is not str or not schema_id:
         raise ValueError("invalid frozen scaler")
+    columns = _stored_columns(columns)
     _frozen_columns({"frozen_id": frozen_id, "columns": columns})
-    body = {
-        "format": "dope-frozen-geometry-state",
-        "version": 1,
-        "encoder_id": encoder_id,
-        "schema_id": schema_id,
-        "columns": [_commitment_column(column) for column in columns],
-    }
+    body = _geometry_state_body(encoder_id, schema_id, columns)
     return MappingProxyType({
         "format": "dope-frozen-geometry-state",
         "version": 1,
         "frozen_id": frozen_id,
+        "encoder_id": encoder_id,
+        "schema_id": schema_id,
+        "columns": columns,
         "state_digest": digest(body),
         "label_verified": False,
         "privacy_result": False,
@@ -442,22 +506,17 @@ def frozen_geometry_commitment(*, frozen_id: str, encoder_id: str, schema_id: st
 
 
 def shared_frozen_geometry(left, right) -> dict:
-    """Compare frozen content digests. Equal caller labels do not share geometry."""
-    for record in (left, right):
-        if (
-            isinstance(record, (str, bytes))
-            or not isinstance(record, Mapping)
-            or record.get("format") != "dope-frozen-geometry-state"
-            or record.get("version") != 1
-            or type(record.get("state_digest")) is not str
-            or len(record["state_digest"]) != 64
-            or record.get("label_verified") is not False
-        ):
-            raise ValueError("invalid frozen scaler")
-    same = left["state_digest"] == right["state_digest"]
+    """Recompute both content digests. A supplied digest is not enough.
+
+    The body is format, version, encoder_id, schema_id, and columns. Equal
+    caller labels do not share geometry. A digest mismatch is refused.
+    """
+    left_digest, left_label = _verified_geometry_state(left)
+    right_digest, right_label = _verified_geometry_state(right)
+    same = left_digest == right_digest
     if same:
         reason = "common_frozen_state"
-    elif left["frozen_id"] == right["frozen_id"]:
+    elif left_label == right_label:
         reason = "unverified_label"
     else:
         reason = "different_frozen_state"
