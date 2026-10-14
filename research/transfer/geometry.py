@@ -448,7 +448,7 @@ def _hex_digest(value) -> bool:
     return type(value) is str and len(value) == 64 and all(character in "0123456789abcdef" for character in value)
 
 
-def _verified_geometry_state(record):
+def _public_geometry_record(record):
     if (
         isinstance(record, (str, bytes))
         or not isinstance(record, Mapping)
@@ -457,18 +457,23 @@ def _verified_geometry_state(record):
         or record.get("label_verified") is not False
         or type(record.get("frozen_id")) is not str
         or not record.get("frozen_id")
-        or type(record.get("encoder_id")) is not str
-        or not record.get("encoder_id")
-        or type(record.get("schema_id")) is not str
-        or not record.get("schema_id")
         or not _hex_digest(record.get("state_digest"))
+        or any(key in record for key in ("columns", "encoder_id", "schema_id", "minimum", "maximum", "levels"))
     ):
         raise ValueError("invalid frozen scaler")
-    columns = _stored_columns(record.get("columns"))
-    _frozen_columns({"frozen_id": record["frozen_id"], "columns": columns})
-    if digest(_geometry_state_body(record["encoder_id"], record["schema_id"], columns)) != record["state_digest"]:
-        raise ValueError("unverified_state_digest")
     return record["state_digest"], record["frozen_id"]
+
+
+def _private_geometry(content):
+    if isinstance(content, (str, bytes)) or not isinstance(content, Mapping):
+        raise ValueError("invalid frozen scaler")
+    encoder_id = content.get("encoder_id")
+    schema_id = content.get("schema_id")
+    if type(encoder_id) is not str or not encoder_id or type(schema_id) is not str or not schema_id:
+        raise ValueError("invalid frozen scaler")
+    columns = _stored_columns(content.get("columns"))
+    _frozen_columns({"frozen_id": "unchecked", "columns": columns})
+    return digest(_geometry_state_body(encoder_id, schema_id, columns))
 
 
 def frozen_column_digest(columns) -> str:
@@ -484,7 +489,9 @@ def frozen_geometry_commitment(*, frozen_id: str, encoder_id: str, schema_id: st
     """Digest the scaler content. The caller label is not that digest.
 
     Column order, nominal level order, and continuous min/max are part of the
-    content. The result does not qualify transfer or privacy.
+    digest body. The returned record is the digest and status. It does not
+    include columns, the encoder id, or the schema id. It does not qualify
+    transfer or privacy.
     """
     if type(encoder_id) is not str or not encoder_id or type(schema_id) is not str or not schema_id:
         raise ValueError("invalid frozen scaler")
@@ -495,9 +502,6 @@ def frozen_geometry_commitment(*, frozen_id: str, encoder_id: str, schema_id: st
         "format": "dope-frozen-geometry-state",
         "version": 1,
         "frozen_id": frozen_id,
-        "encoder_id": encoder_id,
-        "schema_id": schema_id,
-        "columns": columns,
         "state_digest": digest(body),
         "label_verified": False,
         "privacy_result": False,
@@ -505,14 +509,19 @@ def frozen_geometry_commitment(*, frozen_id: str, encoder_id: str, schema_id: st
     })
 
 
-def shared_frozen_geometry(left, right) -> dict:
-    """Recompute both content digests. A supplied digest is not enough.
+def shared_frozen_geometry(left, right, *, left_content=None, right_content=None) -> dict:
+    """Recompute both digests from private content. The public records stay digest-only.
 
-    The body is format, version, encoder_id, schema_id, and columns. Equal
-    caller labels do not share geometry. A digest mismatch is refused.
+    The body is format, version, encoder_id, schema_id, and columns. That content
+    is an argument, not a returned field. Equal caller labels do not share geometry.
+    A missing, copied, or non-hex digest is refused.
     """
-    left_digest, left_label = _verified_geometry_state(left)
-    right_digest, right_label = _verified_geometry_state(right)
+    if left_content is None or right_content is None:
+        raise ValueError("invalid frozen scaler")
+    left_digest, left_label = _public_geometry_record(left)
+    right_digest, right_label = _public_geometry_record(right)
+    if _private_geometry(left_content) != left_digest or _private_geometry(right_content) != right_digest:
+        raise ValueError("unverified_state_digest")
     same = left_digest == right_digest
     if same:
         reason = "common_frozen_state"
