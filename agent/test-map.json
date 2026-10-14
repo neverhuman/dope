@@ -1639,7 +1639,7 @@
     },
     "ops/ci/cpu.sh": {
       "command": "just fast && just check",
-      "purpose": "verify tool readiness before all product/native/paper CPU checks and complete offline transfer discovery; provision guest tools early without late apt transactions or changed budgets"
+      "purpose": "verify early tool readiness, full locked Rust/native discovery, provisioned V1 interpreter for NumPy-dependent paper-log tests and complete offline transfer discovery without late apt transactions or changed budgets"
     },
     "docs/merge-guard.md": {
       "command": "just native-guard-check",
@@ -1663,11 +1663,11 @@
     },
     "research/transfer/frontier.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+      "purpose": "verify qualified complete byte-cap outcomes with full denominators, measured frontier censoring, frozen scaler content commitments and same-entity exclusion; measured calibration remains unqualified without admissible evidence"
     },
     "research/transfer/geometry.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+      "purpose": "verify qualified complete byte-cap outcomes with full denominators, measured frontier censoring, frozen scaler content commitments and same-entity exclusion; measured calibration remains unqualified without admissible evidence"
     },
     "research/transfer/objectives.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1711,7 +1711,7 @@
     },
     "research/transfer/tests/test_geometry.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+      "purpose": "verify qualified complete byte-cap outcomes with full denominators, measured frontier censoring, frozen scaler content commitments and same-entity exclusion; measured calibration remains unqualified without admissible evidence"
     },
     "research/transfer/tests/test_interactions.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1877,10 +1877,6 @@
       "command": "cargo test --locked --lib",
       "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
     },
-    "rust/compiler/target_fitting/part_02.rs": {
-      "command": "cargo test --locked --lib",
-      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
-    },
     "scripts/uninstall-native.sh": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
       "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
@@ -1907,7 +1903,7 @@
     },
     "research/transfer/tests/test_learning_density.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+      "purpose": "verify qualified complete byte-cap outcomes with full denominators, measured frontier censoring, frozen scaler content commitments and same-entity exclusion; measured calibration remains unqualified without admissible evidence"
     },
     "research/transfer/tests/test_calibration_receipt.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1916,6 +1912,46 @@
     "schemas/calibration-receipt-v1.schema.json": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
       "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+    },
+    "rust/compiler/adaptive_allocation.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/compact_neural_training.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/noise_fitting.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/quantization.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/research_training.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/evidence/successors.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "tests/vnext_byte_allocation.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "tests/vnext_native_successors.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "tests/vnext_public_demo.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "tests/fixtures/vnext-successors/development-calibration-v1.json": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
     }
   }
 }

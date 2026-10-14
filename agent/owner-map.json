@@ -464,7 +464,6 @@
     "rust/compiler/part_01.rs": "rust-core",
     "rust/compiler/residual_oof.rs": "rust-core",
     "rust/compiler/target_fitting/part_01.rs": "rust-core",
-    "rust/compiler/target_fitting/part_02.rs": "rust-core",
     "scripts/uninstall-native.sh": "governance",
     "schemas/bound-binding-v2.schema.json": "external-evidence",
     "tests/test_tuner.py": "python-v1-compatibility",
@@ -473,6 +472,16 @@
     "research/transfer/calibration_receipt.py": "external-evidence",
     "research/transfer/tests/test_learning_density.py": "external-evidence",
     "research/transfer/tests/test_calibration_receipt.py": "external-evidence",
-    "schemas/calibration-receipt-v1.schema.json": "external-evidence"
+    "schemas/calibration-receipt-v1.schema.json": "external-evidence",
+    "rust/compiler/adaptive_allocation.rs": "rust-core",
+    "rust/compiler/target_fitting/compact_neural_training.rs": "rust-core",
+    "rust/compiler/target_fitting/noise_fitting.rs": "rust-core",
+    "rust/compiler/target_fitting/quantization.rs": "rust-core",
+    "rust/compiler/target_fitting/research_training.rs": "rust-core",
+    "rust/evidence/successors.rs": "rust-core",
+    "tests/vnext_byte_allocation.rs": "rust-core",
+    "tests/vnext_native_successors.rs": "rust-core",
+    "tests/vnext_public_demo.rs": "rust-core",
+    "tests/fixtures/vnext-successors/development-calibration-v1.json": "rust-core"
   }
 }

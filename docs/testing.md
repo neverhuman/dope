@@ -10,10 +10,14 @@ early package transaction, retaining the 300-second package-lock wait and
 35-minute job budget. `cpu.sh` checks all required tools before tests and never
 starts a late package transaction. `test-cpu-tool-readiness.sh` exercises each
 missing-tool refusal against the real CPU entry, before any build or replay.
-`just check` adds Clippy with warnings denied and the Rust CLI fixtures.
-Local fast/check and hosted CPU run the four bounded public-demo regressions in
+`just check` adds Clippy with warnings denied, the Rust CLI fixtures, and the
+raw-schema, raw-workflow, artifact-only, installer, byte-allocation, native
+successor, and public-demo Rust integration suites. Hosted CPU retains full
+locked Cargo test discovery, which also executes every one of these suites.
+Local fast/check and hosted CPU run the six bounded public-demo regressions in
 `research.benchmark.tests.test_public_demo`: frozen source admission, disjoint
-physical groups, query-label independence, and honest failed-step/report output.
+physical groups, query-label independence, integer producer/reader compatibility,
+safe native diagnostics, and honest failed-step/report output.
 The actual native raw-schema, raw-workflow, artifact-only, and installer suites
 remain auto-discovered by hosted CPU's existing locked Cargo test invocation.
 The native guard's required fast/check and CPU routes share
@@ -51,6 +55,8 @@ CPU CI runs that same required named gate with its provisioned V1 interpreter:
 `target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_*.py'`
 followed by
 `target/ci-python/bin/python -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v`.
+The later paper-number and paper-log unittests also use that provisioned V1
+interpreter, preserving their NumPy-dependent claim-registry imports.
 These replace the selective paper-script unittest calls in `ops/ci/cpu.sh`; the
 independent committed-input replay remains exactly once in that suite.
 The recipe fixture executes Just itself. CPU CI provisions the repository's

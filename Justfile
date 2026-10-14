@@ -39,6 +39,7 @@ check: fast
     bash ops/ci/check-contracts.sh
     cargo clippy --all-targets --locked -- -D warnings
     cargo test --locked --test rust_cli
+    cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo
     git diff --check
 
 security:
