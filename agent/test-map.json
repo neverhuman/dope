@@ -1999,11 +1999,11 @@
     },
     "research/transfer/geometry_distributions.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify matched cloud cardinality and explicit real-real reference, descriptive flat ECDFs with unverified caller counts, development pointwise ECDF bands resampling whole declared fit clusters with deterministic seed/quantiles and degenerate/insufficient/static-error refusals; frozen private/public state wire and scientific qualification remain unchanged"
+      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls and pair-allocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
     },
     "research/transfer/tests/test_geometry_distributions.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify matched cloud cardinality and explicit real-real reference, descriptive flat ECDFs with unverified caller counts, development pointwise ECDF bands resampling whole declared fit clusters with deterministic seed/quantiles and degenerate/insufficient/static-error refusals; frozen private/public state wire and scientific qualification remain unchanged"
+      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls and pair-allocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
     }
   }
 }
