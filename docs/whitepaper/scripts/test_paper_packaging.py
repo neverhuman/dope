@@ -63,6 +63,34 @@ class PackagingTests(unittest.TestCase):
         self.assertIn(r'\input{generated/mfs-v3-examples.tex}', supplement)
         self.assertNotIn('100.0001', supplement)
 
+    def test_a_stated_holm_family_size_names_its_members(self):
+        bare = "\\begin{table}\\caption{Holm family size is nine.}\\end{table}"
+        named = ("\\begin{table}\\caption{Holm family size is nine: DOPE against three comparators "
+                 "under each of the three auditors.}\\end{table}")
+        self.assertTrue(check_paper.table_member_failures(bare))
+        self.assertEqual(check_paper.table_member_failures(named), [])
+        self.assertEqual(check_paper.table_member_failures("\\begin{table}\\caption{No Holm family.}\\end{table}"), [])
+        for path in (check_paper.TEX, check_paper.ROOT / "supplement.tex"):
+            self.assertEqual(check_paper.table_member_failures(check_paper.strip_tex_comments(path.read_text())), [],
+                             path.name)
+
+    def test_main_text_mfs_v3_weights_and_epsilon_match_the_contract(self):
+        """Rubric 9a: the prose weights and epsilon are the production contract's."""
+        fitness = _v3_contract()['master_fitness']
+        text = " ".join(check_paper.TEX.read_text().split())
+        weights = fitness['weights']
+        self.assertIn(f"utility transfer ${weights['utility_transfer']:.2f}$", text)
+        same = {weights[key] for key in ('representation_closeness', 'driver_fidelity', 'distribution_fidelity')}
+        self.assertEqual(len(same), 1)
+        self.assertIn(f"representation closeness, driver fidelity, and distribution fidelity ${same.pop():.2f}$ each", text)
+        self.assertIn(f"structure fidelity ${weights['structure_fidelity']:.2f}$", text)
+        small = {weights['coverage_realism'], weights['compactness']}
+        self.assertEqual(len(small), 1)
+        self.assertIn(f"coverage realism and compactness ${small.pop():.2f}$ each", text)
+        self.assertAlmostEqual(sum(weights.values()), 1.0)
+        self.assertEqual(fitness['epsilon'], 1e-6)
+        self.assertIn(r"\epsilon = 10^{-6}", text)
+
     def test_table_environment_must_declare_a_holm_family(self):
         self.assertEqual(check_paper.table_family_failures(
             "\\begin{table}\\caption{No Holm family.}\\end{table}"), [])

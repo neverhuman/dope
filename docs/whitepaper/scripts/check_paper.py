@@ -172,6 +172,20 @@ def table_family_failures(text: str) -> list[str]:
     return failures
 
 
+_BARE_FAMILY = re.compile(r"Holm family size is (?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\d+)\.")
+
+
+def table_member_failures(text: str) -> list[str]:
+    """A caption that states a Holm family size also names the family's members (rubric 4c)."""
+    failures = []
+    for kind in ("table", "table*", "longtable"):
+        for environment in _environments(text, kind):
+            for caption in _caption_bodies(environment):
+                if _BARE_FAMILY.search(" ".join(caption.split())):
+                    failures.append("Holm family size without its members: " + " ".join(caption.split())[:80])
+    return failures
+
+
 def main() -> int:
     failures = []
     raw_tex = TEX.read_text()
@@ -196,6 +210,7 @@ def main() -> int:
         failures.append("the teaser include has a missing-file fallback")
     for source in (raw_tex, supplement_source):
         failures.extend(table_family_failures(strip_tex_comments(source)))
+        failures.extend(table_member_failures(strip_tex_comments(source)))
     for path in sorted((ROOT / "generated").glob("*.tex")):
         failures.extend(table_family_failures(strip_tex_comments(path.read_text())))
     tex = strip_comments(raw_tex)
