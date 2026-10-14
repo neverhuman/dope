@@ -1290,8 +1290,8 @@
       "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
     },
     "research/benchmark/tests/test_fetch_pmlb.py": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_pmlb -v",
-      "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
     },
     "ops/ci/paper-prepare.py": {
       "command": "just paper-check",
@@ -1443,7 +1443,7 @@
     },
     "research/transfer/lineage.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
-      "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+      "purpose": "verify order-independent alias-chain resolution and cyclic, missing, cross-parent or duplicate refusals, historical default registry bindings, source exposure, split commitments and scoped purpose grants; unresolved rights prevent freeze"
     },
     "research/transfer/registries/sources.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
@@ -1451,7 +1451,7 @@
     },
     "research/transfer/tests/test_lineage.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
-      "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+      "purpose": "verify order-independent alias-chain resolution and cyclic, missing, cross-parent or duplicate refusals, historical default registry bindings, source exposure, split commitments and scoped purpose grants; unresolved rights prevent freeze"
     },
     "schemas/source-family-v1.schema.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
@@ -1999,11 +1999,11 @@
     },
     "research/transfer/geometry_distributions.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls and pair-allocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
+      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls with actual positive/negative label-shuffle distances and width-charged preallocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
     },
     "research/transfer/tests/test_geometry_distributions.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls and pair-allocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
+      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls with actual positive/negative label-shuffle distances and width-charged preallocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
     },
     "scripts/native-notices.py": {
       "command": "sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
@@ -2023,11 +2023,27 @@
     },
     "research/transfer/pilot_admission.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "exercise development registry/lineage/exposure-to-plan reader and refusal/accounting fixtures through mandatory local/CPU transfer discovery; pending P1-P5 source repairs stay unqualified and do not authorize rights, custody, pilot execution or N19 closure"
+      "purpose": "verify development v2 keyed token/commitment refusal, complete non-success accounting, prospective job cap before allocation, trusted expected-plan reconciliation, and canonical seed bound through mandatory local/CPU transfer discovery; no custody, rights, pilot execution or N19/N12 qualification"
     },
     "research/transfer/tests/test_pilot_admission.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "exercise development registry/lineage/exposure-to-plan reader and refusal/accounting fixtures through mandatory local/CPU transfer discovery; pending P1-P5 source repairs stay unqualified and do not authorize rights, custody, pilot execution or N19 closure"
+      "purpose": "verify development v2 keyed token/commitment refusal, complete non-success accounting, prospective job cap before allocation, trusted expected-plan reconciliation, and canonical seed bound through mandatory local/CPU transfer discovery; no custody, rights, pilot execution or N19/N12 qualification"
+    },
+    "rust/compiler/capacity_refinement.rs": {
+      "command": "cargo test --locked --lib --test vnext_byte_allocation --test vnext_raw_workflow",
+      "purpose": "verify actual bounded adaptive rank, edges, support, width and residual refits, fixed-fold rare/random/OOF proposals, exact encoded-byte promotion and preserved raw workflow; mandatory local full library plus byte-allocation3/raw-workflow6 and hosted full Cargo discovery; development only, no equal-compute qualification"
+    },
+    "research/benchmark/fetch_jope.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
+    },
+    "research/benchmark/prepare_s3.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
+    },
+    "research/benchmark/tests/test_fetch_jope.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
     }
   }
 }

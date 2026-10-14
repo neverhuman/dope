@@ -501,6 +501,10 @@
     "scripts/native-legal.sha256": "governance",
     "ops/merge_guard/tests/workflow_events.rs": "governance",
     "research/transfer/pilot_admission.py": "external-evidence",
-    "research/transfer/tests/test_pilot_admission.py": "external-evidence"
+    "research/transfer/tests/test_pilot_admission.py": "external-evidence",
+    "rust/compiler/capacity_refinement.rs": "rust-core",
+    "research/benchmark/fetch_jope.py": "external-evidence",
+    "research/benchmark/prepare_s3.py": "external-evidence",
+    "research/benchmark/tests/test_fetch_jope.py": "external-evidence"
   }
 }
