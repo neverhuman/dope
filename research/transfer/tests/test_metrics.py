@@ -124,8 +124,9 @@ class MetricsTests(unittest.TestCase):
         harmful = task("bad", "other", {k: measured(11.) for k in task().required_cells})
         tasks = [task(f"variant-{i}") for i in range(10)] + [harmful]
         self.assertEqual(observed_coverage(tasks)["coverage"], 0.5)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as failed_cell:
             CellResult("technical_failure", pairs())
+        self.assertEqual(str(failed_cell.exception), "failed cells require absent loss fields")
 
     def test_weighted_tail_fraction_and_harm(self):
         case = GOLDEN["weighted_tail"]
@@ -209,12 +210,16 @@ class MetricsTests(unittest.TestCase):
             "code_digest": PAIRED_MEAN_CODE_DIGEST, "rng_id": "deterministic-paired-mean",
             "draws": 1, "multiplicity": "cell",
         }
-        record = bound_binding_record(evaluation, cell_id, cell.bound, analysis)
-        self.assertIsNone(record["artifact_id"])
-        self.assertEqual(record["artifact_commitment"], "unverified_byte_count")
-        self.assertNotEqual(record["artifact_id"], digest({
+        counted_id = bound_binding_record(evaluation, cell_id, cell.bound, analysis)
+        self.assertEqual(counted_id["version"], 1)
+        self.assertNotIn("artifact_commitment", counted_id)
+        self.assertEqual(counted_id["artifact_id"], digest({
             "cell_id": cell_id, "fit_id": "fit-0", "artifact_bytes": 10,
         }))
+        record = bound_binding_record(evaluation, cell_id, cell.bound, analysis, version=2)
+        self.assertIsNone(record["artifact_id"])
+        self.assertEqual(record["artifact_commitment"], "unverified_byte_count")
+        self.assertNotEqual(record["artifact_id"], counted_id["artifact_id"])
         expected = {**record, "trust": "recomputed", "binding_digest": digest(record)}
         self.assertTrue(authenticate_bound(evaluation, cell_id, cell.bound, expected))
         decision = bound_qualification(evaluation, cell_id, cell.bound, expected)
@@ -243,28 +248,45 @@ class MetricsTests(unittest.TestCase):
             "code_digest": digest({"code": "owner-analysis-v1"}), "rng_id": "rng-1",
             "draws": 1, "multiplicity": "cell",
         }
-        owner_record = bound_binding_record(owner_task, cell_id, interval, owner_analysis)
+        owner_record = bound_binding_record(owner_task, cell_id, interval, owner_analysis, version=2)
         self.assertEqual(owner_record["artifact_id"], hashlib.sha256(content).hexdigest())
         self.assertEqual(owner_record["artifact_commitment"], "content_sha256")
+        self.assertNotIn("calibration", owner_record)
         owner = {**owner_record, "trust": "owner", "binding_digest": digest(owner_record)}
-        qualified = bound_qualification(owner_task, cell_id, interval, owner)
-        self.assertTrue(qualified["qualifies"])
-        self.assertEqual(qualified["disposition"], "owner_interval")
-        self.assertEqual(qualified["calibration"], "unmeasured")
+        unqualified = bound_qualification(owner_task, cell_id, interval, owner)
+        self.assertTrue(unqualified["authenticated"])
+        self.assertFalse(unqualified["qualifies"])
+        self.assertEqual(unqualified["disposition"], "observed_only")
+        self.assertEqual(unqualified["calibration"], "unmeasured")
         covered = qualified_coverage(
             [owner_task], verify_bound=lambda task, key, bound: bound_qualification(task, key, bound, owner),
         )
-        self.assertEqual(covered["cell_counts"]["qualified"], 1)
-        self.assertEqual(covered["coverage"], 1.)
+        self.assertEqual(covered["cell_counts"]["qualified"], 0)
+        self.assertEqual(covered["cell_counts"]["observed_only"], 1)
+        self.assertEqual(covered["coverage"], 0.)
         self.assertIsNone(covered["confidence_interval"])
-        refused_analysis = {**owner_analysis, "code_digest": PAIRED_MEAN_CODE_DIGEST}
-        refused_record = bound_binding_record(owner_task, cell_id, interval, refused_analysis)
-        refused = {**refused_record, "trust": "owner", "binding_digest": digest(refused_record)}
-        self.assertFalse(bound_qualification(owner_task, cell_id, interval, refused)["qualifies"])
+        for label, extra in (
+            ("absent", {}),
+            ("null", {"calibration": None}),
+            ("unmeasured", {"calibration": "unmeasured"}),
+            ("asserted", {"calibration": "measured"}),
+        ):
+            with self.subTest(calibration=label):
+                forged = {**owner, **extra}
+                decision = bound_qualification(owner_task, cell_id, interval, forged)
+                self.assertFalse(decision["qualifies"])
+                self.assertEqual(decision["calibration"], "unmeasured")
+                if extra:
+                    self.assertFalse(decision["authenticated"])
+                    self.assertEqual(decision["disposition"], "unauthenticated")
+        forged_flag = {"authenticated": True, "qualifies": True, "calibration": "measured"}
+        flagged = qualified_coverage([owner_task], verify_bound=lambda *args: forged_flag)
+        self.assertEqual(flagged["cell_counts"]["qualified"], 0)
+        self.assertEqual(flagged["coverage"], 0.)
         point_with_content = TaskEvaluation(
             "f", "t", (cell_id,), {cell_id: cell}, len(content), 100, True, (committed,),
         )
-        content_record = bound_binding_record(point_with_content, cell_id, cell.bound, analysis)
+        content_record = bound_binding_record(point_with_content, cell_id, cell.bound, analysis, version=2)
         content_expected = {**content_record, "trust": "recomputed", "binding_digest": digest(content_record)}
         self.assertEqual(content_record["artifact_commitment"], "content_sha256")
         self.assertFalse(bound_qualification(point_with_content, cell_id, cell.bound, content_expected)["qualifies"])
@@ -281,6 +303,15 @@ class MetricsTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 contract.losses(["yes"], [[0.7, 0.7]])
             self.assertTrue(math.isfinite(contract.losses(["yes"], [[1., 0.]])[0]))
+
+    def test_package_entrypoints_are_distinct(self):
+        import research.transfer as transfer
+        import research.transfer.stress as stress
+        self.assertEqual(transfer.__all__, ["BoundEvidence", "qualified_coverage"])
+        self.assertEqual(stress.__all__, ["product_target", "sign_gate_target"])
+        self.assertIs(transfer.qualified_coverage, qualified_coverage)
+        self.assertTrue(callable(stress.product_target))
+        self.assertNotEqual(transfer.__all__, stress.__all__)
 
 
 if __name__ == "__main__":

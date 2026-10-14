@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:bound-binding:v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "task_id",
+    "learner_id",
+    "fit_id",
+    "artifact_id",
+    "artifact_commitment",
+    "contrast_id",
+    "protocol_id",
+    "receipt_id",
+    "endpoint",
+    "scale",
+    "scale_status",
+    "margin",
+    "paired_digest",
+    "point_z",
+    "query_z_mean",
+    "schedule_id",
+    "code_digest",
+    "rng_id",
+    "draws",
+    "multiplicity",
+    "upper_z",
+    "lower_z"
+  ],
+  "properties": {
+    "format": {"const": "dope-bound-binding"},
+    "version": {"const": 2},
+    "task_id": {"type": "string", "minLength": 1},
+    "learner_id": {"type": "string", "minLength": 1},
+    "fit_id": {"type": "string", "minLength": 1},
+    "artifact_id": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      ]
+    },
+    "artifact_commitment": {
+      "enum": ["content_sha256", "unverified_byte_count"]
+    },
+    "contrast_id": {"type": "string", "minLength": 1},
+    "protocol_id": {"type": "string", "minLength": 1},
+    "receipt_id": {"type": "string", "minLength": 1},
+    "endpoint": {
+      "enum": ["gap", "normalized_gap", "z", "tolerance_adjusted_z_over_fit_scale"]
+    },
+    "scale": {"anyOf": [{"type": "null"}, {"type": "number"}]},
+    "scale_status": {"type": "string", "minLength": 1},
+    "margin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relative", "absolute_scaled", "absolute_raw"],
+      "properties": {
+        "relative": {"type": "number"},
+        "absolute_scaled": {"type": "number"},
+        "absolute_raw": {"anyOf": [{"type": "null"}, {"type": "number"}]}
+      }
+    },
+    "paired_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "point_z": {"type": "number"},
+    "query_z_mean": {"type": "number"},
+    "schedule_id": {"type": "string", "minLength": 1},
+    "code_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "rng_id": {"type": "string", "minLength": 1},
+    "draws": {"type": "integer", "minimum": 1},
+    "multiplicity": {"type": "string", "minLength": 1},
+    "upper_z": {"type": "number"},
+    "lower_z": {"anyOf": [{"type": "null"}, {"type": "number"}]}
+  },
+  "description": "Content commitment for one bound. This record has no calibration field. It does not qualify coverage, a frontier, or a release. artifact_id is SHA-256 of the artifact bytes when artifact_commitment is content_sha256, and null when the commitment is unverified_byte_count. Version 1 remains the byte-count digest and is not this schema."
+}
