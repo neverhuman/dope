@@ -3,17 +3,16 @@
 The geometry-state digest body is not built here. Closeness qualifies neither
 transfer nor privacy.
 
-Development ECDF band protocol `dope-ecdf-band-development` version 1, not
-statistics-v1 and not N13b. The estimand is the equal-weight mean of
-per-cluster empirical distribution functions on a caller-declared ascending
-grid. Each declared fit is one group, and that fit must have its own lineage.
-A repeated lineage is refused. A nested within-lineage resample is not declared.
-Bootstrap draws resample whole fits with replacement and never resample
-pairwise distances. The band is the
-pointwise 0.025 and 0.975 linear quantiles. It is not a simultaneous band.
-The seed and draw count are part of the result. Fewer than two clusters, or
-clusters with identical curves, stay unmeasured rather than a zero-width
-interval. The draw count follows the existing bootstrap floor of 99.
+`dope-ecdf-band-development` version 1 is the historical fit-level identity.
+It is not the cross-lineage return and it is not statistics-v1 or N13b.
+Version 2 estimates the equal-weight mean of lineage ECDFs. A lineage curve
+is the equal-weight mean of that lineage's fit ECDFs, so a lineage with more
+fits does not get more weight. Bootstrap draws resample whole lineages with
+replacement and leave nested fits and entities intact. Conditional fit
+randomness is not source independence, and a fit id is not a source unit.
+One lineage stays unmeasured. The band is the pointwise 0.025 and 0.975
+linear quantiles, not a simultaneous band. The seed and draw count are part
+of the result. The draw count follows the existing bootstrap floor of 99.
 """
 
 from __future__ import annotations
@@ -58,6 +57,7 @@ _PLOT_ESTIMANDS = frozenset({
     "euclidean_cloud_report",
     "dependence_aware_ecdf",
     "equal_weight_mean_of_cluster_ecdfs",
+    "equal_weight_mean_of_lineage_ecdfs",
     "label_shuffle_control",
     "tail_deletion_control",
     "context_query_control",
@@ -148,7 +148,6 @@ ECDF_BAND_DEVELOPMENT = {
     "version": 1,
     "estimand": "equal_weight_mean_of_cluster_ecdfs",
     "group_weight": "one_per_declared_fit",
-    "lineage_rule": "refuse_repeated_lineage",
     "grid": "caller_declared_finite_ascending",
     "resample": "whole_clusters_with_replacement",
     "band": "pointwise_percentile",
@@ -156,6 +155,28 @@ ECDF_BAND_DEVELOPMENT = {
     "pointwise_tails": (0.025, 0.975),
     "simultaneous": False,
     "minimum_clusters": 2,
+    "minimum_draws": 99,
+    "qualifies": False,
+    "n13b": False,
+    "frozen_for_confirmation": False,
+}
+
+ECDF_BAND_CROSS_LINEAGE = {
+    "format": "dope-ecdf-band-development",
+    "version": 2,
+    "estimand": "equal_weight_mean_of_lineage_ecdfs",
+    "population": "cross_lineage",
+    "group_weight": "one_per_declared_lineage",
+    "within_lineage": "equal_weight_mean_of_fit_ecdfs",
+    "nested_units": "fits_and_entities_intact",
+    "conditional_fit_randomness_is_source_independence": False,
+    "grid": "caller_declared_finite_ascending",
+    "resample": "whole_lineages_with_replacement",
+    "band": "pointwise_percentile",
+    "quantile_method": "linear",
+    "pointwise_tails": (0.025, 0.975),
+    "simultaneous": False,
+    "minimum_lineages": 2,
     "minimum_draws": 99,
     "qualifies": False,
     "n13b": False,
@@ -315,8 +336,6 @@ def _read_clusters(clusters, *, encoder_id: str):
         digests.append(digest)
     if len(set(fit_ids)) != len(fit_ids):
         raise ValueError("duplicate fit id")
-    if len(set(lineages)) != len(lineages):
-        raise ValueError("duplicate lineage")
     if len(set(entities)) != len(entities):
         raise ValueError("duplicate entity")
     if any(digest is not None for digest in digests):
@@ -342,46 +361,78 @@ def _role_curve(record, role, grid, max_pairs):
     return _curve_at(distances, grid)
 
 
+def _group_lineages(records):
+    grouped = {}
+    for record in records:
+        grouped.setdefault(record["lineage_id"], []).append(record)
+    return tuple(
+        {
+            "lineage_id": lineage_id,
+            "fits": tuple(sorted(grouped[lineage_id], key=lambda item: item["fit_id"])),
+        }
+        for lineage_id in sorted(grouped)
+    )
+
+
+def _lineage_curves(lineages, role, grid, max_pairs):
+    curves = []
+    for lineage in lineages:
+        fit_curves = np.vstack([
+            _role_curve(fit, role, grid, max_pairs) for fit in lineage["fits"]
+        ])
+        curves.append(fit_curves.mean(axis=0))
+    return np.vstack(curves)
+
+
 def grouped_euclidean_bands(
     clusters, *, space: str, encoder_id: str, grid, seed: int, draws: int,
     max_pairs: int = DEVELOPMENT_MAX_PAIRS,
 ) -> dict:
-    """Pointwise ECDF bands from whole declared fit clusters.
+    """Pointwise cross-lineage ECDF bands.
 
-    Each accepted fit has its own lineage. A repeated lineage is refused, so
-    fits that share a lineage are not resampled as separate units. The result
-    follows dope-ecdf-band-development version 1. It does not qualify transfer,
-    privacy, formal DP, or HIPAA, and it is not N13b.
+    The outer unit is a declared lineage. Nested fits and entities stay inside
+    that lineage. One lineage, however many fits it contains, stays unmeasured.
+    The result follows dope-ecdf-band-development version 2. Version 1 is not
+    this return. The band does not qualify transfer, privacy, formal DP, or
+    HIPAA, and it is not N13b. Declared lineages are not verified sources.
     """
     if space not in SPACES:
         raise ValueError("unknown coordinate space")
     if type(encoder_id) is not str or not encoder_id:
         raise ValueError("missing encoder")
-    if type(seed) is not int or seed < 0 or type(draws) is not int or draws < ECDF_BAND_DEVELOPMENT["minimum_draws"]:
+    if (
+        type(seed) is not int or seed < 0
+        or type(draws) is not int or draws < ECDF_BAND_CROSS_LINEAGE["minimum_draws"]
+    ):
         raise ValueError("invalid bootstrap budget")
     _require_pair_budget(1, 1, max_pairs)
     grid = _declared_grid(grid)
     records, frozen_state = _read_clusters(clusters, encoder_id=encoder_id)
+    lineages = _group_lineages(records)
     roles = ("real_real", "real_synthetic", "synthetic_synthetic")
-    curves = {
-        role: np.vstack([_role_curve(record, role, grid, max_pairs) for record in records])
-        for role in roles
-    }
+    lineage_count = len(lineages)
     roles_result = {}
-    if len(records) < ECDF_BAND_DEVELOPMENT["minimum_clusters"]:
+    if lineage_count < ECDF_BAND_CROSS_LINEAGE["minimum_lineages"]:
         for role in roles:
-            roles_result[role] = {"status": "insufficient_clusters", "curve": None, "lower": None, "upper": None}
+            roles_result[role] = {
+                "status": "insufficient_lineages", "curve": None, "lower": None, "upper": None,
+            }
     else:
+        matrices = {
+            role: _lineage_curves(lineages, role, grid, max_pairs) for role in roles
+        }
         rng = np.random.default_rng(seed)
-        picks = rng.integers(0, len(records), size=(draws, len(records)))
-        for role, matrix in curves.items():
+        picks = rng.integers(0, lineage_count, size=(draws, lineage_count))
+        for role, matrix in matrices.items():
             point = matrix.mean(axis=0)
             if np.all(np.isclose(matrix, matrix[:1])):
-                roles_result[role] = {"status": "degenerate_clusters", "curve": None, "lower": None, "upper": None}
+                roles_result[role] = {
+                    "status": "degenerate_lineages", "curve": None, "lower": None, "upper": None,
+                }
                 continue
             resampled = matrix[picks].mean(axis=1)
             lower, upper = np.quantile(
-                resampled, ECDF_BAND_DEVELOPMENT["pointwise_tails"], axis=0, method="linear",
+                resampled, ECDF_BAND_CROSS_LINEAGE["pointwise_tails"], axis=0, method="linear",
             )
             roles_result[role] = {
                 "status": "pointwise_band",
@@ -390,14 +441,29 @@ def grouped_euclidean_bands(
                 "upper": tuple(float(value) for value in upper),
             }
     return {
-        "estimand": ECDF_BAND_DEVELOPMENT["estimand"],
-        "protocol": dict(ECDF_BAND_DEVELOPMENT),
+        "estimand": ECDF_BAND_CROSS_LINEAGE["estimand"],
+        "protocol": dict(ECDF_BAND_CROSS_LINEAGE),
+        "population": "cross_lineage",
+        "conditional_fit_randomness_is_source_independence": False,
+        "source_independence_verified": False,
         "space": space,
         "encoder_id": encoder_id,
         "roles": roles,
-        "cluster_count": len(records),
-        "independent_units": len(records),
-        "lineage_ids": tuple(record["lineage_id"] for record in records),
+        "lineage_count": lineage_count,
+        "cluster_count": lineage_count,
+        "fit_count": len(records),
+        "independent_units": lineage_count,
+        "unit_status": "unverified",
+        "cross_lineage_band": any(item["status"] == "pointwise_band" for item in roles_result.values()),
+        "lineage_ids": tuple(lineage["lineage_id"] for lineage in lineages),
+        "lineages": tuple(
+            {
+                "lineage_id": lineage["lineage_id"],
+                "fit_ids": tuple(fit["fit_id"] for fit in lineage["fits"]),
+                "entity_ids": tuple(fit["entity_id"] for fit in lineage["fits"]),
+            }
+            for lineage in lineages
+        ),
         "row_count": int(records[0]["real"].shape[0]),
         "allocated_pairs": int(records[0]["real"].shape[0]) * int(records[0]["real"].shape[0]),
         "max_pairs": max_pairs,
@@ -406,7 +472,7 @@ def grouped_euclidean_bands(
         "grid": grid,
         "seed": seed,
         "draws": draws,
-        "resample": ECDF_BAND_DEVELOPMENT["resample"],
+        "resample": ECDF_BAND_CROSS_LINEAGE["resample"],
         "band_meaning": "pointwise",
         "simultaneous": False,
         "frozen_state": frozen_state,

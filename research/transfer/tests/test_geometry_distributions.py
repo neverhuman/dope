@@ -6,9 +6,9 @@ import numpy as np
 
 import research.transfer.geometry as geometry
 from research.transfer.geometry_distributions import (
-    ECDF_BAND_DEVELOPMENT, STEP5_CONTROLS, context_query_control, dependence_aware_ecdf,
-    euclidean_cloud_report, euclidean_role_distributions, geometry_plot_hook,
-    grouped_euclidean_bands, label_shuffle_control, tail_deletion_control,
+    ECDF_BAND_CROSS_LINEAGE, ECDF_BAND_DEVELOPMENT, STEP5_CONTROLS, context_query_control,
+    dependence_aware_ecdf, euclidean_cloud_report, euclidean_role_distributions,
+    geometry_plot_hook, grouped_euclidean_bands, label_shuffle_control, tail_deletion_control,
 )
 
 
@@ -185,10 +185,10 @@ class GeometryDistributionControlTests(unittest.TestCase):
         self.assertEqual(synthetic["status"], "pointwise_band")
         self.assertEqual(synthetic["curve"], (0.5, 1.0))
         self.assertEqual(report["reference_role"], "real_real")
-        self.assertEqual(report["roles_result"]["real_real"]["status"], "degenerate_clusters")
+        self.assertEqual(report["roles_result"]["real_real"]["status"], "degenerate_lineages")
         self.assertIsNone(report["roles_result"]["real_real"]["lower"])
         self.assertIsNone(report["roles_result"]["real_real"]["upper"])
-        self.assertEqual(report["roles_result"]["synthetic_synthetic"]["status"], "degenerate_clusters")
+        self.assertEqual(report["roles_result"]["synthetic_synthetic"]["status"], "degenerate_lineages")
         curves = np.array([[1.0, 1.0], [0.0, 1.0]])
         picks = np.random.default_rng(0).integers(0, 2, size=(99, 2))
         resampled = curves[picks].mean(axis=1)
@@ -199,14 +199,19 @@ class GeometryDistributionControlTests(unittest.TestCase):
         self.assertTrue(all(0.0 <= value <= 1.0 for value in synthetic["lower"] + synthetic["upper"] + synthetic["curve"]))
         self.assertTrue(all(left <= right for left, right in zip(synthetic["lower"], synthetic["upper"])))
         self.assertTrue(any(left < right for left, right in zip(synthetic["lower"], synthetic["upper"])))
-        self.assertEqual(report["resample"], "whole_clusters_with_replacement")
+        self.assertEqual(report["resample"], "whole_lineages_with_replacement")
         self.assertFalse(report["simultaneous"])
-        self.assertEqual(report["protocol"]["format"], "dope-ecdf-band-development")
-        self.assertEqual(report["protocol"]["version"], 1)
+        self.assertEqual(report["protocol"], ECDF_BAND_CROSS_LINEAGE)
+        self.assertEqual(report["protocol"]["version"], 2)
+        self.assertEqual(ECDF_BAND_DEVELOPMENT["version"], 1)
+        self.assertNotIn("lineage_rule", ECDF_BAND_DEVELOPMENT)
+        self.assertNotEqual(report["protocol"]["estimand"], ECDF_BAND_DEVELOPMENT["estimand"])
+        self.assertFalse(report["conditional_fit_randomness_is_source_independence"])
+        self.assertFalse(report["source_independence_verified"])
+        self.assertEqual(report["unit_status"], "unverified")
         self.assertFalse(report["protocol"]["qualifies"])
         self.assertFalse(report["protocol"]["n13b"])
         self.assertFalse(report["protocol"]["frozen_for_confirmation"])
-        self.assertEqual(report["protocol"]["estimand"], ECDF_BAND_DEVELOPMENT["estimand"])
         for flag in ("qualifies_transfer", "privacy_result", "formal_dp", "hipaa", "n13b"):
             self.assertFalse(report[flag])
         self.assertFalse(any(isinstance(value, np.ndarray) for value in _leaves(report)))
@@ -217,9 +222,11 @@ class GeometryDistributionControlTests(unittest.TestCase):
     def test_too_few_or_degenerate_clusters_stay_unmeasured(self):
         one = _band([_cluster("fit-a", [[0.0], [1.0]], [[0.0], [1.0]])])
         self.assertEqual(one["independent_units"], 1)
+        self.assertEqual(one["lineage_count"], 1)
         self.assertEqual(one["cluster_count"], 1)
+        self.assertFalse(one["cross_lineage_band"])
         for role in one["roles_result"].values():
-            self.assertEqual(role["status"], "insufficient_clusters")
+            self.assertEqual(role["status"], "insufficient_lineages")
             self.assertIsNone(role["curve"])
             self.assertIsNone(role["lower"])
             self.assertIsNone(role["upper"])
@@ -228,7 +235,7 @@ class GeometryDistributionControlTests(unittest.TestCase):
             _cluster("fit-b", [[0.0], [0.0]], [[0.0], [0.0]]),
         ])
         for role in twins["roles_result"].values():
-            self.assertEqual(role["status"], "degenerate_clusters")
+            self.assertEqual(role["status"], "degenerate_lineages")
             self.assertIsNone(role["lower"])
             self.assertIsNone(role["upper"])
 
@@ -494,23 +501,62 @@ class Step5ControlTests(unittest.TestCase):
         ):
             self.assertFalse(hasattr(geometry, name))
 
-    def test_repeated_lineage_is_not_resampled_as_separate_units(self):
+    def test_one_lineage_many_fits_is_unavailable_and_lineages_share_weight(self):
         sentinel = "99999.5"
         repeated = [
-            _cluster(fit, [[0.0], [float(index)]], [[0.0], [0.0]], lineage_id=sentinel, entity_id="entity-" + fit)
+            _cluster(
+                fit, [[0.0], [float(index)]], [[0.0], [0.0]],
+                lineage_id=sentinel, entity_id="entity-" + fit,
+            )
             for index, fit in enumerate(("fit-a", "fit-b", "fit-c"))
         ]
-        with self.assertRaises(ValueError) as refused:
-            _band(repeated)
-        self.assertEqual(str(refused.exception), "duplicate lineage")
-        self.assertNotIn(sentinel, str(refused.exception))
+        one = _band(repeated)
+        self.assertEqual(one["independent_units"], 1)
+        self.assertEqual(one["fit_count"], 3)
+        self.assertNotEqual(one["independent_units"], one["fit_count"])
+        self.assertFalse(one["cross_lineage_band"])
+        self.assertFalse(one["conditional_fit_randomness_is_source_independence"])
+        for role in one["roles_result"].values():
+            self.assertEqual(role["status"], "insufficient_lineages")
+            self.assertIsNone(role["curve"])
+            self.assertIsNone(role["lower"])
+            self.assertIsNone(role["upper"])
+        self.assertNotIn(sentinel, "".join(role["status"] for role in one["roles_result"].values()))
         distinct = [
             _cluster(fit, [[0.0], [0.0]], [[float(index)], [float(index)]])
             for index, fit in enumerate(("fit-a", "fit-b", "fit-c"))
         ]
-        report = _band(distinct)
-        self.assertEqual(report["independent_units"], 3)
-        self.assertEqual(report["lineage_ids"], ("lineage-fit-a", "lineage-fit-b", "lineage-fit-c"))
-        self.assertEqual(len(set(report["lineage_ids"])), report["independent_units"])
-        self.assertEqual(report["protocol"]["lineage_rule"], "refuse_repeated_lineage")
+        separate = _band(distinct)
+        self.assertEqual(separate["independent_units"], 3)
+        self.assertEqual(separate["fit_count"], 3)
+        self.assertEqual(separate["lineage_ids"], ("lineage-fit-a", "lineage-fit-b", "lineage-fit-c"))
+        self.assertEqual(len(set(separate["lineage_ids"])), separate["independent_units"])
+        nested = [
+            _cluster("fit-b", [[0.0], [0.0]], [[0.0], [0.0]], lineage_id="lineage-a", entity_id="entity-b"),
+            _cluster("fit-c", [[0.0], [0.0]], [[2.0], [2.0]], lineage_id="lineage-b", entity_id="entity-c"),
+            _cluster("fit-a", [[0.0], [0.0]], [[0.0], [0.0]], lineage_id="lineage-a", entity_id="entity-a"),
+        ]
+        report = _band(nested)
+        again = _band(list(reversed(nested)))
+        self.assertEqual(report, again)
+        synthetic = report["roles_result"]["real_synthetic"]
+        self.assertEqual(synthetic["status"], "pointwise_band")
+        self.assertEqual(synthetic["curve"], (0.5, 1.0))
+        self.assertNotEqual(synthetic["curve"], (2.0 / 3.0, 1.0))
+        self.assertEqual(report["independent_units"], 2)
+        self.assertEqual(report["fit_count"], 3)
+        self.assertTrue(report["cross_lineage_band"])
+        self.assertEqual(report["lineages"], (
+            {"lineage_id": "lineage-a", "fit_ids": ("fit-a", "fit-b"), "entity_ids": ("entity-a", "entity-b")},
+            {"lineage_id": "lineage-b", "fit_ids": ("fit-c",), "entity_ids": ("entity-c",)},
+        ))
+        curves = np.array([[1.0, 1.0], [0.0, 1.0]])
+        picks = np.random.default_rng(0).integers(0, 2, size=(99, 2))
+        resampled = curves[picks].mean(axis=1)
+        lower, upper = np.quantile(resampled, (0.025, 0.975), axis=0, method="linear")
+        self.assertEqual(synthetic["lower"], tuple(float(value) for value in lower))
+        self.assertEqual(synthetic["upper"], tuple(float(value) for value in upper))
+        hook = geometry_plot_hook(report)
+        self.assertEqual(hook["estimand"], "equal_weight_mean_of_lineage_ecdfs")
+        self.assertEqual(hook["figure"], "unmeasured")
         self.assertFalse(report["qualifies_transfer"])
