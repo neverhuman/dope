@@ -7,6 +7,15 @@ fn oof_residual_view(
     completed: &[Vec<f32>],
     target: &Target,
 ) -> Option<(Table, Vec<f32>)> {
+    oof_residual_view_capacity(table, completed, target, None)
+}
+
+fn oof_residual_view_capacity(
+    table: &Table,
+    completed: &[Vec<f32>],
+    target: &Target,
+    capacity: Option<CapacityRefinement>,
+) -> Option<(Table, Vec<f32>)> {
     if table.rows < 24 {
         return None;
     }
@@ -43,28 +52,50 @@ fn oof_residual_view(
             target: train.iter().map(|id| table.target[*id]).collect(),
         };
         let screen = target_screen(&subset.columns, &subset.target);
-        let fitted = match target {
-            Target::SparseLinear { .. } => fit_linear_target(&subset, &subset.columns, &screen).0,
-            Target::SparseGam { .. } => {
-                fit_gam_target(&subset, &subset.columns, &screen, Task::Regression)
-            }
-            Target::Ga2m { .. } => {
-                fit_ga2m_target(&subset, &subset.columns, &screen, Task::Regression)
-            }
-            Target::Mars { .. } => {
-                fit_mars_target(&subset, &subset.columns, &screen, Task::Regression)
-            }
-            Target::ObliviousTree { .. } => {
-                fit_oblivious_tree_target(&subset, &subset.columns, &screen, Task::Regression)
-            }
-            #[cfg(not(feature = "gpu-training"))]
-            Target::CompactNeuralResidual { .. } => fit_compact_neural_target_native(
+        let fitted = if let Some(capacity) = capacity {
+            let family = match target {
+                Target::SparseLinear { .. } => 0,
+                Target::SparseGam { .. } => 1,
+                Target::Ga2m { .. } => 2,
+                Target::Mars { .. } => 3,
+                Target::ObliviousTree { .. } => 4,
+                Target::CompactNeuralResidual { .. } => 5,
+                _ => return None,
+            };
+            refined_target_model(
                 &subset,
                 &subset.columns,
                 &screen,
                 Task::Regression,
-            ),
-            _ => return None,
+                family,
+                capacity,
+            )
+        } else {
+            match target {
+                Target::SparseLinear { .. } => {
+                    fit_linear_target(&subset, &subset.columns, &screen).0
+                }
+                Target::SparseGam { .. } => {
+                    fit_gam_target(&subset, &subset.columns, &screen, Task::Regression)
+                }
+                Target::Ga2m { .. } => {
+                    fit_ga2m_target(&subset, &subset.columns, &screen, Task::Regression)
+                }
+                Target::Mars { .. } => {
+                    fit_mars_target(&subset, &subset.columns, &screen, Task::Regression)
+                }
+                Target::ObliviousTree { .. } => {
+                    fit_oblivious_tree_target(&subset, &subset.columns, &screen, Task::Regression)
+                }
+                #[cfg(not(feature = "gpu-training"))]
+                Target::CompactNeuralResidual { .. } => fit_compact_neural_target_native(
+                    &subset,
+                    &subset.columns,
+                    &screen,
+                    Task::Regression,
+                ),
+                _ => return None,
+            }
         };
         for (at, &id) in ids.iter().enumerate().filter(|(at, _)| folds[*at] == fold) {
             let row = completed
@@ -121,6 +152,9 @@ mod residual_tests {
         assert!(residuals.iter().all(|r| r.is_finite() && *r > 0.0));
         assert!(residuals.iter().sum::<f32>() / 96.0 > 0.15);
         assert!(residual_rule(&target, 96, true).contains("three_fixed_row_folds"));
-        assert_eq!(residual_rule(&target, 96, false), "full_fit_oof_unavailable_unqualified");
+        assert_eq!(
+            residual_rule(&target, 96, false),
+            "full_fit_oof_unavailable_unqualified"
+        );
     }
 }

@@ -104,9 +104,174 @@ fn crossfit_interaction_pairs(table: &Table, columns: &[Vec<f32>]) -> Vec<(usize
     scored.into_iter().take(4).map(|(l, r, _)| (l, r)).collect()
 }
 
+// Explore a bounded semantic-column-order sample plus strong single-column
+// proposals. Tail cuts are estimated in each training fold; no audit/final
+// labels or candidate-dependent folds enter proposal construction.
+fn exploratory_pair_proposals(
+    table: &Table,
+    columns: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    limit: usize,
+) -> Vec<(usize, usize)> {
+    if table.rows < 24 || columns.len() < 2 {
+        return Vec::new();
+    }
+    let count = table.rows.min(256);
+    let ids = (0..count)
+        .map(|at| at * table.rows / count)
+        .collect::<Vec<_>>();
+    let folds = ids
+        .iter()
+        .map(|id| (splitmix64(*id as u64 ^ 0x6d61_696e_666f_6c64) % 4) as usize)
+        .collect::<Vec<_>>();
+    let mut semantic = columns
+        .iter()
+        .enumerate()
+        .map(|(index, column)| {
+            let mut hash = blake3::Hasher::new();
+            for &row in &ids {
+                hash.update(&column[row].to_le_bytes());
+            }
+            (hash.finalize().to_hex().to_string(), index)
+        })
+        .collect::<Vec<_>>();
+    semantic.sort();
+    let mut proposed = std::collections::BTreeSet::new();
+    let strongest = screen
+        .iter()
+        .take(8)
+        .map(|(feature, _)| *feature)
+        .collect::<Vec<_>>();
+    for (at, &left) in strongest.iter().enumerate() {
+        for &right in &strongest[at + 1..] {
+            proposed.insert((left.min(right), left.max(right)));
+        }
+    }
+    for at in 0..128u64 {
+        let left = semantic[(splitmix64(at ^ 0xc2a1) % semantic.len() as u64) as usize].1;
+        let right = semantic[(splitmix64(at ^ 0xc2b2) % semantic.len() as u64) as usize].1;
+        if left != right {
+            proposed.insert((left.min(right), left.max(right)));
+        }
+    }
+    let mut scored = Vec::new();
+    for (left, right) in proposed {
+        let mut best = 0.0f64;
+        for (left_q, right_q) in [(0.1, 0.1), (0.1, 0.9), (0.9, 0.1), (0.9, 0.9)] {
+            let mut null_error = 0.0;
+            let mut pair_error = 0.0;
+            for fold in 0..4 {
+                let train = ids
+                    .iter()
+                    .enumerate()
+                    .filter(|(at, _)| folds[*at] != fold)
+                    .map(|(_, row)| *row)
+                    .collect::<Vec<_>>();
+                let eval = ids
+                    .iter()
+                    .enumerate()
+                    .filter(|(at, _)| folds[*at] == fold)
+                    .map(|(_, row)| *row)
+                    .collect::<Vec<_>>();
+                if train.is_empty() || eval.is_empty() {
+                    continue;
+                }
+                let cut = |feature: usize, q: f32| {
+                    let mut values = train
+                        .iter()
+                        .map(|row| columns[feature][*row])
+                        .collect::<Vec<_>>();
+                    values.sort_by(f32::total_cmp);
+                    quantile(&values, q)
+                };
+                let lm = cut(left, left_q);
+                let rm = cut(right, right_q);
+                let mean = train
+                    .iter()
+                    .map(|row| f64::from(table.target[*row]))
+                    .sum::<f64>()
+                    / train.len() as f64;
+                let cell = |row: usize| {
+                    usize::from(columns[left][row] > lm) * 2 + usize::from(columns[right][row] > rm)
+                };
+                let mut sums = [0.0; 4];
+                let mut counts = [0; 4];
+                for &row in &train {
+                    let at = cell(row);
+                    sums[at] += f64::from(table.target[row]);
+                    counts[at] += 1;
+                }
+                for &row in &eval {
+                    let at = cell(row);
+                    let prediction = if counts[at] == 0 {
+                        mean
+                    } else {
+                        sums[at] / f64::from(counts[at])
+                    };
+                    let actual = f64::from(table.target[row]);
+                    null_error += (actual - mean).powi(2);
+                    pair_error += (actual - prediction).powi(2);
+                }
+            }
+            if null_error > 0.0 {
+                best = best.max((null_error - pair_error) / null_error);
+            }
+        }
+        if best > 0.01 {
+            scored.push((left, right, best));
+        }
+    }
+    scored.sort_by(|a, b| b.2.total_cmp(&a.2).then(a.0.cmp(&b.0)).then(a.1.cmp(&b.1)));
+    scored
+        .into_iter()
+        .take(limit)
+        .map(|(left, right, _)| (left, right))
+        .collect()
+}
+
 #[cfg(test)]
 mod interaction_screen_tests {
     use super::*;
+    #[test]
+    fn rare_gate_proposals_survive_shifted_features_target_units_and_permutation() {
+        let rows = 256;
+        let mut columns = (0..40)
+            .map(|feature| {
+                (0..rows)
+                    .map(|row| {
+                        (splitmix64(row as u64 ^ ((feature as u64 + 1) << 24)) % 1000) as f32
+                            / 999.0
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+        let mut target = Vec::new();
+        for row in 0..rows {
+            let left = (row % 16) as f32 / 15.0;
+            let right = (row / 16) as f32 / 15.0;
+            columns[30][row] = 12.0 + left;
+            columns[31][row] = 19.0 + right;
+            target.push(if left > 0.8 && right > 0.8 { 0.9 } else { 0.1 });
+        }
+        let mut table = Table {
+            rows,
+            features: 40,
+            columns: columns.clone(),
+            target,
+        };
+        for scale in [1.0, 1000.0] {
+            table
+                .target
+                .iter_mut()
+                .for_each(|value| *value = *value * scale + 7.0);
+            let screen = target_screen(&columns, &table.target);
+            assert!(exploratory_pair_proposals(&table, &columns, &screen, 8).contains(&(30, 31)));
+        }
+        columns.reverse();
+        table.columns = columns.clone();
+        let screen = target_screen(&columns, &table.target);
+        assert!(exploratory_pair_proposals(&table, &columns, &screen, 8).contains(&(8, 9)));
+    }
     #[test]
     fn pure_shifted_pair_beyond_marginal_parents_survives_target_units_and_permutation() {
         let n = 256;
