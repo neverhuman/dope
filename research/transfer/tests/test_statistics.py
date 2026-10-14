@@ -125,6 +125,45 @@ class StatisticsTests(unittest.TestCase):
         tiny = scheduled((run(values=(1.,)),), ("a",))
         self.assertEqual(bootstrap_effects(tiny, estimand="fixed_artifact", draws=199)["status"], "insufficient_query_clusters")
 
+    def test_crossed_cell_and_missing_fit_do_not_publish_the_complete_case_win(self):
+        # Every observed cell is a large negative gap. Dropping or failing one
+        # cell must not turn that complete-case mean into the requested estimand.
+        def grid(fail=None, drop=None):
+            runs = []
+            for family in (0, 1):
+                for fit in (0, 1):
+                    for sample in (0, 1):
+                        if drop == (family, fit, sample):
+                            continue
+                        item = run(f"f-{family}", f"t-{family}", fit=str(fit), sample=str(sample), values=(-5., -5.))
+                        if fail == (family, fit, sample):
+                            item = replace(item, pairs=None, status="technical_failure")
+                        runs.append(item)
+            return scheduled(tuple(runs), ("a",))
+
+        complete = bootstrap_effects(grid(), draws=199, seed=3)
+        self.assertEqual(complete["status"], "complete")
+        self.assertEqual(complete["estimand"], "method_new_source")
+        self.assertAlmostEqual(complete["estimates"]["a"], -5.)
+
+        def refused(result, reason):
+            self.assertEqual(result["status"], "incomplete")
+            self.assertEqual(result["reason"], reason)
+            self.assertEqual(result["estimand"], "method_new_source")
+            self.assertIsNone(result["estimates"])
+            self.assertIsNone(result["family_effects"])
+            self.assertIsNone(result["samples"])
+            self.assertEqual(result["sensitivity"]["estimand"], "complete_case_sensitivity")
+            self.assertAlmostEqual(result["sensitivity"]["estimates"]["a"], -5.)
+            self.assertFalse(result["sensitivity"]["qualification"])
+            self.assertIsNone(simultaneous_ucb(result)["bounds"])
+
+        refused(bootstrap_effects(grid(drop=(0, 1, 1)), draws=199, seed=3), "unbalanced scheduled evidence")
+        missing = bootstrap_effects(grid(fail=(0, 1, 1)), draws=199, seed=3)
+        refused(missing, "incomplete scheduled evidence")
+        self.assertEqual(missing["scheduled_runs"], 8)
+        self.assertEqual(missing["dispositions"], {"measured": 7, "technical_failure": 1})
+
     def test_query_alignment_and_coupling_validation(self):
         panel = seed_panel(3)
         bad = replace(panel.runs[1], pairs=replace(panel.runs[1].pairs, query_ids=("other", "q-1")))
@@ -186,7 +225,7 @@ class StatisticsTests(unittest.TestCase):
         result = power_simulation(PowerScenario(0., families=4, fits=3, query_clusters=3, missing_fit_probability=0.5),
                                   repetitions=20, bootstrap_draws=199, seed=220)
         self.assertEqual(result["valid_repetitions"], 0)
-        self.assertEqual(sum(result["failed_repetitions"].values()), 20)
+        self.assertEqual(result["failed_repetitions"], {"incomplete": 20})
         self.assertFalse(result["validation_passed"])
         self.assertIsNone(result["metrics"]["equivalent"]["rate"])
         with self.assertRaises(ValueError):

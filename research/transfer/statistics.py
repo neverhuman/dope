@@ -216,7 +216,11 @@ def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: s
     try:
         tables, namespace_seeds = _tables(design, endpoint)
     except ValueError as error:
-        return refuse("incomplete", str(error))
+        reason = str(error)
+        # A hole in the cross is not a scheduled family mean. Keep its average as sensitivity.
+        if reason in {"incomplete scheduled evidence", "unbalanced scheduled evidence", "incomplete crossed global seed axis"}:
+            point = {**point, "estimand": "complete_case_sensitivity"}
+        return refuse("incomplete", reason)
     families = sorted({r.family_id for r in design.runs})
     if estimand == "method_new_source" and len(families) < 2:
         return refuse("insufficient_families")
