@@ -171,7 +171,11 @@ freeze the behavior contract, a knowledge-transfer claim, or any metric.
   descriptively and claims no priority.
 - **Terminology not adopted.** No `Data IQ`/`DIQ` label: Data-IQ (Seedat et
   al., NeurIPS 2022) already exists, and the label would imply an unvalidated
-  intelligence scale. Qualified Learning Density (QLD) is not adopted as a
+  intelligence scale. Data-IQ primarily stratifies examples by training
+  dynamics and aleatoric uncertainty; as a secondary application it compares
+  datasets, synthetic ones included. The paper cites it in related work as
+  close evaluation prior art, not only as a name collision, and never
+  describes it as a byte or density measure. Qualified Learning Density (QLD) is not adopted as a
   headline, ranking, gate or table metric. It stays an exploratory candidate
   for one artifact on one fixed workload, pending the N02 adversarial
   examples. vNext primary outputs remain the frontier and `B*_tested`, with

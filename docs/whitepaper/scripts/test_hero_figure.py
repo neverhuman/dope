@@ -1,0 +1,67 @@
+"""Page-1 hero readability floor (ledger C053) and the rows it may leave to Table 1."""
+import copy
+import json
+import re
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+
+import figure_style
+import v2_figures
+
+PAPER = Path(__file__).resolve().parents[1]
+
+
+class HeroFigureTests(unittest.TestCase):
+    def setUp(self):
+        self.headline = json.loads(v2_figures.HEADLINE.read_text())
+
+    def draw(self, headline):
+        captured = {}
+        original = v2_figures._save
+
+        def save(figure, path, dpi):
+            figure.canvas.draw()
+            # The tight box covers only what is drawn, so out-of-view tick labels do not count.
+            tight = figure.get_tightbbox(figure.canvas.get_renderer())
+            width, height = figure.get_size_inches()
+            captured["size"] = (width, height)
+            captured["texts"] = v2_figures.text_sizes(figure)
+            captured["outside"] = [edge for edge, cut in (("left", tight.x0 < 0), ("bottom", tight.y0 < 0),
+                                                          ("right", tight.x1 > width), ("top", tight.y1 > height))
+                                   if cut]
+            return original(figure, path, dpi)
+
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(v2_figures, "_save", save):
+            v2_figures.draw_hero(headline, Path(tmp) / "teaser.pdf")
+        return captured
+
+    def test_every_hero_label_meets_the_floor_inside_the_canvas_at_text_width(self):
+        drawn = self.draw(self.headline)
+        self.assertAlmostEqual(drawn["size"][0], figure_style.TEASER_WIDTH_IN)
+        small = [(text, size) for text, size in drawn["texts"] if size < v2_figures.HERO_MIN_POINTS]
+        self.assertEqual(small, [])
+        self.assertEqual(drawn["outside"], [])
+        self.assertGreater(len(drawn["texts"]), 40)
+
+    def test_manuscript_places_the_hero_at_its_drawn_width(self):
+        """Scale 1: the text width equals the drawing width and the include adds no height cap."""
+        tex = (PAPER / "dope-mfs.tex").read_text()
+        self.assertIn("\\includegraphics[width=\\linewidth]{figures/teaser.pdf}", tex)
+        style = (PAPER / "iclr2027_conference.sty").read_text()
+        width = re.search(r"\\textwidth\s+([0-9.]+)\s*true in", style)
+        self.assertIsNotNone(width)
+        self.assertAlmostEqual(float(width.group(1)), figure_style.TEASER_WIDTH_IN)
+
+    def test_a_row_may_leave_the_hero_only_while_every_interval_clears_the_window(self):
+        for code in v2_figures.HERO_OMITTED_ROWS:
+            changed = copy.deepcopy(self.headline)
+            arm = next(arm for arm in changed["arms"] if arm["code"] == code)
+            arm["contrasts"]["mlp"]["hl_lo"] = v2_figures.TEASER_X_LIM[1]
+            with self.assertRaisesRegex(ValueError, "omitted from the hero"):
+                self.draw(changed)
+
+
+if __name__ == "__main__":
+    unittest.main()
