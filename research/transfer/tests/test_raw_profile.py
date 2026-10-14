@@ -1,6 +1,7 @@
 """Synthetic DOPERAW1 framing. No native CLI, source rows, or prediction goldens."""
 
 import hashlib
+import re
 from pathlib import Path
 import tempfile
 import unittest
@@ -15,6 +16,7 @@ from research.transfer.bundle import (
     verify_bundle,
 )
 from research.transfer.evidence import canonical_json
+from research.transfer.blake3_digest import blake3_hash
 from research.transfer.raw_profile import (
     RAW_CAPABILITIES,
     RAW_HANDLER,
@@ -44,12 +46,12 @@ def dpk(features=2):
     return bytes(artifact)
 
 
-def framed(state, payload, *, state_len=None, payload_len=None, magic=b"DOPERAW1", digest=b"\x00" * 32):
+def framed(state, payload, *, state_len=None, payload_len=None, magic=b"DOPERAW1", digest=None):
     artifact = bytearray()
     artifact += magic
     artifact += (len(state) if state_len is None else state_len).to_bytes(8, "little")
     artifact += (len(payload) if payload_len is None else payload_len).to_bytes(8, "little")
-    artifact += digest
+    artifact += blake3_hash(state + payload) if digest is None else digest
     artifact += state
     artifact += payload
     return bytes(artifact)
@@ -85,7 +87,7 @@ class RawChargeTests(unittest.TestCase):
     def test_length_identity_leaves_runtime_and_closure_unmeasured(self):
         state = SECRET.encode()
         payload = dpk()
-        artifact = framed(state, payload, digest=b"SECRET_HASH" + b"!" * 21)
+        artifact = framed(state, payload)
         profile = account_raw_artifact(artifact)
         self.assertEqual(profile["byte_profile_id"], "native-raw-complete-v1")
         self.assertEqual(profile["framing_bytes"], 56)
@@ -99,7 +101,8 @@ class RawChargeTests(unittest.TestCase):
         self.assertEqual(profile["transport_archive_bytes"], len(artifact))
         self.assertIsNone(profile["generic_runtime_bytes"])
         self.assertIsNone(profile["cold_sampling_closure_bytes"])
-        self.assertEqual(profile["content_hash"], "unverified_native_inspect")
+        self.assertEqual(profile["mapped_runtime_cold_closure"], "separate_unmeasured")
+        self.assertEqual(profile["content_hash"], "blake3_state_plus_dpk")
         self.assertEqual(profile["symbolic_backend"], "unverified_native_inspect")
         self.assertEqual(profile["feature_support"], "fit_range_bounded_historical_native_marginals")
         self.assertEqual(profile["target_support"], "unclipped_affine_regression_not_tail_qualified")
@@ -120,6 +123,42 @@ class RawChargeTests(unittest.TestCase):
         self.assertNotIn("scale", profile)
         with self.assertRaises(TypeError):
             profile["framing_bytes"] = 0
+
+    def test_wrong_digest_is_not_an_inspect_replay(self):
+        state = SECRET.encode()
+        payload = dpk()
+        good = framed(state, payload)
+        flipped_digest = bytearray(good)
+        flipped_digest[24] ^= 1
+        flipped_state = bytearray(good)
+        flipped_state[56] ^= 1
+        cases = (
+            bytes(flipped_digest),
+            bytes(flipped_state),
+            framed(state, payload, digest=b"SECRET_HASH" + b"!" * 21),
+        )
+        for artifact in cases:
+            with self.subTest(prefix=artifact[24:28]):
+                with self.assertRaises(BundleError) as raised:
+                    account_raw_artifact(artifact)
+                self.assertEqual(raised.exception.code, "raw_artifact_integrity_failed")
+                self.assertEqual(str(raised.exception), "raw_artifact_integrity_failed")
+                self.assertNotIn(SECRET, str(raised.exception))
+                self.assertNotIn("SECRET_HASH", str(raised.exception))
+
+    def test_digest_matches_unkeyed_blake3_state_plus_payload(self):
+        vectors = {
+            0: "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262",
+            65: "de1e5fa0be70df6d2be8fffd0e99ceaa8eb6e8c93a63f2d8d1c30ecb6b263dee",
+            1024: "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+            1025: "d00278ae47eb27b34faecf67b4fe263f82d5412916c1ffd97c8cb7fb814b8444",
+        }
+        for length, expected in vectors.items():
+            material = bytes(index % 251 for index in range(length))
+            self.assertEqual(blake3_hash(material).hex(), expected)
+        payload = dpk()
+        state = SECRET.encode()
+        self.assertEqual(framed(state, payload)[24:56], blake3_hash(state + payload))
 
     def test_bad_framing_refuses_without_echoing_the_artifact(self):
         state = SECRET.encode()
@@ -189,6 +228,8 @@ class RawColumnTests(unittest.TestCase):
         self.assertIs(declared["declared_columns_checked"], True)
         self.assertEqual(declared["rights"], "unqualified")
         self.assertEqual(declared["official_assets"], "unqualified")
+        self.assertEqual(declared["content_hash"], "unverified_native_inspect")
+        self.assertEqual(declared["symbolic_backend"], "unverified_native_inspect")
         rendered = repr(dict(declared))
         self.assertNotIn("secret_label", rendered)
         self.assertNotIn("secret_unit", rendered)
@@ -233,8 +274,11 @@ class RawHandlerTests(unittest.TestCase):
         self.assertIn(RAW_KIND, KINDS)
         self.assertTrue(set(RAW_CAPABILITIES) <= CAPABILITIES)
         source = (ROOT / "research/transfer/raw_profile.py").read_text()
-        for token in ("subprocess", "socket", "urllib", "pickle", "requests", "blake3", "115.625", "162.76041666666666"):
-            self.assertNotIn(token, source)
+        digest_source = (ROOT / "research/transfer/blake3_digest.py").read_text()
+        for blob in (source, digest_source):
+            for token in ("subprocess", "socket", "urllib", "pickle", "requests", "115.625", "162.76041666666666"):
+                self.assertNotIn(token, blob)
+            self.assertIsNone(re.search(r"^\s*(import|from)\s+blake3\b", blob, re.M))
         bundle = (ROOT / "research/transfer/bundle.py").read_text()
         self.assertLessEqual(bundle.count("\n"), 500)
         self.assertNotIn("115.625", bundle)

@@ -1,13 +1,19 @@
-"""Charge the native raw-complete profile. Rust owns the digest, reload, and sampling.
+"""Charge the native raw-complete profile after the inspect-raw digest check.
 
-The length identity is 56 + fitted-state bytes + native payload bytes. The
-32-byte content digest is not checked here. Generic runtime and cold closure
-stay None until a separate inventory measures them. A passed charge is not
-confirmation, a right, an official asset, a release, formal DP, or HIPAA
-de-identification. Historical DPK tier totals are a different account.
+DOPERAW1 is 8 magic bytes, a little-endian state length, a little-endian DPK
+length, and 32 bytes of unkeyed BLAKE3 over the following state||DPK. The
+carrier charge is that whole artifact. Generic runtime bytes and the mapped
+cold closure stay None: sample-raw-isolated measures those separately, and a
+missing number is not a zero. This check does not reload affine columns, decode
+the kernel, or apply the numeric-constraint and Task fix still owed by native.
+A passed charge is not confirmation, a right, an official asset, a release,
+formal DP, or HIPAA de-identification. Historical DPK tier totals are a
+different account, and inventory-only does not replay this check.
 """
 
 from types import MappingProxyType
+
+from research.transfer.blake3_digest import blake3_hash
 
 RAW_MAGIC = b"DOPERAW1"
 RAW_HEADER = 56
@@ -59,7 +65,11 @@ def profile_limits():
 
 
 def account_raw_artifact(artifact, limits=None):
-    """Split one self-contained artifact. Does not decode the fitted state or payload."""
+    """Split one self-contained artifact after BLAKE3(state||DPK) matches bytes 24..56.
+
+    Does not decode the fitted state or the native program. Column declaration
+    is a separate call and does not inherit this digest result.
+    """
     from research.transfer.bundle import BundleError, BundleLimits
     from research.transfer.bundle_io import preflight_dpk
 
@@ -73,6 +83,8 @@ def account_raw_artifact(artifact, limits=None):
     if state_len == 0 or state_len > len(artifact) or payload_len > len(artifact):
         _fail("raw_artifact_invalid" if state_len == 0 else "raw_artifact_integrity_failed")
     if RAW_HEADER + state_len + payload_len != len(artifact):
+        _fail("raw_artifact_integrity_failed")
+    if blake3_hash(artifact[RAW_HEADER:]) != artifact[24:56]:
         _fail("raw_artifact_integrity_failed")
     payload = artifact[RAW_HEADER + state_len:]
     try:
@@ -88,9 +100,11 @@ def account_raw_artifact(artifact, limits=None):
         "transport_archive_bytes": len(artifact),
         "generic_runtime_bytes": None,
         "cold_sampling_closure_bytes": None,
+        "mapped_runtime_cold_closure": "separate_unmeasured",
     }
     charge.update(profile_limits())
-    # Length identity does not reload columns. Mixed and mask states stay unsupported.
+    # The label is the algorithm that matched. It is not a kernel decode.
+    charge["content_hash"] = "blake3_state_plus_dpk"
     charge["declared_columns_checked"] = False
     return MappingProxyType(charge)
 
