@@ -230,11 +230,17 @@ def _place(axis, text: str, anchors, placed: list, avoid=(), **style):
     return first
 
 
-def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None = None) -> Path:
+def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None = None,
+                floor: float | None = None) -> Path:
     figure, axis = plt.subplots(figsize=(width, 2.7))
     # The frame is final before any label is measured.
     figure.subplots_adjust(left=0.1, right=0.98, bottom=0.17, top=0.95)
-    _frontier(axis, headline, cap_size=6.4, label_size=6.2, dope_size=6.6, control_size=6.4)
+    if floor is None:
+        _frontier(axis, headline, cap_size=6.4, label_size=6.2, dope_size=6.6, control_size=6.4)
+    else:
+        # The paper figure prints at the text width, so its labels keep the page-1 floor.
+        _frontier(axis, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.6, control_size=floor,
+                  offsets=HERO_LABEL_OFFSETS)
     axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)")
     axis.set_ylabel("CatBoost retention at 4n")
     return _save(figure, path, dpi)
@@ -316,7 +322,7 @@ def _draw_all(headline: dict, root: Path | None) -> dict[str, Path]:
         return directory / name
     return {
         "teaser.pdf": draw_hero(headline, place("teaser.pdf")),
-        "pareto.pdf": draw_pareto(headline, place("pareto.pdf")),
+        "pareto.pdf": draw_pareto(headline, place("pareto.pdf"), floor=HERO_MIN_POINTS),
         "paired.png": draw_forest(headline, place("paired.png"), width=8.0, dpi=200),
         "pareto.png": draw_pareto(headline, place("pareto.png"), width=8.0, dpi=200),
     }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile the paper's abstract claims from docs/whitepaper/claim-registry.json and refuse any drift.
+"""Compile the paper's abstract claims from the registry below and refuse any drift.
 
 Each registered claim names its estimand, the panel row or headline field it
 rests on, the macros that print it, and its expected state. The compiler
@@ -15,7 +15,9 @@ the interval rule, and checks that:
 - title, abstract, README prose and CITATION.cff avoid the forbidden language.
 
 ``--check`` exits non-zero on any failure. ``--json`` prints the compiled
-claims. Neither mode writes a file.
+claims. Neither mode writes a file. check_paper.py runs the same compilation
+inside the authenticated build snapshot, so the publication path enforces it;
+the registry lives in this module so that snapshot carries it.
 """
 
 from __future__ import annotations
@@ -35,7 +37,75 @@ if str(REPO) not in sys.path:
 import review_v2_emit as E  # noqa: E402
 from research.benchmark.review_fixes.v2_panel import STRONGEST_MIN_LINEAGES  # noqa: E402
 
-REGISTRY = PAPER / "claim-registry.json"
+# The registry is data: estimands, states, claims and forbidden language.
+REGISTRY = json.loads(r'''
+{
+  "format": "dope-paper-claim-registry",
+  "version": 1,
+  "scope": "Historical five-seed validation panel behind dope-mfs.tex. Successor campaign claims (N21) are out of scope until measured; they never enter this registry as facts.",
+  "sources": {
+    "panel": "research/benchmark/results/review-fixes-v2/panel.json",
+    "headline": "docs/whitepaper/generated/v2-headline.json",
+    "ledger": "research/benchmark/results/review-fixes-v2/scalar-cells.jsonl"
+  },
+  "estimands": {
+    "retention_level": "Median over lineages of null-normalized TSTR/TRTR retention, with the 95% cluster, lineage and fit-seed nested bootstrap interval.",
+    "paired_difference": "Hodges-Lehmann pseudo-median of paired lineage differences, DOPE minus comparator, with the 95% nested bootstrap interval. A raw-gap superiority (or inferiority) verdict requires that interval to exclude zero; otherwise the verdict is inconclusive. Equivalence is a separate rule (90% interval inside the margin) and is never inferred from an inconclusive verdict.",
+    "charged_bytes": "Median over lineages of the per-lineage median charged artifact bytes over completed fits; every byte that sampling reads is charged.",
+    "cap_share": "Completed DOPE fits whose charged bytes are within the 10,240-byte cap, over all completed fits.",
+    "panel_size": "Distinct prepared lineages in the v2 scalar ledger.",
+    "disclosure": "A required statement whose evidence is a flag in the panel, not an estimate."
+  },
+  "states": {
+    "measured": "An estimate on validation rows; selection-exposed, as every estimate in this panel.",
+    "above": "Raw-gap superiority on validation rows; interval excludes zero above it.",
+    "below": "Raw-gap inferiority on validation rows; interval excludes zero below it.",
+    "inconclusive": "The interval contains zero. The paper says 'cannot be separated from', which is not equivalence.",
+    "null_with_reason": "The quantity is unmeasured and printed as null with the gates that keep it null.",
+    "pending": "Reserved for a future pre-registered run; nothing is reported."
+  },
+  "claims": [
+    {"id": "panel-size", "estimand": "panel_size", "kind": "count", "macro": "PreparedN", "state": "measured"},
+    {"id": "dope-bytes", "estimand": "charged_bytes", "kind": "bytes", "arm": "Dope", "macro": "VDopeBytes", "state": "measured"},
+    {"id": "dope-cap-share", "estimand": "cap_share", "kind": "cap_share", "arm": "Dope", "macro": "VDopeWithin", "state": "measured"},
+    {"id": "dope-level-catboost-4n", "estimand": "retention_level", "kind": "level", "arm": "Dope",
+     "auditor": "catboost", "size": 4, "macros": {"value": "VDopeCbFour", "lo": "VDopeCbFourLo", "hi": "VDopeCbFourHi"}, "state": "measured"},
+    {"id": "dope-vs-strongest-catboost-4n", "estimand": "paired_difference", "kind": "contrast", "comparator": "strongest",
+     "auditor": "catboost", "size": 4, "cohort": "full",
+     "macros": {"verdict": "VVerdictStrong", "value": "VStrongDiff", "lo": "VStrongLo", "hi": "VStrongHi", "name": "VStrongestName"},
+     "state": "inconclusive"},
+    {"id": "strongest-bytes-ratio", "estimand": "charged_bytes", "kind": "bytes_ratio", "comparator": "strongest",
+     "macros": {"bytes": "VStrongBytes", "ratio": "VStrongRatio"}, "state": "measured"},
+    {"id": "dope-vs-arf-default-catboost-4n", "estimand": "paired_difference", "kind": "contrast", "arm": "Arf",
+     "auditor": "catboost", "size": 4, "cohort": "full",
+     "macros": {"verdict": "VVerdictArfCbFour", "value": "VDiffArfCbFour", "lo": "VLoArfCbFour", "hi": "VHiArfCbFour"},
+     "state": "inconclusive"},
+    {"id": "dope-vs-forest-flow-catboost-4n", "estimand": "paired_difference", "kind": "contrast",
+     "arm": "Forest", "auditor": "catboost", "size": 4,
+     "cohort": "small", "macros": {"verdict": "VVerdictForestCbFour", "value": "VDiffForestCbFour", "lo": "VLoForestCbFour",
+     "hi": "VHiForestCbFour", "n": "VNForestCbFour"}, "state": "below"},
+    {"id": "dope-vs-predictor-only-catboost-4n", "estimand": "paired_difference", "kind": "contrast", "arm": "Pred",
+     "auditor": "catboost", "size": 4, "cohort": "full",
+     "macros": {"verdict": "VVerdictPredCbFour", "value": "VDiffPredCbFour", "lo": "VLoPredCbFour", "hi": "VHiPredCbFour"},
+     "state": "above"},
+    {"id": "dope-vs-real-rows-catboost-4n", "estimand": "paired_difference", "kind": "contrast", "arm": "Boot",
+     "auditor": "catboost", "size": 4, "cohort": "full",
+     "macros": {"verdict": "VVerdictBootCbFour", "value": "VDiffBootCbFour", "lo": "VLoBootCbFour", "hi": "VHiBootCbFour"},
+     "state": "below"},
+    {"id": "selection-exposure", "estimand": "disclosure", "kind": "disclosure", "panel_flag": "official_tests_opened",
+     "flag_value": false, "abstract_phrases": ["selection-exposed", "official test split is reserved"], "state": "pending"},
+    {"id": "release-score", "estimand": "disclosure", "kind": "null", "panel_flag": "mfs_v3", "flag_value": null,
+     "manuscript_phrases": ["The release score is null until its privacy and representation gates are measured"],
+     "state": "null_with_reason"}
+  ],
+  "forbidden_language": {
+    "applies_to": ["title", "abstract", "README prose outside the generated block", "CITATION.cff"],
+    "patterns": ["intelligen", "state[- ]of[- ]the[- ]art", "\\bsota\\b", "differentially private", "privacy[- ]preserving",
+                 "\\bequivalent to\\b", "\\bguarantee", "kilobyte[- ]scale", "kilobyte generator", "compression is intelligence",
+                 "transferable knowledge"]
+  }
+}
+''')
 TEX = PAPER / "dope-mfs.tex"
 GENERATED = PAPER / "generated"
 MACRO_DEF = re.compile(r"\\newcommand\{\\([A-Za-z]+)\}\{(.*)\}$")
@@ -175,7 +245,9 @@ def compile_claims(registry: dict, panel: dict, headline: dict, macros: dict[str
     used = {name for name in MACRO_USE.findall(abstract) if name in macros}
     for name in sorted(used - covered):
         failures.append(f"abstract macro \\{name} belongs to no registered claim")
-    texts = {"title": title_of(tex), "abstract": abstract, "README": readme_prose(readme), "CITATION.cff": citation}
+    texts = {"title": title_of(tex), "abstract": abstract, "README": readme_prose(readme)}
+    if citation is not None:
+        texts["CITATION.cff"] = citation
     for label, text in texts.items():
         for pattern in registry["forbidden_language"]["patterns"]:
             if re.search(pattern, text, re.IGNORECASE):
@@ -188,8 +260,15 @@ def load_inputs():
     headline = json.loads((GENERATED / "v2-headline.json").read_text())
     ledger = E.RESULTS / "review-fixes-v2" / "scalar-cells.jsonl"
     lineages = len({json.loads(line)["dataset"] for line in ledger.read_text().splitlines() if line.strip()})
-    return (json.loads(REGISTRY.read_text()), panel, headline, generated_macros(), TEX.read_text(),
-            (REPO / "README.md").read_text(), (REPO / "CITATION.cff").read_text(), lineages)
+    # The build snapshot carries no CITATION.cff; paper-tests checks it against the same patterns.
+    citation = REPO / "CITATION.cff"
+    return (REGISTRY, panel, headline, generated_macros(), TEX.read_text(), (REPO / "README.md").read_text(),
+            citation.read_text() if citation.is_file() else None, lineages)
+
+
+def publication_failures() -> list[str]:
+    """Failures for check_paper.py, each prefixed so the build log names the registry."""
+    return ["claim registry: " + failure for failure in compile_claims(*load_inputs())[1]]
 
 
 def main() -> int:

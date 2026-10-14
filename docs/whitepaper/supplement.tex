@@ -151,7 +151,7 @@ The data lock admits $\EligibleN$ MIT-licensed entries and prepares $\PreparedN$
 
 \subsection{Selection rule for each method}
 \label{app:selection}
-\cref{tab:selection} states what chose each configuration and which rows it read. Only DOPE's compile search and the density baselines' fixed or density-selected configurations avoid the scoring auditors; CTGAN and TVAE select on the same validation rows and the same linear and MLP auditors that score retention, and DOPE's research profile was compared with three alternatives on the validation rows of every evaluated lineage under all three auditors (\cref{app:compile}). The sealed test run removes all of these overlaps for its estimate.
+\cref{tab:selection} states what chose each configuration and which rows it read. Only DOPE's compile search and the density baselines' fixed or density-selected configurations avoid the scoring auditors; CTGAN and TVAE select on the same validation rows and the same linear and MLP auditors that score retention, and DOPE's research profile was compared with three alternatives on the validation rows of every evaluated lineage under all three auditors (\cref{app:compile}). The sealed test run removes all of these overlaps for its estimate. TabSyn's five-seed panel has two incomplete parts: six sample cells of one seed-$23$ lineage reached the sample time cap and stay unscored (final, without a retry), and one other lineage has no stored seed-$11$ samples. Every lineage keeps at least four complete fit seeds, so all enter the five-seed comparison.
 
 \begin{table}[t]
 \caption{\textbf{Selection rule for each method.} The scored column is retention on the validation cut. No Holm family.}
@@ -171,7 +171,7 @@ TVAE & Same skill as CTGAN. & Same rows and auditors as CTGAN. & Author implemen
 Chow--Liu & Native: held-out mean log density over a fixed trial set. Default: no search. & Native: validation cut. Default: fit view, eight bins, Laplace smoothing $1.0$. Written for this comparison. & Fixed trial set. \\
 Independent marginals & Native: held-out mean log density over a fixed trial set. Default: no search. & Native: validation cut. Default: fit-view marginals. Written for this comparison. & Fixed trial set. \\
 ARF & Author default; separately, the native objective. & Author default reads no validation rows; the native arm reads the validation cut. & Five fit seeds. \\
-TabSyn & No selection. & Author architecture with a scaled schedule. & $200$ VAE and at most $1{,}000$ diffusion epochs (the authors' early stop can end a fit sooner), five fit seeds from $11$ to $71$; six sample cells of one seed-$23$ lineage reached the sample time cap and stay unscored, and one other lineage has no stored seed-$11$ samples, so every lineage keeps at least four complete fits. \\
+TabSyn & No selection. & Author architecture with a scaled schedule. & $200$ VAE and at most $1{,}000$ diffusion epochs (the authors' early stop can end a fit sooner), five fit seeds from $11$ to $71$; six seed-$23$ cells unscored, one lineage without seed-$11$ samples. \\
 Forest-Flow & Author regression objective on a frozen grid. & $\NForestCb$ confirmation lineages. & Fit cap \BaselineForestFitLimit\ seconds. \\
 \bottomrule
 \end{tabular}
