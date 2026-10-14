@@ -1,9 +1,9 @@
-# DOPE — Downstream Objective-Preserving Encoding
+# DOPE — Generative Compression of Predictive Structure
 
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![Jankurai gate](https://img.shields.io/badge/Jankurai-requires%20score%2085-blue)](docs/audit.md)
 
-DOPE compiles a numeric regression table into a **kilobyte-scale synthetic-data generator**: quantized per-feature marginals, a compact dependence model chosen on the training rows, a twelve-input neural residual for the target, and a noise model, all charged against a 10,240-byte cap. New rows are sampled from that artifact alone. The paper is [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf) (supplement: [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf)).
+DOPE (Downstream Objective-Preserving Encoding) compiles a numeric regression table into a small **sampling program**: quantized per-feature marginals, a compact dependence model chosen on the training rows, a twelve-input neural residual for the target, and a noise model, with every byte that sampling reads charged against a 10,240-byte cap. New rows are sampled from that artifact alone. The question is how much of the table's **predictive structure** learners trained only on those rows recover, measured as retention of a real-trained learner's gain on real validation rows. Size is a measured axis, not the result: an empty or constant generator is also small. The paper is [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf) (supplement: [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf)).
 
 Version `0.3.0-alpha.1`, [MIT License](LICENSE). This source tree is a research release, not a certified production release. Start with [AGENTS.md](AGENTS.md) for ownership and proof commands.
 
@@ -174,7 +174,7 @@ The [architecture](docs/architecture.md), [testing](docs/testing.md), and [relea
 
 ```bibtex
 @misc{taylor2026dope,
-  title  = {{DOPE}: Downstream Objective-Preserving Encoding of Regression Tables into Kilobyte Generators},
+  title  = {{DOPE}: Generative Compression of Predictive Structure},
   author = {Taylor, Jepson and Alexander, Alton},
   year   = {2026},
   note   = {NEVERHUMAN Research. Source and receipts: https://github.com/neverhuman/dope}
