@@ -10,6 +10,7 @@ bash ops/ci/check-contracts.sh
 cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo test --locked
+bash ops/ci/prepare-merge-guard.sh
 cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
 cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
 cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard

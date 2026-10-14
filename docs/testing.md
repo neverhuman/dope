@@ -6,6 +6,12 @@ while editing; it never replaces the full CPU PR lane.
 The CPU workflow pins sccache and preserves the lane's Cargo target cache to
 shorten repeated locked checks. Local builds reuse their worktree target.
 `just check` adds Clippy with warnings denied and the Rust CLI fixtures.
+The native guard's required fast/check and CPU routes share
+`ops/ci/prepare-merge-guard.sh`: explicit locked full-graph metadata preparation
+for both manifests, at most 120 seconds each with no retries. Setup may fetch
+current locked public crates; the subsequent feature-boundary proof stays
+offline and unfiltered. Metadata JSON lives under ignored target output, and
+Cargo failures retain bounded stderr without exposing it in GitHub receipts.
 `just security` scans secrets, dependencies, workflow syntax, and writes an
 SPDX SBOM. `just score` regenerates Python boundary evidence, then runs the
 full pinned Jankurai audit.

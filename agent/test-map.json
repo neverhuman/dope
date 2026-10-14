@@ -1648,6 +1648,10 @@
     "tools/security-lane.sh": {
       "command": "just security",
       "purpose": "audit both product and independent guard locks, retain workflow lint, secret scans and SBOM evidence"
+    },
+    "ops/ci/prepare-merge-guard.sh": {
+      "command": "just native-guard-check",
+      "purpose": "prepare both full locked graphs before mandatory offline feature, workspace, dependency and checksum boundary proofs; CPU uses the same bounded setup"
     }
   }
 }

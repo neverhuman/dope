@@ -13,6 +13,7 @@ setup:
     if test -d src/dope_kernel.egg-info; then mv src/dope_kernel.egg-info "target/python-metadata/dope_kernel.$(date +%s%N).egg-info"; fi
 
 native-guard-check:
+    bash ops/ci/prepare-merge-guard.sh
     cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
     cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
     cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard

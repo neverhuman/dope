@@ -85,6 +85,7 @@ impl github::Transport for RecordedTransport {
         Ok(github::Response {
             code: item["exit"].as_i64().unwrap() as i32,
             stdout: item["stdout"].as_str().unwrap().into(),
+            stderr: String::new(),
         })
     }
 }

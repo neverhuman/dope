@@ -23,6 +23,16 @@ plus native parser, hashing and process boundary cases; the resulting tool and
 tests require no Python execution. Runtime governance Python has been removed;
 historical source and failed audit receipts remain in git and preserved evidence.
 
+`just native-guard-check` and CPU CI first call
+`ops/ci/prepare-merge-guard.sh` to resolve the complete locked root and tool
+graphs into ignored target JSON. This setup can fetch current locked public
+registry dependencies, with one 120-second command per manifest and no retries.
+The boundary tests then resolve both graphs with `--offline --locked`, retaining
+all target nodes and negative feature, membership, dependency and checksum checks.
+Cargo failures report the manifest, argv, status and captured bounded stderr;
+GitHub receipts continue to omit transport stderr. A restored build cache alone
+does not establish this full-graph prerequisite.
+
 Run the synthetic adversarial fixtures without GitHub access:
 
 ```bash

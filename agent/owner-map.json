@@ -405,6 +405,7 @@
     "ops/merge_guard/": "governance",
     "ops/merge_guard/Cargo.toml": "governance",
     "ops/merge_guard/Cargo.lock": "governance",
-    "docs/merge-guard.md": "governance"
+    "docs/merge-guard.md": "governance",
+    "ops/ci/prepare-merge-guard.sh": "governance"
   }
 }

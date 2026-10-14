@@ -29,7 +29,14 @@ fn metadata(manifest: &Path) -> Value {
     let response = ProcessTransport::default()
         .run(&args)
         .expect("bounded offline metadata failed");
-    assert_eq!(response.code, 0, "locked metadata failed");
+    assert_eq!(
+        response.code,
+        0,
+        "locked offline metadata failed: manifest={} argv={args:?} status={} stderr={}",
+        manifest.display(),
+        response.code,
+        response.stderr
+    );
     serde_json::from_str(&response.stdout).expect("invalid metadata JSON")
 }
 fn graphs() -> &'static (Value, Value) {

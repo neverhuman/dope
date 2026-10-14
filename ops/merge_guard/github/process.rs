@@ -100,13 +100,15 @@ impl Transport for ProcessTransport {
                 .recv_timeout(self.limit.saturating_sub(start.elapsed()))
                 .map_err(|_| Refused("api_unavailable"))?
                 .map_err(|_| Refused("api_unavailable"))?;
-            err.recv_timeout(self.limit.saturating_sub(start.elapsed()))
+            let stderr = err
+                .recv_timeout(self.limit.saturating_sub(start.elapsed()))
                 .map_err(|_| Refused("api_unavailable"))?
                 .map_err(|_| Refused("api_unavailable"))?;
             let stdout = String::from_utf8(bytes).map_err(|_| Refused("api_unavailable"))?;
             Ok(Response {
                 code: status.code().ok_or(Refused("api_unavailable"))?,
                 stdout,
+                stderr: String::from_utf8_lossy(&stderr).into_owned(),
             })
         })();
         if capture.is_err() {
