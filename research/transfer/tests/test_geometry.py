@@ -5,7 +5,8 @@ import numpy as np
 from research.transfer.geometry import (
     closeness_qualifies, coordinate_distance, ecdf, energy_distance_unbiased, fit_minmax,
     held_out_status, mmd2_unbiased, nearest_other_entity_distance, null_cloud,
-    other_entity_row_count, real_real_calibration, shared_geometry_claim, sliced_wasserstein,
+    other_entity_row_count, real_real_calibration, shared_geometry_claim, shared_null_realizations,
+    sliced_wasserstein,
 )
 
 
@@ -56,6 +57,30 @@ class GeometryTests(unittest.TestCase):
         self.assertFalse(closeness_qualifies(distance)["formal_dp"])
         self.assertFalse(held_out_status("learner", {"embeddings"})["held_out"])
         self.assertTrue(held_out_status("learner", ())["held_out"])
+
+    def test_one_null_cloud_is_shared_across_comparison_roles(self):
+        shared = shared_null_realizations(8, 2, 3)
+        again = shared_null_realizations(8, 2, 3)
+        other = shared_null_realizations(8, 2, 4)
+        direct = null_cloud(8, 2, 3)
+        self.assertEqual(shared["estimand"], "shared_null_realization")
+        self.assertEqual(shared["roles"], ("real_real", "real_synthetic", "synthetic_synthetic"))
+        self.assertEqual(shared["scale"], 1.0)
+        self.assertEqual(shared["cloud"].shape, (8, 2))
+        self.assertTrue(np.array_equal(shared["cloud"], again["cloud"]))
+        self.assertTrue(np.array_equal(shared["cloud"], direct))
+        self.assertFalse(np.array_equal(shared["cloud"], other["cloud"]))
+        self.assertIs(shared["shared"], True)
+        self.assertIs(shared["nearest_neighbor"], False)
+        self.assertIs(shared["row_count"], False)
+        self.assertIs(shared["privacy_result"], False)
+        self.assertIs(shared["qualifies_transfer"], False)
+        calibration = real_real_calibration(orientation="higher_farther", scale=2.0, floor=1e-6)
+        self.assertNotEqual(shared["scale"], calibration["scale"])
+        self.assertFalse(calibration["qualifies_transfer"])
+        with self.assertRaises(ValueError) as invalid:
+            shared_null_realizations(1, 2, 0)
+        self.assertEqual(str(invalid.exception), "invalid null cloud")
 
     def test_nearest_distance_uses_the_frozen_scaler(self):
         flipped = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
