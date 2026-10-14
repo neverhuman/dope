@@ -11,6 +11,11 @@ early package transaction, retaining the 300-second package-lock wait and
 starts a late package transaction. `test-cpu-tool-readiness.sh` exercises each
 missing-tool refusal against the real CPU entry, before any build or replay.
 `just check` adds Clippy with warnings denied and the Rust CLI fixtures.
+Local fast/check and hosted CPU run the four bounded public-demo regressions in
+`research.benchmark.tests.test_public_demo`: frozen source admission, disjoint
+physical groups, query-label independence, and honest failed-step/report output.
+The actual native raw-schema, raw-workflow, artifact-only, and installer suites
+remain auto-discovered by hosted CPU's existing locked Cargo test invocation.
 The native guard's required fast/check and CPU routes share
 `ops/ci/prepare-merge-guard.sh`: explicit locked full-graph metadata preparation
 for both manifests, at most 120 seconds each with no retries. Setup may fetch

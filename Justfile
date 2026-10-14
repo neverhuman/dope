@@ -25,6 +25,7 @@ fast: native-guard-check
     cargo test --locked --lib
     PYTHONPATH=src python3 -m pytest -q tests
     python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
+    python3 -B -m unittest research.benchmark.tests.test_public_demo -q
 
 focus filter:
     cargo check -p dope-kernel --locked

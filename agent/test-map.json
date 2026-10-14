@@ -1735,11 +1735,11 @@
     },
     "docs/native-workflow.md": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "rust/main.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "rust/main/cli/part_01.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
@@ -1751,15 +1751,15 @@
     },
     "rust/typed_data/isolation.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "rust/typed_data/workflow.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "scripts/install-native.sh": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "tests/vnext_artifact_only.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
@@ -1767,11 +1767,11 @@
     },
     "tests/vnext_native_install.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "tests/vnext_raw_workflow.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "ops/ci/test-cpu-tool-readiness.sh": {
       "command": "bash ops/ci/test-cpu-tool-readiness.sh",
@@ -1785,21 +1785,113 @@
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
       "purpose": "retain full transfer suite including native raw byte-profile charge, carrier limits and truthful unverified digest/closure states"
     },
-    "docs/whitepaper/claim-registry.json": {
-      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
-      "purpose": "bind abstract claims to exact estimands/macros/states and reject evidence, number, wording and registration drift; retained in full paper-tests/CPU discovery"
-    },
     "docs/whitepaper/scripts/claim_registry.py": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
-      "purpose": "bind abstract claims to exact estimands/macros/states and reject evidence, number, wording and registration drift; retained in full paper-tests/CPU discovery"
+      "purpose": "verify source-captured registry12 and mandatory publication hook against estimands, macros, states and forbidden wording; retain full paper/CPU tests and no live-checkout substitution"
     },
     "docs/whitepaper/scripts/test_claim_registry.py": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
-      "purpose": "bind abstract claims to exact estimands/macros/states and reject evidence, number, wording and registration drift; retained in full paper-tests/CPU discovery"
+      "purpose": "verify source-captured registry12 and mandatory publication hook against estimands, macros, states and forbidden wording; retain full paper/CPU tests and no live-checkout substitution"
     },
     "docs/whitepaper/scripts/test_hero_figure.py": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_hero_figure.py' -v",
       "purpose": "verify page-one predictive-structure hero carries exact byte and paired-auditor evidence, stable rendering and omission refusal"
+    },
+    "research/transfer/blake3_digest.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify standard unkeyed BLAKE3 boundary vectors and native raw state/payload corruption refusal; retain full offline transfer discovery"
+    },
+    "research/transfer/learner_roles.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify version2 learner selection versus mandatory held-out evaluation and legacy identity refusal; preserve full transfer discovery"
+    },
+    "research/transfer/tests/test_learner_roles.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify version2 learner selection versus mandatory held-out evaluation and legacy identity refusal; preserve full transfer discovery"
+    },
+    "schemas/learner-roles-v2.schema.json": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify version2 learner selection versus mandatory held-out evaluation and legacy identity refusal; preserve full transfer discovery"
+    },
+    "docs/vnext/LEARNING_DENSITY.md": {
+      "command": "just paper-tests && just paper-check",
+      "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
+    },
+    "docs/whitepaper/COMPREHENSION_v1.md": {
+      "command": "just paper-tests && just paper-check",
+      "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
+    },
+    "docs/compiler-development.md": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+    },
+    "examples/public-regression/README.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q",
+      "purpose": "verify pinned public-source refusal before learner execution, physical group/query-label split independence, unclipped report output, and charged failed steps without source-value diagnostics; required in local fast/check and hosted CPU"
+    },
+    "examples/public-regression/run.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q",
+      "purpose": "verify pinned public-source refusal before learner execution, physical group/query-label split independence, unclipped report output, and charged failed steps without source-value diagnostics; required in local fast/check and hosted CPU"
+    },
+    "research/benchmark/tests/test_public_demo.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q",
+      "purpose": "verify pinned public-source refusal before learner execution, physical group/query-label split independence, unclipped report output, and charged failed steps without source-value diagnostics; required in local fast/check and hosted CPU"
+    },
+    "rust/compiler.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/fair_allocation.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/gpu_readout_tests.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/interaction_screen.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/neural_candidates/part_01.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/neural_candidates/part_02.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/neural_candidates/part_03.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/part_01.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/residual_oof.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/target_fitting/part_01.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/target_fitting/part_02.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "scripts/uninstall-native.sh": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+    },
+    "schemas/bound-binding-v2.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "verify version2 content commitments against historical version1 byte-count identity and refuse uncalibrated point/interval/fabricated caller qualification"
+    },
+    "tests/test_tuner.py": {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests/test_tuner.py",
+      "purpose": "verify tuner behavior and intended140x25 dashboard geometry in both terminal modes, retaining loss/regret and no-sparkline assertions"
     }
   }
 }
