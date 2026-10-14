@@ -79,9 +79,19 @@ def _clean(value):
     return value
 
 
+# Every method a review receipt ledger may hold. A cell with any other method is refused,
+# not skipped, so a renamed or foreign arm cannot drop out of a reduction unseen.
+KNOWN_METHODS = frozenset({"DOPE", "GaussianCopula", "Chow-Liu", "independent_marginals", "CTGAN", "TVAE", "ARF",
+                           "ForestDiffusion/Forest-Flow"})
+
+
 def reduce_cells(cells, method: str, configuration: str, fit_seed: int = 11):
+    if method not in KNOWN_METHODS:
+        raise ValueError(f"unknown method {method!r}")
     grouped: dict[tuple, dict] = {}
     for cell in cells:
+        if cell.get("method") not in KNOWN_METHODS:
+            raise ValueError(f"unknown method {cell.get('method')!r} in a receipt ledger")
         if cell.get("method") != method or cell.get("configuration") != configuration:
             continue
         if cell.get("fit_seed") not in (None, fit_seed):

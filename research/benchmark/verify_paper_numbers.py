@@ -20,6 +20,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 RESULTS = REPO / "research" / "benchmark" / "results"
 PAPER = REPO / "docs" / "whitepaper"
+if str(PAPER / "scripts") not in sys.path:
+    sys.path.insert(0, str(PAPER / "scripts"))
+import rust_closure  # noqa: E402
+FITTER = "rust/compiler/target_fitting.rs"
 GENERATED = PAPER / "generated"
 TEX = PAPER / "dope-mfs.tex"
 SUPPLEMENT = PAPER / "supplement.tex"
@@ -260,9 +264,9 @@ def check_macros(evidence, numbers_text):
 
 def architecture_expected():
     """Displayed pipeline constants from the fitter source and the data lock."""
-    rust = (REPO / "rust/compiler/target_fitting/part_02.rs").read_text()
-    shape = re.search(r'"features12_steps2048" => \(12, (\d+), (\d+)\)', rust)
-    rate = re.search(r"\.build\(&store, ([0-9.eE+-]+)\)", rust)
+    closure = rust_closure.include_closure(REPO, FITTER)
+    shape = rust_closure.unique_match(r'"features12_steps2048" => \(12, (\d+), (\d+)\)', closure)
+    rate = rust_closure.unique_match(r"\.build\(&store, ([0-9.eE+-]+)\)", closure)
     lock = (REPO / "research/benchmark/results/s3-data.lock.json").read_text()
     split = re.search(r"official_test_grouped_training_(\d+)_(\d+)", lock)
     if shape is None or rate is None or split is None:
@@ -307,6 +311,12 @@ def illustration_value():
     return 100.0 * math.exp(log_score / total)
 
 
+def _closure_must_contain(root, snippet, failures):
+    """The fitter constant must appear somewhere in the declared include closure."""
+    if not rust_closure.closure_contains(rust_closure.include_closure(root, FITTER), snippet):
+        failures.append(f"{FITTER} include closure does not contain {snippet!r}")
+
+
 def _must_contain(path, snippet, failures):
     text = path.read_text()
     if snippet not in text:
@@ -317,9 +327,9 @@ def protocol_tokens():
     """Numbers the manuscript may spell because a source file defines them."""
     failures = []
     root = REPO
-    _must_contain(root / "rust/compiler/target_fitting/part_02.rs", '"features12_steps2048" => (12, 16, 2048)', failures)
-    _must_contain(root / "rust/compiler/target_fitting/part_02.rs", ".build(&store, 2e-3)", failures)
-    _must_contain(root / "rust/compiler/target_fitting/part_02.rs", "backward_step_clip(&loss, 5.0)", failures)
+    _closure_must_contain(root, '"features12_steps2048" => (12, 16, 2048)', failures)
+    _closure_must_contain(root, ".build(&store, 2e-3)", failures)
+    _closure_must_contain(root, "backward_step_clip(&loss, 5.0)", failures)
     _must_contain(root / "rust/compiler/target_fitting/part_01.rs", "coefficient.abs() >= 1e-5", failures)
     _must_contain(root / "rust/fitness.rs", "utility_transfer: 0.30", failures)
     _must_contain(root / "rust/fitness.rs", "utility_transfer: 0.35", failures)
