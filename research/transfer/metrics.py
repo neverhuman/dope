@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+import hashlib
 import math
 
 from .evidence import digest
@@ -131,7 +132,7 @@ class CellResult:
                 raise ValueError("measured cell requires paired evidence and margin")
             self.margin.query_z(self.pairs, self.scale)
         elif any(v is not None for v in (self.pairs, self.scale, self.margin, self.bound)):
-            raise ValueError("failed cells cannot carry fabricated losses")
+            raise ValueError("missing losses on failed cells")
 
     @property
     def z(self) -> float | None:
@@ -146,11 +147,14 @@ class FitArtifact:
     cell_id: str
     fit_id: str
     artifact_bytes: int
+    content: bytes | None = None
 
     def __post_init__(self):
         if not isinstance(self.cell_id, str) or not self.cell_id or not isinstance(self.fit_id, str) or not self.fit_id:
             raise ValueError("invalid fit artifact")
         if type(self.artifact_bytes) is not int or self.artifact_bytes < 0:
+            raise ValueError("invalid fit artifact")
+        if self.content is not None and (type(self.content) is not bytes or len(self.content) != self.artifact_bytes):
             raise ValueError("invalid fit artifact")
 
 
@@ -242,11 +246,8 @@ def bound_binding_record(task, cell_id, bound, analysis) -> dict:
         "task_id": task.task_id,
         "learner_id": _binding_text(analysis.get("learner_id")),
         "fit_id": artifact.fit_id,
-        "artifact_id": digest({
-            "cell_id": artifact.cell_id,
-            "fit_id": artifact.fit_id,
-            "artifact_bytes": artifact.artifact_bytes,
-        }),
+        "artifact_id": None if artifact.content is None else hashlib.sha256(artifact.content).hexdigest(),
+        "artifact_commitment": "unverified_byte_count" if artifact.content is None else "content_sha256",
         "contrast_id": bound.contrast_id,
         "protocol_id": bound.protocol_id,
         "receipt_id": bound.receipt_id,
@@ -272,7 +273,10 @@ def bound_binding_record(task, cell_id, bound, analysis) -> dict:
 
 
 def authenticate_bound(task, cell_id, bound, expected) -> bool:
-    """Owner digest or paired recomputation. A pin_source string is not a binding."""
+    """Owner digest or paired recomputation. A pin_source string is not a binding.
+
+    A true result identifies the observed record. It does not qualify coverage.
+    """
     if bound is None or not isinstance(expected, dict) or expected.get("trust") not in ("owner", "recomputed"):
         return False
     if expected.get("pin_source") not in (None, "owner"):
@@ -297,6 +301,35 @@ def authenticate_bound(task, cell_id, bound, expected) -> bool:
     if set(expected) - set(record) - {"trust", "binding_digest", "pin_source"}:
         return False
     return expected.get("binding_digest") == digest(record)
+
+
+def bound_qualification(task, cell_id, bound, expected) -> dict:
+    """Separate an authentic point from an owner uncertainty interval.
+
+    The paired-mean procedure declares calibration unmeasured. Its recomputed
+    mean stays observed-only. Qualification needs owner trust, a nondegenerate
+    interval, a procedure other than that unmeasured mean, and content bytes.
+    """
+    authenticated = authenticate_bound(task, cell_id, bound, expected)
+    observed = {
+        "authenticated": authenticated, "qualifies": False, "disposition": "observed_only",
+        "calibration": "unmeasured", "uncertainty": "absent",
+    }
+    if not authenticated or not isinstance(expected, dict) or bound is None:
+        return {**observed, "authenticated": False, "disposition": "unauthenticated"}
+    point = bound.lower_z is None or bound.lower_z == bound.upper_z
+    unmeasured = (
+        expected.get("trust") != "owner"
+        or expected.get("code_digest") == PAIRED_MEAN_CODE_DIGEST
+        or expected.get("artifact_commitment") != "content_sha256"
+        or expected.get("calibration") == "unmeasured"
+    )
+    if point or unmeasured:
+        return observed
+    return {
+        "authenticated": True, "qualifies": True, "disposition": "owner_interval",
+        "calibration": "unmeasured", "uncertainty": "owner_interval",
+    }
 
 
 def _task_feasible(task) -> bool:
@@ -330,10 +363,16 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
                 potential &= cell.status == "unresolved"
                 continue
             observed = cell.z <= 0
-            verified = (cell.bound is not None and verify_bound is not None
-                        and verify_bound(task, key, cell.bound) is True)
-            inferential_harm = verified and cell.bound.lower_z is not None and cell.bound.lower_z > 0
-            qualified = feasible and observed and verified and cell.bound.upper_z <= 0 and not inferential_harm
+            authenticated, uncertainty = False, False
+            if cell.bound is not None and verify_bound is not None:
+                decision = verify_bound(task, key, cell.bound)
+                if isinstance(decision, dict):
+                    authenticated = decision.get("authenticated") is True
+                    uncertainty = decision.get("qualifies") is True and authenticated
+                else:
+                    authenticated = decision is True
+            inferential_harm = authenticated and cell.bound.lower_z is not None and cell.bound.lower_z > 0
+            qualified = feasible and observed and uncertainty and cell.bound.upper_z <= 0 and not inferential_harm
             if qualified:
                 counts["qualified"] += 1
             elif inferential_harm:

@@ -26,7 +26,8 @@ from research.transfer.raw_profile import (
 )
 
 ROOT = Path(__file__).resolve().parents[3]
-SECRET = "secret_x_offset_scale_99999"
+ROW_MARKER = "row-marker-offset-scale-99999"
+WRONG_DIGEST = b"0123456789abcdef0123456789abcdef"
 
 
 def workspace_temp():
@@ -85,7 +86,7 @@ def stage(manifest, files):
 
 class RawChargeTests(unittest.TestCase):
     def test_length_identity_leaves_runtime_and_closure_unmeasured(self):
-        state = SECRET.encode()
+        state = ROW_MARKER.encode()
         payload = dpk()
         artifact = framed(state, payload)
         profile = account_raw_artifact(artifact)
@@ -117,15 +118,15 @@ class RawChargeTests(unittest.TestCase):
         self.assertEqual(profile["learner_transfer"], "unqualified")
         self.assertIs(profile["declared_columns_checked"], False)
         rendered = repr(dict(profile))
-        self.assertNotIn(SECRET, rendered)
-        self.assertNotIn("SECRET_HASH", rendered)
+        self.assertNotIn(ROW_MARKER, rendered)
+        self.assertNotIn(WRONG_DIGEST.decode(), rendered)
         self.assertNotIn("offset", profile)
         self.assertNotIn("scale", profile)
         with self.assertRaises(TypeError):
             profile["framing_bytes"] = 0
 
     def test_wrong_digest_is_not_an_inspect_replay(self):
-        state = SECRET.encode()
+        state = ROW_MARKER.encode()
         payload = dpk()
         good = framed(state, payload)
         flipped_digest = bytearray(good)
@@ -135,7 +136,7 @@ class RawChargeTests(unittest.TestCase):
         cases = (
             bytes(flipped_digest),
             bytes(flipped_state),
-            framed(state, payload, digest=b"SECRET_HASH" + b"!" * 21),
+            framed(state, payload, digest=WRONG_DIGEST),
         )
         for artifact in cases:
             with self.subTest(prefix=artifact[24:28]):
@@ -143,8 +144,8 @@ class RawChargeTests(unittest.TestCase):
                     account_raw_artifact(artifact)
                 self.assertEqual(raised.exception.code, "raw_artifact_integrity_failed")
                 self.assertEqual(str(raised.exception), "raw_artifact_integrity_failed")
-                self.assertNotIn(SECRET, str(raised.exception))
-                self.assertNotIn("SECRET_HASH", str(raised.exception))
+                self.assertNotIn(ROW_MARKER, str(raised.exception))
+                self.assertNotIn(WRONG_DIGEST.decode(), str(raised.exception))
 
     def test_digest_matches_unkeyed_blake3_state_plus_payload(self):
         vectors = {
@@ -157,11 +158,11 @@ class RawChargeTests(unittest.TestCase):
             material = bytes(index % 251 for index in range(length))
             self.assertEqual(blake3_hash(material).hex(), expected)
         payload = dpk()
-        state = SECRET.encode()
+        state = ROW_MARKER.encode()
         self.assertEqual(framed(state, payload)[24:56], blake3_hash(state + payload))
 
     def test_bad_framing_refuses_without_echoing_the_artifact(self):
-        state = SECRET.encode()
+        state = ROW_MARKER.encode()
         payload = dpk()
         cases = {
             "raw_artifact_invalid": [
@@ -179,7 +180,7 @@ class RawChargeTests(unittest.TestCase):
                 framed(state, payload, state_len=2**64 - 1, payload_len=len(payload)),
             ],
             "raw_payload_limits_invalid": [
-                framed(state, b"DPK3" + SECRET.encode()),
+                framed(state, b"DPK3" + ROW_MARKER.encode()),
                 framed(state, dpk()[:-1]),
             ],
         }
@@ -190,7 +191,7 @@ class RawChargeTests(unittest.TestCase):
                         account_raw_artifact(bytes(artifact) if type(artifact) is not bytearray else artifact)
                     self.assertEqual(raised.exception.code, code)
                     self.assertEqual(str(raised.exception), code)
-                    self.assertNotIn(SECRET, str(raised.exception))
+                    self.assertNotIn(ROW_MARKER, str(raised.exception))
 
     def test_historical_inventory_keys_do_not_gain_the_raw_charge(self):
         accounting = account_inventory(
@@ -213,9 +214,9 @@ class RawChargeTests(unittest.TestCase):
 class RawColumnTests(unittest.TestCase):
     def test_continuous_declaration_keeps_support_limits_and_drops_other_roles(self):
         declared = declare_raw_columns([
-            {"id": "c0001", "role": "feature", "dtype": "continuous", "label": "secret_label", "units": "secret_unit"},
+            {"id": "c0001", "role": "feature", "dtype": "continuous", "label": "column-label-marker", "units": "column-unit-marker"},
             {"id": "c0002", "role": "feature", "dtype": "continuous", "mask_states": []},
-            {"id": "secret_entity", "role": "excluded_sensitive_identifier", "dtype": "nominal"},
+            {"id": "excluded-entity-marker", "role": "excluded_sensitive_identifier", "dtype": "nominal"},
             {"id": "c0003", "role": "target", "dtype": "continuous"},
         ])
         self.assertEqual(declared["feature_count"], 2)
@@ -231,13 +232,13 @@ class RawColumnTests(unittest.TestCase):
         self.assertEqual(declared["content_hash"], "unverified_native_inspect")
         self.assertEqual(declared["symbolic_backend"], "unverified_native_inspect")
         rendered = repr(dict(declared))
-        self.assertNotIn("secret_label", rendered)
-        self.assertNotIn("secret_unit", rendered)
-        self.assertNotIn("secret_entity", rendered)
+        self.assertNotIn("column-label-marker", rendered)
+        self.assertNotIn("column-unit-marker", rendered)
+        self.assertNotIn("excluded-entity-marker", rendered)
 
     def test_mixed_and_mask_states_are_explicit_refusals(self):
         def column(dtype="continuous", mask=None, role="feature"):
-            item = {"id": "secret_name", "role": role, "dtype": dtype}
+            item = {"id": "column-name-marker", "role": role, "dtype": dtype}
             if mask is not None:
                 item["mask_states"] = mask
             return item
@@ -247,7 +248,7 @@ class RawColumnTests(unittest.TestCase):
                 with self.assertRaises(BundleError) as raised:
                     declare_raw_columns([column(dtype), column(role="target")])
                 self.assertEqual(raised.exception.code, "raw_profile_requires_continuous_columns")
-                self.assertNotIn("secret_name", str(raised.exception))
+                self.assertNotIn("column-name-marker", str(raised.exception))
                 self.assertNotIn(dtype, str(raised.exception))
         for state in ("missing", "unknown_category", "structural_absence", "padding", "censored"):
             with self.subTest(mask=state):
@@ -255,11 +256,11 @@ class RawColumnTests(unittest.TestCase):
                     declare_raw_columns([column(mask=[state]), column(role="target")])
                 self.assertEqual(raised.exception.code, "raw_profile_requires_observed_cells")
                 self.assertNotIn(state, str(raised.exception))
-                self.assertNotIn("secret_name", str(raised.exception))
+                self.assertNotIn("column-name-marker", str(raised.exception))
         with self.assertRaises(BundleError) as raised:
-            declare_raw_columns([{"id": "c0001", "role": "feature", "dtype": "continuous", "source_name": SECRET}])
+            declare_raw_columns([{"id": "c0001", "role": "feature", "dtype": "continuous", "source_name": ROW_MARKER}])
         self.assertEqual(raised.exception.code, "schema_mismatch")
-        self.assertNotIn(SECRET, str(raised.exception))
+        self.assertNotIn(ROW_MARKER, str(raised.exception))
         with self.assertRaises(BundleError) as raised:
             declare_raw_columns([column(), column(), column(role="target"), column(role="target")])
         self.assertEqual(raised.exception.code, "raw_sampler_closure_mismatch")
@@ -364,7 +365,7 @@ class RawHandlerTests(unittest.TestCase):
                     with self.assertRaises(BundleError) as raised:
                         verify_bundle(root, digest)
                 self.assertEqual(raised.exception.code, code)
-                self.assertNotIn(SECRET, str(raised.exception))
+                self.assertNotIn(ROW_MARKER, str(raised.exception))
 
 
 if __name__ == "__main__":
