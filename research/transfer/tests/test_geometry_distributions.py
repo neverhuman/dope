@@ -1,12 +1,14 @@
 import math
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
 import research.transfer.geometry as geometry
 from research.transfer.geometry_distributions import (
-    ECDF_BAND_DEVELOPMENT, dependence_aware_ecdf, euclidean_cloud_report,
-    euclidean_role_distributions, grouped_euclidean_bands,
+    ECDF_BAND_DEVELOPMENT, STEP5_CONTROLS, context_query_control, dependence_aware_ecdf,
+    euclidean_cloud_report, euclidean_role_distributions, geometry_plot_hook,
+    grouped_euclidean_bands, label_shuffle_control, tail_deletion_control,
 )
 
 
@@ -304,3 +306,190 @@ class GeometryDistributionControlTests(unittest.TestCase):
         self.assertNotIn(digest, [str(value) for value in _leaves(declared)])
         self.assertFalse(hasattr(geometry, "grouped_euclidean_bands"))
         self.assertFalse(hasattr(geometry, "euclidean_role_distributions"))
+
+
+class Step5ControlTests(unittest.TestCase):
+    def test_step5_audit_keeps_ready_controls_executable(self):
+        states = {item["control"]: item["state"] for item in STEP5_CONTROLS}
+        self.assertEqual(list(states), [
+            "duplicate", "reordered", "label_shuffled", "tail_deleted", "collapse",
+            "row_count", "context", "coordinate_permutation", "pair_allocation",
+            "held_out_relevance", "official_kumo_dope_measurements",
+        ])
+        for state in states.values():
+            self.assertIn(state, {"executable", "unmeasured"})
+        self.assertEqual(states["pair_allocation"], "executable")
+        self.assertEqual(states["held_out_relevance"], "unmeasured")
+        self.assertEqual(states["official_kumo_dope_measurements"], "unmeasured")
+
+    def test_label_shuffle_does_not_change_coordinates_or_grant_held_out(self):
+        real = np.array([[0.0], [1.0]])
+        synthetic = np.array([[0.0], [1.0]])
+        labels = ("keep", "drop")
+        control = label_shuffle_control(
+            real, synthetic, labels, space="row_activation", encoder_id="enc-a", seed=0,
+        )
+        plain = euclidean_role_distributions(real, synthetic, space="row_activation", encoder_id="enc-a")
+        self.assertTrue(control["distances_unchanged"])
+        self.assertEqual(control["distances"], plain["distances"])
+        self.assertFalse(control["labels_are_coordinates"])
+        self.assertFalse(control["labels_consumed"])
+        self.assertFalse(control["selection_exposed"])
+        self.assertFalse(control["held_out"])
+        self.assertEqual(control["held_out_relevance"], "unmeasured")
+        consumed = label_shuffle_control(
+            real, synthetic, labels, space="row_activation", encoder_id="enc-a", seed=1,
+            labels_consumed=True,
+        )
+        self.assertTrue(consumed["selection_exposed"])
+        self.assertFalse(consumed["held_out"])
+        self.assertEqual(consumed["distances"], plain["distances"])
+        encoded = np.array([[0.0, 0.0], [1.0, 1.0]])
+        included = euclidean_role_distributions(encoded, encoded, space="row_activation", encoder_id="enc-a")
+        self.assertNotEqual(included["distances"], plain["distances"])
+        sentinel = "99999.5"
+        with self.assertRaises(ValueError) as mismatch:
+            label_shuffle_control(
+                real, synthetic, (sentinel,), space="row_activation", encoder_id="enc-a", seed=0,
+            )
+        self.assertEqual(str(mismatch.exception), "invalid labels")
+        self.assertNotIn(sentinel, str(mismatch.exception))
+        self.assertNotIn(sentinel, [str(value) for value in _leaves(control)])
+
+    def test_tail_deletion_changes_only_when_the_tail_is_present(self):
+        changed = tail_deletion_control(
+            np.array([[0.0], [0.0], [10.0]]), np.array([[1.0], [1.0], [1.0]]),
+            space="row_activation", encoder_id="enc-a",
+        )
+        self.assertEqual(changed["real_real_before"], (0.0, 10.0, 10.0))
+        self.assertEqual(changed["real_real_after"], (0.0,))
+        self.assertTrue(changed["distance_values_changed"])
+        self.assertEqual(changed["tail_effect"], "changed")
+        self.assertTrue(changed["pair_count_changed"])
+        self.assertEqual(changed["row_count_before"], 3)
+        self.assertEqual(changed["row_count_after"], 2)
+        self.assertFalse(changed["qualifies_transfer"])
+        self.assertEqual(changed["held_out_relevance"], "unmeasured")
+        unchanged = tail_deletion_control(
+            np.array([[0.0], [0.0], [0.0]]), np.array([[1.0], [1.0], [1.0]]),
+            space="row_activation", encoder_id="enc-a",
+        )
+        self.assertFalse(unchanged["distance_values_changed"])
+        self.assertTrue(unchanged["pair_count_changed"])
+        self.assertEqual(unchanged["tail_effect"], "unobserved")
+        self.assertFalse(unchanged["qualifies_transfer"])
+        with self.assertRaises(ValueError) as short:
+            tail_deletion_control(
+                np.array([[0.0], [1.0]]), np.array([[0.0], [1.0]]),
+                space="row_activation", encoder_id="enc-a",
+            )
+        self.assertEqual(str(short.exception), "invalid tail control")
+        sentinel = "99999.5"
+        with self.assertRaises(ValueError) as nonfinite:
+            tail_deletion_control(
+                np.array([[0.0], [1.0], [2.0]]),
+                np.array([[float(sentinel)], [0.0], [float("nan")]]),
+                space="row_activation", encoder_id="enc-a",
+            )
+        self.assertEqual(str(nonfinite.exception), "invalid clouds")
+        self.assertNotIn(sentinel, str(nonfinite.exception))
+
+    def test_context_rows_stay_out_of_the_query_distances(self):
+        real = np.array([[0.0], [3.0]])
+        synthetic = np.array([[10.0], [10.0]])
+        control = context_query_control(
+            ("context-row",), ("query-a", "query-b"), real, synthetic,
+            space="row_activation", encoder_id="enc-a",
+        )
+        plain = euclidean_role_distributions(real, synthetic, space="row_activation", encoder_id="enc-a")
+        self.assertEqual(control["distances"], plain["distances"])
+        self.assertEqual(control["context_row_count"], 1)
+        self.assertEqual(control["query_row_count"], 2)
+        self.assertFalse(control["context_included_in_distances"])
+        self.assertEqual(control["held_out_relevance"], "unmeasured")
+        stacked = euclidean_role_distributions(
+            np.array([[100.0], [0.0], [3.0]]), np.array([[10.0], [10.0], [10.0]]),
+            space="row_activation", encoder_id="enc-a",
+        )
+        self.assertNotEqual(stacked["distances"], control["distances"])
+        sentinel = "99999.5"
+        with self.assertRaises(ValueError) as overlap:
+            context_query_control(
+                (sentinel,), (sentinel, "query-b"), real, synthetic,
+                space="row_activation", encoder_id="enc-a",
+            )
+        self.assertEqual(str(overlap.exception), "query_context_overlap")
+        self.assertNotIn(sentinel, str(overlap.exception))
+        with self.assertRaises(ValueError) as pooled:
+            context_query_control(
+                ("context-row",), ("query-a", "query-b"), real, synthetic,
+                space="row_activation", encoder_id="enc-a", include_context=True,
+            )
+        self.assertEqual(str(pooled.exception), "context is not a query")
+
+    def test_pair_budget_refuses_before_allocation(self):
+        real = np.array([[0.0], [3.0]])
+        synthetic = np.array([[10.0], [10.0]])
+
+        def allocated(left, right):
+            raise AssertionError("allocated")
+
+        clusters = [
+            _cluster("fit-a", [[0.0], [0.0]], [[0.0], [0.0]]),
+            _cluster("fit-b", [[0.0], [0.0]], [[2.0], [2.0]]),
+        ]
+        with patch("research.transfer.geometry_distributions._pairwise_norms", allocated):
+            with self.assertRaises(ValueError) as refused:
+                euclidean_role_distributions(
+                    real, synthetic, space="row_activation", encoder_id="enc-a", max_pairs=3,
+                )
+            self.assertEqual(str(refused.exception), "distance_budget_exceeded")
+            with self.assertRaises(ValueError) as invalid:
+                euclidean_role_distributions(
+                    real, synthetic, space="row_activation", encoder_id="enc-a", max_pairs=0,
+                )
+            self.assertEqual(str(invalid.exception), "invalid_distance_budget")
+            with self.assertRaises(ValueError) as cap:
+                euclidean_cloud_report(
+                    real, synthetic, space="row_activation", encoder_id="enc-a", max_pairs=10_000_001,
+                )
+            self.assertEqual(str(cap.exception), "invalid_distance_budget")
+            with self.assertRaises(ValueError) as grouped:
+                _band(clusters, max_pairs=3)
+            self.assertEqual(str(grouped.exception), "distance_budget_exceeded")
+        allowed = euclidean_role_distributions(
+            real, synthetic, space="row_activation", encoder_id="enc-a", max_pairs=4,
+        )
+        self.assertEqual(allowed["allocated_pairs"], 4)
+        self.assertEqual(allowed["max_pairs"], 4)
+        self.assertEqual(allowed["distances"]["real_real"], (3.0,))
+        self.assertEqual(allowed["distances"]["real_synthetic"], (7.0, 7.0, 10.0, 10.0))
+        self.assertIsNone(allowed["independent_units"])
+        self.assertEqual(allowed["held_out_relevance"], "unmeasured")
+
+    def test_plot_hook_keeps_real_measurements_unmeasured(self):
+        real = np.array([[0.0], [3.0]])
+        synthetic = np.array([[10.0], [10.0]])
+        cloud = euclidean_cloud_report(real, synthetic, space="row_activation", encoder_id="enc-a", fit_count=1)
+        hook = geometry_plot_hook(cloud)
+        self.assertEqual(hook["format"], "dope-geometry-plot-hook-development")
+        self.assertEqual(hook["version"], 1)
+        self.assertEqual(hook["figure"], "unmeasured")
+        self.assertEqual(hook["kumo_measurements"], "unmeasured")
+        self.assertEqual(hook["dope_measurements"], "unmeasured")
+        self.assertEqual(hook["held_out_relevance"], "unmeasured")
+        self.assertFalse(hook["official_asset"])
+        self.assertFalse(hook["qualifies_transfer"])
+        self.assertFalse(hook["formal_dp"])
+        self.assertFalse(hook["hipaa"])
+        self.assertNotIn(10.0, list(_leaves(hook)))
+        self.assertNotIn(7.0, list(_leaves(hook)))
+        sentinel = "99999.5"
+        with self.assertRaises(ValueError) as rejected:
+            geometry_plot_hook({"estimand": sentinel, "space": "row_activation", "distances": (float(sentinel),)})
+        self.assertEqual(str(rejected.exception), "invalid geometry report")
+        self.assertNotIn(sentinel, str(rejected.exception))
+        for name in (
+            "label_shuffle_control", "tail_deletion_control", "context_query_control", "geometry_plot_hook",
+        ):
+            self.assertFalse(hasattr(geometry, name))
