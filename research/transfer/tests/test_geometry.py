@@ -207,6 +207,8 @@ class GeometryTests(unittest.TestCase):
         counted = other_entity_row_count(flipped, flipped, reference_entities=entities, query_entities=entities)
         self.assertEqual(matched["estimand"], "matched_neighbor_references")
         self.assertEqual(matched["reference_rows"], 3)
+        self.assertEqual(matched["state_digest"], scaler["frozen_id"])
+        self.assertEqual(matched["frozen_id"], scaler["frozen_id"])
         self.assertEqual(matched["fit_distances"], (1.0, 2.0 ** 0.5, 1.0))
         self.assertEqual(matched["heldout_distances"], (2.0, 5.0 ** 0.5, 1.0))
         self.assertNotEqual(matched["fit_distances"], counted["counts"])
@@ -260,6 +262,35 @@ class GeometryTests(unittest.TestCase):
         self.assertIs(shared["qualifies_transfer"], False)
         self.assertNotEqual(left["frozen_id"], same["frozen_id"])
         self.assertEqual(left["state_digest"], same["state_digest"])
+        self.assertEqual(left["encoder_id"], "enc-a")
+        self.assertEqual(left["schema_id"], "schema-a")
+        self.assertEqual(
+            left["state_digest"],
+            "9b0ebffefb080f65f33fd457f7a531f9997514bf2c728acebebed82659864319",
+        )
+        copied = {
+            "format": "dope-frozen-geometry-state",
+            "version": 1,
+            "frozen_id": "label",
+            "label_verified": False,
+            "state_digest": left["state_digest"],
+        }
+        with self.assertRaises(ValueError) as bare:
+            shared_frozen_geometry(copied, copied)
+        self.assertEqual(str(bare.exception), "invalid frozen scaler")
+        self.assertNotIn(left["state_digest"], str(bare.exception))
+        letters = dict(left)
+        letters["state_digest"] = "z" * 64
+        with self.assertRaises(ValueError) as nonhex:
+            shared_frozen_geometry(letters, letters)
+        self.assertEqual(str(nonhex.exception), "invalid frozen scaler")
+        tampered = dict(left)
+        tampered["state_digest"] = "a" * 64
+        with self.assertRaises(ValueError) as mismatch:
+            shared_frozen_geometry(tampered, same)
+        self.assertEqual(str(mismatch.exception), "unverified_state_digest")
+        self.assertNotIn(tampered["state_digest"], str(mismatch.exception))
+        self.assertNotIn(left["state_digest"], str(mismatch.exception))
         for other in (relabeled, reordered, reordered_levels, other_encoder):
             refused = shared_frozen_geometry(left, other)
             self.assertFalse(refused["shared_geometry"])
@@ -292,8 +323,35 @@ class GeometryTests(unittest.TestCase):
             rows, rows, reference_entities=pair, query_entities=pair, frozen_scaler=bound_scaler(hundred, hundred),
         )
         self.assertNotEqual(narrow_distance["frozen_id"], wide_distance["frozen_id"])
+        self.assertEqual(narrow_distance["state_digest"], narrow_distance["frozen_id"])
+        self.assertEqual(wide_distance["state_digest"], wide_distance["frozen_id"])
         self.assertAlmostEqual(narrow_distance["distances"][0], 1.0)
         self.assertAlmostEqual(wide_distance["distances"][0], 0.01)
+        one = np.array([[0.0], [0.5]])
+        ends = ("a", "b")
+        unit_column = {"kind": "continuous", "minimum": 0.0, "maximum": 1.0}
+        wide_column = {"kind": "continuous", "minimum": 0.0, "maximum": 100.0}
+        unit_distance = nearest_other_entity_distance(
+            one, one, reference_entities=ends, query_entities=ends, frozen_scaler=bound_scaler(unit_column),
+        )
+        wide_span = nearest_other_entity_distance(
+            one, one, reference_entities=ends, query_entities=ends, frozen_scaler=bound_scaler(wide_column),
+        )
+        self.assertAlmostEqual(unit_distance["distances"][0], 0.5)
+        self.assertAlmostEqual(wide_span["distances"][0], 0.005)
+        self.assertNotEqual(unit_distance["state_digest"], wide_span["state_digest"])
+        unit_matched = matched_neighbor_references(
+            one, one, one, fit_entities=ends, heldout_entities=ends, query_entities=ends,
+            frozen_scaler=bound_scaler(unit_column),
+        )
+        wide_matched = matched_neighbor_references(
+            one, one, one, fit_entities=ends, heldout_entities=ends, query_entities=ends,
+            frozen_scaler=bound_scaler(wide_column),
+        )
+        self.assertEqual(unit_matched["state_digest"], unit_distance["state_digest"])
+        self.assertNotEqual(unit_matched["state_digest"], wide_matched["state_digest"])
+        self.assertAlmostEqual(unit_matched["fit_distances"][0], 0.5)
+        self.assertAlmostEqual(wide_matched["fit_distances"][0], 0.005)
         with self.assertRaises(ValueError) as label:
             nearest_other_entity_distance(
                 rows, rows, reference_entities=pair, query_entities=pair,
