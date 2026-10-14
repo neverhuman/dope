@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Run the declared Lane B paper-reduction graph; never discover experiments."""
 import argparse
+from dataclasses import dataclass, field
 import hashlib
 import json
 import subprocess
 import sys
+import tempfile
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -33,6 +36,81 @@ V2_FAMILY = PREFIX + 'review-fixes-v2/family.json'
 V2_FAMILY_RENDERER = 'docs/whitepaper/scripts/review_v2_family.py'
 JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, V2_LEDGER, V2_FITS)
 OUTPUT_PREFIXES = ('review-', 'v2-')
+_ADMISSION = object()
+AUXILIARY_OUTPUTS = (
+    'README.md', 'docs/readme/pareto.png', 'docs/readme/paired.png',
+    'docs/whitepaper/figures/teaser.pdf', 'docs/whitepaper/figures/pareto.pdf',
+    'docs/whitepaper/generated/teaser-figure-hashes.json',
+    'docs/whitepaper/generated/pareto-figure-hashes.json',
+    'docs/whitepaper/generated/readme-figure-hashes.json',
+)
+
+
+@dataclass(frozen=True)
+class AuthenticatedPaperBuild:
+    """Private, in-process admission; never a serialized authentication receipt.
+
+    This binds trusted-driver control flow, not hostile Python callers.
+    Bytes and tuples keep graph, code, inputs and expected renders immutable.
+    """
+    root: Path
+    graph: bytes
+    inputs: tuple
+    code: tuple
+    consumed: tuple
+    expected: tuple
+    _admission: object = field(repr=False)
+    auxiliary_expected: tuple = ()
+
+    def revalidate(self):
+        if self._admission is not _ADMISSION or self.root != REPO:
+            raise ValueError('invalid paper build context')
+        for name, raw in self.inputs + self.code + self.consumed:
+            if safe_bytes(self.root, name) != raw:
+                raise ValueError('stale paper build context')
+        declared = validate_graph(json.loads(self.graph), dict(self.inputs))
+        original = tuple((name, raw) for name, raw in self.consumed if name not in AUXILIARY_OUTPUTS)
+        if code_snapshot() != self.code or consumed_snapshot(declared) != original:
+            raise ValueError('stale paper build dependency inventory')
+
+
+def safe_bytes(root, name):
+    path = root / name
+    if path.resolve() != root.resolve() / name or path.is_symlink():
+        raise ValueError('redirected paper build dependency')
+    return path.read_bytes()
+
+
+def validate_graph(graph, files):
+    if (not isinstance(graph, dict) or graph.get('format') != 'dope-review-paper-build-v1'
+            or not isinstance(graph.get('scripts'), list) or not graph['scripts']):
+        raise ValueError('invalid review paper graph')
+    declared, scripts = set(), set()
+    for entry in graph['scripts']:
+        if not isinstance(entry, dict) or set(entry) != {'path', 'args', 'check_args', 'outputs'}:
+            raise ValueError('invalid review renderer declaration')
+        script = Path(entry['path'])
+        if (script.as_posix() != entry['path'] or script.parent.as_posix() != 'docs/whitepaper/scripts'
+                or not script.name.startswith('review_') or script.suffix != '.py'
+                or entry['path'] in scripts):
+            raise ValueError('invalid review reduction script')
+        scripts.add(entry['path'])
+        args = entry['args']
+        if (not isinstance(args, list) or len(args) != 2 or args[0] != '--from-panel'
+                or args[1] not in files):
+            raise ValueError('review renderer requires one independently pinned public panel')
+        if entry['check_args'] not in (['--check'], ['--check-parser']):
+            raise ValueError('invalid review renderer check arguments')
+        if not isinstance(entry['outputs'], list) or not entry['outputs']:
+            raise ValueError('incomplete review output declaration')
+        for name in entry['outputs']:
+            path = Path(name)
+            if (path.as_posix() != name or path.parent.as_posix() not in
+                    ('docs/whitepaper/generated', 'docs/whitepaper/figures')
+                    or not path.name.startswith(OUTPUT_PREFIXES) or name in declared):
+                raise ValueError('invalid review output path')
+            declared.add(name)
+    return declared
 
 
 def authenticated(path, digest, size=None):
@@ -44,7 +122,9 @@ def authenticated(path, digest, size=None):
     return raw
 
 
-def authenticated_graph():
+def _authenticated_graph():
+    if not GRAPH.is_file():
+        raise ValueError('paper build requires a declared graph')
     lock = json.loads(authenticated(LOCK, LOCK_SHA256))
     if lock.get('format') != 'dope-paper-review-inputs-v1':
         raise ValueError('invalid review paper input lock')
@@ -67,6 +147,9 @@ def authenticated_graph():
         inputs[name] = authenticated(path, pin['sha256'], pin['bytes'])
     # Every public dependency is authenticated before decoding the build graph.
     graph = json.loads(inputs[graph_name])
+    validate_graph(graph, files)
+    for entry in graph['scripts']:
+        safe_bytes(REPO, entry['path'])
     replayed = set()
     for entry in graph['scripts']:
         args = entry.get('args', [])
@@ -96,7 +179,150 @@ def authenticated_graph():
                 raise ValueError('v2 family renderer requires the pinned family file and v2 panel')
             authenticated_v2_family(inputs)
         replayed.add(panel)
-    return graph
+    return graph, inputs
+
+
+def authenticated_graph():
+    return _authenticated_graph()[0]
+
+
+def review_inventory(root):
+    return {p.relative_to(root).as_posix() for directory in ('generated', 'figures')
+            for prefix in OUTPUT_PREFIXES
+            for p in (root / 'docs/whitepaper' / directory).glob(prefix + '*') if p.is_file()}
+
+
+def rendered_inventory(root):
+    return {p.relative_to(root).as_posix() for directory in
+            ('docs/whitepaper/generated', 'docs/whitepaper/figures', 'docs/readme')
+            for p in (root / directory).rglob('*') if p.is_file()}
+
+
+def code_snapshot():
+    # Bind the transitive local Python implementation, including reducers and
+    # renderer helpers. No numerical source, lock or result is modified.
+    paths = set()
+    for directory in ('research', 'docs/whitepaper/scripts'):
+        paths.update(p for p in (REPO / directory).rglob('*.py')
+                     if 'tests' not in p.parts and not p.name.startswith('test_'))
+    paths.update((REPO / 'ops/ci').glob('paper-*.py'))
+    paths.update(REPO / name for name in ('docs/whitepaper/scripts/build_pdf.sh',
+                                         'ops/ci/paper-architecture.tex'))
+    return tuple((p.relative_to(REPO).as_posix(), safe_bytes(REPO, p.relative_to(REPO)))
+                 for p in sorted(paths))
+
+
+def consumed_snapshot(declared):
+    paths = set()
+    for directory in ('docs/whitepaper', 'docs/readme'):
+        for p in (REPO / directory).rglob('*'):
+            name = p.relative_to(REPO).as_posix()
+            if (p.is_file() and 'scripts' not in p.parts and 'drafts' not in p.parts
+                    and (p.parent.name in ('generated', 'figures', 'readme')
+                         or p.suffix in ('.tex', '.bib', '.cls', '.sty', '.bst'))
+                    and name not in declared and name not in AUXILIARY_OUTPUTS
+                    and name not in ('docs/whitepaper/figures/architecture.pdf',
+                                     'docs/whitepaper/generated/architecture-figure-hashes.json')):
+                paths.add(p)
+    return tuple((p.relative_to(REPO).as_posix(), safe_bytes(REPO, p.relative_to(REPO)))
+                 for p in sorted(paths))
+
+
+def authenticate_build(*, log_directory=None):
+    code = code_snapshot()
+    graph, inputs = _authenticated_graph()
+    declared = validate_graph(graph, inputs)
+    consumed = consumed_snapshot(declared)
+    has_headline = 'docs/whitepaper/generated/v2-headline.json' in declared
+    if has_headline:
+        consumed += (('README.md', safe_bytes(REPO, 'README.md')),)
+    verified = AuthenticatedPaperBuild(REPO, json.dumps(graph).encode(),
+                                       tuple(sorted(inputs.items())) +
+                                       ((LOCK.relative_to(REPO).as_posix(), LOCK.read_bytes()),),
+                                       code, consumed, (), _ADMISSION)
+    verified.revalidate()
+    # Render once from captured inputs/code in an isolated target directory.
+    # This gives expected bytes, rather than trusting hashes of caller outputs.
+    target = REPO / 'target/paper-render'
+    target.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=target) as directory:
+        root = Path(directory)
+        for name, raw in verified.inputs + verified.code + tuple(
+                (name, raw) for name, raw in verified.consumed if name == 'README.md'):
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(raw)
+        (root / 'docs/whitepaper/generated').mkdir(parents=True, exist_ok=True)
+        # Keep exact commands/exits and renderer failures after scratch cleanup.
+        log_path = (target / (root.name + '.log') if log_directory is None
+                    else log_directory / 'render.log')
+        command_path = (target / (root.name + '.json') if log_directory is None
+                        else log_directory / 'render-commands.json')
+        commands = []
+
+        def run_renderer(command, log):
+            started = time.monotonic()
+            result = subprocess.run(command, cwd=root, stdout=log, stderr=subprocess.STDOUT)
+            commands.append({'command': command, 'cwd': str(root), 'log': str(log_path),
+                             'exit': result.returncode, 'elapsed_seconds': time.monotonic() - started})
+            command_path.write_text(json.dumps(commands, indent=2) + '\n')
+            result.check_returncode()
+
+        with log_path.open('wb') as log:
+            for entry in graph['scripts']:
+                prior = {name: safe_bytes(root, name) for name in review_inventory(root)}
+                if entry['check_args'] == ['--check-parser']:
+                    run_renderer([sys.executable, '-B', str(root / entry['path']),
+                                  *entry['args'], *entry['check_args']], log)
+                run_renderer([sys.executable, '-B', str(root / entry['path']), *entry['args']], log)
+                actual = review_inventory(root)
+                if (actual != set(prior) | set(entry['outputs'])
+                        or any(safe_bytes(root, name) != raw for name, raw in prior.items())):
+                    raise ValueError('review renderer differs from actual rendered inventory')
+        if rendered_inventory(root) != declared:
+            raise ValueError('review build graph differs from actual rendered inventory')
+        expected = tuple((name, safe_bytes(root, name)) for name in sorted(declared))
+        auxiliary = ()
+        if has_headline:
+            with log_path.open('ab') as log:
+                for script, args in [('v2_figures.py', []),
+                                     ('readme_benchmark.py', ['--write-readme'])]:
+                    run_renderer([sys.executable, '-B', str(root / 'docs/whitepaper/scripts' / script),
+                                  *args], log)
+            auxiliary = tuple((name, safe_bytes(root, name)) for name in AUXILIARY_OUTPUTS)
+            if dict(auxiliary)['README.md'] != dict(consumed)['README.md']:
+                raise ValueError('README differs from expected rendering')
+            if (rendered_inventory(root) != declared | (set(AUXILIARY_OUTPUTS) - {'README.md'})
+                    or any(safe_bytes(root, name) != raw for name, raw in expected)):
+                raise ValueError('auxiliary renderer changed expected review inventory')
+    verified.revalidate()
+    return AuthenticatedPaperBuild(verified.root, verified.graph, verified.inputs,
+                                   verified.code, verified.consumed, expected, _ADMISSION, auxiliary)
+
+
+def render_review_outputs(verified, *, check):
+    if not isinstance(verified, AuthenticatedPaperBuild):
+        raise ValueError('invalid paper build context')
+    verified.revalidate()
+    declared = validate_graph(json.loads(verified.graph), dict(verified.inputs))
+    if {name for name, _ in verified.expected} != declared:
+        raise ValueError('incomplete expected review inventory')
+    if review_inventory(REPO) - declared:
+        raise ValueError('review build graph does not cover every committed output')
+    for name, _ in verified.expected:
+        if (REPO / name).resolve() != REPO.resolve() / name:
+            raise ValueError('redirected review output')
+    for name, raw in verified.expected:
+        if check:
+            if safe_bytes(REPO, name) != raw:
+                raise ValueError('generated review output differs from expected render')
+        else:
+            path = REPO / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(raw)
+    if review_inventory(REPO) != declared:
+        raise ValueError('missing declared review output')
+    verified.revalidate()
 
 
 def authenticated_controls(inputs):
@@ -208,40 +434,12 @@ def main():
     parser.add_argument('--check-inputs', action='store_true',
                         help='authenticate and replay inputs without writing paper outputs')
     args = parser.parse_args()
-    if not GRAPH.is_file():
-        if list((REPO / 'docs/whitepaper/generated').glob('review-*')):
-            raise ValueError('review outputs require a declared paper-build graph')
-        print('review paper graph has no committed outputs yet')
-        return
-    graph = authenticated_graph()
-    if graph.get('format') != 'dope-review-paper-build-v1':
-        raise ValueError('invalid review paper graph')
     if args.check_inputs:
-        print('review paper inputs authenticated; control scalar panel reproduced; declared wave2 and v2 scalar panels and v2 family file reproduced')
+        authenticated_graph()
+        print('review paper inputs authenticated and declared scalar panels reproduced')
         return
-    declared = set()
-    for entry in graph['scripts']:
-        script = Path(entry['path'])
-        if (script.parent.as_posix() != 'docs/whitepaper/scripts'
-                or not script.name.startswith('review_') or script.suffix != '.py'):
-            raise ValueError('invalid review reduction script')
-        command = [sys.executable, str(REPO / script), *entry.get('args', [])]
-        if args.check:
-            command.extend(entry['check_args'])
-        subprocess.run(command, cwd=REPO, check=True)
-        for relative in entry['outputs']:
-            path = Path(relative)
-            if (path.parent.as_posix() not in ('docs/whitepaper/generated', 'docs/whitepaper/figures')
-                    or not path.name.startswith(OUTPUT_PREFIXES)):
-                raise ValueError('invalid review output path')
-            if not (REPO / path).is_file():
-                raise ValueError('missing declared review output')
-            declared.add(path.as_posix())
-    actual = {p.relative_to(REPO).as_posix() for directory in ('generated', 'figures')
-              for prefix in OUTPUT_PREFIXES
-              for p in (REPO / 'docs/whitepaper' / directory).glob(prefix + '*') if p.is_file()}
-    if actual != declared:
-        raise ValueError('review build graph does not cover every committed output')
+    verified = authenticate_build()
+    render_review_outputs(verified, check=args.check)
 
 
 if __name__ == '__main__':
