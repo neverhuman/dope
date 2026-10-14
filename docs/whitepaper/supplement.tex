@@ -285,7 +285,7 @@ The tables below are the fit-seed-$11$ review panels that preceded the five-seed
 The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ receipts behind the first version of this paper; their intervals are lineage-bootstrap intervals of the median, and they are kept for continuity. The paired median difference is distinct from the difference of two medians. The two DOPE artifacts above the cap in that population are \MissA\ at \MissABytes\ bytes and \MissB\ at \MissBBytes\ bytes, and \NotInfName\ has a fit whose CatBoost group is uninformative, so the CatBoost median uses $\NDopeCb$ lineages while the byte count uses $\PreparedN$. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi. CatBoost reads RMSE $\RmseRealCb$ for the real-trained auditor and $\RmseSynCb$ for the synthetic-trained one, with training-mean skill $\RtwoRealCb$ and $\RtwoSynCb$; RMSE is the square root of the stored mean squared error, and conventional held-out $R^2$ is unstored for these rows. \cref{tab:hist-headline} collects the first version's headline contrasts. On its $\NForestCb$ Forest-Flow lineages the CatBoost medians are $\MedDopeForestCb$ for DOPE, whose artifacts have a median of \DopeForestByteMedian\ bytes, and $\MedForestCb$ [$\LoForestCb$, $\HiForestCb$] for Forest-Flow. The Nemenyi critical differences for the four density methods are $\FriedmanCdCb$ under CatBoost and $\FriedmanCdLin$ under the linear auditor.
 
 \begin{table}[t]
-\caption{\textbf{First-version headline contrasts at $4n$, fit seed 11.} Paired median DOPE-minus-baseline retention difference with W/T/L over lineages; a tie is a difference of zero. The ARF rows use the family-cluster interval of the review panel and its size-$4n$ Holm family of six. The density, neural, and Forest-Flow rows show each block's highest-median baseline with a lineage-bootstrap interval and the block's Holm family (nine, six, and three tests). The five-seed panel supersedes these rows; they are the traceability record of the first version.}
+\caption{\textbf{First-version headline contrasts at $4n$, fit seed 11.} Paired median DOPE-minus-baseline retention difference with W/T/L over lineages; a tie is a difference of zero. The ARF rows use the family-cluster interval of the review panel and its size-$4n$ Holm family of six: DOPE against default and native ARF under each of the three auditors. The density, neural, and Forest-Flow rows show each block's highest-median baseline with a lineage-bootstrap interval and the block's Holm family: nine (DOPE against the Gaussian copula, Chow--Liu, and independent marginals under each auditor), six (DOPE against CTGAN and TVAE under each auditor), and three (DOPE against Forest-Flow under each auditor). The five-seed panel supersedes these rows; they are the traceability record of the first version.}
 \label{tab:hist-headline}
 \centering
 \footnotesize
@@ -441,14 +441,14 @@ The side-by-side columns use the common numeric projection and the published pil
 \textbf{Retained validation.} \cref{tab:retained100,tab:retained8} add the merged retained-sample evidence. Each lineage averages all three sample seeds before a lineage-bootstrap median, which differs from the median-of-seeds rule of the main tables. \cref{tab:retained100} covers ARF and the copula and Chow--Liu defaults and native configurations; \cref{tab:retained8} includes only the eight complete scaled-schedule TabSyn lineages of an earlier run and the classical methods on identical inputs. \cref{tab:retainedpairs} gives exploratory TabSyn-minus-comparator differences on those lineages, with conservative simultaneous intervals (Bonferroni over four metrics times six configurations), which are unbounded at this count. \cref{tab:arfpaired} extends the published DOPE--ARF comparison with lineage intervals under its six-test family.
 
 \begin{table}[t]
-\caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). No Holm family in this table.}
+\caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). DOPE was not scored in this retained harness, so the table has no DOPE row; DOPE minus each of these baselines is in \cref{tab:v2-contrasts}, and DOPE's detector cells beside theirs are in \cref{tab:wave2fidelity}. No Holm family in this table.}
 \label{tab:retained100}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-classical100.tex}\end{minipage}}
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Earlier eight-lineage TabSyn subset at $4n$.} Same inputs and real-data controls for every method; median [95\% interval] (lineages). A separate cohort from the full TabSyn panel. No Holm family in this table.}
+\caption{\textbf{Earlier eight-lineage TabSyn subset at $4n$.} Same inputs and real-data controls for every method; median [95\% interval] (lineages). A separate cohort from the full TabSyn panel. DOPE was not scored in this retained harness; DOPE minus TabSyn on the full TabSyn panel's matched lineages is in \cref{tab:review-tabsyn-contrasts}. No Holm family in this table.}
 \label{tab:retained8}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-matched8.tex}\end{minipage}}
@@ -462,7 +462,7 @@ The side-by-side columns use the common numeric projection and the published pil
 \end{figure}
 
 \begin{table}[t]
-\caption{\textbf{Exploratory eight-lineage subset differences, CatBoost.} The denominator is the shared lineages in the cell. Holm family size is four metrics times six configurations. The corrected simultaneous intervals are unbounded.}
+\caption{\textbf{Exploratory eight-lineage subset differences, CatBoost.} The denominator is the shared lineages in the cell. Holm family size is twenty-four: TabSyn minus each of the six configurations (ARF, Chow--Liu, and the copula, each at its default and its native setting) on each of the four metrics (CatBoost retention, KS/TV, C2ST CatBoost AUC, and distance MIA AUC). The corrected simultaneous intervals are unbounded.}
 \label{tab:retainedpairs}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-paired.tex}\end{minipage}}

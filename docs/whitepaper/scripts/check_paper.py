@@ -172,7 +172,28 @@ def table_family_failures(text: str) -> list[str]:
     return failures
 
 
-_BARE_FAMILY = re.compile(r"Holm family size is (?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\d+)\.")
+_SIZE = r"(?:\$?\d+\$?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty-four)"
+# A stated family size: "family size is nine", "family of six", "density family $9$",
+# "families are 12 ...", "family has $12$ tests", or "family (nine, six, and three tests)".
+_FAMILY_SIZE = re.compile(r"famil(?:y|ies)\b(?!-)(?:[^.;,()]{0,40}?\b)" + _SIZE + r"\b|famil(?:y|ies)\s*\((?=[^)]*\b" + _SIZE + r"\b)")
+# Words that name who is in a family: who is compared, against whom, under which auditors.
+_MEMBERS = re.compile(r"against|versus|minus|by three auditors|under each|each with|on each of|per auditor:|: [A-Z]|"
+                      r"\(DOPE|\(author-default|\(native-selected|\(default|\(predictor")
+
+
+def _family_clause(caption: str, start: int) -> str:
+    """Text from a stated size to the end of its list item: the next top-level comma, semicolon, or period."""
+    depth, index = 0, start
+    while index < len(caption):
+        char = caption[index]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+        elif depth <= 0 and char in ",;" or depth <= 0 and char == "." and not caption[index - 1:index].isdigit():
+            break
+        index += 1
+    return caption[start:index]
 
 
 def table_member_failures(text: str) -> list[str]:
@@ -181,8 +202,11 @@ def table_member_failures(text: str) -> list[str]:
     for kind in ("table", "table*", "longtable"):
         for environment in _environments(text, kind):
             for caption in _caption_bodies(environment):
-                if _BARE_FAMILY.search(" ".join(caption.split())):
-                    failures.append("Holm family size without its members: " + " ".join(caption.split())[:80])
+                flat = " ".join(caption.split())
+                for match in _FAMILY_SIZE.finditer(flat):
+                    clause = flat[match.start():match.end()] + _family_clause(flat, match.end())
+                    if not _MEMBERS.search(clause):
+                        failures.append("Holm family size without its members: " + clause[:90])
     return failures
 
 
@@ -213,6 +237,7 @@ def main() -> int:
         failures.extend(table_member_failures(strip_tex_comments(source)))
     for path in sorted((ROOT / "generated").glob("*.tex")):
         failures.extend(table_family_failures(strip_tex_comments(path.read_text())))
+        failures.extend(table_member_failures(strip_tex_comments(path.read_text())))
     tex = strip_comments(raw_tex)
     # Drop verbatim-ish inputs of generated tables; those files are the generator.
     body = "\n".join(line for line in tex.splitlines() if "\\input{generated/" not in line)

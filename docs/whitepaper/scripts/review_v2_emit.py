@@ -398,7 +398,11 @@ def contrasts_table(panel) -> str:
             "---" if yuen is None else ("yes" if yuen else "no")]) + " \\\\")
     head = "Size & Auditor & Comparator & $n$ & Median diff. & Hodges--Lehmann & W/T/L & Holm $p$ (family) & HL eq. & Yuen eq."
     caption = ("\\textbf{All DOPE-minus-comparator contrasts.} Nested bootstrap 95\\% intervals. The Holm family size "
-               "is in parentheses; families are declared per size in predeclare\\_v2. HL eq.\\ is the pre-declared "
+               "is in parentheses. The families are pre-declared per size in predeclare\\_v2, each by three auditors: primary "
+               "(author-default ARF, TabSyn, TabDDPM, and Forest-Flow under the common budget), density (Gaussian "
+               "copula, Chow--Liu, and independent marginals), deep generator (author-default CTGAN and TVAE, "
+               "TabDiff, GReaT), secondary (native-selected ARF, synthpop, SMOTE), and controls (predictor-only control and "
+               "resampled real rows). HL eq.\\ is the pre-declared "
                "equivalence rule (90\\% interval of the Hodges--Lehmann difference inside $\\pm 0.02$); Yuen eq.\\ is the "
                "trimmed-mean sensitivity.")
     return _longtable("@{}ll>{\\raggedright\\arraybackslash}p{1.1in}rllrlll@{}", head, rows, caption,

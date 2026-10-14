@@ -167,7 +167,7 @@ def render_tabsyn(payload: dict) -> str:
     contrasts_caption = (
         "\\textbf{DOPE minus TabSyn, fit seed 11.} Median paired retention difference on the matched lineages "
         "with its family-cluster bootstrap interval, the mean difference, the v1 mean-difference equivalence test at "
-        "$\\pm 0.02$, and W/T/L. The Holm family has three tests per size (one comparator, three auditors), separate "
+        "$\\pm 0.02$, and W/T/L. The Holm family has three tests per size (DOPE against TabSyn under each of the three auditors), separate "
         "from every other comparator block; the Wilcoxon and equivalence tests treat lineages as independent."
     )
     return longtable(
