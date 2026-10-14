@@ -742,7 +742,9 @@ def emit_tex(payload) -> None:
         "\\textbf{DOPE minus comparator at both sizes, fit seed 11.} Median paired retention difference with its "
         "family-cluster bootstrap 95\\% interval, the mean difference, and the v1 mean-difference equivalence test "
         "at $\\pm 0.02$. W/T/L counts lineages. The Wilcoxon and equivalence tests treat lineages as independent. "
-        "Holm families are separate per size: density 9, neural 6, ARF 6, and Forest-Flow 3 tests.",
+        "Holm families are separate per size: density 9 (DOPE against the Gaussian copula, Chow--Liu, and independent "
+        "marginals), neural 6 (DOPE against CTGAN and TVAE), ARF 6 (DOPE against author-default and native ARF), and "
+        "Forest-Flow 3 (DOPE against Forest-Flow) tests, each under the three auditors.",
         "Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
         paired_lines,
         "lllllrrllrl",

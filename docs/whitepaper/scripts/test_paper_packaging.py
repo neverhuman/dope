@@ -70,7 +70,17 @@ class PackagingTests(unittest.TestCase):
         self.assertTrue(check_paper.table_member_failures(bare))
         self.assertEqual(check_paper.table_member_failures(named), [])
         self.assertEqual(check_paper.table_member_failures("\\begin{table}\\caption{No Holm family.}\\end{table}"), [])
-        for path in (check_paper.TEX, check_paper.ROOT / "supplement.tex"):
+        old_table_one = ("\\begin{table}\\caption{Holm families are pre-declared per size: the primary family has "
+                         "$12$ tests (author-default ARF, TabSyn, by three auditors), the density family $9$, and the "
+                         "control family $6$; untested members keep their slot.}\\end{table}")
+        self.assertEqual(len(check_paper.table_member_failures(old_table_one)), 2)
+        sizes_only = "\\begin{table}\\caption{The block's Holm family (nine, six, and three tests).}\\end{table}"
+        self.assertTrue(check_paper.table_member_failures(sizes_only))
+        cluster = "\\begin{table}\\caption{Its family-cluster bootstrap 95\\% interval. No Holm family.}\\end{table}"
+        self.assertEqual(check_paper.table_member_failures(cluster), [])
+        sources = [check_paper.TEX, check_paper.ROOT / "supplement.tex"]
+        sources += sorted((check_paper.ROOT / "generated").glob("*.tex"))
+        for path in sources:
             self.assertEqual(check_paper.table_member_failures(check_paper.strip_tex_comments(path.read_text())), [],
                              path.name)
 
