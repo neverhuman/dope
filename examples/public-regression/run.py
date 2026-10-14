@@ -122,15 +122,56 @@ def schema() -> dict:
                         for i, name in enumerate(NAMES)]}
 
 
-def native(binary: Path, arguments: list[str], timeout: int = 90) -> dict:
-    # Clear ambient import/cache/loader variables for the native process. Every
-    # argument is passed literally; query tables are never compilation inputs.
-    environment = {} if arguments[0]=="sample-raw-isolated" else {"RAYON_NUM_THREADS":"1"}
-    result = subprocess.run([str(binary), *arguments], env=environment, capture_output=True, text=True,
-                            timeout=timeout, check=False)
+def write_fit_csv(path: Path, rows: list[list[float]], fitting_ids: list[int]) -> None:
+    with path.open("x", newline="") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(NAMES)
+        for index in fitting_ids:
+            row = rows[index]
+            if not math.isfinite(row[0]) or not row[0].is_integer() or abs(row[0]) > 2**53 - 1:
+                raise ValueError("public_frequency_type_mismatch")
+            # Native Integer is an exact integer lexical type, not float text
+            # such as 1000.0. Source parsing already rejects fractional frequency.
+            writer.writerow([int(row[0]), *row[1:]])
+
+
+def native(binary: Path, arguments: list[str], timeout: int = 90, diagnostic: Path | None = None) -> dict:
+    command = arguments[0]
+    if command not in {"doctor", "compile-raw", "inspect-raw", "sample-raw", "sample-raw-isolated"}:
+        raise ValueError("public_native_command_unadmitted")
+    environment = {} if command == "sample-raw-isolated" else {"RAYON_NUM_THREADS": "1"}
+    started = time.monotonic()
+    try:
+        result = subprocess.run([str(binary), *arguments], env=environment, capture_output=True,
+                                timeout=timeout, check=False)
+    except subprocess.TimeoutExpired as error:
+        if diagnostic is not None:
+            write_native_diagnostic(diagnostic, command, None, error.stdout or b"", error.stderr or b"",
+                                    time.monotonic() - started, "timeout")
+        raise ValueError(f"public_native_{command.replace('-', '_')}_timeout") from None
+    if diagnostic is not None:
+        write_native_diagnostic(diagnostic, command, result.returncode, result.stdout, result.stderr,
+                                time.monotonic() - started, "completed" if result.returncode == 0 else "failed")
     if result.returncode:
-        raise ValueError(f"public_native_{arguments[0].replace('-', '_')}_failed")
+        raise ValueError(f"public_native_{command.replace('-', '_')}_failed")
     return json.loads(result.stdout)
+
+
+def write_native_diagnostic(path: Path, command: str, returncode: int | None, stdout: bytes,
+                            stderr: bytes, elapsed: float, state: str) -> None:
+    # Hash raw child streams. Only known static codes are published; raw error
+    # text, argv paths, source headers/values and affine extrema never are.
+    known_codes = ["integer_precision_or_type_mismatch", "invalid_schema_json", "invalid_numeric_value",
+                   "raw_complete_cap_exceeded", "raw_schema_read_failed", "raw_input_read_failed",
+                   "sampling_runtime_inventory_unavailable", "sampling_runtime_mapping_unreadable",
+                   "sampling_syscall_boundary_unavailable", "outside_declared_domain"]
+    record = {"format": "dope-public-native-command-v1", "command": command, "state": state,
+              "returncode": returncode, "elapsed_seconds": elapsed,
+              "stdout_sha256": digest(stdout), "stderr_sha256": digest(stderr),
+              "stdout_bytes": len(stdout), "stderr_bytes": len(stderr),
+              "static_error_codes": [code for code in known_codes if code.encode() in stderr]}
+    with path.open("x") as stream:
+        stream.write(json.dumps(record, indent=2, allow_nan=False) + "\n")
 
 
 def learner_predictions(fit_x, fit_y, query_x):
@@ -210,19 +251,16 @@ def run(binary: Path, data: bytes, output: Path, seed: int) -> dict:
     fit, query, split = grouped_split(rows, seed)
     (output / "split.json").write_text(json.dumps(split, sort_keys=True) + "\n")
     (output / "schema.json").write_text(json.dumps(schema(), sort_keys=True) + "\n")
-    with (output / "fit.csv").open("w", newline="") as stream:
-        writer = csv.writer(stream)
-        writer.writerow(NAMES)
-        writer.writerows(rows[i] for i in fit)
+    write_fit_csv(output / "fit.csv", rows, fit)
     binary = binary.resolve(strict=True)
-    doctor = step("native_doctor", lambda: native(binary, ["doctor"]))
+    doctor = step("native_doctor", lambda: native(binary, ["doctor"], diagnostic=output/"native-doctor.json"))
     if doctor.get("implementation") != "native_rust" or doctor.get("executable_sha256") != digest(binary.read_bytes()):
         raise ValueError("public_demo_requires_native_binary")
     artifact = output / "model.raw"
     compiled = step("native_fit", lambda: native(binary, ["compile-raw", "--csv", str(output / "fit.csv"), "--schema", str(output / "schema.json"),
                                "--out", str(artifact), "--seed", str(seed), "--candidate", "chow_liu",
-                               "--max-complete-bytes", "32768", "--deadline-seconds", "60"]))
-    inspect = step("native_inspection", lambda: native(binary, ["inspect-raw", "--artifact", str(artifact)]))
+                               "--max-complete-bytes", "32768", "--deadline-seconds", "60"], diagnostic=output/"native-fit.json"))
+    inspect = step("native_inspection", lambda: native(binary, ["inspect-raw", "--artifact", str(artifact)], diagnostic=output/"native-inspection.json"))
     if compiled["accounting"] != inspect["accounting"] or artifact.stat().st_size != inspect["accounting"]["complete_sampling_bytes"]:
         raise ValueError("public_complete_byte_mismatch")
     table = np.asarray(rows, dtype=np.float64)
@@ -235,8 +273,8 @@ def run(binary: Path, data: bytes, output: Path, seed: int) -> dict:
     for multiplier in [1, 4]:
         n = len(fit) * multiplier
         sample_path = output / f"sample-{multiplier}n.csv"
-        sampled = step(f"sampling_{multiplier}n", lambda: native(binary, ["sample-raw", "--artifact", str(artifact), "--rows", str(n), "--seed", str(seed + 1), "--out", str(sample_path)]))
-        isolated = step(f"isolated_replay_{multiplier}n", lambda: native(binary, ["sample-raw-isolated", "--artifact", str(artifact), "--rows", str(n), "--seed", str(seed + 1)]))
+        sampled = step(f"sampling_{multiplier}n", lambda: native(binary, ["sample-raw", "--artifact", str(artifact), "--rows", str(n), "--seed", str(seed + 1), "--out", str(sample_path)], diagnostic=output/f"native-sampling-{multiplier}n.json"))
+        isolated = step(f"isolated_replay_{multiplier}n", lambda: native(binary, ["sample-raw-isolated", "--artifact", str(artifact), "--rows", str(n), "--seed", str(seed + 1)], diagnostic=output/f"native-isolated-{multiplier}n.json"))
         synthetic = np.loadtxt(sample_path, delimiter=",", dtype=np.float64)
         if synthetic.shape != (n, 6) or not np.all(np.isfinite(synthetic)):
             raise ValueError("public_sample_shape_invalid")

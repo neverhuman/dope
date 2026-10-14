@@ -55,6 +55,10 @@ checkpoints, driver, geometry, privacy and confirmation remain explicit.
 `attempts.jsonl` preserves started and terminal step costs even when a native
 command or learner fails. The receipt identifies the runner checkout and actual
 executable digest; the exact binary build attestation remains separate.
+Stage command diagnostics contain raw-stream hashes, byte counts, time, exit
+status and known static error codes. They exclude raw error text and private paths.
+The integer frequency is serialized as integer CSV text; decimal float text is
+refused by the native integer type. Earlier failed attempts are retained.
 Results may be poor or retention negative; that does not turn the demonstration
 into a failed privacy or scientific claim. Feature support remains bounded by
 the fit-range sampler and residual tails remain unqualified.

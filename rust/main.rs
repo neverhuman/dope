@@ -443,6 +443,7 @@ fn run(command: Command) -> Result<()> {
             candidate,
             neural_target_weight,
             neural_structural_penalty,
+            adaptive_allocation,
             tier,
             max_artifact_bytes,
             require_formal_dp,
@@ -455,6 +456,7 @@ fn run(command: Command) -> Result<()> {
                 backend_id: candidate,
                 neural_target_weight,
                 neural_structural_penalty,
+                adaptive_allocation,
                 ..Default::default()
             };
             let result = compile_kernel_from_dir(&dataset_dir, parse_task(&task)?, &options)?;

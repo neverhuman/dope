@@ -153,6 +153,7 @@ pub fn seal_sampling_process() -> Result<()> {
     // matches this bounded vector. Neither allocation moves or mutates during
     // the synchronous seccomp call, which copies the program before returning.
     // TSYNC applies the same restrictions to the already initialized CPU pool.
+    // SAFETY: filter and program stay live and unchanged until the kernel copies them.
     let status = unsafe {
         if libc::prctl(libc::PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) != 0 {
             -1

@@ -56,5 +56,23 @@ class PublicDemoTests(unittest.TestCase):
             self.assertEqual(attempts,[records[1]])
             self.assertNotIn("private fixture value",(output/"attempts.jsonl").read_text())
 
+    def test_fractional_frequency_refuses_before_serializing_a_native_integer(self):
+        (ROOT/"target").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=ROOT/"target",prefix="public-demo-frequency-") as directory:
+            with self.assertRaisesRegex(ValueError,"public_frequency_type_mismatch"):
+                demo.write_fit_csv(Path(directory)/"fit.csv",[[1.5,0.0,0.1,20.0,0.01,100.0]],[0])
+
+    def test_native_diagnostics_keep_hash_cost_code_and_exclude_raw_private_text(self):
+        (ROOT/"target").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=ROOT/"target",prefix="public-demo-command-") as directory:
+            path=Path(directory)/"diagnostic.json"
+            stderr=b"private header value: integer_precision_or_type_mismatch"
+            demo.write_native_diagnostic(path,"compile-raw",1,b"",stderr,0.25,"failed")
+            record=json.loads(path.read_text())
+            self.assertEqual(record["static_error_codes"],["integer_precision_or_type_mismatch"])
+            self.assertEqual(record["stderr_sha256"],demo.digest(stderr))
+            self.assertEqual(record["elapsed_seconds"],0.25)
+            self.assertNotIn("private header value",path.read_text())
+
 
 if __name__=="__main__":unittest.main()
