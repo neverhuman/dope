@@ -105,9 +105,14 @@ rtk proxy cargo run --quiet --locked --manifest-path ops/merge_guard/Cargo.toml 
   --review-receipt target/review/exact-source.json
 ```
 
-The expected source workflow/event matrix is CI and Full Jankurai audit for
-both `push` and `pull_request`; CI must expose `cpu`, `paper-clean`, `security`,
-and the audit must expose `jankurai-audit`. All matching runs and jobs must be
+The source definitions determine the workflow/event matrix. CI and Full Jankurai
+audit retain a `push` trigger and a `pull_request` trigger. When both workflows
+filter pushes to `main`, source checks require both PR workflows once; the actual
+receiving-main commit still requires both push workflows. Historical unrestricted
+definitions require both source push and PR workflows. Unsupported filters or
+inconsistent push admission across the workflows refuse readiness. CI must expose
+`cpu`, `paper-clean`, `security`, and the audit must expose `jankurai-audit`.
+All matching runs and jobs must be
 completed success, including extra queued runs with no jobs. PR runs bind the
 exact PR, source, base and branch. Canceled, skipped, missing, failed, truncated,
 malformed and unadmitted retried evidence refuses readiness. The source workflow

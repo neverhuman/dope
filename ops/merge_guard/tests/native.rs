@@ -46,10 +46,14 @@ fn version_one_canonical_digests_match_python_unicode_and_numbers() {
 #[test]
 fn actual_transport_preserves_literal_argv_without_a_shell_command() {
     let dir = scratch("argv");
-    let fake = executable(&dir, "#!/bin/sh\nprintf '%s\\n' \"$@\"\n");
+    // Select an immutable executable through a path containing spaces. The
+    // fixture does not need to publish and immediately execute a writable shim.
+    let fake = dir.join("fake gh with spaces");
+    std::os::unix::fs::symlink("/usr/bin/printf", &fake).unwrap();
     let endpoint = "repos/fixture/pulls?value=literal; quoted ' é";
     let argv = vec![
         fake.to_string_lossy().into_owned(),
+        "%s\n".into(),
         "api".into(),
         "--method".into(),
         "GET".into(),

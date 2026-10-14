@@ -495,6 +495,12 @@
     "docs/whitepaper/scripts/test_rust_closure.py": "governance",
     "research/benchmark/review_fixes/test_receipt_unknown_method.py": "external-evidence",
     "research/transfer/geometry_distributions.py": "external-evidence",
-    "research/transfer/tests/test_geometry_distributions.py": "external-evidence"
+    "research/transfer/tests/test_geometry_distributions.py": "external-evidence",
+    "scripts/native-notices.py": "governance",
+    "scripts/native-third-party.NOTICE": "governance",
+    "scripts/native-legal.sha256": "governance",
+    "ops/merge_guard/tests/workflow_events.rs": "governance",
+    "research/transfer/pilot_admission.py": "external-evidence",
+    "research/transfer/tests/test_pilot_admission.py": "external-evidence"
   }
 }

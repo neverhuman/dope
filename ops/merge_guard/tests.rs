@@ -2,6 +2,7 @@
 mod feature_boundary;
 mod legacy;
 mod native;
+mod workflow_events;
 
 use super::*;
 use serde_json::json;

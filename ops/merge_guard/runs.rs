@@ -39,7 +39,33 @@ fn keys(lines: Vec<&str>, jobs: bool) -> BTreeSet<String> {
         })
         .collect()
 }
-pub fn validate_definitions(definitions: &Value, queue: bool) -> Result<()> {
+fn main_only_event(source: &str, event: &str) -> Result<bool> {
+    let lines: Vec<_> = block(source, "on")?
+        .into_iter()
+        .filter(|line| !line.trim_start().starts_with('#'))
+        .collect();
+    let header = format!("  {event}:");
+    let positions: Vec<_> = lines
+        .iter()
+        .enumerate()
+        .filter_map(|(i, line)| (line.trim_end() == header).then_some(i))
+        .collect();
+    require(positions.len() == 1, "workflow_definition_invalid")?;
+    let body: Vec<_> = lines[positions[0] + 1..]
+        .iter()
+        .take_while(|line| {
+            line.trim().is_empty() || line.starts_with("   ") || line.starts_with('\t')
+        })
+        .filter(|line| !line.trim().is_empty() && !line.trim_start().starts_with('#'))
+        .map(|line| line.trim_end())
+        .collect();
+    match body.as_slice() {
+        [] => Ok(false),
+        ["    branches:", "      - main"] | ["    branches: [main]"] => Ok(true),
+        _ => Err(Refused("workflow_definition_invalid")),
+    }
+}
+pub fn validate_definitions(definitions: &Value, queue: bool) -> Result<&'static [&'static str]> {
     let map = definitions
         .as_object()
         .ok_or(Refused("workflow_definition_invalid"))?;
@@ -47,6 +73,7 @@ pub fn validate_definitions(definitions: &Value, queue: bool) -> Result<()> {
         map.len() == WORKFLOWS.len() && WORKFLOWS.iter().all(|(p, _)| map.contains_key(*p)),
         "workflow_definition_invalid",
     )?;
+    let mut main_only = None;
     for (path, jobs) in WORKFLOWS {
         let source = text(&definitions[path])?;
         let events = keys(block(source, "on")?, false);
@@ -60,12 +87,23 @@ pub fn validate_definitions(definitions: &Value, queue: bool) -> Result<()> {
                 "workflow_definition_invalid"
             },
         )?;
+        let filtered = main_only_event(source, "push")?;
+        main_only_event(source, "pull_request")?;
+        require(
+            main_only.is_none_or(|previous| previous == filtered),
+            "workflow_definition_invalid",
+        )?;
+        main_only = Some(filtered);
         require(
             keys(block(source, "jobs")?, true) == jobs.iter().map(|j| (*j).to_owned()).collect(),
             "workflow_definition_invalid",
         )?;
     }
-    Ok(())
+    Ok(if main_only == Some(true) {
+        &["pull_request"]
+    } else {
+        &["push", "pull_request"]
+    })
 }
 pub fn validate_runs(
     runs: &Value,

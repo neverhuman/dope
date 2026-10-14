@@ -7,6 +7,7 @@ for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg; do
   ci_require_command "$tool"
 done
 bash ops/ci/test-cpu-tool-readiness.sh
+sha256sum --check --status scripts/native-legal.sha256
 bash ops/ci/check-budgets.sh
 bash ops/ci/check-contracts.sh
 cargo fmt --all -- --check

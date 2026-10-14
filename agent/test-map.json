@@ -1759,7 +1759,7 @@
     },
     "scripts/install-native.sh": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+      "purpose": "verify atomic native installation and delivered legal pins, fixed-member manifest/tamper refusal and legacy uninstall compatibility; full existing vnext_native_install target, no release or other-platform qualification"
     },
     "tests/vnext_artifact_only.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
@@ -1767,7 +1767,7 @@
     },
     "tests/vnext_native_install.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+      "purpose": "verify atomic native installation and delivered legal pins, fixed-member manifest/tamper refusal and legacy uninstall compatibility; full existing vnext_native_install target, no release or other-platform qualification"
     },
     "tests/vnext_raw_workflow.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
@@ -1879,7 +1879,7 @@
     },
     "scripts/uninstall-native.sh": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+      "purpose": "verify atomic native installation and delivered legal pins, fixed-member manifest/tamper refusal and legacy uninstall compatibility; full existing vnext_native_install target, no release or other-platform qualification"
     },
     "schemas/bound-binding-v2.schema.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
@@ -2004,6 +2004,30 @@
     "research/transfer/tests/test_geometry_distributions.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
       "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls and pair-allocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
+    },
+    "scripts/native-notices.py": {
+      "command": "sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
+      "purpose": "verify shipped LICENSE/notice/lock/toolchain pins and installed legal layout, fixed-member tamper refusal and legacy uninstall compatibility; no notice regeneration/download or release qualification"
+    },
+    "scripts/native-third-party.NOTICE": {
+      "command": "sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
+      "purpose": "verify shipped LICENSE/notice/lock/toolchain pins and installed legal layout, fixed-member tamper refusal and legacy uninstall compatibility; no notice regeneration/download or release qualification"
+    },
+    "scripts/native-legal.sha256": {
+      "command": "sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
+      "purpose": "verify shipped LICENSE/notice/lock/toolchain pins and installed legal layout, fixed-member tamper refusal and legacy uninstall compatibility; no notice regeneration/download or release qualification"
+    },
+    "ops/merge_guard/tests/workflow_events.rs": {
+      "command": "just native-guard-check",
+      "purpose": "verify current PR-only source event admission with mandatory main pushes, historical dual-source events, exact four-job/source/app binding and stale-review/receiving-check refusal; preserve all original scenarios and canonical version1 receipts"
+    },
+    "research/transfer/pilot_admission.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "exercise development registry/lineage/exposure-to-plan reader and refusal/accounting fixtures through mandatory local/CPU transfer discovery; pending P1-P5 source repairs stay unqualified and do not authorize rights, custody, pilot execution or N19 closure"
+    },
+    "research/transfer/tests/test_pilot_admission.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "exercise development registry/lineage/exposure-to-plan reader and refusal/accounting fixtures through mandatory local/CPU transfer discovery; pending P1-P5 source repairs stay unqualified and do not authorize rights, custody, pilot execution or N19 closure"
     }
   }
 }

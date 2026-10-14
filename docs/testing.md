@@ -15,6 +15,11 @@ raw-schema, raw-workflow, artifact-only, installer, byte-allocation, native
 successor, public-demo, and frozen-geometry binding Rust integration suites.
 Hosted CPU retains full
 locked Cargo test discovery, which also executes every one of these suites.
+Fast/check and hosted CPU verify the shipped native legal-input hashes before
+product checks. The full installer suite covers license delivery, fixed-member
+uninstall validation and legacy two-file compatibility. Offline notice generation
+uses cached locked crate archives and pinned Rust legal inputs; it is separate
+from checking the shipped pins.
 Local fast/check and hosted CPU run the six bounded public-demo regressions in
 `research.benchmark.tests.test_public_demo`: frozen source admission, disjoint
 physical groups, query-label independence, integer producer/reader compatibility,

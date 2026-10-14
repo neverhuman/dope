@@ -89,7 +89,7 @@ pub fn evaluate_preflight(e: &Value, pins: &Value, receipt: &Value) -> Result<co
     )?;
     validate_no_stacking(before, pins)?;
     let policy = controls::qualify(&before["controls"])?;
-    runs::validate_definitions(&e["workflow_definitions"], policy.queue())?;
+    let source_events = runs::validate_definitions(&e["workflow_definitions"], policy.queue())?;
     require(
         e["source_commit"]["sha"] == pins["source_sha"],
         "head_moved",
@@ -97,7 +97,7 @@ pub fn evaluate_preflight(e: &Value, pins: &Value, receipt: &Value) -> Result<co
     let ids = runs::validate_runs(
         &e["runs"],
         &pins["source_sha"],
-        &["push", "pull_request"],
+        source_events,
         Some(&pins["pr"]),
         Some(&pull["head"]["ref"]),
         Some(&pins["base_sha"]),

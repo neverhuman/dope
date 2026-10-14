@@ -20,6 +20,7 @@ native-guard-check:
 
 fast: native-guard-check
     bash ops/ci/test-cpu-tool-readiness.sh
+    sha256sum --check --status scripts/native-legal.sha256
     cargo fmt --all -- --check
     cargo check -p dope-kernel --locked
     cargo test --locked --lib
