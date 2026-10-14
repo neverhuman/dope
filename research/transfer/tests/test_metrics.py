@@ -1,3 +1,4 @@
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -9,7 +10,7 @@ from research.transfer.losses import (
 )
 from research.transfer.metrics import (
     PAIRED_MEAN_CODE_DIGEST, BoundEvidence, CellResult, FitArtifact, Margin, TaskEvaluation,
-    authenticate_bound, bound_binding_record, harm_summary, loss_summary, observed_coverage,
+    authenticate_bound, bound_binding_record, bound_qualification, harm_summary, loss_summary, observed_coverage,
     qualified_coverage, query_z_mean, tail_regression, weighted_cvar,
 )
 
@@ -104,7 +105,10 @@ class MetricsTests(unittest.TestCase):
         self.assertEqual(qualified_coverage([t])["coverage"], 0.)
         self.assertEqual(qualified_coverage([t], verify_bound=lambda t, k, b: b.contrast_id == k)["coverage"], 0.)
         cells = {k: measured(bound=BoundEvidence(-0.1, k, "protocol", "receipt")) for k in t.required_cells}
-        self.assertEqual(qualified_coverage([task(cells=cells)], verify_bound=lambda t, k, b: b.contrast_id == k)["coverage"], 1.)
+        point_only = qualified_coverage([task(cells=cells)], verify_bound=lambda t, k, b: b.contrast_id == k)
+        self.assertEqual(point_only["coverage"], 0.)
+        self.assertEqual(point_only["cell_counts"]["observed_only"], 4)
+        self.assertEqual(point_only["cell_counts"]["qualified"], 0)
         cells["b/n"] = measured(bound=BoundEvidence(0.1, "b/n", "protocol", "receipt"))
         self.assertEqual(qualified_coverage([task(cells=cells)], verify_bound=lambda *args: True)["coverage"], 0.)
 
@@ -192,6 +196,78 @@ class MetricsTests(unittest.TestCase):
         self.assertGreater(tails["positive_p95"], 0.)
         self.assertTrue(tails["mean_hides_tail"])
         self.assertEqual(tails["tail_claim"], "disclosed")
+
+    def test_uncalibrated_point_mean_stays_observed_only(self):
+        cell_id = "a/n"
+        cell = CellResult("measured", pairs(1., 1.), TrainingScale(100.), Margin(0., 0.01),
+                          BoundEvidence(-1., cell_id, "protocol", "receipt"))
+        self.assertEqual(query_z_mean(cell), -1.)
+        artifact = FitArtifact(cell_id, "fit-0", 10)
+        evaluation = TaskEvaluation("f", "t", (cell_id,), {cell_id: cell}, 10, 100, True, (artifact,))
+        analysis = {
+            "learner_id": "a", "endpoint": "z", "schedule_id": "schedule-1",
+            "code_digest": PAIRED_MEAN_CODE_DIGEST, "rng_id": "deterministic-paired-mean",
+            "draws": 1, "multiplicity": "cell",
+        }
+        record = bound_binding_record(evaluation, cell_id, cell.bound, analysis)
+        self.assertIsNone(record["artifact_id"])
+        self.assertEqual(record["artifact_commitment"], "unverified_byte_count")
+        self.assertNotEqual(record["artifact_id"], digest({
+            "cell_id": cell_id, "fit_id": "fit-0", "artifact_bytes": 10,
+        }))
+        expected = {**record, "trust": "recomputed", "binding_digest": digest(record)}
+        self.assertTrue(authenticate_bound(evaluation, cell_id, cell.bound, expected))
+        decision = bound_qualification(evaluation, cell_id, cell.bound, expected)
+        self.assertTrue(decision["authenticated"])
+        self.assertFalse(decision["qualifies"])
+        self.assertEqual(decision["disposition"], "observed_only")
+        self.assertEqual(decision["calibration"], "unmeasured")
+        report = qualified_coverage(
+            [evaluation], verify_bound=lambda task, key, bound: authenticate_bound(task, key, bound, expected),
+        )
+        self.assertEqual(report["coverage"], 0.)
+        self.assertEqual(report["cell_counts"]["qualified"], 0)
+        self.assertEqual(report["cell_counts"]["observed_only"], 1)
+        self.assertIsNone(report["confidence_interval"])
+        counted = qualified_coverage(
+            [evaluation], verify_bound=lambda task, key, bound: bound_qualification(task, key, bound, expected),
+        )
+        self.assertEqual(counted["cell_counts"]["qualified"], 0)
+        content = b"fit-body"
+        committed = FitArtifact(cell_id, "fit-0", len(content), content)
+        interval = BoundEvidence(-0.2, cell_id, "protocol", "receipt", lower_z=-0.5)
+        owner_cell = CellResult("measured", pairs(1., 1.), TrainingScale(100.), Margin(0., 0.01), interval)
+        owner_task = TaskEvaluation("f", "t", (cell_id,), {cell_id: owner_cell}, len(content), 100, True, (committed,))
+        owner_analysis = {
+            "learner_id": "a", "endpoint": "z", "schedule_id": "schedule-1",
+            "code_digest": digest({"code": "owner-analysis-v1"}), "rng_id": "rng-1",
+            "draws": 1, "multiplicity": "cell",
+        }
+        owner_record = bound_binding_record(owner_task, cell_id, interval, owner_analysis)
+        self.assertEqual(owner_record["artifact_id"], hashlib.sha256(content).hexdigest())
+        self.assertEqual(owner_record["artifact_commitment"], "content_sha256")
+        owner = {**owner_record, "trust": "owner", "binding_digest": digest(owner_record)}
+        qualified = bound_qualification(owner_task, cell_id, interval, owner)
+        self.assertTrue(qualified["qualifies"])
+        self.assertEqual(qualified["disposition"], "owner_interval")
+        self.assertEqual(qualified["calibration"], "unmeasured")
+        covered = qualified_coverage(
+            [owner_task], verify_bound=lambda task, key, bound: bound_qualification(task, key, bound, owner),
+        )
+        self.assertEqual(covered["cell_counts"]["qualified"], 1)
+        self.assertEqual(covered["coverage"], 1.)
+        self.assertIsNone(covered["confidence_interval"])
+        refused_analysis = {**owner_analysis, "code_digest": PAIRED_MEAN_CODE_DIGEST}
+        refused_record = bound_binding_record(owner_task, cell_id, interval, refused_analysis)
+        refused = {**refused_record, "trust": "owner", "binding_digest": digest(refused_record)}
+        self.assertFalse(bound_qualification(owner_task, cell_id, interval, refused)["qualifies"])
+        point_with_content = TaskEvaluation(
+            "f", "t", (cell_id,), {cell_id: cell}, len(content), 100, True, (committed,),
+        )
+        content_record = bound_binding_record(point_with_content, cell_id, cell.bound, analysis)
+        content_expected = {**content_record, "trust": "recomputed", "binding_digest": digest(content_record)}
+        self.assertEqual(content_record["artifact_commitment"], "content_sha256")
+        self.assertFalse(bound_qualification(point_with_content, cell_id, cell.bound, content_expected)["qualifies"])
 
     def test_separate_classification_contract(self):
         case = GOLDEN["classification"]
