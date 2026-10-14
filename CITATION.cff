@@ -13,7 +13,7 @@ authors:
     affiliation: NEVERHUMAN Research
 preferred-citation:
   type: report
-  title: "DOPE: Downstream Objective-Preserving Encoding of Regression Tables into Kilobyte Generators"
+  title: "DOPE: Generative Compression of Predictive Structure"
   authors:
     - family-names: Taylor
       given-names: Jepson
