@@ -469,6 +469,10 @@
     "schemas/bound-binding-v2.schema.json": "external-evidence",
     "tests/test_tuner.py": "python-v1-compatibility",
     "research/benchmark/review_fixes/display_names.py": "external-evidence",
-    "research/benchmark/review_fixes/test_display_names.py": "external-evidence"
+    "research/benchmark/review_fixes/test_display_names.py": "external-evidence",
+    "research/transfer/calibration_receipt.py": "external-evidence",
+    "research/transfer/tests/test_learning_density.py": "external-evidence",
+    "research/transfer/tests/test_calibration_receipt.py": "external-evidence",
+    "schemas/calibration-receipt-v1.schema.json": "external-evidence"
   }
 }

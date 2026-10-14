@@ -1662,12 +1662,12 @@
       "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
     },
     "research/transfer/frontier.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
     },
     "research/transfer/geometry.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
     },
     "research/transfer/objectives.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1710,8 +1710,8 @@
       "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
     },
     "research/transfer/tests/test_geometry.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
     },
     "research/transfer/tests/test_interactions.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1900,6 +1900,22 @@
     "research/benchmark/review_fixes/test_display_names.py": {
       "command": "python3 -B -m unittest research.benchmark.review_fixes.test_display_names -v",
       "purpose": "verify exact reader-facing identifier mapping, distinct printed labels, unchanged unknown values and TeX escaping after mapping; required by hosted CPU review-fix entry"
+    },
+    "research/transfer/calibration_receipt.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+    },
+    "research/transfer/tests/test_learning_density.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+    },
+    "research/transfer/tests/test_calibration_receipt.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+    },
+    "schemas/calibration-receipt-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
     }
   }
 }
