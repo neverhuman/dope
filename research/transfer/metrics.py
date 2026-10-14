@@ -132,7 +132,7 @@ class CellResult:
                 raise ValueError("measured cell requires paired evidence and margin")
             self.margin.query_z(self.pairs, self.scale)
         elif any(v is not None for v in (self.pairs, self.scale, self.margin, self.bound)):
-            raise ValueError("missing losses on failed cells")
+            raise ValueError("failed cells require absent loss fields")
 
     @property
     def z(self) -> float | None:
@@ -223,8 +223,13 @@ def _binding_digest_text(value):
     return value
 
 
-def bound_binding_record(task, cell_id, bound, analysis) -> dict:
-    """Live cell, fit artifact, and declared analysis identity. The digest covers this record."""
+def bound_binding_record(task, cell_id, bound, analysis, *, version: int = 1) -> dict:
+    """Live cell, fit artifact, and declared analysis identity. The digest covers this record.
+
+    Version 1 commits the artifact byte count. Version 2 commits content bytes
+    when they are present and records unverified_byte_count when they are not.
+    Neither version carries a calibration result.
+    """
     if bound is None or not isinstance(analysis, dict) or cell_id != bound.contrast_id:
         raise ValueError("incomplete_bound_binding")
     cell = task.cells.get(cell_id)
@@ -240,14 +245,20 @@ def bound_binding_record(task, cell_id, bound, analysis) -> dict:
     draws = analysis.get("draws")
     if type(draws) is not int or isinstance(draws, bool) or draws < 1:
         raise ValueError("incomplete_bound_binding")
-    return {
+    if version not in (1, 2):
+        raise ValueError("unknown_bound_binding_version")
+    artifact_id = digest({
+        "cell_id": artifact.cell_id,
+        "fit_id": artifact.fit_id,
+        "artifact_bytes": artifact.artifact_bytes,
+    })
+    record = {
         "format": "dope-bound-binding",
-        "version": 1,
+        "version": version,
         "task_id": task.task_id,
         "learner_id": _binding_text(analysis.get("learner_id")),
         "fit_id": artifact.fit_id,
-        "artifact_id": None if artifact.content is None else hashlib.sha256(artifact.content).hexdigest(),
-        "artifact_commitment": "unverified_byte_count" if artifact.content is None else "content_sha256",
+        "artifact_id": artifact_id,
         "contrast_id": bound.contrast_id,
         "protocol_id": bound.protocol_id,
         "receipt_id": bound.receipt_id,
@@ -270,6 +281,10 @@ def bound_binding_record(task, cell_id, bound, analysis) -> dict:
         "upper_z": bound.upper_z,
         "lower_z": bound.lower_z,
     }
+    if version == 2:
+        record["artifact_id"] = None if artifact.content is None else hashlib.sha256(artifact.content).hexdigest()
+        record["artifact_commitment"] = "unverified_byte_count" if artifact.content is None else "content_sha256"
+    return record
 
 
 def authenticate_bound(task, cell_id, bound, expected) -> bool:
@@ -281,8 +296,11 @@ def authenticate_bound(task, cell_id, bound, expected) -> bool:
         return False
     if expected.get("pin_source") not in (None, "owner"):
         return False
+    version = expected.get("version", 1)
+    if type(version) is not int or version not in (1, 2):
+        return False
     try:
-        record = bound_binding_record(task, cell_id, bound, expected)
+        record = bound_binding_record(task, cell_id, bound, expected, version=version)
     except ValueError:
         return False
     if expected.get("trust") == "recomputed":
@@ -304,31 +322,19 @@ def authenticate_bound(task, cell_id, bound, expected) -> bool:
 
 
 def bound_qualification(task, cell_id, bound, expected) -> dict:
-    """Separate an authentic point from an owner uncertainty interval.
+    """Authentication is not calibration.
 
-    The paired-mean procedure declares calibration unmeasured. Its recomputed
-    mean stays observed-only. Qualification needs owner trust, a nondegenerate
-    interval, a procedure other than that unmeasured mean, and content bytes.
+    No bound on this wire qualifies coverage. A missing, null, unmeasured, or
+    self-asserted calibration flag stays observed-only. Content bytes do not
+    create a calibration manifest.
     """
     authenticated = authenticate_bound(task, cell_id, bound, expected)
-    observed = {
-        "authenticated": authenticated, "qualifies": False, "disposition": "observed_only",
-        "calibration": "unmeasured", "uncertainty": "absent",
-    }
-    if not authenticated or not isinstance(expected, dict) or bound is None:
-        return {**observed, "authenticated": False, "disposition": "unauthenticated"}
-    point = bound.lower_z is None or bound.lower_z == bound.upper_z
-    unmeasured = (
-        expected.get("trust") != "owner"
-        or expected.get("code_digest") == PAIRED_MEAN_CODE_DIGEST
-        or expected.get("artifact_commitment") != "content_sha256"
-        or expected.get("calibration") == "unmeasured"
-    )
-    if point or unmeasured:
-        return observed
     return {
-        "authenticated": True, "qualifies": True, "disposition": "owner_interval",
-        "calibration": "unmeasured", "uncertainty": "owner_interval",
+        "authenticated": authenticated,
+        "qualifies": False,
+        "disposition": "observed_only" if authenticated else "unauthenticated",
+        "calibration": "unmeasured",
+        "uncertainty": "absent",
     }
 
 
@@ -363,16 +369,15 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
                 potential &= cell.status == "unresolved"
                 continue
             observed = cell.z <= 0
-            authenticated, uncertainty = False, False
+            authenticated = False
             if cell.bound is not None and verify_bound is not None:
                 decision = verify_bound(task, key, cell.bound)
                 if isinstance(decision, dict):
                     authenticated = decision.get("authenticated") is True
-                    uncertainty = decision.get("qualifies") is True and authenticated
                 else:
                     authenticated = decision is True
             inferential_harm = authenticated and cell.bound.lower_z is not None and cell.bound.lower_z > 0
-            qualified = feasible and observed and uncertainty and cell.bound.upper_z <= 0 and not inferential_harm
+            qualified = False
             if qualified:
                 counts["qualified"] += 1
             elif inferential_harm:
