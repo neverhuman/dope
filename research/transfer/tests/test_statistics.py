@@ -10,7 +10,8 @@ from research.transfer.metrics import Margin
 from research.transfer.power import PowerScenario, power_simulation
 from research.transfer.statistics import (
     CrossedDesign, EvaluationRun, bootstrap_effects, interval_decision,
-    leave_one_global_seed_out, paired_family_effect, simultaneous_ucb, task_substream,
+    leave_one_global_seed_out, paired_family_effect, require_separate_cell_bounds,
+    simultaneous_ucb, task_substream,
 )
 
 
@@ -110,6 +111,11 @@ class StatisticsTests(unittest.TestCase):
         incomplete = scheduled(tuple(runs), ("a",))
         result = bootstrap_effects(incomplete, draws=199)
         self.assertEqual(result["status"], "incomplete")
+        self.assertEqual(result["estimand"], "method_new_source")
+        self.assertIsNone(result["estimates"])
+        self.assertIsNone(result["samples"])
+        self.assertEqual(result["sensitivity"]["estimand"], "complete_case_sensitivity")
+        self.assertFalse(result["sensitivity"]["qualification"])
         self.assertIsNone(simultaneous_ucb(result)["bounds"])
         self.assertEqual(paired_family_effect(incomplete)["estimand"], "complete_case_sensitivity")
         self.assertEqual(incomplete.counts["scheduled_runs"], 12)
@@ -137,6 +143,16 @@ class StatisticsTests(unittest.TestCase):
         self.assertFalse(interval_decision(-0.1, 0.1, equivalence_margin=0.1)["equivalent"])
         self.assertTrue(interval_decision(0.2, 0.3)["harmful"])
         self.assertTrue(interval_decision(-0.3, -0.2)["superior"])
+        within_margin_worse = interval_decision(0.02, 0.05, endpoint="gap", equivalence_margin=0.1)
+        self.assertTrue(within_margin_worse["equivalent"])
+        self.assertFalse(within_margin_worse["superior"])
+        adjusted = interval_decision(-0.3, -0.2, endpoint="z")
+        self.assertFalse(adjusted["superior"])
+        self.assertTrue(adjusted["noninferior"])
+        shared = {"lower": -0.2, "upper": -0.1}
+        with self.assertRaises(ValueError):
+            require_separate_cell_bounds({"cell-a": shared, "cell-b": shared})
+        require_separate_cell_bounds({"cell-a": {"lower": -0.2, "upper": -0.1}, "cell-b": {"lower": -0.2, "upper": 0.1}})
         too_many = {**joint, "draws": 99}
         self.assertEqual(simultaneous_ucb(too_many)["status"], "insufficient_tail_draws")
 

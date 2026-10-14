@@ -101,9 +101,14 @@ class BoundEvidence:
     contrast_id: str
     protocol_id: str
     receipt_id: str
+    lower_z: float | None = None
 
     def __post_init__(self):
         finite_number(self.upper_z)
+        if self.lower_z is not None:
+            finite_number(self.lower_z)
+            if self.lower_z > self.upper_z:
+                raise ValueError("reversed bound")
         if not all(isinstance(v, str) and v for v in (self.contrast_id, self.protocol_id, self.receipt_id)):
             raise ValueError("bound identity is incomplete")
 
@@ -135,6 +140,19 @@ class CellResult:
 
 
 @dataclass(frozen=True)
+class FitArtifact:
+    cell_id: str
+    fit_id: str
+    artifact_bytes: int
+
+    def __post_init__(self):
+        if not isinstance(self.cell_id, str) or not self.cell_id or not isinstance(self.fit_id, str) or not self.fit_id:
+            raise ValueError("invalid fit artifact")
+        if type(self.artifact_bytes) is not int or self.artifact_bytes < 0:
+            raise ValueError("invalid fit artifact")
+
+
+@dataclass(frozen=True)
 class TaskEvaluation:
     family_id: str
     task_id: str
@@ -143,16 +161,54 @@ class TaskEvaluation:
     artifact_bytes: int
     byte_budget: int
     resources_within_budget: bool
+    artifacts: tuple = ()
 
     def __post_init__(self):
         object.__setattr__(self, "required_cells", tuple(self.required_cells))
         object.__setattr__(self, "cells", dict(self.cells))
+        object.__setattr__(self, "artifacts", tuple(self.artifacts))
         if not self.family_id or not self.task_id or not self.required_cells or len(set(self.required_cells)) != len(self.required_cells):
             raise ValueError("invalid scheduled task")
         if set(self.cells) - set(self.required_cells):
             raise ValueError("unscheduled cell")
         if any(type(v) is not int or v < 0 for v in (self.artifact_bytes, self.byte_budget)) or type(self.resources_within_budget) is not bool:
             raise ValueError("invalid resource accounting")
+        for artifact in self.artifacts:
+            if not isinstance(artifact, FitArtifact) or artifact.cell_id not in self.required_cells:
+                raise ValueError("unscheduled artifact")
+
+
+def authenticate_bound(task, cell_id, bound, expected) -> bool:
+    """External pins only. Candidate-derived pins, task swaps, and tampered bounds fail."""
+    if bound is None or not isinstance(expected, dict) or expected.get("pin_source") != "external":
+        return False
+    required = ("task_id", "contrast_id", "protocol_id", "receipt_id", "upper_z")
+    if any(expected.get(key) in (None, "") for key in required):
+        return False
+    if task.task_id != expected["task_id"]:
+        return False
+    if cell_id != expected["contrast_id"] or bound.contrast_id != expected["contrast_id"]:
+        return False
+    if bound.protocol_id != expected["protocol_id"] or bound.receipt_id != expected["receipt_id"]:
+        return False
+    if bound.upper_z != expected["upper_z"]:
+        return False
+    if "lower_z" in expected and bound.lower_z != expected["lower_z"]:
+        return False
+    return True
+
+
+def _task_feasible(task) -> bool:
+    if task.artifact_bytes > task.byte_budget or not task.resources_within_budget:
+        return False
+    if not task.artifacts:
+        return True
+    seen = set()
+    for artifact in task.artifacts:
+        if artifact.artifact_bytes > task.byte_budget:
+            return False
+        seen.add(artifact.cell_id)
+    return set(task.required_cells) <= seen
 
 
 def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
@@ -160,9 +216,10 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
     if not tasks or len({t.task_id for t in tasks}) != len(tasks):
         raise ValueError("empty or duplicate task schedule")
     families = defaultdict(list)
-    counts = Counter({k: 0 for k in ("qualified", "observed_only", "harmful", "technical_failure", "unsupported", "unresolved")})
+    counts = Counter({k: 0 for k in ("qualified", "observed_only", "observed_outside", "harmful",
+                                     "technical_failure", "unsupported", "unresolved")})
     for task in tasks:
-        feasible = task.artifact_bytes <= task.byte_budget and task.resources_within_budget
+        feasible = _task_feasible(task)
         passed, potential = feasible, feasible
         for key in task.required_cells:
             cell = task.cells.get(key, CellResult())
@@ -172,18 +229,30 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
                 potential &= cell.status == "unresolved"
                 continue
             observed = cell.z <= 0
-            qualified = (feasible and observed and cell.bound is not None and cell.bound.upper_z <= 0
-                         and verify_bound is not None and verify_bound(task, key, cell.bound) is True)
-            counts["qualified" if qualified else "observed_only" if observed else "harmful"] += 1
+            verified = (cell.bound is not None and verify_bound is not None
+                        and verify_bound(task, key, cell.bound) is True)
+            inferential_harm = verified and cell.bound.lower_z is not None and cell.bound.lower_z > 0
+            qualified = feasible and observed and verified and cell.bound.upper_z <= 0 and not inferential_harm
+            if qualified:
+                counts["qualified"] += 1
+            elif inferential_harm:
+                counts["harmful"] += 1
+            elif observed:
+                counts["observed_only"] += 1
+            else:
+                counts["observed_outside"] += 1
             passed &= qualified if supported else observed
             potential &= qualified if supported else observed
         families[task.family_id].append((int(passed), int(potential)))
     lower = math.fsum(math.fsum(v[0] for v in members) / len(members) for members in families.values()) / len(families)
     upper = math.fsum(math.fsum(v[1] for v in members) / len(members) for members in families.values()) / len(families)
+    if lower > upper:
+        raise ValueError("completion bounds are reversed")
     return {"coverage": lower, "lower": lower, "upper": upper, "families": len(families),
             "tasks": len(tasks), "scheduled_cells": sum(len(t.required_cells) for t in tasks),
             "cell_counts": dict(counts), "byte_infeasible_tasks": sum(t.artifact_bytes > t.byte_budget for t in tasks),
-            "resource_infeasible_tasks": sum(not t.resources_within_budget for t in tasks)}
+            "resource_infeasible_tasks": sum(not t.resources_within_budget for t in tasks),
+            "meaning": "completion", "confidence_interval": None}
 
 
 def observed_coverage(tasks) -> dict:
@@ -243,3 +312,12 @@ def harm_summary(tasks, *, catastrophic_threshold: float) -> dict:
                       positive_p95=quantile(positive, 0.95), positive_cvar90=weighted_cvar(positive, weights),
                       catastrophic_rate=math.fsum(w / total for v, w in zip(values, weights) if v > catastrophic_threshold))
     return result
+
+
+def tail_regression(tasks, *, catastrophic_threshold: float) -> dict:
+    """A nonpositive mean does not hide a positive tail. Tails stay disclosed."""
+    report = harm_summary(tasks, catastrophic_threshold=catastrophic_threshold)
+    mean, tail = report["mean_gap"], report["positive_p95"]
+    hidden = mean is not None and tail is not None and mean <= 0 and tail > 0
+    return {**report, "mean_hides_tail": hidden,
+            "tail_claim": "disclosed" if tail is not None else "not_evidenced"}
