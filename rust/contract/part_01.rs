@@ -224,6 +224,7 @@ pub fn candidate_implementation_hash(id: &str) -> String {
         hasher.update(include_bytes!("../compiler/target_fitting/noise_fitting.rs"));
         hasher.update(include_bytes!("../compiler/target_fitting/quantization.rs"));
         hasher.update(include_bytes!("../compiler/adaptive_allocation.rs"));
+        hasher.update(include_bytes!("../compiler/candidate_dependence.rs"));
         hasher.update(include_bytes!("../contract/part_01.rs"));
         hasher.update(include_bytes!("../contract/part_02.rs"));
         hasher.update(include_bytes!("../model/generator_validation/part_01.rs"));

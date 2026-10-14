@@ -271,75 +271,8 @@ fn compile_symbolic_table(
             })
             .collect();
         let marginal_fidelity = 1.0 - 0.035 / (knots as f64).sqrt();
-        let (dependence, dependence_name, dependence_fidelity) = match dependence_family {
-            0 => {
-                let fidelity = correlation.as_ref().map_or(0.85, |matrix| {
-                    let mean = matrix
-                        .iter()
-                        .enumerate()
-                        .filter(|(index, _)| index / width != index % width)
-                        .map(|(_, value)| f64::from(value.abs()))
-                        .sum::<f64>()
-                        / (width * width - width).max(1) as f64;
-                    (1.0 - mean / 0.5).clamp(0.0, 1.0)
-                });
-                (Dependence::Independent, "independence", fidelity)
-            }
-            1 => (
-                Dependence::ChowLiu {
-                    root: 0,
-                    edges: edges.clone(),
-                },
-                "chow_liu",
-                0.97,
-            ),
-            2 => (
-                Dependence::Triangular {
-                    terms: triangular_terms.clone(),
-                },
-                "triangular_autoregressive",
-                0.98,
-            ),
-            3 => (
-                Dependence::SparseGraph {
-                    edges: strongest_sparse_edges(
-                        correlation.as_ref(),
-                        &edges,
-                        width,
-                        width.saturating_mul(4),
-                    ),
-                },
-                "sparse_gaussian_copula",
-                0.985,
-            ),
-            4 => (
-                poet_dependence(correlation.as_ref(), &edges, width),
-                "poet_factor",
-                0.985,
-            ),
-            5 => (
-                vine_dependence(correlation.as_ref(), &edges, width),
-                "truncated_c_vine",
-                0.99,
-            ),
-            6 => (
-                Dependence::Mixture {
-                    weights: vec![0.5, 0.5],
-                    components: vec![
-                        Dependence::ChowLiu {
-                            root: 0,
-                            edges: edges.clone(),
-                        },
-                        Dependence::Triangular {
-                            terms: triangular_terms.clone(),
-                        },
-                    ],
-                },
-                "two_component_copula_mixture",
-                0.99,
-            ),
-            _ => unreachable!("bounded dependence family"),
-        };
+        let (dependence, dependence_name, dependence_fidelity) = candidate_dependence(
+            dependence_family, width, correlation.as_ref(), &edges, &triangular_terms);
         let (target_name, target_model, (noise, _)) = &target_models[target_index];
         let mut kernel = seed_kernel.clone();
         kernel.marginals = marginals.clone();
