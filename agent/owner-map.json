@@ -482,6 +482,19 @@
     "tests/vnext_byte_allocation.rs": "rust-core",
     "tests/vnext_native_successors.rs": "rust-core",
     "tests/vnext_public_demo.rs": "rust-core",
-    "tests/fixtures/vnext-successors/development-calibration-v1.json": "rust-core"
+    "tests/fixtures/vnext-successors/development-calibration-v1.json": "rust-core",
+    "rust/compiler/candidate_dependence.rs": "rust-core",
+    "rust/embedding/encoder_capability.rs": "rust-core",
+    "rust/embedding/frozen_tests.rs": "rust-core",
+    "rust/embedding/frozen_transform.rs": "rust-core",
+    "rust/evidence/geometry.rs": "rust-core",
+    "rust/fitness/tests.rs": "rust-core",
+    "tests/fixtures/vnext-successors/frozen-geometry-v1.json": "rust-core",
+    "tests/vnext_geometry_binding.rs": "rust-core",
+    "docs/whitepaper/scripts/rust_closure.py": "governance",
+    "docs/whitepaper/scripts/test_rust_closure.py": "governance",
+    "research/benchmark/review_fixes/test_receipt_unknown_method.py": "external-evidence",
+    "research/transfer/geometry_distributions.py": "external-evidence",
+    "research/transfer/tests/test_geometry_distributions.py": "external-evidence"
   }
 }

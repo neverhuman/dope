@@ -12,7 +12,8 @@ starts a late package transaction. `test-cpu-tool-readiness.sh` exercises each
 missing-tool refusal against the real CPU entry, before any build or replay.
 `just check` adds Clippy with warnings denied, the Rust CLI fixtures, and the
 raw-schema, raw-workflow, artifact-only, installer, byte-allocation, native
-successor, and public-demo Rust integration suites. Hosted CPU retains full
+successor, public-demo, and frozen-geometry binding Rust integration suites.
+Hosted CPU retains full
 locked Cargo test discovery, which also executes every one of these suites.
 Local fast/check and hosted CPU run the six bounded public-demo regressions in
 `research.benchmark.tests.test_public_demo`: frozen source admission, disjoint
@@ -32,6 +33,11 @@ are installed. Temporary files stay in `target/transfer-test-tmp`, and native
 learner fixtures use one CPU thread. These fixtures preserve identity, coverage,
 statistics and adapter contracts; they do not qualify official vendor weights
 or a protected scientific campaign. Local fast/check retain their full discovery.
+Local fast/check also run the bounded Rust include-closure fixture against the
+actual fitter. Old and split module layouts must produce the same architecture
+macros; missing, escaping, symlinked or conflicting constants fail closed.
+Hosted paper-script discovery retains that fixture, and the CPU review-fix
+entry includes the unknown-method and duplicate-identity receipt regressions.
 `just security` scans secrets, dependencies, workflow syntax, and writes an
 SPDX SBOM. `just score` regenerates Python boundary evidence, then runs the
 full pinned Jankurai audit.

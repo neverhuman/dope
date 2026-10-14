@@ -26,6 +26,7 @@ fast: native-guard-check
     PYTHONPATH=src python3 -m pytest -q tests
     python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
     python3 -B -m unittest research.benchmark.tests.test_public_demo -q
+    PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_rust_closure -q
 
 focus filter:
     cargo check -p dope-kernel --locked
@@ -39,7 +40,7 @@ check: fast
     bash ops/ci/check-contracts.sh
     cargo clippy --all-targets --locked -- -D warnings
     cargo test --locked --test rust_cli
-    cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo
+    cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo --test vnext_geometry_binding
     git diff --check
 
 security:

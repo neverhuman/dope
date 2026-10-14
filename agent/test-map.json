@@ -1667,7 +1667,7 @@
     },
     "research/transfer/geometry.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify qualified complete byte-cap outcomes with full denominators, measured frontier censoring, frozen scaler content commitments and same-entity exclusion; measured calibration remains unqualified without admissible evidence"
+      "purpose": "verify private-content recomputation and digest-only public commitments, matched same-entity-excluding distances with state identities, Euclidean role distributions and honestly unmeasured ECDF bands; empirical geometry does not qualify transfer, privacy or independent fit units"
     },
     "research/transfer/objectives.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1711,7 +1711,7 @@
     },
     "research/transfer/tests/test_geometry.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify qualified complete byte-cap outcomes with full denominators, measured frontier censoring, frozen scaler content commitments and same-entity exclusion; measured calibration remains unqualified without admissible evidence"
+      "purpose": "verify private-content recomputation and digest-only public commitments, matched same-entity-excluding distances with state identities, Euclidean role distributions and honestly unmeasured ECDF bands; empirical geometry does not qualify transfer, privacy or independent fit units"
     },
     "research/transfer/tests/test_interactions.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1952,6 +1952,58 @@
     "tests/fixtures/vnext-successors/development-calibration-v1.json": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
       "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/candidate_dependence.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/embedding/encoder_capability.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/embedding/frozen_tests.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/embedding/frozen_transform.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/evidence/geometry.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/fitness/tests.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "tests/fixtures/vnext-successors/frozen-geometry-v1.json": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "tests/vnext_geometry_binding.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "docs/whitepaper/scripts/rust_closure.py": {
+      "command": "PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_rust_closure -v",
+      "purpose": "verify identical architecture macros from old and split real fitter layouts, declared include closure coverage and missing/escape/symlink/conflicting constant refusals; mandatory local fast/check and hosted paper-script discovery"
+    },
+    "docs/whitepaper/scripts/test_rust_closure.py": {
+      "command": "PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_rust_closure -v",
+      "purpose": "verify identical architecture macros from old and split real fitter layouts, declared include closure coverage and missing/escape/symlink/conflicting constant refusals; mandatory local fast/check and hosted paper-script discovery"
+    },
+    "research/benchmark/review_fixes/test_receipt_unknown_method.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_receipt_unknown_method -v",
+      "purpose": "verify unknown ledger/request methods and duplicate scientific identities fail instead of being silently skipped; required hosted CPU review-fix entry"
+    },
+    "research/transfer/geometry_distributions.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify matched cloud cardinality and explicit real-real reference, descriptive flat ECDFs with unverified caller counts, development pointwise ECDF bands resampling whole declared fit clusters with deterministic seed/quantiles and degenerate/insufficient/static-error refusals; frozen private/public state wire and scientific qualification remain unchanged"
+    },
+    "research/transfer/tests/test_geometry_distributions.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify matched cloud cardinality and explicit real-real reference, descriptive flat ECDFs with unverified caller counts, development pointwise ECDF bands resampling whole declared fit clusters with deterministic seed/quantiles and degenerate/insufficient/static-error refusals; frozen private/public state wire and scientific qualification remain unchanged"
     }
   }
 }
