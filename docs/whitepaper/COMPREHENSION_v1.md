@@ -1,6 +1,6 @@
-# Page-1 comprehension check, version 1 (frozen before review)
+# Page-1 comprehension check, version 1 (frozen before grading)
 
-This check is frozen before any reviewer sees the rendered page 1 of the current source. It tests whether page 1 (title, abstract and Figure 1) communicates the paper. It is a readability gate, not evidence that any result is valid. Once a score is seen, nothing here changes; any successor is a new file with a new version number, and the scores under both versions are reported.
+This check was committed in `67cd15b` (2026-10-14T19:54Z), before any score under it and before any render of the source it grades. It was not frozen before every reviewer saw page 1: the author and the paper reviewer (`dope_paper_grok`, at 19:50Z) had already seen page 1 of the earlier render `ebf8e8e`. Neither of them may act as the reader; the reviewer may still score. This amendment corrects that statement and one file reference only, and the procedure, questions, answer key and pass rule are unchanged from `67cd15b`. It tests whether page 1 (title, abstract and Figure 1) communicates the paper. It is a readability gate, not evidence that any result is valid. Once a score is seen, nothing here changes; any successor is a new file with a new version number, and the scores under both versions are reported.
 
 ## Procedure
 
@@ -23,4 +23,4 @@ This check is frozen before any reviewer sees the rendered page 1 of the current
 - **Pass:** at least four correct answers, Q3 and Q5 both correct, and no answer that claims superiority over TabSyn, equivalence, privacy, or a general knowledge or intelligence measure.
 - **Fail:** anything else. A fail triggers a page-1 redesign (figure, caption or abstract wording) and a fresh reader. It never triggers a weaker key.
 
-Wording, figure and caption changes made after a fail must keep every number generated and every claim inside `claim-registry.json`.
+Wording, figure and caption changes made after a fail must keep every number generated and every claim inside the registry in `docs/whitepaper/scripts/claim_registry.py`.
