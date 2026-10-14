@@ -44,9 +44,11 @@ class PublicFetchTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=fetch_pmlb.REPO / 'target') as directory:
             with patch.object(fetch_jope.subprocess, 'run') as run:
                 for profile in (None, 'user-supplied'):
-                    fetch_jope.fetch_object('fixture', Path(directory) / 'data.csv', profile)
+                    fetch_jope.fetch_object('fixture', Path(directory) / 'data.csv', profile,
+                                            bucket='explicit-fixture-bucket')
                     command = run.call_args.args[0]
                     self.assertEqual('--profile' in command, profile is not None)
+                    self.assertIn('s3://explicit-fixture-bucket/fixture', command)
 
 
 if __name__ == '__main__':
