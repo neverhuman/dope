@@ -6,6 +6,7 @@ does not create a shared geometry claim. Unbiased MMD-squared is unclipped.
 
 from __future__ import annotations
 
+from types import MappingProxyType
 import math
 
 import numpy as np
@@ -65,7 +66,11 @@ def ecdf(values, *, space: str) -> dict:
     return {"space": space, "values": values, "probabilities": tuple((index + 1) / n for index in range(n))}
 
 
-def nearest_neighbor_cardinality(reference, query, *, reference_entities, query_entities) -> tuple:
+def other_entity_row_count(reference, query, *, reference_entities, query_entities):
+    """Count reference rows with a different entity. Coordinates are not distances.
+
+    The result is not a nearest-neighbor statistic and not a privacy result.
+    """
     reference = np.asarray(reference, float)
     query = np.asarray(query, float)
     reference_entities = tuple(reference_entities)
@@ -85,7 +90,12 @@ def nearest_neighbor_cardinality(reference, query, *, reference_entities, query_
                 continue
             eligible += 1
         counts.append(eligible)
-    return tuple(counts)
+    return MappingProxyType({
+        "estimand": "other_entity_row_count",
+        "counts": tuple(counts),
+        "nearest_neighbor": False,
+        "privacy_result": False,
+    })
 
 
 def null_cloud(rows: int, width: int, seed: int):
@@ -101,13 +111,19 @@ def fit_minmax(rows) -> tuple:
     return (float(rows.min()), float(rows.max()))
 
 
-def shared_geometry_claim(scalers) -> dict:
+def shared_geometry_claim(scalers, *, frozen_id=None) -> dict:
+    """Equal fit ranges are not a shared scaler. One supplied frozen identity is."""
     scalers = tuple(scalers)
     if not scalers:
         raise ValueError("missing scalers")
-    if len(set(scalers)) != 1:
-        return {"shared_geometry": False, "reason": "per_table_refit"}
-    return {"shared_geometry": True, "reason": "common_frozen_scaler"}
+    if frozen_id is not None:
+        if type(frozen_id) is not str or not frozen_id:
+            raise ValueError("invalid frozen scaler")
+        if all(scaler == frozen_id for scaler in scalers):
+            return {"shared_geometry": True, "reason": "common_frozen_scaler"}
+    if len(set(scalers)) == 1:
+        return {"shared_geometry": False, "reason": "equal_ranges"}
+    return {"shared_geometry": False, "reason": "per_table_refit"}
 
 
 def real_real_calibration(*, orientation: str, scale: float, floor: float) -> dict:
