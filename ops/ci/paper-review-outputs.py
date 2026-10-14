@@ -61,10 +61,13 @@ class AuthenticatedPaperBuild:
     expected: tuple
     _admission: object = field(repr=False)
     auxiliary_expected: tuple = ()
+    source_identity: tuple = ()
 
     def revalidate(self):
         if self._admission is not _ADMISSION or self.root != REPO:
             raise ValueError('invalid paper build context')
+        if source_identity(self.inputs + self.code) != self.source_identity:
+            raise ValueError('stale paper build source identity')
         for name, raw in self.inputs + self.code + self.consumed:
             if safe_bytes(self.root, name) != raw:
                 raise ValueError('stale paper build context')
@@ -79,6 +82,14 @@ def safe_bytes(root, name):
     if path.resolve() != root.resolve() / name or path.is_symlink():
         raise ValueError('redirected paper build dependency')
     return path.read_bytes()
+
+
+def source_identity(files):
+    identity = []
+    for name, _ in files:
+        stat = (REPO / name).stat(follow_symlinks=False)
+        identity.append((name, stat.st_dev, stat.st_ino, stat.st_ctime_ns))
+    return tuple(identity)
 
 
 def validate_graph(graph, files):
@@ -122,10 +133,11 @@ def authenticated(path, digest, size=None):
     return raw
 
 
-def _authenticated_graph():
+def _load_authenticated_graph():
     if not GRAPH.is_file():
         raise ValueError('paper build requires a declared graph')
-    lock = json.loads(authenticated(LOCK, LOCK_SHA256))
+    lock_raw = authenticated(LOCK, LOCK_SHA256)
+    lock = json.loads(lock_raw)
     if lock.get('format') != 'dope-paper-review-inputs-v1':
         raise ValueError('invalid review paper input lock')
     files = lock['files']
@@ -150,36 +162,58 @@ def _authenticated_graph():
     validate_graph(graph, files)
     for entry in graph['scripts']:
         safe_bytes(REPO, entry['path'])
+    return graph, inputs, lock_raw
+
+
+def _authenticated_graph():
+    graph, inputs, lock_raw = _load_authenticated_graph()
+    replay_graph(graph, inputs)
+    return graph, inputs, lock_raw
+
+
+def replay_graph(graph, inputs):
     replayed = set()
+    required_panels = {CONTROL_RENDERER: CONTROL_PANEL, FIDELITY_RENDERER: FIDELITY_PANEL,
+                       V2_RENDERER: V2_PANEL, V2_FAMILY_RENDERER: V2_FAMILY}
     for entry in graph['scripts']:
-        args = entry.get('args', [])
-        if len(args) != 2 or args[0] != '--from-panel' or args[1] not in files:
-            raise ValueError('review renderer requires one independently pinned public panel')
-        if entry['path'] == CONTROL_RENDERER:
-            if args[1] != CONTROL_PANEL or CONTROL_LEDGER not in inputs:
+        panel = entry['args'][1]
+        renderer = entry['path']
+        if renderer in required_panels and panel != required_panels[renderer]:
+            raise ValueError('review renderer requires its own independently pinned panel')
+        if renderer == CONTROL_RENDERER:
+            if CONTROL_LEDGER not in inputs:
                 raise ValueError('control renderer requires the pinned scalar ledger and panel')
-            authenticated_controls(inputs)
-        panel = args[1]
-        if panel in replayed:
-            continue
-        if panel == PRIVACY_PANEL:
-            authenticated_bound(inputs, 'privacy')
-        elif panel == TABSYN_PANEL:
-            authenticated_bound(inputs, 'tabsyn')
-        elif entry['path'] == FIDELITY_RENDERER:
-            if panel != FIDELITY_PANEL:
-                raise ValueError('fidelity renderer requires the pinned fidelity panel')
-            authenticated_fidelity(inputs)
-        elif entry['path'] == V2_RENDERER:
-            if panel != V2_PANEL:
-                raise ValueError('v2 renderer requires the pinned v2 panel')
-            authenticated_v2(inputs)
-        elif entry['path'] == V2_FAMILY_RENDERER:
-            if panel != V2_FAMILY or V2_PANEL not in inputs:
+            kind = 'controls'
+        elif renderer == FIDELITY_RENDERER:
+            kind = 'fidelity'
+        elif renderer == V2_RENDERER:
+            kind = 'v2'
+        elif renderer == V2_FAMILY_RENDERER:
+            if V2_PANEL not in inputs:
                 raise ValueError('v2 family renderer requires the pinned family file and v2 panel')
+            kind = 'v2-family'
+        elif panel == PRIVACY_PANEL:
+            kind = 'privacy'
+        elif panel == TABSYN_PANEL:
+            kind = 'tabsyn'
+        else:
+            continue
+        # Only identical reducer contracts may share a replay. A generic or
+        # differently bound renderer cannot mark another reducer as complete.
+        key = (kind, panel)
+        if key in replayed:
+            continue
+        if kind == 'controls':
+            authenticated_controls(inputs)
+        elif kind in ('privacy', 'tabsyn'):
+            authenticated_bound(inputs, kind)
+        elif kind == 'fidelity':
+            authenticated_fidelity(inputs)
+        elif kind == 'v2':
+            authenticated_v2(inputs)
+        else:
             authenticated_v2_family(inputs)
-        replayed.add(panel)
-    return graph, inputs
+        replayed.add(key)
 
 
 def authenticated_graph():
@@ -230,16 +264,16 @@ def consumed_snapshot(declared):
 
 def authenticate_build(*, log_directory=None):
     code = code_snapshot()
-    graph, inputs = _authenticated_graph()
+    graph, inputs, lock_raw = _load_authenticated_graph()
     declared = validate_graph(graph, inputs)
     consumed = consumed_snapshot(declared)
     has_headline = 'docs/whitepaper/generated/v2-headline.json' in declared
     if has_headline:
         consumed += (('README.md', safe_bytes(REPO, 'README.md')),)
-    verified = AuthenticatedPaperBuild(REPO, json.dumps(graph).encode(),
-                                       tuple(sorted(inputs.items())) +
-                                       ((LOCK.relative_to(REPO).as_posix(), LOCK.read_bytes()),),
-                                       code, consumed, (), _ADMISSION)
+    captured_inputs = tuple(sorted(inputs.items())) + ((LOCK.relative_to(REPO).as_posix(), lock_raw),)
+    verified = AuthenticatedPaperBuild(REPO, json.dumps(graph).encode(), captured_inputs,
+                                       code, consumed, (), _ADMISSION,
+                                       source_identity=source_identity(captured_inputs + code))
     verified.revalidate()
     # Render once from captured inputs/code in an isolated target directory.
     # This gives expected bytes, rather than trusting hashes of caller outputs.
@@ -269,6 +303,20 @@ def authenticate_build(*, log_directory=None):
             result.check_returncode()
 
         with log_path.open('wb') as log:
+            # Numerical replay runs once from the same captured local code and
+            # inputs as rendering. No live imported reducer, cached module or
+            # caller-supplied authentication receipt is reused by the driver.
+            loader = (
+                "import importlib.util, pathlib, sys; "
+                "root=pathlib.Path(sys.argv[1]); "
+                "spec=importlib.util.spec_from_file_location('paper_admission',root/'ops/ci/paper-review-outputs.py'); "
+                "gate=importlib.util.module_from_spec(spec); sys.modules[spec.name]=gate; "
+                "spec.loader.exec_module(gate); "
+                "gate.LOCK=root/sys.argv[2]; gate.LOCK_SHA256=sys.argv[3]; "
+                "gate.authenticated_graph()"
+            )
+            run_renderer([sys.executable, '-B', '-c', loader, str(root),
+                          LOCK.relative_to(REPO).as_posix(), LOCK_SHA256], log)
             for entry in graph['scripts']:
                 prior = {name: safe_bytes(root, name) for name in review_inventory(root)}
                 if entry['check_args'] == ['--check-parser']:
@@ -297,7 +345,8 @@ def authenticate_build(*, log_directory=None):
                 raise ValueError('auxiliary renderer changed expected review inventory')
     verified.revalidate()
     return AuthenticatedPaperBuild(verified.root, verified.graph, verified.inputs,
-                                   verified.code, verified.consumed, expected, _ADMISSION, auxiliary)
+                                   verified.code, verified.consumed, expected, _ADMISSION, auxiliary,
+                                   verified.source_identity)
 
 
 def render_review_outputs(verified, *, check):

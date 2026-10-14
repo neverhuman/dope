@@ -398,6 +398,9 @@
     "research/transfer/locks/other-auditors.json": "external-evidence",
     "research/transfer/tests/test_kumo_tabular.py": "external-evidence",
     "research/transfer/tests/test_other_auditors.py": "external-evidence",
-    ".gitleaksignore": "governance"
+    ".gitleaksignore": "governance",
+    "docs/whitepaper/scripts/paper_build.py": "governance",
+    "docs/whitepaper/scripts/build_pdf.sh": "governance",
+    "research/benchmark/tests/test_paper_build_pipeline.py": "governance"
   }
 }

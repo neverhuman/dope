@@ -102,7 +102,7 @@ panel = json.loads((root / sys.argv[2]).read_text())
             with patch.object(GATE.subprocess, 'run') as render:
                 with patch('sys.argv', ['paper-review-outputs.py']):
                     with self.assertRaisesRegex(ValueError, reason):
-                        GATE.main()
+                        GATE.authenticated_graph()
                 render.assert_not_called()
             reduce.assert_not_called()
         self.assertEqual(self.output.read_bytes(), before)
@@ -171,18 +171,17 @@ panel = json.loads((root / sys.argv[2]).read_text())
             with patch.object(GATE.subprocess, 'run') as render:
                 with patch('sys.argv', ['paper-review-outputs.py']):
                     with self.assertRaisesRegex(ValueError, 'does not reproduce'):
-                        GATE.main()
+                        GATE.authenticated_graph()
                 render.assert_not_called()
             reduce.assert_called_once()
         self.assertEqual(self.output.read_bytes(), before)
 
-    def test_matching_scalar_panel_admits_emit(self):
+    def test_matching_scalar_panel_admits_the_graph(self):
         with patch('docs.whitepaper.scripts.review_controls.payload_from_cells',
                    return_value=self.panel_payload) as reduce:
-            with patch('sys.argv', ['paper-review-outputs.py']):
-                GATE.main()
+            self.assertEqual(GATE.authenticated_graph()['format'], 'dope-review-paper-build-v1')
             reduce.assert_called_once_with([scalar_cell()])
-        self.assertEqual(self.output.read_text(), 'paired=0\n')
+        self.assertEqual(self.output.read_text(), 'existing public table\n')
 
     def test_input_only_preflight_replays_without_emitting(self):
         before = self.output.read_bytes()

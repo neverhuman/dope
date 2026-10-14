@@ -478,8 +478,8 @@
       "purpose": "verify V1 package compatibility"
     },
     "Justfile": {
-      "command": "just fast",
-      "purpose": "verify local proof recipes"
+      "command": "just fast && python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v",
+      "purpose": "retain existing local fast proof and verify canonical paper/check driver wiring, legacy drift paths and independent paper-test/CPU input coverage"
     },
     ".github/": {
       "command": "just security",
@@ -1612,6 +1612,18 @@
     ".gitleaksignore": {
       "command": "gitleaks detect --source . --no-banner --redact",
       "purpose": "verify the exact historical public-source SHA256 exception while all other secret findings remain enforced"
+    },
+    "docs/whitepaper/scripts/paper_build.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v",
+      "purpose": "exercise canonical paper/build/check recipes, immutable admission, snapshot compiler inputs, authentication-only entry semantics, expected render inventories and four-PDF control flow with bounded fixtures"
+    },
+    "docs/whitepaper/scripts/build_pdf.sh": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v",
+      "purpose": "exercise canonical paper/build/check recipes, immutable admission, snapshot compiler inputs, authentication-only entry semantics, expected render inventories and four-PDF control flow with bounded fixtures"
+    },
+    "research/benchmark/tests/test_paper_build_pipeline.py": {
+      "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v",
+      "purpose": "exercise canonical paper/build/check recipes, immutable admission, snapshot compiler inputs, authentication-only entry semantics, expected render inventories and four-PDF control flow with bounded fixtures"
     }
   }
 }

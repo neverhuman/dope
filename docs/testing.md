@@ -19,10 +19,44 @@ supersedes the clean full gate.
 `just paper` regenerates every generated paper input, figure, README benchmark
 block, and PDF from committed, SHA-pinned ledgers; `just paper-check` verifies
 macros against those ledgers, figure hashes, the README block, and the build.
+Both recipes enter `paper_build.py` once after their existing legacy preparation
+and drift checks. The direct `build_pdf.sh` entry creates its own fresh admission.
+The independent unit gate is `just paper-tests`: it retains the entire former
+paper-script discovery suite, including the expensive committed-input replay,
+and adds the bounded pipeline/recipe regressions. Full paper validation requires
+both `just paper-tests` and `just paper-check`; moving the suite does not waive it.
+CPU CI runs that same required named gate with its provisioned V1 interpreter:
+`target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_*.py'`
+followed by
+`target/ci-python/bin/python -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v`.
+These replace the selective paper-script unittest calls in `ops/ci/cpu.sh`; the
+independent committed-input replay remains exactly once in that suite.
+The recipe fixture executes Just itself. CPU CI installs the repository's
+existing Just tool only if absent, within the same job and package-lock budget.
 `bash ops/ci/paper-clean.sh` is the CI form: it deletes `docs/whitepaper/generated`,
 runs `just paper`, and requires a zero diff. `bash ops/ci/check-review-fixes.sh`
 runs the review-fix and predeclare_v2 statistics, binder, and sealed-gate fixtures.
 `bash scripts/ci-local.sh cpu|security|audit` reproduces the hosted lanes locally.
+
+Admission captures the verified lock bytes without rereading them as a new pin.
+The driver replays reducers and renders expected bytes from captured code and
+inputs in one private snapshot child; different reducer contracts cannot share
+a completion merely because they use the same panel. TeX, anonymization, the
+architecture sidecar, and final paper checks consume a captured input tree under
+the lane's reused `target/paper-build`. Source identities are checked around
+children, including restored writes. This is trusted-driver control flow with
+one writer per private tree, not an OS sandbox against a principal able to modify
+that tree or substitute the interpreter, TeX installation, or loaded libraries.
+
+Fresh `--check` compares review/auxiliary bytes without rewriting them, then
+compiles all four PDFs and checks drift including the architecture outputs.
+A local receipt may report `status=passed` with `cold_budget=unmeasured`.
+CPU CI still has two independent full replays: the committed-input unit test
+and its standalone authenticated PDF entry. Broader unit coverage and stronger
+snapshot admission may affect that lane's cost. Canonical-driver fixture proof
+does not qualify either full CPU or paper job inside the unchanged 35-minute
+cap; setup, unit tests, compilation and drift need separately admitted measured
+job proof. The historical cancellation remains failed, without unchanged retry.
 
 The CPU PR lane is required. The scheduled GPU lane uses CUDA 12.8, libtorch
 2.7, and `CUBLAS_WORKSPACE_CONFIG=:4096:8`; it checks repeated training,

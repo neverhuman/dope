@@ -156,14 +156,17 @@ def auxiliary_outputs(verified, *, check, receipt):
     return verified
 
 
-def anonymous_sources(root):
-    from public_hardware import strip_journal_availability
+def anonymous_sources(root, *, paper):
+    spec = importlib.util.spec_from_file_location('paper_anonymity', paper / 'scripts/public_hardware.py')
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    strip_journal_availability = helper.strip_journal_availability
     old = ('\\author{Jepson Taylor$^1$, Alton Alexander$^1$\\\\[0.15cm]\n'
            '$^1$NEVERHUMAN Research}')
     new = '\\author{Anonymous\\\\[0.15cm]\nAffiliation withheld for review.}'
     paths = {}
     for stem in ('dope-mfs', 'supplement'):
-        text = (PAPER / f'{stem}.tex').read_text()
+        text = (paper / f'{stem}.tex').read_text()
         if text.count(old) != 1:
             raise ValueError('paper author marker is not unique')
         text = text.replace(old, new, 1)
@@ -188,36 +191,67 @@ def compile_pdfs(verified, receipt):
     root = REPO / 'target/paper-build'
     root.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ, SOURCE_DATE_EPOCH=os.environ.get('SOURCE_DATE_EPOCH', '1760000000'))
-    # Same serial lock and TeX flags as the original wrapper.
+    # Children consume captured bytes in a private input tree, never live
+    # manuscript or macro paths after a parent-only fingerprint check.
+    snapshot_repo = root / 'inputs' / receipt.directory.name
+    snapshot_paper = snapshot_repo / 'docs/whitepaper'
     with (REPO / 'target/paper-latex.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
-        verified.revalidate()
         validate_compiler_inputs()
+        for name, raw in (verified.inputs + verified.code + verified.consumed
+                          + verified.expected + verified.auxiliary_expected):
+            path = snapshot_repo / name
+            if path.resolve() != snapshot_repo.resolve() / name:
+                raise ValueError('redirected compiler snapshot')
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(raw)
+        # Refresh only this build's admitted inventory; stale source files in a
+        # reused snapshot are refused rather than silently fed to the children.
+        admitted = {name for name, _ in (verified.inputs + verified.code + verified.consumed
+                                        + verified.expected + verified.auxiliary_expected)}
+        derived = {'docs/whitepaper/' + stem + '.pdf' for stem in PDF_STEMS}
+        derived.update({'docs/whitepaper/' + stem + '.tex' for stem in PDF_STEMS if stem.endswith('-anonymous')})
+        derived.update({'docs/whitepaper/figures/architecture.pdf',
+                        'docs/whitepaper/generated/architecture-figure-hashes.json'})
+        unexpected = {p.relative_to(snapshot_repo).as_posix() for p in snapshot_repo.rglob('*')
+                      if p.is_file() and 'target' not in p.relative_to(snapshot_repo).parts}
+        if unexpected - admitted - derived:
+            raise ValueError('stale compiler snapshot inventory')
         run(['nice', '-n', '10', 'ionice', '-c', '3', 'pdflatex', f'-output-directory={root}',
              '-interaction=nonstopmode', '-halt-on-error', '-file-line-error',
-             '../../ops/ci/paper-architecture.tex'], receipt, cwd=PAPER, env=env)
-        verified.revalidate()
-        shutil.copyfile(root / 'paper-architecture.pdf', PAPER / 'figures/architecture.pdf')
+             '../../ops/ci/paper-architecture.tex'], receipt, cwd=snapshot_paper, env=env)
+        validate_compiler_inputs()
+        shutil.copyfile(root / 'paper-architecture.pdf', snapshot_paper / 'figures/architecture.pdf')
         sources = ('figures/architecture.tex', 'generated/numbers.tex', '../../ops/ci/paper-architecture.tex')
         payload = {'format': 'dope-paper-architecture-hashes-v1',
-                   'source_sha256': {name: hashlib.sha256((PAPER / name).read_bytes()).hexdigest() for name in sources},
-                   'pdf_sha256': {'architecture.pdf': hashlib.sha256((PAPER / 'figures/architecture.pdf').read_bytes()).hexdigest()}}
-        (PAPER / 'generated/architecture-figure-hashes.json').write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n')
-        anonymous = anonymous_sources(root)
+                   'source_sha256': {name: hashlib.sha256((snapshot_paper / name).read_bytes()).hexdigest() for name in sources},
+                   'pdf_sha256': {'architecture.pdf': hashlib.sha256((snapshot_paper / 'figures/architecture.pdf').read_bytes()).hexdigest()}}
+        (snapshot_paper / 'generated/architecture-figure-hashes.json').write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n')
+        anonymous_sources(snapshot_paper, paper=snapshot_paper)
         for stem in PDF_STEMS:
-            verified.revalidate()
             validate_compiler_inputs()
-            source = anonymous.get(stem, stem)
             run(['nice', '-n', '10', 'ionice', '-c', '3', 'latexmk', '-g', '-pdf',
                  '-usepretex=\\pdftrailerid{}\\pdfsuppressptexinfo=-1', f'-outdir={root}',
-                 '-interaction=nonstopmode', '-halt-on-error', '-file-line-error', str(source)],
-                receipt, cwd=PAPER, env=env)
-            verified.revalidate()
+                 '-interaction=nonstopmode', '-halt-on-error', '-file-line-error', stem],
+                receipt, cwd=snapshot_paper, env=env)
             validate_compiler_inputs()
             shutil.copyfile(root / f'{stem}.log', root / f'{stem}-3.log')
-            shutil.copyfile(root / f'{stem}.pdf', PAPER / f'{stem}.pdf')
+            shutil.copyfile(root / f'{stem}.pdf', snapshot_paper / f'{stem}.pdf')
+        logs = snapshot_repo / 'target/paper-build'
+        logs.mkdir(parents=True, exist_ok=True)
+        for name in ('paper-architecture.log', *(stem + '-3.log' for stem in PDF_STEMS)):
+            shutil.copyfile(root / name, logs / name)
         for stem in PDF_STEMS:
-            run(['pdfinfo', f'{stem}.pdf'], receipt, cwd=PAPER)
+            run(['pdfinfo', f'{stem}.pdf'], receipt, cwd=snapshot_paper)
+        validate_compiler_inputs()
+        # The original paper checks also run from captured code/data. No public
+        # compiler output is copied until all four PDFs and these checks pass.
+        run([sys.executable, '-B', str(snapshot_paper / 'scripts/check_paper.py')],
+            receipt, cwd=snapshot_repo)
+        validate_compiler_inputs()
+        for name in COMPILER_OUTPUTS:
+            shutil.copyfile(snapshot_repo / name, REPO / name)
+    return snapshot_repo
 
 
 def build_paper(*, check=False, pdf_only=False):
@@ -233,7 +267,6 @@ def build_paper(*, check=False, pdf_only=False):
     # Includes every legacy/review output; checks never repair drift by writing.
     receipt.stage('precompile-zero-drift', lambda: output_drift(receipt, before_compile=True))
     receipt.stage('all-four-pdfs', lambda: compile_pdfs(verified, receipt))
-    receipt.stage('paper-checks', lambda: run([sys.executable, '-B', str(PAPER / 'scripts/check_paper.py')], receipt))
     receipt.stage('postcompile-zero-drift', lambda: output_drift(receipt))
     def final_identity():
         verified.revalidate()

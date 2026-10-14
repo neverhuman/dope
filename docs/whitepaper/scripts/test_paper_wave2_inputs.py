@@ -76,7 +76,7 @@ class Wave2EmitTests(unittest.TestCase):
                 patch('docs.whitepaper.scripts.review_fidelity.payload_from_inputs') as fidelity, \
                 patch.object(GATE.subprocess, 'run') as emit, patch('sys.argv', ['paper-review-outputs.py']):
             with self.assertRaisesRegex(ValueError, reason):
-                GATE.main()
+                GATE.authenticated_graph()
             replay.assert_not_called(); fidelity.assert_not_called(); emit.assert_not_called()
         self.assertEqual(self.output.read_bytes(), before)
 
@@ -116,7 +116,7 @@ class Wave2EmitTests(unittest.TestCase):
                 with patch('research.benchmark.review_fixes.bind_review_cells.replay', return_value={'ok': False}), \
                         patch.object(GATE.subprocess, 'run') as emit, patch('sys.argv', ['paper-review-outputs.py']):
                     with self.assertRaisesRegex(ValueError, 'does not reproduce'):
-                        GATE.main()
+                        GATE.authenticated_graph()
                     emit.assert_not_called()
 
 
