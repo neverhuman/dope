@@ -1639,7 +1639,7 @@
     },
     "ops/ci/cpu.sh": {
       "command": "just fast && just check",
-      "purpose": "retain all product/native/paper CPU checks and add complete offline transfer fixture discovery after provisioned dependencies; same full suite runs in local fast/check with no exclusions"
+      "purpose": "verify tool readiness before all product/native/paper CPU checks and complete offline transfer discovery; provision guest tools early without late apt transactions or changed budgets"
     },
     "docs/merge-guard.md": {
       "command": "just native-guard-check",
@@ -1652,6 +1652,154 @@
     "ops/ci/prepare-merge-guard.sh": {
       "command": "just native-guard-check",
       "purpose": "prepare both full locked graphs before mandatory offline feature, workspace, dependency and checksum boundary proofs; CPU uses the same bounded setup"
+    },
+    "research/transfer/allocation.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/drivers.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/frontier.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/geometry.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/objectives.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/privacy/attacks.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/privacy/controls.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/privacy/policy.json": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/probes.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/selection_regret.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/stress/__init__.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/stress/interactions.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_drivers.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_frontier.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_geometry.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_interactions.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_objectives.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_privacy.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "schemas/privacy-evidence-v1.schema.json": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "schemas/transfer-bound-v1.schema.json": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "docs/native-workflow.md": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "rust/main.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "rust/main/cli/part_01.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "rust/sample/part_02.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "rust/typed_data/isolation.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "rust/typed_data/workflow.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "scripts/install-native.sh": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "tests/vnext_artifact_only.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "tests/vnext_native_install.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "tests/vnext_raw_workflow.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "ops/ci/test-cpu-tool-readiness.sh": {
+      "command": "bash ops/ci/test-cpu-tool-readiness.sh",
+      "purpose": "run each missing-tool refusal against the real CPU entry and verify no build/replay starts; required in fast/check and hosted CPU"
+    },
+    "research/transfer/raw_profile.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "retain full transfer suite including native raw byte-profile charge, carrier limits and truthful unverified digest/closure states"
+    },
+    "research/transfer/tests/test_raw_profile.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "retain full transfer suite including native raw byte-profile charge, carrier limits and truthful unverified digest/closure states"
+    },
+    "docs/whitepaper/claim-registry.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
+      "purpose": "bind abstract claims to exact estimands/macros/states and reject evidence, number, wording and registration drift; retained in full paper-tests/CPU discovery"
+    },
+    "docs/whitepaper/scripts/claim_registry.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
+      "purpose": "bind abstract claims to exact estimands/macros/states and reject evidence, number, wording and registration drift; retained in full paper-tests/CPU discovery"
+    },
+    "docs/whitepaper/scripts/test_claim_registry.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
+      "purpose": "bind abstract claims to exact estimands/macros/states and reject evidence, number, wording and registration drift; retained in full paper-tests/CPU discovery"
+    },
+    "docs/whitepaper/scripts/test_hero_figure.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_hero_figure.py' -v",
+      "purpose": "verify page-one predictive-structure hero carries exact byte and paired-auditor evidence, stable rendering and omission refusal"
     }
   }
 }

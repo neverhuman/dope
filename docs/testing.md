@@ -5,6 +5,11 @@
 while editing; it never replaces the full CPU PR lane.
 The CPU workflow pins sccache and preserves the lane's Cargo target cache to
 shorten repeated locked checks. Local builds reuse their worktree target.
+CPU guest setup installs Rust, Just, TeX, Poppler, and ripgrep in its existing
+early package transaction, retaining the 300-second package-lock wait and
+35-minute job budget. `cpu.sh` checks all required tools before tests and never
+starts a late package transaction. `test-cpu-tool-readiness.sh` exercises each
+missing-tool refusal against the real CPU entry, before any build or replay.
 `just check` adds Clippy with warnings denied and the Rust CLI fixtures.
 The native guard's required fast/check and CPU routes share
 `ops/ci/prepare-merge-guard.sh`: explicit locked full-graph metadata preparation
@@ -43,8 +48,8 @@ followed by
 `target/ci-python/bin/python -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v`.
 These replace the selective paper-script unittest calls in `ops/ci/cpu.sh`; the
 independent committed-input replay remains exactly once in that suite.
-The recipe fixture executes Just itself. CPU CI installs the repository's
-existing Just tool only if absent, within the same job and package-lock budget.
+The recipe fixture executes Just itself. CPU CI provisions the repository's
+existing Just tool with the other tools before the test stage.
 The real recipe regression lives in `test_paper_packaging.py`, so that required
 paper-script discovery invokes it exactly once after CPU provisions Just.
 The benchmark boundary's full discovery retains the bounded driver tests;

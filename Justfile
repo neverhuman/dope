@@ -19,6 +19,7 @@ native-guard-check:
     cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard
 
 fast: native-guard-check
+    bash ops/ci/test-cpu-tool-readiness.sh
     cargo fmt --all -- --check
     cargo check -p dope-kernel --locked
     cargo test --locked --lib
