@@ -50,7 +50,7 @@ class DenominatorViewTests(unittest.TestCase):
         linear = view.denominator_rows(_fixture(), "linear")
         self.assertEqual([row["informative"] for row in linear], [5])
         lines = view.denominator_lines(_fixture(), panel.fmt, panel.tex_name)
-        self.assertEqual(lines[0], "ForestDiffusion/Forest-Flow & native\\_selected & 4$n$ & 6 & 0 & 0 & 0 & 0 & 0 & --- \\\\")
+        self.assertEqual(lines[0], "Forest-Flow & native selected & 4$n$ & 6 & 0 & 0 & 0 & 0 & 0 & --- \\\\")
         table = longtable("Denominators. No Holm family.", view.HEADER, lines, view.ALIGN)
         self.assertIn("Informative & \\shortstack[r]{Complete-\\\\loss rows} & \\shortstack[r]{Non-\\\\informative}", table)
         self.assertEqual(panel._nfields(view.HEADER), len(view.ALIGN))
@@ -101,8 +101,8 @@ class DenominatorViewTests(unittest.TestCase):
             with patch.object(panel, "GENERATED", out), patch.object(panel, "_figure", lambda points: None):
                 panel.emit_tex(json.loads((panel.RESULTS / PANEL_NAME).read_text()))
             denominator = (out / "review-denominator.tex").read_text()
-            self.assertIn("ForestDiffusion/Forest-Flow & native\\_selected & 4$n$ & 6 & 0 &", denominator)
-            self.assertIn("DOPE & features12\\_steps2048 & 4$n$ & 97 & 98 &", denominator)
+            self.assertIn("Forest-Flow & native selected & 4$n$ & 6 & 0 &", denominator)
+            self.assertIn("DOPE & DOPE profile & 4$n$ & 97 & 98 &", denominator)
             for written in sorted(out.glob("review-*.tex")):
                 if written.name != "review-denominator.tex":
                     self.assertEqual(written.read_bytes(), (generated / written.name).read_bytes(), written.name)

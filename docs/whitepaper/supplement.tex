@@ -165,7 +165,7 @@ Method & Criterion & Data used & Budget \\
 \midrule
 DOPE & Profile compared with three alternatives by validation retention at fit seed $11$; the deciding rule has no contemporaneous record. Compile search keeps the smallest gate shortfall, then the smallest artifact. & Profile comparison: validation cut of every lineage, all three auditors. Compile search reads fit rows only. & At most twelve inputs, width 16, $2{,}048$ steps, five fit seeds. \\
 DOPE untuned default & No selection. & Fit rows only. & Trainer default, five fit seeds. \\
-Gaussian copula & Held-out mean log density. Copulas $0.14.1$ \texttt{Gaussian\-Multivariate}. & Validation cut, distinct from the retention auditors. & One library configuration. \\
+Gaussian copula & Held-out mean log density. Copulas $0.14.1$ Gaussian multivariate model. & Validation cut, distinct from the retention auditors. & One library configuration. \\
 CTGAN & Mean of linear and MLP training-mean skill. & The validation rows and the two auditors used at scoring. & Author implementation; stopped runs omitted. \\
 TVAE & Same skill as CTGAN. & Same rows and auditors as CTGAN. & Author implementation; stopped runs omitted. \\
 Chow--Liu & Native: held-out mean log density over a fixed trial set. Default: no search. & Native: validation cut. Default: fit view, eight bins, Laplace smoothing $1.0$. Written for this comparison. & Fixed trial set. \\

@@ -37,6 +37,14 @@ class HeroFigureTests(unittest.TestCase):
                      for label in axis.texts if label.get_visible() and label.get_text().strip()]
             captured["overlaps"] = [(a, b) for i, (a, box) in enumerate(boxes) for b, other in boxes[i + 1:]
                                     if box.overlaps(other)]
+            # Tick labels drawn inside each axis's view must not run into each other either.
+            ticks = []
+            for axis in figure.axes:
+                low, high = axis.get_xlim()
+                drawn = [(label.get_text(), label.get_window_extent(renderer)) for tick, label in
+                         zip(axis.get_xticks(), axis.get_xticklabels()) if min(low, high) <= tick <= max(low, high)]
+                ticks += [(a, b) for i, (a, box) in enumerate(drawn) for b, other in drawn[i + 1:] if box.overlaps(other)]
+            captured["tick_overlaps"] = ticks
             return original(figure, path, dpi)
 
         with tempfile.TemporaryDirectory() as tmp, mock.patch.object(v2_figures, "_save", save):
@@ -50,7 +58,19 @@ class HeroFigureTests(unittest.TestCase):
         self.assertEqual(small, [])
         self.assertEqual(drawn["outside"], [])
         self.assertEqual(drawn["overlaps"], [])
+        self.assertEqual(drawn["tick_overlaps"], [])
         self.assertGreater(len(drawn["texts"]), 40)
+
+    def test_no_hero_value_label_is_needed_because_every_point_sits_inside_the_window(self):
+        """A value printed at the window edge would cover part of its interval, so the window holds every point."""
+        left, right = v2_figures.TEASER_X_LIM
+        for arm in self.headline["arms"]:
+            if arm["code"] in v2_figures.HERO_OMITTED_ROWS or arm not in v2_figures._rows(self.headline):
+                continue
+            for auditor, _ in v2_figures.AUDITORS:
+                row = arm["contrasts"][auditor]
+                if row is not None:
+                    self.assertTrue(left <= row["hl"] <= right, (arm["code"], auditor, row["hl"]))
 
     def test_results_pareto_keeps_the_floor_without_overlapping_labels(self):
         """The paper's Pareto figure prints at the text width; the README PNG keeps its own drawing."""

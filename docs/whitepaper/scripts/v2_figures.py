@@ -48,7 +48,7 @@ CONTROL = "#A8A8A8"
 BAND = "#D6D6D6"
 CAP = 10240
 FULL_PANEL = 90
-FOREST_TICKS = (-0.2, 0.0, 0.2, 0.4)
+FOREST_TICKS = (0.0, 0.3, 0.6)
 # Readability floor for the page-1 hero at its printed size (ledger C053).
 HERO_MIN_POINTS = 7.0
 HERO_HEIGHT_IN = 2.8

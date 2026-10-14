@@ -10,11 +10,15 @@ import hashlib
 import io
 import json
 import math
+import sys
 from collections import defaultdict
 from pathlib import Path
 from statistics import mean, median
 
 REPO = Path(__file__).resolve().parents[3]
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+from research.benchmark.review_fixes.display_names import display  # noqa: E402
 SOURCES = {
     "tabsyn": ("tabsyn-eight-lineage-validation/panel.json", "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"),
     "tabddpm": ("tabddpm-twelve-lineage-retained-validation/panel.json", "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"),
@@ -194,7 +198,7 @@ def build(docs):
 def render_table(data):
     lines=[r"\begin{tabular}{@{}lp{8.7cm}l@{}}",r"\toprule",r"Method & Published measured coverage & Remaining campaign \\",r"\midrule"]
     for row in data["rows"]:
-        lines.append(row["method"]+" & "+row["coverage"]+" & Pending "+r"\\")
+        lines.append(display(row["method"])+" & "+row["coverage"]+" & Pending "+r"\\")
     return "\n".join(lines+[r"\bottomrule",r"\end{tabular}",""])
 
 
