@@ -1,9 +1,21 @@
 fn fit_noise(
     table: &Table,
     completed: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    target: &Target,
+    task: Task,
+) -> (Noise, &'static str) {
+    fit_noise_bounded(table, completed, screen, target, task, 4, None)
+}
+
+fn fit_noise_bounded(
+    table: &Table,
+    completed: &[Vec<f32>],
     _screen: &[(usize, f32)],
     target: &Target,
     task: Task,
+    support: usize,
+    capacity: Option<CapacityRefinement>,
 ) -> (Noise, &'static str) {
     let mut linear = Vec::with_capacity(table.rows);
     let mut probabilities = Vec::with_capacity(table.rows);
@@ -57,7 +69,7 @@ fn fit_noise(
             "full_fit_binary_calibration_unqualified",
         );
     }
-    let oof = oof_residual_view(table, completed, target);
+    let oof = oof_residual_view_capacity(table, completed, target, capacity);
     let fitting_rule = residual_rule(target, table.rows, oof.is_some());
     let (residual_table, residuals) = oof.unwrap_or_else(|| {
         (
@@ -79,7 +91,7 @@ fn fit_noise(
     let residual_screen = target_screen(&residual_table.columns, &residuals);
     let selected: Vec<_> = residual_screen
         .iter()
-        .take(4)
+        .take(support)
         .map(|(feature, _)| *feature)
         .collect();
     let basis: Vec<_> = selected
@@ -93,6 +105,14 @@ fn fit_noise(
         .map(|value| value.ln() + 0.635_181_4)
         .collect();
     let (intercept, coefficients) = fit_basis_coefficients(&log_residuals, &basis, false);
+    if support == 0 {
+        return (
+            Noise::Homoscedastic {
+                sigma: intercept.exp().clamp(minimum_sigma, maximum_sigma),
+            },
+            fitting_rule,
+        );
+    }
     (
         Noise::Heteroscedastic {
             intercept,

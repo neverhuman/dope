@@ -1,4 +1,6 @@
-type CandidateSpec = (usize, u8, usize, u8, f64);
+// The final coordinate chooses an executed capacity profile; zero preserves
+// the historical fixed fits. Nonzero profiles are development-only refinements.
+type CandidateSpec = (usize, u8, usize, u8, f64, u8);
 
 /// Keep the same beam/encode budget but give target/dependence families a
 /// round-robin opportunity before more precision/knots within a family.
@@ -38,7 +40,7 @@ mod allocation_tests {
         for family in 0..7 {
             for target in 0..6 {
                 for bits in [4, 8, 16] {
-                    specs.push((0, family, target, bits, 0.0));
+                    specs.push((0, family, target, bits, 0.0, 0));
                 }
             }
         }

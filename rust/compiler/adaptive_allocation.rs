@@ -26,6 +26,7 @@ impl AdaptiveAllocation {
             b.4.total_cmp(&a.4)
                 .then_with(|| a.0.cmp(&b.0))
                 .then_with(|| a.3.cmp(&b.3))
+                .then_with(|| capacity_order(a.5).cmp(&capacity_order(b.5)))
         });
         let mut groups =
             BTreeMap::<AllocationFamily, std::collections::VecDeque<CandidateSpec>>::new();
@@ -34,7 +35,7 @@ impl AdaptiveAllocation {
         }
         let baseline_family = (baseline.1, baseline.2);
         if let Some(group) = groups.get_mut(&baseline_family) {
-            group.retain(|spec| (spec.0, spec.3) != (baseline.0, baseline.3));
+            group.retain(|spec| (spec.0, spec.3, spec.5) != (baseline.0, baseline.3, baseline.5));
             group.push_front(baseline);
         }
         let mut families = groups.keys().copied().collect::<Vec<_>>();
@@ -169,13 +170,13 @@ mod adaptive_allocation_tests {
 
     fn specs() -> Vec<CandidateSpec> {
         (0..3)
-            .flat_map(|family| (0..3).map(move |knot| (knot, family, 0, 8, 0.0)))
+            .flat_map(|family| (0..3).map(move |knot| (knot, family, 0, 8, 0.0, 0)))
             .collect()
     }
 
     #[test]
     fn encoded_feedback_changes_refinement_without_extra_offers_or_starvation() {
-        let mut search = AdaptiveAllocation::new(specs(), 6, 1729, (0, 0, 0, 8, 0.0));
+        let mut search = AdaptiveAllocation::new(specs(), 6, 1729, (0, 0, 0, 8, 0.0, 0));
         let mut first = std::collections::BTreeSet::new();
         for _ in 0..3 {
             let spec = search.next().unwrap();
@@ -202,12 +203,12 @@ mod adaptive_allocation_tests {
     fn proposal_permutation_keeps_sequence_and_encoded_frontier_retains_tradeoffs() {
         let mut reversed = specs();
         reversed.reverse();
-        let mut left = AdaptiveAllocation::new(specs(), 9, 1729, (0, 0, 0, 8, 0.0));
-        let mut right = AdaptiveAllocation::new(reversed, 9, 1729, (0, 0, 0, 8, 0.0));
+        let mut left = AdaptiveAllocation::new(specs(), 9, 1729, (0, 0, 0, 8, 0.0, 0));
+        let mut right = AdaptiveAllocation::new(reversed, 9, 1729, (0, 0, 0, 8, 0.0, 0));
         for _ in 0..9 {
             assert_eq!(left.next(), right.next());
         }
-        let spec = (0, 0, 0, 8, 0.0);
+        let spec = (0, 0, 0, 8, 0.0, 0);
         left.observe(spec, "small".into(), 0.5, 50);
         left.observe(spec, "better".into(), 0.8, 100);
         left.observe(spec, "dominated".into(), 0.4, 60);

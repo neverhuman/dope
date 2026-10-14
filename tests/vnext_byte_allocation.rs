@@ -36,6 +36,26 @@ fn actual_adaptive_search_respects_encoded_cap_and_same_offer_budget() {
             dope_kernel::codec::decode_kernel(artifact).unwrap();
         }
         assert!(result.report.search_preparation_seconds.unwrap() >= 0.0);
+        if adaptive {
+            assert!(result.report.refinement_fit_count > 0);
+            assert!(result.report.refinement_fit_count <= 18);
+            assert!(result.report.search_history.iter().any(|attempt| {
+                attempt.capacity_refinement.is_some() && attempt.actual_artifact_bytes.is_some()
+            }));
+        } else {
+            assert_eq!(result.report.refinement_fit_count, 0);
+            assert!(
+                result
+                    .report
+                    .search_history
+                    .iter()
+                    .all(|attempt| attempt.capacity_refinement.is_none())
+            );
+            assert!(result.candidates.iter().all(|candidate| !matches!(
+                candidate.candidate_id.rsplit('-').next(),
+                Some("c1" | "c2" | "c3")
+            )));
+        }
         assert!(!result.report.unvisited_beam_candidates.is_empty());
         let families = result
             .candidates
@@ -62,6 +82,35 @@ fn actual_adaptive_search_respects_encoded_cap_and_same_offer_budget() {
             );
         }
     }
+}
+
+#[test]
+fn refitting_deadline_spends_no_additional_offer_or_artifact_budget() {
+    let features = (0..64).map(|row| row as f32 / 63.0).collect::<Vec<_>>();
+    let options = CompileOptions {
+        adaptive_allocation: true,
+        seed: Some(1729),
+        beam_width: Some(9),
+        quantization_profiles: vec![8],
+        deadline: Some(std::time::Duration::ZERO),
+        ..Default::default()
+    };
+    let result =
+        compile_kernel_from_arrays(&features, &features, 64, 1, Task::Regression, &options)
+            .unwrap();
+    assert_eq!(result.report.search_history.len(), 9);
+    assert_eq!(result.report.refinement_fit_count, 0);
+    assert_eq!(result.candidate_artifacts.len(), 1);
+    assert_eq!(
+        result
+            .report
+            .search_history
+            .iter()
+            .filter(|attempt| attempt.disposition == "unvisited_deadline")
+            .count(),
+        8
+    );
+    assert!(!result.report.compliant);
 }
 
 #[test]

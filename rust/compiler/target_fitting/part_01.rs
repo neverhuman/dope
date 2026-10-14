@@ -4,6 +4,16 @@ fn fit_gam_target(
     screen: &[(usize, f32)],
     task: Task,
 ) -> Target {
+    fit_gam_target_bounded(table, completed, screen, task, 12)
+}
+
+fn fit_gam_target_bounded(
+    table: &Table,
+    completed: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    task: Task,
+    support: usize,
+) -> Target {
     const KNOTS: usize = 9;
     let logistic = task == Task::Binary;
     let base_rate =
@@ -13,7 +23,7 @@ fn fit_gam_target(
     } else {
         base_rate
     };
-    let selected = spline_features(completed, screen, 12);
+    let selected = spline_features(completed, screen, support);
     let knots: Vec<_> = selected
         .iter()
         .map(|feature| feature_knots(&completed[*feature], KNOTS))
@@ -84,7 +94,30 @@ fn fit_ga2m_target(
     screen: &[(usize, f32)],
     task: Task,
 ) -> Target {
-    let gam = fit_gam_target(table, completed, screen, task);
+    fit_ga2m_target_with_proposals(table, completed, screen, task, 12, 4, false)
+}
+
+fn fit_ga2m_target_bounded(
+    table: &Table,
+    completed: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    task: Task,
+    support: usize,
+    pair_limit: usize,
+) -> Target {
+    fit_ga2m_target_with_proposals(table, completed, screen, task, support, pair_limit, true)
+}
+
+fn fit_ga2m_target_with_proposals(
+    table: &Table,
+    completed: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    task: Task,
+    support: usize,
+    pair_limit: usize,
+    explore: bool,
+) -> Target {
+    let gam = fit_gam_target_bounded(table, completed, screen, task, support);
     let Target::SparseGam {
         intercept,
         logistic,
@@ -115,6 +148,27 @@ fn fit_ga2m_target(
         .collect();
     let mut interactions = Vec::new();
     let mut pairs = crossfit_interaction_pairs(table, completed);
+    if explore {
+        let mut proposals = exploratory_pair_proposals(table, completed, screen, pair_limit);
+        if task == Task::Regression {
+            let linear = fit_linear_target(table, completed, screen).0;
+            if let Some((mut view, residuals)) = oof_residual_view(table, completed, &linear) {
+                view.target = residuals;
+                proposals.extend(crossfit_interaction_pairs(&view, &view.columns));
+            }
+        }
+        // Preserve direct pure-interaction proposals, but reserve an actual
+        // fitting slot for fixed-fold rare/residual/random exploration.
+        if let Some(pair) = proposals.first().copied() {
+            pairs.retain(|existing| *existing != pair);
+            pairs.insert(0, pair);
+        }
+        for pair in proposals {
+            if !pairs.contains(&pair) {
+                pairs.push(pair);
+            }
+        }
+    }
     for left_index in 0..selected.len() {
         for right_index in left_index + 1..selected.len() {
             let pair = (
@@ -126,7 +180,7 @@ fn fit_ga2m_target(
             }
         }
     }
-    for (left, right) in pairs.into_iter().take(4) {
+    for (left, right) in pairs.into_iter().take(pair_limit) {
         const KNOTS: usize = 5;
         let left_knots = feature_knots(&completed[left], KNOTS);
         let right_knots = feature_knots(&completed[right], KNOTS);
@@ -292,7 +346,6 @@ fn fit_oblivious_tree_target(
     }
 }
 
-#[cfg(not(feature = "gpu-training"))]
 fn compact_neural_weight(unit: usize, input: usize) -> f32 {
     let mut value = (unit as u64 + 1).wrapping_mul(0x9e37_79b9_7f4a_7c15)
         ^ (input as u64 + 1).wrapping_mul(0xbf58_476d_1ce4_e5b9);
@@ -313,13 +366,25 @@ fn fit_compact_neural_target_native(
     screen: &[(usize, f32)],
     task: Task,
 ) -> Target {
+    fit_compact_neural_target_native_bounded(
+        table,
+        completed,
+        &screen[..screen.len().min(12)],
+        task,
+        12,
+    )
+}
+
+fn fit_compact_neural_target_native_bounded(
+    table: &Table,
+    completed: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    task: Task,
+    width_limit: usize,
+) -> Target {
     let logistic = task == Task::Binary;
-    let selected: Vec<_> = screen
-        .iter()
-        .take(12)
-        .map(|(feature, _)| *feature)
-        .collect();
-    let hidden_width = selected.len().clamp(4, 12);
+    let selected: Vec<_> = screen.iter().map(|(feature, _)| *feature).collect();
+    let hidden_width = selected.len().clamp(4, width_limit);
     let input_weights: Vec<_> = (0..hidden_width)
         .flat_map(|unit| (0..selected.len()).map(move |input| compact_neural_weight(unit, input)))
         .collect();

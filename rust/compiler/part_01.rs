@@ -113,6 +113,8 @@ pub struct CompileReport {
     pub search_preparation_seconds: Option<f64>,
     #[serde(default)]
     pub unvisited_beam_candidates: Vec<String>,
+    #[serde(default)]
+    pub refinement_fit_count: usize,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -128,6 +130,8 @@ pub struct CandidateAttempt {
     pub allocation: String,
     #[serde(default)]
     pub pruned_encoded_zero_terms: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub capacity_refinement: Option<CapacityRefinement>,
 }
 
 #[derive(Clone, Debug)]

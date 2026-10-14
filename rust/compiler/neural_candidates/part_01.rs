@@ -1,4 +1,3 @@
-
 fn compile_neural_table(
     table: &Table,
     task: Task,
@@ -113,6 +112,7 @@ fn compile_neural_table(
         failed_gates: vec!["production_evidence_unmeasured".into()],
     };
     let compile_report = CompileReport {
+        refinement_fit_count: 0,
         format: "dope-kernel-compile-report".into(),
         version: 3,
         release_policy: options.release_policy.clone(),
@@ -150,7 +150,9 @@ fn compile_neural_table(
 
 fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<CompileResult> {
     if options.adaptive_allocation && options.backend_id.is_some() {
-        return Err(DopeError::Unsupported("adaptive_allocation_requires_unrestricted_symbolic_tournament".into()));
+        return Err(DopeError::Unsupported(
+            "adaptive_allocation_requires_unrestricted_symbolic_tournament".into(),
+        ));
     }
     if let Some(architecture) = options.backend_id.as_deref().and_then(neural_architecture) {
         let started = Instant::now();
