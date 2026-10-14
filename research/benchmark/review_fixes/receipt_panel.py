@@ -82,7 +82,7 @@ def _clean(value):
 # Every method a review receipt ledger may hold. A cell with any other method is refused,
 # not skipped, so a renamed or foreign arm cannot drop out of a reduction unseen.
 KNOWN_METHODS = frozenset({"DOPE", "GaussianCopula", "Chow-Liu", "independent_marginals", "CTGAN", "TVAE", "ARF",
-                           "ForestDiffusion/Forest-Flow"})
+                           "ForestDiffusion/Forest-Flow", "TabSyn"})
 
 
 def reduce_cells(cells, method: str, configuration: str, fit_seed: int = 11):
