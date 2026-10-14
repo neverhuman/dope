@@ -2,7 +2,7 @@
 \usepackage{iclr2027_conference,times}
 
 \usepackage{hyperref}
-\hypersetup{colorlinks=true, urlcolor=blue}
+\hypersetup{colorlinks=true, urlcolor=blue, pdftitle={DOPE: Generative Compression of Predictive Structure}}
 \usepackage{url}
 \makeatletter
 \g@addto@macro{\UrlBreaks}{\do\/\do\_\do\-\do\.\do\=\do\&\do\?\do\#%
@@ -192,7 +192,7 @@ so $R=1$ matches the real-trained auditor and $R<0$ is worse than the null. A li
 
 \subsection{Comparators and controls}
 \label{sec:selection}
-Comparators are author-default and native-selected ARF~\citep{watson2023arf} at five fit seeds; TabSyn with a scaled schedule of $200$ VAE and at most $1{,}000$ diffusion epochs, which the authors' early stop can end sooner, at five fit seeds; Gaussian copula, Chow--Liu, and independent marginals selected by held-out log density; CTGAN and TVAE selected on validation skill of the linear and MLP auditors; and a historical Forest-Flow block. Supplement~C lists each method's selection rule, data, and budget. The \emph{predictor-only} control fits a ridge regression on the fit rows, samples each feature independently from its marginal, and adds Gaussian residual noise; it keeps a regressor and drops the joint model. The \emph{real-row} control resamples the fit rows with replacement to $4n$ rows; it measures what extra rows alone do and is an upper reference rather than a generator.
+Comparators are author-default and native-selected ARF~\citep{watson2023arf} at five fit seeds; TabSyn with a scaled schedule of $200$ VAE and at most $1{,}000$ diffusion epochs, which the authors' early stop can end sooner, at five fit seeds; Gaussian copula, Chow--Liu, and independent marginals selected by held-out log density; CTGAN and TVAE selected on validation skill of the linear and MLP auditors; and a historical Forest-Flow block. Supplement~C lists each method's selection rule, data, and budget. TabSyn's five-seed panel has two gaps: six sample cells of one seed-$23$ lineage reached the sample time cap and stay unscored, and one other lineage has no stored seed-$11$ samples. Every lineage keeps at least four complete fit seeds, so all enter the five-seed comparison, and TabSyn's CatBoost retention row at $4n$ rests on $\VLevTabSynCbFourN$ informative lineages. The \emph{predictor-only} control fits a ridge regression on the fit rows, samples each feature independently from its marginal, and adds Gaussian residual noise; it keeps a regressor and drops the joint model. The \emph{real-row} control resamples the fit rows with replacement to $4n$ rows; it measures what extra rows alone do and is an upper reference rather than a generator.
 
 \subsection{Statistics}
 \label{sec:stats}

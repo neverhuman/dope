@@ -105,6 +105,24 @@ class PackagingTests(unittest.TestCase):
         for text in (main, supplement):
             self.assertIn("selection-exposed", text)
 
+    def test_readme_citation_and_pdf_metadata_carry_the_one_title_without_kilobyte_branding(self):
+        """README heading and bibtex, CITATION.cff and both pdftitle entries name the paper title; byte counts stay measurements."""
+        main = check_paper.TEX.read_text()
+        supplement = (check_paper.ROOT / "supplement.tex").read_text()
+        readme = (check_paper.ROOT.parents[1] / "README.md").read_text()
+        citation = (check_paper.ROOT.parents[1] / "CITATION.cff").read_text()
+        title = re.search(r"\\title\{\\texorpdfstring\{.*?\}\{([^{}]*)\}\}", main, re.S).group(1)
+        self.assertIn(r"pdftitle={" + title + "}", main)
+        self.assertIn(r"pdftitle={Supplement: " + title + "}", supplement)
+        self.assertEqual(readme.splitlines()[0], "# DOPE — " + title.removeprefix("DOPE: "))
+        bibtex = re.search(r"@misc\{taylor2026dope,\n  title  = \{(.*)\},\n", readme)
+        self.assertIsNotNone(bibtex)
+        self.assertEqual(bibtex.group(1), "{DOPE}: " + title.removeprefix("DOPE: "))
+        prose = readme.split("<!-- BEGIN BENCHMARK -->")[0] + readme.split("<!-- END BENCHMARK -->")[1]
+        for text in (prose, citation, title):
+            self.assertNotRegex(text.lower(), r"kilobyte[- ]scale|kilobyte generator")
+        self.assertIn("Downstream Objective-Preserving Encoding", readme)
+
     def test_profile_disclosure_cites_what_each_committed_publication_records(self):
         """The supplement's account of the three profile publications must match their committed fields."""
         results = check_paper.ROOT.parents[1] / "research" / "benchmark" / "results"
