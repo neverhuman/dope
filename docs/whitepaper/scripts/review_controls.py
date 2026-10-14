@@ -239,12 +239,12 @@ def render_controls(payload: dict) -> str:
         if row["auditor"] != "catboost":
             continue
         lines.append(
-            f"{row['size']}$n$ & catboost & predictor fit {row['fit_seed']} & "
+            f"{row['size']}$n$ & CatBoost & predictor fit {row['fit_seed']} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
         )
     for row in payload["split_seeds"]:
         lines.append(
-            f"{row['size']}$n$ & catboost & split {row['split_seed']} & "
+            f"{row['size']}$n$ & CatBoost & split {row['split_seed']} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
         )
     return longtable(

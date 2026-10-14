@@ -751,7 +751,7 @@ def emit_tex(payload) -> None:
         if row["auditor"] != "catboost":
             continue
         family_lines.append(
-            f"excluding simulated & {row['size']}$n$ & catboost & {tex_name(row['method'])} & "
+            f"excluding simulated & {row['size']}$n$ & CatBoost & {tex_name(row['method'])} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
         )
     write_tex("review-family.tex", longtable(
