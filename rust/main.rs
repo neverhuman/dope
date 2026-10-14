@@ -84,7 +84,7 @@ fn run(command: Command) -> Result<()> {
                     "executable_sha256":format!("{:x}", sha2::Sha256::digest(&bytes)),
                     "executable_bytes":bytes.len(),"os":std::env::consts::OS,"architecture":std::env::consts::ARCH,
                     "cpu_sampling":"available","gpu_training":cfg!(feature="gpu-training"),
-                    "raw_profile":"raw-continuous-symbolic-v1","v1_artifact_decode":"read_only_compatible",
+                "raw_profile":"raw-numeric-symbolic-v1","v1_artifact_decode":"read_only_compatible",
                     "source_free_isolation":if cfg!(all(target_os="linux",target_arch="x86_64")) {"linux_x86_64_fresh_worker"} else {"unavailable"},
                     "certification":"requires_measured_external_gates","weights_downloaded":false
                 })
@@ -109,14 +109,16 @@ fn run(command: Command) -> Result<()> {
                     .ok_or_else(|| DopeError::Data("sampling_runtime_size_overflow".into()))?,
             );
             dope_kernel::typed_data::isolation::seal_sampling_process()?;
-            let values = dope_kernel::typed_data::workflow::sample_raw(&bytes, rows, Some(seed))?;
-            let encoded = values
+            let samples =
+                dope_kernel::typed_data::workflow::sample_raw_detailed(&bytes, rows, Some(seed))?;
+            let encoded = samples
+                .values
                 .iter()
                 .flat_map(|v| v.to_le_bytes())
                 .collect::<Vec<_>>();
             println!(
                 "{}",
-                serde_json::json!({"state":"sampled","isolation":"linux_x86_64_seccomp_tsync_default_deny","inherited_source_fds":"closed","filesystem_network_exec":"denied","rows":rows,"seed":seed,"sample_sha256":dope_kernel::bundle::content_fingerprint(&encoded),"runtime_inventory":runtime,"inspection":inspection})
+                serde_json::json!({"state":"sampled","isolation":"linux_x86_64_seccomp_tsync_default_deny","inherited_source_fds":"closed","filesystem_network_exec":"denied","rows":rows,"seed":seed,"sample_sha256":dope_kernel::bundle::content_fingerprint(&encoded),"runtime_inventory":runtime,"inspection":inspection,"integer_rounding_repairs":samples.integer_rounding_repairs,"boolean_rounding_repairs":samples.boolean_rounding_repairs,"physical_domain_rejections":samples.physical_domain_rejections})
             );
         }
         Command::CompileRaw {
@@ -136,16 +138,17 @@ fn run(command: Command) -> Result<()> {
                 return Err(DopeError::Data("raw_deadline_invalid".into()));
             }
             let schema_bytes =
-                fs::read(&schema).map_err(|e| dope_kernel::error::io_error(&schema, e))?;
+                fs::read(&schema).map_err(|_| DopeError::Data("raw_schema_read_failed".into()))?;
             let declaration = dope_kernel::schema::TableSchemaV1::from_private_json(&schema_bytes)
-                .map_err(|e| DopeError::Data(e.code.into()))?;
-            let input = fs::File::open(&csv).map_err(|e| dope_kernel::error::io_error(&csv, e))?;
+                .map_err(|e| DopeError::Data(e.to_string()))?;
+            let input = fs::File::open(&csv)
+                .map_err(|_| DopeError::Data("raw_input_read_failed".into()))?;
             let table = dope_kernel::typed_data::TypedTable::read_csv(
                 input,
                 declaration,
                 dope_kernel::typed_data::InputLimits::default(),
             )
-            .map_err(|e| DopeError::Data(e.code.into()))?;
+            .map_err(|e| DopeError::Data(e.to_string()))?;
             let options = CompileOptions {
                 seed: Some(seed),
                 backend_id: Some(candidate),
@@ -186,12 +189,13 @@ fn run(command: Command) -> Result<()> {
                     )
                 })
                 .count();
-            let values = dope_kernel::typed_data::workflow::sample_raw(&bytes, rows, seed)?;
+            let samples =
+                dope_kernel::typed_data::workflow::sample_raw_detailed(&bytes, rows, seed)?;
             let file = fs::File::create(&out).map_err(|e| dope_kernel::error::io_error(&out, e))?;
             let mut writer = csv::WriterBuilder::new()
                 .has_headers(false)
                 .from_writer(file);
-            for row in values.chunks_exact(columns) {
+            for row in samples.values.chunks_exact(columns) {
                 writer.write_record(row.iter().map(ToString::to_string))?;
             }
             writer
@@ -199,7 +203,7 @@ fn run(command: Command) -> Result<()> {
                 .map_err(|e| dope_kernel::error::io_error(&out, e))?;
             println!(
                 "{}",
-                serde_json::json!({"rows":rows,"profile":inspection.profile,"complete_sampling_bytes":inspection.accounting.complete_sampling_bytes,"privacy":"unmeasured"})
+                serde_json::json!({"rows":rows,"profile":inspection.profile,"complete_sampling_bytes":inspection.accounting.complete_sampling_bytes,"privacy":"unmeasured","integer_rounding_repairs":samples.integer_rounding_repairs,"boolean_rounding_repairs":samples.boolean_rounding_repairs,"physical_domain_rejections":samples.physical_domain_rejections})
             );
         }
         Command::InspectRaw { artifact } => {

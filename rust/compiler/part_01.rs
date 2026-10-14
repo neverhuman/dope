@@ -100,6 +100,18 @@ pub struct CompileReport {
     pub contains_row_references: bool,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub probe_failures: BTreeMap<String, String>,
+    #[serde(default)]
+    pub search_history: Vec<CandidateAttempt>,
+    #[serde(default)]
+    pub residual_fitting: BTreeMap<String, String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CandidateAttempt {
+    pub candidate_id: String,
+    pub disposition: String,
+    pub actual_artifact_bytes: Option<usize>,
+    pub elapsed_seconds: Option<f64>,
 }
 
 #[derive(Clone, Debug)]

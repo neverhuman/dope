@@ -9,7 +9,11 @@ fn bounded_research_training_settings(profile: &str) -> Result<(usize, usize, us
         "features16_steps8192" => (16, 16, 8192),
         "features12_width8_steps8192" => (12, 8, 8192),
         "features24_width8_steps8192" => (24, 8, 8192),
-        _ => return Err(DopeError::Unsupported("unknown bounded GPU research profile".into())),
+        _ => {
+            return Err(DopeError::Unsupported(
+                "unknown bounded GPU research profile".into(),
+            ));
+        }
     };
     Ok((features, width, steps))
 }
@@ -70,6 +74,7 @@ fn fit_linear_gpu_ablation(
     y: &tch::Tensor,
     optimizer_steps: usize,
     readout_refit: bool,
+    task: Task,
 ) -> Result<Target> {
     use tch::nn::{Module, OptimizerConfig};
 
@@ -80,7 +85,7 @@ fn fit_linear_gpu_ablation(
         1,
         Default::default(),
     );
-    let logistic = table.target.iter().all(|value| *value == 0.0 || *value == 1.0);
+    let logistic = task == Task::Binary;
     let mut optimizer = tch::nn::AdamW::default()
         .build(&store, 2e-3)
         .map_err(|error| DopeError::Data(format!("linear ablation optimizer: {error}")))?;
@@ -128,21 +133,30 @@ fn fit_linear_gpu_ablation(
             .map_err(|error| DopeError::Data(format!("research loss log: {error}")))?;
     }
     let (intercept, coefficients) = if readout_refit {
-        let basis = selected.iter().map(|feature| completed[*feature].clone()).collect::<Vec<_>>();
+        let basis = selected
+            .iter()
+            .map(|feature| completed[*feature].clone())
+            .collect::<Vec<_>>();
         fit_basis_coefficients(&table.target, &basis, logistic)
     } else {
         let intercept = tensor_values(
             skip.bs.as_ref().expect("linear bias").shallow_clone(),
             "linear ablation bias export",
         )?[0];
-        (intercept, tensor_values(skip.ws.shallow_clone(), "linear ablation weight export")?)
+        (
+            intercept,
+            tensor_values(skip.ws.shallow_clone(), "linear ablation weight export")?,
+        )
     };
     let terms = selected
         .iter()
         .copied()
         .zip(coefficients)
         .filter(|(_, coefficient)| !readout_refit || coefficient.abs() >= 1e-5)
-        .map(|(feature, coefficient)| LinearTerm { feature: feature as u32, coefficient })
+        .map(|(feature, coefficient)| LinearTerm {
+            feature: feature as u32,
+            coefficient,
+        })
         .collect();
     Ok(if logistic {
         Target::SparseLogistic { intercept, terms }
@@ -157,7 +171,9 @@ fn compact_neural_training_settings(feature_count: usize) -> Result<(usize, usiz
     match std::env::var("DOPE_RESEARCH_TARGET_PROFILE") {
         Ok(profile) => return bounded_research_training_settings(&profile),
         Err(std::env::VarError::NotUnicode(_)) => {
-            return Err(DopeError::Unsupported("unknown bounded GPU research profile".into()));
+            return Err(DopeError::Unsupported(
+                "unknown bounded GPU research profile".into(),
+            ));
         }
         Err(std::env::VarError::NotPresent) => {}
     }
@@ -211,14 +227,19 @@ mod bounded_research_training_tests {
                 for steps in [512, 2048, 8192] {
                     for readout_refit in [false, true] {
                         let readout = if readout_refit { "on" } else { "off" };
-                        let name = format!("grid_features{features}_width{width_name}_steps{steps}_readout{readout}");
+                        let name = format!(
+                            "grid_features{features}_width{width_name}_steps{steps}_readout{readout}"
+                        );
                         let observed = bounded_research_ablation_settings(&name).unwrap();
-                        assert_eq!(observed, ResearchAblationSettings {
-                            feature_limit: features,
-                            hidden_width: width,
-                            optimizer_steps: steps,
-                            readout_refit,
-                        });
+                        assert_eq!(
+                            observed,
+                            ResearchAblationSettings {
+                                feature_limit: features,
+                                hidden_width: width,
+                                optimizer_steps: steps,
+                                readout_refit,
+                            }
+                        );
                         assert!(bounded_research_training_settings(&name).is_err());
                         count += 1;
                     }
@@ -241,7 +262,6 @@ mod bounded_research_training_tests {
     }
 }
 
-
 #[cfg(any(test, feature = "gpu-training"))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum ResearchTargetDevice {
@@ -263,7 +283,9 @@ fn parse_research_target_device(
         Some("cpu") => Err(DopeError::Unsupported(
             "CPU research training requires empty CUDA_VISIBLE_DEVICES".into(),
         )),
-        _ => Err(DopeError::Unsupported("unknown research target device".into())),
+        _ => Err(DopeError::Unsupported(
+            "unknown research target device".into(),
+        )),
     }
 }
 
@@ -274,14 +296,26 @@ mod research_target_device_tests {
 
     #[test]
     fn cuda_default_and_cpu_visibility_are_explicit() {
-        assert_eq!(parse_research_target_device(None, None).unwrap(), ResearchTargetDevice::Cuda);
-        assert_eq!(parse_research_target_device(Some(OsStr::new("cuda")), None).unwrap(), ResearchTargetDevice::Cuda);
-        assert_eq!(parse_research_target_device(Some(OsStr::new("cpu")), Some(OsStr::new(""))).unwrap(), ResearchTargetDevice::Cpu);
+        assert_eq!(
+            parse_research_target_device(None, None).unwrap(),
+            ResearchTargetDevice::Cuda
+        );
+        assert_eq!(
+            parse_research_target_device(Some(OsStr::new("cuda")), None).unwrap(),
+            ResearchTargetDevice::Cuda
+        );
+        assert_eq!(
+            parse_research_target_device(Some(OsStr::new("cpu")), Some(OsStr::new(""))).unwrap(),
+            ResearchTargetDevice::Cpu
+        );
         for visible in [None, Some(OsStr::new("0")), Some(OsStr::new("-1"))] {
             assert!(parse_research_target_device(Some(OsStr::new("cpu")), visible).is_err());
         }
         for requested in ["", "CPU", "cpu ", "auto"] {
-            assert!(parse_research_target_device(Some(OsStr::new(requested)), Some(OsStr::new(""))).is_err());
+            assert!(
+                parse_research_target_device(Some(OsStr::new(requested)), Some(OsStr::new("")))
+                    .is_err()
+            );
         }
     }
 
@@ -320,6 +354,7 @@ fn fit_compact_neural_target(
     completed: &[Vec<f32>],
     screen: &[(usize, f32)],
     seed: u64,
+    task: Task,
 ) -> Result<Target> {
     use tch::nn::{Module, OptimizerConfig};
 
@@ -359,7 +394,11 @@ fn fit_compact_neural_target(
         };
         #[cfg(feature = "gpu-research-training")]
         let (feature_limit, hidden_width, optimizer_steps) = match ablation {
-            Some(settings) => (settings.feature_limit, settings.hidden_width, settings.optimizer_steps),
+            Some(settings) => (
+                settings.feature_limit,
+                settings.hidden_width,
+                settings.optimizer_steps,
+            ),
             None => compact_neural_training_settings(screen.len())?,
         };
         #[cfg(not(feature = "gpu-research-training"))]
@@ -386,8 +425,14 @@ fn fit_compact_neural_target(
         if let Some(settings) = ablation {
             if settings.hidden_width == 0 {
                 return fit_linear_gpu_ablation(
-                    table, completed, &selected, &x, &y,
-                    settings.optimizer_steps, settings.readout_refit,
+                    table,
+                    completed,
+                    &selected,
+                    &x,
+                    &y,
+                    settings.optimizer_steps,
+                    settings.readout_refit,
+                    task,
                 );
             }
         }
@@ -409,10 +454,7 @@ fn fit_compact_neural_target(
         let forward = |input: &tch::Tensor| {
             skip.forward(input) + residual.forward(&hidden.forward(input).tanh())
         };
-        let logistic = table
-            .target
-            .iter()
-            .all(|value| *value == 0.0 || *value == 1.0);
+        let logistic = task == Task::Binary;
         let mut optimizer = tch::nn::AdamW::default()
             .build(&store, 2e-3)
             .map_err(|error| DopeError::Data(format!("neural candidate optimizer: {error}")))?;
@@ -474,8 +516,10 @@ fn fit_compact_neural_target(
                 residual.bs.as_ref().expect("linear bias").shallow_clone(),
                 "neural residual bias export",
             )?[0];
-            let linear_weights = tensor_values(skip.ws.shallow_clone(), "neural skip weight export")?;
-            let output_weights = tensor_values(residual.ws.shallow_clone(), "neural output weight export")?;
+            let linear_weights =
+                tensor_values(skip.ws.shallow_clone(), "neural skip weight export")?;
+            let output_weights =
+                tensor_values(residual.ws.shallow_clone(), "neural output weight export")?;
             return Ok(Target::CompactNeuralResidual {
                 intercept: skip_bias + residual_bias,
                 logistic,
@@ -483,7 +527,10 @@ fn fit_compact_neural_target(
                     .iter()
                     .copied()
                     .zip(linear_weights)
-                    .map(|(feature, coefficient)| LinearTerm { feature: feature as u32, coefficient })
+                    .map(|(feature, coefficient)| LinearTerm {
+                        feature: feature as u32,
+                        coefficient,
+                    })
                     .collect(),
                 hidden_features: selected.into_iter().map(|feature| feature as u32).collect(),
                 hidden_width: hidden_width as u8,
@@ -554,21 +601,25 @@ fn fit_compact_neural_target(
     completed: &[Vec<f32>],
     screen: &[(usize, f32)],
     _seed: u64,
+    task: Task,
 ) -> Result<Target> {
     if std::env::var_os("DOPE_RESEARCH_TARGET_DEVICE").is_some() {
         return Err(DopeError::Unsupported(
             "research device selection requires gpu-research-training".into(),
         ));
     }
-    Ok(fit_compact_neural_target_native(table, completed, screen))
+    Ok(fit_compact_neural_target_native(
+        table, completed, screen, task,
+    ))
 }
 
 fn fit_noise(
     table: &Table,
     completed: &[Vec<f32>],
-    screen: &[(usize, f32)],
+    _screen: &[(usize, f32)],
     target: &Target,
-) -> Noise {
+    task: Task,
+) -> (Noise, &'static str) {
     let mut linear = Vec::with_capacity(table.rows);
     let mut probabilities = Vec::with_capacity(table.rows);
     for row in 0..table.rows {
@@ -581,11 +632,7 @@ fn fit_noise(
             prediction.clamp(0.0, 1.0)
         });
     }
-    if table
-        .target
-        .iter()
-        .all(|value| *value == 0.0 || *value == 1.0)
-    {
+    if task == Task::Binary {
         let mut order: Vec<_> = (0..table.rows).collect();
         order.sort_by(|left, right| {
             probabilities[*left]
@@ -617,31 +664,48 @@ fn fit_noise(
                 calibrated[index] = calibrated[index].max(calibrated[index - 1] + epsilon);
             }
         }
-        return Noise::IsotonicCalibration {
-            knots,
-            probabilities: calibrated,
-        };
+        return (
+            Noise::IsotonicCalibration { knots, probabilities: calibrated },
+            "full_fit_binary_calibration_unqualified",
+        );
     }
-    let residuals: Vec<f32> = table
-        .target
-        .iter()
-        .zip(&linear)
-        .map(|(actual, prediction)| (actual - prediction).abs().max(1e-5))
-        .collect();
+    let oof = oof_residual_view(table, completed, target);
+    let fitting_rule = residual_rule(target, table.rows, oof.is_some());
+    let (residual_table, residuals) = oof.unwrap_or_else(|| {
+            (
+                table.clone(),
+                table
+                    .target
+                    .iter()
+                    .zip(&linear)
+                    .map(|(actual, prediction)| (actual - prediction).abs().max(1e-5))
+                    .collect(),
+            )
+        });
     let mut sorted = residuals.clone();
     sorted.sort_by(f32::total_cmp);
     let minimum_sigma = quantile(&sorted, 0.1).clamp(1e-4, 1.0);
     let maximum_sigma = quantile(&sorted, 0.9)
         .clamp(minimum_sigma, 1.0)
         .max(minimum_sigma);
-    let selected: Vec<_> = screen.iter().take(4).map(|(feature, _)| *feature).collect();
+    let residual_screen = target_screen(&residual_table.columns, &residuals);
+    let selected: Vec<_> = residual_screen
+        .iter()
+        .take(4)
+        .map(|(feature, _)| *feature)
+        .collect();
     let basis: Vec<_> = selected
         .iter()
-        .map(|feature| completed[*feature].clone())
+        .map(|feature| residual_table.columns[*feature].clone())
         .collect();
-    let log_residuals: Vec<_> = residuals.iter().map(|value| value.ln()).collect();
+    // E[log |N(0,1)|] = -(EulerGamma + log 2)/2. This correction
+    // names a Gaussian reference; it is not a calibration certificate.
+    let log_residuals: Vec<_> = residuals
+        .iter()
+        .map(|value| value.ln() + 0.635_181_4)
+        .collect();
     let (intercept, coefficients) = fit_basis_coefficients(&log_residuals, &basis, false);
-    Noise::Heteroscedastic {
+    (Noise::Heteroscedastic {
         intercept,
         terms: selected
             .into_iter()
@@ -654,7 +718,7 @@ fn fit_noise(
             .collect(),
         minimum_sigma,
         maximum_sigma,
-    }
+    }, fitting_rule)
 }
 
 fn quantize(value: f32, bits: u8, unit: bool) -> f32 {
@@ -664,6 +728,44 @@ fn quantize(value: f32, bits: u8, unit: bool) -> f32 {
     } else {
         let step = 2.0f32.powi(-(i32::from(bits) - 2));
         (value / step).round() * step
+    }
+}
+
+#[cfg(test)]
+mod declared_task_tests {
+    use super::*;
+
+    #[test]
+    fn binary_valued_regression_keeps_regression_heads_and_noise() {
+        let x = (0..64).map(|row| row as f32 / 63.0).collect::<Vec<_>>();
+        let y = x
+            .iter()
+            .map(|v| u8::from(*v >= 0.5) as f32)
+            .collect::<Vec<_>>();
+        let table = Table::from_arrays(&x, &y, 64, 1, Task::Regression).unwrap();
+        let screen = vec![(0, 1.0)];
+        for task in [Task::Regression, Task::Binary] {
+            let heads = [
+                fit_gam_target(&table, &table.columns, &screen, task),
+                fit_ga2m_target(&table, &table.columns, &screen, task),
+                fit_mars_target(&table, &table.columns, &screen, task),
+                fit_oblivious_tree_target(&table, &table.columns, &screen, task),
+            ];
+            for head in heads {
+                let (_, logistic) = evaluate_target(&head, &[0.5]);
+                assert_eq!(logistic, task == Task::Binary);
+                let (noise, _) = fit_noise(&table, &table.columns, &screen, &head, task);
+                assert_eq!(
+                    matches!(noise, Noise::IsotonicCalibration { .. }),
+                    task == Task::Binary
+                );
+            }
+            #[cfg(not(feature = "gpu-training"))]
+            {
+                let head = fit_compact_neural_target_native(&table, &table.columns, &screen, task);
+                assert_eq!(evaluate_target(&head, &[0.5]).1, task == Task::Binary);
+            }
+        }
     }
 }
 

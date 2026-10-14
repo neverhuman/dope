@@ -1,10 +1,11 @@
-
-fn fit_gam_target(table: &Table, completed: &[Vec<f32>], screen: &[(usize, f32)]) -> Target {
+fn fit_gam_target(
+    table: &Table,
+    completed: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    task: Task,
+) -> Target {
     const KNOTS: usize = 9;
-    let logistic = table
-        .target
-        .iter()
-        .all(|value| *value == 0.0 || *value == 1.0);
+    let logistic = task == Task::Binary;
     let base_rate =
         (table.target.iter().sum::<f32>() / table.rows.max(1) as f32).clamp(1e-6, 1.0 - 1e-6);
     let intercept = if logistic {
@@ -77,8 +78,13 @@ fn fit_gam_target(table: &Table, completed: &[Vec<f32>], screen: &[(usize, f32)]
     }
 }
 
-fn fit_ga2m_target(table: &Table, completed: &[Vec<f32>], screen: &[(usize, f32)]) -> Target {
-    let gam = fit_gam_target(table, completed, screen);
+fn fit_ga2m_target(
+    table: &Table,
+    completed: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    task: Task,
+) -> Target {
+    let gam = fit_gam_target(table, completed, screen, task);
     let Target::SparseGam {
         intercept,
         logistic,
@@ -108,77 +114,82 @@ fn fit_ga2m_target(table: &Table, completed: &[Vec<f32>], screen: &[(usize, f32)
         .map(|term| term.feature as usize)
         .collect();
     let mut interactions = Vec::new();
-    'pairs: for left_index in 0..selected.len() {
+    let mut pairs = crossfit_interaction_pairs(table, completed);
+    for left_index in 0..selected.len() {
         for right_index in left_index + 1..selected.len() {
-            const KNOTS: usize = 5;
-            let left = selected[left_index];
-            let right = selected[right_index];
-            let left_knots = feature_knots(&completed[left], KNOTS);
-            let right_knots = feature_knots(&completed[right], KNOTS);
-            let mut sums = [0.0f64; KNOTS * KNOTS];
-            let mut weights = [0.0f64; KNOTS * KNOTS];
-            for (row, &linear_value) in linear.iter().enumerate() {
-                let left_slot = nearest_knot(&left_knots, completed[left][row]);
-                let right_slot = nearest_knot(&right_knots, completed[right][row]);
-                let slot = left_slot * KNOTS + right_slot;
-                let (weight, residual) = if logistic {
-                    let probability = sigmoid(f64::from(linear_value));
-                    let weight = (probability * (1.0 - probability)).max(0.02);
-                    (
-                        weight,
-                        (f64::from(table.target[row]) - probability) / weight,
-                    )
-                } else {
-                    (1.0, f64::from(table.target[row] - linear_value))
-                };
-                sums[slot] += weight * residual;
-                weights[slot] += weight;
-            }
-            let mut values: Vec<f32> = sums
-                .iter()
-                .zip(&weights)
-                .map(|(sum, weight)| {
-                    if *weight > 0.0 {
-                        (0.5 * sum / weight) as f32
-                    } else {
-                        0.0
-                    }
-                })
-                .collect();
-            let center = values
-                .iter()
-                .zip(&weights)
-                .map(|(value, weight)| f64::from(*value) * weight)
-                .sum::<f64>()
-                / weights.iter().sum::<f64>().max(1e-12);
-            values.iter_mut().for_each(|value| *value -= center as f32);
-            for (row, linear_value) in linear.iter_mut().enumerate() {
-                let slot = nearest_knot(&left_knots, completed[left][row]) * KNOTS
-                    + nearest_knot(&right_knots, completed[right][row]);
-                *linear_value += values[slot];
-            }
-            let (left, right, left_knots, right_knots, values) = if left < right {
-                (left, right, left_knots, right_knots, values)
-            } else {
-                let transposed = (0..KNOTS)
-                    .flat_map(|new_left| {
-                        let values = &values;
-                        (0..KNOTS).map(move |new_right| values[new_right * KNOTS + new_left])
-                    })
-                    .collect();
-                (right, left, right_knots, left_knots, transposed)
-            };
-            interactions.push(InteractionTerm {
-                left: left as u32,
-                right: right as u32,
-                left_knots,
-                right_knots,
-                values,
-            });
-            if interactions.len() == 4 {
-                break 'pairs;
+            let pair = (
+                selected[left_index].min(selected[right_index]),
+                selected[left_index].max(selected[right_index]),
+            );
+            if !pairs.contains(&pair) {
+                pairs.push(pair);
             }
         }
+    }
+    for (left, right) in pairs.into_iter().take(4) {
+        const KNOTS: usize = 5;
+        let left_knots = feature_knots(&completed[left], KNOTS);
+        let right_knots = feature_knots(&completed[right], KNOTS);
+        let mut sums = [0.0f64; KNOTS * KNOTS];
+        let mut weights = [0.0f64; KNOTS * KNOTS];
+        for (row, &linear_value) in linear.iter().enumerate() {
+            let left_slot = nearest_knot(&left_knots, completed[left][row]);
+            let right_slot = nearest_knot(&right_knots, completed[right][row]);
+            let slot = left_slot * KNOTS + right_slot;
+            let (weight, residual) = if logistic {
+                let probability = sigmoid(f64::from(linear_value));
+                let weight = (probability * (1.0 - probability)).max(0.02);
+                (
+                    weight,
+                    (f64::from(table.target[row]) - probability) / weight,
+                )
+            } else {
+                (1.0, f64::from(table.target[row] - linear_value))
+            };
+            sums[slot] += weight * residual;
+            weights[slot] += weight;
+        }
+        let mut values: Vec<f32> = sums
+            .iter()
+            .zip(&weights)
+            .map(|(sum, weight)| {
+                if *weight > 0.0 {
+                    (0.5 * sum / weight) as f32
+                } else {
+                    0.0
+                }
+            })
+            .collect();
+        let center = values
+            .iter()
+            .zip(&weights)
+            .map(|(value, weight)| f64::from(*value) * weight)
+            .sum::<f64>()
+            / weights.iter().sum::<f64>().max(1e-12);
+        values.iter_mut().for_each(|value| *value -= center as f32);
+        for (row, linear_value) in linear.iter_mut().enumerate() {
+            let slot = nearest_knot(&left_knots, completed[left][row]) * KNOTS
+                + nearest_knot(&right_knots, completed[right][row]);
+            *linear_value += values[slot];
+        }
+        let (left, right, left_knots, right_knots, values) = if left < right {
+            (left, right, left_knots, right_knots, values)
+        } else {
+            let transposed = (0..KNOTS)
+                .flat_map(|new_left| {
+                    let values = &values;
+                    (0..KNOTS).map(move |new_right| values[new_right * KNOTS + new_left])
+                })
+                .collect();
+            (right, left, right_knots, left_knots, transposed)
+        };
+        interactions.push(InteractionTerm {
+            left: left as u32,
+            right: right as u32,
+            left_knots,
+            right_knots,
+            values,
+        });
     }
     Target::Ga2m {
         intercept,
@@ -188,11 +199,13 @@ fn fit_ga2m_target(table: &Table, completed: &[Vec<f32>], screen: &[(usize, f32)
     }
 }
 
-fn fit_mars_target(table: &Table, completed: &[Vec<f32>], screen: &[(usize, f32)]) -> Target {
-    let logistic = table
-        .target
-        .iter()
-        .all(|value| *value == 0.0 || *value == 1.0);
+fn fit_mars_target(
+    table: &Table,
+    completed: &[Vec<f32>],
+    screen: &[(usize, f32)],
+    task: Task,
+) -> Target {
+    let logistic = task == Task::Binary;
     let mut factors = Vec::new();
     let mut basis = Vec::new();
     for &(feature, _) in screen.iter().take(8) {
@@ -237,11 +250,9 @@ fn fit_oblivious_tree_target(
     table: &Table,
     completed: &[Vec<f32>],
     screen: &[(usize, f32)],
+    task: Task,
 ) -> Target {
-    let logistic = table
-        .target
-        .iter()
-        .all(|value| *value == 0.0 || *value == 1.0);
+    let logistic = task == Task::Binary;
     let features: Vec<_> = screen.iter().take(4).map(|(feature, _)| *feature).collect();
     let thresholds: Vec<_> = features
         .iter()
@@ -300,11 +311,9 @@ fn fit_compact_neural_target_native(
     table: &Table,
     completed: &[Vec<f32>],
     screen: &[(usize, f32)],
+    task: Task,
 ) -> Target {
-    let logistic = table
-        .target
-        .iter()
-        .all(|value| *value == 0.0 || *value == 1.0);
+    let logistic = task == Task::Binary;
     let selected: Vec<_> = screen
         .iter()
         .take(12)

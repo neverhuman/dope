@@ -3,7 +3,7 @@
 
 use serde::Serialize;
 
-use super::{Cell, FittedTransforms, TypedTable, fit_transform};
+use super::{FittedTransforms, TypedTable, fit_transform};
 use crate::compiler::{CompileOptions, CompileReport, compile_kernel_from_arrays};
 use crate::error::{DopeError, Result};
 use crate::model::{KernelProgram, Task};
@@ -83,7 +83,7 @@ fn rejected(code: &'static str) -> DopeError {
 }
 
 fn schema_error(error: crate::schema::SchemaError) -> DopeError {
-    rejected(error.code)
+    DopeError::Data(error.to_string())
 }
 
 /// Only explicitly supported, fully observed numeric columns enter the first
@@ -91,13 +91,26 @@ fn schema_error(error: crate::schema::SchemaError) -> DopeError {
 /// unsupported rather than being silently coerced into independent numeric data.
 fn ordered_columns(state: &FittedTransforms) -> Result<Vec<PublicColumn>> {
     let mut columns = state.public_projection().map_err(schema_error)?;
-    columns.retain(|c| matches!(c.role, ColumnRole::Feature | ColumnRole::Target));
-    if columns.iter().any(|c| c.dtype != ColumnType::Continuous) {
+    if columns
+        .iter()
+        .any(|c| !matches!(c.role, ColumnRole::Feature | ColumnRole::Target))
+    {
+        return Err(rejected("raw_sampler_unconsumed_state"));
+    }
+    if columns.iter().any(|c| !c.dtype.numeric()) {
         return Err(DopeError::Unsupported(
-            "raw_profile_requires_continuous_columns".into(),
+            "raw_profile_requires_numeric_columns".into(),
         ));
     }
     columns.sort_by_key(|c| c.role == ColumnRole::Target);
+    if columns
+        .last()
+        .is_none_or(|c| c.dtype != ColumnType::Continuous)
+    {
+        return Err(DopeError::Unsupported(
+            "raw_regression_target_requires_continuous_type".into(),
+        ));
+    }
     Ok(columns)
 }
 
@@ -110,20 +123,27 @@ pub fn compile_raw(
     if max_complete_bytes == 0 || max_complete_bytes > MAX_BYTES {
         return Err(rejected("raw_artifact_cap_invalid"));
     }
-    let state = fit_transform(table, fit_rows).map_err(schema_error)?;
+    let mut state = fit_transform(table, fit_rows).map_err(schema_error)?;
+    // Split/group/entity fields never enter either the fit tensor or the
+    // successor sampling closure. Preserve the historical transform API.
+    state
+        .columns
+        .retain(|column| matches!(column.role, ColumnRole::Feature | ColumnRole::Target));
     let columns = ordered_columns(&state)?;
     let features = columns.len() - 1;
     let mut x = Vec::with_capacity(fit_rows.len() * features);
     let mut y = Vec::with_capacity(fit_rows.len());
     for &row in fit_rows {
         for column in &columns {
-            let Cell::Number(value) = table.cell(row, &column.id).map_err(schema_error)? else {
-                return Err(DopeError::Unsupported(
-                    "raw_profile_requires_observed_cells".into(),
-                ));
-            };
+            let value = table
+                .cell(row, &column.id)
+                .map_err(schema_error)?
+                .number()
+                .ok_or_else(|| {
+                    DopeError::Unsupported("raw_profile_requires_observed_cells".into())
+                })?;
             let value = state
-                .transform_numeric(&column.id, &[*value])
+                .transform_numeric(&column.id, &[value])
                 .map_err(schema_error)?[0];
             if !value.is_finite() || !(0.0..=1.0).contains(&value) {
                 return Err(rejected("raw_fit_normalization_invalid"));
@@ -135,15 +155,34 @@ pub fn compile_raw(
             }
         }
     }
-    let compiled =
-        compile_kernel_from_arrays(&x, &y, fit_rows.len(), features, Task::Regression, options)?;
+    let retained = state.sampling_state_bytes().map_err(schema_error)?;
+    let payload_cap = max_complete_bytes
+        .checked_sub(HEADER + retained.len())
+        .filter(|cap| *cap > 0)
+        .ok_or_else(|| rejected("raw_complete_byte_cap_exceeded"))?;
+    let mut bounded_options = options.clone();
+    bounded_options.release_policy.maximum_artifact_bytes = Some(
+        options
+            .release_policy
+            .maximum_artifact_bytes
+            .map_or(payload_cap, |cap| cap.min(payload_cap)),
+    );
+    bounded_options.release_policy.validate()?;
+    let compiled = compile_kernel_from_arrays(
+        &x,
+        &y,
+        fit_rows.len(),
+        features,
+        Task::Regression,
+        &bounded_options,
+    )?;
     let kernel = crate::codec::decode_kernel(&compiled.artifact)?;
     if !matches!(kernel.program, KernelProgram::Symbolic { .. }) {
         return Err(DopeError::Unsupported(
             "raw_profile_requires_symbolic_backend".into(),
         ));
     }
-    let state = state.sampling_state_bytes().map_err(schema_error)?;
+    let state = retained;
     let total = HEADER
         .checked_add(state.len())
         .and_then(|n| n.checked_add(compiled.artifact.len()))
@@ -214,8 +253,8 @@ pub fn inspect_raw(artifact: &[u8]) -> Result<RawInspection> {
     Ok(RawInspection {
         format: "dope-raw-sampling-artifact",
         version: 1,
-        profile: "raw-continuous-symbolic-v1",
-        capability: "fully_observed_continuous_regression",
+        profile: "raw-numeric-symbolic-v1",
+        capability: "fully_observed_numeric_features_continuous_regression",
         feature_support: "fit_range_bounded_historical_native_marginals",
         target_support: "unclipped_affine_regression_not_tail_qualified",
         constant_target_rule: "unit_scale_with_fitted_offset",
@@ -264,6 +303,18 @@ fn numeric_census(value: &serde_json::Value) -> (usize, usize) {
 /// Reloaded bytes alone determine samples and their original units. No table,
 /// source-name mapping, or query values are retained or consulted here.
 pub fn sample_raw(artifact: &[u8], rows: usize, seed: Option<u64>) -> Result<Vec<f64>> {
+    Ok(sample_raw_detailed(artifact, rows, seed)?.values)
+}
+
+#[derive(Serialize)]
+pub struct RawSamples {
+    pub values: Vec<f64>,
+    pub integer_rounding_repairs: usize,
+    pub boolean_rounding_repairs: usize,
+    pub physical_domain_rejections: usize,
+}
+
+pub fn sample_raw_detailed(artifact: &[u8], rows: usize, seed: Option<u64>) -> Result<RawSamples> {
     let (state, payload) = unpack(artifact)?;
     let columns = ordered_columns(&state)?;
     if rows == 0
@@ -277,16 +328,38 @@ pub fn sample_raw(artifact: &[u8], rows: usize, seed: Option<u64>) -> Result<Vec
     let kernel = crate::codec::decode_kernel(payload)?;
     let normalized = sample_symbolic_support(&kernel, SampleOptions { rows, seed }, false)?;
     let mut values = Vec::with_capacity(normalized.len());
+    let mut integer_repairs = 0;
+    let mut boolean_repairs = 0;
     for row in normalized.chunks_exact(columns.len()) {
         for (column, value) in columns.iter().zip(row) {
-            values.push(
-                state
-                    .inverse_transform(&column.id, &[f64::from(*value)])
-                    .map_err(schema_error)?[0],
-            );
+            let mut original = state
+                .inverse_transform(&column.id, &[f64::from(*value)])
+                .map_err(schema_error)?[0];
+            if matches!(column.dtype, ColumnType::Integer | ColumnType::Ordinal) {
+                let rounded = original.round();
+                integer_repairs += usize::from(rounded != original);
+                original = rounded;
+            } else if column.dtype == ColumnType::Boolean {
+                let rounded = u8::from(original >= 0.5) as f64;
+                boolean_repairs += usize::from(rounded != original);
+                original = rounded;
+            }
+            // Physical declarations are separate from observed extrema. Never
+            // silently clamp or retry a draw that violates the declared domain.
+            let retained = state.column(&column.id).map_err(schema_error)?;
+            super::validate_numeric_cell(original, column.dtype, &retained.domain, |_| {
+                crate::schema::SchemaError::new("raw_sample_physical_domain_violation", None, None)
+            })
+            .map_err(schema_error)?;
+            values.push(original);
         }
     }
-    Ok(values)
+    Ok(RawSamples {
+        values,
+        integer_rounding_repairs: integer_repairs,
+        boolean_rounding_repairs: boolean_repairs,
+        physical_domain_rejections: 0,
+    })
 }
 
 /// Point prediction in original target units; query values never refit the
