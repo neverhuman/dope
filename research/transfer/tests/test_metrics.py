@@ -7,8 +7,9 @@ from research.transfer.losses import (
     ClassificationContract, DegenerateScale, LossSpace, PairedLosses, TrainingScale, training_variance,
 )
 from research.transfer.metrics import (
-    BoundEvidence, CellResult, Margin, TaskEvaluation, harm_summary, loss_summary,
-    observed_coverage, qualified_coverage, weighted_cvar,
+    BoundEvidence, CellResult, FitArtifact, Margin, TaskEvaluation, authenticate_bound,
+    harm_summary, loss_summary, observed_coverage, qualified_coverage, tail_regression,
+    weighted_cvar,
 )
 
 
@@ -23,10 +24,10 @@ def measured(synthetic=1., bound=None):
     return CellResult("measured", pairs(synthetic=synthetic), TrainingScale(100.), Margin(0., 0.01), bound)
 
 
-def task(name="t", family="f", cells=None, artifact_bytes=100):
+def task(name="t", family="f", cells=None, artifact_bytes=100, artifacts=()):
     return TaskEvaluation(family, name, ("a/n", "b/n", "a/4n", "b/4n"),
                           cells or {k: measured() for k in ("a/n", "b/n", "a/4n", "b/4n")},
-                          artifact_bytes, 100, True)
+                          artifact_bytes, 100, True, artifacts)
 
 
 class MetricsTests(unittest.TestCase):
@@ -132,6 +133,39 @@ class MetricsTests(unittest.TestCase):
         self.assertEqual(report["worst_required_learner_gap"], 0.1)
         self.assertEqual(report["catastrophic_rate"], 1.)
         self.assertAlmostEqual(report["positive_cvar90"], 0.1)
+
+    def test_coverage_truth_table_separates_completion_harm_and_artifacts(self):
+        outside = task(cells={k: measured(11.) for k in task().required_cells})
+        report = observed_coverage([outside])
+        self.assertEqual(report["cell_counts"]["observed_outside"], 4)
+        self.assertEqual(report["cell_counts"]["harmful"], 0)
+        self.assertEqual(report["coverage"], 0.)
+        self.assertLessEqual(report["lower"], report["upper"])
+        self.assertEqual(report["meaning"], "completion")
+        self.assertIsNone(report["confidence_interval"])
+        bound = BoundEvidence(0.2, "a/n", "protocol", "receipt", lower_z=0.1)
+        expected = {"pin_source": "external", "task_id": "t", "contrast_id": "a/n",
+                    "protocol_id": "protocol", "receipt_id": "receipt", "upper_z": 0.2, "lower_z": 0.1}
+        harmful = task(cells={"a/n": measured(11., bound)})
+        self.assertEqual(qualified_coverage(
+            [harmful], verify_bound=lambda task, key, bound: authenticate_bound(task, key, bound, expected),
+        )["cell_counts"]["harmful"], 1)
+        self.assertFalse(authenticate_bound(harmful, "a/n", BoundEvidence(0.4, "a/n", "protocol", "receipt", 0.1), expected))
+        swapped = task(name="other", cells={"a/n": measured(11., bound)})
+        self.assertFalse(authenticate_bound(swapped, "a/n", bound, expected))
+        self.assertFalse(authenticate_bound(harmful, "a/n", bound, {**expected, "pin_source": "candidate"}))
+        self.assertFalse(authenticate_bound(harmful, "a/n", bound, {**expected, "contrast_id": ""}))
+        keys = task().required_cells
+        inventory = tuple(FitArtifact(key, "fit-0", 10) for key in keys)
+        hidden = inventory[:-1] + (FitArtifact(keys[-1], "fit-0", 1000),)
+        self.assertEqual(observed_coverage([task(artifact_bytes=10, artifacts=hidden)])["coverage"], 0.)
+        self.assertEqual(observed_coverage([task(artifact_bytes=10, artifacts=inventory[:-1])])["coverage"], 0.)
+        cells = {key: measured(0. if key != "b/4n" else 3.) for key in keys}
+        tails = tail_regression([task(cells=cells)], catastrophic_threshold=0.05)
+        self.assertLess(tails["mean_gap"], 0.)
+        self.assertGreater(tails["positive_p95"], 0.)
+        self.assertTrue(tails["mean_hides_tail"])
+        self.assertEqual(tails["tail_claim"], "disclosed")
 
     def test_separate_classification_contract(self):
         case = GOLDEN["classification"]

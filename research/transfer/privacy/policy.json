@@ -1,0 +1,18 @@
+{
+  "format": "dope-empirical-disclosure-policy",
+  "version": 1,
+  "qualification": "unresolved",
+  "default_target_fpr": 0.01,
+  "threshold_comparison": "greater_than_or_equal",
+  "calibration": "independent_attack_development_only",
+  "multiplicity": "bonferroni_six_one_sided_events_per_declared_comparison",
+  "auc_uncertainty": "bounded_differences_per_independent_member_and_nonmember",
+  "clustered_or_repeated_release_uncertainty": "unmeasured",
+  "shadow_attacker": "regularized_logistic_baseline_v1",
+  "attribute_attacker": "matched_reference_count_ridge_v1",
+  "distance_control": "type_aware_matched_nearest_v1",
+  "empirical_pass_margins": null,
+  "formal_dp": "unverified",
+  "legal_route": "unverified",
+  "release_authorized": false
+}
