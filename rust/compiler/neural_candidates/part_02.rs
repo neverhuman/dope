@@ -64,59 +64,16 @@ fn compile_symbolic_table(
         })
         .collect::<Vec<_>>();
     let screen = target_screen(&completed, &table.target);
-    let (target_model, noise, _fitted_utility) = match task {
-        Task::Regression => fit_linear_target(table, &completed, &screen),
-        Task::Binary => fit_logistic_target(table, &completed, &screen),
-    };
-    let baseline_name = if task == Task::Regression {
-        "sparse_linear"
-    } else {
-        "sparse_logistic"
-    };
-    let baseline_rule = if task == Task::Regression {
-        "full_fit_homoscedastic_baseline_unqualified"
-    } else {
-        "full_fit_binary_calibration_unqualified"
-    };
-    let mut target_models = vec![(
-        baseline_name,
-        target_model.clone(),
-        (noise.clone(), baseline_rule),
-    )];
-    let gam = fit_gam_target(table, &completed, &screen, task);
-    target_models.push((
-        "sparse_gam",
-        gam.clone(),
-        fit_noise(table, &completed, &screen, &gam, task),
-    ));
-    let ga2m = fit_ga2m_target(table, &completed, &screen, task);
-    target_models.push((
-        "ga2m",
-        ga2m.clone(),
-        fit_noise(table, &completed, &screen, &ga2m, task),
-    ));
-    let mars = fit_mars_target(table, &completed, &screen, task);
-    target_models.push((
-        "mars",
-        mars.clone(),
-        fit_noise(table, &completed, &screen, &mars, task),
-    ));
-    let oblivious_tree = fit_oblivious_tree_target(table, &completed, &screen, task);
-    target_models.push((
-        "oblivious_tree",
-        oblivious_tree.clone(),
-        fit_noise(table, &completed, &screen, &oblivious_tree, task),
-    ));
-    let compact_neural = if restricted_profile.is_some_and(|profile| profile.2 != 5) {
-        target_model.clone()
-    } else {
-        fit_compact_neural_target(table, &completed, &screen, seed, task)?
-    };
-    target_models.push((
-        "compact_neural_residual",
-        compact_neural.clone(),
-        fit_noise(table, &completed, &screen, &compact_neural, task),
-    ));
+    let target_models = prepare_symbolic_targets(
+        table,
+        &completed,
+        &screen,
+        task,
+        options,
+        seed,
+        restricted_profile,
+    )?;
+    let (_, target_model, (noise, _)) = &target_models[0];
     let seed_kernel = Kernel {
         task,
         rows_fitted: table.rows as u64,
@@ -129,8 +86,8 @@ fn compile_symbolic_table(
         marginals: Vec::new(),
         program: KernelProgram::Symbolic {
             dependence: Dependence::Independent,
-            target: target_model,
-            noise,
+            target: target_model.clone(),
+            noise: noise.clone(),
         },
     };
 
@@ -201,6 +158,7 @@ fn compile_symbolic_table(
                         spec.3
                     ),
                     spec.5,
+                    options.development_residual,
                 )
             })
         })
@@ -275,6 +233,7 @@ fn compile_symbolic_table(
                     target_models[target_index].0
                 ),
                 capacity_profile,
+                options.development_residual,
             )
         });
         let capacity_refinement = capacity_refinement(capacity_profile);
@@ -314,11 +273,17 @@ fn compile_symbolic_table(
         let (target_name, target_model, (noise, rule)) = &target_models[target_index];
         let (target, noise, rule) = if let Some(capacity) = capacity_refinement {
             refine_dependence(&mut dependence, capacity, width);
-            let fitted = refined_targets
-                .entry((capacity_profile, target_index))
-                .or_insert_with(|| {
-                    refined_target(table, &completed, &screen, task, target_index, capacity)
-                });
+            let fitted = match refined_targets.entry((capacity_profile, target_index)) {
+                std::collections::btree_map::Entry::Occupied(entry) => entry.into_mut(),
+                std::collections::btree_map::Entry::Vacant(entry) => entry.insert(refined_target(
+                    table,
+                    &completed,
+                    &screen,
+                    task,
+                    target_index,
+                    (capacity, options.development_residual),
+                )?),
+            };
             (fitted.0.clone(), fitted.1.clone(), fitted.2)
         } else {
             (target_model.clone(), noise.clone(), *rule)
@@ -401,6 +366,7 @@ fn compile_symbolic_table(
             capacity_candidate_id(
                 format!("k{knots}-{dependence_name}-{target_name}-q{bits}"),
                 capacity_profile,
+                options.development_residual,
             )
         });
         search_history.push(CandidateAttempt {

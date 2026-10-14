@@ -14,8 +14,8 @@ use crate::error::{DopeError, Result};
 use crate::model::{
     AdditiveTerm, ColumnSchema, CopulaEdge, Dependence, FactorLoading, InteractionTerm,
     JointGenerator, Kernel, KernelProgram, LinearTerm, Marginal, MarsFactor, MarsTerm,
-    NeuralArchitecture, NeuralProfile, Noise, RankNormalization, SchemaKind, Target, Task,
-    TriangularTerm, VineEdge,
+    NeuralArchitecture, NeuralProfile, Noise, RankNormalization, ResidualProfile, ResidualV1,
+    SchemaKind, Target, Task, TriangularTerm, VineEdge,
 };
 use crate::sample::evaluate_target;
 
@@ -40,6 +40,8 @@ pub struct CompileOptions {
     pub neural_structural_penalty: f64,
     /// Development-only allocation policy; fixed empirical profiles remain fixed.
     pub adaptive_allocation: bool,
+    /// Explicit unqualified residual-v1 comparison; never changes a frozen backend.
+    pub development_residual: Option<ResidualProfile>,
 }
 
 impl Default for CompileOptions {
@@ -56,6 +58,7 @@ impl Default for CompileOptions {
             neural_target_weight: 2.0,
             neural_structural_penalty: 0.0,
             adaptive_allocation: false,
+            development_residual: None,
         }
     }
 }

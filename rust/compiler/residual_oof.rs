@@ -16,6 +16,19 @@ fn oof_residual_view_capacity(
     target: &Target,
     capacity: Option<CapacityRefinement>,
 ) -> Option<(Table, Vec<f32>)> {
+    let (view, residuals) = oof_signed_residual_view_capacity(table, completed, target, capacity)?;
+    Some((
+        view,
+        residuals.into_iter().map(|v| v.abs().max(1e-5)).collect(),
+    ))
+}
+
+fn oof_signed_residual_view_capacity(
+    table: &Table,
+    completed: &[Vec<f32>],
+    target: &Target,
+    capacity: Option<CapacityRefinement>,
+) -> Option<(Table, Vec<f32>)> {
     if table.rows < 24 {
         return None;
     }
@@ -102,9 +115,7 @@ fn oof_residual_view_capacity(
                 .iter()
                 .map(|column| column[id])
                 .collect::<Vec<_>>();
-            residuals[at] = (table.target[id] - evaluate_target(&fitted, &row).0)
-                .abs()
-                .max(1e-5);
+            residuals[at] = table.target[id] - evaluate_target(&fitted, &row).0;
         }
     }
     Some((

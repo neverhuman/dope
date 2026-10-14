@@ -1,5 +1,3 @@
-
-
 pub(crate) fn evaluate_target(target: &Target, row: &[f32]) -> (f32, bool) {
     match target {
         Target::SparseLinear { intercept, terms } => (
@@ -170,8 +168,19 @@ pub(crate) fn sample_symbolic_support(
             }
             let (linear, logistic) = evaluate_target(target, row);
             row[width] = match (&kernel.task, noise) {
-                (Task::Regression, Noise::Homoscedastic { sigma }) => linear
-                    + *sigma * inverse_normal(uniform(seed, row_index, width, 0x9abc_def0)) as f32,
+                (Task::Regression, Noise::ResidualV1 { distribution }) => {
+                    linear
+                        + residual_v1(
+                            distribution,
+                            uniform(seed, row_index, width, 0x9abc_def0),
+                            uniform(seed, row_index, width, 0x9abc_def1),
+                        )
+                }
+                (Task::Regression, Noise::Homoscedastic { sigma }) => {
+                    linear
+                        + *sigma
+                            * inverse_normal(uniform(seed, row_index, width, 0x9abc_def0)) as f32
+                }
                 (
                     Task::Regression,
                     Noise::Heteroscedastic {

@@ -4,6 +4,9 @@ use dope_kernel::typed_data::workflow::{compile_raw, inspect_raw, predict_raw, s
 use dope_kernel::typed_data::{InputLimits, TypedTable};
 use serde_json::json;
 
+#[path = "support/raw_residual_profiles.rs"]
+mod raw_residual_profiles;
+
 fn table(x_scale: f64, y_scale: f64, query: f64) -> TypedTable {
     let schema = TableSchemaV1::from_private_json(
         &serde_json::to_vec(&json!({

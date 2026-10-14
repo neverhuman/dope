@@ -6,11 +6,12 @@ use serde::Serialize;
 use super::{FittedTransforms, TypedTable, fit_transform};
 use crate::compiler::{CompileOptions, CompileReport, compile_kernel_from_arrays};
 use crate::error::{DopeError, Result};
-use crate::model::{KernelProgram, Task};
+use crate::model::{KernelProgram, Noise, ResidualProfile, Task};
 use crate::sample::{SampleOptions, sample_symbolic_support};
 use crate::schema::{ColumnRole, ColumnType, PublicColumn};
 
 const MAGIC: &[u8; 8] = b"DOPERAW1";
+const RESIDUAL_MAGIC: &[u8; 8] = b"DOPERAW2";
 const HEADER: usize = 56;
 const MAX_BYTES: usize = 32 * 1024 * 1024;
 
@@ -120,6 +121,41 @@ pub fn compile_raw(
     options: &CompileOptions,
     max_complete_bytes: usize,
 ) -> Result<RawCompileResult> {
+    if options.development_residual.is_some() {
+        return Err(DopeError::Unsupported(
+            "raw_v1_refuses_development_residual".into(),
+        ));
+    }
+    compile_raw_profile(table, fit_rows, options, max_complete_bytes, MAGIC)
+}
+
+/// Explicit fully observed numeric successor. Residual parameters enter the
+/// native payload before every encoded cap check; the v1 entry stays unchanged.
+pub fn compile_raw_residual(
+    table: &TypedTable,
+    fit_rows: &[usize],
+    options: &CompileOptions,
+    max_complete_bytes: usize,
+    profile: ResidualProfile,
+) -> Result<RawCompileResult> {
+    let mut options = options.clone();
+    options.development_residual = Some(profile);
+    compile_raw_profile(
+        table,
+        fit_rows,
+        &options,
+        max_complete_bytes,
+        RESIDUAL_MAGIC,
+    )
+}
+
+fn compile_raw_profile(
+    table: &TypedTable,
+    fit_rows: &[usize],
+    options: &CompileOptions,
+    max_complete_bytes: usize,
+    magic: &[u8; 8],
+) -> Result<RawCompileResult> {
     if max_complete_bytes == 0 || max_complete_bytes > MAX_BYTES {
         return Err(rejected("raw_artifact_cap_invalid"));
     }
@@ -191,7 +227,7 @@ pub fn compile_raw(
         return Err(rejected("raw_complete_byte_cap_exceeded"));
     }
     let mut artifact = Vec::with_capacity(total);
-    artifact.extend_from_slice(MAGIC);
+    artifact.extend_from_slice(magic);
     artifact.extend_from_slice(&(state.len() as u64).to_le_bytes());
     artifact.extend_from_slice(&(compiled.artifact.len() as u64).to_le_bytes());
     let mut content = state;
@@ -207,7 +243,10 @@ pub fn compile_raw(
 }
 
 fn unpack(artifact: &[u8]) -> Result<(FittedTransforms, &[u8])> {
-    if artifact.len() < HEADER || artifact.len() > MAX_BYTES || &artifact[..8] != MAGIC {
+    if artifact.len() < HEADER
+        || artifact.len() > MAX_BYTES
+        || (&artifact[..8] != MAGIC && &artifact[..8] != RESIDUAL_MAGIC)
+    {
         return Err(rejected("raw_artifact_invalid"));
     }
     let read_length = |offset| -> Result<usize> {
@@ -233,6 +272,16 @@ fn unpack(artifact: &[u8]) -> Result<(FittedTransforms, &[u8])> {
     crate::bundle::preflight_dpk(payload, &crate::bundle::BundleLimits::default())
         .map_err(|_| rejected("raw_payload_limits_invalid"))?;
     let kernel = crate::codec::decode_kernel(payload)?;
+    let residual = matches!(
+        kernel.program,
+        KernelProgram::Symbolic {
+            noise: Noise::ResidualV1 { .. },
+            ..
+        }
+    );
+    if residual != (&artifact[..8] == RESIDUAL_MAGIC) {
+        return Err(rejected("raw_residual_profile_mismatch"));
+    }
     let columns = ordered_columns(&state)?;
     if kernel.features as usize + 1 != columns.len()
         || kernel.task != Task::Regression
@@ -250,10 +299,15 @@ pub fn inspect_raw(artifact: &[u8]) -> Result<RawInspection> {
     let (native_floats, native_integers) = numeric_census(&native);
     let retained = serde_json::to_value(&state)?;
     let (state_floats, state_integers) = numeric_census(&retained);
+    let residual = &artifact[..8] == RESIDUAL_MAGIC;
     Ok(RawInspection {
         format: "dope-raw-sampling-artifact",
-        version: 1,
-        profile: "raw-numeric-symbolic-v1",
+        version: if residual { 2 } else { 1 },
+        profile: if residual {
+            "raw-numeric-residual-v1"
+        } else {
+            "raw-numeric-symbolic-v1"
+        },
         capability: "fully_observed_numeric_features_continuous_regression",
         feature_support: "fit_range_bounded_historical_native_marginals",
         target_support: "unclipped_affine_regression_not_tail_qualified",
@@ -262,7 +316,11 @@ pub fn inspect_raw(artifact: &[u8]) -> Result<RawInspection> {
         certification: "unqualified_development_artifact",
         schema: state.public_projection().map_err(schema_error)?,
         accounting: RawAccounting {
-            byte_profile_id: "native-raw-complete-v1",
+            byte_profile_id: if residual {
+                "native-raw-complete-residual-v1"
+            } else {
+                "native-raw-complete-v1"
+            },
             framing_bytes: HEADER,
             transform_schema_bytes: artifact.len() - HEADER - payload.len(),
             native_payload_bytes: payload.len(),

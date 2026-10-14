@@ -28,6 +28,9 @@ enum Command {
         seed: u64,
         #[arg(long, default_value = "chow_liu")]
         candidate: String,
+        /// Explicit residual-v1 development comparison. Requires --candidate development_symbolic.
+        #[arg(long)]
+        residual_profile: Option<String>,
         #[arg(long, default_value_t = 32768)]
         max_complete_bytes: usize,
         #[arg(long, default_value_t = 60.0)]

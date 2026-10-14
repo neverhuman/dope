@@ -32,11 +32,16 @@ fn capacity_order(profile: u8) -> u8 {
     if profile == 0 { 3 } else { profile - 1 }
 }
 
-fn capacity_candidate_id(id: String, profile: u8) -> String {
-    if profile == 0 {
+fn capacity_candidate_id(id: String, profile: u8, residual: Option<ResidualProfile>) -> String {
+    let id = if profile == 0 {
         id
     } else {
         format!("{id}-c{profile}")
+    };
+    if let Some(residual) = residual {
+        format!("{id}-{}", residual.as_str())
+    } else {
+        id
     }
 }
 
@@ -46,19 +51,19 @@ fn refined_target(
     screen: &[(usize, f32)],
     task: Task,
     target_index: usize,
-    capacity: CapacityRefinement,
-) -> (Target, Noise, &'static str) {
+    controls: (CapacityRefinement, Option<ResidualProfile>),
+) -> Result<(Target, Noise, &'static str)> {
+    let (capacity, residual) = controls;
     let target = refined_target_model(table, completed, screen, task, target_index, capacity);
-    let (noise, rule) = fit_noise_bounded(
+    let (noise, rule) = selected_noise(
         table,
         completed,
         screen,
         &target,
         task,
-        capacity.residual_support,
-        Some(capacity),
-    );
-    (target, noise, rule)
+        (Some(capacity), residual),
+    )?;
+    Ok((target, noise, rule))
 }
 
 fn refined_target_model(

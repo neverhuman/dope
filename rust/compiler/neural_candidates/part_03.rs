@@ -1,5 +1,3 @@
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -36,11 +34,20 @@ mod tests {
         let targets = features.iter().map(|x| 0.2 + 0.6 * x).collect::<Vec<_>>();
         for beam in [1, 18] {
             let options = CompileOptions {
-                seed: Some(1729), beam_width: Some(beam), quantization_profiles: vec![8],
+                seed: Some(1729),
+                beam_width: Some(beam),
+                quantization_profiles: vec![8],
                 ..Default::default()
             };
-            let result = compile_kernel_from_arrays(&features, &targets, 64, 1, Task::Regression, &options).unwrap();
-            assert!(result.candidates.iter().any(|candidate| candidate.candidate_id == "k5-independence-sparse_linear-q8"));
+            let result =
+                compile_kernel_from_arrays(&features, &targets, 64, 1, Task::Regression, &options)
+                    .unwrap();
+            assert!(
+                result
+                    .candidates
+                    .iter()
+                    .any(|candidate| candidate.candidate_id == "k5-independence-sparse_linear-q8")
+            );
             assert_eq!(result.report.search_history.len(), beam);
             assert_eq!(result.report.candidate_count, beam);
         }
@@ -100,6 +107,7 @@ mod tests {
             neural_target_weight: 2.0,
             neural_structural_penalty: 0.0,
             adaptive_allocation: false,
+            development_residual: None,
             release_policy: ReleasePolicy::new(AnonymizationTier::L0, None, false).unwrap(),
         };
         let result =

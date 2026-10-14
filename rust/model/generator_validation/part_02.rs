@@ -1,5 +1,3 @@
-
-
 fn validate_target(target: &Target, width: usize) -> std::result::Result<(), String> {
     let linear_terms_valid = |terms: &[LinearTerm]| {
         terms.len() <= 64
@@ -111,6 +109,7 @@ fn validate_target(target: &Target, width: usize) -> std::result::Result<(), Str
 
 fn validate_noise(noise: &Noise, width: usize) -> std::result::Result<(), String> {
     match noise {
+        Noise::ResidualV1 { distribution } => distribution.validate(),
         Noise::Homoscedastic { sigma } if valid_probability(*sigma) => Ok(()),
         Noise::BernoulliCalibration { base_rate } if valid_probability(*base_rate) => Ok(()),
         Noise::Heteroscedastic {

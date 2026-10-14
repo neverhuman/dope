@@ -1,4 +1,3 @@
-
 pub fn decode_kernel(artifact: &[u8]) -> Result<Kernel> {
     if artifact.len() < HEADER_BYTES || artifact.len() > MAX_ARTIFACT_BYTES {
         return Err(DopeError::Codec("artifact violates the size bounds".into()));
@@ -112,6 +111,18 @@ pub fn decode_kernel(artifact: &[u8]) -> Result<Kernel> {
         }
     };
     let width = features as usize;
+    if matches!(
+        program,
+        KernelProgram::Symbolic {
+            noise: Noise::ResidualV1 { .. },
+            ..
+        }
+    ) && (!v3 || artifact[5] != VERSION_MINOR || task != Task::Regression)
+    {
+        return Err(DopeError::Codec(
+            "residual v1 requires native DPK3.3 regression".into(),
+        ));
+    }
     let kernel = Kernel {
         task,
         rows_fitted,

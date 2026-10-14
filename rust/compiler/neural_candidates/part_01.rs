@@ -149,6 +149,15 @@ fn compile_neural_table(
 }
 
 fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<CompileResult> {
+    if options.development_residual.is_some()
+        && (task != Task::Regression
+            || options.backend_id.is_some()
+            || cfg!(feature = "gpu-training"))
+    {
+        return Err(DopeError::Unsupported(
+            "development_residual_requires_unrestricted_native_regression".into(),
+        ));
+    }
     if options.adaptive_allocation && options.backend_id.is_some() {
         return Err(DopeError::Unsupported(
             "adaptive_allocation_requires_unrestricted_symbolic_tournament".into(),

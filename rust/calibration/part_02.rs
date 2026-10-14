@@ -1,5 +1,3 @@
-
-
 fn row_major(table: &Table) -> Vec<f32> {
     let mut values = vec![0.0; table.rows * table.features];
     for row in 0..table.rows {
@@ -146,6 +144,7 @@ fn compile_labels(packed: &PackedCorpus, manifest: &SplitManifest) -> Result<Lab
         *operators
             .entry(
                 match kernel_noise {
+                    Noise::ResidualV1 { .. } => "development_residual_v1",
                     Noise::Homoscedastic { .. } => "homoscedastic",
                     Noise::BernoulliCalibration { .. } => "bernoulli_calibration",
                     Noise::Heteroscedastic { .. } => "heteroscedastic",

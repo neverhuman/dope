@@ -1,4 +1,3 @@
-
 impl JointGenerator {
     pub fn validate(&self, features: usize, task: Task) -> std::result::Result<(), String> {
         let tokens = features + 1;
@@ -180,6 +179,9 @@ impl Kernel {
                 target,
                 noise,
             } => {
+                if matches!(noise, Noise::ResidualV1 { .. }) && self.task != Task::Regression {
+                    return Err("development residual v1 requires regression".into());
+                }
                 validate_dependence(dependence, width, 0)?;
                 validate_target(target, width)?;
                 validate_noise(noise, width)?;
