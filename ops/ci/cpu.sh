@@ -10,6 +10,9 @@ bash ops/ci/check-contracts.sh
 cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo test --locked
+cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
+cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
+cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard
 python3 -m venv --system-site-packages target/ci-python
 bash ops/ci/install-python-v1.sh target/ci-python/bin/python
 PYTHONPATH=src target/ci-python/bin/python -m pytest -q tests

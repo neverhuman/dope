@@ -401,6 +401,10 @@
     ".gitleaksignore": "governance",
     "docs/whitepaper/scripts/paper_build.py": "governance",
     "docs/whitepaper/scripts/build_pdf.sh": "governance",
-    "research/benchmark/tests/test_paper_build_pipeline.py": "governance"
+    "research/benchmark/tests/test_paper_build_pipeline.py": "governance",
+    "ops/merge_guard/": "governance",
+    "ops/merge_guard/Cargo.toml": "governance",
+    "ops/merge_guard/Cargo.lock": "governance",
+    "docs/merge-guard.md": "governance"
   }
 }

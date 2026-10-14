@@ -12,7 +12,12 @@ setup:
     mkdir -p target/python-metadata
     if test -d src/dope_kernel.egg-info; then mv src/dope_kernel.egg-info "target/python-metadata/dope_kernel.$(date +%s%N).egg-info"; fi
 
-fast:
+native-guard-check:
+    cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
+    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
+    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard
+
+fast: native-guard-check
     cargo fmt --all -- --check
     cargo check -p dope-kernel --locked
     cargo test --locked --lib

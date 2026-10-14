@@ -1,0 +1,88 @@
+[
+  {
+    "api": [
+      {
+        "args": [
+          "user"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "login": "jepsontaylor"
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/git/ref/heads/main"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "object": {
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/branches/main/protection"
+        ],
+        "kwargs": {
+          "optional": true
+        },
+        "method": "get",
+        "value": null
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/rules/branches/main"
+        ],
+        "kwargs": {},
+        "method": "listing",
+        "value": []
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/branches/main/protection"
+        ],
+        "kwargs": {
+          "optional": true
+        },
+        "method": "get",
+        "value": null
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/rules/branches/main"
+        ],
+        "kwargs": {},
+        "method": "listing",
+        "value": []
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/git/ref/heads/main"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "object": {
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      }
+    ],
+    "args": [
+      "neverhuman/dope",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    ],
+    "expected": {
+      "merge_authorized": false,
+      "read_only": true,
+      "reason": "control_unavailable",
+      "state": "control_unavailable"
+    },
+    "kwargs": {},
+    "operation": "inspect_controls"
+  }
+]

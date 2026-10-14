@@ -1624,6 +1624,30 @@
     "research/benchmark/tests/test_paper_build_pipeline.py": {
       "command": "PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_paper_packaging -v && python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v",
       "purpose": "exercise canonical paper/build/check recipes, immutable admission, snapshot compiler inputs, authentication-only entry semantics, expected render inventories and four-PDF control flow with bounded fixtures"
+    },
+    "ops/merge_guard/": {
+      "command": "just native-guard-check",
+      "purpose": "prove all 51 legacy guard scenarios and 196 subcases, native read-only transport, receipt integrity, malformed data, Unicode hashing and timestamp boundaries without GitHub access"
+    },
+    "ops/merge_guard/Cargo.toml": {
+      "command": "just native-guard-check",
+      "purpose": "verify isolated locked native tool dependency graph, format, clippy and complete scenario proofs"
+    },
+    "ops/merge_guard/Cargo.lock": {
+      "command": "just native-guard-check && just security",
+      "purpose": "prove pinned isolated tool dependencies and require independent lock advisory coverage in the canonical security lane"
+    },
+    "ops/ci/cpu.sh": {
+      "command": "just check",
+      "purpose": "preserve existing CPU checks and require isolated native guard format/clippy/tests; CI retains all paper and product gates"
+    },
+    "docs/merge-guard.md": {
+      "command": "just native-guard-check",
+      "purpose": "verify fail-closed exact-source independent review, complete queued/failed workflow accounting, server controls, race rejection and actual squash merge receipts using synthetic read-only API fixtures"
+    },
+    "tools/security-lane.sh": {
+      "command": "just security",
+      "purpose": "audit both product and independent guard locks, retain workflow lint, secret scans and SBOM evidence"
     }
   }
 }
