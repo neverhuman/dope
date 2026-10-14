@@ -1,9 +1,10 @@
 """Transfer diagnostics and scheduled reliability, with bytes as a constraint.
 
 BoundEvidence is the typed bound-evidence record consumed alongside verified
-PR01/PR02 evaluation receipts. The trusted verifier checks the task, contrast,
-protocol and receipt identities before a bound counts toward supported coverage.
-Missing verification defaults to observed-only evidence. These diagnostics do
+PR01/PR02 evaluation receipts. A supported bound needs an owner digest or a
+paired recomputation over the live learner, fit, artifact, scale, margin,
+paired losses, schedule, code, RNG, and result. A pin_source string is not
+that binding. Missing verification stays observed-only. These diagnostics do
 not authorize release.
 """
 
@@ -13,6 +14,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 import math
 
+from .evidence import digest
 from .losses import PairedLosses, TrainingScale, finite_number
 
 
@@ -178,24 +180,123 @@ class TaskEvaluation:
                 raise ValueError("unscheduled artifact")
 
 
+_BOUND_ENDPOINTS = frozenset({"gap", "normalized_gap", "z", "tolerance_adjusted_z_over_fit_scale"})
+_PAIRED_MEAN_PROCEDURE = {
+    "format": "dope-bound-procedure",
+    "version": 1,
+    "id": "paired-mean-query-z-v1",
+    "calibration": "unmeasured",
+}
+PAIRED_MEAN_CODE_DIGEST = digest(_PAIRED_MEAN_PROCEDURE)
+
+
+def query_z_mean(cell) -> float:
+    """Mean of per-query tolerance-adjusted Z. This is not a calibrated upper bound."""
+    values = cell.margin.query_z(cell.pairs, cell.scale)
+    return finite_number(math.fsum(values) / len(values))
+
+
+def _paired_digest(pairs: PairedLosses) -> str:
+    return digest({
+        "query_ids": list(pairs.query_ids),
+        "cluster_ids": list(pairs.cluster_ids),
+        "real": list(pairs.real),
+        "synthetic": list(pairs.synthetic),
+        "null": list(pairs.null),
+        "loss_space": pairs.loss_space.value,
+    })
+
+
+def _binding_text(value):
+    if type(value) is not str or not value:
+        raise ValueError("incomplete_bound_binding")
+    return value
+
+
+def _binding_digest_text(value):
+    if type(value) is not str or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
+        raise ValueError("incomplete_bound_binding")
+    return value
+
+
+def bound_binding_record(task, cell_id, bound, analysis) -> dict:
+    """Live cell, fit artifact, and declared analysis identity. The digest covers this record."""
+    if bound is None or not isinstance(analysis, dict) or cell_id != bound.contrast_id:
+        raise ValueError("incomplete_bound_binding")
+    cell = task.cells.get(cell_id)
+    if cell is None or cell.status != "measured" or cell.pairs is None:
+        raise ValueError("incomplete_bound_binding")
+    matches = [artifact for artifact in task.artifacts if artifact.cell_id == cell_id]
+    if len(matches) != 1:
+        raise ValueError("unbound_artifact")
+    artifact = matches[0]
+    endpoint = _binding_text(analysis.get("endpoint"))
+    if endpoint not in _BOUND_ENDPOINTS:
+        raise ValueError("incomplete_bound_binding")
+    draws = analysis.get("draws")
+    if type(draws) is not int or isinstance(draws, bool) or draws < 1:
+        raise ValueError("incomplete_bound_binding")
+    return {
+        "format": "dope-bound-binding",
+        "version": 1,
+        "task_id": task.task_id,
+        "learner_id": _binding_text(analysis.get("learner_id")),
+        "fit_id": artifact.fit_id,
+        "artifact_id": digest({
+            "cell_id": artifact.cell_id,
+            "fit_id": artifact.fit_id,
+            "artifact_bytes": artifact.artifact_bytes,
+        }),
+        "contrast_id": bound.contrast_id,
+        "protocol_id": bound.protocol_id,
+        "receipt_id": bound.receipt_id,
+        "endpoint": endpoint,
+        "scale": cell.scale.value,
+        "scale_status": cell.scale.status.value if cell.scale.status else "positive_fit_scale",
+        "margin": {
+            "relative": cell.margin.relative,
+            "absolute_scaled": cell.margin.absolute_scaled,
+            "absolute_raw": cell.margin.absolute_raw,
+        },
+        "paired_digest": _paired_digest(cell.pairs),
+        "point_z": cell.z,
+        "query_z_mean": query_z_mean(cell),
+        "schedule_id": _binding_text(analysis.get("schedule_id")),
+        "code_digest": _binding_digest_text(analysis.get("code_digest")),
+        "rng_id": _binding_text(analysis.get("rng_id")),
+        "draws": draws,
+        "multiplicity": _binding_text(analysis.get("multiplicity")),
+        "upper_z": bound.upper_z,
+        "lower_z": bound.lower_z,
+    }
+
+
 def authenticate_bound(task, cell_id, bound, expected) -> bool:
-    """External pins only. Candidate-derived pins, task swaps, and tampered bounds fail."""
-    if bound is None or not isinstance(expected, dict) or expected.get("pin_source") != "external":
+    """Owner digest or paired recomputation. A pin_source string is not a binding."""
+    if bound is None or not isinstance(expected, dict) or expected.get("trust") not in ("owner", "recomputed"):
         return False
-    required = ("task_id", "contrast_id", "protocol_id", "receipt_id", "upper_z")
-    if any(expected.get(key) in (None, "") for key in required):
+    if expected.get("pin_source") not in (None, "owner"):
         return False
-    if task.task_id != expected["task_id"]:
+    try:
+        record = bound_binding_record(task, cell_id, bound, expected)
+    except ValueError:
         return False
-    if cell_id != expected["contrast_id"] or bound.contrast_id != expected["contrast_id"]:
+    if expected.get("trust") == "recomputed":
+        cell = task.cells.get(cell_id)
+        if (
+            record["endpoint"] != "z"
+            or record["code_digest"] != PAIRED_MEAN_CODE_DIGEST
+            or record["rng_id"] != "deterministic-paired-mean"
+            or record["draws"] != len(cell.pairs.real)
+            or bound.lower_z is not None
+            or bound.upper_z != record["query_z_mean"]
+        ):
+            return False
+    if any(expected.get(key) != record[key] for key in record):
         return False
-    if bound.protocol_id != expected["protocol_id"] or bound.receipt_id != expected["receipt_id"]:
+    if set(expected) - set(record) - {"trust", "binding_digest", "pin_source"}:
         return False
-    if bound.upper_z != expected["upper_z"]:
-        return False
-    if "lower_z" in expected and bound.lower_z != expected["lower_z"]:
-        return False
-    return True
+    return expected.get("binding_digest") == digest(record)
 
 
 def _task_feasible(task) -> bool:

@@ -3,13 +3,14 @@ import math
 from pathlib import Path
 import unittest
 
+from research.transfer.evidence import digest
 from research.transfer.losses import (
     ClassificationContract, DegenerateScale, LossSpace, PairedLosses, TrainingScale, training_variance,
 )
 from research.transfer.metrics import (
-    BoundEvidence, CellResult, FitArtifact, Margin, TaskEvaluation, authenticate_bound,
-    harm_summary, loss_summary, observed_coverage, qualified_coverage, tail_regression,
-    weighted_cvar,
+    PAIRED_MEAN_CODE_DIGEST, BoundEvidence, CellResult, FitArtifact, Margin, TaskEvaluation,
+    authenticate_bound, bound_binding_record, harm_summary, loss_summary, observed_coverage,
+    qualified_coverage, query_z_mean, tail_regression, weighted_cvar,
 )
 
 
@@ -144,17 +145,42 @@ class MetricsTests(unittest.TestCase):
         self.assertEqual(report["meaning"], "completion")
         self.assertIsNone(report["confidence_interval"])
         bound = BoundEvidence(0.2, "a/n", "protocol", "receipt", lower_z=0.1)
-        expected = {"pin_source": "external", "task_id": "t", "contrast_id": "a/n",
-                    "protocol_id": "protocol", "receipt_id": "receipt", "upper_z": 0.2, "lower_z": 0.1}
-        harmful = task(cells={"a/n": measured(11., bound)})
+        artifact = FitArtifact("a/n", "fit-0", 10)
+        harmful = task(cells={"a/n": measured(11., bound)}, artifacts=(artifact,))
+        analysis = {
+            "learner_id": "a", "endpoint": "z", "schedule_id": "schedule-1",
+            "code_digest": digest({"code": "owner-analysis-v1"}), "rng_id": "rng-1",
+            "draws": 20, "multiplicity": "cell",
+        }
+        record = bound_binding_record(harmful, "a/n", bound, analysis)
+        expected = {**record, "trust": "owner", "binding_digest": digest(record)}
+        legacy = {
+            "pin_source": "external", "task_id": "t", "contrast_id": "a/n",
+            "protocol_id": "protocol", "receipt_id": "receipt", "upper_z": 0.2, "lower_z": 0.1,
+        }
         self.assertEqual(qualified_coverage(
             [harmful], verify_bound=lambda task, key, bound: authenticate_bound(task, key, bound, expected),
         )["cell_counts"]["harmful"], 1)
+        self.assertFalse(authenticate_bound(harmful, "a/n", bound, legacy))
         self.assertFalse(authenticate_bound(harmful, "a/n", BoundEvidence(0.4, "a/n", "protocol", "receipt", 0.1), expected))
-        swapped = task(name="other", cells={"a/n": measured(11., bound)})
+        swapped = task(name="other", cells={"a/n": measured(11., bound)}, artifacts=(artifact,))
         self.assertFalse(authenticate_bound(swapped, "a/n", bound, expected))
+        shifted = task(cells={"a/n": measured(12., bound)}, artifacts=(artifact,))
+        self.assertFalse(authenticate_bound(shifted, "a/n", bound, expected))
         self.assertFalse(authenticate_bound(harmful, "a/n", bound, {**expected, "pin_source": "candidate"}))
+        self.assertFalse(authenticate_bound(harmful, "a/n", bound, {**expected, "rng_id": "other-rng"}))
         self.assertFalse(authenticate_bound(harmful, "a/n", bound, {**expected, "contrast_id": ""}))
+        recomputed_bound = BoundEvidence(query_z_mean(harmful.cells["a/n"]), "a/n", "protocol", "receipt")
+        recomputed_task = task(cells={"a/n": measured(11., recomputed_bound)}, artifacts=(artifact,))
+        recomputed_analysis = {
+            **analysis, "code_digest": PAIRED_MEAN_CODE_DIGEST,
+            "rng_id": "deterministic-paired-mean", "draws": 1,
+        }
+        recomputed_record = bound_binding_record(recomputed_task, "a/n", recomputed_bound, recomputed_analysis)
+        recomputed = {**recomputed_record, "trust": "recomputed", "binding_digest": digest(recomputed_record)}
+        self.assertTrue(authenticate_bound(recomputed_task, "a/n", recomputed_bound, recomputed))
+        forged = BoundEvidence(recomputed_bound.upper_z + 1, "a/n", "protocol", "receipt")
+        self.assertFalse(authenticate_bound(recomputed_task, "a/n", forged, recomputed))
         keys = task().required_cells
         inventory = tuple(FitArtifact(key, "fit-0", 10) for key in keys)
         hidden = inventory[:-1] + (FitArtifact(keys[-1], "fit-0", 1000),)
