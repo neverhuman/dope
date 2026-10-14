@@ -64,15 +64,25 @@ _PLOT_ESTIMANDS = frozenset({
 })
 
 
-def _require_pair_budget(left_rows: int, right_rows: int, max_pairs: int) -> None:
+def _require_pair_budget(left_rows: int, right_rows: int, max_pairs: int, width: int = 1) -> None:
+    """Refuse before the rows-by-rows-by-width broadcast.
+
+    max_pairs bounds that temporary element count. Pair counts alone do not.
+    The product is a Python int. Width 1 keeps the historical pair bound.
+    """
     if type(max_pairs) is not int or max_pairs < 1 or max_pairs > PAIR_ALLOCATION_LIMIT:
         raise ValueError("invalid_distance_budget")
-    if left_rows * right_rows > max_pairs:
+    if type(width) is not int or width < 1:
+        raise ValueError("invalid clouds")
+    if left_rows * right_rows * width > max_pairs:
         raise ValueError("distance_budget_exceeded")
 
 
 def _bounded_pairwise(left, right, max_pairs):
-    _require_pair_budget(int(left.shape[0]), int(right.shape[0]), max_pairs)
+    left_width = int(left.shape[1])
+    if left_width != int(right.shape[1]):
+        raise ValueError("invalid clouds")
+    _require_pair_budget(int(left.shape[0]), int(right.shape[0]), max_pairs, left_width)
     return _pairwise_norms(left, right)
 
 
@@ -100,9 +110,9 @@ def euclidean_role_distributions(
     """Euclidean distances for real-real, real-synthetic, and synthetic-synthetic.
 
     The two clouds have the same row count and the same width. Each call is one
-    space and one encoder. Pair counts are not row counts. The allocated matrix
-    is rows by rows. A product above max_pairs is refused before that matrix
-    is built. Pairs are not subsampled.
+    space and one encoder. Pair counts are not row counts. The temporary
+    broadcast is rows by rows by width. That element count is refused before
+    the broadcast when it exceeds max_pairs. Pairs are not subsampled.
     """
     if space not in SPACES:
         raise ValueError("unknown coordinate space")
@@ -122,6 +132,7 @@ def euclidean_role_distributions(
         "synthetic_synthetic": _upper_euclidean(synthetic, max_pairs),
     }
     row_count = int(real.shape[0])
+    width = int(real.shape[1])
     return {
         "estimand": "euclidean_distance_distribution",
         "space": space,
@@ -130,6 +141,8 @@ def euclidean_role_distributions(
         "row_count": row_count,
         "pair_counts": {role: len(values) for role, values in distances.items()},
         "allocated_pairs": row_count * row_count,
+        "width": width,
+        "broadcast_elements": row_count * row_count * width,
         "max_pairs": max_pairs,
         "distances": distances,
         "distance_definition": "euclidean",
@@ -494,14 +507,27 @@ def _string_ids(values, message):
     return tuple(values)
 
 
+def _label_rank_codes(labels: tuple[str, ...]) -> np.ndarray:
+    ranks = {label: float(index) for index, label in enumerate(sorted(set(labels)))}
+    return np.asarray([ranks[label] for label in labels], dtype=float)
+
+
+def _append_code(cloud: np.ndarray, codes: np.ndarray) -> np.ndarray:
+    return np.column_stack([cloud, codes])
+
+
 def label_shuffle_control(
     real, synthetic, labels, *, space: str, encoder_id: str, seed: int,
     labels_consumed: bool = False, max_pairs: int = DEVELOPMENT_MAX_PAIRS,
 ) -> dict:
-    """A side label vector is not a coordinate. Shuffling it leaves distances unchanged.
+    """Compare coordinate distances with a rank-code column, then shuffle that column.
 
+    The supplied clouds stay coordinate-only. Ranks come from the sorted distinct
+    labels and do not depend on the seed. The seed permutes the code column only.
+    Constant labels are degenerate. A non-constant column is a measured change.
+    Three or more rows can make that shuffled column change the distance multiset.
     Consumed labels make the geometry selection-exposed. Held-out relevance stays
-    unmeasured either way.
+    unmeasured. Qualification flags stay false. Label strings are not returned.
     """
     if type(labels_consumed) is not bool or type(seed) is not int or seed < 0:
         raise ValueError("invalid labels")
@@ -509,26 +535,55 @@ def label_shuffle_control(
     real = _finite_cloud(real)
     if len(labels) != real.shape[0]:
         raise ValueError("invalid labels")
+    if space not in SPACES:
+        raise ValueError("unknown coordinate space")
+    if type(encoder_id) is not str or not encoder_id:
+        raise ValueError("missing encoder")
+    synthetic = _finite_cloud(synthetic)
+    if real.shape[1] != synthetic.shape[1]:
+        raise ValueError("invalid clouds")
+    if real.shape[0] != synthetic.shape[0]:
+        raise ValueError("unequal cloud cardinality")
+    rows = int(real.shape[0])
+    _require_pair_budget(rows, rows, max_pairs, int(real.shape[1]) + 1)
     report = euclidean_role_distributions(
         real, synthetic, space=space, encoder_id=encoder_id, max_pairs=max_pairs,
     )
-    order = np.random.default_rng(seed).permutation(len(labels))
-    shuffled = tuple(labels[int(index)] for index in order)
-    if len(shuffled) != len(labels):
-        raise ValueError("invalid labels")
-    repeated = euclidean_role_distributions(
+    codes = _label_rank_codes(labels)
+    order = np.random.default_rng(seed).permutation(rows)
+    shuffled_codes = np.asarray(codes[order], dtype=float)
+    coded = euclidean_role_distributions(
+        _append_code(real, codes), _append_code(synthetic, codes),
+        space=space, encoder_id=encoder_id, max_pairs=max_pairs,
+    )
+    shuffled = euclidean_role_distributions(
+        _append_code(real, shuffled_codes), _append_code(synthetic, shuffled_codes),
+        space=space, encoder_id=encoder_id, max_pairs=max_pairs,
+    )
+    again = euclidean_role_distributions(
         real, synthetic, space=space, encoder_id=encoder_id, max_pairs=max_pairs,
     )
+    label_coordinate_changes_distances = report["distances"] != coded["distances"]
+    shuffle_changes_label_distances = coded["distances"] != shuffled["distances"]
+    if not label_coordinate_changes_distances and not shuffle_changes_label_distances:
+        label_effect = "degenerate_labels" if len(set(labels)) == 1 else "unobserved"
+    else:
+        label_effect = "detected"
     return {
         "estimand": "label_shuffle_control",
         "space": space,
         "encoder_id": encoder_id,
         "seed": seed,
-        "distances_unchanged": report["distances"] == repeated["distances"],
+        "distances_unchanged": report["distances"] == again["distances"],
         "labels_are_coordinates": False,
+        "label_coordinate_changes_distances": label_coordinate_changes_distances,
+        "shuffle_changes_label_distances": shuffle_changes_label_distances,
+        "label_effect": label_effect,
         "labels_consumed": labels_consumed,
         "selection_exposed": labels_consumed,
         "distances": report["distances"],
+        "label_distances": coded["distances"],
+        "shuffled_label_distances": shuffled["distances"],
         **_qualification(),
     }
 
