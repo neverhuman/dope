@@ -17,6 +17,7 @@ WORKFLOWS = {
     ".github/workflows/jankurai.yml": ("jankurai-audit",),
 }
 CHECKS = {job for jobs in WORKFLOWS.values() for job in jobs}
+CHECK_APP_ID = 15368
 REVIEWER = "neverhumanbot"
 OPERATOR = "jepsontaylor"
 SHA = re.compile(r"[0-9a-f]{40}\Z")
@@ -50,9 +51,13 @@ class GitHub:
         self.executable = executable
         self.calls = []
 
-    def get(self, endpoint, optional=False):
+    def get(self, endpoint, optional=False, paginate=False):
         command = ["rtk", "proxy", self.executable, "api", "--method", "GET", endpoint]
+        if paginate:
+            command += ["--paginate", "--slurp"]
         call = {"endpoint": endpoint, "method": "GET", "state": "started"}
+        if paginate:
+            call["pagination"] = "all_linked_pages"
         self.calls.append(call)
         try:
             response = subprocess.run(command, capture_output=True, text=True, timeout=45)
@@ -91,6 +96,53 @@ class GitHub:
                 return items
         raise Refused("api_listing_truncated")
 
+    def open_pulls(self, root):
+        # gh follows REST Link headers, unlike a fixed-size `gh pr list` or a
+        # single visible page. The 45-second request bound covers this traversal.
+        pages = self.get(f"{root}/pulls?state=open&sort=created&direction=asc&per_page=100", paginate=True)
+        require(isinstance(pages, list) and bool(pages), "open_pr_listing_unavailable")
+        require(len(pages) < 10, "open_pr_listing_truncated")
+        pulls = []
+        for index, page in enumerate(pages):
+            require(isinstance(page, list), "open_pr_listing_unavailable")
+            require(len(page) <= 100 and (index == len(pages) - 1 or len(page) == 100),
+                    "open_pr_listing_truncated")
+            pulls.extend(page)
+        return pulls
+
+
+def pull_identity(pull):
+    identity = {key: pull[key] for key in ("number", "state", "draft")}
+    require(type(identity["number"]) is int and identity["number"] > 0
+            and type(identity["draft"]) is bool, "open_pr_listing_unavailable")
+    for field in ("head", "base"):
+        ref = pull[field]
+        require(SHA.fullmatch(ref["sha"]) and isinstance(ref["ref"], str) and bool(ref["ref"])
+                and isinstance(ref["repo"]["full_name"], str) and bool(ref["repo"]["full_name"]),
+                "open_pr_listing_unavailable")
+        identity[field] = {"sha": ref["sha"], "ref": ref["ref"],
+                           "repo": {"full_name": ref["repo"]["full_name"]}}
+    return identity
+
+
+def capture_open_pulls(api, root):
+    try:
+        pulls = api.open_pulls(root)
+        require(isinstance(pulls, list), "open_pr_listing_unavailable")
+        identities = [pull_identity(pull) for pull in pulls]
+        require(all(pull["state"] == "open" for pull in identities), "open_pr_listing_unavailable")
+        require(len({pull["number"] for pull in identities}) == len(identities), "open_pr_listing_changed")
+        return sorted(identities, key=lambda pull: pull["number"])
+    except (KeyError, TypeError, ValueError, AttributeError):
+        raise Refused("open_pr_listing_unavailable") from None
+
+
+def validate_no_stacking(snapshot, pins):
+    pulls = snapshot["open_prs"]
+    require(len(pulls) <= 1, "multiple_open_prs")
+    require(len(pulls) == 1 and pulls[0]["number"] == pins["pr"], "inspected_pr_not_open")
+    require(pulls[0] == pull_identity(snapshot["pull"]), "open_pr_identity_mismatch")
+
 
 def capture_controls(api, root, branch):
     try:
@@ -118,6 +170,10 @@ def qualify_controls(controls):
         checks = protection.get("required_status_checks") or {}
         contexts = set(checks.get("contexts", [])) | {c["context"] for c in checks.get("checks", [])}
         require(contexts <= CHECKS, "control_unavailable")
+        bindings = checks.get("checks", [])
+        require(len(bindings) == len(CHECKS) and {c["context"] for c in bindings} == CHECKS
+                and all(c.get("app_id") == CHECK_APP_ID for c in bindings)
+                and (not checks.get("contexts") or set(checks["contexts"]) == CHECKS), "control_unavailable")
         review = protection.get("required_pull_request_reviews") or {}
         strict = checks.get("strict") is True and contexts == CHECKS
         reviews = (review.get("required_approving_review_count", 0) >= 1
@@ -142,7 +198,9 @@ def qualify_controls(controls):
         for rule in rules:
             parameters = rule.get("parameters", {})
             if rule["type"] == "required_status_checks":
-                contexts = {c["context"] for c in parameters["required_status_checks"]}
+                bindings = parameters["required_status_checks"]
+                require(all(c.get("integration_id") == CHECK_APP_ID for c in bindings), "control_unavailable")
+                contexts = {c["context"] for c in bindings}
                 rule_checks.append((contexts, parameters.get("strict_required_status_checks_policy") is True))
             if rule["type"] == "pull_request":
                 rule_reviews |= (parameters.get("required_approving_review_count", 0) >= 1
@@ -157,6 +215,7 @@ def qualify_controls(controls):
     # An enforced queue also needs an enforced review/check policy in rulesets.
     require(not queue or rule_qualified, "control_unavailable")
     return {"base_policy": "queue" if queue else "strict", "required_checks": sorted(CHECKS),
+            "required_check_app_id": CHECK_APP_ID,
             "independent_review_required": True, "stale_approval_dismissal": True,
             "last_push_approval_required": True, "bypass_policy": "none"}
 
@@ -169,7 +228,8 @@ def snapshot(api, root, pr, branch):
         "merged_at", "merge_commit_sha", "mergeable_state")}
     base = api.get(f"{root}/git/ref/heads/{quote(branch, safe='')}")["object"]["sha"]
     controls = capture_controls(api, root, branch)
-    return {"pull": pull, "base_sha": base, "controls": controls}
+    return {"pull": pull, "base_sha": base, "controls": controls,
+            "open_prs": capture_open_pulls(api, root)}
 
 
 def workflow_definitions(api, root, source):
@@ -196,7 +256,7 @@ def validate_definitions(definitions, queue):
         events = set(re.findall(r"^  ([a-z_]+):", workflow_block(text, "on"), re.M))
         expected = {"push", "pull_request"} | ({"merge_group"} if queue else set())
         require(expected <= events, "control_unavailable" if queue else "workflow_definition_invalid")
-        names = set(re.findall(r"^  ([a-z_-]+):", workflow_block(text, "jobs"), re.M))
+        names = set(re.findall(r"^  ([A-Za-z_][A-Za-z0-9_-]*):", workflow_block(text, "jobs"), re.M))
         require(names == set(jobs), "workflow_definition_invalid")
 
 
@@ -270,8 +330,10 @@ def validate_review(evidence, pins, receipt, runs):
     require(review["state"] == "APPROVED" and review["commit_id"] == source, "approval_stale")
     require(bool(receipt["receipt_locator"]) and "\n" not in receipt["receipt_locator"], "receipt_identity_mismatch")
     expected = f"Reviewed source {source}; receipt {receipt['receipt_locator']}; checks {','.join(map(str, runs))}."
+    references = re.findall(r"\b[0-9a-f]{7,40}\b", review["body"], re.I)
     require(review["body"].splitlines()[0] == expected
             and set(re.findall(r"\b[0-9a-f]{40}\b", review["body"])) == {source}
+            and all(source.startswith(ref.lower()) for ref in references if not ref.isdecimal())
             and hashlib.sha256(review["body"].encode()).hexdigest() == receipt["body_sha256"], "approval_body_mismatch")
     require(receipt["check_run_ids"] == runs, "approval_checks_stale")
     require(all(timestamp(run["updated_at"]) <= timestamp(review["submitted_at"])
@@ -294,10 +356,12 @@ def evaluate_preflight(evidence, pins, receipt):
     require(before == after, "inspection_changed")
     pull = before["pull"]
     require(pull["number"] == pins["pr"] and pull["head"]["sha"] == pins["source_sha"], "head_moved")
+    require(pull["head"]["repo"]["full_name"] == pins["repo"], "source_repo_mismatch")
     require(pull["base"]["sha"] == before["base_sha"] == pins["base_sha"]
             and pull["base"]["ref"] == pins["base_branch"]
             and pull["base"]["repo"]["full_name"] == pins["repo"], "base_moved")
     require(pull["state"] == "open" and pull["merged"] is False and not pull["draft"], "pr_not_open")
+    validate_no_stacking(before, pins)
     policy = qualify_controls(before["controls"])
     validate_definitions(evidence["workflow_definitions"], policy["base_policy"] == "queue")
     require(evidence["source_commit"]["sha"] == pins["source_sha"], "head_moved")
@@ -338,11 +402,17 @@ def evaluate_merge(evidence, prior):
     require(before == after, "inspection_changed")
     pull = before["pull"]
     require(pull["number"] == pins["pr"] and pull["head"]["sha"] == pins["source_sha"], "head_moved")
+    require(pull["head"]["repo"]["full_name"] == pins["repo"], "source_repo_mismatch")
     require(pull["base"]["ref"] == pins["base_branch"]
             and pull["base"]["repo"]["full_name"] == pins["repo"], "base_moved")
     require(before["controls"] == prior["evidence"]["after"]["controls"], "controls_changed")
+    require(evidence["reviews"] == evidence["reviews_after"], "inspection_changed")
+    current = {**prior["evidence"], "before": before, "reviews": evidence["reviews"],
+               "inspection_completed_at": evidence["inspection_completed_at"]}
+    validate_review(current, pins, receipt, receipt["check_run_ids"])
     if pull["state"] == "open" and pull["merged"] is False and pull["merged_at"] is None:
         require(before["base_sha"] == pins["base_sha"] and pull["base"]["sha"] == pins["base_sha"], "base_moved")
+        validate_no_stacking(before, pins)
         return "awaiting_merge"
     require(pull["state"] == "closed" and pull["merged"] is True and bool(pull["merged_at"]), "merge_not_verified")
     require(timestamp(prior["captured_at"]) < timestamp(pull["merged_at"]), "premerge_receipt_not_premerge")
@@ -411,13 +481,16 @@ def inspect(api, pins, receipt=None, prior=None):
             root = "repos/" + pins["repo"]
             before = snapshot(api, root, pins["pr"], pins["base_branch"])
             result["prior_receipt_sha256"] = digest(prior)
-            result["evidence"] = {"before": before}
+            result["evidence"] = {"before": before,
+                                  "reviews": api.listing(f"{root}/pulls/{pins['pr']}/reviews")}
             if before["pull"]["merged"]:
                 merge = before["pull"]["merge_commit_sha"]
                 require(isinstance(merge, str) and SHA.fullmatch(merge), "merge_not_verified")
                 result["evidence"]["merge_commit"] = api.get(f"{root}/git/commits/{merge}")
                 result["evidence"]["receiving_runs"] = collect_runs(api, root, merge)
             result["evidence"]["after"] = snapshot(api, root, pins["pr"], pins["base_branch"])
+            result["evidence"]["reviews_after"] = api.listing(f"{root}/pulls/{pins['pr']}/reviews")
+            result["evidence"]["inspection_completed_at"] = datetime.now(timezone.utc).isoformat()
             result["state"] = evaluate_merge(result["evidence"], prior)
     except Refused as error:
         result["reason"] = error.reason

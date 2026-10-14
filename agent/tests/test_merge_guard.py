@@ -18,7 +18,8 @@ PINS = {"repo": "neverhuman/dope", "pr": 7, "source_sha": SOURCE,
 
 def controls():
     return {"protection": {
-        "required_status_checks": {"strict": True, "contexts": sorted(guard.CHECKS), "checks": []},
+        "required_status_checks": {"strict": True, "contexts": sorted(guard.CHECKS),
+            "checks": [{"context": name, "app_id": guard.CHECK_APP_ID} for name in sorted(guard.CHECKS)]},
         "required_pull_request_reviews": {"required_approving_review_count": 1,
             "dismiss_stale_reviews": True, "require_last_push_approval": True,
             "bypass_pull_request_allowances": {"users": [], "teams": [], "apps": []}},
@@ -28,7 +29,8 @@ def controls():
 
 def rule_controls(queue=False):
     checks = {"type": "required_status_checks", "ruleset_id": 11, "parameters": {
-        "required_status_checks": [{"context": name} for name in sorted(guard.CHECKS)],
+        "required_status_checks": [{"context": name, "integration_id": guard.CHECK_APP_ID}
+                                   for name in sorted(guard.CHECKS)],
         "strict_required_status_checks_policy": not queue}}
     review = {"type": "pull_request", "ruleset_id": 11, "parameters": {
         "required_approving_review_count": 1, "dismiss_stale_reviews_on_push": True,
@@ -58,10 +60,11 @@ def fixture(queue=False):
     ctrl = rule_controls(True) if queue else controls()
     pull = {"number": 7, "state": "open", "draft": False, "merged": False, "merged_at": None,
             "merge_commit_sha": None, "mergeable_state": "clean",
-            "head": {"sha": SOURCE, "ref": "codex/fixture"},
+            "head": {"sha": SOURCE, "ref": "codex/fixture", "repo": {"full_name": "neverhuman/dope"}},
             "base": {"sha": BASE, "ref": "main", "repo": {"full_name": "neverhuman/dope"}},
             "user": {"login": guard.OPERATOR}, "commits": 1}
-    snapshot = {"pull": pull, "base_sha": BASE, "controls": ctrl}
+    snapshot = {"pull": pull, "base_sha": BASE, "controls": ctrl,
+                "open_prs": [guard.pull_identity(pull)]}
     defs = {path: "name: fixture\non:\n  push:\n  pull_request:\n"
             + ("  merge_group:\n" if queue else "")
             + "\njobs:\n" + "".join(f"  {job}:\n    runs-on: fixture\n" for job in jobs)
@@ -93,9 +96,13 @@ def merge_fixture(prior, merged=True):
     if merged:
         before["pull"].update(state="closed", merged=True, merged_at="2026-10-14T02:03:00Z", merge_commit_sha=MERGE)
         before["base_sha"] = MERGE
+        before["open_prs"] = []
     return {"before": before, "after": deepcopy(before),
             "merge_commit": {"sha": MERGE, "tree": {"sha": TREE}, "parents": [{"sha": BASE}]},
-            "receiving_runs": runs(MERGE, ("push",), "main")}
+            "receiving_runs": runs(MERGE, ("push",), "main"),
+            "reviews": deepcopy(prior["evidence"]["reviews"]),
+            "reviews_after": deepcopy(prior["evidence"]["reviews"]),
+            "inspection_completed_at": "2026-10-14T02:04:00Z"}
 
 
 class FakeAPI:
@@ -106,6 +113,14 @@ class FakeAPI:
         self.snapshots = 0
         self.fail_endpoint = None
         self.mutate_after = None
+
+    def open_pulls(self, root):
+        endpoint = f"{root}/pulls?state=open"
+        self.calls.append({"endpoint": endpoint, "method": "GET"})
+        if endpoint == self.fail_endpoint:
+            raise guard.Refused("api_unavailable")
+        snapshot = self.evidence["before" if self.snapshots < 2 else "after"]
+        return deepcopy(snapshot["open_prs"])
 
     def get(self, endpoint, optional=False):
         self.calls.append({"endpoint": endpoint, "method": "GET"})
@@ -251,6 +266,19 @@ class PreflightTests(unittest.TestCase):
         e["reviews"].append(later)
         self.rejected(e, r, "approval_stale")
 
+    def test_old_abbreviated_or_uppercase_sha_text_cannot_shadow_exact_body_line(self):
+        for reference in ("5333ca40262c", "FD2F74A0588B", BASE[:16]):
+            e, r = fixture()
+            e["reviews"][0]["body"] += "\nabbrev " + reference
+            r["body_sha256"] = hashlib.sha256(e["reviews"][0]["body"].encode()).hexdigest()
+            self.rejected(e, r, "approval_body_mismatch")
+
+    def test_same_source_prefix_and_decimal_run_ids_are_unambiguous(self):
+        e, r = fixture()
+        e["reviews"][0]["body"] += f"\nsource {SOURCE[:12]}; run ID 38489725548."
+        r["body_sha256"] = hashlib.sha256(e["reviews"][0]["body"].encode()).hexdigest()
+        self.assertEqual(guard.evaluate_preflight(e, PINS, r)["base_policy"], "strict")
+
     def test_later_comment_preserves_approval_but_other_changes_requested_blocks(self):
         e, r = fixture()
         later = deepcopy(e["reviews"][0])
@@ -338,6 +366,27 @@ class PreflightTests(unittest.TestCase):
         e["after"] = deepcopy(e["before"])
         self.rejected(e, r, "control_unavailable")
 
+    def test_missing_any_app_or_wrong_app_bindings_reject_the_same_four_names(self):
+        for ruleset in (False, True):
+            for index in range(4):
+                for value in ("missing", None, -1, 0, 12345, "15368"):
+                    with self.subTest(ruleset=ruleset, check=index, binding=value):
+                        e, r = fixture()
+                        control = rule_controls() if ruleset else controls()
+                        if ruleset:
+                            binding = control["rules"][0]["parameters"]["required_status_checks"][index]
+                            key = "integration_id"
+                        else:
+                            binding = control["protection"]["required_status_checks"]["checks"][index]
+                            key = "app_id"
+                        if value == "missing":
+                            binding.pop(key)
+                        else:
+                            binding[key] = value
+                        e["before"]["controls"] = control
+                        e["after"] = deepcopy(e["before"])
+                        self.rejected(e, r, "control_unavailable")
+
     def test_ruleset_bypass_unknown_disabled_or_present_and_extra_required_check(self):
         for change in (lambda d: d.pop("bypass_actors"), lambda d: d.update(enforcement="evaluate"),
                        lambda d: d.update(bypass_actors=[{"actor_type": "RepositoryRole", "actor_id": 5}])):
@@ -367,10 +416,12 @@ class PreflightTests(unittest.TestCase):
         self.rejected(e, r, "mergeability_unavailable")
 
     def test_changed_workflow_job_inventory_fails_closed(self):
-        e, r = fixture()
-        path = next(iter(guard.WORKFLOWS))
-        e["workflow_definitions"][path] += "  new-required-job:\n    runs-on: fixture\n"
-        self.rejected(e, r, "workflow_definition_invalid")
+        for name in ("new-required-job", "extra2", "EXTRA_2", "_extra2"):
+            with self.subTest(job_id=name):
+                e, r = fixture()
+                path = next(iter(guard.WORKFLOWS))
+                e["workflow_definitions"][path] += f"  {name}:\n    runs-on: fixture\n"
+                self.rejected(e, r, "workflow_definition_invalid")
 
 
 class CollectorTests(unittest.TestCase):
@@ -454,7 +505,139 @@ class CollectorTests(unittest.TestCase):
             with self.assertRaises(guard.Refused): api.listing("runs", "workflow_runs")
 
 
+class NoStackingTests(unittest.TestCase):
+    def rejected(self, evidence, receipt, reason):
+        with self.assertRaises(guard.Refused) as caught:
+            guard.evaluate_preflight(evidence, PINS, receipt)
+        self.assertEqual(caught.exception.reason, reason)
+
+    def test_second_open_pr_blocks_even_when_its_base_is_not_main(self):
+        for base in ("main", "unmerged-feature"):
+            with self.subTest(base=base):
+                e, r = fixture()
+                extra = deepcopy(e["before"]["open_prs"][0])
+                extra["number"] = 8
+                extra["base"]["ref"] = base
+                e["before"]["open_prs"].append(extra)
+                e["after"] = deepcopy(e["before"])
+                self.rejected(e, r, "multiple_open_prs")
+
+    def test_inspected_pr_must_be_present_as_the_sole_open_pr(self):
+        for numbers in ([], [8]):
+            e, r = fixture()
+            entries = e["before"]["open_prs"]
+            if not numbers:
+                entries.clear()
+            else:
+                entries[0]["number"] = numbers[0]
+            e["after"] = deepcopy(e["before"])
+            self.rejected(e, r, "inspected_pr_not_open")
+
+    def test_non_main_base_or_cross_repo_source_and_base_fail(self):
+        for change, reason in (
+            (lambda p: p["base"].update(ref="unmerged-feature"), "base_moved"),
+            (lambda p: p["head"]["repo"].update(full_name="fork/dope"), "source_repo_mismatch"),
+            (lambda p: p["base"]["repo"].update(full_name="other/dope"), "base_moved")):
+            e, r = fixture()
+            change(e["before"]["pull"])
+            e["before"]["open_prs"] = [guard.pull_identity(e["before"]["pull"])]
+            e["after"] = deepcopy(e["before"])
+            self.rejected(e, r, reason)
+
+    def test_listing_source_base_or_branch_must_match_inspected_pr(self):
+        for field, value in (("sha", BASE), ("ref", "another-source-branch")):
+            e, r = fixture()
+            e["before"]["open_prs"][0]["head"][field] = value
+            e["after"] = deepcopy(e["before"])
+            self.rejected(e, r, "open_pr_identity_mismatch")
+        e, r = fixture()
+        e["before"]["open_prs"][0]["base"]["sha"] = SOURCE
+        e["after"] = deepcopy(e["before"])
+        self.rejected(e, r, "open_pr_identity_mismatch")
+
+    def test_creation_closure_or_identity_change_between_listings_invalidates_receipt(self):
+        changes = [lambda e: e["after"]["open_prs"].clear(),
+            lambda e: e["after"]["open_prs"][0]["head"].update(sha=BASE),
+            lambda e: e["after"]["open_prs"].append(
+                {**deepcopy(e["before"]["open_prs"][0]), "number": 8})]
+        for change in changes:
+            e, r = fixture()
+            change(e)
+            self.rejected(e, r, "inspection_changed")
+
+    def test_collector_observes_concurrent_pr_creation(self):
+        e, r = fixture()
+        api = FakeAPI(e)
+        api.mutate_after = lambda data: data["after"]["open_prs"].append(
+            {**deepcopy(data["before"]["open_prs"][0]), "number": 8})
+        result = guard.inspect(api, PINS, r)
+        self.assertEqual(result["reason"], "inspection_changed")
+        self.assertEqual(sum("/pulls?state=open" in c["endpoint"] for c in api.calls), 2)
+
+    def test_missing_malformed_duplicate_or_failed_open_listing_never_ready(self):
+        cases = [None, {}, [{"number": 7}], []]
+        for entries in cases:
+            e, r = fixture()
+            e["before"]["open_prs"] = entries
+            result = guard.inspect(FakeAPI(e), PINS, r)
+            self.assertEqual(result["state"], "blocked")
+        e, r = fixture()
+        e["before"]["open_prs"] *= 2
+        self.assertEqual(guard.inspect(FakeAPI(e), PINS, r)["reason"], "open_pr_listing_changed")
+        e, r = fixture()
+        api = FakeAPI(e)
+        api.fail_endpoint = "repos/neverhuman/dope/pulls?state=open"
+        self.assertEqual(guard.inspect(api, PINS, r)["reason"], "api_unavailable")
+
+    def test_link_paginated_transport_retains_second_page_and_get_only(self):
+        api = guard.GitHub()
+        first = [{"number": n} for n in range(1, 101)]
+        pages = [first, [{"number": 101}]]
+        with patch.object(guard.subprocess, "run", return_value=SimpleNamespace(
+                returncode=0, stdout=json.dumps(pages))) as run:
+            self.assertEqual(len(api.open_pulls("repos/neverhuman/dope")), 101)
+        command = run.call_args.args[0]
+        self.assertEqual(command[:6], ["rtk", "proxy", "gh", "api", "--method", "GET"])
+        self.assertEqual(command[-2:], ["--paginate", "--slurp"])
+        self.assertIn("per_page=100", command[6])
+        self.assertEqual(run.call_count, 1)
+
+    def test_missing_or_truncated_paginated_transport_blocks(self):
+        api = guard.GitHub()
+        for pages in ([], {}, [None], [[{"number": 7}], []], [[{}] * 101], [[]] * 10):
+            with self.subTest(pages=pages):
+                with patch.object(api, "get", return_value=pages):
+                    with self.assertRaises(guard.Refused): api.open_pulls("repos/neverhuman/dope")
+        with patch.object(api, "get", return_value=[[]]):
+            self.assertEqual(api.open_pulls("repos/neverhuman/dope"), [])
+
+    def test_open_queue_receipt_cannot_ignore_a_new_second_pr(self):
+        prior = prior_receipt(queue=True)
+        e = merge_fixture(prior, merged=False)
+        extra = {**deepcopy(e["before"]["open_prs"][0]), "number": 8}
+        e["before"]["open_prs"].append(extra)
+        e["after"] = deepcopy(e["before"])
+        with self.assertRaises(guard.Refused) as caught: guard.evaluate_merge(e, prior)
+        self.assertEqual(caught.exception.reason, "multiple_open_prs")
+
+
 class MergeReceiptTests(unittest.TestCase):
+    def test_verification_fetches_current_approval_and_rejects_dismissal(self):
+        prior = prior_receipt()
+        e = merge_fixture(prior, merged=False)
+        e["reviews"][0]["state"] = "DISMISSED"
+        api = FakeAPI(e)
+        result = guard.inspect(api, PINS, prior=prior)
+        self.assertEqual(result["reason"], "approval_stale")
+        self.assertEqual(sum(c["endpoint"].endswith("/reviews") for c in api.calls), 2)
+
+    def test_current_review_change_during_verification_invalidates_receipt(self):
+        prior = prior_receipt()
+        e = merge_fixture(prior, merged=False)
+        api = FakeAPI(e)
+        api.mutate_after = lambda data: data["reviews"][0].update(state="DISMISSED")
+        self.assertEqual(guard.inspect(api, PINS, prior=prior)["reason"], "inspection_changed")
+
     def test_successful_cli_or_queue_acceptance_remains_awaiting_merge(self):
         for queue in (False, True):
             prior = prior_receipt(queue)
