@@ -255,15 +255,27 @@ class GeometryTests(unittest.TestCase):
         other_encoder = frozen_geometry_commitment(
             frozen_id="label", encoder_id="enc-b", schema_id="schema-a", columns=(unit, nominal),
         )
-        shared = shared_frozen_geometry(left, same)
+
+        def private(encoder_id, columns):
+            return {"encoder_id": encoder_id, "schema_id": "schema-a", "columns": columns}
+
+        left_content = private("enc-a", (unit, nominal))
+        self.assertEqual(set(left), {
+            "format", "version", "frozen_id", "state_digest", "label_verified",
+            "privacy_result", "qualifies_transfer",
+        })
+        shared = shared_frozen_geometry(
+            left, same, left_content=left_content, right_content=left_content,
+        )
         self.assertTrue(shared["shared_geometry"])
         self.assertEqual(shared["reason"], "common_frozen_state")
         self.assertIs(shared["label_verified"], False)
         self.assertIs(shared["qualifies_transfer"], False)
         self.assertNotEqual(left["frozen_id"], same["frozen_id"])
         self.assertEqual(left["state_digest"], same["state_digest"])
-        self.assertEqual(left["encoder_id"], "enc-a")
-        self.assertEqual(left["schema_id"], "schema-a")
+        self.assertNotIn("encoder_id", left)
+        self.assertNotIn("schema_id", left)
+        self.assertNotIn("columns", left)
         self.assertEqual(
             left["state_digest"],
             "9b0ebffefb080f65f33fd457f7a531f9997514bf2c728acebebed82659864319",
@@ -279,20 +291,40 @@ class GeometryTests(unittest.TestCase):
             shared_frozen_geometry(copied, copied)
         self.assertEqual(str(bare.exception), "invalid frozen scaler")
         self.assertNotIn(left["state_digest"], str(bare.exception))
+        wide_content = private("enc-a", (wide, nominal))
+        with self.assertRaises(ValueError) as forged:
+            shared_frozen_geometry(
+                copied, copied, left_content=wide_content, right_content=wide_content,
+            )
+        self.assertEqual(str(forged.exception), "unverified_state_digest")
+        self.assertNotIn(left["state_digest"], str(forged.exception))
         letters = dict(left)
         letters["state_digest"] = "z" * 64
         with self.assertRaises(ValueError) as nonhex:
-            shared_frozen_geometry(letters, letters)
+            shared_frozen_geometry(
+                letters, letters, left_content=left_content, right_content=left_content,
+            )
         self.assertEqual(str(nonhex.exception), "invalid frozen scaler")
+        self.assertNotIn("z" * 64, str(nonhex.exception))
         tampered = dict(left)
         tampered["state_digest"] = "a" * 64
         with self.assertRaises(ValueError) as mismatch:
-            shared_frozen_geometry(tampered, same)
+            shared_frozen_geometry(
+                tampered, same, left_content=left_content, right_content=left_content,
+            )
         self.assertEqual(str(mismatch.exception), "unverified_state_digest")
         self.assertNotIn(tampered["state_digest"], str(mismatch.exception))
         self.assertNotIn(left["state_digest"], str(mismatch.exception))
-        for other in (relabeled, reordered, reordered_levels, other_encoder):
-            refused = shared_frozen_geometry(left, other)
+        comparisons = (
+            (relabeled, private("enc-a", (wide, nominal))),
+            (reordered, private("enc-a", (nominal, unit))),
+            (reordered_levels, private("enc-a", (unit, swapped_levels))),
+            (other_encoder, private("enc-b", (unit, nominal))),
+        )
+        for other, other_content in comparisons:
+            refused = shared_frozen_geometry(
+                left, other, left_content=left_content, right_content=other_content,
+            )
             self.assertFalse(refused["shared_geometry"])
             self.assertEqual(refused["reason"], "unverified_label")
             self.assertNotEqual(left["state_digest"], other["state_digest"])
@@ -349,9 +381,45 @@ class GeometryTests(unittest.TestCase):
             frozen_scaler=bound_scaler(wide_column),
         )
         self.assertEqual(unit_matched["state_digest"], unit_distance["state_digest"])
+        self.assertEqual(unit_matched["frozen_id"], unit_distance["frozen_id"])
         self.assertNotEqual(unit_matched["state_digest"], wide_matched["state_digest"])
+        self.assertNotIn("columns", unit_matched)
         self.assertAlmostEqual(unit_matched["fit_distances"][0], 0.5)
         self.assertAlmostEqual(wide_matched["fit_distances"][0], 0.005)
+        sentinel_level = "secret-level-99999"
+        sentinel_encoder = "encoder-sentinel-99999"
+        sentinel_schema = "schema-sentinel-99999"
+        extreme = {"kind": "continuous", "minimum": -424242.5, "maximum": 424242.5}
+        hidden = {"kind": "nominal", "levels": ("red", sentinel_level)}
+        sentinel_content = {
+            "encoder_id": sentinel_encoder,
+            "schema_id": sentinel_schema,
+            "columns": (extreme, hidden),
+        }
+        redacted = frozen_geometry_commitment(
+            frozen_id="label", encoder_id=sentinel_encoder, schema_id=sentinel_schema,
+            columns=(extreme, hidden),
+        )
+        again = frozen_geometry_commitment(
+            frozen_id="other-label", encoder_id=sentinel_encoder, schema_id=sentinel_schema,
+            columns=(extreme, hidden),
+        )
+        redacted_shared = shared_frozen_geometry(
+            redacted, again, left_content=sentinel_content, right_content=sentinel_content,
+        )
+        for secret in (sentinel_level, sentinel_encoder, sentinel_schema, "424242.5"):
+            self.assertNotIn(secret, repr(redacted))
+            self.assertNotIn(secret, repr(redacted_shared))
+        self.assertTrue(redacted_shared["shared_geometry"])
+        smuggled = dict(redacted)
+        smuggled["columns"] = (extreme, hidden)
+        with self.assertRaises(ValueError) as exposed:
+            shared_frozen_geometry(
+                smuggled, again, left_content=sentinel_content, right_content=sentinel_content,
+            )
+        self.assertEqual(str(exposed.exception), "invalid frozen scaler")
+        self.assertNotIn(sentinel_level, str(exposed.exception))
+        self.assertNotIn("424242.5", str(exposed.exception))
         with self.assertRaises(ValueError) as label:
             nearest_other_entity_distance(
                 rows, rows, reference_entities=pair, query_entities=pair,
