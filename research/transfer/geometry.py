@@ -6,11 +6,14 @@ does not create a shared geometry claim. Unbiased MMD-squared is unclipped.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from numbers import Real
 from types import MappingProxyType
 import math
 
 import numpy as np
+
+from .evidence import digest
 
 
 SPACES = ("row_activation", "pooled_embedding", "prediction_fingerprint", "refit_statistics", "action_representation")
@@ -256,6 +259,45 @@ def nearest_other_entity_distance(reference, query, *, reference_entities, query
     })
 
 
+def matched_neighbor_references(fit_reference, heldout_reference, query, *, fit_entities,
+                                heldout_entities, query_entities, frozen_scaler):
+    """Neighbor distances for two references with the same row count.
+
+    Each side uses nearest_other_entity_distance, so the same entity and a
+    same-index self row stay out. Unequal reference lengths are refused.
+    The distances are not row counts.
+    """
+    fit_rows = _row_tuples(fit_reference)
+    held_rows = _row_tuples(heldout_reference)
+    fit_entities = tuple(fit_entities)
+    heldout_entities = tuple(heldout_entities)
+    if len(fit_rows) != len(fit_entities) or len(held_rows) != len(heldout_entities):
+        raise ValueError("entity cardinality mismatch")
+    if len(fit_rows) != len(held_rows):
+        raise ValueError("unequal reference cardinality")
+    fit = nearest_other_entity_distance(
+        fit_reference, query, reference_entities=fit_entities,
+        query_entities=query_entities, frozen_scaler=frozen_scaler,
+    )
+    held = nearest_other_entity_distance(
+        heldout_reference, query, reference_entities=heldout_entities,
+        query_entities=query_entities, frozen_scaler=frozen_scaler,
+    )
+    return MappingProxyType({
+        "estimand": "matched_neighbor_references",
+        "reference_rows": len(fit_rows),
+        "fit_distances": fit["distances"],
+        "heldout_distances": held["distances"],
+        "fit_statuses": fit["statuses"],
+        "heldout_statuses": held["statuses"],
+        "matched": True,
+        "nearest_neighbor": True,
+        "row_count": False,
+        "privacy_result": False,
+        "qualifies_transfer": False,
+    })
+
+
 def other_entity_row_count(reference, query, *, reference_entities, query_entities):
     """Count reference rows with a different entity. Coordinates are not distances.
 
@@ -337,6 +379,68 @@ def shared_geometry_claim(scalers, *, frozen_id=None) -> dict:
     if len(set(scalers)) == 1:
         return {"shared_geometry": False, "reason": "equal_ranges"}
     return {"shared_geometry": False, "reason": "per_table_refit"}
+
+
+def _commitment_column(column):
+    if column["kind"] == "continuous":
+        return {"kind": "continuous", "minimum": column["minimum"], "maximum": column["maximum"]}
+    return {"kind": "nominal", "levels": list(column["levels"])}
+
+
+def frozen_geometry_commitment(*, frozen_id: str, encoder_id: str, schema_id: str, columns) -> MappingProxyType:
+    """Digest the scaler content. The caller label is not that digest.
+
+    Column order, nominal level order, and continuous min/max are part of the
+    content. The result does not qualify transfer or privacy.
+    """
+    if type(encoder_id) is not str or not encoder_id or type(schema_id) is not str or not schema_id:
+        raise ValueError("invalid frozen scaler")
+    _frozen_columns({"frozen_id": frozen_id, "columns": columns})
+    body = {
+        "format": "dope-frozen-geometry-state",
+        "version": 1,
+        "encoder_id": encoder_id,
+        "schema_id": schema_id,
+        "columns": [_commitment_column(column) for column in columns],
+    }
+    return MappingProxyType({
+        "format": "dope-frozen-geometry-state",
+        "version": 1,
+        "frozen_id": frozen_id,
+        "state_digest": digest(body),
+        "label_verified": False,
+        "privacy_result": False,
+        "qualifies_transfer": False,
+    })
+
+
+def shared_frozen_geometry(left, right) -> dict:
+    """Compare frozen content digests. Equal caller labels do not share geometry."""
+    for record in (left, right):
+        if (
+            isinstance(record, (str, bytes))
+            or not isinstance(record, Mapping)
+            or record.get("format") != "dope-frozen-geometry-state"
+            or record.get("version") != 1
+            or type(record.get("state_digest")) is not str
+            or len(record["state_digest"]) != 64
+            or record.get("label_verified") is not False
+        ):
+            raise ValueError("invalid frozen scaler")
+    same = left["state_digest"] == right["state_digest"]
+    if same:
+        reason = "common_frozen_state"
+    elif left["frozen_id"] == right["frozen_id"]:
+        reason = "unverified_label"
+    else:
+        reason = "different_frozen_state"
+    return {
+        "shared_geometry": same,
+        "reason": reason,
+        "label_verified": False,
+        "privacy_result": False,
+        "qualifies_transfer": False,
+    }
 
 
 def real_real_calibration(*, orientation: str, scale: float, floor: float) -> dict:

@@ -4,8 +4,10 @@ import numpy as np
 
 from research.transfer.geometry import (
     closeness_qualifies, coordinate_distance, ecdf, energy_distance_unbiased, fit_minmax,
-    held_out_status, mmd2_unbiased, nearest_other_entity_distance, null_cloud,
-    other_entity_row_count, real_real_calibration, shared_geometry_claim, shared_null_realizations,
+    frozen_geometry_commitment, held_out_status, matched_neighbor_references, mmd2_unbiased,
+    nearest_other_entity_distance, null_cloud,
+    other_entity_row_count, real_real_calibration, shared_frozen_geometry, shared_geometry_claim,
+    shared_null_realizations,
     sliced_wasserstein,
 )
 
@@ -184,6 +186,91 @@ class GeometryTests(unittest.TestCase):
                 frozen_scaler=fit_minmax([[0.0], [1.0]]),
             )
         self.assertEqual(str(refit.exception), "missing frozen scaler")
+
+    def test_fit_and_heldout_references_match_cardinality(self):
+        flipped = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+        entities = ("a", "a", "b")
+        unit = {"kind": "continuous", "minimum": 0.0, "maximum": 1.0}
+        scaler = {"frozen_id": "fit-scale-a", "columns": (unit, unit)}
+        heldout = np.array([[0.0, 0.0], [2.0, 0.0], [0.0, 2.0]])
+        matched = matched_neighbor_references(
+            flipped, heldout, flipped, fit_entities=entities, heldout_entities=entities,
+            query_entities=entities, frozen_scaler=scaler,
+        )
+        counted = other_entity_row_count(flipped, flipped, reference_entities=entities, query_entities=entities)
+        self.assertEqual(matched["estimand"], "matched_neighbor_references")
+        self.assertEqual(matched["reference_rows"], 3)
+        self.assertEqual(matched["fit_distances"], (1.0, 2.0 ** 0.5, 1.0))
+        self.assertEqual(matched["heldout_distances"], (2.0, 5.0 ** 0.5, 1.0))
+        self.assertNotEqual(matched["fit_distances"], counted["counts"])
+        self.assertIs(matched["matched"], True)
+        self.assertIs(matched["nearest_neighbor"], True)
+        self.assertIs(matched["row_count"], False)
+        self.assertIs(matched["privacy_result"], False)
+        self.assertIs(matched["qualifies_transfer"], False)
+        alone = matched_neighbor_references(
+            [[0.0, 0.0]], [[1.0, 0.0]], [[0.0, 0.0]],
+            fit_entities=("a",), heldout_entities=("a",), query_entities=("a",), frozen_scaler=scaler,
+        )
+        self.assertEqual(alone["reference_rows"], 1)
+        self.assertEqual(alone["fit_statuses"], ("missing_neighbor",))
+        self.assertEqual(alone["heldout_statuses"], ("missing_neighbor",))
+        self.assertEqual(alone["fit_distances"], (None,))
+        with self.assertRaises(ValueError) as unequal:
+            matched_neighbor_references(
+                flipped, flipped[:2], flipped, fit_entities=entities, heldout_entities=("a", "b"),
+                query_entities=entities, frozen_scaler=scaler,
+            )
+        self.assertEqual(str(unequal.exception), "unequal reference cardinality")
+
+    def test_frozen_content_not_caller_label_binds_shared_geometry(self):
+        unit = {"kind": "continuous", "minimum": 0.0, "maximum": 1.0}
+        wide = {"kind": "continuous", "minimum": 0.0, "maximum": 2.0}
+        nominal = {"kind": "nominal", "levels": ("red", "blue")}
+        swapped_levels = {"kind": "nominal", "levels": ("blue", "red")}
+        left = frozen_geometry_commitment(
+            frozen_id="label", encoder_id="enc-a", schema_id="schema-a", columns=(unit, nominal),
+        )
+        same = frozen_geometry_commitment(
+            frozen_id="other-label", encoder_id="enc-a", schema_id="schema-a", columns=(unit, nominal),
+        )
+        relabeled = frozen_geometry_commitment(
+            frozen_id="label", encoder_id="enc-a", schema_id="schema-a", columns=(wide, nominal),
+        )
+        reordered = frozen_geometry_commitment(
+            frozen_id="label", encoder_id="enc-a", schema_id="schema-a", columns=(nominal, unit),
+        )
+        reordered_levels = frozen_geometry_commitment(
+            frozen_id="label", encoder_id="enc-a", schema_id="schema-a", columns=(unit, swapped_levels),
+        )
+        other_encoder = frozen_geometry_commitment(
+            frozen_id="label", encoder_id="enc-b", schema_id="schema-a", columns=(unit, nominal),
+        )
+        shared = shared_frozen_geometry(left, same)
+        self.assertTrue(shared["shared_geometry"])
+        self.assertEqual(shared["reason"], "common_frozen_state")
+        self.assertIs(shared["label_verified"], False)
+        self.assertIs(shared["qualifies_transfer"], False)
+        self.assertNotEqual(left["frozen_id"], same["frozen_id"])
+        self.assertEqual(left["state_digest"], same["state_digest"])
+        for other in (relabeled, reordered, reordered_levels, other_encoder):
+            refused = shared_frozen_geometry(left, other)
+            self.assertFalse(refused["shared_geometry"])
+            self.assertEqual(refused["reason"], "unverified_label")
+            self.assertNotEqual(left["state_digest"], other["state_digest"])
+            self.assertIs(refused["label_verified"], False)
+        legacy = shared_geometry_claim(("label", "label"), frozen_id="label")
+        self.assertTrue(legacy["shared_geometry"])
+        self.assertEqual(legacy["reason"], "common_frozen_scaler")
+        self.assertNotIn("state_digest", legacy)
+        marker = "secret-level-99999"
+        with self.assertRaises(ValueError) as echoed:
+            frozen_geometry_commitment(
+                frozen_id="label", encoder_id="enc-a", schema_id="schema-a",
+                columns=({"kind": "nominal", "levels": ("red", marker, "red")},),
+            )
+        self.assertEqual(str(echoed.exception), "invalid frozen scaler")
+        self.assertNotIn(marker, str(echoed.exception))
 
     def test_energy_and_sliced_wasserstein_do_not_qualify(self):
         negative = energy_distance_unbiased(np.array([[0.0], [1.0]]), np.array([[0.0], [1.0]]))
