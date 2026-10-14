@@ -4,8 +4,9 @@ Family weights are frozen with the schedule. Pending work refuses B*_tested.
 Terminal failures stay in the denominator. Only a measured, qualified, attempted,
 complete artifact at or under B enters the numerator.
 
-`tested_budget_frontier` keeps `censored_below_grid` for a measured artifact
-smaller than the first grid point. `b_star_tested` uses the frozen state
+`tested_budget_frontier` keeps `censored_below_grid` for a countable measured
+artifact smaller than the first grid point. Empty, trivial, external,
+incomplete, and unqualified rows do not set it. `b_star_tested` uses the frozen state
 `censored_below_grid` only when coverage at the first grid point already
 reaches the quality floor. Those two fields are not the same claim.
 """
@@ -86,7 +87,7 @@ def _qualified_at(task, budget) -> bool:
         matched = [flag for point, flag in task.outcomes if point == budget]
         if len(matched) != 1 or type(matched[0]) is not bool:
             raise ValueError("invalid budget outcome")
-        return bool(matched[0] and under_cap)
+        return bool(matched[0] and task.qualified and under_cap)
     return bool(task.qualified and under_cap)
 
 
@@ -100,7 +101,15 @@ def tested_budget_frontier(tasks, budgets, *, measured_points=None) -> dict:
     shares = _shares(tasks)
     denominator = sum(shares.values())
     refused = any(task.status == "pending" or not task.attempted for task in tasks)
-    measured_bytes = [task.artifact_bytes for task in tasks if task.status == "measured" and task.artifact_bytes is not None]
+    measured_bytes = []
+    for task in tasks:
+        if task.empty_generator or task.trivial_target or task.external_checkpoint or not task.complete:
+            continue
+        if task.status != "measured" or not task.attempted or not task.qualified:
+            continue
+        if task.artifact_bytes is None:
+            continue
+        measured_bytes.append(task.artifact_bytes)
     censored = any(size < budgets[0] for size in measured_bytes)
     non_monotone = False
     if measured_points is not None:

@@ -218,6 +218,10 @@ def nearest_other_entity_distance(reference, query, *, reference_entities, query
     and not a privacy result. A per-table refit cannot supply the scaler.
     """
     frozen_id, columns = _frozen_columns(frozen_scaler)
+    content_id = frozen_column_digest(columns)
+    if frozen_id != content_id:
+        raise ValueError("unverified_frozen_label")
+    frozen_id = content_id
     reference = _scale_rows(_row_tuples(reference), columns)
     query = _scale_rows(_row_tuples(query), columns)
     reference_entities = tuple(reference_entities)
@@ -367,15 +371,29 @@ def fit_minmax(rows) -> tuple:
 
 
 def shared_geometry_claim(scalers, *, frozen_id=None) -> dict:
-    """Equal fit ranges are not a shared scaler. One supplied frozen identity is."""
+    """Equal fit ranges are not a shared scaler. A caller label is not one either.
+
+    Shared geometry requires column records whose frozen_id is the column digest.
+    """
     scalers = tuple(scalers)
     if not scalers:
         raise ValueError("missing scalers")
-    if frozen_id is not None:
-        if type(frozen_id) is not str or not frozen_id:
-            raise ValueError("invalid frozen scaler")
-        if all(scaler == frozen_id for scaler in scalers):
-            return {"shared_geometry": True, "reason": "common_frozen_scaler"}
+    if frozen_id is not None and (type(frozen_id) is not str or not frozen_id):
+        raise ValueError("invalid frozen scaler")
+    if all(type(scaler) is str for scaler in scalers):
+        return {"shared_geometry": False, "reason": "unverified_label", "label_verified": False}
+    if all(isinstance(scaler, dict) and isinstance(scaler.get("columns"), tuple) for scaler in scalers):
+        digests = []
+        for scaler in scalers:
+            content_id = frozen_column_digest(scaler["columns"])
+            supplied = scaler.get("frozen_id")
+            if type(supplied) is str and supplied != content_id:
+                return {"shared_geometry": False, "reason": "unverified_label", "label_verified": False}
+            digests.append(content_id)
+        if len(set(digests)) == 1:
+            return {"shared_geometry": True, "reason": "common_frozen_state", "label_verified": False,
+                    "state_digest": digests[0]}
+        return {"shared_geometry": False, "reason": "different_frozen_state", "label_verified": False}
     if len(set(scalers)) == 1:
         return {"shared_geometry": False, "reason": "equal_ranges"}
     return {"shared_geometry": False, "reason": "per_table_refit"}
@@ -385,6 +403,15 @@ def _commitment_column(column):
     if column["kind"] == "continuous":
         return {"kind": "continuous", "minimum": column["minimum"], "maximum": column["maximum"]}
     return {"kind": "nominal", "levels": list(column["levels"])}
+
+
+def frozen_column_digest(columns) -> str:
+    """Identity of frozen columns. A caller label is not this digest."""
+    columns = tuple(columns)
+    _frozen_columns({"frozen_id": "unchecked", "columns": columns})
+    body = {"format": "dope-frozen-columns", "version": 1,
+            "columns": [_commitment_column(column) for column in columns]}
+    return digest(body)
 
 
 def frozen_geometry_commitment(*, frozen_id: str, encoder_id: str, schema_id: str, columns) -> MappingProxyType:
