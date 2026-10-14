@@ -6,8 +6,10 @@ transfer nor privacy.
 Development ECDF band protocol `dope-ecdf-band-development` version 1, not
 statistics-v1 and not N13b. The estimand is the equal-weight mean of
 per-cluster empirical distribution functions on a caller-declared ascending
-grid. Each declared fit is one group. Bootstrap draws resample whole clusters
-with replacement and never resample pairwise distances. The band is the
+grid. Each declared fit is one group, and that fit must have its own lineage.
+A repeated lineage is refused. A nested within-lineage resample is not declared.
+Bootstrap draws resample whole fits with replacement and never resample
+pairwise distances. The band is the
 pointwise 0.025 and 0.975 linear quantiles. It is not a simultaneous band.
 The seed and draw count are part of the result. Fewer than two clusters, or
 clusters with identical curves, stay unmeasured rather than a zero-width
@@ -146,6 +148,7 @@ ECDF_BAND_DEVELOPMENT = {
     "version": 1,
     "estimand": "equal_weight_mean_of_cluster_ecdfs",
     "group_weight": "one_per_declared_fit",
+    "lineage_rule": "refuse_repeated_lineage",
     "grid": "caller_declared_finite_ascending",
     "resample": "whole_clusters_with_replacement",
     "band": "pointwise_percentile",
@@ -272,6 +275,7 @@ def _read_clusters(clusters, *, encoder_id: str):
         raise ValueError("query is not a fit cluster")
     records = []
     fit_ids = []
+    lineages = []
     entities = []
     digests = []
     shape = None
@@ -306,10 +310,13 @@ def _read_clusters(clusters, *, encoder_id: str):
             "synthetic": synthetic,
         })
         fit_ids.append(fit_id)
+        lineages.append(lineage_id)
         entities.append(entity_id)
         digests.append(digest)
     if len(set(fit_ids)) != len(fit_ids):
         raise ValueError("duplicate fit id")
+    if len(set(lineages)) != len(lineages):
+        raise ValueError("duplicate lineage")
     if len(set(entities)) != len(entities):
         raise ValueError("duplicate entity")
     if any(digest is not None for digest in digests):
@@ -341,8 +348,10 @@ def grouped_euclidean_bands(
 ) -> dict:
     """Pointwise ECDF bands from whole declared fit clusters.
 
-    The result follows dope-ecdf-band-development version 1. It does not
-    qualify transfer, privacy, formal DP, or HIPAA, and it is not N13b.
+    Each accepted fit has its own lineage. A repeated lineage is refused, so
+    fits that share a lineage are not resampled as separate units. The result
+    follows dope-ecdf-band-development version 1. It does not qualify transfer,
+    privacy, formal DP, or HIPAA, and it is not N13b.
     """
     if space not in SPACES:
         raise ValueError("unknown coordinate space")
@@ -388,6 +397,7 @@ def grouped_euclidean_bands(
         "roles": roles,
         "cluster_count": len(records),
         "independent_units": len(records),
+        "lineage_ids": tuple(record["lineage_id"] for record in records),
         "row_count": int(records[0]["real"].shape[0]),
         "allocated_pairs": int(records[0]["real"].shape[0]) * int(records[0]["real"].shape[0]),
         "max_pairs": max_pairs,
