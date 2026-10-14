@@ -1612,6 +1612,18 @@
     ".gitleaksignore": {
       "command": "gitleaks detect --source . --no-banner --redact",
       "purpose": "verify the exact historical public-source SHA256 exception while all other secret findings remain enforced"
+    },
+    "agent/merge_guard.py": {
+      "command": "python3 -B -m unittest discover -s agent/tests -p test_merge_guard.py -v",
+      "purpose": "verify fail-closed exact-source independent review, complete queued/failed workflow accounting, server controls, race rejection and actual squash merge receipts using synthetic read-only API fixtures"
+    },
+    "agent/tests/test_merge_guard.py": {
+      "command": "python3 -B -m unittest discover -s agent/tests -p test_merge_guard.py -v",
+      "purpose": "verify fail-closed exact-source independent review, complete queued/failed workflow accounting, server controls, race rejection and actual squash merge receipts using synthetic read-only API fixtures"
+    },
+    "docs/merge-guard.md": {
+      "command": "python3 -B -m unittest discover -s agent/tests -p test_merge_guard.py -v",
+      "purpose": "verify fail-closed exact-source independent review, complete queued/failed workflow accounting, server controls, race rejection and actual squash merge receipts using synthetic read-only API fixtures"
     }
   }
 }
