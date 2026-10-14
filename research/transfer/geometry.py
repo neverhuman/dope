@@ -294,6 +294,29 @@ def null_cloud(rows: int, width: int, seed: int):
     return np.random.default_rng(seed).normal(size=(rows, width))
 
 
+def shared_null_realizations(rows: int, width: int, seed: int) -> MappingProxyType:
+    """One standard-normal cloud for real-real, real-synthetic, and synthetic-synthetic.
+
+    The scale is the null scale. It is not a real-real calibration scale.
+    The cloud is not a neighbor distance, a privacy result, or a transfer qualification.
+    """
+    cloud = null_cloud(rows, width, seed)
+    return MappingProxyType({
+        "estimand": "shared_null_realization",
+        "seed": seed,
+        "rows": rows,
+        "width": width,
+        "scale": 1.0,
+        "roles": ("real_real", "real_synthetic", "synthetic_synthetic"),
+        "cloud": cloud,
+        "shared": True,
+        "nearest_neighbor": False,
+        "row_count": False,
+        "privacy_result": False,
+        "qualifies_transfer": False,
+    })
+
+
 def fit_minmax(rows) -> tuple:
     rows = np.asarray(rows, float)
     if rows.size == 0 or not np.isfinite(rows).all():
