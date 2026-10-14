@@ -106,7 +106,7 @@ Byte gate failed & null \\
 
 \subsection{Clean-license transfer on the density block}
 \label{app:transfer}
-The density block was also scored by Kumo large, Mitra, and TabICL on the shared map, with the three sample seeds of the main panel. These auditors are separate from the CatBoost, linear, and MLP rows, and their Holm adjustment is one family per auditor of size three (that auditor against the three density comparators). \input{generated/mfs-v3-scalar.tex}
+The density block was also scored by Kumo large, Mitra, and TabICL on the shared map, with the three sample seeds of the main panel. These three are pretrained in-context models: the synthetic rows replace the real rows as their context, and no model is trained or fine-tuned on them, so their rows measure context substitution, not a newly trained foundation model. These auditors are separate from the CatBoost, linear, and MLP rows, and their Holm adjustment is one family per auditor of size three (that auditor against the three density comparators). \input{generated/mfs-v3-scalar.tex}
 
 \begin{table}[t]
 \caption{\textbf{Kumo large, Mitra, and TabICL on the density block at $4n$.} Each cell is a retention; the denominator is the paired informative lineages in that row. Holm family size is three per auditor. W/T/L counts lineages; a tie is a difference of zero.}
