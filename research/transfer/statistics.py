@@ -17,7 +17,7 @@ import math
 
 import numpy as np
 
-from .losses import PairedLosses, TrainingScale, finite_number
+from .losses import LossSpace, PairedLosses, TrainingScale, finite_number
 from .metrics import Margin
 
 
@@ -327,13 +327,111 @@ def interval_decision(lower: float, upper: float, *, endpoint: str = "gap",
 
 
 def require_separate_cell_bounds(bounds: dict) -> dict:
-    """One method-level population bound cannot be reused for every cell."""
+    """Each cell carries its own task-cell provenance. A copied population bound does not qualify."""
     if not isinstance(bounds, dict) or not bounds:
         raise ValueError("missing cell bounds")
     values = list(bounds.values())
     if len(values) >= 2 and all(item is values[0] for item in values):
         raise ValueError("one population bound cannot cover every cell")
+    provenances = []
+    for cell_id, bound in bounds.items():
+        if not isinstance(bound, dict):
+            raise ValueError("cell bound requires provenance")
+        if bound.get("bound_kind") != "task_cell" or bound.get("cell_id") != cell_id:
+            raise ValueError("one population bound cannot cover every cell")
+        provenance = bound.get("provenance")
+        if type(provenance) is not str or not provenance:
+            raise ValueError("cell bound requires provenance")
+        provenances.append(provenance)
+    if len(provenances) != len(set(provenances)):
+        raise ValueError("one population bound cannot cover every cell")
     return bounds
+
+
+def _mean_query_z(pairs, margin, scale) -> float:
+    values = margin.query_z(pairs, scale)
+    return finite_number(math.fsum(values) / len(values))
+
+
+def cross_task_endpoint(cells, *, version: int = 1) -> dict:
+    """Versioned dimensionless tolerance-adjusted Z. normalized_gap is not this endpoint.
+
+    MSE divides by fit-only variance. RMSE divides by its square root. MAE divides
+    by a caller-supplied fit-only mean absolute deviation. A degenerate fit scale
+    stays out of the pool. Campaign and calibration are unmeasured.
+    """
+    if version != 1:
+        raise ValueError("unknown_cross_task_endpoint_version")
+    cells = tuple(cells)
+    if not cells:
+        raise ValueError("missing_cross_task_cells")
+    seen = set()
+    rows = []
+    pooled = []
+    for cell in cells:
+        if not isinstance(cell, dict):
+            raise ValueError("invalid_cross_task_cell")
+        task_id = cell.get("task_id")
+        loss = cell.get("loss")
+        pairs, margin, scale = cell.get("pairs"), cell.get("margin"), cell.get("fit_scale")
+        if (
+            type(task_id) is not str or not task_id or task_id in seen
+            or not isinstance(pairs, PairedLosses) or not isinstance(margin, Margin)
+            or not isinstance(scale, TrainingScale)
+        ):
+            raise ValueError("invalid_cross_task_cell")
+        seen.add(task_id)
+        if loss not in ("mse", "rmse", "mae"):
+            raise ValueError("unknown_cross_task_loss")
+        if pairs.loss_space != LossSpace.ORIGINAL_MSE:
+            raise ValueError("loss_space_requires_original_mse")
+        normalized = None if scale.value is None else finite_number((pairs.means[1] - pairs.means[0]) / scale.value)
+        row = {
+            "task_id": task_id, "loss": loss, "normalized_gap": normalized,
+            "raw_z": None, "dimensionless": None, "status": "pooled",
+        }
+        if loss in ("mse", "rmse") and scale.value is None:
+            row["status"] = "degenerate_scale"
+            row["absolute_raw_not_dimensionless"] = True
+            rows.append(row)
+            continue
+        if loss == "mse":
+            raw_z = _mean_query_z(pairs, margin, scale)
+            denominator = scale.value
+        elif loss == "rmse":
+            real, synthetic = math.sqrt(pairs.means[0]), math.sqrt(pairs.means[1])
+            denominator = math.sqrt(scale.value)
+            raw_z = finite_number(synthetic - real - (margin.relative * real + margin.absolute_scaled * denominator))
+        else:
+            deviation = cell.get("fit_absolute_deviation")
+            if deviation is None:
+                raise ValueError("mae_scale_required")
+            deviation = finite_number(deviation)
+            if deviation <= 0:
+                row["status"] = "degenerate_scale"
+                row["absolute_raw_not_dimensionless"] = True
+                rows.append(row)
+                continue
+            real = finite_number(math.fsum(math.sqrt(v) for v in pairs.real) / len(pairs.real))
+            synthetic = finite_number(math.fsum(math.sqrt(v) for v in pairs.synthetic) / len(pairs.synthetic))
+            denominator = deviation
+            raw_z = finite_number(synthetic - real - (margin.relative * real + margin.absolute_scaled * deviation))
+        row["raw_z"] = raw_z
+        row["dimensionless"] = finite_number(raw_z / denominator)
+        pooled.append(row["dimensionless"])
+        rows.append(row)
+    return {
+        "format": "dope-cross-task-endpoint",
+        "version": 1,
+        "endpoint": "tolerance_adjusted_z_over_fit_scale",
+        "value": None if not pooled else finite_number(math.fsum(pooled) / len(pooled)),
+        "status": "pooled" if pooled else "unpooled_degenerate_scale",
+        "tasks": rows,
+        "normalized_gap_omits_margin": True,
+        "campaign": "unmeasured",
+        "calibration": "unmeasured",
+        "qualification": False,
+    }
 
 
 def leave_one_global_seed_out(design: CrossedDesign, *, endpoint="z") -> dict:
