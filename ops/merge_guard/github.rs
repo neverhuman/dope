@@ -8,6 +8,7 @@ pub use process::ProcessTransport;
 pub struct Response {
     pub code: i32,
     pub stdout: String,
+    pub stderr: String,
 }
 pub trait Transport {
     fn run(&mut self, argv: &[String]) -> Result<Response>;
@@ -109,6 +110,8 @@ impl<T: Transport> Api for GitHub<T> {
         let index = self.calls.len() - 1;
         let response = self.transport.run(&argv);
         let parsed = response.and_then(|r| {
+            // Cargo diagnostics stay internal; GitHub receipts discard raw stderr.
+            drop(r.stderr);
             let data: Value =
                 serde_json::from_str(&r.stdout).map_err(|_| Refused("api_unavailable"))?;
             Ok((r.code, data))

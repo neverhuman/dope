@@ -3,20 +3,22 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 root=$PWD
 source ops/ci/lib.sh
-ci_require_command cargo
-ci_require_command python3
+for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg; do
+  ci_require_command "$tool"
+done
+bash ops/ci/test-cpu-tool-readiness.sh
 bash ops/ci/check-budgets.sh
 bash ops/ci/check-contracts.sh
 cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo test --locked
+bash ops/ci/prepare-merge-guard.sh
 cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
 cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
 cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard
 python3 -m venv --system-site-packages target/ci-python
 bash ops/ci/install-python-v1.sh target/ci-python/bin/python
 PYTHONPATH=src target/ci-python/bin/python -m pytest -q tests
-ci_require_command uv
 uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'jsonschema==4.26.0'
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_checkpoint_index -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_validation_figure -q
@@ -30,6 +32,7 @@ PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_retained_comparison -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_arf_tabsyn_followon -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_cpu_fit_batch research.benchmark.tests.test_arf_contract -q
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_public_demo -q
 cd validation/external
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --locked --extra xgboost --extra lightgbm
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --offline --locked --extra xgboost --extra lightgbm
@@ -43,14 +46,12 @@ python3 docs/whitepaper/scripts/local_receipts.py --check
 python3 research/benchmark/verify_paper_numbers.py
 python3 docs/whitepaper/scripts/compute_cost.py
 uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'matplotlib==3.10.8' 'catboost==1.2.10'
+mkdir -p target/transfer-test-tmp
+TMPDIR="$PWD/target/transfer-test-tmp" PYTHONPATH=. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 target/ci-python/bin/python -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
 target/ci-python/bin/python docs/whitepaper/scripts/retained_evidence.py
 target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py
 # Required paper-tests gate: same commands as Justfile, using the V1 interpreter.
 # Contains the independent committed-input replay exactly once; do not also run its old selector.
-if ! command -v just >/dev/null 2>&1; then
-  sudo apt-get update
-  sudo apt-get -o DPkg::Lock::Timeout=300 install -y just
-fi
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_*.py'
 target/ci-python/bin/python -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v
 bash ops/ci/check-review-fixes.sh target/ci-python/bin/python
@@ -61,11 +62,7 @@ target/ci-python/bin/python docs/whitepaper/scripts/mfs_v3_table.py --check
 target/ci-python/bin/python docs/whitepaper/scripts/v2_figures.py --check
 target/ci-python/bin/python docs/whitepaper/scripts/readme_benchmark.py --check
 git diff --exit-code -- docs/whitepaper/generated/fit-trace.json docs/whitepaper/generated/panel-stats.json docs/whitepaper/generated/numbers.tex docs/whitepaper/generated/figure-spec.tex docs/whitepaper/generated/density-table.tex docs/whitepaper/generated/neural-table.tex docs/whitepaper/generated/forest-table.tex docs/whitepaper/generated/headline-table.tex docs/whitepaper/generated/byte-table.tex docs/whitepaper/generated/threshold-table.tex docs/whitepaper/generated/threshold-counts.tex docs/whitepaper/generated/beyond-fit.tex docs/whitepaper/generated/provenance-table.tex docs/whitepaper/generated/fidelity-privacy-table.tex docs/whitepaper/generated/loss-beside-retention.tex docs/whitepaper/generated/artifact-hashes.tex docs/whitepaper/generated/coreset-paragraph.tex docs/whitepaper/generated/compute-cost.json docs/whitepaper/generated/compute-cost-receipts.json docs/whitepaper/generated/compute-cost-table.tex docs/whitepaper/generated/licenses.json docs/whitepaper/generated/availability.tex docs/whitepaper/generated/publication-rows.tex docs/whitepaper/generated/figure-hashes.json docs/whitepaper/figures/retention-bytes.pdf docs/whitepaper/figures/retention-bars.pdf docs/whitepaper/figures/paired-cdf.pdf docs/whitepaper/figures/loss-curves.pdf docs/whitepaper/figures/teaser.pdf docs/whitepaper/generated/teaser-figure-hashes.json docs/whitepaper/figures/pareto.pdf docs/whitepaper/generated/pareto-figure-hashes.json docs/whitepaper/generated/readme-figure-hashes.json docs/readme/pareto.png docs/readme/paired.png README.md docs/whitepaper/generated/v2-numbers.tex docs/whitepaper/generated/v2-headline.json docs/whitepaper/generated/v2-headline-table.tex docs/whitepaper/generated/v2-size-table.tex docs/whitepaper/generated/v2-fidelity-table.tex docs/whitepaper/generated/v2-fidelity-levels.tex docs/whitepaper/generated/v2-contrasts.tex docs/whitepaper/generated/v2-levels.tex docs/whitepaper/generated/v2-seeds.tex docs/whitepaper/generated/v2-family-numbers.tex docs/whitepaper/generated/v2-family-table.tex docs/whitepaper/generated/v2-all-five-numbers.tex docs/whitepaper/generated/v2-all-five-table.tex docs/whitepaper/generated/mfs-v3-density-table.tex docs/whitepaper/generated/mfs-v3-scalar.tex docs/whitepaper/generated/mfs-v3-layers.tex docs/whitepaper/generated/mfs-v3-figure-hashes.json docs/whitepaper/figures/mfs-v3-retention-bars.pdf docs/whitepaper/figures/mfs-v3-paired.pdf research/benchmark/results/mfs-v3-density-panel.json
-python3 -B -m unittest research.benchmark.tests.test_verify_paper_numbers research.benchmark.tests.test_paper_log
-if ! command -v latexmk >/dev/null 2>&1 || ! command -v pdffonts >/dev/null 2>&1; then
-  sudo apt-get update
-  sudo apt-get -o DPkg::Lock::Timeout=300 install -y latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-pictures texlive-publishers
-fi
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_verify_paper_numbers research.benchmark.tests.test_paper_log
 # PDF admission replays scientific inputs using the provisioned V1 interpreter.
 export PATH="$PWD/target/ci-python/bin:$PATH"
 bash docs/whitepaper/scripts/build_pdf.sh

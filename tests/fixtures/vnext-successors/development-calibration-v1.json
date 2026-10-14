@@ -1,0 +1,14 @@
+{
+  "format": "dope-calibration-receipt",
+  "version": 1,
+  "protocol_id": "transfer-statistics-v1-development",
+  "protocol_digest": "5175781dcf9cf105fb055c87a75f0dcf803f6fd377e43a647259fb0bee819200",
+  "repetitions": 120,
+  "bootstrap_draws": 399,
+  "frozen_for_confirmation": false,
+  "manifest_digest": null,
+  "tolerances_frozen_before_outcomes": true,
+  "mcse_reported": true,
+  "wilson_reported": true,
+  "binding_digest": "81b4707d1a7b4ac1349e42e416684b7edefcecf23c14289a081c98ea8ef59889"
+}

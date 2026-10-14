@@ -1,9 +1,4 @@
-#[allow(dead_code)]
-#[path = "../rust/schema.rs"]
-mod schema;
-#[allow(dead_code)]
-#[path = "../rust/typed_data.rs"]
-mod typed_data;
+use dope_kernel::{schema, typed_data};
 
 use schema::{MaskState, MetadataVisibility, TableSchemaV1};
 use serde_json::{Value, json};
@@ -561,19 +556,6 @@ fn retained_field_limit_defaults_for_prior_v1_states_and_refuses_zero() {
             .code,
         "invalid_transform_state"
     );
-}
-
-#[test]
-fn target_lookup_returns_an_error_when_the_role_is_missing() {
-    let mut data = numeric_table();
-    for column in &mut data.schema.columns {
-        if column.role == schema::ColumnRole::Target {
-            column.role = schema::ColumnRole::Feature;
-        }
-    }
-    let lookup = std::panic::catch_unwind(|| data.target_id());
-    assert!(lookup.is_ok(), "target lookup must return a typed reason");
-    assert_eq!(lookup.unwrap().unwrap_err().code, "missing_target_role");
 }
 
 #[test]

@@ -133,6 +133,11 @@ fn compile_neural_table(
         contains_row_payloads: false,
         contains_row_references: false,
         probe_failures: BTreeMap::new(),
+        search_history: Vec::new(),
+        residual_fitting: BTreeMap::new(),
+        allocation_policy: "fixed_neural_profile".into(),
+        search_preparation_seconds: None,
+        unvisited_beam_candidates: Vec::new(),
     };
     Ok(CompileResult {
         candidate_artifacts: BTreeMap::from([(candidate_id, artifact.clone())]),
@@ -144,6 +149,9 @@ fn compile_neural_table(
 }
 
 fn compile_table(table: &Table, task: Task, options: &CompileOptions) -> Result<CompileResult> {
+    if options.adaptive_allocation && options.backend_id.is_some() {
+        return Err(DopeError::Unsupported("adaptive_allocation_requires_unrestricted_symbolic_tournament".into()));
+    }
     if let Some(architecture) = options.backend_id.as_deref().and_then(neural_architecture) {
         let started = Instant::now();
         return compile_neural_table(

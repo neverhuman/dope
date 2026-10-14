@@ -29,6 +29,22 @@ mod tests {
         let fit = fit_column(&[0.1, 0.100_000_05, 0.2, 0.2]);
         assert!(fit.discrete.is_some());
     }
+
+    #[test]
+    fn forced_baseline_consumes_the_requested_beam_budget() {
+        let features = (0..64).map(|row| row as f32 / 63.0).collect::<Vec<_>>();
+        let targets = features.iter().map(|x| 0.2 + 0.6 * x).collect::<Vec<_>>();
+        for beam in [1, 18] {
+            let options = CompileOptions {
+                seed: Some(1729), beam_width: Some(beam), quantization_profiles: vec![8],
+                ..Default::default()
+            };
+            let result = compile_kernel_from_arrays(&features, &targets, 64, 1, Task::Regression, &options).unwrap();
+            assert!(result.candidates.iter().any(|candidate| candidate.candidate_id == "k5-independence-sparse_linear-q8"));
+            assert_eq!(result.report.search_history.len(), beam);
+            assert_eq!(result.report.candidate_count, beam);
+        }
+    }
     use crate::codec::decode_kernel;
     use std::collections::BTreeSet;
 
@@ -83,6 +99,7 @@ mod tests {
             backend_id: None,
             neural_target_weight: 2.0,
             neural_structural_penalty: 0.0,
+            adaptive_allocation: false,
             release_policy: ReleasePolicy::new(AnonymizationTier::L0, None, false).unwrap(),
         };
         let result =
@@ -111,7 +128,15 @@ mod tests {
             .collect();
         assert_eq!(
             dependence_families,
-            BTreeSet::from(["chow_liu", "independence", "triangular_autoregressive",])
+            BTreeSet::from([
+                "chow_liu",
+                "independence",
+                "poet_factor",
+                "sparse_gaussian_copula",
+                "triangular_autoregressive",
+                "truncated_c_vine",
+                "two_component_copula_mixture",
+            ])
         );
         let baseline = result
             .candidates

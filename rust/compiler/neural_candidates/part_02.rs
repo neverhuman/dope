@@ -1,5 +1,3 @@
-
-
 fn compile_symbolic_table(
     table: &Table,
     task: Task,
@@ -70,40 +68,49 @@ fn compile_symbolic_table(
     } else {
         "sparse_logistic"
     };
-    let mut target_models = vec![(baseline_name, target_model.clone(), noise.clone())];
-    let gam = fit_gam_target(table, &completed, &screen);
+    let baseline_rule = if task == Task::Regression {
+        "full_fit_homoscedastic_baseline_unqualified"
+    } else {
+        "full_fit_binary_calibration_unqualified"
+    };
+    let mut target_models = vec![(
+        baseline_name,
+        target_model.clone(),
+        (noise.clone(), baseline_rule),
+    )];
+    let gam = fit_gam_target(table, &completed, &screen, task);
     target_models.push((
         "sparse_gam",
         gam.clone(),
-        fit_noise(table, &completed, &screen, &gam),
+        fit_noise(table, &completed, &screen, &gam, task),
     ));
-    let ga2m = fit_ga2m_target(table, &completed, &screen);
+    let ga2m = fit_ga2m_target(table, &completed, &screen, task);
     target_models.push((
         "ga2m",
         ga2m.clone(),
-        fit_noise(table, &completed, &screen, &ga2m),
+        fit_noise(table, &completed, &screen, &ga2m, task),
     ));
-    let mars = fit_mars_target(table, &completed, &screen);
+    let mars = fit_mars_target(table, &completed, &screen, task);
     target_models.push((
         "mars",
         mars.clone(),
-        fit_noise(table, &completed, &screen, &mars),
+        fit_noise(table, &completed, &screen, &mars, task),
     ));
-    let oblivious_tree = fit_oblivious_tree_target(table, &completed, &screen);
+    let oblivious_tree = fit_oblivious_tree_target(table, &completed, &screen, task);
     target_models.push((
         "oblivious_tree",
         oblivious_tree.clone(),
-        fit_noise(table, &completed, &screen, &oblivious_tree),
+        fit_noise(table, &completed, &screen, &oblivious_tree, task),
     ));
     let compact_neural = if restricted_profile.is_some_and(|profile| profile.2 != 5) {
         target_model.clone()
     } else {
-        fit_compact_neural_target(table, &completed, &screen, seed)?
+        fit_compact_neural_target(table, &completed, &screen, seed, task)?
     };
     target_models.push((
         "compact_neural_residual",
         compact_neural.clone(),
-        fit_noise(table, &completed, &screen, &compact_neural),
+        fit_noise(table, &completed, &screen, &compact_neural, task),
     ));
     let seed_kernel = Kernel {
         task,
@@ -163,21 +170,95 @@ fn compile_symbolic_table(
             .then_with(|| left.2.cmp(&right.2))
             .then_with(|| left.3.cmp(&right.3))
     });
-    let mut selected_specs: Vec<_> = specs.into_iter().take(beam_width).collect();
+    let proposed_ids = specs
+        .iter()
+        .map(|spec| {
+            options.backend_id.clone().unwrap_or_else(|| {
+                format!(
+                    "k{}-{}-{}-q{}",
+                    KNOT_LADDER[spec.0],
+                    dependence_name(spec.1),
+                    target_models[spec.2].0,
+                    spec.3
+                )
+            })
+        })
+        .collect::<std::collections::BTreeSet<_>>();
+    let search_preparation_seconds = started.elapsed().as_secs_f64();
+    let mut adaptive = if options.adaptive_allocation {
+        let bits = *options
+            .quantization_profiles
+            .iter()
+            .min()
+            .expect("validated nonempty profiles");
+        Some(AdaptiveAllocation::new(
+            specs.clone(),
+            beam_width,
+            seed,
+            (0, 0, 0, bits, 0.0),
+        ))
+    } else {
+        None
+    };
+    let mut selected_specs = if restricted_profile.is_none() {
+        fair_candidate_specs(specs, beam_width, seed)
+    } else {
+        specs.into_iter().take(beam_width).collect()
+    };
     if restricted_profile.is_none() {
         let baseline = (0, 0, 0, options.quantization_profiles[0]);
         if !selected_specs
             .iter()
             .any(|spec| (spec.0, spec.1, spec.2, spec.3) == baseline)
         {
-            selected_specs.push((baseline.0, baseline.1, baseline.2, baseline.3, 0.0));
+            // The baseline consumes an existing beam slot; preserving it must
+            // not silently grant an additional candidate/evaluation budget.
+            if selected_specs.len() == beam_width {
+                selected_specs.pop();
+            }
+            selected_specs.insert(0, (baseline.0, baseline.1, baseline.2, baseline.3, 0.0));
         }
     }
+    let mut fixed_specs = selected_specs.into_iter();
     let mut smallest_observed = None::<usize>;
-    for (knot_index, dependence_family, target_index, bits, _) in selected_specs {
-        if deadline.is_some_and(|limit| Instant::now() > limit) && !candidates.is_empty() {
+    let mut search_history = Vec::new();
+    loop {
+        let next = if let Some(search) = &mut adaptive {
+            search.next()
+        } else {
+            fixed_specs.next()
+        };
+        let Some(spec @ (knot_index, dependence_family, target_index, bits, _)) = next else {
             break;
+        };
+        let parent_candidate_id = adaptive.as_ref().and_then(|search| search.parent(spec));
+        let allocation = match adaptive.as_ref() {
+            None => "fixed_family_round_robin",
+            Some(search) if search.exploration => "adaptive_family_exploration",
+            Some(_) => "adaptive_encoded_racing_uncalibrated",
         }
+        .to_string();
+        let candidate_id = options.backend_id.clone().unwrap_or_else(|| {
+            format!(
+                "k{}-{}-{}-q{bits}",
+                KNOT_LADDER[knot_index],
+                dependence_name(dependence_family),
+                target_models[target_index].0
+            )
+        });
+        if deadline.is_some_and(|limit| Instant::now() > limit) && !candidates.is_empty() {
+            search_history.push(CandidateAttempt {
+                candidate_id,
+                disposition: "unvisited_deadline".into(),
+                actual_artifact_bytes: None,
+                elapsed_seconds: None,
+                pruned_encoded_zero_terms: None,
+                parent_candidate_id,
+                allocation,
+            });
+            continue;
+        }
+        let attempt_started = Instant::now();
         let knots = KNOT_LADDER[knot_index];
         let marginals: Vec<Marginal> = fits
             .iter()
@@ -190,76 +271,9 @@ fn compile_symbolic_table(
             })
             .collect();
         let marginal_fidelity = 1.0 - 0.035 / (knots as f64).sqrt();
-        let (dependence, dependence_name, dependence_fidelity) = match dependence_family {
-            0 => {
-                let fidelity = correlation.as_ref().map_or(0.85, |matrix| {
-                    let mean = matrix
-                        .iter()
-                        .enumerate()
-                        .filter(|(index, _)| index / width != index % width)
-                        .map(|(_, value)| f64::from(value.abs()))
-                        .sum::<f64>()
-                        / (width * width - width).max(1) as f64;
-                    (1.0 - mean / 0.5).clamp(0.0, 1.0)
-                });
-                (Dependence::Independent, "independence", fidelity)
-            }
-            1 => (
-                Dependence::ChowLiu {
-                    root: 0,
-                    edges: edges.clone(),
-                },
-                "chow_liu",
-                0.97,
-            ),
-            2 => (
-                Dependence::Triangular {
-                    terms: triangular_terms.clone(),
-                },
-                "triangular_autoregressive",
-                0.98,
-            ),
-            3 => (
-                Dependence::SparseGraph {
-                    edges: strongest_sparse_edges(
-                        correlation.as_ref(),
-                        &edges,
-                        width,
-                        width.saturating_mul(4),
-                    ),
-                },
-                "sparse_gaussian_copula",
-                0.985,
-            ),
-            4 => (
-                poet_dependence(correlation.as_ref(), &edges, width),
-                "poet_factor",
-                0.985,
-            ),
-            5 => (
-                vine_dependence(correlation.as_ref(), &edges, width),
-                "truncated_c_vine",
-                0.99,
-            ),
-            6 => (
-                Dependence::Mixture {
-                    weights: vec![0.5, 0.5],
-                    components: vec![
-                        Dependence::ChowLiu {
-                            root: 0,
-                            edges: edges.clone(),
-                        },
-                        Dependence::Triangular {
-                            terms: triangular_terms.clone(),
-                        },
-                    ],
-                },
-                "two_component_copula_mixture",
-                0.99,
-            ),
-            _ => unreachable!("bounded dependence family"),
-        };
-        let (target_name, target_model, noise) = &target_models[target_index];
+        let (dependence, dependence_name, dependence_fidelity) = candidate_dependence(
+            dependence_family, width, correlation.as_ref(), &edges, &triangular_terms);
+        let (target_name, target_model, (noise, _)) = &target_models[target_index];
         let mut kernel = seed_kernel.clone();
         kernel.marginals = marginals.clone();
         kernel.program = KernelProgram::Symbolic {
@@ -268,8 +282,19 @@ fn compile_symbolic_table(
             noise: noise.clone(),
         };
         kernel = quantized_kernel(&kernel, bits);
-        let utility = quantized_target_utility(&kernel, table, &completed);
-        let driver_agreement = quantized_driver_agreement(&kernel, &screen);
+        let pruned_encoded_zero_terms = if options.adaptive_allocation {
+            let (_, target, noise) = kernel.symbolic_mut().expect("symbolic allocation");
+            Some(prune_encoded_zero_support(target, noise))
+        } else {
+            None
+        };
+        // Promotion and ranking consume the same decoded bytes as the shipped
+        // sampler. In-memory quantized coefficients are not the final object.
+        kernel.compliant = false;
+        let artifact = encode_kernel(&kernel)?;
+        let decoded = crate::codec::decode_kernel(&artifact)?;
+        let utility = quantized_target_utility(&decoded, table, &completed);
+        let driver_agreement = quantized_driver_agreement(&decoded, &screen);
         let quantization_penalty = 0.5 / ((1u32 << bits) - 1) as f64;
         let proxy_joint_fidelity = 0.55
             * (marginal_fidelity - quantization_penalty).clamp(0.0, 1.0)
@@ -291,19 +316,36 @@ fn compile_symbolic_table(
         failed_gates.push("production_evidence_unmeasured".to_string());
         // Compilation sees train.csv only. No train-only heuristic may certify an artifact.
         kernel.compliant = false;
-        let artifact = encode_kernel(&kernel)?;
         smallest_observed =
             Some(smallest_observed.map_or(artifact.len(), |size| size.min(artifact.len())));
         if !options
             .release_policy
             .accepts_artifact_bytes(artifact.len())
         {
+            search_history.push(CandidateAttempt {
+                candidate_id,
+                disposition: "encoded_over_cap".into(),
+                actual_artifact_bytes: Some(artifact.len()),
+                elapsed_seconds: Some(attempt_started.elapsed().as_secs_f64()),
+                parent_candidate_id,
+                allocation,
+                pruned_encoded_zero_terms,
+            });
             continue;
         }
         let candidate_id = options
             .backend_id
             .clone()
             .unwrap_or_else(|| format!("k{knots}-{dependence_name}-{target_name}-q{bits}"));
+        search_history.push(CandidateAttempt {
+            candidate_id: candidate_id.clone(),
+            disposition: "encoded_accepted_development_only".into(),
+            actual_artifact_bytes: Some(artifact.len()),
+            elapsed_seconds: Some(attempt_started.elapsed().as_secs_f64()),
+            parent_candidate_id,
+            allocation,
+            pruned_encoded_zero_terms,
+        });
         let score = 0.45 * utility + 0.25 * driver_agreement + 0.30 * proxy_joint_fidelity;
         let record = CandidateReport {
             candidate_id: candidate_id.clone(),
@@ -321,6 +363,9 @@ fn compile_symbolic_table(
             proxy_membership_auc,
             failed_gates,
         };
+        if let Some(search) = &mut adaptive {
+            search.observe(spec, candidate_id.clone(), score, artifact.len());
+        }
         artifacts.insert(candidate_id, artifact);
         candidates.push(record);
     }
@@ -344,6 +389,11 @@ fn compile_symbolic_table(
         .unwrap()
         .clone();
     let artifact = artifacts.get(&selected.candidate_id).unwrap().clone();
+    let offered_ids = search_history
+        .iter()
+        .map(|attempt| attempt.candidate_id.clone())
+        .collect::<std::collections::BTreeSet<_>>();
+    let unvisited_beam_candidates = proposed_ids.difference(&offered_ids).cloned().collect();
     let report = CompileReport {
         format: "dope-kernel-compile-report".into(),
         version: 3,
@@ -365,6 +415,19 @@ fn compile_symbolic_table(
         contains_row_payloads: false,
         contains_row_references: false,
         probe_failures: BTreeMap::new(),
+        search_history,
+        allocation_policy: if options.adaptive_allocation {
+            "adaptive_encoded_development_uncalibrated"
+        } else {
+            "fixed_family_round_robin"
+        }
+        .into(),
+        search_preparation_seconds: Some(search_preparation_seconds),
+        unvisited_beam_candidates,
+        residual_fitting: target_models
+            .iter()
+            .map(|(name, _, (_, rule))| ((*name).into(), (*rule).into()))
+            .collect(),
     };
     Ok(CompileResult {
         artifact,

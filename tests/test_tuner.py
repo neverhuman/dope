@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 import torch
 
 from dope_kernel.cli import build_parser
@@ -271,15 +272,20 @@ def test_tui_renderer_accepts_synthetic_events() -> None:
     assert dashboard.render() is not None
 
 
-def test_tui_renderer_does_not_use_ascii_sparkline_strings() -> None:
+@pytest.mark.parametrize("force_terminal", [False, True])
+def test_tui_renderer_does_not_use_ascii_sparkline_strings(monkeypatch: pytest.MonkeyPatch, force_terminal: bool) -> None:
     from rich.console import Console
 
+    monkeypatch.setenv("TERM", "dumb")
+    monkeypatch.delenv("LINES", raising=False)
     dashboard = TunerDashboard({"host": "unit", "device": "cpu", "gpu": None, "disk": {"free_mb": 100}, "max_datasets": 1, "config": {}})
     for value in (0.9, 0.6, 0.3):
         dashboard.apply({"type": "train_step", "loss": value})
     dashboard.apply({"type": "epoch_metrics", "train_loss": 0.3, "val_loss": 0.4, "rank_accuracy": 1.0, "rbcs": 0.7})
 
-    console = Console(record=True, width=140)
+    # Rich's dumb-terminal fallback ignores width alone when height is unset.
+    console = Console(record=True, width=140, height=25, force_terminal=force_terminal)
+    assert console.size == (140, 25)
     console.print(dashboard.render())
     rendered = console.export_text()
 

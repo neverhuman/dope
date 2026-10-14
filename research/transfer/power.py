@@ -111,13 +111,15 @@ def power_simulation(scenario: PowerScenario, *, repetitions: int = 120, bootstr
     failures = {}
     for _ in range(repetitions):
         design = _generate(scenario, rng)
-        result = simultaneous_ucb(bootstrap_effects(design, draws=bootstrap_draws, seed=int(rng.integers(2**63))), alpha=alpha)
+        boot = bootstrap_effects(design, draws=bootstrap_draws, seed=int(rng.integers(2**63)))
+        result = simultaneous_ucb(boot, alpha=alpha)
         if result["status"] != "complete":
             failures[result["status"]] = failures.get(result["status"], 0) + 1
             continue
         bounds = result["bounds"]["synthetic-minus-real"]
         lower, upper = bounds["lower"], bounds["upper"]
-        decision = interval_decision(lower, upper, equivalence_margin=scenario.equivalence_margin)
+        decision = interval_decision(lower, upper, endpoint=boot["endpoint"],
+                                     equivalence_margin=scenario.equivalence_margin)
         counts["valid"] += 1
         counts["upper_covered"] += scenario.effect <= upper
         counts["interval_covered"] += lower <= scenario.effect <= upper

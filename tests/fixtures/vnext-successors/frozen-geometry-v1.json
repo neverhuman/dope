@@ -1,0 +1,24 @@
+{
+  "body": {
+    "format": "dope-frozen-geometry-state",
+    "version": 1,
+    "encoder_id": "fixture-encoder",
+    "schema_id": "fixture-schema",
+    "columns": [
+      {
+        "kind": "continuous",
+        "minimum": -0.0,
+        "maximum": 1.25
+      },
+      {
+        "kind": "nominal",
+        "levels": [
+          "α",
+          "β"
+        ]
+      }
+    ]
+  },
+  "expected_state_digest": "780fe3badfe2c2100388704b2c276af33d6a4396f4900fdc69cf52e91c22c458",
+  "expected_positive_zero_digest": "9740811bb186705f6c5f28c9f7b0501f697bb5c21b8a445d5221aee82ef823f1"
+}

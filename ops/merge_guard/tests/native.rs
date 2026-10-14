@@ -109,6 +109,57 @@ fn actual_malformed_response_never_qualifies_or_echoes_payload() {
     assert!(!api.calls().to_string().contains("payload marker"));
 }
 #[test]
+fn bounded_stderr_is_retained_internally_and_omitted_from_github_receipts() {
+    let dir = scratch("stderr");
+    let fake = executable(
+        &dir,
+        "#!/bin/sh\nprintf '%s' '{\"fixture\":true}'\nprintf 'private diagnostic marker\\377' >&2\n",
+    );
+    let response = github::ProcessTransport::default()
+        .run(&[fake.to_string_lossy().into_owned()])
+        .unwrap();
+    assert_eq!(response.code, 0);
+    assert_eq!(response.stderr, "private diagnostic marker\u{fffd}");
+    let mut api = github::GitHub::new(
+        fake.to_string_lossy().into_owned(),
+        github::ProcessTransport::default(),
+    );
+    assert_eq!(api.get("user", false, false), Ok(json!({"fixture": true})));
+    assert!(!api.calls().to_string().contains("diagnostic marker"));
+    let fake = executable(
+        &dir,
+        "#!/bin/sh\nprintf '%s' '{\"status\":500}'\nprintf '%s' 'cargo metadata diagnostic marker' >&2\nexit 101\n",
+    );
+    let response = github::ProcessTransport::default()
+        .run(&[fake.to_string_lossy().into_owned()])
+        .unwrap();
+    assert_eq!(response.code, 101);
+    assert_eq!(response.stderr, "cargo metadata diagnostic marker");
+    let mut api = github::GitHub::new(
+        fake.to_string_lossy().into_owned(),
+        github::ProcessTransport::default(),
+    );
+    assert_eq!(
+        api.get("user", false, false),
+        Err(Refused("api_unavailable"))
+    );
+    assert!(!api.calls().to_string().contains("diagnostic marker"));
+}
+#[test]
+fn stderr_exceeding_the_existing_capture_bound_is_refused() {
+    let dir = scratch("stderr-bound");
+    let fake = executable(
+        &dir,
+        "#!/bin/sh\nprintf '%s' '{}'\nhead -c 65537 /dev/zero >&2\n",
+    );
+    assert_eq!(
+        github::ProcessTransport::default()
+            .run(&[fake.to_string_lossy().into_owned()])
+            .err(),
+        Some(Refused("api_unavailable"))
+    );
+}
+#[test]
 fn selected_gh_runs_when_rtk_is_absent_from_path() {
     const CHILD: &str = "DOPE_GUARD_RTK_ABSENT_CHILD";
     if let Some(fake) = std::env::var_os(CHILD) {
