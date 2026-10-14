@@ -354,11 +354,16 @@ class _StructuredGenerator:
 
     def reload(self, state):
         _require(type(state) is ExportState and state.metadata["spec_sha256"] == self.spec.sha256, "state_identity_mismatch")
-        backend = self._call("reload", state)
-        _require(backend is not self.backend, "reload_reused_fitting_backend")
-        loaded = type(self)(self.spec, backend, wall_seconds=self._limits[0], memory_bytes=self._limits[1], gpu_bytes=self._limits[2])
-        loaded._metadata = state.metadata
-        return loaded
+        try:
+            backend = self._call("reload", state)
+            _require(backend is not self.backend, "reload_reused_fitting_backend")
+            loaded = type(self)(self.spec, backend, wall_seconds=self._limits[0], memory_bytes=self._limits[1], gpu_bytes=self._limits[2])
+            loaded._metadata = state.metadata
+            return loaded
+        except BaseException:
+            # A failed reload may already have mutated the fitting backend.
+            self._metadata = None
+            raise
 
     def as_pr09(self, identity, admission, cohort_sha256, auditors_sha256):
         """Bind PR09 lazily; its recipe pin must cover the complete spec SHA256."""

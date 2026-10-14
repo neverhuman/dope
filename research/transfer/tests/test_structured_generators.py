@@ -344,16 +344,25 @@ class StructuredTests(unittest.TestCase):
         self.assertEqual(loaded.to_bytes(), body)
         self.assertEqual(loaded.charged_bytes, len(body))
 
-    def test_reload_identity_and_reusing_fitted_backend_refuse(self):
-        engine, backend = self.engine()
-        engine.fit(view(), 1)
+    def test_reload_identity_refusal_preserves_fit_before_backend(self):
+        B, engine, backend, model, admission, fitting = self.bridge_fixture()
+        bridge = engine.as_pr09(model, admission, PIN, PIN)
+        bridge.fit(fitting, 7)
         exported = engine.export()
+        key = engine.cache_key(2, 13)
+        bridge_key = bridge.cache_key(PIN, 13, 2)
         changed = exported.metadata
         changed["spec_sha256"] = "d" * 64
-        with self.assertRaisesRegex(S.StructuredError, "state_identity_mismatch"):
-            engine.reload(S.ExportState(changed, exported.components))
-        with patch.object(backend, "reload", return_value=backend), self.assertRaisesRegex(S.StructuredError, "reload_reused_fitting_backend"):
-            engine.reload(exported)
+        before = len(backend.calls)
+        for state in (None, exported.to_bytes(), S.ExportState(changed, exported.components)):
+            with self.assertRaisesRegex(S.StructuredError, "state_identity_mismatch"):
+                engine.reload(state)
+        self.assertEqual(len(backend.calls), before)
+        self.assertEqual(engine.cache_key(2, 13), key)
+        self.assertEqual(bridge.cache_key(PIN, 13, 2), bridge_key)
+        self.assertEqual(engine.sample(2, 13).rows, ((13.0, 15.0), (14.0, 15.0)))
+        self.assertEqual(bridge.sample(2, 13).data.targets, (15.0, 15.0))
+        self.assertEqual(engine.export().to_bytes(), exported.to_bytes())
 
     def test_large_circuit_state_is_valid_and_visible_but_tier_infeasible(self):
         engine, backend = self.engine("tabpc")
@@ -527,19 +536,86 @@ class StructuredTests(unittest.TestCase):
         replacement.fit(view(), 9)
         self.assertEqual(replacement.sample(2, 13).rows, ((13.0, 15.0), (14.0, 15.0)))
 
-    def test_reload_refuses_distinct_backend_with_shared_mutable_state(self):
-        engine, backend = self.engine()
-        engine.fit(view(), 7)
+    def test_mutating_refused_reload_invalidates_engine_and_retained_bridge(self):
+        for alias in (False, True):
+            with self.subTest(alias=alias):
+                B, engine, backend, model, admission, fitting = self.bridge_fixture()
+                bridge = engine.as_pr09(model, admission, PIN, PIN)
+                bridge.fit(fitting, 7)
+                self.assertEqual(bridge.sample(2, 13).data.targets, (15.0, 15.0))
+                engine.cache_key(2, 13)
+                bridge.cache_key(PIN, 13, 2)
+                state = engine.export()
+                def mutating_reload(state):
+                    backend.calls.append(("reload",))
+                    backend.level = 999.0
+                    return copy.copy(backend) if alias else backend
+                code = "backend_state_already_owned" if alias else "reload_reused_fitting_backend"
+                with patch.object(backend, "reload", mutating_reload):
+                    with self.assertRaisesRegex(S.StructuredError, code):
+                        engine.reload(state)
+                self.assertEqual(backend.level, 999.0)
+                before = len(backend.calls)
+                for operation in (lambda: engine.sample(2, 13), lambda: engine.cache_key(2, 13), engine.export):
+                    with self.assertRaisesRegex(S.StructuredError, "generator_not_fitted"):
+                        operation()
+                for operation in (lambda: bridge.sample(2, 13), lambda: bridge.cache_key(PIN, 13, 2)):
+                    with self.assertRaisesRegex(B.AdapterError, "structured_fit_changed"):
+                        operation()
+                self.assertEqual(len(backend.calls), before)
+                with self.assertRaisesRegex(S.StructuredError, "backend_state_already_owned"):
+                    S.ARFAdapter(engine.spec, backend)
+                bridge.fit(fitting, 7)
+                self.assertEqual(bridge.sample(2, 13).data.targets, (15.0, 15.0))
+
+    def test_mutating_reload_exception_invalidates_engine_and_retained_bridge(self):
+        cases = ((RuntimeError, "backend_failed", S.StructuredError),
+                 (SystemExit, "backend_failed", S.StructuredError),
+                 (ModuleNotFoundError, "backend_unavailable", S.StructuredUnavailable),
+                 (KeyboardInterrupt, "", KeyboardInterrupt))
+        for fault, code, kind in cases:
+            with self.subTest(fault=fault):
+                B, engine, backend, model, admission, fitting = self.bridge_fixture()
+                bridge = engine.as_pr09(model, admission, PIN, PIN)
+                bridge.fit(fitting, 7)
+                state = engine.export()
+                def mutating_reload(state):
+                    backend.calls.append(("reload",))
+                    backend.level = 999.0
+                    raise fault("private_value_999")
+                with patch.object(backend, "reload", mutating_reload):
+                    with self.assertRaises(kind) as caught:
+                        engine.reload(state)
+                self.assertEqual(str(caught.exception), code)
+                self.assertTrue(caught.exception.__suppress_context__)
+                self.assertEqual(backend.level, 999.0)
+                before = len(backend.calls)
+                for operation in (lambda: engine.sample(2, 13), lambda: engine.cache_key(2, 13), engine.export):
+                    with self.assertRaisesRegex(S.StructuredError, "generator_not_fitted"):
+                        operation()
+                for operation in (lambda: bridge.sample(2, 13), lambda: bridge.cache_key(PIN, 13, 2)):
+                    with self.assertRaisesRegex(B.AdapterError, "structured_fit_changed"):
+                        operation()
+                self.assertEqual(len(backend.calls), before)
+
+    def test_independent_reload_preserves_original_engine_and_bridge(self):
+        B, engine, backend, model, admission, fitting = self.bridge_fixture()
+        bridge = engine.as_pr09(model, admission, PIN, PIN)
+        bridge.fit(fitting, 7)
+        key = engine.cache_key(2, 13)
+        bridge_key = bridge.cache_key(PIN, 13, 2)
+        metadata = engine._metadata
         state = engine.export()
-        alias = copy.copy(backend)
-        self.assertIsNot(alias, backend)
-        with patch.object(backend, "reload", return_value=alias):
-            with self.assertRaisesRegex(S.StructuredError, "backend_state_already_owned"):
-                engine.reload(state)
         loaded = engine.reload(state)
         self.assertIsNot(loaded.backend.state_token, backend.state_token)
+        self.assertEqual(loaded.sample(2, 13).rows, ((13.0, 15.0), (14.0, 15.0)))
         loaded.fit(view(((1.0, 100.0), (3.0, 200.0))), 8)
+        self.assertIs(engine._metadata, metadata)
+        self.assertEqual(engine.cache_key(2, 13), key)
+        self.assertEqual(bridge.cache_key(PIN, 13, 2), bridge_key)
         self.assertEqual(engine.sample(2, 13).rows, ((13.0, 15.0), (14.0, 15.0)))
+        self.assertEqual(bridge.sample(2, 13).data.targets, (15.0, 15.0))
+        self.assertEqual(engine.export().to_bytes(), state.to_bytes())
 
     def test_backend_ownership_protocol_refuses_missing_or_changed_tokens(self):
         declaration = spec()
