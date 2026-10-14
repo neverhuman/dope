@@ -1892,6 +1892,14 @@
     "tests/test_tuner.py": {
       "command": "PYTHONPATH=src python3 -m pytest -q tests/test_tuner.py",
       "purpose": "verify tuner behavior and intended140x25 dashboard geometry in both terminal modes, retaining loss/regret and no-sparkline assertions"
+    },
+    "research/benchmark/review_fixes/display_names.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_display_names -v",
+      "purpose": "verify exact reader-facing identifier mapping, distinct printed labels, unchanged unknown values and TeX escaping after mapping; required by hosted CPU review-fix entry"
+    },
+    "research/benchmark/review_fixes/test_display_names.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_display_names -v",
+      "purpose": "verify exact reader-facing identifier mapping, distinct printed labels, unchanged unknown values and TeX escaping after mapping; required by hosted CPU review-fix entry"
     }
   }
 }

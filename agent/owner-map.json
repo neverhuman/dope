@@ -467,6 +467,8 @@
     "rust/compiler/target_fitting/part_02.rs": "rust-core",
     "scripts/uninstall-native.sh": "governance",
     "schemas/bound-binding-v2.schema.json": "external-evidence",
-    "tests/test_tuner.py": "python-v1-compatibility"
+    "tests/test_tuner.py": "python-v1-compatibility",
+    "research/benchmark/review_fixes/display_names.py": "external-evidence",
+    "research/benchmark/review_fixes/test_display_names.py": "external-evidence"
   }
 }
