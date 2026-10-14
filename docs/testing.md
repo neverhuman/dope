@@ -33,6 +33,13 @@ These replace the selective paper-script unittest calls in `ops/ci/cpu.sh`; the
 independent committed-input replay remains exactly once in that suite.
 The recipe fixture executes Just itself. CPU CI installs the repository's
 existing Just tool only if absent, within the same job and package-lock budget.
+The real recipe regression lives in `test_paper_packaging.py`, so that required
+paper-script discovery invokes it exactly once after CPU provisions Just.
+The benchmark boundary's full discovery retains the bounded driver tests;
+it does not require Just to run the paper recipe regression. Moving that
+regression preserves its actual Just execution, reducer replay, old-path
+rejection, and four fixture PDF checks. The focused invocation is
+`PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_paper_packaging -v`.
 `bash ops/ci/paper-clean.sh` is the CI form: it deletes `docs/whitepaper/generated`,
 runs `just paper`, and requires a zero diff. `bash ops/ci/check-review-fixes.sh`
 runs the review-fix and predeclare_v2 statistics, binder, and sealed-gate fixtures.

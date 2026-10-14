@@ -8,6 +8,15 @@ from research.benchmark.mfs_v3_score import _v3_contract
 
 
 class PackagingTests(unittest.TestCase):
+    def test_canonical_recipes_execute_one_real_replay_and_reject_the_old_path(self):
+        # Import inside the test so discovery does not also collect the shared
+        # PipelineTests class. Run the same real Just/reducer/PDF assertions once.
+        from research.benchmark.tests.test_paper_build_pipeline import PipelineTests
+        fixture = PipelineTests()
+        self.addCleanup(fixture.doCleanups)
+        fixture.setUp()
+        fixture.assert_canonical_recipes_execute_one_real_replay_and_reject_the_old_path()
+
     def test_body_limit_counts_text_before_references_on_the_same_page(self):
         first_ten = "body\f" * 10
         self.assertEqual(check_paper.presentation_failures(first_ten + 'R E F E R E N C E S\n'), [])

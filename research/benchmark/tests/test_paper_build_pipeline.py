@@ -143,7 +143,10 @@ assert panel['official_tests_opened'] is False
 '''.encode())
         self.add_auxiliary_renderers()
 
-    def test_canonical_recipes_execute_one_real_replay_and_reject_the_old_path(self):
+    def assert_canonical_recipes_execute_one_real_replay_and_reject_the_old_path(self):
+        # The Just-dependent recipe proof is invoked by the required paper-script
+        # suite in CPU CI. Benchmark boundary discovery retains the bounded
+        # driver tests without adding a paper toolchain dependency to audit.
         self.add_v2_replay_fixture()
         self.write('docs/whitepaper/scripts/build_pdf.sh', (SCRIPTS / 'build_pdf.sh').read_bytes())
         verified = self.admit(); self.publish(verified)
@@ -208,6 +211,7 @@ elif args and args[0]=='docs/whitepaper/scripts/build_pdf.sh':
         (binary / 'git').chmod(0o755)
         env = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ['PATH'])
         just = shutil.which('just')
+        self.assertIsNotNone(just, 'canonical paper recipe regression requires Just')
         for recipe in ('paper', 'paper-check'):
             for version, count in [('old', 2), ('current', 1)]:
                 (self.root / 'replays.log').write_text('')
