@@ -147,7 +147,7 @@ def render_privacy(payload: dict) -> str:
         "each method's lineages whose synthetic row count equals fit rows times size; matched-density rows use the "
         "lineages shared by DOPE, the Gaussian copula, Chow--Liu, and independent marginals. Fit DCR and NNDR use "
         "the fit rows as the reference set and holdout DCR the validation rows, about a quarter as many. Distance "
-        "MIA AUC is an empirical membership attack, and c2st\\_catboost\\_auc is the CatBoost detector. These are "
+        "MIA AUC is an empirical membership attack, and C2ST CatBoost AUC is the CatBoost detector. These are "
         "empirical attack scores, not formal differential privacy and not HIPAA de-identification. Unavailable "
         f"cells are no wins: {unavailable}. No Holm family."
     )

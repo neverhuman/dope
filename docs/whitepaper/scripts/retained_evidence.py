@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -12,6 +13,9 @@ from scipy import stats
 from compute_panel import DRAWS, SEED, holm, paired_test, sig3, summarize, tex_p
 
 REPO = Path(__file__).resolve().parents[3]
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+from research.benchmark.review_fixes.display_names import display  # noqa: E402
 OUT = REPO / "docs/whitepaper/generated"
 SOURCES = {
     "classical": ("research/benchmark/results/retained-classical-validation/panel.json",
@@ -199,14 +203,14 @@ def render_tables(data, first12):
              r"ARF config. & Auditor & $n$ & DOPE minus ARF & Simultaneous median CI & Holm $p$ \\", r"\midrule"]
     for row in data["arf_paired"]:
         config = "Default" if row["configuration"] == "author_default" else "Native"
-        lines.append(f"{config} & {row['auditor']} & {row['n']} & {sig3(row['median_difference'])} & {interval_text(row)} & ${tex_p(row['holm_p'])}$ " + r"\\")
+        lines.append(f"{config} & {display(row['auditor'])} & {row['n']} & {sig3(row['median_difference'])} & {interval_text(row)} & ${tex_p(row['holm_p'])}$ " + r"\\")
     lines += [r"\bottomrule", r"\end{tabular}", ""]
     outputs["retained-arf-paired.tex"] = "\n".join(lines)
     lines = [r"\begin{tabular}{@{}llrrrr@{}}", r"\toprule",
              r"Job prefix & Method & Pearson diff. & Alpha & Beta & Distance MIA AUC \\", r"\midrule"]
     for cell in first12["cells"]:
         diag = cell["diagnostics"]
-        method = "/".join(sorted({x["method"] for x in cell["logical_aliases"]}))
+        method = "/".join(display(x) for x in sorted({x["method"] for x in cell["logical_aliases"]}))
         values = [diag["fidelity"]["pairwise_pearson_difference"]["value"]["mean"], diag["alpha_beta"]["value"]["alpha_precision"], diag["alpha_beta"]["value"]["beta_recall"], diag["privacy"]["distance_mia"]["value"]]
         lines.append(cell["physical_job_sha256"][:12] + " & " + method.replace("_", r"\_") + " & " + " & ".join(sig3(x) for x in values) + r" \\")
     lines += [r"\bottomrule", r"\end{tabular}", ""]

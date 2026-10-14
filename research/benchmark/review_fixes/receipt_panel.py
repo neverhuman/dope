@@ -16,6 +16,7 @@ from pathlib import Path
 import numpy as np
 
 from research.benchmark.review_fixes import denominator_view
+from research.benchmark.review_fixes.display_names import display
 from research.benchmark.review_fixes.stats import (
     MARGIN,
     cap_retention,
@@ -253,7 +254,8 @@ def ci(summary) -> str:
 
 
 def tex_name(value: str) -> str:
-    return str(value).replace("_", r"\_").replace("&", r"\&")
+    """Printed table text: the reader-facing name of a known identifier, TeX-escaped."""
+    return display(value).replace("_", r"\_").replace("&", r"\&")
 
 
 def write_tex(name: str, body: str) -> None:
