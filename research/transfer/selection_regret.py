@@ -1,7 +1,7 @@
 """One development selection. Held-out oracle scores never select.
 
-Failed risk sketches keep the cheaper admissible policy. The result is not a
-qualified release and does not report a fabricated regret.
+Failed risk sketches keep the cheaper admissible candidate. The return keeps
+qualification false and power_measured false, and it includes no regret value.
 """
 
 from __future__ import annotations

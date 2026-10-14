@@ -54,6 +54,50 @@ class LearningDensityTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             b_star_tested([task("fit")], (64,), quality=True)
 
+    def test_outcome_flag_cannot_bypass_the_byte_cap(self):
+        capped = task("cap", bytes_=64, outcomes=((32, True), (64, True)))
+        report = b_star_tested([capped], (32, 64), quality=1)
+        self.assertEqual(report["denominator_weight"], 1)
+        self.assertEqual(report["points"][0]["coverage"], 0.0)
+        self.assertEqual(report["points"][1]["coverage"], 1.0)
+        self.assertEqual(report["state"], "measured")
+        self.assertEqual(report["budget"], 64)
+        self.assertIsNone(report["qld"]["value"])
+        self.assertFalse(report["lower_bound_claim"])
+        old = tested_budget_frontier([capped], (32, 64))
+        self.assertEqual(old["tested"]["32"]["rate"], 0.0)
+        self.assertEqual(old["tested"]["32"]["denominator_weight"], 1)
+        self.assertEqual(old["tested"]["64"]["rate"], 1.0)
+        self.assertFalse(old["lower_bound_claim"])
+        missing = b_star_tested([task("miss", bytes_=None, outcomes=((64, True),))], (64,), quality=1)
+        self.assertEqual(missing["points"][0]["coverage"], 0.0)
+        self.assertEqual(missing["denominator_weight"], 1)
+        failed = b_star_tested(
+            [task("bad", status="technical_failure", bytes_=8, qualified=False, outcomes=((64, True),))],
+            (64,), quality=1,
+        )
+        self.assertEqual(failed["points"][0]["coverage"], 0.0)
+        self.assertEqual(failed["denominator_weight"], 1)
+        for name, flags in (
+            ("empty", {"empty_generator": True}),
+            ("trivial", {"trivial_target": True}),
+            ("hidden", {"external_checkpoint": True}),
+            ("partial-row", {"complete": False}),
+        ):
+            blocked = b_star_tested([task(name, bytes_=8, outcomes=((64, True),), **flags)], (64,), quality=1)
+            self.assertEqual(blocked["points"][0]["coverage"], 0.0)
+            self.assertEqual(blocked["denominator_weight"], 1)
+        with self.assertRaises(ValueError) as partial:
+            b_star_tested([task("part", bytes_=16, outcomes=((64, True),))], (32, 64), quality=1)
+        self.assertEqual(str(partial.exception), "invalid budget outcome")
+        pair = b_star_tested([
+            task("ok", "f", bytes_=16, outcomes=((32, True), (64, True))),
+            task("late", "g", bytes_=64, outcomes=((32, True), (64, True))),
+        ], (32, 64), quality=1)
+        self.assertEqual(pair["denominator_weight"], 2)
+        self.assertEqual(pair["points"][0]["coverage"], 0.5)
+        self.assertEqual(pair["points"][1]["coverage"], 1.0)
+
     def test_padding_moves_the_budget_and_not_a_density(self):
         plain = b_star_tested([task("fit", bytes_=40)], (16, 64, 256), quality=1)
         padded = b_star_tested([task("fit", bytes_=200)], (16, 64, 256), quality=1)
