@@ -77,3 +77,26 @@ receipt v1 entries. Held-out learner families cannot win development selection.
 A matching development-protocol digest authenticates its binding while remaining
 unmeasured for N13b, qualified coverage, confirmation and release. Historical
 behavior-contract-v1 validation stays separate and retains its overlap refusal.
+
+The separate `FrozenNumericTransform::fit_csv` API fits numeric ranges and binary
+label coding only on a development reference. `apply_csv` maps later columns to
+that frozen schema, preserving missing-feature states and refusing unknown
+binary labels. Its explicitly named min/max transform clamps outside-reference
+values; this behavior does not establish tail or geometry calibration. Public
+metadata contains a content digest and positional counts, never fitted extrema
+or source headers. Historical `load_numeric_csv` and embedding-v1 decoding keep
+their existing per-table behavior.
+
+`DatasetEmbedder::embed_csv_frozen` returns a separate frozen-action wrapper with
+router bundle/evidence, coordinate schema, candidate order, component offsets and
+reference-transform identity bound into its basis digest. The capability records
+the actual penultimate/action layer, concatenation, normalization, target/context
+and width. A typed unavailable activation may coexist with an available declared
+prediction interface. Neither capability metadata nor common coordinates qualifies
+transfer, privacy or release.
+
+The native `frozen_geometry_state_v1` entry recomputes the shared finite-JSON
+digest of G1's `dope-frozen-geometry-state` body, including encoder, schema and
+ordered column/level/range content. `compare_frozen_geometry_v1` validates both
+original bodies. Caller labels and supplied digest-only claims are refused;
+body commitments and official activation availability remain separate.
