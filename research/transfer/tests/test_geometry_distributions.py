@@ -113,6 +113,20 @@ def _leaves(value):
         yield value
 
 
+def _role_oracle(real, synthetic):
+    def upper(cloud):
+        matrix = geometry._pairwise_norms(cloud, cloud)
+        index = np.triu_indices(cloud.shape[0], k=1)
+        return tuple(sorted(float(value) for value in matrix[index]))
+
+    cross = geometry._pairwise_norms(real, synthetic)
+    return {
+        "real_real": upper(real),
+        "real_synthetic": tuple(sorted(float(value) for value in cross.ravel())),
+        "synthetic_synthetic": upper(synthetic),
+    }
+
+
 class GeometryDistributionControlTests(unittest.TestCase):
     def test_caller_fit_count_is_not_an_independent_unit(self):
         distances = (0.0, 1.0, 2.0, 3.0, 4.0, 5.0)
@@ -362,6 +376,72 @@ class Step5ControlTests(unittest.TestCase):
         self.assertEqual(str(mismatch.exception), "invalid labels")
         self.assertNotIn(sentinel, str(mismatch.exception))
         self.assertNotIn(sentinel, [str(value) for value in _leaves(control)])
+        self.assertTrue(control["label_coordinate_changes_distances"])
+        self.assertFalse(control["shuffle_changes_label_distances"])
+        self.assertEqual(control["label_effect"], "detected")
+        self.assertNotIn("keep", [str(value) for value in _leaves(control)])
+        self.assertNotIn("drop", [str(value) for value in _leaves(control)])
+        constant = label_shuffle_control(
+            real, synthetic, ("same", "same"), space="row_activation", encoder_id="enc-a", seed=3,
+        )
+        self.assertEqual(constant["label_effect"], "degenerate_labels")
+        self.assertFalse(constant["label_coordinate_changes_distances"])
+        self.assertFalse(constant["shuffle_changes_label_distances"])
+        self.assertTrue(constant["distances_unchanged"])
+        self.assertEqual(constant["distances"], plain["distances"])
+        self.assertFalse(constant["qualifies_transfer"])
+        self.assertFalse(constant["formal_dp"])
+        self.assertFalse(constant["hipaa"])
+        self.assertNotIn("same", [str(value) for value in _leaves(constant)])
+        rows = np.array([[0.0], [1.0], [2.0]])
+        codes = np.array([0.0, 1.0, 2.0])
+        coded = np.column_stack([rows, codes])
+        moved = label_shuffle_control(
+            rows, rows, ("a", "b", "c"), space="row_activation", encoder_id="enc-a", seed=0,
+        )
+        identity = label_shuffle_control(
+            rows, rows, ("a", "b", "c"), space="row_activation", encoder_id="enc-a", seed=1,
+        )
+        shuffled_codes = codes[np.random.default_rng(0).permutation(3)]
+        self.assertEqual(moved["label_distances"], _role_oracle(coded, coded))
+        self.assertEqual(
+            moved["shuffled_label_distances"],
+            _role_oracle(np.column_stack([rows, shuffled_codes]), np.column_stack([rows, shuffled_codes])),
+        )
+        self.assertTrue(moved["label_coordinate_changes_distances"])
+        self.assertTrue(moved["shuffle_changes_label_distances"])
+        self.assertEqual(moved["label_effect"], "detected")
+        self.assertTrue(identity["label_coordinate_changes_distances"])
+        self.assertFalse(identity["shuffle_changes_label_distances"])
+        self.assertEqual(identity["label_effect"], "detected")
+        self.assertEqual(
+            moved["distances"],
+            euclidean_role_distributions(rows, rows, space="row_activation", encoder_id="enc-a")["distances"],
+        )
+        self.assertFalse(moved["labels_are_coordinates"])
+        self.assertFalse(moved["qualifies_transfer"])
+        self.assertFalse(moved["privacy_result"])
+        self.assertFalse(moved["formal_dp"])
+        self.assertFalse(moved["hipaa"])
+        self.assertFalse(moved["n13b"])
+        self.assertFalse(moved["held_out"])
+        swapped = label_shuffle_control(
+            real, synthetic, labels, space="row_activation", encoder_id="enc-a", seed=3,
+        )
+        self.assertTrue(swapped["label_coordinate_changes_distances"])
+        self.assertFalse(swapped["shuffle_changes_label_distances"])
+        self.assertNotIn("a", [str(value) for value in _leaves(moved)])
+
+        def allocated(left, right):
+            raise AssertionError("allocated")
+
+        with patch("research.transfer.geometry_distributions._pairwise_norms", allocated):
+            with self.assertRaises(ValueError) as width_budget:
+                label_shuffle_control(
+                    real, synthetic, labels, space="row_activation", encoder_id="enc-a",
+                    seed=0, max_pairs=7,
+                )
+            self.assertEqual(str(width_budget.exception), "distance_budget_exceeded")
 
     def test_tail_deletion_changes_only_when_the_tail_is_present(self):
         changed = tail_deletion_control(
@@ -464,15 +544,42 @@ class Step5ControlTests(unittest.TestCase):
             with self.assertRaises(ValueError) as grouped:
                 _band(clusters, max_pairs=3)
             self.assertEqual(str(grouped.exception), "distance_budget_exceeded")
+            wide = np.array([[0.0, 1.0], [3.0, 1.0]])
+            wide_synthetic = np.array([[10.0, 1.0], [10.0, 4.0]])
+            with self.assertRaises(ValueError) as wide_refused:
+                euclidean_role_distributions(
+                    wide, wide_synthetic, space="row_activation", encoder_id="enc-a", max_pairs=7,
+                )
+            self.assertEqual(str(wide_refused.exception), "distance_budget_exceeded")
+            wide_clusters = [
+                _cluster("fit-a", [[0.0, 1.0], [1.0, 1.0]], [[0.0, 0.0], [1.0, 0.0]], lineage_id="L1"),
+                _cluster("fit-b", [[0.0, 1.0], [2.0, 1.0]], [[3.0, 0.0], [1.0, 0.0]], lineage_id="L2"),
+            ]
+            with self.assertRaises(ValueError) as wide_grouped:
+                _band(wide_clusters, max_pairs=7)
+            self.assertEqual(str(wide_grouped.exception), "distance_budget_exceeded")
         allowed = euclidean_role_distributions(
             real, synthetic, space="row_activation", encoder_id="enc-a", max_pairs=4,
         )
         self.assertEqual(allowed["allocated_pairs"], 4)
+        self.assertEqual(allowed["width"], 1)
+        self.assertEqual(allowed["broadcast_elements"], 4)
         self.assertEqual(allowed["max_pairs"], 4)
         self.assertEqual(allowed["distances"]["real_real"], (3.0,))
         self.assertEqual(allowed["distances"]["real_synthetic"], (7.0, 7.0, 10.0, 10.0))
+        self.assertEqual(allowed["distances"], _role_oracle(real, synthetic))
         self.assertIsNone(allowed["independent_units"])
         self.assertEqual(allowed["held_out_relevance"], "unmeasured")
+        wide = np.array([[0.0, 1.0], [3.0, 1.0]])
+        wide_synthetic = np.array([[10.0, 1.0], [10.0, 4.0]])
+        allowed_wide = euclidean_role_distributions(
+            wide, wide_synthetic, space="row_activation", encoder_id="enc-a", max_pairs=8,
+        )
+        self.assertEqual(allowed_wide["allocated_pairs"], 4)
+        self.assertEqual(allowed_wide["width"], 2)
+        self.assertEqual(allowed_wide["broadcast_elements"], 8)
+        self.assertEqual(allowed_wide["distances"], _role_oracle(wide, wide_synthetic))
+        self.assertFalse(allowed_wide["qualifies_transfer"])
 
     def test_plot_hook_keeps_real_measurements_unmeasured(self):
         real = np.array([[0.0], [3.0]])
