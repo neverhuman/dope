@@ -29,7 +29,7 @@ Y_LIM = (-1.5, 1.6)
 # paired-cdf.pdf top row and mfs-v3-paired.pdf: sorted paired retention
 # differences. Differences outside this window are counted in the panel title.
 PAIRED_X_LIM = (-1.5, 1.5)
-# teaser.pdf: Hodges-Lehmann paired differences per auditor. A difference outside
+# teaser.pdf panel (b): Hodges-Lehmann paired differences per auditor. A difference outside
 # the window is drawn at the nearer edge as an arrow with its value printed.
 TEASER_X_LIM = (-0.3, 0.5)
 # teaser.pdf rows sit at 0..k-1; this margin pads the first and last row.

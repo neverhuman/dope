@@ -54,7 +54,7 @@ cd dope
 cargo build --locked --release -p dope-kernel
 ```
 
-That command writes `target/release/dope-kernel`. The generator is Rust. Python is used for the bounded V1 baseline under `src/dope_kernel`, the offline research harness under `research/`, and the scripts that rebuild the paper under `docs/whitepaper/scripts`.
+That command writes `target/release/dope-kernel`. The generator is Rust. Python is used for the bounded V1 baseline under `src/dope_kernel` (console command `dope-kernel-v1`; the native command stays `dope-kernel`), the offline research harness under `research/`, and the scripts that rebuild the paper under `docs/whitepaper/scripts`.
 
 ## Quick start
 
