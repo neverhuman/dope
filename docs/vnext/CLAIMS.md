@@ -23,3 +23,20 @@ authorized by these interfaces or fixtures. Negative, harmful, incomplete and
 inconclusive outcomes remain in the scheduled denominator. A non-significant
 comparison does not establish equivalence. Unknown rights or privacy/legal routes
 block sharing irrespective of measured utility.
+
+## Historical paper claim limits (N02, 2026-10-14)
+
+The title `DOPE: Generative Compression of Predictive Structure` covers only
+these claims:
+
+- validation-split retention under CatBoost, linear and MLP auditors on the
+  100 PMLB regression lineages;
+- charged artifact bytes;
+- the stated controls.
+
+Every lineage and all three auditors are exposed to the historical profile
+selection (see the N02 entry in `DECISIONS.md`). That paper therefore makes no
+held-out learner, held-out source-family, transferable-knowledge, intelligence,
+minimum-size, formal-DP or HIPAA claim. Only the pre-declared sealed test run
+can give a selection-free estimate for that profile. The claims in the table
+above remain unmeasured and are unaffected by this narrative decision.
