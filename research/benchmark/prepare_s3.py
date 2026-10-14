@@ -11,7 +11,7 @@ import json
 import os
 from pathlib import Path
 
-from .fetch_jope import CATALOG_SHA256, fetch
+from .fetch_jope import CATALOG_SHA256, fetch, validate_bucket
 from .manifest import digest, prepare
 from .score import sha256
 
@@ -44,9 +44,11 @@ def selected_catalog(catalog: Path) -> tuple[list[dict], int]:
     return sorted(selected, key=lambda row: row["dataset_hash"]), len(all_rows) - len(selected)
 
 
-def prepare_entry(row: dict, scratch: Path, profile: str | None) -> dict:
+def prepare_entry(row: dict, scratch: Path, profile: str | None,
+                  *, bucket: str | None = None) -> dict:
+    bucket = validate_bucket(bucket)
     dataset_id = row["dataset_hash"]
-    source = fetch(dataset_id, scratch, profile)
+    source = fetch(dataset_id, scratch, profile, bucket=bucket)
     columns = row["files"]["train"]["columns"]
     if (row["target"] != {"index": -1, "name": "target", "type": "numeric"}
             or row["files"]["test"]["columns"] != columns
@@ -97,13 +99,14 @@ def verify_prepared(receipt: dict, scratch: Path) -> None:
         raise ValueError("prepared S3 manifest or sealed partition changed")
 
 
-def run(scratch: Path, profile: str | None) -> dict:
+def run(scratch: Path, profile: str | None, *, bucket: str | None = None) -> dict:
+    bucket = validate_bucket(bucket)
     if not scratch.resolve().is_relative_to(ROOT.resolve()):
         raise ValueError("S3 preparation must stay on benchmark scratch")
     catalog = scratch / "catalog/v1/catalog.jsonl"
     if not catalog.exists():
         from .fetch_jope import fetch_object
-        fetch_object("catalog/v1/catalog.jsonl", catalog, profile)
+        fetch_object("catalog/v1/catalog.jsonl", catalog, profile, bucket=bucket)
     selected, excluded_unknown_rights = selected_catalog(catalog)
     receipt_root = scratch / "s3-v1/receipts"
     records = []
@@ -116,7 +119,7 @@ def run(scratch: Path, profile: str | None) -> dict:
                 raise ValueError("existing receipt differs from frozen catalog")
         else:
             try:
-                receipt = prepare_entry(row, scratch, profile)
+                receipt = prepare_entry(row, scratch, profile, bucket=bucket)
             except (ValueError, OSError, KeyError) as error:
                 receipt = {"status": "excluded", "id": dataset_id,
                            "reason_type": type(error).__name__, "reason": str(error)}
@@ -145,9 +148,10 @@ def run(scratch: Path, profile: str | None) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scratch", type=Path, default=ROOT)
+    parser.add_argument("--bucket", required=True, help="explicit source bucket name; no default")
     parser.add_argument("--profile", help="optional AWS profile; otherwise use the standard AWS credential chain")
     args = parser.parse_args()
-    summary = run(args.scratch, args.profile)
+    summary = run(args.scratch, args.profile, bucket=args.bucket)
     print(json.dumps({key: summary[key] for key in
                       ("eligible_catalog_entries", "unknown_rights_excluded",
                        "prepared", "excluded_after_checks")}, sort_keys=True))

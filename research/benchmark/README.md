@@ -217,7 +217,7 @@ Entry points:
 
 ```text
 python3 -m research.benchmark.inventory_hosts --output HOSTS.json
-python3 -m research.benchmark.fetch_jope DATASET_HASH DATA_ROOT
+python3 -m research.benchmark.fetch_jope DATASET_HASH DATA_ROOT --bucket SOURCE_BUCKET
 python3 -m research.benchmark.public_sources Adult ADULT.zip ADULT_TRAIN.csv --test-output ADULT_TEST.csv
 python3 -m research.benchmark.california_source CAL_HOUSING.tgz CALIFORNIA.csv
 python3 -m research.benchmark.manifest SELECTION.json DATA_ROOT/prepared
@@ -238,8 +238,12 @@ python3 -m research.benchmark.real_test_utility WORKER_DIR EVALUATOR_DIR SAMPLE_
 The runner enforces a 16-core affinity and respects the launcher's GPU
 visibility setting (defaulting to GPU 0), hashes worker
 inputs, verifies repeated artifact sampling, and resumes receipts without
-refitting. The coordinator's JopeDime fetch reads only requested catalog,
-manifest, and blob objects through the named AWS profile. Credentials stay on
+refitting. The coordinator's JopeDime fetch requires an explicit validated
+`--bucket SOURCE_BUCKET` before creating directories or reading AWS objects.
+`prepare_s3` requires the same flag. Only requested catalog, manifest, and blob
+objects are read; `--profile NAME` is optional, with the standard AWS credential
+chain used when omitted. This configuration does not grant data or study admission
+or publish historical partitions; the frozen catalog identity is unchanged. Credentials stay on
 `xbabe2`. `pilot_metrics` consumes validation, never the test partition.
 On `xbabe2`, each fit and sample cell reserves space against the 200 GB scratch
 ceiling, counting the whole scratch root (the output root's parent by default).
