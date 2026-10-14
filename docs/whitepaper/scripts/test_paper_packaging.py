@@ -96,6 +96,26 @@ class PackagingTests(unittest.TestCase):
         for text in (main, supplement):
             self.assertIn("selection-exposed", text)
 
+    def test_profile_disclosure_cites_what_each_committed_publication_records(self):
+        """The supplement's account of the three profile publications must match their committed fields."""
+        results = check_paper.ROOT.parents[1] / "research" / "benchmark" / "results"
+        for name in ("s3-matched-discovery-validation.json", "s3-matched-confirmation-validation.json"):
+            publication = json.loads((results / name).read_text())
+            self.assertEqual(publication["fit_seeds"], [11], name)
+            self.assertTrue(publication["scope"].endswith("All four DOPE profiles retained; production family unselected."),
+                            name)
+        population = json.loads((results / "dope-s3-population-validation.json").read_text())
+        self.assertIs(population["global_family_selected"], False)
+        self.assertEqual(population["fit_seeds"], [11])
+        self.assertEqual(sorted({cell["profile"] for cell in population["cells"]}),
+                         ["features12_steps2048", "features12_steps512", "features24_steps2048", "features24_steps512"])
+        self.assertIn("descriptive aggregates, with no DOPE win or production family selection",
+                      (results / "dope-s3-population-validation.md").read_text())
+        supplement = (check_paper.ROOT / "supplement.tex").read_text()
+        self.assertIn("``production family unselected''", supplement)
+        self.assertIn(r"\texttt{global\_\allowbreak{}family\_\allowbreak{}selected} to false", supplement)
+        self.assertNotIn("records that no global family was selected", supplement)
+
 
 if __name__ == '__main__':
     unittest.main()
