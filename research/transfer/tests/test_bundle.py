@@ -12,6 +12,7 @@ from research.transfer.bundle import (
     CAPABILITIES,
     FORMAT,
     HANDLERS,
+    KINDS,
     ROLES,
     BundleError,
     BundleLimits,
@@ -59,6 +60,7 @@ class BundleGoldenTests(unittest.TestCase):
         self.assertEqual(SCHEMA["properties"]["version"]["const"], 1)
         self.assertEqual(set(SCHEMA["properties"]["sampling_handler"]["enum"]), HANDLERS)
         self.assertEqual(set(SCHEMA["properties"]["capabilities"]["items"]["enum"]), CAPABILITIES)
+        self.assertEqual(set(SCHEMA["$defs"]["component"]["properties"]["kind"]["enum"]), KINDS)
         self.assertEqual(set(SCHEMA["$defs"]["component"]["properties"]["role"]["enum"]), ROLES)
         self.assertIs(SCHEMA["$defs"]["component"]["additionalProperties"], False)
         self.assertIs(SCHEMA["$defs"]["component"]["properties"]["executable"]["const"], False)

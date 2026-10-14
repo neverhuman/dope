@@ -26,7 +26,7 @@ NEURAL_CAP = 16 * 1024 * 1024
 DPK3 = b"DPK3"
 DPK2 = b"DPK2"
 QUANTIZATION = frozenset({4, 6, 8, 10, 12, 16})
-HANDLERS = frozenset({"inventory-only", "native-inline-dpk"})
+HANDLERS = frozenset({"inventory-only", "native-inline-dpk", "native-raw-complete-v1"})
 ROLES = frozenset({
     "dictionary",
     "evidence_authorization",
@@ -36,8 +36,8 @@ ROLES = frozenset({
     "shared_learned_state",
     "transform",
 })
-KINDS = frozenset({"dpk2", "dpk3", "opaque"})
-CAPABILITIES = frozenset({"byte-inventory", "native-dpk-sample"})
+KINDS = frozenset({"dpk2", "dpk3", "doperaw1", "opaque"})
+CAPABILITIES = frozenset({"byte-inventory", "native-dpk-sample", "native-raw-sample"})
 TRANSPORT = frozenset({"included", "unmeasured"})
 EXECUTABLE_SUFFIXES = frozenset({
     "dll", "dylib", "exe", "jar", "node", "pkl", "py", "pyc", "sh", "so", "wasm",
@@ -327,10 +327,9 @@ def _graph(components, handler):
         if state[identity] == 0:
             visit(identity)
     payloads = [component for component in components if component["role"] == "sampling_payload"]
-    if handler == "native-inline-dpk":
-        if len(payloads) != 1 or not payloads[0]["required"] or not payloads[0]["consumed_by_sampler"]:
-            _fail("sampler_closure_mismatch")
-        if payloads[0]["kind"] not in {"dpk2", "dpk3"}:
+    payload_kinds = {"native-inline-dpk": {"dpk2", "dpk3"}, "native-raw-complete-v1": {"doperaw1"}}.get(handler)
+    if payload_kinds is not None:
+        if len(payloads) != 1 or not payloads[0]["required"] or not payloads[0]["consumed_by_sampler"] or payloads[0]["kind"] not in payload_kinds:
             _fail("sampler_closure_mismatch")
         if any(component["consumed_by_sampler"] and component is not payloads[0] for component in components):
             _fail("sampler_closure_mismatch")
@@ -407,7 +406,10 @@ def _manifest(value, limits):
         _fail("schema_mismatch")
     if any(item not in CAPABILITIES for item in capabilities):
         _fail("unknown_capability")
-    expected = ["byte-inventory", "native-dpk-sample"] if handler == "native-inline-dpk" else ["byte-inventory"]
+    expected = {
+        "native-inline-dpk": ["byte-inventory", "native-dpk-sample"],
+        "native-raw-complete-v1": ["byte-inventory", "native-raw-sample"],
+    }.get(handler, ["byte-inventory"])
     if capabilities != expected:
         _fail("sampler_closure_mismatch")
     count = _u64(value["amortization_count"], "invalid_amortization")
@@ -460,6 +462,7 @@ def verify_bundle(root, expected_manifest_sha256, limits=None):
     _inventory(root, declared, max_entries, max_entries * 64)
     payload = None
     features = None
+    raw_profile = None
     total = size
     for component in components:
         file_digest, file_size, file_bytes = _read_bytes(root, component["path"], limits.max_component_bytes)
@@ -476,7 +479,14 @@ def verify_bundle(root, expected_manifest_sha256, limits=None):
                 _fail("sampler_closure_mismatch")
             payload = file_bytes
             features = summary["features"]
+        elif component["role"] == "sampling_payload" and handler == "native-raw-complete-v1":
+            from research.transfer.raw_profile import account_raw_artifact
+            raw_profile = account_raw_artifact(file_bytes, limits)
+            payload = file_bytes
+            features = None
     if total > limits.max_total_bytes:
         _fail("total_bytes_exceeded")
     accounting = account_inventory(components, size, count, framing)
+    if raw_profile is not None:
+        accounting["raw_profile"] = raw_profile
     return VerifiedBundle(accounting, payload, features, _VERIFIED)
