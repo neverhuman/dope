@@ -83,6 +83,57 @@ class LineageTests(unittest.TestCase):
             sum(item.relation is Relation.ORIGINAL for item in registry.families()),
         )
 
+    def test_alias_chains_resolve_in_any_id_order(self) -> None:
+        parent = family()
+        for first, second in (("dev-lineage-alpha-a1", "dev-lineage-alpha-a2"),
+                              ("dev-lineage-alpha-a2", "dev-lineage-alpha-a1")):
+            root = family(family_id=first, relation=Relation.ALIAS, alias_of="dev-lineage-alpha")
+            chained = family(family_id=second, relation=Relation.ALIAS, alias_of=first)
+            forward = Registry([parent, root, chained], final_label_custody="external")
+            backward = Registry([chained, root, parent], final_label_custody="external")
+            self.assertEqual(forward.independent_source_count(), 1)
+            self.assertEqual(
+                [item.family_id for item in forward.families()],
+                ["dev-lineage-alpha", "dev-lineage-alpha-a1", "dev-lineage-alpha-a2"],
+            )
+            self.assertEqual(forward.families(), backward.families())
+
+    def test_alias_cycles_missing_and_cross_parent_targets_are_refused(self) -> None:
+        parent = family()
+        other = family(family_id="dev-lineage-beta", parent_lineage_id="dev-lineage-beta", split=split("part-beta"))
+        cases = (
+            ("alias chain is cyclic", [
+                family(family_id="dev-lineage-alpha-c1", relation=Relation.ALIAS, alias_of="dev-lineage-alpha-c2"),
+                family(family_id="dev-lineage-alpha-c2", relation=Relation.ALIAS, alias_of="dev-lineage-alpha-c1"),
+            ]),
+            ("alias chain is cyclic", [
+                family(family_id="dev-lineage-alpha-self", relation=Relation.ALIAS, alias_of="dev-lineage-alpha-self"),
+            ]),
+            ("alias target is missing", [
+                family(family_id="dev-lineage-alpha-lost", relation=Relation.ALIAS, alias_of="dev-lineage-absent"),
+            ]),
+            ("alias target is outside the parent lineage", [
+                family(family_id="dev-lineage-alpha-cross", relation=Relation.ALIAS, alias_of="dev-lineage-beta"),
+            ]),
+            ("alias target is outside the parent lineage", [
+                family(family_id="dev-lineage-alpha-hop", relation=Relation.ALIAS, alias_of="dev-lineage-beta-alias"),
+                family(family_id="dev-lineage-beta-alias", parent_lineage_id="dev-lineage-beta", split=split("part-beta"),
+                       relation=Relation.ALIAS, alias_of="dev-lineage-beta"),
+            ]),
+            ("duplicate family id", [
+                family(family_id="dev-lineage-alpha-twin", relation=Relation.ALIAS, alias_of="dev-lineage-alpha"),
+                family(family_id="dev-lineage-alpha-twin", relation=Relation.ALIAS, alias_of="dev-lineage-alpha"),
+            ]),
+        )
+        for message, aliases in cases:
+            with self.assertRaises(LineageError) as refused:
+                Registry([parent, other, *aliases], final_label_custody="external")
+            self.assertEqual(str(refused.exception), message)
+        registry = Registry([parent], final_label_custody="external")
+        with self.assertRaises(LineageError) as single:
+            registry.add(family(family_id="dev-lineage-alpha-late", relation=Relation.ALIAS, alias_of="dev-lineage-gone"))
+        self.assertEqual(str(single.exception), "alias target is missing")
+
     def test_derived_tables_cannot_cross_meta_partitions(self) -> None:
         registry = Registry([family()], final_label_custody="external")
         crossed = family(
