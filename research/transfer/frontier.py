@@ -81,12 +81,13 @@ def _qualified_at(task, budget) -> bool:
         return False
     if task.status != "measured" or not task.attempted:
         return False
+    under_cap = task.artifact_bytes is not None and task.artifact_bytes <= budget
     if task.outcomes is not None:
         matched = [flag for point, flag in task.outcomes if point == budget]
         if len(matched) != 1 or type(matched[0]) is not bool:
             raise ValueError("invalid budget outcome")
-        return matched[0]
-    return bool(task.qualified and task.artifact_bytes is not None and task.artifact_bytes <= budget)
+        return bool(matched[0] and under_cap)
+    return bool(task.qualified and under_cap)
 
 
 def tested_budget_frontier(tasks, budgets, *, measured_points=None) -> dict:
