@@ -1,5 +1,6 @@
 """Anonymity failures and generated contract conformance examples."""
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -66,6 +67,34 @@ class PackagingTests(unittest.TestCase):
             self.assertEqual(check_paper.table_family_failures(path.read_text()), [], path.name)
         for path in (check_paper.ROOT / "generated").glob("*.tex"):
             self.assertEqual(check_paper.table_family_failures(path.read_text()), [], path.name)
+
+    def test_titles_metadata_and_profile_selection_disclosure_agree(self):
+        """One title in the paper, the supplement and CITATION.cff; the withdrawn selection claims stay out."""
+        main = check_paper.TEX.read_text()
+        supplement = (check_paper.ROOT / "supplement.tex").read_text()
+        registry = (check_paper.ROOT / "scripts" / "method_registry.py").read_text()
+        citation = (check_paper.ROOT.parents[1] / "CITATION.cff").read_text()
+
+        def plain_title(source):
+            match = re.search(r"\\title\{\\texorpdfstring\{.*?\}\{([^{}]*)\}\}", source, re.S)
+            self.assertIsNotNone(match, "no \\texorpdfstring title")
+            return match.group(1)
+
+        title = plain_title(main)
+        self.assertEqual(plain_title(supplement), "Supplement: " + title)
+        cited = re.search(r"preferred-citation:.*?\n  title: \"([^\"]*)\"", citation, re.S)
+        self.assertIsNotNone(cited)
+        self.assertEqual(cited.group(1), title)
+        self.assertTrue(title.startswith("DOPE: "))
+        self.assertNotIn("Kilobyte", title)
+        self.assertIn("Downstream Objective-Preserving Encoding", main)
+        # The round records keep all four profiles and record no selection, so these statements are withdrawn.
+        for text in (main, supplement, registry):
+            for withdrawn in ("chosen on a six-lineage discovery panel", "checked on six disjoint confirmation",
+                              "pre-registered reference", "pre-registered profile"):
+                self.assertNotIn(withdrawn, text)
+        for text in (main, supplement):
+            self.assertIn("selection-exposed", text)
 
 
 if __name__ == '__main__':
