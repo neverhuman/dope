@@ -95,7 +95,7 @@ REGISTRY = json.loads(r'''
     {"id": "selection-exposure", "estimand": "disclosure", "kind": "disclosure", "panel_flag": "official_tests_opened",
      "flag_value": false, "abstract_phrases": ["selection-exposed", "official test split is reserved"], "state": "pending"},
     {"id": "release-score", "estimand": "disclosure", "kind": "null", "panel_flag": "mfs_v3", "flag_value": null,
-     "manuscript_phrases": ["The release score is null until its privacy and representation gates are measured"],
+     "manuscript_phrases": ["The release score is null because its prerequisites and cleartext scan are unmeasured, and measured copy, membership, and attribute gates already fail on some cells"],
      "state": "null_with_reason"}
   ],
   "forbidden_language": {

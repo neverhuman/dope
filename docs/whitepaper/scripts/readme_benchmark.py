@@ -93,7 +93,8 @@ def benchmark_block(headline: dict) -> str:
         "training-derived cut; the official test split is reserved for one pre-registered run. Resampled real "
         "rows are a row-count diagnostic, neither a generator nor an upper bound. The release score (MFS-v3) is "
         "null for every method "
-        "until its privacy and representation gates are measured. DOPE's median artifact is "
+        "because its prerequisites and cleartext scan are unmeasured, and measured copy, membership, and "
+        "attribute gates already fail on some cells. DOPE's median artifact is "
         f"{size(dope['bytes']['median'])}, and {dope['bytes']['fits_within_cap']} of {dope['bytes']['fits_ok']} "
         "individual DOPE fits are within the 10,240-byte release cap; the paper names the lineages above it.",
     ]
