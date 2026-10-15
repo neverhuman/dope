@@ -8,8 +8,8 @@ use std::io::{Read, Write};
 use std::path::Path;
 
 use crate::schema::{
-    ColumnDomain, ColumnRole, ColumnSchemaV1, ColumnType, MaskState, Result, SchemaError,
-    TableSchemaV1,
+    ColumnDomain, ColumnRole, ColumnSchemaV1, ColumnType, DEFAULT_MAX_FIELD_BYTES, MaskState,
+    Result, SchemaError, TableSchemaV1,
 };
 
 pub mod isolation;
@@ -48,7 +48,7 @@ impl Default for InputLimits {
             max_bytes: 16 * 1024 * 1024,
             max_rows: 100_000,
             max_cells: 1_000_000,
-            max_field_bytes: 4096,
+            max_field_bytes: DEFAULT_MAX_FIELD_BYTES,
         }
     }
 }
@@ -72,7 +72,6 @@ impl fmt::Debug for TypedTable {
 
 impl TypedTable {
     pub fn read_csv(reader: impl Read, schema: TableSchemaV1, limits: InputLimits) -> Result<Self> {
-        schema.validate()?;
         if limits.max_bytes == 0
             || limits.max_rows == 0
             || limits.max_cells == 0
@@ -80,6 +79,7 @@ impl TypedTable {
         {
             return Err(SchemaError::new("invalid_input_limits", None, None));
         }
+        schema.validate_with_field_limit(limits.max_field_bytes)?;
         let cap = limits
             .max_bytes
             .checked_add(1)

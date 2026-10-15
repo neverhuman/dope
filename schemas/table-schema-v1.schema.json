@@ -187,7 +187,8 @@
           "items": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 4096
+            "maxLength": 2097152,
+            "$comment": "Structural envelope only: native validation enforces the chosen UTF-8 field byte limit (4096 by default) and the aggregate metadata byte cap. Custom limits must be explicit."
           }
         }
       }

@@ -536,6 +536,134 @@ fn retained_nominal_cells_use_the_csv_field_byte_limit() {
 }
 
 #[test]
+fn declared_domains_honor_the_csv_field_byte_limit_before_reading() {
+    let mut value = declaration();
+    value["columns"][0]["dtype"] = json!("nominal");
+    value["columns"][0]["domain"] = json!({"kind":"categorical", "values":["ééx"]});
+    let limits = InputLimits {
+        max_field_bytes: 4,
+        ..InputLimits::default()
+    };
+    let mut reader = std::io::Cursor::new("private_measurement,private_outcome\nok,1\n");
+    let error = TypedTable::read_csv(&mut reader, parse(&value).unwrap(), limits).unwrap_err();
+    assert_eq!(reader.position(), 0);
+    assert_eq!(error.code, "invalid_declared_domain");
+    assert_eq!(error.column, Some(1));
+    assert_eq!(error.to_string(), "column 1: invalid_declared_domain");
+}
+
+#[test]
+fn declared_categories_round_trip_with_explicit_small_and_large_byte_limits() {
+    for field_limit in [4, 8192] {
+        let category = "é".repeat(field_limit / 2);
+        let mut value = declaration();
+        value["columns"][0]["dtype"] = json!("nominal");
+        value["columns"][0]["domain"] = json!({"kind":"categorical", "values":[category]});
+        let bytes = serde_json::to_vec(&value).unwrap();
+        let schema =
+            TableSchemaV1::from_private_json_with_field_limit(&bytes, field_limit).unwrap();
+        let public = serde_json::to_string(
+            &schema
+                .public_projection_with_field_limit(field_limit)
+                .unwrap(),
+        )
+        .unwrap();
+        assert!(!public.contains(&category));
+        assert!(!public.contains("private_measurement"));
+        assert_eq!(
+            TableSchemaV1::from_private_json_with_field_limit(&bytes, field_limit - 1)
+                .err()
+                .unwrap()
+                .code,
+            "invalid_declared_domain"
+        );
+        if field_limit > InputLimits::default().max_field_bytes {
+            assert_eq!(parse(&value).err().unwrap().code, "invalid_declared_domain");
+            assert_eq!(
+                schema.validate().unwrap_err().code,
+                "invalid_declared_domain"
+            );
+        }
+        let limits = InputLimits {
+            max_field_bytes: field_limit,
+            ..InputLimits::default()
+        };
+        let csv = format!("private_measurement,private_outcome\n{category},1\n");
+        let data = TypedTable::read_csv(csv.as_bytes(), schema, limits).unwrap();
+        let state = fit_transform(&data, &[0]).unwrap();
+        let retained = state.sampling_state_bytes().unwrap();
+        assert_eq!(state.required_sampling_bytes().unwrap(), retained.len());
+        drop(data);
+        drop(state);
+        let loaded = FittedTransforms::reload(&retained).unwrap();
+        assert_eq!(
+            loaded
+                .transform_cell("c0001", &Cell::Category(category.clone()))
+                .unwrap(),
+            Cell::Category(category)
+        );
+        let mut changed: Value = serde_json::from_slice(&retained).unwrap();
+        changed["max_field_bytes"] = json!(field_limit - 1);
+        assert_eq!(
+            FittedTransforms::reload(&serde_json::to_vec(&changed).unwrap())
+                .unwrap_err()
+                .code,
+            "invalid_transform_state"
+        );
+        if field_limit > InputLimits::default().max_field_bytes {
+            changed.as_object_mut().unwrap().remove("max_field_bytes");
+            assert_eq!(
+                FittedTransforms::reload(&serde_json::to_vec(&changed).unwrap())
+                    .unwrap_err()
+                    .code,
+                "invalid_transform_state"
+            );
+        }
+    }
+}
+
+#[test]
+fn explicit_domain_limits_preserve_structural_and_aggregate_metadata_guards() {
+    let mut value = declaration();
+    value["columns"][0]["dtype"] = json!("nominal");
+    for values in [json!([]), json!([""]), json!(["same", "same"])] {
+        value["columns"][0]["domain"] = json!({"kind":"categorical", "values":values});
+        assert_eq!(
+            TableSchemaV1::from_private_json_with_field_limit(
+                &serde_json::to_vec(&value).unwrap(),
+                8192
+            )
+            .err()
+            .unwrap()
+            .code,
+            "invalid_declared_domain"
+        );
+    }
+    assert_eq!(
+        TableSchemaV1::from_private_json_with_field_limit(
+            &serde_json::to_vec(&declaration()).unwrap(),
+            0
+        )
+        .err()
+        .unwrap()
+        .code,
+        "invalid_input_limits"
+    );
+    value["columns"][0]["domain"] =
+        json!({"kind":"categorical", "values":["x".repeat(schema::MAX_SCHEMA_BYTES)]});
+    assert_eq!(
+        TableSchemaV1::from_private_json_with_field_limit(
+            &serde_json::to_vec(&value).unwrap(),
+            usize::MAX
+        )
+        .err()
+        .unwrap()
+        .code,
+        "schema_bytes_exceeded"
+    );
+}
+
+#[test]
 fn retained_field_limit_defaults_for_prior_v1_states_and_refuses_zero() {
     let state = fit_transform(&numeric_table(), &[0, 1]).unwrap();
     let mut retained: Value =
