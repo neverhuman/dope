@@ -1,6 +1,7 @@
 """Synthetic DOPERAW1 framing and the retained DOPERAW2 fixture.
 
-The fixture is read by its recorded hash. It is not rendered or regenerated.
+The 707-byte fixture is the file next to this module. It is read by its recorded
+hash. It is not rendered or regenerated.
 No native CLI, source rows, or prediction goldens.
 """
 
@@ -34,9 +35,7 @@ from research.transfer.raw_profile import (
 ROOT = Path(__file__).resolve().parents[3]
 ROW_MARKER = "row-marker-offset-scale-99999"
 WRONG_DIGEST = b"0123456789abcdef0123456789abcdef"
-RETAINED_RAW = Path(
-    "/home/ubuntu/dope/.agent/worktrees/consolidated-native-20261014/target/raw-residual-cli/304654/model.raw"
-)
+RETAINED_RAW = Path(__file__).resolve().parent / "fixtures" / "retained-doperaw2-707.raw"
 RETAINED_SHA256 = "fac2d6b32a59ac67a86571b57c0ee24669a6d865c0c91246ed2e80c3dc567d22"
 RETAINED_MIXED = Path(
     "/home/ubuntu/dope/.agent/worktrees/consolidated-native-20261014/target/raw-mixed-cli/50530/model.mixed"
