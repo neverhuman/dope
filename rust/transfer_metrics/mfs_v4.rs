@@ -77,7 +77,7 @@ pub fn driver_attribution_agreement(
         }
     }
     let sign_agreement = match (real_signs, synthetic_signs) {
-        (None, None) => 1.0,
+        (None, None) => return Err(MetricError::InvalidEvidence),
         (Some(real_s), Some(syn_s)) if !real_s.is_empty() && real_s.len() == syn_s.len() => {
             if real_s
                 .iter()
@@ -105,8 +105,8 @@ pub fn driver_attribution_agreement(
         .clamp(5, 20)
         .min(features)
         .max(1);
-    let real_total: f64 = real_importances.iter().sum();
-    let syn_total: f64 = synthetic_importances.iter().sum();
+    let real_total = finite(real_importances.iter().sum())?;
+    let syn_total = finite(synthetic_importances.iter().sum())?;
     let (ndcg_at_k, top_k_jaccard, top_k_overlap, l1_attribution_agreement) = if real_total <= 1e-12
     {
         if syn_total <= 1e-12 {

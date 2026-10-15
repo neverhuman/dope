@@ -263,7 +263,7 @@ pub fn evaluate_v4(
         observation.artifact_sampling_verified,
         observation.metric_implementations_locked,
         observation.control_contrastive_baselines_complete,
-        observation.model_driver_attribution_measured,
+        observation.model_driver_attribution_measured && driver_attr.is_some(),
     ]) {
         hard_gates.insert(key.into(), passed);
     }
