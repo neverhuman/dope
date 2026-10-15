@@ -9,5 +9,7 @@ include!("compiler/residual_oof.rs");
 include!("compiler/residual_profiles.rs");
 include!("compiler/target_preparation.rs");
 
+pub mod interactions;
+
 #[cfg(all(test, feature = "gpu-training"))]
 mod gpu_readout_tests;

@@ -2248,6 +2248,14 @@
     "rust/fitness/v4.rs": {
       "command": "cargo test --locked --lib fitness::tests::",
       "purpose": "verify MFS-v4 frozen contract weights, hard release gates, control-contrastive lift, driver attribution, and knowledge compression scoring"
+    },
+    "rust/compiler/interactions.rs": {
+      "command": "cargo test --locked --test vnext_interactions",
+      "purpose": "verify original seven development interaction fixtures: shared term-tariff widths12/24/48/adaptive, fold complement fitting, generating pairs, seed determinism, permutation/substitution and code-only refusals; no encoded-artifact or independent-generalization qualification"
+    },
+    "tests/vnext_interactions.rs": {
+      "command": "cargo test --locked --test vnext_interactions",
+      "purpose": "verify original seven development interaction fixtures: shared term-tariff widths12/24/48/adaptive, fold complement fitting, generating pairs, seed determinism, permutation/substitution and code-only refusals; no encoded-artifact or independent-generalization qualification"
     }
   }
 }
