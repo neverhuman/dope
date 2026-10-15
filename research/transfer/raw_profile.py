@@ -8,6 +8,7 @@ separately, and a missing number is not a zero. DOPERAW2 requires DPK 3.3
 regression and an uncompressed noise section of opcode 4, version 1, kind 0-3.
 The kind fields are counted and discarded. This check does not decompress,
 decode the kernel, reload affine columns, or publish offsets, scales, or knots.
+DOPMIX01 is a separate carrier and is charged only by account_mixed_artifact.
 A passed charge is not confirmation, a right, an official asset, a release,
 formal DP, or HIPAA de-identification. Historical DPK tier totals are a
 different account, and inventory-only does not replay this check.
@@ -25,6 +26,19 @@ RAW_HANDLER = "native-raw-complete-v1"
 RESIDUAL_BYTE_PROFILE = "native-raw-complete-residual-v1"
 RAW_KIND = "doperaw1"
 RAW_CAPABILITIES = ["byte-inventory", "native-raw-sample"]
+MIXED_MAGIC = b"DOPMIX01"
+MIXED_HEADER = 56
+MIXED_MAX_BYTES = 32 * 1024 * 1024
+MIXED_MAX_STATE = 2 * 1024 * 1024
+MIXED_BYTE_PROFILE = "native-mixed-complete-v1"
+_MIXED_PROFILES = frozenset({"independent_v1", "numeric_split_v1"})
+_MIXED_STATE_KEYS = frozenset({
+    "format", "version", "profile", "constant_target", "affine", "features",
+})
+_MIXED_FEATURE_KEYS = frozenset({
+    "id", "start", "categories", "completion", "probabilities", "split",
+})
+_MIXED_SPLIT_KEYS = frozenset({"anchor", "threshold", "left", "right"})
 _NOISE_TAG = 5
 _RESIDUAL_FIELDS = {0: 0, 1: 2, 2: 4, 3: 17}
 _FEATURE_ROLES = frozenset({"feature", "target"})
@@ -193,6 +207,124 @@ def account_raw_artifact(artifact, limits=None):
     # The label is the algorithm that matched. It is not a kernel decode.
     charge["content_hash"] = "blake3_state_plus_dpk"
     charge["declared_columns_checked"] = False
+    return MappingProxyType(charge)
+
+
+def _number(value):
+    return type(value) in (int, float)
+
+
+def _mixed_profile(state_bytes):
+    """Return the profile name. Fitted values stay inside the byte charge."""
+    from research.transfer.evidence import EvidenceError, parse_json
+
+    try:
+        state = parse_json(state_bytes)
+    except (EvidenceError, ValueError, UnicodeError, RecursionError):
+        _fail("mixed_state_invalid")
+    if (
+        type(state) is not dict
+        or set(state) != _MIXED_STATE_KEYS
+        or state["format"] != "dope-mixed-state"
+        or type(state["version"]) is not int
+        or state["version"] != 1
+        or type(state["profile"]) is not str
+        or state["profile"] not in _MIXED_PROFILES
+        or type(state["constant_target"]) is not bool
+        or type(state["affine"]) is not dict
+        or type(state["features"]) is not list
+        or not state["features"]
+    ):
+        _fail("mixed_state_invalid")
+    for feature in state["features"]:
+        split = feature["split"] if type(feature) is dict else None
+        if (
+            type(feature) is not dict
+            or set(feature) != _MIXED_FEATURE_KEYS
+            or type(feature["id"]) is not str
+            or type(feature["start"]) is not int
+            or type(feature["categories"]) is not list
+            or any(type(item) is not str for item in feature["categories"])
+            or not _number(feature["completion"])
+            or type(feature["probabilities"]) is not list
+            or any(not _number(item) for item in feature["probabilities"])
+        ):
+            _fail("mixed_state_invalid")
+        if split is None:
+            continue
+        if (
+            type(split) is not dict
+            or set(split) != _MIXED_SPLIT_KEYS
+            or type(split["anchor"]) is not int
+            or not _number(split["threshold"])
+            or type(split["left"]) is not list
+            or type(split["right"]) is not list
+            or any(not _number(item) for item in split["left"])
+            or any(not _number(item) for item in split["right"])
+        ):
+            _fail("mixed_state_invalid")
+    return state["profile"]
+
+
+def account_mixed_artifact(artifact, limits=None):
+    """Charge one DOPMIX01 carrier after BLAKE3(state||DPK) matches bytes 24..56.
+
+    Private affine, dictionaries, completions, probabilities, and splits count
+    toward the cap and are not returned. The kernel is not decoded. DOPERAW1
+    and DOPERAW2 stay on account_raw_artifact. A passed charge is not
+    confirmation, a right, an official asset, a release, formal DP, or HIPAA
+    de-identification.
+    """
+    from research.transfer.bundle import BundleError, BundleLimits
+    from research.transfer.bundle_io import preflight_dpk
+
+    limits = limits or BundleLimits()
+    if type(artifact) is not bytes or len(artifact) < MIXED_HEADER or len(artifact) > MIXED_MAX_BYTES:
+        _fail("mixed_artifact_invalid")
+    if artifact[:8] != MIXED_MAGIC:
+        _fail("mixed_artifact_invalid")
+    state_len = int.from_bytes(artifact[8:16], "little")
+    payload_len = int.from_bytes(artifact[16:24], "little")
+    if (
+        state_len > MIXED_MAX_STATE
+        or MIXED_HEADER + state_len + payload_len != len(artifact)
+        or blake3_hash(artifact[MIXED_HEADER:]) != artifact[24:56]
+    ):
+        _fail("mixed_artifact_integrity_failed")
+    profile = _mixed_profile(artifact[MIXED_HEADER:MIXED_HEADER + state_len])
+    try:
+        preflight_dpk(artifact[MIXED_HEADER + state_len:], limits)
+    except BundleError:
+        _fail("mixed_payload_limits_invalid")
+    charge = {
+        "format": "dope-mixed-sampling-artifact",
+        "version": 1,
+        "profile": profile,
+        "byte_profile_id": MIXED_BYTE_PROFILE,
+        "capability": "bounded_numeric_nominal_features_five_masks_continuous_regression",
+        "support": "fit_range_numeric_one_hot_nominal_fit_only_empirical_classes_optional_one_numeric_split",
+        "privacy": "unmeasured_private_affine_dictionary_completion_probabilities_retained",
+        "certification": "unqualified_development_artifact",
+        "framing_bytes": MIXED_HEADER,
+        "transform_schema_bytes": state_len,
+        "native_payload_bytes": payload_len,
+        "complete_sampling_bytes": len(artifact),
+        "transport_archive_bytes": len(artifact),
+        "generic_runtime_bytes": None,
+        "cold_sampling_closure_bytes": None,
+        "mapped_runtime_cold_closure": "separate_unmeasured",
+        "mathematical_parameter_count": None,
+        "content_hash": "blake3_state_plus_dpk",
+        "declared_columns_checked": False,
+        "confirmation": "unqualified",
+        "rights": "unqualified",
+        "official_assets": "unqualified",
+        "formal_dp": False,
+        "hipaa_deidentification": False,
+        "release_authorized": False,
+        "tail_fidelity": "unqualified",
+        "learner_transfer": "unqualified",
+    }
     return MappingProxyType(charge)
 
 
