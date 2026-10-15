@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Page-1 hero, the utility-per-byte figure and the README forest, from v2-headline.json.
 
-The page-1 hero (teaser.pdf) pairs the two questions a reader brings: how much
-predictive structure each generator keeps per charged byte (top), and how DOPE
-differs from each comparator lineage by lineage under every auditor (bottom).
-It is drawn at the text width and placed at that width, so every label keeps
+The page-1 hero (teaser.pdf) is a single panel showing how much predictive
+structure each generator keeps per charged byte at synthetic size 4n. It is
+drawn at the text width and placed at that width, so every label keeps
 HERO_MIN_POINTS on the page.
 
-Both figures use the emphasis form: DOPE in its accent green, every
+All figures use the emphasis form: DOPE in its accent green, every
 comparator in recessive grey with a direct ink label. Identity never rests
-on color alone. The README variants are the same drawings as PNG files.
+on color alone. The README includes both the utility-per-byte PNG and the
+three-auditor paired-difference forest PNG.
 `--check` redraws into a temporary directory and compares SHA-256 digests.
 """
 
