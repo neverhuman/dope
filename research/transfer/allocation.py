@@ -8,6 +8,9 @@ Allocation gain is attributable only for a paired measured comparison.
 from __future__ import annotations
 
 
+from .losses import finite_number
+
+
 def admit_candidate(*, estimated_bytes: int, actual_bytes: int | None, cap: int) -> dict:
     if any(type(value) is not int or value < 0 for value in (estimated_bytes, cap)):
         raise ValueError("invalid byte accounting")
@@ -25,8 +28,8 @@ def admit_candidate(*, estimated_bytes: int, actual_bytes: int | None, cap: int)
 def allocation_gain(baseline_loss, allocated_loss) -> dict:
     if baseline_loss is None or allocated_loss is None:
         return {"gain": None, "attributable": False, "reason": "unmeasured"}
-    baseline, allocated = float(baseline_loss), float(allocated_loss)
-    return {"gain": baseline - allocated, "attributable": True, "reason": "paired_comparison"}
+    baseline, allocated = finite_number(baseline_loss), finite_number(allocated_loss)
+    return {"gain": finite_number(baseline - allocated), "attributable": True, "reason": "paired_comparison"}
 
 
 def search_coverage(families_by_order) -> dict:
@@ -40,8 +43,15 @@ def search_coverage(families_by_order) -> dict:
 
 def provenance_row(*, candidate_id: str, parent_id: str | None, estimated_bytes: int,
                    actual_bytes: int | None, cost: float, rejection: str | None) -> dict:
-    if not candidate_id:
+    if not isinstance(candidate_id, str) or not candidate_id:
         raise ValueError("missing candidate")
+    if parent_id is not None and (not isinstance(parent_id, str) or not parent_id):
+        raise ValueError("invalid parent candidate")
+    if rejection is not None and (not isinstance(rejection, str) or not rejection):
+        raise ValueError("invalid rejection reason")
+    cost_val = finite_number(cost)
+    if cost_val < 0:
+        raise ValueError("invalid candidate cost")
     admit_candidate(estimated_bytes=estimated_bytes, actual_bytes=actual_bytes, cap=max(estimated_bytes, 0))
     return {"candidate_id": candidate_id, "parent_id": parent_id, "estimated_bytes": estimated_bytes,
-            "actual_bytes": actual_bytes, "cost": float(cost), "rejection": rejection}
+            "actual_bytes": actual_bytes, "cost": cost_val, "rejection": rejection}

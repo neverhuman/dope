@@ -47,6 +47,64 @@ class DriverTests(unittest.TestCase):
                                          learner_id="group-learner", query_population="fixture-rows", seed=1, repeats=4)
         self.assertAlmostEqual(grouped["importance"]["color"], 0.0)
 
+    def test_driver_agreement_refuses_cross_population_proxy_booleans_and_overflow(self):
+        with self.assertRaises(ValueError):
+            pearson([1e200, 2e200], [1e200, 3e200])
+        with self.assertRaises(ValueError):
+            pearson([True, False, True], [1.0, 0.0, 1.0])
+        with self.assertRaises(ValueError):
+            pearson([[1.0, 2.0], [3.0, 4.0]], [[1.0, 2.0], [3.0, 4.0]])
+        with self.assertRaises(ValueError):
+            permutation_importance(
+                lambda cols: 0.1,
+                ((1.0, 2.0, 3.0), (4.0, 5.0, 6.0)),
+                {},
+                learner_id="l1",
+                query_population="holdout",
+                seed=0,
+            )
+        with self.assertRaises(ValueError):
+            permutation_importance(
+                lambda cols: True,
+                ((1.0, 2.0, 3.0), (4.0, 5.0, 6.0)),
+                {"g": (0,)},
+                learner_id="l1",
+                query_population="holdout",
+                seed=0,
+            )
+        valid_left = {
+            "path": "drivers-v1",
+            "evidence_kind": "permutation_importance",
+            "learner_id": "catboost",
+            "query_population": "real-holdout-v1",
+            "importance": {"f0": 0.1, "f1": 0.1, "f2": 0.5},
+        }
+        valid_right = {
+            "path": "drivers-v1",
+            "evidence_kind": "permutation_importance",
+            "learner_id": "catboost-syn",
+            "query_population": "real-holdout-v1",
+            "importance": {"f0": 0.2, "f1": 0.2, "f2": 0.8},
+        }
+        agreed = importance_agreement(valid_left, valid_right)
+        self.assertEqual(agreed["status"], "defined")
+        self.assertAlmostEqual(agreed["agreement"], 1.0)
+        with self.assertRaises(ValueError):
+            importance_agreement(valid_left, {**valid_right, "query_population": "train-fit-v1"})
+        with self.assertRaises(ValueError):
+            importance_agreement(valid_left, {**valid_right, "path": "historical-proxy-v0"})
+        with self.assertRaises(ValueError):
+            importance_agreement(valid_left, {**valid_right, "evidence_kind": "absolute_target_correlation"})
+        with self.assertRaises(ValueError):
+            importance_agreement(valid_left, {**valid_right, "learner_id": ""})
+        with self.assertRaises(ValueError):
+            importance_agreement(
+                valid_left,
+                {**valid_right, "importance": {"f0": True, "f1": 0.2, "f2": 0.8}},
+            )
+        with self.assertRaises(ValueError):
+            importance_agreement(valid_left, valid_right, low_signal=-1e-8)
+
 
 if __name__ == "__main__":
     unittest.main()
