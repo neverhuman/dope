@@ -1698,8 +1698,8 @@
       "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
     },
     "research/transfer/stress/interactions.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify executable bounded parity/product/rare-gate/diffuse/conditional stress fixtures, preallocation4096-cell refusal, deterministic affine/permutation behavior and historical helpers; all scientific/selection/privacy qualification flags false"
     },
     "research/transfer/tests/test_drivers.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1714,8 +1714,8 @@
       "purpose": "verify private-content recomputation and digest-only public commitments, matched same-entity-excluding distances with state identities, Euclidean role distributions and honestly unmeasured ECDF bands; empirical geometry does not qualify transfer, privacy or independent fit units"
     },
     "research/transfer/tests/test_interactions.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify executable bounded parity/product/rare-gate/diffuse/conditional stress fixtures, preallocation4096-cell refusal, deterministic affine/permutation behavior and historical helpers; all scientific/selection/privacy qualification flags false"
     },
     "research/transfer/tests/test_objectives.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1999,11 +1999,11 @@
     },
     "research/transfer/geometry_distributions.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls with actual positive/negative label-shuffle distances and width-charged preallocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
+      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls with actual positive/negative label-shuffle distances and width-charged preallocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified; squared-array peak documented, label-code distance lists private and tautological status removed"
     },
     "research/transfer/tests/test_geometry_distributions.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls with actual positive/negative label-shuffle distances and width-charged preallocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified"
+      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls with actual positive/negative label-shuffle distances and width-charged preallocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified; squared-array peak documented, label-code distance lists private and tautological status removed"
     },
     "scripts/native-notices.py": {
       "command": "sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
@@ -2064,6 +2064,22 @@
     "tests/support/raw_residual_profiles.rs": {
       "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
       "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "rust/corpus/source_pilot.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full native library162 and CLI7 including all8 P-v2 metadata consumer units and read-only CLI, exact integer/float/signed-zero plan/summary parity, trusted expected digest,4MiB/4096 caps, opaque custody/false admission flags, and complete missing/unavailable/source denominators; no N19/N12 or campaign admission"
+    },
+    "rust/corpus/source_pilot_tests.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full native library162 and CLI7 including all8 P-v2 metadata consumer units and read-only CLI, exact integer/float/signed-zero plan/summary parity, trusted expected digest,4MiB/4096 caps, opaque custody/false admission flags, and complete missing/unavailable/source denominators; no N19/N12 or campaign admission"
+    },
+    "tests/fixtures/n19-pilot-v2.json": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full native library162 and CLI7 including all8 P-v2 metadata consumer units and read-only CLI, exact integer/float/signed-zero plan/summary parity, trusted expected digest,4MiB/4096 caps, opaque custody/false admission flags, and complete missing/unavailable/source denominators; no N19/N12 or campaign admission"
+    },
+    "tests/support/source_pilot_cli.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full native library162 and CLI7 including all8 P-v2 metadata consumer units and read-only CLI, exact integer/float/signed-zero plan/summary parity, trusted expected digest,4MiB/4096 caps, opaque custody/false admission flags, and complete missing/unavailable/source denominators; no N19/N12 or campaign admission"
     }
   }
 }

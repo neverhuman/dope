@@ -510,6 +510,10 @@
     "rust/compiler/target_preparation.rs": "rust-core",
     "rust/model/residual.rs": "rust-core",
     "rust/sample/residual.rs": "rust-core",
-    "tests/support/raw_residual_profiles.rs": "rust-core"
+    "tests/support/raw_residual_profiles.rs": "rust-core",
+    "rust/corpus/source_pilot.rs": "rust-core",
+    "rust/corpus/source_pilot_tests.rs": "rust-core",
+    "tests/fixtures/n19-pilot-v2.json": "rust-core",
+    "tests/support/source_pilot_cli.rs": "rust-core"
   }
 }
