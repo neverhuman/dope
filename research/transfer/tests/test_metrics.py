@@ -11,8 +11,10 @@ from research.transfer.losses import (
 )
 from research.transfer.metrics import (
     PAIRED_MEAN_CODE_DIGEST, BoundEvidence, CellResult, FitArtifact, Margin, TaskEvaluation,
-    authenticate_bound, bound_binding_record, bound_qualification, harm_summary, loss_summary, observed_coverage,
-    qualified_coverage, query_z_mean, tail_regression, weighted_cvar,
+    authenticate_bound, bound_binding_record, bound_qualification, control_contrastive_lift,
+    driver_attribution_agreement, harm_summary, knowledge_compression_metrics, loss_summary,
+    observed_coverage, qualified_coverage, query_z_mean, standardize_numeric_table_01,
+    tail_regression, weighted_cvar,
 )
 
 
@@ -46,6 +48,82 @@ class MetricsTests(unittest.TestCase):
                         self.assertAlmostEqual(result[key], case[key])
                 self.assertEqual(result["ratio_status"], case["ratio_status"])
                 json.dumps(result, allow_nan=False)
+
+    def test_mfs_v4_golden_values_and_standard_01_preprocessing(self):
+        v4 = GOLDEN["mfs_v4"]
+        ccl_expected = v4["control_contrastive_lift"]
+        ccl = control_contrastive_lift(
+            ccl_expected["retention"],
+            ccl_expected["predictor_only_retention"],
+            ccl_expected["independent_marginals_retention"],
+            ccl_expected["real_bootstrap_4n_retention"],
+        )
+        for key in (
+            "lift_over_predictor_only",
+            "lift_over_independent_marginals",
+            "lift_vs_real_bootstrap_4n",
+            "contrastive_utility_score",
+        ):
+            self.assertAlmostEqual(ccl[key], ccl_expected[key])
+        self.assertEqual(ccl["positive_predictor_lift"], ccl_expected["positive_predictor_lift"])
+        self.assertEqual(ccl["positive_dependence_lift"], ccl_expected["positive_dependence_lift"])
+
+        drv_expected = v4["driver_attribution"]
+        drv = driver_attribution_agreement(
+            drv_expected["real_importances"],
+            drv_expected["synthetic_importances"],
+            drv_expected["real_signs"],
+            drv_expected["synthetic_signs"],
+        )
+        self.assertEqual(drv["k"], drv_expected["k"])
+        for key in (
+            "ndcg_at_k",
+            "top_k_jaccard",
+            "top_k_overlap",
+            "l1_attribution_agreement",
+            "sign_agreement",
+            "composite_driver_fidelity",
+        ):
+            self.assertAlmostEqual(drv[key], drv_expected[key])
+
+        kc_expected = v4["knowledge_compression"]
+        kc = knowledge_compression_metrics(
+            kc_expected["artifact_bytes"],
+            kc_expected["encoded_numbers"],
+            kc_expected["real_rows"],
+            kc_expected["real_columns"],
+            kc_expected["byte_limit"],
+            kc_expected["retained_utility"],
+        )
+        for key in (
+            "bits_per_original_cell",
+            "numbers_per_original_cell",
+            "bpc_score",
+            "parameter_sparsity_score",
+            "log_byte_score",
+            "knowledge_compression_score",
+            "utility_per_kilobyte",
+            "utility_per_encoded_number",
+        ):
+            self.assertAlmostEqual(kc[key], kc_expected[key])
+
+        fit_table = [["cardiology", 10.0, 100.0], ["oncology", 20.0, 200.0], ["neurology", 30.0, 300.0]]
+        eval_table = [["cardiology", 15.0, 250.0], ["pediatrics", 50.0, 50.0]]
+        for mode in ("zscore_std_01", "minmax_01", "midrank_quantile_01"):
+            standardized = standardize_numeric_table_01(
+                fit_table,
+                eval_table,
+                column_kinds=("categorical", "numeric", "numeric"),
+                numeric_mode=mode,
+            )
+            self.assertEqual(standardized["columns"], 3)
+            self.assertFalse(standardized["cleartext_headers_retained"])
+            self.assertFalse(standardized["raw_extrema_retained"])
+            serialized = json.dumps(standardized, allow_nan=False)
+            self.assertNotIn("cardiology", serialized)
+            self.assertNotIn("pediatrics", serialized)
+            for row in standardized["rows"]:
+                self.assertTrue(all(isinstance(v, float) and 0.0 <= v <= 1.0 for v in row))
 
     def test_rank_reversal_is_scored_in_raw_units(self):
         case = GOLDEN["rank_reversal"]

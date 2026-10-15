@@ -50,13 +50,22 @@ Sampling draws a latent vector from the stored dependence, maps it through each 
 
 ## Install
 
+Build the native Rust CLI directly or install it into `~/.local/bin`:
+
 ```bash
 git clone https://github.com/neverhuman/dope.git
 cd dope
 cargo build --locked --release -p dope-kernel
+
+# Optional: install dope-kernel into ~/.local/bin and verify toolchain health
+./scripts/install-native.sh --prefix "$HOME/.local"
+target/release/dope-kernel doctor
+
+# Optional: create the Python research and paper environment (.venv)
+just setup
 ```
 
-That command writes `target/release/dope-kernel`. The generator is Rust. Python is used for the bounded V1 baseline under `src/dope_kernel` (console command `dope-kernel-v1`; the native command stays `dope-kernel`), the offline research harness under `research/`, and the scripts that rebuild the paper under `docs/whitepaper/scripts`.
+`cargo build --locked --release -p dope-kernel` writes `target/release/dope-kernel`. The generator is Rust. Python is used for the bounded V1 baseline under `src/dope_kernel` (console command `dope-kernel-v1`; the native command stays `dope-kernel`), the offline research harness under `research/`, and the scripts that rebuild the paper under `docs/whitepaper/scripts`.
 
 ## Quick start
 
@@ -80,6 +89,32 @@ Inspect of the artifact built for this page reports `artifact_bytes` 196, `rows_
 
 The installed public demo in [examples/public-regression](examples/public-regression/) fits the UCI Airfoil Self-Noise table (Brooks, Pope, and Marcolini; CC BY 4.0; DOI 10.24432/C5VW2C) on a grouped development split and writes one native raw-unit artifact, `model.raw` (SHA-256 `0950cbe79817…`), with profile `raw-numeric-symbolic-v1` under the byte profile `native-raw-complete-v1`. Compile, `inspect`, the demo's research receipt, and the file size all report 1,558 bytes: 56 bytes of framing, 1,080 bytes of fitted schema and transforms, and 422 bytes of sampling payload. The file is its own transport archive. The generic runtime is measured separately: the debug binary and its mapped libraries came to 72,049,152 bytes, so the cold sampling closure was 72,050,710 bytes. No portable bundle or release-build runtime was measured. The run used commit `59437b1`, and privacy, driver, and geometry checks are unmeasured for this artifact. It is an engineering conformance example on one development split, not a benchmark result, and a different object from both the toy above and the paper's `.dpk` plus `projection.json` charge. The pinned values are in [docs/whitepaper/receipts/native-byte-conformance-v1.json](docs/whitepaper/receipts/native-byte-conformance-v1.json), and the supplement repeats them.
 
+## Standard `[0, 1]` numeric preprocessing and MFS-v4 metric
+
+### Standard `[0, 1]` numeric and categorical preprocessing contract
+
+Sensitive enterprise and regulated workflows require that released synthetic artifacts and public sidecars never echo source strings, column headers, category vocabularies, or raw extrema. DOPE enforces a numeric-only `[0, 1]` contract (`crates/dope-data/src/csv.rs` in Rust and `research.transfer.metrics.standardize_numeric_table_01` in Python):
+
+- **Headerless numeric `[0, 1]` input**: L3 `compile`, `convert`, and `certify` consume headerless numeric CSV files with the target in the final column and every cell already in `[0, 1]`. Out-of-range values fail closed with normalization guidance.
+- **Categorical encoding to `[0, 1]`**: Raw categorical tokens are mapped deterministically onto `[0, 1]` before compilation using 65,536-bucket HMAC-SHA256 projection (`bucket / 65535.0`) or training-split frequency/target statistics, so `.dpk` artifacts store only numeric distributions and zero cleartext strings.
+- **Numeric scaling to `[0, 1]` (fit on training split only)**: Continuous columns are standardized using training-split statistics only—either by dividing by the training standard deviation (`z_i = (x_i - μ_train) / σ_train`) and mapping smoothly onto `[0, 1]` via the standard normal CDF `Φ(z_i)` (`zscore_std_01`), by training min-max clamping (`minmax_01`), or by empirical mid-rank quantiles (`midrank_quantile_01`).
+
+### MFS-v4 quality metric: downstream tabular lift + feature-importance preservation
+
+When tabular learners (CatBoost, LightGBM/tree ensembles, MLPs, linear models) train on synthetic rows and are evaluated on unseen real holdout rows, a synthetic generator should both beat trivial controls on predictive skill and preserve the key feature drivers. MFS-v4 ([production/kpi-contract-v4.json](production/kpi-contract-v4.json), verified against [schemas/metric-golden-v1.json](schemas/metric-golden-v1.json)) combines seven `[0, 1]` components with a gated geometric mean:
+
+| Component | Weight | What it measures on unseen real holdout data |
+| --- | ---: | --- |
+| `utility_transfer` | 0.45 | Null-normalized TSTR/TRTR retention blended with **control-contrastive lift** (`control_contrastive_lift`) above `predictor_only` and `independent_marginals` controls |
+| `driver_fidelity` | 0.20 | Holdout **feature-importance and attribution agreement** (`driver_attribution_agreement`) between synthetic-trained and real-trained models: `0.35 * NDCG@k + 0.25 * Top-k Jaccard + 0.25 * L1 attribution share + 0.15 * sign agreement` |
+| `representation_closeness` | 0.10 | Holdout-calibrated two-sample representation fidelity (`1 - 2 * |C2ST_AUC - 0.5|`) |
+| `distribution_fidelity` | 0.08 | Marginal 1-Wasserstein / Kolmogorov–Smirnov fidelity across features |
+| `structure_fidelity` | 0.07 | Pairwise correlation, mutual-information, and target-association preservation |
+| `coverage_realism` | 0.05 | Support precision and recall (`alpha_precision`, `beta_recall`, coverage balance) |
+| `compactness` | 0.05 | Charged artifact byte efficiency (`clamp(1 - bytes / 10240, 0, 1)`) and bits-per-encoded-parameter (`knowledge_compression_metrics`) |
+
+Every MFS-v3 and MFS-v4 release score fails closed (`null`) unless all four prerequisites (`real_vs_real_control_present`, `size_n_and_4n_present`, `artifact_only_sampling`, `metric_implementations_locked`) and all hard empirical privacy and byte gates (`dcr_share_lt_0_50`, `nndr_q05_ge_0_05`, `mia_auc_le_0_60`, `attr_leakage_le_0_05`, `no_cleartext_leak`, `artifact_bytes <= 10240`) pass.
+
 ## Reproduce the paper
 
 ```bash
@@ -96,7 +131,7 @@ Every number in the paper is a macro emitted from a committed, SHA-pinned ledger
 - Regression tables only; fit views hold at most 800 rows, and 65 of the 100 lineages come from four simulated families.
 - All benchmark numbers are validation estimates; the official test split is reserved for one pre-registered run.
 - The privacy numbers are empirical attacks. DOPE offers no formal differential privacy and no HIPAA de-identification claim.
-- The release scores MFS-v2 and MFS-v3 are null for every method until their own gates pass.
+- The release scores MFS-v2, MFS-v3, and MFS-v4 are null for every method until their own gates pass.
 - The toy artifact above is an illustration, not the benchmark comparison.
 
 ## Artifact format

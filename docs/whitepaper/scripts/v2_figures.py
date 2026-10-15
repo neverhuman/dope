@@ -51,9 +51,8 @@ FULL_PANEL = 90
 FOREST_TICKS = (0.0, 0.3, 0.6)
 # Readability floor for the page-1 hero at its printed size (ledger C053).
 HERO_MIN_POINTS = 7.0
-HERO_HEIGHT_IN = 2.8
-# Panel (b) leaves out the two rows DOPE exceeds by more than its whole window; panel (a) keeps them
-# and the caption and Table 1 name them.
+HERO_HEIGHT_IN = 2.65
+# Table 1 reports all rows; HERO_OMITTED_ROWS guards the forest window contract.
 HERO_OMITTED_ROWS = ("Ind", "Ctgan")
 AUDITORS = (("catboost", "CatBoost"), ("linear", "Linear"), ("mlp", "MLP"))
 # The figures draw these arms only; every other arm stays in the supplement tables.
@@ -143,35 +142,25 @@ def _forest_panels(axes, rows: list[dict], margin: float, value_size: float, cou
 
 
 def draw_hero(headline: dict, path: Path) -> Path:
-    """Page-1 hero: (a) retention against charged bytes, (b) paired differences under the three auditors."""
-    rows = [arm for arm in _rows(headline) if arm["code"] not in HERO_OMITTED_ROWS]
+    """Page-1 hero: single clear plot of CatBoost retention at 4n against median charged artifact bytes."""
     _, right = TEASER_X_LIM
     for arm in _rows(headline):
         if arm["code"] in HERO_OMITTED_ROWS and any(
                 row is None or row["hl_lo"] <= right for row in (arm["contrasts"][key] for key, _ in AUDITORS)):
             raise ValueError(f"{arm['display']} is omitted from the hero but an interval reaches its window")
-    margin = headline.get("margin", 0.02)
     floor = HERO_MIN_POINTS
     sizes = {key: floor for key in ("font.size", "axes.labelsize", "axes.titlesize", "xtick.labelsize",
                                     "ytick.labelsize", "legend.fontsize")}
     with matplotlib.rc_context(sizes):
         figure = plt.figure(figsize=(figure_style.TEASER_WIDTH_IN, HERO_HEIGHT_IN))
-        # Both frames are final before any label is measured.
-        top = figure.add_gridspec(1, 1, left=0.1, right=0.985, top=0.935, bottom=0.6).subplots()
-        bottom = figure.add_gridspec(1, 3, left=0.27, right=0.915, top=0.37, bottom=0.075,
-                                     wspace=0.08).subplots(sharey=True)
-        _frontier(top, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.6, control_size=floor,
+        axis = figure.add_gridspec(1, 1, left=0.1, right=0.985, top=0.90, bottom=0.175).subplots()
+        _frontier(axis, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.8, control_size=floor,
                   offsets=HERO_LABEL_OFFSETS, names=HERO_NAMES,
-                  dope_offsets=((-7, 0, "right", "center"),) + HERO_LABEL_OFFSETS)
-        top.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)", labelpad=1.5)
-        top.set_ylabel("CatBoost retention at 4n")
-        top.set_title("(a) Predictive structure kept against charged bytes", loc="left", pad=3)
-        _forest_panels(bottom, rows, margin, value_size=floor, count_size=floor)
-        for axis in bottom:
-            axis.title.set_position((0.5, 1.0))
-            axis.set_title(axis.get_title(), pad=2)
-        figure.text(0.1, 0.43, "(b) DOPE minus each comparator at 4n, paired Hodges-Lehmann retention difference",
-                    ha="left", va="bottom", fontsize=floor, fontweight="bold")
+                  dope_offsets=((-6, 1, "right", "bottom"), (-2, 7, "center", "bottom")) + HERO_LABEL_OFFSETS)
+        axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)", labelpad=2.0)
+        axis.set_ylabel("CatBoost retention at 4n")
+        axis.set_title("CatBoost retention at 4n against median charged artifact bytes", loc="left", pad=4,
+                       fontweight="bold")
         return _save(figure, path, None)
 
 

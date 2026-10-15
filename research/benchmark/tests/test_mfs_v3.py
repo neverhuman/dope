@@ -206,6 +206,57 @@ class MfsV3Tests(unittest.TestCase):
         finally:
             shutil.rmtree(outside, ignore_errors=True)
 
+    def test_mfs_v4_evaluation_and_gates(self):
+        from research.benchmark.mfs_v3_score import V4_PREREQUISITES, evaluate_v4
+
+        obs = {
+            **{key: True for key in V4_PREREQUISITES},
+            "encoder": "kumo_tabular_l",
+            "distance": 0.2,
+            "d_null": 0.5,
+            "d_match": 0.4,
+            "gap_mitra": -0.1,
+            "gap_tabicl": -0.2,
+            "exact_row_matches": 0,
+            "near_copy_ok": True,
+            "cleartext_absent": True,
+            "membership_auc": 0.51,
+            "attribute_inference_advantage": 0.02,
+            "artifact_bytes": 1024,
+            "encoded_numbers": 64,
+            "real_rows": 1024,
+            "real_columns": 8,
+            "normalizer": "empirical_midrank_quantile_v1",
+            "utility_protocol": "train_on_synthetic_score_on_real",
+            "utility_auditors": ["kumo_tabular_l", "catboost", "mitra_v2", "tabicl2"],
+            "retention": 0.90,
+            "predictor_only_retention": 0.70,
+            "independent_marginals_retention": 0.65,
+            "real_bootstrap_4n_retention": 0.85,
+            "real_importances": [0.40, 0.30, 0.20, 0.10],
+            "synthetic_importances": [0.45, 0.25, 0.20, 0.10],
+            "real_signs": [1, -1, 1, -1],
+            "synthetic_signs": [1, -1, 1, 1],
+            "mfs_components": {
+                "distribution_fidelity": 0.85,
+                "structure_fidelity": 0.80,
+                "coverage_realism": 0.75,
+            },
+        }
+        report = evaluate_v4(obs)
+        self.assertTrue(report["eligible"])
+        self.assertAlmostEqual(report["control_contrastive_lift"]["contrastive_utility_score"], 0.935)
+        self.assertAlmostEqual(report["driver_attribution"]["composite_driver_fidelity"], 0.95)
+        self.assertAlmostEqual(report["representation_closeness"], 0.5)
+        self.assertIsNotNone(report["score"])
+        self.assertGreater(report["score"], 70.0)
+
+        no_lift = dict(obs, predictor_only_retention=0.92)
+        failed = evaluate_v4(no_lift)
+        self.assertFalse(failed["eligible"])
+        self.assertIsNone(failed["score"])
+        self.assertIn("positive_predictor_lift", failed["failed_gates"])
+
 
 if __name__ == "__main__":
     unittest.main()

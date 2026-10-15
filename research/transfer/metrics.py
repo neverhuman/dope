@@ -18,6 +18,12 @@ import math
 from .calibration_receipt import verify_calibration_receipt
 from .evidence import digest
 from .losses import PairedLosses, TrainingScale, finite_number
+from .objectives import (  # noqa: F401
+    control_contrastive_lift,
+    driver_attribution_agreement,
+    knowledge_compression_metrics,
+    standardize_numeric_table_01,
+)
 
 
 @dataclass(frozen=True)
