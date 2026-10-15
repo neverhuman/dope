@@ -26,6 +26,17 @@ fn executable(dir: &std::path::Path, source: &str) -> std::path::PathBuf {
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
     path
 }
+// The stderr fixtures read their body through an immutable interpreter rather
+// than immediately executing the newly written file. The real bounded process
+// transport still captures both streams; no shell command string is built.
+struct ScriptTransport;
+impl Transport for ScriptTransport {
+    fn run(&mut self, argv: &[String]) -> Result<github::Response> {
+        let mut interpreted = vec!["/bin/sh".into()];
+        interpreted.extend_from_slice(argv);
+        github::ProcessTransport::default().run(&interpreted)
+    }
+}
 #[test]
 fn version_one_canonical_digests_match_python_unicode_and_numbers() {
     let rows: Value = serde_json::from_str(include_str!("../fixtures/canonical-v1.json")).unwrap();
@@ -119,30 +130,24 @@ fn bounded_stderr_is_retained_internally_and_omitted_from_github_receipts() {
         &dir,
         "#!/bin/sh\nprintf '%s' '{\"fixture\":true}'\nprintf 'private diagnostic marker\\377' >&2\n",
     );
-    let response = github::ProcessTransport::default()
+    let response = ScriptTransport
         .run(&[fake.to_string_lossy().into_owned()])
         .unwrap();
     assert_eq!(response.code, 0);
     assert_eq!(response.stderr, "private diagnostic marker\u{fffd}");
-    let mut api = github::GitHub::new(
-        fake.to_string_lossy().into_owned(),
-        github::ProcessTransport::default(),
-    );
+    let mut api = github::GitHub::new(fake.to_string_lossy().into_owned(), ScriptTransport);
     assert_eq!(api.get("user", false, false), Ok(json!({"fixture": true})));
     assert!(!api.calls().to_string().contains("diagnostic marker"));
     let fake = executable(
         &dir,
         "#!/bin/sh\nprintf '%s' '{\"status\":500}'\nprintf '%s' 'cargo metadata diagnostic marker' >&2\nexit 101\n",
     );
-    let response = github::ProcessTransport::default()
+    let response = ScriptTransport
         .run(&[fake.to_string_lossy().into_owned()])
         .unwrap();
     assert_eq!(response.code, 101);
     assert_eq!(response.stderr, "cargo metadata diagnostic marker");
-    let mut api = github::GitHub::new(
-        fake.to_string_lossy().into_owned(),
-        github::ProcessTransport::default(),
-    );
+    let mut api = github::GitHub::new(fake.to_string_lossy().into_owned(), ScriptTransport);
     assert_eq!(
         api.get("user", false, false),
         Err(Refused("api_unavailable"))
@@ -157,7 +162,7 @@ fn stderr_exceeding_the_existing_capture_bound_is_refused() {
         "#!/bin/sh\nprintf '%s' '{}'\nhead -c 65537 /dev/zero >&2\n",
     );
     assert_eq!(
-        github::ProcessTransport::default()
+        ScriptTransport
             .run(&[fake.to_string_lossy().into_owned()])
             .err(),
         Some(Refused("api_unavailable"))

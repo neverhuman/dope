@@ -505,6 +505,11 @@
     "rust/compiler/capacity_refinement.rs": "rust-core",
     "research/benchmark/fetch_jope.py": "external-evidence",
     "research/benchmark/prepare_s3.py": "external-evidence",
-    "research/benchmark/tests/test_fetch_jope.py": "external-evidence"
+    "research/benchmark/tests/test_fetch_jope.py": "external-evidence",
+    "rust/compiler/residual_profiles.rs": "rust-core",
+    "rust/compiler/target_preparation.rs": "rust-core",
+    "rust/model/residual.rs": "rust-core",
+    "rust/sample/residual.rs": "rust-core",
+    "tests/support/raw_residual_profiles.rs": "rust-core"
   }
 }

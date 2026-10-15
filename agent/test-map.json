@@ -1770,8 +1770,8 @@
       "purpose": "verify atomic native installation and delivered legal pins, fixed-member manifest/tamper refusal and legacy uninstall compatibility; full existing vnext_native_install target, no release or other-platform qualification"
     },
     "tests/vnext_raw_workflow.rs": {
-      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
     },
     "ops/ci/test-cpu-tool-readiness.sh": {
       "command": "bash ops/ci/test-cpu-tool-readiness.sh",
@@ -2044,6 +2044,26 @@
     "research/benchmark/tests/test_fetch_jope.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
       "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
+    },
+    "rust/compiler/residual_profiles.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "rust/compiler/target_preparation.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "rust/model/residual.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "rust/sample/residual.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "tests/support/raw_residual_profiles.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
     }
   }
 }
