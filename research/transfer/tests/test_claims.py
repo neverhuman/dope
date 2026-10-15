@@ -64,7 +64,11 @@ class ClaimGraphTests(unittest.TestCase):
             body = {key: value for key, value in projection.items() if key != "projection_sha256"}
             self.assertEqual(projection["projection_sha256"], _pin(canonical_json(body)))
             reference = parse_json(fixture["document"])["claims"][0]["references"][0]
-            self.assertEqual(reference["sha256"], _pin(fixture["receipts"][reference["receipt_id"]]))
+            pin = _pin(fixture["receipts"][reference["receipt_id"]])
+            self.assertEqual(reference["sha256"], pin)
+            self.assertEqual(claim["receipts"], [{"sha256": pin}])
+            self.assertNotIn("receipt_pins", claim)
+            self.assertNotIn("receipt_sha256", claim)
 
     def test_endpoints_do_not_share_a_decision(self):
         _, _, raw_gap = _graph("raw_gap_superiority")

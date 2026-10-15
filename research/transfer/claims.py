@@ -352,7 +352,7 @@ def _project_claim(claim, rows):
         "n21_admitted": False,
         "qualified": False,
         "synthetic": claim["synthetic"],
-        "receipt_pins": sorted({item["sha256"] for item in claim["references"]}),
+        "receipts": [{"sha256": pin} for pin in sorted({item["sha256"] for item in claim["references"]})],
         "raw_gap_superiority": _decision_object("raw_gap_superiority", rows[0], states["raw_gap_superiority"]),
         "adjusted_z_noninferiority": _decision_object(
             "adjusted_z_noninferiority", rows[0], states["adjusted_z_noninferiority"]
