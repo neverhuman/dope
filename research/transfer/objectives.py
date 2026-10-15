@@ -17,15 +17,23 @@ CATEGORICAL_BUCKETS = 65536
 
 
 def label_objective(kind: str, value: float) -> dict:
+    v = finite_number(value)
     if kind == "stored_target_fit":
-        return {"label": "stored_target_fit", "value": float(value), "retraining_utility": None}
+        return {"label": "stored_target_fit", "value": v, "retraining_utility": None}
     if kind == "measured_retraining":
-        return {"label": "measured_retraining", "value": float(value), "retraining_utility": float(value)}
+        return {"label": "measured_retraining", "value": v, "retraining_utility": v}
     raise ValueError("stored-target fit is not retraining utility")
 
 
 def _clamp01(value: float) -> float:
     return min(1.0, max(0.0, finite_number(value)))
+
+
+def _fsum(values) -> float:
+    try:
+        return finite_number(math.fsum(values))
+    except OverflowError as exc:
+        raise ValueError("non-finite number") from exc
 
 
 def _require_positive_int(value: int, name: str) -> int:
@@ -89,8 +97,8 @@ def driver_attribution_agreement(
     active = [(r, s) for r, s in zip(real_s, syn_s) if r != 0]
     sign_agreement = 1.0 if not active else sum(1 for r, s in active if r == s) / float(len(active))
     k = max(1, min(features, min(20, max(5, math.ceil(features * 0.10)))))
-    real_total = finite_number(math.fsum(real_imp))
-    syn_total = finite_number(math.fsum(syn_imp))
+    real_total = _fsum(real_imp)
+    syn_total = _fsum(syn_imp)
     if real_total <= 1e-12:
         ndcg, jaccard, overlap, l1_agree = (1.0, 1.0, 1.0, 1.0) if syn_total <= 1e-12 else (0.0, 0.0, 0.0, 0.0)
     elif syn_total <= 1e-12:
@@ -104,10 +112,10 @@ def driver_attribution_agreement(
         union = max(1, len(real_top | syn_top))
         overlap = inter / float(k)
         jaccard = inter / float(union)
-        idcg = math.fsum(real_imp[idx] / math.log2(rank + 2.0) for rank, idx in enumerate(real_order[:k]))
-        dcg = math.fsum(real_imp[idx] / math.log2(rank + 2.0) for rank, idx in enumerate(syn_order[:k]))
+        idcg = _fsum(real_imp[idx] / math.log2(rank + 2.0) for rank, idx in enumerate(real_order[:k]))
+        dcg = _fsum(real_imp[idx] / math.log2(rank + 2.0) for rank, idx in enumerate(syn_order[:k]))
         ndcg = 1.0 if idcg <= 1e-12 else _clamp01(dcg / idcg)
-        tv = 0.5 * math.fsum(abs(real_imp[i] / real_total - syn_imp[i] / syn_total) for i in range(features))
+        tv = 0.5 * _fsum(abs(real_imp[i] / real_total - syn_imp[i] / syn_total) for i in range(features))
         l1_agree = _clamp01(1.0 - tv)
     composite = _clamp01(0.35 * ndcg + 0.25 * jaccard + 0.25 * l1_agree + 0.15 * sign_agreement)
     return {
@@ -180,18 +188,25 @@ def _scale_numeric_column_01(fit_col: list[float], eval_col: list[float], mode: 
         finite_number(v)
     if mode == "minmax_01":
         lo, hi = min(fit_col), max(fit_col)
-        span = hi - lo
+        span = finite_number(hi - lo)
         if span <= 1e-12:
             return [0.5 for _ in eval_col]
-        return [_clamp01((v - lo) / span) for v in eval_col]
+        return [_clamp01(finite_number(v - lo) / span) for v in eval_col]
     if mode == "zscore_std_01":
-        mean = math.fsum(fit_col) / float(len(fit_col))
-        var = math.fsum((v - mean) ** 2 for v in fit_col) / float(len(fit_col))
-        std = math.sqrt(var)
+        n_fit = float(len(fit_col))
+        mean = _fsum(v / n_fit for v in fit_col)
+        diffs = [finite_number(v - mean) for v in fit_col]
+        scale = max(abs(d) for d in diffs)
+        if scale <= 1e-12:
+            return [0.5 for _ in eval_col]
+        std = finite_number(scale * math.sqrt(_fsum((d / scale) ** 2 for d in diffs) / n_fit))
         if std <= 1e-12:
             return [0.5 for _ in eval_col]
         # Divide by training std (z-score) and map smoothly onto [0, 1] via Gaussian CDF Phi(z).
-        return [_clamp01(0.5 * (1.0 + math.erf(((v - mean) / std) / math.sqrt(2.0)))) for v in eval_col]
+        return [
+            _clamp01(0.5 * (1.0 + math.erf(finite_number(finite_number(v - mean) / std) / math.sqrt(2.0))))
+            for v in eval_col
+        ]
     if mode == "midrank_quantile_01":
         ordered = sorted(fit_col)
         n = float(len(ordered))
@@ -206,7 +221,11 @@ def _scale_numeric_column_01(fit_col: list[float], eval_col: list[float], mode: 
             elif less == right:
                 x0, x1 = ordered[less - 1], ordered[less]
                 left_img, right_img = (less - 0.5) / n, (less + 0.5) / n
-                t = 0.0 if x1 == x0 else (v - x0) / (x1 - x0)
+                if x1 == x0:
+                    t = 0.0
+                else:
+                    span = finite_number(x1 - x0)
+                    t = finite_number(v - x0) / span
                 out.append(_clamp01(left_img + t * (right_img - left_img)))
             else:
                 out.append(_clamp01(sum((idx + 0.5) / n for idx in range(less, right)) / float(right - less)))
@@ -231,17 +250,29 @@ def standardize_numeric_table_01(
     - 'midrank_quantile_01': empirical mid-rank quantile map onto (0, 1)
     No source headers, category strings, or raw extrema appear in the returned public metadata.
     """
-    if not fit_rows or not column_kinds:
-        raise ValueError("nonempty fit_rows and column_kinds required")
+    if (
+        not isinstance(fit_rows, (list, tuple))
+        or not isinstance(column_kinds, (list, tuple))
+        or (eval_rows is not None and not isinstance(eval_rows, (list, tuple)))
+        or not fit_rows
+        or not column_kinds
+    ):
+        raise ValueError("nonempty fit_rows and column_kinds sequences required")
     if type(salt) is not bytes or not salt:
         raise ValueError("nonempty bytes salt required")
     width = len(column_kinds)
     target_rows = fit_rows if eval_rows is None else eval_rows
-    if not target_rows or any(len(row) != width for row in (*fit_rows, *target_rows)):
+    if not target_rows or any(
+        not isinstance(row, (list, tuple)) or len(row) != width for row in (*fit_rows, *target_rows)
+    ):
         raise ValueError("row width mismatch")
     transformed_cols = []
     for col_idx, kind in enumerate(column_kinds):
         if kind == "categorical":
+            for row in fit_rows:
+                fit_val = row[col_idx]
+                if type(fit_val) is not str or not fit_val:
+                    raise ValueError("categorical column requires nonempty string tokens")
             col_vals = []
             for row in target_rows:
                 val = row[col_idx]

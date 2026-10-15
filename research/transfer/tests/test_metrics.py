@@ -124,6 +124,47 @@ class MetricsTests(unittest.TestCase):
             self.assertNotIn("pediatrics", serialized)
             for row in standardized["rows"]:
                 self.assertTrue(all(isinstance(v, float) and 0.0 <= v <= 1.0 for v in row))
+            large_finite = standardize_numeric_table_01(
+                [[-1e200, 1.0], [1e200, 2.0]],
+                [[0.0, 1.5]],
+                column_kinds=("numeric", "numeric"),
+                numeric_mode=mode,
+            )
+            self.assertAlmostEqual(large_finite["rows"][0][0], 0.5)
+        for mode in ("minmax_01", "midrank_quantile_01"):
+            with self.assertRaises(ValueError):
+                standardize_numeric_table_01(
+                    [[-1e308, 1.0], [1e308, 2.0]],
+                    [[0.0, 1.5]],
+                    column_kinds=("numeric", "numeric"),
+                    numeric_mode=mode,
+                )
+        with self.assertRaises(ValueError):
+            standardize_numeric_table_01(
+                [[1e308, 1.0], [1.5e308, 2.0]],
+                [[-1e308, 1.5]],
+                column_kinds=("numeric", "numeric"),
+                numeric_mode="zscore_std_01",
+            )
+        for bad_cat in ("", None, 123, True):
+            with self.assertRaises(ValueError):
+                standardize_numeric_table_01(
+                    [[bad_cat, 10.0, 100.0]],
+                    eval_table,
+                    column_kinds=("categorical", "numeric", "numeric"),
+                )
+        with self.assertRaises(ValueError):
+            standardize_numeric_table_01(
+                ["ab"],
+                column_kinds=("categorical", "categorical"),
+            )
+        with self.assertRaises(ValueError):
+            driver_attribution_agreement(
+                [1e307] * 500,
+                [1e307] * 500,
+                [1] * 500,
+                [1] * 500,
+            )
 
     def test_rank_reversal_is_scored_in_raw_units(self):
         case = GOLDEN["rank_reversal"]

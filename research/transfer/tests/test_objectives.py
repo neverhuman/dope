@@ -21,6 +21,11 @@ class ObjectiveTests(unittest.TestCase):
         self.assertIsNone(stored["retraining_utility"])
         with self.assertRaises(ValueError):
             label_objective("retraining_utility", 0.2)
+        for bad_val in (True, False, float("nan"), float("inf"), float("-inf")):
+            with self.assertRaises(ValueError):
+                label_objective("stored_target_fit", bad_val)
+            with self.assertRaises(ValueError):
+                label_objective("measured_retraining", bad_val)
         self.assertEqual(sketch_status(None), "absent")
         self.assertEqual(sketch_status(False), "failed")
         chosen = select_once([
