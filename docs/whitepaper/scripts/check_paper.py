@@ -196,6 +196,21 @@ def _family_clause(caption: str, start: int) -> str:
     return caption[start:index]
 
 
+_REAL_ROW_BOUND = (
+    re.compile(r"upper reference", re.IGNORECASE),
+    re.compile(r"(?:real[- ]row control|real rows)\s+bounds?\b", re.IGNORECASE),
+    re.compile(r"(?:real[- ]row|real rows|resampled real)[^.]{0,80}?\b(?:is|are|remains?|as)\s+(?:an?|the)\s+upper\b",
+               re.IGNORECASE),
+)
+
+
+def real_row_bound_failures(text: str) -> list[str]:
+    """The resampled real-row control is a diagnostic of row count, never an upper reference or bound."""
+    flat = " ".join(text.split())
+    return ["real-row control described as a bound: " + match.group(0)[:60]
+            for pattern in _REAL_ROW_BOUND for match in pattern.finditer(flat)]
+
+
 def table_member_failures(text: str) -> list[str]:
     """A caption that states a Holm family size also names the family's members (rubric 4c)."""
     failures = []
@@ -235,9 +250,12 @@ def main() -> int:
     for source in (raw_tex, supplement_source):
         failures.extend(table_family_failures(strip_tex_comments(source)))
         failures.extend(table_member_failures(strip_tex_comments(source)))
+        failures.extend(real_row_bound_failures(strip_tex_comments(source)))
     for path in sorted((ROOT / "generated").glob("*.tex")):
         failures.extend(table_family_failures(strip_tex_comments(path.read_text())))
         failures.extend(table_member_failures(strip_tex_comments(path.read_text())))
+        failures.extend(real_row_bound_failures(strip_tex_comments(path.read_text())))
+    failures.extend(real_row_bound_failures((ROOT.parents[1] / "README.md").read_text()))
     tex = strip_comments(raw_tex)
     # Drop verbatim-ish inputs of generated tables; those files are the generator.
     body = "\n".join(line for line in tex.splitlines() if "\\input{generated/" not in line)
