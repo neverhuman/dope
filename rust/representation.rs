@@ -94,22 +94,20 @@ pub fn midrank_quantile(fit: &[f64], values: &[f64]) -> Option<Vec<f64>> {
     let mut ordered = fit.to_vec();
     ordered.sort_by(|left, right| left.partial_cmp(right).expect("finite"));
     let n = ordered.len() as f64;
-    Some(
-        values
-            .iter()
-            .map(|value| midrank_one(&ordered, *value, n))
-            .collect(),
-    )
+    values
+        .iter()
+        .map(|value| midrank_one(&ordered, *value, n))
+        .collect()
 }
 
-fn midrank_one(ordered: &[f64], value: f64, n: f64) -> f64 {
+fn midrank_one(ordered: &[f64], value: f64, n: f64) -> Option<f64> {
     let less = ordered.partition_point(|item| *item < value);
     let right = ordered.partition_point(|item| *item <= value);
     if right == 0 {
-        return 0.5 / n;
+        return Some(0.5 / n);
     }
     if less == ordered.len() {
-        return (n - 0.5) / n;
+        return Some((n - 0.5) / n);
     }
     if less == right {
         let left_image = (less as f64 - 0.5) / n;
@@ -117,16 +115,23 @@ fn midrank_one(ordered: &[f64], value: f64, n: f64) -> f64 {
         let x0 = ordered[less - 1];
         let x1 = ordered[less];
         if x1 == x0 {
-            return left_image;
+            return Some(left_image);
         }
-        let t = (value - x0) / (x1 - x0);
-        return left_image + t * (right_image - left_image);
+        let span = x1 - x0;
+        let num = value - x0;
+        if !span.is_finite() || !num.is_finite() {
+            return None;
+        }
+        let t = num / span;
+        let out = left_image + t * (right_image - left_image);
+        return (out.is_finite() && out > 0.0 && out < 1.0).then_some(out);
     }
     let mut total = 0.0;
     for index in less..right {
         total += (index as f64 + 0.5) / n;
     }
-    total / (right - less) as f64
+    let out = total / (right - less) as f64;
+    (out.is_finite() && out > 0.0 && out < 1.0).then_some(out)
 }
 
 pub fn unit_half_distance(left: &[f64], right: &[f64]) -> Option<f64> {
@@ -142,7 +147,7 @@ pub fn unit_half_distance(left: &[f64], right: &[f64]) -> Option<f64> {
     }
     let left_norm = left.iter().map(|value| value * value).sum::<f64>().sqrt();
     let right_norm = right.iter().map(|value| value * value).sum::<f64>().sqrt();
-    if left_norm == 0.0 || right_norm == 0.0 {
+    if !left_norm.is_finite() || !right_norm.is_finite() || left_norm == 0.0 || right_norm == 0.0 {
         return None;
     }
     let mut total = 0.0;
@@ -478,5 +483,12 @@ mod tests {
         assert!(!headline_encoder("tabpfn35"));
         assert!(REFUSED_ENCODERS.contains(&"foundation"));
         assert!(SENSITIVITY_ENCODERS.contains(&"mitra_v2"));
+    }
+
+    #[test]
+    fn midrank_and_unit_half_distance_refuse_overflow() {
+        assert!(midrank_quantile(&[-1e308, 1e308], &[0.0]).is_none());
+        assert!(midrank_quantile(&[-1e308, 1e308], &[0.5e308]).is_none());
+        assert!(unit_half_distance(&[1e200, 0.0], &[0.0, 1e200]).is_none());
     }
 }

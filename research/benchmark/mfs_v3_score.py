@@ -303,7 +303,7 @@ def evaluate_v4(evidence: dict) -> dict:
         "utility_transfer": utility_transfer,
         "driver_fidelity": driver_fidelity,
         "representation_closeness": closeness,
-        "knowledge_compression": compression,
+        "knowledge_compression": knowledge_compression,
         "compression_metrics": compression,
         "control_contrastive_lift": lift,
         "driver_attribution": driver_attr,
