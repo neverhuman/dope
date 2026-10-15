@@ -1,4 +1,6 @@
+import math
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -453,6 +455,176 @@ class GeometryTests(unittest.TestCase):
         with self.assertRaises(ValueError) as unequal:
             sliced_wasserstein(cloud, cloud[:1], projections=4, seed=0)
         self.assertEqual(str(unequal.exception), "unequal sliced cardinality")
+
+
+def _euclid(left, right):
+    return math.sqrt(sum((left_value - right_value) ** 2 for left_value, right_value in zip(left, right)))
+
+
+def _prior_energy(left, right):
+    def mean_all(one, other):
+        return sum(_euclid(row, item) for row in one for item in other) / (len(one) * len(other))
+
+    def off_mean(rows):
+        count = len(rows)
+        total = sum(
+            _euclid(row, other)
+            for index, row in enumerate(rows)
+            for other_index, other in enumerate(rows)
+            if index != other_index
+        )
+        return total / (count * (count - 1))
+
+    return 2 * mean_all(left, right) - off_mean(left) - off_mean(right)
+
+
+def _prior_mmd(left, right, sigma):
+    def kernel(one, other):
+        gap = _euclid(one, other)
+        return math.exp(-(gap * gap) / (2 * sigma * sigma))
+
+    def mean_all(one, other):
+        return sum(kernel(row, item) for row in one for item in other) / (len(one) * len(other))
+
+    def off_mean(rows):
+        count = len(rows)
+        total = sum(
+            kernel(row, other)
+            for index, row in enumerate(rows)
+            for other_index, other in enumerate(rows)
+            if index != other_index
+        )
+        return total / (count * (count - 1))
+
+    return off_mean(left) + off_mean(right) - 2 * mean_all(left, right)
+
+
+def _role_work(left_rows, right_rows, width):
+    roles = left_rows * left_rows + right_rows * right_rows + left_rows * right_rows
+    return roles * (2 * width + 1)
+
+
+class MetricBudgetTests(unittest.TestCase):
+    def test_small_inputs_match_the_prior_formulas(self):
+        left = ((0.0, 1.0), (2.0, -1.0))
+        right = ((0.5, 0.25), (1.5, 0.0), (-0.5, 2.0))
+        sigma = 0.5
+        self.assertEqual(_role_work(2, 3, 2), (4 + 9 + 6) * (2 * 2 + 1))
+        self.assertAlmostEqual(energy_distance_unbiased(left, right), _prior_energy(left, right))
+        self.assertAlmostEqual(
+            energy_distance_unbiased(left, right, max_elements=_role_work(2, 3, 2)),
+            _prior_energy(left, right),
+        )
+        self.assertAlmostEqual(mmd2_unbiased(left, right, sigma=sigma), _prior_mmd(left, right, sigma))
+        self.assertAlmostEqual(
+            mmd2_unbiased(left, right, sigma=sigma, max_elements=_role_work(2, 3, 2)),
+            _prior_mmd(left, right, sigma),
+        )
+        narrow = ((0.0,), (1.0,))
+        self.assertAlmostEqual(energy_distance_unbiased(narrow, narrow), -1.0)
+        zeros = ((0.0,), (0.0,))
+        self.assertEqual(mmd2_unbiased(zeros, zeros, sigma=1.0), 0.0)
+
+    def test_width_and_every_role_count_toward_the_bound(self):
+        pair = ((0.0, 1.0), (1.0, 0.0))
+        other = ((0.0, 0.0), (1.0, 1.0))
+        wide_work = _role_work(2, 2, 2)
+        self.assertEqual(wide_work, 60)
+        self.assertAlmostEqual(
+            energy_distance_unbiased(pair, other, max_elements=wide_work),
+            _prior_energy(pair, other),
+        )
+        self.assertAlmostEqual(
+            mmd2_unbiased(pair, other, sigma=1.0, max_elements=wide_work),
+            _prior_mmd(pair, other, 1.0),
+        )
+        narrow = ((0.0,), (1.0,))
+        same = ((2.0,), (3.0,))
+        narrow_work = _role_work(2, 2, 1)
+        self.assertEqual(narrow_work, 36)
+        self.assertAlmostEqual(energy_distance_unbiased(narrow, same, max_elements=narrow_work), _prior_energy(narrow, same))
+        longer = ((2.0,), (3.0,), (4.0,))
+        role_work = _role_work(2, 3, 1)
+        self.assertEqual(role_work, (4 + 9 + 6) * 3)
+        self.assertAlmostEqual(
+            energy_distance_unbiased(narrow, longer, max_elements=role_work),
+            _prior_energy(narrow, longer),
+        )
+        self.assertAlmostEqual(
+            mmd2_unbiased(narrow, longer, sigma=0.5, max_elements=role_work),
+            _prior_mmd(narrow, longer, 0.5),
+        )
+
+        def allocated(*_args, **_kwargs):
+            raise AssertionError("allocated")
+
+        sentinel = "99999.5"
+        marked = ((0.0,), (float(sentinel),))
+        with patch("research.transfer.geometry._pairwise_norms", allocated), patch(
+            "research.transfer.geometry._rbf", allocated
+        ):
+            for function, payload in (
+                (energy_distance_unbiased, (pair, other)),
+                (mmd2_unbiased, (pair, other)),
+            ):
+                with self.subTest(function=function.__name__, bound=wide_work - 1):
+                    kwargs = {"max_elements": wide_work - 1}
+                    if function is mmd2_unbiased:
+                        kwargs["sigma"] = 1.0
+                    with self.assertRaises(ValueError) as refused:
+                        function(*payload, **kwargs)
+                    self.assertEqual(str(refused.exception), "distance_budget_exceeded")
+                    self.assertNotIn(sentinel, str(refused.exception))
+            for omitted in (4 * 3, 9 * 3, 6 * 3, (4 + 9) * 3, (4 + 6) * 3, (9 + 6) * 3):
+                with self.subTest(omitted=omitted):
+                    with self.assertRaises(ValueError) as refused:
+                        energy_distance_unbiased(marked, longer, max_elements=omitted)
+                    self.assertEqual(str(refused.exception), "distance_budget_exceeded")
+                    self.assertNotIn(sentinel, str(refused.exception))
+                    with self.assertRaises(ValueError) as refused:
+                        mmd2_unbiased(marked, longer, sigma=0.5, max_elements=omitted)
+                    self.assertEqual(str(refused.exception), "distance_budget_exceeded")
+            with self.assertRaises(ValueError) as narrow_refused:
+                energy_distance_unbiased(marked, same, max_elements=narrow_work - 1)
+            self.assertEqual(str(narrow_refused.exception), "distance_budget_exceeded")
+            with self.assertRaises(ValueError) as wide_as_narrow:
+                energy_distance_unbiased(pair, other, max_elements=narrow_work)
+            self.assertEqual(str(wide_as_narrow.exception), "distance_budget_exceeded")
+
+    def test_malformed_budget_is_refused_before_allocation(self):
+        sentinel = "99999.5"
+        left = ((0.0,), (float(sentinel),))
+        right = ((1.0,), (2.0,))
+
+        def allocated(*_args, **_kwargs):
+            raise AssertionError("allocated")
+
+        budgets = (True, False, 1.5, float("nan"), float("inf"), float("-inf"), 0, -1, 10_000_001)
+        with patch("research.transfer.geometry._pairwise_norms", allocated), patch(
+            "research.transfer.geometry._rbf", allocated
+        ):
+            for budget in budgets:
+                with self.subTest(budget=type(budget).__name__):
+                    with self.assertRaises(ValueError) as energy:
+                        energy_distance_unbiased(left, right, max_elements=budget)
+                    self.assertEqual(str(energy.exception), "invalid_distance_budget")
+                    self.assertNotIn(sentinel, str(energy.exception))
+                    self.assertNotIn("nan", str(energy.exception))
+                    with self.assertRaises(ValueError) as kernel:
+                        mmd2_unbiased(left, right, sigma=1.0, max_elements=budget)
+                    self.assertEqual(str(kernel.exception), "invalid_distance_budget")
+                    self.assertNotIn(sentinel, str(kernel.exception))
+            with self.assertRaises(ValueError) as nonfinite:
+                energy_distance_unbiased(((0.0,), (float("nan"),)), right, max_elements=36)
+            self.assertEqual(str(nonfinite.exception), "nonfinite cloud")
+            with self.assertRaises(ValueError) as scale:
+                mmd2_unbiased(left, right, sigma=float("nan"), max_elements=36)
+            self.assertEqual(str(scale.exception), "invalid kernel scale")
+            self.assertNotIn(sentinel, str(scale.exception))
+        self.assertAlmostEqual(
+            energy_distance_unbiased(left, right, max_elements=10_000_000),
+            _prior_energy(left, right),
+        )
 
 
 if __name__ == "__main__":

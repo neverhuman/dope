@@ -36,12 +36,49 @@ def coordinate_distance(left, right, *, space: str, encoder_id: str, other_space
     return float(np.linalg.norm(left - right))
 
 
+# Ceiling on the summed role temporaries. The number matches the distribution
+# pair ceiling. The default accepts the existing tiny fixtures and is not a campaign size.
+METRIC_DEFAULT_ELEMENTS = 1_000_000
+METRIC_ELEMENT_LIMIT = 10_000_000
+
+
+def _metric_budget(max_elements):
+    if type(max_elements) is not int or max_elements < 1 or max_elements > METRIC_ELEMENT_LIMIT:
+        raise ValueError("invalid_distance_budget")
+
+
+def _metric_work(left_rows, right_rows, width):
+    """Work bound for the three role broadcasts, in elements.
+
+    Real-real, real-synthetic, and synthetic-synthetic each build a
+    rows-by-rows-by-width difference and a squared copy of that same shape,
+    then keep the reduced rows-by-rows matrix. The squared copy is a second
+    array, so each role contributes rows * rows * (2 * width + 1). The sum is
+    a work bound: the broadcasts are sequential, and a simultaneous peak is
+    about two width-broadcasts of the active role plus the matrices already
+    retained. Pair counts alone do not bound it. The product is a Python int.
+    """
+    roles = left_rows * left_rows + right_rows * right_rows + left_rows * right_rows
+    return roles * (2 * width + 1)
+
+
+def _require_metric_work(left_rows, right_rows, width, max_elements):
+    if _metric_work(left_rows, right_rows, width) > max_elements:
+        raise ValueError("distance_budget_exceeded")
+
+
 def _rbf(left, right, sigma):
     diff = left[:, None, :] - right[None, :, :]
     return np.exp(-np.sum(diff * diff, axis=2) / (2 * sigma * sigma))
 
 
-def mmd2_unbiased(left, right, *, sigma: float) -> float:
+def mmd2_unbiased(left, right, *, sigma: float, max_elements: int = METRIC_DEFAULT_ELEMENTS) -> float:
+    """Unbiased MMD-squared. The value is unclipped and may be negative.
+
+    max_elements bounds the three role temporaries before any broadcast.
+    The number is not a privacy result and does not qualify transfer.
+    """
+    _metric_budget(max_elements)
     left = np.asarray(left, float)
     right = np.asarray(right, float)
     sigma = float(sigma)
@@ -51,6 +88,7 @@ def mmd2_unbiased(left, right, *, sigma: float) -> float:
         raise ValueError("invalid kernel scale")
     if not np.isfinite(left).all() or not np.isfinite(right).all():
         raise ValueError("nonfinite cloud")
+    _require_metric_work(left.shape[0], right.shape[0], left.shape[1], max_elements)
     left_kernel = _rbf(left, left, sigma)
     right_kernel = _rbf(right, right, sigma)
     cross = _rbf(left, right, sigma)
@@ -65,17 +103,20 @@ def _pairwise_norms(left, right):
     return np.sqrt(np.sum(diff * diff, axis=2))
 
 
-def energy_distance_unbiased(left, right) -> float:
+def energy_distance_unbiased(left, right, *, max_elements: int = METRIC_DEFAULT_ELEMENTS) -> float:
     """Unbiased energy distance. The diagonal is excluded and the value may be negative.
 
+    max_elements bounds the three role temporaries before any broadcast.
     The number is not a privacy result and does not qualify transfer.
     """
+    _metric_budget(max_elements)
     left = np.asarray(left, float)
     right = np.asarray(right, float)
     if left.ndim != 2 or right.ndim != 2 or left.shape[1] != right.shape[1] or min(left.shape[0], right.shape[0]) < 2:
         raise ValueError("invalid clouds")
     if not np.isfinite(left).all() or not np.isfinite(right).all():
         raise ValueError("nonfinite cloud")
+    _require_metric_work(left.shape[0], right.shape[0], left.shape[1], max_elements)
     cross = _pairwise_norms(left, right)
     left_d = _pairwise_norms(left, left)
     right_d = _pairwise_norms(right, right)
