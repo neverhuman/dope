@@ -37,9 +37,7 @@ ROW_MARKER = "row-marker-offset-scale-99999"
 WRONG_DIGEST = b"0123456789abcdef0123456789abcdef"
 RETAINED_RAW = Path(__file__).resolve().parent / "fixtures" / "retained-doperaw2-707.raw"
 RETAINED_SHA256 = "fac2d6b32a59ac67a86571b57c0ee24669a6d865c0c91246ed2e80c3dc567d22"
-RETAINED_MIXED = Path(
-    "/home/ubuntu/dope/.agent/worktrees/consolidated-native-20261014/target/raw-mixed-cli/50530/model.mixed"
-)
+RETAINED_MIXED = Path(__file__).resolve().parent / "fixtures" / "retained-dopmix01-1523.mixed"
 RETAINED_MIXED_SHA256 = "d13c986a437af7e17c8b4b274b19fe9131b05d783b4847ad9ead0dc397a97912"
 RETAINED_MIXED_NATIVE_SHA256 = "f5d6686b28caa71f68d05f4d48b0d39eea3133394fd449c1a6435ff7974d3a60"
 
