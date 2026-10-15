@@ -2,6 +2,9 @@ use dope_kernel::compiler::{CompileOptions, compile_kernel_from_arrays};
 use dope_kernel::contract::{AnonymizationTier, ReleasePolicy};
 use dope_kernel::model::Task;
 
+#[path = "support/native_rank_feasible_interactions.rs"]
+mod native_rank_feasible_interactions;
+
 #[test]
 fn actual_adaptive_search_respects_encoded_cap_and_same_offer_budget() {
     let rows = 64;
