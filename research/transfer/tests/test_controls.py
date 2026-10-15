@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 
 from research.transfer.adapters.generators.distillation import TabularCondensation
-from research.transfer.evidence import canonical_json
+from research.transfer.evidence import canonical_json, digest
 from research.transfer.controls import (
     CONTROLS, ByteMatchedCoreset, ControlError, DirectPredictorControl, MatchedTeacherFactorial, Teacher,
 )
@@ -143,6 +143,32 @@ class ControlTests(unittest.TestCase):
             rebuilt.charged_bytes,
             sum(dependencies.values()) + len(canonical_json({"prototypes": [2, 3]})),
         )
+
+    def test_caller_prototype_mutation_keeps_the_accepted_charge(self):
+        dependencies = {"encoder": 1, "decoder": 1, "init": 1, "recipe": 1}
+        payload = [0]
+        model = TabularCondensation((payload,), dependencies, 24, 1)
+        self.assertEqual(model.charged_bytes, 24)
+        self.assertEqual(model.prototypes, ((0,),))
+        self.assertIsNot(model.prototypes[0], payload)
+        accepted = model.prototype_sha256
+        payload.extend(range(1, 16))
+        self.assertEqual(model.charged_bytes, 24)
+        self.assertEqual(model.prototype_sha256, accepted)
+        self.assertTrue(model.valid)
+        self.assertEqual(model.prototypes, ((0,),))
+        retained = digest({"prototypes": [[0]], "dependencies": model.dependencies})
+        self.assertEqual(model.prototype_sha256, retained)
+        refit_payload = [0]
+        model.refit((refit_payload,))
+        refit_hash = model.prototype_sha256
+        self.assertEqual(model.charged_bytes, 24)
+        self.assertTrue(model.valid)
+        refit_payload.extend(range(1, 16))
+        self.assertEqual(model.charged_bytes, 24)
+        self.assertEqual(model.prototype_sha256, refit_hash)
+        self.assertEqual(model.prototypes, ((0,),))
+        self.assertTrue(model.valid)
 
     def test_parameter_mutation_cannot_leave_the_parameter_hash_stale(self):
         teacher = Teacher("nonlinear", {"quadratic": 1, "linear": 1, "bias": 1}, 0, "float64")
