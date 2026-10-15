@@ -7,6 +7,7 @@ import unittest
 
 from research.transfer.adapters.base import AdapterAdmission, AdapterError, FeatureBatch, TrainingBatch
 from research.transfer.adapters.generators.neural import load_lock, neural_adapter, recipe_identity
+from research.transfer.evidence import EvidenceError, admit_generator_evidence
 
 ROOT = Path(__file__).resolve().parents[3]
 LOCK = json.loads((ROOT / "research/transfer/locks/neural-generators.json").read_text())
@@ -103,6 +104,25 @@ class NeuralGeneratorTests(unittest.TestCase):
                 self.assertEqual(reference["schedule"][author_key], author_value)
                 self.assertEqual(reference["lane"], "unrestricted_quality")
                 self.assertFalse(reference["within_budget"])
+
+    def test_unexecuted_probe_is_refused_by_evidence_admission(self):
+        model = adapter(self.lock, "tabsyn", "scaled")
+        model.fit(self.training, 11)
+        state = model.export()
+        self.assertFalse(state["vendor_executed"])
+        with self.assertRaises(EvidenceError) as raised:
+            model.admit_evidence()
+        self.assertEqual(str(raised.exception), "vendor_not_executed")
+        self.assertNotIn("123456789", str(raised.exception))
+        with self.assertRaises(EvidenceError) as direct:
+            admit_generator_evidence(state)
+        self.assertEqual(str(direct.exception), "vendor_not_executed")
+        claimed = dict(state, vendor_executed=True)
+        with self.assertRaises(EvidenceError) as unverified:
+            admit_generator_evidence(claimed)
+        self.assertEqual(str(unverified.exception), "vendor_execution_unverified")
+        self.assertNotIn("123456789", str(unverified.exception))
+        self.assertEqual(model.export()["vendor_executed"], False)
 
 
 if __name__ == "__main__":

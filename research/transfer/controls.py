@@ -2,14 +2,13 @@
 
 from types import MappingProxyType
 
-from research.transfer.evidence import digest
+from research.transfer.evidence import canonical_json, digest
 
 
 CONTROLS = frozenset({
     "real_n", "real_bootstrap_4n", "shuffled_label", "no_noise",
     "prequantization", "postquantization", "direct_predictor", "coreset", "distillation",
 })
-_ROW_BYTES = 8
 
 
 class ControlError(ValueError):
@@ -147,7 +146,13 @@ class DirectPredictorControl:
     def __init__(self, teacher, draws, noises):
         self.teacher = teacher
         self.outputs = tuple(teacher.value(x, noise) for x, noise in _pairs(draws, noises))
-        self.charged_bytes = _ROW_BYTES * len(teacher.parameters)
+        stored = {
+            "form": teacher.form,
+            "precision": teacher.precision,
+            "parameters": dict(teacher.parameters),
+            "noise_scale": teacher.noise_scale,
+        }
+        self.charged_bytes = len(canonical_json(stored))
         self.retained_real_rows = False
         self.output_sha256 = digest({"outputs": list(self.outputs)})
 
@@ -156,16 +161,29 @@ class DirectPredictorControl:
         return digest({"outputs": list(values)})
 
 
+def _coreset_export(rows):
+    return canonical_json({"rows": [
+        {"row_id": row["row_id"], "x": row["x"], "noise": row["noise"]} for row in rows
+    ]})
+
+
 class ByteMatchedCoreset:
-    """Keep a prefix of retained real rows whose charged bytes fit the budget."""
+    """Keep the longest real-row prefix whose serialized export fits the budget."""
 
     def __init__(self, draws, noises, byte_budget):
         rows = _rows(draws, noises)
-        _fail("invalid_budget") if type(byte_budget) is not int or byte_budget < _ROW_BYTES else None
-        kept = rows[:byte_budget // _ROW_BYTES]
+        _fail("invalid_budget") if type(byte_budget) is not int or byte_budget < 1 else None
+        kept = ()
+        charged = 0
+        for count in range(1, len(rows) + 1):
+            export = _coreset_export(rows[:count])
+            if len(export) > byte_budget:
+                break
+            kept = rows[:count]
+            charged = len(export)
+        _fail("invalid_budget") if not kept else None
         self.rows = kept
-        self.charged_bytes = _ROW_BYTES * len(kept)
+        self.charged_bytes = charged
         self.byte_budget = byte_budget
         self.retained_real_rows = True
         self.adaptations = ()
-        _fail("byte_budget_exceeded") if self.charged_bytes > byte_budget else None
