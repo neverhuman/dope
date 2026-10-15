@@ -461,4 +461,26 @@ mod tests {
         assert!(!failed_lift.hard_gates["positive_predictor_lift"]);
         assert_eq!(failed_lift.score, None);
     }
+
+    #[test]
+    fn v4_refuses_nonfinite_or_overflowed_control_baselines() {
+        for bad_predictor in [f64::NAN, f64::INFINITY, -f64::MAX] {
+            let mut observation = v4_observation();
+            if bad_predictor == -f64::MAX {
+                observation.retention = f64::MAX;
+            }
+            observation.predictor_only_retention = bad_predictor;
+            let report = evaluate_v4(&v4_contract(), &v4_components(), &observation);
+            assert!(!report.eligible);
+            assert_eq!(report.score, None);
+            assert_eq!(report.utility_transfer, None);
+            assert_eq!(report.control_contrastive_lift, None);
+            assert!(!report.hard_gates["control_contrastive_baselines_complete"]);
+            assert!(!report.hard_gates["positive_predictor_lift"]);
+            assert!(report
+                .unavailable_terms
+                .iter()
+                .any(|term| term == "utility_transfer"));
+        }
+    }
 }

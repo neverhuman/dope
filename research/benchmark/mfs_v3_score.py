@@ -161,6 +161,7 @@ def evaluate_v4(evidence: dict) -> dict:
         and contract["privacy_soft_weight"] == 0.0
         and contract["epsilon"] == 1e-6
         and contract["epsilon_rule"] == "max_component_epsilon"
+        and contract.get("score_range") == [0, 100]
         and contract["prerequisites"] == list(V4_PREREQUISITES)
         and weights == V4_WEIGHTS
     )
@@ -177,7 +178,7 @@ def evaluate_v4(evidence: dict) -> dict:
             float(evidence["gap_tabicl"]),
         )
     auditors = evidence.get("utility_auditors")
-    if not isinstance(auditors, list):
+    if not isinstance(auditors, list) or not all(isinstance(name, str) for name in auditors):
         auditors = []
     tabular_ok = (
         evidence.get("normalizer") == NORMALIZER
@@ -185,17 +186,19 @@ def evaluate_v4(evidence: dict) -> dict:
         and len(auditors) == len(V4_TABULAR_AUDITORS)
         and all(name in auditors for name in V4_TABULAR_AUDITORS)
     )
-    lift = None
-    if tabular_ok and evidence.get("control_contrastive_baselines_complete") is True:
+    baseline_lift = None
+    if evidence.get("control_contrastive_baselines_complete") is True:
         try:
-            lift = control_contrastive_lift(
+            baseline_lift = control_contrastive_lift(
                 evidence["retention"],
                 evidence["predictor_only_retention"],
                 evidence["independent_marginals_retention"],
                 evidence.get("real_bootstrap_4n_retention"),
             )
         except (KeyError, TypeError, ValueError):
-            lift = None
+            baseline_lift = None
+    lift = baseline_lift if tabular_ok else None
+    utility_transfer = lift["contrastive_utility_score"] if lift is not None else None
     driver_attr = None
     if evidence.get("model_driver_attribution_measured") is True:
         try:
@@ -207,6 +210,7 @@ def evaluate_v4(evidence: dict) -> dict:
             )
         except (KeyError, TypeError, ValueError):
             driver_attr = None
+    driver_fidelity = driver_attr["composite_driver_fidelity"] if driver_attr is not None else None
     compression = None
     try:
         compression = knowledge_compression_metrics(
@@ -215,16 +219,45 @@ def evaluate_v4(evidence: dict) -> dict:
             evidence.get("real_rows"),
             evidence.get("real_columns"),
             10240,
-            evidence.get("retention", 0.0),
+            evidence.get("retention"),
         )
     except (TypeError, ValueError):
         compression = None
+    knowledge_compression = (
+        compression["knowledge_compression_score"] if compression is not None else None
+    )
     vector = evidence.get("mfs_components")
     vector = dict(vector) if isinstance(vector, dict) else {}
-    components_ok = all(
-        _number(vector.get(k)) and 0 <= vector[k] <= 1
-        for k in ("distribution_fidelity", "structure_fidelity", "coverage_realism")
+    distribution_fidelity = (
+        float(vector["distribution_fidelity"])
+        if _number(vector.get("distribution_fidelity")) and 0 <= vector["distribution_fidelity"] <= 1
+        else None
     )
+    structure_fidelity = (
+        float(vector["structure_fidelity"])
+        if _number(vector.get("structure_fidelity")) and 0 <= vector["structure_fidelity"] <= 1
+        else None
+    )
+    coverage_realism = (
+        float(vector["coverage_realism"])
+        if _number(vector.get("coverage_realism")) and 0 <= vector["coverage_realism"] <= 1
+        else None
+    )
+    components_ok = (
+        distribution_fidelity is not None
+        and structure_fidelity is not None
+        and coverage_realism is not None
+    )
+    named_terms = (
+        ("utility_transfer", utility_transfer),
+        ("driver_fidelity", driver_fidelity),
+        ("representation_closeness", closeness),
+        ("knowledge_compression", knowledge_compression),
+        ("distribution_fidelity", distribution_fidelity),
+        ("structure_fidelity", structure_fidelity),
+        ("coverage_realism", coverage_realism),
+    )
+    unavailable_terms = [name for name, val in named_terms if val is None]
     checks = {
         "exact_row_match": type(evidence.get("exact_row_matches")) is int and evidence["exact_row_matches"] == 0,
         "near_copy": evidence.get("near_copy_ok") is True,
@@ -243,19 +276,21 @@ def evaluate_v4(evidence: dict) -> dict:
         "mfs_components_complete": components_ok,
     }
     checks.update({key: evidence.get(key) is True for key in V4_PREREQUISITES})
-    checks["model_driver_attribution_measured"] = checks["model_driver_attribution_measured"] and driver_attr is not None
-    eligible = frozen and components_ok and all(checks.values()) and lift is not None and driver_attr is not None and compression is not None and closeness is not None
+    checks["control_contrastive_baselines_complete"] = (
+        checks["control_contrastive_baselines_complete"] and baseline_lift is not None
+    )
+    checks["model_driver_attribution_measured"] = (
+        checks["model_driver_attribution_measured"] and driver_attr is not None
+    )
+    eligible = (
+        frozen
+        and components_ok
+        and all(checks.values())
+        and not unavailable_terms
+    )
     score = None
     if eligible:
-        measured = {
-            "utility_transfer": lift["contrastive_utility_score"],
-            "driver_fidelity": driver_attr["composite_driver_fidelity"],
-            "representation_closeness": closeness,
-            "knowledge_compression": compression["knowledge_compression_score"],
-            "distribution_fidelity": float(vector["distribution_fidelity"]),
-            "structure_fidelity": float(vector["structure_fidelity"]),
-            "coverage_realism": float(vector["coverage_realism"]),
-        }
+        measured = dict(named_terms)
         total = sum(V4_WEIGHTS.values())
         score = min(100.0, max(0.0, 100.0 * math.exp(
             sum(weight * math.log(max(contract["epsilon"], measured[key])) for key, weight in V4_WEIGHTS.items()) / total
@@ -265,10 +300,14 @@ def evaluate_v4(evidence: dict) -> dict:
         "version": 4,
         "eligible": eligible,
         "score": score,
+        "utility_transfer": utility_transfer,
+        "driver_fidelity": driver_fidelity,
         "representation_closeness": closeness,
+        "knowledge_compression": compression,
+        "compression_metrics": compression,
         "control_contrastive_lift": lift,
         "driver_attribution": driver_attr,
-        "knowledge_compression": compression,
+        "unavailable_terms": unavailable_terms,
         "gates": checks,
         "failed_gates": [key for key, passed in checks.items() if not passed],
     }
