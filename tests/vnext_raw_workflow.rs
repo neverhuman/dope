@@ -7,6 +7,9 @@ use serde_json::json;
 #[path = "support/raw_residual_profiles.rs"]
 mod raw_residual_profiles;
 
+#[path = "support/raw_mixed_cli.rs"]
+mod raw_mixed_cli;
+
 fn table(x_scale: f64, y_scale: f64, query: f64) -> TypedTable {
     let schema = TableSchemaV1::from_private_json(
         &serde_json::to_vec(&json!({

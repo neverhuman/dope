@@ -150,3 +150,42 @@ digest of G1's `dope-frozen-geometry-state` body, including encoder, schema and
 ordered column/level/range content. `compare_frozen_geometry_v1` validates both
 original bodies. Caller labels and supplied digest-only claims are refused;
 body commitments and official activation availability remain separate.
+# Explicit mixed development profile
+
+`compile-mixed --csv fit.csv --schema schema.json --out model.mixed --profile numeric_split_v1`
+fits a separate `DOPMIX01` carrier. `independent_v1` is the matched baseline.
+Only declared fitting rows enter the API fit; the CLI treats its entire input
+as fitting data. Numeric features retain affine inverses; nominal dictionaries
+are exact and column scoped, with at most 32 observed categories per column and
+128 total numeric/one-hot coordinates. Missing, unknown category, structural
+absence, padding and censored cells remain five distinct classes. Nominal inputs
+outside an explicit domain become unknown-category masks, never dictionary
+entries. Dictionaries learn only observed fit categories; no hash collisions or
+category ordering become numeric distances.
+
+The conditional profile fits one median split per variable categorical/mask
+column, choosing among at most eight wholly observed numeric anchors in opaque-id
+order by fit-only empirical entropy. Each branch requires four fit rows; absent
+supported anchors return `mixed_conditional_anchor_unavailable`. This is a bounded
+development model, not a general joint conditional-distribution fit. Fully masked
+features, masked targets, nominal targets, text and datetime are unavailable.
+Targets must be fully observed continuous regression. Masked feature completion
+uses a retained numeric mean or modal category; it is applied before native
+target and residual evaluation. Mask indicators are not separate target inputs.
+
+`inspect-mixed --artifact model.mixed` reports complete accounting without private
+categories, affine parameters or class probabilities. Framing, all private
+dictionaries, transforms, completions, probabilities and splits are charged before
+native candidate byte-cap acceptance. Preparation consumes the same declared
+deadline as native fitting. Runtime/cold closure remains separate. Existing
+DPK3.2, `DOPERAW1`, `DOPERAW2`, default Gaussian and raw CLI behavior stay fixed.
+
+`sample-mixed --artifact model.mixed --rows 128 --seed 1729 --out samples.json`
+writes tagged number/category/mask cells, preventing collisions between a nominal
+string such as `missing` and a missing-state marker. A fresh Linux worker uses
+`sample-mixed --artifact model.mixed --rows 128 --seed 1729 --isolated`; it emits a
+digest and runtime accounting after the existing filesystem/network/exec seal.
+Redirect its stdout/stderr to pipes or regular files. Samples use only the carrier
+and native runtime. Integer/ordinal/boolean repairs are counted; declared physical
+domain violations refuse rather than clamp or retry. Public errors remain static.
+Privacy, tails, mixed transfer gains and calibration require separate measurements.

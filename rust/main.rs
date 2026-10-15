@@ -72,6 +72,41 @@ fn write_json(path: &PathBuf, value: &impl serde::Serialize) -> Result<()> {
 
 fn run(command: Command) -> Result<()> {
     match command {
+        Command::CompileMixed {
+            csv,
+            schema,
+            out,
+            profile,
+            seed,
+            max_complete_bytes,
+            deadline_seconds,
+        } => {
+            compile_mixed_command(
+                csv,
+                schema,
+                out,
+                profile,
+                seed,
+                max_complete_bytes,
+                deadline_seconds,
+            )?;
+        }
+        Command::InspectMixed { artifact } => {
+            let bytes = dope_kernel::typed_data::mixed::read_mixed_artifact(&artifact)?;
+            println!(
+                "{}",
+                serde_json::to_string(&dope_kernel::typed_data::mixed::inspect_mixed(&bytes)?)?
+            );
+        }
+        Command::SampleMixed {
+            artifact,
+            rows,
+            out,
+            seed,
+            isolated,
+        } => {
+            sample_mixed_command(artifact, rows, out, seed, isolated)?;
+        }
         Command::Doctor => {
             let executable = std::env::current_exe()
                 .map_err(|_| DopeError::Data("native_identity_unavailable".into()))?;
@@ -670,3 +705,4 @@ fn main() -> ExitCode {
 }
 
 include!("main/campaign_commands.rs");
+include!("main/mixed_commands.rs");
