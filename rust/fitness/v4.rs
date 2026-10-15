@@ -183,7 +183,7 @@ pub fn evaluate_v4(
         &observation.utility_protocol,
         &observation.utility_auditors,
     );
-    let lift = if tabular_ok && observation.control_contrastive_baselines_complete {
+    let baseline_lift = if observation.control_contrastive_baselines_complete {
         crate::transfer_metrics::control_contrastive_lift(
             observation.retention,
             observation.predictor_only_retention,
@@ -194,6 +194,7 @@ pub fn evaluate_v4(
     } else {
         None
     };
+    let lift = baseline_lift.filter(|_| tabular_ok);
     let utility_transfer = lift.and_then(|item| component_in_unit(Some(item.contrastive_utility_score)));
     let driver_attr = if observation.model_driver_attribution_measured {
         crate::transfer_metrics::driver_attribution_agreement(
@@ -262,7 +263,7 @@ pub fn evaluate_v4(
         observation.required_size_cells_complete,
         observation.artifact_sampling_verified,
         observation.metric_implementations_locked,
-        observation.control_contrastive_baselines_complete,
+        observation.control_contrastive_baselines_complete && baseline_lift.is_some(),
         observation.model_driver_attribution_measured && driver_attr.is_some(),
     ]) {
         hard_gates.insert(key.into(), passed);

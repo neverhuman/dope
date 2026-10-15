@@ -245,6 +245,9 @@ class MfsV3Tests(unittest.TestCase):
         }
         report = evaluate_v4(obs)
         self.assertTrue(report["eligible"])
+        self.assertEqual(report["unavailable_terms"], [])
+        self.assertAlmostEqual(report["utility_transfer"], 0.935)
+        self.assertAlmostEqual(report["driver_fidelity"], 0.95)
         self.assertAlmostEqual(report["control_contrastive_lift"]["contrastive_utility_score"], 0.935)
         self.assertAlmostEqual(report["driver_attribution"]["composite_driver_fidelity"], 0.95)
         self.assertAlmostEqual(report["representation_closeness"], 0.5)
@@ -256,6 +259,31 @@ class MfsV3Tests(unittest.TestCase):
         self.assertFalse(failed["eligible"])
         self.assertIsNone(failed["score"])
         self.assertIn("positive_predictor_lift", failed["failed_gates"])
+
+        missing_retention = dict(obs)
+        del missing_retention["retention"]
+        no_ret_report = evaluate_v4(missing_retention)
+        self.assertFalse(no_ret_report["eligible"])
+        self.assertIsNone(no_ret_report["score"])
+        self.assertIsNone(no_ret_report["compression_metrics"])
+        self.assertIn("encoded_numbers", no_ret_report["failed_gates"])
+        self.assertIn("control_contrastive_baselines_complete", no_ret_report["failed_gates"])
+        self.assertIn("utility_transfer", no_ret_report["unavailable_terms"])
+        self.assertIn("knowledge_compression", no_ret_report["unavailable_terms"])
+
+        bad_baseline = dict(obs, predictor_only_retention=float("nan"))
+        bad_base_report = evaluate_v4(bad_baseline)
+        self.assertFalse(bad_base_report["eligible"])
+        self.assertIsNone(bad_base_report["utility_transfer"])
+        self.assertIn("control_contrastive_baselines_complete", bad_base_report["failed_gates"])
+        self.assertIn("utility_transfer", bad_base_report["unavailable_terms"])
+
+        no_signs = dict(obs, real_signs=None, synthetic_signs=None)
+        no_signs_report = evaluate_v4(no_signs)
+        self.assertFalse(no_signs_report["eligible"])
+        self.assertIsNone(no_signs_report["driver_fidelity"])
+        self.assertIn("model_driver_attribution_measured", no_signs_report["failed_gates"])
+        self.assertIn("driver_fidelity", no_signs_report["unavailable_terms"])
 
 
 if __name__ == "__main__":
