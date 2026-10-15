@@ -116,6 +116,38 @@ class MeasuredRenderTests(unittest.TestCase):
         self.assertIn("raw-gap superiority supported, interval [-0.875, -0.125]", render.macros)
         self.assertNotIn("-0.25]", render.macros)
 
+    def test_limitation_claims_render_negative_inconclusive_and_unavailable_states(self):
+        """Limitation and campaign-cost claims keep their computed state; the headline stays strict."""
+        def claim_id(name):
+            return lambda document: document["claims"][0].__setitem__("claim_id", name)
+
+        def bounds(lower, upper):
+            def change(receipt):
+                receipt["lower"], receipt["upper"] = lower, upper
+            return change
+
+        cases = (
+            ("unfavorable-baseline", bounds(0.25, 0.5), "raw-gap superiority not supported, interval [0.25, 0.5]"),
+            ("tail-harm", bounds(-0.25, 0.25), "raw-gap superiority inconclusive, interval [-0.25, 0.25]"),
+            ("campaign-cost", bounds(None, None), "raw-gap superiority unavailable; "),
+        )
+        for name, change, text in cases:
+            with self.subTest(name):
+                render = V.verify_and_render(*mutated("raw_gap_superiority", change, claim_id(name)), CAMPAIGN)
+                definitions = [line for line in render.macros.splitlines() if line.startswith("\\@namedef")]
+                self.assertEqual(len(definitions), 1)
+                self.assertTrue(definitions[0].startswith(
+                    f"\\@namedef{{vnext@claim@{name}}}{{\\VNextUnqualified{{synthetic}}{{"))
+                self.assertIn(text, definitions[0])
+                self.assertEqual((render.receipt["bound_claims"], render.receipt["qualified_claims"]), (1, 0))
+                self.assertIn({"claim_id": "rate-risk-frontier", "state": "unbound", "qualification": None},
+                              render.receipt["ladder"])
+        for change, code in ((bounds(None, None), "unverified_bound"), (bounds(0.25, 0.5), "label_mismatch"),
+                             (bounds(-0.25, 0.25), "label_mismatch")):
+            with self.subTest(code), self.assertRaises(claims.ClaimError) as raised:
+                V.verify_and_render(*mutated("raw_gap_superiority", change), CAMPAIGN)
+            self.assertEqual(str(raised.exception), code)
+
     def test_verifier_refusals_never_reach_a_render(self):
         def receipt(key, value):
             return lambda row: row.__setitem__(key, value)
