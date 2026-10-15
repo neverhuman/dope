@@ -63,6 +63,28 @@ class PackagingTests(unittest.TestCase):
         self.assertIn(r'\input{generated/mfs-v3-examples.tex}', supplement)
         self.assertNotIn('100.0001', supplement)
 
+    def test_the_real_row_control_is_a_diagnostic_not_a_bound(self):
+        for phrase in (
+            "resampled real rows remain the upper reference (Section 5).",
+            "it measures what extra rows alone do and is an upper reference rather than a generator.",
+            "retention mixes fidelity with row count, which the real-row control bounds.",
+            "Resampled real rows are an upper bound on retention.",
+        ):
+            self.assertTrue(check_paper.real_row_bound_failures(phrase), phrase)
+        for phrase in (
+            "and is below resampled real rows, which diagnose row count rather than bound retention.",
+            "it is a diagnostic of what extra rows alone do, neither a generator nor an upper bound on retention.",
+            "the real-row control diagnoses that effect but does not bound it.",
+            "Resampled real rows are a row-count diagnostic, neither a generator nor an upper bound.",
+            "The interval's upper bound is printed beneath each median.",
+        ):
+            self.assertEqual(check_paper.real_row_bound_failures(phrase), [], phrase)
+        sources = [check_paper.TEX, check_paper.ROOT / "supplement.tex", check_paper.ROOT.parents[1] / "README.md"]
+        sources += sorted((check_paper.ROOT / "generated").glob("*.tex"))
+        for path in sources:
+            self.assertEqual(check_paper.real_row_bound_failures(check_paper.strip_tex_comments(path.read_text())), [],
+                             path.name)
+
     def test_a_stated_holm_family_size_names_its_members(self):
         bare = "\\begin{table}\\caption{Holm family size is nine.}\\end{table}"
         named = ("\\begin{table}\\caption{Holm family size is nine: DOPE against three comparators "
