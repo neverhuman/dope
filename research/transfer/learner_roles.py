@@ -62,9 +62,12 @@ def assign_learner_roles(record) -> MappingProxyType:
 
 def select_development_learner(candidates, roles) -> MappingProxyType:
     """Minimize development loss inside selection families. Held-out families are not scored."""
+    if not isinstance(candidates, (list, tuple)):
+        raise ValueError("invalid_learner_candidate")
     assigned = assign_learner_roles(roles)
     held = set(assigned["held_out_families"])
     selection = set(assigned["selection_families"])
+    seen_learners = set()
     best = None
     chosen = None
     for candidate in candidates:
@@ -74,10 +77,21 @@ def select_development_learner(candidates, roles) -> MappingProxyType:
         learner = candidate.get("learner_id")
         if type(family) is not str or type(learner) is not str or not family or not learner:
             raise ValueError("invalid_learner_candidate")
+        if learner in seen_learners:
+            raise ValueError("duplicate_learner_candidate")
+        seen_learners.add(learner)
         if family in held or family not in selection:
             continue
+        if candidate.get("held_out_oracle") is not None or candidate.get("held_out_loss") is not None:
+            raise ValueError("held_out_oracle_in_selection")
         loss = finite_number(candidate.get("development_loss"))
-        rank = (loss, learner)
+        if loss < 0:
+            raise ValueError("invalid_learner_candidate")
+        artifact_bytes = candidate.get("artifact_bytes")
+        if artifact_bytes is not None and (type(artifact_bytes) is not int or artifact_bytes < 0):
+            raise ValueError("invalid_learner_candidate")
+        byte_tiebreak = artifact_bytes if artifact_bytes is not None else float("inf")
+        rank = (loss, byte_tiebreak, learner)
         if best is None or rank < best:
             best = rank
             chosen = learner
