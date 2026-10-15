@@ -26,9 +26,10 @@ class PackagingTests(unittest.TestCase):
     def test_a_cold_paper_recipe_renders_the_native_byte_paragraph_before_the_driver(self):
         """paper-clean deletes generated/; the real paper recipe must render this paragraph before the driver checks it.
 
-        The actual Justfile runs through a python3 shim: paper-prepare only creates generated/, the copied
-        native_byte_conformance.py runs for real (--write, then the default check at the driver stub), and the
-        other generators are traced without running. The same Justfile without the generator line must fail.
+        The actual Justfile runs through a python3 shim: paper-prepare only creates generated/, the shim execs
+        the copied native_byte_conformance.py in its place (--write, then the default check at the driver stub)
+        so the checker's own exit status is the step's status, and the other generators are traced without
+        running. The same Justfile without the generator line must fail, and so must a checker that crashes.
         """
         repo = check_paper.ROOT.parents[1]
         just = shutil.which("just")
@@ -54,7 +55,7 @@ class PackagingTests(unittest.TestCase):
             shutil.copyfile(repo / name, root / name)
         trace = root / "commands.jsonl"
         runner = root / "recipe-runner.py"
-        runner.write_text(f"""import json, pathlib, subprocess, sys
+        runner.write_text(f"""import json, os, pathlib, sys
 root = pathlib.Path({str(root)!r})
 args = sys.argv[1:]
 if args[:1] == ["-B"]:
@@ -62,13 +63,17 @@ if args[:1] == ["-B"]:
 with pathlib.Path({str(trace)!r}).open("a") as log:
     log.write(json.dumps(args) + "\\n")
 checker = {checker!r}
+real_checker = [{sys.executable!r}, "-B", str(root / checker)]
 if args[:1] == ["ops/ci/paper-prepare.py"]:
     (root / "docs/whitepaper/generated").mkdir(parents=True, exist_ok=True)
 elif args[:1] == [checker]:
-    sys.exit(subprocess.run([{sys.executable!r}, "-B", str(root / checker), *args[1:]], cwd=root).returncode)
+    # Become the real checker: its own exit status is this recipe step's status.
+    os.chdir(root)
+    os.execv(real_checker[0], [*real_checker, *args[1:]])
 elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
     # The canonical driver checks the captured paragraph before any numerical replay.
-    sys.exit(subprocess.run([{sys.executable!r}, "-B", str(root / checker)], cwd=root).returncode)
+    os.chdir(root)
+    os.execv(real_checker[0], real_checker)
 """)
         binary = root / "bin"
         binary.mkdir()
@@ -76,24 +81,34 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
         (binary / "python3").chmod(0o755)
         env = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ["PATH"])
         generated = root / "docs/whitepaper/generated/native-byte-conformance.tex"
-        outcomes = {}
-        for name, text in (("current", current), ("missing", missing)):
+
+        def run_paper(name, text):
+            """Run the real recipe cold; check=True turns any failed step into CalledProcessError."""
             shutil.rmtree(root / "docs/whitepaper/generated", ignore_errors=True)
             trace.write_text("")
             (root / f"Justfile.{name}").write_text(text)
-            result = subprocess.run([just, "--justfile", str(root / f"Justfile.{name}"), "--working-directory",
-                                     str(root), "paper"], env=env, capture_output=True, text=True, timeout=120)
-            commands = [json.loads(line)[0] for line in trace.read_text().splitlines()]
-            outcomes[name] = (result.returncode, commands, generated.read_bytes() if generated.exists() else None)
-        code, commands, rendered = outcomes["current"]
-        self.assertEqual(code, 0)
-        self.assertEqual(rendered, (repo / "docs/whitepaper/generated/native-byte-conformance.tex").read_bytes())
-        self.assertLess(commands.index(checker), commands.index("docs/whitepaper/scripts/paper_build.py"))
-        code, commands, rendered = outcomes["missing"]
-        self.assertNotEqual(code, 0)
-        self.assertIsNone(rendered)
-        self.assertEqual(commands[-1], "docs/whitepaper/scripts/paper_build.py")
-        self.assertNotIn(checker, commands)
+            subprocess.run([just, "--justfile", str(root / f"Justfile.{name}"), "--working-directory", str(root),
+                            "paper"], env=env, capture_output=True, text=True, timeout=120, check=True)
+
+        def commands():
+            return [json.loads(line)[0] for line in trace.read_text().splitlines()]
+
+        run_paper("current", current)
+        self.assertEqual(generated.read_bytes(),
+                         (repo / "docs/whitepaper/generated/native-byte-conformance.tex").read_bytes())
+        self.assertLess(commands().index(checker), commands().index("docs/whitepaper/scripts/paper_build.py"))
+        with self.assertRaises(subprocess.CalledProcessError):
+            run_paper("missing", missing)
+        self.assertFalse(generated.exists())
+        self.assertEqual(commands()[-1], "docs/whitepaper/scripts/paper_build.py")
+        self.assertNotIn(checker, commands())
+        (root / checker).write_text('raise RuntimeError("hostile checker")\n')
+        with self.assertRaises(subprocess.CalledProcessError) as raised:
+            run_paper("hostile", current)
+        self.assertEqual(raised.exception.returncode, 1)
+        self.assertIn("RuntimeError: hostile checker", raised.exception.stderr)
+        self.assertFalse(generated.exists())
+        self.assertEqual(commands()[-1], checker)
 
     def test_body_limit_counts_text_before_references_on_the_same_page(self):
         first_ten = "body\f" * 10
