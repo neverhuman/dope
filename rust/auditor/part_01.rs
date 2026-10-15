@@ -17,10 +17,16 @@ pub struct FeatureImportanceConsistency {
     pub informative_feature_count: usize,
     pub spearman: Option<f64>,
     pub top_k: usize,
-    pub top_k_agreement: f64,
+    pub top_k_agreement: Option<f64>,
     pub real_normalized_shares: Vec<(usize, f64)>,
     pub synthetic_normalized_shares: Vec<(usize, f64)>,
     pub mean_ratio_error: Option<f64>,
+}
+
+pub(crate) fn importance_driver_fidelity(rank: Option<f64>, top_k: Option<f64>) -> Option<f64> {
+    rank.zip(top_k).map(|(rank, top_k)| {
+        0.5 * ((rank + 1.0) / 2.0).clamp(0.0, 1.0) + 0.5 * top_k.clamp(0.0, 1.0)
+    })
 }
 
 pub trait AuditorBackend: Send + Sync {
@@ -363,11 +369,7 @@ pub fn compare_permutation_importance(
         informative_feature_count: informative.len(),
         spearman: pearson(&real_ranks, &synthetic_ranks),
         top_k,
-        top_k_agreement: if union == 0 {
-            1.0
-        } else {
-            intersection as f64 / union as f64
-        },
+        top_k_agreement: (union > 0).then(|| intersection as f64 / union as f64),
         real_normalized_shares: real_shares,
         synthetic_normalized_shares: synthetic_shares,
         mean_ratio_error,

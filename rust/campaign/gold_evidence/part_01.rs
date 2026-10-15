@@ -223,6 +223,7 @@ fn aggregate_importance<'a>(
     let mut spearman = None::<f64>;
     let mut jaccard = None::<f64>;
     let mut missing_rank = false;
+    let mut missing_top_k = false;
     for cell in cells {
         count += 1;
         complete &= cell.version == JOB_EVIDENCE_VERSION
@@ -236,15 +237,18 @@ fn aggregate_importance<'a>(
             } else {
                 missing_rank = true;
             }
-            let value = cell.feature_importance_top_k_agreement;
-            jaccard = Some(jaccard.map_or(value, |minimum| minimum.min(value)));
+            if let Some(value) = cell.feature_importance_top_k_agreement {
+                jaccard = Some(jaccard.map_or(value, |minimum| minimum.min(value)));
+            } else {
+                missing_top_k = true;
+            }
         }
     }
     (
         count > 0 && complete,
         applicable,
         if missing_rank { None } else { spearman },
-        jaccard,
+        if missing_top_k { None } else { jaccard },
     )
 }
 

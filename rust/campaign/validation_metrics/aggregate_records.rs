@@ -236,7 +236,7 @@
                     }
                     update_optional_min(
                         &mut feature_importance_top_k_jaccard_min,
-                        Some(cell.feature_importance_top_k_agreement),
+                        cell.feature_importance_top_k_agreement,
                     );
                 }
                 update_optional_max(

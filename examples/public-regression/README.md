@@ -62,3 +62,53 @@ refused by the native integer type. Earlier failed attempts are retained.
 Results may be poor or retention negative; that does not turn the demonstration
 into a failed privacy or scientific claim. Feature support remains bounded by
 the fit-range sampler and residual tails remain unqualified.
+
+An optional programmatic comparison accepts a `LocalCheckpointHook` from
+`research.benchmark.local_checkpoint` through `run(..., local_checkpoint=hook)`.
+The command above keeps its default unavailable state and does not discover,
+install or select a model. A separately admitted local custodian supplies an
+existing frozen-context `ObservedLearner` port, its registry `AdapterAdmission`,
+and independent expected identity, eligibility and native-reference SHA256 pins:
+
+```python
+hook = LocalCheckpointHook(offline_adapter, registry_admission,
+                           expected_identity_sha256=identity_pin,
+                           expected_eligibility_sha256=eligibility_pin,
+                           expected_native_reference_sha256=native_reference_pin)
+receipt = demo.run(installed_binary, pinned_source_bytes, new_output_directory,
+                   1729, local_checkpoint=hook)
+```
+
+The existing offline port verifies its local code, dependency, license and weight
+files before loading. Native execution refuses fixture factories. No checkpoint
+or vendor code is run without a separately supplied adapter; the example contains
+no checkpoint acquisition or automatic download step. The programmatic custodian
+must make the repository modules available in its admitted Python environment.
+The hook receives only fit-arm labels and original-unit query features. It scores
+real/n/4n predictions against the same query truth outside the worker, recording
+exact recipe/checkpoint pins, provided and actually consumed context, raw losses,
+prediction digest and observed worker cost. Context and query policies come from
+the frozen adapter identity; an oversized request refuses rather than silently
+changing its policy.
+
+Only Linux CPU workers are supported: at most 16,384 provided fit rows, 4,096
+query rows, 128 features and one million input cells. The adapter's total wall
+budget (at most 180 seconds) is shared across optional arms, including preparation
+and failed attempts. Each fresh spawned child has wall, CPU and virtual-address-space
+limits, with at most 4 GiB; measured peak RSS and adapter usage are also checked.
+Those limits do not establish hostile-code filesystem/network isolation or
+immutable snapshot custody. The admitted custodian still owns those controls.
+Optional errors retain failed elapsed costs and a static unavailable/failed state
+while the main demonstration continues. All qualification/admission flags remain
+false. Synthetic factory fixtures are labeled `interface_fixture_completed`,
+never vendor performance. Actual checkpoint/reference/privacy evidence is absent
+from the existing Airfoil receipt; this code addition does not rerun or qualify it.
+The default receipt remains `dope-public-airfoil-demo-v1`. Supplying a hook selects
+`dope-public-airfoil-demo-local-checkpoint-v1` with a separate versioned comparison
+section, preserving the old unavailable field's string type and v1 decoding.
+
+The supplied adapter/runtime callbacks must support Python spawn serialization,
+and the programmatic caller must use a standard `if __name__ == "__main__":`
+entry. A fresh interpreter receives declared fit labels and query features,
+without inheriting the evaluator's query-label memory. Nonserializable callbacks
+return an explicit optional failure.

@@ -20,7 +20,7 @@ fn candidate_descriptor(candidate: &CandidateReport) -> CandidateDescriptor {
 
 fn normalized_shortfall(candidate: &CandidateReport) -> f64 {
     [
-        ((0.99 - candidate.utility_retention) / 0.99).max(0.0),
+        ((0.99 - candidate.stored_target_fit) / 0.99).max(0.0),
         ((0.95 - candidate.driver_agreement) / 0.95).max(0.0),
         ((0.90 - candidate.proxy_joint_fidelity) / 0.90).max(0.0),
         ((candidate.proxy_membership_auc - 0.60) / 0.40).max(0.0),

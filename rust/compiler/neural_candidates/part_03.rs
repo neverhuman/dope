@@ -156,8 +156,20 @@ mod tests {
             .iter()
             .find(|candidate| candidate.target == "oblivious_tree")
             .unwrap();
-        assert!(tree.utility_retention > baseline.utility_retention + 0.5);
+        assert!(tree.stored_target_fit > baseline.stored_target_fit + 0.5);
         assert_eq!(result.report.candidate_count, 18);
+        let mut wire = serde_json::to_value(baseline).unwrap();
+        assert!(wire.get("utility_retention").is_none());
+        let value = wire
+            .as_object_mut()
+            .unwrap()
+            .remove("stored_target_fit")
+            .unwrap();
+        wire["utility_retention"] = value;
+        let old: CandidateReport = serde_json::from_value(wire.clone()).unwrap();
+        assert_eq!(&old, baseline);
+        wire["stored_target_fit"] = serde_json::json!(0.0);
+        assert!(serde_json::from_value::<CandidateReport>(wire).is_err());
         decode_kernel(&result.artifact).unwrap();
     }
 }

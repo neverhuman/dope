@@ -74,7 +74,9 @@ pub struct CandidateReport {
     pub marginal_knots: usize,
     pub dependence: String,
     pub target: String,
-    pub utility_retention: f64,
+    /// Fit-only stored-target score; not downstream retraining utility.
+    #[serde(alias = "utility_retention")]
+    pub stored_target_fit: f64,
     pub driver_agreement: f64,
     /// Train-only heuristic used to rank candidates. This is not certification evidence.
     pub proxy_joint_fidelity: f64,

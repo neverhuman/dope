@@ -263,7 +263,7 @@ mod tests {
             marginal_knots: 9,
             dependence: "independence".into(),
             target: "sparse_linear".into(),
-            utility_retention: if compliant { 1.0 } else { 0.5 },
+            stored_target_fit: if compliant { 1.0 } else { 0.5 },
             driver_agreement: 1.0,
             proxy_joint_fidelity: 1.0,
             proxy_membership_auc: 0.5,
