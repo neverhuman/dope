@@ -10,7 +10,10 @@ Sampling failures the adapter and the CSV publication are known to raise
 (deadline, I/O, contract refusal, runtime) are recorded in the ledger as fixed
 reason codes, never as exception text. Any other exception is a programming or
 contract error: it stops the lineage with a nonzero exit, which sample_all()
-records. A partial staging file never survives either way.
+records. A failed write never replaces a prior final CSV. Its staging file is
+removed where the filesystem allows; when removal is refused the original error
+still propagates, and a known failure stops the lineage with
+StagingCleanupRefused instead of being recorded as an ordinary failed cell.
 """
 
 from __future__ import annotations
@@ -381,27 +384,53 @@ def sample_failure_reason(error: BaseException) -> str:
     return next(reason for kind, reason in SAMPLE_FAILURE_REASONS if isinstance(error, kind))
 
 
+class StagingCleanupRefused(Exception):
+    """A failed cell's staging file could not be removed. The lineage stops; no cell is recorded."""
+
+
+def _discard_staging(staging: Path) -> None:
+    """Best-effort removal of a failed write's staging file.
+
+    It runs only while that failure propagates, so a refusal is reported on stderr
+    and never replaces the original error. The caller sees the file still present.
+    """
+    try:
+        staging.unlink(missing_ok=True)
+    except OSError:
+        import sys
+        print("TabSyn sample staging file could not be removed", file=sys.stderr)
+
+
 def _publish_sample(matrix, final: Path, rows: int) -> None:
     """Write the target-last CSV through a staging file, then rename it into place."""
     import numpy as np
     if not isinstance(matrix, np.ndarray) or matrix.ndim != 2 or matrix.shape[0] != rows or matrix.shape[1] < 2:
         raise ValueError("TabSyn sample matrix shape differs")
     staging = final.with_suffix(".csv.tmp")
+    published = False
     try:
         with staging.open("w", newline="") as handle:
             writer = csv.writer(handle)
             writer.writerow([f"f{i}" for i in range(matrix.shape[1] - 1)] + ["target"])
             writer.writerows([[*row[1:], row[0]] for row in matrix])
         staging.replace(final)
+        published = True
     finally:
-        staging.unlink(missing_ok=True)
+        if not published:
+            _discard_staging(staging)
 
 
 def _sample_cell(sample, final: Path, rows: int, *args, **kwargs) -> tuple[str, str | None]:
     """Sample and publish one cell. Only the four known failure classes are recorded."""
+    staging = final.with_suffix(".csv.tmp")
+    if staging.exists():
+        # Left by an earlier killed attempt. A refused removal raises before sampling.
+        staging.unlink()
     try:
         _publish_sample(sample(*args, **kwargs), final, rows)
     except (TimeoutError, OSError, ValueError, RuntimeError) as error:
+        if staging.exists():
+            raise StagingCleanupRefused("TabSyn sample staging file was not removed") from error
         return "failed", sample_failure_reason(error)
     return "ok", None
 
