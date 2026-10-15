@@ -249,6 +249,39 @@ fn randomized_proposals_follow_the_seed() {
 }
 
 #[test]
+fn finite_large_inputs_keep_interaction_reports_finite() {
+    let rows = 64;
+    let left = bits(rows, 3);
+    let right = bits(rows, 4);
+    let target = left.iter().zip(&right).map(|(l, r)| l * r).collect();
+    let matrix = matrix_from(
+        vec![
+            left.iter().map(|value| value * 1.0e20).collect(),
+            right.iter().map(|value| value * 1.0e20).collect(),
+            bits(rows, 9),
+        ],
+        target,
+    );
+    let wide = feature_budget_search(&matrix, 1_024, 11).unwrap();
+    assert!(
+        wide.widths
+            .iter()
+            .all(|report| report.held_out_mse.is_finite())
+    );
+    let narrow = feature_budget_search(&matrix, ProposalKind::Product.bytes(), 11).unwrap();
+    assert_eq!(narrow.support.proposals.len(), 1);
+    assert_eq!(narrow.support.proposals[0].kind, ProposalKind::Product);
+    assert_eq!(
+        (
+            narrow.support.proposals[0].left,
+            narrow.support.proposals[0].right
+        ),
+        (0, Some(1))
+    );
+    assert!(narrow.support.held_out_mse < 1.0e-8);
+}
+
+#[test]
 fn unseen_slot_uses_only_the_columns_that_generate_it() {
     let rows = 64;
     for slot in 0..3u16 {

@@ -403,6 +403,36 @@ mod tests {
     }
 
     #[test]
+    fn v4_refuses_unmeasured_directional_attribution() {
+        let mut observation = v4_observation();
+        observation.real_signs = None;
+        observation.synthetic_signs = None;
+        let report = evaluate_v4(&v4_contract(), &v4_components(), &observation);
+        assert_eq!(report.driver_fidelity, None);
+        assert_eq!(report.driver_attribution, None);
+        assert_eq!(report.score, None);
+        assert!(!report.eligible);
+        assert!(!report.hard_gates["model_driver_attribution_measured"]);
+        assert!(report.unavailable_terms.iter().any(|term| term == "driver_fidelity"));
+    }
+
+    #[test]
+    fn v4_refuses_overflowed_attribution_normalizers() {
+        let mut observation = v4_observation();
+        observation.real_importances = vec![f64::MAX / 32.0; 500];
+        observation.synthetic_importances = observation.real_importances.clone();
+        observation.synthetic_importances[100..].fill(0.0);
+        observation.real_signs = Some(vec![1; 500]);
+        observation.synthetic_signs = Some(vec![1; 500]);
+        let report = evaluate_v4(&v4_contract(), &v4_components(), &observation);
+        assert_eq!(report.driver_fidelity, None);
+        assert_eq!(report.driver_attribution, None);
+        assert_eq!(report.score, None);
+        assert!(!report.eligible);
+        assert!(!report.hard_gates["model_driver_attribution_measured"]);
+    }
+
+    #[test]
     fn v4_enforces_control_lift_driver_attribution_and_rewards_knowledge_compression() {
         let contract = v4_contract();
         let components = v4_components();

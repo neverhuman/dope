@@ -433,11 +433,11 @@ fn joint_mse(
             let train_feature = gather(matrix, term.kind, term.left, term.right, &train);
             let (intercept, slope) = fit_line(&train_feature, &residual);
             for slot in 0..train.len() {
-                residual[slot] -= intercept + slope * f64::from(train_feature[slot]);
+                residual[slot] -= intercept + slope * train_feature[slot];
             }
             let eval_feature = gather(matrix, term.kind, term.left, term.right, &eval);
             for (slot, feature) in eval_feature.iter().copied().enumerate() {
-                eval_prediction[slot] += intercept + slope * f64::from(feature);
+                eval_prediction[slot] += intercept + slope * feature;
             }
         }
         for (slot, row) in eval.iter().copied().enumerate() {
@@ -467,7 +467,7 @@ fn gather(
     left: u16,
     right: Option<u16>,
     rows: &[usize],
-) -> Vec<f32> {
+) -> Vec<f64> {
     rows.iter()
         .copied()
         .map(|row| feature_at(matrix, kind, left, right, row))
@@ -480,12 +480,12 @@ fn feature_at(
     left: u16,
     right: Option<u16>,
     row: usize,
-) -> f32 {
-    let left_value = matrix.columns[usize::from(left)][row];
+) -> f64 {
+    let left_value = f64::from(matrix.columns[usize::from(left)][row]);
     match kind {
         ProposalKind::Rank => left_value,
         ProposalKind::Product => {
-            left_value * matrix.columns[usize::from(right.unwrap_or(left))][row]
+            left_value * f64::from(matrix.columns[usize::from(right.unwrap_or(left))][row])
         }
         ProposalKind::Gate => {
             let right_value = matrix.columns[usize::from(right.unwrap_or(left))][row];
@@ -505,17 +505,17 @@ fn gather_target(matrix: &ColumnMatrix, rows: &[usize]) -> Vec<f64> {
         .collect()
 }
 
-fn fit_line(feature: &[f32], target: &[f64]) -> (f64, f64) {
+fn fit_line(feature: &[f64], target: &[f64]) -> (f64, f64) {
     let count = target.len() as f64;
     if count == 0.0 {
         return (0.0, 0.0);
     }
-    let mean_feature = feature.iter().map(|value| f64::from(*value)).sum::<f64>() / count;
+    let mean_feature = feature.iter().sum::<f64>() / count;
     let mean_target = target.iter().sum::<f64>() / count;
     let mut variance = 0.0;
     let mut covariance = 0.0;
     for (value, response) in feature.iter().zip(target) {
-        let feature_gap = f64::from(*value) - mean_feature;
+        let feature_gap = *value - mean_feature;
         variance += feature_gap * feature_gap;
         covariance += feature_gap * (response - mean_target);
     }
@@ -535,9 +535,9 @@ fn mean(values: &[f64]) -> f64 {
     }
 }
 
-fn abs_correlation(feature: &[f32], target: &[f64]) -> f64 {
+fn abs_correlation(feature: &[f64], target: &[f64]) -> f64 {
     let (_, slope) = fit_line(feature, target);
-    let feature_scale = scale(feature.iter().map(|value| f64::from(*value)));
+    let feature_scale = scale(feature.iter().copied());
     let target_scale = scale(target.iter().copied());
     if feature_scale <= 1.0e-12 || target_scale <= 1.0e-12 {
         0.0
