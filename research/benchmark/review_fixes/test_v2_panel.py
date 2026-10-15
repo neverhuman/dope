@@ -30,10 +30,12 @@ def ledger(n_lineages=8, dope=0.9, other=0.8):
                 for size in (1, 4):
                     cells.append(B.public_cell(raw("DOPE", "headline", dataset, fit_seed, seed, size,
                                                    dope + 0.001 * index), CONTRACT, "t"))
-        for seed in (101, 211, 307):
-            for size in (1, 4):
-                cells.append(B.public_cell(raw("TabSyn", "scaled_200_vae_1000_diffusion", dataset, 11, seed,
-                                               size, other), CONTRACT, "t"))
+        # TabSyn is a five-seed arm, so a lineage needs three complete fits, as DOPE does here.
+        for fit_seed in (11, 23, 37):
+            for seed in (101, 211, 307):
+                for size in (1, 4):
+                    cells.append(B.public_cell(raw("TabSyn", "scaled_200_vae_1000_diffusion", dataset, fit_seed,
+                                                   seed, size, other), CONTRACT, "t"))
     return cells
 
 

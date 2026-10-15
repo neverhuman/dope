@@ -99,7 +99,7 @@ mod tests {
             membership_auc: None,
             attribute_inference_advantage: None,
             feature_importance_spearman: Some(0.5),
-            feature_importance_top_k_agreement: 0.5,
+            feature_importance_top_k_agreement: Some(0.5),
             feature_importance_feature_count: 4,
             feature_importance_informative_count: 3,
             feature_importance_real_shares: Vec::new(),

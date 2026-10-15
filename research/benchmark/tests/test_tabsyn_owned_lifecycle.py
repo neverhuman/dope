@@ -39,9 +39,17 @@ class OwnedCapture(unittest.TestCase):
 
     def test_actual_concurrent_reap_is_unbound_and_not_owned(self):
         child,w=self.spawn();backend=lifecycle.Linux();row=backend.table()[child.pid]
+        unrelated,unrelated_w=self.spawn()
         original=backend.table;tables=[{child.pid:row}];fds=[];events=[]
-        backend.table=lambda:tables.pop(0) if tables else original()
+        self.assertIn(unrelated.pid,original())
+        def fixture_table():
+            if tables: return tables.pop(0)
+            # Only this fixture's child/root belong to the controlled capture.
+            return {pid:record for pid,record in original().items()
+                if pid in (backend.parent_pid(),child.pid)}
+        backend.table=fixture_table
         def opened(pid):
+            self.assertEqual(pid,child.pid);self.assertFalse(fds)
             fd=os.pidfd_open(pid);fds.append(fd);self.finish(child,w)
             self.assertTrue(select.select([fd],[],[],0)[0]);return fd
         backend._pidfd_api=(opened,None)
@@ -51,7 +59,10 @@ class OwnedCapture(unittest.TestCase):
         self.assertFalse(guardian.known)
         self.assertTrue(any(k=='capture_subject_vanished_unbound' for k,f in events))
         self.assertFalse(any(k=='owned_descendant_captured' for k,f in events))
+        self.assertEqual(len(fds),1)
         with self.assertRaises(OSError):os.fstat(fds[0])
+        self.assertIsNone(unrelated.poll())
+        self.finish(unrelated,unrelated_w)
 
     def test_absence_requires_dead_pidfd_and_identity_drift_rejects(self):
         row=lifecycle.Linux().table()[os.getpid()]

@@ -89,6 +89,17 @@ def digest(value) -> str:
     return hashlib.sha256(canonical_json(value)).hexdigest()
 
 
+def admit_generator_evidence(state):
+    """Refuse probe output that has no verified vendor run.
+
+    vendor_executed False is the recorded non-execution flag. Any other value
+    is not a verified vendor receipt and does not qualify a claim.
+    """
+    if type(state) is not dict or state.get("vendor_executed") is False:
+        _fail("vendor_not_executed")
+    _fail("vendor_execution_unverified")
+
+
 def _validate(value, schema):
     """Validate the closed schema subset used by the three pinned v1 schemas."""
     known = {'$schema', '$id', '$defs', 'title', 'type', 'anyOf', 'allOf', 'if', 'then', 'else',

@@ -14,6 +14,7 @@ import re
 from pathlib import Path
 
 from public_hardware import banned_hits, origin_counts, origin_sentence, public_hardware
+import rust_closure
 
 # Distinct cost phrases. The same words joined by "and" were the CM-03 sentence.
 TABSYN_COST = "not measured (the retained validation subset reports quality, not cost)"
@@ -257,15 +258,20 @@ def _span_cell(median_name, lo_name, hi_name):
     return f"\\{median_name} (\\{lo_name}--\\{hi_name})"
 
 
-def _architecture_commands(command):
-    """Displayed-generator constants, read from the fitter and the data lock."""
-    root = Path(__file__).resolve().parents[3]
-    rust = (root / "rust/compiler/target_fitting/part_02.rs").read_text()
-    shape = re.search(r'"features12_steps2048" => \(12, (\d+), (\d+)\)', rust)
-    rate = re.search(r"\.build\(&store, ([0-9.eE+-]+)\)", rust)
-    production = re.search(
+def _architecture_commands(command, *, root=None):
+    """Displayed-generator constants, read from the fitter and the data lock.
+
+    The fitter is read through the include! closure that rust/compiler/target_fitting.rs
+    declares, so a split into semantic modules changes no constant; a missing file or
+    constant, or two different values for one constant, raises.
+    """
+    root = Path(__file__).resolve().parents[3] if root is None else Path(root)
+    closure = rust_closure.include_closure(root, "rust/compiler/target_fitting.rs")
+    shape = rust_closure.unique_match(r'"features12_steps2048" => \(12, (\d+), (\d+)\)', closure)
+    rate = rust_closure.unique_match(r"\.build\(&store, ([0-9.eE+-]+)\)", closure)
+    production = rust_closure.unique_match(
         r"Ok\(\(12, feature_count\.min\(12\)\.clamp\((\d+), (\d+)\), (\d+)\)\)",
-        rust,
+        closure,
     )
     lock = (root / "research/benchmark/results/s3-data.lock.json").read_text()
     split = re.search(r"official_test_grouped_training_(\d+)_(\d+)", lock)

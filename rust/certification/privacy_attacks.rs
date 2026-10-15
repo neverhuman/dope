@@ -611,11 +611,10 @@ fn driver_fidelity(fit: &crate::data::Table, synthetic: &crate::data::Table) -> 
     let real_top = top(1);
     let synthetic_top = top(2);
     let union = real_top.union(&synthetic_top).count();
-    let overlap = if union == 0 {
-        1.0
-    } else {
-        real_top.intersection(&synthetic_top).count() as f64 / union as f64
-    };
+    if union == 0 {
+        return None;
+    }
+    let overlap = real_top.intersection(&synthetic_top).count() as f64 / union as f64;
     let rank = ((spearman + 1.0) / 2.0).clamp(0.0, 1.0);
     Some(0.5 * rank + 0.5 * overlap.clamp(0.0, 1.0))
 }

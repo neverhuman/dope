@@ -1,5 +1,3 @@
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -28,6 +26,31 @@ mod tests {
     fn near_equal_discrete_values_are_counted_without_exact_search_panics() {
         let fit = fit_column(&[0.1, 0.100_000_05, 0.2, 0.2]);
         assert!(fit.discrete.is_some());
+    }
+
+    #[test]
+    fn forced_baseline_consumes_the_requested_beam_budget() {
+        let features = (0..64).map(|row| row as f32 / 63.0).collect::<Vec<_>>();
+        let targets = features.iter().map(|x| 0.2 + 0.6 * x).collect::<Vec<_>>();
+        for beam in [1, 18] {
+            let options = CompileOptions {
+                seed: Some(1729),
+                beam_width: Some(beam),
+                quantization_profiles: vec![8],
+                ..Default::default()
+            };
+            let result =
+                compile_kernel_from_arrays(&features, &targets, 64, 1, Task::Regression, &options)
+                    .unwrap();
+            assert!(
+                result
+                    .candidates
+                    .iter()
+                    .any(|candidate| candidate.candidate_id == "k5-independence-sparse_linear-q8")
+            );
+            assert_eq!(result.report.search_history.len(), beam);
+            assert_eq!(result.report.candidate_count, beam);
+        }
     }
     use crate::codec::decode_kernel;
     use std::collections::BTreeSet;
@@ -83,6 +106,8 @@ mod tests {
             backend_id: None,
             neural_target_weight: 2.0,
             neural_structural_penalty: 0.0,
+            adaptive_allocation: false,
+            development_residual: None,
             release_policy: ReleasePolicy::new(AnonymizationTier::L0, None, false).unwrap(),
         };
         let result =
@@ -111,7 +136,15 @@ mod tests {
             .collect();
         assert_eq!(
             dependence_families,
-            BTreeSet::from(["chow_liu", "independence", "triangular_autoregressive",])
+            BTreeSet::from([
+                "chow_liu",
+                "independence",
+                "poet_factor",
+                "sparse_gaussian_copula",
+                "triangular_autoregressive",
+                "truncated_c_vine",
+                "two_component_copula_mixture",
+            ])
         );
         let baseline = result
             .candidates
@@ -123,8 +156,20 @@ mod tests {
             .iter()
             .find(|candidate| candidate.target == "oblivious_tree")
             .unwrap();
-        assert!(tree.utility_retention > baseline.utility_retention + 0.5);
+        assert!(tree.stored_target_fit > baseline.stored_target_fit + 0.5);
         assert_eq!(result.report.candidate_count, 18);
+        let mut wire = serde_json::to_value(baseline).unwrap();
+        assert!(wire.get("utility_retention").is_none());
+        let value = wire
+            .as_object_mut()
+            .unwrap()
+            .remove("stored_target_fit")
+            .unwrap();
+        wire["utility_retention"] = value;
+        let old: CandidateReport = serde_json::from_value(wire.clone()).unwrap();
+        assert_eq!(&old, baseline);
+        wire["stored_target_fit"] = serde_json::json!(0.0);
+        assert!(serde_json::from_value::<CandidateReport>(wire).is_err());
         decode_kernel(&result.artifact).unwrap();
     }
 }

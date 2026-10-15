@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Page-1 forest plot and the utility-per-byte figure, from v2-headline.json.
+"""Page-1 hero, the utility-per-byte figure and the README forest, from v2-headline.json.
+
+The page-1 hero (teaser.pdf) pairs the two questions a reader brings: how much
+predictive structure each generator keeps per charged byte (top), and how DOPE
+differs from each comparator lineage by lineage under every auditor (bottom).
+It is drawn at the text width and placed at that width, so every label keeps
+HERO_MIN_POINTS on the page.
 
 Both figures use the emphasis form: DOPE in its accent green, every
 comparator in recessive grey with a direct ink label. Identity never rests
@@ -42,7 +48,13 @@ CONTROL = "#A8A8A8"
 BAND = "#D6D6D6"
 CAP = 10240
 FULL_PANEL = 90
-FOREST_TICKS = (-0.2, 0.0, 0.2, 0.4)
+FOREST_TICKS = (0.0, 0.3, 0.6)
+# Readability floor for the page-1 hero at its printed size (ledger C053).
+HERO_MIN_POINTS = 7.0
+HERO_HEIGHT_IN = 2.8
+# Panel (b) leaves out the two rows DOPE exceeds by more than its whole window; panel (a) keeps them
+# and the caption and Table 1 name them.
+HERO_OMITTED_ROWS = ("Ind", "Ctgan")
 AUDITORS = (("catboost", "CatBoost"), ("linear", "Linear"), ("mlp", "MLP"))
 # The figures draw these arms only; every other arm stays in the supplement tables.
 FIGURE_CODES = ("TabSyn", "Arf", "Gauss", "Chow", "Ind", "Tvae", "Ctgan", "Forest", "TabDdpm", "TabDiff",
@@ -72,6 +84,15 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     margin = headline.get("margin", 0.02)
     height = 0.42 + 0.215 * len(rows)
     figure, axes = plt.subplots(1, 3, figsize=(width, height), sharey=True)
+    _forest_panels(axes, rows, margin, value_size=6.0, count_size=6.4)
+    figure.supxlabel("DOPE minus comparator, Hodges-Lehmann retention difference (95% nested interval)",
+                     fontsize=figure_style_size(), y=0.01)
+    figure.subplots_adjust(left=0.27, right=0.93, bottom=0.2, top=0.9, wspace=0.08)
+    return _save(figure, path, dpi)
+
+
+def _forest_panels(axes, rows: list[dict], margin: float, value_size: float, count_size: float) -> None:
+    """One paired-difference panel per auditor, rows shared; the MLP panel prints each CatBoost cohort."""
     # A fixed window keeps the close comparisons readable; a row outside it is drawn at the edge
     # with an arrow and its value printed, so nothing is dropped.
     left, right = TEASER_X_LIM
@@ -107,11 +128,11 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
                           color=colour)
                 axis.annotate(f"{point:.2f}", xy=(edge, y), xytext=(-6 if point > right else 6, 0),
                               textcoords="offset points", ha="right" if point > right else "left", va="center",
-                              fontsize=6.0, color=figure_style.INK,
+                              fontsize=value_size, color=figure_style.INK,
                               bbox={"boxstyle": "square,pad=0.1", "facecolor": "white", "edgecolor": "none"})
             if auditor == "mlp":
                 axis.annotate(f"n={cohort}", xy=(1.0, y), xycoords=("axes fraction", "data"),
-                              xytext=(3, 0), textcoords="offset points", va="center", fontsize=6.4,
+                              xytext=(3, 0), textcoords="offset points", va="center", fontsize=count_size,
                               color=figure_style.INK)
         axis.set_xlim(left, right)
         axis.set_xticks(FOREST_TICKS)
@@ -119,10 +140,48 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     axes[0].set_yticks(range(len(rows)))
     axes[0].set_yticklabels([arm["display"] for arm in reversed(rows)])
     axes[0].set_ylim(-TEASER_ROW_PAD, len(rows) - 1 + TEASER_ROW_PAD)
-    figure.supxlabel("DOPE minus comparator, Hodges-Lehmann retention difference (95% nested interval)",
-                     fontsize=figure_style_size(), y=0.01)
-    figure.subplots_adjust(left=0.27, right=0.93, bottom=0.2, top=0.9, wspace=0.08)
-    return _save(figure, path, dpi)
+
+
+def draw_hero(headline: dict, path: Path) -> Path:
+    """Page-1 hero: (a) retention against charged bytes, (b) paired differences under the three auditors."""
+    rows = [arm for arm in _rows(headline) if arm["code"] not in HERO_OMITTED_ROWS]
+    _, right = TEASER_X_LIM
+    for arm in _rows(headline):
+        if arm["code"] in HERO_OMITTED_ROWS and any(
+                row is None or row["hl_lo"] <= right for row in (arm["contrasts"][key] for key, _ in AUDITORS)):
+            raise ValueError(f"{arm['display']} is omitted from the hero but an interval reaches its window")
+    margin = headline.get("margin", 0.02)
+    floor = HERO_MIN_POINTS
+    sizes = {key: floor for key in ("font.size", "axes.labelsize", "axes.titlesize", "xtick.labelsize",
+                                    "ytick.labelsize", "legend.fontsize")}
+    with matplotlib.rc_context(sizes):
+        figure = plt.figure(figsize=(figure_style.TEASER_WIDTH_IN, HERO_HEIGHT_IN))
+        # Both frames are final before any label is measured.
+        top = figure.add_gridspec(1, 1, left=0.1, right=0.985, top=0.935, bottom=0.6).subplots()
+        bottom = figure.add_gridspec(1, 3, left=0.27, right=0.915, top=0.37, bottom=0.075,
+                                     wspace=0.08).subplots(sharey=True)
+        _frontier(top, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.6, control_size=floor,
+                  offsets=HERO_LABEL_OFFSETS, names=HERO_NAMES,
+                  dope_offsets=((-7, 0, "right", "center"),) + HERO_LABEL_OFFSETS)
+        top.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)", labelpad=1.5)
+        top.set_ylabel("CatBoost retention at 4n")
+        top.set_title("(a) Predictive structure kept against charged bytes", loc="left", pad=3)
+        _forest_panels(bottom, rows, margin, value_size=floor, count_size=floor)
+        for axis in bottom:
+            axis.title.set_position((0.5, 1.0))
+            axis.set_title(axis.get_title(), pad=2)
+        figure.text(0.1, 0.43, "(b) DOPE minus each comparator at 4n, paired Hodges-Lehmann retention difference",
+                    ha="left", va="bottom", fontsize=floor, fontweight="bold")
+        return _save(figure, path, None)
+
+
+def text_sizes(figure) -> list[tuple[str, float]]:
+    """Every visible non-empty text in a drawn figure with its size in points."""
+    found = []
+    for artist in figure.findobj(matplotlib.text.Text):
+        if artist.get_visible() and artist.get_text().strip():
+            found.append((artist.get_text(), float(artist.get_fontsize())))
+    return found
 
 
 def figure_style_size() -> float:
@@ -135,6 +194,15 @@ LABEL_OFFSETS = ((4, 3, "left", "bottom"), (4, -3, "left", "top"), (-4, 3, "righ
                  (6, 9, "left", "bottom"), (6, -9, "left", "top"), (-6, 9, "right", "bottom"),
                  (-6, -9, "right", "top"))
 CONTROL_POSITIONS = (0.02, 0.98, 0.5, 0.26, 0.74)
+# The hero's labels are larger, so they are shorter and also try offsets one label height further out.
+# Panel (b) and the results figure keep the full names, including each configuration.
+HERO_NAMES = {"DopeDef": "DOPE untuned", "TabSyn": "TabSyn", "Arf": "ARF", "Forest": "Forest-Flow", "Tvae": "TVAE",
+              "Ctgan": "CTGAN", "Gauss": "Gaussian copula", "Chow": "Chow-Liu", "Ind": "Independent",
+              "Pred": "Predictor-only control", "Boot": "Real rows resampled"}
+HERO_LABEL_OFFSETS = LABEL_OFFSETS + ((7, 0, "left", "center"), (-7, 0, "right", "center"), (6, -14, "left", "top"),
+                                      (-6, -14, "right", "top"), (8, 14, "left", "bottom"), (-8, 14, "right", "bottom"),
+                                      (0, -16, "center", "top"), (0, 16, "center", "bottom"), (14, -6, "left", "top"),
+                                      (-14, -6, "right", "top"), (14, 6, "left", "bottom"), (-14, 6, "right", "bottom"))
 
 
 def _place(axis, text: str, anchors, placed: list, avoid=(), **style):
@@ -162,10 +230,26 @@ def _place(axis, text: str, anchors, placed: list, avoid=(), **style):
     return first
 
 
-def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None = None) -> Path:
+def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None = None,
+                floor: float | None = None) -> Path:
     figure, axis = plt.subplots(figsize=(width, 2.7))
     # The frame is final before any label is measured.
     figure.subplots_adjust(left=0.1, right=0.98, bottom=0.17, top=0.95)
+    if floor is None:
+        _frontier(axis, headline, cap_size=6.4, label_size=6.2, dope_size=6.6, control_size=6.4)
+    else:
+        # The paper figure prints at the text width, so its labels keep the page-1 floor.
+        _frontier(axis, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.6, control_size=floor,
+                  offsets=HERO_LABEL_OFFSETS)
+    axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)")
+    axis.set_ylabel("CatBoost retention at 4n")
+    return _save(figure, path, dpi)
+
+
+def _frontier(axis, headline: dict, cap_size: float, label_size: float, dope_size: float,
+              control_size: float, offsets=LABEL_OFFSETS, names=None, dope_offsets=None) -> None:
+    """CatBoost retention at 4n against median charged bytes, labels placed after every mark and limit."""
+    figure = axis.figure
     figure_style.panel(axis, grid="both")
     axis.set_xscale("log")
     axis.axvline(CAP, color=figure_style.SPINE, linestyle=(0, (4, 3)), linewidth=0.8, zorder=1)
@@ -203,24 +287,23 @@ def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     # Labels go on after every mark and limit is fixed, DOPE first, then by retention.
     placed: list = []
     _place(axis, "10,240-byte cap", [((CAP, 1.0), ("data", "axes fraction"), ((3, -3, "left", "top"),))],
-           placed, fontsize=6.4, color=figure_style.INK)
+           placed, fontsize=cap_size, color=figure_style.INK)
     order = sorted(plotted, key=lambda arm: (arm["code"] != "Dope", -(arm["level"]["median"] or 0.0)))
     for arm in order:
         is_dope = arm["code"] == "Dope"
         others = [box for code, owned in boxes.items() if code != arm["code"] for box in owned]
-        _place(axis, arm["display"], [((arm["bytes"]["median"], arm["level"]["median"]), "data", LABEL_OFFSETS)],
-               placed, avoid=others, fontsize=6.6 if is_dope else 6.2, color=figure_style.INK,
+        _place(axis, (names or {}).get(arm["code"], arm["display"]),
+               [((arm["bytes"]["median"], arm["level"]["median"]), "data",
+                 (dope_offsets or offsets) if is_dope else offsets)],
+               placed, avoid=others, fontsize=dope_size if is_dope else label_size, color=figure_style.INK,
                fontweight="bold" if is_dope else "normal")
     for arm in controls:
         anchors = [((fraction, arm["level"]["median"]), ("axes fraction", "data"),
                     ((0, 2, "left" if fraction < 0.1 else ("right" if fraction > 0.9 else "center"), "bottom"),
                      (0, -2, "left" if fraction < 0.1 else ("right" if fraction > 0.9 else "center"), "top")))
                    for fraction in CONTROL_POSITIONS]
-        _place(axis, arm["display"], anchors, placed, avoid=[box for owned in boxes.values() for box in owned],
-               fontsize=6.4, color=figure_style.INK)
-    axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)")
-    axis.set_ylabel("CatBoost retention at 4n")
-    return _save(figure, path, dpi)
+        _place(axis, (names or {}).get(arm["code"], arm["display"]), anchors, placed, avoid=[box for owned in boxes.values() for box in owned],
+               fontsize=control_size, color=figure_style.INK)
 
 
 def _save(figure, path: Path, dpi: int | None) -> Path:
@@ -238,8 +321,8 @@ def _draw_all(headline: dict, root: Path | None) -> dict[str, Path]:
         directory = OUTPUTS[name][0] if root is None else root
         return directory / name
     return {
-        "teaser.pdf": draw_forest(headline, place("teaser.pdf")),
-        "pareto.pdf": draw_pareto(headline, place("pareto.pdf")),
+        "teaser.pdf": draw_hero(headline, place("teaser.pdf")),
+        "pareto.pdf": draw_pareto(headline, place("pareto.pdf"), floor=HERO_MIN_POINTS),
         "paired.png": draw_forest(headline, place("paired.png"), width=8.0, dpi=200),
         "pareto.png": draw_pareto(headline, place("pareto.png"), width=8.0, dpi=200),
     }

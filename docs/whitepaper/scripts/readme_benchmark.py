@@ -13,6 +13,9 @@ import json
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from figure_spec import TEASER_X_LIM  # noqa: E402
+
 REPO = Path(__file__).resolve().parents[3]
 HEADLINE = REPO / "docs" / "whitepaper" / "generated" / "v2-headline.json"
 README = REPO / "README.md"
@@ -83,10 +86,15 @@ def benchmark_block(headline: dict) -> str:
         "![DOPE minus each comparator, Hodges–Lehmann retention difference with 95% nested intervals, "
         "under the CatBoost, linear, and MLP auditors.](docs/readme/paired.png)",
         "",
+        f"In the paired chart the axis runs from {TEASER_X_LIM[0]:g} to {TEASER_X_LIM[1]:g}: an interval end beyond it "
+        "is drawn as an arrow at the edge, and a point beyond it is drawn at the edge with its value printed.",
+        "",
         f"The strongest full-panel comparator is {strongest['display']}. These are validation estimates on a "
         "training-derived cut; the official test split is reserved for one pre-registered run. Resampled real "
-        "rows are an upper reference, not a generator. The release score (MFS-v3) is null for every method "
-        "until its privacy and representation gates are measured. DOPE's median artifact is "
+        "rows are a row-count diagnostic, neither a generator nor an upper bound. The release score (MFS-v3) is "
+        "null for every method "
+        "because its prerequisites and cleartext scan are unmeasured, and measured copy, membership, and "
+        "attribute gates already fail on some cells. DOPE's median artifact is "
         f"{size(dope['bytes']['median'])}, and {dope['bytes']['fits_within_cap']} of {dope['bytes']['fits_ok']} "
         "individual DOPE fits are within the 10,240-byte release cap; the paper names the lineages above it.",
     ]

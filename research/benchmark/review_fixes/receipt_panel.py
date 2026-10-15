@@ -16,6 +16,7 @@ from pathlib import Path
 import numpy as np
 
 from research.benchmark.review_fixes import denominator_view
+from research.benchmark.review_fixes.display_names import display
 from research.benchmark.review_fixes.stats import (
     MARGIN,
     cap_retention,
@@ -78,9 +79,19 @@ def _clean(value):
     return value
 
 
+# Every method a review receipt ledger may hold. A cell with any other method is refused,
+# not skipped, so a renamed or foreign arm cannot drop out of a reduction unseen.
+KNOWN_METHODS = frozenset({"DOPE", "GaussianCopula", "Chow-Liu", "independent_marginals", "CTGAN", "TVAE", "ARF",
+                           "ForestDiffusion/Forest-Flow", "TabSyn"})
+
+
 def reduce_cells(cells, method: str, configuration: str, fit_seed: int = 11):
+    if method not in KNOWN_METHODS:
+        raise ValueError(f"unknown method {method!r}")
     grouped: dict[tuple, dict] = {}
     for cell in cells:
+        if cell.get("method") not in KNOWN_METHODS:
+            raise ValueError(f"unknown method {cell.get('method')!r} in a receipt ledger")
         if cell.get("method") != method or cell.get("configuration") != configuration:
             continue
         if cell.get("fit_seed") not in (None, fit_seed):
@@ -253,7 +264,8 @@ def ci(summary) -> str:
 
 
 def tex_name(value: str) -> str:
-    return str(value).replace("_", r"\_").replace("&", r"\&")
+    """Printed table text: the reader-facing name of a known identifier, TeX-escaped."""
+    return display(value).replace("_", r"\_").replace("&", r"\&")
 
 
 def write_tex(name: str, body: str) -> None:
@@ -730,7 +742,9 @@ def emit_tex(payload) -> None:
         "\\textbf{DOPE minus comparator at both sizes, fit seed 11.} Median paired retention difference with its "
         "family-cluster bootstrap 95\\% interval, the mean difference, and the v1 mean-difference equivalence test "
         "at $\\pm 0.02$. W/T/L counts lineages. The Wilcoxon and equivalence tests treat lineages as independent. "
-        "Holm families are separate per size: density 9, neural 6, ARF 6, and Forest-Flow 3 tests.",
+        "Holm families are separate per size: density 9 (DOPE against the Gaussian copula, Chow--Liu, and independent "
+        "marginals), neural 6 (DOPE against CTGAN and TVAE), ARF 6 (DOPE against author-default and native ARF), and "
+        "Forest-Flow 3 (DOPE against Forest-Flow) tests, each under the three auditors.",
         "Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
         paired_lines,
         "lllllrrllrl",
@@ -749,7 +763,7 @@ def emit_tex(payload) -> None:
         if row["auditor"] != "catboost":
             continue
         family_lines.append(
-            f"excluding simulated & {row['size']}$n$ & catboost & {tex_name(row['method'])} & "
+            f"excluding simulated & {row['size']}$n$ & CatBoost & {tex_name(row['method'])} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} \\\\"
         )
     write_tex("review-family.tex", longtable(

@@ -1,5 +1,3 @@
-
-
 pub(crate) fn evaluate_target(target: &Target, row: &[f32]) -> (f32, bool) {
     match target {
         Target::SparseLinear { intercept, terms } => (
@@ -124,6 +122,30 @@ pub(crate) fn evaluate_target(target: &Target, row: &[f32]) -> (f32, bool) {
 }
 
 fn sample_v2(kernel: &Kernel, options: SampleOptions) -> Result<Vec<f32>> {
+    sample_symbolic_support(kernel, options, true)
+}
+
+/// Successor raw-unit envelopes use an unclipped regression target. Historical
+/// DPK callers continue through `sample_v2` with their original support rule.
+pub(crate) fn sample_symbolic_support(
+    kernel: &Kernel,
+    options: SampleOptions,
+    clip_target: bool,
+) -> Result<Vec<f32>> {
+    sample_symbolic_with_features(kernel, options, clip_target, |_, _| {})
+}
+
+/// Explicit successor repair/completion runs before the target and residual.
+/// The historical entry above supplies a no-op and preserves its draw streams.
+pub(crate) fn sample_symbolic_with_features<F>(
+    kernel: &Kernel,
+    options: SampleOptions,
+    clip_target: bool,
+    map: F,
+) -> Result<Vec<f32>>
+where
+    F: Fn(usize, &mut [f32]) + Sync,
+{
     kernel.validate().map_err(DopeError::Codec)?;
     let (dependence, target, noise) = match &kernel.program {
         KernelProgram::Symbolic {
@@ -158,11 +180,22 @@ fn sample_v2(kernel: &Kernel, options: SampleOptions) -> Result<Vec<f32>> {
                     inverse_marginal(marginal, normal_cdf(f64::from(row[feature])) as f32),
                 );
             }
+            map(row_index, &mut row[..width]);
             let (linear, logistic) = evaluate_target(target, row);
             row[width] = match (&kernel.task, noise) {
-                (Task::Regression, Noise::Homoscedastic { sigma }) => (linear
-                    + *sigma * inverse_normal(uniform(seed, row_index, width, 0x9abc_def0)) as f32)
-                    .clamp(0.0, 1.0),
+                (Task::Regression, Noise::ResidualV1 { distribution }) => {
+                    linear
+                        + residual_v1(
+                            distribution,
+                            uniform(seed, row_index, width, 0x9abc_def0),
+                            uniform(seed, row_index, width, 0x9abc_def1),
+                        )
+                }
+                (Task::Regression, Noise::Homoscedastic { sigma }) => {
+                    linear
+                        + *sigma
+                            * inverse_normal(uniform(seed, row_index, width, 0x9abc_def0)) as f32
+                }
                 (
                     Task::Regression,
                     Noise::Heteroscedastic {
@@ -178,10 +211,9 @@ fn sample_v2(kernel: &Kernel, options: SampleOptions) -> Result<Vec<f32>> {
                             .map(|term| term.coefficient * row[term.feature as usize])
                             .sum::<f32>();
                     let sigma = log_sigma.exp().clamp(*minimum_sigma, *maximum_sigma);
-                    (linear
+                    linear
                         + sigma
-                            * inverse_normal(uniform(seed, row_index, width, 0x9abc_def0)) as f32)
-                        .clamp(0.0, 1.0)
+                            * inverse_normal(uniform(seed, row_index, width, 0x9abc_def0)) as f32
                 }
                 (Task::Binary, _) => {
                     let mut probability = if logistic {
@@ -201,6 +233,9 @@ fn sample_v2(kernel: &Kernel, options: SampleOptions) -> Result<Vec<f32>> {
                 }
                 _ => linear.clamp(0.0, 1.0),
             };
+            if clip_target && kernel.task == Task::Regression {
+                row[width] = row[width].clamp(0.0, 1.0);
+            }
             for (feature, schema) in kernel.schema.iter().enumerate() {
                 if schema.missing_probability > 0.0
                     && uniform(seed, row_index, feature, 0xfeed_beef) as f32

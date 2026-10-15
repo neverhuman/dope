@@ -112,7 +112,7 @@ pub struct JobEvidence {
     pub membership_auc: Option<f64>,
     pub attribute_inference_advantage: Option<f64>,
     pub feature_importance_spearman: Option<f64>,
-    pub feature_importance_top_k_agreement: f64,
+    pub feature_importance_top_k_agreement: Option<f64>,
     pub feature_importance_feature_count: usize,
     pub feature_importance_informative_count: usize,
     #[serde(default)]
@@ -174,8 +174,11 @@ impl JobEvidence {
             ]
             .into_iter()
             .all(optional_finite)
-            || !self.feature_importance_top_k_agreement.is_finite()
-            || !(0.0..=1.0).contains(&self.feature_importance_top_k_agreement)
+            || self
+                .feature_importance_top_k_agreement
+                .is_some_and(|value| !value.is_finite() || !(0.0..=1.0).contains(&value))
+            || (self.feature_importance_informative_count > 0
+                && self.feature_importance_top_k_agreement.is_none())
             || self.feature_importance_feature_count == 0
             || self.feature_importance_feature_count > self.features
             || self.feature_importance_informative_count > self.feature_importance_feature_count

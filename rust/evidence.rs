@@ -53,6 +53,8 @@ include!("evidence/identity.rs");
 include!("evidence/dependencies.rs");
 include!("evidence/verify.rs");
 include!("evidence/cache.rs");
+include!("evidence/successors.rs");
+include!("evidence/geometry.rs");
 
 #[cfg(test)]
 mod tests {

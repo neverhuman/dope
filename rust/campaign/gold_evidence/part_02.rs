@@ -154,7 +154,7 @@ pub fn summarize_evidence(metric_paths: &[PathBuf], out: &Path) -> Result<Measur
             }
             update_min(
                 &mut importance_jaccard_min,
-                Some(cell.feature_importance_top_k_agreement),
+                cell.feature_importance_top_k_agreement,
             );
         }
         update_max(

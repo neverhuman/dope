@@ -22,6 +22,10 @@ path = "rust/bench.rs"
 name = "mfs-v3-holdout"
 path = "rust/mfs_v3_holdout.rs"
 
+[[bin]]
+name = "dope-native-notices"
+path = "scripts/native-notices.rs"
+
 [dependencies]
 blake3 = "1.8.2"
 clap = { version = "4.6.1", features = ["derive"] }

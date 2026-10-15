@@ -1,9 +1,10 @@
 """Transfer diagnostics and scheduled reliability, with bytes as a constraint.
 
 BoundEvidence is the typed bound-evidence record consumed alongside verified
-PR01/PR02 evaluation receipts. The trusted verifier checks the task, contrast,
-protocol and receipt identities before a bound counts toward supported coverage.
-Missing verification defaults to observed-only evidence. These diagnostics do
+PR01/PR02 evaluation receipts. A supported bound needs an owner digest or a
+paired recomputation over the live learner, fit, artifact, scale, margin,
+paired losses, schedule, code, RNG, and result. A pin_source string is not
+that binding. Missing verification stays observed-only. These diagnostics do
 not authorize release.
 """
 
@@ -11,8 +12,11 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+import hashlib
 import math
 
+from .calibration_receipt import verify_calibration_receipt
+from .evidence import digest
 from .losses import PairedLosses, TrainingScale, finite_number
 
 
@@ -101,9 +105,14 @@ class BoundEvidence:
     contrast_id: str
     protocol_id: str
     receipt_id: str
+    lower_z: float | None = None
 
     def __post_init__(self):
         finite_number(self.upper_z)
+        if self.lower_z is not None:
+            finite_number(self.lower_z)
+            if self.lower_z > self.upper_z:
+                raise ValueError("reversed bound")
         if not all(isinstance(v, str) and v for v in (self.contrast_id, self.protocol_id, self.receipt_id)):
             raise ValueError("bound identity is incomplete")
 
@@ -124,7 +133,7 @@ class CellResult:
                 raise ValueError("measured cell requires paired evidence and margin")
             self.margin.query_z(self.pairs, self.scale)
         elif any(v is not None for v in (self.pairs, self.scale, self.margin, self.bound)):
-            raise ValueError("failed cells cannot carry fabricated losses")
+            raise ValueError("failed cells require absent loss fields")
 
     @property
     def z(self) -> float | None:
@@ -132,6 +141,22 @@ class CellResult:
             return None
         real, synthetic, _ = self.pairs.means
         return finite_number(synthetic - real - self.margin.tolerance(real, self.scale))
+
+
+@dataclass(frozen=True)
+class FitArtifact:
+    cell_id: str
+    fit_id: str
+    artifact_bytes: int
+    content: bytes | None = None
+
+    def __post_init__(self):
+        if not isinstance(self.cell_id, str) or not self.cell_id or not isinstance(self.fit_id, str) or not self.fit_id:
+            raise ValueError("invalid fit artifact")
+        if type(self.artifact_bytes) is not int or self.artifact_bytes < 0:
+            raise ValueError("invalid fit artifact")
+        if self.content is not None and (type(self.content) is not bytes or len(self.content) != self.artifact_bytes):
+            raise ValueError("invalid fit artifact")
 
 
 @dataclass(frozen=True)
@@ -143,16 +168,210 @@ class TaskEvaluation:
     artifact_bytes: int
     byte_budget: int
     resources_within_budget: bool
+    artifacts: tuple = ()
 
     def __post_init__(self):
         object.__setattr__(self, "required_cells", tuple(self.required_cells))
         object.__setattr__(self, "cells", dict(self.cells))
+        object.__setattr__(self, "artifacts", tuple(self.artifacts))
         if not self.family_id or not self.task_id or not self.required_cells or len(set(self.required_cells)) != len(self.required_cells):
             raise ValueError("invalid scheduled task")
         if set(self.cells) - set(self.required_cells):
             raise ValueError("unscheduled cell")
         if any(type(v) is not int or v < 0 for v in (self.artifact_bytes, self.byte_budget)) or type(self.resources_within_budget) is not bool:
             raise ValueError("invalid resource accounting")
+        for artifact in self.artifacts:
+            if not isinstance(artifact, FitArtifact) or artifact.cell_id not in self.required_cells:
+                raise ValueError("unscheduled artifact")
+
+
+_BOUND_ENDPOINTS = frozenset({"gap", "normalized_gap", "z", "tolerance_adjusted_z_over_fit_scale"})
+_PAIRED_MEAN_PROCEDURE = {
+    "format": "dope-bound-procedure",
+    "version": 1,
+    "id": "paired-mean-query-z-v1",
+    "calibration": "unmeasured",
+}
+PAIRED_MEAN_CODE_DIGEST = digest(_PAIRED_MEAN_PROCEDURE)
+
+
+def query_z_mean(cell) -> float:
+    """Mean of per-query tolerance-adjusted Z. This is not a calibrated upper bound."""
+    values = cell.margin.query_z(cell.pairs, cell.scale)
+    return finite_number(math.fsum(values) / len(values))
+
+
+def _paired_digest(pairs: PairedLosses) -> str:
+    return digest({
+        "query_ids": list(pairs.query_ids),
+        "cluster_ids": list(pairs.cluster_ids),
+        "real": list(pairs.real),
+        "synthetic": list(pairs.synthetic),
+        "null": list(pairs.null),
+        "loss_space": pairs.loss_space.value,
+    })
+
+
+def _binding_text(value):
+    if type(value) is not str or not value:
+        raise ValueError("incomplete_bound_binding")
+    return value
+
+
+def _binding_digest_text(value):
+    if type(value) is not str or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
+        raise ValueError("incomplete_bound_binding")
+    return value
+
+
+def bound_binding_record(task, cell_id, bound, analysis, *, version: int = 1) -> dict:
+    """Live cell, fit artifact, and declared analysis identity. The digest covers this record.
+
+    Version 1 commits the artifact byte count. Version 2 commits content bytes
+    when they are present and records unverified_byte_count when they are not.
+    Neither version carries a calibration result.
+    """
+    if bound is None or not isinstance(analysis, dict) or cell_id != bound.contrast_id:
+        raise ValueError("incomplete_bound_binding")
+    cell = task.cells.get(cell_id)
+    if cell is None or cell.status != "measured" or cell.pairs is None:
+        raise ValueError("incomplete_bound_binding")
+    matches = [artifact for artifact in task.artifacts if artifact.cell_id == cell_id]
+    if len(matches) != 1:
+        raise ValueError("unbound_artifact")
+    artifact = matches[0]
+    endpoint = _binding_text(analysis.get("endpoint"))
+    if endpoint not in _BOUND_ENDPOINTS:
+        raise ValueError("incomplete_bound_binding")
+    draws = analysis.get("draws")
+    if type(draws) is not int or isinstance(draws, bool) or draws < 1:
+        raise ValueError("incomplete_bound_binding")
+    if version not in (1, 2):
+        raise ValueError("unknown_bound_binding_version")
+    artifact_id = digest({
+        "cell_id": artifact.cell_id,
+        "fit_id": artifact.fit_id,
+        "artifact_bytes": artifact.artifact_bytes,
+    })
+    record = {
+        "format": "dope-bound-binding",
+        "version": version,
+        "task_id": task.task_id,
+        "learner_id": _binding_text(analysis.get("learner_id")),
+        "fit_id": artifact.fit_id,
+        "artifact_id": artifact_id,
+        "contrast_id": bound.contrast_id,
+        "protocol_id": bound.protocol_id,
+        "receipt_id": bound.receipt_id,
+        "endpoint": endpoint,
+        "scale": cell.scale.value,
+        "scale_status": cell.scale.status.value if cell.scale.status else "positive_fit_scale",
+        "margin": {
+            "relative": cell.margin.relative,
+            "absolute_scaled": cell.margin.absolute_scaled,
+            "absolute_raw": cell.margin.absolute_raw,
+        },
+        "paired_digest": _paired_digest(cell.pairs),
+        "point_z": cell.z,
+        "query_z_mean": query_z_mean(cell),
+        "schedule_id": _binding_text(analysis.get("schedule_id")),
+        "code_digest": _binding_digest_text(analysis.get("code_digest")),
+        "rng_id": _binding_text(analysis.get("rng_id")),
+        "draws": draws,
+        "multiplicity": _binding_text(analysis.get("multiplicity")),
+        "upper_z": bound.upper_z,
+        "lower_z": bound.lower_z,
+    }
+    if version == 2:
+        record["artifact_id"] = None if artifact.content is None else hashlib.sha256(artifact.content).hexdigest()
+        record["artifact_commitment"] = "unverified_byte_count" if artifact.content is None else "content_sha256"
+    return record
+
+
+def authenticate_bound(task, cell_id, bound, expected) -> bool:
+    """Owner digest or paired recomputation. A pin_source string is not a binding.
+
+    A true result identifies the observed record. It does not qualify coverage.
+    """
+    if bound is None or not isinstance(expected, dict) or expected.get("trust") not in ("owner", "recomputed"):
+        return False
+    if expected.get("pin_source") not in (None, "owner"):
+        return False
+    version = expected.get("version", 1)
+    if type(version) is not int or version not in (1, 2):
+        return False
+    try:
+        record = bound_binding_record(task, cell_id, bound, expected, version=version)
+    except ValueError:
+        return False
+    if expected.get("trust") == "recomputed":
+        cell = task.cells.get(cell_id)
+        if (
+            record["endpoint"] != "z"
+            or record["code_digest"] != PAIRED_MEAN_CODE_DIGEST
+            or record["rng_id"] != "deterministic-paired-mean"
+            or record["draws"] != len(cell.pairs.real)
+            or bound.lower_z is not None
+            or bound.upper_z != record["query_z_mean"]
+        ):
+            return False
+    if any(expected.get(key) != record[key] for key in record):
+        return False
+    if set(expected) - set(record) - {"trust", "binding_digest", "pin_source"}:
+        return False
+    return expected.get("binding_digest") == digest(record)
+
+
+def bound_qualification(task, cell_id, bound, expected) -> dict:
+    """Authentication is not calibration.
+
+    No bound on this wire qualifies coverage. A missing, null, unmeasured, or
+    self-asserted calibration flag stays observed-only. Content bytes do not
+    create a calibration manifest.
+    """
+    authenticated = authenticate_bound(task, cell_id, bound, expected)
+    return {
+        "authenticated": authenticated,
+        "qualifies": False,
+        "disposition": "observed_only" if authenticated else "unauthenticated",
+        "calibration": "unmeasured",
+        "uncertainty": "absent",
+    }
+
+
+def _admissible_uncertainty(decision) -> bool:
+    """Caller flags are not a calibration manifest.
+
+    Both inferential directions stay closed unless a receipt verifies as
+    measured N13b. The development protocol does not.
+    """
+    if not isinstance(decision, dict):
+        return False
+    receipt = decision.get("calibration_receipt")
+    if not isinstance(receipt, dict):
+        return False
+    try:
+        verified = verify_calibration_receipt(receipt)
+    except ValueError:
+        return False
+    return (
+        verified.get("n13b") is True
+        and verified.get("qualifies") is True
+        and verified.get("calibration") == "measured"
+    )
+
+
+def _task_feasible(task) -> bool:
+    if task.artifact_bytes > task.byte_budget or not task.resources_within_budget:
+        return False
+    if not task.artifacts:
+        return True
+    seen = set()
+    for artifact in task.artifacts:
+        if artifact.artifact_bytes > task.byte_budget:
+            return False
+        seen.add(artifact.cell_id)
+    return set(task.required_cells) <= seen
 
 
 def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
@@ -160,9 +379,10 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
     if not tasks or len({t.task_id for t in tasks}) != len(tasks):
         raise ValueError("empty or duplicate task schedule")
     families = defaultdict(list)
-    counts = Counter({k: 0 for k in ("qualified", "observed_only", "harmful", "technical_failure", "unsupported", "unresolved")})
+    counts = Counter({k: 0 for k in ("qualified", "observed_only", "observed_outside", "harmful",
+                                     "technical_failure", "unsupported", "unresolved")})
     for task in tasks:
-        feasible = task.artifact_bytes <= task.byte_budget and task.resources_within_budget
+        feasible = _task_feasible(task)
         passed, potential = feasible, feasible
         for key in task.required_cells:
             cell = task.cells.get(key, CellResult())
@@ -172,18 +392,35 @@ def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
                 potential &= cell.status == "unresolved"
                 continue
             observed = cell.z <= 0
-            qualified = (feasible and observed and cell.bound is not None and cell.bound.upper_z <= 0
-                         and verify_bound is not None and verify_bound(task, key, cell.bound) is True)
-            counts["qualified" if qualified else "observed_only" if observed else "harmful"] += 1
-            passed &= qualified if supported else observed
-            potential &= qualified if supported else observed
+            admissible = False
+            if cell.bound is not None and verify_bound is not None:
+                admissible = _admissible_uncertainty(verify_bound(task, key, cell.bound))
+            inferential_harm = (
+                admissible and cell.bound is not None and cell.bound.lower_z is not None and cell.bound.lower_z > 0
+            )
+            inferential_benefit = (
+                admissible and observed and cell.bound is not None and cell.bound.upper_z <= 0 and not inferential_harm
+            )
+            if inferential_benefit:
+                counts["qualified"] += 1
+            elif inferential_harm:
+                counts["harmful"] += 1
+            elif observed:
+                counts["observed_only"] += 1
+            else:
+                counts["observed_outside"] += 1
+            passed &= inferential_benefit if supported else observed
+            potential &= inferential_benefit if supported else observed
         families[task.family_id].append((int(passed), int(potential)))
     lower = math.fsum(math.fsum(v[0] for v in members) / len(members) for members in families.values()) / len(families)
     upper = math.fsum(math.fsum(v[1] for v in members) / len(members) for members in families.values()) / len(families)
+    if lower > upper:
+        raise ValueError("completion bounds are reversed")
     return {"coverage": lower, "lower": lower, "upper": upper, "families": len(families),
             "tasks": len(tasks), "scheduled_cells": sum(len(t.required_cells) for t in tasks),
             "cell_counts": dict(counts), "byte_infeasible_tasks": sum(t.artifact_bytes > t.byte_budget for t in tasks),
-            "resource_infeasible_tasks": sum(not t.resources_within_budget for t in tasks)}
+            "resource_infeasible_tasks": sum(not t.resources_within_budget for t in tasks),
+            "meaning": "completion", "confidence_interval": None}
 
 
 def observed_coverage(tasks) -> dict:
@@ -243,3 +480,12 @@ def harm_summary(tasks, *, catastrophic_threshold: float) -> dict:
                       positive_p95=quantile(positive, 0.95), positive_cvar90=weighted_cvar(positive, weights),
                       catastrophic_rate=math.fsum(w / total for v, w in zip(values, weights) if v > catastrophic_threshold))
     return result
+
+
+def tail_regression(tasks, *, catastrophic_threshold: float) -> dict:
+    """A nonpositive mean does not hide a positive tail. Tails stay disclosed."""
+    report = harm_summary(tasks, catastrophic_threshold=catastrophic_threshold)
+    mean, tail = report["mean_gap"], report["positive_p95"]
+    hidden = mean is not None and tail is not None and mean <= 0 and tail > 0
+    return {**report, "mean_hides_tail": hidden,
+            "tail_claim": "disclosed" if tail is not None else "not_evidenced"}

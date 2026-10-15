@@ -5,6 +5,20 @@ The parser check scores the published sample-101-4n.csv for dataset
 that check. The captured adapter is executed with the four admission imports
 removed and with seeds left at 101, 211, and 307. The expired owner window,
 parent-pid lock, and 12 hour budget are not reused. Artifacts are read only.
+
+Sampling failures the adapter and the CSV publication are known to raise
+(deadline, I/O, contract refusal, runtime) are recorded in the ledger as fixed
+reason codes, never as exception text. Any other exception is a programming or
+contract error: it stops the lineage with a nonzero exit, which sample_all()
+records. A failed write never replaces a prior final CSV. Its staging file is
+removed where the filesystem allows; when removal is refused the original error
+still propagates, and a known failure stops the lineage with
+StagingCleanupRefused instead of being recorded as an ordinary failed cell.
+
+Run as a script, an unhandled error is shown as one fixed line with a fixed code
+and the process exits nonzero. The exception message, its cause chain and the
+traceback are not printed, because a message can carry a source value. Imported
+helpers still raise their own exceptions; only the standalone entry installs this.
 """
 
 from __future__ import annotations
@@ -357,6 +371,75 @@ def sys_modules_path(runtime: dict) -> None:
     sys.path[:] = [runtime["source"], runtime["package_site"], runtime["stdlib"], runtime["dynload"]]
 
 
+# Known sampling failures, in match order (TimeoutError is an OSError). The
+# captured adapter's require() raises ValueError and check_deadline() raises
+# TimeoutError; the pinned runtime and admission bindings and torch, CUDA
+# out-of-memory included, raise RuntimeError; artifact reads and the staging
+# write raise OSError.
+SAMPLE_FAILURE_REASONS = (
+    (TimeoutError, "sample_deadline_exceeded"),
+    (OSError, "sample_io_failed"),
+    (ValueError, "sample_contract_refused"),
+    (RuntimeError, "sample_runtime_failed"),
+)
+
+
+def sample_failure_reason(error: BaseException) -> str:
+    """The fixed ledger code for one known sampling failure."""
+    return next(reason for kind, reason in SAMPLE_FAILURE_REASONS if isinstance(error, kind))
+
+
+class StagingCleanupRefused(Exception):
+    """A failed cell's staging file could not be removed. The lineage stops; no cell is recorded."""
+
+
+def _discard_staging(staging: Path) -> None:
+    """Best-effort removal of a failed write's staging file.
+
+    It runs only while that failure propagates, so a refusal is reported on stderr
+    and never replaces the original error. The caller sees the file still present.
+    """
+    try:
+        staging.unlink(missing_ok=True)
+    except OSError:
+        import sys
+        print("TabSyn sample staging file could not be removed", file=sys.stderr)
+
+
+def _publish_sample(matrix, final: Path, rows: int) -> None:
+    """Write the target-last CSV through a staging file, then rename it into place."""
+    import numpy as np
+    if not isinstance(matrix, np.ndarray) or matrix.ndim != 2 or matrix.shape[0] != rows or matrix.shape[1] < 2:
+        raise ValueError("TabSyn sample matrix shape differs")
+    staging = final.with_suffix(".csv.tmp")
+    published = False
+    try:
+        with staging.open("w", newline="") as handle:
+            writer = csv.writer(handle)
+            writer.writerow([f"f{i}" for i in range(matrix.shape[1] - 1)] + ["target"])
+            writer.writerows([[*row[1:], row[0]] for row in matrix])
+        staging.replace(final)
+        published = True
+    finally:
+        if not published:
+            _discard_staging(staging)
+
+
+def _sample_cell(sample, final: Path, rows: int, *args, **kwargs) -> tuple[str, str | None]:
+    """Sample and publish one cell. Only the four known failure classes are recorded."""
+    staging = final.with_suffix(".csv.tmp")
+    if staging.exists():
+        # Left by an earlier killed attempt. A refused removal raises before sampling.
+        staging.unlink()
+    try:
+        _publish_sample(sample(*args, **kwargs), final, rows)
+    except (TimeoutError, OSError, ValueError, RuntimeError) as error:
+        if staging.exists():
+            raise StagingCleanupRefused("TabSyn sample staging file was not removed") from error
+        return "failed", sample_failure_reason(error)
+    return "ok", None
+
+
 def sample_lineage(dataset: str, artifact: Path, git_sha: str) -> int:
     import sys
     request = _request()
@@ -411,26 +494,15 @@ def sample_lineage(dataset: str, artifact: Path, git_sha: str) -> int:
                 "samples": [{"rows": rows * size, "seed": seed}],
             }
             started = time.monotonic()
-            try:
-                matrix = namespace["sample"](
-                    artifact, rows * size, seed, inventory, device="cuda:0",
-                    runtime_path=request["runtime_ref"]["path"],
-                    runtime_sha256=info["runtime_sha256"],
-                    code_path=request["adapter_ref"]["path"],
-                    code_sha256=info["code_sha256"],
-                    admission=holder["grant"],
-                )
-                staging = final.with_suffix(".csv.tmp")
-                with staging.open("w", newline="") as handle:
-                    writer = csv.writer(handle)
-                    writer.writerow([f"f{i}" for i in range(matrix.shape[1] - 1)] + ["target"])
-                    writer.writerows([[*row[1:], row[0]] for row in matrix])
-                staging.replace(final)
-                status = "ok"
-                reason = None
-            except Exception as error:
-                status = "failed"
-                reason = type(error).__name__
+            status, reason = _sample_cell(
+                namespace["sample"], final, rows * size,
+                artifact, rows * size, seed, inventory, device="cuda:0",
+                runtime_path=request["runtime_ref"]["path"],
+                runtime_sha256=info["runtime_sha256"],
+                code_path=request["adapter_ref"]["path"],
+                code_sha256=info["code_sha256"],
+                admission=holder["grant"],
+            )
             _ledger({
                 "dataset": dataset, "seed": seed, "size": size, "status": status, "reason": reason,
                 "seconds": round(time.monotonic() - started, 3), "rows": rows * size,
@@ -527,6 +599,26 @@ def score_samples(panel_workers_pilot: Path) -> int:
     return 0
 
 
+def _cli_failure_code(error: BaseException) -> str:
+    if isinstance(error, StagingCleanupRefused):
+        return "sample_staging_cleanup_refused"
+    if isinstance(error, KeyboardInterrupt):
+        return "sample_interrupted"
+    return "sample_unexpected_failure"
+
+
+def _report_unhandled_error(_kind, error, _traceback) -> None:
+    """sys.excepthook for the standalone CLI: one fixed line, no message, cause chain or traceback."""
+    import sys
+    sys.stderr.write(f"tabsyn_sample: stopped ({_cli_failure_code(error)}); exception text is withheld\n")
+
+
+def _install_cli_error_display() -> None:
+    """Install the fixed-line display in this process only. Called from the script entry."""
+    import sys
+    sys.excepthook = _report_unhandled_error
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--parser-check", action="store_true")
@@ -550,4 +642,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    _install_cli_error_display()
     main()

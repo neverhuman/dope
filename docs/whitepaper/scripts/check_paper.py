@@ -15,6 +15,7 @@ from pathlib import Path
 _SCRIPTS = Path(__file__).resolve().parent
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
+from claim_registry import publication_failures
 from paper_v2_guards import run_v2_lint
 from public_hardware import banned_hits
 
@@ -171,6 +172,73 @@ def table_family_failures(text: str) -> list[str]:
     return failures
 
 
+_SIZE = r"(?:\$?\d+\$?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty-four)"
+# A stated family size: "family size is nine", "family of six", "density family $9$",
+# "families are 12 ...", "family has $12$ tests", or "family (nine, six, and three tests)".
+_FAMILY_SIZE = re.compile(r"famil(?:y|ies)\b(?!-)(?:[^.;,()]{0,40}?\b)" + _SIZE + r"\b|famil(?:y|ies)\s*\((?=[^)]*\b" + _SIZE + r"\b)")
+# Words that name who is in a family: who is compared, against whom, under which auditors.
+_MEMBERS = re.compile(r"against|versus|minus|by three auditors|under each|each with|on each of|per auditor:|: [A-Z]|"
+                      r"\(DOPE|\(author-default|\(native-selected|\(default|\(predictor")
+
+
+def _family_clause(caption: str, start: int) -> str:
+    """Text from a stated size to the end of its list item: the next top-level comma, semicolon, or period."""
+    depth, index = 0, start
+    while index < len(caption):
+        char = caption[index]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+        elif depth <= 0 and char in ",;" or depth <= 0 and char == "." and not caption[index - 1:index].isdigit():
+            break
+        index += 1
+    return caption[start:index]
+
+
+_REAL_ROW_BOUND = (
+    re.compile(r"upper reference", re.IGNORECASE),
+    re.compile(r"(?:real[- ]row control|real rows)\s+bounds?\b", re.IGNORECASE),
+    re.compile(r"(?:real[- ]row|real rows|resampled real)[^.]{0,80}?\b(?:is|are|remains?|as)\s+(?:an?|the)\s+upper\b",
+               re.IGNORECASE),
+)
+
+
+def real_row_bound_failures(text: str) -> list[str]:
+    """The resampled real-row control is a diagnostic of row count, never an upper reference or bound."""
+    flat = " ".join(text.split())
+    return ["real-row control described as a bound: " + match.group(0)[:60]
+            for pattern in _REAL_ROW_BOUND for match in pattern.finditer(flat)]
+
+
+_MFS_GATES_UNMEASURED = (
+    re.compile(r"(?:privacy|representation)(?: and (?:privacy|representation))? gates? (?:are|is) (?:still )?unmeasured",
+               re.IGNORECASE),
+    re.compile(r"until (?:its|their) privacy and representation gates are measured", re.IGNORECASE),
+)
+
+
+def mfs_gate_state_failures(text: str) -> list[str]:
+    """Measured MFS-v3 gate failures are not unmeasured; only the prerequisites and the cleartext scan are."""
+    flat = " ".join(text.split())
+    return ["measured MFS-v3 gates described as unmeasured: " + match.group(0)[:60]
+            for pattern in _MFS_GATES_UNMEASURED for match in pattern.finditer(flat)]
+
+
+def table_member_failures(text: str) -> list[str]:
+    """A caption that states a Holm family size also names the family's members (rubric 4c)."""
+    failures = []
+    for kind in ("table", "table*", "longtable"):
+        for environment in _environments(text, kind):
+            for caption in _caption_bodies(environment):
+                flat = " ".join(caption.split())
+                for match in _FAMILY_SIZE.finditer(flat):
+                    clause = flat[match.start():match.end()] + _family_clause(flat, match.end())
+                    if not _MEMBERS.search(clause):
+                        failures.append("Holm family size without its members: " + clause[:90])
+    return failures
+
+
 def main() -> int:
     failures = []
     raw_tex = TEX.read_text()
@@ -195,8 +263,16 @@ def main() -> int:
         failures.append("the teaser include has a missing-file fallback")
     for source in (raw_tex, supplement_source):
         failures.extend(table_family_failures(strip_tex_comments(source)))
+        failures.extend(table_member_failures(strip_tex_comments(source)))
+        failures.extend(real_row_bound_failures(strip_tex_comments(source)))
+        failures.extend(mfs_gate_state_failures(strip_tex_comments(source)))
     for path in sorted((ROOT / "generated").glob("*.tex")):
         failures.extend(table_family_failures(strip_tex_comments(path.read_text())))
+        failures.extend(table_member_failures(strip_tex_comments(path.read_text())))
+        failures.extend(real_row_bound_failures(strip_tex_comments(path.read_text())))
+        failures.extend(mfs_gate_state_failures(strip_tex_comments(path.read_text())))
+    failures.extend(real_row_bound_failures((ROOT.parents[1] / "README.md").read_text()))
+    failures.extend(mfs_gate_state_failures((ROOT.parents[1] / "README.md").read_text()))
     tex = strip_comments(raw_tex)
     # Drop verbatim-ish inputs of generated tables; those files are the generator.
     body = "\n".join(line for line in tex.splitlines() if "\\input{generated/" not in line)
@@ -222,13 +298,15 @@ def main() -> int:
             defined.update(MACRO_DEF.findall(NUMBERS_V2_FAMILY.read_text()))
         else:
             failures.append("generated/v2-family-numbers.tex is missing")
+        for path in sorted((ROOT / "generated").glob("v2-*-numbers.tex")):
+            defined.update(MACRO_DEF.findall(path.read_text()))
         used = set(MACRO_USE.findall(body))
         missing = sorted(
             name for name in used
             if name not in defined and name not in _LATEX and not name.startswith("IEEE")
         )
         if missing:
-            failures.append("macros used but not defined in numbers.tex, v2-numbers.tex or v2-family-numbers.tex: "
+            failures.append("macros used but not defined in numbers.tex or any generated v2 numbers file: "
                             + ", ".join(missing))
     else:
         failures.append("generated/numbers.tex is missing")
@@ -349,6 +427,7 @@ def main() -> int:
         if hits:
             failures.append(log.name + ": " + " | ".join(hits[:6]))
     failures.extend(run_v2_lint())
+    failures.extend(publication_failures())
     if failures:
         print("\n".join(failures))
         return 1

@@ -1,9 +1,9 @@
-# DOPE — Downstream Objective-Preserving Encoding
+# DOPE — Generative Compression of Predictive Structure
 
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![Jankurai gate](https://img.shields.io/badge/Jankurai-requires%20score%2085-blue)](docs/audit.md)
 
-DOPE compiles a numeric regression table into a **kilobyte-scale synthetic-data generator**: quantized per-feature marginals, a compact dependence model chosen on the training rows, a twelve-input neural residual for the target, and a noise model, all charged against a 10,240-byte cap. New rows are sampled from that artifact alone. The paper is [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf) (supplement: [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf)).
+DOPE (Downstream Objective-Preserving Encoding) compiles a numeric regression table into a small **sampling program**: quantized per-feature marginals, a compact dependence model chosen on the training rows, a twelve-input neural residual for the target, and a noise model, with every byte that sampling reads charged against a 10,240-byte cap. New rows are sampled from that artifact alone. The question is how much of the table's **predictive structure** learners trained only on those rows recover, measured as retention of a real-trained learner's gain on real validation rows. Size is a measured axis, not the result: an empty or constant generator is also small. The paper is [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf) (supplement: [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf)).
 
 Version `0.3.0-alpha.1`, [MIT License](LICENSE). This source tree is a research release, not a certified production release. Start with [AGENTS.md](AGENTS.md) for ownership and proof commands.
 
@@ -15,7 +15,7 @@ Validation panel: 100 PMLB regression tables, CatBoost auditor, synthetic size 4
 | Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Lineage medians within 10,240 B |
 | --- | ---: | --- | --- | ---: | ---: | ---: |
 | **DOPE (ours)** | 99 | 0.898 [0.804, 0.972] | — | — | 1.9 KB | 98% |
-| TabSyn (scaled schedule) | 98 | 0.897 [0.816, 0.979] | −0.008 [−0.057, 0.042] | 47/0/51 | 42.3 MB | 0% |
+| TabSyn (scaled schedule) | 99 | 0.924 [0.814, 0.965] | −0.003 [−0.053, 0.053] | 53/0/46 | 42.3 MB | 0% |
 | ARF (author default) | 99 | 0.822 [0.689, 0.894] | +0.048 [−0.034, 0.149] | 60/0/39 | 1.4 MB | 0% |
 | ARF (native selected) | 99 | 0.804 [0.647, 0.885] | +0.083 [0.006, 0.191] | 66/0/33 | 1.6 MB | 0% |
 | Gaussian copula | 99 | 0.669 [0.369, 0.867] | +0.191 [0.089, 0.273] | 83/0/16 | 5.5 KB | 62% |
@@ -31,7 +31,9 @@ Validation panel: 100 PMLB regression tables, CatBoost auditor, synthetic size 4
 
 ![DOPE minus each comparator, Hodges–Lehmann retention difference with 95% nested intervals, under the CatBoost, linear, and MLP auditors.](docs/readme/paired.png)
 
-The strongest full-panel comparator is TabSyn (scaled schedule). These are validation estimates on a training-derived cut; the official test split is reserved for one pre-registered run. Resampled real rows are an upper reference, not a generator. The release score (MFS-v3) is null for every method until its privacy and representation gates are measured. DOPE's median artifact is 1.9 KB, and 490 of 500 individual DOPE fits are within the 10,240-byte release cap; the paper names the lineages above it.
+In the paired chart the axis runs from -0.3 to 0.7: an interval end beyond it is drawn as an arrow at the edge, and a point beyond it is drawn at the edge with its value printed.
+
+The strongest full-panel comparator is TabSyn (scaled schedule). These are validation estimates on a training-derived cut; the official test split is reserved for one pre-registered run. Resampled real rows are a row-count diagnostic, neither a generator nor an upper bound. The release score (MFS-v3) is null for every method because its prerequisites and cleartext scan are unmeasured, and measured copy, membership, and attribute gates already fail on some cells. DOPE's median artifact is 1.9 KB, and 490 of 500 individual DOPE fits are within the 10,240-byte release cap; the paper names the lineages above it.
 <!-- END BENCHMARK -->
 
 ## What the artifact stores
@@ -54,7 +56,7 @@ cd dope
 cargo build --locked --release -p dope-kernel
 ```
 
-That command writes `target/release/dope-kernel`. The generator is Rust. Python is used for the bounded V1 baseline under `src/dope_kernel`, the offline research harness under `research/`, and the scripts that rebuild the paper under `docs/whitepaper/scripts`.
+That command writes `target/release/dope-kernel`. The generator is Rust. Python is used for the bounded V1 baseline under `src/dope_kernel` (console command `dope-kernel-v1`; the native command stays `dope-kernel`), the offline research harness under `research/`, and the scripts that rebuild the paper under `docs/whitepaper/scripts`.
 
 ## Quick start
 
@@ -73,6 +75,10 @@ target/release/dope-kernel sample \
 ```
 
 Inspect of the artifact built for this page reports `artifact_bytes` 196, `rows_fitted` 400, three positional features, dependence `independence`, and target `mars`. `compliant` is false: compile sees `train.csv` only and does not certify a release. The transcript is [examples/readme-regression/INSPECT.txt](examples/readme-regression/INSPECT.txt). This toy is not the benchmark above.
+
+### One measured native artifact
+
+The installed public demo in [examples/public-regression](examples/public-regression/) fits the UCI Airfoil Self-Noise table (Brooks, Pope, and Marcolini; CC BY 4.0; DOI 10.24432/C5VW2C) on a grouped development split and writes one native raw-unit artifact, `model.raw` (SHA-256 `0950cbe79817…`), with profile `raw-numeric-symbolic-v1` under the byte profile `native-raw-complete-v1`. Compile, `inspect`, the demo's research receipt, and the file size all report 1,558 bytes: 56 bytes of framing, 1,080 bytes of fitted schema and transforms, and 422 bytes of sampling payload. The file is its own transport archive. The generic runtime is measured separately: the debug binary and its mapped libraries came to 72,049,152 bytes, so the cold sampling closure was 72,050,710 bytes. No portable bundle or release-build runtime was measured. The run used commit `59437b1`, and privacy, driver, and geometry checks are unmeasured for this artifact. It is an engineering conformance example on one development split, not a benchmark result, and a different object from both the toy above and the paper's `.dpk` plus `projection.json` charge. The pinned values are in [docs/whitepaper/receipts/native-byte-conformance-v1.json](docs/whitepaper/receipts/native-byte-conformance-v1.json), and the supplement repeats them.
 
 ## Reproduce the paper
 
@@ -174,7 +180,7 @@ The [architecture](docs/architecture.md), [testing](docs/testing.md), and [relea
 
 ```bibtex
 @misc{taylor2026dope,
-  title  = {{DOPE}: Downstream Objective-Preserving Encoding of Regression Tables into Kilobyte Generators},
+  title  = {{DOPE}: Generative Compression of Predictive Structure},
   author = {Taylor, Jepson and Alexander, Alton},
   year   = {2026},
   note   = {NEVERHUMAN Research. Source and receipts: https://github.com/neverhuman/dope}

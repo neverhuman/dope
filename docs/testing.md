@@ -5,7 +5,46 @@
 while editing; it never replaces the full CPU PR lane.
 The CPU workflow pins sccache and preserves the lane's Cargo target cache to
 shorten repeated locked checks. Local builds reuse their worktree target.
-`just check` adds Clippy with warnings denied and the Rust CLI fixtures.
+CPU guest setup installs Rust, Just, TeX, Poppler, and ripgrep in its existing
+early package transaction, retaining the 300-second package-lock wait and
+35-minute job budget. `cpu.sh` checks all required tools before tests and never
+starts a late package transaction. `test-cpu-tool-readiness.sh` exercises each
+missing-tool refusal against the real CPU entry, before any build or replay.
+`just check` adds Clippy with warnings denied, the Rust CLI fixtures, and the
+raw-schema, raw-workflow, artifact-only, installer, byte-allocation, native
+successor, public-demo, and frozen-geometry binding Rust integration suites.
+Hosted CPU retains full
+locked Cargo test discovery, which also executes every one of these suites.
+Fast/check and hosted CPU verify the shipped native legal-input hashes before
+product checks. The full installer suite covers license delivery, fixed-member
+uninstall validation and legacy two-file compatibility. The Rust notice generator's full unit suite runs in local fast/check and hosted
+Cargo discovery. Local fast/check and hosted CPU also verify real offline
+regeneration against the shipped notice and pins, using cached locked crate
+archives and pinned Rust legal inputs. GNU tar and gzip are required by the CPU
+entry, with real missing-tool refusal fixtures before any build.
+Local fast/check and hosted CPU run the six bounded public-demo regressions in
+`research.benchmark.tests.test_public_demo`: frozen source admission, disjoint
+physical groups, query-label independence, integer producer/reader compatibility,
+safe native diagnostics, and honest failed-step/report output.
+The actual native raw-schema, raw-workflow, artifact-only, and installer suites
+remain auto-discovered by hosted CPU's existing locked Cargo test invocation.
+The native guard's required fast/check and CPU routes share
+`ops/ci/prepare-merge-guard.sh`: explicit locked full-graph metadata preparation
+for both manifests, at most 120 seconds each with no retries. Setup may fetch
+current locked public crates; the subsequent feature-boundary proof stays
+offline and unfiltered. Metadata JSON lives under ignored target output, and
+Cargo failures retain bounded stderr without exposing it in GitHub receipts.
+Hosted CPU also runs the complete offline `research/transfer/tests/test_*.py`
+discovery once, using its provisioned V1 interpreter after all fixture packages
+are installed. Temporary files stay in `target/transfer-test-tmp`, and native
+learner fixtures use one CPU thread. These fixtures preserve identity, coverage,
+statistics and adapter contracts; they do not qualify official vendor weights
+or a protected scientific campaign. Local fast/check retain their full discovery.
+Local fast/check also run the bounded Rust include-closure fixture against the
+actual fitter. Old and split module layouts must produce the same architecture
+macros; missing, escaping, symlinked or conflicting constants fail closed.
+Hosted paper-script discovery retains that fixture, and the CPU review-fix
+entry includes the unknown-method and duplicate-identity receipt regressions.
 `just security` scans secrets, dependencies, workflow syntax, and writes an
 SPDX SBOM. `just score` regenerates Python boundary evidence, then runs the
 full pinned Jankurai audit.
@@ -29,10 +68,12 @@ CPU CI runs that same required named gate with its provisioned V1 interpreter:
 `target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_*.py'`
 followed by
 `target/ci-python/bin/python -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v`.
+The later paper-number and paper-log unittests also use that provisioned V1
+interpreter, preserving their NumPy-dependent claim-registry imports.
 These replace the selective paper-script unittest calls in `ops/ci/cpu.sh`; the
 independent committed-input replay remains exactly once in that suite.
-The recipe fixture executes Just itself. CPU CI installs the repository's
-existing Just tool only if absent, within the same job and package-lock budget.
+The recipe fixture executes Just itself. CPU CI provisions the repository's
+existing Just tool with the other tools before the test stage.
 The real recipe regression lives in `test_paper_packaging.py`, so that required
 paper-script discovery invokes it exactly once after CPU provisions Just.
 The benchmark boundary's full discovery retains the bounded driver tests;

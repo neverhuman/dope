@@ -191,8 +191,8 @@ fn validate_gold_record_block(
             ]
             .into_iter()
             .all(optional_finite)
-            || !cell.feature_importance_top_k_agreement.is_finite()
-            || !(0.0..=1.0).contains(&cell.feature_importance_top_k_agreement)
+            || cell.feature_importance_top_k_agreement.is_some_and(|value| !value.is_finite() || !(0.0..=1.0).contains(&value))
+            || (cell.feature_importance_informative_count > 0 && cell.feature_importance_top_k_agreement.is_none())
             || cell.feature_importance_feature_count == 0
             || cell.feature_importance_feature_count > cell.features
             || cell.feature_importance_informative_count > cell.feature_importance_feature_count

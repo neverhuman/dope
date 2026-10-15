@@ -12,6 +12,10 @@ use crate::schema::{
     TableSchemaV1,
 };
 
+pub mod isolation;
+pub mod mixed;
+pub mod workflow;
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Cell {
     Number(f64),
@@ -319,3 +323,33 @@ fn check_numeric_domain(
 }
 
 include!("typed_data/transforms.rs");
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // This internal-corruption guard formerly lived in the path-imported raw
+    // schema integration test. Keep the same negative coverage while integration
+    // tests now exercise the actual public product modules.
+    #[test]
+    fn target_lookup_returns_an_error_when_the_role_is_missing() {
+        let declaration = serde_json::json!({
+            "format":"dope-table-schema","version":1,"columns":[
+                {"id":"c0001","source_name":"x","role":"feature","dtype":"continuous"},
+                {"id":"c0002","source_name":"y","role":"target","dtype":"continuous"}
+            ]
+        });
+        let schema =
+            TableSchemaV1::from_private_json(&serde_json::to_vec(&declaration).unwrap()).unwrap();
+        let mut data =
+            TypedTable::read_csv("x,y\n1,2\n".as_bytes(), schema, InputLimits::default()).unwrap();
+        for column in &mut data.schema.columns {
+            if column.role == ColumnRole::Target {
+                column.role = ColumnRole::Feature;
+            }
+        }
+        let lookup = std::panic::catch_unwind(|| data.target_id());
+        assert!(lookup.is_ok(), "target lookup must return a typed reason");
+        assert_eq!(lookup.unwrap().unwrap_err().code, "missing_target_role");
+    }
+}

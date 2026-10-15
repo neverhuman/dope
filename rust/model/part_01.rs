@@ -255,6 +255,10 @@ pub enum Noise {
         knots: Vec<f32>,
         probabilities: Vec<f32>,
     },
+    /// Versioned additive opcode; emitted only by an explicit development profile.
+    ResidualV1 {
+        distribution: ResidualV1,
+    },
 }
 
 pub const NEURAL_LATENT_WIDTH: usize = 32;

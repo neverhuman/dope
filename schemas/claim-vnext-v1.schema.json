@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:claim-vnext:v1",
+  "title": "vNext claim graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "claims"],
+  "properties": {
+    "format": {"const": "dope-claim-graph"},
+    "version": {"const": 1},
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {"$ref": "#/$defs/claim"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "protocol_sha256",
+        "cohort_sha256",
+        "recipe_sha256",
+        "source_sha256",
+        "loss",
+        "loss_unit",
+        "metric_sha256",
+        "artifact_count",
+        "fit_count",
+        "sample_count",
+        "asserted_comparison",
+        "equivalence_margin",
+        "references",
+        "synthetic"
+      ],
+      "properties": {
+        "claim_id": {
+          "enum": [
+            "rate-risk-frontier",
+            "cross-source-transfer",
+            "cross-learner-transfer",
+            "standard-transfer-bound",
+            "algorithmic-hypothesis",
+            "algorithmic-hypothesis-margin",
+            "direct-predictor-control",
+            "coreset-control",
+            "distillation-control",
+            "circuit-control",
+            "unfavorable-baseline",
+            "cap-failure-mass",
+            "tail-harm",
+            "rights-unfrozen",
+            "historical-panel-reuse",
+            "seed-dependence",
+            "campaign-cost",
+            "replay-receipt",
+            "one-cell-loss",
+            "full-refit"
+          ]
+        },
+        "protocol_sha256": {"$ref": "#/$defs/sha256"},
+        "cohort_sha256": {"$ref": "#/$defs/sha256"},
+        "recipe_sha256": {"$ref": "#/$defs/sha256"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "loss": {"enum": ["mse", "rmse", "mae"]},
+        "loss_unit": {"type": "string", "pattern": "^[a-z0-9_]{1,64}$"},
+        "metric_sha256": {"$ref": "#/$defs/sha256"},
+        "artifact_count": {"type": "integer", "minimum": 0},
+        "fit_count": {"type": "integer", "minimum": 0},
+        "sample_count": {"type": "integer", "minimum": 0},
+        "asserted_comparison": {
+          "enum": [
+            "raw_gap_superiority",
+            "adjusted_z_noninferiority",
+            "equivalence"
+          ]
+        },
+        "equivalence_margin": {"anyOf": [{"type": "number"}, {"type": "null"}]},
+        "references": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["receipt_id", "sha256"],
+            "properties": {
+              "receipt_id": {"type": "string", "pattern": "^[a-z0-9-]{1,64}$"},
+              "sha256": {"$ref": "#/$defs/sha256"}
+            }
+          }
+        },
+        "synthetic": {"type": "boolean"}
+      }
+    }
+  },
+  "description": "Caller claim records. A verified flag is not a field. Campaign admission is not this document."
+}

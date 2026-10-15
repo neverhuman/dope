@@ -418,4 +418,6 @@ mod tests {
         assert!(qualify_embedding_router(&bundle_path, &evidence_path).is_err());
         fs::remove_dir_all(root).unwrap();
     }
+    include!("frozen_tests.rs");
+
 }

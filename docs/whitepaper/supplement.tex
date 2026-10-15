@@ -2,10 +2,11 @@
 \usepackage{iclr2027_conference,times}
 \usepackage{booktabs,longtable,array,graphicx,url,amsmath,amssymb}
 \usepackage{hyperref}
+\hypersetup{pdftitle={Supplement: DOPE: Generative Compression of Predictive Structure}}
 \usepackage[capitalise]{cleveref}
 \emergencystretch=3em
 \raggedbottom
-\title{\texorpdfstring{\raggedright Supplement: DOPE: Downstream Objective-Preserving Encoding\\ of Regression Tables into Kilobyte Generators}{Supplement: DOPE: Downstream Objective-Preserving Encoding of Regression Tables into Kilobyte Generators}}
+\title{\texorpdfstring{\raggedright Supplement: DOPE: Generative Compression\\ of Predictive Structure}{Supplement: DOPE: Generative Compression of Predictive Structure}}
 \author{Jepson Taylor$^1$, Alton Alexander$^1$\\[0.15cm]
 $^1$NEVERHUMAN Research}
 \iclrfinalcopy
@@ -14,6 +15,7 @@ $^1$NEVERHUMAN Research}
 \input{generated/figure-spec.tex}
 \input{generated/v2-numbers.tex}
 \input{generated/v2-family-numbers.tex}
+\input{generated/v2-all-five-numbers.tex}
 \maketitle
 \fancyhead{}
 \renewcommand{\headrulewidth}{0pt}
@@ -41,7 +43,7 @@ Training maps the screened inputs through the width-16 $\tanh$ layer and runs Ad
 
 The compile search records the proxy $0.45u + 0.25d + 0.30j$ and keeps the candidate with the smallest normalized gate shortfall, then the smallest artifact, then the lowest candidate id. It reads the fit rows only. A candidate record carries no release certificate, and no global DOPE family has been selected.
 
-The reported research profile, \texttt{features12\_\allowbreak{}steps2048}, was chosen among four bounded research profiles (twelve or twenty-four screened inputs, $512$ or $2{,}048$ steps) on a six-lineage discovery panel and checked on six disjoint confirmation lineages, by validation retention at fit seed $11$. Those twelve lineages belong to the hundred-lineage panel, so the reported profile carries a mild selection on validation rows. The untuned trainer default, used for any other profile, sets the hidden width between \ProductionWidthLo\ and \ProductionWidthHi\ and trains for \ProductionSteps\ steps; the main paper reports it as a separate arm. Other neural shapes (micro-TVAEs, TinyMAT, joint TVAE, a masked transformer, and a TabSyn candidate) are outside this measurement, and the direct-rank TabDDPM candidate is a research comparator with no claim on the $10{,}240$-byte tier.
+The reported research profile, \texttt{features12\_\allowbreak{}steps2048}, is one of four bounded research profiles (twelve or twenty-four screened inputs, $512$ or $2{,}048$ steps) that were compared by validation retention at fit seed $11$ and sample seeds $101$, $211$, and $307$. Three committed publications under \texttt{research/\allowbreak{}benchmark/\allowbreak{}results/} record that comparison: a six-lineage discovery panel (\texttt{s3-matched-\allowbreak{}discovery-\allowbreak{}validation.json}), six disjoint confirmation lineages (\texttt{s3-matched-\allowbreak{}confirmation-\allowbreak{}validation.json}), and all hundred lineages under CatBoost, the linear auditor, and the MLP at $n$ and $4n$ (\texttt{dope-s3-\allowbreak{}population-\allowbreak{}validation.json}). Each keeps all four profiles. The scope statements of the first two end with ``production family unselected''; the third sets the field \texttt{global\_\allowbreak{}family\_\allowbreak{}selected} to false, and its report describes descriptive aggregates with no production family selection. None of the three states a selecting rule. The first committed record that shows the reported profile alone is a later CTGAN and TVAE comparison figure, and no contemporaneous record states the rule, the auditor, or the rows that singled it out. Earlier versions of this paper said the profile was chosen on the discovery panel and checked on the confirmation lineages, and called it pre-registered; no record supports either statement, so this version withdraws both. We classify every lineage and all three auditors as selection-exposed. The twelve discovery and confirmation lineages cover all four simulated families and three lineages outside them, so the source-family sensitivity cannot serve as a held-out-source result for this choice. The untuned trainer default, used for any other profile, sets the hidden width between \ProductionWidthLo\ and \ProductionWidthHi\ and trains for \ProductionSteps\ steps; the main paper reports it as a separate arm. Other neural shapes (micro-TVAEs, TinyMAT, joint TVAE, a masked transformer, and a TabSyn candidate) are outside this measurement, and the direct-rank TabDDPM candidate is a research comparator with no claim on the $10{,}240$-byte tier.
 
 \subsection{Dataset sketch and router vector}
 \label{app:sketch}
@@ -104,10 +106,10 @@ Byte gate failed & null \\
 
 \subsection{Clean-license transfer on the density block}
 \label{app:transfer}
-The density block was also scored by Kumo large, Mitra, and TabICL on the shared map, with the three sample seeds of the main panel. These auditors are separate from the CatBoost, linear, and MLP rows, and their Holm adjustment is one family per auditor of size three (that auditor against the three density comparators). \input{generated/mfs-v3-scalar.tex}
+The density block was also scored by Kumo large, Mitra, and TabICL on the shared map, with the three sample seeds of the main panel. These three are pretrained in-context models: the synthetic rows replace the real rows as their context, and no model is trained or fine-tuned on them, so their rows measure context substitution, not a newly trained foundation model. These auditors are separate from the CatBoost, linear, and MLP rows, and their Holm adjustment is one family per auditor of size three (that auditor against the three density comparators). \input{generated/mfs-v3-scalar.tex}
 
 \begin{table}[t]
-\caption{\textbf{Kumo large, Mitra, and TabICL on the density block at $4n$.} Each cell is a retention; the denominator is the paired informative lineages in that row. Holm family size is three per auditor. W/T/L counts lineages; a tie is a difference of zero.}
+\caption{\textbf{Kumo large, Mitra, and TabICL on the density block at $4n$.} Each cell is a retention; the denominator is the paired informative lineages in that row. Holm family size is three per auditor: that auditor's DOPE against the Gaussian copula, Chow--Liu, and independent marginals. W/T/L counts lineages; a tie is a difference of zero.}
 \label{tab:mfsv3}
 \centering
 \footnotesize
@@ -120,14 +122,14 @@ The density block was also scored by Kumo large, Mitra, and TabICL on the shared
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/mfs-v3-retention-bars.pdf}
-\caption{\textbf{Kumo large, Mitra, and TabICL retention at $4n$.} Each bar is the lineage median and its lineage-bootstrap interval; the denominator is the paired informative lineages in that panel. Holm family size is three per auditor.}
+\caption{\textbf{Kumo large, Mitra, and TabICL retention at $4n$.} Each bar is the lineage median and its lineage-bootstrap interval; the denominator is the paired informative lineages in that panel. Holm family size is three per auditor: that auditor's DOPE against the Gaussian copula, Chow--Liu, and independent marginals.}
 \label{fig:mfsv3bars}
 \end{figure}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/mfs-v3-paired.pdf}
-\caption{\textbf{Paired retention differences for Kumo large, Mitra, and TabICL, sorted by lineage.} The denominator is the paired informative lineages in that panel. Holm family size is three per auditor.}
+\caption{\textbf{Paired retention differences for Kumo large, Mitra, and TabICL, sorted by lineage.} The denominator is the paired informative lineages in that panel. Holm family size is three per auditor: that auditor's DOPE against the Gaussian copula, Chow--Liu, and independent marginals.}
 \label{fig:mfsv3pairs}
 \end{figure}
 
@@ -149,7 +151,7 @@ The data lock admits $\EligibleN$ MIT-licensed entries and prepares $\PreparedN$
 
 \subsection{Selection rule for each method}
 \label{app:selection}
-\cref{tab:selection} states what chose each configuration and which rows it read. Only DOPE's compile search and the density baselines' fixed or density-selected configurations avoid the scoring auditors; CTGAN and TVAE select on the same validation rows and the same linear and MLP auditors that score retention, and DOPE's research profile was chosen on a discovery panel inside the evaluated lineages. The sealed test run removes all of these overlaps for its estimate.
+\cref{tab:selection} states what chose each configuration and which rows it read. Only DOPE's compile search and the density baselines' fixed or density-selected configurations avoid the scoring auditors; CTGAN and TVAE select on the same validation rows and the same linear and MLP auditors that score retention, and DOPE's research profile was compared with three alternatives on the validation rows of every evaluated lineage under all three auditors (\cref{app:compile}). The sealed test run removes all of these overlaps for its estimate. TabSyn's five-seed panel has two incomplete parts: six sample cells of one seed-$23$ lineage reached the sample time cap and stay unscored (final, without a retry), and one other lineage has no stored seed-$11$ samples. Every lineage keeps at least four complete fit seeds, so all enter the five-seed comparison.
 
 \begin{table}[t]
 \caption{\textbf{Selection rule for each method.} The scored column is retention on the validation cut. No Holm family.}
@@ -161,15 +163,15 @@ The data lock admits $\EligibleN$ MIT-licensed entries and prepares $\PreparedN$
 \toprule
 Method & Criterion & Data used & Budget \\
 \midrule
-DOPE & Profile chosen on a six-lineage discovery panel and checked on six confirmation lineages; compile search keeps the smallest gate shortfall, then the smallest artifact. & Discovery and confirmation lineages' validation cut; compile search reads fit rows only. & At most twelve inputs, width 16, $2{,}048$ steps, five fit seeds. \\
+DOPE & Profile compared with three alternatives by validation retention at fit seed $11$; the deciding rule has no contemporaneous record. Compile search keeps the smallest gate shortfall, then the smallest artifact. & Profile comparison: validation cut of every lineage, all three auditors. Compile search reads fit rows only. & At most twelve inputs, width 16, $2{,}048$ steps, five fit seeds. \\
 DOPE untuned default & No selection. & Fit rows only. & Trainer default, five fit seeds. \\
-Gaussian copula & Held-out mean log density. Copulas $0.14.1$ \texttt{Gaussian\-Multivariate}. & Validation cut, distinct from the retention auditors. & One library configuration. \\
+Gaussian copula & Held-out mean log density. Copulas $0.14.1$ Gaussian multivariate model. & Validation cut, distinct from the retention auditors. & One library configuration. \\
 CTGAN & Mean of linear and MLP training-mean skill. & The validation rows and the two auditors used at scoring. & Author implementation; stopped runs omitted. \\
 TVAE & Same skill as CTGAN. & Same rows and auditors as CTGAN. & Author implementation; stopped runs omitted. \\
 Chow--Liu & Native: held-out mean log density over a fixed trial set. Default: no search. & Native: validation cut. Default: fit view, eight bins, Laplace smoothing $1.0$. Written for this comparison. & Fixed trial set. \\
 Independent marginals & Native: held-out mean log density over a fixed trial set. Default: no search. & Native: validation cut. Default: fit-view marginals. Written for this comparison. & Fixed trial set. \\
 ARF & Author default; separately, the native objective. & Author default reads no validation rows; the native arm reads the validation cut. & Five fit seeds. \\
-TabSyn & No selection. & Author architecture with a scaled schedule. & $200$ VAE and $1{,}000$ diffusion epochs, fit seed $11$. \\
+TabSyn & No selection. & Author architecture with a scaled schedule. & $200$ VAE and at most $1{,}000$ diffusion epochs (the authors' early stop can end a fit sooner), five fit seeds from $11$ to $71$; six seed-$23$ cells unscored, one lineage without seed-$11$ samples. \\
 Forest-Flow & Author regression objective on a frozen grid. & $\NForestCb$ confirmation lineages. & Fit cap \BaselineForestFitLimit\ seconds. \\
 \bottomrule
 \end{tabular}
@@ -198,6 +200,10 @@ A credential-free path to the source data is
 \hspace*{1.5em}\verb|python3 -m research.benchmark.fetch_pmlb DATASET_ID OUTPUT_DIRECTORY|\par}\smallskip
 \noindent
 It authenticates PMLB data against an upstream Git LFS SHA pin at a fixed public revision. The public manifest lists every prepared lineage's PMLB identifier and the historical train, validation, and test split hashes from the committed data lock. The historical staging used a hybrid coreset and target-stratified selection whose exact row indices were never captured, so the public fetch reproduces the source datasets and the split identities but cannot rebuild the exact historical partitions; publishing the fit and validation partitions themselves (PMLB is MIT-licensed) closes that gap and is scheduled with the artifact release. The originally scored model files and synthetic rows have no published bundle yet; the committed validation ledgers, the original metadata, and the compressed numeric logs, authenticated by the input pins and rebuilt by \texttt{just paper}, reproduce every reduction and figure.
+
+\subsection{One native artifact, accounted end to end}
+\label{app:native-bytes}
+\input{generated/native-byte-conformance.tex}
 
 \subsection{Reproducibility and hashes}
 \input{generated/availability.tex}
@@ -242,10 +248,11 @@ A Friedman test and a Nemenyi critical difference compare the four density metho
 
 \section{Five-seed panel}
 \label{app:v2}
-\cref{tab:v2-levels} gives the retention level of every arm, auditor, and size, and \cref{tab:v2-contrasts} every DOPE-minus-comparator contrast with its family-adjusted $p$-value and both equivalence rules. \cref{tab:v2-seeds} gives the seed-exchangeability diagnostics: how often seed $11$ is the best of five, the estimate from seeds $23$ to $71$ alone, and the binary-by-seed diagnostic on the lineages common to every cell. The historical-binary refit reproduces the samples of the historical seed-$11$ population byte for byte on $\VSameHist$ of $\VSameHistN$ lineages. The later binary is the one an earlier four-seed run used; it writes the same seed-$11$ artifacts as the historical binary on $\VSameArtifact$ of $\VSameArtifactN$ lineages, and its samples match the refit at seeds $23$ to $71$ on $\VSameLater$ of $\VSameLaterN$ fits. Every retention cell in these tables, for DOPE and for every baseline including Forest-Flow, was scored again from its stored synthetic sample file by one pinned evaluator with auditor seed $1729$; a cell whose sample file was missing stays out. Each statistic draws its own bootstrap stream, so two rows built from identical samples, such as the seeds-$23$-to-$71$ sensitivity and the later-binary four-seed arm, can differ in the third decimal of an interval. The fit-seed-$11$ privacy and detector panels in \cref{app:privacy} come from separate earlier runs, which record the Forest-Flow cells as unavailable. The historical density, SDV, Forest-Flow, and fit-seed-$11$ DOPE receipts had used the sample seed as the auditor seed, while the ARF, TabSyn, and control receipts had used $1729$; the uniform re-score removes that difference, so the five-seed tables and the historical block tables below differ slightly for this reason as well as for the extra fit seeds.
+\cref{tab:v2-levels} gives the retention level of every arm, auditor, and size, and \cref{tab:v2-contrasts} every DOPE-minus-comparator contrast with its family-adjusted $p$-value and both equivalence rules. \cref{tab:v2-seeds} gives the seed-exchangeability diagnostics: how often seed $11$ is the best of five, the estimate from seeds $23$ to $71$ alone, and the binary-by-seed diagnostic on the lineages common to every cell. The historical-binary refit reproduces the samples of the historical seed-$11$ population byte for byte on $\VSameHist$ of $\VSameHistN$ lineages. The later binary is the one an earlier four-seed run used; it writes the same seed-$11$ artifacts as the historical binary on $\VSameArtifact$ of $\VSameArtifactN$ lineages, and its samples match the refit at seeds $23$ to $71$ on $\VSameLater$ of $\VSameLaterN$ fits. Every retention cell in these tables, for DOPE and for every baseline including Forest-Flow, was scored again from its stored synthetic sample file by one pinned evaluator with auditor seed $1729$; a cell whose sample file was missing stays out. Each statistic draws its own bootstrap stream, so two rows built from identical samples, such as the seeds-$23$-to-$71$ sensitivity and the later-binary four-seed arm, can differ in the third decimal of an interval. The fit-seed-$11$ privacy and detector panels in \cref{app:privacy} come from separate earlier runs, which record the Forest-Flow cells as unavailable. The historical density, SDV, Forest-Flow, and fit-seed-$11$ DOPE receipts had used the sample seed as the auditor seed, while the ARF, TabSyn, and control receipts had used $1729$; the uniform re-score removes that difference, so the five-seed tables and the historical block tables below differ slightly for this reason as well as for the extra fit seeds. TabSyn's later fit seeds change only TabSyn's own measurements; ARF's cells and Hodges--Lehmann differences are unchanged. ARF's Holm-adjusted $p$-values still differ from the version that scored TabSyn at fit seed $11$ only, because TabSyn's contrasts share ARF's pre-declared Holm family and a Holm adjustment depends on every $p$-value in its family.
 
 {\scriptsize\setlength{\tabcolsep}{2pt}
 \input{generated/v2-levels.tex}
+\newpage
 \input{generated/v2-contrasts.tex}}
 
 \begin{table}[t]
@@ -259,6 +266,10 @@ A Friedman test and a Nemenyi critical difference compare the four density metho
 \cref{tab:v2-family} repeats the first version's source-family sensitivity on the five-seed panel under the inherited family rule: the excluding-simulated rows drop the four simulated families, and inside one family the family is fixed while its lineages, and each lineage's fit seeds, are resampled.
 {\scriptsize\setlength{\tabcolsep}{2pt}
 \input{generated/v2-family-table.tex}}
+
+\cref{tab:v2-all-five} gives the pre-declared all-five-fits sensitivity of the five-seed arms: a lineage enters a row only when all five of its fit seeds completed, and a DOPE-minus row pairs the lineages where both arms did.
+{\scriptsize\setlength{\tabcolsep}{2pt}
+\input{generated/v2-all-five-table.tex}}
 
 \subsection{Fit-seed-11 review panels}
 The tables below are the fit-seed-$11$ review panels that preceded the five-seed refit. A method with two configurations keeps one row per configuration. Their intervals are the family-cluster bootstrap of the median, their equivalence column is the v1 mean-difference test, and their Holm families are split by size: nine density tests, six neural tests, six ARF tests, and three Forest-Flow tests per size. Forest-Flow cells store no null loss, so its loss-path columns in \cref{tab:review-denominator} are empty while its informative count matches the size table. The sensitivity column of that table is the capped cohort, a different denominator from the headline.
@@ -279,7 +290,7 @@ The tables below are the fit-seed-$11$ review panels that preceded the five-seed
 The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ receipts behind the first version of this paper; their intervals are lineage-bootstrap intervals of the median, and they are kept for continuity. The paired median difference is distinct from the difference of two medians. The two DOPE artifacts above the cap in that population are \MissA\ at \MissABytes\ bytes and \MissB\ at \MissBBytes\ bytes, and \NotInfName\ has a fit whose CatBoost group is uninformative, so the CatBoost median uses $\NDopeCb$ lineages while the byte count uses $\PreparedN$. The displayed byte range runs from \DopeByteLo\ to \DopeByteHi. CatBoost reads RMSE $\RmseRealCb$ for the real-trained auditor and $\RmseSynCb$ for the synthetic-trained one, with training-mean skill $\RtwoRealCb$ and $\RtwoSynCb$; RMSE is the square root of the stored mean squared error, and conventional held-out $R^2$ is unstored for these rows. \cref{tab:hist-headline} collects the first version's headline contrasts. On its $\NForestCb$ Forest-Flow lineages the CatBoost medians are $\MedDopeForestCb$ for DOPE, whose artifacts have a median of \DopeForestByteMedian\ bytes, and $\MedForestCb$ [$\LoForestCb$, $\HiForestCb$] for Forest-Flow. The Nemenyi critical differences for the four density methods are $\FriedmanCdCb$ under CatBoost and $\FriedmanCdLin$ under the linear auditor.
 
 \begin{table}[t]
-\caption{\textbf{First-version headline contrasts at $4n$, fit seed 11.} Paired median DOPE-minus-baseline retention difference with W/T/L over lineages; a tie is a difference of zero. The ARF rows use the family-cluster interval of the review panel and its size-$4n$ Holm family of six. The density, neural, and Forest-Flow rows show each block's highest-median baseline with a lineage-bootstrap interval and the block's Holm family (nine, six, and three tests). The five-seed panel supersedes these rows; they are the traceability record of the first version.}
+\caption{\textbf{First-version headline contrasts at $4n$, fit seed 11.} Paired median DOPE-minus-baseline retention difference with W/T/L over lineages; a tie is a difference of zero. The ARF rows use the family-cluster interval of the review panel and its size-$4n$ Holm family of six: DOPE against default and native ARF under each of the three auditors. The density, neural, and Forest-Flow rows show each block's highest-median baseline with a lineage-bootstrap interval and the block's Holm family: nine (DOPE against the Gaussian copula, Chow--Liu, and independent marginals under each auditor), six (DOPE against CTGAN and TVAE under each auditor), and three (DOPE against Forest-Flow under each auditor). The five-seed panel supersedes these rows; they are the traceability record of the first version.}
 \label{tab:hist-headline}
 \centering
 \footnotesize
@@ -288,7 +299,7 @@ The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ re
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Density block at $4n$, fit seed 11.} Each cell is a retention; the denominator is the paired informative lineages in that row. Holm family size is nine. W/T/L counts lineages; a tie is a difference of zero.}
+\caption{\textbf{Density block at $4n$, fit seed 11.} Each cell is a retention; the denominator is the paired informative lineages in that row. Holm family size is nine: DOPE against the Gaussian copula, Chow--Liu, and independent marginals under each of the three auditors. W/T/L counts lineages; a tie is a difference of zero.}
 \label{tab:density}
 \centering
 \footnotesize
@@ -297,7 +308,7 @@ The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ re
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Neural block at $4n$, fit seed 11.} The denominator is the paired informative lineages in the cell; CatBoost uses $\NNeuCb$. Holm family size is six. W/T/L counts lineages; a tie is a difference of zero.}
+\caption{\textbf{Neural block at $4n$, fit seed 11.} The denominator is the paired informative lineages in the cell; CatBoost uses $\NNeuCb$. Holm family size is six: DOPE against CTGAN and TVAE under each of the three auditors. W/T/L counts lineages; a tie is a difference of zero.}
 \label{tab:neural}
 \centering
 \footnotesize
@@ -306,7 +317,7 @@ The density, neural, and Forest-Flow block tables below are the fit-seed-$11$ re
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Forest-Flow confirmation at $4n$, CatBoost, fit seed 11.} The denominator is $\NForestCb$ lineages. Holm family size is three.}
+\caption{\textbf{Forest-Flow confirmation at $4n$, CatBoost, fit seed 11.} The denominator is $\NForestCb$ lineages. Holm family size is three: DOPE against Forest-Flow under each of the three auditors.}
 \label{tab:forest}
 \centering
 \footnotesize
@@ -384,7 +395,7 @@ The real-row control draws the published training rows with replacement until th
 \endgroup
 
 \begin{table}[t]
-\caption{\textbf{Grouped-validation fidelity and empirical privacy, fit seed 11.} Each cell is a median with its 95\% lineage-bootstrap interval. The fidelity denominator is the complete three-seed group count, distinct from the $\NDopeCb$ retention lineages. Holm families are 12 density tests and 8 neural tests, separate from retention.}
+\caption{\textbf{Grouped-validation fidelity and empirical privacy, fit seed 11.} Each cell is a median with its 95\% lineage-bootstrap interval. The fidelity denominator is the complete three-seed group count, distinct from the $\NDopeCb$ retention lineages. Holm families are 12 density tests (DOPE against the Gaussian copula, Chow--Liu, and independent marginals on each of the four metrics) and 8 neural tests (DOPE against CTGAN and TVAE on each of the four metrics), separate from retention.}
 \label{tab:fidelity-hist}
 \centering
 \footnotesize
@@ -435,14 +446,14 @@ The side-by-side columns use the common numeric projection and the published pil
 \textbf{Retained validation.} \cref{tab:retained100,tab:retained8} add the merged retained-sample evidence. Each lineage averages all three sample seeds before a lineage-bootstrap median, which differs from the median-of-seeds rule of the main tables. \cref{tab:retained100} covers ARF and the copula and Chow--Liu defaults and native configurations; \cref{tab:retained8} includes only the eight complete scaled-schedule TabSyn lineages of an earlier run and the classical methods on identical inputs. \cref{tab:retainedpairs} gives exploratory TabSyn-minus-comparator differences on those lineages, with conservative simultaneous intervals (Bonferroni over four metrics times six configurations), which are unbounded at this count. \cref{tab:arfpaired} extends the published DOPE--ARF comparison with lineage intervals under its six-test family.
 
 \begin{table}[t]
-\caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). No Holm family in this table.}
+\caption{\textbf{Retained classical validation at $4n$.} Median [95\% lineage-bootstrap interval] (informative lineages). DOPE was not scored in this retained harness, so the table has no DOPE row; DOPE minus each of these baselines is in \cref{tab:v2-contrasts}, and DOPE's detector cells beside theirs are in \cref{tab:wave2fidelity}. No Holm family in this table.}
 \label{tab:retained100}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-classical100.tex}\end{minipage}}
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Earlier eight-lineage TabSyn subset at $4n$.} Same inputs and real-data controls for every method; median [95\% interval] (lineages). A separate cohort from the full TabSyn panel. No Holm family in this table.}
+\caption{\textbf{Earlier eight-lineage TabSyn subset at $4n$.} Same inputs and real-data controls for every method; median [95\% interval] (lineages). A separate cohort from the full TabSyn panel. DOPE was not scored in this retained harness; DOPE minus TabSyn on the full TabSyn panel's matched lineages is in \cref{tab:review-tabsyn-contrasts}. No Holm family in this table.}
 \label{tab:retained8}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-matched8.tex}\end{minipage}}
@@ -456,14 +467,14 @@ The side-by-side columns use the common numeric projection and the published pil
 \end{figure}
 
 \begin{table}[t]
-\caption{\textbf{Exploratory eight-lineage subset differences, CatBoost.} The denominator is the shared lineages in the cell. Holm family size is four metrics times six configurations. The corrected simultaneous intervals are unbounded.}
+\caption{\textbf{Exploratory eight-lineage subset differences, CatBoost.} The denominator is the shared lineages in the cell. Holm family size is twenty-four: TabSyn minus each of the six configurations (ARF, Chow--Liu, and the copula, each at its default and its native setting) on each of the four metrics (CatBoost retention, KS/TV, C2ST CatBoost AUC, and distance MIA AUC). The corrected simultaneous intervals are unbounded.}
 \label{tab:retainedpairs}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-paired.tex}\end{minipage}}
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{DOPE--ARF legacy matched receipt at $4n$: exploratory paired differences with conservative simultaneous median intervals.} The denominator is the shared-lineage intersection for that auditor. Holm family size is six. Median-of-seed aggregation.}
+\caption{\textbf{DOPE--ARF legacy matched receipt at $4n$: exploratory paired differences with conservative simultaneous median intervals.} The denominator is the shared-lineage intersection for that auditor. Holm family size is six: DOPE against default and native ARF under each of the three auditors. Median-of-seed aggregation.}
 \label{tab:arfpaired}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \resizebox{\linewidth}{!}{\begin{minipage}{7.16in}\input{generated/retained-arf-paired.tex}\end{minipage}}
@@ -515,13 +526,36 @@ The inventory below lists every BeyondArena family name in the dataset bucket wi
 
 \section{Extended related work}
 \label{app:related}
-\textbf{Generators by family.} Parametric copulas~\citep{patki2016sdv} and Chow--Liu trees~\citep{chow1968dependence} are the classical density models, and pair-copula constructions~\citep{aas2009paircopula} generalize them. Conditional GANs and variational autoencoders form a second family: CTGAN, TVAE, TableGAN, CTAB-GAN, and CTAB-GAN+~\citep{xu2019ctgan,park2018tablegan,zhao2021ctabgan,zhao2024ctabganplus}. Diffusion and score-based models form a third: TabDDPM, TabSyn, STASy, CoDi, TabDiff, CDTD, Forest-Diffusion, and GATD~\citep{kotelnikov2023tabddpm,zhang2024tabsyn,kim2023stasy,lee2023codi,shi2025tabdiff,mueller2025cdtd,jolicoeurmartineau2024forestdiffusion,zagardo2026gatd}. Autoregressive and language-model generators, and prior-data fitted generators, form a fourth~\citep{borisov2023great,solatorio2023realtabformer,ma2023tabpfgen,hollmann2025tabpfn}. Graphical neural generators are separate~\citep{liu2023goggle}; ARF estimates density with a forest~\citep{watson2023arf}; CART synthesis is the synthpop line~\citep{nowok2016synthpop}; SMOTE interpolates between neighbouring rows~\citep{chawla2002smote}; and a survey collects these design choices~\citep{borisov2024survey}. Probabilistic-program synthesis~\citep{saad2019bayesian} and CrossCat~\citep{mansinghka2016crosscat} produce small, inspectable joint models.
+\cref{tab:taxonomy} groups the generator literature by family and states, for each, what it fits and where DOPE differs. No row is a measured comparison; the measured generators follow below.
 
-\textbf{How DOPE differs from each line.} A parametric copula or a Chow--Liu tree optimizes a joint density of a fixed form; DOPE adds an explicit model of the target's conditional mean and charges the result against a byte cap. A conditional GAN optimizes adversarial agreement and a VAE reconstruction plus a latent regularizer; both ship weights orders of magnitude larger than DOPE's cap. A diffusion model optimizes a denoising or score objective over the joint table; DOPE optimizes the target's conditional mean directly. A language-model generator optimizes serialized-row likelihood with a pretrained backbone; DOPE stores a screened residual of fixed width. A forest density model such as ARF optimizes axis-aligned splits of the joint table; CART synthesis optimizes sequential conditional draws, which also model the target given the features but store the trees. A prior-data fitted network optimizes a pretraining objective on other tables, whereas DOPE is fit on the lineage alone. A probabilistic-program synthesizer targets posterior inference over the joint distribution. A differentially private synthesizer optimizes under a privacy budget; DOPE's privacy evidence is empirical, and its release gate is the MFS contract.
+\begin{table}[t]
+\caption{\textbf{Generator families and how DOPE differs.} Representative work for each family, what that family fits, and the line on which DOPE differs. DOPE implements none of these families' objectives, makes no formal privacy claim, and uses no pretrained prior. No Holm family.}
+\label{tab:taxonomy}
+\centering\scriptsize
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.14\linewidth}>{\raggedright\arraybackslash}p{0.22\linewidth}>{\raggedright\arraybackslash}p{0.22\linewidth}>{\raggedright\arraybackslash}p{0.27\linewidth}@{}}
+\toprule
+Family & Representative work & What it fits & How DOPE differs \\
+\midrule
+Copula & \citet{patki2016sdv}; pair copulas \citep{aas2009paircopula} & A joint density of fixed parametric form & Adds an explicit model of the target's conditional mean and charges every byte against a cap \\
+Bayesian network, Chow--Liu & \citet{chow1968dependence}; PrivBayes \citep{zhang2014privbayes} & A tree or graph factorization of the joint & Same difference: the target mean is stored, not implied by the factorization \\
+GAN & CTGAN \citep{xu2019ctgan}; TableGAN \citep{park2018tablegan}; CTAB-GAN, CTAB-GAN+ \citep{zhao2021ctabgan,zhao2024ctabganplus} & Adversarial agreement with the joint table & No adversary; weights orders of magnitude smaller \\
+VAE & \citet{kingma2014vae}; TVAE \citep{xu2019ctgan} & Reconstruction plus a latent regularizer & No latent decoder; a twelve-input residual for the target \\
+Diffusion, score & TabDDPM \citep{kotelnikov2023tabddpm}; TabSyn \citep{zhang2024tabsyn}; STaSy \citep{kim2023stasy}; CoDi \citep{lee2023codi}; TabDiff \citep{shi2025tabdiff}; CDTD \citep{mueller2025cdtd}; GATD \citep{zagardo2026gatd} & A denoising or score objective over the joint table & Optimizes the target's conditional mean directly \\
+Language model & GReaT \citep{borisov2023great}; REaLTabFormer \citep{solatorio2023realtabformer} & Serialized-row likelihood on a pretrained backbone & Fit on the lineage alone; no pretrained backbone \\
+Forest & ARF \citep{watson2023arf}; Forest-Flow \citep{jolicoeurmartineau2024forestdiffusion} & Axis-aligned splits or forest flows of the joint & A byte-capped program instead of stored forests \\
+CART, synthpop & \citet{nowok2016synthpop} & Sequential conditional draws that store the trees & Stores a screened residual of fixed width \\
+PFN generator & TabPFGen \citep{ma2023tabpfgen}; TabPFN \citep{hollmann2025tabpfn} & A prior pretrained on other tables & No pretraining; no external checkpoint, since all sampling bytes are charged \\
+DP synthesis & MST \citep{mckenna2021mst}; AIM \citep{mckenna2022aim}; PrivMRF \citep{cai2021privmrf}; PrivBayes \citep{zhang2014privbayes} & Synthesis under a formal privacy budget & No formal privacy guarantee; privacy evidence is empirical, and the release gate is the MFS contract \\
+Other & GOGGLE \citep{liu2023goggle}; SMOTE \citep{chawla2002smote}; probabilistic programs \citep{saad2019bayesian,mansinghka2016crosscat}; survey \citep{borisov2024survey} & Graph generators, neighbour interpolation, posterior inference over the joint & A target-objective program judged by learners trained on its samples \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\textbf{What this paper measured.} The measured generators are the Gaussian copula, a Chow--Liu baseline and independent marginals written for this comparison, CTGAN, TVAE, ARF at five fit seeds, TabSyn on the full panel with a scaled schedule, and a historical Forest-Flow block; TabDDPM, TabDiff, a language-model generator, synthpop CART, and SMOTE are scheduled under a common budget in predeclare\_v2. This panel scores regression retention.
+\textbf{What this paper measured.} The measured generators are the Gaussian copula, a Chow--Liu baseline and independent marginals written for this comparison, CTGAN, TVAE, ARF at five fit seeds, TabSyn on all $100$ lineages with a scaled schedule at five fit seeds (six sample cells of one seed-$23$ lineage reached the sample time cap and stay unscored, and one other lineage has no stored seed-$11$ samples), and a historical Forest-Flow block; TabDDPM, TabDiff, a language-model generator, synthpop CART, and SMOTE are scheduled under a common budget in predeclare\_v2. This panel scores regression retention.
 
 \textbf{Utility ratios, fidelity, and privacy.} Retention is a null-normalized TSTR/TRTR ratio; Esteban, Hyland, and R{\"a}tsch introduced train-on-synthetic, test-on-real and train-on-real, test-on-real~\citep{esteban2017rcgan}. Utility reviews separate marginal fidelity from downstream prediction~\citep{snoke2018utility,raab2018practical}; alpha-precision, beta-recall, SDMetrics, and synthcity are the usual fidelity reports~\citep{alaa2022faithful,zhang2020sdmetrics,qian2023synthcity}. Differentially private Bayesian networks and marginal synthesizers optimize a privacy budget~\citep{zhang2014privbayes,mckenna2021mst,mckenna2022aim,cai2021privmrf}. Membership inference, shadow-model attacks, and holdout-referenced distances form the empirical privacy literature~\citep{shokri2017membership,hayes2018logan,vanbreugel2023domias,stadler2022groundhog,platzer2021holdout}; formal differential privacy is a different claim from an empirical resemblance score~\citep{dwork2014foundations,abadi2016deep}.
+
+\textbf{Compression, distillation, and terminology.} Minimum description length and Occam's-razor arguments tie short descriptions to prediction~\citep{rissanen1978modeling,blumer1987occam}, and the information bottleneck keeps what a compressed variable says about a target~\citep{tishby2000bottleneck}; this paper uses them as motivation and estimates neither description length nor mutual information. Dataset distillation keeps model accuracy in a few learned examples~\citep{wang2018distillation}, knowledge distillation keeps a model's behavior in a smaller model~\citep{hinton2015distilling}, and algorithm-ranking preservation is an earlier synthetic-data criterion~\citep{jordon2018measuring}. Generative compression of images and video predates this work~\citep{santurkar2017generative}; the title uses the phrase descriptively for a table-generating program judged by a declared learning loss.
 
 \textbf{Auditors and rank tests.} Tree models remain strong tabular predictors, which is why CatBoost is one of the three auditors~\citep{grinsztajn2022trees,prokhorenkova2018catboost,shwartz-ziv2022tabular}. TabZilla and TabArena show how brittle a single split can be~\citep{mcelfresh2023tabzilla,erickson2026tabarena}. The regression lineages come from PMLB~\citep{olson2017pmlb,romano2021pmlb}. Comparing several methods on the same lineages needs a rank test and a critical difference, or a Bayesian signed-rank alternative~\citep{demsar2006statistical,benavoli2017time}.
 

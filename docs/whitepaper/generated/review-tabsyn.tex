@@ -8,28 +8,28 @@ Method & Configuration & Cohort & Size & Auditor & $n$ lineages & Median & Hiera
 Method & Configuration & Cohort & Size & Auditor & $n$ lineages & Median & Hierarchical CI \\
 \midrule
 \endhead
-TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 1$n$ & catboost & 98 & 0.8557 & [0.6955, 0.9459] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 1$n$ & linear & 93 & 0.9107 & [0.7705, 0.9890] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 1$n$ & mlp & 87 & 0.9170 & [0.7414, 0.9844] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 4$n$ & catboost & 98 & 0.8966 & [0.8188, 0.9779] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 4$n$ & linear & 93 & 0.9585 & [0.8297, 0.9897] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & own lineages & 4$n$ & mlp & 87 & 1.0314 & [0.9689, 1.1865] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & matched lineages & 1$n$ & catboost & 96 & 0.8599 & [0.7076, 0.9459] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & matched lineages & 1$n$ & linear & 91 & 0.9280 & [0.7705, 0.9896] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & matched lineages & 1$n$ & mlp & 72 & 0.9438 & [0.8201, 0.9857] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & matched lineages & 4$n$ & catboost & 96 & 0.9009 & [0.8161, 0.9788] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & matched lineages & 4$n$ & linear & 91 & 0.9595 & [0.8310, 0.9897] \\
-TabSyn & scaled\_200\_vae\_1000\_diffusion & matched lineages & 4$n$ & mlp & 72 & 1.0355 & [0.9992, 1.1968] \\
-DOPE & features12\_steps2048 & matched lineages & 1$n$ & catboost & 96 & 0.8852 & [0.8224, 0.9690] \\
-DOPE & features12\_steps2048 & matched lineages & 1$n$ & linear & 91 & 0.9812 & [0.9659, 0.9942] \\
-DOPE & features12\_steps2048 & matched lineages & 1$n$ & mlp & 72 & 0.9732 & [0.9490, 0.9898] \\
-DOPE & features12\_steps2048 & matched lineages & 4$n$ & catboost & 96 & 0.9386 & [0.8922, 0.9831] \\
-DOPE & features12\_steps2048 & matched lineages & 4$n$ & linear & 91 & 0.9940 & [0.9718, 0.9967] \\
-DOPE & features12\_steps2048 & matched lineages & 4$n$ & mlp & 72 & 1.0684 & [1.0048, 1.2714] \\
+TabSyn & scaled schedule & own lineages & 1$n$ & CatBoost & 98 & 0.8557 & [0.6955, 0.9459] \\
+TabSyn & scaled schedule & own lineages & 1$n$ & Linear & 93 & 0.9107 & [0.7705, 0.9890] \\
+TabSyn & scaled schedule & own lineages & 1$n$ & MLP & 87 & 0.9170 & [0.7414, 0.9844] \\
+TabSyn & scaled schedule & own lineages & 4$n$ & CatBoost & 98 & 0.8966 & [0.8188, 0.9779] \\
+TabSyn & scaled schedule & own lineages & 4$n$ & Linear & 93 & 0.9585 & [0.8297, 0.9897] \\
+TabSyn & scaled schedule & own lineages & 4$n$ & MLP & 87 & 1.0314 & [0.9689, 1.1865] \\
+TabSyn & scaled schedule & matched lineages & 1$n$ & CatBoost & 96 & 0.8599 & [0.7076, 0.9459] \\
+TabSyn & scaled schedule & matched lineages & 1$n$ & Linear & 91 & 0.9280 & [0.7705, 0.9896] \\
+TabSyn & scaled schedule & matched lineages & 1$n$ & MLP & 72 & 0.9438 & [0.8201, 0.9857] \\
+TabSyn & scaled schedule & matched lineages & 4$n$ & CatBoost & 96 & 0.9009 & [0.8161, 0.9788] \\
+TabSyn & scaled schedule & matched lineages & 4$n$ & Linear & 91 & 0.9595 & [0.8310, 0.9897] \\
+TabSyn & scaled schedule & matched lineages & 4$n$ & MLP & 72 & 1.0355 & [0.9992, 1.1968] \\
+DOPE & DOPE profile & matched lineages & 1$n$ & CatBoost & 96 & 0.8852 & [0.8224, 0.9690] \\
+DOPE & DOPE profile & matched lineages & 1$n$ & Linear & 91 & 0.9812 & [0.9659, 0.9942] \\
+DOPE & DOPE profile & matched lineages & 1$n$ & MLP & 72 & 0.9732 & [0.9490, 0.9898] \\
+DOPE & DOPE profile & matched lineages & 4$n$ & CatBoost & 96 & 0.9386 & [0.8922, 0.9831] \\
+DOPE & DOPE profile & matched lineages & 4$n$ & Linear & 91 & 0.9940 & [0.9718, 0.9967] \\
+DOPE & DOPE profile & matched lineages & 4$n$ & MLP & 72 & 1.0684 & [1.0048, 1.2714] \\
 \bottomrule
 \end{longtable}
 \begin{longtable}{lllllrrllrl}
-\caption{\textbf{DOPE minus TabSyn, fit seed 11.} Median paired retention difference on the matched lineages with its family-cluster bootstrap interval, the mean difference, the v1 mean-difference equivalence test at $\pm 0.02$, and W/T/L. The Holm family has three tests per size (one comparator, three auditors), separate from every other comparator block; the Wilcoxon and equivalence tests treat lineages as independent.}\label{tab:review-tabsyn-contrasts}\\
+\caption{\textbf{DOPE minus TabSyn, fit seed 11.} Median paired retention difference on the matched lineages with its family-cluster bootstrap interval, the mean difference, the v1 mean-difference equivalence test at $\pm 0.02$, and W/T/L. The Holm family has three tests per size (DOPE against TabSyn under each of the three auditors), separate from every other comparator block; the Wilcoxon and equivalence tests treat lineages as independent.}\label{tab:review-tabsyn-contrasts}\\
 \toprule
 Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
 \midrule
@@ -38,11 +38,11 @@ Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical 
 Size & Auditor & Comparator & Configuration & $n$ & Median diff. & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$ \\
 \midrule
 \endhead
-1$n$ & catboost & TabSyn & scaled\_200\_vae\_1000\_diffusion & 96 & 0.0122 & [-0.0033, 0.0851] & 0.0338 & no & 59/0/37 & 0.042 \\
-1$n$ & linear & TabSyn & scaled\_200\_vae\_1000\_diffusion & 91 & 0.0348 & [-0.0008, 0.1265] & 58.8632 & no & 61/0/30 & 0.000 \\
-1$n$ & mlp & TabSyn & scaled\_200\_vae\_1000\_diffusion & 72 & 0.0333 & [-0.0078, 0.1272] & 0.2127 & no & 43/0/29 & 0.011 \\
-4$n$ & catboost & TabSyn & scaled\_200\_vae\_1000\_diffusion & 96 & 0.0157 & [-0.0033, 0.0890] & 0.0737 & no & 56/0/40 & 0.056 \\
-4$n$ & linear & TabSyn & scaled\_200\_vae\_1000\_diffusion & 91 & 0.0199 & [-0.0018, 0.1364] & 68.9447 & no & 60/0/31 & 0.000 \\
-4$n$ & mlp & TabSyn & scaled\_200\_vae\_1000\_diffusion & 72 & -0.0041 & [-0.0384, 0.0738] & 0.1739 & no & 33/0/39 & 0.682 \\
+1$n$ & CatBoost & TabSyn & scaled schedule & 96 & 0.0122 & [-0.0033, 0.0851] & 0.0338 & no & 59/0/37 & 0.042 \\
+1$n$ & Linear & TabSyn & scaled schedule & 91 & 0.0348 & [-0.0008, 0.1265] & 58.8632 & no & 61/0/30 & 0.000 \\
+1$n$ & MLP & TabSyn & scaled schedule & 72 & 0.0333 & [-0.0078, 0.1272] & 0.2127 & no & 43/0/29 & 0.011 \\
+4$n$ & CatBoost & TabSyn & scaled schedule & 96 & 0.0157 & [-0.0033, 0.0890] & 0.0737 & no & 56/0/40 & 0.056 \\
+4$n$ & Linear & TabSyn & scaled schedule & 91 & 0.0199 & [-0.0018, 0.1364] & 68.9447 & no & 60/0/31 & 0.000 \\
+4$n$ & MLP & TabSyn & scaled schedule & 72 & -0.0041 & [-0.0384, 0.0738] & 0.1739 & no & 33/0/39 & 0.682 \\
 \bottomrule
 \end{longtable}

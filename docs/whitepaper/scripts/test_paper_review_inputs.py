@@ -3,6 +3,7 @@
 import hashlib
 import importlib.util
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -134,6 +135,90 @@ class ReviewInputTests(unittest.TestCase):
         self.relock([self.graph_name, self.panel_name])
         with self.assertRaisesRegex(ValueError, 'independently pinned'):
             REVIEW.authenticated_graph()
+
+    def conformance_fixture(self):
+        names = (REVIEW.NATIVE_BYTE_PIN, REVIEW.NATIVE_BYTE_CHECKER, 'README.md',
+                 'docs/whitepaper/supplement.tex',
+                 'docs/whitepaper/generated/native-byte-conformance.tex')
+        for name in names:
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes((ROOT / name).read_bytes())
+        self.graph['scripts'][0]['outputs'] = ['docs/whitepaper/generated/v2-headline.json']
+        REVIEW.GRAPH.write_text(json.dumps(self.graph))
+        self.relock([self.graph_name, self.panel_name, REVIEW.NATIVE_BYTE_PIN])
+
+    def test_conformance_checker_uses_captured_files_before_numerical_replay(self):
+        self.conformance_fixture()
+        run = subprocess.run
+        readme = self.root / 'README.md'
+        original = readme.read_bytes()
+
+        class NumericalReplayReached(Exception):
+            pass
+
+        def captured_run(command, **kwargs):
+            if '-c' in command:
+                raise NumericalReplayReached
+            captured = Path(kwargs['cwd'])
+            self.assertNotEqual(captured, self.root)
+            self.assertEqual((captured / REVIEW.NATIVE_BYTE_PIN).read_bytes(),
+                             (self.root / REVIEW.NATIVE_BYTE_PIN).read_bytes())
+            # A live-file change after capture must not substitute the bytes
+            # checked in the isolated subprocess.
+            readme.write_text('changed after capture\n')
+            try:
+                result = run(command, **kwargs)
+            finally:
+                readme.write_bytes(original)
+            self.assertEqual(result.returncode, 0)
+            return result
+
+        with patch.object(REVIEW.subprocess, 'run', side_effect=captured_run):
+            with self.assertRaises(NumericalReplayReached):
+                REVIEW.authenticate_build()
+
+    def test_conformance_document_drift_refuses_before_numerical_replay(self):
+        self.conformance_fixture()
+        (self.root / 'README.md').write_text('missing the measured byte profile\n')
+        run = subprocess.run
+
+        def captured_run(command, **kwargs):
+            self.assertNotIn('-c', command)
+            return run(command, **kwargs)
+
+        with patch.object(REVIEW.subprocess, 'run', side_effect=captured_run):
+            with self.assertRaises(subprocess.CalledProcessError):
+                REVIEW.authenticate_build()
+
+    def test_native_witness_drift_or_redirection_refuses_before_graph_decode(self):
+        self.conformance_fixture()
+        witness = self.root / REVIEW.NATIVE_BYTE_PIN
+        raw = witness.read_bytes()
+        for redirected in (False, True):
+            with self.subTest(redirected=redirected):
+                if redirected:
+                    saved = witness.with_suffix('.saved')
+                    saved.write_bytes(raw)
+                    witness.unlink()
+                    witness.symlink_to(saved)
+                else:
+                    witness.write_bytes(raw + b' ')
+                loads = json.loads
+                with patch.object(REVIEW.json, 'loads', wraps=loads) as decode:
+                    with patch.object(REVIEW.subprocess, 'run') as renderer:
+                        with self.assertRaises(ValueError):
+                            REVIEW.authenticate_build()
+                        renderer.assert_not_called()
+                    self.assertEqual(decode.call_count, 1)  # Authenticated lock only.
+
+    def test_native_witness_allowance_does_not_admit_other_receipts(self):
+        self.conformance_fixture()
+        other = 'docs/whitepaper/receipts/unregistered.json'
+        (self.root / other).write_bytes(b'{}\n')
+        self.relock([self.graph_name, self.panel_name, other])
+        with self.assertRaisesRegex(ValueError, 'invalid review paper input path'):
+            REVIEW.authenticate_build()
 
 
 if __name__ == '__main__':

@@ -119,6 +119,15 @@
         "docs/whitepaper/generated/v2-family-numbers.tex",
         "docs/whitepaper/generated/v2-family-table.tex"
       ]
+    },
+    {
+      "path": "docs/whitepaper/scripts/review_v2_all_five.py",
+      "args": ["--from-panel", "research/benchmark/results/review-fixes-v2/all-five.json"],
+      "check_args": ["--check"],
+      "outputs": [
+        "docs/whitepaper/generated/v2-all-five-numbers.tex",
+        "docs/whitepaper/generated/v2-all-five-table.tex"
+      ]
     }
   ]
 }

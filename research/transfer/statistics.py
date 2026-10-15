@@ -17,8 +17,18 @@ import math
 
 import numpy as np
 
-from .losses import PairedLosses, TrainingScale, finite_number
+from .losses import LossSpace, PairedLosses, TrainingScale, finite_number
 from .metrics import Margin
+
+
+_INFERENCE_ASSUMPTIONS = {
+    "moment_assumption": "finite_variance",
+    "distribution_free": False,
+}
+
+
+def _with_assumptions(payload):
+    return {**payload, **_INFERENCE_ASSUMPTIONS}
 
 
 def task_substream(master_seed: int, task_id: str, component_id: str) -> int:
@@ -169,6 +179,32 @@ def _tables(design: CrossedDesign, endpoint: str):
     return tables, namespace_seeds
 
 
+def _bootstrap_refusal(point, estimand, draws, status, reason=None):
+    """The requested estimand is refused. Complete-case numbers stay sensitivity."""
+    payload = {
+        "estimand": estimand,
+        "status": status,
+        "draws": draws,
+        "endpoint": point["endpoint"],
+        "scheduled_runs": point["scheduled_runs"],
+        "dispositions": point["dispositions"],
+        "families": point["families"],
+        "tasks": point["tasks"],
+        "estimates": None,
+        "family_effects": None,
+        "samples": None,
+        "sensitivity": {
+            "estimand": point["estimand"],
+            "estimates": point["estimates"],
+            "family_effects": point["family_effects"],
+            "qualification": False,
+        },
+    }
+    if reason is not None:
+        payload["reason"] = reason
+    return _with_assumptions(payload)
+
+
 def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: str = "method_new_source",
                       draws: int = 1999, seed: int = 0) -> dict:
     """Cross sources/global fits; nest independent fits/sample/learner seeds.
@@ -176,34 +212,41 @@ def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: s
     Query clusters are drawn once per task and shared across all its fits and
     methods. Fixed-artifact inference conditions on one fit/sample/learner per
     task and only resamples query clusters; it does not draw new sources.
+    Failed fits and missing crossed cells refuse the requested estimand.
     """
     if type(draws) is not int or draws < 99 or type(seed) is not int or seed < 0:
         raise ValueError("invalid bootstrap budget or stream")
     if estimand not in ("method_new_source", "fixed_artifact"):
         raise ValueError("unknown estimand")
     point = paired_family_effect(design, endpoint=endpoint)
-    result = {**point, "estimand": estimand, "draws": draws, "samples": None, "status": "incomplete"}
+
+    def refuse(status, reason=None):
+        return _bootstrap_refusal(point, estimand, draws, status, reason)
+
     try:
         tables, namespace_seeds = _tables(design, endpoint)
     except ValueError as error:
-        result["reason"] = str(error)
-        return result
+        reason = str(error)
+        # A hole in the cross is not a scheduled family mean. Keep its average as sensitivity.
+        if reason in {"incomplete scheduled evidence", "unbalanced scheduled evidence", "incomplete crossed global seed axis"}:
+            point = {**point, "estimand": "complete_case_sensitivity"}
+        return refuse("incomplete", reason)
     families = sorted({r.family_id for r in design.runs})
     if estimand == "method_new_source" and len(families) < 2:
-        return {**result, "status": "insufficient_families"}
+        return refuse("insufficient_families")
     rng = np.random.default_rng(seed)
     global_draws = {}
     if estimand == "method_new_source":
         for namespace, seeds in sorted(namespace_seeds.items()):
             if len(seeds) < 2:
-                return {**result, "status": "insufficient_global_seeds"}
+                return refuse("insufficient_global_seeds")
             global_draws[namespace] = rng.integers(len(seeds), size=(draws, len(seeds)))
     query_weights = {}
     for task in sorted({r.task_id for r in design.runs}):
         pairs = tables[(task, design.required_methods[0])][3]
         clusters = sorted(set(pairs.cluster_ids))
         if len(clusters) < 2:
-            return {**result, "status": "insufficient_query_clusters"}
+            return refuse("insufficient_query_clusters")
         picks = rng.integers(len(clusters), size=(draws, len(clusters)))
         counts = np.sum(picks[:, :, None] == np.arange(len(clusters))[None, None, :], axis=1)
         index = np.asarray([clusters.index(c) for c in pairs.cluster_ids])
@@ -219,7 +262,7 @@ def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: s
             task_samples[(task, method)] = values[:, 0, 0, 0]
             continue
         if nfit < 2:
-            return {**result, "status": "insufficient_fits"}
+            return refuse("insufficient_fits")
         if namespace is None:
             fits = rng.integers(nfit, size=(draws, nfit))
         else:
@@ -237,7 +280,9 @@ def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: s
     for method in design.required_methods:
         family_samples = np.column_stack([np.mean([task_samples[(task, method)] for task in sorted(family_tasks[f])], axis=0) for f in families])
         output[method] = family_samples[np.arange(draws)[:, None], family_picks].mean(axis=1) if family_picks is not None else family_samples.mean(axis=1)
-    return {**result, "status": "complete", "samples": output}
+    return _with_assumptions(
+        {**point, "estimand": estimand, "draws": draws, "status": "complete", "samples": output}
+    )
 
 
 def simultaneous_ucb(bootstrap: dict, *, alpha: float = 0.05) -> dict:
@@ -250,33 +295,159 @@ def simultaneous_ucb(bootstrap: dict, *, alpha: float = 0.05) -> dict:
     if not 0 < alpha < 0.5:
         raise ValueError("invalid inference alpha")
     if bootstrap["status"] != "complete":
-        return {"status": bootstrap["status"], "bounds": None}
+        return _with_assumptions({"status": bootstrap["status"], "bounds": None})
     samples = bootstrap["samples"]
     per_tail = alpha / len(samples)
     if per_tail * bootstrap["draws"] < 5:
-        return {"status": "insufficient_tail_draws", "bounds": None}
+        return _with_assumptions({"status": "insufficient_tail_draws", "bounds": None})
     bounds = {}
     for method, draws in samples.items():
         point = bootstrap["estimates"][method]
         lo, hi = np.quantile(draws - point, [per_tail, 1 - per_tail])
         bounds[method] = {"estimate": point, "lower": float(point - hi), "upper": float(point - lo)}
-    return {"status": "complete", "alpha": alpha, "multiplicity": "bonferroni_one_sided",
-            "simultaneous_one_sided_level": 1 - alpha, "two_sided_level_at_least": 1 - 2 * alpha,
-            "bounds": bounds}
+    return _with_assumptions({
+        "status": "complete", "alpha": alpha, "multiplicity": "bonferroni_one_sided",
+        "simultaneous_one_sided_level": 1 - alpha, "two_sided_level_at_least": 1 - 2 * alpha,
+        "bounds": bounds,
+    })
 
 
-def interval_decision(lower: float, upper: float, *, equivalence_margin: float | None = None) -> dict:
+def interval_decision(lower: float, upper: float, *, endpoint: str = "gap",
+                      equivalence_margin: float | None = None) -> dict:
+    """Raw-gap superiority is separate from tolerance-adjusted noninferiority.
+
+    Equivalence requires both bounds strictly inside the frozen margin. A
+    zero-crossing interval is equivalence only when it is inside that margin.
+    A negative tolerance-adjusted Z is within-tolerance noninferiority, never
+    raw-loss superiority, including when synthetic risk is worse inside the margin.
+    """
     lower, upper = finite_number(lower), finite_number(upper)
     if lower > upper:
         raise ValueError("reversed interval")
+    if endpoint not in ("gap", "normalized_gap", "z"):
+        raise ValueError("unknown endpoint")
     equivalent = False
     if equivalence_margin is not None:
-        if finite_number(equivalence_margin) <= 0:
+        margin = finite_number(equivalence_margin)
+        if margin <= 0:
             raise ValueError("equivalence requires a positive frozen margin")
-        equivalent = -equivalence_margin < lower and upper < equivalence_margin
-    return {"superior": upper < 0, "noninferior": upper <= 0,
-            "harmful": lower > 0, "equivalent": equivalent,
-            "inconclusive": not (upper <= 0 or lower > 0 or equivalent)}
+        equivalent = -margin < lower and upper < margin
+    superior = endpoint in ("gap", "normalized_gap") and upper < 0
+    noninferior = upper <= 0
+    harmful = lower > 0
+    return _with_assumptions({
+        "endpoint": endpoint, "superior": superior, "noninferior": noninferior,
+        "harmful": harmful, "equivalent": equivalent,
+        "inconclusive": not (superior or noninferior or harmful or equivalent),
+    })
+
+
+def require_separate_cell_bounds(bounds: dict) -> dict:
+    """Each cell carries its own task-cell provenance. A copied population bound does not qualify."""
+    if not isinstance(bounds, dict) or not bounds:
+        raise ValueError("missing cell bounds")
+    values = list(bounds.values())
+    if len(values) >= 2 and all(item is values[0] for item in values):
+        raise ValueError("one population bound cannot cover every cell")
+    provenances = []
+    for cell_id, bound in bounds.items():
+        if not isinstance(bound, dict):
+            raise ValueError("cell bound requires provenance")
+        if bound.get("bound_kind") != "task_cell" or bound.get("cell_id") != cell_id:
+            raise ValueError("one population bound cannot cover every cell")
+        provenance = bound.get("provenance")
+        if type(provenance) is not str or not provenance:
+            raise ValueError("cell bound requires provenance")
+        provenances.append(provenance)
+    if len(provenances) != len(set(provenances)):
+        raise ValueError("one population bound cannot cover every cell")
+    return bounds
+
+
+def _mean_query_z(pairs, margin, scale) -> float:
+    values = margin.query_z(pairs, scale)
+    return finite_number(math.fsum(values) / len(values))
+
+
+def cross_task_endpoint(cells, *, version: int = 1) -> dict:
+    """Versioned dimensionless tolerance-adjusted Z. normalized_gap is not this endpoint.
+
+    MSE divides by fit-only variance. RMSE divides by its square root. MAE divides
+    by a caller-supplied fit-only mean absolute deviation. A degenerate fit scale
+    stays out of the pool. Campaign and calibration are unmeasured.
+    """
+    if version != 1:
+        raise ValueError("unknown_cross_task_endpoint_version")
+    cells = tuple(cells)
+    if not cells:
+        raise ValueError("missing_cross_task_cells")
+    seen = set()
+    rows = []
+    pooled = []
+    for cell in cells:
+        if not isinstance(cell, dict):
+            raise ValueError("invalid_cross_task_cell")
+        task_id = cell.get("task_id")
+        loss = cell.get("loss")
+        pairs, margin, scale = cell.get("pairs"), cell.get("margin"), cell.get("fit_scale")
+        if (
+            type(task_id) is not str or not task_id or task_id in seen
+            or not isinstance(pairs, PairedLosses) or not isinstance(margin, Margin)
+            or not isinstance(scale, TrainingScale)
+        ):
+            raise ValueError("invalid_cross_task_cell")
+        seen.add(task_id)
+        if loss not in ("mse", "rmse", "mae"):
+            raise ValueError("unknown_cross_task_loss")
+        if pairs.loss_space != LossSpace.ORIGINAL_MSE:
+            raise ValueError("loss_space_requires_original_mse")
+        normalized = None if scale.value is None else finite_number((pairs.means[1] - pairs.means[0]) / scale.value)
+        row = {
+            "task_id": task_id, "loss": loss, "normalized_gap": normalized,
+            "raw_z": None, "dimensionless": None, "status": "pooled",
+        }
+        if loss in ("mse", "rmse") and scale.value is None:
+            row["status"] = "degenerate_scale"
+            row["absolute_raw_not_dimensionless"] = True
+            rows.append(row)
+            continue
+        if loss == "mse":
+            raw_z = _mean_query_z(pairs, margin, scale)
+            denominator = scale.value
+        elif loss == "rmse":
+            real, synthetic = math.sqrt(pairs.means[0]), math.sqrt(pairs.means[1])
+            denominator = math.sqrt(scale.value)
+            raw_z = finite_number(synthetic - real - (margin.relative * real + margin.absolute_scaled * denominator))
+        else:
+            deviation = cell.get("fit_absolute_deviation")
+            if deviation is None:
+                raise ValueError("mae_scale_required")
+            deviation = finite_number(deviation)
+            if deviation <= 0:
+                row["status"] = "degenerate_scale"
+                row["absolute_raw_not_dimensionless"] = True
+                rows.append(row)
+                continue
+            real = finite_number(math.fsum(math.sqrt(v) for v in pairs.real) / len(pairs.real))
+            synthetic = finite_number(math.fsum(math.sqrt(v) for v in pairs.synthetic) / len(pairs.synthetic))
+            denominator = deviation
+            raw_z = finite_number(synthetic - real - (margin.relative * real + margin.absolute_scaled * deviation))
+        row["raw_z"] = raw_z
+        row["dimensionless"] = finite_number(raw_z / denominator)
+        pooled.append(row["dimensionless"])
+        rows.append(row)
+    return {
+        "format": "dope-cross-task-endpoint",
+        "version": 1,
+        "endpoint": "tolerance_adjusted_z_over_fit_scale",
+        "value": None if not pooled else finite_number(math.fsum(pooled) / len(pooled)),
+        "status": "pooled" if pooled else "unpooled_degenerate_scale",
+        "tasks": rows,
+        "normalized_gap_omits_margin": True,
+        "campaign": "unmeasured",
+        "calibration": "unmeasured",
+        "qualification": False,
+    }
 
 
 def leave_one_global_seed_out(design: CrossedDesign, *, endpoint="z") -> dict:

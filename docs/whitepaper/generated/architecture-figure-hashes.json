@@ -1,11 +1,11 @@
 {
   "format": "dope-paper-architecture-hashes-v1",
   "pdf_sha256": {
-    "architecture.pdf": "cebb5833d3cd8fc35416806aa9e1964dc34d11a8f1a46c57f65bc97333d36d75"
+    "architecture.pdf": "afc09771a2f898f431e466b054b34c7849e7bc21b80116bb5be8094b97a916ea"
   },
   "source_sha256": {
     "../../ops/ci/paper-architecture.tex": "64a50ac1567087d144c728ce02e9759d5d1211ff06ccdf47d0a3e4d38ee9b5ed",
-    "figures/architecture.tex": "961ae0e310955ced5b1ac391f4eb7304a8a202f5f2c9da1e232c7f4847131a51",
+    "figures/architecture.tex": "2bde83bbf63e8d6b150fa717d8897d90f159a75d9ea3594d795ab11e291b6b4b",
     "generated/numbers.tex": "0523f3cd4a53145c3a57d3eb9ed926ec88f1fbe6be72dba4def2a45238a968b4"
   }
 }

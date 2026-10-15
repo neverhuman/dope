@@ -149,6 +149,34 @@ class MfsV3TableTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 mfs_v3_table.measure(_receipt(bad))
 
+    def test_a_measured_cleartext_failure_is_not_unscanned(self):
+        lineages = [_lineage(method, dataset, 0.1) for method in mfs_v3_table.METHODS for dataset in ("aa", "bb")]
+        lineages[0]["seeds"] = [{"sample_seed": seed, "cleartext_absent": False} for seed in (101, 211, 307)]
+        lineages[1]["seeds"] = [{"sample_seed": seed, "cleartext_absent": None} for seed in (101, 211, 307)]
+        self.assertEqual(mfs_v3_table.measure(_receipt(lineages))["cleartext_unscanned"], len(lineages) - 1)
+
+    def test_the_null_reason_matches_the_pinned_receipt(self):
+        """The prose names unmeasured prerequisites and cleartext, and measured copy, membership, attribute failures."""
+        import math
+
+        from research.benchmark.mfs_v3_assemble import boolean_gate_evidence
+
+        receipt = mfs_v3_table.load_receipt()
+        rows = receipt["lineages"]
+        evidence = [boolean_gate_evidence(row["seeds"]) for row in rows]
+        self.assertTrue(all(item["complete_seed_set"] for item in evidence))
+        for key in ("real_vs_real_control_complete", "required_size_cells_complete", "artifact_sampling_verified",
+                    "metric_implementations_locked", "cleartext_absent"):
+            self.assertTrue(all(item["values"][key] is None for item in evidence), key)
+        self.assertTrue(any("near_copy" in item["measured_failed_gates"] for item in evidence))
+        for gate, key in (("membership_auc", "membership_auc"), ("attribute_inference", "attribute_inference_advantage")):
+            failed = [row for row in rows if gate in row["failed_gates"]]
+            self.assertTrue(failed, gate)
+            for row in failed:
+                values = [(seed.get("holdout") or {}).get(key) for seed in row["seeds"]]
+                self.assertTrue(all(type(value) is float and math.isfinite(value) for value in values), gate)
+        self.assertTrue(any(row["failed_gates"].count("exact_row_match") for row in rows))
+
     def test_real_receipt_matches_its_lineage_retentions(self):
         path = mfs_v3_table.RECEIPT
         self.assertTrue(path.is_file(), "density receipt is missing")

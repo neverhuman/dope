@@ -31,6 +31,15 @@ impl DatasetEmbedder {
         metadata_mode: MetadataMode,
     ) -> Result<DatasetActionEmbedding> {
         let loaded = load_numeric_csv(csv_path, selector, task)?;
+        self.embed_loaded_dataset(loaded, task, metadata_mode)
+    }
+
+    fn embed_loaded_dataset(
+        &self,
+        loaded: LoadedNumericDataset,
+        task: Task,
+        metadata_mode: MetadataMode,
+    ) -> Result<DatasetActionEmbedding> {
         let sketch = DatasetSketch::from_train(&loaded.table, task);
         if sketch.version != DATASET_SKETCH_VERSION {
             return Err(DopeError::Data("unsupported dataset sketch version".into()));

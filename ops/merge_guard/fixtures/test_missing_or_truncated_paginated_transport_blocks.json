@@ -1,0 +1,268 @@
+[
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls?state=open&sort=created&direction=asc&per_page=100"
+        ],
+        "kwargs": {
+          "paginate": true
+        },
+        "method": "get",
+        "value": []
+      }
+    ],
+    "args": [
+      "repos/neverhuman/dope"
+    ],
+    "kwargs": {},
+    "operation": "open_pulls",
+    "refused": "open_pr_listing_unavailable"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls?state=open&sort=created&direction=asc&per_page=100"
+        ],
+        "kwargs": {
+          "paginate": true
+        },
+        "method": "get",
+        "value": {}
+      }
+    ],
+    "args": [
+      "repos/neverhuman/dope"
+    ],
+    "kwargs": {},
+    "operation": "open_pulls",
+    "refused": "open_pr_listing_unavailable"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls?state=open&sort=created&direction=asc&per_page=100"
+        ],
+        "kwargs": {
+          "paginate": true
+        },
+        "method": "get",
+        "value": [
+          null
+        ]
+      }
+    ],
+    "args": [
+      "repos/neverhuman/dope"
+    ],
+    "kwargs": {},
+    "operation": "open_pulls",
+    "refused": "open_pr_listing_unavailable"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls?state=open&sort=created&direction=asc&per_page=100"
+        ],
+        "kwargs": {
+          "paginate": true
+        },
+        "method": "get",
+        "value": [
+          [
+            {
+              "number": 7
+            }
+          ],
+          []
+        ]
+      }
+    ],
+    "args": [
+      "repos/neverhuman/dope"
+    ],
+    "kwargs": {},
+    "operation": "open_pulls",
+    "refused": "open_pr_listing_truncated"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls?state=open&sort=created&direction=asc&per_page=100"
+        ],
+        "kwargs": {
+          "paginate": true
+        },
+        "method": "get",
+        "value": [
+          [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ]
+        ]
+      }
+    ],
+    "args": [
+      "repos/neverhuman/dope"
+    ],
+    "kwargs": {},
+    "operation": "open_pulls",
+    "refused": "open_pr_listing_truncated"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls?state=open&sort=created&direction=asc&per_page=100"
+        ],
+        "kwargs": {
+          "paginate": true
+        },
+        "method": "get",
+        "value": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      }
+    ],
+    "args": [
+      "repos/neverhuman/dope"
+    ],
+    "kwargs": {},
+    "operation": "open_pulls",
+    "refused": "open_pr_listing_truncated"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls?state=open&sort=created&direction=asc&per_page=100"
+        ],
+        "kwargs": {
+          "paginate": true
+        },
+        "method": "get",
+        "value": [
+          []
+        ]
+      }
+    ],
+    "args": [
+      "repos/neverhuman/dope"
+    ],
+    "expected": [],
+    "kwargs": {},
+    "operation": "open_pulls"
+  }
+]

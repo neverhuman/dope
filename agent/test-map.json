@@ -6,8 +6,8 @@
       "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
     },
     "rust/certification/privacy_attacks.rs": {
-      "command": "cargo test --locked --test vnext_custody",
-      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
     "rust/certification.rs": {
       "command": "cargo test --locked --test vnext_custody",
@@ -1290,8 +1290,8 @@
       "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
     },
     "research/benchmark/tests/test_fetch_pmlb.py": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_pmlb -v",
-      "purpose": "verify the complete pinned public PMLB source matrix, credential-free byte authentication, and optional AWS profile behavior without reading dataset rows"
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
     },
     "ops/ci/paper-prepare.py": {
       "command": "just paper-check",
@@ -1390,8 +1390,8 @@
       "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
     },
     "research/transfer/evidence.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
-      "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/tests/test_evidence.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
@@ -1426,16 +1426,16 @@
       "purpose": "validate original-unit losses, full required-cell coverage, weighted tail harm and bytes as a separate constraint"
     },
     "research/transfer/statistics.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
-      "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/power.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
       "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
     },
     "research/transfer/tests/test_statistics.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
-      "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/protocols/statistics-v1.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
@@ -1443,7 +1443,7 @@
     },
     "research/transfer/lineage.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
-      "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+      "purpose": "verify order-independent alias-chain resolution and cyclic, missing, cross-parent or duplicate refusals, historical default registry bindings, source exposure, split commitments and scoped purpose grants; unresolved rights prevent freeze"
     },
     "research/transfer/registries/sources.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
@@ -1451,7 +1451,7 @@
     },
     "research/transfer/tests/test_lineage.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
-      "purpose": "validate source-family alias/exposure lineage, split commitments, scoped purpose grants and unresolved rights preventing freeze"
+      "purpose": "verify order-independent alias-chain resolution and cyclic, missing, cross-parent or duplicate refusals, historical default registry bindings, source exposure, split commitments and scoped purpose grants; unresolved rights prevent freeze"
     },
     "schemas/source-family-v1.schema.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_lineage -v",
@@ -1494,8 +1494,8 @@
       "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
     },
     "docs/whitepaper/scripts/vnext_paper.py": {
-      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
-      "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
+      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_vnext_paper.py -v",
+      "purpose": "verify unchanged draft/venue/rights refusal and measured rendering of the real verified claim graph, distinct decision states and counts, tampering/stale/vendor/bool refusals, escaped TeX and unqualified output; full paper-tests discovery remains mandatory locally and in CPU CI"
     },
     "docs/vnext/RELATED_WORK.md": {
       "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
@@ -1534,8 +1534,8 @@
       "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
     },
     "rust/typed_data.rs": {
-      "command": "cargo test --locked --test vnext_raw_schema",
-      "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
     },
     "rust/typed_data/transforms.rs": {
       "command": "cargo test --locked --test vnext_raw_schema",
@@ -1554,28 +1554,28 @@
       "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
     },
     "research/transfer/adapters/generators/distillation.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
-      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify exact serialized prototype and dependency charges, constructor/refit snapshots that survive caller nested-container mutation with matching hash and cap, and cleared state after refused refits through full local/CPU transfer discovery; no model benefit or scientific qualification inferred"
     },
     "research/transfer/adapters/generators/neural.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
-      "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/controls.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
-      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/locks/neural-generators.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
       "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
     },
     "research/transfer/tests/test_controls.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
-      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify full control accounting, exact serialized coreset/prototype charges, constructor/refit snapshots with immutable retained payload after caller mutation, and cleared state after refused refits through full local/CPU transfer discovery; no model benefit or scientific qualification inferred"
     },
     "research/transfer/tests/test_neural_generators.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
-      "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/adapters/auditors/kumo_tabular.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_kumo_tabular -v",
@@ -1624,6 +1624,618 @@
     "research/benchmark/tests/test_paper_build_pipeline.py": {
       "command": "PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_paper_packaging -v && python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v",
       "purpose": "exercise canonical paper/build/check recipes, immutable admission, snapshot compiler inputs, authentication-only entry semantics, expected render inventories and four-PDF control flow with bounded fixtures"
+    },
+    "ops/merge_guard/": {
+      "command": "just native-guard-check",
+      "purpose": "prove all 51 legacy guard scenarios and 196 subcases, native read-only transport, receipt integrity, malformed data, Unicode hashing and timestamp boundaries without GitHub access"
+    },
+    "ops/merge_guard/Cargo.toml": {
+      "command": "just native-guard-check",
+      "purpose": "verify isolated locked native tool dependency graph, format, clippy and complete scenario proofs"
+    },
+    "ops/merge_guard/Cargo.lock": {
+      "command": "just native-guard-check && just security",
+      "purpose": "prove pinned isolated tool dependencies and require independent lock advisory coverage in the canonical security lane"
+    },
+    "ops/ci/cpu.sh": {
+      "command": "just fast && just check",
+      "purpose": "verify early tool readiness, full locked Rust/native discovery, provisioned V1 interpreter for NumPy-dependent paper-log tests and complete offline transfer discovery without late apt transactions or changed budgets"
+    },
+    "docs/merge-guard.md": {
+      "command": "just native-guard-check",
+      "purpose": "verify fail-closed exact-source independent review, complete queued/failed workflow accounting, server controls, race rejection and actual squash merge receipts using synthetic read-only API fixtures"
+    },
+    "tools/security-lane.sh": {
+      "command": "just security",
+      "purpose": "audit both product and independent guard locks, retain workflow lint, secret scans and SBOM evidence"
+    },
+    "ops/ci/prepare-merge-guard.sh": {
+      "command": "just native-guard-check",
+      "purpose": "prepare both full locked graphs before mandatory offline feature, workspace, dependency and checksum boundary proofs; CPU uses the same bounded setup"
+    },
+    "research/transfer/allocation.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/drivers.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/frontier.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify qualified complete byte-cap outcomes with full denominators, measured frontier censoring, frozen scaler content commitments and same-entity exclusion; measured calibration remains unqualified without admissible evidence"
+    },
+    "research/transfer/geometry.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify content-bound frozen geometry, distance identities and exact energy/MMD numerical parity; enforce sum-of-role broadcast/square/matrix work bounds before allocation with bounded max_elements and hard ceiling, preserving private wire and unqualified scientific states"
+    },
+    "research/transfer/objectives.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/privacy/attacks.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/privacy/controls.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/privacy/policy.json": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/probes.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/selection_regret.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/stress/__init__.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/stress/interactions.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify executable bounded parity/product/rare-gate/diffuse/conditional stress fixtures, preallocation4096-cell refusal, deterministic affine/permutation behavior and historical helpers; all scientific/selection/privacy qualification flags false"
+    },
+    "research/transfer/tests/test_drivers.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_frontier.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_geometry.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify content-bound frozen geometry, distance identities and exact energy/MMD numerical parity; enforce sum-of-role broadcast/square/matrix work bounds before allocation with bounded max_elements and hard ceiling, preserving private wire and unqualified scientific states"
+    },
+    "research/transfer/tests/test_interactions.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify executable bounded parity/product/rare-gate/diffuse/conditional stress fixtures, preallocation4096-cell refusal, deterministic affine/permutation behavior and historical helpers; all scientific/selection/privacy qualification flags false"
+    },
+    "research/transfer/tests/test_objectives.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "research/transfer/tests/test_privacy.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "schemas/privacy-evidence-v1.schema.json": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "schemas/transfer-bound-v1.schema.json": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "verify versioned transfer identity/coverage, inference, privacy-power and diagnostics using full offline fixtures; preserve historical identities and explicit unqualified scientific states"
+    },
+    "docs/native-workflow.md": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+    },
+    "rust/main.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/main/cli/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/sample/part_02.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/isolation.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+    },
+    "rust/typed_data/workflow.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+    },
+    "scripts/install-native.sh": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify atomic native installation and delivered legal pins, fixed-member manifest/tamper refusal and legacy uninstall compatibility; full existing vnext_native_install target, no release or other-platform qualification"
+    },
+    "tests/vnext_artifact_only.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+    },
+    "tests/vnext_native_install.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify atomic native installation and delivered legal pins, fixed-member manifest/tamper refusal and legacy uninstall compatibility; full existing vnext_native_install target, no release or other-platform qualification"
+    },
+    "tests/vnext_raw_workflow.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "ops/ci/test-cpu-tool-readiness.sh": {
+      "command": "bash ops/ci/test-cpu-tool-readiness.sh",
+      "purpose": "run each missing-tool refusal against the real CPU entry and verify no build/replay starts; required in fast/check and hosted CPU"
+    },
+    "research/transfer/raw_profile.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "retain full transfer suite including authenticated raw-v1/raw-v2 and distinct DOPMIX01 complete-byte charges, framing/integrity/payload bounds and privacy-safe metadata; raw handler refuses mixed artifacts; fitted affine/dictionary/mask/split values stay private, runtime/parameter count/cold closure unmeasured; no native sampling/kernel decode or scientific qualification"
+    },
+    "research/transfer/tests/test_raw_profile.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "retain full transfer suite including authenticated raw-v1/raw-v2 and distinct DOPMIX01 complete-byte charges, framing/integrity/payload bounds and privacy-safe metadata; raw handler refuses mixed artifacts; fitted affine/dictionary/mask/split values stay private, runtime/parameter count/cold closure unmeasured; no native sampling/kernel decode or scientific qualification"
+    },
+    "docs/whitepaper/scripts/claim_registry.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
+      "purpose": "verify source-captured registry12 and mandatory publication hook against estimands, macros, states and forbidden wording; retain full paper/CPU tests and no live-checkout substitution"
+    },
+    "docs/whitepaper/scripts/test_claim_registry.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
+      "purpose": "verify source-captured registry12 and mandatory publication hook against estimands, macros, states and forbidden wording; retain full paper/CPU tests and no live-checkout substitution"
+    },
+    "docs/whitepaper/scripts/test_hero_figure.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_hero_figure.py' -v",
+      "purpose": "verify page-one predictive-structure hero carries exact byte and paired-auditor evidence, stable rendering and omission refusal"
+    },
+    "research/transfer/blake3_digest.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify standard unkeyed BLAKE3 boundary vectors and native raw state/payload corruption refusal; retain full offline transfer discovery"
+    },
+    "research/transfer/learner_roles.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify version2 learner selection versus mandatory held-out evaluation and legacy identity refusal; preserve full transfer discovery"
+    },
+    "research/transfer/tests/test_learner_roles.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify version2 learner selection versus mandatory held-out evaluation and legacy identity refusal; preserve full transfer discovery"
+    },
+    "schemas/learner-roles-v2.schema.json": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify version2 learner selection versus mandatory held-out evaluation and legacy identity refusal; preserve full transfer discovery"
+    },
+    "docs/vnext/LEARNING_DENSITY.md": {
+      "command": "just paper-tests && just paper-check",
+      "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
+    },
+    "docs/whitepaper/COMPREHENSION_v1.md": {
+      "command": "just paper-tests && just paper-check",
+      "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
+    },
+    "docs/compiler-development.md": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+    },
+    "examples/public-regression/README.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
+      "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
+    },
+    "examples/public-regression/run.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
+      "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
+    },
+    "research/benchmark/tests/test_public_demo.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q",
+      "purpose": "verify pinned public-source refusal before learner execution, physical group/query-label split independence, unclipped report output, and charged failed steps without source-value diagnostics; required in local fast/check and hosted CPU"
+    },
+    "rust/compiler.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/fair_allocation.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/gpu_readout_tests.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/interaction_screen.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/compiler/neural_candidates/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/compiler/neural_candidates/part_02.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/compiler/neural_candidates/part_03.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/compiler/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/compiler/residual_oof.rs": {
+      "command": "cargo test --locked --lib",
+      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+    },
+    "rust/compiler/target_fitting/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "scripts/uninstall-native.sh": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
+      "purpose": "verify atomic native installation and delivered legal pins, fixed-member manifest/tamper refusal and legacy uninstall compatibility; full existing vnext_native_install target, no release or other-platform qualification"
+    },
+    "schemas/bound-binding-v2.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "verify version2 content commitments against historical version1 byte-count identity and refuse uncalibrated point/interval/fabricated caller qualification"
+    },
+    "tests/test_tuner.py": {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests/test_tuner.py",
+      "purpose": "verify tuner behavior and intended140x25 dashboard geometry in both terminal modes, retaining loss/regret and no-sparkline assertions"
+    },
+    "research/benchmark/review_fixes/display_names.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_display_names -v",
+      "purpose": "verify exact reader-facing identifier mapping, distinct printed labels, unchanged unknown values and TeX escaping after mapping; required by hosted CPU review-fix entry"
+    },
+    "research/benchmark/review_fixes/test_display_names.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_display_names -v",
+      "purpose": "verify exact reader-facing identifier mapping, distinct printed labels, unchanged unknown values and TeX escaping after mapping; required by hosted CPU review-fix entry"
+    },
+    "research/transfer/calibration_receipt.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+    },
+    "research/transfer/tests/test_learning_density.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify qualified complete byte-cap outcomes with full denominators, measured frontier censoring, frozen scaler content commitments and same-entity exclusion; measured calibration remains unqualified without admissible evidence"
+    },
+    "research/transfer/tests/test_calibration_receipt.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+    },
+    "schemas/calibration-receipt-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify frozen mixed-type distances excluding same entity, B-star tested-grid states/full denominators, adversarial unadopted learning-density refusal, and development calibration receipt authentication without qualification; required full local/CPU transfer discovery"
+    },
+    "rust/compiler/adaptive_allocation.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/compact_neural_training.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/noise_fitting.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/quantization.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/research_training.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/evidence/successors.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "tests/vnext_byte_allocation.rs": {
+      "command": "cargo test --locked --test vnext_byte_allocation",
+      "purpose": "verify all5 actual native compilation/allocation fixtures including48-feature rank-feasible distractor/redundancy and typed residual families; accepted artifact/report bytes, finite ranks, canonical consumed interactions and attempt/table budgets remain bounded; engineering fixtures only, no recovery/calibration/tail/equal-compute qualification"
+    },
+    "tests/vnext_native_successors.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "tests/vnext_public_demo.rs": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "tests/fixtures/vnext-successors/development-calibration-v1.json": {
+      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
+      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/candidate_dependence.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/embedding/encoder_capability.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/embedding/frozen_tests.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/embedding/frozen_transform.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/evidence/geometry.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "rust/fitness/tests.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "tests/fixtures/vnext-successors/frozen-geometry-v1.json": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "tests/vnext_geometry_binding.rs": {
+      "command": "cargo test --locked --lib --test vnext_geometry_binding",
+      "purpose": "verify declared candidate dependence, encoder capability refusals, frozen native transform/state content binding and Python-native canonical golden distinction; development fixture proof preserves historical decoding and does not qualify calibrated geometry or privacy"
+    },
+    "docs/whitepaper/scripts/rust_closure.py": {
+      "command": "PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_rust_closure -v",
+      "purpose": "verify identical architecture macros from old and split real fitter layouts, declared include closure coverage and missing/escape/symlink/conflicting constant refusals; mandatory local fast/check and hosted paper-script discovery"
+    },
+    "docs/whitepaper/scripts/test_rust_closure.py": {
+      "command": "PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_rust_closure -v",
+      "purpose": "verify identical architecture macros from old and split real fitter layouts, declared include closure coverage and missing/escape/symlink/conflicting constant refusals; mandatory local fast/check and hosted paper-script discovery"
+    },
+    "research/benchmark/review_fixes/test_receipt_unknown_method.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_receipt_unknown_method -v",
+      "purpose": "verify unknown ledger/request methods and duplicate scientific identities fail instead of being silently skipped; required hosted CPU review-fix entry"
+    },
+    "research/transfer/geometry_distributions.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls with actual positive/negative label-shuffle distances and width-charged preallocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified; squared-array peak documented, label-code distance lists private and tautological status removed"
+    },
+    "research/transfer/tests/test_geometry_distributions.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify matched clouds and real-real references, descriptive flat ECDFs, version 2 development bands resampling outer declared lineages with nested fits intact and equal lineage weights, single-lineage unavailability, deterministic seed/quantiles, step5 controls with actual positive/negative label-shuffle distances and width-charged preallocation refusals; version 1 and the frozen private/public wire remain unchanged, source independence and scientific qualification stay unverified; squared-array peak documented, label-code distance lists private and tautological status removed"
+    },
+    "scripts/native-third-party.NOTICE": {
+      "command": "sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
+      "purpose": "verify shipped LICENSE/notice/lock/toolchain pins and installed legal layout, fixed-member tamper refusal and legacy uninstall compatibility; no notice regeneration/download or release qualification"
+    },
+    "scripts/native-legal.sha256": {
+      "command": "sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
+      "purpose": "verify shipped LICENSE/notice/lock/toolchain pins and installed legal layout, fixed-member tamper refusal and legacy uninstall compatibility; no notice regeneration/download or release qualification"
+    },
+    "ops/merge_guard/tests/workflow_events.rs": {
+      "command": "just native-guard-check",
+      "purpose": "verify current PR-only source event admission with mandatory main pushes, historical dual-source events, exact four-job/source/app binding and stale-review/receiving-check refusal; preserve all original scenarios and canonical version1 receipts"
+    },
+    "research/transfer/pilot_admission.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify development v2 keyed token/commitment refusal, complete non-success accounting, prospective job cap before allocation, trusted expected-plan reconciliation, and canonical seed bound through mandatory local/CPU transfer discovery; no custody, rights, pilot execution or N19/N12 qualification"
+    },
+    "research/transfer/tests/test_pilot_admission.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify development v2 keyed token/commitment refusal, complete non-success accounting, prospective job cap before allocation, trusted expected-plan reconciliation, and canonical seed bound through mandatory local/CPU transfer discovery; no custody, rights, pilot execution or N19/N12 qualification"
+    },
+    "rust/compiler/capacity_refinement.rs": {
+      "command": "cargo test --locked --lib --test vnext_byte_allocation --test vnext_raw_workflow",
+      "purpose": "verify actual bounded adaptive rank, edges, support, width and residual refits, fixed-fold rare/random/OOF proposals, exact encoded-byte promotion and preserved raw workflow; mandatory local full library plus byte-allocation3/raw-workflow6 and hosted full Cargo discovery; development only, no equal-compute qualification"
+    },
+    "research/benchmark/fetch_jope.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
+    },
+    "research/benchmark/prepare_s3.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
+    },
+    "research/benchmark/tests/test_fetch_jope.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -v",
+      "purpose": "verify explicit validated bucket refusal before mkdir or AWS, wrapper/profile propagation, pinned hashes, rights and byte-budget refusal through all14 mocked fetch tests; mandatory local fast/check and hosted CPU, without data or network execution"
+    },
+    "rust/compiler/residual_profiles.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "rust/compiler/target_preparation.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "rust/model/residual.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "rust/sample/residual.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "tests/support/raw_residual_profiles.rs": {
+      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+    },
+    "rust/corpus/source_pilot.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full native library162 and CLI7 including all8 P-v2 metadata consumer units and read-only CLI, exact integer/float/signed-zero plan/summary parity, trusted expected digest,4MiB/4096 caps, opaque custody/false admission flags, and complete missing/unavailable/source denominators; no N19/N12 or campaign admission"
+    },
+    "rust/corpus/source_pilot_tests.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full native library162 and CLI7 including all8 P-v2 metadata consumer units and read-only CLI, exact integer/float/signed-zero plan/summary parity, trusted expected digest,4MiB/4096 caps, opaque custody/false admission flags, and complete missing/unavailable/source denominators; no N19/N12 or campaign admission"
+    },
+    "tests/fixtures/n19-pilot-v2.json": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full native library162 and CLI7 including all8 P-v2 metadata consumer units and read-only CLI, exact integer/float/signed-zero plan/summary parity, trusted expected digest,4MiB/4096 caps, opaque custody/false admission flags, and complete missing/unavailable/source denominators; no N19/N12 or campaign admission"
+    },
+    "tests/support/source_pilot_cli.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full native library162 and CLI7 including all8 P-v2 metadata consumer units and read-only CLI, exact integer/float/signed-zero plan/summary parity, trusted expected digest,4MiB/4096 caps, opaque custody/false admission flags, and complete missing/unavailable/source denominators; no N19/N12 or campaign admission"
+    },
+    "scripts/native-notices.rs": {
+      "command": "cargo test --locked --bin dope-native-notices && cargo run --locked --offline --bin dope-native-notices -- --check && sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
+      "purpose": "verify the Rust notice generator's strict lock/manifest/tree parsing, unique regular archive members through literal-argv tar, tamper/missing/ambiguous/link refusals and exact rendering; offline regeneration equals the shipped notice and pins; installed legal layout, fixed-member tamper refusal and legacy uninstall stay intact; no download, cache deletion or release qualification"
+    },
+    "scripts/native-notices/": {
+      "command": "cargo test --locked --bin dope-native-notices && cargo run --locked --offline --bin dope-native-notices -- --check && sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
+      "purpose": "verify the Rust notice generator's strict lock/manifest/tree parsing, unique regular archive members through literal-argv tar, tamper/missing/ambiguous/link refusals and exact rendering; offline regeneration equals the shipped notice and pins; installed legal layout, fixed-member tamper refusal and legacy uninstall stay intact; no download, cache deletion or release qualification"
+    },
+    "rust/main/mixed_commands.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed/codec.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed/fit.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed/sample.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed/tests.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "tests/support/raw_mixed_cli.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "research/benchmark/local_checkpoint.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
+      "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
+    },
+    "research/benchmark/tests/test_local_checkpoint.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
+      "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
+    },
+    "rust/auditor/auditor_backends/tests.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/auditor/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/calibration/part_02.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/calibration/training_metrics/part_03.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/campaign/gold_blocks/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/campaign/gold_evidence/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/campaign/gold_evidence/part_02.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/campaign/validation_metrics/aggregate_records.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/certification/privacy_attacks/finalize_certification.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/compiler/candidate_search/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/deep_campaign/part_02.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/ledger.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/ledger/sqlite_ledger/part_03.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "research/transfer/tests/fixtures/raw-residual-v2.bin": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_raw_profile -v",
+      "purpose": "verify immutable retained synthetic fixture hash/full framing bytes and corruption/refusal/public-redaction assertions using temporary per-test carriers, with no author-local build path or native regeneration"
+    },
+    "research/transfer/tests/fixtures/mixed-feature-v1.bin": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_raw_profile -v",
+      "purpose": "verify immutable retained synthetic fixture hash/full framing bytes and corruption/refusal/public-redaction assertions using temporary per-test carriers, with no author-local build path or native regeneration"
+    },
+    "research/transfer/scheduler.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "research/transfer/executor.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "research/transfer/tests/test_scheduler.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "research/transfer/tests/test_executor.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "schemas/transfer-execution-plan-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "tests/support/native_rank_feasible_interactions.rs": {
+      "command": "cargo test --locked --test vnext_byte_allocation",
+      "purpose": "verify all5 actual native compilation/allocation fixtures including48-feature rank-feasible distractor/redundancy and typed residual families; accepted artifact/report bytes, finite ranks, canonical consumed interactions and attempt/table budgets remain bounded; engineering fixtures only, no recovery/calibration/tail/equal-compute qualification"
+    },
+    "research/transfer/claims.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify receipt-pinned claim identities, separate raw-gap/adjusted-Z/equivalence decisions, preserved negative/unavailable limitation states with positive headline refusal, complete fit/sample denominators, stale/missing/mixed/vendor/bool/budget refusals and public receipts projection through mandatory local and CPU discovery; synthetic/development graphs remain unqualified with campaign and N21 admission false"
+    },
+    "research/transfer/tests/test_claims.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify receipt-pinned claim identities, separate raw-gap/adjusted-Z/equivalence decisions, preserved negative/unavailable limitation states with positive headline refusal, complete fit/sample denominators, stale/missing/mixed/vendor/bool/budget refusals and public receipts projection through mandatory local and CPU discovery; synthetic/development graphs remain unqualified with campaign and N21 admission false"
+    },
+    "schemas/claim-vnext-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "exercise the versioned claim document and its receipt-binding refusals through full transfer discovery; schema declarations do not grant measured qualification or campaign admission"
+    },
+    "docs/whitepaper/scripts/test_vnext_paper.py": {
+      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_vnext_paper.py -v",
+      "purpose": "verify unchanged draft/venue/rights refusal and measured rendering of the real verified claim graph, distinct decision states and counts, tampering/stale/vendor/bool refusals, escaped TeX and unqualified output; full paper-tests discovery remains mandatory locally and in CPU CI"
+    },
+    "docs/whitepaper/scripts/native_byte_conformance.py": {
+      "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
+      "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
+    },
+    "docs/whitepaper/scripts/test_native_byte_conformance.py": {
+      "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
+      "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
+    },
+    "docs/whitepaper/receipts/native-byte-conformance-v1.json": {
+      "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
+      "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
+    },
+    "docs/whitepaper/generated/native-byte-conformance.tex": {
+      "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
+      "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
     }
   }
 }

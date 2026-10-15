@@ -239,12 +239,12 @@ def render_controls(payload: dict) -> str:
         if row["auditor"] != "catboost":
             continue
         lines.append(
-            f"{row['size']}$n$ & catboost & predictor fit {row['fit_seed']} & "
+            f"{row['size']}$n$ & CatBoost & predictor fit {row['fit_seed']} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
         )
     for row in payload["split_seeds"]:
         lines.append(
-            f"{row['size']}$n$ & catboost & split {row['split_seed']} & "
+            f"{row['size']}$n$ & CatBoost & split {row['split_seed']} & "
             f"{row['n']} & {fmt(row['median'])} & {ci(row)} & --- & --- & --- & --- \\\\"
         )
     return longtable(
@@ -252,8 +252,9 @@ def render_controls(payload: dict) -> str:
         "difference with its family-cluster bootstrap 95\\% interval, the mean difference, the v1 mean-difference "
         "equivalence test at $\\pm 0.02$, and W/T/L over lineages; the Wilcoxon and equivalence tests treat lineages "
         "as independent. Predictor fit-seed and split-seed rows give the control's own CatBoost retention level. "
-        "The size-$n$ Holm family is the three predictor-only tests, because the real-row control exists at $4n$ "
-        "only; the size-$4n$ family has six tests. Fit-seed and split-seed rows are outside both Holm families.",
+        "The size-$n$ Holm family is the three predictor-only tests (DOPE against the predictor-only control under each "
+        "auditor), because the real-row control exists at $4n$ only; the size-$4n$ family has six tests (DOPE against "
+        "the predictor-only control and the resampled real rows under each auditor). Fit-seed and split-seed rows are outside both Holm families.",
         "Size & Auditor & Control & $n$ & Median diff. or level & Hierarchical CI & Mean & TOST & W/T/L & Holm $p$",
         lines,
         "lllrrrrllr",

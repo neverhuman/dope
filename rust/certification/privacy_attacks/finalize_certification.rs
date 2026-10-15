@@ -67,7 +67,8 @@
         .copied()
         .collect::<Option<Vec<_>>>()
         .and_then(|values| values.into_iter().reduce(f64::min));
-    let structure_jaccard = importance_jaccard.into_iter().reduce(f64::min);
+    let structure_jaccard = importance_jaccard.into_iter().collect::<Option<Vec<_>>>()
+        .and_then(|values| values.into_iter().reduce(f64::min));
     let mut gates: BTreeMap<String, bool> = BTreeMap::new();
     gates.insert(
         "auditor_family_coverage".into(),
@@ -189,11 +190,7 @@
     let coverage_realism_min = worst_diagnostics(|item| item.coverage_realism);
     let pareto_vector = ParetoVector {
         utility_transfer: minimum_gold_one_sided_95_retention.map(|value| value.clamp(0.0, 1.0)),
-        driver_fidelity: structure_spearman
-            .zip(structure_jaccard)
-            .map(|(rank, top_k)| {
-                0.5 * ((rank + 1.0) / 2.0).clamp(0.0, 1.0) + 0.5 * top_k.clamp(0.0, 1.0)
-            }),
+        driver_fidelity: crate::auditor::importance_driver_fidelity(structure_spearman, structure_jaccard),
         distribution_fidelity: marginal_fidelity_min
             .zip(sliced_fidelity_min)
             .zip(mmd_fidelity_min)

@@ -3,6 +3,8 @@
 
 Digits come from the lineage retentions in the MFS-v3 receipt. Stored medians
 are checked and then ignored. CatBoost, linear, and MLP figures are untouched.
+A cell is unscanned only when no seed records a cleartext measurement, read with
+the assembler's boolean gate evidence; a measured failure is never unscanned.
 """
 
 from __future__ import annotations
@@ -24,6 +26,7 @@ if str(REPO) not in sys.path:
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+from research.benchmark.mfs_v3_assemble import boolean_gate_evidence
 from research.benchmark.mfs_v3_panel import KUMO_ESTIMATORS, REFUSED_ENCODERS, VECTOR_PIN
 from research.benchmark.representation import TABULAR_AUDITORS
 
@@ -170,7 +173,7 @@ def measure(receipt: dict) -> dict:
             )
         block[auditor] = {"methods": methods, "pairs": pairs}
     cleartext = sum(
-        "cleartext_absent" in (row.get("failed_gates") or [])
+        boolean_gate_evidence(row.get("seeds") or [])["values"]["cleartext_absent"] is None
         for row in receipt["lineages"]
     )
     return {

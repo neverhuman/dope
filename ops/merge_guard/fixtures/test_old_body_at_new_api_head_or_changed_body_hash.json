@@ -1,0 +1,1754 @@
+[
+  {
+    "args": [
+      {
+        "after": {
+          "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "controls": {
+            "protection": {
+              "allow_deletions": {
+                "enabled": false
+              },
+              "allow_force_pushes": {
+                "enabled": false
+              },
+              "enforce_admins": {
+                "enabled": true
+              },
+              "required_pull_request_reviews": {
+                "bypass_pull_request_allowances": {
+                  "apps": [],
+                  "teams": [],
+                  "users": []
+                },
+                "dismiss_stale_reviews": true,
+                "require_last_push_approval": true,
+                "required_approving_review_count": 1
+              },
+              "required_status_checks": {
+                "checks": [
+                  {
+                    "app_id": 15368,
+                    "context": "cpu"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "jankurai-audit"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "paper-clean"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "security"
+                  }
+                ],
+                "contexts": [
+                  "cpu",
+                  "jankurai-audit",
+                  "paper-clean",
+                  "security"
+                ],
+                "strict": true
+              }
+            },
+            "rules": [],
+            "rulesets": {}
+          },
+          "open_prs": [
+            {
+              "base": {
+                "ref": "main",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "draft": false,
+              "head": {
+                "ref": "codex/fixture",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "number": 7,
+              "state": "open"
+            }
+          ],
+          "pull": {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "commits": 1,
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "merge_commit_sha": null,
+            "mergeable_state": "clean",
+            "merged": false,
+            "merged_at": null,
+            "number": 7,
+            "state": "open",
+            "user": {
+              "login": "jepsontaylor"
+            }
+          }
+        },
+        "before": {
+          "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "controls": {
+            "protection": {
+              "allow_deletions": {
+                "enabled": false
+              },
+              "allow_force_pushes": {
+                "enabled": false
+              },
+              "enforce_admins": {
+                "enabled": true
+              },
+              "required_pull_request_reviews": {
+                "bypass_pull_request_allowances": {
+                  "apps": [],
+                  "teams": [],
+                  "users": []
+                },
+                "dismiss_stale_reviews": true,
+                "require_last_push_approval": true,
+                "required_approving_review_count": 1
+              },
+              "required_status_checks": {
+                "checks": [
+                  {
+                    "app_id": 15368,
+                    "context": "cpu"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "jankurai-audit"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "paper-clean"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "security"
+                  }
+                ],
+                "contexts": [
+                  "cpu",
+                  "jankurai-audit",
+                  "paper-clean",
+                  "security"
+                ],
+                "strict": true
+              }
+            },
+            "rules": [],
+            "rulesets": {}
+          },
+          "open_prs": [
+            {
+              "base": {
+                "ref": "main",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "draft": false,
+              "head": {
+                "ref": "codex/fixture",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "number": 7,
+              "state": "open"
+            }
+          ],
+          "pull": {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "commits": 1,
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "merge_commit_sha": null,
+            "mergeable_state": "clean",
+            "merged": false,
+            "merged_at": null,
+            "number": 7,
+            "state": "open",
+            "user": {
+              "login": "jepsontaylor"
+            }
+          }
+        },
+        "commits": [
+          {
+            "author": {
+              "login": "jepsontaylor"
+            },
+            "committer": {
+              "login": "jepsontaylor"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "inspection_completed_at": "2026-10-14T02:02:00Z",
+        "operator": {
+          "login": "jepsontaylor"
+        },
+        "reviewer_permission": {
+          "permission": "write",
+          "user": {
+            "login": "neverhumanbot"
+          }
+        },
+        "reviews": [
+          {
+            "body": "Reviewed source eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee; receipt old; checks 1.",
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 901,
+            "state": "APPROVED",
+            "submitted_at": "2026-10-14T02:01:00Z",
+            "user": {
+              "login": "neverhumanbot"
+            }
+          }
+        ],
+        "runs": [
+          {
+            "conclusion": "success",
+            "event": "push",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 101,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1010,
+                "name": "cpu",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1011,
+                "name": "paper-clean",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1012,
+                "name": "security",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/ci.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "pull_request",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 102,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1020,
+                "name": "cpu",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1021,
+                "name": "paper-clean",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1022,
+                "name": "security",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/ci.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "push",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 103,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1030,
+                "name": "jankurai-audit",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/jankurai.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "pull_request",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 104,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1040,
+                "name": "jankurai-audit",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/jankurai.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          }
+        ],
+        "source_commit": {
+          "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "tree": {
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "workflow_definitions": {
+          ".github/workflows/ci.yml": "name: fixture\non:\n  push:\n  pull_request:\n\njobs:\n  cpu:\n    runs-on: fixture\n  paper-clean:\n    runs-on: fixture\n  security:\n    runs-on: fixture\n",
+          ".github/workflows/jankurai.yml": "name: fixture\non:\n  push:\n  pull_request:\n\njobs:\n  jankurai-audit:\n    runs-on: fixture\n"
+        }
+      },
+      {
+        "base_branch": "main",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pr": 7,
+        "repo": "neverhuman/dope",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "body_sha256": "902691b22dbc970c92db01eb140f34ed5e9fbaccc13ccd98633663a25a193e81",
+        "check_run_ids": [
+          101,
+          102,
+          103,
+          104
+        ],
+        "inspected_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pr": 7,
+        "receipt_locator": "target/review/fixture.json",
+        "repo": "neverhuman/dope",
+        "review_id": 901,
+        "reviewer": "neverhumanbot",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "version": 1
+      }
+    ],
+    "kwargs": {},
+    "operation": "evaluate_preflight",
+    "refused": "approval_body_mismatch"
+  },
+  {
+    "args": [
+      {
+        "after": {
+          "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "controls": {
+            "protection": {
+              "allow_deletions": {
+                "enabled": false
+              },
+              "allow_force_pushes": {
+                "enabled": false
+              },
+              "enforce_admins": {
+                "enabled": true
+              },
+              "required_pull_request_reviews": {
+                "bypass_pull_request_allowances": {
+                  "apps": [],
+                  "teams": [],
+                  "users": []
+                },
+                "dismiss_stale_reviews": true,
+                "require_last_push_approval": true,
+                "required_approving_review_count": 1
+              },
+              "required_status_checks": {
+                "checks": [
+                  {
+                    "app_id": 15368,
+                    "context": "cpu"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "jankurai-audit"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "paper-clean"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "security"
+                  }
+                ],
+                "contexts": [
+                  "cpu",
+                  "jankurai-audit",
+                  "paper-clean",
+                  "security"
+                ],
+                "strict": true
+              }
+            },
+            "rules": [],
+            "rulesets": {}
+          },
+          "open_prs": [
+            {
+              "base": {
+                "ref": "main",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "draft": false,
+              "head": {
+                "ref": "codex/fixture",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "number": 7,
+              "state": "open"
+            }
+          ],
+          "pull": {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "commits": 1,
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "merge_commit_sha": null,
+            "mergeable_state": "clean",
+            "merged": false,
+            "merged_at": null,
+            "number": 7,
+            "state": "open",
+            "user": {
+              "login": "jepsontaylor"
+            }
+          }
+        },
+        "before": {
+          "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "controls": {
+            "protection": {
+              "allow_deletions": {
+                "enabled": false
+              },
+              "allow_force_pushes": {
+                "enabled": false
+              },
+              "enforce_admins": {
+                "enabled": true
+              },
+              "required_pull_request_reviews": {
+                "bypass_pull_request_allowances": {
+                  "apps": [],
+                  "teams": [],
+                  "users": []
+                },
+                "dismiss_stale_reviews": true,
+                "require_last_push_approval": true,
+                "required_approving_review_count": 1
+              },
+              "required_status_checks": {
+                "checks": [
+                  {
+                    "app_id": 15368,
+                    "context": "cpu"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "jankurai-audit"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "paper-clean"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "security"
+                  }
+                ],
+                "contexts": [
+                  "cpu",
+                  "jankurai-audit",
+                  "paper-clean",
+                  "security"
+                ],
+                "strict": true
+              }
+            },
+            "rules": [],
+            "rulesets": {}
+          },
+          "open_prs": [
+            {
+              "base": {
+                "ref": "main",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "draft": false,
+              "head": {
+                "ref": "codex/fixture",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "number": 7,
+              "state": "open"
+            }
+          ],
+          "pull": {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "commits": 1,
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "merge_commit_sha": null,
+            "mergeable_state": "clean",
+            "merged": false,
+            "merged_at": null,
+            "number": 7,
+            "state": "open",
+            "user": {
+              "login": "jepsontaylor"
+            }
+          }
+        },
+        "commits": [
+          {
+            "author": {
+              "login": "jepsontaylor"
+            },
+            "committer": {
+              "login": "jepsontaylor"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "inspection_completed_at": "2026-10-14T02:02:00Z",
+        "operator": {
+          "login": "jepsontaylor"
+        },
+        "reviewer_permission": {
+          "permission": "write",
+          "user": {
+            "login": "neverhumanbot"
+          }
+        },
+        "reviews": [
+          {
+            "body": "changed",
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 901,
+            "state": "APPROVED",
+            "submitted_at": "2026-10-14T02:01:00Z",
+            "user": {
+              "login": "neverhumanbot"
+            }
+          }
+        ],
+        "runs": [
+          {
+            "conclusion": "success",
+            "event": "push",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 101,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1010,
+                "name": "cpu",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1011,
+                "name": "paper-clean",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1012,
+                "name": "security",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/ci.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "pull_request",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 102,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1020,
+                "name": "cpu",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1021,
+                "name": "paper-clean",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1022,
+                "name": "security",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/ci.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "push",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 103,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1030,
+                "name": "jankurai-audit",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/jankurai.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "pull_request",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 104,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1040,
+                "name": "jankurai-audit",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/jankurai.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          }
+        ],
+        "source_commit": {
+          "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "tree": {
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "workflow_definitions": {
+          ".github/workflows/ci.yml": "name: fixture\non:\n  push:\n  pull_request:\n\njobs:\n  cpu:\n    runs-on: fixture\n  paper-clean:\n    runs-on: fixture\n  security:\n    runs-on: fixture\n",
+          ".github/workflows/jankurai.yml": "name: fixture\non:\n  push:\n  pull_request:\n\njobs:\n  jankurai-audit:\n    runs-on: fixture\n"
+        }
+      },
+      {
+        "base_branch": "main",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pr": 7,
+        "repo": "neverhuman/dope",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "body_sha256": "d67e2e944994496c8d8ec76eed0cf9f09679448d584b532bebf941852a37f5ed",
+        "check_run_ids": [
+          101,
+          102,
+          103,
+          104
+        ],
+        "inspected_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pr": 7,
+        "receipt_locator": "target/review/fixture.json",
+        "repo": "neverhuman/dope",
+        "review_id": 901,
+        "reviewer": "neverhumanbot",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "version": 1
+      }
+    ],
+    "kwargs": {},
+    "operation": "evaluate_preflight",
+    "refused": "approval_body_mismatch"
+  },
+  {
+    "args": [
+      {
+        "after": {
+          "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "controls": {
+            "protection": {
+              "allow_deletions": {
+                "enabled": false
+              },
+              "allow_force_pushes": {
+                "enabled": false
+              },
+              "enforce_admins": {
+                "enabled": true
+              },
+              "required_pull_request_reviews": {
+                "bypass_pull_request_allowances": {
+                  "apps": [],
+                  "teams": [],
+                  "users": []
+                },
+                "dismiss_stale_reviews": true,
+                "require_last_push_approval": true,
+                "required_approving_review_count": 1
+              },
+              "required_status_checks": {
+                "checks": [
+                  {
+                    "app_id": 15368,
+                    "context": "cpu"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "jankurai-audit"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "paper-clean"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "security"
+                  }
+                ],
+                "contexts": [
+                  "cpu",
+                  "jankurai-audit",
+                  "paper-clean",
+                  "security"
+                ],
+                "strict": true
+              }
+            },
+            "rules": [],
+            "rulesets": {}
+          },
+          "open_prs": [
+            {
+              "base": {
+                "ref": "main",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "draft": false,
+              "head": {
+                "ref": "codex/fixture",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "number": 7,
+              "state": "open"
+            }
+          ],
+          "pull": {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "commits": 1,
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "merge_commit_sha": null,
+            "mergeable_state": "clean",
+            "merged": false,
+            "merged_at": null,
+            "number": 7,
+            "state": "open",
+            "user": {
+              "login": "jepsontaylor"
+            }
+          }
+        },
+        "before": {
+          "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "controls": {
+            "protection": {
+              "allow_deletions": {
+                "enabled": false
+              },
+              "allow_force_pushes": {
+                "enabled": false
+              },
+              "enforce_admins": {
+                "enabled": true
+              },
+              "required_pull_request_reviews": {
+                "bypass_pull_request_allowances": {
+                  "apps": [],
+                  "teams": [],
+                  "users": []
+                },
+                "dismiss_stale_reviews": true,
+                "require_last_push_approval": true,
+                "required_approving_review_count": 1
+              },
+              "required_status_checks": {
+                "checks": [
+                  {
+                    "app_id": 15368,
+                    "context": "cpu"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "jankurai-audit"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "paper-clean"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "security"
+                  }
+                ],
+                "contexts": [
+                  "cpu",
+                  "jankurai-audit",
+                  "paper-clean",
+                  "security"
+                ],
+                "strict": true
+              }
+            },
+            "rules": [],
+            "rulesets": {}
+          },
+          "open_prs": [
+            {
+              "base": {
+                "ref": "main",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "draft": false,
+              "head": {
+                "ref": "codex/fixture",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "number": 7,
+              "state": "open"
+            }
+          ],
+          "pull": {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "commits": 1,
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "merge_commit_sha": null,
+            "mergeable_state": "clean",
+            "merged": false,
+            "merged_at": null,
+            "number": 7,
+            "state": "open",
+            "user": {
+              "login": "jepsontaylor"
+            }
+          }
+        },
+        "commits": [
+          {
+            "author": {
+              "login": "jepsontaylor"
+            },
+            "committer": {
+              "login": "jepsontaylor"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "inspection_completed_at": "2026-10-14T02:02:00Z",
+        "operator": {
+          "login": "jepsontaylor"
+        },
+        "reviewer_permission": {
+          "permission": "write",
+          "user": {
+            "login": "neverhumanbot"
+          }
+        },
+        "reviews": [
+          {
+            "body": "Reviewed source aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; receipt target/review/fixture.json; checks 101,102,103,104.",
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 901,
+            "state": "APPROVED",
+            "submitted_at": "2026-10-14T02:01:00Z",
+            "user": {
+              "login": "neverhumanbot"
+            }
+          }
+        ],
+        "runs": [
+          {
+            "conclusion": "success",
+            "event": "push",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 101,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1010,
+                "name": "cpu",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1011,
+                "name": "paper-clean",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1012,
+                "name": "security",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/ci.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "pull_request",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 102,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1020,
+                "name": "cpu",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1021,
+                "name": "paper-clean",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1022,
+                "name": "security",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/ci.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "push",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 103,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1030,
+                "name": "jankurai-audit",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/jankurai.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "pull_request",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 104,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1040,
+                "name": "jankurai-audit",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/jankurai.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          }
+        ],
+        "source_commit": {
+          "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "tree": {
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "workflow_definitions": {
+          ".github/workflows/ci.yml": "name: fixture\non:\n  push:\n  pull_request:\n\njobs:\n  cpu:\n    runs-on: fixture\n  paper-clean:\n    runs-on: fixture\n  security:\n    runs-on: fixture\n",
+          ".github/workflows/jankurai.yml": "name: fixture\non:\n  push:\n  pull_request:\n\njobs:\n  jankurai-audit:\n    runs-on: fixture\n"
+        }
+      },
+      {
+        "base_branch": "main",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pr": 7,
+        "repo": "neverhuman/dope",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "body_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "check_run_ids": [
+          101,
+          102,
+          103,
+          104
+        ],
+        "inspected_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pr": 7,
+        "receipt_locator": "target/review/fixture.json",
+        "repo": "neverhuman/dope",
+        "review_id": 901,
+        "reviewer": "neverhumanbot",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "version": 1
+      }
+    ],
+    "kwargs": {},
+    "operation": "evaluate_preflight",
+    "refused": "approval_body_mismatch"
+  },
+  {
+    "args": [
+      {
+        "after": {
+          "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "controls": {
+            "protection": {
+              "allow_deletions": {
+                "enabled": false
+              },
+              "allow_force_pushes": {
+                "enabled": false
+              },
+              "enforce_admins": {
+                "enabled": true
+              },
+              "required_pull_request_reviews": {
+                "bypass_pull_request_allowances": {
+                  "apps": [],
+                  "teams": [],
+                  "users": []
+                },
+                "dismiss_stale_reviews": true,
+                "require_last_push_approval": true,
+                "required_approving_review_count": 1
+              },
+              "required_status_checks": {
+                "checks": [
+                  {
+                    "app_id": 15368,
+                    "context": "cpu"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "jankurai-audit"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "paper-clean"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "security"
+                  }
+                ],
+                "contexts": [
+                  "cpu",
+                  "jankurai-audit",
+                  "paper-clean",
+                  "security"
+                ],
+                "strict": true
+              }
+            },
+            "rules": [],
+            "rulesets": {}
+          },
+          "open_prs": [
+            {
+              "base": {
+                "ref": "main",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "draft": false,
+              "head": {
+                "ref": "codex/fixture",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "number": 7,
+              "state": "open"
+            }
+          ],
+          "pull": {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "commits": 1,
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "merge_commit_sha": null,
+            "mergeable_state": "clean",
+            "merged": false,
+            "merged_at": null,
+            "number": 7,
+            "state": "open",
+            "user": {
+              "login": "jepsontaylor"
+            }
+          }
+        },
+        "before": {
+          "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "controls": {
+            "protection": {
+              "allow_deletions": {
+                "enabled": false
+              },
+              "allow_force_pushes": {
+                "enabled": false
+              },
+              "enforce_admins": {
+                "enabled": true
+              },
+              "required_pull_request_reviews": {
+                "bypass_pull_request_allowances": {
+                  "apps": [],
+                  "teams": [],
+                  "users": []
+                },
+                "dismiss_stale_reviews": true,
+                "require_last_push_approval": true,
+                "required_approving_review_count": 1
+              },
+              "required_status_checks": {
+                "checks": [
+                  {
+                    "app_id": 15368,
+                    "context": "cpu"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "jankurai-audit"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "paper-clean"
+                  },
+                  {
+                    "app_id": 15368,
+                    "context": "security"
+                  }
+                ],
+                "contexts": [
+                  "cpu",
+                  "jankurai-audit",
+                  "paper-clean",
+                  "security"
+                ],
+                "strict": true
+              }
+            },
+            "rules": [],
+            "rulesets": {}
+          },
+          "open_prs": [
+            {
+              "base": {
+                "ref": "main",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "draft": false,
+              "head": {
+                "ref": "codex/fixture",
+                "repo": {
+                  "full_name": "neverhuman/dope"
+                },
+                "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "number": 7,
+              "state": "open"
+            }
+          ],
+          "pull": {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "commits": 1,
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "merge_commit_sha": null,
+            "mergeable_state": "clean",
+            "merged": false,
+            "merged_at": null,
+            "number": 7,
+            "state": "open",
+            "user": {
+              "login": "jepsontaylor"
+            }
+          }
+        },
+        "commits": [
+          {
+            "author": {
+              "login": "jepsontaylor"
+            },
+            "committer": {
+              "login": "jepsontaylor"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "inspection_completed_at": "2026-10-14T02:02:00Z",
+        "operator": {
+          "login": "jepsontaylor"
+        },
+        "reviewer_permission": {
+          "permission": "write",
+          "user": {
+            "login": "neverhumanbot"
+          }
+        },
+        "reviews": [
+          {
+            "body": "Reviewed source aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; receipt target/review/fixture.json; checks 101,102,103,104.\nAlso reviewed source bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 901,
+            "state": "APPROVED",
+            "submitted_at": "2026-10-14T02:01:00Z",
+            "user": {
+              "login": "neverhumanbot"
+            }
+          }
+        ],
+        "runs": [
+          {
+            "conclusion": "success",
+            "event": "push",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 101,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1010,
+                "name": "cpu",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1011,
+                "name": "paper-clean",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1012,
+                "name": "security",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/ci.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "pull_request",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 102,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1020,
+                "name": "cpu",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1021,
+                "name": "paper-clean",
+                "status": "completed"
+              },
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1022,
+                "name": "security",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/ci.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "push",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 103,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1030,
+                "name": "jankurai-audit",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/jankurai.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          },
+          {
+            "conclusion": "success",
+            "event": "pull_request",
+            "head_branch": "codex/fixture",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": 104,
+            "jobs": [
+              {
+                "conclusion": "success",
+                "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "id": 1040,
+                "name": "jankurai-audit",
+                "status": "completed"
+              }
+            ],
+            "path": ".github/workflows/jankurai.yml",
+            "pull_requests": [
+              {
+                "base": {
+                  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "head": {
+                  "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "number": 7
+              }
+            ],
+            "run_attempt": 1,
+            "status": "completed",
+            "updated_at": "2026-10-14T02:00:00Z"
+          }
+        ],
+        "source_commit": {
+          "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "tree": {
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "workflow_definitions": {
+          ".github/workflows/ci.yml": "name: fixture\non:\n  push:\n  pull_request:\n\njobs:\n  cpu:\n    runs-on: fixture\n  paper-clean:\n    runs-on: fixture\n  security:\n    runs-on: fixture\n",
+          ".github/workflows/jankurai.yml": "name: fixture\non:\n  push:\n  pull_request:\n\njobs:\n  jankurai-audit:\n    runs-on: fixture\n"
+        }
+      },
+      {
+        "base_branch": "main",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pr": 7,
+        "repo": "neverhuman/dope",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "body_sha256": "cecd026facae7986edf0cccf08da56b9061257f4f150966ee5c3eeb77f7c2683",
+        "check_run_ids": [
+          101,
+          102,
+          103,
+          104
+        ],
+        "inspected_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pr": 7,
+        "receipt_locator": "target/review/fixture.json",
+        "repo": "neverhuman/dope",
+        "review_id": 901,
+        "reviewer": "neverhumanbot",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "version": 1
+      }
+    ],
+    "kwargs": {},
+    "operation": "evaluate_preflight",
+    "refused": "approval_body_mismatch"
+  }
+]

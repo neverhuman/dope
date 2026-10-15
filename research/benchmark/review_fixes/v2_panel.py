@@ -42,7 +42,8 @@ FAMILIES = {
     "controls": [("predictor_only", "control"), ("real_bootstrap_4n", "control")],
 }
 FIVE_SEED = {("DOPE", "headline"), ("DOPE", "product_default"), ("ARF", "author_default"),
-             ("ARF", "native_selected"), ("predictor_only", "control")}
+             ("ARF", "native_selected"), ("predictor_only", "control"),
+             ("TabSyn", "scaled_200_vae_1000_diffusion")}
 NOT_A_COMPARATOR = {"predictor_only", "real_bootstrap_4n"}
 
 

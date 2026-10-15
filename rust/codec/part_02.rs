@@ -1,5 +1,3 @@
-
-
 fn encode_dependence(dependence: &Dependence) -> Vec<u8> {
     let mut writer = Writer::default();
     encode_dependence_value(&mut writer, dependence);
@@ -193,6 +191,35 @@ fn encode_noise(noise: &Noise) -> Vec<u8> {
             }
             for probability in probabilities {
                 writer.unit(*probability);
+            }
+        }
+        Noise::ResidualV1 { distribution } => {
+            writer.byte(4);
+            writer.byte(1);
+            match distribution {
+                ResidualV1::NoNoise => writer.byte(0),
+                ResidualV1::StudentT4 { location, scale } => {
+                    writer.byte(1);
+                    writer.fixed(*location);
+                    writer.fixed(*scale);
+                }
+                ResidualV1::GaussianMixture2 {
+                    weight,
+                    locations,
+                    scales,
+                } => {
+                    writer.byte(2);
+                    writer.unit(*weight);
+                    for value in locations.iter().chain(scales) {
+                        writer.fixed(*value);
+                    }
+                }
+                ResidualV1::MonotoneQuantile17 { values } => {
+                    writer.byte(3);
+                    for value in values {
+                        writer.fixed(*value);
+                    }
+                }
             }
         }
     }

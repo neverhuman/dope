@@ -1,0 +1,681 @@
+[
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls/7"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "base": {
+            "ref": "main",
+            "repo": {
+              "full_name": "neverhuman/dope"
+            },
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "commits": 1,
+          "draft": false,
+          "head": {
+            "ref": "codex/fixture",
+            "repo": {
+              "full_name": "neverhuman/dope"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "merge_commit_sha": null,
+          "mergeable_state": "clean",
+          "merged": false,
+          "merged_at": null,
+          "number": 7,
+          "state": "open",
+          "user": {
+            "login": "jepsontaylor"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/git/ref/heads/main"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "object": {
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/branches/main/protection"
+        ],
+        "kwargs": {
+          "optional": true
+        },
+        "method": "get",
+        "value": {
+          "allow_deletions": {
+            "enabled": false
+          },
+          "allow_force_pushes": {
+            "enabled": false
+          },
+          "enforce_admins": {
+            "enabled": true
+          },
+          "required_pull_request_reviews": {
+            "bypass_pull_request_allowances": {
+              "apps": [],
+              "teams": [],
+              "users": []
+            },
+            "dismiss_stale_reviews": true,
+            "require_last_push_approval": true,
+            "required_approving_review_count": 1
+          },
+          "required_status_checks": {
+            "checks": [
+              {
+                "app_id": 15368,
+                "context": "cpu"
+              },
+              {
+                "app_id": 15368,
+                "context": "jankurai-audit"
+              },
+              {
+                "app_id": 15368,
+                "context": "paper-clean"
+              },
+              {
+                "app_id": 15368,
+                "context": "security"
+              }
+            ],
+            "contexts": [
+              "cpu",
+              "jankurai-audit",
+              "paper-clean",
+              "security"
+            ],
+            "strict": true
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/rules/branches/main"
+        ],
+        "kwargs": {},
+        "method": "listing",
+        "value": []
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope"
+        ],
+        "kwargs": {},
+        "method": "open_pulls",
+        "value": [
+          {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "number": 7,
+            "state": "open"
+          }
+        ]
+      },
+      {
+        "args": [
+          "user"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "refused": "api_unavailable"
+      }
+    ],
+    "args": [
+      {
+        "base_branch": "main",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pr": 7,
+        "repo": "neverhuman/dope",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "body_sha256": "7e8fafdee419e8aae8832eed8b71576abaf3bd31bb837266834d769276861733",
+        "check_run_ids": [
+          101,
+          102,
+          103,
+          104
+        ],
+        "inspected_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pr": 7,
+        "receipt_locator": "target/review/fixture.json",
+        "repo": "neverhuman/dope",
+        "review_id": 901,
+        "reviewer": "neverhumanbot",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "version": 1
+      }
+    ],
+    "expected": {
+      "merge_authorized": false,
+      "read_only": true,
+      "reason": "api_unavailable",
+      "review_receipt_sha256": "a2f17f35234292194dbcf75da198afddee9f03ae7534aa1673192f2251f336fe",
+      "state": "blocked"
+    },
+    "kwargs": {},
+    "operation": "inspect"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls/7"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "base": {
+            "ref": "main",
+            "repo": {
+              "full_name": "neverhuman/dope"
+            },
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "commits": 1,
+          "draft": false,
+          "head": {
+            "ref": "codex/fixture",
+            "repo": {
+              "full_name": "neverhuman/dope"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "merge_commit_sha": null,
+          "mergeable_state": "clean",
+          "merged": false,
+          "merged_at": null,
+          "number": 7,
+          "state": "open",
+          "user": {
+            "login": "jepsontaylor"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/git/ref/heads/main"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "object": {
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/branches/main/protection"
+        ],
+        "kwargs": {
+          "optional": true
+        },
+        "method": "get",
+        "refused": "api_unavailable"
+      }
+    ],
+    "args": [
+      {
+        "base_branch": "main",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pr": 7,
+        "repo": "neverhuman/dope",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "body_sha256": "7e8fafdee419e8aae8832eed8b71576abaf3bd31bb837266834d769276861733",
+        "check_run_ids": [
+          101,
+          102,
+          103,
+          104
+        ],
+        "inspected_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pr": 7,
+        "receipt_locator": "target/review/fixture.json",
+        "repo": "neverhuman/dope",
+        "review_id": 901,
+        "reviewer": "neverhumanbot",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "version": 1
+      }
+    ],
+    "expected": {
+      "merge_authorized": false,
+      "read_only": true,
+      "reason": "control_unavailable",
+      "review_receipt_sha256": "a2f17f35234292194dbcf75da198afddee9f03ae7534aa1673192f2251f336fe",
+      "state": "control_unavailable"
+    },
+    "kwargs": {},
+    "operation": "inspect"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls/7"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "base": {
+            "ref": "main",
+            "repo": {
+              "full_name": "neverhuman/dope"
+            },
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "commits": 1,
+          "draft": false,
+          "head": {
+            "ref": "codex/fixture",
+            "repo": {
+              "full_name": "neverhuman/dope"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "merge_commit_sha": null,
+          "mergeable_state": "clean",
+          "merged": false,
+          "merged_at": null,
+          "number": 7,
+          "state": "open",
+          "user": {
+            "login": "jepsontaylor"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/git/ref/heads/main"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "object": {
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/branches/main/protection"
+        ],
+        "kwargs": {
+          "optional": true
+        },
+        "method": "get",
+        "value": {
+          "allow_deletions": {
+            "enabled": false
+          },
+          "allow_force_pushes": {
+            "enabled": false
+          },
+          "enforce_admins": {
+            "enabled": true
+          },
+          "required_pull_request_reviews": {
+            "bypass_pull_request_allowances": {
+              "apps": [],
+              "teams": [],
+              "users": []
+            },
+            "dismiss_stale_reviews": true,
+            "require_last_push_approval": true,
+            "required_approving_review_count": 1
+          },
+          "required_status_checks": {
+            "checks": [
+              {
+                "app_id": 15368,
+                "context": "cpu"
+              },
+              {
+                "app_id": 15368,
+                "context": "jankurai-audit"
+              },
+              {
+                "app_id": 15368,
+                "context": "paper-clean"
+              },
+              {
+                "app_id": 15368,
+                "context": "security"
+              }
+            ],
+            "contexts": [
+              "cpu",
+              "jankurai-audit",
+              "paper-clean",
+              "security"
+            ],
+            "strict": true
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/rules/branches/main"
+        ],
+        "kwargs": {},
+        "method": "listing",
+        "refused": "api_unavailable"
+      }
+    ],
+    "args": [
+      {
+        "base_branch": "main",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pr": 7,
+        "repo": "neverhuman/dope",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "body_sha256": "7e8fafdee419e8aae8832eed8b71576abaf3bd31bb837266834d769276861733",
+        "check_run_ids": [
+          101,
+          102,
+          103,
+          104
+        ],
+        "inspected_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pr": 7,
+        "receipt_locator": "target/review/fixture.json",
+        "repo": "neverhuman/dope",
+        "review_id": 901,
+        "reviewer": "neverhumanbot",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "version": 1
+      }
+    ],
+    "expected": {
+      "merge_authorized": false,
+      "read_only": true,
+      "reason": "control_unavailable",
+      "review_receipt_sha256": "a2f17f35234292194dbcf75da198afddee9f03ae7534aa1673192f2251f336fe",
+      "state": "control_unavailable"
+    },
+    "kwargs": {},
+    "operation": "inspect"
+  },
+  {
+    "api": [
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls/7"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "base": {
+            "ref": "main",
+            "repo": {
+              "full_name": "neverhuman/dope"
+            },
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "commits": 1,
+          "draft": false,
+          "head": {
+            "ref": "codex/fixture",
+            "repo": {
+              "full_name": "neverhuman/dope"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "merge_commit_sha": null,
+          "mergeable_state": "clean",
+          "merged": false,
+          "merged_at": null,
+          "number": 7,
+          "state": "open",
+          "user": {
+            "login": "jepsontaylor"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/git/ref/heads/main"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "object": {
+            "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/branches/main/protection"
+        ],
+        "kwargs": {
+          "optional": true
+        },
+        "method": "get",
+        "value": {
+          "allow_deletions": {
+            "enabled": false
+          },
+          "allow_force_pushes": {
+            "enabled": false
+          },
+          "enforce_admins": {
+            "enabled": true
+          },
+          "required_pull_request_reviews": {
+            "bypass_pull_request_allowances": {
+              "apps": [],
+              "teams": [],
+              "users": []
+            },
+            "dismiss_stale_reviews": true,
+            "require_last_push_approval": true,
+            "required_approving_review_count": 1
+          },
+          "required_status_checks": {
+            "checks": [
+              {
+                "app_id": 15368,
+                "context": "cpu"
+              },
+              {
+                "app_id": 15368,
+                "context": "jankurai-audit"
+              },
+              {
+                "app_id": 15368,
+                "context": "paper-clean"
+              },
+              {
+                "app_id": 15368,
+                "context": "security"
+              }
+            ],
+            "contexts": [
+              "cpu",
+              "jankurai-audit",
+              "paper-clean",
+              "security"
+            ],
+            "strict": true
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/rules/branches/main"
+        ],
+        "kwargs": {},
+        "method": "listing",
+        "value": []
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope"
+        ],
+        "kwargs": {},
+        "method": "open_pulls",
+        "value": [
+          {
+            "base": {
+              "ref": "main",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "draft": false,
+            "head": {
+              "ref": "codex/fixture",
+              "repo": {
+                "full_name": "neverhuman/dope"
+              },
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "number": 7,
+            "state": "open"
+          }
+        ]
+      },
+      {
+        "args": [
+          "user"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "login": "jepsontaylor"
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/git/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "tree": {
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/collaborators/neverhumanbot/permission"
+        ],
+        "kwargs": {},
+        "method": "get",
+        "value": {
+          "permission": "write",
+          "user": {
+            "login": "neverhumanbot"
+          }
+        }
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls/7/commits"
+        ],
+        "kwargs": {},
+        "method": "listing",
+        "value": [
+          {
+            "author": {
+              "login": "jepsontaylor"
+            },
+            "committer": {
+              "login": "jepsontaylor"
+            },
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ]
+      },
+      {
+        "args": [
+          "repos/neverhuman/dope/pulls/7/reviews"
+        ],
+        "kwargs": {},
+        "method": "listing",
+        "refused": "api_unavailable"
+      }
+    ],
+    "args": [
+      {
+        "base_branch": "main",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "pr": 7,
+        "repo": "neverhuman/dope",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "body_sha256": "7e8fafdee419e8aae8832eed8b71576abaf3bd31bb837266834d769276861733",
+        "check_run_ids": [
+          101,
+          102,
+          103,
+          104
+        ],
+        "inspected_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "pr": 7,
+        "receipt_locator": "target/review/fixture.json",
+        "repo": "neverhuman/dope",
+        "review_id": 901,
+        "reviewer": "neverhumanbot",
+        "source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "version": 1
+      }
+    ],
+    "expected": {
+      "merge_authorized": false,
+      "read_only": true,
+      "reason": "api_unavailable",
+      "review_receipt_sha256": "a2f17f35234292194dbcf75da198afddee9f03ae7534aa1673192f2251f336fe",
+      "state": "blocked"
+    },
+    "kwargs": {},
+    "operation": "inspect"
+  }
+]

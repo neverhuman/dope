@@ -7,6 +7,8 @@ mkdir -p target/review-test-tmp
 TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittest \
   research.benchmark.review_fixes.test_review_stats \
   research.benchmark.review_fixes.test_denominator_view \
+  research.benchmark.review_fixes.test_display_names \
+  research.benchmark.review_fixes.test_receipt_unknown_method \
   research.benchmark.review_fixes.test_cluster_text \
   research.benchmark.review_fixes.test_sealed_gate \
   research.benchmark.review_fixes.test_sample_paths \
@@ -20,6 +22,7 @@ TMPDIR="$PWD/target/review-test-tmp" PYTHONPATH=. "$review_python" -B -m unittes
   research.benchmark.review_fixes.test_rescore_cells \
   research.benchmark.review_fixes.test_v2_panel \
   research.benchmark.review_fixes.test_v2_family \
+  research.benchmark.review_fixes.test_v2_all_five \
   research.benchmark.review_fixes.test_rescore_ledger \
   research.benchmark.review_fixes.test_bound_review_cells \
   research.benchmark.review_fixes.test_review_fidelity \

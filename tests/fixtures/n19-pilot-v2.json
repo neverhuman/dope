@@ -1,0 +1,298 @@
+{
+  "format": "dope-native-pilot-fixture-v2",
+  "synthetic_only": true,
+  "producer_commit": "47827eb2eeac939aa5550ed6ddf80e2945765c6d",
+  "schema_sha256": "7eca4b9395c4856537e36bfd5d9fb0ea7374900eca3c88356f691892d5e0392f",
+  "producer_sha256": {
+    "research/transfer/pilot_admission.py": "601c7037139794abdc6f033c253bc97ff9d1b752edba04200b5518680cfa5dc8",
+    "research/transfer/lineage.py": "8a0ca7847dc2a07e32a1ce943b97002970f79af99949301d496283ce48bf9879",
+    "research/transfer/evidence.py": "aba56b871779bdbf849b5d5e91e081e2458a08238c6826866ec9495d32284888",
+    "research/transfer/tests/test_pilot_admission.py": "6f9e093e52b2ac4bf063cf245a9c1c9fb689c858f1954dfc92fd25e9212cd470"
+  },
+  "plan": {
+    "confirmation_allowed": false,
+    "cost_basis": "estimate_not_observation",
+    "estimated_seconds": 6,
+    "execution_authorized": false,
+    "format": "dope-development-source-pilot-v2",
+    "group_token_scheme": "hmac-sha256-custody-key-v1",
+    "jobs": [
+      {
+        "attempt": 1,
+        "estimated_seconds": 1,
+        "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+        "stage": "fit"
+      },
+      {
+        "attempt": 1,
+        "estimated_seconds": 1,
+        "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+        "stage": "sample"
+      },
+      {
+        "attempt": 1,
+        "estimated_seconds": 1,
+        "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+        "stage": "learner"
+      },
+      {
+        "attempt": 1,
+        "estimated_seconds": 1,
+        "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+        "stage": "fit"
+      },
+      {
+        "attempt": 1,
+        "estimated_seconds": 1,
+        "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+        "stage": "sample"
+      },
+      {
+        "attempt": 1,
+        "estimated_seconds": 1,
+        "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+        "stage": "learner"
+      }
+    ],
+    "observed_seconds": null,
+    "owner_manifest_commitment": "f87d394d6817d21b85785c1bc0452f7552ac678dd92e5012e5e50aefdff3458d",
+    "planned_attempts": 6,
+    "planned_independent_sources": 2,
+    "registry_content_commitment": "02f8b75a0e62c6c6b4e33d90728da0f501e28e2ae6e7481b153d74eaffb7f843",
+    "scientific_admission": false,
+    "scope": "development_only",
+    "seed": 0,
+    "signed_admission": false,
+    "source_groups": [
+      {
+        "availability": "planned",
+        "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+        "partition": "development_selection",
+        "reasons": [],
+        "views": 2
+      },
+      {
+        "availability": "planned",
+        "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+        "partition": "development_query",
+        "reasons": [],
+        "views": 1
+      }
+    ],
+    "total_seconds_cap": 20,
+    "unavailable_sources": 0,
+    "version": 2
+  },
+  "attempts": [
+    {
+      "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+      "stage": "fit",
+      "attempt": 1,
+      "status": "success",
+      "seconds": 1
+    },
+    {
+      "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+      "stage": "sample",
+      "attempt": 1,
+      "status": "failed",
+      "seconds": 2
+    },
+    {
+      "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+      "stage": "fit",
+      "attempt": 1,
+      "status": "timeout",
+      "seconds": 3
+    }
+  ],
+  "expected_plan_digest": "d4c3a0b488210b65bafa66474a468530419a7883be07bc95cc0bb678c9c42d5b",
+  "expected_summary": {
+    "budget_exceeded": false,
+    "confirmation_allowed": false,
+    "execution_authorized": false,
+    "execution_error_numerator": 2,
+    "failure_denominator": 6,
+    "failures": [
+      {
+        "attempt": 1,
+        "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+        "seconds": 2,
+        "stage": "sample",
+        "status": "failed"
+      },
+      {
+        "attempt": 1,
+        "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+        "seconds": 3,
+        "stage": "fit",
+        "status": "timeout"
+      }
+    ],
+    "format": "dope-development-source-pilot-summary-v2",
+    "non_success_numerator": 5,
+    "observed_attempts": 3,
+    "observed_seconds": 6,
+    "original_seconds_cap": 20,
+    "plan_digest": "d4c3a0b488210b65bafa66474a468530419a7883be07bc95cc0bb678c9c42d5b",
+    "planned_attempts": 6,
+    "planned_independent_sources": 2,
+    "scientific_admission": false,
+    "scope": "development_only",
+    "signed_admission": false,
+    "status_counts": {
+      "success": 1,
+      "failed": 1,
+      "timeout": 1,
+      "unavailable": 0,
+      "not_attempted": 3
+    },
+    "unavailable_sources": 0,
+    "version": 2
+  },
+  "expected_summary_digest": "ac8d8c10b0bebed6a65e98d6dedbb8b3fb90cc2f1d4ec88837ed055424c0d9cb",
+  "floating_fixture": {
+    "plan": {
+      "confirmation_allowed": false,
+      "cost_basis": "estimate_not_observation",
+      "estimated_seconds": 0.6,
+      "execution_authorized": false,
+      "format": "dope-development-source-pilot-v2",
+      "group_token_scheme": "hmac-sha256-custody-key-v1",
+      "jobs": [
+        {
+          "attempt": 1,
+          "estimated_seconds": 0.1,
+          "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+          "stage": "fit"
+        },
+        {
+          "attempt": 1,
+          "estimated_seconds": 0.1,
+          "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+          "stage": "sample"
+        },
+        {
+          "attempt": 1,
+          "estimated_seconds": 0.1,
+          "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+          "stage": "learner"
+        },
+        {
+          "attempt": 1,
+          "estimated_seconds": 0.1,
+          "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+          "stage": "fit"
+        },
+        {
+          "attempt": 1,
+          "estimated_seconds": 0.1,
+          "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+          "stage": "sample"
+        },
+        {
+          "attempt": 1,
+          "estimated_seconds": 0.1,
+          "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+          "stage": "learner"
+        }
+      ],
+      "observed_seconds": null,
+      "owner_manifest_commitment": "f87d394d6817d21b85785c1bc0452f7552ac678dd92e5012e5e50aefdff3458d",
+      "planned_attempts": 6,
+      "planned_independent_sources": 2,
+      "registry_content_commitment": "02f8b75a0e62c6c6b4e33d90728da0f501e28e2ae6e7481b153d74eaffb7f843",
+      "scientific_admission": false,
+      "scope": "development_only",
+      "seed": 0,
+      "signed_admission": false,
+      "source_groups": [
+        {
+          "availability": "planned",
+          "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+          "partition": "development_selection",
+          "reasons": [],
+          "views": 2
+        },
+        {
+          "availability": "planned",
+          "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+          "partition": "development_query",
+          "reasons": [],
+          "views": 1
+        }
+      ],
+      "total_seconds_cap": 20.0,
+      "unavailable_sources": 0,
+      "version": 2
+    },
+    "attempts": [
+      {
+        "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+        "stage": "fit",
+        "attempt": 1,
+        "status": "success",
+        "seconds": -0.0
+      },
+      {
+        "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+        "stage": "sample",
+        "attempt": 1,
+        "status": "failed",
+        "seconds": 0.1
+      },
+      {
+        "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+        "stage": "fit",
+        "attempt": 1,
+        "status": "timeout",
+        "seconds": 0.2
+      }
+    ],
+    "expected_plan_digest": "de1fa1187dcb6a49d7db60c6166c9e086d3695f1a87bb9f5be1b9583bfc1a925",
+    "expected_summary": {
+      "budget_exceeded": false,
+      "confirmation_allowed": false,
+      "execution_authorized": false,
+      "execution_error_numerator": 2,
+      "failure_denominator": 6,
+      "failures": [
+        {
+          "attempt": 1,
+          "group": "809c8f1f6cefc62e3f98957c95a59554d49a0fa1a0836636d94c24c4c5b3d690",
+          "seconds": 0.1,
+          "stage": "sample",
+          "status": "failed"
+        },
+        {
+          "attempt": 1,
+          "group": "e2d2b25ed15f24dff10a559cbd26062b8cbcd967788898199666a6c74daab297",
+          "seconds": 0.2,
+          "stage": "fit",
+          "status": "timeout"
+        }
+      ],
+      "format": "dope-development-source-pilot-summary-v2",
+      "non_success_numerator": 5,
+      "observed_attempts": 3,
+      "observed_seconds": 0.30000000000000004,
+      "original_seconds_cap": 20.0,
+      "plan_digest": "de1fa1187dcb6a49d7db60c6166c9e086d3695f1a87bb9f5be1b9583bfc1a925",
+      "planned_attempts": 6,
+      "planned_independent_sources": 2,
+      "scientific_admission": false,
+      "scope": "development_only",
+      "signed_admission": false,
+      "status_counts": {
+        "success": 1,
+        "failed": 1,
+        "timeout": 1,
+        "unavailable": 0,
+        "not_attempted": 3
+      },
+      "unavailable_sources": 0,
+      "version": 2
+    },
+    "expected_summary_digest": "e117cdeabdd0e549864fe4126a9bbeb94dbdd893e89da08e4cdd49f067a47f52"
+  }
+}

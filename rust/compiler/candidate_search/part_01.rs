@@ -1,4 +1,3 @@
-
 fn quantized_kernel(kernel: &Kernel, bits: u8) -> Kernel {
     let mut output = kernel.clone();
     output.quantization_bits = bits;
@@ -104,6 +103,31 @@ fn quantized_kernel(kernel: &Kernel, bits: u8) -> Kernel {
         }
     }
     match noise {
+        Noise::ResidualV1 { distribution } => match distribution {
+            ResidualV1::NoNoise => {}
+            ResidualV1::StudentT4 { location, scale } => {
+                *location = quantize(*location, bits, false);
+                *scale = quantize(*scale, bits, false).max(0.0);
+            }
+            ResidualV1::GaussianMixture2 {
+                weight,
+                locations,
+                scales,
+            } => {
+                *weight = quantize(*weight, bits, true);
+                locations
+                    .iter_mut()
+                    .for_each(|v| *v = quantize(*v, bits, false));
+                scales
+                    .iter_mut()
+                    .for_each(|v| *v = quantize(*v, bits, false).max(0.0));
+            }
+            ResidualV1::MonotoneQuantile17 { values } => {
+                values
+                    .iter_mut()
+                    .for_each(|v| *v = quantize(*v, bits, false));
+            }
+        },
         Noise::Homoscedastic { sigma } => *sigma = quantize(*sigma, bits, true),
         Noise::BernoulliCalibration { base_rate } => *base_rate = quantize(*base_rate, bits, true),
         Noise::Heteroscedastic {
@@ -361,7 +385,7 @@ fn pareto(candidates: &[CandidateReport]) -> Vec<CandidateReport> {
 
 fn maximum_normalized_gate_shortfall(candidate: &CandidateReport) -> f64 {
     [
-        ((0.99 - candidate.utility_retention) / 0.99).max(0.0),
+        ((0.99 - candidate.stored_target_fit) / 0.99).max(0.0),
         ((0.95 - candidate.driver_agreement) / 0.95).max(0.0),
         ((0.90 - candidate.proxy_joint_fidelity) / 0.90).max(0.0),
         ((candidate.proxy_membership_auc - 0.60) / 0.40).max(0.0),

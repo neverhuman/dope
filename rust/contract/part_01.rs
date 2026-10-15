@@ -219,7 +219,23 @@ pub fn candidate_implementation_hash(id: &str) -> String {
         hasher.update(include_bytes!("../compiler/part_01.rs"));
         hasher.update(include_bytes!("../compiler/part_02.rs"));
         hasher.update(include_bytes!("../compiler/target_fitting/part_01.rs"));
-        hasher.update(include_bytes!("../compiler/target_fitting/part_02.rs"));
+        hasher.update(include_bytes!(
+            "../compiler/target_fitting/research_training.rs"
+        ));
+        hasher.update(include_bytes!(
+            "../compiler/target_fitting/compact_neural_training.rs"
+        ));
+        hasher.update(include_bytes!(
+            "../compiler/target_fitting/noise_fitting.rs"
+        ));
+        hasher.update(include_bytes!("../compiler/target_fitting/quantization.rs"));
+        hasher.update(include_bytes!("../compiler/adaptive_allocation.rs"));
+        hasher.update(include_bytes!("../compiler/candidate_dependence.rs"));
+        hasher.update(include_bytes!("../compiler/capacity_refinement.rs"));
+        hasher.update(include_bytes!("../compiler/residual_profiles.rs"));
+        hasher.update(include_bytes!("../compiler/target_preparation.rs"));
+        hasher.update(include_bytes!("../model/residual.rs"));
+        hasher.update(include_bytes!("../sample/residual.rs"));
         hasher.update(include_bytes!("../contract/part_01.rs"));
         hasher.update(include_bytes!("../contract/part_02.rs"));
         hasher.update(include_bytes!("../model/generator_validation/part_01.rs"));

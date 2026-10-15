@@ -27,7 +27,7 @@ class Arm:
 
 ARMS = (
     Arm("DOPE", "headline", "Dope", "DOPE (ours)", "#76B900", "o", "headline",
-        "profile chosen on a six-lineage discovery panel; compile search on fit rows"),
+        "profile compared among four on validation rows of every lineage; compile search on fit rows"),
     Arm("DOPE", "product_default", "DopeDef", "DOPE, untuned default", "#A6D96A", "o", "diagnostic",
         "trainer default; no selection"),
     Arm("DOPE", "historical_seed11", "DopeHist", "DOPE, historical seed 11", "#4D7F00", "o", "diagnostic",

@@ -279,13 +279,48 @@ def _add_order(family: SourceFamily) -> tuple[int, str]:
     return rank, family.family_id
 
 
+def _alias_order(aliases: list[SourceFamily], known: dict[str, SourceFamily]) -> list[SourceFamily]:
+    """Order aliases so each one follows the record it repeats, whatever the id order.
+
+    A chain may run through other aliases. It must end at a registered non-alias
+    record; a missing end or a cycle is refused. Each hop is checked for the same
+    parent lineage when the alias is added.
+    """
+    pending = {family.family_id: family for family in aliases}
+    ordered: list[SourceFamily] = []
+    placed: set[str] = set()
+    for start in sorted(pending):
+        chain: list[str] = []
+        seen: set[str] = set()
+        current = start
+        while current in pending and current not in placed:
+            if current in seen:
+                raise LineageError("alias chain is cyclic")
+            seen.add(current)
+            chain.append(current)
+            current = pending[current].alias_of or ""
+        if current not in placed and current not in known:
+            raise LineageError("alias target is missing")
+        for family_id in reversed(chain):
+            ordered.append(pending[family_id])
+            placed.add(family_id)
+    return ordered
+
+
 class Registry:
     def __init__(self, families: list[SourceFamily], *, final_label_custody: str):
         if final_label_custody != "external":
             raise LineageError("final source and label custody stays external")
         self.final_label_custody = final_label_custody
         self._by_id: dict[str, SourceFamily] = {}
+        identifiers = [family.family_id for family in families]
+        if len(set(identifiers)) != len(identifiers):
+            raise LineageError("duplicate family id")
+        aliases = [family for family in families if family.relation is Relation.ALIAS]
         for family in sorted(families, key=_add_order):
+            if family.relation is not Relation.ALIAS:
+                self.add(family)
+        for family in _alias_order(aliases, self._by_id):
             self.add(family)
 
     def add(self, family: SourceFamily) -> None:
@@ -302,7 +337,9 @@ class Registry:
                 raise LineageError("derived tables cannot cross meta partitions")
         if family.relation is Relation.ALIAS:
             target = self._by_id.get(family.alias_of or "")
-            if target is None or target.parent_lineage_id != family.parent_lineage_id:
+            if target is None:
+                raise LineageError("alias target is missing")
+            if target.parent_lineage_id != family.parent_lineage_id:
                 raise LineageError("alias target is outside the parent lineage")
         self._by_id[family.family_id] = family
 

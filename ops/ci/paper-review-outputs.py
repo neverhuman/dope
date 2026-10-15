@@ -13,7 +13,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = '3794ced8967151d7c86bdd14566121bdfeb4a551a98f3009017b7418dc4f6d3c'
+LOCK_SHA256 = 'e17f3461f1d322abe036e9c7c80e5abf3b0534d91563ff4b6b30a7a914629b96'
+NATIVE_BYTE_PIN = 'docs/whitepaper/receipts/native-byte-conformance-v1.json'
+NATIVE_BYTE_CHECKER = 'docs/whitepaper/scripts/native_byte_conformance.py'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
 CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
 CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
@@ -28,13 +30,17 @@ FIDELITY_PANEL = PREFIX + 'review-fixes-fidelity-v1/panel.json'
 FIDELITY_RENDERER = 'docs/whitepaper/scripts/review_fidelity.py'
 V2_LEDGER = PREFIX + 'review-fixes-v2/scalar-cells.jsonl'
 V2_FITS = PREFIX + 'review-fixes-v2/fits.jsonl'
+TABSYN_SEEDS_FITS = PREFIX + 'review-fixes-tabsyn-seeds-v2/fits.jsonl'
 V2_PANEL = PREFIX + 'review-fixes-v2/panel.json'
 V2_RECORD = PREFIX + 's3-lineage-record.json'
 V2_PREDECLARE = 'research/benchmark/review_fixes/predeclare_v2.json'
 V2_RENDERER = 'docs/whitepaper/scripts/review_v2_emit.py'
 V2_FAMILY = PREFIX + 'review-fixes-v2/family.json'
 V2_FAMILY_RENDERER = 'docs/whitepaper/scripts/review_v2_family.py'
-JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, V2_LEDGER, V2_FITS)
+V2_ALL_FIVE = PREFIX + 'review-fixes-v2/all-five.json'
+V2_ALL_FIVE_RENDERER = 'docs/whitepaper/scripts/review_v2_all_five.py'
+JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, V2_LEDGER, V2_FITS,
+                TABSYN_SEEDS_FITS)
 OUTPUT_PREFIXES = ('review-', 'v2-')
 _ADMISSION = object()
 AUXILIARY_OUTPUTS = (
@@ -149,7 +155,8 @@ def _load_authenticated_graph():
         relative = Path(name)
         if (relative.is_absolute() or '..' in relative.parts or relative.as_posix() != name
                 or (relative.suffix != '.json' and name not in JSONL_INPUTS)
-                or not name.startswith(('research/benchmark/results/', 'research/benchmark/review_fixes/'))):
+                or not (name == NATIVE_BYTE_PIN or name.startswith(
+                    ('research/benchmark/results/', 'research/benchmark/review_fixes/')))):
             raise ValueError('invalid review paper input path')
         path = REPO / relative
         if path.resolve() != REPO.resolve() / relative:
@@ -174,7 +181,8 @@ def _authenticated_graph():
 def replay_graph(graph, inputs):
     replayed = set()
     required_panels = {CONTROL_RENDERER: CONTROL_PANEL, FIDELITY_RENDERER: FIDELITY_PANEL,
-                       V2_RENDERER: V2_PANEL, V2_FAMILY_RENDERER: V2_FAMILY}
+                       V2_RENDERER: V2_PANEL, V2_FAMILY_RENDERER: V2_FAMILY,
+                       V2_ALL_FIVE_RENDERER: V2_ALL_FIVE}
     for entry in graph['scripts']:
         panel = entry['args'][1]
         renderer = entry['path']
@@ -192,6 +200,10 @@ def replay_graph(graph, inputs):
             if V2_PANEL not in inputs:
                 raise ValueError('v2 family renderer requires the pinned family file and v2 panel')
             kind = 'v2-family'
+        elif renderer == V2_ALL_FIVE_RENDERER:
+            if V2_PANEL not in inputs:
+                raise ValueError('v2 all-five renderer requires the pinned all-five file and v2 panel')
+            kind = 'v2-all-five'
         elif panel == PRIVACY_PANEL:
             kind = 'privacy'
         elif panel == TABSYN_PANEL:
@@ -211,6 +223,8 @@ def replay_graph(graph, inputs):
             authenticated_fidelity(inputs)
         elif kind == 'v2':
             authenticated_v2(inputs)
+        elif kind == 'v2-all-five':
+            authenticated_v2_reduction(inputs, 'v2_all_five', V2_ALL_FIVE)
         else:
             authenticated_v2_family(inputs)
         replayed.add(key)
@@ -294,15 +308,28 @@ def authenticate_build(*, log_directory=None):
                         else log_directory / 'render-commands.json')
         commands = []
 
-        def run_renderer(command, log):
+        def run_renderer(command, log, *, cwd=root):
             started = time.monotonic()
-            result = subprocess.run(command, cwd=root, stdout=log, stderr=subprocess.STDOUT)
-            commands.append({'command': command, 'cwd': str(root), 'log': str(log_path),
+            result = subprocess.run(command, cwd=cwd, stdout=log, stderr=subprocess.STDOUT)
+            commands.append({'command': command, 'cwd': str(cwd), 'log': str(log_path),
                              'exit': result.returncode, 'elapsed_seconds': time.monotonic() - started})
             command_path.write_text(json.dumps(commands, indent=2) + '\n')
             result.check_returncode()
 
         with log_path.open('wb') as log:
+            if NATIVE_BYTE_PIN in inputs:
+                # Check only captured bytes in a separate scratch root; do not
+                # seed the numerical render inventory with committed outputs.
+                conformance_root = root / 'native-byte-conformance'
+                captured = dict(verified.inputs + verified.code + verified.consumed)
+                for name in (NATIVE_BYTE_PIN, NATIVE_BYTE_CHECKER, 'README.md',
+                             'docs/whitepaper/supplement.tex',
+                             'docs/whitepaper/generated/native-byte-conformance.tex'):
+                    path = conformance_root / name
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(captured[name])
+                run_renderer([sys.executable, '-B', str(conformance_root / NATIVE_BYTE_CHECKER)],
+                             log, cwd=conformance_root)
             # Numerical replay runs once from the same captured local code and
             # inputs as rendering. No live imported reducer, cached module or
             # caller-supplied authentication receipt is reused by the driver.
@@ -475,6 +502,25 @@ def authenticated_v2_family(inputs):
                               predeclare=inputs[V2_PREDECLARE])
     if v2_panel.canonical(family).encode() != inputs[V2_FAMILY]:
         raise ValueError('v2 scalar ledger does not reproduce the pinned family file')
+
+
+def authenticated_v2_reduction(inputs, module, output):
+    """Recompute one v2 sensitivity file from the pinned v2 scalar ledger before it is rendered."""
+    names = (V2_LEDGER, V2_RECORD, V2_PREDECLARE)
+    if any(name not in inputs for name in names):
+        raise ValueError('v2 sensitivity renderer requires its pinned ledger, lineage record and predeclaration')
+    cells = [json.loads(line) for line in inputs[V2_LEDGER].splitlines()]
+    if not cells or any(not isinstance(item, dict) or item.get('official_tests_opened') is not False
+                        for item in cells):
+        raise ValueError('v2 ledger official test flag is not closed')
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    import importlib
+    from research.benchmark.review_fixes import v2_panel
+    reducer = importlib.import_module(f'research.benchmark.review_fixes.{module}')
+    result = reducer.reduce(cells, v2_panel.names_of(json.loads(inputs[V2_RECORD])), predeclare=inputs[V2_PREDECLARE])
+    if v2_panel.canonical(result).encode() != inputs[output]:
+        raise ValueError(f'v2 scalar ledger does not reproduce the pinned {module} output')
 
 
 def main():

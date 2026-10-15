@@ -14,8 +14,8 @@ use crate::error::{DopeError, Result};
 use crate::model::{
     AdditiveTerm, ColumnSchema, CopulaEdge, Dependence, FactorLoading, InteractionTerm,
     JointGenerator, Kernel, KernelProgram, LinearTerm, Marginal, MarsFactor, MarsTerm,
-    NeuralArchitecture, NeuralProfile, Noise, RankNormalization, SchemaKind, Target, Task,
-    TriangularTerm, VineEdge,
+    NeuralArchitecture, NeuralProfile, Noise, RankNormalization, ResidualProfile, ResidualV1,
+    SchemaKind, Target, Task, TriangularTerm, VineEdge,
 };
 use crate::sample::evaluate_target;
 
@@ -38,6 +38,10 @@ pub struct CompileOptions {
     pub neural_target_weight: f64,
     /// Frozen structural-loss grid value. Ignored by symbolic candidates.
     pub neural_structural_penalty: f64,
+    /// Development-only allocation policy; fixed empirical profiles remain fixed.
+    pub adaptive_allocation: bool,
+    /// Explicit unqualified residual-v1 comparison; never changes a frozen backend.
+    pub development_residual: Option<ResidualProfile>,
 }
 
 impl Default for CompileOptions {
@@ -53,6 +57,8 @@ impl Default for CompileOptions {
             backend_id: None,
             neural_target_weight: 2.0,
             neural_structural_penalty: 0.0,
+            adaptive_allocation: false,
+            development_residual: None,
         }
     }
 }
@@ -68,7 +74,9 @@ pub struct CandidateReport {
     pub marginal_knots: usize,
     pub dependence: String,
     pub target: String,
-    pub utility_retention: f64,
+    /// Fit-only stored-target score; not downstream retraining utility.
+    #[serde(alias = "utility_retention")]
+    pub stored_target_fit: f64,
     pub driver_agreement: f64,
     /// Train-only heuristic used to rank candidates. This is not certification evidence.
     pub proxy_joint_fidelity: f64,
@@ -100,6 +108,35 @@ pub struct CompileReport {
     pub contains_row_references: bool,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub probe_failures: BTreeMap<String, String>,
+    #[serde(default)]
+    pub search_history: Vec<CandidateAttempt>,
+    #[serde(default)]
+    pub residual_fitting: BTreeMap<String, String>,
+    #[serde(default)]
+    pub allocation_policy: String,
+    #[serde(default)]
+    pub search_preparation_seconds: Option<f64>,
+    #[serde(default)]
+    pub unvisited_beam_candidates: Vec<String>,
+    #[serde(default)]
+    pub refinement_fit_count: usize,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CandidateAttempt {
+    pub candidate_id: String,
+    pub disposition: String,
+    pub actual_artifact_bytes: Option<usize>,
+    pub elapsed_seconds: Option<f64>,
+    /// Comparison parent shares the fitted family; it is not a stored row reference.
+    #[serde(default)]
+    pub parent_candidate_id: Option<String>,
+    #[serde(default)]
+    pub allocation: String,
+    #[serde(default)]
+    pub pruned_encoded_zero_terms: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub capacity_refinement: Option<CapacityRefinement>,
 }
 
 #[derive(Clone, Debug)]

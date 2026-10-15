@@ -375,12 +375,12 @@
   },
   {
    "bytes": {
-    "fits_ok": null,
-    "fits_within_cap": null,
+    "fits_ok": 500,
+    "fits_within_cap": 0,
     "median": 42261045.5,
     "n": 100,
-    "q1": 42178286.0,
-    "q3": 42476250.25,
+    "q1": 42178285.75,
+    "q3": 42476250.5,
     "within_cap": 0
    },
    "code": "TabSyn",
@@ -388,42 +388,42 @@
    "configuration": "scaled_200_vae_1000_diffusion",
    "contrasts": {
     "catboost": {
-     "hl": -0.008268769405780863,
-     "hl_hi": 0.04219696141359892,
-     "hl_lo": -0.056984177933027215,
-     "losses": 51,
-     "n": 98,
+     "hl": -0.0029874333337716608,
+     "hl_hi": 0.05281517426890211,
+     "hl_lo": -0.05299051968715631,
+     "losses": 46,
+     "n": 99,
      "ties": 0,
      "verdict": "inseparable",
-     "wins": 47
+     "wins": 53
     },
     "linear": {
-     "hl": 0.07238439493628135,
-     "hl_hi": 0.2478414403481794,
-     "hl_lo": 0.004019194094267424,
-     "losses": 23,
-     "n": 93,
+     "hl": 0.06872012672710892,
+     "hl_hi": 0.20951752170331603,
+     "hl_lo": 0.005262233051103961,
+     "losses": 20,
+     "n": 94,
      "ties": 0,
      "verdict": "above",
-     "wins": 70
+     "wins": 74
     },
     "mlp": {
-     "hl": 0.06893729308731547,
-     "hl_hi": 0.39159753648957407,
-     "hl_lo": -0.013974457886758431,
-     "losses": 44,
-     "n": 87,
+     "hl": 0.053715847424111396,
+     "hl_hi": 0.27700865865374397,
+     "hl_lo": -0.005760608830030745,
+     "losses": 36,
+     "n": 88,
      "ties": 0,
      "verdict": "inseparable",
-     "wins": 43
+     "wins": 52
     }
    },
    "display": "TabSyn (scaled schedule)",
    "level": {
-    "hi": 0.9788268588625855,
-    "lo": 0.8160702600799806,
-    "median": 0.8965503865360913,
-    "n": 98
+    "hi": 0.964784107476397,
+    "lo": 0.8142261789641545,
+    "median": 0.9240695923067241,
+    "n": 99
    },
    "marker": "D",
    "method": "TabSyn",
@@ -1457,8 +1457,8 @@
  "format": "dope-v2-headline",
  "strongest": {
   "configuration": "scaled_200_vae_1000_diffusion",
-  "median": 0.8965503865360913,
+  "median": 0.9240695923067241,
   "method": "TabSyn",
-  "paired_n": 98
+  "paired_n": 99
  }
 }

@@ -134,3 +134,64 @@ lands, the integrator must add `pub mod transfer_metrics;` to `rust/lib.rs` and
 run its module tests plus `just check`. The source is absent on this branch;
 enabling that declaration now would break a standalone build. No parallel-lane
 source is copied or edited here. PR05/35 needs no additional Rust registration.
+
+## N02 narrow narrative decision (2026-10-14)
+
+Scope: title, thesis and terminology of the historical-evidence paper
+(`docs/whitepaper/dope-mfs.tex` and its supplement). This record does not
+freeze the behavior contract, a knowledge-transfer claim, or any metric.
+`production/behavior-contract-v1.json` and `protocol_frozen=false` are unchanged.
+
+- **Title.** `DOPE: Generative Compression of Predictive Structure`. The
+  acronym stays **Downstream Objective-Preserving Encoding** and is expanded
+  once in the abstract. Kilobyte-led titles are retired: size is a charged
+  axis, not the contribution.
+- **Gated title.** `DOPE: Compressing Data into Transferable Knowledge` stays
+  withheld. It needs a frozen held-out learner family and a held-out source
+  family. On the historical 100-lineage panel neither exists for the DOPE
+  profile. The N01 receipt (`target/vnext/20261013/receipts/N01.json`, sha256
+  `1264ca2108dc70310a1e7082c5123b19e0ed1e461dfcf3310665aad3358ef239`) shows
+  why: the profile comparison read every lineage under CatBoost, linear and
+  MLP, and its twelve discovery/confirmation lineages span every source-family
+  scope.
+- **Predictive structure.** This term is operational. It means the
+  feature-target relationships that a declared learner uses, measured as
+  retention. Retention is the fraction of a real-trained learner's gain over a
+  null that a learner trained only on synthetic rows recovers on real
+  validation rows. Every use is relative to a workload: target, learner,
+  synthetic size and loss. The term does not denote general knowledge,
+  intelligence, mutual information or description length.
+- **Compression.** Minimum description length, Occam's-razor bounds and the
+  information bottleneck are motivation only. Small size proves nothing about
+  learning: empty, constant and checkpoint-hiding generators are
+  counterexamples. Every sampling byte is charged, and evidence comes only from
+  learners trained on samples.
+- **Generative compression.** The term already names learned image/video
+  compression (Santurkar et al., arXiv:1703.01467). The paper uses it
+  descriptively and claims no priority.
+- **Terminology not adopted.** No `Data IQ`/`DIQ` label: Data-IQ (Seedat et
+  al., NeurIPS 2022) already exists, and the label would imply an unvalidated
+  intelligence scale. Data-IQ primarily stratifies examples by training
+  dynamics and aleatoric uncertainty; as a secondary application it compares
+  datasets, synthetic ones included. The paper cites it in related work as
+  close evaluation prior art, not only as a name collision, and never
+  describes it as a byte or density measure. Qualified Learning Density (QLD) is not adopted as a
+  headline, ranking, gate or table metric. It stays an exploratory candidate
+  for one artifact on one fixed workload, pending the N02 adversarial
+  examples. vNext primary outputs remain the frontier and `B*_tested`, with
+  censored, non-monotone and refusal states. No information-theoretic minimum
+  is claimed.
+- **Profile-selection disclosure.** The four bounded research profiles were
+  compared by validation retention at fit seed 11 on the discovery,
+  confirmation and all-lineage publications. Each publication keeps all four
+  profiles, and no contemporaneous record states the selecting rule or the
+  rows consulted. The paper therefore classifies the whole panel and all three
+  auditors as selection-exposed. It withdraws the earlier "chosen on a
+  six-lineage discovery panel and checked on six disjoint confirmation
+  lineages" and "pre-registered profile" wording. The sealed test, which is
+  pre-declared in `research/benchmark/review_fixes/predeclare.json`
+  (`sealed_test`), remains the only selection-free estimate.
+
+This decision changes manuscript prose, citation metadata and one registry
+description string. It changes no ledger, reducer, generated macro, statistical
+identity or scientific contract.

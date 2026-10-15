@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+- Add native raw-unit compilation, inspection, sampling, and a restricted
+  artifact-only CPU worker. The complete raw-artifact charge includes retained
+  fitted transforms and schema, framing, and native payload; historical DPK
+  accounting and decoding remain separate. These fixtures do not certify
+  learner transfer, tail fidelity, privacy, or a release.
+- Rename the Python compatibility console to `dope-kernel-v1`; the native Rust
+  executable remains `dope-kernel`. Native installation verifies the supplied
+  checksum and identity and refuses to overwrite an existing command.
+- Preserve missing fit/sample cells as incomplete estimands, with any
+  complete-case summary confined to unqualified sensitivity output. Local and
+  hosted CPU gates run the complete offline transfer fixture suite.
+- Add a standalone native merge guard with isolated locked dependencies,
+  exact-source review and check provenance, required GitHub app bindings, and
+  a sole-open-PR constraint. Canonical paper admission retains all four PDF
+  builds, independent reducer authentication, and output-drift checks.
+- Frame the paper as *DOPE: Generative Compression of Predictive Structure*,
+  bind abstract claims to their evidence registry, and show charged bytes
+  beside paired auditor contrasts in the first-page figure.
+
+- Block B: TabSyn's scaled arm (200 VAE and at most 1,000 diffusion
+  epochs, which the authors' early stop can end sooner) is fit at seeds 23,
+  37, 53, and 71 under its seed-11 caps. It is scored by the pinned evaluator,
+  which matches bit for bit across xbabe1 and xbabe3 on 200 seeded cells, and
+  it enters the v2 panel under the five-seed design, with missing fits and
+  unscored sample cells disclosed. The paper's TabSyn rows,
+  intervals, bytes, and seed text follow the panel.
+- The pre-declared all-five-fits lineage sensitivity (`v2_all_five.py`) is
+  printed for every five-seed arm and DOPE-minus contrast, outside every
+  Holm family; CI recomputes it from the pinned ledger.
+
 - Paper v2 (wave 2): a pre-declared v2 analysis contract
   (`research/benchmark/review_fixes/predeclare_v2.json`) committed before any v2
   result; DOPE refit at five fit seeds with the historical binary plus an

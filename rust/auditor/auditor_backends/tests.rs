@@ -116,7 +116,7 @@ mod tests {
         .unwrap();
         assert_eq!(informative.spearman, Some(1.0));
         assert_eq!(informative.top_k, 1);
-        assert_eq!(informative.top_k_agreement, 1.0);
+        assert_eq!(informative.top_k_agreement, Some(1.0));
         assert!(
             (informative
                 .real_normalized_shares
@@ -132,7 +132,7 @@ mod tests {
             &evidence(vec![1.0, 2.0, 3.0]),
         )
         .unwrap();
-        assert_eq!(changed_driver.top_k_agreement, 0.0);
+        assert_eq!(changed_driver.top_k_agreement, Some(0.0));
         assert_eq!(changed_driver.spearman, Some(-1.0));
 
         let undefined = compare_permutation_importance(
@@ -142,6 +142,20 @@ mod tests {
         .unwrap();
         assert_eq!(undefined.informative_feature_count, 3);
         assert_eq!(undefined.spearman, None);
+        let zero = compare_permutation_importance(&evidence(vec![0.0; 3]), &evidence(vec![0.0; 3]))
+            .unwrap();
+        assert_eq!(zero.top_k, 0);
+        assert_eq!(zero.top_k_agreement, None);
+        assert_eq!(
+            crate::auditor::importance_driver_fidelity(zero.spearman, zero.top_k_agreement),
+            None
+        );
+        let encoded = serde_json::to_value(&zero).unwrap();
+        assert!(encoded["top_k_agreement"].is_null());
+        let mut historical = encoded;
+        historical["top_k_agreement"] = serde_json::json!(1.0);
+        let old: FeatureImportanceConsistency = serde_json::from_value(historical).unwrap();
+        assert_eq!(old.top_k_agreement, Some(1.0));
     }
 
     #[test]

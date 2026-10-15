@@ -2,7 +2,7 @@
 
 DOPE charges the encoded model plus projection.json (the v2 fit ledger).
 TabSyn charges every saved file except intermediate diffusion epoch
-checkpoints, which sampling never reads. Baselines charge the per-lineage
+checkpoints, which sampling never reads, at each of its five fit seeds. Baselines charge the per-lineage
 bytes stored in their committed ledgers. Each arm reports the median,
 quartiles, and the share of lineages within the 10,240-byte cap.
 """
@@ -44,16 +44,24 @@ def dope(fits: list[dict], configuration: str) -> dict | None:
     return _summary(per_lineage, len(ok), within, len(chosen))
 
 
-def tabsyn(path: Path = RESULTS / "tabsyn-default100-scaled-cuda-fits.json") -> dict | None:
-    document = json.loads(path.read_text())
-    per_lineage = {}
-    for cell in document["cells"]:
+def tabsyn(path: Path = RESULTS / "tabsyn-default100-scaled-cuda-fits.json",
+           seeds: Path = RESULTS / "review-fixes-tabsyn-seeds-v2" / "fits.jsonl") -> dict | None:
+    """Per-lineage median over the five fit seeds: seed 11 from its population record, 23 to 71 from block B."""
+    grouped, total = defaultdict(list), 0
+    for cell in json.loads(path.read_text())["cells"]:
+        total += 1
         files = cell.get("artifact_files") or {}
-        if not files:
-            continue
-        per_lineage[cell["dataset_id"]] = float(sum(
-            meta["bytes"] for name, meta in files.items() if not name.startswith("diffusion-epoch-")))
-    return _summary(per_lineage)
+        if files:
+            grouped[cell["dataset_id"]].append(
+                sum(meta["bytes"] for name, meta in files.items() if not name.startswith("diffusion-epoch-")))
+    for line in seeds.read_text().splitlines():
+        record = json.loads(line)
+        total += 1
+        if record["status"] == "ok" and isinstance(record["charged_bytes"], int):
+            grouped[record["dataset"]].append(record["charged_bytes"])
+    charged = [value for values in grouped.values() for value in values]
+    per_lineage = {key: float(np.median(values)) for key, values in grouped.items()}
+    return _summary(per_lineage, len(charged), sum(1 for value in charged if value <= CAP), total)
 
 
 def ledger_cells(name: str, method: str, configuration: str) -> dict | None:

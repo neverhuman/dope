@@ -5,6 +5,7 @@ from pathlib import Path
 import unittest
 
 from research.transfer.adapters.generators.distillation import TabularCondensation
+from research.transfer.evidence import canonical_json, digest
 from research.transfer.controls import (
     CONTROLS, ByteMatchedCoreset, ControlError, DirectPredictorControl, MatchedTeacherFactorial, Teacher,
 )
@@ -69,19 +70,45 @@ class ControlTests(unittest.TestCase):
         predictor = DirectPredictorControl(teacher, draws, noises)
         self.assertEqual(predictor.output_sha256, predictor.empirical_diagnostic(draws, noises))
         self.assertFalse(predictor.retained_real_rows)
-        self.assertGreater(predictor.charged_bytes, 0)
+        stored = {
+            "form": teacher.form,
+            "precision": teacher.precision,
+            "parameters": dict(teacher.parameters),
+            "noise_scale": teacher.noise_scale,
+        }
+        self.assertEqual(predictor.charged_bytes, len(canonical_json(stored)))
+        self.assertNotEqual(predictor.charged_bytes, 8 * len(teacher.parameters))
 
     def test_coreset_keeps_real_rows_inside_the_byte_budget(self):
         draws, noises = (0, 1, 2, 3), (0, 0, 0, 1)
-        coreset = ByteMatchedCoreset(draws, noises, 16)
+
+        def export(count):
+            rows = [{"row_id": index, "x": draws[index], "noise": noises[index]} for index in range(count)]
+            return canonical_json({"rows": rows})
+
+        coreset = ByteMatchedCoreset(draws, noises, len(export(2)))
         self.assertEqual(len(coreset.rows), 2)
-        self.assertEqual(coreset.charged_bytes, 16)
+        self.assertEqual(coreset.charged_bytes, len(export(2)))
+        self.assertEqual(coreset.charged_bytes, len(canonical_json({"rows": [dict(row) for row in coreset.rows]})))
+        self.assertNotEqual(coreset.charged_bytes, 8 * len(coreset.rows))
         self.assertTrue(coreset.retained_real_rows)
+        shorter = ByteMatchedCoreset(draws, noises, len(export(2)) - 1)
+        self.assertEqual(len(shorter.rows), 1)
+        self.assertEqual(shorter.charged_bytes, len(export(1)))
+        with self.assertRaises(ControlError) as raised:
+            ByteMatchedCoreset(draws, noises, len(export(1)) - 1)
+        self.assertEqual(str(raised.exception), "invalid_budget")
+        with self.assertRaises(ControlError) as proxy:
+            ByteMatchedCoreset(draws, noises, 16)
+        self.assertEqual(str(proxy.exception), "invalid_budget")
 
     def test_distillation_charges_encoder_decoder_init_and_recipe(self):
         dependencies = {"encoder": 8, "decoder": 8, "init": 8, "recipe": 8}
         condensed = TabularCondensation((0, 1), dependencies, PLAN["byte_budget"], PLAN["search_budget"])
-        self.assertEqual(condensed.charged_bytes, 48)
+        prototype_bytes = len(canonical_json({"prototypes": [0, 1]}))
+        self.assertEqual(condensed.charged_bytes, sum(dependencies.values()) + prototype_bytes)
+        self.assertNotEqual(condensed.charged_bytes, sum(dependencies.values()) + 8 * 2)
+        self.assertTrue(condensed.valid)
         self.assertFalse(condensed.retained_real_rows)
         self.assertEqual(condensed.adaptations, ("synthetic_prototype",))
         missing = dict(dependencies)
@@ -90,6 +117,58 @@ class ControlTests(unittest.TestCase):
             TabularCondensation((0, 1), missing, PLAN["byte_budget"], PLAN["search_budget"])
         self.assertEqual(str(raised.exception), "uncharged_dependency")
         self.assertNotIn("99991", str(raised.exception))
+
+    def test_refused_refit_invalidates_the_prior_prototypes(self):
+        dependencies = {"encoder": 8, "decoder": 8, "init": 8, "recipe": 8}
+        condensed = TabularCondensation((0, 1), dependencies, PLAN["byte_budget"], PLAN["search_budget"])
+        with self.assertRaises(ControlError) as empty:
+            condensed.refit(())
+        self.assertEqual(str(empty.exception), "invalid_prototypes")
+        self.assertIsNone(condensed.prototype_sha256)
+        self.assertIsNone(condensed.charged_bytes)
+        self.assertNotEqual(condensed.prototypes, (0, 1))
+        self.assertFalse(condensed.valid)
+        rebuilt = TabularCondensation((0, 1), dependencies, PLAN["byte_budget"], PLAN["search_budget"])
+        huge = {"encoder": 100, "decoder": 100, "init": 100, "recipe": 100}
+        with self.assertRaises(ControlError) as over:
+            rebuilt.refit((0, 1), huge)
+        self.assertEqual(str(over.exception), "byte_budget_exceeded")
+        self.assertIsNone(rebuilt.prototype_sha256)
+        self.assertNotEqual(rebuilt.prototypes, (0, 1))
+        self.assertFalse(rebuilt.valid)
+        rebuilt.refit((2, 3))
+        self.assertEqual(rebuilt.prototypes, (2, 3))
+        self.assertTrue(rebuilt.valid)
+        self.assertEqual(
+            rebuilt.charged_bytes,
+            sum(dependencies.values()) + len(canonical_json({"prototypes": [2, 3]})),
+        )
+
+    def test_caller_prototype_mutation_keeps_the_accepted_charge(self):
+        dependencies = {"encoder": 1, "decoder": 1, "init": 1, "recipe": 1}
+        payload = [0]
+        model = TabularCondensation((payload,), dependencies, 24, 1)
+        self.assertEqual(model.charged_bytes, 24)
+        self.assertEqual(model.prototypes, ((0,),))
+        self.assertIsNot(model.prototypes[0], payload)
+        accepted = model.prototype_sha256
+        payload.extend(range(1, 16))
+        self.assertEqual(model.charged_bytes, 24)
+        self.assertEqual(model.prototype_sha256, accepted)
+        self.assertTrue(model.valid)
+        self.assertEqual(model.prototypes, ((0,),))
+        retained = digest({"prototypes": [[0]], "dependencies": model.dependencies})
+        self.assertEqual(model.prototype_sha256, retained)
+        refit_payload = [0]
+        model.refit((refit_payload,))
+        refit_hash = model.prototype_sha256
+        self.assertEqual(model.charged_bytes, 24)
+        self.assertTrue(model.valid)
+        refit_payload.extend(range(1, 16))
+        self.assertEqual(model.charged_bytes, 24)
+        self.assertEqual(model.prototype_sha256, refit_hash)
+        self.assertEqual(model.prototypes, ((0,),))
+        self.assertTrue(model.valid)
 
     def test_parameter_mutation_cannot_leave_the_parameter_hash_stale(self):
         teacher = Teacher("nonlinear", {"quadratic": 1, "linear": 1, "bias": 1}, 0, "float64")
