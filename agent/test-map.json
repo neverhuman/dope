@@ -6,8 +6,8 @@
       "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
     },
     "rust/certification/privacy_attacks.rs": {
-      "command": "cargo test --locked --test vnext_custody",
-      "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
     "rust/certification.rs": {
       "command": "cargo test --locked --test vnext_custody",
@@ -1779,11 +1779,11 @@
     },
     "research/transfer/raw_profile.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "retain full transfer suite including authenticated native raw-v1/raw-v2 byte-profile charge, residual payload structure/limits and privacy-safe metadata; runtime, mathematical parameter count and cold closure remain unmeasured; no native sample/kernel decode or scientific qualification"
+      "purpose": "retain full transfer suite including authenticated raw-v1/raw-v2 and distinct DOPMIX01 complete-byte charges, framing/integrity/payload bounds and privacy-safe metadata; raw handler refuses mixed artifacts; fitted affine/dictionary/mask/split values stay private, runtime/parameter count/cold closure unmeasured; no native sampling/kernel decode or scientific qualification"
     },
     "research/transfer/tests/test_raw_profile.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "retain full transfer suite including authenticated native raw-v1/raw-v2 byte-profile charge, residual payload structure/limits and privacy-safe metadata; runtime, mathematical parameter count and cold closure remain unmeasured; no native sample/kernel decode or scientific qualification"
+      "purpose": "retain full transfer suite including authenticated raw-v1/raw-v2 and distinct DOPMIX01 complete-byte charges, framing/integrity/payload bounds and privacy-safe metadata; raw handler refuses mixed artifacts; fitted affine/dictionary/mask/split values stay private, runtime/parameter count/cold closure unmeasured; no native sampling/kernel decode or scientific qualification"
     },
     "docs/whitepaper/scripts/claim_registry.py": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_claim_registry.py' -v",
@@ -1826,12 +1826,12 @@
       "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "examples/public-regression/README.md": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q",
-      "purpose": "verify pinned public-source refusal before learner execution, physical group/query-label split independence, unclipped report output, and charged failed steps without source-value diagnostics; required in local fast/check and hosted CPU"
+      "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
+      "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
     },
     "examples/public-regression/run.py": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q",
-      "purpose": "verify pinned public-source refusal before learner execution, physical group/query-label split independence, unclipped report output, and charged failed steps without source-value diagnostics; required in local fast/check and hosted CPU"
+      "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
+      "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
     },
     "research/benchmark/tests/test_public_demo.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q",
@@ -1850,32 +1850,32 @@
       "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
     },
     "rust/compiler/interaction_screen.rs": {
-      "command": "cargo test --locked --lib",
-      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
     "rust/compiler/neural_candidates/part_01.rs": {
-      "command": "cargo test --locked --lib",
-      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
     "rust/compiler/neural_candidates/part_02.rs": {
-      "command": "cargo test --locked --lib",
-      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
     "rust/compiler/neural_candidates/part_03.rs": {
-      "command": "cargo test --locked --lib",
-      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
     "rust/compiler/part_01.rs": {
-      "command": "cargo test --locked --lib",
-      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
     "rust/compiler/residual_oof.rs": {
       "command": "cargo test --locked --lib",
       "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
     },
     "rust/compiler/target_fitting/part_01.rs": {
-      "command": "cargo test --locked --lib",
-      "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
     "scripts/uninstall-native.sh": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
@@ -2112,6 +2112,74 @@
     "tests/support/raw_mixed_cli.rs": {
       "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
       "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "research/benchmark/local_checkpoint.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
+      "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
+    },
+    "research/benchmark/tests/test_local_checkpoint.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
+      "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
+    },
+    "rust/auditor/auditor_backends/tests.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/auditor/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/calibration/part_02.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/calibration/training_metrics/part_03.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/campaign/gold_blocks/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/campaign/gold_evidence/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/campaign/gold_evidence/part_02.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/campaign/validation_metrics/aggregate_records.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/certification/privacy_attacks/finalize_certification.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/compiler/candidate_search/part_01.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/deep_campaign/part_02.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/ledger.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "rust/ledger/sqlite_ledger/part_03.rs": {
+      "command": "cargo test --locked --lib --test rust_cli",
+      "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
+    },
+    "research/transfer/tests/fixtures/raw-residual-v2.bin": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_raw_profile -v",
+      "purpose": "verify immutable retained synthetic fixture hash/full framing bytes and corruption/refusal/public-redaction assertions using temporary per-test carriers, with no author-local build path or native regeneration"
+    },
+    "research/transfer/tests/fixtures/mixed-feature-v1.bin": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_raw_profile -v",
+      "purpose": "verify immutable retained synthetic fixture hash/full framing bytes and corruption/refusal/public-redaction assertions using temporary per-test carriers, with no author-local build path or native regeneration"
     }
   }
 }

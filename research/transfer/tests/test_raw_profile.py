@@ -34,13 +34,9 @@ from research.transfer.raw_profile import (
 ROOT = Path(__file__).resolve().parents[3]
 ROW_MARKER = "row-marker-offset-scale-99999"
 WRONG_DIGEST = b"0123456789abcdef0123456789abcdef"
-RETAINED_RAW = Path(
-    "/home/ubuntu/dope/.agent/worktrees/consolidated-native-20261014/target/raw-residual-cli/304654/model.raw"
-)
+RETAINED_RAW = Path(__file__).resolve().parent / "fixtures" / "raw-residual-v2.bin"
 RETAINED_SHA256 = "fac2d6b32a59ac67a86571b57c0ee24669a6d865c0c91246ed2e80c3dc567d22"
-RETAINED_MIXED = Path(
-    "/home/ubuntu/dope/.agent/worktrees/consolidated-native-20261014/target/raw-mixed-cli/50530/model.mixed"
-)
+RETAINED_MIXED = Path(__file__).resolve().parent / "fixtures" / "mixed-feature-v1.bin"
 RETAINED_MIXED_SHA256 = "d13c986a437af7e17c8b4b274b19fe9131b05d783b4847ad9ead0dc397a97912"
 RETAINED_MIXED_NATIVE_SHA256 = "f5d6686b28caa71f68d05f4d48b0d39eea3133394fd449c1a6435ff7974d3a60"
 
@@ -401,8 +397,14 @@ class RawHandlerTests(unittest.TestCase):
 
 
 class ResidualRawTests(unittest.TestCase):
+    def setUp(self):
+        workspace = workspace_temp()
+        self.addCleanup(workspace.cleanup)
+        self.raw_fixture = Path(workspace.name) / "model.raw"
+        self.raw_fixture.write_bytes(RETAINED_RAW.read_bytes())
+
     def test_retained_fixture_charges_full_bytes_without_fitted_numbers(self):
-        artifact = RETAINED_RAW.read_bytes()
+        artifact = self.raw_fixture.read_bytes()
         self.assertEqual(len(artifact), 707)
         self.assertEqual(hashlib.sha256(artifact).hexdigest(), RETAINED_SHA256)
         self.assertEqual(artifact[:8], b"DOPERAW2")
@@ -499,7 +501,7 @@ class ResidualRawTests(unittest.TestCase):
         self.assertEqual(raised.exception.code, "raw_artifact_integrity_failed")
 
     def test_verified_bundle_charges_the_retained_residual_file(self):
-        artifact = RETAINED_RAW.read_bytes()
+        artifact = self.raw_fixture.read_bytes()
         manifest = {
             "amortization_count": 1,
             "bundle_id": "synthetic-residual",
@@ -554,8 +556,16 @@ def _private_tokens(value):
 
 
 class MixedChargeTests(unittest.TestCase):
+    def setUp(self):
+        workspace = workspace_temp()
+        self.addCleanup(workspace.cleanup)
+        self.raw_fixture = Path(workspace.name) / "model.raw"
+        self.raw_fixture.write_bytes(RETAINED_RAW.read_bytes())
+        self.mixed_fixture = Path(workspace.name) / "model.mixed"
+        self.mixed_fixture.write_bytes(RETAINED_MIXED.read_bytes())
+
     def test_retained_fixture_charges_full_bytes_without_fitted_fields(self):
-        artifact = RETAINED_MIXED.read_bytes()
+        artifact = self.mixed_fixture.read_bytes()
         self.assertEqual(len(artifact), 1523)
         self.assertEqual(hashlib.sha256(artifact).hexdigest(), RETAINED_MIXED_SHA256)
         self.assertEqual(artifact[:8], b"DOPMIX01")
@@ -620,8 +630,8 @@ class MixedChargeTests(unittest.TestCase):
         self.assertEqual(str(raised.exception), "raw_artifact_invalid")
 
     def test_raw_magic_and_broken_framing_stay_outside_this_charge(self):
-        mixed = RETAINED_MIXED.read_bytes()
-        raw = RETAINED_RAW.read_bytes()
+        mixed = self.mixed_fixture.read_bytes()
+        raw = self.raw_fixture.read_bytes()
         with self.assertRaises(BundleError) as raised:
             account_mixed_artifact(raw)
         self.assertEqual(raised.exception.code, "mixed_artifact_invalid")
@@ -646,7 +656,7 @@ class MixedChargeTests(unittest.TestCase):
         self.assertNotIn(ROW_MARKER, str(raised.exception))
 
     def test_verified_bundle_does_not_charge_mixed_through_the_raw_handler(self):
-        artifact = RETAINED_MIXED.read_bytes()
+        artifact = self.mixed_fixture.read_bytes()
         manifest = {
             "amortization_count": 1,
             "bundle_id": "synthetic-mixed",

@@ -28,7 +28,7 @@ fast: native-guard-check
     cargo run --locked --offline --bin dope-native-notices -- --check
     PYTHONPATH=src python3 -m pytest -q tests
     python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
-    python3 -B -m unittest research.benchmark.tests.test_public_demo -q
+    python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -q
     python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -q
     PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_rust_closure -q
 

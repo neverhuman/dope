@@ -34,7 +34,7 @@ PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_retained_comparison -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_arf_tabsyn_followon -q
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_cpu_fit_batch research.benchmark.tests.test_arf_contract -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_public_demo -q
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -q
 cd validation/external
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --locked --extra xgboost --extra lightgbm
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --offline --locked --extra xgboost --extra lightgbm
