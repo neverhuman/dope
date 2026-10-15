@@ -50,15 +50,15 @@ Sampling draws a latent vector from the stored dependence, maps it through each 
 
 ## Install
 
-Build the native Rust CLI directly or install it into `~/.local/bin`:
+Build the native Rust CLI directly and optionally install it into a dedicated prefix:
 
 ```bash
 git clone https://github.com/neverhuman/dope.git
 cd dope
 cargo build --locked --release -p dope-kernel
 
-# Optional: install dope-kernel into ~/.local/bin and verify toolchain health
-./scripts/install-native.sh --prefix "$HOME/.local"
+# Optional: verify pin and install dope-kernel (BINARY SHA256 PREFIX [--dry-run])
+./scripts/install-native.sh target/release/dope-kernel "$(sha256sum target/release/dope-kernel | awk '{print $1}')" "$HOME/.local/dope-native" --dry-run
 target/release/dope-kernel doctor
 
 # Optional: create the Python research and paper environment (.venv)
@@ -93,27 +93,27 @@ The installed public demo in [examples/public-regression](examples/public-regres
 
 ### Standard `[0, 1]` numeric and categorical preprocessing contract
 
-Sensitive enterprise and regulated workflows require that released synthetic artifacts and public sidecars never echo source strings, column headers, category vocabularies, or raw extrema. DOPE enforces a numeric-only `[0, 1]` contract (`crates/dope-data/src/csv.rs` in Rust and `research.transfer.metrics.standardize_numeric_table_01` in Python):
+Released `.dpk` artifacts and public sidecars omit source strings, column headers, and raw extrema. DOPE enforces a numeric-only `[0, 1]` contract ([rust/data.rs](rust/data.rs), [rust/error.rs](rust/error.rs), and [rust/representation.rs](rust/representation.rs) in Rust; `research.transfer.metrics.standardize_numeric_table_01` and [research/benchmark/representation.py](research/benchmark/representation.py) in Python):
 
 - **Headerless numeric `[0, 1]` input**: L3 `compile`, `convert`, and `certify` consume headerless numeric CSV files with the target in the final column and every cell already in `[0, 1]`. Out-of-range values fail closed with normalization guidance.
-- **Categorical encoding to `[0, 1]`**: Raw categorical tokens are mapped deterministically onto `[0, 1]` before compilation using 65,536-bucket HMAC-SHA256 projection (`bucket / 65535.0`) or training-split frequency/target statistics, so `.dpk` artifacts store only numeric distributions and zero cleartext strings.
+- **Categorical bucket projection into `(0, 1)`**: Raw categorical tokens are mapped deterministically into `(0, 1)` before compilation using 65,536-bucket HMAC-SHA256 projection (`(bucket + 0.5) / 65536`), so `.dpk` artifacts store only numeric values and no cleartext strings. With the fixed public default salt (`dope-representation-v1`), this deterministic map is pseudonymization rather than secrecy against dictionary guessing of low-cardinality vocabularies.
 - **Numeric scaling to `[0, 1]` (fit on training split only)**: Continuous columns are standardized using training-split statistics only—either by dividing by the training standard deviation (`z_i = (x_i - μ_train) / σ_train`) and mapping smoothly onto `[0, 1]` via the standard normal CDF `Φ(z_i)` (`zscore_std_01`), by training min-max clamping (`minmax_01`), or by empirical mid-rank quantiles (`midrank_quantile_01`).
 
 ### MFS-v4 quality metric: downstream tabular lift + feature-importance preservation
 
-When tabular learners (CatBoost, LightGBM/tree ensembles, MLPs, linear models) train on synthetic rows and are evaluated on unseen real holdout rows, a synthetic generator should both beat trivial controls on predictive skill and preserve the key feature drivers. MFS-v4 ([production/kpi-contract-v4.json](production/kpi-contract-v4.json), verified against [schemas/metric-golden-v1.json](schemas/metric-golden-v1.json)) combines seven `[0, 1]` components with a gated geometric mean:
+When tabular learners (CatBoost, LightGBM/tree ensembles, MLPs, linear models) train on synthetic rows and are evaluated on unseen real holdout rows, a synthetic generator should both beat trivial controls on predictive skill and preserve the key feature drivers. MFS-v4 ([production/kpi-contract-v4.json](production/kpi-contract-v4.json), verified against [schemas/metric-golden-v1.json](schemas/metric-golden-v1.json)) combines seven `[0, 1]` components with a gated geometric mean (`V4_WEIGHTS`):
 
 | Component | Weight | What it measures on unseen real holdout data |
 | --- | ---: | --- |
-| `utility_transfer` | 0.45 | Null-normalized TSTR/TRTR retention blended with **control-contrastive lift** (`control_contrastive_lift`) above `predictor_only` and `independent_marginals` controls |
-| `driver_fidelity` | 0.20 | Holdout **feature-importance and attribution agreement** (`driver_attribution_agreement`) between synthetic-trained and real-trained models: `0.35 * NDCG@k + 0.25 * Top-k Jaccard + 0.25 * L1 attribution share + 0.15 * sign agreement` |
-| `representation_closeness` | 0.10 | Holdout-calibrated two-sample representation fidelity (`1 - 2 * |C2ST_AUC - 0.5|`) |
-| `distribution_fidelity` | 0.08 | Marginal 1-Wasserstein / Kolmogorov–Smirnov fidelity across features |
-| `structure_fidelity` | 0.07 | Pairwise correlation, mutual-information, and target-association preservation |
+| `utility_transfer` | 0.30 | Null-normalized TSTR/TRTR retention blended with **control-contrastive lift** (`control_contrastive_lift`: `clamp_0_1(0.65 * clamp_0_1(retention) + 0.20 * clamp_0_1(max(0, retention - predictor_only) / 0.20) + 0.15 * clamp_0_1(max(0, retention - independent_marginals) / 0.25))`) |
+| `driver_fidelity` | 0.20 | Holdout **feature-importance and attribution agreement** (`driver_attribution_agreement`) between synthetic-trained and real-trained models: `0.35 * NDCG@k + 0.25 * Top-k Jaccard + 0.25 * L1 attribution agreement + 0.15 * sign agreement` |
+| `representation_closeness` | 0.15 | Encoder distance (`l2_unit_half` under `kumo_tabular_l`) against a matched null (`median_linear_mse_of_three`) on the shared `empirical_midrank_quantile_v1` map ([research/benchmark/representation.py](research/benchmark/representation.py)) |
+| `knowledge_compression` | 0.15 | Composite MDL knowledge compression (`knowledge_compression_metrics`): `0.40 * bpc_score + 0.35 * parameter_sparsity_score + 0.25 * log_byte_score` (`1 / (1 + bits_per_original_cell)`, `1 / (1 + encoded_numbers / (real_columns * 8.0))`, and `clamp_0_1(1 - ln(max(1, artifact_bytes)) / ln(10240))`) |
+| `distribution_fidelity` | 0.10 | Marginal 1-Wasserstein / Kolmogorov–Smirnov fidelity across features |
+| `structure_fidelity` | 0.05 | Pairwise correlation, mutual-information, and target-association preservation |
 | `coverage_realism` | 0.05 | Support precision and recall (`alpha_precision`, `beta_recall`, coverage balance) |
-| `compactness` | 0.05 | Charged artifact byte efficiency (`clamp(1 - bytes / 10240, 0, 1)`) and bits-per-encoded-parameter (`knowledge_compression_metrics`) |
 
-Every MFS-v3 and MFS-v4 release score fails closed (`null`) unless all four prerequisites (`real_vs_real_control_present`, `size_n_and_4n_present`, `artifact_only_sampling`, `metric_implementations_locked`) and all hard empirical privacy and byte gates (`dcr_share_lt_0_50`, `nndr_q05_ge_0_05`, `mia_auc_le_0_60`, `attr_leakage_le_0_05`, `no_cleartext_leak`, `artifact_bytes <= 10240`) pass.
+Every MFS-v4 release score fails closed (`null`) unless all six prerequisites (`real_vs_real_control_complete`, `required_size_cells_complete`, `artifact_sampling_verified`, `metric_implementations_locked`, `control_contrastive_baselines_complete`, `model_driver_attribution_measured`; MFS-v3 uses the first four) and all hard release gates (`exact_row_match_max == 0`, `near_copy` via `squared_l2_on_shared_map` against `nearest_other_distinct_fit_row` at the `0.01` quantile, `cleartext_absent == true`, `membership_auc_max <= 0.55`, `attribute_inference_advantage_max <= 0.05`, `byte_limit_l3 <= 10240`, `encoded_numbers_min >= 1`, `predictor_only_lift_min > 0.0`, and `independent_marginals_lift_min > 0.0`) pass.
 
 ## Reproduce the paper
 
