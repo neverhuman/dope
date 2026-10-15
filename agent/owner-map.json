@@ -540,6 +540,12 @@
     "rust/ledger.rs": "rust-core",
     "rust/ledger/sqlite_ledger/part_03.rs": "rust-core",
     "research/transfer/tests/fixtures/raw-residual-v2.bin": "external-evidence",
-    "research/transfer/tests/fixtures/mixed-feature-v1.bin": "external-evidence"
+    "research/transfer/tests/fixtures/mixed-feature-v1.bin": "external-evidence",
+    "research/transfer/scheduler.py": "external-evidence",
+    "research/transfer/executor.py": "external-evidence",
+    "research/transfer/tests/test_scheduler.py": "external-evidence",
+    "research/transfer/tests/test_executor.py": "external-evidence",
+    "schemas/transfer-execution-plan-v1.schema.json": "external-evidence",
+    "tests/support/native_rank_feasible_interactions.rs": "rust-core"
   }
 }

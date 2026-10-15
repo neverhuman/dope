@@ -1390,8 +1390,8 @@
       "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
     },
     "research/transfer/evidence.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
-      "purpose": "verify draft/frozen contracts, receipt/cache admission, original-unit paired evidence, alias identity, corruption and protected role separation using target-only fixtures"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/tests/test_evidence.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_evidence -v",
@@ -1426,16 +1426,16 @@
       "purpose": "validate original-unit losses, full required-cell coverage, weighted tail harm and bytes as a separate constraint"
     },
     "research/transfer/statistics.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
-      "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/power.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
       "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
     },
     "research/transfer/tests/test_statistics.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
-      "purpose": "validate source-family/fit/sample/learner/query clustered inference, seed identity, failure disposition and power operating characteristics"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/protocols/statistics-v1.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_statistics -v",
@@ -1554,28 +1554,28 @@
       "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
     },
     "research/transfer/adapters/generators/distillation.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
-      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/adapters/generators/neural.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
-      "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/controls.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
-      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/locks/neural-generators.json": {
       "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
       "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
     },
     "research/transfer/tests/test_controls.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_controls -v",
-      "purpose": "verify exact teacher identities, label permutation, equal draw/noise lengths, charged control dependencies and explicit retained-row status"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/tests/test_neural_generators.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_neural_generators -v",
-      "purpose": "verify offline schema/export/reload probes, distinct scaled/native recipes and visible unavailable vendor qualification"
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
     },
     "research/transfer/adapters/auditors/kumo_tabular.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_kumo_tabular -v",
@@ -1938,8 +1938,8 @@
       "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
     },
     "tests/vnext_byte_allocation.rs": {
-      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
-      "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+      "command": "cargo test --locked --test vnext_byte_allocation",
+      "purpose": "verify all5 actual native compilation/allocation fixtures including48-feature rank-feasible distractor/redundancy and typed residual families; accepted artifact/report bytes, finite ranks, canonical consumed interactions and attempt/table budgets remain bounded; engineering fixtures only, no recovery/calibration/tail/equal-compute qualification"
     },
     "tests/vnext_native_successors.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
@@ -2180,6 +2180,30 @@
     "research/transfer/tests/fixtures/mixed-feature-v1.bin": {
       "command": "python3 -B -m unittest research.transfer.tests.test_raw_profile -v",
       "purpose": "verify immutable retained synthetic fixture hash/full framing bytes and corruption/refusal/public-redaction assertions using temporary per-test carriers, with no author-local build path or native regeneration"
+    },
+    "research/transfer/scheduler.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "research/transfer/executor.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "research/transfer/tests/test_scheduler.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "research/transfer/tests/test_executor.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "schemas/transfer-execution-plan-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+    },
+    "tests/support/native_rank_feasible_interactions.rs": {
+      "command": "cargo test --locked --test vnext_byte_allocation",
+      "purpose": "verify all5 actual native compilation/allocation fixtures including48-feature rank-feasible distractor/redundancy and typed residual families; accepted artifact/report bytes, finite ranks, canonical consumed interactions and attempt/table budgets remain bounded; engineering fixtures only, no recovery/calibration/tail/equal-compute qualification"
     }
   }
 }
