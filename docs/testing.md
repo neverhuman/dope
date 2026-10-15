@@ -20,6 +20,15 @@ seven development fixtures for the recovered equal-term-tariff interaction
 helper. Its 12/24/48/adaptive comparison charges term fields, not complete
 encoded artifacts, and does not replace the production compiler's encoded-byte
 allocation or qualify generalization.
+Raw-schema tests cover explicit categorical field limits through intake and
+source-free transform reload, including UTF-8 byte boundaries. Schema parsing,
+validation, and metadata projection retain their 4096-byte defaults. Callers
+using custom `InputLimits.max_field_bytes` can use the matching
+`TableSchemaV1::*_with_field_limit` methods; table ingestion revalidates every
+declared category against that limit before reading CSV bytes. Retained states
+use their stored limit, with 4096 as the historical v1 fallback. The structural
+JSON schema supplies the metadata envelope; native semantic validation applies
+the chosen field byte limit and aggregate metadata cap.
 Fast/check and hosted CPU verify the shipped native legal-input hashes before
 product checks. The full installer suite covers license delivery, fixed-member
 uninstall validation and legacy two-file compatibility. The Rust notice generator's full unit suite runs in local fast/check and hosted

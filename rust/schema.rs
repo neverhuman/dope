@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const SCHEMA_FORMAT: &str = "dope-table-schema";
 pub const MAX_COLUMNS: usize = 4096;
 pub const MAX_SCHEMA_BYTES: usize = 2 * 1024 * 1024;
+pub const DEFAULT_MAX_FIELD_BYTES: usize = 4096;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SchemaError {
@@ -152,7 +153,11 @@ pub(crate) fn opaque_id(id: &str) -> bool {
     id.len() == 5 && id.starts_with('c') && id.as_bytes()[1..].iter().all(u8::is_ascii_digit)
 }
 
-pub(crate) fn validate_domain(dtype: ColumnType, domain: &Option<ColumnDomain>) -> bool {
+pub(crate) fn validate_domain(
+    dtype: ColumnType,
+    domain: &Option<ColumnDomain>,
+    max_field_bytes: usize,
+) -> bool {
     match domain {
         None => true,
         Some(ColumnDomain::Numeric { lower, upper }) => {
@@ -164,7 +169,9 @@ pub(crate) fn validate_domain(dtype: ColumnType, domain: &Option<ColumnDomain>) 
             dtype == ColumnType::Nominal
                 && !values.is_empty()
                 && values.len() <= 4096
-                && values.iter().all(|x| !x.is_empty() && x.len() <= 4096)
+                && values
+                    .iter()
+                    .all(|x| !x.is_empty() && x.len() <= max_field_bytes)
                 && values.iter().collect::<BTreeSet<_>>().len() == values.len()
         }
     }
@@ -172,16 +179,32 @@ pub(crate) fn validate_domain(dtype: ColumnType, domain: &Option<ColumnDomain>) 
 
 impl TableSchemaV1 {
     pub fn from_private_json(bytes: &[u8]) -> Result<Self> {
+        Self::from_private_json_with_field_limit(bytes, DEFAULT_MAX_FIELD_BYTES)
+    }
+
+    /// Parse private metadata using the same byte limit as the table's input limits.
+    pub fn from_private_json_with_field_limit(
+        bytes: &[u8],
+        max_field_bytes: usize,
+    ) -> Result<Self> {
         if bytes.len() > MAX_SCHEMA_BYTES {
             return Err(SchemaError::new("schema_bytes_exceeded", None, None));
         }
         let schema: Self = serde_json::from_slice(bytes)
             .map_err(|_| SchemaError::new("invalid_schema_json", None, None))?;
-        schema.validate()?;
+        schema.validate_with_field_limit(max_field_bytes)?;
         Ok(schema)
     }
 
     pub fn validate(&self) -> Result<()> {
+        self.validate_with_field_limit(DEFAULT_MAX_FIELD_BYTES)
+    }
+
+    /// Validate categorical tokens in bytes, including declared values absent from the CSV.
+    pub fn validate_with_field_limit(&self, max_field_bytes: usize) -> Result<()> {
+        if max_field_bytes == 0 {
+            return Err(SchemaError::new("invalid_input_limits", None, None));
+        }
         if self.format != SCHEMA_FORMAT || self.version != 1 {
             return Err(SchemaError::new("unknown_schema_version", None, None));
         }
@@ -212,7 +235,7 @@ impl TableSchemaV1 {
             if matches!(c.dtype, ColumnType::DateTime | ColumnType::Text) {
                 return Err(error("unsupported_logical_type"));
             }
-            if !validate_domain(c.dtype, &c.domain) {
+            if !validate_domain(c.dtype, &c.domain, max_field_bytes) {
                 return Err(error("invalid_declared_domain"));
             }
             let mut tokens = BTreeSet::new();
@@ -257,7 +280,15 @@ impl TableSchemaV1 {
     }
 
     pub fn public_projection(&self) -> Result<Vec<PublicColumn>> {
-        self.validate()?;
+        self.public_projection_with_field_limit(DEFAULT_MAX_FIELD_BYTES)
+    }
+
+    /// Project custom-limit metadata without publishing source names or domains.
+    pub fn public_projection_with_field_limit(
+        &self,
+        max_field_bytes: usize,
+    ) -> Result<Vec<PublicColumn>> {
+        self.validate_with_field_limit(max_field_bytes)?;
         let approved = self.metadata_visibility == MetadataVisibility::ApprovedSemanticLabels;
         Ok(self
             .columns
