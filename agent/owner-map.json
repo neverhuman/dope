@@ -557,6 +557,8 @@
     "docs/whitepaper/generated/native-byte-conformance.tex": "external-evidence",
     "production/kpi-contract-v4.json": "release",
     "rust/transfer_metrics/mfs_v4.rs": "rust-core",
-    "rust/fitness/v4.rs": "rust-core"
+    "rust/fitness/v4.rs": "rust-core",
+    "rust/compiler/interactions.rs": "rust-core",
+    "tests/vnext_interactions.rs": "rust-core"
   }
 }

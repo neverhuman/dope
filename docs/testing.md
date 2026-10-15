@@ -15,6 +15,11 @@ raw-schema, raw-workflow, artifact-only, installer, byte-allocation, native
 successor, public-demo, and frozen-geometry binding Rust integration suites.
 Hosted CPU retains full
 locked Cargo test discovery, which also executes every one of these suites.
+Local check and hosted Cargo discovery also retain `vnext_interactions`, the
+seven development fixtures for the recovered equal-term-tariff interaction
+helper. Its 12/24/48/adaptive comparison charges term fields, not complete
+encoded artifacts, and does not replace the production compiler's encoded-byte
+allocation or qualify generalization.
 Fast/check and hosted CPU verify the shipped native legal-input hashes before
 product checks. The full installer suite covers license delivery, fixed-member
 uninstall validation and legacy two-file compatibility. The Rust notice generator's full unit suite runs in local fast/check and hosted
