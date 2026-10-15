@@ -390,7 +390,7 @@ fn compile_symbolic_table(
             marginal_knots: knots,
             dependence: dependence_name.into(),
             target: (*target_name).into(),
-            utility_retention: utility,
+            stored_target_fit: utility,
             driver_agreement,
             proxy_joint_fidelity,
             proxy_membership_auc,

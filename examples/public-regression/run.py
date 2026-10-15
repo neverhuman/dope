@@ -224,6 +224,14 @@ def render_report(receipt: dict) -> str:
             table+=f"<tr><td>{label}</td><td>{n}</td><td>{loss['mse_db_squared']:.4f}</td><td>{loss['rmse_db']:.4f}</td><td>{loss['mae_db']:.4f}</td><td>{r}</td></tr>"
         table+="</table>"
         table=f"<p>{receipt['fit_rows']} fitting rows / {receipt['query_rows']} query rows; {receipt['fit_groups']} fitting configurations / {receipt['query_groups']} query configurations. Complete sampling artifact: {receipt['inspection']['accounting']['complete_sampling_bytes']:,} bytes. One declared linear learner.</p>"+table
+    if "optional_checkpoint_v1" in receipt:
+        table += "<h2>Optional local checkpoint</h2><p>Supplied development observations; fixture rows are interface tests. Scientific and release qualification remain false.</p>"
+        table += "<table><tr><th>Arm</th><th>State</th><th>Consumed rows</th><th>MSE (dB²)</th></tr>"
+        for arm, record in receipt["optional_checkpoint_v1"]["arms"].items():
+            loss = record.get("loss")
+            mse = "—" if loss is None else f"{loss['mse_db_squared']:.4f}"
+            table += f"<tr><td>{html.escape(arm)}</td><td>{html.escape(record['state'])}</td><td>{record.get('consumed_rows', '—')}</td><td>{mse}</td></tr>"
+        table += "</table>"
     return "<!doctype html><meta charset=utf-8><title>DOPE public Airfoil demonstration</title>" \
            "<style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px}td,th{padding:10px;text-align:right;border-bottom:1px solid #ddd}td:first-child,th:first-child{text-align:left}pre{white-space:pre-wrap;overflow-wrap:anywhere}</style>" \
            "<h1>Public Airfoil transfer demonstration</h1><p>Observed public grouped split; " \
@@ -234,7 +242,35 @@ def render_report(receipt: dict) -> str:
            f"<details><summary>Reproduction receipt and limitations</summary><pre>{safe}</pre></details>"
 
 
-def run(binary: Path, data: bytes, output: Path, seed: int) -> dict:
+def optional_checkpoint_arm(hook, fit_x, fit_y, query_x, truth, seed, arm, output, attempts):
+    """Optional execution failures remain visible; query labels stay in scoring."""
+    if hook is None:
+        return {"state": "not_run_no_admitted_local_checkpoint"}
+    from research.benchmark.local_checkpoint import LocalCheckpointHook
+    if type(hook) is not LocalCheckpointHook:
+        raise ValueError("public_checkpoint_interface_invalid")
+    def compare():
+        predictions, receipt = hook.predict(fit_x, fit_y, query_x, seed, arm,
+                                           digest(json.dumps(schema(), sort_keys=True).encode()))
+        return {**receipt, "loss": losses(truth, predictions)}
+    try:
+        return measured_step(output, attempts, f"optional_checkpoint_{arm}", compare)
+    except ValueError:
+        return {"state": "unavailable_or_failed", "reason": "public_checkpoint_optional_failed",
+                "scope": "development_only", "scientific_admission": False, "release_qualified": False}
+
+
+def attach_optional_checkpoint(receipt, optional):
+    if optional is not None:
+        receipt["format"] = "dope-public-airfoil-demo-local-checkpoint-v1"
+        receipt["optional_foundation_model"] = "attempted_offline_development_comparison"
+        receipt["optional_checkpoint_v1"] = {"format": "dope-public-local-checkpoint-comparison-v1",
+                                             "scope": "development_only", "arms": optional,
+                                             "scientific_admission": False, "release_qualified": False}
+    return receipt
+
+
+def run(binary: Path, data: bytes, output: Path, seed: int, *, local_checkpoint=None) -> dict:
     started = time.monotonic()
     if len(data)!=SOURCE_BYTES or digest(data)!=SOURCE_SHA:
         raise ValueError("public_source_digest_mismatch")
@@ -269,6 +305,10 @@ def run(binary: Path, data: bytes, output: Path, seed: int) -> dict:
     real_pred, recipe = step("real_learner", lambda: learner_predictions(real_x, real_y, query_x))
     real_loss = losses(truth, real_pred)
     null_loss = losses(truth, np.full(len(query), float(np.mean(real_y))))
+    optional = None
+    if local_checkpoint is not None:
+        optional = {"real": optional_checkpoint_arm(local_checkpoint, real_x, real_y, query_x, truth,
+                                                    seed, "real", output, attempts)}
     arms = []
     for multiplier in [1, 4]:
         n = len(fit) * multiplier
@@ -282,6 +322,10 @@ def run(binary: Path, data: bytes, output: Path, seed: int) -> dict:
             raise ValueError("public_isolated_replay_mismatch")
         pred, native_recipe = step(f"synthetic_learner_{multiplier}n", lambda: learner_predictions(synthetic[:, :5], synthetic[:, 5], query_x))
         loss = losses(truth, pred)
+        if optional is not None:
+            name = f"synthetic_{multiplier}n"
+            optional[name] = optional_checkpoint_arm(local_checkpoint, synthetic[:, :5], synthetic[:, 5],
+                                                      query_x, truth, seed, name, output, attempts)
         rng=np.random.default_rng(seed+multiplier)
         bootstrap=rng.integers(0,len(fit),size=n)
         bootstrap_pred, bootstrap_recipe=step(f"bootstrap_learner_{multiplier}n", lambda: learner_predictions(real_x[bootstrap],real_y[bootstrap],query_x))
@@ -313,6 +357,7 @@ def run(binary: Path, data: bytes, output: Path, seed: int) -> dict:
                "cost_scope": "observed_public_demo_steps_not_full_campaign_or_resident_memory",
                "limitations": ["Public demonstration, not independent-source confirmation.", "One linear diagnostic learner, not a portfolio transfer result.",
                                "Feature support remains fit-range bounded; residual tails are not qualified.", "Private affine/schema state is retained and charged; disclosure attacks are absent."]}
+    attach_optional_checkpoint(receipt, optional)
     (output / "receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True, allow_nan=False) + "\n")
     (output / "report.html").write_text(render_report(receipt))
     return receipt

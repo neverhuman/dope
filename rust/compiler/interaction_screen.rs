@@ -1,9 +1,39 @@
 // Fit-only bounded pair exploration independent of marginal parent support.
 // Row folds use a fixed row-index hash, never target/candidate-dependent folds.
 
+// Deduplicate complete fit columns, not just the screening row subset. Verify
+// equality inside hash buckets and canonicalize signed zero's numeric identity.
+fn interaction_column_aliases(columns: &[Vec<f32>]) -> Vec<usize> {
+    let mut buckets = std::collections::BTreeMap::<[u8; 32], Vec<usize>>::new();
+    let mut aliases = Vec::with_capacity(columns.len());
+    for (index, column) in columns.iter().enumerate() {
+        let mut hash = blake3::Hasher::new();
+        for &value in column {
+            hash.update(&(if value == 0.0 { 0.0 } else { value }).to_le_bytes());
+        }
+        let bucket = buckets.entry(*hash.finalize().as_bytes()).or_default();
+        let representative = bucket
+            .iter()
+            .copied()
+            .find(|&other| columns[other] == *column)
+            .unwrap_or_else(|| {
+                bucket.push(index);
+                index
+            });
+        aliases.push(representative);
+    }
+    aliases
+}
+
 fn crossfit_interaction_pairs(table: &Table, columns: &[Vec<f32>]) -> Vec<(usize, usize)> {
     let rows = table.rows.min(512);
-    if rows < 16 || columns.len() < 2 {
+    let aliases = interaction_column_aliases(columns);
+    let unique = aliases
+        .iter()
+        .enumerate()
+        .filter_map(|(index, &parent)| (index == parent).then_some(index))
+        .collect::<Vec<_>>();
+    if rows < 16 || unique.len() < 2 {
         return Vec::new();
     }
     let row_ids = (0..rows).map(|r| r * table.rows / rows).collect::<Vec<_>>();
@@ -12,9 +42,9 @@ fn crossfit_interaction_pairs(table: &Table, columns: &[Vec<f32>]) -> Vec<(usize
         .map(|r| (splitmix64(*r as u64 ^ 0x6d61_696e_666f_6c64) % 4) as usize)
         .collect::<Vec<_>>();
     let mut pairs = Vec::new();
-    if columns.len() <= 64 {
-        for left in 0..columns.len() {
-            for right in left + 1..columns.len() {
+    if unique.len() <= 64 {
+        for (at, &left) in unique.iter().enumerate() {
+            for &right in &unique[at + 1..] {
                 pairs.push((left, right));
             }
         }
@@ -23,8 +53,8 @@ fn crossfit_interaction_pairs(table: &Table, columns: &[Vec<f32>]) -> Vec<(usize
         // rather than requiring marginally useful parents for all proposals.
         let mut seen = std::collections::BTreeSet::new();
         for at in 0..2048u64 {
-            let left = (splitmix64(at ^ 0xa17e) % columns.len() as u64) as usize;
-            let right = (splitmix64(at ^ 0xc0fe) % columns.len() as u64) as usize;
+            let left = unique[(splitmix64(at ^ 0xa17e) % unique.len() as u64) as usize];
+            let right = unique[(splitmix64(at ^ 0xc0fe) % unique.len() as u64) as usize];
             if left != right {
                 seen.insert((left.min(right), left.max(right)));
             }
@@ -113,7 +143,15 @@ fn exploratory_pair_proposals(
     screen: &[(usize, f32)],
     limit: usize,
 ) -> Vec<(usize, usize)> {
-    if table.rows < 24 || columns.len() < 2 {
+    let aliases = interaction_column_aliases(columns);
+    if table.rows < 24
+        || aliases
+            .iter()
+            .enumerate()
+            .filter(|(index, parent)| *index == **parent)
+            .count()
+            < 2
+    {
         return Vec::new();
     }
     let count = table.rows.min(256);
@@ -127,6 +165,7 @@ fn exploratory_pair_proposals(
     let mut semantic = columns
         .iter()
         .enumerate()
+        .filter(|(index, _)| aliases[*index] == *index)
         .map(|(index, column)| {
             let mut hash = blake3::Hasher::new();
             for &row in &ids {
@@ -137,10 +176,12 @@ fn exploratory_pair_proposals(
         .collect::<Vec<_>>();
     semantic.sort();
     let mut proposed = std::collections::BTreeSet::new();
+    let mut seen_parents = std::collections::BTreeSet::new();
     let strongest = screen
         .iter()
+        .map(|(feature, _)| aliases[*feature])
+        .filter(|feature| seen_parents.insert(*feature))
         .take(8)
-        .map(|(feature, _)| *feature)
         .collect::<Vec<_>>();
     for (at, &left) in strongest.iter().enumerate() {
         for &right in &strongest[at + 1..] {
@@ -232,6 +273,63 @@ fn exploratory_pair_proposals(
 #[cfg(test)]
 mod interaction_screen_tests {
     use super::*;
+    #[test]
+    fn duplicated_parents_never_form_self_or_repeated_interactions() {
+        let rows = 256;
+        let parent = (0..rows)
+            .map(|row| (row % 16) as f32 / 15.0)
+            .collect::<Vec<_>>();
+        let columns = vec![parent.clone(); 70];
+        let table = Table {
+            rows,
+            features: columns.len(),
+            columns: columns.clone(),
+            target: parent.clone(),
+        };
+        let screen = target_screen(&columns, &table.target);
+        assert!(crossfit_interaction_pairs(&table, &columns).is_empty());
+        assert!(exploratory_pair_proposals(&table, &columns, &screen, 4).is_empty());
+        let target = fit_ga2m_target(&table, &columns, &screen, Task::Regression);
+        let Target::Ga2m { interactions, .. } = target else {
+            panic!("ga2m");
+        };
+        assert!(interactions.is_empty());
+        let other = (0..rows)
+            .map(|row| ((row / 16) % 16) as f32 / 15.0)
+            .collect::<Vec<_>>();
+        let columns = vec![parent.clone(), other.clone(), parent, other];
+        let table = Table {
+            rows,
+            features: 4,
+            columns: columns.clone(),
+            target: (0..rows)
+                .map(|row| u8::from((row % 16 > 7) != (row / 16 > 7)) as f32)
+                .collect(),
+        };
+        let pairs = crossfit_interaction_pairs(&table, &columns);
+        assert_eq!(pairs, vec![(0, 1)]);
+        assert!(pairs.len() <= 4);
+        let screen = target_screen(&columns, &table.target);
+        let target = fit_ga2m_target(&table, &columns, &screen, Task::Regression);
+        let Target::Ga2m { interactions, .. } = target else {
+            panic!("ga2m");
+        };
+        assert!(interactions.len() <= 4);
+        assert!(
+            interactions
+                .iter()
+                .all(|term| term.left == 0 && term.right == 1)
+        );
+    }
+
+    #[test]
+    fn duplicate_identity_uses_all_rows_and_numeric_signed_zero() {
+        let mut a = vec![0.0; 1024];
+        let mut b = a.clone();
+        b[1] = 1.0; // Outside the 512-row screening subset.
+        a[0] = -0.0;
+        assert_eq!(interaction_column_aliases(&[a.clone(), b, a]), [0, 1, 0]);
+    }
     #[test]
     fn rare_gate_proposals_survive_shifted_features_target_units_and_permutation() {
         let rows = 256;

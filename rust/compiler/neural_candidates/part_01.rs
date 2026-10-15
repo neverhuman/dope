@@ -105,7 +105,7 @@ fn compile_neural_table(
             NeuralArchitecture::TabDdpm => "tabddpm",
         }
         .into(),
-        utility_retention: 0.0,
+        stored_target_fit: 0.0,
         driver_agreement: 0.0,
         proxy_joint_fidelity: 0.0,
         proxy_membership_auc: 0.5,

@@ -169,12 +169,16 @@ fn fit_ga2m_target_with_proposals(
             }
         }
     }
+    let aliases = interaction_column_aliases(completed);
     for left_index in 0..selected.len() {
         for right_index in left_index + 1..selected.len() {
             let pair = (
-                selected[left_index].min(selected[right_index]),
-                selected[left_index].max(selected[right_index]),
+                aliases[selected[left_index]].min(aliases[selected[right_index]]),
+                aliases[selected[left_index]].max(aliases[selected[right_index]]),
             );
+            if pair.0 == pair.1 {
+                continue;
+            }
             if !pairs.contains(&pair) {
                 pairs.push(pair);
             }

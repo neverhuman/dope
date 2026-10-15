@@ -277,9 +277,7 @@ pub fn rebuild_deep_outcomes(
                 supported_subgroup_retention: evidence.supported_subgroup_retention,
                 nominal_coverage: evidence.nominal_95_coverage,
                 feature_importance_spearman: evidence.feature_importance_spearman,
-                feature_importance_top_k_agreement: Some(
-                    evidence.feature_importance_top_k_agreement,
-                ),
+                feature_importance_top_k_agreement: evidence.feature_importance_top_k_agreement,
                 feature_importance_informative_groups: Some(
                     evidence.feature_importance_informative_count as f64,
                 ),
