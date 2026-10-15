@@ -53,6 +53,32 @@ class ObjectiveTests(unittest.TestCase):
         self.assertEqual(row["parent_id"], "parent")
         self.assertEqual(row["actual_bytes"], 20)
 
+    def test_selection_prefers_smaller_bytes_and_refuses_absent_sketch_or_nonfinite_losses(self):
+        tied = select_once([
+            candidate("alpha-larger", estimated_bytes=24, actual_bytes=24, development_loss=0.25),
+            candidate("zeta-smaller", estimated_bytes=12, actual_bytes=12, development_loss=0.25),
+            candidate("unprobed", estimated_bytes=8, actual_bytes=8, development_loss=0.10, risk_sketch="absent"),
+        ], cap=32)
+        self.assertEqual(tied["selected"], "zeta-smaller")
+        reasons = {item["candidate_id"]: item["reason"] for item in tied["rejections"]}
+        self.assertEqual(reasons["unprobed"], "sketch_absent")
+        for bad_loss in (True, float("nan"), float("inf"), -0.1):
+            with self.assertRaises(ValueError):
+                select_once([candidate("bad", development_loss=bad_loss)], cap=32)
+        with self.assertRaises(ValueError):
+            select_once([candidate("dup"), candidate("dup")], cap=32)
+        for bad_val in (True, float("nan"), float("inf")):
+            with self.assertRaises(ValueError):
+                allocation_gain(bad_val, 0.2)
+            with self.assertRaises(ValueError):
+                allocation_gain(0.4, bad_val)
+        with self.assertRaises(ValueError):
+            allocation_gain(1e308, -1e308)
+        for bad_cost in (True, -1.0, float("nan"), float("inf")):
+            with self.assertRaises(ValueError):
+                provenance_row(candidate_id="c1", parent_id=None, estimated_bytes=16,
+                               actual_bytes=16, cost=bad_cost, rejection=None)
+
 
 if __name__ == "__main__":
     unittest.main()
