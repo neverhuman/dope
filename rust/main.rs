@@ -123,6 +123,18 @@ fn run(command: Command) -> Result<()> {
                 serde_json::json!({"state":"sampled","isolation":"linux_x86_64_seccomp_tsync_default_deny","inherited_source_fds":"closed","filesystem_network_exec":"denied","rows":rows,"seed":seed,"sample_sha256":dope_kernel::bundle::content_fingerprint(&encoded),"runtime_inventory":runtime,"inspection":inspection,"integer_rounding_repairs":samples.integer_rounding_repairs,"boolean_rounding_repairs":samples.boolean_rounding_repairs,"physical_domain_rejections":samples.physical_domain_rejections})
             );
         }
+        Command::InspectDevelopmentPilot {
+            plan,
+            expected_plan_digest,
+            attempts,
+        } => {
+            let inspection = dope_kernel::corpus::source_pilot::inspect_source_pilot_v2(
+                &plan,
+                attempts.as_deref(),
+                &expected_plan_digest,
+            )?;
+            println!("{}", serde_json::to_string(&inspection)?);
+        }
         Command::CompileRaw {
             csv,
             schema,

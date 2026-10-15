@@ -7,6 +7,9 @@ use dope_kernel::RouterEvidence;
 use dope_kernel::production::write_canonical;
 use dope_kernel::router::{QuantizedLayer, ROUTER_OUTPUTS, RouterBundle};
 
+#[path = "support/source_pilot_cli.rs"]
+mod source_pilot_cli;
+
 fn run(binary: &str, args: &[&str]) {
     let output = Command::new(binary).args(args).output().unwrap();
     assert!(
