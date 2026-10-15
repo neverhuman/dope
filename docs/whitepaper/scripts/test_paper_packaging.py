@@ -63,6 +63,27 @@ class PackagingTests(unittest.TestCase):
         self.assertIn(r'\input{generated/mfs-v3-examples.tex}', supplement)
         self.assertNotIn('100.0001', supplement)
 
+    def test_measured_mfs_gate_failures_are_not_called_unmeasured(self):
+        for phrase in (
+            "The score is null for every method in this paper because its privacy and representation gates are "
+            "still unmeasured.",
+            "The release score is null until its privacy and representation gates are measured.",
+            "The privacy gate is unmeasured.",
+        ):
+            self.assertTrue(check_paper.mfs_gate_state_failures(phrase), phrase)
+        for phrase in (
+            "because the four prerequisites and the cleartext scan are unmeasured; measured copy, membership, and "
+            "attribute gates also fail on some method--lineage cells.",
+            "The release score is null because its prerequisites and cleartext scan are unmeasured.",
+            "Cleartext is unscanned on every method--lineage cell.",
+        ):
+            self.assertEqual(check_paper.mfs_gate_state_failures(phrase), [], phrase)
+        sources = [check_paper.TEX, check_paper.ROOT / "supplement.tex", check_paper.ROOT.parents[1] / "README.md"]
+        sources += sorted((check_paper.ROOT / "generated").glob("*.tex"))
+        for path in sources:
+            self.assertEqual(check_paper.mfs_gate_state_failures(check_paper.strip_tex_comments(path.read_text())), [],
+                             path.name)
+
     def test_the_real_row_control_is_a_diagnostic_not_a_bound(self):
         for phrase in (
             "resampled real rows remain the upper reference (Section 5).",
