@@ -1,6 +1,11 @@
-"""Synthetic DOPERAW1 framing. No native CLI, source rows, or prediction goldens."""
+"""Synthetic DOPERAW1 framing and the retained DOPERAW2 fixture.
+
+The fixture is read by its recorded hash. It is not rendered or regenerated.
+No native CLI, source rows, or prediction goldens.
+"""
 
 import hashlib
+import json
 import re
 from pathlib import Path
 import tempfile
@@ -28,6 +33,10 @@ from research.transfer.raw_profile import (
 ROOT = Path(__file__).resolve().parents[3]
 ROW_MARKER = "row-marker-offset-scale-99999"
 WRONG_DIGEST = b"0123456789abcdef0123456789abcdef"
+RETAINED_RAW = Path(
+    "/home/ubuntu/dope/.agent/worktrees/consolidated-native-20261014/target/raw-residual-cli/304654/model.raw"
+)
+RETAINED_SHA256 = "fac2d6b32a59ac67a86571b57c0ee24669a6d865c0c91246ed2e80c3dc567d22"
 
 
 def workspace_temp():
@@ -44,6 +53,24 @@ def dpk(features=2):
     artifact[6] = 1
     artifact[8] = 8
     artifact[12:16] = features.to_bytes(4, "little")
+    return bytes(artifact)
+
+
+def noise_dpk(body, *, minor=3, task=0, features=1, compress=False):
+    if compress:
+        section = bytes([5 | 0x80, len(body), len(body)]) + body
+    else:
+        section = bytes([5, len(body)]) + body
+    artifact = bytearray(56 + len(section))
+    artifact[:4] = b"DPK3"
+    artifact[4] = 3
+    artifact[5] = minor
+    artifact[6] = 1
+    artifact[7] = task
+    artifact[8] = 4
+    artifact[12:16] = features.to_bytes(4, "little")
+    artifact[32:40] = len(section).to_bytes(8, "little")
+    artifact[56:] = section
     return bytes(artifact)
 
 
@@ -169,7 +196,6 @@ class RawChargeTests(unittest.TestCase):
                 b"",
                 b"DOPERAW1",
                 bytearray(framed(state, payload)),
-                framed(state, payload, magic=b"DOPERAW2"),
                 framed(b"", payload),
             ],
             "raw_artifact_integrity_failed": [
@@ -366,6 +392,144 @@ class RawHandlerTests(unittest.TestCase):
                         verify_bundle(root, digest)
                 self.assertEqual(raised.exception.code, code)
                 self.assertNotIn(ROW_MARKER, str(raised.exception))
+
+
+class ResidualRawTests(unittest.TestCase):
+    def test_retained_fixture_charges_full_bytes_without_fitted_numbers(self):
+        artifact = RETAINED_RAW.read_bytes()
+        self.assertEqual(len(artifact), 707)
+        self.assertEqual(hashlib.sha256(artifact).hexdigest(), RETAINED_SHA256)
+        self.assertEqual(artifact[:8], b"DOPERAW2")
+        self.assertEqual(int.from_bytes(artifact[8:16], "little"), 392)
+        self.assertEqual(int.from_bytes(artifact[16:24], "little"), 259)
+        self.assertEqual(artifact[24:56], blake3_hash(artifact[56:]))
+        self.assertTrue(artifact.endswith(b"\x05\x03\x04\x01\x00"))
+        profile = account_raw_artifact(artifact)
+        self.assertEqual(profile["byte_profile_id"], "native-raw-complete-residual-v1")
+        self.assertEqual(profile["version"], 2)
+        self.assertEqual(profile["profile"], "raw-numeric-residual-v1")
+        self.assertEqual(profile["capability"], "fully_observed_numeric_features_continuous_regression")
+        self.assertIsNone(profile["mathematical_parameter_count"])
+        self.assertEqual(profile["framing_bytes"], 56)
+        self.assertEqual(profile["transform_schema_bytes"], 392)
+        self.assertEqual(profile["native_payload_bytes"], 259)
+        self.assertEqual(profile["complete_sampling_bytes"], 707)
+        self.assertEqual(profile["transport_archive_bytes"], 707)
+        self.assertIsNone(profile["generic_runtime_bytes"])
+        self.assertIsNone(profile["cold_sampling_closure_bytes"])
+        self.assertEqual(profile["content_hash"], "blake3_state_plus_dpk")
+        self.assertIs(profile["formal_dp"], False)
+        self.assertIs(profile["hipaa_deidentification"], False)
+        self.assertIs(profile["release_authorized"], False)
+        self.assertEqual(profile["confirmation"], "unqualified")
+        self.assertEqual(profile["certification"], "unqualified_development_artifact")
+        rendered = repr(dict(profile))
+        state = json.loads(artifact[56:448])
+        self.assertNotIn(state["format"], rendered)
+        self.assertNotIn(state["visibility"], rendered)
+        for column in state["columns"]:
+            self.assertNotIn(column["id"], rendered)
+            for key in ("offset", "scale"):
+                self.assertNotIn(json.dumps(column[key]), rendered)
+        for key in ("offset", "scale", "knot", "label", "domain"):
+            self.assertNotIn(key, profile)
+        with self.assertRaises(TypeError):
+            profile["mathematical_parameter_count"] = 0
+
+    def test_each_uncompressed_kind_charges_without_keeping_its_integers(self):
+        bodies = {
+            0: bytes([4, 1, 0]),
+            1: bytes([4, 1, 1, 0x80, 0x01, 0x00]),
+            2: bytes([4, 1, 2, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00]),
+            3: bytes([4, 1, 3]) + bytes(17),
+        }
+        state = ROW_MARKER.encode()
+        for kind, body in bodies.items():
+            with self.subTest(kind=kind):
+                profile = account_raw_artifact(framed(state, noise_dpk(body), magic=b"DOPERAW2"))
+                self.assertEqual(profile["version"], 2)
+                self.assertEqual(profile["profile"], "raw-numeric-residual-v1")
+                self.assertIsNone(profile["mathematical_parameter_count"])
+                self.assertNotIn(128, profile.values())
+                self.assertNotIn(65535, profile.values())
+                self.assertNotIn(ROW_MARKER, repr(dict(profile)))
+                self.assertNotIn("knot", profile)
+
+    def test_profile_mismatch_stays_closed(self):
+        state = ROW_MARKER.encode()
+        cases = [
+            noise_dpk(bytes([4, 1, 0]), minor=2),
+            noise_dpk(bytes([4, 1, 0]), task=1),
+            noise_dpk(bytes([4, 1, 0]), compress=True),
+            noise_dpk(bytes([4, 1, 0, 0x00])),
+            noise_dpk(bytes([4, 1, 3]) + bytes(16)),
+            noise_dpk(bytes([0, 0, 0])),
+            dpk(),
+        ]
+        for payload in cases:
+            with self.subTest(payload=payload[:8]):
+                with self.assertRaises(BundleError) as raised:
+                    account_raw_artifact(framed(state, payload, magic=b"DOPERAW2"))
+                self.assertEqual(raised.exception.code, "raw_residual_profile_mismatch")
+                self.assertEqual(str(raised.exception), "raw_residual_profile_mismatch")
+                self.assertNotIn(ROW_MARKER, str(raised.exception))
+
+    def test_doperaw1_keeps_historical_noise_and_refuses_explicit_residual(self):
+        state = ROW_MARKER.encode()
+        historical = account_raw_artifact(framed(state, noise_dpk(bytes([0, 0, 0]), minor=2)))
+        self.assertEqual(historical["byte_profile_id"], "native-raw-complete-v1")
+        self.assertEqual(historical["version"], 1)
+        self.assertEqual(historical["profile"], "raw-continuous-symbolic-v1")
+        self.assertEqual(historical["capability"], "fully_observed_continuous_regression")
+        self.assertNotIn("mathematical_parameter_count", historical)
+        with self.assertRaises(BundleError) as raised:
+            account_raw_artifact(framed(state, noise_dpk(bytes([4, 1, 0]))))
+        self.assertEqual(raised.exception.code, "raw_residual_profile_mismatch")
+        self.assertNotIn(ROW_MARKER, str(raised.exception))
+        flipped = bytearray(framed(state, noise_dpk(bytes([4, 1, 0])), magic=b"DOPERAW2"))
+        flipped[24] ^= 1
+        with self.assertRaises(BundleError) as raised:
+            account_raw_artifact(bytes(flipped))
+        self.assertEqual(raised.exception.code, "raw_artifact_integrity_failed")
+
+    def test_verified_bundle_charges_the_retained_residual_file(self):
+        artifact = RETAINED_RAW.read_bytes()
+        manifest = {
+            "amortization_count": 1,
+            "bundle_id": "synthetic-residual",
+            "capabilities": ["byte-inventory", "native-raw-sample"],
+            "components": [
+                component(
+                    "payload",
+                    "sampling_payload",
+                    "doperaw1",
+                    "model.raw",
+                    artifact,
+                    required=True,
+                    consumed=True,
+                ),
+            ],
+            "format": "dope.generator-bundle/v1",
+            "sampling_handler": "native-raw-complete-v1",
+            "transport_framing": "included",
+            "version": 1,
+        }
+        directory, root, digest = stage(manifest, {"model.raw": artifact})
+        with directory:
+            verified = verify_bundle(root, digest)
+        profile = verified.accounting["raw_profile"]
+        self.assertEqual(profile["byte_profile_id"], "native-raw-complete-residual-v1")
+        self.assertEqual(profile["complete_sampling_bytes"], 707)
+        self.assertEqual(profile["transform_schema_bytes"], 392)
+        self.assertEqual(profile["native_payload_bytes"], 259)
+        self.assertIsNone(profile["mathematical_parameter_count"])
+        self.assertEqual(verified.retained_payload, artifact)
+        self.assertIsNone(verified.features)
+        self.assertEqual(preflight_dpk(artifact[448:])["minor"], 3)
+        self.assertEqual(preflight_dpk(artifact[448:])["features"], 1)
+        rendered = repr(dict(profile))
+        self.assertNotIn("dope-affine-state", rendered)
+        self.assertNotIn(ROW_MARKER, rendered)
 
 
 if __name__ == "__main__":
