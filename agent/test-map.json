@@ -2236,6 +2236,18 @@
     "docs/whitepaper/generated/native-byte-conformance.tex": {
       "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
       "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
+    },
+    "production/kpi-contract-v4.json": {
+      "command": "cargo test --locked --lib fitness::tests::embedded_v4_contract_matches_the_build_digest",
+      "purpose": "bind the pre-registered MFS-v4 sibling contract to its build digest"
+    },
+    "rust/transfer_metrics/mfs_v4.rs": {
+      "command": "cargo test --locked --lib transfer_metrics::tests::",
+      "purpose": "verify MFS-v4 control-contrastive lift, model-driver attribution agreement, and MDL knowledge compression against the golden corpus"
+    },
+    "rust/fitness/v4.rs": {
+      "command": "cargo test --locked --lib fitness::tests::",
+      "purpose": "verify MFS-v4 frozen contract weights, hard release gates, control-contrastive lift, driver attribution, and knowledge compression scoring"
     }
   }
 }

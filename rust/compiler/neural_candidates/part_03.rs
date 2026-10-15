@@ -170,6 +170,14 @@ mod tests {
         assert_eq!(&old, baseline);
         wire["stored_target_fit"] = serde_json::json!(0.0);
         assert!(serde_json::from_value::<CandidateReport>(wire).is_err());
+        assert!(
+            result.candidates.iter().all(|candidate| {
+                candidate.encoded_numbers > 0
+                    && (0.0..=1.0).contains(&candidate.knowledge_compression)
+            })
+        );
+        assert!(result.report.encoded_numbers > 0);
+        assert!((0.0..=1.0).contains(&result.report.knowledge_compression));
         decode_kernel(&result.artifact).unwrap();
     }
 }

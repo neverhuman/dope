@@ -12,6 +12,7 @@ contract, checks the historical v1 fixture, and writes a digest receipt.
 verification. New freezes and releases bind v2. The contract test and the
 locked CPU CI lane check the generated seam on every change.
 
-`production/kpi-contract-v3.json` pre-registers MFS-v3. It is not the active
-embedded contract. v2 stays the file historical receipts pin. A v3 scalar is
+`production/kpi-contract-v3.json` pre-registers MFS-v3 and
+`production/kpi-contract-v4.json` pre-registers MFS-v4. Neither replaces the
+active v2 release contract that historical receipts pin. A v3 or v4 scalar is
 null until its components and hard gates are measured.

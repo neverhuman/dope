@@ -380,10 +380,28 @@ fn compile_symbolic_table(
             capacity_refinement,
         });
         let score = 0.45 * utility + 0.25 * driver_agreement + 0.30 * proxy_joint_fidelity;
+        let encoded_numbers = decoded.encoded_number_count();
+        let knowledge_compression = crate::transfer_metrics::knowledge_compression_metrics(
+            artifact.len().max(1) as u64,
+            encoded_numbers.max(1) as u64,
+            table.rows.max(1) as u64,
+            (width + 1).max(1) as u64,
+            options
+                .release_policy
+                .tier
+                .byte_limit()
+                .unwrap_or(10_240)
+                .max(2) as u64,
+            utility,
+        )
+        .map(|item| item.knowledge_compression_score)
+        .unwrap_or(0.0);
         let record = CandidateReport {
             candidate_id: candidate_id.clone(),
             artifact_bytes: artifact.len(),
+            encoded_numbers,
             bits_per_original_cell: 8.0 * artifact.len() as f64 / (table.rows * (width + 1)) as f64,
+            knowledge_compression,
             score,
             compliant: kernel.compliant,
             quantization_bits: bits,
@@ -417,6 +435,7 @@ fn compile_symbolic_table(
             maximum_normalized_gate_shortfall(left)
                 .total_cmp(&maximum_normalized_gate_shortfall(right))
                 .then_with(|| left.artifact_bytes.cmp(&right.artifact_bytes))
+                .then_with(|| left.encoded_numbers.cmp(&right.encoded_numbers))
                 .then_with(|| left.candidate_id.cmp(&right.candidate_id))
         })
         .unwrap()
@@ -438,7 +457,9 @@ fn compile_symbolic_table(
         selected_candidate: selected.candidate_id.clone(),
         artifact_bytes: artifact.len(),
         effective_bytes: artifact.len(),
+        encoded_numbers: selected.encoded_numbers,
         bits_per_original_cell: selected.bits_per_original_cell,
+        knowledge_compression: selected.knowledge_compression,
         compliant: selected.compliant,
         failed_gates: selected.failed_gates.clone(),
         candidate_count: candidates.len(),

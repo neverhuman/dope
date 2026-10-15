@@ -147,4 +147,260 @@ pub struct JointGenerator {
     pub implementation_hash: String,
 }
 
+impl QuantizedLinear {
+    pub fn encoded_number_count(&self) -> usize {
+        self.weights.len() + self.scales.len() + self.biases.len()
+    }
+}
+
+impl LayerNormParameters {
+    pub fn encoded_number_count(&self) -> usize {
+        self.weight.len() + self.bias.len()
+    }
+}
+
+impl JointDecoder {
+    pub fn encoded_number_count(&self) -> usize {
+        self.hidden_1.encoded_number_count()
+            + self.hidden_2.encoded_number_count()
+            + self.value_head.encoded_number_count()
+            + self.missing_head.encoded_number_count()
+            + 1
+    }
+}
+
+impl TransformerBlock {
+    pub fn encoded_number_count(&self) -> usize {
+        self.query.encoded_number_count()
+            + self.key.encoded_number_count()
+            + self.value.encoded_number_count()
+            + self.attention_output.encoded_number_count()
+            + self.attention_norm.encoded_number_count()
+            + self.feed_forward_1.encoded_number_count()
+            + self.feed_forward_2.encoded_number_count()
+            + self.feed_forward_norm.encoded_number_count()
+    }
+}
+
+impl AutoregressiveTransformer {
+    pub fn encoded_number_count(&self) -> usize {
+        self.input_projection.encoded_number_count()
+            + self.positional_embeddings.len()
+            + self
+                .blocks
+                .iter()
+                .map(TransformerBlock::encoded_number_count)
+                .sum::<usize>()
+            + self.value_head.encoded_number_count()
+            + self.missing_head.encoded_number_count()
+    }
+}
+
+impl LatentDenoiser {
+    pub fn encoded_number_count(&self) -> usize {
+        self.hidden_1.encoded_number_count()
+            + self.hidden_2.encoded_number_count()
+            + self.hidden_3.encoded_number_count()
+            + self.output.encoded_number_count()
+    }
+}
+
+impl JointNetwork {
+    pub fn encoded_number_count(&self) -> usize {
+        match self {
+            Self::Tvae { decoder } => decoder.encoded_number_count(),
+            Self::MaskedAutoregressiveTransformer { transformer } => {
+                transformer.encoded_number_count()
+            }
+            Self::TabSyn {
+                decoder,
+                denoiser,
+                alpha_cumprod,
+                inference_timesteps,
+            } => {
+                decoder.encoded_number_count()
+                    + denoiser.encoded_number_count()
+                    + alpha_cumprod.len()
+                    + inference_timesteps.len()
+            }
+            Self::TabDdpm {
+                denoiser,
+                alpha_cumprod,
+                inference_timesteps,
+            } => {
+                denoiser.encoded_number_count()
+                    + alpha_cumprod.len()
+                    + inference_timesteps.len()
+            }
+        }
+    }
+}
+
+impl Marginal {
+    pub fn encoded_number_count(&self) -> usize {
+        match self {
+            Self::Constant { .. } | Self::Bernoulli { .. } => 1,
+            Self::Beta { .. } | Self::Gaussian { .. } => 2,
+            Self::Grid {
+                values,
+                probabilities,
+            } => values.len() + probabilities.len(),
+            Self::QuantileSpline { values } => values.len(),
+            Self::Histogram {
+                edges,
+                probabilities,
+            } => edges.len() + probabilities.len(),
+            Self::ZeroInflated { base, .. } => 2 + base.encoded_number_count(),
+        }
+    }
+}
+
+impl Dependence {
+    pub fn encoded_number_count(&self) -> usize {
+        match self {
+            Self::Independent => 0,
+            Self::ChowLiu { edges, .. } => 1 + edges.len() * 3,
+            Self::GaussianCopula { cholesky } => cholesky.len(),
+            Self::SparseGraph { edges } => edges.len() * 3,
+            Self::Poet {
+                loadings,
+                residual_edges,
+                ..
+            } => 1 + loadings.len() * 3 + residual_edges.len() * 3,
+            Self::Vine { edges } => edges.len() * 4,
+            Self::Mixture {
+                weights,
+                components,
+            } => {
+                weights.len()
+                    + components
+                        .iter()
+                        .map(Self::encoded_number_count)
+                        .sum::<usize>()
+            }
+            Self::Triangular { terms } => terms.len() * 3,
+        }
+    }
+}
+
+impl Target {
+    pub fn encoded_number_count(&self) -> usize {
+        match self {
+            Self::SparseLinear { terms, .. } | Self::SparseLogistic { terms, .. } => {
+                1 + terms.len() * 2
+            }
+            Self::SparseGam { terms, .. } => {
+                1 + terms
+                    .iter()
+                    .map(|term| 1 + term.knots.len() + term.values.len())
+                    .sum::<usize>()
+            }
+            Self::Ga2m {
+                main_terms,
+                interactions,
+                ..
+            } => {
+                1 + main_terms
+                    .iter()
+                    .map(|term| 1 + term.knots.len() + term.values.len())
+                    .sum::<usize>()
+                    + interactions
+                        .iter()
+                        .map(|term| {
+                            2 + term.left_knots.len()
+                                + term.right_knots.len()
+                                + term.values.len()
+                        })
+                        .sum::<usize>()
+            }
+            Self::Mars { terms, .. } => {
+                1 + terms
+                    .iter()
+                    .map(|term| 1 + term.factors.len() * 3)
+                    .sum::<usize>()
+            }
+            Self::ObliviousTree {
+                features,
+                thresholds,
+                leaves,
+                ..
+            } => features.len() + thresholds.len() + leaves.len(),
+            Self::CompactNeuralResidual {
+                linear_terms,
+                hidden_features,
+                input_weights,
+                hidden_biases,
+                output_weights,
+                ..
+            } => {
+                1 + linear_terms.len() * 2
+                    + hidden_features.len()
+                    + input_weights.len()
+                    + hidden_biases.len()
+                    + output_weights.len()
+            }
+        }
+    }
+}
+
+impl Noise {
+    pub fn encoded_number_count(&self) -> usize {
+        match self {
+            Self::Homoscedastic { .. } | Self::BernoulliCalibration { .. } => 1,
+            Self::Heteroscedastic { terms, .. } => 3 + terms.len() * 2,
+            Self::IsotonicCalibration {
+                knots,
+                probabilities,
+            } => knots.len() + probabilities.len(),
+            Self::ResidualV1 { distribution } => match distribution {
+                ResidualV1::NoNoise => 0,
+                ResidualV1::StudentT4 { .. } => 2,
+                ResidualV1::GaussianMixture2 { .. } => 5,
+                ResidualV1::MonotoneQuantile17 { values } => values.len(),
+            },
+        }
+    }
+}
+
+impl Kernel {
+    pub fn encoded_number_count(&self) -> usize {
+        let schema_numbers: usize = self
+            .schema
+            .iter()
+            .map(|col| {
+                2 + match col.transform {
+                    Transform::Identity => 0,
+                    Transform::Log1p { .. }
+                    | Transform::Power { .. }
+                    | Transform::Logit { .. } => 1,
+                    Transform::Winsorize { .. } => 2,
+                }
+            })
+            .sum();
+        let marginal_numbers: usize = self
+            .marginals
+            .iter()
+            .map(Marginal::encoded_number_count)
+            .sum();
+        let program_numbers = match &self.program {
+            KernelProgram::Symbolic {
+                dependence,
+                target,
+                noise,
+            } => {
+                dependence.encoded_number_count()
+                    + target.encoded_number_count()
+                    + noise.encoded_number_count()
+            }
+            KernelProgram::NeuralJoint(joint) => {
+                joint.feature_permutation.len()
+                    + joint.target_marginal.encoded_number_count()
+                    + joint.normalization.len() * 3
+                    + joint.network.encoded_number_count()
+            }
+        };
+        (schema_numbers + marginal_numbers + program_numbers).max(1)
+    }
+}
+
 include!("generator_validation.rs");

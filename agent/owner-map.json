@@ -554,6 +554,9 @@
     "docs/whitepaper/scripts/native_byte_conformance.py": "external-evidence",
     "docs/whitepaper/scripts/test_native_byte_conformance.py": "external-evidence",
     "docs/whitepaper/receipts/native-byte-conformance-v1.json": "external-evidence",
-    "docs/whitepaper/generated/native-byte-conformance.tex": "external-evidence"
+    "docs/whitepaper/generated/native-byte-conformance.tex": "external-evidence",
+    "production/kpi-contract-v4.json": "release",
+    "rust/transfer_metrics/mfs_v4.rs": "rust-core",
+    "rust/fitness/v4.rs": "rust-core"
   }
 }

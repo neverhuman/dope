@@ -86,11 +86,29 @@ fn compile_neural_table(
             artifact.len()
         )));
     }
+    let encoded_numbers = kernel.encoded_number_count();
+    let knowledge_compression = crate::transfer_metrics::knowledge_compression_metrics(
+        artifact.len().max(1) as u64,
+        encoded_numbers.max(1) as u64,
+        table.rows.max(1) as u64,
+        (table.features + 1).max(1) as u64,
+        options
+            .release_policy
+            .tier
+            .byte_limit()
+            .unwrap_or(10_240)
+            .max(2) as u64,
+        0.0,
+    )
+    .map(|item| item.knowledge_compression_score)
+    .unwrap_or(0.0);
     let report = CandidateReport {
         candidate_id: candidate_id.clone(),
         artifact_bytes: artifact.len(),
+        encoded_numbers,
         bits_per_original_cell: 8.0 * artifact.len() as f64
             / (table.rows * (table.features + 1)).max(1) as f64,
+        knowledge_compression,
         score: 0.0,
         compliant: false,
         quantization_bits: 8,
@@ -123,7 +141,9 @@ fn compile_neural_table(
         selected_candidate: candidate_id.clone(),
         artifact_bytes: artifact.len(),
         effective_bytes: artifact.len(),
+        encoded_numbers: report.encoded_numbers,
         bits_per_original_cell: report.bits_per_original_cell,
+        knowledge_compression: report.knowledge_compression,
         compliant: false,
         failed_gates: report.failed_gates.clone(),
         candidate_count: 1,
@@ -243,6 +263,7 @@ fn probe_compact_neural(
             maximum_normalized_gate_shortfall(left)
                 .total_cmp(&maximum_normalized_gate_shortfall(right))
                 .then_with(|| left.artifact_bytes.cmp(&right.artifact_bytes))
+                .then_with(|| left.encoded_numbers.cmp(&right.encoded_numbers))
                 .then_with(|| left.candidate_id.cmp(&right.candidate_id))
         })
         .expect("symbolic baseline exists");
@@ -250,7 +271,9 @@ fn probe_compact_neural(
     result.report.selected_candidate = selected.candidate_id.clone();
     result.report.artifact_bytes = result.artifact.len();
     result.report.effective_bytes = result.artifact.len();
+    result.report.encoded_numbers = selected.encoded_numbers;
     result.report.bits_per_original_cell = selected.bits_per_original_cell;
+    result.report.knowledge_compression = selected.knowledge_compression;
     result.report.compliant = selected.compliant;
     result.report.failed_gates = selected.failed_gates.clone();
     result.report.candidate_count = result.candidates.len();

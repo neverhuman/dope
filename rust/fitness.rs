@@ -463,5 +463,7 @@ pub fn evaluate_v3(
     }
 }
 
+include!("fitness/v4.rs");
+
 #[cfg(test)]
 include!("fitness/tests.rs");

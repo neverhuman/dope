@@ -256,7 +256,9 @@ mod tests {
         let candidate = |id: &str, bytes: usize, compliant: bool| CandidateReport {
             candidate_id: id.into(),
             artifact_bytes: bytes,
+            encoded_numbers: bytes / 4,
             bits_per_original_cell: 1.0,
+            knowledge_compression: 0.5,
             score: 1.0,
             compliant,
             quantization_bits: 8,
