@@ -1,4 +1,8 @@
-"""Path rules for published sample files. No ledger and no CSV is opened."""
+"""Path rules for published sample files, and the TabSyn sampler's adapter and failure boundaries.
+
+No ledger, artifact, GPU, or vendor runtime is opened; sampling is a fake that
+returns a small matrix or raises, and CSVs are written only inside a test-owned folder.
+"""
 
 import ast
 import importlib.util
@@ -12,6 +16,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from research.benchmark.review_fixes.sample_paths import resolve_sample_csv
+from research.benchmark.review_fixes import tabsyn_sample
 from research.benchmark.review_fixes.tabsyn_sample import _load_allowlisted, _reject_adapter
 
 
@@ -195,6 +200,120 @@ class AdapterBoundaryTests(unittest.TestCase):
         source = Path(__file__).resolve().parents[1] / "tabsyn_adapter.py"
         _reject_adapter(ast.parse(source.read_text()))
 
+
+
+class SampleFailureBoundaryTests(unittest.TestCase):
+    """One sampled cell: known failures get a fixed code, anything else propagates."""
+
+    SENTINEL = "zq-source-header-extremum-7781"
+
+    def setUp(self):
+        import numpy as np
+
+        self.np = np
+        self.folder = tempfile.TemporaryDirectory()
+        self.final = Path(self.folder.name) / "sample-101-1n.csv"
+        self.matrix = np.array([[0.5, 1.0, 2.0], [1.5, 3.0, 4.0]])
+
+    def tearDown(self):
+        self.folder.cleanup()
+
+    def cell(self, sample, rows=2):
+        return tabsyn_sample._sample_cell(sample, self.final, rows, "artifact", rows, 101, ["inventory"],
+                                          device="cuda:0", admission={"grant": "review-fixes"})
+
+    def assert_nothing_published(self):
+        self.assertFalse(self.final.exists())
+        self.assertFalse(self.final.with_suffix(".csv.tmp").exists())
+
+    def raising(self, error):
+        def sample(*_args, **_kwargs):
+            raise error
+        return sample
+
+    def test_a_sampled_matrix_is_published_target_last(self):
+        calls = []
+
+        def sample(*args, **kwargs):
+            calls.append((args, kwargs))
+            return self.matrix
+
+        self.assertEqual(self.cell(sample), ("ok", None))
+        self.assertEqual(calls, [(("artifact", 2, 101, ["inventory"]),
+                                  {"device": "cuda:0", "admission": {"grant": "review-fixes"}})])
+        self.assertEqual(self.final.read_text().splitlines(),
+                         ["f0,f1,target", "1.0,2.0,0.5", "3.0,4.0,1.5"])
+        self.assertFalse(self.final.with_suffix(".csv.tmp").exists())
+
+    def test_known_failures_are_recorded_as_fixed_codes(self):
+        class OutOfMemoryError(RuntimeError):
+            """Stands in for torch.cuda.OutOfMemoryError, a RuntimeError subclass."""
+
+        cases = (
+            (ValueError("TabSyn artifact custody differs " + self.SENTINEL), "sample_contract_refused"),
+            (TimeoutError("whole fit deadline exceeded " + self.SENTINEL), "sample_deadline_exceeded"),
+            (RuntimeError("sample admission does not match the artifact " + self.SENTINEL), "sample_runtime_failed"),
+            (OutOfMemoryError("CUDA out of memory " + self.SENTINEL), "sample_runtime_failed"),
+            (FileNotFoundError(self.SENTINEL), "sample_io_failed"),
+        )
+        for error, code in cases:
+            with self.subTest(type(error).__name__):
+                status, reason = self.cell(self.raising(error))
+                self.assertEqual((status, reason), ("failed", code))
+                self.assertNotIn(self.SENTINEL, reason)
+                self.assert_nothing_published()
+
+    def test_unexpected_errors_propagate_and_publish_nothing(self):
+        for error in (KeyError(self.SENTINEL), TypeError(self.SENTINEL), AttributeError(self.SENTINEL),
+                      NameError(self.SENTINEL), ZeroDivisionError(self.SENTINEL)):
+            with self.subTest(type(error).__name__), self.assertRaises(type(error)):
+                self.cell(self.raising(error))
+            self.assert_nothing_published()
+
+    def test_a_malformed_matrix_is_a_contract_refusal(self):
+        np = self.np
+        for matrix in ([[0.5, 1.0], [1.5, 3.0]], np.zeros((3, 3)), np.zeros((2, 1)), np.zeros(6)):
+            with self.subTest(repr(matrix)[:40]):
+                self.assertEqual(self.cell(lambda *_a, value=matrix, **_k: value), ("failed", "sample_contract_refused"))
+                self.assert_nothing_published()
+
+    def test_a_failed_rename_leaves_no_partial_file(self):
+        with patch.object(Path, "replace", side_effect=PermissionError(self.SENTINEL)):
+            self.assertEqual(self.cell(lambda *_a, **_k: self.matrix), ("failed", "sample_io_failed"))
+        self.assert_nothing_published()
+
+    def test_an_unexpected_write_error_propagates_and_removes_the_staging_file(self):
+        def broken_writer(_handle):
+            class Writer:
+                def writerow(self, _row):
+                    pass
+
+                def writerows(self, _rows):
+                    raise TypeError("unexpected writer state")
+            return Writer()
+
+        with patch.object(tabsyn_sample.csv, "writer", broken_writer), self.assertRaises(TypeError):
+            self.cell(lambda *_a, **_k: self.matrix)
+        self.assert_nothing_published()
+
+    def test_a_deadline_is_not_reported_as_generic_io(self):
+        self.assertEqual(tabsyn_sample.sample_failure_reason(TimeoutError()), "sample_deadline_exceeded")
+        self.assertEqual(tabsyn_sample.sample_failure_reason(OSError()), "sample_io_failed")
+
+    def test_the_sampler_has_no_catch_all_handler(self):
+        """Every handler names explicit classes; sample_lineage delegates each cell to _sample_cell."""
+        tree = ast.parse(Path(tabsyn_sample.__file__).read_text())
+        broad = {"Exception", "BaseException"}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ExceptHandler):
+                self.assertIsNotNone(node.type, f"bare except at line {node.lineno}")
+                names = node.type.elts if isinstance(node.type, ast.Tuple) else [node.type]
+                for name in names:
+                    self.assertFalse(isinstance(name, ast.Name) and name.id in broad, f"broad except at line {node.lineno}")
+        lineage = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "sample_lineage")
+        self.assertFalse(any(isinstance(node, ast.Try) for node in ast.walk(lineage)))
+        self.assertTrue(any(isinstance(node, ast.Call) and getattr(node.func, "id", None) == "_sample_cell"
+                            for node in ast.walk(lineage)))
 
 if __name__ == "__main__":
     unittest.main()
