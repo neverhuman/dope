@@ -1534,8 +1534,8 @@
       "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
     },
     "rust/typed_data.rs": {
-      "command": "cargo test --locked --test vnext_raw_schema",
-      "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
     },
     "rust/typed_data/transforms.rs": {
       "command": "cargo test --locked --test vnext_raw_schema",
@@ -1738,16 +1738,16 @@
       "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
     },
     "rust/main.rs": {
-      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
     },
     "rust/main/cli/part_01.rs": {
-      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
     },
     "rust/sample/part_02.rs": {
-      "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
-      "purpose": "verify actual raw-state native compile/reload/sample units, complete framing/state bytes, fresh-process FD/file/network/exec denial with positive sampling and source-free native installation identity"
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
     },
     "rust/typed_data/isolation.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
@@ -1770,8 +1770,8 @@
       "purpose": "verify atomic native installation and delivered legal pins, fixed-member manifest/tamper refusal and legacy uninstall compatibility; full existing vnext_native_install target, no release or other-platform qualification"
     },
     "tests/vnext_raw_workflow.rs": {
-      "command": "cargo test --locked --lib --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
-      "purpose": "verify all11 raw-workflow cases including explicit residual none/t4/mixture2/quantile17 compiler, encoded complete-byte caps, CLI and fresh-worker parity; preserve Gaussian, DPK3.2/raw-v1 goldens, byte-allocation3, artifact-only4 and full library; development only, no tail/calibration/privacy qualification"
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
     },
     "ops/ci/test-cpu-tool-readiness.sh": {
       "command": "bash ops/ci/test-cpu-tool-readiness.sh",
@@ -2084,6 +2084,34 @@
     "scripts/native-notices/": {
       "command": "cargo test --locked --bin dope-native-notices && cargo run --locked --offline --bin dope-native-notices -- --check && sha256sum --check --status scripts/native-legal.sha256 && cargo test --locked --test vnext_native_install",
       "purpose": "verify the Rust notice generator's strict lock/manifest/tree parsing, unique regular archive members through literal-argv tar, tamper/missing/ambiguous/link refusals and exact rendering; offline regeneration equals the shipped notice and pins; installed legal layout, fixed-member tamper refusal and legacy uninstall stay intact; no download, cache deletion or release qualification"
+    },
+    "rust/main/mixed_commands.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed/codec.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed/fit.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed/sample.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "rust/typed_data/mixed/tests.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
+    },
+    "tests/support/raw_mixed_cli.rs": {
+      "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
+      "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
     }
   }
 }

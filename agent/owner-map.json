@@ -515,6 +515,13 @@
     "tests/fixtures/n19-pilot-v2.json": "rust-core",
     "tests/support/source_pilot_cli.rs": "rust-core",
     "scripts/native-notices.rs": "governance",
-    "scripts/native-notices/": "governance"
+    "scripts/native-notices/": "governance",
+    "rust/main/mixed_commands.rs": "rust-core",
+    "rust/typed_data/mixed.rs": "rust-core",
+    "rust/typed_data/mixed/codec.rs": "rust-core",
+    "rust/typed_data/mixed/fit.rs": "rust-core",
+    "rust/typed_data/mixed/sample.rs": "rust-core",
+    "rust/typed_data/mixed/tests.rs": "rust-core",
+    "tests/support/raw_mixed_cli.rs": "rust-core"
   }
 }

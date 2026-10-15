@@ -22,7 +22,9 @@ Document release changes in `CHANGELOG.md` before a release candidate.
    file inventory must pass for the frozen selection. The owner evaluates the
    exact predeclared batch in order, without ranking or calling the optimizer.
    External exact-library claims require separate hashed evidence.
-5. Publish only the staged allowlisted bundle after required CPU CI and the
+5. Reconcile every discrepancy in the candidate's reproduction record. An open,
+   incomplete, or independently unverified discrepancy blocks release.
+6. Publish only the staged allowlisted bundle after required CPU CI and the
    scheduled GPU lane pass. Store manifests, hashes, certification, and the
    full Pareto vector with the release.
 
@@ -32,6 +34,21 @@ GPU report; the tested rollback manifest and restore command; and abuse-control
 proof for privacy gates, input rejection, size caps, and inventory validation.
 Treat any absent class as a failed launch gate. The checklist is tied to the
 source commit and contract digest, not to a tier name alone.
+
+## Reproduction discrepancies
+
+Keep an append-only discrepancy record with the candidate evidence. Each entry
+has a stable ID, an owner, and an open or resolved status. Bind it to the exact
+source, artifact, contract, protocol, environment and evaluation receipt hashes.
+Record the expected and observed results, the reproduction command and log
+hashes, and the original query charges and attempt limits. Preserve the original
+receipts and failures when adding a diagnosis or correction.
+
+A resolved entry also identifies the correction and its verification receipt,
+including the independent verifier's sign-off. The release checklist refuses
+any unresolved entry, missing identity or evidence, or unverified resolution.
+Resolving a discrepancy does not authorize another protected query, change a
+frozen selection, erase a prior access charge or replace the original receipt.
 
 ## Protected evaluator deployment
 
