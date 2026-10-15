@@ -5,6 +5,12 @@ The parser check scores the published sample-101-4n.csv for dataset
 that check. The captured adapter is executed with the four admission imports
 removed and with seeds left at 101, 211, and 307. The expired owner window,
 parent-pid lock, and 12 hour budget are not reused. Artifacts are read only.
+
+Sampling failures the adapter and the CSV publication are known to raise
+(deadline, I/O, contract refusal, runtime) are recorded in the ledger as fixed
+reason codes, never as exception text. Any other exception is a programming or
+contract error: it stops the lineage with a nonzero exit, which sample_all()
+records. A partial staging file never survives either way.
 """
 
 from __future__ import annotations
@@ -357,6 +363,49 @@ def sys_modules_path(runtime: dict) -> None:
     sys.path[:] = [runtime["source"], runtime["package_site"], runtime["stdlib"], runtime["dynload"]]
 
 
+# Known sampling failures, in match order (TimeoutError is an OSError). The
+# captured adapter's require() raises ValueError and check_deadline() raises
+# TimeoutError; the pinned runtime and admission bindings and torch, CUDA
+# out-of-memory included, raise RuntimeError; artifact reads and the staging
+# write raise OSError.
+SAMPLE_FAILURE_REASONS = (
+    (TimeoutError, "sample_deadline_exceeded"),
+    (OSError, "sample_io_failed"),
+    (ValueError, "sample_contract_refused"),
+    (RuntimeError, "sample_runtime_failed"),
+)
+
+
+def sample_failure_reason(error: BaseException) -> str:
+    """The fixed ledger code for one known sampling failure."""
+    return next(reason for kind, reason in SAMPLE_FAILURE_REASONS if isinstance(error, kind))
+
+
+def _publish_sample(matrix, final: Path, rows: int) -> None:
+    """Write the target-last CSV through a staging file, then rename it into place."""
+    import numpy as np
+    if not isinstance(matrix, np.ndarray) or matrix.ndim != 2 or matrix.shape[0] != rows or matrix.shape[1] < 2:
+        raise ValueError("TabSyn sample matrix shape differs")
+    staging = final.with_suffix(".csv.tmp")
+    try:
+        with staging.open("w", newline="") as handle:
+            writer = csv.writer(handle)
+            writer.writerow([f"f{i}" for i in range(matrix.shape[1] - 1)] + ["target"])
+            writer.writerows([[*row[1:], row[0]] for row in matrix])
+        staging.replace(final)
+    finally:
+        staging.unlink(missing_ok=True)
+
+
+def _sample_cell(sample, final: Path, rows: int, *args, **kwargs) -> tuple[str, str | None]:
+    """Sample and publish one cell. Only the four known failure classes are recorded."""
+    try:
+        _publish_sample(sample(*args, **kwargs), final, rows)
+    except (TimeoutError, OSError, ValueError, RuntimeError) as error:
+        return "failed", sample_failure_reason(error)
+    return "ok", None
+
+
 def sample_lineage(dataset: str, artifact: Path, git_sha: str) -> int:
     import sys
     request = _request()
@@ -411,26 +460,15 @@ def sample_lineage(dataset: str, artifact: Path, git_sha: str) -> int:
                 "samples": [{"rows": rows * size, "seed": seed}],
             }
             started = time.monotonic()
-            try:
-                matrix = namespace["sample"](
-                    artifact, rows * size, seed, inventory, device="cuda:0",
-                    runtime_path=request["runtime_ref"]["path"],
-                    runtime_sha256=info["runtime_sha256"],
-                    code_path=request["adapter_ref"]["path"],
-                    code_sha256=info["code_sha256"],
-                    admission=holder["grant"],
-                )
-                staging = final.with_suffix(".csv.tmp")
-                with staging.open("w", newline="") as handle:
-                    writer = csv.writer(handle)
-                    writer.writerow([f"f{i}" for i in range(matrix.shape[1] - 1)] + ["target"])
-                    writer.writerows([[*row[1:], row[0]] for row in matrix])
-                staging.replace(final)
-                status = "ok"
-                reason = None
-            except Exception as error:
-                status = "failed"
-                reason = type(error).__name__
+            status, reason = _sample_cell(
+                namespace["sample"], final, rows * size,
+                artifact, rows * size, seed, inventory, device="cuda:0",
+                runtime_path=request["runtime_ref"]["path"],
+                runtime_sha256=info["runtime_sha256"],
+                code_path=request["adapter_ref"]["path"],
+                code_sha256=info["code_sha256"],
+                admission=holder["grant"],
+            )
             _ledger({
                 "dataset": dataset, "seed": seed, "size": size, "status": status, "reason": reason,
                 "seconds": round(time.monotonic() - started, 3), "rows": rows * size,
