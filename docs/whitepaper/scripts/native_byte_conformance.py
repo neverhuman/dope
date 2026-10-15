@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -25,6 +26,29 @@ SUBSECTION = "\\subsection{One native artifact, accounted end to end}"
 FORMAT = "dope-native-byte-conformance"
 PARTS = ("framing_bytes", "transform_schema_bytes", "native_payload_bytes")
 SAME_OBJECT = ("complete_sampling_bytes", "transport_archive_bytes", *PARTS)
+MAX_PIN_BYTES = 16 * 1024
+SHA256 = re.compile(r"[0-9a-f]{64}")
+COMMIT = re.compile(r"[0-9a-f]{40}")
+SLUG = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
+VERSION = re.compile(r"[0-9][0-9.]{0,15}")
+# The closed shape of the pin: each key maps to its kind. "int" is a non-negative integer, never a bool.
+SHAPE = {
+    "format": "str", "version": "int", "kind": "str", "scope": "str", "distinct_objects": "str",
+    "artifact": {"sha256": "sha256", "container": "str", "format": "slug", "format_version": "int",
+                 "profile": "slug", "byte_profile_id": "slug", "file_bytes": "int"},
+    "accounting": {key: "int" for key in (*SAME_OBJECT, "generic_runtime_bytes", "cold_sampling_closure_bytes")},
+    "agreement": {"inspect_equals_compiled_arms": "true", "file_size_equals_complete": "true",
+                  "source_free_replays": "multipliers"},
+    "runtime": {"scope": "str", "binary_sha256": "sha256", "binary_file_bytes": "int"},
+    "unavailable": {"portable_bundle_bytes": "str", "release_build_runtime_bytes": "str"},
+    "measured_run": {"source_commit": "commit", "source_tree": "commit", "runner": "str",
+                     "dependency_versions": "versions"},
+    "evidence_sha256": {key: "sha256" for key in ("research_receipt", "report_html", "inspect_record",
+                                                  "inspect_stdout", "fit_record")},
+    "source_data": {"name": "str", "attribution": "str", "doi": "str", "license": "str", "sha256": "sha256",
+                    "bytes": "int", "rows": "int", "fit_rows": "int", "query_rows": "int", "fit_groups": "int",
+                    "query_groups": "int", "split_seed": "int", "split_sha256": "sha256"},
+}
 
 
 class ConformanceError(ValueError):
@@ -123,7 +147,31 @@ def project(receipt: dict, evidence: dict) -> dict:
     }
 
 
+def _check_value(value, kind, where: str) -> None:
+    if isinstance(kind, dict):
+        _require(type(value) is dict and set(value) == set(kind), f"{where} does not have the closed pin shape")
+        for key, inner in kind.items():
+            _check_value(value[key], inner, f"{where}.{key}")
+    elif kind == "int":
+        _require(type(value) is int and value >= 0, f"{where} is not a non-negative integer")
+    elif kind == "true":
+        _require(value is True, f"{where} is not true")
+    elif kind == "multipliers":
+        _require(type(value) is list and value and all(type(item) is int and item > 0 for item in value),
+                 f"{where} is not a list of positive multipliers")
+    elif kind == "versions":
+        _require(type(value) is dict and value and all(type(name) is str and SLUG.fullmatch(name)
+                                                       and type(version) is str and VERSION.fullmatch(version)
+                                                       for name, version in value.items()),
+                 f"{where} is not a map of package versions")
+    else:
+        pattern = {"sha256": SHA256, "commit": COMMIT, "slug": SLUG}.get(kind)
+        _require(type(value) is str and (pattern is None or pattern.fullmatch(value) is not None),
+                 f"{where} is not a valid {kind}")
+
+
 def check_pin(pin: dict) -> None:
+    _check_value(pin, SHAPE, "pin")
     accounting = pin["accounting"]
     _require(pin["format"] == FORMAT and pin["version"] == 1, "pin format is not registered")
     complete = accounting["complete_sampling_bytes"]
@@ -133,6 +181,20 @@ def check_pin(pin: dict) -> None:
              "pinned cold closure is not runtime plus artifact")
     text = json.dumps(pin)
     _require("/home/" not in text and "/mnt/" not in text, "pin carries a private path")
+
+
+def _unique_keys(pairs):
+    keys = [key for key, _ in pairs]
+    _require(len(keys) == len(set(keys)), "pin repeats a key")
+    return dict(pairs)
+
+
+def load_pin(raw: bytes) -> dict:
+    """Parse and check one pin; the size bound is enforced before parsing."""
+    _require(len(raw) <= MAX_PIN_BYTES, "pin exceeds the small-witness size bound")
+    pin = json.loads(raw, object_pairs_hook=_unique_keys)
+    check_pin(pin)
+    return pin
 
 
 def readme_number(value: int) -> str:
@@ -149,13 +211,19 @@ def _section(text: str, start: str, stop: str) -> str:
 
 
 def readme_fragments(pin: dict) -> list[str]:
-    """The exact fragments the README paragraph must carry for this artifact."""
+    """The README phrases for this artifact, each number bound to the label it measures."""
     accounting, artifact = pin["accounting"], pin["artifact"]
-    totals = ("complete_sampling_bytes", "framing_bytes", "transform_schema_bytes", "native_payload_bytes",
-              "generic_runtime_bytes", "cold_sampling_closure_bytes")
-    return [*(f"{readme_number(accounting[key])} bytes" for key in totals),
-            f"`{artifact['profile']}`", f"`{artifact['byte_profile_id']}`", artifact["sha256"][:12],
-            pin["measured_run"]["source_commit"][:7]]
+    number = readme_number
+    return [
+        f"`model.raw` (SHA-256 `{artifact['sha256'][:12]}…`), with profile `{artifact['profile']}` under the byte "
+        f"profile `{artifact['byte_profile_id']}`",
+        f"all report {number(accounting['complete_sampling_bytes'])} bytes: {number(accounting['framing_bytes'])} "
+        f"bytes of framing, {number(accounting['transform_schema_bytes'])} bytes of fitted schema and transforms, "
+        f"and {number(accounting['native_payload_bytes'])} bytes of sampling payload.",
+        f"the debug binary and its mapped libraries came to {number(accounting['generic_runtime_bytes'])} bytes, so "
+        f"the cold sampling closure was {number(accounting['cold_sampling_closure_bytes'])} bytes.",
+        f"The run used commit `{pin['measured_run']['source_commit'][:7]}`",
+    ]
 
 
 def supplement_paragraph(pin: dict) -> str:
@@ -200,8 +268,7 @@ def text_failures(pin: dict, readme: str, supplement: str, generated: str) -> li
 
 
 def check(readme_path: Path = REPO / "README.md", supplement_path: Path = PAPER / "supplement.tex") -> dict:
-    pin = json.loads(PIN.read_text())
-    check_pin(pin)
+    pin = load_pin(PIN.read_bytes())
     failures = text_failures(pin, readme_path.read_text(), supplement_path.read_text(), GENERATED.read_text())
     if failures:
         raise ConformanceError("; ".join(failures))
@@ -215,8 +282,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--write", action="store_true", help="render the supplement paragraph from the pin")
     args = parser.parse_args(argv)
     if args.write:
-        pin = json.loads(PIN.read_text())
-        check_pin(pin)
+        pin = load_pin(PIN.read_bytes())
         GENERATED.write_text(supplement_paragraph(pin))
         print("wrote", GENERATED.relative_to(REPO))
         return 0

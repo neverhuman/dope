@@ -84,7 +84,11 @@ class NativeByteConformanceTests(unittest.TestCase):
         generated = N.GENERATED.read_text()
         self.assertEqual(N.text_failures(pin, readme, supplement, generated), [])
         self.assertEqual(generated, N.supplement_paragraph(pin))
+        swapped = readme.replace("56 bytes of framing, 1,080 bytes of fitted schema",
+                                 "1,080 bytes of framing, 56 bytes of fitted schema")
+        self.assertNotEqual(swapped, readme)
         drifted = {
+            "README swaps framing and schema": (swapped, supplement, generated),
             "README total": (readme.replace("all report 1,558 bytes", "all report 1,559 bytes"), supplement, generated),
             "README source commit": (readme.replace("commit `59437b1`", "commit `0000000`"), supplement, generated),
             "generated profile": (readme, supplement, generated.replace(r"\texttt{native-raw-complete-v1}",
@@ -113,6 +117,42 @@ class NativeByteConformanceTests(unittest.TestCase):
             change(changed)
             with self.subTest(json.dumps(changed)[:40]), self.assertRaises(N.ConformanceError):
                 N.check_pin(changed)
+
+    def test_the_pin_has_a_closed_shape_valid_digests_and_bounded_parts(self):
+        """C2 P17-F2: malformed digests, extra fields, and balanced negative parts are refused."""
+        pin = json.loads(N.PIN.read_text())
+        sentinel = "zq-raw-source-row-7781"
+
+        def accounting(framing, schema):
+            def change(p):
+                p["accounting"]["framing_bytes"], p["accounting"]["transform_schema_bytes"] = framing, schema
+            return change
+
+        cases = {
+            "nonhex artifact digest": lambda p: p["artifact"].__setitem__("sha256", p["artifact"]["sha256"][:12] + "z" * 52),
+            "short evidence digest": lambda p: p["evidence_sha256"].__setitem__("research_receipt", "ab" * 10),
+            "malformed source commit": lambda p: p["measured_run"].__setitem__("source_commit", "59437b1"),
+            "extra top-level field": lambda p: p.__setitem__("raw_source_rows", [sentinel]),
+            "extra source field": lambda p: p["source_data"].__setitem__("header", sentinel),
+            "missing field": lambda p: p["runtime"].pop("binary_file_bytes"),
+            "balanced negative part": accounting(-1, 1137),
+            "boolean count": lambda p: p["source_data"].__setitem__("rows", True),
+            "float total": lambda p: p["accounting"].__setitem__("generic_runtime_bytes", 72049152.0),
+            "agreement not true": lambda p: p["agreement"].__setitem__("file_size_equals_complete", 1),
+            "bad dependency version": lambda p: p["measured_run"]["dependency_versions"].__setitem__("numpy", sentinel),
+        }
+        for name, change in cases.items():
+            changed = copy.deepcopy(pin)
+            change(changed)
+            with self.subTest(name), self.assertRaises(N.ConformanceError) as raised:
+                N.check_pin(changed)
+            self.assertNotIn(sentinel, str(raised.exception))
+        raw = N.PIN.read_bytes()
+        self.assertEqual(N.load_pin(raw), pin)
+        with self.assertRaises(N.ConformanceError):
+            N.load_pin(raw.rstrip(b"\n") + b" " * N.MAX_PIN_BYTES)
+        with self.assertRaises(N.ConformanceError):
+            N.load_pin(raw.replace(b'"version": 1\n', b'"version": 1, "version": 1\n'))
 
 
 if __name__ == "__main__":
