@@ -14,6 +14,11 @@ records. A failed write never replaces a prior final CSV. Its staging file is
 removed where the filesystem allows; when removal is refused the original error
 still propagates, and a known failure stops the lineage with
 StagingCleanupRefused instead of being recorded as an ordinary failed cell.
+
+Run as a script, an unhandled error is shown as one fixed line with a fixed code
+and the process exits nonzero. The exception message, its cause chain and the
+traceback are not printed, because a message can carry a source value. Imported
+helpers still raise their own exceptions; only the standalone entry installs this.
 """
 
 from __future__ import annotations
@@ -594,6 +599,26 @@ def score_samples(panel_workers_pilot: Path) -> int:
     return 0
 
 
+def _cli_failure_code(error: BaseException) -> str:
+    if isinstance(error, StagingCleanupRefused):
+        return "sample_staging_cleanup_refused"
+    if isinstance(error, KeyboardInterrupt):
+        return "sample_interrupted"
+    return "sample_unexpected_failure"
+
+
+def _report_unhandled_error(_kind, error, _traceback) -> None:
+    """sys.excepthook for the standalone CLI: one fixed line, no message, cause chain or traceback."""
+    import sys
+    sys.stderr.write(f"tabsyn_sample: stopped ({_cli_failure_code(error)}); exception text is withheld\n")
+
+
+def _install_cli_error_display() -> None:
+    """Install the fixed-line display in this process only. Called from the script entry."""
+    import sys
+    sys.excepthook = _report_unhandled_error
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--parser-check", action="store_true")
@@ -617,4 +642,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    _install_cli_error_display()
     main()

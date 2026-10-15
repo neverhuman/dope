@@ -374,5 +374,107 @@ class SampleFailureBoundaryTests(unittest.TestCase):
         self.assertTrue(any(isinstance(node, ast.Call) and getattr(node.func, "id", None) == "_sample_cell"
                             for node in ast.walk(lineage)))
 
+
+CLI_DRIVER = """
+import csv
+import sys
+from pathlib import Path
+from unittest.mock import patch
+
+import numpy as np
+
+from research.benchmark.review_fixes import tabsyn_sample
+
+mode, folder, sentinel = sys.argv[1], Path(sys.argv[2]), sys.argv[3]
+final = folder / "sample-101-1n.csv"
+
+
+def partial_writer(handle):
+    class Writer:
+        def writerow(self, row):
+            handle.write(",".join(row) + "\\n")
+
+        def writerows(self, _rows):
+            raise OSError(sentinel)
+    return Writer()
+
+
+def lineage(_dataset, _artifact, _git_sha):
+    if mode == "unexpected":
+        def sample(*_args, **_kwargs):
+            raise KeyError(sentinel)
+        tabsyn_sample._sample_cell(sample, final, 2)
+    else:
+        with patch.object(tabsyn_sample.csv, "writer", partial_writer), \\
+                patch.object(Path, "unlink", side_effect=PermissionError(sentinel)):
+            tabsyn_sample._sample_cell(lambda *_a, **_k: np.zeros((2, 3)), final, 2)
+    return 0
+
+
+tabsyn_sample.sample_lineage = lineage
+tabsyn_sample._install_cli_error_display()
+sys.argv = ["tabsyn_sample.py", "--sample-lineage", "synthetic", "--artifact", str(folder), "--git-sha", "synthetic"]
+tabsyn_sample.main()
+"""
+
+
+class CliErrorDisplayTests(unittest.TestCase):
+    """The standalone entry shows a fixed line; the sentinel never reaches stdout or stderr."""
+
+    SENTINEL = "zq-source-header-extremum-7781"
+    ROOT = Path(__file__).resolve().parents[3]
+
+    def run_entry(self, *args, script=None):
+        import subprocess
+
+        env = {**os.environ, "PYTHONPATH": str(self.ROOT), "OMP_NUM_THREADS": "1"}
+        command = [sys.executable, "-B", str(script or self.ROOT / tabsyn_sample.__file__), *args]
+        return subprocess.run(command, cwd=self.ROOT, env=env, capture_output=True, text=True, timeout=120)
+
+    def run_driver(self, mode):
+        with tempfile.TemporaryDirectory() as folder:
+            driver = Path(folder) / "driver.py"
+            driver.write_text(CLI_DRIVER)
+            final = Path(folder) / "sample-101-1n.csv"
+            final.write_text("prior,final\n")
+            result = self.run_entry(mode, folder, self.SENTINEL, script=driver)
+            self.assertEqual(final.read_text(), "prior,final\n")
+            return result
+
+    def test_an_unexpected_error_is_one_fixed_line(self):
+        result = self.run_driver("unexpected")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, "")
+        self.assertEqual(result.stderr, "tabsyn_sample: stopped (sample_unexpected_failure); exception text is withheld\n")
+        self.assertNotIn(self.SENTINEL, result.stdout + result.stderr)
+
+    def test_a_refused_cleanup_chain_is_one_fixed_line(self):
+        result = self.run_driver("cleanup")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, "")
+        self.assertEqual(result.stderr.splitlines(), [
+            "TabSyn sample staging file could not be removed",
+            "tabsyn_sample: stopped (sample_staging_cleanup_refused); exception text is withheld",
+        ])
+        self.assertNotIn(self.SENTINEL, result.stdout + result.stderr)
+
+    def test_systemexit_and_argparse_keep_their_messages_and_codes(self):
+        result = self.run_entry()
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stderr, "choose --parser-check, --sample-all, --sample-lineage, or --score\n")
+        result = self.run_entry("--no-such-option")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unrecognized arguments: --no-such-option", result.stderr)
+
+    def test_only_the_script_entry_installs_the_display(self):
+        self.assertIsNot(sys.excepthook, tabsyn_sample._report_unhandled_error)
+        tree = ast.parse(Path(tabsyn_sample.__file__).read_text())
+        guard = tree.body[-1]
+        self.assertIsInstance(guard, ast.If)
+        self.assertEqual(ast.unparse(guard.test), "__name__ == '__main__'")
+        self.assertEqual([ast.unparse(node) for node in guard.body], ["_install_cli_error_display()", "main()"])
+        top_level_calls = [node for node in tree.body[:-1] if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call)]
+        self.assertEqual(top_level_calls, [])
+
 if __name__ == "__main__":
     unittest.main()
