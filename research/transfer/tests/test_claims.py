@@ -37,6 +37,18 @@ def _replace_receipt(document, receipts, receipt_id, mutate):
     return canonical_json(doc), updated
 
 
+def _named(claim_id, receipt_change=None, comparison="raw_gap_superiority"):
+    fixture = synthetic_fixture(comparison)
+    document = fixture["document"]
+    receipts = fixture["receipts"]
+    receipt_id = next(iter(receipts))
+    if receipt_change is not None:
+        document, receipts = _replace_receipt(document, receipts, receipt_id, receipt_change)
+    doc = parse_json(document)
+    doc["claims"][0]["claim_id"] = claim_id
+    return canonical_json(doc), receipts, fixture["expected"]
+
+
 def _graph(comparison="raw_gap_superiority"):
     fixture = synthetic_fixture(comparison)
     graph = verify_claim_graph(fixture["document"], fixture["receipts"], fixture["expected"])
@@ -243,6 +255,86 @@ class ClaimGraphTests(unittest.TestCase):
         self.assertNotIn("header", rendered)
         self.assertNotIn(SENTINEL, rendered)
         self.assertNotIn("99999.5", rendered)
+
+    def test_limitation_ids_keep_computed_states(self):
+        preserved = (
+            "unfavorable-baseline",
+            "cap-failure-mass",
+            "tail-harm",
+            "rights-unfrozen",
+            "historical-panel-reuse",
+            "seed-dependence",
+            "campaign-cost",
+        )
+        document, receipts, expected = _named(
+            "unfavorable-baseline",
+            lambda receipt: receipt.update(lower=0.25, upper=0.5),
+        )
+        projection = public_projection(verify_claim_graph(document, receipts, expected))
+        self.assertEqual(assert_public_provenance(projection), projection)
+        claim = projection["claims"][0]
+        self.assertEqual(claim["raw_gap_superiority"]["decision"], "not_supported")
+        self.assertFalse(claim["qualified"])
+        self.assertFalse(claim["campaign_admitted"])
+        self.assertFalse(claim["n21_admitted"])
+        self.assertFalse(claim["raw_gap_superiority"]["qualified"])
+        self.assertEqual(claim["receipts"], [{"sha256": _pin(receipts["receipt-raw-gap"])}])
+        self.assertNotIn("receipt_sha256", claim)
+        document, receipts, expected = _named(
+            "tail-harm",
+            lambda receipt: receipt.update(lower=-0.25, upper=0.25),
+        )
+        claim = public_projection(verify_claim_graph(document, receipts, expected))["claims"][0]
+        self.assertEqual(claim["raw_gap_superiority"]["decision"], "inconclusive")
+        self.assertEqual(claim["adjusted_z_noninferiority"]["decision"], "unavailable")
+        self.assertEqual(claim["equivalence"]["decision"], "unavailable")
+        self.assertFalse(claim["qualified"])
+        for claim_id in preserved:
+            document, receipts, expected = _named(claim_id, lambda receipt: receipt.update(lower=None))
+            claim = public_projection(verify_claim_graph(document, receipts, expected))["claims"][0]
+            self.assertEqual(claim["claim_id"], claim_id)
+            self.assertEqual(claim["raw_gap_superiority"]["decision"], "unavailable")
+            self.assertIsNone(claim["raw_gap_superiority"]["lower"])
+            self.assertFalse(claim["qualified"])
+            self.assertFalse(claim["campaign_admitted"])
+        fixture = synthetic_fixture("raw_gap_superiority")
+        document, receipts = _replace_receipt(
+            fixture["document"], fixture["receipts"], "receipt-raw-gap",
+            lambda receipt: receipt.update(lower=None),
+        )
+        with self.assertRaises(ClaimError) as caught:
+            verify_claim_graph(document, receipts, fixture["expected"])
+        self.assertEqual(str(caught.exception), "unverified_bound")
+        document, receipts = _replace_receipt(
+            fixture["document"], fixture["receipts"], "receipt-raw-gap",
+            lambda receipt: receipt.update(lower=0.25, upper=0.5),
+        )
+        with self.assertRaises(ClaimError) as caught:
+            verify_claim_graph(document, receipts, fixture["expected"])
+        self.assertEqual(str(caught.exception), "label_mismatch")
+        for headline in ("algorithmic-hypothesis-margin", "replay-receipt", "one-cell-loss", "full-refit"):
+            document, receipts, expected = _named(headline, lambda receipt: receipt.update(lower=None))
+            with self.assertRaises(ClaimError) as caught:
+                verify_claim_graph(document, receipts, expected)
+            self.assertEqual(str(caught.exception), "unverified_bound")
+        for flag in ("verified", "qualified"):
+            document, receipts, expected = _named("cap-failure-mass")
+            doc = parse_json(document)
+            doc["claims"][0][flag] = True
+            with self.assertRaises(ClaimError) as caught:
+                verify_claim_graph(canonical_json(doc), receipts, expected)
+            self.assertEqual(str(caught.exception), "self_declared_verification")
+        names = ("raw_gap_superiority", "adjusted_z_noninferiority", "equivalence")
+        for comparison in names:
+            document, receipts, expected = _named("seed-dependence", comparison=comparison)
+            claim = public_projection(verify_claim_graph(document, receipts, expected))["claims"][0]
+            self.assertEqual(claim[comparison]["decision"], "supported")
+            self.assertFalse(claim["qualified"])
+            self.assertFalse(claim[comparison]["qualified"])
+            self.assertFalse(claim["campaign_admitted"])
+            for other in names:
+                if other != comparison:
+                    self.assertNotEqual(claim[other]["decision"], "supported")
 
     def test_incomplete_denominator_and_identity(self):
         fixture = synthetic_fixture("raw_gap_superiority")
