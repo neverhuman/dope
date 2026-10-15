@@ -57,7 +57,7 @@ git clone https://github.com/neverhuman/dope.git
 cd dope
 cargo build --locked --release -p dope-kernel
 
-# Optional: verify pin and install dope-kernel (BINARY SHA256 PREFIX [--dry-run])
+# Optional: verify and dry-run install dope-kernel (BINARY SHA256 PREFIX [--dry-run])
 ./scripts/install-native.sh target/release/dope-kernel "$(sha256sum target/release/dope-kernel | awk '{print $1}')" "$HOME/.local/dope-native" --dry-run
 target/release/dope-kernel doctor
 
@@ -96,7 +96,7 @@ The installed public demo in [examples/public-regression](examples/public-regres
 Released `.dpk` artifacts and public sidecars omit source strings, column headers, and raw extrema. DOPE enforces a numeric-only `[0, 1]` contract ([rust/data.rs](rust/data.rs), [rust/error.rs](rust/error.rs), and [rust/representation.rs](rust/representation.rs) in Rust; `research.transfer.metrics.standardize_numeric_table_01` and [research/benchmark/representation.py](research/benchmark/representation.py) in Python):
 
 - **Headerless numeric `[0, 1]` input**: L3 `compile`, `convert`, and `certify` consume headerless numeric CSV files with the target in the final column and every cell already in `[0, 1]`. Out-of-range values fail closed with normalization guidance.
-- **Categorical bucket projection into `(0, 1)`**: Raw categorical tokens are mapped deterministically into `(0, 1)` before compilation using 65,536-bucket HMAC-SHA256 projection (`(bucket + 0.5) / 65536`), so `.dpk` artifacts store only numeric values and no cleartext strings. With the fixed public default salt (`dope-representation-v1`), this deterministic map is pseudonymization rather than secrecy against dictionary guessing of low-cardinality vocabularies.
+- **Categorical bucket projection into `(0, 1)`**: Raw categorical tokens are mapped deterministically into `(0, 1)` before compilation using 65,536-bucket HMAC-SHA256 projection (`(bucket + 0.5) / 65536`), so `.dpk` artifacts store only numeric values and no cleartext strings. `rust/representation.rs` and `research/benchmark/representation.py` require a caller-supplied salt; in `standardize_numeric_table_01`, the fixed default salt (`dope-standard-01-v1`) provides deterministic pseudonymization rather than secrecy against dictionary guessing of low-cardinality vocabularies.
 - **Numeric scaling to `[0, 1]` (fit on training split only)**: Continuous columns are standardized using training-split statistics only—either by dividing by the training standard deviation (`z_i = (x_i - μ_train) / σ_train`) and mapping smoothly onto `[0, 1]` via the standard normal CDF `Φ(z_i)` (`zscore_std_01`), by training min-max clamping (`minmax_01`), or by empirical mid-rank quantiles (`midrank_quantile_01`).
 
 ### MFS-v4 quality metric: downstream tabular lift + feature-importance preservation
@@ -113,7 +113,7 @@ When tabular learners (CatBoost, LightGBM/tree ensembles, MLPs, linear models) t
 | `structure_fidelity` | 0.05 | Pairwise correlation, mutual-information, and target-association preservation |
 | `coverage_realism` | 0.05 | Support precision and recall (`alpha_precision`, `beta_recall`, coverage balance) |
 
-Every MFS-v4 release score fails closed (`null`) unless all six prerequisites (`real_vs_real_control_complete`, `required_size_cells_complete`, `artifact_sampling_verified`, `metric_implementations_locked`, `control_contrastive_baselines_complete`, `model_driver_attribution_measured`; MFS-v3 uses the first four) and all hard release gates (`exact_row_match_max == 0`, `near_copy` via `squared_l2_on_shared_map` against `nearest_other_distinct_fit_row` at the `0.01` quantile, `cleartext_absent == true`, `membership_auc_max <= 0.55`, `attribute_inference_advantage_max <= 0.05`, `byte_limit_l3 <= 10240`, `encoded_numbers_min >= 1`, `predictor_only_lift_min > 0.0`, and `independent_marginals_lift_min > 0.0`) pass.
+Every MFS-v4 release score fails closed (`null`) unless all six prerequisites (`real_vs_real_control_complete`, `required_size_cells_complete`, `artifact_sampling_verified`, `metric_implementations_locked`, `control_contrastive_baselines_complete`, `model_driver_attribution_measured`; MFS-v3 uses the first four) and all hard release gates (`exact_row_matches == exact_row_match_max (0)`, `near_copy` via `squared_l2_on_shared_map` against `nearest_other_distinct_fit_row` at the `0.01` quantile, `cleartext_absent == true`, `membership_auc <= membership_auc_max (0.55)`, `attribute_inference_advantage <= attribute_inference_advantage_max (0.05)`, `artifact_bytes <= byte_limit_l3 (10240)`, `encoded_numbers >= encoded_numbers_min (1)`, `predictor_only_lift > predictor_only_lift_min (0.0)`, and `independent_marginals_lift > independent_marginals_lift_min (0.0)`) pass.
 
 ## Reproduce the paper
 
