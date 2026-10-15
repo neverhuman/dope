@@ -18,6 +18,10 @@ After the original-unit metric contract exists, recompute one frozen development
 
 Refit the decoded generator only after rights, exposure, code, learner set, and budget locks are frozen. The development registry currently leaves rights and exposure unresolved, so confirmation is closed and this level is blocked. The placeholder is claim `full-refit`. The step is unmeasured.
 
+## Measured interface mode
+
+The checker also has a separately versioned measured mode, `--measured`. It reads a claim graph only through the verifier in `research/transfer/claims.py`. The custodian supplies the trusted identities, never the graph. The mode renders the verified public projection as TeX macros, with a render receipt, under `target/vnext/` and does not edit this draft. It refuses a dictionary, a number or a verified flag offered in place of a verified graph. Every rendered claim is labeled unqualified, and a ladder claim with no verified record stays a placeholder. Figure inputs stay unbound because no claim is admitted to a campaign. The interface fixtures are synthetic, so this mode proves the interface only, and replay stays unmeasured.
+
 ## Locks
 
 `docs/testing.md` records the CPU pull-request quota, the security and audit quotas, the scheduled GPU quota, the neural fit cap, and the GPU memory admission rule. `production/kpi-contract.json` records the tier byte caps. Quote those files at execution time. Do not transcribe them into this draft. Claim `campaign-cost` stays unbound. Nothing in this packet authorizes a paid or scheduled run.
