@@ -5,7 +5,9 @@ returns a small matrix or raises, and CSVs are written only inside a test-owned 
 """
 
 import ast
+import contextlib
 import importlib.util
+import io
 import os
 import py_compile
 import sys
@@ -295,6 +297,63 @@ class SampleFailureBoundaryTests(unittest.TestCase):
         with patch.object(tabsyn_sample.csv, "writer", broken_writer), self.assertRaises(TypeError):
             self.cell(lambda *_a, **_k: self.matrix)
         self.assert_nothing_published()
+
+    def write_prior_final(self):
+        self.final.write_text("prior,final\n")
+
+    def assert_prior_final_unchanged(self):
+        self.assertEqual(self.final.read_text(), "prior,final\n")
+
+    def partial_then(self, error):
+        def broken_writer(handle):
+            class Writer:
+                def writerow(self, row):
+                    handle.write(",".join(row) + "\n")
+
+                def writerows(self, _rows):
+                    raise error
+            return Writer()
+        return broken_writer
+
+    def test_a_refused_cleanup_does_not_mask_an_unexpected_write_error(self):
+        """P15-F1: the writer's TypeError propagates even when the staging file cannot be removed."""
+        self.write_prior_final()
+        stderr = io.StringIO()
+        with patch.object(tabsyn_sample.csv, "writer", self.partial_then(TypeError(self.SENTINEL))), \
+                patch.object(Path, "unlink", side_effect=PermissionError(self.SENTINEL)), \
+                contextlib.redirect_stderr(stderr), self.assertRaises(TypeError):
+            self.cell(lambda *_a, **_k: self.matrix)
+        self.assert_prior_final_unchanged()
+        self.assertTrue(self.final.with_suffix(".csv.tmp").exists())
+        self.assertEqual(stderr.getvalue(), "TabSyn sample staging file could not be removed\n")
+
+    def test_a_refused_cleanup_after_a_known_failure_stops_the_lineage(self):
+        """A known failure whose staging file survives is not recorded as an ordinary cell."""
+        self.write_prior_final()
+        with patch.object(tabsyn_sample.csv, "writer", self.partial_then(OSError(self.SENTINEL))), \
+                patch.object(Path, "unlink", side_effect=PermissionError(self.SENTINEL)), \
+                contextlib.redirect_stderr(io.StringIO()), \
+                self.assertRaises(tabsyn_sample.StagingCleanupRefused) as raised:
+            self.cell(lambda *_a, **_k: self.matrix)
+        self.assertIsInstance(raised.exception.__cause__, OSError)
+        self.assertNotIn(self.SENTINEL, str(raised.exception))
+        self.assert_prior_final_unchanged()
+
+    def test_a_stale_staging_file_is_removed_before_sampling(self):
+        staging = self.final.with_suffix(".csv.tmp")
+        staging.write_text("left by a killed attempt")
+        self.assertEqual(self.cell(lambda *_a, **_k: self.matrix), ("ok", None))
+        self.assertFalse(staging.exists())
+        self.assertEqual(self.final.read_text().splitlines()[0], "f0,f1,target")
+
+    def test_a_stale_staging_file_that_cannot_be_removed_stops_before_sampling(self):
+        self.final.with_suffix(".csv.tmp").write_text("left by a killed attempt")
+        calls = []
+        with patch.object(Path, "unlink", side_effect=PermissionError(self.SENTINEL)), \
+                self.assertRaises(PermissionError):
+            self.cell(lambda *a, **_k: calls.append(a) or self.matrix)
+        self.assertEqual(calls, [])
+        self.assertFalse(self.final.exists())
 
     def test_a_deadline_is_not_reported_as_generic_io(self):
         self.assertEqual(tabsyn_sample.sample_failure_reason(TimeoutError()), "sample_deadline_exceeded")
