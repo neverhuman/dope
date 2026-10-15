@@ -14,6 +14,15 @@ enum Command {
     /// Report this native executable and supported runtime profiles without data,
     /// optional imports, network access, or automatic weight installation.
     Doctor,
+    /// Inspect a hash-bound development pilot plan without execution or admission.
+    InspectDevelopmentPilot {
+        #[arg(long)]
+        plan: PathBuf,
+        #[arg(long)]
+        expected_plan_digest: String,
+        #[arg(long)]
+        attempts: Option<PathBuf>,
+    },
     /// Fit a headered, declared continuous schema using fit rows only.
     CompileRaw {
         #[arg(long)]

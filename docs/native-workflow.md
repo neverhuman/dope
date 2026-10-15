@@ -110,6 +110,18 @@ requires a dedicated fresh process and refuses unsupported platforms. Its
 positive and negative fixture proof is local CPU evidence, not an arbitrary-code
 isolation claim or protected evaluator deployment.
 
+`inspect-development-pilot --plan PLAN.json
+--expected-plan-digest SHA256 [--attempts OBSERVATIONS.json]` consumes the exact
+development source-pilot v2 protocol, using the existing dope-finite-json-v1
+numeric canonicalization. Each input is bounded to4MiB; jobs/observations to4096.
+The digest must be supplied from the trusted published plan, rather than derived
+from an edited cap. Its HMAC tokens and owner/registry commitments remain opaque
+and unverified without custody's secret. The command reads metadata and emits
+the v2 summary: missing/unavailable attempts count as non-success, failed+timeout
+remain the separate execution-error numerator, and source counts are retained.
+Caller observations are not cost receipts. All four admission flags remain false;
+the reader performs no data fetch, pilot execution or scientific admission.
+
 The native evidence library also exposes separate learner-role v2 and calibration
 receipt v1 entries. Held-out learner families cannot win development selection.
 A matching development-protocol digest authenticates its binding while remaining
