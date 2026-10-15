@@ -13,6 +13,7 @@ use crate::schema::{
 };
 
 pub mod isolation;
+pub mod mixed;
 pub mod workflow;
 
 #[derive(Clone, Debug, PartialEq)]

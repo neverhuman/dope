@@ -132,6 +132,20 @@ pub(crate) fn sample_symbolic_support(
     options: SampleOptions,
     clip_target: bool,
 ) -> Result<Vec<f32>> {
+    sample_symbolic_with_features(kernel, options, clip_target, |_, _| {})
+}
+
+/// Explicit successor repair/completion runs before the target and residual.
+/// The historical entry above supplies a no-op and preserves its draw streams.
+pub(crate) fn sample_symbolic_with_features<F>(
+    kernel: &Kernel,
+    options: SampleOptions,
+    clip_target: bool,
+    map: F,
+) -> Result<Vec<f32>>
+where
+    F: Fn(usize, &mut [f32]) + Sync,
+{
     kernel.validate().map_err(DopeError::Codec)?;
     let (dependence, target, noise) = match &kernel.program {
         KernelProgram::Symbolic {
@@ -166,6 +180,7 @@ pub(crate) fn sample_symbolic_support(
                     inverse_marginal(marginal, normal_cdf(f64::from(row[feature])) as f32),
                 );
             }
+            map(row_index, &mut row[..width]);
             let (linear, logistic) = evaluate_target(target, row);
             row[width] = match (&kernel.task, noise) {
                 (Task::Regression, Noise::ResidualV1 { distribution }) => {

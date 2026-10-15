@@ -14,6 +14,41 @@ enum Command {
     /// Report this native executable and supported runtime profiles without data,
     /// optional imports, network access, or automatic weight installation.
     Doctor,
+    /// Explicit development mixed feature/mask carrier; old raw defaults stay fixed.
+    CompileMixed {
+        #[arg(long)]
+        csv: PathBuf,
+        #[arg(long)]
+        schema: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, value_parser = ["independent_v1", "numeric_split_v1"])]
+        profile: String,
+        #[arg(long, default_value_t = 1729)]
+        seed: u64,
+        #[arg(long, default_value_t = 32768)]
+        max_complete_bytes: usize,
+        #[arg(long, default_value_t = 60.0)]
+        deadline_seconds: f64,
+    },
+    /// Inspect complete charged mixed state, without private dictionaries/probabilities.
+    InspectMixed {
+        #[arg(long)]
+        artifact: PathBuf,
+    },
+    /// Write tagged JSON cells, or emit only a digest in a fresh sealed worker.
+    SampleMixed {
+        #[arg(long)]
+        artifact: PathBuf,
+        #[arg(long)]
+        rows: usize,
+        #[arg(long)]
+        out: Option<PathBuf>,
+        #[arg(long, default_value_t = 1729)]
+        seed: u64,
+        #[arg(long)]
+        isolated: bool,
+    },
     /// Inspect a hash-bound development pilot plan without execution or admission.
     InspectDevelopmentPilot {
         #[arg(long)]
