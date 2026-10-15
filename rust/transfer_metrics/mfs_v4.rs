@@ -78,7 +78,9 @@ pub fn driver_attribution_agreement(
     }
     let sign_agreement = match (real_signs, synthetic_signs) {
         (None, None) => return Err(MetricError::InvalidEvidence),
-        (Some(real_s), Some(syn_s)) if !real_s.is_empty() && real_s.len() == syn_s.len() => {
+        (Some(real_s), Some(syn_s))
+            if real_s.len() >= features && real_s.len() == syn_s.len() =>
+        {
             if real_s
                 .iter()
                 .chain(syn_s)
@@ -137,31 +139,36 @@ pub fn driver_attribution_agreement(
         let union = real_top.union(&syn_top).count().max(1);
         let overlap = intersection as f64 / k as f64;
         let jaccard = intersection as f64 / union as f64;
-        let idcg: f64 = real_order
-            .iter()
-            .take(k)
-            .enumerate()
-            .map(|(rank, &idx)| real_importances[idx] / ((rank + 2) as f64).log2())
-            .sum();
-        let dcg: f64 = syn_order
-            .iter()
-            .take(k)
-            .enumerate()
-            .map(|(rank, &idx)| real_importances[idx] / ((rank + 2) as f64).log2())
-            .sum();
+        let idcg: f64 = finite(
+            real_order
+                .iter()
+                .take(k)
+                .enumerate()
+                .map(|(rank, &idx)| real_importances[idx] / ((rank + 2) as f64).log2())
+                .sum(),
+        )?;
+        let dcg: f64 = finite(
+            syn_order
+                .iter()
+                .take(k)
+                .enumerate()
+                .map(|(rank, &idx)| real_importances[idx] / ((rank + 2) as f64).log2())
+                .sum(),
+        )?;
         let ndcg = if idcg <= 1e-12 {
             1.0
         } else {
-            (dcg / idcg).clamp(0.0, 1.0)
+            finite(dcg / idcg)?.clamp(0.0, 1.0)
         };
-        let tv_distance = 0.5
-            * (0..features)
+        let tv_distance = finite(
+            0.5 * (0..features)
                 .map(|idx| {
                     (real_importances[idx] / real_total - synthetic_importances[idx] / syn_total)
                         .abs()
                 })
-                .sum::<f64>();
-        let l1_agreement = (1.0 - tv_distance).clamp(0.0, 1.0);
+                .sum::<f64>(),
+        )?;
+        let l1_agreement = finite(1.0 - tv_distance)?.clamp(0.0, 1.0);
         (ndcg, jaccard, overlap, l1_agreement)
     };
     let composite_driver_fidelity = finite(

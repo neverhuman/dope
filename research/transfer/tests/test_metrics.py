@@ -165,6 +165,20 @@ class MetricsTests(unittest.TestCase):
                 [1] * 500,
                 [1] * 500,
             )
+        with self.assertRaises(ValueError):
+            driver_attribution_agreement(
+                [0.4, 0.3, 0.2, 0.1],
+                [0.4, 0.3, 0.2, 0.1],
+                [1, -1],
+                [1, -1],
+            )
+        with self.assertRaises(ValueError):
+            driver_attribution_agreement(
+                {"f0": 0.4, "f1": 0.6},
+                [0.4, 0.6],
+                [1, -1],
+                [1, -1],
+            )
 
     def test_rank_reversal_is_scored_in_raw_units(self):
         case = GOLDEN["rank_reversal"]

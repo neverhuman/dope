@@ -414,6 +414,16 @@ mod tests {
         assert!(!report.eligible);
         assert!(!report.hard_gates["model_driver_attribution_measured"]);
         assert!(report.unavailable_terms.iter().any(|term| term == "driver_fidelity"));
+
+        let mut truncated = v4_observation();
+        truncated.real_signs = Some(vec![1, -1]);
+        truncated.synthetic_signs = Some(vec![1, -1]);
+        let truncated_report = evaluate_v4(&v4_contract(), &v4_components(), &truncated);
+        assert_eq!(truncated_report.driver_fidelity, None);
+        assert_eq!(truncated_report.driver_attribution, None);
+        assert_eq!(truncated_report.score, None);
+        assert!(!truncated_report.eligible);
+        assert!(!truncated_report.hard_gates["model_driver_attribution_measured"]);
     }
 
     #[test]

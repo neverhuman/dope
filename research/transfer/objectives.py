@@ -81,6 +81,8 @@ def driver_attribution_agreement(
     synthetic_signs=None,
 ) -> dict:
     """Score holdout feature-driver fidelity via NDCG@k, Top-k Jaccard, L1 share, and sign agreement."""
+    if not isinstance(real_importances, (list, tuple)) or not isinstance(synthetic_importances, (list, tuple)):
+        raise ValueError("invalid driver importance vector")
     real_imp = [finite_number(v) for v in real_importances]
     syn_imp = [finite_number(v) for v in synthetic_importances]
     features = len(real_imp)
@@ -88,9 +90,11 @@ def driver_attribution_agreement(
         raise ValueError("invalid driver importance vector")
     if real_signs is None or synthetic_signs is None:
         raise ValueError("driver sign vectors are required")
+    if not isinstance(real_signs, (list, tuple)) or not isinstance(synthetic_signs, (list, tuple)):
+        raise ValueError("invalid driver sign vector")
     real_s = list(real_signs)
     syn_s = list(synthetic_signs)
-    if not real_s or len(real_s) != len(syn_s):
+    if len(real_s) < features or len(real_s) != len(syn_s):
         raise ValueError("driver sign vector length mismatch")
     if any(type(s) is not int or isinstance(s, bool) or s not in (-1, 0, 1) for s in (*real_s, *syn_s)):
         raise ValueError("invalid driver sign value")

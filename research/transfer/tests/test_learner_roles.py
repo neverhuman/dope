@@ -70,6 +70,36 @@ class LearnerRoleTests(unittest.TestCase):
         with self.assertRaises(ValueError) as raised:
             assign_learner_roles({**roles(), "protocol_frozen": True})
         self.assertEqual(str(raised.exception), "invalid_learner_roles")
+        tied_bytes = select_development_learner(
+            [
+                {"family_id": "tree", "learner_id": "alpha-large", "development_loss": 0.2, "artifact_bytes": 512},
+                {"family_id": "linear", "learner_id": "zeta-small", "development_loss": 0.2, "artifact_bytes": 128},
+            ],
+            roles(),
+        )
+        self.assertEqual(tied_bytes["selected_learner"], "zeta-small")
+        with self.assertRaises(ValueError) as raised:
+            select_development_learner(
+                [
+                    {"family_id": "linear", "learner_id": "dup", "development_loss": 0.2},
+                    {"family_id": "tree", "learner_id": "dup", "development_loss": 0.3},
+                ],
+                roles(),
+            )
+        self.assertEqual(str(raised.exception), "duplicate_learner_candidate")
+        with self.assertRaises(ValueError) as raised:
+            select_development_learner(
+                [{"family_id": "linear", "learner_id": "leaked", "development_loss": 0.2, "held_out_oracle": 0.1}],
+                roles(),
+            )
+        self.assertEqual(str(raised.exception), "held_out_oracle_in_selection")
+        for bad_candidates in (
+            "not-a-list",
+            [{"family_id": "linear", "learner_id": "neg", "development_loss": -0.1}],
+            [{"family_id": "linear", "learner_id": "bad-bytes", "development_loss": 0.1, "artifact_bytes": True}],
+        ):
+            with self.assertRaises(ValueError):
+                select_development_learner(bad_candidates, roles())
 
 
 if __name__ == "__main__":
