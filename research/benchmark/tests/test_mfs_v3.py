@@ -251,6 +251,11 @@ class MfsV3Tests(unittest.TestCase):
         self.assertAlmostEqual(report["control_contrastive_lift"]["contrastive_utility_score"], 0.935)
         self.assertAlmostEqual(report["driver_attribution"]["composite_driver_fidelity"], 0.95)
         self.assertAlmostEqual(report["representation_closeness"], 0.5)
+        self.assertIsInstance(report["knowledge_compression"], float)
+        self.assertAlmostEqual(
+            report["knowledge_compression"],
+            report["compression_metrics"]["knowledge_compression_score"],
+        )
         self.assertIsNotNone(report["score"])
         self.assertGreater(report["score"], 70.0)
 
@@ -265,6 +270,7 @@ class MfsV3Tests(unittest.TestCase):
         no_ret_report = evaluate_v4(missing_retention)
         self.assertFalse(no_ret_report["eligible"])
         self.assertIsNone(no_ret_report["score"])
+        self.assertIsNone(no_ret_report["knowledge_compression"])
         self.assertIsNone(no_ret_report["compression_metrics"])
         self.assertIn("encoded_numbers", no_ret_report["failed_gates"])
         self.assertIn("control_contrastive_baselines_complete", no_ret_report["failed_gates"])
@@ -284,6 +290,17 @@ class MfsV3Tests(unittest.TestCase):
         self.assertIsNone(no_signs_report["driver_fidelity"])
         self.assertIn("model_driver_attribution_measured", no_signs_report["failed_gates"])
         self.assertIn("driver_fidelity", no_signs_report["unavailable_terms"])
+
+    def test_representation_refuses_overflow_and_booleans(self):
+        from research.benchmark.representation import representation_closeness, unit_half_distance
+
+        self.assertIsNone(midrank_quantile([-1e308, 1e308], [0.0]))
+        self.assertIsNone(midrank_quantile([-1e308, 1e308], [0.5e308]))
+        self.assertIsNone(midrank_quantile([True, 2.0], [1.0]))
+        self.assertIsNone(midrank_quantile([1.0, 2.0], [False]))
+        self.assertIsNone(unit_half_distance([1e200, 0.0], [0.0, 1e200]))
+        self.assertIsNone(unit_half_distance([True, 0.0], [0.0, 1.0]))
+        self.assertIsNone(representation_closeness(True, 0.5, 0.4, -0.1, -0.2))
 
 
 if __name__ == "__main__":

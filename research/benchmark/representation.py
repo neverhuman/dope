@@ -51,13 +51,17 @@ def category_code(salt: bytes, level: str) -> float:
     return (bucket + 0.5) / CATEGORICAL_BUCKETS
 
 
+def _is_finite_float(value: object) -> bool:
+    return not isinstance(value, bool) and isinstance(value, (int, float)) and math.isfinite(value)
+
+
 def midrank_quantile(fit: list[float], values: list[float]) -> list[float] | None:
-    if not fit or any(not math.isfinite(value) for value in (*fit, *values)):
+    if not fit or any(not _is_finite_float(value) for value in (*fit, *values)):
         return None
-    ordered = sorted(fit)
+    ordered = sorted(float(value) for value in fit)
     n = float(len(ordered))
 
-    def one(value: float) -> float:
+    def one(value: float) -> float | None:
         less = _bisect_left(ordered, value)
         right = _bisect_right(ordered, value)
         if right == 0:
@@ -71,12 +75,24 @@ def midrank_quantile(fit: list[float], values: list[float]) -> list[float] | Non
             x1 = ordered[less]
             if x1 == x0:
                 return left_image
-            t = (value - x0) / (x1 - x0)
-            return left_image + t * (right_image - left_image)
+            span = x1 - x0
+            num = value - x0
+            if not math.isfinite(span) or not math.isfinite(num):
+                return None
+            t = num / span
+            out = left_image + t * (right_image - left_image)
+            return out if math.isfinite(out) and 0.0 < out < 1.0 else None
         total = sum((index + 0.5) / n for index in range(less, right))
-        return total / (right - less)
+        out = total / (right - less)
+        return out if math.isfinite(out) and 0.0 < out < 1.0 else None
 
-    return [one(value) for value in values]
+    mapped: list[float] = []
+    for value in values:
+        item = one(float(value))
+        if item is None:
+            return None
+        mapped.append(item)
+    return mapped
 
 
 def _bisect_left(ordered: list[float], value: float) -> int:
@@ -104,13 +120,13 @@ def _bisect_right(ordered: list[float], value: float) -> int:
 def unit_half_distance(left: list[float], right: list[float]) -> float | None:
     if not left or len(left) != len(right):
         return None
-    if any(not math.isfinite(value) for value in (*left, *right)):
+    if any(not _is_finite_float(value) for value in (*left, *right)):
         return None
-    left_norm = math.sqrt(sum(value * value for value in left))
-    right_norm = math.sqrt(sum(value * value for value in right))
-    if left_norm == 0.0 or right_norm == 0.0:
+    left_norm = math.sqrt(sum(float(value) * float(value) for value in left))
+    right_norm = math.sqrt(sum(float(value) * float(value) for value in right))
+    if not math.isfinite(left_norm) or not math.isfinite(right_norm) or left_norm == 0.0 or right_norm == 0.0:
         return None
-    total = sum((a / left_norm - b / right_norm) ** 2 for a, b in zip(left, right))
+    total = sum((float(a) / left_norm - float(b) / right_norm) ** 2 for a, b in zip(left, right))
     distance = math.sqrt(total) / 2.0
     if math.isfinite(distance) and 0.0 <= distance <= 1.0:
         return distance
@@ -125,7 +141,7 @@ def representation_closeness(
     gap_tabicl: float,
 ) -> float | None:
     values = (distance, d_null, d_match, gap_mitra, gap_tabicl)
-    if any(not math.isfinite(value) for value in values):
+    if any(not _is_finite_float(value) for value in values):
         return None
     if not 0.0 <= distance <= 1.0 or not 0.0 <= d_null <= 1.0 or not 0.0 < d_match <= 1.0:
         return None
