@@ -58,6 +58,7 @@ score:
 
 paper:
     python3 ops/ci/paper-prepare.py
+    python3 -B docs/whitepaper/scripts/native_byte_conformance.py --write
     python3 docs/whitepaper/scripts/local_receipts.py
     python3 research/benchmark/verify_paper_numbers.py --write-evidence
     python3 docs/whitepaper/scripts/compute_cost.py
