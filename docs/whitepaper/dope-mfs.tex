@@ -90,7 +90,7 @@ All estimates use validation rows that also compared DOPE's profile with three a
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{figures/teaser.pdf}
-  \caption{\textbf{What DOPE keeps, and at what size.} (a) CatBoost retention at $4n$ (median, 95\% interval) against median charged bytes (bar: interquartile range); dashed: the $10{,}240$-byte cap; dotted: the controls. (b) Paired differences under each auditor; band $\pm\VMargin$; an interval end outside $\FigTeaserXLo$ to $\FigTeaserXHi$ is an edge arrow; open marks: under $90$ lineages. \cref{tab:headline} adds independent marginals and CTGAN, whose intervals lie wholly above that window. All are selection-exposed validation estimates.}
+  \caption{\textbf{What DOPE keeps, and at what size.} CatBoost retention at $4n$ (lineage median and 95\% nested bootstrap interval) against median charged artifact bytes (log scale; horizontal bar: interquartile range). The dashed vertical line marks the $10{,}240$-byte release cap; dotted horizontal lines mark the predictor-only control and four-fold resampled real rows (a row-count diagnostic); open marks denote cohorts below $90$ lineages (\cref{tab:headline} gives the paired Hodges--Lehmann differences under all three auditors). All values are selection-exposed validation estimates.}
   \label{fig:teaser}
 \end{figure}
 

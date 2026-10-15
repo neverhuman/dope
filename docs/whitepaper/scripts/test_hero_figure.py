@@ -59,7 +59,7 @@ class HeroFigureTests(unittest.TestCase):
         self.assertEqual(drawn["outside"], [])
         self.assertEqual(drawn["overlaps"], [])
         self.assertEqual(drawn["tick_overlaps"], [])
-        self.assertGreater(len(drawn["texts"]), 40)
+        self.assertGreaterEqual(len(drawn["texts"]), 18)
 
     def test_no_hero_value_label_is_needed_because_every_point_sits_inside_the_window(self):
         """A value printed at the window edge would cover part of its interval, so the window holds every point."""
