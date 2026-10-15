@@ -502,5 +502,42 @@ mod tests {
         assert!(compact.knowledge_compression_score > bloated.knowledge_compression_score);
         assert!(compact.utility_per_kilobyte > bloated.utility_per_kilobyte);
         assert!(compact.utility_per_encoded_number > bloated.utility_per_encoded_number);
+
+        let zero_utility =
+            knowledge_compression_metrics(1_536, 48, 1_000, 16, 10_240, 0.0).unwrap();
+        assert_eq!(zero_utility.knowledge_compression_score, 0.0);
+        let over_budget =
+            knowledge_compression_metrics(12_288, 48, 1_000, 16, 10_240, 0.95).unwrap();
+        assert_eq!(over_budget.knowledge_compression_score, 0.0);
+
+        assert!(
+            driver_attribution_agreement(
+                &[0.0, 0.0, 0.0, 0.0],
+                &[0.0, 0.0, 0.0, 0.0],
+                Some(&[1, -1, 1, -1]),
+                Some(&[1, -1, 1, -1]),
+            )
+            .is_err()
+        );
+        assert!(
+            driver_attribution_agreement(
+                &[0.6, 0.4, 0.0, 0.0],
+                &[0.6, 0.4, 0.0, 0.0],
+                Some(&[0, 1, 0, 0]),
+                Some(&[0, 1, 0, 0]),
+            )
+            .is_err()
+        );
+        let disjoint = driver_attribution_agreement(
+            &[0.6, 0.4, 0.0, 0.0, 0.0],
+            &[0.0, 0.0, 0.5, 0.5, 0.0],
+            Some(&[1, -1, 0, 0, 0]),
+            Some(&[0, 0, 1, -1, 0]),
+        )
+        .unwrap();
+        assert_eq!(disjoint.k, 2);
+        assert_eq!(disjoint.top_k_jaccard, 0.0);
+        assert_eq!(disjoint.top_k_overlap, 0.0);
+        assert_eq!(disjoint.ndcg_at_k, 0.0);
     }
 }

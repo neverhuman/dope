@@ -76,6 +76,12 @@ pub fn driver_attribution_agreement(
             return Err(MetricError::InvalidEvidence);
         }
     }
+    let real_total = finite(real_importances.iter().sum())?;
+    let syn_total = finite(synthetic_importances.iter().sum())?;
+    let active_real_features = real_importances.iter().filter(|&&v| v > 1e-12).count();
+    if real_total <= 1e-12 || active_real_features == 0 {
+        return Err(MetricError::InvalidEvidence);
+    }
     let sign_agreement = match (real_signs, synthetic_signs) {
         (None, None) => return Err(MetricError::InvalidEvidence),
         (Some(real_s), Some(syn_s))
@@ -88,6 +94,13 @@ pub fn driver_attribution_agreement(
             {
                 return Err(MetricError::InvalidEvidence);
             }
+            if real_importances
+                .iter()
+                .zip(real_s.iter())
+                .any(|(&imp, &sign)| imp > 1e-12 && sign == 0)
+            {
+                return Err(MetricError::InvalidEvidence);
+            }
             let active: Vec<(i8, i8)> = real_s
                 .iter()
                 .copied()
@@ -95,28 +108,20 @@ pub fn driver_attribution_agreement(
                 .filter(|(r, _)| *r != 0)
                 .collect();
             if active.is_empty() {
-                1.0
-            } else {
-                let matches = active.iter().filter(|(r, s)| r == s).count();
-                matches as f64 / active.len() as f64
+                return Err(MetricError::InvalidEvidence);
             }
+            let matches = active.iter().filter(|(r, s)| r == s).count();
+            matches as f64 / active.len() as f64
         }
         _ => return Err(MetricError::InvalidEvidence),
     };
     let k = ((features as f64 * 0.10).ceil() as usize)
         .clamp(5, 20)
         .min(features)
+        .min(active_real_features)
         .max(1);
-    let real_total = finite(real_importances.iter().sum())?;
-    let syn_total = finite(synthetic_importances.iter().sum())?;
-    let (ndcg_at_k, top_k_jaccard, top_k_overlap, l1_attribution_agreement) = if real_total <= 1e-12
+    let (ndcg_at_k, top_k_jaccard, top_k_overlap, l1_attribution_agreement) = if syn_total <= 1e-12
     {
-        if syn_total <= 1e-12 {
-            (1.0, 1.0, 1.0, 1.0)
-        } else {
-            (0.0, 0.0, 0.0, 0.0)
-        }
-    } else if syn_total <= 1e-12 {
         (0.0, 0.0, 0.0, 0.0)
     } else {
         let mut real_order: Vec<usize> = (0..features).collect();
@@ -131,10 +136,18 @@ pub fn driver_attribution_agreement(
                 .total_cmp(&synthetic_importances[a])
                 .then_with(|| a.cmp(&b))
         });
-        let real_top: std::collections::BTreeSet<usize> =
-            real_order.iter().copied().take(k).collect();
-        let syn_top: std::collections::BTreeSet<usize> =
-            syn_order.iter().copied().take(k).collect();
+        let real_top: std::collections::BTreeSet<usize> = real_order
+            .iter()
+            .copied()
+            .filter(|&idx| real_importances[idx] > 1e-12)
+            .take(k)
+            .collect();
+        let syn_top: std::collections::BTreeSet<usize> = syn_order
+            .iter()
+            .copied()
+            .filter(|&idx| synthetic_importances[idx] > 1e-12)
+            .take(k)
+            .collect();
         let intersection = real_top.intersection(&syn_top).count();
         let union = real_top.union(&syn_top).count().max(1);
         let overlap = intersection as f64 / k as f64;
@@ -152,11 +165,12 @@ pub fn driver_attribution_agreement(
                 .iter()
                 .take(k)
                 .enumerate()
+                .filter(|(_, idx)| synthetic_importances[**idx] > 1e-12)
                 .map(|(rank, &idx)| real_importances[idx] / ((rank + 2) as f64).log2())
                 .sum(),
         )?;
         let ndcg = if idcg <= 1e-12 {
-            1.0
+            0.0
         } else {
             finite(dcg / idcg)?.clamp(0.0, 1.0)
         };
@@ -235,8 +249,14 @@ pub fn knowledge_compression_metrics(
     } else {
         0.0
     };
-    let knowledge_compression_score =
-        finite((0.40 * bpc_score + 0.35 * parameter_sparsity_score + 0.25 * log_byte_score).clamp(0.0, 1.0))?;
+    let knowledge_compression_score = if retained_utility > 0.0 && artifact_bytes <= byte_limit {
+        finite(
+            (0.40 * bpc_score + 0.35 * parameter_sparsity_score + 0.25 * log_byte_score)
+                .clamp(0.0, 1.0),
+        )?
+    } else {
+        0.0
+    };
     let positive_utility = retained_utility.max(0.0);
     let utility_per_kilobyte = finite(positive_utility / ((artifact_bytes as f64) / 1024.0))?;
     let utility_per_encoded_number = finite(positive_utility / (encoded_numbers as f64))?;

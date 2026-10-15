@@ -263,7 +263,22 @@ class MfsV3Tests(unittest.TestCase):
         failed = evaluate_v4(no_lift)
         self.assertFalse(failed["eligible"])
         self.assertIsNone(failed["score"])
+        self.assertIsNone(failed["utility_transfer"])
+        self.assertIn("utility_transfer", failed["unavailable_terms"])
         self.assertIn("positive_predictor_lift", failed["failed_gates"])
+
+        over_budget = dict(obs, artifact_bytes=12288)
+        over_budget_report = evaluate_v4(over_budget)
+        self.assertFalse(over_budget_report["eligible"])
+        self.assertIsNone(over_budget_report["knowledge_compression"])
+        self.assertIn("knowledge_compression", over_budget_report["unavailable_terms"])
+        self.assertIn("tier_bytes", over_budget_report["failed_gates"])
+
+        too_few_cols = dict(obs, real_columns=2)
+        col_report = evaluate_v4(too_few_cols)
+        self.assertFalse(col_report["eligible"])
+        self.assertIsNone(col_report["driver_fidelity"])
+        self.assertIn("model_driver_attribution_measured", col_report["failed_gates"])
 
         missing_retention = dict(obs)
         del missing_retention["retention"]

@@ -198,12 +198,23 @@ def evaluate_v4(evidence: dict) -> dict:
         except (KeyError, TypeError, ValueError):
             baseline_lift = None
     lift = baseline_lift if tabular_ok else None
-    utility_transfer = lift["contrastive_utility_score"] if lift is not None else None
+    utility_transfer = (
+        lift["contrastive_utility_score"]
+        if lift is not None and lift["positive_predictor_lift"] and lift["positive_dependence_lift"]
+        else None
+    )
     driver_attr = None
-    if evidence.get("model_driver_attribution_measured") is True:
+    real_cols = evidence.get("real_columns")
+    real_imp = evidence.get("real_importances")
+    if (
+        evidence.get("model_driver_attribution_measured") is True
+        and type(real_cols) is int
+        and isinstance(real_imp, (list, tuple))
+        and real_cols >= len(real_imp)
+    ):
         try:
             driver_attr = driver_attribution_agreement(
-                evidence["real_importances"],
+                real_imp,
                 evidence["synthetic_importances"],
                 evidence.get("real_signs"),
                 evidence.get("synthetic_signs"),
@@ -224,7 +235,9 @@ def evaluate_v4(evidence: dict) -> dict:
     except (TypeError, ValueError):
         compression = None
     knowledge_compression = (
-        compression["knowledge_compression_score"] if compression is not None else None
+        compression["knowledge_compression_score"]
+        if compression is not None and compression["knowledge_compression_score"] > 0.0
+        else None
     )
     vector = evidence.get("mfs_components")
     vector = dict(vector) if isinstance(vector, dict) else {}

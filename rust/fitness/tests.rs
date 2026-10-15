@@ -469,7 +469,27 @@ mod tests {
         let failed_lift = evaluate_v4(&contract, &components, &no_predictor_lift);
         assert!(!failed_lift.eligible);
         assert!(!failed_lift.hard_gates["positive_predictor_lift"]);
+        assert_eq!(failed_lift.utility_transfer, None);
+        assert!(failed_lift
+            .unavailable_terms
+            .iter()
+            .any(|term| term == "utility_transfer"));
         assert_eq!(failed_lift.score, None);
+
+        let mut over_budget = v4_observation();
+        over_budget.artifact_bytes = 12_288;
+        let over_budget_report = evaluate_v4(&contract, &components, &over_budget);
+        assert!(!over_budget_report.eligible);
+        assert!(!over_budget_report.hard_gates["tier_bytes"]);
+        assert_eq!(over_budget_report.knowledge_compression, None);
+        assert_eq!(over_budget_report.score, None);
+
+        let mut too_few_cols = v4_observation();
+        too_few_cols.real_columns = 2;
+        let col_report = evaluate_v4(&contract, &components, &too_few_cols);
+        assert!(!col_report.eligible);
+        assert_eq!(col_report.driver_fidelity, None);
+        assert!(!col_report.hard_gates["model_driver_attribution_measured"]);
     }
 
     #[test]

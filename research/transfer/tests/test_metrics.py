@@ -179,6 +179,38 @@ class MetricsTests(unittest.TestCase):
                 [1, -1],
                 [1, -1],
             )
+        with self.assertRaises(ValueError):
+            driver_attribution_agreement(
+                [0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0],
+                [1, -1, 1, -1],
+                [1, -1, 1, -1],
+            )
+        with self.assertRaises(ValueError):
+            driver_attribution_agreement(
+                [0.6, 0.4, 0.0, 0.0],
+                [0.6, 0.4, 0.0, 0.0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+            )
+        disjoint = driver_attribution_agreement(
+            [0.6, 0.4, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.5, 0.5, 0.0],
+            [1, -1, 0, 0, 0],
+            [0, 0, 1, -1, 0],
+        )
+        self.assertEqual(disjoint["k"], 2)
+        self.assertEqual(disjoint["top_k_jaccard"], 0.0)
+        self.assertEqual(disjoint["top_k_overlap"], 0.0)
+        self.assertEqual(disjoint["ndcg_at_k"], 0.0)
+        self.assertEqual(
+            knowledge_compression_metrics(1536, 48, 1000, 16, 10240, 0.0)["knowledge_compression_score"],
+            0.0,
+        )
+        self.assertEqual(
+            knowledge_compression_metrics(12288, 48, 1000, 16, 10240, 0.95)["knowledge_compression_score"],
+            0.0,
+        )
 
     def test_rank_reversal_is_scored_in_raw_units(self):
         case = GOLDEN["rank_reversal"]
