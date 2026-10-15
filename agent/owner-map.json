@@ -546,6 +546,10 @@
     "research/transfer/tests/test_scheduler.py": "external-evidence",
     "research/transfer/tests/test_executor.py": "external-evidence",
     "schemas/transfer-execution-plan-v1.schema.json": "external-evidence",
-    "tests/support/native_rank_feasible_interactions.rs": "rust-core"
+    "tests/support/native_rank_feasible_interactions.rs": "rust-core",
+    "research/transfer/claims.py": "external-evidence",
+    "research/transfer/tests/test_claims.py": "external-evidence",
+    "schemas/claim-vnext-v1.schema.json": "external-evidence",
+    "docs/whitepaper/scripts/test_vnext_paper.py": "governance"
   }
 }

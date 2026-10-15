@@ -31,7 +31,7 @@ HEADLINE = "kumo_tabular_l"
 
 
 def boolean_gate_evidence(seeds: list[dict]) -> dict:
-    """Versioned evidence projection; legacy failed_gates still blocks unknowns."""
+    """Versioned tri-state diagnostics; failed_gates still blocks unknown evidence."""
     complete = (
         len(seeds) == len(SAMPLE_SEEDS)
         and all(type(seed.get("sample_seed")) is int for seed in seeds)

@@ -1494,8 +1494,8 @@
       "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
     },
     "docs/whitepaper/scripts/vnext_paper.py": {
-      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
-      "purpose": "check draft-only falsifiable paper scope and claim placeholders; paper build and scientific replay require their separate gates"
+      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_vnext_paper.py -v",
+      "purpose": "verify unchanged draft/venue/rights refusal and measured rendering of the real verified claim graph, distinct decision states and counts, tampering/stale/vendor/bool refusals, escaped TeX and unqualified output; full paper-tests discovery remains mandatory locally and in CPU CI"
     },
     "docs/vnext/RELATED_WORK.md": {
       "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py",
@@ -1555,7 +1555,7 @@
     },
     "research/transfer/adapters/generators/distillation.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+      "purpose": "verify exact serialized prototype and dependency charges, constructor/refit snapshots that survive caller nested-container mutation with matching hash and cap, and cleared state after refused refits through full local/CPU transfer discovery; no model benefit or scientific qualification inferred"
     },
     "research/transfer/adapters/generators/neural.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -1571,7 +1571,7 @@
     },
     "research/transfer/tests/test_controls.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
-      "purpose": "verify per-source identity/query bindings and retained interruption charges; selection families cannot claim held-out status, vendor flags fail closed, controls charge exact serialized rows/prototypes and refused refits clear prior state, inferential outputs declare finite variance and lack distribution-free qualification; historical decoding and prior fixtures retained"
+      "purpose": "verify full control accounting, exact serialized coreset/prototype charges, constructor/refit snapshots with immutable retained payload after caller mutation, and cleared state after refused refits through full local/CPU transfer discovery; no model benefit or scientific qualification inferred"
     },
     "research/transfer/tests/test_neural_generators.py": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
@@ -2204,6 +2204,22 @@
     "tests/support/native_rank_feasible_interactions.rs": {
       "command": "cargo test --locked --test vnext_byte_allocation",
       "purpose": "verify all5 actual native compilation/allocation fixtures including48-feature rank-feasible distractor/redundancy and typed residual families; accepted artifact/report bytes, finite ranks, canonical consumed interactions and attempt/table budgets remain bounded; engineering fixtures only, no recovery/calibration/tail/equal-compute qualification"
+    },
+    "research/transfer/claims.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify receipt-pinned claim identities, separate raw-gap/adjusted-Z/equivalence decisions, preserved negative/unavailable limitation states with positive headline refusal, complete fit/sample denominators, stale/missing/mixed/vendor/bool/budget refusals and public receipts projection through mandatory local and CPU discovery; synthetic/development graphs remain unqualified with campaign and N21 admission false"
+    },
+    "research/transfer/tests/test_claims.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify receipt-pinned claim identities, separate raw-gap/adjusted-Z/equivalence decisions, preserved negative/unavailable limitation states with positive headline refusal, complete fit/sample denominators, stale/missing/mixed/vendor/bool/budget refusals and public receipts projection through mandatory local and CPU discovery; synthetic/development graphs remain unqualified with campaign and N21 admission false"
+    },
+    "schemas/claim-vnext-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "exercise the versioned claim document and its receipt-binding refusals through full transfer discovery; schema declarations do not grant measured qualification or campaign admission"
+    },
+    "docs/whitepaper/scripts/test_vnext_paper.py": {
+      "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_vnext_paper.py -v",
+      "purpose": "verify unchanged draft/venue/rights refusal and measured rendering of the real verified claim graph, distinct decision states and counts, tampering/stale/vendor/bool refusals, escaped TeX and unqualified output; full paper-tests discovery remains mandatory locally and in CPU CI"
     }
   }
 }
