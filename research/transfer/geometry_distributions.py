@@ -67,7 +67,8 @@ _PLOT_ESTIMANDS = frozenset({
 def _require_pair_budget(left_rows: int, right_rows: int, max_pairs: int, width: int = 1) -> None:
     """Refuse before the rows-by-rows-by-width broadcast.
 
-    max_pairs bounds that one temporary's element count. The squared copy is a
+    max_pairs bounds the element count of the allocated difference array.
+    That array is left rows by right rows by width. The squared copy is a
     second array of the same shape, so a traced peak is about two broadcasts,
     roughly max_pairs times 16 bytes. Pair counts alone do not bound it. The
     product is a Python int. Width 1 keeps the historical pair bound.
@@ -112,10 +113,11 @@ def euclidean_role_distributions(
     """Euclidean distances for real-real, real-synthetic, and synthetic-synthetic.
 
     The two clouds have the same row count and the same width. Each call is one
-    space and one encoder. Pair counts are not row counts. The temporary
-    broadcast is rows by rows by width, and the squared copy doubles that
-    peak. The element count is refused before the broadcast when it exceeds
-    max_pairs. Pairs are not subsampled.
+    space and one encoder. Pair counts are not row counts. The allocated
+    difference broadcast is rows by rows by width. The squared copy is a
+    second array of that shape, so a traced peak is about two arrays, roughly
+    max_pairs times 16 bytes. The element count is refused before the broadcast
+    when it exceeds max_pairs. Pairs are not subsampled.
     """
     if space not in SPACES:
         raise ValueError("unknown coordinate space")

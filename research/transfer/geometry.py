@@ -36,7 +36,7 @@ def coordinate_distance(left, right, *, space: str, encoder_id: str, other_space
     return float(np.linalg.norm(left - right))
 
 
-# Ceiling on the summed role temporaries. The number matches the distribution
+# Ceiling on the summed allocated role arrays. The number matches the distribution
 # pair ceiling. The default accepts the existing tiny fixtures and is not a campaign size.
 METRIC_DEFAULT_ELEMENTS = 1_000_000
 METRIC_ELEMENT_LIMIT = 10_000_000
@@ -75,7 +75,7 @@ def _rbf(left, right, sigma):
 def mmd2_unbiased(left, right, *, sigma: float, max_elements: int = METRIC_DEFAULT_ELEMENTS) -> float:
     """Unbiased MMD-squared. The value is unclipped and may be negative.
 
-    max_elements bounds the three role temporaries before any broadcast.
+    max_elements bounds the allocated role arrays before any broadcast.
     The number is not a privacy result and does not qualify transfer.
     """
     _metric_budget(max_elements)
@@ -106,7 +106,7 @@ def _pairwise_norms(left, right):
 def energy_distance_unbiased(left, right, *, max_elements: int = METRIC_DEFAULT_ELEMENTS) -> float:
     """Unbiased energy distance. The diagonal is excluded and the value may be negative.
 
-    max_elements bounds the three role temporaries before any broadcast.
+    max_elements bounds the allocated role arrays before any broadcast.
     The number is not a privacy result and does not qualify transfer.
     """
     _metric_budget(max_elements)
