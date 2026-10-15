@@ -1,11 +1,13 @@
 """Charge the native raw-complete profile after the inspect-raw digest check.
 
-DOPERAW1 is 8 magic bytes, a little-endian state length, a little-endian DPK
-length, and 32 bytes of unkeyed BLAKE3 over the following state||DPK. The
-carrier charge is that whole artifact. Generic runtime bytes and the mapped
-cold closure stay None: sample-raw-isolated measures those separately, and a
-missing number is not a zero. This check does not reload affine columns, decode
-the kernel, or apply the numeric-constraint and Task fix still owed by native.
+DOPERAW1 and DOPERAW2 share 8 magic bytes, a little-endian state length, a
+little-endian DPK length, and 32 bytes of unkeyed BLAKE3 over the following
+state||DPK. The carrier charge is that whole artifact. Generic runtime bytes
+and the mapped cold closure stay None: sample-raw-isolated measures those
+separately, and a missing number is not a zero. DOPERAW2 requires DPK 3.3
+regression and an uncompressed noise section of opcode 4, version 1, kind 0-3.
+The kind fields are counted and discarded. This check does not decompress,
+decode the kernel, reload affine columns, or publish offsets, scales, or knots.
 A passed charge is not confirmation, a right, an official asset, a release,
 formal DP, or HIPAA de-identification. Historical DPK tier totals are a
 different account, and inventory-only does not replay this check.
@@ -16,11 +18,15 @@ from types import MappingProxyType
 from research.transfer.blake3_digest import blake3_hash
 
 RAW_MAGIC = b"DOPERAW1"
+RESIDUAL_MAGIC = b"DOPERAW2"
 RAW_HEADER = 56
 RAW_MAX_BYTES = 32 * 1024 * 1024
 RAW_HANDLER = "native-raw-complete-v1"
+RESIDUAL_BYTE_PROFILE = "native-raw-complete-residual-v1"
 RAW_KIND = "doperaw1"
 RAW_CAPABILITIES = ["byte-inventory", "native-raw-sample"]
+_NOISE_TAG = 5
+_RESIDUAL_FIELDS = {0: 0, 1: 2, 2: 4, 3: 17}
 _FEATURE_ROLES = frozenset({"feature", "target"})
 _KNOWN_ROLES = _FEATURE_ROLES | {
     "entity_key",
@@ -64,6 +70,80 @@ def profile_limits():
     }
 
 
+def _uncompressed_noise(payload):
+    """Return the tag-5 body. A compressed tag 5 is closed, not decoded."""
+    from research.transfer.bundle import BundleError
+    from research.transfer.bundle_io import _varint
+
+    minor = payload[5]
+    maximum = 6 if payload[:4] == b"DPK3" and minor >= 2 else 5
+    data = payload[RAW_HEADER:]
+    offset = 0
+    prior = 0
+    noise = None
+    compressed = False
+    while offset < len(data):
+        tag_byte = data[offset]
+        offset += 1
+        tag = tag_byte & 0x7F
+        if tag == 0 or tag > maximum or tag <= prior:
+            _fail("raw_payload_limits_invalid")
+        prior = tag
+        try:
+            encoded_length, offset = _varint(data, offset)
+            if tag_byte & 0x80:
+                _, offset = _varint(data, offset)
+        except BundleError:
+            _fail("raw_payload_limits_invalid")
+        if encoded_length > len(data) - offset:
+            _fail("raw_payload_limits_invalid")
+        if tag == _NOISE_TAG:
+            if tag_byte & 0x80:
+                compressed = True
+            else:
+                noise = data[offset:offset + encoded_length]
+        offset += encoded_length
+    return noise, compressed
+
+
+def _residual_fields_fit(body):
+    """Consume opcode 4, version 1, and kind 0-3. Discard every integer."""
+    from research.transfer.bundle import BundleError
+    from research.transfer.bundle_io import _varint
+
+    if len(body) < 3 or body[0] != 4 or body[1] != 1 or body[2] not in _RESIDUAL_FIELDS:
+        return False
+    offset = 5 if body[2] == 2 else 3
+    if offset > len(body):
+        return False
+    try:
+        for _ in range(_RESIDUAL_FIELDS[body[2]]):
+            _, offset = _varint(body, offset)
+    except BundleError:
+        return False
+    return offset == len(body)
+
+
+def _require_residual_agreement(magic, payload):
+    noise, compressed = _uncompressed_noise(payload)
+    residual_payload = (
+        payload[:4] == b"DPK3"
+        and payload[4] == 3
+        and payload[5] == 3
+        and payload[6] == 1
+        and payload[7] == 0
+        and not compressed
+        and noise is not None
+        and _residual_fields_fit(noise)
+    )
+    if magic == RESIDUAL_MAGIC:
+        if not residual_payload:
+            _fail("raw_residual_profile_mismatch")
+    elif noise is not None and noise[:1] == b"\x04":
+        # DOPERAW1 still carries uncompressed noise opcodes 0-3. Opcode 4 is residual.
+        _fail("raw_residual_profile_mismatch")
+
+
 def account_raw_artifact(artifact, limits=None):
     """Split one self-contained artifact after BLAKE3(state||DPK) matches bytes 24..56.
 
@@ -76,7 +156,8 @@ def account_raw_artifact(artifact, limits=None):
     limits = limits or BundleLimits()
     if type(artifact) is not bytes or len(artifact) < RAW_HEADER or len(artifact) > RAW_MAX_BYTES:
         _fail("raw_artifact_invalid")
-    if artifact[:8] != RAW_MAGIC:
+    magic = artifact[:8]
+    if magic != RAW_MAGIC and magic != RESIDUAL_MAGIC:
         _fail("raw_artifact_invalid")
     state_len = int.from_bytes(artifact[8:16], "little")
     payload_len = int.from_bytes(artifact[16:24], "little")
@@ -91,8 +172,9 @@ def account_raw_artifact(artifact, limits=None):
         preflight_dpk(payload, limits)
     except BundleError:
         _fail("raw_payload_limits_invalid")
+    _require_residual_agreement(magic, payload)
     charge = {
-        "byte_profile_id": RAW_HANDLER,
+        "byte_profile_id": RESIDUAL_BYTE_PROFILE if magic == RESIDUAL_MAGIC else RAW_HANDLER,
         "framing_bytes": RAW_HEADER,
         "transform_schema_bytes": state_len,
         "native_payload_bytes": payload_len,
@@ -103,6 +185,11 @@ def account_raw_artifact(artifact, limits=None):
         "mapped_runtime_cold_closure": "separate_unmeasured",
     }
     charge.update(profile_limits())
+    if magic == RESIDUAL_MAGIC:
+        charge["version"] = 2
+        charge["profile"] = "raw-numeric-residual-v1"
+        charge["capability"] = "fully_observed_numeric_features_continuous_regression"
+        charge["mathematical_parameter_count"] = None
     # The label is the algorithm that matched. It is not a kernel decode.
     charge["content_hash"] = "blake3_state_plus_dpk"
     charge["declared_columns_checked"] = False
