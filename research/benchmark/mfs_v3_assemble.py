@@ -2,6 +2,9 @@
 
 Missing auditors, failed gates, and undefined retentions stay null.
 The scalar comes only from ``evaluate_v3``.
+Boolean gates pass only on the complete expected seed set with literal True
+measurements. A literal False establishes failure even with other evidence
+missing; otherwise missing, malformed, empty or incomplete evidence stays null.
 """
 
 from __future__ import annotations
@@ -25,6 +28,33 @@ from research.benchmark.mfs_v3_score import PREREQUISITES, evaluate_v3
 
 AUDITORS = ("kumo_tabular_l", "mitra_v2", "tabicl2")
 HEADLINE = "kumo_tabular_l"
+
+
+def boolean_gate_evidence(seeds: list[dict]) -> dict:
+    """Versioned evidence projection; legacy failed_gates still blocks unknowns."""
+    complete = (
+        len(seeds) == len(SAMPLE_SEEDS)
+        and all(type(seed.get("sample_seed")) is int for seed in seeds)
+        and {seed["sample_seed"] for seed in seeds} == set(SAMPLE_SEEDS)
+    )
+    values = {}
+    for key in (*PREREQUISITES, "near_copy_ok", "cleartext_absent"):
+        measured = [seed.get(key) for seed in seeds]
+        values[key] = (
+            False if any(value is False for value in measured)
+            else True if complete and all(value is True for value in measured)
+            else None
+        )
+    def gate_name(key):
+        return "near_copy" if key == "near_copy_ok" else key
+    return {
+        "format": "dope-mfs-v3-boolean-gate-evidence-v1",
+        "version": 1,
+        "complete_seed_set": complete,
+        "values": values,
+        "unavailable_gates": [gate_name(key) for key, value in values.items() if value is None],
+        "measured_failed_gates": [gate_name(key) for key, value in values.items() if value is False],
+    }
 
 
 def _finite(value) -> bool:
@@ -123,6 +153,7 @@ def utility_component(retentions: list[float], bound) -> float | None:
 
 
 def score_lineage(seeds: list[dict], bound) -> dict:
+    gates = boolean_gate_evidence(seeds)
     by_auditor = {
         name: lineage_retention([seed.get("auditors", {}).get(name) or {} for seed in seeds])
         for name in AUDITORS
@@ -139,12 +170,12 @@ def score_lineage(seeds: list[dict], bound) -> dict:
         distribution = distribution_fidelity(marginal, sliced, mmd)
     bytes_known = [type(seed.get("artifact_bytes")) is int and 0 < seed["artifact_bytes"] <= BYTE_CAP
                    for seed in seeds]
-    artifact_bytes = max(seed["artifact_bytes"] for seed in seeds) if all(bytes_known) and seeds else None
+    artifact_bytes = max(seed["artifact_bytes"] for seed in seeds) if gates["complete_seed_set"] and all(bytes_known) else None
     headline_rows = [seed.get("auditors", {}).get(HEADLINE) or {} for seed in seeds]
     headline_retentions = [seed_retention(row) for row in headline_rows]
     # The gate needs finite losses from every auditor. A noninformative retention
     # is still a completed measurement when the three losses are finite.
-    losses_ready = all(
+    losses_ready = gates["complete_seed_set"] and all(
         all(
             _finite((seed.get("auditors", {}).get(name) or {}).get(key))
             and (seed["auditors"][name][key] >= 0)
@@ -154,16 +185,13 @@ def score_lineage(seeds: list[dict], bound) -> dict:
         for name in AUDITORS
     )
     evidence = {
-        **{key: len(seeds) == len(SAMPLE_SEEDS) and all(seed.get(key) is True for seed in seeds)
-           for key in PREREQUISITES},
+        **gates["values"],
         "normalizer": NORMALIZER,
         "utility_protocol": TABULAR_PROTOCOL,
         "utility_auditors": list(TABULAR_AUDITORS) if losses_ready else [],
         "encoder": HEADLINE,
-        "exact_row_matches": 0 if seeds and all(type(seed.get("exact_row_matches")) is int
+        "exact_row_matches": 0 if gates["complete_seed_set"] and all(type(seed.get("exact_row_matches")) is int
                                                and seed["exact_row_matches"] == 0 for seed in seeds) else None,
-        "near_copy_ok": all(seed.get("near_copy_ok") is True for seed in seeds),
-        "cleartext_absent": all(seed.get("cleartext_absent") is True for seed in seeds),
         "membership_auc": _max([row.get("membership_auc") for row in holdouts]),
         "attribute_inference_advantage": _max([row.get("attribute_inference_advantage") for row in holdouts]),
         "artifact_bytes": artifact_bytes,
@@ -188,6 +216,7 @@ def score_lineage(seeds: list[dict], bound) -> dict:
     return {
         "counts_as_dope_win": False,
         "failed_gates": report["failed_gates"],
+        "gate_evidence": gates,
         "official_tests_opened": False,
         "retention": by_auditor,
         "score": report["score"],

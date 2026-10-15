@@ -9,6 +9,7 @@ from research.benchmark.mfs_v3_panel import (
     DENSITY_SPECS,
     MODEL_FILES,
     REFUSED_ENCODERS,
+    SAMPLE_SEEDS,
     VECTOR_PIN,
     apply_map,
     build_nulls,
@@ -244,6 +245,76 @@ def _measured_seed(cleartext=True):
 
 
 class AssembleScoreTest(unittest.TestCase):
+    @staticmethod
+    def complete_seeds():
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+        return [dict(_measured_seed(), sample_seed=seed,
+                     **{key: True for key in PREREQUISITES}) for seed in SAMPLE_SEEDS]
+
+    def test_complete_boolean_measurements_pass_in_any_seed_order(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage
+        report = score_lineage(self.complete_seeds()[::-1], lambda values: 0.8)
+        self.assertIsNotNone(report["score"])
+        gates = report["gate_evidence"]
+        self.assertTrue(all(value is True for value in gates["values"].values()))
+        self.assertEqual(gates["unavailable_gates"], [])
+        self.assertEqual(gates["measured_failed_gates"], [])
+
+    def test_missing_null_and_bool_like_measurements_are_unavailable(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+        missing = object()
+        for key in (*PREREQUISITES, "near_copy_ok", "cleartext_absent"):
+            gate = "near_copy" if key == "near_copy_ok" else key
+            for value in (missing, None, 0, 1, 0.0, 1.0, "true", "false", [], {}):
+                with self.subTest(key=key, value=value):
+                    seeds = self.complete_seeds()
+                    if value is missing:
+                        seeds[0].pop(key)
+                    else:
+                        seeds[0][key] = value
+                    report = score_lineage(seeds, lambda values: 0.8)
+                    self.assertIsNone(report["score"])
+                    self.assertIn(gate, report["failed_gates"])
+                    self.assertIsNone(report["gate_evidence"]["values"][key])
+                    self.assertIn(gate, report["gate_evidence"]["unavailable_gates"])
+                    self.assertNotIn(gate, report["gate_evidence"]["measured_failed_gates"])
+
+    def test_measured_false_survives_missing_or_incomplete_evidence(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage
+        from research.benchmark.mfs_v3_score import PREREQUISITES
+        for key in (*PREREQUISITES, "near_copy_ok", "cleartext_absent"):
+            gate = "near_copy" if key == "near_copy_ok" else key
+            for count in (1, 3):
+                with self.subTest(key=key, count=count):
+                    seeds = self.complete_seeds()[:count]
+                    seeds[0][key] = False
+                    if count == 3:
+                        seeds[1].pop(key)
+                    report = score_lineage(seeds, lambda values: 0.8)
+                    self.assertIsNone(report["score"])
+                    self.assertIn(gate, report["failed_gates"])
+                    self.assertIs(report["gate_evidence"]["values"][key], False)
+                    self.assertIn(gate, report["gate_evidence"]["measured_failed_gates"])
+                    self.assertNotIn(gate, report["gate_evidence"]["unavailable_gates"])
+
+    def test_empty_partial_extra_or_duplicate_seed_sets_never_pass(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage
+        complete = self.complete_seeds()
+        cases = [[], complete[:1], complete[:2], complete + complete[:1],
+                 [complete[0], complete[0], complete[2]]]
+        for invalid_id in (None, True, 101.0, "101", [], 999):
+            seeds = self.complete_seeds()
+            seeds[0]["sample_seed"] = invalid_id
+            cases.append(seeds)
+        for seeds in cases:
+            with self.subTest(seed_ids=[seed.get("sample_seed") for seed in seeds]):
+                report = score_lineage(seeds, lambda values: 0.8)
+                self.assertIsNone(report["score"])
+                self.assertTrue(all(value is None for value in report["gate_evidence"]["values"].values()))
+                self.assertEqual(report["gate_evidence"]["measured_failed_gates"], [])
+                self.assertEqual(len(report["gate_evidence"]["unavailable_gates"]), 6)
+
     def test_distribution_uses_the_production_mix(self):
         from research.benchmark.mfs_v3_assemble import distribution_fidelity
 
@@ -255,7 +326,7 @@ class AssembleScoreTest(unittest.TestCase):
     def test_legacy_lineage_without_prerequisite_evidence_stays_null(self):
         from research.benchmark.mfs_v3_assemble import panel_receipt, score_lineage
 
-        seeds = [_measured_seed() for _ in range(3)]
+        seeds = [dict(_measured_seed(), sample_seed=seed) for seed in SAMPLE_SEEDS]
         scored = score_lineage(seeds, lambda values: sum(values) / len(values))
         self.assertFalse(scored["counts_as_dope_win"])
         self.assertIsNone(scored["superiority"])
@@ -263,7 +334,7 @@ class AssembleScoreTest(unittest.TestCase):
         self.assertTrue(set(PREREQUISITES).issubset(scored["failed_gates"]))
         self.assertAlmostEqual(scored["retention"]["kumo_tabular_l"], 0.8)
         self.assertIsNone(scored["score"])
-        withheld = score_lineage([_measured_seed(cleartext=None) for _ in range(3)], lambda values: 0.8)
+        withheld = score_lineage([dict(_measured_seed(cleartext=None), sample_seed=seed) for seed in SAMPLE_SEEDS], lambda values: 0.8)
         self.assertIsNone(withheld["score"])
         self.assertIn("cleartext_absent", withheld["failed_gates"])
         self.assertAlmostEqual(withheld["retention"]["kumo_tabular_l"], 0.8)
@@ -275,7 +346,7 @@ class AssembleScoreTest(unittest.TestCase):
         from research.benchmark.mfs_v3_assemble import score_lineage
         from research.benchmark.mfs_v3_score import PREREQUISITES
 
-        seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+        seeds = [dict(_measured_seed(), sample_seed=seed, **{key: True for key in PREREQUISITES}) for seed in SAMPLE_SEEDS]
         self.assertIsNotNone(score_lineage(seeds, lambda values: 0.8)["score"])
         seeds[0]["artifact_bytes"] = 1000.5
         self.assertIn("tier_bytes", score_lineage(seeds, lambda values: 0.8)["failed_gates"])
@@ -321,14 +392,14 @@ class AssembleScoreTest(unittest.TestCase):
         ):
             for value in values:
                 with self.subTest(field=field, value=value):
-                    seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+                    seeds = [dict(_measured_seed(), sample_seed=seed, **{key: True for key in PREREQUISITES}) for seed in SAMPLE_SEEDS]
                     seeds[0][field] = value
                     report = score_lineage(seeds, lambda values: 0.8)
                     self.assertIsNone(report["score"])
                     self.assertIn(gate, report["failed_gates"])
         for field, gate in (("membership_auc", "membership_auc"),
                             ("attribute_inference_advantage", "attribute_inference")):
-            seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+            seeds = [dict(_measured_seed(), sample_seed=seed, **{key: True for key in PREREQUISITES}) for seed in SAMPLE_SEEDS]
             seeds[0]["holdout"][field] = -1.0
             report = score_lineage(seeds, lambda values: 0.8)
             self.assertIsNone(report["score"])
@@ -343,7 +414,7 @@ class AssembleScoreTest(unittest.TestCase):
         for field in fields:
             for value in (-0.1, 1.1):
                 with self.subTest(field=field, value=value):
-                    seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+                    seeds = [dict(_measured_seed(), sample_seed=seed, **{key: True for key in PREREQUISITES}) for seed in SAMPLE_SEEDS]
                     seeds[0]["holdout"][field] = value
                     report = score_lineage(seeds, lambda values: 0.8)
                     self.assertIsNone(report["score"])
@@ -364,7 +435,7 @@ class AssembleScoreTest(unittest.TestCase):
                 ("synthetic_loss", -0.1, "tabular_transfer"),
             ):
                 with self.subTest(auditor=auditor, field=field, value=value):
-                    seeds = [dict(_measured_seed(), **{key: True for key in PREREQUISITES}) for _ in range(3)]
+                    seeds = [dict(_measured_seed(), sample_seed=seed, **{key: True for key in PREREQUISITES}) for seed in SAMPLE_SEEDS]
                     seeds[0]["auditors"][auditor][field] = value
                     report = score_lineage(seeds, lambda values: 0.8)
                     self.assertIsNone(report["score"])
