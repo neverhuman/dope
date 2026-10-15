@@ -13,7 +13,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = 'f3477fb08ed5636626847e21cbceead5de44f9c2fc95449fb107065e218b4d7a'
+LOCK_SHA256 = 'e17f3461f1d322abe036e9c7c80e5abf3b0534d91563ff4b6b30a7a914629b96'
+NATIVE_BYTE_PIN = 'docs/whitepaper/receipts/native-byte-conformance-v1.json'
+NATIVE_BYTE_CHECKER = 'docs/whitepaper/scripts/native_byte_conformance.py'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'
 CONTROL_PANEL = 'research/benchmark/results/review-fixes-controls-v1/panel.json'
 CONTROL_RENDERER = 'docs/whitepaper/scripts/review_controls.py'
@@ -153,7 +155,8 @@ def _load_authenticated_graph():
         relative = Path(name)
         if (relative.is_absolute() or '..' in relative.parts or relative.as_posix() != name
                 or (relative.suffix != '.json' and name not in JSONL_INPUTS)
-                or not name.startswith(('research/benchmark/results/', 'research/benchmark/review_fixes/'))):
+                or not (name == NATIVE_BYTE_PIN or name.startswith(
+                    ('research/benchmark/results/', 'research/benchmark/review_fixes/')))):
             raise ValueError('invalid review paper input path')
         path = REPO / relative
         if path.resolve() != REPO.resolve() / relative:
@@ -305,15 +308,28 @@ def authenticate_build(*, log_directory=None):
                         else log_directory / 'render-commands.json')
         commands = []
 
-        def run_renderer(command, log):
+        def run_renderer(command, log, *, cwd=root):
             started = time.monotonic()
-            result = subprocess.run(command, cwd=root, stdout=log, stderr=subprocess.STDOUT)
-            commands.append({'command': command, 'cwd': str(root), 'log': str(log_path),
+            result = subprocess.run(command, cwd=cwd, stdout=log, stderr=subprocess.STDOUT)
+            commands.append({'command': command, 'cwd': str(cwd), 'log': str(log_path),
                              'exit': result.returncode, 'elapsed_seconds': time.monotonic() - started})
             command_path.write_text(json.dumps(commands, indent=2) + '\n')
             result.check_returncode()
 
         with log_path.open('wb') as log:
+            if NATIVE_BYTE_PIN in inputs:
+                # Check only captured bytes in a separate scratch root; do not
+                # seed the numerical render inventory with committed outputs.
+                conformance_root = root / 'native-byte-conformance'
+                captured = dict(verified.inputs + verified.code + verified.consumed)
+                for name in (NATIVE_BYTE_PIN, NATIVE_BYTE_CHECKER, 'README.md',
+                             'docs/whitepaper/supplement.tex',
+                             'docs/whitepaper/generated/native-byte-conformance.tex'):
+                    path = conformance_root / name
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(captured[name])
+                run_renderer([sys.executable, '-B', str(conformance_root / NATIVE_BYTE_CHECKER)],
+                             log, cwd=conformance_root)
             # Numerical replay runs once from the same captured local code and
             # inputs as rendering. No live imported reducer, cached module or
             # caller-supplied authentication receipt is reused by the driver.

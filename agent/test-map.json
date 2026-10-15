@@ -2220,6 +2220,22 @@
     "docs/whitepaper/scripts/test_vnext_paper.py": {
       "command": "python3 -B docs/whitepaper/scripts/vnext_paper.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_vnext_paper.py -v",
       "purpose": "verify unchanged draft/venue/rights refusal and measured rendering of the real verified claim graph, distinct decision states and counts, tampering/stale/vendor/bool refusals, escaped TeX and unqualified output; full paper-tests discovery remains mandatory locally and in CPU CI"
+    },
+    "docs/whitepaper/scripts/native_byte_conformance.py": {
+      "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
+      "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
+    },
+    "docs/whitepaper/scripts/test_native_byte_conformance.py": {
+      "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
+      "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
+    },
+    "docs/whitepaper/receipts/native-byte-conformance-v1.json": {
+      "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
+      "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
+    },
+    "docs/whitepaper/generated/native-byte-conformance.tex": {
+      "command": "python3 -B docs/whitepaper/scripts/native_byte_conformance.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_native_byte_conformance.py -v",
+      "purpose": "bind one measured native artifact to its exact source-free witness, named complete-byte profile and labeled README/supplement totals; reject malformed hashes, shape/bounds errors, document drift and private fields; canonical build checks the authenticated captured witness"
     }
   }
 }

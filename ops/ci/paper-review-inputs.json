@@ -1,5 +1,9 @@
 {
   "files": {
+    "docs/whitepaper/receipts/native-byte-conformance-v1.json": {
+      "bytes": 3091,
+      "sha256": "c4771f0b0723c2ecae086da1ec71df286b690e60d67dc4fe921982619327a4e6"
+    },
     "research/benchmark/results/arf-matched-population-validation.json": {
       "bytes": 6807387,
       "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"

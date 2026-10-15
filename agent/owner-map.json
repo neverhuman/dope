@@ -550,6 +550,10 @@
     "research/transfer/claims.py": "external-evidence",
     "research/transfer/tests/test_claims.py": "external-evidence",
     "schemas/claim-vnext-v1.schema.json": "external-evidence",
-    "docs/whitepaper/scripts/test_vnext_paper.py": "governance"
+    "docs/whitepaper/scripts/test_vnext_paper.py": "governance",
+    "docs/whitepaper/scripts/native_byte_conformance.py": "external-evidence",
+    "docs/whitepaper/scripts/test_native_byte_conformance.py": "external-evidence",
+    "docs/whitepaper/receipts/native-byte-conformance-v1.json": "external-evidence",
+    "docs/whitepaper/generated/native-byte-conformance.tex": "external-evidence"
   }
 }
