@@ -271,6 +271,8 @@ pub fn weighted_cvar(values: &[f64], weights: &[f64], alpha: f64) -> Result<f64,
     finite(result / (1.0 - alpha))
 }
 
+include!("transfer_metrics/mfs_v4.rs");
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -300,6 +302,123 @@ mod tests {
                 _ => panic!("unknown golden ratio disposition"),
             };
             assert_eq!(summary.ratio, ratio);
+        }
+        if let Some(mfs_v4) = corpus.get("mfs_v4") {
+            let lift_case = &mfs_v4["control_contrastive_lift"];
+            let lift = control_contrastive_lift(
+                lift_case["retention"].as_f64().unwrap(),
+                lift_case["predictor_only_retention"].as_f64().unwrap(),
+                lift_case["independent_marginals_retention"]
+                    .as_f64()
+                    .unwrap(),
+                lift_case["real_bootstrap_4n_retention"].as_f64(),
+            )
+            .unwrap();
+            assert!(
+                (lift.lift_over_predictor_only
+                    - lift_case["lift_over_predictor_only"].as_f64().unwrap())
+                .abs()
+                    < 1e-12
+            );
+            assert!(
+                (lift.lift_over_independent_marginals
+                    - lift_case["lift_over_independent_marginals"]
+                        .as_f64()
+                        .unwrap())
+                .abs()
+                    < 1e-12
+            );
+            assert!(
+                (lift.contrastive_utility_score
+                    - lift_case["contrastive_utility_score"].as_f64().unwrap())
+                .abs()
+                    < 1e-12
+            );
+
+            let drv_case = &mfs_v4["driver_attribution"];
+            let real_imp: Vec<f64> = drv_case["real_importances"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_f64().unwrap())
+                .collect();
+            let syn_imp: Vec<f64> = drv_case["synthetic_importances"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_f64().unwrap())
+                .collect();
+            let real_signs: Vec<i8> = drv_case["real_signs"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_i64().unwrap() as i8)
+                .collect();
+            let syn_signs: Vec<i8> = drv_case["synthetic_signs"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_i64().unwrap() as i8)
+                .collect();
+            let drv = driver_attribution_agreement(
+                &real_imp,
+                &syn_imp,
+                Some(&real_signs),
+                Some(&syn_signs),
+            )
+            .unwrap();
+            assert!((drv.ndcg_at_k - drv_case["ndcg_at_k"].as_f64().unwrap()).abs() < 1e-12);
+            assert!(
+                (drv.top_k_jaccard - drv_case["top_k_jaccard"].as_f64().unwrap()).abs() < 1e-12
+            );
+            assert!(
+                (drv.l1_attribution_agreement
+                    - drv_case["l1_attribution_agreement"].as_f64().unwrap())
+                .abs()
+                    < 1e-12
+            );
+            assert!(
+                (drv.sign_agreement - drv_case["sign_agreement"].as_f64().unwrap()).abs() < 1e-12
+            );
+            assert!(
+                (drv.composite_driver_fidelity
+                    - drv_case["composite_driver_fidelity"].as_f64().unwrap())
+                .abs()
+                    < 1e-12
+            );
+
+            let comp_case = &mfs_v4["knowledge_compression"];
+            let comp = knowledge_compression_metrics(
+                comp_case["artifact_bytes"].as_u64().unwrap(),
+                comp_case["encoded_numbers"].as_u64().unwrap(),
+                comp_case["real_rows"].as_u64().unwrap(),
+                comp_case["real_columns"].as_u64().unwrap(),
+                comp_case["byte_limit"].as_u64().unwrap(),
+                comp_case["retained_utility"].as_f64().unwrap(),
+            )
+            .unwrap();
+            assert!(
+                (comp.bits_per_original_cell
+                    - comp_case["bits_per_original_cell"].as_f64().unwrap())
+                .abs()
+                    < 1e-12
+            );
+            assert!((comp.bpc_score - comp_case["bpc_score"].as_f64().unwrap()).abs() < 1e-12);
+            assert!(
+                (comp.parameter_sparsity_score
+                    - comp_case["parameter_sparsity_score"].as_f64().unwrap())
+                .abs()
+                    < 1e-12
+            );
+            assert!(
+                (comp.log_byte_score - comp_case["log_byte_score"].as_f64().unwrap()).abs() < 1e-12
+            );
+            assert!(
+                (comp.knowledge_compression_score
+                    - comp_case["knowledge_compression_score"].as_f64().unwrap())
+                .abs()
+                    < 1e-12
+            );
         }
     }
 
@@ -367,5 +486,21 @@ mod tests {
         let tail = weighted_cvar(&[0.0, 10.0, 20.0], &[0.85, 0.1, 0.05], 0.9).unwrap();
         assert!((tail - 15.0).abs() < 1e-10);
         assert!(weighted_cvar(&[0.0], &[0.0], 0.9).is_err());
+    }
+
+    #[test]
+    fn control_contrastive_and_knowledge_compression_monotone_invariants() {
+        let strong = control_contrastive_lift(0.95, 0.70, 0.60, Some(0.92)).unwrap();
+        let predictor_clone = control_contrastive_lift(0.70, 0.70, 0.60, Some(0.92)).unwrap();
+        assert!(strong.positive_predictor_lift);
+        assert!(strong.positive_dependence_lift);
+        assert!(!predictor_clone.positive_predictor_lift);
+        assert!(strong.contrastive_utility_score > predictor_clone.contrastive_utility_score);
+
+        let compact = knowledge_compression_metrics(1_536, 48, 1_000, 16, 10_240, 0.95).unwrap();
+        let bloated = knowledge_compression_metrics(8_192, 512, 1_000, 16, 10_240, 0.95).unwrap();
+        assert!(compact.knowledge_compression_score > bloated.knowledge_compression_score);
+        assert!(compact.utility_per_kilobyte > bloated.utility_per_kilobyte);
+        assert!(compact.utility_per_encoded_number > bloated.utility_per_encoded_number);
     }
 }

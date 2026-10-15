@@ -319,4 +319,116 @@ mod tests {
             serde_json::from_value(parsed["master_fitness"].clone()).unwrap();
         assert!(contract.is_frozen());
     }
+
+    fn v4_contract() -> MasterFitnessV4Contract {
+        MasterFitnessV4Contract {
+            version: 4,
+            scalarization: "geometric_mean".into(),
+            privacy_soft_weight: 0.0,
+            epsilon: 1e-6,
+            epsilon_rule: "max_component_epsilon".into(),
+            prerequisites: V4_PREREQUISITES.iter().map(|k| (*k).to_string()).collect(),
+            score_range: [0, 100],
+            weights: FitnessWeightsV4 {
+                utility_transfer: 0.30,
+                driver_fidelity: 0.20,
+                representation_closeness: 0.15,
+                knowledge_compression: 0.15,
+                distribution_fidelity: 0.10,
+                structure_fidelity: 0.05,
+                coverage_realism: 0.05,
+            },
+        }
+    }
+
+    fn v4_components() -> ScoredComponentsV4 {
+        ScoredComponentsV4 {
+            distribution_fidelity: Some(0.85),
+            structure_fidelity: Some(0.80),
+            coverage_realism: Some(0.90),
+        }
+    }
+
+    fn v4_observation() -> MfsV4Observation {
+        MfsV4Observation {
+            encoder: "kumo_tabular_l".into(),
+            distance: 0.2,
+            d_null: 0.5,
+            d_match: 0.4,
+            gap_mitra: -0.1,
+            gap_tabicl: -0.2,
+            exact_row_matches: 0,
+            near_copy_ok: true,
+            cleartext_absent: true,
+            membership_auc: 0.50,
+            attribute_inference_advantage: 0.01,
+            artifact_bytes: 1_024,
+            encoded_numbers: 64,
+            real_rows: 1_024,
+            real_columns: 8,
+            normalizer: crate::representation::NORMALIZER.into(),
+            utility_protocol: crate::representation::TABULAR_PROTOCOL.into(),
+            utility_auditors: V4_TABULAR_AUDITORS
+                .iter()
+                .map(|name| (*name).to_string())
+                .collect(),
+            retention: 0.90,
+            predictor_only_retention: 0.70,
+            independent_marginals_retention: 0.65,
+            real_bootstrap_4n_retention: Some(0.85),
+            real_importances: vec![0.40, 0.30, 0.20, 0.10],
+            synthetic_importances: vec![0.45, 0.25, 0.20, 0.10],
+            real_signs: Some(vec![1, -1, 1, -1]),
+            synthetic_signs: Some(vec![1, -1, 1, 1]),
+            real_vs_real_control_complete: true,
+            required_size_cells_complete: true,
+            artifact_sampling_verified: true,
+            metric_implementations_locked: true,
+            control_contrastive_baselines_complete: true,
+            model_driver_attribution_measured: true,
+        }
+    }
+
+    #[test]
+    fn embedded_v4_contract_matches_the_build_digest() {
+        use sha2::{Digest, Sha256};
+        let bytes = include_bytes!("../../production/kpi-contract-v4.json");
+        let normalized = bytes.strip_suffix(b"\n").unwrap_or(bytes);
+        let digest = format!("{:x}", Sha256::digest(normalized));
+        assert_eq!(digest, env!("DOPE_KPI_CONTRACT_V4_SHA256"));
+        let parsed: serde_json::Value = serde_json::from_slice(normalized).unwrap();
+        let contract: MasterFitnessV4Contract =
+            serde_json::from_value(parsed["master_fitness"].clone()).unwrap();
+        assert!(contract.is_frozen());
+    }
+
+    #[test]
+    fn v4_enforces_control_lift_driver_attribution_and_rewards_knowledge_compression() {
+        let contract = v4_contract();
+        let components = v4_components();
+        let compact_obs = v4_observation();
+        let compact_report = evaluate_v4(&contract, &components, &compact_obs);
+        assert!(compact_report.eligible);
+        assert!(compact_report.score.unwrap() > 0.0);
+        assert!((compact_report.utility_transfer.unwrap() - 0.935).abs() < 1e-12);
+        assert!((compact_report.driver_fidelity.unwrap() - 0.95).abs() < 1e-12);
+
+        let mut bloated_obs = v4_observation();
+        bloated_obs.artifact_bytes = 8_192;
+        bloated_obs.encoded_numbers = 512;
+        let bloated_report = evaluate_v4(&contract, &components, &bloated_obs);
+        assert!(bloated_report.eligible);
+        assert!(
+            compact_report.knowledge_compression.unwrap()
+                > bloated_report.knowledge_compression.unwrap()
+        );
+        assert!(compact_report.score.unwrap() > bloated_report.score.unwrap());
+
+        let mut no_predictor_lift = v4_observation();
+        no_predictor_lift.predictor_only_retention = 0.90;
+        let failed_lift = evaluate_v4(&contract, &components, &no_predictor_lift);
+        assert!(!failed_lift.eligible);
+        assert!(!failed_lift.hard_gates["positive_predictor_lift"]);
+        assert_eq!(failed_lift.score, None);
+    }
 }

@@ -67,7 +67,11 @@ impl Default for CompileOptions {
 pub struct CandidateReport {
     pub candidate_id: String,
     pub artifact_bytes: usize,
+    #[serde(default)]
+    pub encoded_numbers: usize,
     pub bits_per_original_cell: f64,
+    #[serde(default)]
+    pub knowledge_compression: f64,
     pub score: f64,
     pub compliant: bool,
     pub quantization_bits: u8,
@@ -97,7 +101,11 @@ pub struct CompileReport {
     pub selected_candidate: String,
     pub artifact_bytes: usize,
     pub effective_bytes: usize,
+    #[serde(default)]
+    pub encoded_numbers: usize,
     pub bits_per_original_cell: f64,
+    #[serde(default)]
+    pub knowledge_compression: f64,
     pub compliant: bool,
     pub failed_gates: Vec<String>,
     pub candidate_count: usize,

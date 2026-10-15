@@ -118,4 +118,33 @@ fn main() {
         "cargo:rustc-env=DOPE_KPI_CONTRACT_V3_SHA256={:x}",
         Sha256::digest(&v3_bytes)
     );
+    let v4_path = "production/kpi-contract-v4.json";
+    println!("cargo:rerun-if-changed={v4_path}");
+    let v4 = fs::read(v4_path).expect("MFS-v4 contract must be readable");
+    let v4_parsed: Value = serde_json::from_slice(&v4).expect("MFS-v4 contract must be JSON");
+    assert_eq!(
+        v4_parsed["version"].as_u64(),
+        Some(4),
+        "MFS-v4 file must be version 4"
+    );
+    assert_eq!(
+        v4_parsed["master_fitness"]["version"].as_u64(),
+        Some(4),
+        "MFS-v4 scalar must be version 4"
+    );
+    assert_eq!(
+        v4_parsed["master_fitness"]["privacy_soft_weight"].as_f64(),
+        Some(0.0),
+        "MFS-v4 privacy stays a gate"
+    );
+    let v4_bytes = serde_json::to_vec(&canonical(&v4_parsed)).expect("MFS-v4 contract serializes");
+    assert_eq!(
+        v4.strip_suffix(b"\n").unwrap_or(&v4),
+        v4_bytes,
+        "production/kpi-contract-v4.json must use canonical JSON encoding"
+    );
+    println!(
+        "cargo:rustc-env=DOPE_KPI_CONTRACT_V4_SHA256={:x}",
+        Sha256::digest(&v4_bytes)
+    );
 }
