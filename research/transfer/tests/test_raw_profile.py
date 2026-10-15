@@ -26,6 +26,7 @@ from research.transfer.raw_profile import (
     RAW_CAPABILITIES,
     RAW_HANDLER,
     RAW_KIND,
+    account_mixed_artifact,
     account_raw_artifact,
     declare_raw_columns,
 )
@@ -37,6 +38,11 @@ RETAINED_RAW = Path(
     "/home/ubuntu/dope/.agent/worktrees/consolidated-native-20261014/target/raw-residual-cli/304654/model.raw"
 )
 RETAINED_SHA256 = "fac2d6b32a59ac67a86571b57c0ee24669a6d865c0c91246ed2e80c3dc567d22"
+RETAINED_MIXED = Path(
+    "/home/ubuntu/dope/.agent/worktrees/consolidated-native-20261014/target/raw-mixed-cli/50530/model.mixed"
+)
+RETAINED_MIXED_SHA256 = "d13c986a437af7e17c8b4b274b19fe9131b05d783b4847ad9ead0dc397a97912"
+RETAINED_MIXED_NATIVE_SHA256 = "f5d6686b28caa71f68d05f4d48b0d39eea3133394fd449c1a6435ff7974d3a60"
 
 
 def workspace_temp():
@@ -530,6 +536,143 @@ class ResidualRawTests(unittest.TestCase):
         rendered = repr(dict(profile))
         self.assertNotIn("dope-affine-state", rendered)
         self.assertNotIn(ROW_MARKER, rendered)
+
+
+def _private_tokens(value):
+    found = []
+    if type(value) is str:
+        found.append(value)
+    elif type(value) in (int, float) and type(value) is not bool:
+        found.append(json.dumps(value))
+    elif type(value) is dict:
+        for item in value.values():
+            found.extend(_private_tokens(item))
+    elif type(value) is list:
+        for item in value:
+            found.extend(_private_tokens(item))
+    return found
+
+
+class MixedChargeTests(unittest.TestCase):
+    def test_retained_fixture_charges_full_bytes_without_fitted_fields(self):
+        artifact = RETAINED_MIXED.read_bytes()
+        self.assertEqual(len(artifact), 1523)
+        self.assertEqual(hashlib.sha256(artifact).hexdigest(), RETAINED_MIXED_SHA256)
+        self.assertEqual(artifact[:8], b"DOPMIX01")
+        self.assertEqual(int.from_bytes(artifact[8:16], "little"), 1085)
+        self.assertEqual(int.from_bytes(artifact[16:24], "little"), 382)
+        self.assertEqual(artifact[24:56], blake3_hash(artifact[56:]))
+        native = artifact[56 + 1085:]
+        self.assertEqual(hashlib.sha256(native).hexdigest(), RETAINED_MIXED_NATIVE_SHA256)
+        self.assertEqual(native[:4], b"DPK3")
+        self.assertEqual(native[5], 2)
+        profile = account_mixed_artifact(artifact)
+        self.assertEqual(profile["byte_profile_id"], "native-mixed-complete-v1")
+        self.assertEqual(profile["format"], "dope-mixed-sampling-artifact")
+        self.assertEqual(profile["version"], 1)
+        self.assertEqual(profile["profile"], "numeric_split_v1")
+        self.assertIsNone(profile["mathematical_parameter_count"])
+        self.assertEqual(profile["framing_bytes"], 56)
+        self.assertEqual(profile["transform_schema_bytes"], 1085)
+        self.assertEqual(profile["native_payload_bytes"], 382)
+        self.assertEqual(profile["complete_sampling_bytes"], 1523)
+        self.assertEqual(profile["transport_archive_bytes"], 1523)
+        self.assertIsNone(profile["generic_runtime_bytes"])
+        self.assertIsNone(profile["cold_sampling_closure_bytes"])
+        self.assertEqual(profile["content_hash"], "blake3_state_plus_dpk")
+        self.assertIs(profile["formal_dp"], False)
+        self.assertIs(profile["hipaa_deidentification"], False)
+        self.assertIs(profile["release_authorized"], False)
+        self.assertEqual(profile["confirmation"], "unqualified")
+        self.assertEqual(profile["certification"], "unqualified_development_artifact")
+        rendered = repr(dict(profile))
+        state = json.loads(artifact[56:56 + 1085])
+        self.assertNotIn(state["format"], rendered)
+        self.assertNotIn(state["affine"]["format"], rendered)
+        self.assertNotIn(state["affine"]["visibility"], rendered)
+        for column in state["affine"]["columns"]:
+            self.assertNotIn(column["id"], rendered)
+        for feature in state["features"]:
+            self.assertNotIn(feature["id"], rendered)
+            for category in feature["categories"]:
+                self.assertNotIn(category, rendered)
+        public_numbers = {"0", "1", "56", "1085", "382", "1523"}
+        for token in _private_tokens({
+            "affine": state["affine"],
+            "features": state["features"],
+        }):
+            if not re.fullmatch(r"-?\d+(?:\.\d+)?(?:e[+-]?\d+)?", token):
+                continue
+            if token in public_numbers:
+                continue
+            self.assertNotIn(token, rendered)
+        for key in (
+            "affine", "categories", "probabilities", "completion", "split", "threshold",
+            "offset", "scale", "fit_rows", "columns", "constant_target", "visibility",
+            "max_field_bytes", "id",
+        ):
+            self.assertNotIn(key, profile)
+        with self.assertRaises(TypeError):
+            profile["mathematical_parameter_count"] = 0
+        with self.assertRaises(BundleError) as raised:
+            account_raw_artifact(artifact)
+        self.assertEqual(raised.exception.code, "raw_artifact_invalid")
+        self.assertEqual(str(raised.exception), "raw_artifact_invalid")
+
+    def test_raw_magic_and_broken_framing_stay_outside_this_charge(self):
+        mixed = RETAINED_MIXED.read_bytes()
+        raw = RETAINED_RAW.read_bytes()
+        with self.assertRaises(BundleError) as raised:
+            account_mixed_artifact(raw)
+        self.assertEqual(raised.exception.code, "mixed_artifact_invalid")
+        self.assertNotIn(ROW_MARKER, str(raised.exception))
+        flipped = bytearray(mixed)
+        flipped[80] ^= 1
+        with self.assertRaises(BundleError) as raised:
+            account_mixed_artifact(bytes(flipped))
+        self.assertEqual(str(raised.exception), "mixed_artifact_integrity_failed")
+        replaced = bytearray(mixed)
+        replaced[56 + 1085:] = b"\x00" * 382
+        replaced[24:56] = blake3_hash(bytes(replaced[56:]))
+        with self.assertRaises(BundleError) as raised:
+            account_mixed_artifact(bytes(replaced))
+        self.assertEqual(str(raised.exception), "mixed_payload_limits_invalid")
+        state = json.loads(mixed[56:56 + 1085])
+        state["profile"] = ROW_MARKER
+        refused = framed(json.dumps(state).encode(), dpk(), magic=b"DOPMIX01")
+        with self.assertRaises(BundleError) as raised:
+            account_mixed_artifact(refused)
+        self.assertEqual(str(raised.exception), "mixed_state_invalid")
+        self.assertNotIn(ROW_MARKER, str(raised.exception))
+
+    def test_verified_bundle_does_not_charge_mixed_through_the_raw_handler(self):
+        artifact = RETAINED_MIXED.read_bytes()
+        manifest = {
+            "amortization_count": 1,
+            "bundle_id": "synthetic-mixed",
+            "capabilities": ["byte-inventory", "native-raw-sample"],
+            "components": [
+                component(
+                    "payload",
+                    "sampling_payload",
+                    "doperaw1",
+                    "model.raw",
+                    artifact,
+                    required=True,
+                    consumed=True,
+                ),
+            ],
+            "format": "dope.generator-bundle/v1",
+            "sampling_handler": "native-raw-complete-v1",
+            "transport_framing": "included",
+            "version": 1,
+        }
+        directory, root, digest = stage(manifest, {"model.raw": artifact})
+        with directory:
+            with self.assertRaises(BundleError) as raised:
+                verify_bundle(root, digest)
+        self.assertEqual(raised.exception.code, "raw_artifact_invalid")
+        self.assertNotIn(b"DOPMIX01".decode(), str(raised.exception))
 
 
 if __name__ == "__main__":
