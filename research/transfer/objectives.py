@@ -88,6 +88,11 @@ def driver_attribution_agreement(
     features = len(real_imp)
     if features == 0 or features != len(syn_imp) or any(v < 0.0 for v in (*real_imp, *syn_imp)):
         raise ValueError("invalid driver importance vector")
+    real_total = _fsum(real_imp)
+    syn_total = _fsum(syn_imp)
+    active_real_features = sum(1 for v in real_imp if v > 1e-12)
+    if real_total <= 1e-12 or active_real_features == 0:
+        raise ValueError("degenerate real driver importance vector")
     if real_signs is None or synthetic_signs is None:
         raise ValueError("driver sign vectors are required")
     if not isinstance(real_signs, (list, tuple)) or not isinstance(synthetic_signs, (list, tuple)):
@@ -98,27 +103,31 @@ def driver_attribution_agreement(
         raise ValueError("driver sign vector length mismatch")
     if any(type(s) is not int or isinstance(s, bool) or s not in (-1, 0, 1) for s in (*real_s, *syn_s)):
         raise ValueError("invalid driver sign value")
+    if any(imp > 1e-12 and sign == 0 for imp, sign in zip(real_imp, real_s)):
+        raise ValueError("missing directional sign for active real driver")
     active = [(r, s) for r, s in zip(real_s, syn_s) if r != 0]
-    sign_agreement = 1.0 if not active else sum(1 for r, s in active if r == s) / float(len(active))
-    k = max(1, min(features, min(20, max(5, math.ceil(features * 0.10)))))
-    real_total = _fsum(real_imp)
-    syn_total = _fsum(syn_imp)
-    if real_total <= 1e-12:
-        ndcg, jaccard, overlap, l1_agree = (1.0, 1.0, 1.0, 1.0) if syn_total <= 1e-12 else (0.0, 0.0, 0.0, 0.0)
-    elif syn_total <= 1e-12:
+    if not active:
+        raise ValueError("degenerate driver sign vector")
+    sign_agreement = sum(1 for r, s in active if r == s) / float(len(active))
+    k = max(1, min(features, active_real_features, min(20, max(5, math.ceil(features * 0.10)))))
+    if syn_total <= 1e-12:
         ndcg, jaccard, overlap, l1_agree = (0.0, 0.0, 0.0, 0.0)
     else:
         real_order = sorted(range(features), key=lambda idx: (-real_imp[idx], idx))
         syn_order = sorted(range(features), key=lambda idx: (-syn_imp[idx], idx))
-        real_top = set(real_order[:k])
-        syn_top = set(syn_order[:k])
+        real_top = {idx for idx in real_order[:k] if real_imp[idx] > 1e-12}
+        syn_top = {idx for idx in syn_order[:k] if syn_imp[idx] > 1e-12}
         inter = len(real_top & syn_top)
         union = max(1, len(real_top | syn_top))
         overlap = inter / float(k)
         jaccard = inter / float(union)
         idcg = _fsum(real_imp[idx] / math.log2(rank + 2.0) for rank, idx in enumerate(real_order[:k]))
-        dcg = _fsum(real_imp[idx] / math.log2(rank + 2.0) for rank, idx in enumerate(syn_order[:k]))
-        ndcg = 1.0 if idcg <= 1e-12 else _clamp01(dcg / idcg)
+        dcg = _fsum(
+            real_imp[idx] / math.log2(rank + 2.0)
+            for rank, idx in enumerate(syn_order[:k])
+            if syn_imp[idx] > 1e-12
+        )
+        ndcg = 0.0 if idcg <= 1e-12 else _clamp01(dcg / idcg)
         tv = 0.5 * _fsum(abs(real_imp[i] / real_total - syn_imp[i] / syn_total) for i in range(features))
         l1_agree = _clamp01(1.0 - tv)
     composite = _clamp01(0.35 * ndcg + 0.25 * jaccard + 0.25 * l1_agree + 0.15 * sign_agreement)
@@ -160,7 +169,11 @@ def knowledge_compression_metrics(
         if artifact_bytes <= byte_limit
         else 0.0
     )
-    compression_score = _clamp01(0.40 * bpc_score + 0.35 * sparsity_score + 0.25 * log_byte_score)
+    compression_score = (
+        _clamp01(0.40 * bpc_score + 0.35 * sparsity_score + 0.25 * log_byte_score)
+        if utility > 0.0 and artifact_bytes <= byte_limit
+        else 0.0
+    )
     pos_utility = max(0.0, utility)
     return {
         "artifact_bytes": artifact_bytes,
