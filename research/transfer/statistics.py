@@ -21,6 +21,16 @@ from .losses import LossSpace, PairedLosses, TrainingScale, finite_number
 from .metrics import Margin
 
 
+_INFERENCE_ASSUMPTIONS = {
+    "moment_assumption": "finite_variance",
+    "distribution_free": False,
+}
+
+
+def _with_assumptions(payload):
+    return {**payload, **_INFERENCE_ASSUMPTIONS}
+
+
 def task_substream(master_seed: int, task_id: str, component_id: str) -> int:
     """Prospective RNG identity includes task and algorithm/component namespace."""
     if type(master_seed) is not int or master_seed < 0 or not task_id or not component_id:
@@ -192,7 +202,7 @@ def _bootstrap_refusal(point, estimand, draws, status, reason=None):
     }
     if reason is not None:
         payload["reason"] = reason
-    return payload
+    return _with_assumptions(payload)
 
 
 def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: str = "method_new_source",
@@ -270,7 +280,9 @@ def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: s
     for method in design.required_methods:
         family_samples = np.column_stack([np.mean([task_samples[(task, method)] for task in sorted(family_tasks[f])], axis=0) for f in families])
         output[method] = family_samples[np.arange(draws)[:, None], family_picks].mean(axis=1) if family_picks is not None else family_samples.mean(axis=1)
-    return {**point, "estimand": estimand, "draws": draws, "status": "complete", "samples": output}
+    return _with_assumptions(
+        {**point, "estimand": estimand, "draws": draws, "status": "complete", "samples": output}
+    )
 
 
 def simultaneous_ucb(bootstrap: dict, *, alpha: float = 0.05) -> dict:
@@ -283,19 +295,21 @@ def simultaneous_ucb(bootstrap: dict, *, alpha: float = 0.05) -> dict:
     if not 0 < alpha < 0.5:
         raise ValueError("invalid inference alpha")
     if bootstrap["status"] != "complete":
-        return {"status": bootstrap["status"], "bounds": None}
+        return _with_assumptions({"status": bootstrap["status"], "bounds": None})
     samples = bootstrap["samples"]
     per_tail = alpha / len(samples)
     if per_tail * bootstrap["draws"] < 5:
-        return {"status": "insufficient_tail_draws", "bounds": None}
+        return _with_assumptions({"status": "insufficient_tail_draws", "bounds": None})
     bounds = {}
     for method, draws in samples.items():
         point = bootstrap["estimates"][method]
         lo, hi = np.quantile(draws - point, [per_tail, 1 - per_tail])
         bounds[method] = {"estimate": point, "lower": float(point - hi), "upper": float(point - lo)}
-    return {"status": "complete", "alpha": alpha, "multiplicity": "bonferroni_one_sided",
-            "simultaneous_one_sided_level": 1 - alpha, "two_sided_level_at_least": 1 - 2 * alpha,
-            "bounds": bounds}
+    return _with_assumptions({
+        "status": "complete", "alpha": alpha, "multiplicity": "bonferroni_one_sided",
+        "simultaneous_one_sided_level": 1 - alpha, "two_sided_level_at_least": 1 - 2 * alpha,
+        "bounds": bounds,
+    })
 
 
 def interval_decision(lower: float, upper: float, *, endpoint: str = "gap",
@@ -321,9 +335,11 @@ def interval_decision(lower: float, upper: float, *, endpoint: str = "gap",
     superior = endpoint in ("gap", "normalized_gap") and upper < 0
     noninferior = upper <= 0
     harmful = lower > 0
-    return {"endpoint": endpoint, "superior": superior, "noninferior": noninferior,
-            "harmful": harmful, "equivalent": equivalent,
-            "inconclusive": not (superior or noninferior or harmful or equivalent)}
+    return _with_assumptions({
+        "endpoint": endpoint, "superior": superior, "noninferior": noninferior,
+        "harmful": harmful, "equivalent": equivalent,
+        "inconclusive": not (superior or noninferior or harmful or equivalent),
+    })
 
 
 def require_separate_cell_bounds(bounds: dict) -> dict:

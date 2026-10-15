@@ -12,7 +12,7 @@ from research.transfer.adapters.base import (
     AdapterError, GeneratorAdapter, ModelIdentity, ResourceLimits, ResourceUsage, SampleResult,
     TrainingBatch, FeatureBatch,
 )
-from research.transfer.evidence import digest
+from research.transfer.evidence import admit_generator_evidence, digest
 
 
 _LANES = frozenset({"resource_matched", "common_transfer", "unrestricted_quality"})
@@ -170,6 +170,10 @@ class NeuralGenerator(GeneratorAdapter):
         self._ready()
         _require(self._inference is not None and self._inference["vendor_executed"] is False, "vendor_execution_unmeasured")
         return dict(self._inference)
+
+    def admit_evidence(self):
+        """Route the exported probe into evidence admission. Export itself stays unexecuted."""
+        return admit_generator_evidence(self.export())
 
     def reload(self, state):
         """Replace the inference probe. A scaled adapter still cannot carry a full schedule."""

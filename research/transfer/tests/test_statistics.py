@@ -333,6 +333,27 @@ class StatisticsTests(unittest.TestCase):
         self.assertEqual(result["valid_repetitions"], 0)
         self.assertEqual(result["failed_repetitions"], {"insufficient_query_clusters": 20})
 
+    def test_inferential_outputs_carry_finite_variance_assumptions(self):
+        def check(payload):
+            self.assertEqual(payload["moment_assumption"], "finite_variance")
+            self.assertIs(payload["distribution_free"], False)
+
+        complete = bootstrap_effects(seed_panel(4), draws=199, seed=1)
+        check(complete)
+        refused = bootstrap_effects(seed_panel(1), draws=199)
+        self.assertEqual(refused["status"], "insufficient_families")
+        check(refused)
+        check(simultaneous_ucb(complete))
+        check(simultaneous_ucb(refused))
+        check(simultaneous_ucb({**complete, "draws": 99}))
+        self.assertEqual(simultaneous_ucb({**complete, "draws": 99})["status"], "insufficient_tail_draws")
+        narrow = interval_decision(-0.01, 0.01, equivalence_margin=0.1)
+        wide = interval_decision(-0.1, 0.1, equivalence_margin=0.1)
+        check(narrow)
+        check(wide)
+        self.assertTrue(narrow["equivalent"])
+        self.assertFalse(wide["equivalent"])
+
 
 if __name__ == "__main__":
     unittest.main()
