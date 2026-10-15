@@ -1,0 +1,75 @@
+{
+  "accounting": {
+    "cold_sampling_closure_bytes": 72050710,
+    "complete_sampling_bytes": 1558,
+    "framing_bytes": 56,
+    "generic_runtime_bytes": 72049152,
+    "native_payload_bytes": 422,
+    "transform_schema_bytes": 1080,
+    "transport_archive_bytes": 1558
+  },
+  "agreement": {
+    "file_size_equals_complete": true,
+    "inspect_equals_compiled_arms": true,
+    "source_free_replays": [
+      1,
+      4
+    ]
+  },
+  "artifact": {
+    "byte_profile_id": "native-raw-complete-v1",
+    "container": "DOPERAW1",
+    "file_bytes": 1558,
+    "format": "dope-raw-sampling-artifact",
+    "format_version": 1,
+    "profile": "raw-numeric-symbolic-v1",
+    "sha256": "0950cbe79817ac37eab6ac7d0010d0f9c7fa7493f211dada7084722141f043f1"
+  },
+  "distinct_objects": "The paper's benchmark charge (encoded .dpk plus projection.json) and the 196-byte README toy are different objects and do not share these totals.",
+  "evidence_sha256": {
+    "fit_record": "325718d4dde03ffcca0712642c3ea4c36f722145387472d68c7ba49fc7a9fc8b",
+    "inspect_record": "39c23557a97fd81b2353d8580f72e10384eff1690be845738f848f7cd41e3dd1",
+    "inspect_stdout": "28031fde3de3572484245c8748163098ce74204add14712149364258fef1f9a2",
+    "report_html": "95356646a71f307e9e2ef95d609a5bc2fd907b88a7732e838334c545d90d020d",
+    "research_receipt": "a92678a35a2f09f4bb9abf56c0a4f99b9b445d76d3f9a6f26f5c966515049bde"
+  },
+  "format": "dope-native-byte-conformance",
+  "kind": "engineering_conformance_example",
+  "measured_run": {
+    "dependency_versions": {
+      "numpy": "1.26.4",
+      "scikit-learn": "1.7.2",
+      "scipy": "1.17.1",
+      "threadpoolctl": "3.7.0"
+    },
+    "runner": "examples/public-regression/run.py with the installed dope-kernel",
+    "source_commit": "59437b116ef28e5758c7cb37846dcd220b1a1772",
+    "source_tree": "9d31d7dd6d897d7cd15f1658fb37185d2798d80a"
+  },
+  "runtime": {
+    "binary_file_bytes": 68547472,
+    "binary_sha256": "677ddd5b3ef1099d9c4c6df32f62795177b90f6d37efbbc94fdef8d2672b4205",
+    "scope": "Actual debug binary and mapped runtime libraries, each whole file once; not RSS, portableOS, optimized-release size or learned-state charge"
+  },
+  "scope": "one public grouped development split and one diagnostic learner; not a benchmark result, release, or privacy, driver or geometry measurement",
+  "source_data": {
+    "attribution": "Brooks, T., Pope, D., & Marcolini, M. (1989). Airfoil Self-Noise. UCI Machine Learning Repository.",
+    "bytes": 59984,
+    "doi": "10.24432/C5VW2C",
+    "fit_groups": 84,
+    "fit_rows": 1190,
+    "license": "CC-BY-4.0",
+    "name": "Airfoil Self-Noise",
+    "query_groups": 22,
+    "query_rows": 313,
+    "rows": 1503,
+    "sha256": "74c75fd71783f1e6b71f8a622b993dc592897a97cd689c5090a07147a1b097b3",
+    "split_seed": 1729,
+    "split_sha256": "4bbaab917546f75a2d294619758368ecc3acc43bdb4133c8aed1e1ce47eff9f9"
+  },
+  "unavailable": {
+    "portable_bundle_bytes": "not measured; the inline file is the only transport object",
+    "release_build_runtime_bytes": "not measured; the runtime above is a debug build"
+  },
+  "version": 1
+}

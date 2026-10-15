@@ -201,6 +201,10 @@ A credential-free path to the source data is
 \noindent
 It authenticates PMLB data against an upstream Git LFS SHA pin at a fixed public revision. The public manifest lists every prepared lineage's PMLB identifier and the historical train, validation, and test split hashes from the committed data lock. The historical staging used a hybrid coreset and target-stratified selection whose exact row indices were never captured, so the public fetch reproduces the source datasets and the split identities but cannot rebuild the exact historical partitions; publishing the fit and validation partitions themselves (PMLB is MIT-licensed) closes that gap and is scheduled with the artifact release. The originally scored model files and synthetic rows have no published bundle yet; the committed validation ledgers, the original metadata, and the compressed numeric logs, authenticated by the input pins and rebuilt by \texttt{just paper}, reproduce every reduction and figure.
 
+\subsection{One native artifact, accounted end to end}
+\label{app:native-bytes}
+\input{generated/native-byte-conformance.tex}
+
 \subsection{Reproducibility and hashes}
 \input{generated/availability.tex}
 
