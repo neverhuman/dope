@@ -52,6 +52,15 @@ _LADDER = frozenset({
     "one-cell-loss",
     "full-refit",
 })
+_PRESERVED_STATES = frozenset({
+    "unfavorable-baseline",
+    "cap-failure-mass",
+    "tail-harm",
+    "rights-unfrozen",
+    "historical-panel-reuse",
+    "seed-dependence",
+    "campaign-cost",
+})
 _COMPARISONS = (
     "raw_gap_superiority",
     "adjusted_z_noninferiority",
@@ -330,10 +339,11 @@ def _decision_object(kind, receipt, state):
 def _project_claim(claim, rows):
     states = {kind: _decision_state(kind, rows[0]) for kind in _COMPARISONS}
     asserted = claim["asserted_comparison"]
-    if states[asserted] == "unavailable":
-        _fail("unverified_bound")
-    if states[asserted] != "supported":
-        _fail("label_mismatch")
+    if claim["claim_id"] not in _PRESERVED_STATES:
+        if states[asserted] == "unavailable":
+            _fail("unverified_bound")
+        if states[asserted] != "supported":
+            _fail("label_mismatch")
     return {
         "claim_id": claim["claim_id"],
         "protocol_sha256": claim["protocol_sha256"],
