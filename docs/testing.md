@@ -17,9 +17,11 @@ Hosted CPU retains full
 locked Cargo test discovery, which also executes every one of these suites.
 Fast/check and hosted CPU verify the shipped native legal-input hashes before
 product checks. The full installer suite covers license delivery, fixed-member
-uninstall validation and legacy two-file compatibility. Offline notice generation
-uses cached locked crate archives and pinned Rust legal inputs; it is separate
-from checking the shipped pins.
+uninstall validation and legacy two-file compatibility. The Rust notice generator's full unit suite runs in local fast/check and hosted
+Cargo discovery. Local fast/check and hosted CPU also verify real offline
+regeneration against the shipped notice and pins, using cached locked crate
+archives and pinned Rust legal inputs. GNU tar and gzip are required by the CPU
+entry, with real missing-tool refusal fixtures before any build.
 Local fast/check and hosted CPU run the six bounded public-demo regressions in
 `research.benchmark.tests.test_public_demo`: frozen source admission, disjoint
 physical groups, query-label independence, integer producer/reader compatibility,

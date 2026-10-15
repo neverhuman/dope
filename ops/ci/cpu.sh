@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 root=$PWD
 source ops/ci/lib.sh
-for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg; do
+for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg tar gzip; do
   ci_require_command "$tool"
 done
 bash ops/ci/test-cpu-tool-readiness.sh
@@ -13,6 +13,7 @@ bash ops/ci/check-contracts.sh
 cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo test --locked
+cargo run --locked --offline --bin dope-native-notices -- --check
 bash ops/ci/prepare-merge-guard.sh
 cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
 cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings

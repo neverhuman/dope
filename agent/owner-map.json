@@ -496,7 +496,6 @@
     "research/benchmark/review_fixes/test_receipt_unknown_method.py": "external-evidence",
     "research/transfer/geometry_distributions.py": "external-evidence",
     "research/transfer/tests/test_geometry_distributions.py": "external-evidence",
-    "scripts/native-notices.py": "governance",
     "scripts/native-third-party.NOTICE": "governance",
     "scripts/native-legal.sha256": "governance",
     "ops/merge_guard/tests/workflow_events.rs": "governance",
@@ -514,6 +513,8 @@
     "rust/corpus/source_pilot.rs": "rust-core",
     "rust/corpus/source_pilot_tests.rs": "rust-core",
     "tests/fixtures/n19-pilot-v2.json": "rust-core",
-    "tests/support/source_pilot_cli.rs": "rust-core"
+    "tests/support/source_pilot_cli.rs": "rust-core",
+    "scripts/native-notices.rs": "governance",
+    "scripts/native-notices/": "governance"
   }
 }

@@ -24,6 +24,8 @@ fast: native-guard-check
     cargo fmt --all -- --check
     cargo check -p dope-kernel --locked
     cargo test --locked --lib
+    cargo test --locked --bin dope-native-notices
+    cargo run --locked --offline --bin dope-native-notices -- --check
     PYTHONPATH=src python3 -m pytest -q tests
     python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
     python3 -B -m unittest research.benchmark.tests.test_public_demo -q
