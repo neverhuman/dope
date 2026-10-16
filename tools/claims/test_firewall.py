@@ -29,6 +29,60 @@ class FirewallTests(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertTrue(C.lint_public_text(phrase, 'fixture'))
 
+    def test_hipaa_deidentified_and_mdl_claim_fixtures_fail(self):
+        for phrase in ('HIPAA-safe artifacts.', 'The artifact is hipaa compliant.',
+                       'These artifacts are de-identified.', 'These artifacts are deidentified.',
+                       'These artifacts are de identified.', 'The MDL score is favorable.'):
+            with self.subTest(phrase=phrase):
+                self.assertTrue(any('forbidden claim' in failure for failure in C.lint_public_text(phrase, 'fixture')))
+                self.data['demo_notes']['paragraphs'] = [phrase]
+                self.assertIn('demo_notes[0]: forbidden claim', self.failures())
+
+    def test_direct_negation_does_not_hide_an_affirmative_claim(self):
+        for disclaimer in ('There is no HIPAA de-identification.',
+                           'Empirical attacks are not HIPAA de-identification.',
+                           'The artifact is not HIPAA-safe.', 'The artifact is not HIPAA compliant.',
+                           'The artifact is not de-identified.', 'This score is not MDL.'):
+            with self.subTest(disclaimer=disclaimer):
+                self.assertEqual(C.lint_public_text(disclaimer, 'fixture'), [])
+                for claim in ('It is HIPAA-safe.', 'It is de-identified.', 'It is MDL.'):
+                    self.assertTrue(C.lint_public_text(disclaimer + ' ' + claim, 'fixture'))
+        self.assertTrue(C.lint_public_text('The artifact is not only HIPAA-safe but also de-identified.', 'fixture'))
+        self.assertTrue(C.lint_public_text('There is no HIPAA risk.', 'fixture'))
+
+    def test_nested_paper_claim_fixtures_fail_the_public_gate(self):
+        import shutil
+        import tempfile
+        local_tmp = ROOT / 'target/claims-tests'
+        local_tmp.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=local_tmp) as directory:
+            root = Path(directory)
+            for name in ('paper', 'schemas', 'research/transfer/registries',
+                         'research/transfer/locks', 'research/transfer/manifests'):
+                shutil.copytree(ROOT / name, root / name)
+            inputs = {'README.md', 'Cargo.toml', 'pyproject.toml', 'CITATION.cff',
+                      'evidence/status.json', C.REGISTRY['sources']['headline']}
+            inputs.update(pin['path'] for pin in self.data['demo_notes']['pins'])
+            for name in inputs:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / name, path)
+            (root / 'paper/archive/fixture.tex').write_text('Historical privacy-preserving claim.')
+            self.assertEqual(C.public_failures(root, check_render=False), [])
+            # Unknown generated files are prose too; only authenticated renderer outputs are exempt.
+            for name in ('paper/sections/deep/fixture.tex', 'paper/generated/fixture.tex'):
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                for phrase in ('HIPAA-safe artifacts.', 'These artifacts are de-identified.',
+                               'The MDL score is favorable.', 'This is privacy-preserving.',
+                               'Retention is 0.898.'):
+                    with self.subTest(path=name, phrase=phrase):
+                        path.write_text(phrase)
+                        self.assertTrue(any(failure.startswith(name + ':')
+                                            for failure in C.public_failures(root, check_render=False)))
+                path.write_text('No measured claim is available.')
+            self.assertEqual(C.public_failures(root, check_render=False), [])
+
     def test_hand_typed_numbers_fail_but_cli_and_citation_numbers_are_not_claims(self):
         self.assertTrue(C.lint_public_text('Retention is 0.898.', 'fixture'))
         self.assertFalse(C.lint_public_text('Run `dope sample --rows 200`. T90/D80.', 'fixture'))
