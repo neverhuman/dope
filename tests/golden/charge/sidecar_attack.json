@@ -1,0 +1,31 @@
+{
+  "case_id": "charge_sidecar_attack",
+  "citable": false,
+  "component": "charge",
+  "expected": {
+    "reason": "undeclared_or_dataset_specific_closure",
+    "status": "failed"
+  },
+  "input": {
+    "closure_files": [
+      {
+        "dataset_specific": true,
+        "hex": "0000000000000000000000000000000000",
+        "name": "runtime",
+        "scope": "runtime"
+      }
+    ],
+    "sections": [
+      {
+        "hex": "010203",
+        "name": "z"
+      },
+      {
+        "hex": "04",
+        "name": "a"
+      }
+    ]
+  },
+  "purpose": "Dataset-specific sidecars must be in charged payload, never shared runtime.",
+  "schema_version": 1
+}

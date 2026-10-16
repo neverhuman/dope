@@ -1,0 +1,90 @@
+{
+  "case_id": "frontier_not_reached",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "frontier": [
+      {
+        "artifact_bytes": 1024,
+        "driver_fidelity": 0.1,
+        "frontier_transfer": null,
+        "lcb_transfer": 0.85,
+        "tdl_pass": false
+      },
+      {
+        "artifact_bytes": 2048,
+        "driver_fidelity": 0.1,
+        "frontier_transfer": null,
+        "lcb_transfer": 0.95,
+        "tdl_pass": false
+      },
+      {
+        "artifact_bytes": 4096,
+        "driver_fidelity": 0.1,
+        "frontier_transfer": null,
+        "lcb_transfer": 0.9,
+        "tdl_pass": false
+      }
+    ],
+    "largest_tested_bytes": 4096,
+    "reason": null,
+    "status": "not_reached_in_tested_range",
+    "tdl_bytes": null
+  },
+  "input": {
+    "cells": [
+      {
+        "artifact_bytes": 1024,
+        "driver_fidelity": 0.1,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.85,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 2048,
+        "driver_fidelity": 0.1,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.95,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 4096,
+        "driver_fidelity": 0.1,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.9,
+        "status": "complete"
+      }
+    ],
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "required_gates": [
+      "closure",
+      "privacy"
+    ]
+  },
+  "purpose": "No tested cell passes both non-compensatory thresholds; no extrapolation.",
+  "schema_version": 1
+}

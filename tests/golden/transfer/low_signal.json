@@ -1,0 +1,27 @@
+{
+  "case_id": "transfer_low_signal",
+  "citable": false,
+  "component": "transfer",
+  "expected": {
+    "reason": "real_gain_not_informative",
+    "status": "uninformative"
+  },
+  "input": {
+    "constant_target": false,
+    "null_losses": [
+      10.0,
+      10.0
+    ],
+    "real_gain_lcb": 7.0,
+    "real_losses": [
+      9.99,
+      9.99
+    ],
+    "synthetic_losses": [
+      2.8,
+      2.8
+    ]
+  },
+  "purpose": "Original-unit paired retention and informative-task refusal.",
+  "schema_version": 1
+}

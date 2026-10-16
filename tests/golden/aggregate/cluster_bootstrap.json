@@ -1,0 +1,221 @@
+{
+  "case_id": "aggregate_cluster_bootstrap",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "family_means": {
+      "linear": 0.8,
+      "tree": 0.8999999999999999
+    },
+    "lcb": 0.7583333333333333,
+    "mean_transfer": 0.85,
+    "reason": null,
+    "robust_transfer": 0.8,
+    "status": "complete"
+  },
+  "input": {
+    "alpha": 0.05,
+    "bootstrap_replicates": 199,
+    "bootstrap_seed": 1729,
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "rows": [
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 1,
+        "source_family": "s1",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 1,
+        "source_family": "s1",
+        "transfer": 0.7000000000000001
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 2,
+        "source_family": "s1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 2,
+        "source_family": "s1",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 3,
+        "source_family": "s1",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 3,
+        "source_family": "s1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 1,
+        "source_family": "s1",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 1,
+        "source_family": "s1",
+        "transfer": 0.7000000000000001
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 2,
+        "source_family": "s1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 2,
+        "source_family": "s1",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 3,
+        "source_family": "s1",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 3,
+        "source_family": "s1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 1,
+        "source_family": "s2",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 1,
+        "source_family": "s2",
+        "transfer": 0.7000000000000001
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 2,
+        "source_family": "s2",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 2,
+        "source_family": "s2",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 3,
+        "source_family": "s2",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 3,
+        "source_family": "s2",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 1,
+        "source_family": "s2",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 1,
+        "source_family": "s2",
+        "transfer": 0.7000000000000001
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 2,
+        "source_family": "s2",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 2,
+        "source_family": "s2",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 3,
+        "source_family": "s2",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 3,
+        "source_family": "s2",
+        "transfer": 0.9
+      }
+    ]
+  },
+  "purpose": "Paired source-family -> dataset -> seed bootstrap with nonconstant draws.",
+  "schema_version": 1
+}

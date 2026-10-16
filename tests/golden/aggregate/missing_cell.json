@@ -1,0 +1,206 @@
+{
+  "case_id": "aggregate_missing_cell",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "reason": "missing_family_or_cell",
+    "status": "incomplete"
+  },
+  "input": {
+    "alpha": 0.05,
+    "bootstrap_replicates": 199,
+    "bootstrap_seed": 1729,
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "rows": [
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 1,
+        "source_family": "s1",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 1,
+        "source_family": "s1",
+        "transfer": 0.7000000000000001
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 2,
+        "source_family": "s1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 2,
+        "source_family": "s1",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 3,
+        "source_family": "s1",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 3,
+        "source_family": "s1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 1,
+        "source_family": "s1",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 1,
+        "source_family": "s1",
+        "transfer": 0.7000000000000001
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 2,
+        "source_family": "s1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 2,
+        "source_family": "s1",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 3,
+        "source_family": "s1",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 3,
+        "source_family": "s1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 1,
+        "source_family": "s2",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 1,
+        "source_family": "s2",
+        "transfer": 0.7000000000000001
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 2,
+        "source_family": "s2",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 2,
+        "source_family": "s2",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 3,
+        "source_family": "s2",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d1",
+        "family": "linear",
+        "seed": 3,
+        "source_family": "s2",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 1,
+        "source_family": "s2",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 1,
+        "source_family": "s2",
+        "transfer": 0.7000000000000001
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 2,
+        "source_family": "s2",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "linear",
+        "dataset": "d2",
+        "family": "linear",
+        "seed": 2,
+        "source_family": "s2",
+        "transfer": 0.8
+      },
+      {
+        "auditor": "tree",
+        "dataset": "d2",
+        "family": "tree",
+        "seed": 3,
+        "source_family": "s2",
+        "transfer": 1.0
+      }
+    ]
+  },
+  "purpose": "Each paired seed block must contain every required family.",
+  "schema_version": 1
+}
