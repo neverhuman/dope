@@ -5,23 +5,7 @@ one paired draw. Input rows are seed-level paired retention observations.
 """
 import math
 
-from .common import MetricError, count, failure, mean, number, opt_default, require, unit
-
-MASK = (1 << 64) - 1
-
-
-class XorShift64:
-    """Explicit portable RNG; zero seed maps to one. Modulo indexing is frozen."""
-    def __init__(self, seed):
-        self.state = count(seed) or 1
-
-    def index(self, length):
-        x = self.state
-        x ^= (x << 13) & MASK
-        x ^= x >> 7
-        x ^= (x << 17) & MASK
-        self.state = x & MASK
-        return self.state % length
+from .common import MetricError, XorShift64, count, failure, mean, number, opt_default, require, unit
 
 
 def _names(values, invalid="invalid_families", dup="duplicate_family"):

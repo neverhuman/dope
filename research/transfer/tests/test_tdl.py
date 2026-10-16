@@ -233,7 +233,13 @@ class StandaloneGeneratorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout)
                 receipt = json.loads(result.stdout)
                 self.assertEqual(receipt["payload_bytes"], artifact.stat().st_size)
-                self.assertEqual(receipt["access_trace"]["events"], [{"operation": "read", "inventory_id": "payload"}])
+                trace = receipt["access_trace"]
+                self.assertEqual(trace["status"], "passed")
+                self.assertEqual(trace["coverage"], "all_threads_and_native_file_opens")
+                self.assertIn({"operation": "read", "inventory_id": "payload"}, trace["events"])
+                self.assertGreater(receipt["shared_bytes"], 0)
+                self.assertEqual(receipt["sampling_closure_bytes"], receipt["payload_bytes"] + receipt["shared_bytes"])
+                self.assertEqual(trace["byte_accounting"]["artifact_sha256"], inventory["artifact_sha256"])
                 self.assertNotIn(str(root), result.stdout)
                 self.assertEqual(len(output.read_text().splitlines()), 12)
 
