@@ -74,9 +74,11 @@ and `relative_gain_floor = 0.01`; the contract fixes the final values.
 
 ### 3.3 Family aggregation
 
-The required auditor families are tabular foundation models, boosted trees, task-trained
-neural models, and linear or additive models. Every member must be `qualified` in the
-auditor registry before it can count (see [claims policy](claims-policy.md) §1).
+The contract's required families are boosted trees, linear or additive models, and
+task-trained neural models. Tabular foundation models are the held-out family: the compiler
+never sees them, they confirm transfer, and their panel qualification waits on decision D-07.
+Every member must be `qualified` in the auditor registry before it can count (see
+[claims policy](claims-policy.md) §1).
 
 ```math
 T_f(A) = \operatorname{mean}_{m \in f} T_{d,m}(A), \qquad
@@ -93,8 +95,9 @@ family can never raise `T_robust` (a property test in T-031).
 The seed design is five generator fit seeds by three sample seeds, plus declared auditor
 seeds for stochastic task-trained models. A cluster bootstrap resamples source family,
 then dataset, then seed. It uses a fixed RNG seed (xorshift64) and the same resample
-indices for every auditor family. The one-sided 95% lower bound `LCB(T_robust)` is the
-nearest-rank lower quantile. Qualification reads the lower bound only, never the mean
+indices for every auditor family. The one-sided 95% lower bound `LCB(T_robust)` is a lower
+order statistic of the bootstrap replicates; the contract fixes the generator, seed, replicate
+count and quantile rule (`aggregation_policy` in `contracts/tdl-contract-v1.json`). Qualification reads the lower bound only, never the mean
 and never the best seed.
 
 ## 4. Driver fidelity
