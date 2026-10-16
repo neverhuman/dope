@@ -175,7 +175,10 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         let family = get_str("family")?;
         let auditor = get_str("auditor")?;
         require(family_set.contains(family.as_str()), "unexpected_family")?;
-        require(required_auditors[&family].contains(&auditor), "unexpected_auditor")?;
+        require(
+            required_auditors[&family].contains(&auditor),
+            "unexpected_auditor",
+        )?;
         let seed = count(row.get("seed").ok_or(MetricError::new("invalid_count"))?, 0)?;
         require(required_seeds.contains(&seed), "unexpected_seed")?;
         let obs_key = (
