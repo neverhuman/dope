@@ -21,9 +21,9 @@ from research.benchmark.publish_baseline_completion import build, load_sources, 
 STATIC = REPO / 'ops/ci/paper-inputs'
 OUT = REPO / 'docs/whitepaper/generated'
 LOCK_SHA256 = 'c1c7142eed329e15ebdd2cd5745817962c03d09a68786166655cc159e2f97b81'
-INVENTORY_SHA256 = '6d79785fc4da2e54c4d80acde6ab0c39d404c14658997e6db5a433fb94513b58'
+INVENTORY_SHA256 = '504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64'
 PREDECLARE = REPO / 'research/benchmark/review_fixes/predeclare.json'
-PREDECLARE_SHA256 = 'e64a73897a0282bcf3604b175f5c90955022f12a8dc5167eb2e1da3c2687d2d3'
+PREDECLARE_SHA256 = '921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5'
 
 
 def authenticated(path, digest):
