@@ -29,6 +29,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 
+import declared_facts
 import figure_style
 from figure_spec import TEASER_ROW_PAD, TEASER_X_LIM
 
@@ -36,6 +37,10 @@ figure_style.apply(matplotlib, size=7.6)
 import matplotlib.pyplot as plt  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[3]
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+from research.benchmark.review_fixes.v2_panel import STRONGEST_MIN_LINEAGES  # noqa: E402
+
 GEN = REPO / "docs" / "whitepaper" / "generated"
 FIG = REPO / "docs" / "whitepaper" / "figures"
 README_DIR = REPO / "docs" / "readme"
@@ -46,8 +51,10 @@ DEFAULT_GREEN = "#A6D96A"
 CONTEXT = "#7A7A7A"
 CONTROL = "#A8A8A8"
 BAND = "#D6D6D6"
-CAP = 10240
-FULL_PANEL = 90
+# The cap, the full-panel lineage floor and the interval level are read, not typed.
+CAP = declared_facts.byte_cap(declared_facts.read(declared_facts.CONTRACT, REPO))
+FULL_PANEL = STRONGEST_MIN_LINEAGES
+INTERVAL_LEVEL = declared_facts.interval_level(declared_facts.read(declared_facts.PREDECLARE, REPO))
 FOREST_TICKS = (0.0, 0.3, 0.6)
 # Readability floor for the page-1 hero at its printed size (ledger C053).
 HERO_MIN_POINTS = 7.0
@@ -84,7 +91,7 @@ def draw_forest(headline: dict, path: Path, width: float = 5.5, dpi: int | None 
     height = 0.42 + 0.215 * len(rows)
     figure, axes = plt.subplots(1, 3, figsize=(width, height), sharey=True)
     _forest_panels(axes, rows, margin, value_size=6.0, count_size=6.4)
-    figure.supxlabel("DOPE minus comparator, Hodges-Lehmann retention difference (95% nested interval)",
+    figure.supxlabel(f"DOPE minus comparator, Hodges-Lehmann retention difference ({INTERVAL_LEVEL}% nested interval)",
                      fontsize=figure_style_size(), y=0.01)
     figure.subplots_adjust(left=0.27, right=0.93, bottom=0.2, top=0.9, wspace=0.08)
     return _save(figure, path, dpi)
@@ -275,7 +282,7 @@ def _frontier(axis, headline: dict, cap_size: float, label_size: float, dope_siz
     boxes = {code: [line.get_window_extent(renderer) for line in lines] for code, lines in marks.items()}
     # Labels go on after every mark and limit is fixed, DOPE first, then by retention.
     placed: list = []
-    _place(axis, "10,240-byte cap", [((CAP, 1.0), ("data", "axes fraction"), ((3, -3, "left", "top"),))],
+    _place(axis, f"{CAP:,}-byte cap", [((CAP, 1.0), ("data", "axes fraction"), ((3, -3, "left", "top"),))],
            placed, fontsize=cap_size, color=figure_style.INK)
     order = sorted(plotted, key=lambda arm: (arm["code"] != "Dope", -(arm["level"]["median"] or 0.0)))
     for arm in order:
