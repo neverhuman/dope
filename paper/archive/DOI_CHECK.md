@@ -1,3 +1,7 @@
+> **Archived 2026-10-15 (T-111). Historical.** This review ledger belongs to the frozen v2 validation paper
+> (`docs/whitepaper/dope-mfs.tex`) and moved here from `docs/whitepaper/DOI_CHECK.md` unchanged. It is not the
+> current paper's status; see [paper/README.md](../README.md) and [docs/claims-policy.md](../../docs/claims-policy.md).
+
 # DOI and URL check
 
 Recorded 2026-10-06 from the bibliography on `paper-ieee-w1`.
