@@ -42,7 +42,7 @@ Current assignments (2026-10-15):
 
 | Do not claim | Why | Say instead |
 | --- | --- | --- |
-| DOPE beats TabSyn, or any method, overall | The paired interval against the strongest full-panel comparator contains zero; the comparison is CatBoost-centred and selection-exposed. | "the paired interval contains zero" |
+| DOPE beats TabSyn, or any method, overall | The paired interval against the strongest full-panel comparator contains zero; the comparison is CatBoost-centered and selection-exposed. | "the paired interval contains zero" |
 | DOPE is validated across Kumo, Mitra or TabICLv2 | These auditors are unqualified. | "planned, unqualified" |
 | MFS-v4 is an established master score | It was never measured; it is historical. | "historical draft contract" |
 | The artifact is private, anonymous, de-identified, HIPAA-safe or differentially private | Empirical attacks are partial, and measured copy, membership and attribute gates fail on some cells. No formal mechanism is implemented. | "empirical attack results on the stated cells" |

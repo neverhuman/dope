@@ -109,7 +109,7 @@ never compared across model families; native attributions are sensitivity analys
 
 ### 4.2 Components
 
-With `p_real` and `p_syn` the normalised non-negative importance vectors over groups:
+With `p_real` and `p_syn` the normalized non-negative importance vectors over groups:
 
 | Component | Definition | Role |
 | --- | --- | --- |
@@ -131,7 +131,7 @@ ceiling and clipped to `[0, 1]`. When a ceiling is below the stability floor, th
 
 ### 4.4 Driver score
 
-The auditor driver score is the smallest normalised required component. The family
+The auditor driver score is the smallest normalized required component. The family
 score is the mean over the family's auditors. `D_robust` is the worst family score. A
 missing required component makes the cell `incomplete`, never zero.
 
