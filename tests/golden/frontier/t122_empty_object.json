@@ -1,0 +1,14 @@
+{
+  "case_id": "t122_frontier_empty_object",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "reason": "invalid_cells",
+    "status": "failed"
+  },
+  "input": {
+    "cells": {}
+  },
+  "purpose": "An empty object is malformed, not a missing list.",
+  "schema_version": 1
+}

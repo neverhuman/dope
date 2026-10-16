@@ -1,0 +1,38 @@
+{
+  "case_id": "t122_drivers_sequential_sum_threshold",
+  "citable": false,
+  "component": "drivers",
+  "expected": {
+    "driver_fidelity": 0.7846876807403124,
+    "driver_pass": true,
+    "normalized_components": {
+      "mass": 0.7846876807403124
+    },
+    "raw_components": {
+      "mass": 0.7846876807403124
+    },
+    "reason": null,
+    "status": "complete"
+  },
+  "input": {
+    "driver_threshold": 0.7846876807403124,
+    "real_importances": [
+      0.457,
+      0.871,
+      0.952
+    ],
+    "real_real_ceiling": {
+      "mass": 1.0
+    },
+    "required_components": [
+      "mass"
+    ],
+    "synthetic_importances": [
+      0.681,
+      0.559,
+      0.398
+    ]
+  },
+  "purpose": "Rust sequential binary64 sum crosses the threshold; compensated Python sum must not flip the boolean.",
+  "schema_version": 1
+}

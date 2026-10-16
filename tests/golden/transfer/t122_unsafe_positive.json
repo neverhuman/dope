@@ -1,0 +1,24 @@
+{
+  "case_id": "t122_transfer_unsafe_positive",
+  "citable": false,
+  "component": "transfer",
+  "expected": {
+    "reason": "nonfinite_or_invalid_number",
+    "status": "failed"
+  },
+  "input": {
+    "constant_target": false,
+    "null_losses": [
+      10.0
+    ],
+    "real_gain_lcb": 7.0,
+    "real_losses": [
+      2.0
+    ],
+    "synthetic_losses": [
+      9007199254740992
+    ]
+  },
+  "purpose": "Integer magnitudes outside the exact binary64 integer range refuse before loss arithmetic.",
+  "schema_version": 1
+}
