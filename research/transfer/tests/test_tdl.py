@@ -48,7 +48,9 @@ def aggregate_input():
                 for family, base in (("tree", .9), ("linear", .8)):
                     rows.append(dict(source_family=source, dataset=dataset, seed=seed,
                                      family=family, auditor=family, transfer=base + (seed - 2) * .1))
-    return dict(rows=rows, required_families=["tree", "linear"], bootstrap_seed=1729,
+    return dict(rows=rows, required_families=["tree", "linear"],
+                required_auditors={"tree": ["tree"], "linear": ["linear"]},
+                required_seeds=[1, 2, 3], bootstrap_seed=1729,
                 bootstrap_replicates=199, alpha=.05)
 
 
@@ -57,6 +59,7 @@ def frontier_input():
         return dict(artifact_bytes=size, status="complete", families=["tree", "linear"],
                     gates={"closure": True, "privacy": True}, lcb_transfer=transfer_, driver_fidelity=driver)
     return dict(required_families=["tree", "linear"], required_gates=["closure", "privacy"],
+                byte_grid=[1024, 2048, 4096],
                 cells=[cell(1024, .85), cell(2048, .95), cell(4096, .90)])
 
 
@@ -100,8 +103,10 @@ class AggregateTests(unittest.TestCase):
         data = aggregate_input()
         original = aggregate.evaluate(data)
         data["rows"] += [dict(row, auditor="tree2") for row in data["rows"] if row["family"] == "tree"]
+        data["required_auditors"]["tree"].append("tree2")
         self.assertTrue(close(aggregate.evaluate(data), original))
         data["required_families"].append("weak")
+        data["required_auditors"]["weak"] = ["weak"]
         data["rows"] += [dict(row, family="weak", auditor="weak", transfer=-.2)
                          for row in data["rows"] if row["family"] == "linear"]
         self.assertLessEqual(aggregate.evaluate(data)["robust_transfer"], original["robust_transfer"])
