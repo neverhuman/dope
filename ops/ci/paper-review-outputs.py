@@ -254,8 +254,10 @@ def code_snapshot():
         paths.update(p for p in (REPO / directory).rglob('*.py')
                      if 'tests' not in p.parts and not p.name.startswith('test_'))
     paths.update((REPO / 'ops/ci').glob('paper-*.py'))
+    # readme_benchmark.py reads the L3 byte cap from the embedded release contract.
     paths.update(REPO / name for name in ('docs/whitepaper/scripts/build_pdf.sh',
-                                         'ops/ci/paper-architecture.tex'))
+                                         'ops/ci/paper-architecture.tex',
+                                         'production/kpi-contract.json'))
     return tuple((p.relative_to(REPO).as_posix(), safe_bytes(REPO, p.relative_to(REPO)))
                  for p in sorted(paths))
 

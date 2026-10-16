@@ -99,6 +99,7 @@ The linter matches case-insensitively in README prose outside generated blocks, 
 - Resampled real rows are a row-count diagnostic, not a generator.
 - A number in the README or paper comes from `paper/generated/headline-results.json`
   through a generated block, or from a pin that a checker verifies. It is never typed by hand.
+- Toolchain versions (for example TeX Live, `latexmk` and BibTeX in `paper/README.md`) are environment facts, not results. They need no generated source, but must match the environment that builds the paper.
 
 ## 5. Claim ladder
 

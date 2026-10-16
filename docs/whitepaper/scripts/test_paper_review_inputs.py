@@ -72,6 +72,9 @@ class ReviewInputTests(unittest.TestCase):
         architecture = self.root / 'ops/ci/paper-architecture.tex'
         architecture.parent.mkdir(parents=True)
         architecture.write_text('% fixture architecture\n')
+        contract = self.root / 'production/kpi-contract.json'
+        contract.parent.mkdir(parents=True)
+        contract.write_text('{"tier_byte_limits": {"l3": 10240}}\n')
         self.panel = self.root / self.panel_name
         self.panel.parent.mkdir(parents=True)
         self.panel.write_bytes(b'{"median": 0.5}\n')
