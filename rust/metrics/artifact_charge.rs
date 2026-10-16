@@ -282,12 +282,19 @@ fn finalize_charge(
 }
 
 /// Evaluate exact byte charge directly on a binary `TDL1` container or native `DPK3` artifact.
+/// A null closure declaration is unmeasured; an explicit empty array declares no extra files.
 pub fn evaluate_artifact_bytes(
     artifact: &[u8],
     closure_files: &Value,
     amortization_count: Option<u64>,
 ) -> Value {
     let inner = (|| -> MetricResult<Value> {
+        if closure_files.is_null() {
+            return Err(MetricError::with_status(
+                "missing_charge_manifest",
+                "incomplete",
+            ));
+        }
         let closure = parse_closure_files(closure_files)?;
         let users = match amortization_count {
             Some(u) => count(&json!(u), 1)?,

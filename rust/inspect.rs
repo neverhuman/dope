@@ -2,7 +2,7 @@ use std::fs;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::Value;
 
 use crate::codec::{ArtifactAccounting, LoadedKernel, account_artifact, load_kernel};
 use crate::error::{DopeError, Result, io_error};
@@ -76,7 +76,7 @@ fn inspect_tdl1_bytes(bytes: &[u8], sampling_closure_bytes: Option<usize>) -> Re
         artifact_bytes: payload_bytes,
         byte_scopes: InspectionByteScopes {
             payload_bytes,
-            sampling_closure_bytes: Some(sampling_closure_bytes.unwrap_or(payload_bytes)),
+            sampling_closure_bytes,
             section_bytes,
         },
         byte_accounting: Some(accounting),
@@ -329,6 +329,7 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
 /// Reconcile `inspect_kernel` with `artifact_charge` for a native `DPK3` artifact,
 /// binary `TDL1` container, or JSON `TDL1` charge manifest, returning the exact
 /// `artifact_charge` JSON record after verifying equality with `Inspection`.
+/// Bare artifacts have no closure declaration and return an incomplete charge.
 pub fn inspect_charge(path: &Path) -> Result<Value> {
     let inspection = inspect_kernel(path)?;
     let raw_bytes = fs::read(path).map_err(|error| io_error(path, error))?;
@@ -340,8 +341,11 @@ pub fn inspect_charge(path: &Path) -> Result<Value> {
     {
         artifact_charge::evaluate(charge_input)
     } else {
-        artifact_charge::evaluate_artifact_bytes(&raw_bytes, &json!([]), None)
+        artifact_charge::evaluate_artifact_bytes(&raw_bytes, &Value::Null, None)
     };
+    if charge.get("status").and_then(Value::as_str) == Some("incomplete") {
+        return Ok(charge);
+    }
     if charge.get("status").and_then(Value::as_str) != Some("complete") {
         let reason = charge
             .get("reason")
@@ -362,11 +366,7 @@ pub fn inspect_charge(path: &Path) -> Result<Value> {
         || inspection.byte_scopes.payload_bytes != charge_payload
         || inspection.framing_bytes() != Some(charge_framing)
         || inspection.byte_scopes.section_bytes != charge_sections
-        || inspection
-            .byte_scopes
-            .sampling_closure_bytes
-            .unwrap_or(inspection.byte_scopes.payload_bytes)
-            != charge_closure
+        || inspection.byte_scopes.sampling_closure_bytes != Some(charge_closure)
     {
         return Err(DopeError::Codec(
             "inspect byte accounting disagrees with TDL1 byte charge".into(),
@@ -380,7 +380,51 @@ mod tests {
     use super::*;
     use crate::compiler::{CompileOptions, compile_kernel_from_dir};
     use crate::model::Task;
+    use serde_json::json;
     use std::path::PathBuf;
+
+    fn bare_tdl1_fixture(name: &str) -> (PathBuf, Vec<u8>) {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("target/inspect-closure-tests")
+            .join(std::process::id().to_string());
+        fs::create_dir_all(&root).unwrap();
+        let bytes = artifact_charge::canonical_container(&json!([
+            {"name": "weights", "hex": "010203"}
+        ]))
+        .unwrap();
+        let path = root.join(name);
+        fs::write(&path, &bytes).unwrap();
+        (path, bytes)
+    }
+
+    #[test]
+    fn bare_tdl1_inspection_keeps_sampling_closure_unmeasured() {
+        let (path, bytes) = bare_tdl1_fixture("inspection.tdl1");
+        let inspection = inspect_kernel(&path).unwrap();
+        assert_eq!(inspection.byte_scopes.payload_bytes, bytes.len());
+        assert_eq!(inspection.byte_scopes.sampling_closure_bytes, None);
+        assert_eq!(inspection.byte_scopes.section_bytes, vec![3]);
+        assert_eq!(inspection.framing_bytes(), Some(bytes.len() - 3));
+        let serialized = serde_json::to_value(inspection).unwrap();
+        assert!(serialized["byte_scopes"]["sampling_closure_bytes"].is_null());
+        assert_eq!(serialized["metric_status"]["status"], "unmeasured");
+    }
+
+    #[test]
+    fn bare_tdl1_charge_is_incomplete_without_a_closure_manifest() {
+        let (path, bytes) = bare_tdl1_fixture("charge.tdl1");
+        let charge = inspect_charge(&path).unwrap();
+        assert_eq!(charge["status"], "incomplete");
+        assert_eq!(charge["reason"], "missing_charge_manifest");
+        assert_eq!(charge, artifact_charge::evaluate(&json!({})));
+        assert_eq!(
+            charge,
+            artifact_charge::evaluate_artifact_bytes(&bytes, &Value::Null, None)
+        );
+        let declared_empty = artifact_charge::evaluate_artifact_bytes(&bytes, &json!([]), None);
+        assert_eq!(declared_empty["status"], "complete");
+        assert_eq!(declared_empty["sampling_closure_bytes"], bytes.len());
+    }
 
     #[test]
     fn inspect_and_tdl1_charge_report_identical_numbers_on_toy_and_golden_cases() {
@@ -408,10 +452,12 @@ mod tests {
             "toy.dpk inspection must match committed INSPECT.txt"
         );
 
-        let toy_native_charge = inspect_charge(&toy_dpk_path).expect("toy.dpk charge must succeed");
-        let direct_dpk_charge =
+        let missing_charge = artifact_charge::evaluate(&json!({}));
+        assert_eq!(toy_inspection.byte_scopes.sampling_closure_bytes, None);
+        assert_eq!(inspect_charge(&toy_dpk_path).unwrap(), missing_charge);
+        let toy_native_charge =
             artifact_charge::evaluate_artifact_bytes(&compiled.artifact, &json!([]), None);
-        assert_eq!(toy_native_charge, direct_dpk_charge);
+        assert_eq!(toy_native_charge["status"], "complete");
         assert_eq!(
             toy_inspection.artifact_bytes as u64,
             toy_native_charge["payload_bytes"].as_u64().unwrap()
@@ -454,10 +500,7 @@ mod tests {
             toy_tdl1_inspect.byte_scopes.payload_bytes as u64,
             toy_tdl1_charge["payload_bytes"].as_u64().unwrap()
         );
-        assert_eq!(
-            toy_tdl1_inspect.byte_scopes.sampling_closure_bytes.unwrap() as u64,
-            toy_tdl1_charge["sampling_closure_bytes"].as_u64().unwrap()
-        );
+        assert_eq!(toy_tdl1_inspect.byte_scopes.sampling_closure_bytes, None);
         assert_eq!(
             toy_tdl1_inspect.framing_bytes().unwrap() as u64,
             toy_tdl1_charge["framing_bytes"].as_u64().unwrap()
@@ -466,7 +509,24 @@ mod tests {
             toy_tdl1_inspect.byte_scopes.section_bytes,
             toy_inspection.byte_scopes.section_bytes
         );
-        assert_eq!(inspect_charge(&toy_tdl1_path).unwrap(), toy_tdl1_charge);
+        assert_eq!(inspect_charge(&toy_tdl1_path).unwrap(), missing_charge);
+
+        let toy_manifest_path = tmp_dir.join("toy-charge.json");
+        fs::write(
+            &toy_manifest_path,
+            serde_json::to_vec(&json!({
+                "sections": toy_tdl1_sections,
+                "closure_files": [],
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        let declared_toy = inspect_kernel(&toy_manifest_path).unwrap();
+        assert_eq!(
+            declared_toy.byte_scopes.sampling_closure_bytes,
+            Some(toy_tdl1_bytes.len())
+        );
+        assert_eq!(inspect_charge(&toy_manifest_path).unwrap(), toy_tdl1_charge);
 
         // 2. Golden charge cases: tests/golden/charge/*.json
         let golden_charge_dir = manifest_dir.join("tests/golden/charge");
@@ -533,6 +593,8 @@ mod tests {
             assert_eq!(container_inspect.byte_scopes.payload_bytes, exp_payload);
             assert_eq!(container_inspect.framing_bytes(), Some(exp_framing));
             assert_eq!(container_inspect.byte_scopes.section_bytes, exp_sections);
+            assert_eq!(container_inspect.byte_scopes.sampling_closure_bytes, None);
+            assert_eq!(inspect_charge(&container_path).unwrap(), missing_charge);
         }
         assert!(
             checked_goldens >= 6,
