@@ -58,6 +58,25 @@ enum Command {
         #[arg(long)]
         attempts: Option<PathBuf>,
     },
+    /// Compile a headered CSV directly into a row-free DOPE artifact by inferring
+    /// numeric/nominal column types from fit rows with opaque public IDs by default.
+    CompileCsv {
+        #[arg(long)]
+        csv: PathBuf,
+        /// Target column name or 0-based index (defaults to the last column).
+        #[arg(long)]
+        target: Option<String>,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = 1729)]
+        seed: u64,
+        #[arg(long, default_value = "chow_liu")]
+        candidate: String,
+        #[arg(long, default_value_t = 10240)]
+        max_complete_bytes: usize,
+        #[arg(long, default_value_t = 60.0)]
+        deadline_seconds: f64,
+    },
     /// Fit a headered, declared continuous schema using fit rows only.
     CompileRaw {
         #[arg(long)]

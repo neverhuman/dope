@@ -203,7 +203,8 @@ class FirewallTests(unittest.TestCase):
     def test_generated_blocks_are_admitted_but_new_prose_numbers_and_demo_drift_fail(self):
         from unittest.mock import patch
         readme_path = ROOT / 'README.md'
-        candidate = "# DOPE\n\n" + (ROOT / 'paper/generated/readme-result-card.md').read_text()
+        candidate = "# DOPE\n\n![Historical validation hero](paper/generated/hero-frontier.png)\n\n"
+        candidate += (ROOT / 'paper/generated/readme-result-card.md').read_text()
         candidate += (ROOT / 'paper/generated/readme-demo-notes.md').read_text()
         original_read = Path.read_text
         def check(text):
@@ -221,6 +222,22 @@ class FirewallTests(unittest.TestCase):
         outputs['paper/generated/hero-frontier.png'] = b'seeded drift'
         with patch.object(render, 'expected_outputs', return_value=outputs):
             self.assertTrue(any('figure hash drift' in f for f in C.public_failures()))
+
+
+    def test_readme_hero_must_stay_above_the_first_section(self):
+        with self.public_fixture() as root:
+            readme = (root / 'README.md').read_text()
+            self.assertEqual(C.readme_hero_failures(readme), [])
+            hero = next(line for line in readme.splitlines() if 'paper/generated/hero-frontier.png' in line)
+            without = readme.replace(hero + '\n', '', 1)
+            heading_end = without.index('\n', without.index('\n## ') + 1)
+            moved = without[:heading_end + 1] + hero + '\n' + without[heading_end + 1:]
+            for label, text in (('moved below a section', moved), ('removed', without),
+                                ('without alt text', readme.replace(hero, '![](paper/generated/hero-frontier.png)'))):
+                with self.subTest(label=label):
+                    (root / 'README.md').write_text(text)
+                    self.assertIn('README: the generated hero figure must appear above the first section',
+                                  C.public_failures(root, check_render=False))
 
 
 class RegistryTests(unittest.TestCase):
@@ -253,6 +270,7 @@ class RegistryTests(unittest.TestCase):
         subprocess.run([sys.executable, str(ROOT / 'tools/claims/registry.py'), '--migrate'], check=True, capture_output=True)
         self.assertEqual(index.read_bytes(), before)
         self.assertEqual({p: p.read_bytes() for p in paths}, original)
+
 
 
 if __name__ == '__main__':

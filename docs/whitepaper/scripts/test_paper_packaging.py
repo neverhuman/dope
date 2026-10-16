@@ -267,7 +267,7 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
         cited = re.search(r"preferred-citation:.*?\n  title: \"([^\"]*)\"", citation, re.S)
         self.assertIsNotNone(cited)
         self.assertEqual(cited.group(1), title)
-        self.assertTrue(title.startswith("DOPE: "))
+        self.assertTrue(title.startswith("D.O.P.E.: "))
         self.assertNotIn("Kilobyte", title)
         self.assertIn("Downstream Objective-Preserving Encoding", main)
         # The round records keep all four profiles and record no selection, so these statements are withdrawn.
@@ -287,10 +287,10 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
         title = re.search(r"\\title\{\\texorpdfstring\{.*?\}\{([^{}]*)\}\}", main, re.S).group(1)
         self.assertIn(r"pdftitle={" + title + "}", main)
         self.assertIn(r"pdftitle={Supplement: " + title + "}", supplement)
-        self.assertEqual(readme.splitlines()[0], "# DOPE — " + title.removeprefix("DOPE: "))
+        self.assertEqual(readme.splitlines()[0], "# " + title.split(" -- ")[0])
         bibtex = re.search(r"@misc\{taylor2026dope,\n  title  = \{(.*)\},\n", readme)
         self.assertIsNotNone(bibtex)
-        self.assertEqual(bibtex.group(1), "{DOPE}: " + title.removeprefix("DOPE: "))
+        self.assertEqual(bibtex.group(1), "{D.O.P.E.}: " + title.removeprefix("D.O.P.E.: "))
         prose = readme.split("<!-- BEGIN BENCHMARK -->")[0] + readme.split("<!-- END BENCHMARK -->")[1]
         for text in (prose, citation, title):
             self.assertNotRegex(text.lower(), r"kilobyte[- ]scale|kilobyte generator")
