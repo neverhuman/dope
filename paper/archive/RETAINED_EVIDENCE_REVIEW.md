@@ -1,3 +1,7 @@
+> **Archived 2026-10-15 (T-111). Historical.** This review ledger belongs to the frozen v2 validation paper
+> (`docs/whitepaper/dope-mfs.tex`) and moved here from `docs/whitepaper/RETAINED_EVIDENCE_REVIEW.md` unchanged. It is not the
+> current paper's status; see [paper/README.md](../README.md) and [docs/claims-policy.md](../../docs/claims-policy.md).
+
 # Retained-evidence red-team review, 2026-10-07
 
 ## Findings repaired
