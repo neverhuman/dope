@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "citable": false,
+  "purpose": "Strict JSON admission cases; input_json is intentionally untrusted serialized JSON.",
+  "cases": [
+    {
+      "case_id": "t122_json_huge_positive",
+      "input_json": "{\"value\":10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}",
+      "expected_error": "invalid_json"
+    },
+    {
+      "case_id": "t122_json_huge_negative",
+      "input_json": "{\"value\":-10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}",
+      "expected_error": "invalid_json"
+    },
+    {
+      "case_id": "t122_json_float_overflow",
+      "input_json": "{\"value\":1e400}",
+      "expected_error": "nonstandard_json_number"
+    },
+    {
+      "case_id": "t122_json_duplicate_key",
+      "input_json": "{\"value\":0,\"value\":1}",
+      "expected_error": "duplicate_json_key"
+    },
+    {
+      "case_id": "t122_json_nan",
+      "input_json": "{\"value\":NaN}",
+      "expected_error": "nonstandard_json_number"
+    },
+    {
+      "case_id": "t122_json_above_u64",
+      "input_json": "{\"value\":18446744073709551616}",
+      "expected_error": "invalid_json"
+    },
+    {
+      "case_id": "t122_json_below_i64",
+      "input_json": "{\"value\":-9223372036854775809}",
+      "expected_error": "invalid_json"
+    },
+    {
+      "case_id": "t122_json_max_u64",
+      "input_json": "{\"value\":18446744073709551615}",
+      "expected_value": {
+        "value": 18446744073709551615
+      }
+    },
+    {
+      "case_id": "t122_json_min_i64",
+      "input_json": "{\"value\":-9223372036854775808}",
+      "expected_value": {
+        "value": -9223372036854775808
+      }
+    }
+  ]
+}

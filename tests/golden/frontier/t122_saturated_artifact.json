@@ -1,0 +1,108 @@
+{
+  "case_id": "t122_frontier_saturated_artifact",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "frontier": [
+      {
+        "artifact_bytes": 256,
+        "budget_bytes": 512,
+        "driver_fidelity": 0.95,
+        "frontier_transfer": 0.85,
+        "lcb_transfer": 0.85,
+        "tdl_pass": false
+      },
+      {
+        "artifact_bytes": 256,
+        "budget_bytes": 1024,
+        "driver_fidelity": 0.95,
+        "frontier_transfer": 0.95,
+        "lcb_transfer": 0.95,
+        "tdl_pass": true
+      },
+      {
+        "artifact_bytes": 256,
+        "budget_bytes": 2048,
+        "driver_fidelity": 0.95,
+        "frontier_transfer": 0.96,
+        "lcb_transfer": 0.96,
+        "tdl_pass": true
+      }
+    ],
+    "largest_tested_bytes": 2048,
+    "reason": null,
+    "status": "qualified",
+    "tdl_budget_bytes": 1024,
+    "tdl_bytes": 256,
+    "tdl_interval_bytes": [
+      512,
+      1024
+    ]
+  },
+  "input": {
+    "byte_grid": [
+      512,
+      1024,
+      2048
+    ],
+    "cells": [
+      {
+        "artifact_bytes": 256,
+        "budget_bytes": 512,
+        "driver_fidelity": 0.95,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.85,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 256,
+        "budget_bytes": 1024,
+        "driver_fidelity": 0.95,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.95,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 256,
+        "budget_bytes": 2048,
+        "driver_fidelity": 0.95,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.96,
+        "status": "complete"
+      }
+    ],
+    "driver_threshold": 0.8,
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "required_gates": [
+      "closure",
+      "privacy"
+    ],
+    "transfer_threshold": 0.9
+  },
+  "purpose": "Grid budgets are distinct keys even when artifact bytes repeat; interval and B_k are grid values.",
+  "schema_version": 1
+}

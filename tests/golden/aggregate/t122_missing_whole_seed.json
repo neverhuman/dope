@@ -1,0 +1,84 @@
+{
+  "case_id": "t122_aggregate_missing_whole_seed",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "reason": "missing_family_or_cell",
+    "status": "incomplete"
+  },
+  "input": {
+    "alpha": 0.05,
+    "bootstrap_replicates": 9,
+    "bootstrap_seed": 1729,
+    "required_auditors": {
+      "linear": [
+        "en"
+      ],
+      "tree": [
+        "cb",
+        "lgbm"
+      ]
+    },
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "required_seeds": [
+      101,
+      211,
+      307
+    ],
+    "rows": [
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 0.95
+      },
+      {
+        "auditor": "lgbm",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 0.5
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 0.95
+      },
+      {
+        "auditor": "lgbm",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 0.5
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 0.9
+      }
+    ]
+  },
+  "purpose": "Declared auditor/seed roster cannot improve its score by omitting weak observations.",
+  "schema_version": 1
+}

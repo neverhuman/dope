@@ -1,0 +1,75 @@
+{
+  "case_id": "t122_frontier_all_gates_fail",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "reason": "gate_failed_privacy",
+    "status": "unqualified"
+  },
+  "input": {
+    "byte_grid": [
+      512,
+      1024,
+      2048
+    ],
+    "cells": [
+      {
+        "artifact_bytes": 256,
+        "budget_bytes": 512,
+        "driver_fidelity": 0.95,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": false
+        },
+        "lcb_transfer": 0.85,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 768,
+        "budget_bytes": 1024,
+        "driver_fidelity": 0.95,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": false
+        },
+        "lcb_transfer": 0.95,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 1536,
+        "budget_bytes": 2048,
+        "driver_fidelity": 0.95,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": false
+        },
+        "lcb_transfer": 0.96,
+        "status": "complete"
+      }
+    ],
+    "driver_threshold": 0.8,
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "required_gates": [
+      "closure",
+      "privacy"
+    ],
+    "transfer_threshold": 0.9
+  },
+  "purpose": "Declared budget and mandatory-gate refusal; no silent complete-case selection.",
+  "schema_version": 1
+}

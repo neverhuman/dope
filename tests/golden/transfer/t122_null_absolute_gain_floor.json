@@ -1,0 +1,34 @@
+{
+  "case_id": "t122_transfer_null_absolute_gain_floor",
+  "citable": false,
+  "component": "transfer",
+  "expected": {
+    "clipped_transfer": 0.9,
+    "null_loss": 10.0,
+    "raw_transfer": 0.9,
+    "real_gain": 8.0,
+    "real_loss": 2.0,
+    "reason": null,
+    "status": "informative",
+    "synthetic_loss": 2.8
+  },
+  "input": {
+    "absolute_gain_floor": null,
+    "constant_target": false,
+    "null_losses": [
+      10.0,
+      10.0
+    ],
+    "real_gain_lcb": 7.0,
+    "real_losses": [
+      2.0,
+      2.0
+    ],
+    "synthetic_losses": [
+      2.8,
+      2.8
+    ]
+  },
+  "purpose": "Explicit null has the same numeric-option default as Rust.",
+  "schema_version": 1
+}

@@ -1,0 +1,115 @@
+{
+  "case_id": "t122_aggregate_clip_before_family_mean",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "family_means": {
+      "linear": 1.0,
+      "tree": 0.75
+    },
+    "lcb": 0.75,
+    "mean_transfer": 0.875,
+    "reason": null,
+    "robust_transfer": 0.75,
+    "status": "complete"
+  },
+  "input": {
+    "alpha": 0.05,
+    "bootstrap_replicates": 9,
+    "bootstrap_seed": 1729,
+    "required_auditors": {
+      "linear": [
+        "en"
+      ],
+      "tree": [
+        "cb",
+        "lgbm"
+      ]
+    },
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "required_seeds": [
+      101,
+      211,
+      307
+    ],
+    "rows": [
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 1.4
+      },
+      {
+        "auditor": "lgbm",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 0.5
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 211,
+        "source_family": "source1",
+        "transfer": 1.4
+      },
+      {
+        "auditor": "lgbm",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 211,
+        "source_family": "source1",
+        "transfer": 0.5
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 211,
+        "source_family": "source1",
+        "transfer": 1.0
+      },
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 1.4
+      },
+      {
+        "auditor": "lgbm",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 0.5
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 1.0
+      }
+    ]
+  },
+  "purpose": "Each observation is capped at one before family means and paired bootstrap; 1.4 and .5 must give .75.",
+  "schema_version": 1
+}

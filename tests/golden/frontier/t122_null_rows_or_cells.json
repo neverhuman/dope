@@ -1,0 +1,14 @@
+{
+  "case_id": "t122_frontier_null_rows_or_cells",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "reason": "missing_budget_cell",
+    "status": "incomplete"
+  },
+  "input": {
+    "cells": null
+  },
+  "purpose": "Null observations are missing evidence, never complete.",
+  "schema_version": 1
+}
