@@ -1,0 +1,198 @@
+% TDL manuscript skeleton (T-110). Status: specified, not measured.
+% Numbers enter only through paper/generated/ (see macros.tex and paper/README.md).
+% Neutral preprint class on purpose: no venue class until a submission build exists.
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+\definecolor{pendingcolor}{RGB}{176,58,46}
+\hypersetup{pdftitle={Transfer Description Length for Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
+\input{macros}
+
+\title{Transfer Description Length for Synthetic Tables\\[0.4em]
+  \large How few bytes preserve what models learn from a table?}
+\author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
+\date{Draft skeleton --- evidence status: \ResultStatus}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+% Five moves (S2 §17.2). No number appears here until the sealed run exists.
+Synthetic tables are usually judged by how much they resemble the source or by one
+downstream learner, while the size of the generator that produced them goes uncounted.
+We define \MetricLong{} (\MetricName{}): the smallest tested number of dataset-specific
+bytes for which learners trained or conditioned only on generated rows recover a declared
+share of the real data's predictive gain in every required model family, rely on the same
+feature drivers, and pass copy, cleartext and byte-accounting gates, all measured on
+untouched real rows. DOPE (Downstream Objective-Preserving Encoding) compiles a table into
+a bounded executable sampling program whose every sampling byte is charged. The specified
+protocol holds out real rows, learner families and source families, and reports the full
+transfer-versus-bytes frontier rather than a weighted score.
+\pending{Sealed result: one sentence, written only after the sealed run.}
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+% Problem: resemblance and single-learner utility ignore generator size.
+A dataset is valuable because it changes what a learner can do. We ask how little
+executable information can carry that change: compile real training rows into a small
+sampler, give only its samples to independent learners, test those learners on untouched
+real rows, and count every byte the sampler reads. Train-on-synthetic, test-on-real
+evaluation \citep{esteban2017rcgan,jordon2018measuring} supplies the transfer measurement;
+this paper makes the charged size of the generator the quantity being reduced and makes
+transfer and driver agreement constraints rather than weighted terms.
+
+\begin{figure}[t]
+  \centering
+  \GeneratedFigure{hero-frontier.pdf}{Figure 1 (T-072): robust transfer lower bound against
+  dataset-specific bytes on a log axis, one step curve per admitted method, the
+  \MetricName{} threshold as a horizontal line, gate status by marker fill. Rendered from
+  generated/headline-results.json.}
+  \caption{How many bytes are needed to preserve learning? Each point is one method at one
+  tested byte budget. Only methods measured on the same cohort, splits, sizes, seeds and
+  auditor panel appear together. Evidence status: \ResultStatus.}
+  \label{fig:frontier}
+\end{figure}
+
+\paragraph{Contributions.}
+(1)~\MetricName{}, a constrained transfer-versus-bytes measure with explicit result states
+and hard gates;
+(2)~DOPE, a compiler of bounded sampling programs with exact byte charging;
+(3)~a cross-model benchmark protocol with qualified auditor families, copy and coreset
+controls, and held-out learner and source families;
+(4)~executable evidence: charge manifests, golden metric parity between the Rust core and
+its Python mirror, and generated tables and figures.
+
+\section{Transfer Description Length}
+\label{sec:metric}
+
+For a dataset $d$, an auditor $m$ in family $f$ and an artifact $A$, all losses are paired
+on the same untouched real query rows and stated in original target units. Transfer is the
+share of the real-data gain over a null that synthetic training recovers:
+\begin{equation}
+  T_{d,m}(A) = \frac{\Lnull - \Lsyn(A)}{\Lnull - \Lreal}.
+  \label{eq:transfer}
+\end{equation}
+Receipts store $T$ unclipped. A cell is informative only when the real gain clears a
+declared floor and its lower confidence bound is positive; an uninformative cell is
+excluded from that auditor's estimate, never scored as zero. The null is the strongest
+baseline that learns nothing from the table, including no-context and label-shuffled
+context for in-context foundation models.
+
+Within a family the transfer values are averaged; across the required families the
+worst family is kept, $\Trobust(A) = \min_f T_f(A)$. Driver fidelity $\Drobust$ is built
+the same way from per-auditor driver scores (Section~\ref{sec:drivers}). An artifact
+qualifies when
+\begin{equation}
+  \LCB\bigl(\Trobust(A)\bigr) \ge \tau_T, \qquad \Drobust(A) \ge \tau_D, \qquad G(A) = \text{pass},
+  \label{eq:qualify}
+\end{equation}
+where $G$ is the conjunction of hard gates. \MetricName{} is the charged dataset-specific
+payload of the qualifying artifact at the smallest tested budget, reported with its grid
+interval. It is the smallest \emph{tested} size, not an optimum. The headline operating
+point is \HeadlinePoint{} ($\tau_T = $ \TauT, $\tau_D = $ \TauD); the budget grid is
+\ByteGrid. When no tested budget qualifies, the result is \emph{not reached in the tested
+range}; when a required cell is missing, no number is emitted.
+
+\section{Byte accounting}
+\label{sec:bytes}
+
+The primary rate is the dataset-specific payload: every byte whose value depends on the
+fitted data and that sampling reads, including schema, transforms, category dictionaries,
+seeds needed for replay, framing and sidecars. The sampling closure, which adds the decoder,
+runtime and any shared checkpoint a cold sampler opens, is reported beside it. Bytes come
+from one canonical container and a charge manifest; the compiler, the inspector, the file
+length, the sum of charged sections and a traced clean-room sampler must agree. Encoded
+value counts are diagnostics and never rank methods. \pending{Section-byte ablation and
+closure table from generated/.}
+
+\section{Auditors}
+\label{sec:auditors}
+
+Auditors come from a registry with a typed qualification path (specified, source verified,
+weights verified, environment verified, parity verified, resource verified, qualified).
+The required families are boosted trees \citep{prokhorenkova2018catboost}, task-trained
+neural models, linear or additive models, and tabular foundation models. Only qualified
+auditors count. The tabular foundation models named in the registry (Kumo Tabular,
+Mitra-v2, TabICLv2, TabPFN, LimiX, TabDPT, TabFM) are planned and unqualified at the time
+of writing, and no result in this draft uses them. \pending{Qualified auditor table from
+generated/.}
+
+\section{Driver fidelity}
+\label{sec:drivers}
+
+For each qualified auditor, a real-trained and a synthetic-trained instance of the same
+recipe are explained on the same real test rows by grouped permutation importance over the
+original features. Mass agreement (one minus total variation), rank agreement and sign
+agreement on stable drivers are each divided by the agreement two real-trained instances
+reach, so a synthetic table is never held to a standard real data cannot meet. The auditor
+score is the smallest normalised component, the family score their mean, and $\Drobust$ the
+worst family. Raw attribution magnitudes are never compared across model families.
+
+\section{Benchmark protocol}
+\label{sec:protocol}
+
+Real tables form the majority of the headline cohort; shift, mechanism and stress cohorts
+are reported separately. Three tracks compare methods at their author defaults, at equal
+selection compute, and at equal byte budgets. Controls include copied rows, a compressed
+copy of the original table as a size reference, a row-subset frontier, predictor-only and
+independent-marginal samplers. The seed design is \SeedDesign. Every scheduled cell ends in
+a terminal disposition, and failures stay in every denominator. The sealed test is opened
+once through a frozen release manifest.
+
+\section{Current validation evidence}
+\label{sec:evidence}
+
+The only measured evidence is the historical v2 validation panel: PMLB regression tables
+\citep{olson2017pmlb,romano2021pmlb}, CatBoost-centred, and selection-exposed, because every
+lineage and all three auditors informed the profile choice. It reports retention beside
+charged bytes, which is not a \MetricName{} result. Rows are labelled by evidence status.
+\begin{table}[h]
+  \centering
+  \GeneratedTable{result-card.tex}{Result card (T-070): rendered from
+  generated/headline-results.json with one evidence label per row.}
+  \caption{Evidence card. No row is a sealed-test or \MetricName{} result.}
+  \label{tab:card}
+\end{table}
+
+\section{Limitations}
+\label{sec:limits}
+
+\MetricName{} is an operational rate--distortion measure for one declared supervised
+workload. It does not estimate Shannon information or Kolmogorov complexity, it is not a
+code-length optimum, and it makes no causal claim. The artifact is conditioned on one
+target and does not replace the table for other uses. Empirical attack results are not
+formal differential privacy and not HIPAA de-identification. Foundation-model auditors
+drift and carry licence terms that can block their use.
+
+\section{Claim ladder}
+\label{sec:ladder}
+
+Every table and figure carries one evidence label: development, matched benchmark, sealed
+final, or release-certified. This draft is at the development rung. Superiority, cross-model
+and driver-preservation statements are pending their evidence and are not made here.
+
+\paragraph{Related work.}
+Generators for tabular data range from copulas, dependence trees and synthesis by
+sequential models \citep{chow1968dependence,patki2016sdv,nowok2016synthpop} to adversarial
+\citep{xu2019ctgan}, forest-based \citep{watson2023arf} and diffusion \citep{kotelnikov2023tabddpm}
+models. Dataset distillation and model distillation compress data or models for one
+learner \citep{wang2018distillation,hinton2015distilling}; generative compression names learned
+media codecs \citep{santurkar2017generative}. Description-length and bottleneck ideas
+\citep{rissanen1978modeling,tishby2000bottleneck} motivate the framing but are not claimed as
+the measure. Privacy evaluation of synthetic data is discussed by
+\citet{stadler2022groundhog} and \citet{platzer2021holdout}.
+\pending{Verified citations for TabSyn, Forest-Flow and the tabular foundation models.}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+\end{document}
