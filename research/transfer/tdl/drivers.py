@@ -71,13 +71,14 @@ def evaluate(data):
         for component in required:
             if ceilings.get(component) is not None:
                 parsed_ceilings[component] = unit(ceilings[component])
+        for component, ceiling in parsed_ceilings.items():
+            if ceiling <= 0 or ceiling < floor:
+                return failure("unstable_real_drivers", "uninformative")
         if any(ceilings.get(component) is None for component in required):
             return failure("missing_driver_component", "incomplete")
         normalized = {}
         for component in required:
             ceiling = parsed_ceilings[component]
-            if ceiling <= 0 or ceiling < floor:
-                return failure("unstable_real_drivers", "uninformative")
             normalized[component] = min(1.0, max(0.0, raw[component] / ceiling))
         score = min(normalized.values())
         threshold = unit(opt_default(data, "driver_threshold", 0.80))

@@ -114,10 +114,12 @@ mod tests {
             let input_json = case["input_json"].as_str().expect("input_json");
             let res = strict_parse_json(input_json);
             if let Some(expected_err) = case.get("expected_error").and_then(Value::as_str) {
-                let err = res.expect_err(&format!("case `{case_id}` should fail"));
+                let err = res
+                    .err()
+                    .unwrap_or_else(|| panic!("case `{case_id}` should fail"));
                 assert_eq!(err.reason, expected_err, "case `{case_id}` reason mismatch");
             } else if let Some(expected_val) = case.get("expected_value") {
-                let val = res.expect(&format!("case `{case_id}` should parse"));
+                let val = res.unwrap_or_else(|_| panic!("case `{case_id}` should parse"));
                 assert_eq!(&val, expected_val, "case `{case_id}` value mismatch");
             } else {
                 panic!("case `{case_id}` missing expected_error or expected_value");

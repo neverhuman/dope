@@ -201,6 +201,14 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
             parsed_ceilings.insert(comp.clone(), unit(v)?);
         }
     }
+    for &ceiling in parsed_ceilings.values() {
+        if ceiling <= 0.0 || ceiling < floor {
+            return Err(MetricError::with_status(
+                "unstable_real_drivers",
+                "uninformative",
+            ));
+        }
+    }
     if required
         .iter()
         .any(|comp| ceilings.get(comp).is_none_or(Value::is_null))
@@ -217,12 +225,6 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
 
     for comp in &required {
         let ceiling = parsed_ceilings[comp];
-        if ceiling <= 0.0 || ceiling < floor {
-            return Err(MetricError::with_status(
-                "unstable_real_drivers",
-                "uninformative",
-            ));
-        }
         let r_val = raw[comp];
         let norm_val = (r_val / ceiling).clamp(0.0, 1.0);
         min_score = min_score.min(norm_val);
