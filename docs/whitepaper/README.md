@@ -9,7 +9,7 @@ reproducible and are not extended. The new manuscript is the TDL package in
 The paper reports DOPE against copula, tree, forest, neural and diffusion baselines on 100
 PMLB regression tables. The reported profile is the compact residual
 `features12_steps2048` (at most 12 inputs, hidden width 16) at five fit seeds. The shared
-measurements are null-normalised retention under three auditors at sizes n and 4n, two
+measurements are null-normalized retention under three auditors at sizes n and 4n, two
 controls, and charged artifact bytes. Every lineage and auditor is selection-exposed, and
 the official test split is sealed. The release score MFS-v3 is printed as null. Its
 evidence label is `selection_exposed_validation` (see the
@@ -42,8 +42,8 @@ evidence stays in the checkout's `target/paper-build/`.
   receipt the build reads, with byte length and SHA-256. `paper_build.py` refuses a file
   whose bytes differ, or one not admitted by that list.
 - `ops/ci/paper-inputs/` holds the immutable source snapshots from `b774807`
-  (`inputs.lock.json`, provenance, licences, the extra bibliography and the sanitized
-  compute-cost receipts). `ops/ci/paper-prepare.py` authenticates them and materialises
+  (`inputs.lock.json`, provenance, licenses, the extra bibliography and the sanitized
+  compute-cost receipts). `ops/ci/paper-prepare.py` authenticates them and materializes
   them into `generated/`.
 - `research/benchmark/review_fixes/paper-build.json` declares each review reduction:
   its script, arguments and outputs.
