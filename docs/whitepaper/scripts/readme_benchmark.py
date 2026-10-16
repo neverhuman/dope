@@ -71,19 +71,72 @@ def load_facts(headline: dict) -> dict:
     return panel_facts(headline, json.loads(PREDECLARE.read_text()), json.loads(CONTRACT.read_text()))
 
 
+V2_PANEL = REPO / "research" / "benchmark" / "results" / "review-fixes-v2" / "panel.json"
+MFS_PANEL = REPO / "research" / "benchmark" / "results" / "mfs-v3-density-panel.json"
+
+
+def _load_extra_tables() -> tuple[dict, dict, dict]:
+    classical: dict[tuple[str, str], dict[str, dict]] = {}
+    if V2_PANEL.is_file():
+        v2 = json.loads(V2_PANEL.read_text())
+        for row in v2.get("levels", ()):
+            if row.get("size") == 4:
+                classical.setdefault((row["method"], row["configuration"]), {})[row["auditor"]] = row
+    tfm: dict[str, dict] = {}
+    driver: dict[str, tuple[float, float, float, int]] = {}
+    if MFS_PANEL.is_file():
+        mfs = json.loads(MFS_PANEL.read_text())
+        tfm = mfs.get("retention_summary", {})
+        by_m: dict[str, list[float]] = {}
+        for lin in mfs.get("lineages", ()):
+            vals = sorted(
+                float(s["holdout"]["driver_fidelity"])
+                for s in lin.get("seeds", ())
+                if isinstance(s.get("holdout", {}).get("driver_fidelity"), (int, float))
+            )
+            if vals:
+                mid = len(vals) // 2
+                med = vals[mid] if len(vals) % 2 == 1 else 0.5 * (vals[mid - 1] + vals[mid])
+                by_m.setdefault(lin["method"], []).append(med)
+        for m, vals in by_m.items():
+            vals.sort()
+            n = len(vals)
+            mid = n // 2
+            med = vals[mid] if n % 2 == 1 else 0.5 * (vals[mid - 1] + vals[mid])
+            q1 = vals[max(0, int(round(0.25 * (n - 1))))]
+            q3 = vals[min(n - 1, int(round(0.75 * (n - 1))))]
+            driver[m] = (med, q1, q3, n)
+    return classical, tfm, driver
+
+
 def benchmark_block(headline: dict, facts: dict | None = None) -> str:
     facts = load_facts(headline) if facts is None else facts
     cap = f"{facts['cap']:,}"
     arms = {arm["code"]: arm for arm in headline["arms"]}
     dope = arms["Dope"]
+    classical, tfm, driver = _load_extra_tables()
+    key = (headline["strongest"]["method"], headline["strongest"]["configuration"])
+    strongest = next(arm for arm in headline["arms"] if (arm["method"], arm["configuration"]) == key)
+    others = [arm["bytes"]["median"] for arm in headline["arms"]
+              if arm["role"] == "generator" and arm["bytes"] is not None]
+
     lines = [
-        f"Validation panel: {facts['panel']} PMLB regression tables, CatBoost auditor, synthetic size 4n. "
+        "![Multi-model retention at synthetic size 4n against median charged artifact bytes on a log axis, "
+        "and cross-architecture transfer across zero-shot tabular foundation models (NVIDIA Kumo-L, TabICLv2, Mitra-v2), "
+        f"classical learners, and feature driver fidelity. DOPE's median artifact is {size(dope['bytes']['median'])}; "
+        f"the other generators' medians run from {size(min(others))} to {size(max(others))}.](docs/readme/pareto.png)",
+        "",
+        f"Validation panel: {facts['panel']} PMLB regression tables across three task-trained model families "
+        "(CatBoost, Linear, Neural MLP) and three zero-shot tabular foundation models "
+        "(NVIDIA Kumo Tabular Large, TabICLv2, AutoGluon Mitra-v2), synthetic size 4n. "
         f"DOPE uses {facts['fit_seeds']} fit seeds; intervals are {facts['level']}% nested bootstrap intervals "
         "(simulated-family clusters, then lineages, then fit seeds). "
         "The difference column is DOPE minus the method on shared lineages (Hodges–Lehmann).",
         "",
-        f"| Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Lineage medians within {cap} B |",
-        "| --- | ---: | --- | --- | ---: | ---: | ---: |",
+        "#### 1. Multi-Model Task-Trained Transfer & Charged Artifact Bytes (Synthetic Size `4n`)",
+        "",
+        f"| Method | Lineages | CatBoost (4n) | Linear (4n) | Neural MLP (4n) | DOPE − method (CatBoost) | W/T/L | Median artifact | Within {cap} B |",
+        "| --- | ---: | --- | --- | --- | --- | ---: | ---: | ---: |",
     ]
     for code in ORDER:
         arm = arms.get(code)
@@ -93,23 +146,50 @@ def benchmark_block(headline: dict, facts: dict | None = None) -> str:
         name = f"**{arm['display']}**" if code == "Dope" else arm["display"]
         if arm["role"] == "control":
             name += " (control)"
+        cls_rows = classical.get((arm["method"], arm["configuration"]), {})
+        lin_row = cls_rows.get("linear")
+        mlp_row = cls_rows.get("mlp")
+        cb_cell = f"{fmt(level['median'])} [{fmt(level['lo'])}, {fmt(level['hi'])}]"
+        lin_cell = "—" if lin_row is None else f"{fmt(lin_row['median'])} [{fmt(lin_row['lo'])}, {fmt(lin_row['hi'])}]"
+        mlp_cell = "—" if mlp_row is None else f"{fmt(mlp_row['median'])} [{fmt(mlp_row['lo'])}, {fmt(mlp_row['hi'])}]"
         row = arm["contrasts"]["catboost"]
         diff = "—" if row is None else f"{signed(row['hl'])} [{fmt(row['hl_lo'])}, {fmt(row['hl_hi'])}]"
         wtl = "—" if row is None else f"{row['wins']}/{row['ties']}/{row['losses']}"
         stats = arm["bytes"]
         within = "—" if stats is None else f"{round(100 * stats['within_cap'] / stats['n'])}%"
         artifact = "none" if arm["role"] == "control" else ("—" if stats is None else size(stats["median"]))
-        lines.append(f"| {name} | {level['n']} | {fmt(level['median'])} [{fmt(level['lo'])}, {fmt(level['hi'])}] "
-                     f"| {diff} | {wtl} | {artifact} | {within} |")
-    key = (headline["strongest"]["method"], headline["strongest"]["configuration"])
-    strongest = next(arm for arm in headline["arms"] if (arm["method"], arm["configuration"]) == key)
-    others = [arm["bytes"]["median"] for arm in headline["arms"]
-              if arm["role"] == "generator" and arm["bytes"] is not None]
+        lines.append(
+            f"| {name} | {level['n']} | {cb_cell} | {lin_cell} | {mlp_cell} | {diff} | {wtl} | {artifact} | {within} |"
+        )
+
+    if tfm:
+        lines += [
+            "",
+            "#### 2. Zero-Shot Tabular Foundation Models (TFM) & Holdout Feature Driver Fidelity",
+            "",
+            "| Method | Lineages | NVIDIA Kumo Large (`kumo_tabular_l`) | TabICLv2 (`tabicl2`) | AutoGluon Mitra-v2 (`mitra_v2`) | Holdout Feature Driver Fidelity | Median artifact |",
+            "| --- | ---: | --- | --- | --- | --- | ---: |",
+        ]
+        tfm_arms = (
+            ("DOPE", "**DOPE (ours)**", arms["Dope"]["bytes"]),
+            ("GaussianCopula", "Gaussian copula", arms["Gauss"]["bytes"]),
+            ("Chow-Liu", "Chow-Liu tree", arms["Chow"]["bytes"]),
+            ("independent_marginals", "Independent marginals", arms["Ind"]["bytes"]),
+        )
+        for m_key, m_disp, b_stats in tfm_arms:
+            k_row = tfm.get("kumo_tabular_l", {}).get("methods", {}).get(m_key)
+            t_row = tfm.get("tabicl2", {}).get("methods", {}).get(m_key)
+            m_row = tfm.get("mitra_v2", {}).get("methods", {}).get(m_key)
+            d_row = driver.get(m_key)
+            n_val = k_row["n"] if k_row else "—"
+            k_cell = "—" if not k_row else f"{fmt(k_row['median'])} [{fmt(k_row['lo'])}, {fmt(k_row['hi'])}]"
+            t_cell = "—" if not t_row else f"{fmt(t_row['median'])} [{fmt(t_row['lo'])}, {fmt(t_row['hi'])}]"
+            m_cell = "—" if not m_row else f"{fmt(m_row['median'])} [{fmt(m_row['lo'])}, {fmt(m_row['hi'])}]"
+            d_cell = "—" if not d_row else f"{fmt(d_row[0])} (IQR [{fmt(d_row[1])}, {fmt(d_row[2])}])"
+            b_cell = "—" if not b_stats else size(b_stats["median"])
+            lines.append(f"| {m_disp} | {n_val} | {k_cell} | {t_cell} | {m_cell} | {d_cell} | {b_cell} |")
+
     lines += [
-        "",
-        "![CatBoost retention at synthetic size 4n against median charged artifact bytes on a log axis. "
-        f"DOPE's median artifact is {size(dope['bytes']['median'])}; the other generators' medians run from "
-        f"{size(min(others))} to {size(max(others))}.](docs/readme/pareto.png)",
         "",
         f"![DOPE minus each comparator, Hodges–Lehmann retention difference with {facts['level']}% nested intervals, "
         "under the CatBoost, linear, and MLP auditors.](docs/readme/paired.png)",

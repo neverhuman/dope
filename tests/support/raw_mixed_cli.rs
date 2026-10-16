@@ -147,3 +147,82 @@ fn mixed_cli_replays_tagged_masks_and_column_scoped_nominal_values_in_fresh_work
         .unwrap();
     assert!(!forbidden.status.success() && !root.join("forbidden.json").exists());
 }
+
+#[test]
+fn compile_csv_cli_infers_schema_and_preserves_opaque_ids() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("target/compile-csv-cli")
+        .join(std::process::id().to_string());
+    fs::create_dir_all(&root).unwrap();
+    let csv = root.join("headered_numeric.csv");
+    let artifact = root.join("model.dpk");
+    let samples = root.join("synthetic.csv");
+    let mut rows = String::from("secret_freq_hz,secret_angle_deg,secret_pressure_db\n");
+    for row in 0..64 {
+        let freq = 200 + (row % 8) * 100;
+        let angle = (row as f64) * 0.25;
+        let db = 130.0 - 0.02 * (freq as f64) - 0.5 * angle;
+        rows.push_str(&format!("{freq},{angle:.4},{db:.4}\n"));
+    }
+    fs::write(&csv, rows).unwrap();
+    let binary = env!("CARGO_BIN_EXE_dope-kernel");
+    let compiled = Command::new(binary)
+        .arg("compile-csv")
+        .arg("--csv")
+        .arg(&csv)
+        .arg("--target")
+        .arg("secret_pressure_db")
+        .arg("--out")
+        .arg(&artifact)
+        .output()
+        .unwrap();
+    assert!(
+        compiled.status.success(),
+        "{}",
+        String::from_utf8_lossy(&compiled.stderr)
+    );
+    let artifact_bytes = fs::read(&artifact).unwrap();
+    assert!(artifact_bytes.starts_with(b"DOPERAW1"));
+    assert!(artifact_bytes.len() <= 10_240);
+    for secret in ["secret_freq_hz", "secret_angle_deg", "secret_pressure_db"] {
+        assert!(
+            !String::from_utf8_lossy(&artifact_bytes).contains(secret),
+            "artifact leaked header {secret}"
+        );
+    }
+
+    let inspected = Command::new(binary)
+        .arg("inspect")
+        .arg("--kernel")
+        .arg(&artifact)
+        .output()
+        .unwrap();
+    assert!(inspected.status.success());
+    let public = String::from_utf8(inspected.stdout).unwrap();
+    for secret in ["secret_freq_hz", "secret_angle_deg", "secret_pressure_db"] {
+        assert!(!public.contains(secret));
+    }
+    let parsed_inspect: serde_json::Value = serde_json::from_str(&public).unwrap();
+    assert_eq!(parsed_inspect["schema"][0]["id"], "c0001");
+    assert_eq!(parsed_inspect["schema"][0]["dtype"], "integer");
+
+    let sampled = Command::new(binary)
+        .arg("sample")
+        .arg("--kernel")
+        .arg(&artifact)
+        .arg("--rows")
+        .arg("32")
+        .arg("--seed")
+        .arg("1729")
+        .arg("--out")
+        .arg(&samples)
+        .output()
+        .unwrap();
+    assert!(
+        sampled.status.success(),
+        "{}",
+        String::from_utf8_lossy(&sampled.stderr)
+    );
+    let sample_text = fs::read_to_string(&samples).unwrap();
+    assert_eq!(sample_text.lines().count(), 32);
+}

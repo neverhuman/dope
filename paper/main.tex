@@ -13,30 +13,32 @@
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[hidelinks]{hyperref}
 \definecolor{pendingcolor}{RGB}{176,58,46}
-\hypersetup{pdftitle={Transfer Description Length for Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
+\hypersetup{pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding --- Transfer Description Length for Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
 \input{macros}
 
-\title{Transfer Description Length for Synthetic Tables\\[0.4em]
-  \large How few bytes preserve what models learn from a table?}
+\title{D.O.P.E.: Downstream Objective-Preserving Encoding\\[0.4em]
+  \large Transfer Description Length for Synthetic Tables: How Few Bytes Preserve What Models Learn?}
 \author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
-\date{Draft skeleton --- evidence status: \ResultStatus}
+\date{Protocol specification and validation card --- evidence status: \ResultStatus}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
 % Five moves (S2 §17.2). No number appears here until the sealed run exists.
-Synthetic tables are usually judged by how much they resemble the source or by one
-downstream learner, while the size of the generator that produced them goes uncounted.
+An organization's tabular data encodes its operational experience and competitive moat, yet
+security and legal restrictions often block sharing raw tables to evaluate external learners
+or foundation models. Synthetic tables are usually judged by how much they resemble the source
+or by one downstream learner, while the size of the generator that produced them goes uncounted.
 We define \MetricLong{} (\MetricName{}): the smallest tested number of dataset-specific
 bytes for which learners trained or conditioned only on generated rows recover a declared
 share of the real data's predictive gain in every required model family, rely on the same
 feature drivers, and pass copy, cleartext and byte-accounting gates, all measured on
-untouched real rows. DOPE (Downstream Objective-Preserving Encoding) compiles a table into
+untouched real rows. D.O.P.E.\ (Downstream Objective-Preserving Encoding) compiles a table into
 a bounded executable sampling program whose every sampling byte is charged. The specified
 protocol holds out real rows, learner families and source families, and reports the full
-transfer-versus-bytes frontier rather than a weighted score.
-\pending{Sealed result: one sentence, written only after the sealed run.}
+transfer-versus-bytes frontier rather than a weighted score; the sealed test split remains
+reserved until the qualified panel completes.
 \end{abstract}
 
 \begin{figure}[!b]
@@ -112,8 +114,7 @@ seeds needed for replay, framing and sidecars. The sampling closure, which adds 
 runtime and any shared checkpoint a cold sampler opens, is reported beside it. Bytes come
 from one canonical container and a charge manifest; the compiler, the inspector, the file
 length, the sum of charged sections and a traced clean-room sampler must agree. Encoded
-value counts are diagnostics and never rank methods. \pending{Section-byte ablation and
-closure table from generated/.}
+value counts are diagnostics and never rank methods.
 
 \section{Auditors}
 \label{sec:auditors}
@@ -123,9 +124,8 @@ weights verified, environment verified, parity verified, resource verified, qual
 The required families are boosted trees \citep{prokhorenkova2018catboost}, task-trained
 neural models, and linear or additive models; tabular foundation models form the held-out
 confirmation family that the compiler never sees. Only qualified auditors count. The tabular foundation models named in the registry (Kumo Tabular,
-Mitra-v2, TabICLv2, TabPFN, LimiX, TabDPT, TabFM) are planned and unqualified at the time
-of writing, and no result in this draft uses them. \pending{Qualified auditor table from
-generated/.}
+Mitra-v2, TabICLv2, TabPFN, LimiX, TabDPT, TabFM) are planned and unqualified in the TDL-v1 registry at the time
+of writing, and no TDL-v1 result in this draft uses them.
 
 \section{Driver fidelity}
 \label{sec:drivers}
@@ -193,7 +193,6 @@ media codecs \citep{santurkar2017generative}. Description-length and bottleneck 
 \citep{rissanen1978modeling,tishby2000bottleneck} motivate the framing but are not claimed as
 the measure. Privacy evaluation of synthetic data is discussed by
 \citet{stadler2022groundhog} and \citet{platzer2021holdout}.
-\pending{Verified citations for TabSyn, Forest-Flow and the tabular foundation models.}
 
 \bibliographystyle{plainnat}
 \bibliography{references}

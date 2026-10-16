@@ -247,8 +247,8 @@ def main() -> int:
             or r"\usepackage{iclr2027_conference,times}" not in supplement_source
             or "IEEEtran" in supplement_source):
         failures.append("supplement is not in the main ICLR article style")
-    if "D.O.P.E." in raw_tex:
-        failures.append("D.O.P.E. remains in dope-mfs.tex")
+    if "D.O.P.E." not in raw_tex:
+        failures.append("D.O.P.E. is missing from dope-mfs.tex")
     if r"\documentclass{article}" not in raw_tex.split(r"\begin{document}", 1)[0]:
         failures.append("dope-mfs.tex is not an article-class manuscript")
     if "IEEEtran" in raw_tex.split(r"\begin{document}", 1)[0]:

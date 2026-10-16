@@ -74,9 +74,9 @@ paper:
     python3 docs/whitepaper/scripts/retained_evidence.py
     python3 docs/whitepaper/scripts/compute_panel.py
     python3 docs/whitepaper/scripts/publication_rows.py
+    python3 docs/whitepaper/scripts/mfs_v3_table.py
     python3 research/benchmark/verify_paper_numbers.py
     python3 docs/whitepaper/scripts/render_figures.py
-    python3 docs/whitepaper/scripts/mfs_v3_table.py
     python3 -B docs/whitepaper/scripts/paper_build.py
 
 paper-check:
