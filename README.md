@@ -11,7 +11,7 @@ DOPE stands for **Downstream Objective-Preserving Encoding**. The artifact is a 
 
 ![Historical CatBoost validation, selection-exposed: retention against median charged artifact bytes on a log axis, with smaller cohorts in grey. It is not a TDL frontier.](paper/generated/hero-frontier.png)
 
-*Historical CatBoost validation, not a TDL frontier. The figure is rendered from `paper/generated/headline-results.json`, and the measured transfer-versus-bytes frontier will replace it when the qualified panel runs.*
+*Why this matters: how much learning survives at how few bytes. This is historical CatBoost validation, not a TDL frontier. `tools/claims/render.py` renders it from `paper/generated/headline-results.json`, and the same figure opens the new paper (`paper/main.tex`, Figure 1). The historical paper's first-page figure draws the same data with `docs/whitepaper/scripts/v2_figures.py`, shown as `docs/readme/pareto.png` in the panel below. The measured transfer-versus-bytes frontier will replace both when the qualified panel runs.*
 
 ## The metric: Transfer Description Length
 
