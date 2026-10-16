@@ -27,7 +27,10 @@ Smaller cohorts remain separate and grey in the figure.
 
 Place `paper/generated/readme-result-card.md` verbatim in the README, including
 its `BEGIN TDL RESULTS` / `END TDL RESULTS` markers. Include
-`generated/headline-macros.tex` from the canonical paper. Example macro names
+`generated/headline-macros.tex` from the canonical paper. The generated
+`result-card.tex` supplies its evidence table. Preserve native engineering
+examples using the exact `readme-demo-notes.md` block and its PINNED DEMOS markers;
+the native receipt and toy INSPECT transcript remain SHA-pinned. Example macro names
 are `\HistoricalDopeRetention`, `\HistoricalDopeLower`,
 `\HistoricalDopeUpper`, `\HistoricalDopeBytes` and
 `\HistoricalDopeLineages`. Result numbers outside generated inputs are refused;

@@ -278,14 +278,17 @@ EVIDENCE_STATUSES = frozenset(("sealed_test", "validation", "selection_exposed_v
                                "specified_unrun", "unqualified", "failed"))
 LEGACY_README_PROSE_SHA256 = "8d90e1fc7dd3a910a3c01b721fd29a8a0329d67ce646aeb54ddd1b788d1f279e"
 PUBLIC_BANNED = (r"privacy[- ]preserving", r"\bminimum\b", r"\bbeats\s+TabSyn\b",
-                 r"validated\s+across\s+Kumo", r"1\.9\s*KiB\s+cold\s+closure")
+                 r"validated\s+across\s+(?:Kumo|Mitra|TabICL|TabPFN)",
+                 r"1\.9\s*(?:KiB|KB)\s+(?:cold\s+closure|standalone)", r"\boutperforms\b",
+                 *REGISTRY["forbidden_language"]["patterns"])
 # Result prose must use generated values. Structural names (TDL-v1, D-01, T90),
 # URLs, citations, CLI code examples and TeX layout dimensions are not results.
 PUBLIC_NUMBER = re.compile(r"(?<![\w./#-])(?:[+-]?\d+(?:[.,]\d+)*|\.\d+)(?:%|\s*(?:KiB|MiB|GiB|bytes))?(?![\w/-]|\.\d)")
 
 
-def public_prose(text: str) -> str:
-    text = re.sub(r"(?m)(?<!\\)%.*$", "", text)
+def public_prose(text: str, tex: bool = False) -> str:
+    if tex:
+        text = re.sub(r"(?m)(?<!\\)%.*$", "", text)
     text = re.sub(r"```(?:bash|sh|shell)\n.*?```", "", text, flags=re.S)
     text = re.sub(r"`([^`]*)`", lambda m: m.group(1) if re.match(r"^[+-]?(?:\d|\.\d)", m.group(1)) else "", text)
     text = re.sub(r"https?://[^\s)>}]+", "", text)
@@ -299,7 +302,7 @@ def public_prose(text: str) -> str:
 
 def lint_public_text(text: str, label: str, held_out_knowledge: bool = False) -> list[str]:
     failures = []
-    prose = public_prose(text)
+    prose = public_prose(text, tex=label.endswith(".tex"))
     for pattern in PUBLIC_BANNED:
         if re.search(pattern, text, re.I):
             failures.append(f"{label}: forbidden claim /{pattern}/")
@@ -391,6 +394,10 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
             failures.append(f"{row['id']}: result differs from pinned historical input")
         if original is not None and row["artifact_bytes"] is not None and row["artifact_bytes"]["median"] != original["bytes"]["median"]:
             failures.append(f"{row['id']}: bytes differ from pinned historical input")
+    for pin in data.get("demo_notes", {}).get("pins", []):
+        path = root / pin["path"]
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != pin["sha256"]:
+            failures.append("historical demo source pin drift")
     outputs = render.expected_outputs(root) if check_render else render.text_outputs(data, status)
     if check_render:
         for name, expected in outputs.items():
@@ -408,7 +415,23 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
             expected = outputs["paper/generated/readme-result-card.md"].decode().strip()
             if block != expected:
                 failures.append("README: generated result card drift")
-            failures.extend(lint_public_text(readme.replace(block, ""), "README"))
+            prose = readme.replace(block, "")
+            if "<!-- BEGIN BENCHMARK -->" in prose:
+                import readme_benchmark
+                historical = readme_benchmark.readme_block(prose)
+                original = json.loads((root / REGISTRY["sources"]["headline"]).read_text())
+                if historical != readme_benchmark.expected_readme_block(original):
+                    failures.append("README: historical generated benchmark drift")
+                prose = prose.replace(historical, "")
+            if render.DEMO_BEGIN in prose:
+                if prose.count(render.DEMO_BEGIN) != 1 or prose.count(render.DEMO_END) != 1 or prose.index(render.DEMO_BEGIN) > prose.index(render.DEMO_END):
+                    failures.append("README: demo markers must be unique and ordered")
+                else:
+                    demo = prose[prose.index(render.DEMO_BEGIN):prose.index(render.DEMO_END) + len(render.DEMO_END)]
+                    if demo != outputs["paper/generated/readme-demo-notes.md"].decode().strip():
+                        failures.append("README: generated historical demo notes drift")
+                    prose = prose.replace(demo, "")
+            failures.extend(lint_public_text(prose, "README"))
     elif "<!-- BEGIN BENCHMARK -->" not in readme:
         failures.append("README: generated result card markers are missing")
     elif hashlib.sha256(readme_prose(readme).encode()).hexdigest() != LEGACY_README_PROSE_SHA256:

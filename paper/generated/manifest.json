@@ -1,6 +1,6 @@
 {
   "format": "dope-generated-claims-v1",
-  "source_sha256": "6d79776f88d6cfb992195028e5ae109b2fbcc55873813058070d890067e49b4b",
+  "source_sha256": "9866158eea8894d5058c55052ba3ecae73b31e49573952cf79fa0798e70c550c",
   "files": {
     "STATUS.md": "a75983886e1b9f943714a5ba553cd57046b1024ca78abf50b1e70c6db5ed4337",
     "paper/generated/headline-macros.tex": "22f898ab0069c06b92b44e430b1457d07343bb9ea1bfc02e4c87bc0d4d7ad9da",
@@ -8,6 +8,8 @@
     "paper/generated/hero-frontier.pdf": "12ee4952035da51a53219b2d5422dc2a6a3ed3a7dd0fa10348f80334d36f163b",
     "paper/generated/hero-frontier.png": "6d929a8dce3980a7fad2467dd2a511098a9bc8fff3c07003d82dcb6e14f1a8eb",
     "paper/generated/hero-frontier.svg": "102829e36b3ecd66f3fe3d58ea333ff248d87c0a8ac8bda19330a774297a67e4",
-    "paper/generated/readme-result-card.md": "90e9b04c188613ea48288cee577b225f10f759ee5252ab1a57b12583a5620da4"
+    "paper/generated/readme-demo-notes.md": "431d9094417a89108059196787a686b1193066316b229209607306cda9d9d536",
+    "paper/generated/readme-result-card.md": "90e9b04c188613ea48288cee577b225f10f759ee5252ab1a57b12583a5620da4",
+    "paper/generated/result-card.tex": "a40ddcb8c5a59045fb8c3f464af9c1adad7831adc46f48bb76bd7b326399bbba"
   }
 }

@@ -69,6 +69,21 @@ class FirewallTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'fixture'):
                     render.load_results(path)
 
+    def test_generated_blocks_are_admitted_but_new_prose_numbers_and_demo_drift_fail(self):
+        from unittest.mock import patch
+        readme_path = ROOT / 'README.md'
+        candidate = "# DOPE\n\n" + (ROOT / 'paper/generated/readme-result-card.md').read_text()
+        candidate += (ROOT / 'paper/generated/readme-demo-notes.md').read_text()
+        original_read = Path.read_text
+        def check(text):
+            def read(path, *args, **kwargs):
+                return text if path == readme_path else original_read(path, *args, **kwargs)
+            with patch.object(Path, 'read_text', read):
+                return C.public_failures(check_render=False)
+        self.assertEqual(check(candidate), [])
+        self.assertTrue(any('hand-typed' in f for f in check(candidate + "New result: 0.123.")))
+        self.assertTrue(any('demo notes drift' in f for f in check(candidate.replace('`artifact_bytes` 151', '`artifact_bytes` 152'))))
+
     def test_figure_and_card_drift_is_detected_by_same_gate(self):
         from unittest.mock import patch
         with patch.object(render, 'expected_outputs', return_value={'paper/generated/hero-frontier.png': b'seeded drift'}):

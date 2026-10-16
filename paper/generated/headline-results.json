@@ -46,7 +46,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Dope"
-      }
+      },
+      "paper_card": true
     },
     {
       "id": "DopeDef",
@@ -84,7 +85,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "DopeDef"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "DopeHist",
@@ -118,7 +120,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "DopeHist"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "DopeHistA",
@@ -152,7 +155,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "DopeHistA"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "DopeHistB",
@@ -186,7 +190,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "DopeHistB"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "DopeHistC",
@@ -220,7 +225,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "DopeHistC"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "DopeBnew",
@@ -254,7 +260,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "DopeBnew"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "DopeBnewFour",
@@ -288,7 +295,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "DopeBnewFour"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "TabSyn",
@@ -326,7 +334,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "TabSyn"
-      }
+      },
+      "paper_card": true
     },
     {
       "id": "Arf",
@@ -364,7 +373,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Arf"
-      }
+      },
+      "paper_card": true
     },
     {
       "id": "ArfNat",
@@ -402,7 +412,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "ArfNat"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "Gauss",
@@ -440,7 +451,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Gauss"
-      }
+      },
+      "paper_card": true
     },
     {
       "id": "Chow",
@@ -478,7 +490,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Chow"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "Ind",
@@ -516,7 +529,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Ind"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "Ctgan",
@@ -554,7 +568,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Ctgan"
-      }
+      },
+      "paper_card": true
     },
     {
       "id": "Tvae",
@@ -592,7 +607,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Tvae"
-      }
+      },
+      "paper_card": true
     },
     {
       "id": "CtganDef",
@@ -626,7 +642,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "CtganDef"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "TvaeDef",
@@ -660,7 +677,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "TvaeDef"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "GaussDef",
@@ -694,7 +712,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "GaussDef"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "ChowDef",
@@ -728,7 +747,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "ChowDef"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "IndDef",
@@ -762,7 +782,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "IndDef"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "ForestDef",
@@ -796,7 +817,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "ForestDef"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "Forest",
@@ -834,7 +856,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Forest"
-      }
+      },
+      "paper_card": true
     },
     {
       "id": "Pred",
@@ -868,7 +891,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Pred"
-      }
+      },
+      "paper_card": true
     },
     {
       "id": "PredSplitA",
@@ -902,7 +926,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "PredSplitA"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "PredSplitB",
@@ -936,7 +961,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "PredSplitB"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "PredSplitC",
@@ -970,7 +996,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "PredSplitC"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "PredSplitD",
@@ -1004,7 +1031,8 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "PredSplitD"
-      }
+      },
+      "paper_card": false
     },
     {
       "id": "Boot",
@@ -1038,7 +1066,27 @@
         "path": "docs/whitepaper/generated/v2-headline.json",
         "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
         "arm": "Boot"
-      }
+      },
+      "paper_card": true
     }
-  ]
+  ],
+  "demo_notes": {
+    "evidence_status": "historical",
+    "citable": true,
+    "source_commit": "b8340ec41799ccfe18d7aeee25bc6a23c2e0a093",
+    "paragraphs": [
+      "Inspect of the artifact built for this page reports `artifact_bytes` 151, `rows_fitted` 400, three positional features, dependence `chow_liu`, and target `sparse_linear`. `compliant` is false: compile sees `train.csv` only and does not certify a release. The transcript is [examples/readme-regression/INSPECT.txt](examples/readme-regression/INSPECT.txt). This toy is not the benchmark above.",
+      "The installed public demo in [examples/public-regression](examples/public-regression/) fits the UCI Airfoil Self-Noise table (Brooks, Pope, and Marcolini; CC BY 4.0; DOI 10.24432/C5VW2C) on a grouped development split and writes one native raw-unit artifact, `model.raw` (SHA-256 `0950cbe79817\u2026`), with profile `raw-numeric-symbolic-v1` under the byte profile `native-raw-complete-v1`. Compile, `inspect`, the demo's research receipt, and the file size all report 1,558 bytes: 56 bytes of framing, 1,080 bytes of fitted schema and transforms, and 422 bytes of sampling payload. The file is its own transport archive. The generic runtime is measured separately: the debug binary and its mapped libraries came to 72,049,152 bytes, so the cold sampling closure was 72,050,710 bytes. On a release build (`target/release/dope-kernel`, 10,386,496 bytes, SHA-256 `91f6ff9da65d\u2026` at commit `ee4a3d0`), the artifact is byte-identical (`0950cbe79817\u2026`), the release binary and its mapped libraries come to 13,888,176 bytes (cold sampling closure 13,889,734 bytes), and the native steps run in 15.7 ms (`compile-raw`), 2.1 ms (`inspect-raw`), 8.5 ms / 27.0 ms (`sample-raw` / isolated replay at 1n, 1,190 rows), and 24.5 ms / 44.2 ms (`sample-raw` / isolated replay at 4n, 4,760 rows), with total end-to-end demo wall time 0.83 s; no portable bundle was measured. The run used commit `59437b1`, and privacy, driver, and geometry checks are unmeasured for this artifact. It is an engineering conformance example on one development split, not a benchmark result, and a different object from both the toy above and the paper's `.dpk` plus `projection.json` charge. The pinned values are in [docs/whitepaper/receipts/native-byte-conformance-v1.json](docs/whitepaper/receipts/native-byte-conformance-v1.json), and the supplement repeats them."
+    ],
+    "pins": [
+      {
+        "path": "examples/readme-regression/INSPECT.txt",
+        "sha256": "cf9e9f5a3cafc4bb37d327307e0a047563fa568c219e1c3d5b030ff569c6156c"
+      },
+      {
+        "path": "docs/whitepaper/receipts/native-byte-conformance-v1.json",
+        "sha256": "c4771f0b0723c2ecae086da1ec71df286b690e60d67dc4fe921982619327a4e6"
+      }
+    ]
+  }
 }
