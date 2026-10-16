@@ -70,7 +70,12 @@ from committed machine-readable results.
 ## 3. Banned phrases
 
 The linter matches case-insensitively in README prose outside generated blocks, in
-`paper/*.tex` outside `paper/archive/`, and in `CITATION.cff`.
+active `paper/**/*.tex` outside `paper/archive/`, and in `CITATION.cff`.
+Known generated TeX is exempt from prose-number lint only through its checker:
+the claims renderer authenticates its outputs, and the contract-macro generator
+must reproduce `paper/generated/contract-macros.tex` byte for byte. Other files in
+`paper/generated/` are still linted. Direct negative disclosures such as
+"not HIPAA de-identification" are allowed; a later affirmative claim still fails.
 
 | Pattern | Scope | Replacement |
 | --- | --- | --- |
@@ -112,3 +117,29 @@ The linter matches case-insensitively in README prose outside generated blocks, 
 The project is on the first rung. The language in S2 §2.5 applies: before held-out
 confirmation, "generative compression of predictive structure"; after held-out learner and
 source-family confirmation, "transfer-preserving generative compression".
+
+## 6. Reviewed design prose (U6/U7)
+
+The following spelled-out design counts were reviewed on 2026-10-16 against the
+tree shared by `59500ea` and receiving main `04b6f53`. They describe designs and
+historical protocol settings. They establish no measured TDL result. A change to
+the wording, scope or cited source requires a new review; this register does not
+exempt result numbers from the generated-claims gate.
+
+| Surface and reviewed wording | Source and scope |
+| --- | --- |
+| README: "one of seven families" | [`candidate_dependence.rs`](../rust/compiler/candidate_dependence.rs), match arms zero through six, describes the default compile search. |
+| README: "at most twelve screened inputs" | [`part_01.rs`](../rust/compiler/target_fitting/part_01.rs), `fit_compact_neural_target_native`, caps the default screen at twelve; [`research_training.rs`](../rust/compiler/target_fitting/research_training.rs) uses that default when no research profile is selected. Explicit `features24_*` research profiles allow twenty-four, so the README wording must be scoped to the default. |
+| README: "up to four screened features" | [`noise_fitting.rs`](../rust/compiler/target_fitting/noise_fitting.rs), `fit_noise`, passes support four to the bounded fitter. This describes the default path; refined profiles can set another bound. |
+| README toy: "four columns" | [`INSPECT.txt`](../examples/readme-regression/INSPECT.txt) reports three positional features and a last-column target; the bundled [`train.csv`](../examples/readme-regression/train.csv) has four fields per row. This count belongs to the bundled toy. |
+| README: "Two byte scopes" | [`tdl-contract-v1.json`](../contracts/tdl-contract-v1.json), `byte_scopes.primary` and `secondary`: payload and sampling closure. Optional cold-bundle and amortized scopes are additional disclosures. |
+| README: "two real-trained models"; paper driver section: "two real-trained instances" | The contract's `driver_protocol.ceiling_normalization` is a real/real agreement denominator; [`drivers.rs`](../rust/metrics/drivers.rs) consumes that ceiling. These are the reference pair in the design, not a count of completed certification fits. |
+| Paper protocol: "Three tracks" | [`benchmark.md`](benchmark.md), Tracks: author-default, equal-compute and rate-constrained. These are planned protocol tracks, not three completed campaigns. |
+| Paper validation evidence: "all three auditors" | [`v2_panel.py`](../research/benchmark/review_fixes/v2_panel.py), `AUDITORS`: CatBoost, linear and MLP. The statement concerns historical selection exposure, not the planned foundation-model panel. |
+| Paper historical card: "four times the fit rows" | The same historical reducer selects size four (the `HEADLINE, 4, catboost` cells). This is the v2 validation panel's sample-size setting; the TDL contract's primary sample size is one times the real fit rows. |
+
+The README family/input/noise counts above require a default-search qualifier.
+Proposed wording is coordinated with L3 in `COMMS.md`; paper and README prose
+remain under L3 ownership. Demo license, DOI and positional-feature counts (U5)
+are checked against the native pin's `source_data` and `INSPECT.txt` by the public
+claims registry, including missing or contradictory metadata.
