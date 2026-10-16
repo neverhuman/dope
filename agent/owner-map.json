@@ -312,6 +312,8 @@
     "docs/whitepaper/generated/baseline-budget.tex": "external-evidence",
     "docs/whitepaper/scripts/readme_benchmark.py": "external-evidence",
     "docs/whitepaper/scripts/test_readme_benchmark.py": "external-evidence",
+    "docs/whitepaper/scripts/declared_facts.py": "external-evidence",
+    "docs/whitepaper/scripts/test_declared_facts.py": "external-evidence",
     "docs/readme/retention-bars.png": "governance",
     "examples/readme-regression/": "governance",
     "research/benchmark/bounded_auditors.py": "external-evidence",

@@ -57,5 +57,16 @@ class HeroFigureTests(unittest.TestCase):
                 self.assertTrue(render.figure_bound_failures(self.rows, thresholds))
 
 
+    def test_interval_level_is_read_from_the_predeclaration(self):
+        predeclare = json.loads((ROOT / "research/benchmark/review_fixes/predeclare_v2.json").read_text())
+        self.assertIn(f"percentile {render.interval_level()}% interval", predeclare["estimands"]["uncertainty"])
+        status = json.loads((ROOT / "evidence/status.json").read_text())
+        card = render.text_outputs(self.data, status, 90)["paper/generated/readme-result-card.md"].decode()
+        self.assertIn("[historical 90% interval]", card)
+        svg = render.figure_outputs(self.csv, self.data["thresholds"], 90)["paper/generated/hero-frontier.svg"].decode()
+        self.assertIn("historical 90% interval", svg)
+        self.assertNotIn("95%", (ROOT / "tools/claims/render.py").read_text(), "renderer types the interval level")
+
+
 if __name__ == "__main__":
     unittest.main()

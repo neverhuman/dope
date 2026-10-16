@@ -13,11 +13,11 @@ and the paper cannot disagree. `--check` compares the committed block.
 from __future__ import annotations
 
 import json
-import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import declared_facts  # noqa: E402
 from figure_spec import TEASER_X_LIM  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[3]
@@ -26,8 +26,8 @@ README = REPO / "README.md"
 PNGS = (REPO / "docs" / "readme" / "pareto.png", REPO / "docs" / "readme" / "paired.png")
 BEGIN = "<!-- BEGIN BENCHMARK -->"
 END = "<!-- END BENCHMARK -->"
-PREDECLARE = REPO / "research" / "benchmark" / "review_fixes" / "predeclare_v2.json"
-CONTRACT = REPO / "production" / "kpi-contract.json"
+PREDECLARE = REPO / declared_facts.PREDECLARE
+CONTRACT = REPO / declared_facts.CONTRACT
 COUNT_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten"}
 ORDER = ("Dope", "TabSyn", "Arf", "ArfNat", "Gauss", "Chow", "Ind", "Tvae", "Ctgan", "Forest", "TabDdpm",
          "TabDiff", "Great", "Synthpop", "Smote", "Boot", "Pred")
@@ -63,11 +63,8 @@ def panel_facts(headline: dict, predeclare: dict, contract: dict) -> dict:
     seeds = len(predeclare["dope"]["fit_seeds"])
     if seeds not in COUNT_WORDS:
         raise ValueError("fit-seed count has no README wording")
-    match = re.search(r"percentile (\d+)% interval", predeclare["estimands"]["uncertainty"])
-    if match is None:
-        raise ValueError("predeclare_v2 does not state the interval level")
-    return {"panel": panel, "fit_seeds": COUNT_WORDS[seeds], "level": int(match.group(1)),
-            "cap": contract["tier_byte_limits"]["l3"]}
+    return {"panel": panel, "fit_seeds": COUNT_WORDS[seeds], "level": declared_facts.interval_level(predeclare),
+            "cap": declared_facts.byte_cap(contract)}
 
 
 def load_facts(headline: dict) -> dict:

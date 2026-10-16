@@ -344,6 +344,15 @@ def demo_metadata_failures(data: dict, inspected: dict, native_pin: dict) -> lis
     return failures
 
 
+def readme_hero_failures(readme: str) -> list[str]:
+    """The generated hero figure is a README image above the first section heading."""
+    first_section = re.search(r"(?m)^## ", readme)
+    head = readme[:first_section.start()] if first_section else readme
+    if not re.search(r"(?m)^!\[[^\]\n]+\]\(paper/generated/hero-frontier\.png\)", head):
+        return ["README: the generated hero figure must appear above the first section"]
+    return []
+
+
 def result_failures(data: dict, auditors: dict, status: dict) -> list[str]:
     failures = []
     if data.get("citable") is not True or data.get("fixture") is True:
@@ -454,6 +463,7 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
     # Existing v2 BENCHMARK is already compiled by the historical registry.
     # The L3 landing page uses the new marker. While lanes integrate, both are admitted.
     if render.BEGIN in readme:
+        failures.extend(readme_hero_failures(readme))
         if readme.count(render.BEGIN) != 1 or readme.count(render.END) != 1 or readme.index(render.BEGIN) > readme.index(render.END):
             failures.append("README: generated result markers must be unique and ordered")
         else:

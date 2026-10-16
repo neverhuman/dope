@@ -1261,6 +1261,14 @@
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "keep the README CatBoost table and retention figure on the committed density table"
     },
+    "docs/whitepaper/scripts/declared_facts.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_declared_facts.py -v",
+      "purpose": "keep figure scripts on the declared interval level, release byte cap and full-panel floor"
+    },
+    "docs/whitepaper/scripts/test_declared_facts.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_declared_facts.py -v",
+      "purpose": "keep figure scripts on the declared interval level, release byte cap and full-panel floor"
+    },
     "docs/readme/retention-bars.png": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "keep the README CatBoost table and retention figure on the committed density table"

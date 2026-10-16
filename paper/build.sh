@@ -23,4 +23,6 @@ for doc in main supplement; do
     exit 1
   fi
 done
+# Figure 1 must be the generated hero figure on page 1, not a pending placeholder.
+python3 -B scripts/figure_one.py "$out"
 echo "built $out/main.pdf and $out/supplement.pdf"
