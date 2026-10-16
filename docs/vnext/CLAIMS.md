@@ -35,7 +35,7 @@ these claims:
 - the stated controls.
 
 Every lineage and all three auditors are exposed to the historical profile
-selection (see the N02 entry in `DECISIONS.md`). That paper therefore makes no
+selection (see the N02 entry in [the decision history](../archive/decisions-history.md)). That paper therefore makes no
 held-out learner, held-out source-family, transferable-knowledge, intelligence,
 minimum-size, formal-DP or HIPAA claim. Only the pre-declared sealed test run
 can give a selection-free estimate for that profile. The claims in the table
