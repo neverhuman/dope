@@ -1,0 +1,12 @@
+id,method,artifact_bytes,retention,interval_lo,interval_hi,observed_lineages,prepared_lineages,evidence_status,cohort_id,complete_budget_grid,driver_gate,cohort_complete
+Dope,DOPE (ours),1895.0,0.898170827619396,0.8039037291006366,0.9719353159481083,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
+DopeDef,"DOPE, untuned default",1660.5,0.7039398384416241,0.42395421590584487,0.8768901931379116,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
+TabSyn,TabSyn (scaled schedule),42261045.5,0.9240695923067241,0.8142261789641545,0.964784107476397,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
+Arf,ARF (author default),1438304.5,0.8224144967169416,0.6886489590460345,0.8943111358999637,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
+ArfNat,ARF (native selected),1627718.5,0.8040514194638223,0.6473544399453184,0.8854103100080929,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
+Gauss,Gaussian copula,5464.5,0.6694654307455047,0.36945274735021405,0.8669514529126394,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
+Chow,Chow-Liu tree,29865.0,0.5756921422142081,0.29448130701116293,0.638324269163479,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
+Ind,Independent marginals,2549.5,-0.011986971805031716,-0.04031737293677982,-0.002334590784225717,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
+Ctgan,CTGAN (native selected),730999.0,-0.07954816473487325,-0.28157444132042014,0.22331969914584035,21,100,selection_exposed_validation,legacy-v2-catboost-21,false,unmeasured,false
+Tvae,TVAE (native selected),308629.5,0.6736705986320002,0.45211352660470355,0.7760902457365483,21,100,selection_exposed_validation,legacy-v2-catboost-21,false,unmeasured,false
+Forest,Forest-Flow (historical),325848913.5,1.0110782839271955,0.9053171959560922,1.0407646059536928,6,100,selection_exposed_validation,legacy-v2-catboost-6,false,unmeasured,false

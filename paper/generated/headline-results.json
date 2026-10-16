@@ -1,0 +1,1044 @@
+{
+  "format": "dope-headline-results-v1",
+  "citable": true,
+  "fixture": false,
+  "metric_name": "TDL",
+  "protocol_frozen": false,
+  "thresholds": {
+    "transfer": 0.9,
+    "drivers": 0.8
+  },
+  "status": "historical_validation_only",
+  "results": [
+    {
+      "id": "Dope",
+      "macro_id": "Dope",
+      "display": "DOPE (ours)",
+      "method": "DOPE",
+      "configuration": "headline",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.898170827619396,
+        "lo": 0.8039037291006366,
+        "hi": 0.9719353159481083,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 1895.0,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Dope"
+      }
+    },
+    {
+      "id": "DopeDef",
+      "macro_id": "DopeDef",
+      "display": "DOPE, untuned default",
+      "method": "DOPE",
+      "configuration": "product_default",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.7039398384416241,
+        "lo": 0.42395421590584487,
+        "hi": 0.8768901931379116,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 1660.5,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "DopeDef"
+      }
+    },
+    {
+      "id": "DopeHist",
+      "macro_id": "DopeHist",
+      "display": "DOPE, historical seed 11",
+      "method": "DOPE",
+      "configuration": "historical_seed11",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-97",
+        "prepared_lineages": 100,
+        "observed_lineages": 97,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.9491572283028776,
+        "lo": 0.8933951277441468,
+        "hi": 0.9866819821863521,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "DopeHist"
+      }
+    },
+    {
+      "id": "DopeHistA",
+      "macro_id": "DopeHistA",
+      "display": "DOPE historical, 12 inputs, 512 steps",
+      "method": "DOPE",
+      "configuration": "historical_seed11_features12_steps512",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-97",
+        "prepared_lineages": 100,
+        "observed_lineages": 97,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.8007729729075269,
+        "lo": 0.4449615167667116,
+        "hi": 0.9584668700833847,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "DopeHistA"
+      }
+    },
+    {
+      "id": "DopeHistB",
+      "macro_id": "DopeHistB",
+      "display": "DOPE historical, 24 inputs, 512 steps",
+      "method": "DOPE",
+      "configuration": "historical_seed11_features24_steps512",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-93",
+        "prepared_lineages": 100,
+        "observed_lineages": 93,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.802108785881121,
+        "lo": 0.45706928055838386,
+        "hi": 0.9584668700833847,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "DopeHistB"
+      }
+    },
+    {
+      "id": "DopeHistC",
+      "macro_id": "DopeHistC",
+      "display": "DOPE historical, 24 inputs, 2048 steps",
+      "method": "DOPE",
+      "configuration": "historical_seed11_features24_steps2048",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-93",
+        "prepared_lineages": 100,
+        "observed_lineages": 93,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.930867274009485,
+        "lo": 0.8143091705891025,
+        "hi": 0.9853739128922073,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "DopeHistC"
+      }
+    },
+    {
+      "id": "DopeBnew",
+      "macro_id": "DopeBnew",
+      "display": "DOPE, later binary, seed 11",
+      "method": "DOPE",
+      "configuration": "headline_bnew",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.9443760121351324,
+        "lo": 0.8933657128382798,
+        "hi": 0.9853739128922073,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "DopeBnew"
+      }
+    },
+    {
+      "id": "DopeBnewFour",
+      "macro_id": "DopeBnewFour",
+      "display": "DOPE, later binary, seeds 23-71",
+      "method": "DOPE",
+      "configuration": "fourseed_bnew",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.8621311649541546,
+        "lo": 0.7721913605594807,
+        "hi": 0.9597262492240343,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "DopeBnewFour"
+      }
+    },
+    {
+      "id": "TabSyn",
+      "macro_id": "TabSyn",
+      "display": "TabSyn (scaled schedule)",
+      "method": "TabSyn",
+      "configuration": "scaled_200_vae_1000_diffusion",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.9240695923067241,
+        "lo": 0.8142261789641545,
+        "hi": 0.964784107476397,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 42261045.5,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "TabSyn"
+      }
+    },
+    {
+      "id": "Arf",
+      "macro_id": "Arf",
+      "display": "ARF (author default)",
+      "method": "ARF",
+      "configuration": "author_default",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.8224144967169416,
+        "lo": 0.6886489590460345,
+        "hi": 0.8943111358999637,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 1438304.5,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Arf"
+      }
+    },
+    {
+      "id": "ArfNat",
+      "macro_id": "ArfNat",
+      "display": "ARF (native selected)",
+      "method": "ARF",
+      "configuration": "native_selected",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.8040514194638223,
+        "lo": 0.6473544399453184,
+        "hi": 0.8854103100080929,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 1627718.5,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "ArfNat"
+      }
+    },
+    {
+      "id": "Gauss",
+      "macro_id": "Gauss",
+      "display": "Gaussian copula",
+      "method": "GaussianCopula",
+      "configuration": "native_selected",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.6694654307455047,
+        "lo": 0.36945274735021405,
+        "hi": 0.8669514529126394,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 5464.5,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Gauss"
+      }
+    },
+    {
+      "id": "Chow",
+      "macro_id": "Chow",
+      "display": "Chow-Liu tree",
+      "method": "Chow-Liu",
+      "configuration": "native_selected",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.5756921422142081,
+        "lo": 0.29448130701116293,
+        "hi": 0.638324269163479,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 29865.0,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Chow"
+      }
+    },
+    {
+      "id": "Ind",
+      "macro_id": "Ind",
+      "display": "Independent marginals",
+      "method": "independent_marginals",
+      "configuration": "native_selected",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": -0.011986971805031716,
+        "lo": -0.04031737293677982,
+        "hi": -0.002334590784225717,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 2549.5,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Ind"
+      }
+    },
+    {
+      "id": "Ctgan",
+      "macro_id": "Ctgan",
+      "display": "CTGAN (native selected)",
+      "method": "CTGAN",
+      "configuration": "native_selected",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-21",
+        "prepared_lineages": 100,
+        "observed_lineages": 21,
+        "complete": false
+      },
+      "retention": {
+        "estimate": -0.07954816473487325,
+        "lo": -0.28157444132042014,
+        "hi": 0.22331969914584035,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 730999.0,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Ctgan"
+      }
+    },
+    {
+      "id": "Tvae",
+      "macro_id": "Tvae",
+      "display": "TVAE (native selected)",
+      "method": "TVAE",
+      "configuration": "native_selected",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-21",
+        "prepared_lineages": 100,
+        "observed_lineages": 21,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.6736705986320002,
+        "lo": 0.45211352660470355,
+        "hi": 0.7760902457365483,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 308629.5,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Tvae"
+      }
+    },
+    {
+      "id": "CtganDef",
+      "macro_id": "CtganDef",
+      "display": "CTGAN (author default)",
+      "method": "CTGAN",
+      "configuration": "author_default",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-17",
+        "prepared_lineages": 100,
+        "observed_lineages": 17,
+        "complete": false
+      },
+      "retention": {
+        "estimate": -0.23665601757803045,
+        "lo": -0.5089682309067722,
+        "hi": -0.02164860085092805,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "CtganDef"
+      }
+    },
+    {
+      "id": "TvaeDef",
+      "macro_id": "TvaeDef",
+      "display": "TVAE (author default)",
+      "method": "TVAE",
+      "configuration": "author_default",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-18",
+        "prepared_lineages": 100,
+        "observed_lineages": 18,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.28310185696168544,
+        "lo": 0.17497410382064815,
+        "hi": 0.5957620436074827,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "TvaeDef"
+      }
+    },
+    {
+      "id": "GaussDef",
+      "macro_id": "GaussDef",
+      "display": "Gaussian copula (default)",
+      "method": "GaussianCopula",
+      "configuration": "default",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.6053741908919544,
+        "lo": 0.30464250806109716,
+        "hi": 0.879029565490158,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "GaussDef"
+      }
+    },
+    {
+      "id": "ChowDef",
+      "macro_id": "ChowDef",
+      "display": "Chow-Liu tree (default)",
+      "method": "Chow-Liu",
+      "configuration": "default",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.6364875018208753,
+        "lo": 0.5453994843350408,
+        "hi": 0.7539305093672986,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "ChowDef"
+      }
+    },
+    {
+      "id": "IndDef",
+      "macro_id": "IndDef",
+      "display": "Independent marginals (default)",
+      "method": "independent_marginals",
+      "configuration": "default",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": -0.01581544100818437,
+        "lo": -0.04022027586932544,
+        "hi": -0.005849709908018427,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "IndDef"
+      }
+    },
+    {
+      "id": "ForestDef",
+      "macro_id": "ForestDef",
+      "display": "Forest-Flow default (historical)",
+      "method": "ForestDiffusion/Forest-Flow",
+      "configuration": "default",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-6",
+        "prepared_lineages": 100,
+        "observed_lineages": 6,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 1.0110782839271955,
+        "lo": 0.9053171959560922,
+        "hi": 1.0407646059536928,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "ForestDef"
+      }
+    },
+    {
+      "id": "Forest",
+      "macro_id": "Forest",
+      "display": "Forest-Flow (historical)",
+      "method": "ForestDiffusion/Forest-Flow",
+      "configuration": "native_selected",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-6",
+        "prepared_lineages": 100,
+        "observed_lineages": 6,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 1.0110782839271955,
+        "lo": 0.9053171959560922,
+        "hi": 1.0407646059536928,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": {
+        "median": 325848913.5,
+        "scope": "historical_charged_artifact",
+        "cold_closure_measured": false
+      },
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Forest"
+      }
+    },
+    {
+      "id": "Pred",
+      "macro_id": "Pred",
+      "display": "Predictor-only control",
+      "method": "predictor_only",
+      "configuration": "control",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.6305693743691723,
+        "lo": 0.3752434962988792,
+        "hi": 0.7838362590283643,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Pred"
+      }
+    },
+    {
+      "id": "PredSplitA",
+      "macro_id": "PredSplitA",
+      "display": "Predictor-only, split 2027",
+      "method": "predictor_only",
+      "configuration": "control_split2027",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 0.5996831991459214,
+        "lo": 0.3653707484932918,
+        "hi": 0.7783731530625921,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "PredSplitA"
+      }
+    },
+    {
+      "id": "PredSplitB",
+      "macro_id": "PredSplitB",
+      "display": "Predictor-only, split 2999",
+      "method": "predictor_only",
+      "configuration": "control_split2999",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-100",
+        "prepared_lineages": 100,
+        "observed_lineages": 100,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.6474935007064829,
+        "lo": 0.3681137725118065,
+        "hi": 0.7774055066562909,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "PredSplitB"
+      }
+    },
+    {
+      "id": "PredSplitC",
+      "macro_id": "PredSplitC",
+      "display": "Predictor-only, split 4099",
+      "method": "predictor_only",
+      "configuration": "control_split4099",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-100",
+        "prepared_lineages": 100,
+        "observed_lineages": 100,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.6398988216844521,
+        "lo": 0.36214704527080793,
+        "hi": 0.7770752280709936,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "PredSplitC"
+      }
+    },
+    {
+      "id": "PredSplitD",
+      "macro_id": "PredSplitD",
+      "display": "Predictor-only, split 8191",
+      "method": "predictor_only",
+      "configuration": "control_split8191",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-100",
+        "prepared_lineages": 100,
+        "observed_lineages": 100,
+        "complete": false
+      },
+      "retention": {
+        "estimate": 0.6766908239960203,
+        "lo": 0.3593954676635658,
+        "hi": 0.7873580885263898,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "PredSplitD"
+      }
+    },
+    {
+      "id": "Boot",
+      "macro_id": "Boot",
+      "display": "Real rows resampled",
+      "method": "real_bootstrap_4n",
+      "configuration": "control",
+      "auditor": "catboost",
+      "citable": true,
+      "publication_role": "historical",
+      "evidence_status": "selection_exposed_validation",
+      "evaluation_split": "validation",
+      "final": false,
+      "cohort": {
+        "id": "legacy-v2-catboost-99",
+        "prepared_lineages": 100,
+        "observed_lineages": 99,
+        "complete": true
+      },
+      "retention": {
+        "estimate": 1.0180604845291463,
+        "lo": 1.0047524069088873,
+        "hi": 1.0283199605718147,
+        "interval_kind": "historical_nested_bootstrap_95_percent"
+      },
+      "artifact_bytes": null,
+      "driver_gate": null,
+      "tdl_bytes": null,
+      "complete_budget_grid": false,
+      "source": {
+        "path": "docs/whitepaper/generated/v2-headline.json",
+        "sha256": "44cc100e1ea1eecf9ea3f2e39f83ddcf63b1edb8d23dbb002c4973c57f3c4833",
+        "arm": "Boot"
+      }
+    }
+  ]
+}

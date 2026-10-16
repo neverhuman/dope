@@ -135,7 +135,9 @@ def title_of(tex: str) -> str:
 
 def readme_prose(readme: str) -> str:
     begin, end = "<!-- BEGIN BENCHMARK -->", "<!-- END BENCHMARK -->"
-    return readme.split(begin)[0] + readme.split(end)[1]
+    if begin in readme and end in readme:
+        return readme.split(begin)[0] + readme.split(end)[1]
+    return re.sub(r"<!-- BEGIN TDL RESULTS -->.*?<!-- END TDL RESULTS -->", "", readme, flags=re.S)
 
 
 def _row(rows, code, auditor, size):
@@ -271,12 +273,159 @@ def publication_failures() -> list[str]:
     return ["claim registry: " + failure for failure in compile_claims(*load_inputs())[1]]
 
 
+# TDL publication rules extend this registry; tools/claims/check.py is only an entry point.
+EVIDENCE_STATUSES = frozenset(("sealed_test", "validation", "selection_exposed_validation", "historical",
+                               "specified_unrun", "unqualified", "failed"))
+LEGACY_README_PROSE_SHA256 = "8d90e1fc7dd3a910a3c01b721fd29a8a0329d67ce646aeb54ddd1b788d1f279e"
+PUBLIC_BANNED = (r"privacy[- ]preserving", r"\bminimum\b", r"\bbeats\s+TabSyn\b",
+                 r"validated\s+across\s+Kumo", r"1\.9\s*KiB\s+cold\s+closure")
+# Result prose must use generated values. Structural names (TDL-v1, D-01, T90),
+# URLs, citations, CLI code examples and TeX layout dimensions are not results.
+PUBLIC_NUMBER = re.compile(r"(?<![\w./#-])(?:[+-]?\d+(?:[.,]\d+)*|\.\d+)(?:%|\s*(?:KiB|MiB|GiB|bytes))?(?![\w/-]|\.\d)")
+
+
+def public_prose(text: str) -> str:
+    text = re.sub(r"(?m)(?<!\\)%.*$", "", text)
+    text = re.sub(r"```(?:bash|sh|shell)\n.*?```", "", text, flags=re.S)
+    text = re.sub(r"`([^`]*)`", lambda m: m.group(1) if re.match(r"^[+-]?(?:\d|\.\d)", m.group(1)) else "", text)
+    text = re.sub(r"https?://[^\s)>}]+", "", text)
+    text = re.sub(r"\\(?:cite\w*|label|ref|eqref|url|input|includegraphics)(?:\[[^\]]*\])?\{[^}]*\}", "", text)
+    text = re.sub(r"(?m)^\s*\\(?:documentclass|usepackage|setlength|hypersetup|geometry|definecolor).*", "", text)
+    text = re.sub(r"(?m)^\s*(?:\d+[.)]\s|\(\d+\)~)", "", text)
+    text = re.sub(r"\b(?:Figure|Table|Section)\s+\d+\b", "", text)
+    text = re.sub(r"(\\(?:newcommand|renewcommand|providecommand)\{\\[A-Za-z]+\})\[\d+\]", r"\1", text)
+    return text
+
+
+def lint_public_text(text: str, label: str, held_out_knowledge: bool = False) -> list[str]:
+    failures = []
+    prose = public_prose(text)
+    for pattern in PUBLIC_BANNED:
+        if re.search(pattern, text, re.I):
+            failures.append(f"{label}: forbidden claim /{pattern}/")
+    if not held_out_knowledge and re.search(r"\bknowledge\b", text, re.I):
+        failures.append(f"{label}: knowledge claim lacks held-out evidence")
+    for match in PUBLIC_NUMBER.finditer(prose):
+        failures.append(f"{label}: hand-typed result number {match.group()!r}; use generated input")
+    return failures
+
+
+def result_failures(data: dict, auditors: dict, status: dict) -> list[str]:
+    failures = []
+    if data.get("citable") is not True or data.get("fixture") is True:
+        failures.append("results: non-citable fixture cannot be published")
+    entries = {row["id"]: row for row in auditors["entries"]}
+    labels = {row["id"]: row["evidence_status"] for row in status["results"]}
+    if len(labels) != len(status["results"]):
+        failures.append("status: duplicate result id")
+    ids = set()
+    for row in data["results"]:
+        name = row["id"]
+        if name in ids:
+            failures.append(f"{name}: duplicate result id")
+        ids.add(name)
+        if row.get("citable") is not True:
+            failures.append(f"{name}: non-citable fixture result")
+        evidence = row.get("evidence_status")
+        if row.get("source", {}).get("path") == REGISTRY["sources"]["headline"] and (
+                evidence != "selection_exposed_validation" or row.get("evaluation_split") != "validation" or row.get("final")):
+            failures.append(f"{name}: historical source cannot be relabeled as sealed or final")
+        if evidence not in EVIDENCE_STATUSES or labels.get(name) != evidence:
+            failures.append(f"{name}: missing or inconsistent evidence status")
+        if row.get("final") and (evidence != "sealed_test" or row.get("evaluation_split") != "sealed_test"):
+            failures.append(f"{name}: final claim requires sealed-test evidence")
+        if evidence == "sealed_test" and row.get("evaluation_split") != "sealed_test":
+            failures.append(f"{name}: sealed evidence label disagrees with evaluation split")
+        if row.get("publication_role") == "headline":
+            auditor = entries.get(row.get("auditor"), {})
+            if auditor.get("qualification", {}).get("state") != "qualified":
+                failures.append(f"{name}: unqualified headline auditor")
+            cohort = row["cohort"]
+            if not cohort.get("complete") or cohort["observed_lineages"] != cohort["prepared_lineages"]:
+                failures.append(f"{name}: incomplete-cohort headline claim")
+            if not data.get("protocol_frozen") or not row.get("complete_budget_grid") or row.get("driver_gate") is not True:
+                failures.append(f"{name}: headline requires frozen protocol, complete budget grid and driver gate")
+        if row.get("pooled_cohort_ids") and set(row["pooled_cohort_ids"]) != {row["cohort"]["id"]}:
+            failures.append(f"{name}: mixed-cohort claim")
+        if row.get("tdl_bytes") is not None and (row.get("driver_gate") is not True or not row.get("complete_budget_grid")):
+            failures.append(f"{name}: TDL bytes lack required gates")
+    if status.get("allowed_statuses") is None or set(status["allowed_statuses"]) != EVIDENCE_STATUSES:
+        failures.append("status: evidence vocabulary differs from registry")
+    return failures
+
+
+def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
+    """Fail closed on public TDL claims; preserve the historical compiler above."""
+    import hashlib
+    from tools.claims import render
+    from tools.claims.registry import validate as validate_registries
+    from tools.claims.version import failures as version_failures
+
+    data_path = root / "paper/generated/headline-results.json"
+    if not data_path.is_file():
+        return ["public results source is missing"]
+    data = json.loads(data_path.read_text())
+    status = json.loads((root / "evidence/status.json").read_text())
+    auditors = json.loads((root / "research/transfer/registries/auditors.json").read_text())
+    failures = result_failures(data, auditors, status)
+    failures.extend(validate_registries(root))
+    failures.extend(version_failures(root))
+    for row in data["results"]:
+        source = row["source"]
+        path = root / source["path"]
+        if source["path"] != REGISTRY["sources"]["headline"]:
+            failures.append(f"{row['id']}: source is not admitted by this historical publication registry")
+            continue
+        if not path.resolve().is_relative_to(root.resolve()) or not path.is_file():
+            failures.append(f"{row['id']}: source must be a tracked repository input")
+            continue
+        if hashlib.sha256(path.read_bytes()).hexdigest() != source["sha256"]:
+            failures.append(f"{row['id']}: source hash drift")
+        original = next((arm for arm in json.loads(path.read_text())["arms"] if arm["code"] == source["arm"]), None)
+        if original is not None and any(row.get(key) != original[key] for key in ("method", "configuration", "display")):
+            failures.append(f"{row['id']}: method or configuration differs from pinned source")
+        if row.get("auditor") != "catboost":
+            failures.append(f"{row['id']}: historical source only supports CatBoost")
+        level = row["retention"]
+        if original is None or (level and {"median": level["estimate"], "lo": level["lo"], "hi": level["hi"], "n": row["cohort"]["observed_lineages"]} != original["level"]):
+            failures.append(f"{row['id']}: result differs from pinned historical input")
+        if original is not None and row["artifact_bytes"] is not None and row["artifact_bytes"]["median"] != original["bytes"]["median"]:
+            failures.append(f"{row['id']}: bytes differ from pinned historical input")
+    outputs = render.expected_outputs(root) if check_render else render.text_outputs(data, status)
+    if check_render:
+        for name, expected in outputs.items():
+            path = root / name
+            if not path.is_file() or path.read_bytes() != expected:
+                failures.append(f"{name}: generated output or figure hash drift")
+    readme = (root / "README.md").read_text()
+    # Existing v2 BENCHMARK is already compiled by the historical registry.
+    # The L3 landing page uses the new marker. While lanes integrate, both are admitted.
+    if render.BEGIN in readme:
+        if readme.count(render.BEGIN) != 1 or readme.count(render.END) != 1 or readme.index(render.BEGIN) > readme.index(render.END):
+            failures.append("README: generated result markers must be unique and ordered")
+        else:
+            block = readme[readme.index(render.BEGIN):readme.index(render.END) + len(render.END)]
+            expected = outputs["paper/generated/readme-result-card.md"].decode().strip()
+            if block != expected:
+                failures.append("README: generated result card drift")
+            failures.extend(lint_public_text(readme.replace(block, ""), "README"))
+    elif "<!-- BEGIN BENCHMARK -->" not in readme:
+        failures.append("README: generated result card markers are missing")
+    elif hashlib.sha256(readme_prose(readme).encode()).hexdigest() != LEGACY_README_PROSE_SHA256:
+        failures.append("README: changed prose must adopt the generated TDL result card")
+    for path in sorted((root / "paper").glob("*.tex")):
+        failures.extend(lint_public_text(path.read_text(), str(path.relative_to(root))))
+    return failures
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--public-only", action="store_true", help="Check the new public artifacts without the archived manuscript")
     args = parser.parse_args()
-    compiled, failures = compile_claims(*load_inputs())
+    compiled, failures = ([], []) if args.public_only else compile_claims(*load_inputs())
+    failures.extend(public_failures())
     if args.json:
         print(json.dumps({"claims": compiled, "failures": failures}, indent=1))
     for failure in failures:

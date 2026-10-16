@@ -1,0 +1,207 @@
+{
+  "format": "dope-evidence-status-v1",
+  "summary": "MFS-v2 current evidence is selection-exposed validation; MFS-v3/v4 are historical drafts; TDL is specified and unrun.",
+  "allowed_statuses": [
+    "sealed_test",
+    "validation",
+    "selection_exposed_validation",
+    "historical",
+    "specified_unrun",
+    "unqualified",
+    "failed"
+  ],
+  "results": [
+    {
+      "id": "Dope",
+      "display": "DOPE (ours)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "DopeDef",
+      "display": "DOPE, untuned default",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "DopeHist",
+      "display": "DOPE, historical seed 11",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "DopeHistA",
+      "display": "DOPE historical, 12 inputs, 512 steps",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "DopeHistB",
+      "display": "DOPE historical, 24 inputs, 512 steps",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "DopeHistC",
+      "display": "DOPE historical, 24 inputs, 2048 steps",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "DopeBnew",
+      "display": "DOPE, later binary, seed 11",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "DopeBnewFour",
+      "display": "DOPE, later binary, seeds 23-71",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "TabSyn",
+      "display": "TabSyn (scaled schedule)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Arf",
+      "display": "ARF (author default)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "ArfNat",
+      "display": "ARF (native selected)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Gauss",
+      "display": "Gaussian copula",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Chow",
+      "display": "Chow-Liu tree",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Ind",
+      "display": "Independent marginals",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Ctgan",
+      "display": "CTGAN (native selected)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Tvae",
+      "display": "TVAE (native selected)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "CtganDef",
+      "display": "CTGAN (author default)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "TvaeDef",
+      "display": "TVAE (author default)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "GaussDef",
+      "display": "Gaussian copula (default)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "ChowDef",
+      "display": "Chow-Liu tree (default)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "IndDef",
+      "display": "Independent marginals (default)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "ForestDef",
+      "display": "Forest-Flow default (historical)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Forest",
+      "display": "Forest-Flow (historical)",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Pred",
+      "display": "Predictor-only control",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "PredSplitA",
+      "display": "Predictor-only, split 2027",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "PredSplitB",
+      "display": "Predictor-only, split 2999",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "PredSplitC",
+      "display": "Predictor-only, split 4099",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "PredSplitD",
+      "display": "Predictor-only, split 8191",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "Boot",
+      "display": "Real rows resampled",
+      "evidence_status": "selection_exposed_validation",
+      "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "mfs-v3",
+      "display": "MFS-v3",
+      "evidence_status": "historical",
+      "qualification": "release score null"
+    },
+    {
+      "id": "mfs-v4",
+      "display": "MFS-v4",
+      "evidence_status": "historical",
+      "qualification": "historical draft"
+    },
+    {
+      "id": "tdl",
+      "display": "TDL",
+      "evidence_status": "specified_unrun",
+      "qualification": "unfrozen; no measured headline"
+    }
+  ]
+}
