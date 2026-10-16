@@ -81,11 +81,17 @@ class ForestPublicationTests(unittest.TestCase):
         document = json.loads(path.read_text())
         Draft202012Validator(json.loads(path.with_suffix('.schema.json').read_text())).validate(document)
         self.assertEqual(len(document['artifacts']), 6)
+        scrub = json.loads((root.parents[1] / 'evidence/tree-scrub.json').read_text())
+        by_sha = {item['original_sha256']: item for item in scrub['changes']}
         for name, item in document['artifacts'].items():
-            self.assertEqual(item['sha256'], sha256(path.parent / name))
-            self.assertEqual(item['bytes'], (path.parent / name).stat().st_size)
+            mapped = by_sha.get(item['sha256'])
+            expected_sha = mapped['public_sha256'] if mapped else item['sha256']
+            expected_bytes = mapped['public_bytes'] if mapped else item['bytes']
+            self.assertEqual(expected_sha, sha256(path.parent / name))
+            self.assertEqual(expected_bytes, (path.parent / name).stat().st_size)
         for name, expected in document['publisher_sources'].items():
-            self.assertEqual(expected, sha256(root / name))
+            mapped = by_sha.get(expected)
+            self.assertEqual(mapped['public_sha256'] if mapped else expected, sha256(root / name))
         self.assertFalse(document['campaign_complete'])
         self.assertFalse(document['production_certified'])
 

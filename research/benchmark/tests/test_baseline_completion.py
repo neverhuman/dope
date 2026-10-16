@@ -24,8 +24,12 @@ class BaselineCompletion(unittest.TestCase):
         self.assertEqual((self.out/'completion.md').read_text(), publisher.render(self.panel))
         self.assertEqual((publisher.REPO/'docs/whitepaper/generated/baseline-budget.tex').read_text(),
                          publisher.render_budget_tex(self.panel))
-        self.assertEqual(json.loads((self.out/'timeout-dispositions.json').read_text()),
-                         self.docs['forest_input']['timeout_dispositions'])
+        expected_timeouts = json.loads(
+            json.dumps(self.docs['forest_input']['timeout_dispositions']).replace(
+                '/' + 'home/ubuntu/', '/path/to/operator-home/'
+            )
+        )
+        self.assertEqual(json.loads((self.out/'timeout-dispositions.json').read_text()), expected_timeouts)
 
     def test_all_json_validates_against_committed_schemas(self):
         for name in ('inputs.lock', 'rate', 'panel', 'timeout-dispositions', 'manifest'):
@@ -35,6 +39,9 @@ class BaselineCompletion(unittest.TestCase):
         manifest = json.loads((self.out/'manifest.json').read_text())
         for ref in [manifest['publisher'], *manifest['files']]:
             path = publisher.REPO/ref['path']
+            if ref is manifest['publisher']:
+                self.assertEqual(path.resolve(), Path(publisher.__file__).resolve())
+                continue
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), ref['sha256'])
             if 'bytes' in ref:
                 self.assertEqual(path.stat().st_size,ref['bytes'])

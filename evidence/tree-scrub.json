@@ -1998,14 +1998,14 @@
       "public_bytes": 132782
     },
     {
-      "path": "research/benchmark/results/campaign-local-capacity-amendment-xbabe2.json",
+      "path": "research/benchmark/results/campaign-local-capacity-amendment-fit-machine-2.json",
       "original_sha256": "f2f3c66bcaa469e58a80195aac9f0612488bf8943b7d37a299e03794f233a506",
       "public_sha256": "c1d406861a9833cb089edf719d16a8e07b8d36a5d2b775afa117243866df3901",
       "original_bytes": 4388,
       "public_bytes": 4565
     },
     {
-      "path": "research/benchmark/results/campaign-local-capacity-amendment-xbabe2.schema.json",
+      "path": "research/benchmark/results/campaign-local-capacity-amendment-fit-machine-2.schema.json",
       "original_sha256": "4c52ff6b917e64dd5b32d5fe16412687d16e0e49a75ceafb18d158e664f8d02b",
       "public_sha256": "9f307289da777036db5dfd8c1e881281452722092d7db97a8980066aa5002324",
       "original_bytes": 7065,

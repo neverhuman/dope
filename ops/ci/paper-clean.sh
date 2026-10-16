@@ -33,6 +33,7 @@ find docs/whitepaper/generated -type f -print > target/paper-clean/generated-bef
 rm -rf docs/whitepaper/generated
 rm -f docs/whitepaper/figures/architecture.pdf
 nice -n 10 ionice -c 3 just paper
+nice -n 10 ionice -c 3 bash paper/build.sh
 # Include absent/untracked files as well as tracked drift in the clean-rebuild gate.
 git diff --exit-code
 if [[ -n "$(git status --porcelain -- "${output_paths[@]}")" ]]; then

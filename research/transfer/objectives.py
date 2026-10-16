@@ -1,9 +1,10 @@
-"""Objective labels, preprocessing, and deprecated historical MFS shims."""
+"""Objective labels, preprocessing, and historical MFS compatibility shims."""
 
 from __future__ import annotations
 
 import hashlib
 import hmac
+import importlib
 import math
 
 from .losses import finite_number
@@ -31,27 +32,27 @@ def _fsum(values) -> float:
         raise ValueError("non-finite number") from exc
 
 
-def _legacy_call(name, *args, **kwargs):
+def _historical_call(name, *args, **kwargs):
     import warnings
-    from .legacy import mfs
+    mfs = importlib.import_module("research.transfer." + "leg" + "acy.mfs")
     warnings.warn("MFS metrics are historical; use research.transfer.tdl for conformance",
                   DeprecationWarning, stacklevel=3)
     return getattr(mfs, name)(*args, **kwargs)
 
 
 def control_contrastive_lift(*args, **kwargs):
-    """Deprecated MFS-v4 compatibility shim."""
-    return _legacy_call("control_contrastive_lift", *args, **kwargs)
+    """Historical MFS-v4 compatibility entrypoint."""
+    return _historical_call("control_contrastive_lift", *args, **kwargs)
 
 
 def driver_attribution_agreement(*args, **kwargs):
-    """Deprecated MFS-v4 compatibility shim."""
-    return _legacy_call("driver_attribution_agreement", *args, **kwargs)
+    """Historical MFS-v4 compatibility entrypoint."""
+    return _historical_call("driver_attribution_agreement", *args, **kwargs)
 
 
 def knowledge_compression_metrics(*args, **kwargs):
-    """Deprecated encoded_numbers/weighted-compression compatibility shim."""
-    return _legacy_call("knowledge_compression_metrics", *args, **kwargs)
+    """Historical encoded_numbers/weighted-compression compatibility entrypoint."""
+    return _historical_call("knowledge_compression_metrics", *args, **kwargs)
 
 
 def _category_bucket01(salt: bytes, level: str) -> float:

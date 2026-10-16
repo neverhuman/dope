@@ -19,7 +19,7 @@ from research.benchmark.tabsyn_runtime_guard import bound, require, safe
 
 AUTHOR = 'cb5ac0f74ec36ee88e7a974a393dfbef50d42da7'
 LEASE = '/path/to/operator-home/dope-scratch-x3/.gpu-fit.lock'
-OWNER_ONE_POLICY_SHA256 = '3b5e46786727a6f09938ea4276c37070fae63824c7b1e6ff5b0ea8be88012f94'
+OWNER_ONE_POLICY_SHA256 = '813429a331a4135dd68b250920f17c0b83cca4c4d2e22efa4cdf8c55d38bd63d'
 
 
 class _VerifiedGuardLoader(SourceFileLoader):

@@ -7,7 +7,7 @@
 
 DOPE stands for **Downstream Objective-Preserving Encoding**. The artifact is a small **sampling program**, not a synthetic table. Train on generated rows. Test on untouched real rows. Count every byte that sampling reads.
 
-> **Evidence status (2026-10-15).** The active evidence is the v2 validation panel: PMLB regression tables, CatBoost-centered and selection-exposed. The MFS-v3 and MFS-v4 release scores are historical and null for every method. The new metric, TDL, is specified and unmeasured. The official test split is sealed. Every result carries a label from the [claims policy](docs/claims-policy.md).
+> **Evidence status (2026-10-15).** The active evidence is the v2 validation panel: PMLB regression tables, CatBoost-centered and selection-exposed. The MFS-v3 and MFS-v4 release scores are historical and null for every method. The new metric, TDL, is specified and unmeasured. The official test split is sealed. Every result carries a label from the [claims policy](docs/claims-policy.md). Repository architecture and contributor rules are in [AGENTS.md](AGENTS.md).
 
 ![Historical CatBoost validation, selection-exposed: retention against median charged artifact bytes on a log axis, with smaller cohorts in grey. It is not a TDL frontier.](paper/generated/hero-frontier.png)
 
@@ -175,7 +175,7 @@ Every number in the historical paper and in the panel above comes from a committ
 | Generated evidence status | [STATUS.md](STATUS.md) |
 | New paper (skeleton) and historical paper | [paper/](paper/README.md), [docs/whitepaper/](docs/whitepaper/README.md) |
 | Architecture, testing, release, audit | [architecture](docs/architecture.md), [testing](docs/testing.md), [release](docs/release.md), [audit](docs/audit.md) |
-| Contributing, security, governance | [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [GOVERNANCE.md](GOVERNANCE.md) |
+| Contributing, security, governance, conduct, third-party notices | [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [GOVERNANCE.md](GOVERNANCE.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
 Development checks: `just fast` while editing and `just check` before a commit.
 

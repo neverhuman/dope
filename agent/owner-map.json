@@ -561,6 +561,7 @@
     "rust/compiler/interactions.rs": "rust-core",
     "tests/vnext_interactions.rs": "rust-core",
     "contracts/tdl-contract-v1.json": "rust-core",
+    "ops/ci/public-smoke.sh": "governance",
     "rust/metrics/": "rust-core",
     "rust/dope.rs": "rust-core",
     "schemas/tdl-contract-v1.schema.json": "governance",

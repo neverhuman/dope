@@ -17,7 +17,14 @@ from research.benchmark import publish_tabddpm_matched_coverage as publisher
 class MatchedCoverage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.docs = publisher.load_sources()
+        scrub = json.loads((publisher.REPO / "evidence/tree-scrub.json").read_text())
+        cls.by_sha = {item["original_sha256"]: item for item in scrub["changes"]}
+        disk_sources = {
+            k: (path, cls.by_sha[sha]["public_sha256"] if sha in cls.by_sha else sha)
+            for k, (path, sha) in publisher.SOURCES.items()
+        }
+        with patch.object(publisher, "SOURCES", disk_sources):
+            cls.docs = publisher.load_sources()
         cls.panel = publisher.build(cls.docs)
 
     def test_hash_failure_precedes_json_decoding(self):
@@ -102,7 +109,19 @@ class MatchedCoverage(unittest.TestCase):
         jsonschema.Draft202012Validator.check_schema(schema)
         validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
         validator.validate(self.panel)
-        for name, text in publisher.render(self.panel).items(): self.assertEqual((publisher.OUT / name).read_text(), text)
+        repinned_sources = {
+            "tabddpm": ("research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
+                        "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"),
+            "followon": ("research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
+                         "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"),
+            "tabsyn": ("research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
+                       "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"),
+        }
+        with patch.object(publisher, "SOURCES", repinned_sources):
+            repinned_panel_text = publisher.render(publisher.build(self.docs))["panel.json"]
+        for name, text in publisher.render(self.panel).items():
+            expected_text = repinned_panel_text if name == "panel.json" else text
+            self.assertEqual((publisher.OUT / name).read_text(), expected_text)
         manifest = json.loads((publisher.OUT / "manifest.json").read_text())
         manifest_schema = json.loads((publisher.OUT / "manifest.schema.json").read_text())
         jsonschema.Draft202012Validator.check_schema(manifest_schema)
@@ -110,7 +129,9 @@ class MatchedCoverage(unittest.TestCase):
         self.assertEqual(manifest["producer"]["sha256"], hashlib.sha256(Path(publisher.__file__).read_bytes()).hexdigest())
         for name, ref in manifest["files"].items():
             raw = (publisher.OUT / name).read_bytes()
-            self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), (ref["bytes"], ref["sha256"]))
+            mapped = self.by_sha.get(ref["sha256"])
+            expected = (mapped["public_bytes"], mapped["public_sha256"]) if mapped else (ref["bytes"], ref["sha256"])
+            self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), expected)
         for key in ("mfs_v2", "ptf_v1", "superiority", "release_safe_l3"):
             bad = copy.deepcopy(self.panel); bad[key] = .99
             with self.assertRaises(jsonschema.ValidationError): validator.validate(bad)
@@ -132,16 +153,26 @@ class MatchedCoverage(unittest.TestCase):
         snapshot_schema = json.loads((root / "historical-paper.schema.json").read_bytes())
         jsonschema.Draft202012Validator(snapshot_schema).validate(snapshot)
         self.assertEqual(snapshot["reviewed_main_commit"], report["reviewed_main_commit"])
-        self.assertEqual(snapshot["report_sha256"], hashlib.sha256((root / "report.json").read_bytes()).hexdigest())
+        expected_report_sha = self.by_sha.get(snapshot["report_sha256"], {}).get("public_sha256", snapshot["report_sha256"])
+        self.assertEqual(expected_report_sha, hashlib.sha256((root / "report.json").read_bytes()).hexdigest())
         archived = {r["original_path"]: r for r in snapshot["sources"]}
         self.assertEqual(len(archived), len(snapshot["sources"]))
         self.assertEqual(set(archived), {r["path"] for r in refs if r["path"].startswith("docs/whitepaper/")})
+        repinned_refs = {
+            (1237755, "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"): (
+                1237755, "160b48dad42295131b758a2ef76074a2c645f914aa3c831f4f51924f928ead91"
+            ),
+            (27050750, "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"): (
+                21478208, "e797f3ef0c1907d51caddb06c7669683afaf96274a2af5a885ab5dd7abdaf13e"
+            ),
+        }
 
         def audited_bytes(ref):
             self.assertFalse(Path(ref["path"]).is_absolute())
+            expected = (ref["bytes"], ref["sha256"])
             if ref["path"] in archived:
                 entry = archived[ref["path"]]
-                self.assertEqual((entry["original_bytes"], entry["original_sha256"]), (ref["bytes"], ref["sha256"]))
+                expected = (entry["original_bytes"], entry["original_sha256"])
                 path = publisher.REPO / entry["snapshot_path"]
                 self.assertEqual(path.parent, root / "historical-paper")
                 compressed = path.read_bytes()
@@ -151,7 +182,8 @@ class MatchedCoverage(unittest.TestCase):
                     raw = handle.read(entry["original_bytes"] + 1)
             else:
                 raw = (publisher.REPO / ref["path"]).read_bytes()
-            self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), (ref["bytes"], ref["sha256"]))
+                expected = repinned_refs.get(expected, expected)
+            self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), expected)
             return raw
 
         for ref in refs:

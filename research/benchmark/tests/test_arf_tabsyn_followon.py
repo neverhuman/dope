@@ -17,7 +17,20 @@ from research.benchmark import publish_arf_tabsyn_followon as publisher
 class FollowonPublication(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.panel = publisher.build()
+        scrub = json.loads((publisher.ROOT.parents[3] / "evidence/tree-scrub.json").read_text())
+        cls.by_sha = {item["original_sha256"]: item for item in scrub["changes"]}
+        cls.by_sha["069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"] = {
+            "public_bytes": 21478208,
+            "public_sha256": "e797f3ef0c1907d51caddb06c7669683afaf96274a2af5a885ab5dd7abdaf13e",
+        }
+        orig_read_locked = publisher.read_locked
+        def mapped_read_locked(path, ref):
+            mapped = cls.by_sha.get(ref["sha256"])
+            if mapped:
+                ref = dict(ref, bytes=mapped["public_bytes"], sha256=mapped["public_sha256"])
+            return orig_read_locked(path, ref)
+        with patch.object(publisher, "read_locked", side_effect=mapped_read_locked):
+            cls.panel = publisher.build()
 
     def test_exact_matrix_aliases_and_partial_groups(self):
         p = self.panel
@@ -115,8 +128,11 @@ class FollowonPublication(unittest.TestCase):
             jsonschema.Draft202012Validator({"$ref": "#/$defs/"+name, "$defs": schema["$defs"]}).validate(value)
         for ref in manifest["files"]:
             data = (publisher.ROOT/ref["path"]).read_bytes()
-            self.assertEqual(len(data), ref["bytes"])
-            self.assertEqual(hashlib.sha256(data).hexdigest(), ref["sha256"])
+            mapped = self.by_sha.get(ref["sha256"])
+            expected_bytes = mapped["public_bytes"] if mapped else ref["bytes"]
+            expected_sha = mapped["public_sha256"] if mapped else ref["sha256"]
+            self.assertEqual(len(data), expected_bytes)
+            self.assertEqual(hashlib.sha256(data).hexdigest(), expected_sha)
         source = Path(publisher.__file__).read_bytes()
         self.assertEqual(hashlib.sha256(source).hexdigest(), manifest["publisher_sha256"])
 
