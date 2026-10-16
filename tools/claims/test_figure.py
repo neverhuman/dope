@@ -1,0 +1,61 @@
+"""The hero figure reads its threshold from the results file and refuses values outside its axes."""
+import csv
+import io
+import json
+import sys
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from tools.claims import render  # noqa: E402
+
+
+def rows_to_csv(rows: list[dict]) -> bytes:
+    buffer = io.StringIO(newline="")
+    writer = csv.DictWriter(buffer, fieldnames=list(rows[0]), lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(rows)
+    return buffer.getvalue().encode()
+
+
+class HeroFigureTests(unittest.TestCase):
+    def setUp(self):
+        self.data = json.loads((ROOT / "paper/generated/headline-results.json").read_text())
+        self.csv = (ROOT / "paper/generated/hero-frontier.csv").read_bytes()
+        self.rows = list(csv.DictReader(io.StringIO(self.csv.decode())))
+
+    def test_committed_points_and_threshold_fit_the_axes(self):
+        self.assertEqual(render.figure_bound_failures(self.rows, self.data["thresholds"]), [])
+        self.assertEqual(render.threshold_label(self.data["thresholds"]), "Proposed T90; driver gate unmeasured")
+
+    def test_threshold_line_follows_the_results_file(self):
+        moved = dict(self.data["thresholds"], transfer=0.95)
+        svg = render.figure_outputs(self.csv, moved)["paper/generated/hero-frontier.svg"].decode()
+        self.assertIn("Proposed T95", svg)
+        self.assertNotIn("Proposed T90", svg)
+
+    def test_point_outside_either_axis_is_refused(self):
+        for key, value in (("artifact_bytes", "5e9"), ("artifact_bytes", "500"), ("retention", "-0.6"),
+                           ("interval_hi", "1.3"), ("interval_lo", "-0.5"), ("retention", "nan")):
+            with self.subTest(key=key, value=value):
+                rows = [dict(row) for row in self.rows]
+                rows[0][key] = value
+                with self.assertRaisesRegex(ValueError, "out-of-axis"):
+                    render.figure_outputs(rows_to_csv(rows), self.data["thresholds"])
+
+    def test_retention_outside_its_interval_is_refused(self):
+        rows = [dict(row) for row in self.rows]
+        rows[0]["interval_hi"] = str(float(rows[0]["retention"]) - 0.01)
+        self.assertTrue(any("outside its own interval" in f
+                            for f in render.figure_bound_failures(rows, self.data["thresholds"])))
+
+    def test_threshold_outside_the_axes_is_refused(self):
+        for transfer in (1.2, -1.0, float("nan"), True):
+            with self.subTest(transfer=transfer):
+                thresholds = dict(self.data["thresholds"], transfer=transfer)
+                self.assertTrue(render.figure_bound_failures(self.rows, thresholds))
+
+
+if __name__ == "__main__":
+    unittest.main()
