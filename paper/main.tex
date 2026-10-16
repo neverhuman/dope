@@ -39,6 +39,18 @@ transfer-versus-bytes frontier rather than a weighted score.
 \pending{Sealed result: one sentence, written only after the sealed run.}
 \end{abstract}
 
+\begin{figure}[!b]
+  \centering
+  \GeneratedFigure[\herowidth]{hero-frontier.pdf}{Figure 1 (T-072): transfer against dataset-specific
+  bytes on a log axis, DOPE against the baselines, rendered from generated/headline-results.json.}
+  \caption{\textbf{Why this matters: how much learning survives at how few bytes.} Historical
+  CatBoost validation (selection-exposed): each method's retention against its median charged
+  artifact bytes on a log axis, with smaller cohorts in grey and the proposed transfer threshold
+  dashed. It is not a \MetricName{} frontier; the measured transfer-versus-bytes frontier replaces it
+  when the qualified panel runs. Evidence status: \ResultStatus.}
+  \label{fig:frontier}
+\end{figure}
+
 \section{Introduction}
 \label{sec:intro}
 
@@ -50,19 +62,6 @@ real rows, and count every byte the sampler reads. Train-on-synthetic, test-on-r
 evaluation \citep{esteban2017rcgan,jordon2018measuring} supplies the transfer measurement;
 this paper makes the charged size of the generator the quantity being reduced and makes
 transfer and driver agreement constraints rather than weighted terms.
-
-\begin{figure}[t]
-  \centering
-  \GeneratedFigure{hero-frontier.pdf}{Figure 1 (T-072): robust transfer lower bound against
-  dataset-specific bytes on a log axis, one step curve per admitted method, the
-  \MetricName{} threshold as a horizontal line, gate status by marker fill. Rendered from
-  generated/headline-results.json.}
-  \caption{Historical CatBoost validation (selection-exposed): retention against median charged
-  artifact bytes, smaller cohorts in grey. This is not a \MetricName{} frontier; the measured
-  transfer-versus-bytes frontier replaces it when the qualified panel runs. Evidence status:
-  \ResultStatus.}
-  \label{fig:frontier}
-\end{figure}
 
 \paragraph{Contributions.}
 (1)~\MetricName{}, a constrained transfer-versus-bytes measure with explicit result states

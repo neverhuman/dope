@@ -33,9 +33,11 @@
 % Generated inputs with placeholders when absent.
 \newlength{\pendingwidth}
 \setlength{\pendingwidth}{0.9\linewidth}
-\newcommand{\GeneratedFigure}[2]{%
-  \IfFileExists{generated/#1}{\includegraphics[width=\linewidth]{generated/#1}}{%
-    \fbox{\parbox{\pendingwidth}{\centering\vspace{2em}\pending{#2}\vspace{2em}}}}}
+\newlength{\herowidth}
+\setlength{\herowidth}{0.86\linewidth}
+\newcommand{\GeneratedFigure}[3][\linewidth]{%
+  \IfFileExists{generated/#2}{\includegraphics[width=#1]{generated/#2}}{%
+    \fbox{\parbox{\pendingwidth}{\centering\vspace{2em}\pending{#3}\vspace{2em}}}}}
 \newcommand{\GeneratedTable}[2]{%
   \IfFileExists{generated/#1}{\input{generated/#1}}{%
     \fbox{\parbox{\pendingwidth}{\centering\vspace{1em}\pending{#2}\vspace{1em}}}}}
