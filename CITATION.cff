@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use DOPE or its benchmark receipts, please cite the paper below."
+message: "Cite the software and identify the evidence status of any benchmark result. The TDL protocol is unfrozen and unmeasured."
 title: "DOPE: Downstream Objective-Preserving Encoding"
 version: 0.3.0-alpha.1
 license: MIT
