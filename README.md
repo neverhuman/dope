@@ -17,7 +17,7 @@ DOPE stands for **Downstream Objective-Preserving Encoding**. The artifact is a 
 
 TDL is the smallest tested number of dataset-specific bytes for which models trained or conditioned on the artifact's samples do two things on untouched real rows:
 
-- recover at least nine-tenths of the real data's predictive gain over a null (T90), at the lower confidence bound, in every required model family (trees, neural, linear, tabular foundation models); and
+- recover at least nine-tenths of the real data's predictive gain over a null (T90), at the lower confidence bound, in every required model family (trees, linear models, neural models), with tabular foundation models held out for confirmation; and
 - rely on the same feature drivers, reaching at least four-fifths of the agreement two real-trained models reach (D80).
 
 The artifact must also pass the copy, cleartext, control-lift and byte-accounting gates. The public form is `KiB@T90/D80`. When no tested budget qualifies, the result is "not reached in the tested range", never zero. Bytes are the quantity being reduced; transfer and drivers are constraints, and no weight trades one against another. The definitions are in [docs/metric.md](docs/metric.md). The name and thresholds are working defaults pending owner decisions D-01 and D-02 ([docs/decisions.md](docs/decisions.md)).
