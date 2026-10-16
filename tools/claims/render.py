@@ -11,18 +11,28 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from tools.claims.cohorts import cohort_failures, refresh_cohorts  # noqa: E402
+
 RESULTS = ROOT / "paper/generated/headline-results.json"
 BEGIN, END = "<!-- BEGIN TDL RESULTS -->", "<!-- END TDL RESULTS -->"
 DEMO_BEGIN, DEMO_END = "<!-- BEGIN PINNED DEMOS -->", "<!-- END PINNED DEMOS -->"
 
 
-def load_results(path: Path = RESULTS) -> dict:
+def load_results(path: Path = RESULTS, *, root: Path = ROOT, derive_cohorts: bool = False) -> dict:
     data = json.loads(path.read_text())
     if data.get("citable") is not True or data.get("fixture") is True:
         raise ValueError("publication renderer refuses non-citable fixture input")
     for row in data["results"]:
         if row.get("citable") is not True:
             raise ValueError("publication renderer refuses non-citable result")
+    if derive_cohorts:
+        refresh_cohorts(data, root)
+    else:
+        failures = cohort_failures(data, root)
+        if failures:
+            raise ValueError("; ".join(failures))
     return data
 
 
@@ -111,7 +121,7 @@ def figure_outputs(csv_bytes: bytes) -> dict[str, bytes]:
 
 
 def expected_outputs(root: Path = ROOT) -> dict[str, bytes]:
-    data = load_results(root / "paper/generated/headline-results.json")
+    data = load_results(root / "paper/generated/headline-results.json", root=root)
     status = json.loads((root / "evidence/status.json").read_text())
     outputs = text_outputs(data, status)
     outputs.update(figure_outputs(outputs["paper/generated/hero-frontier.csv"]))
@@ -124,6 +134,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
+    if not args.check:
+        data = load_results(derive_cohorts=True)
+        content = (json.dumps(data, indent=2) + "\n").encode()
+        if RESULTS.read_bytes() != content:
+            RESULTS.write_bytes(content)
     failures = []
     for name, content in expected_outputs().items():
         path = ROOT / name

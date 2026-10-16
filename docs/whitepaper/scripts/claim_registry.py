@@ -367,6 +367,7 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
     """Fail closed on public TDL claims; preserve the historical compiler above."""
     import hashlib
     from tools.claims import render
+    from tools.claims.cohorts import cohort_failures
     from tools.claims.registry import validate as validate_registries
     from tools.claims.version import failures as version_failures
 
@@ -377,6 +378,9 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
     status = json.loads((root / "evidence/status.json").read_text())
     auditors = json.loads((root / "research/transfer/registries/auditors.json").read_text())
     failures = result_failures(data, auditors, status)
+    cohort_errors = cohort_failures(data, root)
+    if cohort_errors:
+        return failures + cohort_errors
     failures.extend(validate_registries(root))
     failures.extend(version_failures(root))
     for row in data["results"]:
