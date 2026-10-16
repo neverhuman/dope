@@ -215,6 +215,19 @@
         "source_family": "s1",
         "transfer": 0.8
       }
+    ],
+    "required_auditors": {
+      "tree": [
+        "tree"
+      ],
+      "linear": [
+        "linear"
+      ]
+    },
+    "required_seeds": [
+      1,
+      2,
+      3
     ]
   },
   "purpose": "Duplicate observations cannot reweight the mean.",

@@ -57,6 +57,11 @@
     "required_gates": [
       "closure",
       "privacy"
+    ],
+    "byte_grid": [
+      1024,
+      2048,
+      4096
     ]
   },
   "purpose": "Required family/gate/finite cell must be present.",

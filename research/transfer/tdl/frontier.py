@@ -30,9 +30,12 @@ def evaluate(data):
         require(len(gates) == len(set(gates)), "duplicate_gate")
         raw_grid = data.get("byte_grid") if data.get("byte_grid") is not None else data.get("declared_grid_bytes")
         declared_grid = _parse_grid(raw_grid)
+        # T-122 B5: byte_grid is mandatory; do not invent it from cell budgets or artifact sizes.
+        if declared_grid is None:
+            return failure("missing_budget_cell", "incomplete")
         tt = unit(opt_default(data, "transfer_threshold", 0.90))
         dt = unit(opt_default(data, "driver_threshold", 0.80))
-        has_grid = declared_grid is not None or any(type(c) is dict and c.get("budget_bytes") is not None for c in cells)
+        has_grid = any(type(c) is dict and c.get("budget_bytes") is not None for c in cells)
         budgets, admitted, states = set(), [], []
         for cell in cells:
             require(type(cell) is dict, "invalid_cells")
@@ -46,8 +49,7 @@ def evaluate(data):
             else:
                 size = count(cell.get("artifact_bytes"), 1)
                 budget = size
-            if declared_grid is not None:
-                require(budget in declared_grid, "undeclared_budget")
+            require(budget in declared_grid, "undeclared_budget")
             require(budget not in budgets, "duplicate_budget")
             budgets.add(budget)
             state = cell.get("status")
@@ -85,7 +87,7 @@ def evaluate(data):
         for state in ("failed", "unqualified"):
             if state in states:
                 return failure("budget_cell_" + state, state)
-        if declared_grid is not None and budgets != set(declared_grid):
+        if budgets != set(declared_grid):
             return failure("missing_budget_cell", "incomplete")
         if "incomplete" in states:
             return failure("budget_cell_incomplete", "incomplete")

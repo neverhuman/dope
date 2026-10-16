@@ -114,6 +114,25 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
     let family_set: BTreeSet<&str> = families.iter().map(String::as_str).collect();
     let declared_auditors = parse_required_auditors(obj.get("required_auditors"), &families)?;
     let declared_seeds = parse_required_seeds(obj.get("required_seeds"))?;
+    // T-122 B2: design rosters are mandatory; observations must not invent the panel.
+    let required_auditors = match declared_auditors {
+        Some(v) => v,
+        None => {
+            return Err(MetricError::with_status(
+                "missing_family_or_cell",
+                "incomplete",
+            ));
+        }
+    };
+    let required_seeds = match declared_seeds {
+        Some(v) => v,
+        None => {
+            return Err(MetricError::with_status(
+                "missing_family_or_cell",
+                "incomplete",
+            ));
+        }
+    };
 
     let rows_val = match obj.get("rows") {
         None | Some(Value::Null) => {
@@ -138,10 +157,6 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
     type RawClusterTree = BTreeMap<String, BTreeMap<String, BTreeMap<u64, FamilyAuditorCells>>>;
     let mut raw_tree: RawClusterTree = BTreeMap::new();
     let mut seen = BTreeSet::new();
-    let mut observed_auditors: BTreeMap<String, BTreeSet<String>> = families
-        .iter()
-        .map(|f| (f.clone(), BTreeSet::new()))
-        .collect();
 
     for row_val in rows {
         let row = row_val
@@ -160,13 +175,9 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         let family = get_str("family")?;
         let auditor = get_str("auditor")?;
         require(family_set.contains(family.as_str()), "unexpected_family")?;
-        if let Some(ref decl_aud) = declared_auditors {
-            require(decl_aud[&family].contains(&auditor), "unexpected_auditor")?;
-        }
+        require(required_auditors[&family].contains(&auditor), "unexpected_auditor")?;
         let seed = count(row.get("seed").ok_or(MetricError::new("invalid_count"))?, 0)?;
-        if let Some(ref decl_seeds) = declared_seeds {
-            require(decl_seeds.contains(&seed), "unexpected_seed")?;
-        }
+        require(required_seeds.contains(&seed), "unexpected_seed")?;
         let obs_key = (
             source_family.clone(),
             dataset.clone(),
@@ -208,10 +219,6 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
             }
             Some(v) => number(v)?.min(1.0),
         };
-        observed_auditors
-            .get_mut(&family)
-            .unwrap()
-            .insert(auditor.clone());
         raw_tree
             .entry(source_family)
             .or_default()
@@ -224,7 +231,6 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
             .insert(auditor, transfer_val);
     }
 
-    let required_auditors = declared_auditors.unwrap_or(observed_auditors);
     if families.iter().any(|f| required_auditors[f].is_empty()) {
         return Err(MetricError::with_status(
             "missing_family_or_cell",
@@ -237,7 +243,7 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         let mut ds_map = BTreeMap::new();
         for (dataset, seeds) in datasets {
             let observed_seed_set: BTreeSet<u64> = seeds.keys().copied().collect();
-            let expected_seeds = declared_seeds.as_ref().unwrap_or(&observed_seed_set);
+            let expected_seeds = &required_seeds;
             if &observed_seed_set != expected_seeds {
                 return Err(MetricError::with_status(
                     "missing_family_or_cell",
