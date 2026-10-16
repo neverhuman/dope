@@ -142,6 +142,41 @@ V4_PREREQUISITES = (
     "model_driver_attribution_measured",
 )
 V4_TABULAR_AUDITORS = ("kumo_tabular_l", "catboost", "mitra_v2", "tabicl2")
+V4_SAMPLE_SEEDS = (101, 211, 307)
+V4_SEED_VARIANCE_METRICS = (
+    "retention_mean",
+    "retention_sample_sd",
+    "retention_min",
+    "retention_max",
+    "retention_lcb",
+    "driver_fidelity_mean",
+    "driver_fidelity_sample_sd",
+    "driver_fidelity_min",
+    "driver_fidelity_max",
+    "seed_score_mean",
+    "seed_score_sample_sd",
+    "seed_score_min",
+    "seed_score_max",
+)
+
+
+def v4_lineage_contract_frozen(document: dict) -> bool:
+    lineage = document.get("lineage_aggregation")
+    return (
+        isinstance(lineage, dict)
+        and lineage.get("sample_seeds") == list(V4_SAMPLE_SEEDS)
+        and lineage.get("all_seeds_must_pass_gates") is True
+        and lineage.get("utility_bound_rule") == "lcb_le_mean_plus_1e_12"
+        and lineage.get("control_baseline_aggregation") == "max_across_seeds"
+        and lineage.get("driver_attribution_aggregation") == "min_composite_driver_fidelity_seed"
+        and lineage.get("representation_aggregation") == "min_representation_closeness_seed"
+        and lineage.get("compression_aggregation")
+        == "max_artifact_bytes_and_encoded_numbers_across_seeds"
+        and lineage.get("fidelity_aggregation") == "min_across_seeds"
+        and lineage.get("privacy_aggregation") == "max_risk_across_seeds"
+        and lineage.get("seed_variance_reported") is True
+        and lineage.get("seed_variance_metrics") == list(V4_SEED_VARIANCE_METRICS)
+    )
 
 
 def evaluate_v4(evidence: dict) -> dict:
@@ -164,6 +199,7 @@ def evaluate_v4(evidence: dict) -> dict:
         and contract.get("score_range") == [0, 100]
         and contract["prerequisites"] == list(V4_PREREQUISITES)
         and weights == V4_WEIGHTS
+        and v4_lineage_contract_frozen(document)
     )
     shared_map = evidence.get("normalizer") == NORMALIZER
     closeness = None
