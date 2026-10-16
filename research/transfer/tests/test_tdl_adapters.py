@@ -42,7 +42,8 @@ class TdlAuditorTests(unittest.TestCase):
         model = replace(fixture.identity, dependencies=(("catboost", "1.2.10", file_sha256(fixture.artifacts.dependencies[0])),))
         runtime = replace(fixture.runtime, factory=None, version_reader=lambda _: "1.2.10")
         port = fixture.adapter(ConventionalAdapter, recipe, model, runtime)
-        receipt = port.fit(batch(targets=(1000., 3000., 5000.)), 7)
+        training = batch(targets=(1000., 3000., 5000.))
+        receipt = port.fit(training, 7)
         self.assertEqual(receipt["consumed_rows"], 3)
         real_test = query()
         predictions = port.predict(real_test, 8)
@@ -54,5 +55,15 @@ class TdlAuditorTests(unittest.TestCase):
         self.assertIsInstance(importance, ImportanceResult)
         self.assertEqual(importance.query_sha256, real_test.sha256)
         self.assertEqual(importance.group_ids, (0,))
-        self.assertNotIn("/home/", json.dumps(port.receipt()))
-        self.assertNotIn("4000", json.dumps(port.receipt()))
+        portable = port.receipt()
+        self.assertNotIn("/home/", json.dumps(portable))
+        # Timing and digest digits can coincide with source-number substrings.
+        self.assertEqual({key: value for key, value in portable.items() if key != "wall_seconds"}, {
+            "format": "dope-adapter-execution-v1", "kind": "learner",
+            "identity_sha256": model.sha256, "provided_sha256": training.sha256,
+            "context_sha256": training.sha256, "fit_seed": 7,
+            "provided_rows": 3, "consumed_rows": 3, "citable": False,
+        })
+        self.assertIsInstance(portable["wall_seconds"], float)
+        self.assertGreaterEqual(portable["wall_seconds"], 0.)
+        self.assertLessEqual(portable["wall_seconds"], model.resources.wall_seconds)
