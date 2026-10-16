@@ -7,6 +7,7 @@ import csv
 import hashlib
 import io
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -87,15 +88,57 @@ def text_outputs(data: dict, status: dict) -> dict[str, bytes]:
             "STATUS.md": "\n".join(lines).encode()}
 
 
-def figure_outputs(csv_bytes: bytes) -> dict[str, bytes]:
+# Fixed hero axes. Every plotted value must fall inside them, or the figure would clip silently.
+FIGURE_XLIM = (900.0, 2e9)
+FIGURE_YLIM = (-0.45, 1.12)
+THRESHOLD_SHADE_TOP = 1.1
+
+
+def threshold_label(thresholds: dict) -> str:
+    return f"Proposed T{round(100 * thresholds['transfer'])}; driver gate unmeasured"
+
+
+def figure_bound_failures(rows: list[dict], thresholds: dict) -> list[str]:
+    """Plotted points, intervals and the transfer threshold must lie inside the hero axes."""
+    failures = []
+
+    def finite(value) -> float | None:
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return None
+        return number if math.isfinite(number) else None
+
+    transfer = thresholds.get("transfer")
+    if isinstance(transfer, bool) or finite(transfer) is None or not FIGURE_YLIM[0] < transfer < THRESHOLD_SHADE_TOP:
+        failures.append(f"transfer threshold {transfer!r} is outside the y-axis {FIGURE_YLIM}")
+    for row in rows:
+        name = row.get("id", "?")
+        x = finite(row.get("artifact_bytes"))
+        if x is None or not FIGURE_XLIM[0] <= x <= FIGURE_XLIM[1]:
+            failures.append(f"{name}: artifact_bytes {row.get('artifact_bytes')!r} is outside the x-axis {FIGURE_XLIM}")
+        values = {key: finite(row.get(key)) for key in ("retention", "interval_lo", "interval_hi")}
+        for key, value in values.items():
+            if value is None or not FIGURE_YLIM[0] <= value <= FIGURE_YLIM[1]:
+                failures.append(f"{name}: {key} {row.get(key)!r} is outside the y-axis {FIGURE_YLIM}")
+        if None not in values.values() and not values["interval_lo"] <= values["retention"] <= values["interval_hi"]:
+            failures.append(f"{name}: retention lies outside its own interval")
+    return failures
+
+
+def figure_outputs(csv_bytes: bytes, thresholds: dict) -> dict[str, bytes]:
+    rows = list(csv.DictReader(io.StringIO(csv_bytes.decode())))
+    failures = figure_bound_failures(rows, thresholds)
+    if failures:
+        raise ValueError("hero figure refuses out-of-axis values: " + "; ".join(failures))
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     matplotlib.rcParams.update({"svg.hashsalt": "dope-historical-validation-v1", "font.family": "DejaVu Sans", "font.size": 9})
-    rows = list(csv.DictReader(io.StringIO(csv_bytes.decode())))
     figure, axis = plt.subplots(figsize=(8.4, 4.8), constrained_layout=True)
-    axis.axhspan(0.90, 1.1, color="#e3efde", zorder=0)
-    axis.axhline(0.90, color="#526647", linestyle="--", linewidth=0.8, label="Proposed T90; driver gate unmeasured")
+    transfer = float(thresholds["transfer"])
+    axis.axhspan(transfer, THRESHOLD_SHADE_TOP, color="#e3efde", zorder=0)
+    axis.axhline(transfer, color="#526647", linestyle="--", linewidth=0.8, label=threshold_label(thresholds))
     for row in rows:
         value = float(row["retention"])
         small = row["cohort_complete"] != "true"
@@ -104,8 +147,8 @@ def figure_outputs(csv_bytes: bytes) -> dict[str, bytes]:
         axis.errorbar(x, value, yerr=[[value - float(row["interval_lo"])] , [float(row["interval_hi"]) - value]], fmt="o" if not small else "s", color=color, capsize=3, markersize=5)
         axis.annotate(f"{row['method']} (n={row['observed_lineages']})", (x, value), xytext=(5, 5 if row['id'] != 'ArfNat' else -14), textcoords="offset points", fontsize=7, color=color)
     axis.set_xscale("log")
-    axis.set_xlim(900, 2e9)
-    axis.set_ylim(-0.45, 1.12)
+    axis.set_xlim(*FIGURE_XLIM)
+    axis.set_ylim(*FIGURE_YLIM)
     axis.set_xlabel("Median charged artifact bytes (historical scope; log scale)")
     axis.set_ylabel("CatBoost retention and historical 95% interval")
     axis.set_title("historical CatBoost validation\nSelection-exposed; separate cohorts grey; no measured TDL frontier", loc="left", fontsize=10, pad=10)
@@ -124,7 +167,7 @@ def expected_outputs(root: Path = ROOT) -> dict[str, bytes]:
     data = load_results(root / "paper/generated/headline-results.json", root=root)
     status = json.loads((root / "evidence/status.json").read_text())
     outputs = text_outputs(data, status)
-    outputs.update(figure_outputs(outputs["paper/generated/hero-frontier.csv"]))
+    outputs.update(figure_outputs(outputs["paper/generated/hero-frontier.csv"], data["thresholds"]))
     manifest = {"format": "dope-generated-claims-v1", "source_sha256": hashlib.sha256((root / "paper/generated/headline-results.json").read_bytes()).hexdigest(), "files": {name: hashlib.sha256(content).hexdigest() for name, content in sorted(outputs.items())}}
     outputs["paper/generated/manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
     return outputs
