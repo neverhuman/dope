@@ -104,7 +104,7 @@
         "id": "legacy-v2-catboost-97",
         "prepared_lineages": 100,
         "observed_lineages": 97,
-        "complete": false
+        "complete": true
       },
       "retention": {
         "estimate": 0.9491572283028776,
@@ -139,7 +139,7 @@
         "id": "legacy-v2-catboost-97",
         "prepared_lineages": 100,
         "observed_lineages": 97,
-        "complete": false
+        "complete": true
       },
       "retention": {
         "estimate": 0.8007729729075269,
@@ -174,7 +174,7 @@
         "id": "legacy-v2-catboost-93",
         "prepared_lineages": 100,
         "observed_lineages": 93,
-        "complete": false
+        "complete": true
       },
       "retention": {
         "estimate": 0.802108785881121,
@@ -209,7 +209,7 @@
         "id": "legacy-v2-catboost-93",
         "prepared_lineages": 100,
         "observed_lineages": 93,
-        "complete": false
+        "complete": true
       },
       "retention": {
         "estimate": 0.930867274009485,
@@ -945,7 +945,7 @@
         "id": "legacy-v2-catboost-100",
         "prepared_lineages": 100,
         "observed_lineages": 100,
-        "complete": false
+        "complete": true
       },
       "retention": {
         "estimate": 0.6474935007064829,
@@ -980,7 +980,7 @@
         "id": "legacy-v2-catboost-100",
         "prepared_lineages": 100,
         "observed_lineages": 100,
-        "complete": false
+        "complete": true
       },
       "retention": {
         "estimate": 0.6398988216844521,
@@ -1015,7 +1015,7 @@
         "id": "legacy-v2-catboost-100",
         "prepared_lineages": 100,
         "observed_lineages": 100,
-        "complete": false
+        "complete": true
       },
       "retention": {
         "estimate": 0.6766908239960203,
