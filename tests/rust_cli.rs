@@ -55,6 +55,43 @@ fn inspect_bare_tdl1_keeps_sampling_closure_unmeasured() {
 }
 
 #[test]
+fn inspect_rejects_duplicate_charge_manifest_keys_without_echoing_input() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("target/cli-inspect-strict-json")
+        .join(std::process::id().to_string());
+    fs::create_dir_all(&root).unwrap();
+    let duplicate = r#"{"sections":[{"name":"weights","hex":"010203"}],"closure_files":[{"name":"forbidden","hex":"aabbccdd","scope":"runtime","dataset_specific":true}],"closure_files":[]}"#;
+    for (index, input) in [
+        duplicate.to_owned(),
+        format!(r#"{{"component":"charge","input":{duplicate}}}"#),
+    ]
+    .iter()
+    .enumerate()
+    {
+        let artifact = root.join(format!("duplicate-{index}.json"));
+        let inspection = root.join(format!("inspect-{index}.json"));
+        fs::write(&artifact, input).unwrap();
+        let output = Command::new(env!("CARGO_BIN_EXE_dope"))
+            .args([
+                "inspect",
+                "--artifact",
+                &text(&artifact),
+                "--out",
+                &text(&inspection),
+            ])
+            .output()
+            .unwrap();
+        assert!(!output.status.success());
+        assert!(output.stdout.is_empty());
+        assert!(!inspection.exists());
+        let stderr = String::from_utf8(output.stderr).unwrap();
+        assert!(stderr.contains("duplicate_json_key"));
+        assert!(!stderr.contains("forbidden"));
+        assert!(!stderr.contains("aabbccdd"));
+    }
+}
+
+#[test]
 fn explicit_fit_seed_preserves_historical_seed_11_artifact_bytes() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("target/cli-fit-seed-conformance")

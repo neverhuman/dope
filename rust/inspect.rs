@@ -6,7 +6,7 @@ use serde_json::Value;
 
 use crate::codec::{ArtifactAccounting, LoadedKernel, account_artifact, load_kernel};
 use crate::error::{DopeError, Result, io_error};
-use crate::metrics::{METRIC_NAME, artifact_charge};
+use crate::metrics::{METRIC_NAME, artifact_charge, strict_parse_json};
 use crate::model::{Dependence, KernelProgram, Marginal, NeuralArchitecture, Noise, Target};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -116,14 +116,25 @@ fn extract_charge_manifest_input(value: &Value) -> Option<&Value> {
     None
 }
 
+fn parse_inspection_json(bytes: &[u8]) -> Result<Option<Value>> {
+    if bytes.starts_with(crate::codec::MAGIC)
+        || bytes.starts_with(crate::codec::V2_MAGIC)
+        || bytes.starts_with(artifact_charge::MAGIC)
+    {
+        return Ok(None);
+    }
+    let text = std::str::from_utf8(bytes).map_err(|_| DopeError::Codec("invalid_json".into()))?;
+    strict_parse_json(text)
+        .map(Some)
+        .map_err(|error| DopeError::Codec(error.reason.into()))
+}
+
 pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
     let raw_bytes = fs::read(path).map_err(|error| io_error(path, error))?;
     if raw_bytes.starts_with(artifact_charge::MAGIC) {
         return inspect_tdl1_bytes(&raw_bytes, None);
     }
-    if !raw_bytes.starts_with(crate::codec::MAGIC)
-        && !raw_bytes.starts_with(crate::codec::V2_MAGIC)
-        && let Ok(json_val) = serde_json::from_slice::<Value>(&raw_bytes)
+    if let Some(json_val) = parse_inspection_json(&raw_bytes)?
         && let Some(charge_input) = extract_charge_manifest_input(&json_val)
     {
         let evaluated = artifact_charge::evaluate(charge_input);
@@ -333,10 +344,7 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
 pub fn inspect_charge(path: &Path) -> Result<Value> {
     let inspection = inspect_kernel(path)?;
     let raw_bytes = fs::read(path).map_err(|error| io_error(path, error))?;
-    let charge = if !raw_bytes.starts_with(crate::codec::MAGIC)
-        && !raw_bytes.starts_with(crate::codec::V2_MAGIC)
-        && !raw_bytes.starts_with(artifact_charge::MAGIC)
-        && let Ok(json_val) = serde_json::from_slice::<Value>(&raw_bytes)
+    let charge = if let Some(json_val) = parse_inspection_json(&raw_bytes)?
         && let Some(charge_input) = extract_charge_manifest_input(&json_val)
     {
         artifact_charge::evaluate(charge_input)
@@ -424,6 +432,36 @@ mod tests {
         let declared_empty = artifact_charge::evaluate_artifact_bytes(&bytes, &json!([]), None);
         assert_eq!(declared_empty["status"], "complete");
         assert_eq!(declared_empty["sampling_closure_bytes"], bytes.len());
+    }
+
+    #[test]
+    fn inspect_rejects_duplicate_charge_manifest_keys() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("target/inspect-strict-json")
+            .join(std::process::id().to_string());
+        fs::create_dir_all(&root).unwrap();
+        let duplicate = r#"{"sections":[{"name":"weights","hex":"010203"}],"closure_files":[{"name":"forbidden","hex":"aabbccdd","scope":"runtime","dataset_specific":true}],"closure_files":[]}"#;
+        let valid = r#"{"sections":[{"name":"weights","hex":"010203"}],"closure_files":[]}"#;
+        let nested = r#"{"sections":[{"name":"weights","hex":"010203"}],"closure_files":[{"name":"forbidden","hex":"aabbccdd","scope":"runtime","dataset_specific":true,"dataset_specific":false}]}"#;
+        let cases = [
+            duplicate.to_owned(),
+            format!(r#"{{"component":"charge","input":{duplicate}}}"#),
+            nested.to_owned(),
+            format!(r#"{{"component":"charge","input":{valid},"input":{valid}}}"#),
+        ];
+        for (index, input) in cases.iter().enumerate() {
+            let path = root.join(format!("duplicate-{index}.json"));
+            fs::write(&path, input).unwrap();
+            for result in [
+                inspect_kernel(&path).map(|_| ()),
+                inspect_charge(&path).map(|_| ()),
+            ] {
+                assert!(matches!(
+                    result,
+                    Err(DopeError::Codec(reason)) if reason == "duplicate_json_key"
+                ));
+            }
+        }
     }
 
     #[test]
