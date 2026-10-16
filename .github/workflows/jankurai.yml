@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   jankurai-audit:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on:
       group: neverhuman-lan
       labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]
@@ -22,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
+          persist-credentials: false
           fetch-depth: 0
       - name: Install Rust toolchain manager in the disposable guest
         run: sudo apt-get update && sudo apt-get -o DPkg::Lock::Timeout=300 install -y rustup
