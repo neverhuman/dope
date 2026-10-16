@@ -1,63 +1,90 @@
-# DOPE white paper
+# Historical white paper: DOPE v2 validation
 
-The paper (`dope-mfs.tex`) and its supplement (`supplement.tex`) report the
-DOPE generator against copula, tree, forest, neural, and diffusion baselines
-on 100 PMLB regression tables. The reported DOPE profile is the compact
-residual `features12_steps2048` (at most 12 inputs, hidden width 16) at five
-fit seeds. The shared measurements are null-normalized retention under three
-auditors at sizes n and 4n, two controls, and charged artifact bytes. The
-release score MFS-v3 is defined, conformance-tested, and printed as null until
-every required component is present and every hard gate passes. The analysis
-contract is `research/benchmark/review_fixes/predeclare_v2.json`.
+**Frozen 2026-10-15 (T-111).** `dope-mfs.tex` and `supplement.tex` are the historical v2
+validation paper, *DOPE: Generative Compression of Predictive Structure*. They are kept
+reproducible and are not extended. The new manuscript is the TDL package in
+[`paper/`](../../paper/README.md). The review ledgers that used to sit here are in
+[`paper/archive/`](../../paper/archive/README.md).
+
+The paper reports DOPE against copula, tree, forest, neural and diffusion baselines on 100
+PMLB regression tables. The reported profile is the compact residual
+`features12_steps2048` (at most 12 inputs, hidden width 16) at five fit seeds. The shared
+measurements are null-normalised retention under three auditors at sizes n and 4n, two
+controls, and charged artifact bytes. Every lineage and auditor is selection-exposed, and
+the official test split is sealed. The release score MFS-v3 is printed as null. Its
+evidence label is `selection_exposed_validation` (see the
+[claims policy](../claims-policy.md)).
 
 ## Build
 
-From this directory:
+| Command | What it does |
+| --- | --- |
+| `just setup` | creates the Python environment for the paper scripts (`target/venv`) |
+| `just paper` | regenerates every `generated/` file, every figure, the README benchmark block and all four PDFs |
+| `just paper-check` | re-derives macros from their ledgers, checks figure hashes, and rebuilds through `scripts/paper_build.py --check` |
+| `bash scripts/build_pdf.sh` | PDFs only, through the same authenticated driver (`paper_build.py --pdf-only`) |
+| `bash ops/ci/paper-clean.sh` | what CI runs: delete `generated/`, rebuild from committed inputs, and require a zero diff |
 
-```bash
-bash scripts/build_pdf.sh
-```
+One build writes four PDFs: `dope-mfs.pdf`, `supplement.pdf`, and the anonymous
+submission variants `dope-mfs-anonymous.pdf` and `supplement-anonymous.pdf`. Build
+evidence stays in the checkout's `target/paper-build/`.
 
-The manuscript is a single-column `article` with `iclr2027_conference` and
-Times. Citations are natbib author-year (`\citep` / `\citet`). The class
-running header is cleared. `references.bib` is the reference list.
+**Toolchain.**
 
-## What is allowed to change a number
+- pdfTeX and `latexmk` from TeX Live 2023.
+- The repository's `iclr2027_conference.sty` and `.bst`, with the class running header
+  cleared, and natbib author-year citations.
+- Python 3 with the packages that `just setup` installs into `target/venv`.
 
-Edit tables only from committed, hash-pinned validation publications. The
-retained panels merged on 2026-10-07 are reduced by
-`scripts/retained_evidence.py`: TabSyn's eight-lineage scaled-default
-subset, classical default/native samples on 100 lineages, and the
-authenticated deterministic first12 diagnostics. Generated source digests,
-JSON pointers, lineage means, intervals and paired differences are in
-`generated/retained-evidence.json`; coverage and conditional ETAs are in
-`generated/baseline-coverage.json`. Original receipt paths are in the
-referenced benchmark publications. `just paper` regenerates these inputs
-and their figure before building the PDFs; build evidence stays in the
-checkout's `target/paper-build/`.
+## Inputs
 
-Keep the 97-lineage density panel and the
-21-lineage CTGAN/TVAE panel in separate rows. Official test partitions stay
-closed. Empirical privacy text in this draft is not a differential-privacy
-or HIPAA claim. PTF-v1, release-safe L3, and paired superiority stay out of
-the abstract until the frozen gates say otherwise. The new mean-of-three
-retained panels and legacy median-of-three blocks stay separate. A paired
-validation difference does not certify superiority.
+- `ops/ci/paper-review-inputs.json` lists every pinned result publication, ledger and
+  receipt the build reads, with byte length and SHA-256. `paper_build.py` refuses a file
+  whose bytes differ, or one not admitted by that list.
+- `ops/ci/paper-inputs/` holds the immutable source snapshots from `b774807`
+  (`inputs.lock.json`, provenance, licences, the extra bibliography and the sanitized
+  compute-cost receipts). `ops/ci/paper-prepare.py` authenticates them and materialises
+  them into `generated/`.
+- `research/benchmark/review_fixes/paper-build.json` declares each review reduction:
+  its script, arguments and outputs.
+- The analysis contract is `research/benchmark/review_fixes/predeclare_v2.json`.
+- The five-seed v2 panel (fit seeds 11, 23, 37, 53 and 71) is reduced by
+  `research/benchmark/review_fixes/v2_panel.py`.
 
-## Original metadata and seed scope
+## Figure provenance and expected hashes
 
-`research/benchmark/results/paper-original-metadata-v1/index.json` binds
-210 original fit receipt/report pairs and compressed numeric replay traces,
-plus safe preparation outcomes and a filename-only provenance observation.
-The capture date is explicit; earlier historical custody is not reconstructed.
-`generated/original-field-map.json` records file hashes and field selectors.
-The loss PDF and bootstrap summary now regenerate from committed inputs on
-machines without campaign scratch. `local_receipts.py --check` rejects a
-changed original or aggregate before its values can enter the paper.
+Figures are drawn by `scripts/render_figures.py` and `scripts/v2_figures.py` from the
+pinned inputs. The README images come from the same `generated/v2-headline.json` as the
+paper. The expected hashes are committed beside the outputs:
 
-The primary displayed DOPE results come from the five-seed v2 panel (fit seeds
-11, 23, 37, 53, and 71 with the historical binary), reduced by
-`research/benchmark/review_fixes/v2_panel.py`. Fit seed 11 describes the
-first-version tables that the supplement keeps for traceability. ARF and TabSyn
-also have five fit seeds; every other comparator has one. No displayed result is a
-release score.
+| Hash file | Covers |
+| --- | --- |
+| `generated/figure-hashes.json` | the main figure set |
+| `generated/teaser-figure-hashes.json`, `generated/pareto-figure-hashes.json` | the page-one teaser and the bytes figure |
+| `generated/readme-figure-hashes.json` | `docs/readme/pareto.png` and `docs/readme/paired.png` |
+| `generated/architecture-figure-hashes.json` | the architecture figure and its sources |
+| `generated/mfs-v3-figure-hashes.json`, `generated/retained-figure-hashes.json`, `generated/published-baseline-figure-hashes.json` | historical MFS-v3, retained-panel and published-baseline figures |
+
+`just paper-check` and the clean rebuild compare the regenerated files with these hashes
+and with the committed PDFs. A mismatch fails the build.
+
+## What may change a number
+
+Nothing, while the paper is frozen. Before the freeze, tables were edited only from
+committed, hash-pinned validation publications. `research/benchmark/verify_paper_numbers.py`
+fails if a printed value disagrees with its ledger. `scripts/local_receipts.py --check`
+rejects a changed original or aggregate before its values reach the paper. These rules
+also hold:
+
+- Rows from different cohorts stay separate.
+- Official test partitions stay closed.
+- Empirical privacy text is not a differential-privacy or HIPAA claim.
+- A paired validation difference does not certify superiority.
+
+## Packaging
+
+The release package is the four committed PDFs from one build. The scored DOPE
+artifacts, the fit and validation partitions and the synthetic-row bundle are not
+published. The committed ledgers reproduce every reduction; publishing the artifacts
+themselves is Stage 4 work, confirmed by the owner (see
+[REVIEW_GAPS.md](REVIEW_GAPS.md)).
