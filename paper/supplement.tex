@@ -1,0 +1,84 @@
+% Supplement skeleton for the TDL manuscript (T-110). Status: specified, not measured.
+% Numbers enter only through paper/generated/ (see macros.tex and paper/README.md).
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+\definecolor{pendingcolor}{RGB}{176,58,46}
+\hypersetup{pdftitle={Supplement: Transfer Description Length for Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
+\input{macros}
+
+\title{Supplement: Transfer Description Length for Synthetic Tables}
+\author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
+\date{Draft skeleton --- evidence status: \ResultStatus}
+
+\begin{document}
+\maketitle
+\appendix
+
+\section{Metric contract}
+\label{app:contract}
+The machine-readable contract is \path{contracts/tdl-contract-v1.json} with its schema in
+\path{schemas/}. It records the transfer equation, the informative-task floor, the
+thresholds (\HeadlinePoint{}, $\tau_T = $ \TauT, $\tau_D = $ \TauD), the byte grid
+(\ByteGrid), the required and held-out learner families, the payload and closure policy,
+the seed design (\SeedDesign), the multiplicity procedure, evaluator isolation, and
+\texttt{protocol\_frozen}. While any field is unresolved, \texttt{protocol\_frozen} stays
+false. The human-readable definitions are in \path{docs/metric.md}.
+\GeneratedTable{contract-table.tex}{Contract field table rendered from the contract.}
+
+\section{Result states and gates}
+\label{app:states}
+A cell or method reports exactly one state: \texttt{qualified},
+\texttt{not\_reached\_in\_tested\_range}, \texttt{unqualified}, \texttt{incomplete} or
+\texttt{failed}. Hard gates are conjunctive: exact and near copy, cleartext scan, positive
+lift over the predictor-only and independent-marginal controls, a reconciled byte ledger,
+verified clean-room sampling, and complete qualified auditor families. The empirical attack
+panel is required for release certification, which is reported separately.
+
+\section{Byte ledgers}
+\label{app:bytes}
+\GeneratedTable{byte-ledger-table.tex}{Per-artifact payload, closure and section bytes from
+the charge manifests.}
+
+\section{Statistical plan}
+\label{app:stats}
+Cluster bootstrap over source family, dataset and seed with a fixed generator seed and shared
+resample indices across auditor families; the one-sided lower bound is the nearest-rank lower
+quantile. Golden fixtures hold the Rust core and the Python mirror to identical outputs.
+\pending{Resample count, interval level and multiplicity family from the frozen contract.}
+
+\section{Auditor and generator registries}
+\label{app:registries}
+\GeneratedTable{auditor-registry-table.tex}{Auditor registry: identity, licence, qualification
+state. Frontier foundation models are planned and unqualified.}
+\GeneratedTable{generator-registry-table.tex}{Generator registry and admission state.}
+
+\section{Per-dataset results and failure dispositions}
+\label{app:datasets}
+\GeneratedTable{dataset-dispositions.tex}{Per-dataset cells with every terminal disposition.}
+
+\section{Historical metric mapping}
+\label{app:history}
+Earlier repository releases explored weighted certification scores (MFS-v2, MFS-v3 and
+MFS-v4). They are historical: their release scores are null for every method, and their
+contracts and scorers stay executable so existing receipts verify. The historical validation
+paper is \path{docs/whitepaper/dope-mfs.tex}; the retired score definitions are in
+\path{docs/archive/mfs-history.md}.
+
+\section{Reproduction}
+\label{app:repro}
+\path{paper/README.md} gives the build command, toolchain, generated inputs and figure
+provenance. The claims policy is \path{docs/claims-policy.md}.
+
+\bibliographystyle{plainnat}
+\nocite{esteban2017rcgan}
+\bibliography{references}
+\end{document}

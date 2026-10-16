@@ -1,0 +1,35 @@
+% Shared macros for the TDL manuscript and supplement.
+%
+% Every number in the paper comes from paper/generated/ (claims firewall, T-070/T-071).
+% generated/contract-macros.tex (from contracts/tdl-contract-v1.json, T-020) and
+% generated/headline-macros.tex (from generated/headline-results.json, T-070) are read
+% first when present. The \providecommand defaults below are visible placeholders, so a
+% missing generated file can never print a number that looks measured.
+\IfFileExists{generated/contract-macros.tex}{\input{generated/contract-macros.tex}}{}
+\IfFileExists{generated/headline-macros.tex}{\input{generated/headline-macros.tex}}{}
+
+\newcommand{\pending}[1]{\textcolor{pendingcolor}{\textbf{[#1]}}}
+\providecommand{\MetricName}{TDL}
+\providecommand{\MetricLong}{Transfer Description Length}
+\providecommand{\TauT}{\pending{$\tau_T$ from contract}}
+\providecommand{\TauD}{\pending{$\tau_D$ from contract}}
+\providecommand{\HeadlinePoint}{\pending{headline operating point}}
+\providecommand{\ByteGrid}{\pending{byte grid from contract}}
+\providecommand{\SeedDesign}{\pending{seed design from contract}}
+\providecommand{\ResultStatus}{specified, not measured}
+
+% Display helpers.
+\newcommand{\Lnull}{L_{\mathrm{null}}}
+\newcommand{\Lreal}{L_{\mathrm{real}}}
+\newcommand{\Lsyn}{L_{\mathrm{syn}}}
+\newcommand{\Trobust}{T_{\mathrm{robust}}}
+\newcommand{\Drobust}{D_{\mathrm{robust}}}
+\newcommand{\LCB}{\operatorname{LCB}_{95}}
+
+% Generated inputs with placeholders when absent.
+\newcommand{\GeneratedFigure}[2]{%
+  \IfFileExists{generated/#1}{\includegraphics[width=\linewidth]{generated/#1}}{%
+    \fbox{\parbox{0.95\linewidth}{\centering\vspace{2em}\pending{#2}\vspace{2em}}}}}
+\newcommand{\GeneratedTable}[2]{%
+  \IfFileExists{generated/#1}{\input{generated/#1}}{%
+    \fbox{\parbox{0.95\linewidth}{\centering\vspace{1em}\pending{#2}\vspace{1em}}}}}
