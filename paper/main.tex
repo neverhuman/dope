@@ -57,9 +57,10 @@ transfer and driver agreement constraints rather than weighted terms.
   dataset-specific bytes on a log axis, one step curve per admitted method, the
   \MetricName{} threshold as a horizontal line, gate status by marker fill. Rendered from
   generated/headline-results.json.}
-  \caption{How many bytes are needed to preserve learning? Each point is one method at one
-  tested byte budget. Only methods measured on the same cohort, splits, sizes, seeds and
-  auditor panel appear together. Evidence status: \ResultStatus.}
+  \caption{Historical CatBoost validation (selection-exposed): retention against median charged
+  artifact bytes, smaller cohorts in grey. This is not a \MetricName{} frontier; the measured
+  transfer-versus-bytes frontier replaces it when the qualified panel runs. Evidence status:
+  \ResultStatus.}
   \label{fig:frontier}
 \end{figure}
 
@@ -156,11 +157,21 @@ The only measured evidence is the historical v2 validation panel: PMLB regressio
 \citep{olson2017pmlb,romano2021pmlb}, CatBoost-centered, and selection-exposed, because every
 lineage and all three auditors informed the profile choice. It reports retention beside
 charged bytes, which is not a \MetricName{} result. Rows are labeled by evidence status.
-\begin{table}[h]
+\begin{table}[ht]
   \centering
-  \GeneratedTable{result-card.tex}{Result card (T-070): rendered from
-  generated/headline-results.json with one evidence label per row.}
-  \caption{Evidence card. No row is a sealed-test or \MetricName{} result.}
+  \begin{tabular}{lll}
+    \toprule
+    Arm & CatBoost retention [historical interval] & Lineages \\
+    \midrule
+    \HistRow{Dope}{DOPE} \\
+    \HistRow{TabSyn}{TabSyn, scaled schedule} \\
+    \HistRow{Pred}{Predictor-only control} \\
+    \HistRow{Boot}{Real rows resampled (diagnostic)} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Historical evidence card from the v2 panel (CatBoost auditor, synthetic size four times the
+  fit rows), printed from generated/headline-macros.tex. Evidence status of every row: selection-exposed validation. No row is a sealed-test or \MetricName{} result;
+  the full status-labelled card is in the repository's STATUS file.}
   \label{tab:card}
 \end{table}
 
