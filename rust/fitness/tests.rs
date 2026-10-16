@@ -429,6 +429,7 @@ mod tests {
     #[test]
     fn v4_refuses_overflowed_attribution_normalizers() {
         let mut observation = v4_observation();
+        observation.real_columns = 501;
         observation.real_importances = vec![f64::MAX / 32.0; 500];
         observation.synthetic_importances = observation.real_importances.clone();
         observation.synthetic_importances[100..].fill(0.0);
@@ -470,10 +471,15 @@ mod tests {
         assert!(!failed_lift.eligible);
         assert!(!failed_lift.hard_gates["positive_predictor_lift"]);
         assert_eq!(failed_lift.utility_transfer, None);
+        assert_eq!(failed_lift.knowledge_compression, None);
         assert!(failed_lift
             .unavailable_terms
             .iter()
             .any(|term| term == "utility_transfer"));
+        assert!(failed_lift
+            .unavailable_terms
+            .iter()
+            .any(|term| term == "knowledge_compression"));
         assert_eq!(failed_lift.score, None);
 
         let mut over_budget = v4_observation();
@@ -484,12 +490,32 @@ mod tests {
         assert_eq!(over_budget_report.knowledge_compression, None);
         assert_eq!(over_budget_report.score, None);
 
-        let mut too_few_cols = v4_observation();
-        too_few_cols.real_columns = 2;
-        let col_report = evaluate_v4(&contract, &components, &too_few_cols);
-        assert!(!col_report.eligible);
-        assert_eq!(col_report.driver_fidelity, None);
-        assert!(!col_report.hard_gates["model_driver_attribution_measured"]);
+        let mut eq_cols = v4_observation();
+        eq_cols.real_columns = eq_cols.real_importances.len() as u64;
+        let eq_col_report = evaluate_v4(&contract, &components, &eq_cols);
+        assert!(!eq_col_report.eligible);
+        assert_eq!(eq_col_report.driver_fidelity, None);
+        assert!(!eq_col_report.hard_gates["model_driver_attribution_measured"]);
+
+        let mut plus_one_cols = v4_observation();
+        plus_one_cols.real_columns = (plus_one_cols.real_importances.len() + 1) as u64;
+        let plus_one_report = evaluate_v4(&contract, &components, &plus_one_cols);
+        assert!(plus_one_report.eligible);
+        assert!(plus_one_report.score.is_some());
+
+        let mut disjoint_obs = v4_observation();
+        disjoint_obs.real_importances = vec![0.60, 0.40, 0.0, 0.0];
+        disjoint_obs.synthetic_importances = vec![0.0, 0.0, 0.50, 0.50];
+        disjoint_obs.real_signs = Some(vec![1, -1, 0, 0]);
+        disjoint_obs.synthetic_signs = Some(vec![1, -1, 1, -1]);
+        let disjoint_report = evaluate_v4(&contract, &components, &disjoint_obs);
+        assert!(!disjoint_report.eligible);
+        assert_eq!(disjoint_report.driver_fidelity, None);
+        assert!(disjoint_report
+            .unavailable_terms
+            .iter()
+            .any(|term| term == "driver_fidelity"));
+        assert_eq!(disjoint_report.score, None);
     }
 
     #[test]

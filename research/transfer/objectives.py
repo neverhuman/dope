@@ -103,12 +103,19 @@ def driver_attribution_agreement(
         raise ValueError("driver sign vector length mismatch")
     if any(type(s) is not int or isinstance(s, bool) or s not in (-1, 0, 1) for s in (*real_s, *syn_s)):
         raise ValueError("invalid driver sign value")
-    if any(imp > 1e-12 and sign == 0 for imp, sign in zip(real_imp, real_s)):
-        raise ValueError("missing directional sign for active real driver")
-    active = [(r, s) for r, s in zip(real_s, syn_s) if r != 0]
+    if any(
+        (imp > 1e-12 and sign == 0) or (imp <= 1e-12 and sign != 0)
+        for imp, sign in zip(real_imp, real_s)
+    ) or any(imp > 1e-12 and sign == 0 for imp, sign in zip(syn_imp, syn_s)):
+        raise ValueError("missing or spurious directional sign for active driver")
+    active = [(idx, r, s) for idx, (r, s) in enumerate(zip(real_s, syn_s)) if r != 0]
     if not active:
         raise ValueError("degenerate driver sign vector")
-    sign_agreement = sum(1 for r, s in active if r == s) / float(len(active))
+    sign_agreement = sum(
+        1
+        for idx, r, s in active
+        if r == s and (idx >= features or syn_imp[idx] > 1e-12)
+    ) / float(len(active))
     k = max(1, min(features, active_real_features, min(20, max(5, math.ceil(features * 0.10)))))
     if syn_total <= 1e-12:
         ndcg, jaccard, overlap, l1_agree = (0.0, 0.0, 0.0, 0.0)
