@@ -1,3 +1,4 @@
+// historical; do not extend
 /// MFS-v4 upgrades MFS-v3 with control-contrastive utility lift (over
 /// `predictor_only`, `independent_marginals`, and `real_bootstrap_4n`),
 /// holdout model-driver attribution agreement (NDCG@k, Top-k Jaccard, L1
@@ -332,6 +333,57 @@ pub fn evaluate_v4(
 
 pub const V4_SAMPLE_SEEDS: [u64; 3] = [101, 211, 307];
 
+pub const V4_SEED_VARIANCE_METRICS: [&str; 13] = [
+    "retention_mean",
+    "retention_sample_sd",
+    "retention_min",
+    "retention_max",
+    "retention_lcb",
+    "driver_fidelity_mean",
+    "driver_fidelity_sample_sd",
+    "driver_fidelity_min",
+    "driver_fidelity_max",
+    "seed_score_mean",
+    "seed_score_sample_sd",
+    "seed_score_min",
+    "seed_score_max",
+];
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct V4LineageAggregationContract {
+    pub sample_seeds: Vec<u64>,
+    pub all_seeds_must_pass_gates: bool,
+    pub utility_bound_rule: String,
+    pub control_baseline_aggregation: String,
+    pub driver_attribution_aggregation: String,
+    pub representation_aggregation: String,
+    pub compression_aggregation: String,
+    pub fidelity_aggregation: String,
+    pub privacy_aggregation: String,
+    pub seed_variance_reported: bool,
+    pub seed_variance_metrics: Vec<String>,
+}
+
+impl V4LineageAggregationContract {
+    pub fn is_frozen(&self) -> bool {
+        self.sample_seeds == V4_SAMPLE_SEEDS
+            && self.all_seeds_must_pass_gates
+            && self.utility_bound_rule == "lcb_le_mean_plus_1e_12"
+            && self.control_baseline_aggregation == "max_across_seeds"
+            && self.driver_attribution_aggregation == "min_composite_driver_fidelity_seed"
+            && self.representation_aggregation == "min_representation_closeness_seed"
+            && self.compression_aggregation == "max_artifact_bytes_and_encoded_numbers_across_seeds"
+            && self.fidelity_aggregation == "min_across_seeds"
+            && self.privacy_aggregation == "max_risk_across_seeds"
+            && self.seed_variance_reported
+            && self
+                .seed_variance_metrics
+                .iter()
+                .map(String::as_str)
+                .eq(V4_SEED_VARIANCE_METRICS)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct V4SeedObservation {
     pub sample_seed: u64,
@@ -477,41 +529,54 @@ where
         .filter(|&(val, mean)| val.is_finite() && val <= mean + 1e-12)
         .map(|(val, _)| val.clamp(0.0, 1.0));
 
-    let worst_drv = seed_reports
-        .iter()
-        .enumerate()
-        .min_by(|&(ia, ra), &(ib, rb)| {
-            ra.driver_fidelity
-                .unwrap_or(-1.0)
-                .total_cmp(&rb.driver_fidelity.unwrap_or(-1.0))
-                .then_with(|| {
-                    ra.driver_attribution
-                        .map(|d| d.top_k_overlap)
-                        .unwrap_or(-1.0)
-                        .total_cmp(
-                            &rb.driver_attribution
-                                .map(|d| d.top_k_overlap)
-                                .unwrap_or(-1.0),
-                        )
-                })
-                .then_with(|| seeds[idx[ia]].sample_seed.cmp(&seeds[idx[ib]].sample_seed))
-        })
-        .map(|(pos, _)| &seeds[idx[pos]].observation)
-        .unwrap_or(first);
-    let worst_repr = seed_reports
-        .iter()
-        .enumerate()
-        .min_by(|&(ia, ra), &(ib, rb)| {
-            ra.representation_closeness
-                .unwrap_or(-1.0)
-                .total_cmp(&rb.representation_closeness.unwrap_or(-1.0))
-                .then_with(|| seeds[idx[ia]].sample_seed.cmp(&seeds[idx[ib]].sample_seed))
-        })
-        .map(|(pos, _)| &seeds[idx[pos]].observation)
-        .unwrap_or(first);
+    let worst_drv = (complete_seed_set
+        && schema_consistent
+        && seed_reports
+            .iter()
+            .all(|r| r.driver_fidelity.is_some() && r.driver_attribution.is_some()))
+    .then(|| {
+        seed_reports
+            .iter()
+            .enumerate()
+            .min_by(|&(ia, ra), &(ib, rb)| {
+                ra.driver_fidelity
+                    .unwrap_or(-1.0)
+                    .total_cmp(&rb.driver_fidelity.unwrap_or(-1.0))
+                    .then_with(|| {
+                        ra.driver_attribution
+                            .map(|d| d.top_k_overlap)
+                            .unwrap_or(-1.0)
+                            .total_cmp(
+                                &rb.driver_attribution
+                                    .map(|d| d.top_k_overlap)
+                                    .unwrap_or(-1.0),
+                            )
+                    })
+                    .then_with(|| seeds[idx[ia]].sample_seed.cmp(&seeds[idx[ib]].sample_seed))
+            })
+            .map(|(pos, _)| &seeds[idx[pos]].observation)
+    })
+    .flatten();
+    let worst_repr = (complete_seed_set
+        && seed_reports
+            .iter()
+            .all(|r| r.representation_closeness.is_some()))
+    .then(|| {
+        seed_reports
+            .iter()
+            .enumerate()
+            .min_by(|&(ia, ra), &(ib, rb)| {
+                ra.representation_closeness
+                    .unwrap_or(-1.0)
+                    .total_cmp(&rb.representation_closeness.unwrap_or(-1.0))
+                    .then_with(|| seeds[idx[ia]].sample_seed.cmp(&seeds[idx[ib]].sample_seed))
+            })
+            .map(|(pos, _)| &seeds[idx[pos]].observation)
+    })
+    .flatten();
 
     let finite_max = |f: fn(&MfsV4Observation) -> f64| {
-        if idx.iter().all(|&i| f(&seeds[i].observation).is_finite()) {
+        if complete_seed_set && idx.iter().all(|&i| f(&seeds[i].observation).is_finite()) {
             idx.iter()
                 .map(|&i| f(&seeds[i].observation))
                 .fold(f64::NEG_INFINITY, f64::max)
@@ -534,14 +599,19 @@ where
         }
     };
     let unit_min = |f: fn(&ScoredComponentsV4) -> Option<f64>| {
-        idx.iter()
-            .map(|&i| component_in_unit(f(&seeds[i].components)))
-            .collect::<Option<Vec<_>>>()
-            .and_then(|vals| vals.into_iter().reduce(f64::min))
+        complete_seed_set
+            .then(|| {
+                idx.iter()
+                    .map(|&i| component_in_unit(f(&seeds[i].components)))
+                    .collect::<Option<Vec<_>>>()
+                    .and_then(|vals| vals.into_iter().reduce(f64::min))
+            })
+            .flatten()
     };
-    let bootstrap_4n = if idx
-        .iter()
-        .all(|&i| seeds[i].observation.real_bootstrap_4n_retention.is_some())
+    let bootstrap_4n = if complete_seed_set
+        && idx
+            .iter()
+            .all(|&i| seeds[i].observation.real_bootstrap_4n_retention.is_some())
     {
         Some(
             if idx.iter().all(|&i| {
@@ -552,17 +622,19 @@ where
             }) {
                 idx.iter()
                     .filter_map(|&i| seeds[i].observation.real_bootstrap_4n_retention)
-                    .fold(f64::INFINITY, f64::min)
+                    .fold(f64::NEG_INFINITY, f64::max)
             } else {
                 f64::NAN
             },
         )
-    } else if idx.iter().any(|&i| {
-        seeds[i]
-            .observation
-            .real_bootstrap_4n_retention
-            .is_some_and(|v| !v.is_finite())
-    }) {
+    } else if complete_seed_set
+        && idx.iter().any(|&i| {
+            seeds[i]
+                .observation
+                .real_bootstrap_4n_retention
+                .is_some_and(|v| !v.is_finite())
+        })
+    {
         Some(f64::NAN)
     } else {
         None
@@ -579,11 +651,11 @@ where
         } else {
             String::new()
         },
-        distance: worst_repr.distance,
-        d_null: worst_repr.d_null,
-        d_match: worst_repr.d_match,
-        gap_mitra: worst_repr.gap_mitra,
-        gap_tabicl: worst_repr.gap_tabicl,
+        distance: worst_repr.map_or(f64::NAN, |o| o.distance),
+        d_null: worst_repr.map_or(f64::NAN, |o| o.d_null),
+        d_match: worst_repr.map_or(f64::NAN, |o| o.d_match),
+        gap_mitra: worst_repr.map_or(f64::NAN, |o| o.gap_mitra),
+        gap_tabicl: worst_repr.map_or(f64::NAN, |o| o.gap_tabicl),
         exact_row_matches: if complete_seed_set {
             idx.iter()
                 .map(|&i| seeds[i].observation.exact_row_matches)
@@ -644,10 +716,10 @@ where
         predictor_only_retention: finite_max(|o| o.predictor_only_retention),
         independent_marginals_retention: finite_max(|o| o.independent_marginals_retention),
         real_bootstrap_4n_retention: bootstrap_4n,
-        real_importances: worst_drv.real_importances.clone(),
-        synthetic_importances: worst_drv.synthetic_importances.clone(),
-        real_signs: worst_drv.real_signs.clone(),
-        synthetic_signs: worst_drv.synthetic_signs.clone(),
+        real_importances: worst_drv.map_or_else(Vec::new, |o| o.real_importances.clone()),
+        synthetic_importances: worst_drv.map_or_else(Vec::new, |o| o.synthetic_importances.clone()),
+        real_signs: worst_drv.and_then(|o| o.real_signs.clone()),
+        synthetic_signs: worst_drv.and_then(|o| o.synthetic_signs.clone()),
         real_vs_real_control_complete: complete_seed_set
             && idx
                 .iter()
