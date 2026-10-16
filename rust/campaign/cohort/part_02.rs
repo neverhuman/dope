@@ -1,14 +1,14 @@
 
 
 /// Materializes validation-cert paths only after the single durable
-/// authorization event. This command is intended to execute on xbabe3; the
+/// authorization event. This command is intended to execute on fit-machine-3; the
 /// resulting cohort never participates in router training.
 pub fn plan_validation_cert_cohort(
     state_dir: &Path,
     manifest_path: &Path,
     validation_path: &Path,
 ) -> Result<CohortPlan> {
-    require_host("xbabe3", "validation-cert cohort planning")?;
+    require_host("fit-machine-3", "validation-cert cohort planning")?;
     let state = load_state(state_dir)?;
     if state.phase != CampaignPhase::ValidationCertOpen
         || state.validation_cert_open_count != 1

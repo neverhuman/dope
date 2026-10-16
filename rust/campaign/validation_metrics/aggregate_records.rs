@@ -39,7 +39,7 @@
             if receipt.dataset_id != record.dataset_id
                 || receipt.matrix_identity != matrix_identity
                 || receipt.phase != "validation_cert"
-                || receipt.worker != "xbabe3"
+                || receipt.worker != "fit-machine-3"
                 || receipt.source_sha256 != state.source_tree.sha256
                 || receipt.source_sha256 != evaluator.source_sha256
                 || receipt.evaluator_binary_sha256 != evaluator.binary_sha256
@@ -50,7 +50,7 @@
                 || receipt.failed_cells != block.failures.len()
             {
                 return Err(DopeError::Data(
-                    "gold block receipt does not reconcile with frozen xbabe3 inputs".into(),
+                    "gold block receipt does not reconcile with frozen fit-machine-3 inputs".into(),
                 ));
             }
             Ok((block, receipt))

@@ -10,6 +10,7 @@ setup:
     bash ops/ci/install-python-v1.sh target/venv/bin/python
     TMPDIR="$PWD/target/tmp" target/venv/bin/python -m pip install --no-deps -e .
     mkdir -p target/python-metadata
+    if test -d src/dope.egg-info; then mv src/dope.egg-info "target/python-metadata/dope.$(date +%s%N).egg-info"; fi
     if test -d src/dope_kernel.egg-info; then mv src/dope_kernel.egg-info "target/python-metadata/dope_kernel.$(date +%s%N).egg-info"; fi
 
 native-guard-check:
@@ -55,6 +56,13 @@ contract-drift:
 
 score:
     bash ops/ci/audit.sh run
+
+golden-parity:
+    python3 -B -m research.transfer.tdl.golden --check
+    cargo test --locked --lib metrics::golden
+
+paper-tdl:
+    bash paper/build.sh
 
 paper:
     python3 ops/ci/paper-prepare.py

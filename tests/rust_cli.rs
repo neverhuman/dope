@@ -775,5 +775,77 @@ fn native_cli_end_to_end() {
         ],
     );
     assert_eq!(fs::read_to_string(&v1_sample).unwrap().lines().count(), 10);
+
+    let dope_bin = env!("CARGO_BIN_EXE_dope");
+    let version_out = Command::new(dope_bin).arg("--version").output().unwrap();
+    assert!(version_out.status.success());
+    assert!(
+        String::from_utf8_lossy(&version_out.stdout).contains(env!("CARGO_PKG_VERSION")),
+        "dope --version must print Cargo package version"
+    );
+    let alias_artifact = root.join("alias.dpk");
+    let alias_inspect = root.join("alias-inspect.json");
+    let alias_sample = root.join("alias-sample.csv");
+    let alias_eval = root.join("alias-eval.json");
+    run(
+        dope_bin,
+        &[
+            "fit",
+            "--dataset-dir",
+            &dataset_s,
+            "--task",
+            "regression",
+            "--out",
+            &text(&alias_artifact),
+            "--seed",
+            "7",
+        ],
+    );
+    run(
+        dope_bin,
+        &[
+            "inspect",
+            "--artifact",
+            &text(&alias_artifact),
+            "--out",
+            &text(&alias_inspect),
+        ],
+    );
+    let alias_inspected: serde_json::Value =
+        serde_json::from_slice(&fs::read(&alias_inspect).unwrap()).unwrap();
+    assert_eq!(
+        alias_inspected["byte_scopes"]["payload_bytes"],
+        alias_inspected["artifact_bytes"]
+    );
+    assert_eq!(alias_inspected["metric_status"]["metric_name"], "TDL");
+    assert_eq!(alias_inspected["metric_status"]["status"], "unmeasured");
+    assert_eq!(alias_inspected["metric_status"]["protocol_frozen"], false);
+    run(
+        dope_bin,
+        &[
+            "sample",
+            "--artifact",
+            &text(&alias_artifact),
+            "--rows",
+            "10",
+            "--out",
+            &text(&alias_sample),
+            "--seed",
+            "8",
+        ],
+    );
+    run(
+        dope_bin,
+        &[
+            "evaluate",
+            "--real-dir",
+            &dataset_s,
+            "--artifact",
+            &text(&alias_artifact),
+            "--out",
+            &text(&alias_eval),
+        ],
+    );
+    assert!(alias_eval.is_file());
     fs::remove_dir_all(&root).unwrap();
 }

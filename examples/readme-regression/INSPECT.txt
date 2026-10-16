@@ -2,6 +2,17 @@
   "format": "dope-kernel-v3",
   "version": 3,
   "artifact_bytes": 151,
+  "byte_scopes": {
+    "payload_bytes": 151,
+    "sampling_closure_bytes": null,
+    "section_bytes": [
+      19,
+      37,
+      11,
+      15,
+      3
+    ]
+  },
   "byte_accounting": {
     "header_bytes": 56,
     "sections": [
@@ -42,6 +53,11 @@
       }
     ],
     "total_bytes": 151
+  },
+  "metric_status": {
+    "metric_name": "TDL",
+    "status": "unmeasured",
+    "protocol_frozen": false
   },
   "task": "regression",
   "rows_fitted": 400,

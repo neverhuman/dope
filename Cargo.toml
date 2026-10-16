@@ -11,6 +11,10 @@ name = "dope_kernel"
 path = "rust/lib.rs"
 
 [[bin]]
+name = "dope"
+path = "rust/dope.rs"
+
+[[bin]]
 name = "dope-kernel"
 path = "rust/main.rs"
 

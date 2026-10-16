@@ -365,9 +365,9 @@ impl RunContract {
             || self.generation_seeds_per_lineage != GENERATION_REPEATS
             || self.auditor_seeds != AUDITOR_SEEDS
             || self.artifact_ceiling_bytes != EMPIRICAL_ARTIFACT_CEILING_BYTES
-            || self.controller != "xbabe1"
-            || self.primary_worker != "xbabe1"
-            || self.guarded_evaluator != "xbabe3"
+            || self.controller != "fit-machine-1"
+            || self.primary_worker != "fit-machine-1"
+            || self.guarded_evaluator != "fit-machine-3"
             || self.lease_seconds != 600
             || self.heartbeat_seconds != 30
             || self.infrastructure_retries != 2

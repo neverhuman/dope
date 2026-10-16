@@ -120,14 +120,14 @@ mod tests {
         let (ledger, path) = ledger();
         assert_eq!(ledger.insert_specs(&[spec()]).unwrap(), 1);
         assert_eq!(ledger.insert_specs(&[spec()]).unwrap(), 0);
-        let leased = ledger.lease_next("xbabe1", 600).unwrap().unwrap();
-        ledger.mark_running(&leased.job_id, "xbabe1").unwrap();
+        let leased = ledger.lease_next("fit-machine-1", 600).unwrap().unwrap();
+        ledger.mark_running(&leased.job_id, "fit-machine-1").unwrap();
         let mut receipt = JobReceipt {
             format: "dope-job-receipt".into(),
             version: 1,
             job_id: leased.job_id.clone(),
             attempt: leased.attempt,
-            worker: "xbabe1".into(),
+            worker: "fit-machine-1".into(),
             state: JobState::Succeeded,
             started_unix_seconds: now(),
             finished_unix_seconds: now(),

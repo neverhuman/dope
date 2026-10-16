@@ -357,10 +357,6 @@
       "command": "python3 -B -m unittest research.benchmark.tests.test_tabsyn_validation_inputs -v",
       "purpose": "verify frozen TabSyn operation joins, TRAIN-derived validation and target-last order, preserve unavailable samples and unknown parent exit, prepare shared evaluator inputs without scientific execution"
     },
-    "research/benchmark/results/campaign-local-capacity-amendment-xbabe2": {
-      "command": "python3 -B -m jsonschema -i research/benchmark/results/campaign-local-capacity-amendment-xbabe2.json research/benchmark/results/campaign-local-capacity-amendment-xbabe2.schema.json",
-      "purpose": "validate the separate owner-authorized xbabe2 local100GB root, carried budgets, sealed tests and null claims; fresh per-fit admission remains required"
-    },
     "research/benchmark/DOPE_CPU_RESEARCH.md": {
       "command": "just check",
       "purpose": "verify explicit research-device parsing, ordinary-build rejection before fixed-hidden fallback, and Rust compiler compatibility; actual CPU libtorch training needs separate runtime qualification"
@@ -2256,6 +2252,114 @@
     "tests/vnext_interactions.rs": {
       "command": "cargo test --locked --test vnext_interactions",
       "purpose": "verify original seven development interaction fixtures: shared term-tariff widths12/24/48/adaptive, fold complement fitting, generating pairs, seed determinism, permutation/substitution and code-only refusals; no encoded-artifact or independent-generalization qualification"
+    },
+    "contracts/tdl-contract-v1.json": {
+      "command": "cargo test --locked --lib metrics::",
+      "purpose": "validate the pre-freeze TDL v1 contract against its schema and reject protocol_frozen=true while any field is TBD"
+    },
+    "rust/metrics/": {
+      "command": "cargo test --locked --lib metrics::",
+      "purpose": "verify Rust TDL transfer, aggregate, driver, frontier, and artifact-charge evaluation against the golden parity corpus and adversarial checks"
+    },
+    "rust/dope.rs": {
+      "command": "cargo test --locked --test rust_cli",
+      "purpose": "verify the public dope CLI binary entrypoint and version parity with Cargo.toml"
+    },
+    "schemas/tdl-contract-v1.schema.json": {
+      "command": "cargo test --locked --lib metrics::",
+      "purpose": "validate the pre-freeze TDL v1 contract schema"
+    },
+    "schemas/byte-accounting-v1.schema.json": {
+      "command": "cargo test --locked --lib metrics::",
+      "purpose": "validate byte-scope accounting fixtures (payload, sampling closure, cold bundle, amortized, and section bytes)"
+    },
+    "schemas/tdl-report-v1.schema.json": {
+      "command": "cargo test --locked --lib metrics::",
+      "purpose": "validate TDL candidate and evaluation receipt reports with diagnostic representation counts"
+    },
+    "schemas/auditor-registry-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
+      "purpose": "validate auditor registry entries and qualification lock state requirements"
+    },
+    "schemas/generator-registry-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
+      "purpose": "validate generator registry entries and track/charge declarations"
+    },
+    "schemas/dataset-manifest-v1.schema.json": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
+      "purpose": "validate dataset cohort manifests, contamination statuses, and redistribution rights"
+    },
+    "bench/": {
+      "command": "python3 -B -m research.transfer.tdl.golden --check",
+      "purpose": "verify benchmark metric entrypoints and golden parity"
+    },
+    "research/transfer/tdl/": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_tdl research.transfer.tests.test_tdl_adapters -v",
+      "purpose": "verify Python TDL conformance equations, standalone sampling trace, and golden corpus parity"
+    },
+    "research/transfer/legacy/": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_metrics -v",
+      "purpose": "preserve historical MFS-v4 Python compatibility shims"
+    },
+    "research/benchmark/legacy/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_mfs_v3 research.benchmark.tests.test_mfs_v3_panel -v",
+      "purpose": "preserve historical MFS-v3/v4 benchmark assembly and score compatibility shims"
+    },
+    "research/transfer/manifests/": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
+      "purpose": "validate dataset cohort manifests and rights declarations"
+    },
+    "research/transfer/registries/": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
+      "purpose": "validate auditor, generator, and lock-state registries"
+    },
+    "tests/golden/": {
+      "command": "just golden-parity",
+      "purpose": "verify cross-language Rust and Python parity across the noncitable TDL golden corpus"
+    },
+    "tests/fixtures/tdl/": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_tdl_adapters -v",
+      "purpose": "verify noncitable synthetic TDL adapter and correlated-feature fixtures"
+    },
+    "tools/claims/": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
+      "purpose": "verify single-source claims rendering, banned-phrase firewall, and registry checks"
+    },
+    "paper/": {
+      "command": "bash paper/build.sh",
+      "purpose": "build the TDL manuscript and supplement from generated macros and verify zero undefined references"
+    },
+    "paper/generated/": {
+      "command": "python3 tools/claims/render.py --check",
+      "purpose": "verify deterministic regeneration of status-labelled headline macros, result cards, and historical frontier figures"
+    },
+    "evidence/": {
+      "command": "python3 tools/claims/check.py",
+      "purpose": "verify repository evidence status and tracked-tree scrub manifest"
+    },
+    "CODE_OF_CONDUCT.md": {
+      "command": "just fast",
+      "purpose": "verify governance documentation"
+    },
+    "CONTRIBUTING.md": {
+      "command": "just fast",
+      "purpose": "verify contributor guidance"
+    },
+    "GOVERNANCE.md": {
+      "command": "just fast",
+      "purpose": "verify governance documentation"
+    },
+    "SECURITY.md": {
+      "command": "just fast",
+      "purpose": "verify security disclosure documentation"
+    },
+    "STATUS.md": {
+      "command": "python3 tools/claims/check.py",
+      "purpose": "verify public evidence status table"
+    },
+    "THIRD_PARTY_NOTICES.md": {
+      "command": "just fast",
+      "purpose": "verify third-party dependency and model license notices"
     }
   }
 }

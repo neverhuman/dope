@@ -5,14 +5,31 @@ use serde::{Deserialize, Serialize};
 
 use crate::codec::{ArtifactAccounting, LoadedKernel, account_artifact, load_kernel};
 use crate::error::{Result, io_error};
+use crate::metrics::METRIC_NAME;
 use crate::model::{Dependence, KernelProgram, Marginal, NeuralArchitecture, Noise, Target};
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub struct InspectionByteScopes {
+    pub payload_bytes: usize,
+    pub sampling_closure_bytes: Option<usize>,
+    pub section_bytes: Vec<usize>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub struct InspectionMetricStatus {
+    pub metric_name: String,
+    pub status: String,
+    pub protocol_frozen: bool,
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Inspection {
     pub format: String,
     pub version: u8,
     pub artifact_bytes: usize,
+    pub byte_scopes: InspectionByteScopes,
     pub byte_accounting: Option<ArtifactAccounting>,
+    pub metric_status: InspectionMetricStatus,
     pub task: String,
     pub rows_fitted: u64,
     pub positional_features: u32,
@@ -44,6 +61,20 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
         )?)
     } else {
         None
+    };
+    let section_bytes = byte_accounting
+        .as_ref()
+        .map(|acc| acc.sections.iter().map(|s| s.encoded_bytes).collect())
+        .unwrap_or_default();
+    let byte_scopes = InspectionByteScopes {
+        payload_bytes: artifact_bytes,
+        sampling_closure_bytes: None,
+        section_bytes,
+    };
+    let metric_status = InspectionMetricStatus {
+        metric_name: METRIC_NAME.to_owned(),
+        status: "unmeasured".to_owned(),
+        protocol_frozen: false,
     };
     match loaded {
         LoadedKernel::V3(kernel) | LoadedKernel::V2(kernel) => {
@@ -146,7 +177,9 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
                 format: format!("dope-kernel-v{native_version}"),
                 version: native_version,
                 artifact_bytes,
+                byte_scopes,
                 byte_accounting,
+                metric_status,
                 task: kernel.task.as_str().into(),
                 rows_fitted: kernel.rows_fitted,
                 positional_features: kernel.features,
@@ -168,7 +201,9 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
                 format: "dope-kernel".into(),
                 version: 1,
                 artifact_bytes,
+                byte_scopes,
                 byte_accounting,
+                metric_status,
                 task: shell["task"].as_str().unwrap_or("unknown").into(),
                 rows_fitted: shell["n"].as_u64().unwrap_or(0),
                 positional_features: shell["p"].as_u64().unwrap_or(0) as u32,

@@ -37,7 +37,8 @@ subprocess, database, and product-route code before each full audit.
 `production/kpi-contract.json` is the active canonical v2 input embedded at
 build time. `production/kpi-contract-v1.json` remains for read-only historical
 verification. `production/kpi-contract-v3.json` pre-registers MFS-v3 and
-`production/kpi-contract-v4.json` pre-registers MFS-v4 (control-contrastive
-lift, model-driver attribution agreement, and MDL knowledge compression). A v3
-or v4 scalar stays null until its components and hard gates are measured.
-Neither legacy receipts nor V1 Python output acquire an L3 label.
+`production/kpi-contract-v4.json` pre-registers the historical MFS-v4 draft
+(control-contrastive lift, model-driver attribution agreement, and historical
+compactness score), superseded by `contracts/tdl-contract-v1.json`. A v3 or v4
+scalar stays null until its components and hard gates are measured. Neither
+legacy receipts nor V1 Python output acquire an L3 label.

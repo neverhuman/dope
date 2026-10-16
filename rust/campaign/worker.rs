@@ -12,7 +12,7 @@ pub struct ValidationAuthorizationEvent {
 }
 
 pub fn open_validation_cert(state_dir: &Path, authorization: &Path) -> Result<CampaignState> {
-    require_host("xbabe3", "validation-cert authorization")?;
+    require_host("fit-machine-3", "validation-cert authorization")?;
     let mut state = load_state(state_dir)?;
     if state.phase != CampaignPhase::RouterFrozen || state.validation_cert_open_count != 0 {
         return Err(DopeError::Data(
@@ -98,7 +98,7 @@ fn handle_request(
             require_durable_space(state_dir)?;
             ledger.reclaim_expired(unix_now())?;
             let state = load_state(state_dir)?;
-            let phases: &[&str] = if worker == "xbabe3" {
+            let phases: &[&str] = if worker == "fit-machine-3" {
                 if state.phase != CampaignPhase::ValidationCertOpen {
                     &[]
                 } else {
