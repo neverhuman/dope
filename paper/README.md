@@ -1,0 +1,50 @@
+# TDL paper package
+
+The canonical manuscript package for **Transfer Description Length for Synthetic Tables**
+(working title; the metric name awaits owner decision D-01). Status: **skeleton, specified,
+not measured.** It contains no result. Every number it will print comes from `generated/`
+through the claims firewall (T-070, T-071). The historical v2 validation paper stays frozen in
+[`docs/whitepaper/`](../docs/whitepaper/README.md).
+
+| Path | Contents | Owner |
+| --- | --- | --- |
+| `main.tex`, `supplement.tex` | manuscript and supplement skeletons (T-110) | L3 |
+| `macros.tex` | shared macros; reads generated macro files first, then typesets visible `[pending]` placeholders | L3 |
+| `references.bib` | starts as a copy of the historical paper's DOI-checked bibliography; add only verified entries | L3 |
+| `build.sh` | builds both PDFs into `target/paper/` and fails on unresolved references or citations | L3 |
+| `generated/` | numbers, tables and figures rendered from `generated/headline-results.json` | L2 (tools/claims) |
+| `archive/` | review ledgers and readiness notes moved out of the historical paper directory (T-111) | L3 |
+
+## Build
+
+```bash
+bash paper/build.sh        # writes target/paper/main.pdf and target/paper/supplement.pdf
+```
+
+Toolchain: pdfTeX from TeX Live 2023, `latexmk` 4.83 and BibTeX 0.99d, using only standard
+packages (`amsmath`, `booktabs`, `graphicx`, `xcolor`, `natbib`, `hyperref`). The PDFs are
+build output and are not committed while the paper is a skeleton.
+
+## Generated inputs
+
+The manuscript reads these files when they exist and prints a red `[pending]` box when they
+do not, so a missing input can never look like a measurement:
+
+| File | Source | Used in |
+| --- | --- | --- |
+| `generated/contract-macros.tex` | `contracts/tdl-contract-v1.json` (T-020): `\TauT`, `\TauD`, `\HeadlinePoint`, `\ByteGrid`, `\SeedDesign`, `\MetricName` | metric definition, supplement A |
+| `generated/headline-macros.tex` | `generated/headline-results.json` (T-070): `\ResultStatus` and any printed value | title block, evidence section |
+| `generated/hero-frontier.pdf` | the hero figure generator (T-072), from the same CSV as the README image | Figure 1 |
+| `generated/result-card.tex` | the result card, one evidence label per row | Table 1 |
+| `generated/contract-table.tex`, `byte-ledger-table.tex`, `auditor-registry-table.tex`, `generator-registry-table.tex`, `dataset-dispositions.tex` | contract, charge manifests and registries | supplement |
+
+## Rules
+
+- Follow [docs/claims-policy.md](../docs/claims-policy.md): an evidence label on every table and
+  figure, "smallest tested", never an optimum, no privacy claim, and no unqualified auditor in a
+  headline.
+- Do not type a number into the `.tex` sources. Add it to `generated/headline-results.json` and
+  render it.
+- Use the neutral `article` class until a submission build exists. A venue build will be a
+  separate target generated from the same sources.
+- Do not fill the abstract's result sentence before the sealed run.
