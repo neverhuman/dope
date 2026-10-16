@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import struct
 import sys
+import zlib
 
 if __package__:
     from .common import XorShift64, number, require
@@ -50,5 +51,5 @@ if __name__ == "__main__":
     try:
         rows = _sample_literal(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))
         print(json.dumps(rows, allow_nan=False))
-    except Exception:
+    except (OSError, ValueError, KeyError, TypeError, EOFError, csv.Error, zlib.error):
         sys.exit(1)  # No private parser errors or values cross the worker boundary.
