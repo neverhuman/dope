@@ -23,6 +23,9 @@ selection-exposed CatBoost validation; it supplies no TDL result. The renderer
 emits `STATUS.md`, a README block, TeX macros, figure CSV, PNG/PDF/SVG and their
 SHA256 manifest. Every image comes from that CSV. These historical points do not
 establish an optimized budget frontier, a driver certificate or cold closure.
+The figure's threshold line and shading come from the `thresholds` field of
+`headline-results.json`. Rendering refuses any point, interval or threshold that would fall
+outside the fixed axes, so a value is never clipped silently (`test_figure.py`).
 Smaller cohorts remain separate and grey in the figure.
 
 Place `paper/generated/readme-result-card.md` verbatim in the README, including
