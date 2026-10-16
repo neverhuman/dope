@@ -9,6 +9,10 @@
 \IfFileExists{generated/headline-macros.tex}{\input{generated/headline-macros.tex}}{}
 
 \newcommand{\pending}[1]{\textcolor{pendingcolor}{\textbf{[#1]}}}
+% Names emitted by tools/claims/render.py (L2) take precedence over the placeholders.
+\ifdefined\TdlMetricName\providecommand{\MetricName}{\TdlMetricName}\fi
+\ifdefined\TdlTransferThreshold\providecommand{\TauT}{\TdlTransferThreshold}\fi
+\ifdefined\TdlDriverThreshold\providecommand{\TauD}{\TdlDriverThreshold}\fi
 \providecommand{\MetricName}{TDL}
 \providecommand{\MetricLong}{Transfer Description Length}
 \providecommand{\TauT}{\pending{$\tau_T$ from contract}}
@@ -24,12 +28,17 @@
 \newcommand{\Lsyn}{L_{\mathrm{syn}}}
 \newcommand{\Trobust}{T_{\mathrm{robust}}}
 \newcommand{\Drobust}{D_{\mathrm{robust}}}
-\newcommand{\LCB}{\operatorname{LCB}_{95}}
+\newcommand{\LCB}{\operatorname{LCB}_{1-\alpha}}
 
 % Generated inputs with placeholders when absent.
+\newlength{\pendingwidth}
+\setlength{\pendingwidth}{0.9\linewidth}
 \newcommand{\GeneratedFigure}[2]{%
   \IfFileExists{generated/#1}{\includegraphics[width=\linewidth]{generated/#1}}{%
-    \fbox{\parbox{0.95\linewidth}{\centering\vspace{2em}\pending{#2}\vspace{2em}}}}}
+    \fbox{\parbox{\pendingwidth}{\centering\vspace{2em}\pending{#2}\vspace{2em}}}}}
 \newcommand{\GeneratedTable}[2]{%
   \IfFileExists{generated/#1}{\input{generated/#1}}{%
-    \fbox{\parbox{0.95\linewidth}{\centering\vspace{1em}\pending{#2}\vspace{1em}}}}}
+    \fbox{\parbox{\pendingwidth}{\centering\vspace{1em}\pending{#2}\vspace{1em}}}}}
+% \Hist{Dope}{Retention} prints \HistoricalDopeRetention from headline-macros.tex, or a placeholder.
+\newcommand{\Hist}[2]{\ifcsname Historical#1#2\endcsname\csname Historical#1#2\endcsname\else\pending{generated}\fi}
+\newcommand{\HistRow}[2]{#2 & \Hist{#1}{Retention} [\Hist{#1}{Lower}, \Hist{#1}{Upper}] & \Hist{#1}{Lineages}}
