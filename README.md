@@ -102,7 +102,7 @@ The strongest full-panel comparator is TabSyn (scaled schedule). These are valid
 - Against the strongest full-panel comparator, the paired interval contains zero. The panel shows a size difference, not superiority.
 - Kumo Tabular, Mitra-v2, TabICLv2, TabPFN, LimiX, TabDPT and TabFM are planned, unqualified auditors. No result uses them.
 - Driver fidelity is not measured for any method.
-- DOPE's median size counts dataset-specific state. Sampling also needs a runtime closure, measured separately below.
+- DOPE's median size counts dataset-specific state. Sampling also needs a runtime closure, which the native-artifact example below measures separately.
 - No privacy claim is made. Empirical attacks cover only the stated cells, and measured copy, membership, and attribute gates already fail on some of them. There is no formal differential privacy and no HIPAA de-identification.
 - The artifact is conditioned on one declared regression target. It does not replace the table for other uses.
 
@@ -117,11 +117,23 @@ target/release/dope-kernel inspect --kernel examples/readme-regression/toy.dpk
 target/release/dope-kernel sample --kernel examples/readme-regression/toy.dpk --rows 200 --out examples/readme-regression/synth.csv
 ```
 
-The toy in [examples/readme-regression](examples/readme-regression/) has four columns already in `[0, 1]`, with the target last. `compile` reads `train.csv` only, and its [README](examples/readme-regression/README.md) gives the formula, the seed and the row counts. <!-- BEGIN PINNED readme-toy: checked by docs/whitepaper/scripts/test_readme_benchmark.py -->
-Inspect of the artifact built for this page reports `artifact_bytes` 151, `rows_fitted` 400, three positional features, dependence `chow_liu`, and target `sparse_linear`. `compliant` is false: compile sees `train.csv` only and does not certify a release. The transcript is [INSPECT.txt](examples/readme-regression/INSPECT.txt). This toy is not the benchmark.
-<!-- END PINNED readme-toy -->
+The toy in [examples/readme-regression](examples/readme-regression/) has four columns already in `[0, 1]`, with the target last. `compile` reads `train.csv` only, and its [README](examples/readme-regression/README.md) gives the formula, the seed and the row counts.
 
 Native input today is headerless numeric CSV with values in `[0, 1]` and the target in the last column. Ordinary CSV input with explicit categorical modes is a follow-on design ([decisions](docs/decisions.md)). The planned public commands are `dope compile`, `dope sample`, `dope inspect` and `dope evaluate` (D-09). Until they land, use `dope-kernel`. Python is used only for the V1 baseline, the offline research harness and the paper scripts (`just setup`).
+
+### One measured native artifact, and the toy's inspect output
+
+Both paragraphs below are generated from `paper/generated/headline-results.json` and pinned by checkers: the toy line by `INSPECT.txt`, the native line by the byte-conformance receipt.
+
+<!-- BEGIN PINNED DEMOS -->
+
+<!-- Generated historical engineering notes; not a TDL result. -->
+
+Inspect of the artifact built for this page reports `artifact_bytes` 151, `rows_fitted` 400, three positional features, dependence `chow_liu`, and target `sparse_linear`. `compliant` is false: compile sees `train.csv` only and does not certify a release. The transcript is [examples/readme-regression/INSPECT.txt](examples/readme-regression/INSPECT.txt). This toy is not the benchmark above.
+
+The installed public demo in [examples/public-regression](examples/public-regression/) fits the UCI Airfoil Self-Noise table (Brooks, Pope, and Marcolini; CC BY 4.0; DOI 10.24432/C5VW2C) on a grouped development split and writes one native raw-unit artifact, `model.raw` (SHA-256 `0950cbe79817…`), with profile `raw-numeric-symbolic-v1` under the byte profile `native-raw-complete-v1`. Compile, `inspect`, the demo's research receipt, and the file size all report 1,558 bytes: 56 bytes of framing, 1,080 bytes of fitted schema and transforms, and 422 bytes of sampling payload. The file is its own transport archive. The generic runtime is measured separately: the debug binary and its mapped libraries came to 72,049,152 bytes, so the cold sampling closure was 72,050,710 bytes. On a release build (`target/release/dope-kernel`, 10,386,496 bytes, SHA-256 `91f6ff9da65d…` at commit `ee4a3d0`), the artifact is byte-identical (`0950cbe79817…`), the release binary and its mapped libraries come to 13,888,176 bytes (cold sampling closure 13,889,734 bytes), and the native steps run in 15.7 ms (`compile-raw`), 2.1 ms (`inspect-raw`), 8.5 ms / 27.0 ms (`sample-raw` / isolated replay at 1n, 1,190 rows), and 24.5 ms / 44.2 ms (`sample-raw` / isolated replay at 4n, 4,760 rows), with total end-to-end demo wall time 0.83 s; no portable bundle was measured. The run used commit `59437b1`, and privacy, driver, and geometry checks are unmeasured for this artifact. It is an engineering conformance example on one development split, not a benchmark result, and a different object from both the toy above and the paper's `.dpk` plus `projection.json` charge. The pinned values are in [docs/whitepaper/receipts/native-byte-conformance-v1.json](docs/whitepaper/receipts/native-byte-conformance-v1.json), and the supplement repeats them.
+
+<!-- END PINNED DEMOS -->
 
 ## What the artifact stores and what is counted
 
@@ -133,12 +145,6 @@ Native input today is headerless numeric CSV with values in `[0, 1]` and the tar
 | Noise | a heteroscedastic scale fitted on up to four screened features |
 
 Sampling reads only the artifact. No training row is stored or read when sampling. Two byte scopes are reported: the **dataset-specific payload**, which is the primary axis, and the **cold sampling closure**, which adds the decoder and runtime. The v2 panel's charge is the encoded `.dpk` file plus `projection.json`. Byte accounting is defined in [docs/metric.md](docs/metric.md#5-byte-scopes).
-
-### One measured native artifact
-
-<!-- BEGIN PINNED native-byte-conformance: checked by docs/whitepaper/scripts/native_byte_conformance.py -->
-The public demo in [examples/public-regression](examples/public-regression/) fits the UCI Airfoil Self-Noise table (Creative Commons Attribution license) on a grouped development split and writes one native artifact, `model.raw` (SHA-256 `0950cbe79817…`), with profile `raw-numeric-symbolic-v1` under the byte profile `native-raw-complete-v1`. Compile, `inspect`, the demo's research receipt and the file size all report 1,558 bytes: 56 bytes of framing, 1,080 bytes of fitted schema and transforms, and 422 bytes of sampling payload. That is the dataset-specific payload. The runtime is measured separately: the debug binary and its mapped libraries came to 72,049,152 bytes, so the cold sampling closure was 72,050,710 bytes. The run used commit `59437b1`, and privacy, driver and geometry checks are unmeasured for this artifact. It is an engineering conformance example, not a benchmark result. The pinned values are in [docs/whitepaper/receipts/native-byte-conformance-v1.json](docs/whitepaper/receipts/native-byte-conformance-v1.json), and the release-build measurement is in the [archive](docs/archive/mfs-history.md).
-<!-- END PINNED native-byte-conformance -->
 
 ## Reproduce
 
