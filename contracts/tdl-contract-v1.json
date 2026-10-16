@@ -1,0 +1,209 @@
+{
+  "format": "dope-tdl-contract",
+  "contract_id": "tdl-contract-v1",
+  "version": 1,
+  "metric_name": "TDL",
+  "status": "draft",
+  "protocol_frozen": false,
+  "headline_operating_point": "T90/D80",
+  "operating_points": [
+    {
+      "id": "T80/D80",
+      "transfer_threshold": 0.8,
+      "driver_threshold": 0.8,
+      "headline": false
+    },
+    {
+      "id": "T90/D80",
+      "transfer_threshold": 0.9,
+      "driver_threshold": 0.8,
+      "headline": true
+    },
+    {
+      "id": "T90/D90",
+      "transfer_threshold": 0.9,
+      "driver_threshold": 0.9,
+      "headline": false
+    },
+    {
+      "id": "T95/D95",
+      "transfer_threshold": 0.95,
+      "driver_threshold": 0.95,
+      "headline": false
+    }
+  ],
+  "secondary_fixed_budgets_kib": [
+    1,
+    4,
+    10,
+    64
+  ],
+  "byte_grid_kib": [
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    16.0,
+    32.0,
+    64.0,
+    128.0,
+    256.0
+  ],
+  "byte_grid_bytes": [
+    512,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    131072,
+    262144
+  ],
+  "byte_scopes": {
+    "primary": "payload_bytes",
+    "secondary": "sampling_closure_bytes",
+    "optional": [
+      "cold_bundle_bytes",
+      "amortized_bytes"
+    ],
+    "container_magic": "TDL1",
+    "encoded_numbers_role": "diagnostic_only_never_ranks"
+  },
+  "transfer_protocol": {
+    "equation_id": "null_normalized_paired_loss_retention_v1",
+    "formula": "(L_null - L_syn) / (L_null - L_real)",
+    "loss_space": "original_target_units",
+    "receipt_clipping": "unclamped",
+    "frontier_clipping": "clamp_0_1",
+    "informative_task_gate": {
+      "require_positive_real_gain_lcb": true,
+      "absolute_gain_floor": 1e-12,
+      "relative_gain_floor": 0.01,
+      "refuse_constant_target": true
+    }
+  },
+  "aggregation_policy": {
+    "task_weights": "equal_within_dataset_and_source_family",
+    "within_family": "mean",
+    "across_families": "min",
+    "secondary_summary": "mean",
+    "cluster_hierarchy": [
+      "source_family",
+      "dataset",
+      "seed"
+    ],
+    "bootstrap_rng": "xorshift64_13_7_17",
+    "bootstrap_seed": 1729,
+    "bootstrap_replicates": 1000,
+    "alpha": 0.05,
+    "lcb_quantile_rule": "floor_alpha_times_replicates_minus_one"
+  },
+  "driver_protocol": {
+    "method": "grouped_conditional_permutation_importance",
+    "evaluation_split": "real_test",
+    "cross_model_raw_shap_allowed": false,
+    "required_components": [
+      "mass",
+      "rank",
+      "sign",
+      "interaction"
+    ],
+    "ceiling_normalization": "divide_by_real_real_ceiling_clamp_0_1",
+    "stability_floor": 0.7,
+    "combination_rule": "min",
+    "driver_threshold": 0.8
+  },
+  "learner_families": {
+    "required_families": [
+      "tree",
+      "linear",
+      "neural"
+    ],
+    "held_out_families": [
+      "foundation_tabular"
+    ],
+    "frontier_panel_qualification": "TBD-D07"
+  },
+  "sample_size_policy": {
+    "primary_synthetic_rows": "1n_real_fit_rows",
+    "calibration_multipliers": [
+      1,
+      4
+    ],
+    "downstream_context_policy": "matched_to_real_fit_rows_or_declared_context_cap"
+  },
+  "seed_policy": {
+    "fit_seeds_count": 5,
+    "sample_seeds_count": 3,
+    "fit_seeds": [
+      101,
+      211,
+      307,
+      401,
+      509
+    ],
+    "sample_seeds": [
+      101,
+      211,
+      307
+    ]
+  },
+  "multiplicity_policy": {
+    "family_gate": "non_compensatory_conjunction_and_worst_family_min",
+    "budget_frontier_rule": "smallest_tested_passing_budget_on_declared_grid",
+    "sealed_test_policy": "TBD-D08"
+  },
+  "evaluator_isolation": {
+    "sampler_network_access": "forbidden",
+    "sampler_source_access": "forbidden",
+    "importance_computed_by": "isolated_evaluator_on_real_test",
+    "audit_trace_required": true
+  },
+  "result_states": [
+    "qualified",
+    "not_reached_in_tested_range",
+    "unqualified",
+    "incomplete",
+    "failed"
+  ],
+  "pending_decisions": {
+    "D-01": "TBD-D01",
+    "D-02": "TBD-D02",
+    "D-03": "TBD-D03",
+    "D-04": "TBD-D04",
+    "D-05": "TBD-D05",
+    "D-06": "TBD-D06",
+    "D-07": "TBD-D07",
+    "D-08": "TBD-D08",
+    "D-09": "TBD-D09"
+  },
+  "historical_contracts": {
+    "production/kpi-contract-v1.json": {
+      "version": 1,
+      "status": "historical_draft",
+      "headline": false,
+      "superseded_by": "tdl-contract-v1"
+    },
+    "production/kpi-contract.json": {
+      "version": 2,
+      "status": "historical_draft",
+      "headline": false,
+      "superseded_by": "tdl-contract-v1"
+    },
+    "production/kpi-contract-v3.json": {
+      "version": 3,
+      "status": "historical_draft",
+      "headline": false,
+      "superseded_by": "tdl-contract-v1"
+    },
+    "production/kpi-contract-v4.json": {
+      "version": 4,
+      "status": "historical_draft",
+      "headline": false,
+      "superseded_by": "tdl-contract-v1"
+    }
+  }
+}

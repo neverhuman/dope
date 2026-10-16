@@ -42,7 +42,21 @@
     ],
     "target_transform_policy": "fit_only_invert_before_loss",
     "sampling_mode": "population",
-    "teaching_context_policy_hash": null
+    "teaching_context_policy_hash": null,
+    "byte_grid_kib": [
+      0.5,
+      1.0,
+      2.0,
+      4.0,
+      8.0,
+      16.0,
+      32.0,
+      64.0,
+      128.0,
+      256.0
+    ],
+    "payload_cold_policy": "payload_bytes_primary_sampling_closure_secondary",
+    "context_sample_policy": "1n_real_fit_rows_primary_4n_calibration"
   },
   "endpoints": {
     "development_fitness": "development-only family/learner-balanced excess risk with declared tail penalty",
@@ -52,8 +66,8 @@
     "score_implies_release": false
   },
   "margins": {
-    "noninferiority": null,
-    "catastrophic_harm": null
+    "noninferiority": 0.1,
+    "catastrophic_harm": 0.2
   },
   "learners": {
     "required_families": [
@@ -61,17 +75,27 @@
       "linear",
       "foundation_tabular"
     ],
-    "held_out_families": []
+    "held_out_families": [
+      "neural"
+    ],
+    "learner_portfolio": [
+      "catboost",
+      "lightgbm",
+      "xgboost",
+      "elastic_net",
+      "ebm",
+      "realmlp"
+    ]
   },
   "budgets": {
-    "sampling_payload_bytes": null,
-    "downstream_context_rows": null,
+    "sampling_payload_bytes": 10240,
+    "downstream_context_rows": 10000,
     "fit_seconds": 600,
     "memory_bytes": 17179869184,
-    "campaign_spend": null
+    "campaign_spend": 0.0
   },
   "disclosure": {
-    "protected_unit": null,
+    "protected_unit": "row",
     "adversary_access": [
       "rows",
       "black_box_samples",
@@ -84,19 +108,19 @@
     "purpose_grants": []
   },
   "freeze_requirements": {
-    "margin_justification": null,
-    "checkpoint_manifest": null,
-    "rights_manifest": null,
-    "cohort_manifest": null,
-    "learner_portfolio": null,
-    "power_validation": null,
-    "pilot_cost": null,
-    "retry_policy": null,
-    "resource_policy": null,
-    "evaluator_isolation": null,
-    "multiplicity_policy": null,
-    "projection_policy": null,
-    "operator_authority": null
+    "margin_justification": "TBD-D02",
+    "checkpoint_manifest": "TBD-D07",
+    "rights_manifest": "TBD-D06",
+    "cohort_manifest": "TBD-D08",
+    "learner_portfolio": "TBD-D07",
+    "power_validation": "TBD-D02",
+    "pilot_cost": "TBD-D07",
+    "retry_policy": "TBD-D08",
+    "resource_policy": "TBD-D07",
+    "evaluator_isolation": "TBD-D08",
+    "multiplicity_policy": "TBD-D02",
+    "projection_policy": "TBD-D06",
+    "operator_authority": "TBD-D08"
   },
   "states": {
     "execution": [

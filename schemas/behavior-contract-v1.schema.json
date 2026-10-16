@@ -258,6 +258,23 @@
               "type": "null"
             }
           ]
+        },
+        "byte_grid_kib": {
+          "type": "array",
+          "minItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "number",
+            "minimum": 0.5
+          }
+        },
+        "payload_cold_policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "context_sample_policy": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -304,6 +321,19 @@
               "minimum": 0
             },
             {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
+            },
+            {
               "type": "null"
             }
           ]
@@ -313,6 +343,19 @@
             {
               "type": "number",
               "minimum": 0
+            },
+            {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
             },
             {
               "type": "null"
@@ -344,6 +387,15 @@
             "type": "string",
             "minLength": 1
           },
+          "uniqueItems": true
+        },
+        "learner_portfolio": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
           "uniqueItems": true
         }
       }
@@ -537,6 +589,19 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
+            },
+            {
               "type": "null"
             }
           ]
@@ -546,6 +611,19 @@
             {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
             },
             {
               "type": "null"
@@ -559,6 +637,19 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
+            },
+            {
               "type": "null"
             }
           ]
@@ -568,6 +659,19 @@
             {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
             },
             {
               "type": "null"
@@ -581,6 +685,19 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
+            },
+            {
               "type": "null"
             }
           ]
@@ -590,6 +707,19 @@
             {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
             },
             {
               "type": "null"
@@ -603,6 +733,19 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
+            },
+            {
               "type": "null"
             }
           ]
@@ -612,6 +755,19 @@
             {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
             },
             {
               "type": "null"
@@ -625,6 +781,19 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
+            },
+            {
               "type": "null"
             }
           ]
@@ -634,6 +803,19 @@
             {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
             },
             {
               "type": "null"
@@ -647,6 +829,19 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
+            },
+            {
               "type": "null"
             }
           ]
@@ -658,6 +853,19 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
+            },
+            {
               "type": "null"
             }
           ]
@@ -667,6 +875,19 @@
             {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "enum": [
+                "TBD-D01",
+                "TBD-D02",
+                "TBD-D03",
+                "TBD-D04",
+                "TBD-D05",
+                "TBD-D06",
+                "TBD-D07",
+                "TBD-D08",
+                "TBD-D09"
+              ]
             },
             {
               "type": "null"

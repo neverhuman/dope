@@ -1,0 +1,580 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:tdl-contract:v1",
+  "title": "TdlContractV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "contract_id",
+    "version",
+    "metric_name",
+    "status",
+    "protocol_frozen",
+    "headline_operating_point",
+    "operating_points",
+    "secondary_fixed_budgets_kib",
+    "byte_grid_kib",
+    "byte_grid_bytes",
+    "byte_scopes",
+    "transfer_protocol",
+    "aggregation_policy",
+    "driver_protocol",
+    "learner_families",
+    "sample_size_policy",
+    "seed_policy",
+    "multiplicity_policy",
+    "evaluator_isolation",
+    "result_states",
+    "pending_decisions",
+    "historical_contracts"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-tdl-contract"
+    },
+    "contract_id": {
+      "const": "tdl-contract-v1"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "metric_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "frozen"
+      ]
+    },
+    "protocol_frozen": {
+      "type": "boolean"
+    },
+    "headline_operating_point": {
+      "enum": [
+        "T80/D80",
+        "T90/D80",
+        "T90/D90",
+        "T95/D95"
+      ]
+    },
+    "operating_points": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "transfer_threshold",
+          "driver_threshold",
+          "headline"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "T80/D80",
+              "T90/D80",
+              "T90/D90",
+              "T95/D95"
+            ]
+          },
+          "transfer_threshold": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "driver_threshold": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "headline": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "secondary_fixed_budgets_kib": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "byte_grid_kib": {
+      "type": "array",
+      "minItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "number",
+        "minimum": 0.5
+      }
+    },
+    "byte_grid_bytes": {
+      "type": "array",
+      "minItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 512
+      }
+    },
+    "byte_scopes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary",
+        "secondary",
+        "optional",
+        "container_magic",
+        "encoded_numbers_role"
+      ],
+      "properties": {
+        "primary": {
+          "const": "payload_bytes"
+        },
+        "secondary": {
+          "const": "sampling_closure_bytes"
+        },
+        "optional": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "cold_bundle_bytes",
+              "amortized_bytes"
+            ]
+          }
+        },
+        "container_magic": {
+          "const": "TDL1"
+        },
+        "encoded_numbers_role": {
+          "const": "diagnostic_only_never_ranks"
+        }
+      }
+    },
+    "transfer_protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equation_id",
+        "formula",
+        "loss_space",
+        "receipt_clipping",
+        "frontier_clipping",
+        "informative_task_gate"
+      ],
+      "properties": {
+        "equation_id": {
+          "const": "null_normalized_paired_loss_retention_v1"
+        },
+        "formula": {
+          "const": "(L_null - L_syn) / (L_null - L_real)"
+        },
+        "loss_space": {
+          "const": "original_target_units"
+        },
+        "receipt_clipping": {
+          "const": "unclamped"
+        },
+        "frontier_clipping": {
+          "const": "clamp_0_1"
+        },
+        "informative_task_gate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "require_positive_real_gain_lcb",
+            "absolute_gain_floor",
+            "relative_gain_floor",
+            "refuse_constant_target"
+          ],
+          "properties": {
+            "require_positive_real_gain_lcb": {
+              "const": true
+            },
+            "absolute_gain_floor": {
+              "type": "number",
+              "minimum": 0.0
+            },
+            "relative_gain_floor": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "refuse_constant_target": {
+              "const": true
+            }
+          }
+        }
+      }
+    },
+    "aggregation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_weights",
+        "within_family",
+        "across_families",
+        "secondary_summary",
+        "cluster_hierarchy",
+        "bootstrap_rng",
+        "bootstrap_seed",
+        "bootstrap_replicates",
+        "alpha",
+        "lcb_quantile_rule"
+      ],
+      "properties": {
+        "task_weights": {
+          "const": "equal_within_dataset_and_source_family"
+        },
+        "within_family": {
+          "const": "mean"
+        },
+        "across_families": {
+          "const": "min"
+        },
+        "secondary_summary": {
+          "const": "mean"
+        },
+        "cluster_hierarchy": {
+          "const": [
+            "source_family",
+            "dataset",
+            "seed"
+          ]
+        },
+        "bootstrap_rng": {
+          "const": "xorshift64_13_7_17"
+        },
+        "bootstrap_seed": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bootstrap_replicates": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "alpha": {
+          "type": "number",
+          "minimum": 0.0001,
+          "maximum": 0.4999
+        },
+        "lcb_quantile_rule": {
+          "const": "floor_alpha_times_replicates_minus_one"
+        }
+      }
+    },
+    "driver_protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "evaluation_split",
+        "cross_model_raw_shap_allowed",
+        "required_components",
+        "ceiling_normalization",
+        "stability_floor",
+        "combination_rule",
+        "driver_threshold"
+      ],
+      "properties": {
+        "method": {
+          "const": "grouped_conditional_permutation_importance"
+        },
+        "evaluation_split": {
+          "const": "real_test"
+        },
+        "cross_model_raw_shap_allowed": {
+          "const": false
+        },
+        "required_components": {
+          "const": [
+            "mass",
+            "rank",
+            "sign",
+            "interaction"
+          ]
+        },
+        "ceiling_normalization": {
+          "const": "divide_by_real_real_ceiling_clamp_0_1"
+        },
+        "stability_floor": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "combination_rule": {
+          "const": "min"
+        },
+        "driver_threshold": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "learner_families": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_families",
+        "held_out_families",
+        "frontier_panel_qualification"
+      ],
+      "properties": {
+        "required_families": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "held_out_families": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "frontier_panel_qualification": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sample_size_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_synthetic_rows",
+        "calibration_multipliers",
+        "downstream_context_policy"
+      ],
+      "properties": {
+        "primary_synthetic_rows": {
+          "const": "1n_real_fit_rows"
+        },
+        "calibration_multipliers": {
+          "const": [
+            1,
+            4
+          ]
+        },
+        "downstream_context_policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "seed_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fit_seeds_count",
+        "sample_seeds_count",
+        "fit_seeds",
+        "sample_seeds"
+      ],
+      "properties": {
+        "fit_seeds_count": {
+          "const": 5
+        },
+        "sample_seeds_count": {
+          "const": 3
+        },
+        "fit_seeds": {
+          "type": "array",
+          "minItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "sample_seeds": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "multiplicity_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family_gate",
+        "budget_frontier_rule",
+        "sealed_test_policy"
+      ],
+      "properties": {
+        "family_gate": {
+          "const": "non_compensatory_conjunction_and_worst_family_min"
+        },
+        "budget_frontier_rule": {
+          "const": "smallest_tested_passing_budget_on_declared_grid"
+        },
+        "sealed_test_policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evaluator_isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sampler_network_access",
+        "sampler_source_access",
+        "importance_computed_by",
+        "audit_trace_required"
+      ],
+      "properties": {
+        "sampler_network_access": {
+          "const": "forbidden"
+        },
+        "sampler_source_access": {
+          "const": "forbidden"
+        },
+        "importance_computed_by": {
+          "const": "isolated_evaluator_on_real_test"
+        },
+        "audit_trace_required": {
+          "const": true
+        }
+      }
+    },
+    "result_states": {
+      "const": [
+        "qualified",
+        "not_reached_in_tested_range",
+        "unqualified",
+        "incomplete",
+        "failed"
+      ]
+    },
+    "pending_decisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "D-01",
+        "D-02",
+        "D-03",
+        "D-04",
+        "D-05",
+        "D-06",
+        "D-07",
+        "D-08",
+        "D-09"
+      ],
+      "properties": {
+        "D-01": {
+          "type": "string",
+          "minLength": 1
+        },
+        "D-02": {
+          "type": "string",
+          "minLength": 1
+        },
+        "D-03": {
+          "type": "string",
+          "minLength": 1
+        },
+        "D-04": {
+          "type": "string",
+          "minLength": 1
+        },
+        "D-05": {
+          "type": "string",
+          "minLength": 1
+        },
+        "D-06": {
+          "type": "string",
+          "minLength": 1
+        },
+        "D-07": {
+          "type": "string",
+          "minLength": 1
+        },
+        "D-08": {
+          "type": "string",
+          "minLength": 1
+        },
+        "D-09": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "historical_contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "production/kpi-contract-v1.json",
+        "production/kpi-contract.json",
+        "production/kpi-contract-v3.json",
+        "production/kpi-contract-v4.json"
+      ],
+      "properties": {
+        "production/kpi-contract-v1.json": {
+          "$ref": "#/$defs/HistoricalContractRecord"
+        },
+        "production/kpi-contract.json": {
+          "$ref": "#/$defs/HistoricalContractRecord"
+        },
+        "production/kpi-contract-v3.json": {
+          "$ref": "#/$defs/HistoricalContractRecord"
+        },
+        "production/kpi-contract-v4.json": {
+          "$ref": "#/$defs/HistoricalContractRecord"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "HistoricalContractRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "status",
+        "headline",
+        "superseded_by"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "status": {
+          "const": "historical_draft"
+        },
+        "headline": {
+          "const": false
+        },
+        "superseded_by": {
+          "const": "tdl-contract-v1"
+        }
+      }
+    }
+  }
+}

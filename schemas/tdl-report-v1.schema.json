@@ -1,0 +1,414 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:tdl-report:v1",
+  "title": "TdlReportV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "contract_id",
+    "metric_name",
+    "citable",
+    "evidence_status",
+    "dataset",
+    "byte_accounting",
+    "diagnostics",
+    "auditor_reports",
+    "driver_report",
+    "aggregate",
+    "release_gates",
+    "provenance"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-tdl-report"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "contract_id": {
+      "const": "tdl-contract-v1"
+    },
+    "metric_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "citable": {
+      "type": "boolean"
+    },
+    "evidence_status": {
+      "enum": [
+        "sealed_test",
+        "validation",
+        "selection_exposed_validation",
+        "historical",
+        "specified_unrun",
+        "unqualified",
+        "failed"
+      ]
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dataset_id",
+        "source_family",
+        "data_sha256",
+        "query_sha256",
+        "split_sha256",
+        "fit_rows",
+        "query_rows"
+      ],
+      "properties": {
+        "dataset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "query_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "split_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "fit_rows": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "query_rows": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "byte_accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "payload_bytes",
+        "sampling_closure_bytes",
+        "cold_bundle_bytes",
+        "amortized_bytes",
+        "section_bytes",
+        "framing_bytes",
+        "shared_bytes",
+        "artifact_sha256"
+      ],
+      "properties": {
+        "payload_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sampling_closure_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cold_bundle_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "amortized_bytes": {
+          "type": "number",
+          "minimum": 1.0
+        },
+        "section_bytes": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "framing_bytes": {
+          "type": "integer",
+          "minimum": 8
+        },
+        "shared_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "artifact_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "diagnostic_only",
+        "encoded_scalars",
+        "encoded_symbols",
+        "representation_closeness"
+      ],
+      "properties": {
+        "diagnostic_only": {
+          "const": true
+        },
+        "encoded_scalars": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "encoded_symbols": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "representation_closeness": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "auditor_reports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_family",
+          "dataset",
+          "seed",
+          "family",
+          "auditor",
+          "status",
+          "null_loss",
+          "real_loss",
+          "synthetic_loss",
+          "real_gain",
+          "raw_transfer",
+          "clipped_transfer"
+        ],
+        "properties": {
+          "source_family": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dataset": {
+            "type": "string",
+            "minLength": 1
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "family": {
+            "type": "string",
+            "minLength": 1
+          },
+          "auditor": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "informative",
+              "uninformative",
+              "incomplete",
+              "failed"
+            ]
+          },
+          "null_loss": {
+            "type": "number",
+            "minimum": 0.0
+          },
+          "real_loss": {
+            "type": "number",
+            "minimum": 0.0
+          },
+          "synthetic_loss": {
+            "type": "number",
+            "minimum": 0.0
+          },
+          "real_gain": {
+            "type": "number"
+          },
+          "raw_transfer": {
+            "type": "number"
+          },
+          "clipped_transfer": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0
+          }
+        }
+      }
+    },
+    "driver_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "raw_components",
+        "normalized_components",
+        "driver_fidelity",
+        "driver_pass"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "uninformative",
+            "incomplete",
+            "failed"
+          ]
+        },
+        "raw_components": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0
+          }
+        },
+        "normalized_components": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0
+          }
+        },
+        "driver_fidelity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "driver_pass": {
+          "type": "boolean"
+        }
+      }
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "family_means",
+        "robust_transfer",
+        "mean_transfer",
+        "lcb",
+        "driver_gate",
+        "tdl_pass"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "qualified",
+            "not_reached_in_tested_range",
+            "unqualified",
+            "incomplete",
+            "failed"
+          ]
+        },
+        "family_means": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "robust_transfer": {
+          "type": "number"
+        },
+        "mean_transfer": {
+          "type": "number"
+        },
+        "lcb": {
+          "type": "number"
+        },
+        "driver_gate": {
+          "type": "boolean"
+        },
+        "tdl_pass": {
+          "type": "boolean"
+        }
+      }
+    },
+    "release_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cleartext_absent",
+        "exact_row_match_passed",
+        "near_copy_passed",
+        "membership_inference_passed",
+        "attribute_inference_passed",
+        "sampler_isolation_verified"
+      ],
+      "properties": {
+        "cleartext_absent": {
+          "type": "boolean"
+        },
+        "exact_row_match_passed": {
+          "type": "boolean"
+        },
+        "near_copy_passed": {
+          "type": "boolean"
+        },
+        "membership_inference_passed": {
+          "type": "boolean"
+        },
+        "attribute_inference_passed": {
+          "type": "boolean"
+        },
+        "sampler_isolation_verified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generator_id",
+        "generator_version",
+        "executor_sha256",
+        "protocol_sha256",
+        "receipt_sha256"
+      ],
+      "properties": {
+        "generator_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "executor_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "protocol_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "receipt_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}
