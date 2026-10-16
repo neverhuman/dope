@@ -241,6 +241,7 @@ enum Command {
         #[arg(long)]
         require_formal_dp: bool,
     },
+    #[command(visible_alias = "fit")]
     Compile {
         #[arg(long)]
         dataset_dir: PathBuf,
@@ -276,13 +277,13 @@ enum Command {
         require_formal_dp: bool,
     },
     Inspect {
-        #[arg(long)]
+        #[arg(long, visible_alias = "artifact")]
         kernel: PathBuf,
         #[arg(long)]
         out: Option<PathBuf>,
     },
     Sample {
-        #[arg(long)]
+        #[arg(long, visible_alias = "artifact")]
         kernel: PathBuf,
         #[arg(long)]
         rows: usize,
@@ -336,10 +337,11 @@ enum Command {
         #[arg(long, default_value_t = 1729)]
         seed: u64,
     },
+    #[command(visible_alias = "evaluate", visible_alias = "verify")]
     Certify {
         #[arg(long)]
         real_dir: PathBuf,
-        #[arg(long)]
+        #[arg(long, visible_alias = "artifact")]
         kernel: PathBuf,
         #[arg(long)]
         out: PathBuf,

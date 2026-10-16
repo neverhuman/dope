@@ -146,7 +146,10 @@ impl GoldBlockReceipt {
                 self.phase.as_str(),
                 "training_gold" | "validation_select" | "validation_cert"
             )
-            || !matches!(self.worker.as_str(), "xbabe1" | "xbabe2" | "xbabe3")
+            || !matches!(
+                self.worker.as_str(),
+                "fit-machine-1" | "fit-machine-2" | "fit-machine-3"
+            )
             || !is_lower_hex(&self.source_sha256, &[64])
             || !is_lower_hex(&self.evaluator_binary_sha256, &[64])
             || self

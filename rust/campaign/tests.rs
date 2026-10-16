@@ -4,10 +4,19 @@ mod tests {
 
     #[test]
     fn controller_and_gpu_worker_cannot_open_validation_cert() {
-        for host in ["xbabe1", "xbabe2"] {
-            assert!(require_named_host(host, "xbabe3", "validation-cert authorization").is_err());
+        for host in ["fit-machine-1", "fit-machine-2"] {
+            assert!(
+                require_named_host(host, "fit-machine-3", "validation-cert authorization").is_err()
+            );
         }
-        assert!(require_named_host("xbabe3", "xbabe3", "validation-cert authorization").is_ok());
+        assert!(
+            require_named_host(
+                "fit-machine-3",
+                "fit-machine-3",
+                "validation-cert authorization"
+            )
+            .is_ok()
+        );
     }
 
     #[test]

@@ -8,7 +8,7 @@ pub struct RoutedCertOptions<'a> {
 }
 
 pub fn run_routed_cert_matrix(options: &RoutedCertOptions<'_>) -> Result<BaselineSummary> {
-    require_host("xbabe3", "routed validation-cert evaluation")?;
+    require_host("fit-machine-3", "routed validation-cert evaluation")?;
     let state = load_state(options.state_dir)?;
     if state.phase != CampaignPhase::ValidationCertOpen
         || state.validation_cert_open_count != 1
@@ -240,7 +240,7 @@ pub fn sign_gold_blocks(
     router_bundle: Option<&Path>,
     receipt_key: &Path,
 ) -> Result<GoldReceiptSummary> {
-    if !matches!(worker, "xbabe1" | "xbabe2" | "xbabe3")
+    if !matches!(worker, "fit-machine-1" | "fit-machine-2" | "fit-machine-3")
         || !is_lower_hex(source_sha256, &[64])
         || !is_lower_hex(evaluator_binary_sha256, &[64])
     {

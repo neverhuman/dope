@@ -1,6 +1,6 @@
 
 /// Reconstructs the final validation-cert metrics directly from content-addressed
-/// record blocks. Only blocks with a valid xbabe3 keyed receipt and exact frozen
+/// record blocks. Only blocks with a valid fit-machine-3 keyed receipt and exact frozen
 /// source, binary, router, cohort, and block hashes are admitted as evidence.
 pub fn export_validation_cert_metrics(
     state_dir: &Path,
@@ -59,13 +59,13 @@ pub fn export_validation_cert_metrics(
     let evaluator = host_inventory
         .workers
         .iter()
-        .find(|worker| worker.host == "xbabe3")
-        .ok_or_else(|| DopeError::Data("xbabe3 is absent from host inventory".into()))?;
+        .find(|worker| worker.host == "fit-machine-3")
+        .ok_or_else(|| DopeError::Data("fit-machine-3 is absent from host inventory".into()))?;
     let controller = host_inventory
         .workers
         .iter()
-        .find(|worker| worker.host == "xbabe1")
-        .ok_or_else(|| DopeError::Data("xbabe1 is absent from host inventory".into()))?;
+        .find(|worker| worker.host == "fit-machine-1")
+        .ok_or_else(|| DopeError::Data("fit-machine-1 is absent from host inventory".into()))?;
 
     let cohort: CohortPlan = read_json(cohort_path)?;
     let cohort_hashes = file_hashes(cohort_path)?;

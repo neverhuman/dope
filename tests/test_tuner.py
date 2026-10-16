@@ -129,7 +129,7 @@ def test_cli_parses_train_tuner() -> None:
         [
             "train-tuner",
             "--corpus",
-            "/home/ubuntu/remote_super/quant",
+            "/path/to/operator-home/remote_super/quant",
             "--tasks",
             "regression,binary",
             "--max-datasets",
@@ -147,7 +147,7 @@ def test_cli_parses_train_tuner() -> None:
     )
 
     assert args.command == "train-tuner"
-    assert args.corpus == "/home/ubuntu/remote_super/quant"
+    assert args.corpus == "/path/to/operator-home/remote_super/quant"
     assert args.tasks == "regression,binary"
     assert args.max_datasets == 8
     assert args.tui is True

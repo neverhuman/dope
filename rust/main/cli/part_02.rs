@@ -357,7 +357,7 @@ enum CampaignCommand {
         #[arg(long)]
         receipt_key: PathBuf,
     },
-    /// Reconcile xbabe3 block receipts and publish final validation-cert metrics.
+    /// Reconcile fit-machine-3 block receipts and publish final validation-cert metrics.
     ExportValidationCertMetrics {
         #[arg(long)]
         state_dir: PathBuf,
