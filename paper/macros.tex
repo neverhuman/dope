@@ -1,9 +1,10 @@
 % Shared macros for the TDL manuscript and supplement.
 %
 % Every number in the paper comes from paper/generated/ (claims firewall, T-070/T-071).
-% generated/contract-macros.tex (from contracts/tdl-contract-v1.json, T-020) and
-% generated/headline-macros.tex (from generated/headline-results.json, T-070) are read
-% first when present. The \providecommand defaults below are visible placeholders, so a
+% generated/contract-macros.tex (paper/scripts/contract_macros.py from
+% contracts/tdl-contract-v1.json; paper/build.sh refuses drift) and
+% generated/headline-macros.tex (tools/claims/render.py from generated/headline-results.json)
+% are read first when present; the contract file wins for the thresholds. The \providecommand defaults below are visible placeholders, so a
 % missing generated file can never print a number that looks measured.
 \IfFileExists{generated/contract-macros.tex}{\input{generated/contract-macros.tex}}{}
 \IfFileExists{generated/headline-macros.tex}{\input{generated/headline-macros.tex}}{}

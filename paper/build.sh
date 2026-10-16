@@ -7,6 +7,12 @@ cd "$(dirname "$0")"
 out="../target/paper"
 mkdir -p "$out"
 export BIBINPUTS="$PWD:${BIBINPUTS:-}"
+# The contract macros and every public surface must agree with contracts/tdl-contract-v1.json.
+python3 -B scripts/contract_macros.py --check
+python3 -B -m unittest discover -s scripts -p 'test_*.py' >"$out/contract-macros.test.log" 2>&1 || {
+  tail -40 "$out/contract-macros.test.log" >&2
+  exit 1
+}
 for doc in main supplement; do
   latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir="$out" "$doc.tex" >"$out/$doc.build.log" 2>&1 || {
     tail -40 "$out/$doc.build.log" >&2
