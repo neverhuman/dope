@@ -1,0 +1,109 @@
+//! Golden parity runner across `tests/golden/{transfer,aggregate,drivers,frontier,charge}/*.json` (T-037).
+
+use std::collections::BTreeSet;
+use std::fs;
+use std::path::{Path, PathBuf};
+
+use serde_json::Value;
+
+use super::{
+    GOLDEN_TOLERANCE, MetricError, MetricResult, aggregate, artifact_charge, drivers, frontier,
+    require, strict_parse_json, transfer, values_close,
+};
+
+pub const COMPONENTS: &[&str] = &["transfer", "aggregate", "drivers", "frontier", "charge"];
+
+pub fn run_case(case: &Value) -> MetricResult<Value> {
+    let obj = case
+        .as_object()
+        .ok_or(MetricError::new("invalid_golden_schema"))?;
+    require(
+        obj.get("schema_version").and_then(Value::as_i64) == Some(1)
+            && !obj["schema_version"].is_f64(),
+        "invalid_golden_schema",
+    )?;
+    require(
+        obj.get("citable").and_then(Value::as_bool) == Some(false),
+        "golden_must_be_noncitable",
+    )?;
+    let case_id = obj
+        .get("case_id")
+        .and_then(Value::as_str)
+        .ok_or(MetricError::new("invalid_case_id"))?;
+    require(!case_id.is_empty(), "invalid_case_id")?;
+    let component = obj
+        .get("component")
+        .and_then(Value::as_str)
+        .ok_or(MetricError::new("unknown_component"))?;
+    let input = obj.get("input").unwrap_or(&Value::Null);
+    match component {
+        "transfer" => Ok(transfer::evaluate(input)),
+        "aggregate" => Ok(aggregate::evaluate(input)),
+        "drivers" => Ok(drivers::evaluate(input)),
+        "frontier" => Ok(frontier::evaluate(input)),
+        "charge" => Ok(artifact_charge::evaluate(input)),
+        _ => Err(MetricError::new("unknown_component")),
+    }
+}
+
+pub fn discover_cases(root: &Path) -> Vec<PathBuf> {
+    let mut paths = Vec::new();
+    for component in COMPONENTS {
+        let dir = root.join(component);
+        if let Ok(entries) = fs::read_dir(dir) {
+            for entry in entries.flatten() {
+                let p = entry.path();
+                if p.extension().and_then(|s| s.to_str()) == Some("json") {
+                    paths.push(p);
+                }
+            }
+        }
+    }
+    paths.sort();
+    paths
+}
+
+pub fn verify_golden_corpus(root: &Path) -> MetricResult<usize> {
+    let paths = discover_cases(root);
+    require(!paths.is_empty(), "empty_golden_corpus")?;
+    let mut ids = BTreeSet::new();
+    for path in &paths {
+        let text = fs::read_to_string(path).map_err(|_| MetricError::new("unreadable_golden"))?;
+        let case = strict_parse_json(&text)?;
+        let case_id = case["case_id"]
+            .as_str()
+            .ok_or(MetricError::new("invalid_case_id"))?
+            .to_owned();
+        require(ids.insert(case_id.clone()), "duplicate_case_id")?;
+        let actual = run_case(&case)?;
+        let expected = case
+            .get("expected")
+            .ok_or(MetricError::new("invalid_golden_schema"))?;
+        if !values_close(&actual, expected, GOLDEN_TOLERANCE) {
+            panic!(
+                "golden mismatch for case `{case_id}` ({}):\n  actual:   {actual}\n  expected: {expected}",
+                path.display()
+            );
+        }
+    }
+    Ok(paths.len())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rust_matches_golden_parity_corpus() {
+        let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let local_golden = manifest_dir.join("tests/golden");
+        let rt_l1_golden = manifest_dir.join("../rt-L1/tests/golden");
+        let root = if !discover_cases(&local_golden).is_empty() {
+            local_golden
+        } else {
+            rt_l1_golden
+        };
+        let count = verify_golden_corpus(&root).expect("golden parity corpus must pass in Rust");
+        assert!(count >= 40, "expected full golden corpus, got {count}");
+    }
+}

@@ -1,4 +1,6 @@
-//! Frozen real-train normalization and the clean-encoder distance for MFS-v3.
+//! Diagnostic representation normalization and clean-encoder distance (demoted
+//! from headline ranking in TDL; retained for diagnostics and historical
+//! receipt compatibility, T-038).
 //!
 //! The quantile map is fit on real fit rows only. Column names and category
 //! levels become HMAC digests. The shipped manifest stores those digests, not
@@ -8,10 +10,15 @@ use std::fs::{self, OpenOptions};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
+pub const REPRESENTATION_ROLE: &str = "diagnostic_only";
+pub const HEADLINE_COMPONENT: bool = false;
 pub const NORMALIZER: &str = "empirical_midrank_quantile_v1";
-pub const HEADLINE_ENCODER: &str = "kumo_tabular_l";
+pub const DIAGNOSTIC_ENCODER: &str = "kumo_tabular_l";
+/// Historical alias retained for legacy MFS compatibility tests.
+pub const HEADLINE_ENCODER: &str = DIAGNOSTIC_ENCODER;
 pub const TABULAR_PROTOCOL: &str = "train_on_synthetic_score_on_real";
 pub const TABULAR_AUDITORS: &[&str] = &["kumo_tabular_l", "mitra_v2", "tabicl2"];
 pub const CATEGORICAL_BUCKETS: u32 = 65_536;
@@ -28,6 +35,33 @@ pub const REFUSED_ENCODERS: &[&str] = &[
     "ta_hyperion_v8braw",
     "target",
 ];
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct RepresentationDiagnostics {
+    pub role: &'static str,
+    pub headline_component: bool,
+    pub encoder: String,
+    pub normalizer: String,
+    pub unit_half_distance: Option<f64>,
+    pub closeness: Option<f64>,
+}
+
+impl RepresentationDiagnostics {
+    pub fn from_scores(
+        encoder: impl Into<String>,
+        distance: Option<f64>,
+        closeness: Option<f64>,
+    ) -> Self {
+        Self {
+            role: REPRESENTATION_ROLE,
+            headline_component: HEADLINE_COMPONENT,
+            encoder: encoder.into(),
+            normalizer: NORMALIZER.to_owned(),
+            unit_half_distance: distance,
+            closeness,
+        }
+    }
+}
 
 pub fn hmac_sha256(key: &[u8], message: &[u8]) -> [u8; 32] {
     const BLOCK: usize = 64;
