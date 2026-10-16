@@ -1,0 +1,12 @@
+{
+  "citable": false,
+  "synthetic_only": true,
+  "purpose": "Grouped permutation treats substitution between perfectly correlated features equally.",
+  "real_test_rows": [[0, 0, 0], [1, 1, 0], [0, 0, 1], [1, 1, 1]],
+  "targets": [0, 1, 0.5, 1.5],
+  "groups": [[0, 1], [2]],
+  "permutation": [3, 2, 1, 0],
+  "real_model_feature": 0,
+  "synthetic_model_feature": 1,
+  "expected_group_importances": [1.0, 0.25]
+}
