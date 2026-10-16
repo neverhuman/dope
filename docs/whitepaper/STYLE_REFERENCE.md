@@ -1,6 +1,6 @@
 # STYLE_SPEC — emulate the UNREAL paper layout for the DOPE whitepaper
 
-Style reference for the DOPE whitepaper restyle (2026-10-08). Paths below are relative to the restyle working folder on fit-machine-2 (~/dope_paper_restyle).
+Style reference for the DOPE whitepaper restyle (2026-10-08). Paths below are relative to the restyle working folder on xbabe2 (~/dope_paper_restyle).
 
 ## 0. Which paper is the "reference"?
 Jepson's link (`neverhuman/dope/blob/main/docs/whitepaper/dope-mfs.pdf`) is **our own current paper**:

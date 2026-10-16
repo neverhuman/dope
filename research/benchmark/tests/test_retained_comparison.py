@@ -148,11 +148,7 @@ class CommittedComparisonTests(unittest.TestCase):
         cls.panel = json.loads((cls.root / "panel.json").read_bytes())
         ref = cls.panel["physical_metrics_file"]
         data = (cls.root / ref["path"]).read_bytes()
-        actual = (len(data), hashlib.sha256(data).hexdigest())
-        if actual not in (
-            (ref["bytes"], ref["sha256"]),
-            (21410189, "835f4d456a909662104546c2644f6269169ab3aae4f571dbde089db3adddecb4"),
-        ):
+        if len(data) != ref["bytes"] or hashlib.sha256(data).hexdigest() != ref["sha256"]:
             raise AssertionError("committed_physical_metrics_changed")
         cls.records = [json.loads(line) for line in data.splitlines()]
         cls.measurements = {r["receipt_sha256"]: {k: v for k, v in r.items() if k != "receipt_sha256"}
@@ -207,12 +203,7 @@ class CommittedComparisonTests(unittest.TestCase):
         self.assertEqual(summary, self.panel["summary"])
         panel = {**self.panel, "measurements": self.measurements}
         for filename, data in publisher.render(panel).items():
-            if filename == "panel.json":
-                rendered = json.loads(data)
-                rendered["physical_metrics_file"] = self.panel["physical_metrics_file"]
-                self.assertEqual(rendered, self.panel, filename)
-            else:
-                self.assertEqual(data, (self.root / filename).read_bytes(), filename)
+            self.assertEqual(data, (self.root / filename).read_bytes(), filename)
 
 
 if __name__ == "__main__":

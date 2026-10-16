@@ -70,6 +70,16 @@ def _attempt_path(root: Path) -> Path:
     return root / f"attempt-{max(numbers, default=0) + 1:04d}.json"
 
 
+def _should_reserve_scratch(scratch_root: Path) -> bool:
+    configured = os.environ.get("DOPE_SCRATCH_ROOT", "").strip()
+    if configured and scratch_root == Path(configured):
+        return True
+    op_home = os.environ.get("DOPE_OPERATOR_HOME", "").strip().rstrip("/")
+    if op_home and scratch_root == Path(f"{op_home}/dope-scratch-x3"):
+        return True
+    return scratch_root == Path("/path/to/operator-home/dope-scratch-x3")
+
+
 def reserve_scratch(root: Path, rows: int, columns: int) -> None:
     # Two simultaneous samples are held for determinism verification. The
     # numeric CSV upper allowance covers a full 17-digit float plus separators.
@@ -395,7 +405,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
         start = time.perf_counter()
         attempt_path = _attempt_path(directory / "fit-attempts")
         try:
-            if os.uname().nodename == "fit-machine-2":
+            if _should_reserve_scratch(scratch_root):
                 reserve_scratch(scratch_root, 0, 0)
             artifact_dir.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(worker / "projection.json", artifact_dir / "projection.json")
@@ -464,7 +474,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
             attempt_path = _attempt_path(directory / "sample-attempts" / key)
             repeat = directory / f"{key}.repeat.csv"
             try:
-                if os.uname().nodename == "fit-machine-2":
+                if _should_reserve_scratch(scratch_root):
                     reserve_scratch(scratch_root, row_count, projection["output_features"] + 1)
                 sample_request = {"action": "sample", "method": method,
                                   "artifact_dir": str(artifact_dir), "row_count": row_count,

@@ -17,7 +17,7 @@ import re
 ADAPTER_SHA256 = '19111055329f4d05f4366c668bd2cd5562fa10c1957f3fed06645f3700aec628'
 EVALUATOR_SHA256 = 'a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f'
 KINDS_REF = {
-    'path': '/path/to/operator-home/dope/.agent/worktrees/integration/target/work-order-b-expanded-metric-round-v1/runtime-final-rehash-repair-v3/source-v10/kinds.py',
+    'path': '/home/ubuntu/dope/.agent/worktrees/integration/target/work-order-b-expanded-metric-round-v1/runtime-final-rehash-repair-v3/source-v10/kinds.py',
     'bytes': 2375,
     'sha256': '576169b3afb4e4b8168b1e2e05a931f6bf98e1ab44fea793d70e9d08b0be7add',
 }

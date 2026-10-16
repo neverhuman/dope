@@ -59,12 +59,12 @@ pub fn export_validation_cert_metrics(
     let evaluator = host_inventory
         .workers
         .iter()
-        .find(|worker| worker.host == "fit-machine-3")
+        .find(|worker| crate::production::matches_host_role(&worker.host, 3))
         .ok_or_else(|| DopeError::Data("fit-machine-3 is absent from host inventory".into()))?;
     let controller = host_inventory
         .workers
         .iter()
-        .find(|worker| worker.host == "fit-machine-1")
+        .find(|worker| crate::production::matches_host_role(&worker.host, 1))
         .ok_or_else(|| DopeError::Data("fit-machine-1 is absent from host inventory".into()))?;
 
     let cohort: CohortPlan = read_json(cohort_path)?;

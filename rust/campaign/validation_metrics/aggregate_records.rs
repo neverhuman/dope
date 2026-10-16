@@ -39,7 +39,8 @@
             if receipt.dataset_id != record.dataset_id
                 || receipt.matrix_identity != matrix_identity
                 || receipt.phase != "validation_cert"
-                || receipt.worker != "fit-machine-3"
+                || !crate::production::matches_host_role(&receipt.worker, 3)
+                || receipt.worker != evaluator.host
                 || receipt.source_sha256 != state.source_tree.sha256
                 || receipt.source_sha256 != evaluator.source_sha256
                 || receipt.evaluator_binary_sha256 != evaluator.binary_sha256

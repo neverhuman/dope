@@ -181,7 +181,7 @@ def build(receipt_sha,report_sha):
             'all_frozen_cells_accounted':True,'identical_artifact_worker_aliases_charge_once':True,
             'cells':cells,'summary':summary,'profile_panels':panels,
             'cost':{'shared_sampler_and_evaluator_seconds':report['new_operation_seconds'],
-                    'coordinator_wall_seconds':report['coordinator_wall_seconds'],'host':'fit-machine-2',
+                    'coordinator_wall_seconds':report['coordinator_wall_seconds'],'host':'xbabe2',
                     'new_generator_fits':0,'new_tuning_trials':0,'new_gpu_fit_operation_seconds':fits['cost']['new_fit_operation_seconds'],
                     'gpu_fit_cost_accounting':fits['cost'],
                     'architecture_research_spend_separate_from_final_cell_parity':True,'job_attributed_energy_joules':None},

@@ -130,7 +130,7 @@ def execution_cost(receipt, original_cost, marker, batch, operation_file=None):
             and marker['round_sha256'] == receipt['round_sha256'] == owned.ROUND
             and native.number(marker['start_monotonic']) and marker['start_monotonic'] >= 0,
             'execution marker or cap differs')
-    require(operation['host'] == 'fit-machine-2' and operation['official_tests_opened'] is False
+    require(operation['host'] == 'xbabe2' and operation['official_tests_opened'] is False
             and operation['foreign_processes_signaled'] is False, 'operation scope differs')
     require(operation['status'] in statuses and operation['status'] != 'deadline_unstarted'
             and (receipt['status'] == operation['status'] or
@@ -196,7 +196,7 @@ def replay_closed_costs(receipt_sha256, report_sha256):
             admissions = [read(n) for n, h in evidence.items() if n.startswith('admission-') and n.endswith('.json') and (h == op['admission_sha256'])]
             owned.require(len(admissions) == 1 and admissions[0]['admitted'] is True
                           and admissions[0]['blockers'] == [] and admissions[0]['round_sha256'] == owned.ROUND
-                          and admissions[0]['host'] == 'fit-machine-2' and admissions[0]['requested']['requires_gpu'] is False
+                          and admissions[0]['host'] == 'xbabe2' and admissions[0]['requested']['requires_gpu'] is False
                           and all(owned.digest_identity(admissions[0]['requested'][k]) == owned.digest_identity(v)
                                   for k, v in lock['roles']['coordinator'].items())
                           and type(admissions[0]['requested']['pid']) is int and admissions[0]['requested']['pid'] > 0,

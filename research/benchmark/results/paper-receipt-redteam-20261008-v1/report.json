@@ -21,22 +21,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -45,10 +45,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -115,22 +115,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -139,10 +139,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -209,22 +209,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -233,10 +233,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -299,55 +299,55 @@
           "bytes": 10516,
           "path": "docs/whitepaper/generated/baseline-coverage.json",
           "pointer": "",
-          "sha256": "909f06d4fd940aad693427394a88bb7b60fe0fc10f9c7ae932e5ed89bf5bd4f8"
+          "sha256": "a6cc9a4902027d9575ac4f62eeb68c4cec006776d452d4ccd1d13eab0a68f839"
         },
         {
-          "bytes": 7791788,
+          "bytes": 7718907,
           "path": "research/benchmark/results/retained-classical-validation/panel.json",
           "pointer": "",
-          "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
         },
         {
-          "bytes": 583249,
+          "bytes": 582699,
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
-          "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
         },
         {
-          "bytes": 27050750,
+          "bytes": 21453198,
           "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
           "pointer": "",
-          "sha256": "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         },
         {
-          "bytes": 2438960,
+          "bytes": 2426210,
           "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
           "pointer": "",
-          "sha256": "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
         },
         {
-          "bytes": 960803,
+          "bytes": 956753,
           "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
         },
         {
-          "bytes": 2762234,
+          "bytes": 2750434,
           "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
         },
         {
-          "bytes": 2377921,
+          "bytes": 2368071,
           "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
         },
         {
-          "bytes": 6807397,
+          "bytes": 6807387,
           "path": "research/benchmark/results/arf-matched-population-validation.json",
           "pointer": "",
-          "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+          "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
         },
         {
           "bytes": 77406,
@@ -378,22 +378,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -402,10 +402,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -472,22 +472,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -496,10 +496,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -566,22 +566,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -590,10 +590,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -666,22 +666,22 @@
           "sha256": "16cd9f392d96d3cfabefe09777d32efd35aadf443b0f324805595e461d30ece9"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         }
       ]
     },
@@ -706,22 +706,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -730,10 +730,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -800,22 +800,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -824,10 +824,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -894,22 +894,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -918,10 +918,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -988,22 +988,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -1012,10 +1012,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -1082,22 +1082,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -1106,10 +1106,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -1176,22 +1176,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -1200,10 +1200,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -1270,22 +1270,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -1294,10 +1294,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -1364,22 +1364,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -1388,10 +1388,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -1458,22 +1458,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -1482,10 +1482,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -1545,10 +1545,10 @@
       ],
       "reduction_source_refs": [
         {
-          "bytes": 6807397,
+          "bytes": 6807387,
           "path": "research/benchmark/results/arf-matched-population-validation.json",
           "pointer": "",
-          "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+          "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
         }
       ]
     },
@@ -1569,55 +1569,55 @@
           "bytes": 1343097,
           "path": "docs/whitepaper/generated/retained-evidence.json",
           "pointer": "",
-          "sha256": "2eb0a2d91eb2fae390a9a775ecda49b0ecdd3108474aae1ef9eabc6043442666"
+          "sha256": "3970fd7c41eb0e9fa6a2a63bf4f4c963de53f09aac0352eea9a241d2e336103d"
         },
         {
-          "bytes": 7791788,
+          "bytes": 7718907,
           "path": "research/benchmark/results/retained-classical-validation/panel.json",
           "pointer": "",
-          "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
         },
         {
-          "bytes": 583249,
+          "bytes": 582699,
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
-          "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
         },
         {
-          "bytes": 27050750,
+          "bytes": 21453198,
           "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
           "pointer": "",
-          "sha256": "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         },
         {
-          "bytes": 2438960,
+          "bytes": 2426210,
           "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
           "pointer": "",
-          "sha256": "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
         },
         {
-          "bytes": 960803,
+          "bytes": 956753,
           "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
         },
         {
-          "bytes": 2762234,
+          "bytes": 2750434,
           "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
         },
         {
-          "bytes": 2377921,
+          "bytes": 2368071,
           "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
         },
         {
-          "bytes": 6807397,
+          "bytes": 6807387,
           "path": "research/benchmark/results/arf-matched-population-validation.json",
           "pointer": "",
-          "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+          "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
         },
         {
           "bytes": 77406,
@@ -1644,55 +1644,55 @@
           "bytes": 1343097,
           "path": "docs/whitepaper/generated/retained-evidence.json",
           "pointer": "",
-          "sha256": "2eb0a2d91eb2fae390a9a775ecda49b0ecdd3108474aae1ef9eabc6043442666"
+          "sha256": "3970fd7c41eb0e9fa6a2a63bf4f4c963de53f09aac0352eea9a241d2e336103d"
         },
         {
-          "bytes": 7791788,
+          "bytes": 7718907,
           "path": "research/benchmark/results/retained-classical-validation/panel.json",
           "pointer": "",
-          "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
         },
         {
-          "bytes": 583249,
+          "bytes": 582699,
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
-          "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
         },
         {
-          "bytes": 27050750,
+          "bytes": 21453198,
           "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
           "pointer": "",
-          "sha256": "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         },
         {
-          "bytes": 2438960,
+          "bytes": 2426210,
           "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
           "pointer": "",
-          "sha256": "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
         },
         {
-          "bytes": 960803,
+          "bytes": 956753,
           "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
         },
         {
-          "bytes": 2762234,
+          "bytes": 2750434,
           "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
         },
         {
-          "bytes": 2377921,
+          "bytes": 2368071,
           "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
         },
         {
-          "bytes": 6807397,
+          "bytes": 6807387,
           "path": "research/benchmark/results/arf-matched-population-validation.json",
           "pointer": "",
-          "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+          "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
         },
         {
           "bytes": 77406,
@@ -1719,55 +1719,55 @@
           "bytes": 1343097,
           "path": "docs/whitepaper/generated/retained-evidence.json",
           "pointer": "",
-          "sha256": "2eb0a2d91eb2fae390a9a775ecda49b0ecdd3108474aae1ef9eabc6043442666"
+          "sha256": "3970fd7c41eb0e9fa6a2a63bf4f4c963de53f09aac0352eea9a241d2e336103d"
         },
         {
-          "bytes": 7791788,
+          "bytes": 7718907,
           "path": "research/benchmark/results/retained-classical-validation/panel.json",
           "pointer": "",
-          "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
         },
         {
-          "bytes": 583249,
+          "bytes": 582699,
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
-          "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
         },
         {
-          "bytes": 27050750,
+          "bytes": 21453198,
           "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
           "pointer": "",
-          "sha256": "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         },
         {
-          "bytes": 2438960,
+          "bytes": 2426210,
           "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
           "pointer": "",
-          "sha256": "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
         },
         {
-          "bytes": 960803,
+          "bytes": 956753,
           "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
         },
         {
-          "bytes": 2762234,
+          "bytes": 2750434,
           "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
         },
         {
-          "bytes": 2377921,
+          "bytes": 2368071,
           "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
         },
         {
-          "bytes": 6807397,
+          "bytes": 6807387,
           "path": "research/benchmark/results/arf-matched-population-validation.json",
           "pointer": "",
-          "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+          "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
         },
         {
           "bytes": 77406,
@@ -1794,55 +1794,55 @@
           "bytes": 1343097,
           "path": "docs/whitepaper/generated/retained-evidence.json",
           "pointer": "",
-          "sha256": "2eb0a2d91eb2fae390a9a775ecda49b0ecdd3108474aae1ef9eabc6043442666"
+          "sha256": "3970fd7c41eb0e9fa6a2a63bf4f4c963de53f09aac0352eea9a241d2e336103d"
         },
         {
-          "bytes": 7791788,
+          "bytes": 7718907,
           "path": "research/benchmark/results/retained-classical-validation/panel.json",
           "pointer": "",
-          "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
         },
         {
-          "bytes": 583249,
+          "bytes": 582699,
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
-          "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
         },
         {
-          "bytes": 27050750,
+          "bytes": 21453198,
           "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
           "pointer": "",
-          "sha256": "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         },
         {
-          "bytes": 2438960,
+          "bytes": 2426210,
           "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
           "pointer": "",
-          "sha256": "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
         },
         {
-          "bytes": 960803,
+          "bytes": 956753,
           "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
         },
         {
-          "bytes": 2762234,
+          "bytes": 2750434,
           "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
         },
         {
-          "bytes": 2377921,
+          "bytes": 2368071,
           "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
         },
         {
-          "bytes": 6807397,
+          "bytes": 6807387,
           "path": "research/benchmark/results/arf-matched-population-validation.json",
           "pointer": "",
-          "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+          "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
         },
         {
           "bytes": 77406,
@@ -1869,55 +1869,55 @@
           "bytes": 1343097,
           "path": "docs/whitepaper/generated/retained-evidence.json",
           "pointer": "",
-          "sha256": "2eb0a2d91eb2fae390a9a775ecda49b0ecdd3108474aae1ef9eabc6043442666"
+          "sha256": "3970fd7c41eb0e9fa6a2a63bf4f4c963de53f09aac0352eea9a241d2e336103d"
         },
         {
-          "bytes": 7791788,
+          "bytes": 7718907,
           "path": "research/benchmark/results/retained-classical-validation/panel.json",
           "pointer": "",
-          "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
         },
         {
-          "bytes": 583249,
+          "bytes": 582699,
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
-          "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
         },
         {
-          "bytes": 27050750,
+          "bytes": 21453198,
           "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
           "pointer": "",
-          "sha256": "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         },
         {
-          "bytes": 2438960,
+          "bytes": 2426210,
           "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
           "pointer": "",
-          "sha256": "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
         },
         {
-          "bytes": 960803,
+          "bytes": 956753,
           "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
         },
         {
-          "bytes": 2762234,
+          "bytes": 2750434,
           "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
         },
         {
-          "bytes": 2377921,
+          "bytes": 2368071,
           "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
         },
         {
-          "bytes": 6807397,
+          "bytes": 6807387,
           "path": "research/benchmark/results/arf-matched-population-validation.json",
           "pointer": "",
-          "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+          "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
         },
         {
           "bytes": 77406,
@@ -1948,22 +1948,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -1972,10 +1972,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -2042,22 +2042,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -2066,10 +2066,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -2136,22 +2136,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -2160,10 +2160,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -2230,22 +2230,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -2254,10 +2254,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -2344,22 +2344,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -2368,10 +2368,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -2398,19 +2398,19 @@
           "bytes": 1343097,
           "path": "docs/whitepaper/generated/retained-evidence.json",
           "pointer": "",
-          "sha256": "2eb0a2d91eb2fae390a9a775ecda49b0ecdd3108474aae1ef9eabc6043442666"
+          "sha256": "3970fd7c41eb0e9fa6a2a63bf4f4c963de53f09aac0352eea9a241d2e336103d"
         },
         {
-          "bytes": 7791788,
+          "bytes": 7718907,
           "path": "research/benchmark/results/retained-classical-validation/panel.json",
           "pointer": "",
-          "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
         },
         {
-          "bytes": 583249,
+          "bytes": 582699,
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
-          "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
         }
       ]
     },
@@ -2434,22 +2434,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -2458,10 +2458,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -2491,22 +2491,22 @@
           "sha256": "152f69d6d8cfccf66da7575e87521badb5fb95fddc13f7b002fffb87026e8703"
         },
         {
-          "bytes": 21794636,
+          "bytes": 21794615,
           "path": "research/benchmark/results/density-matched-population-validation.json",
           "pointer": "",
-          "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+          "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
         },
         {
-          "bytes": 13571834,
+          "bytes": 13567823,
           "path": "research/benchmark/results/sdv-matched-population-validation.json",
           "pointer": "",
-          "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+          "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
         },
         {
-          "bytes": 1237755,
+          "bytes": 1237153,
           "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
           "pointer": "",
-          "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
+          "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
         },
         {
           "bytes": 1834757,
@@ -2515,10 +2515,10 @@
           "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
         },
         {
-          "bytes": 1563424,
+          "bytes": 1563417,
           "path": "research/benchmark/results/expanded-validation-diagnostics.json",
           "pointer": "",
-          "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+          "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
         },
         {
           "bytes": 21987,
@@ -2545,55 +2545,55 @@
           "bytes": 2576771,
           "path": "docs/whitepaper/generated/published-baseline-kpis.json",
           "pointer": "",
-          "sha256": "8ff0fbbe0e5bc99cda8b3dfc629bcbe55549883cb8a6723c1595df964a9a3fd1"
+          "sha256": "e8c3a26f687be6b02d00ddbfb1bbe08c331edb3289dfcc05c457625b2c1f3b89"
         },
         {
-          "bytes": 7791788,
+          "bytes": 7718907,
           "path": "research/benchmark/results/retained-classical-validation/panel.json",
           "pointer": "",
-          "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+          "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
         },
         {
-          "bytes": 583249,
+          "bytes": 582699,
           "path": "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
           "pointer": "",
-          "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+          "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
         },
         {
-          "bytes": 27050750,
+          "bytes": 21453198,
           "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
           "pointer": "",
-          "sha256": "7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66"
+          "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
         },
         {
-          "bytes": 2438960,
+          "bytes": 2426210,
           "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
           "pointer": "",
-          "sha256": "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"
+          "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
         },
         {
-          "bytes": 960803,
+          "bytes": 956753,
           "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"
+          "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
         },
         {
-          "bytes": 2762234,
+          "bytes": 2750434,
           "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"
+          "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
         },
         {
-          "bytes": 2377921,
+          "bytes": 2368071,
           "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
           "pointer": "",
-          "sha256": "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"
+          "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
         },
         {
-          "bytes": 6807397,
+          "bytes": 6807387,
           "path": "research/benchmark/results/arf-matched-population-validation.json",
           "pointer": "",
-          "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+          "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
         },
         {
           "bytes": 77406,

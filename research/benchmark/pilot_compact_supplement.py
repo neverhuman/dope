@@ -41,7 +41,7 @@ def dispatch(dataset: str, method: str, seed: int, deadline: float) -> dict:
                    "scratch_ceiling" if used_bytes(ROOT) > LIMIT - 20_000_000_000 else None)
     if stop_reason:
         receipt = {"name": name, "status": "not_started", "reason": stop_reason,
-                   "host": "fit-machine-1", "started_utc": started, "elapsed_seconds": 0.0}
+                   "host": "xbabe1", "started_utc": started, "elapsed_seconds": 0.0}
     else:
         command = ["env", f"PYTHONPATH={PACKAGE}", "CUDA_VISIBLE_DEVICES=",
                    "OMP_NUM_THREADS=16", "OPENBLAS_NUM_THREADS=16", "MKL_NUM_THREADS=16",
@@ -52,10 +52,10 @@ def dispatch(dataset: str, method: str, seed: int, deadline: float) -> dict:
                    str(PACKAGE / "research/benchmark/methods.lock.json"), str(BASE / "results")]
         start = time.monotonic()
         try:
-            process = subprocess.run(["ssh", "-o", "BatchMode=yes", "fit-machine-1", shlex.join(command)],
+            process = subprocess.run(["ssh", "-o", "BatchMode=yes", "xbabe1", shlex.join(command)],
                                      capture_output=True, text=True, timeout=remaining + 35)
         except subprocess.TimeoutExpired as error:
-            receipt = {"name": name, "status": "timeout", "host": "fit-machine-1",
+            receipt = {"name": name, "status": "timeout", "host": "xbabe1",
                        "started_utc": started, "elapsed_seconds": time.monotonic() - start,
                        "error_type": type(error).__name__}
             atomic_json(receipt_path, receipt)
@@ -69,7 +69,7 @@ def dispatch(dataset: str, method: str, seed: int, deadline: float) -> dict:
                 status = "ok" if children and all(child["status"] == "ok" for child in children) else "partial"
             except (IndexError, json.JSONDecodeError):
                 status = "failed"
-        receipt = {"name": name, "status": status, "host": "fit-machine-1",
+        receipt = {"name": name, "status": status, "host": "xbabe1",
                    "started_utc": started, "elapsed_seconds": time.monotonic() - start,
                    "runner_exit_code": process.returncode, "log_sha256": digest(log_path)}
     atomic_json(receipt_path, receipt)
@@ -84,7 +84,7 @@ def main() -> None:
     method_lock = json.loads((PACKAGE / "research/benchmark/methods.lock.json").read_text())
     if any(method_lock["methods"][method]["status"] != "locked" for method in METHODS):
         raise ValueError("supplement method is not source locked")
-    cells = [{"dataset": dataset, "method": method, "fit_seed": seed, "host": "fit-machine-1"}
+    cells = [{"dataset": dataset, "method": method, "fit_seed": seed, "host": "xbabe1"}
              for dataset in DATASETS for method in METHODS for seed in FIT_SEEDS]
     for name in ("jobs", "logs", "receipts", "results"):
         (BASE / name).mkdir(parents=True, exist_ok=True)

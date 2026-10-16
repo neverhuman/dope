@@ -3,15 +3,16 @@
 Ceilings and stable signs come from independent real-real controls on the same
 real test rows. Required components are combined by minimum, never a blend.
 """
-from .common import MetricError, failure, number, require, unit, vector
+from .common import MetricError, failure, number, opt_default, require, sum_checked, unit, vector
 
 
 def mass_agreement(real, synthetic):
-    rtotal, stotal = number(sum(real)), number(sum(synthetic))
+    rtotal, stotal = sum_checked(real), sum_checked(synthetic)
     require(rtotal > 0, "degenerate_real_importance")
     if stotal <= 0:
         return 0.0
-    return max(0.0, 1.0 - 0.5 * sum(abs(r / rtotal - s / stotal) for r, s in zip(real, synthetic)))
+    l1 = sum_checked([abs(r / rtotal - s / stotal) for r, s in zip(real, synthetic)])
+    return max(0.0, 1.0 - 0.5 * l1)
 
 
 def rank_agreement(real, synthetic):
@@ -38,7 +39,7 @@ def evaluate(data):
         real = vector(data["real_importances"], True)
         syn = vector(data["synthetic_importances"], True)
         require(len(real) == len(syn), "importance_shape_mismatch")
-        if number(sum(real)) <= 0:
+        if sum_checked(real) <= 0:
             return failure("degenerate_real_importance", "uninformative")
         raw = {"mass": mass_agreement(real, syn), "rank": rank_agreement(real, syn)}
         if "sign" in required:
@@ -58,24 +59,28 @@ def evaluate(data):
             require(len(ri) == len(si), "interaction_shape_mismatch")
             # Preserve absolute strength as well as distribution; losing an
             # interaction cannot pass merely by retaining its normalized rank.
-            rt, st = number(sum(ri)), number(sum(si))
+            rt, st = sum_checked(ri), sum_checked(si)
             if rt <= 0:
                 return failure("no_stable_interaction", "uninformative")
             strength = min(rt, st) / max(rt, st)
             raw["interaction"] = mass_agreement(ri, si) * strength
         ceilings = data["real_real_ceiling"]
         require(type(ceilings) is dict, "invalid_ceiling")
-        floor = unit(data.get("stability_floor", 0.70))
+        floor = unit(opt_default(data, "stability_floor", 0.70))
+        parsed_ceilings = {}
+        for component in required:
+            if ceilings.get(component) is not None:
+                parsed_ceilings[component] = unit(ceilings[component])
+        if any(ceilings.get(component) is None for component in required):
+            return failure("missing_driver_component", "incomplete")
         normalized = {}
         for component in required:
-            if ceilings.get(component) is None:
-                return failure("missing_driver_component", "incomplete")
-            ceiling = unit(ceilings[component])
+            ceiling = parsed_ceilings[component]
             if ceiling <= 0 or ceiling < floor:
                 return failure("unstable_real_drivers", "uninformative")
             normalized[component] = min(1.0, max(0.0, raw[component] / ceiling))
         score = min(normalized.values())
-        threshold = unit(data.get("driver_threshold", 0.80))
+        threshold = unit(opt_default(data, "driver_threshold", 0.80))
         return {"status": "complete", "reason": None,
                 "raw_components": {k: raw[k] for k in required},
                 "normalized_components": normalized, "driver_fidelity": score,

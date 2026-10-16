@@ -13,7 +13,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 10.38632700406015
+        "xbabe1": 10.38632700406015
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -48,7 +48,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 14.591207609977573
+        "xbabe2": 14.591207609977573
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -83,7 +83,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.063838182017207
+        "xbabe3": 26.063838182017207
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -118,7 +118,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.926526014925912
+        "xbabe1": 6.926526014925912
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -153,7 +153,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 26.226333365077153
+        "xbabe2": 26.226333365077153
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -188,7 +188,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.715280221076682
+        "xbabe3": 26.715280221076682
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -223,7 +223,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.3754364140331745
+        "xbabe1": 7.3754364140331745
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -258,7 +258,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 24.52135447715409
+        "xbabe2": 24.52135447715409
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -293,7 +293,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.36691606300883
+        "xbabe3": 25.36691606300883
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -328,7 +328,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 8.379721469944343
+        "xbabe1": 8.379721469944343
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -363,7 +363,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 17.015852394979447
+        "xbabe2": 17.015852394979447
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -398,7 +398,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.209600395988673
+        "xbabe3": 26.209600395988673
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -433,7 +433,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.579463626025245
+        "xbabe1": 6.579463626025245
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -468,7 +468,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 20.415841898182407
+        "xbabe2": 20.415841898182407
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -503,7 +503,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 24.758009537821636
+        "xbabe3": 24.758009537821636
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -538,7 +538,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 8.531641626963392
+        "xbabe1": 8.531641626963392
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -573,7 +573,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 28.765381477074698
+        "xbabe2": 28.765381477074698
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -608,7 +608,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.916610080050305
+        "xbabe3": 27.916610080050305
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -643,7 +643,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.525246460922062
+        "xbabe1": 6.525246460922062
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -678,7 +678,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 22.205399885075167
+        "xbabe2": 22.205399885075167
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -713,7 +713,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.271539285080507
+        "xbabe3": 25.271539285080507
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -748,7 +748,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.775158755946904
+        "xbabe1": 6.775158755946904
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -783,7 +783,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.624650282785296
+        "xbabe1": 6.624650282785296
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -818,7 +818,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.20639297598973
+        "xbabe3": 25.20639297598973
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -853,7 +853,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.625967849045992
+        "xbabe1": 6.625967849045992
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -888,7 +888,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 23.817632211139426
+        "xbabe2": 23.817632211139426
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -923,7 +923,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.35660798684694
+        "xbabe3": 25.35660798684694
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -958,7 +958,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.028943885117769
+        "xbabe1": 7.028943885117769
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -993,7 +993,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 21.350809198105708
+        "xbabe2": 21.350809198105708
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1028,7 +1028,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.34879326284863
+        "xbabe3": 26.34879326284863
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1063,7 +1063,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.5747703509405255
+        "xbabe1": 6.5747703509405255
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1098,7 +1098,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 22.11620925483294
+        "xbabe2": 22.11620925483294
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1133,7 +1133,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.219267984852195
+        "xbabe3": 25.219267984852195
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1168,7 +1168,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.727748702978715
+        "xbabe1": 6.727748702978715
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1203,7 +1203,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 22.20673393108882
+        "xbabe2": 22.20673393108882
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1238,7 +1238,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.21234007901512
+        "xbabe3": 25.21234007901512
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1273,7 +1273,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.578234720043838
+        "xbabe1": 7.578234720043838
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1308,7 +1308,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 23.95684802206233
+        "xbabe2": 23.95684802206233
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1343,7 +1343,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.56754962494597
+        "xbabe3": 26.56754962494597
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1378,7 +1378,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.683306138031185
+        "xbabe1": 6.683306138031185
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1413,7 +1413,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-2": 26.48787415912375
+        "xbabe2": 26.48787415912375
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1448,7 +1448,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.030691551975906
+        "xbabe3": 27.030691551975906
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1483,7 +1483,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.476001298055053
+        "xbabe1": 6.476001298055053
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1518,7 +1518,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 16.244355886010453
+        "xbabe2": 16.244355886010453
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1553,7 +1553,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 24.660508231027052
+        "xbabe3": 24.660508231027052
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1588,7 +1588,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.727578242076561
+        "xbabe1": 7.727578242076561
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1623,7 +1623,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 16.696361765032634
+        "xbabe2": 16.696361765032634
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1658,7 +1658,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.29208857100457
+        "xbabe3": 26.29208857100457
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1693,7 +1693,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 19.076064454158768
+        "xbabe2": 19.076064454158768
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1728,7 +1728,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 17.944122149143368
+        "xbabe2": 17.944122149143368
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1763,7 +1763,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 24.70897896005772
+        "xbabe3": 24.70897896005772
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1798,7 +1798,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.533616955159232
+        "xbabe1": 7.533616955159232
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1833,7 +1833,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 24.227533645927906
+        "xbabe2": 24.227533645927906
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1868,7 +1868,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 30.023821878014132
+        "xbabe3": 30.023821878014132
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1903,7 +1903,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.551520820008591
+        "xbabe1": 7.551520820008591
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1938,7 +1938,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 10.647910717176273
+        "xbabe1": 10.647910717176273
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -1973,7 +1973,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.29877636092715
+        "xbabe3": 27.29877636092715
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2008,7 +2008,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 8.298014296917245
+        "xbabe1": 8.298014296917245
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2043,7 +2043,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 26.94262142898515
+        "xbabe2": 26.94262142898515
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2078,7 +2078,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.21526430710219
+        "xbabe3": 27.21526430710219
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2113,7 +2113,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.077636312926188
+        "xbabe1": 7.077636312926188
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2148,7 +2148,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 17.601157919038087
+        "xbabe2": 17.601157919038087
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2183,7 +2183,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.41910892003216
+        "xbabe3": 25.41910892003216
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2218,7 +2218,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 10.783371752128005
+        "xbabe1": 10.783371752128005
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2253,7 +2253,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 21.40801110304892
+        "xbabe2": 21.40801110304892
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2288,7 +2288,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 28.47151061706245
+        "xbabe3": 28.47151061706245
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2323,7 +2323,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 8.881178025854751
+        "xbabe1": 8.881178025854751
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2358,7 +2358,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-2": 15.841580050066113
+        "xbabe2": 15.841580050066113
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2393,7 +2393,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 28.312727057142183
+        "xbabe3": 28.312727057142183
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2428,7 +2428,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 9.53526291390881
+        "xbabe1": 9.53526291390881
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2463,7 +2463,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 16.29530303995125
+        "xbabe2": 16.29530303995125
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2498,7 +2498,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.107628309866413
+        "xbabe3": 25.107628309866413
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2533,7 +2533,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.626566912978888
+        "xbabe1": 6.626566912978888
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2568,7 +2568,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 16.44526704889722
+        "xbabe2": 16.44526704889722
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2603,7 +2603,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.119340572040528
+        "xbabe3": 25.119340572040528
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2638,7 +2638,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.977062372025102
+        "xbabe1": 6.977062372025102
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2673,7 +2673,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 15.840750959003344
+        "xbabe2": 15.840750959003344
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2708,7 +2708,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 29.810713989892974
+        "xbabe3": 29.810713989892974
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2743,7 +2743,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.879148375010118
+        "xbabe1": 7.879148375010118
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2778,7 +2778,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 17.345054259058088
+        "xbabe2": 17.345054259058088
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2813,7 +2813,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.807583068031818
+        "xbabe3": 25.807583068031818
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2848,7 +2848,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.424703501863405
+        "xbabe1": 6.424703501863405
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2883,7 +2883,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 16.3933524179738
+        "xbabe2": 16.3933524179738
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2918,7 +2918,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.41602444788441
+        "xbabe3": 25.41602444788441
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2953,7 +2953,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.527001105016097
+        "xbabe1": 6.527001105016097
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -2988,7 +2988,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 38.68303786381148
+        "xbabe2": 38.68303786381148
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3023,7 +3023,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.660488921916112
+        "xbabe3": 25.660488921916112
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3058,7 +3058,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.427229105029255
+        "xbabe1": 6.427229105029255
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3093,7 +3093,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 29.69424516079016
+        "xbabe2": 29.69424516079016
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3128,7 +3128,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.96685241884552
+        "xbabe3": 25.96685241884552
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3163,7 +3163,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.528011523885652
+        "xbabe1": 6.528011523885652
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3198,7 +3198,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 26.222422576043755
+        "xbabe2": 26.222422576043755
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3233,7 +3233,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.62429096410051
+        "xbabe3": 26.62429096410051
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3268,7 +3268,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.880216218996793
+        "xbabe1": 6.880216218996793
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3303,7 +3303,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 33.29437769204378
+        "xbabe2": 33.29437769204378
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3338,7 +3338,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.537752743111923
+        "xbabe3": 26.537752743111923
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3373,7 +3373,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.0909421681426466
+        "xbabe1": 7.0909421681426466
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3408,7 +3408,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.326173654058948
+        "xbabe1": 7.326173654058948
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3443,7 +3443,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.32757880492136
+        "xbabe3": 27.32757880492136
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3478,7 +3478,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.9811635001096874
+        "xbabe1": 6.9811635001096874
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3513,7 +3513,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 37.14317181985825
+        "xbabe2": 37.14317181985825
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3548,7 +3548,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 31.319851716049016
+        "xbabe3": 31.319851716049016
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3583,7 +3583,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.524114051833749
+        "xbabe1": 6.524114051833749
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3618,7 +3618,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 38.69746224000119
+        "xbabe2": 38.69746224000119
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3653,7 +3653,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-3": 27.021765780169517
+        "xbabe3": 27.021765780169517
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3688,7 +3688,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.829002465121448
+        "xbabe1": 6.829002465121448
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3723,7 +3723,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 24.319212232949212
+        "xbabe2": 24.319212232949212
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3758,7 +3758,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 24.940705478191376
+        "xbabe3": 24.940705478191376
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3793,7 +3793,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.778175741899759
+        "xbabe1": 6.778175741899759
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3828,7 +3828,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 39.745416334830225
+        "xbabe2": 39.745416334830225
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3863,7 +3863,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.074882015120238
+        "xbabe3": 26.074882015120238
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3898,7 +3898,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.678277459926903
+        "xbabe1": 6.678277459926903
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3933,7 +3933,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 60.456209040945396
+        "xbabe2": 60.456209040945396
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -3968,7 +3968,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.974740645848215
+        "xbabe3": 25.974740645848215
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4003,7 +4003,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 8.180514845997095
+        "xbabe1": 8.180514845997095
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4038,7 +4038,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 32.18715691799298
+        "xbabe2": 32.18715691799298
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4073,7 +4073,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.990298948949203
+        "xbabe3": 25.990298948949203
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4108,7 +4108,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.574915803037584
+        "xbabe1": 6.574915803037584
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4143,7 +4143,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 27.021494970889762
+        "xbabe2": 27.021494970889762
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4178,7 +4178,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.866552873980254
+        "xbabe3": 27.866552873980254
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4213,7 +4213,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 8.68819731194526
+        "xbabe1": 8.68819731194526
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4248,7 +4248,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 21.98453700891696
+        "xbabe2": 21.98453700891696
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4283,7 +4283,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.056318010902032
+        "xbabe3": 26.056318010902032
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4318,7 +4318,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.997605351032689
+        "xbabe1": 6.997605351032689
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4353,7 +4353,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 28.068050428992137
+        "xbabe2": 28.068050428992137
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4388,7 +4388,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.76422010618262
+        "xbabe3": 25.76422010618262
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4423,7 +4423,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.578757727984339
+        "xbabe1": 6.578757727984339
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4458,7 +4458,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 28.689522011904046
+        "xbabe2": 28.689522011904046
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4493,7 +4493,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.040545132942498
+        "xbabe3": 27.040545132942498
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4528,7 +4528,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.530935533810407
+        "xbabe1": 6.530935533810407
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4563,7 +4563,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 27.029015831882134
+        "xbabe2": 27.029015831882134
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4598,7 +4598,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.017023416003212
+        "xbabe3": 27.017023416003212
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4633,7 +4633,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.481531664961949
+        "xbabe1": 6.481531664961949
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4668,7 +4668,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 16.996892380993813
+        "xbabe2": 16.996892380993813
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4703,7 +4703,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 31.942531434819102
+        "xbabe3": 31.942531434819102
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4738,7 +4738,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 9.839176311856136
+        "xbabe1": 9.839176311856136
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4773,7 +4773,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 40.851236385060474
+        "xbabe2": 40.851236385060474
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4808,7 +4808,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.396007523173466
+        "xbabe3": 26.396007523173466
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4843,7 +4843,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.443706593010575
+        "xbabe1": 7.443706593010575
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4878,7 +4878,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 32.238631079904735
+        "xbabe2": 32.238631079904735
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4913,7 +4913,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.777190789114684
+        "xbabe3": 25.777190789114684
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4948,7 +4948,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.529344974085689
+        "xbabe1": 7.529344974085689
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -4983,7 +4983,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 30.69415685511194
+        "xbabe2": 30.69415685511194
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5018,7 +5018,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.609332408057526
+        "xbabe3": 25.609332408057526
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5053,7 +5053,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.577340123942122
+        "xbabe1": 6.577340123942122
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5088,7 +5088,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 17.2472834601067
+        "xbabe2": 17.2472834601067
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5123,7 +5123,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.664251337060705
+        "xbabe3": 26.664251337060705
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5158,7 +5158,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.730033907806501
+        "xbabe1": 6.730033907806501
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5193,7 +5193,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 23.860632593976334
+        "xbabe2": 23.860632593976334
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5228,7 +5228,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.6648115250282
+        "xbabe3": 26.6648115250282
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5263,7 +5263,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.079585429048166
+        "xbabe1": 7.079585429048166
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5298,7 +5298,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 18.25519432197325
+        "xbabe2": 18.25519432197325
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5333,7 +5333,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.868597995955497
+        "xbabe3": 26.868597995955497
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5368,7 +5368,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.929133956786245
+        "xbabe1": 6.929133956786245
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5403,7 +5403,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 26.932923769112676
+        "xbabe2": 26.932923769112676
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5438,7 +5438,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 25.33527207514271
+        "xbabe3": 25.33527207514271
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5473,7 +5473,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 7.501170317875221
+        "xbabe1": 7.501170317875221
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5508,7 +5508,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 45.709373235935345
+        "xbabe2": 45.709373235935345
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5543,7 +5543,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.516189832007512
+        "xbabe3": 26.516189832007512
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5578,7 +5578,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.5282567569520324
+        "xbabe1": 6.5282567569520324
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5613,7 +5613,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 34.17952792998403
+        "xbabe2": 34.17952792998403
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5648,7 +5648,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 30.478035900974646
+        "xbabe3": 30.478035900974646
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5683,7 +5683,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 8.580916432198137
+        "xbabe1": 8.580916432198137
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5718,7 +5718,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 15.947309047915041
+        "xbabe2": 15.947309047915041
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5753,7 +5753,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 24.96913214493543
+        "xbabe3": 24.96913214493543
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5788,7 +5788,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.323399982880801
+        "xbabe1": 6.323399982880801
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5823,7 +5823,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 16.64408750203438
+        "xbabe2": 16.64408750203438
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5858,7 +5858,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 28.879610200878233
+        "xbabe3": 28.879610200878233
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5893,7 +5893,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.478750076843426
+        "xbabe1": 6.478750076843426
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5928,7 +5928,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 29.515148871112615
+        "xbabe2": 29.515148871112615
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5963,7 +5963,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 26.809780590003356
+        "xbabe3": 26.809780590003356
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -5998,7 +5998,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.525989402085543
+        "xbabe1": 6.525989402085543
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -6033,7 +6033,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 16.34197901096195
+        "xbabe2": 16.34197901096195
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -6068,7 +6068,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-3": 27.411710866959766
+        "xbabe3": 27.411710866959766
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -6103,7 +6103,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": false,
       "host_operation_seconds": {
-        "fit-machine-1": 6.576332192169502
+        "xbabe1": 6.576332192169502
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -6138,7 +6138,7 @@
       "global_family_selected": false,
       "gpu_target_operator_verified": true,
       "host_operation_seconds": {
-        "fit-machine-2": 25.66917650285177
+        "xbabe2": 25.66917650285177
       },
       "immutable_prior_fit_reused": false,
       "kind": "new_gpu_refinement_fit",
@@ -6959,9 +6959,9 @@
     "earlier_architecture_research_spend_separate_from_final_cell_parity": true,
     "energy_attributable_to_job": null,
     "host_operation_seconds": {
-      "fit-machine-1": 446.9886174881831,
-      "fit-machine-2": 1436.2978990890551,
-      "fit-machine-3": 1544.4138351229485
+      "xbabe1": 446.9886174881831,
+      "xbabe2": 1436.2978990890551,
+      "xbabe3": 1544.4138351229485
     },
     "new_operation_seconds": 3427.7003517001867,
     "prior_whole_discovery_confirmation_operation_seconds": 859.7875888752751,
@@ -7111,7 +7111,7 @@
   "scope": "Complete bounded official-training-derived 100-lineage/two-profile research training; no quality selection.",
   "shared_validation_complete": false,
   "source_round_sha256": "fe53444eeb3b485f895473a27101d93fb515c9dfbe3ee72d50d71417fef487d4",
-  "source_sha256": "bfcb8ade1fcc8cb4322bc0f5f81be51e8b0decffb098cee5fcb585e3feff68c5",
+  "source_sha256": "560a4f3a5331c895adea9bbe54eb26b3c8ef25cc5d82460cb6cfce94fb199827",
   "status_counts": {
     "charged_artifact_cap": 2,
     "foreign_gpu_owner_appeared": 1,

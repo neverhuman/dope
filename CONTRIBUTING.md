@@ -12,11 +12,13 @@ The complete CPU, paper, security and audit commands and budgets are in
 checkout's reused `target/` directory. Do not commit local datasets, credentials,
 checkpoints, operator paths, or compute host names.
 
-Fork pull requests run the `public-smoke` job on GitHub-hosted CPU runners.
-Private runners accept same-repository changes only. Fork contributors do not
-need private infrastructure or sealed data; maintainers may port an accepted
-change to a repository branch for the complete required checks. Never register
-runners or expose secrets to a fork workflow.
+Fork pull requests run the `public-smoke` job on GitHub-hosted CPU runners; on
+public repositories, `pull_request` workflows execute against untrusted fork
+branches and must never receive write tokens or secrets. Private runners accept
+same-repository changes only. Fork contributors do not need private
+infrastructure or sealed data; maintainers may port an accepted change to a
+repository branch for the complete required checks. Never register runners or
+expose secrets to a fork workflow.
 
 Scientific changes need deterministic fixtures and a declared protocol. A fixture
 is not benchmark evidence. Preserve historical decoding and unsuccessful runs.

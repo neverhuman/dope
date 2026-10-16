@@ -270,7 +270,7 @@ def build():
         require(fit_operation['status'] == 'ok' and fit_operation['elapsed_seconds'] <= 250
                 and fit_admission['capacity']['admitted'] is True
                 and fit_admission['global_scratch_admitted'] is True
-                and fit_admission['host']['host'] in ('fit-machine-1', 'fit-machine-3')
+                and fit_admission['host']['host'] in ('xbabe1', 'xbabe3')
                 and fit_admission['host']['active_gpu_processes'] == []
                 and receipt['fit']['peak_gpu_allocated_bytes'] <= 16 * 1024**3,
                 'TabDDPM GPU fit admission or cap changed')

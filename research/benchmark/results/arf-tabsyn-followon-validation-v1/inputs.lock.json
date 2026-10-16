@@ -8,12 +8,12 @@
   "metric_source_refs": {
     "expanded_validation_metrics": {
       "bytes": 13747,
-      "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/expanded_validation_metrics.py",
+      "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/expanded_validation_metrics.py",
       "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
     },
     "pilot_metrics": {
       "bytes": 6986,
-      "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/pilot_metrics.py",
+      "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/pilot_metrics.py",
       "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3"
     }
   },
@@ -44,28 +44,28 @@
       "sha256": "9b5fcca34cb49391ae22e82d756da4c61aff832d3843cc0bb39d8bae8c9c07bb"
     },
     "arf_prior_seed23_publication": {
-      "bytes": 1751842,
+      "bytes": 1751802,
       "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
-      "sha256": "0b8b6191be188cbc7abf7412e80cae028f4b8bc3e8ecbc5332370a945e9e4f0f"
+      "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
     },
     "arf_seed11_publication": {
-      "bytes": 7791788,
+      "bytes": 7718907,
       "path": "research/benchmark/results/retained-classical-validation/panel.json",
-      "sha256": "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"
+      "sha256": "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"
     },
     "tabsyn_execution": {
       "bytes": 264,
-      "path": "/path/to/operator-home/dope-scratch-x2/tabsyn-retained-95-common-v1/metrics-exit.actual.json",
+      "path": "/home/ubuntu/dope-scratch-x2/tabsyn-retained-95-common-v1/metrics-exit.actual.json",
       "sha256": "f1d79d8fed5f782d221f8d8ede539338964beb2408c5ec9c3b83cd18fcfb677c"
     },
     "tabsyn_input_manifest": {
       "bytes": 737736,
-      "path": "/path/to/operator-home/dope-scratch-x2/tabsyn-retained-95-common-v1/inputs.lock.json",
+      "path": "/home/ubuntu/dope-scratch-x2/tabsyn-retained-95-common-v1/inputs.lock.json",
       "sha256": "52d790c28b55bfcbd28658afd8e38374f2e89234e84d46fa989c4bcac58abacd"
     },
     "tabsyn_metric_lock": {
       "bytes": 27420,
-      "path": "/path/to/operator-home/dope-scratch-x2/tabsyn-retained-95-common-v1/metric-receipts/receipt-lock.json",
+      "path": "/home/ubuntu/dope-scratch-x2/tabsyn-retained-95-common-v1/metric-receipts/receipt-lock.json",
       "sha256": "3f917159f4e963fb45a2bc00e8144b8fe2c50f26e29926b3300ba0d1b08ee222"
     }
   },

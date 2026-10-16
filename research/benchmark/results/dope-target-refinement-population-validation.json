@@ -64286,9 +64286,9 @@
     "earlier_architecture_research_spend_separate_from_final_cell_parity": true,
     "energy_attributable_to_job": null,
     "host_operation_seconds": {
-      "fit-machine-1": 446.9886174881831,
-      "fit-machine-2": 1436.2978990890551,
-      "fit-machine-3": 1544.4138351229485
+      "xbabe1": 446.9886174881831,
+      "xbabe2": 1436.2978990890551,
+      "xbabe3": 1544.4138351229485
     },
     "new_operation_seconds": 3427.7003517001867,
     "prior_whole_discovery_confirmation_operation_seconds": 859.7875888752751,
@@ -64296,7 +64296,7 @@
   },
   "fit_ledger_reference": {
     "path": "research/benchmark/results/dope-target-refinement-population-fits.json",
-    "sha256": "4327e94f833dc8c0ed4100958eacca14626ddd68b4f9531cc3ebfa20a49d3867"
+    "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
   },
   "format": "dope-complete-refinement-population-common-validation",
   "full_campaign_admitted": false,
@@ -121913,7 +121913,7 @@
   "matched_reference": {
     "logical_cells": 6000,
     "path": "research/benchmark/results/density-matched-population-validation.json",
-    "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+    "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
   },
   "metric_replay_controls": {
     "exact": 35,
@@ -122568,7 +122568,7 @@
     "reconciliation": "48ac7c71dae668edef778ddffb1fa045e9b823c33069723eef8427f1f861ccb4",
     "round": "b0198ffc65524d3616d9f0f062e9a6e49345b0eb4db7dfa7f727bd1612e75545"
   },
-  "source_sha256": "1e41db576691ec9f73fbacd8c9dcd5633c88f2143c649e2650325881aa8266c7",
+  "source_sha256": "66eb7031c68fb42ff894c7f755a7f4931452e652039b627c832ee5248cb7156a",
   "summary": [
     {
       "charged_bytes_max": 148968,

@@ -17,8 +17,8 @@ def command(args: list[str]) -> str:
 
 
 def local() -> dict:
-    disk = shutil.disk_usage(Path.home())
-    scratch = shutil.disk_usage(os.environ.get("DOPE_SCRATCH_ROOT", str(Path.cwd())))
+    disk = shutil.disk_usage("/home/ubuntu")
+    scratch = shutil.disk_usage("/mnt/fast-scratch/dope-benchmark")
     with Path("/proc/meminfo").open() as stream:
         memory = {parts[0].rstrip(":"): int(parts[1]) * 1024
                   for line in stream if (parts := line.split()) and parts[0] in ("MemAvailable:", "MemTotal:")}
@@ -44,15 +44,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--local", action="store_true")
     parser.add_argument("--output", type=Path)
-    parser.add_argument("--hosts", nargs="*", default=os.environ.get("DOPE_COMPUTE_HOSTS", "").split(),
-                        help="SSH aliases; no remote hosts are contacted by default")
     args = parser.parse_args()
     if args.local:
         print(json.dumps(local(), sort_keys=True))
         return
     source = Path(__file__).read_text()
     hosts = [local()]
-    for name in args.hosts:
+    for name in ("xbabe1", "xbabe3"):
         result = subprocess.run(["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5",
                                  name, "python3", "-", "--local"], input=source,
                                 capture_output=True, text=True, timeout=20, check=True)

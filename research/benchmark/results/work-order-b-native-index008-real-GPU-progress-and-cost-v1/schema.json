@@ -39,11 +39,11 @@
         "whole_run_RAM_peak_forecast_bytes": {
           "type": "null"
         },
-        "fit-machine-2_aggregate_RAM_reservation_bytes": {
+        "xbabe2_aggregate_RAM_reservation_bytes": {
           "minimum": 0,
           "type": "integer"
         },
-        "fit-machine-2_measured_MemAvailable_bytes": {
+        "xbabe2_measured_MemAvailable_bytes": {
           "minimum": 0,
           "type": "integer"
         }
@@ -57,8 +57,8 @@
         "prospective_GPU_resident_threshold_mib",
         "reserved_CPU_slot",
         "whole_run_RAM_peak_forecast_bytes",
-        "fit-machine-2_aggregate_RAM_reservation_bytes",
-        "fit-machine-2_measured_MemAvailable_bytes"
+        "xbabe2_aggregate_RAM_reservation_bytes",
+        "xbabe2_measured_MemAvailable_bytes"
       ],
       "type": "object"
     },

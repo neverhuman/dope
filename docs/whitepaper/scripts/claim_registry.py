@@ -350,8 +350,14 @@ def result_failures(data: dict, auditors: dict, status: dict) -> list[str]:
                 failures.append(f"{name}: headline requires frozen protocol, complete budget grid and driver gate")
         if row.get("pooled_cohort_ids") and set(row["pooled_cohort_ids"]) != {row["cohort"]["id"]}:
             failures.append(f"{name}: mixed-cohort claim")
+        if row.get("claim_allowed") is True and (row.get("citable") is not True or evidence != "sealed_test" or not row.get("final")):
+            failures.append(f"{name}: non-citable or non-sealed row cannot set claim_allowed: true")
         if row.get("tdl_bytes") is not None and (row.get("driver_gate") is not True or not row.get("complete_budget_grid")):
             failures.append(f"{name}: TDL bytes lack required gates")
+    for idx, para in enumerate(data.get("demo_notes", {}).get("paragraphs", [])):
+        for pattern in PUBLIC_BANNED:
+            if re.search(pattern, para, re.I):
+                failures.append(f"demo_notes[{idx}]: forbidden claim /{pattern}/")
     if status.get("allowed_statuses") is None or set(status["allowed_statuses"]) != EVIDENCE_STATUSES:
         failures.append("status: evidence vocabulary differs from registry")
     return failures

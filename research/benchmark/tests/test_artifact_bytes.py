@@ -76,7 +76,7 @@ class BytePublication(unittest.TestCase):
             'all_candidates_accounted': True, 'byte_cap_satisfied_candidates': 32,
             'generator_validation_admitted': False, 'raw_parent_scores_rewritten': False,
             'production_certified': False, 'counts_as_dope_win': False, 'release_safe_l3': None,
-            'new_gpu_fits': 0, 'elapsed_seconds': 0.1, 'host': 'fit-machine-2', **flags}
+            'new_gpu_fits': 0, 'elapsed_seconds': 0.1, 'host': 'xbabe2', **flags}
         self.refresh()
 
     def tearDown(self):

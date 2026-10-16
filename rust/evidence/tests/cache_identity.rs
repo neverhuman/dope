@@ -41,7 +41,7 @@ fn full_identity_changes_cache_attempts_and_aliases_do_not_change_fit() {
     let key = scientific_cache_key(first.identity()).unwrap();
     assert_eq!(
         key,
-        "9d06cdc4bf77403bed33e67da087e02cc524cdf20f97a3b4c0a2bcf667fea0e4"
+        "4bfc81f998d7d6a907b60e44948a4f211c5aa84f2ed865f731fb7fb253e8952e"
     );
     assert_eq!(
         fit_replicate_key(first.identity()).unwrap(),

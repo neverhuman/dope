@@ -199,7 +199,7 @@ class ReceiptTests(unittest.TestCase):
         f = ReceiptFixture()
         identity = EvaluationIdentity(f.receipt['identity'])
         key = scientific_cache_key(identity)
-        self.assertEqual(key, '9d06cdc4bf77403bed33e67da087e02cc524cdf20f97a3b4c0a2bcf667fea0e4')
+        self.assertEqual(key, '4bfc81f998d7d6a907b60e44948a4f211c5aa84f2ed865f731fb7fb253e8952e')
         self.assertEqual(fit_replicate_key(identity), '6774caa4afc0fcad64da7139d288b94a849ecc786c7a0cfa45112e36175da5a1')
         for field in identity.value:
             changed = identity.value

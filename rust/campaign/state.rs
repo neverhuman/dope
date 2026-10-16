@@ -182,7 +182,13 @@ impl HostInventory {
             || self.version != 1
             || self.tch_rs != "0.20.0"
             || self.libtorch != "2.7.0"
-            || hosts != BTreeSet::from(["fit-machine-1", "fit-machine-2", "fit-machine-3"])
+            || self.workers.len() != 3
+            || hosts.len() != 3
+            || !(1..=3).all(|role| {
+                self.workers
+                    .iter()
+                    .any(|w| crate::production::matches_host_role(&w.host, role))
+            })
             || samples.len() != 1
             || self.workers.iter().any(|worker| {
                 worker.rust != "1.88.0"
@@ -193,7 +199,8 @@ impl HostInventory {
                     || worker.corpus_manifest_sha256 != corpus_sha256
                     || !is_lower_hex(&worker.binary_sha256, &[64])
                     || !is_lower_hex(&worker.corpus_sample_sha256, &[64])
-                    || (matches!(worker.host.as_str(), "fit-machine-1" | "fit-machine-3")
+                    || ((crate::production::matches_host_role(&worker.host, 1)
+                        || crate::production::matches_host_role(&worker.host, 3))
                         && worker.available_bytes < MIN_DURABLE_FREE_GIB * GIB)
             })
         {

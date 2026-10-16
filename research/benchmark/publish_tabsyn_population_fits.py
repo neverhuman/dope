@@ -18,7 +18,7 @@ NAME = 'tabsyn-default100-scaled-cuda-fits'
 CACHE = HERE.parents[1] / 'target/tabsyn-default100-fit-ledger-v1/publisher-input-custody'
 CACHE_SHA = 'e961b5a62b412b26e10a9731c487e103af65fbd5c0c3632cfc1989ad0b69ff8b'
 MANIFEST_SHA = '555229ad005510f621880fe59be5f91ba8de03297fc13df7ae3aca17d600e04a'
-REPLAY = Path('/path/to/operator-home/dope/target/work-order-b-root-readiness-v1/TabSyn100-independent-small-custody-replay.actual.v1.json')
+REPLAY = Path('/home/ubuntu/dope/target/work-order-b-root-readiness-v1/TabSyn100-independent-small-custody-replay.actual.v1.json')
 REPLAY_SHA = '7a740feb199a4590a1eced09cb349f496f8baf07d4180a18f226b99f456e027d'
 CONFIG_SHA = 'a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc'
 AUTHOR = 'cb5ac0f74ec36ee88e7a974a393dfbef50d42da7'
@@ -194,7 +194,7 @@ def build():
     require(hashlib.sha256(buffers['manifest.json']).hexdigest() == MANIFEST_SHA,
             'manifest identity changed')
     sources = {p: r['sha256'] for p, r in lock['source_files'].items()}
-    require(sources == manifest['source_files'] and manifest['host'] == 'fit-machine-1'
+    require(sources == manifest['source_files'] and manifest['host'] == 'xbabe1'
             and manifest['source_commit'] == AUTHOR and manifest['config_sha256'] == CONFIG_SHA
             and manifest['fit_phase_closed'] is True
             and manifest['default_fits_all_ok'] is True and manifest['counts'] == {
@@ -232,7 +232,7 @@ def build():
             'scaled_epochs': {'vae': 200, 'diffusion': 1000}, 'author_patience': 500,
             'author_commit': AUTHOR, 'config_sha256': CONFIG_SHA, 'epoch_policy_sha256': manifest['scaled_epoch_policy_sha256'],
             'publisher_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-            'host': 'fit-machine-1', 'device': 'CUDA', 'fit_seed': 11,
+            'host': 'xbabe1', 'device': 'CUDA', 'fit_seed': 11,
             'partition': 'official_training_derived_validation', 'summary': summary, 'cells': cells,
             'source_files': sources, 'local_source_cache': {'path': str(CACHE / 'input-custody.lock.json'), 'sha256': CACHE_SHA},
             'immutable_references': [manifest['plan_ref'], manifest['source_peer_ref'], manifest['dispatch_amendment_ref'],
@@ -259,7 +259,7 @@ def tables(report):
     for row in report['cells']: writer.writerow([row[k] for k in columns])
     s = report['summary']
     markdown = '\n'.join(['# TabSyn default 100 CUDA fit ledger', '',
-        'Fit phase only: 100/100 actual fit exits were zero, at seed 11 on fit-machine-1 (99 new fits and one retained prior fit).', '',
+        'Fit phase only: 100/100 actual fit exits were zero, at seed 11 on xbabe1 (99 new fits and one retained prior fit).', '',
         'This is the scaled 200 VAE / 1,000 diffusion epoch track. Author defaults remain a separate 4,000 / 10,001 track; patience 500 is preserved.', '',
         f"Measured closed fit operations: {s['measured_whole_seconds']:.6f}s. Charged model and projection bytes: {s['charged_model_and_projection_bytes']:,}.", '',
         f"Prior {s['prior_unmeasured_allocations']} allocations carry {s['prior_unmeasured_book_charge_seconds']:,} conservative seconds; these are unmeasured budget charges, not measured method runtime.", '',

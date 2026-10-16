@@ -275,7 +275,7 @@
       "fit_seed": 11,
       "gpu": "NVIDIA GeForce RTX 3090",
       "gpu_fit_seconds": 2.816294456832111,
-      "host": "fit-machine-3",
+      "host": "xbabe3",
       "native_validation_kpi": {
         "components": [
           {
@@ -348,7 +348,7 @@
       "fit_seed": 23,
       "gpu": "NVIDIA GeForce RTX 3090",
       "gpu_fit_seconds": 2.830356695689261,
-      "host": "fit-machine-3",
+      "host": "xbabe3",
       "native_validation_kpi": {
         "components": [
           {

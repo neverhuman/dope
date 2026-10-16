@@ -10,15 +10,15 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 RESULTS = REPO / 'research/benchmark/results'
 PREDECLARE = 'research/benchmark/review_fixes/predeclare.json'
-PREDECLARE_SHA256 = 'e64a73897a0282bcf3604b175f5c90955022f12a8dc5167eb2e1da3c2687d2d3'
+PREDECLARE_SHA256 = '921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5'
 TABSYN_FITS = 'research/benchmark/results/tabsyn-default100-scaled-cuda-fits.json'
 TABSYN_REFERENCE = 'research/benchmark/results/tabsyn-eight-lineage-validation/panel.json'
 TABSYN_SAMPLES = 'research/benchmark/results/review-fixes-tabsyn-v1/sample-evidence.json'
 TABSYN_OPERATIONS = 'research/benchmark/results/review-fixes-tabsyn-v1/sampling-receipts.json'
 SOURCE_SHA256 = {
-    TABSYN_FITS: '0ae182ceb2602a542f77d8936518c5ca5a7fbba8761b2d2051f0c11c24d257f0',
-    TABSYN_REFERENCE: 'ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5',
-    TABSYN_SAMPLES: 'f71ae4e90d77b7c5a769d7afe56533571cfd64f866c45b97c2017a584130f4aa',
+    TABSYN_FITS: 'cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272',
+    TABSYN_REFERENCE: '3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76',
+    TABSYN_SAMPLES: '274b6eef4ce95545ded969763ffffa3e1154a2d9192c1e2867dd7ddcb719e0e3',
     TABSYN_OPERATIONS: 'e09c7eb22abb15a171a321b7f4c7b80b276509963898870a6f430965f665d88d',
 }
 PRIVACY_BASE = {'configuration', 'dataset', 'formal_dp', 'hipaa_deidentification',

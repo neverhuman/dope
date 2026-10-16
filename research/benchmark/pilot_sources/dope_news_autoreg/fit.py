@@ -19,7 +19,7 @@ OUT = ROOT / "pilot-24h/dope-news-autoreg-confirm-v1"
 LOCK = OUT / "round.lock.json"
 WORKER = ROOT / "pilot-24h/prepared-v2/worker/News"
 BINARY = ROOT / "conditional-readout-v1/bin/dope-gpu-132f8467f56a79ec"
-BASELINE = Path("/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/pilot24-interim.json")
+BASELINE = Path("/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/pilot24-interim.json")
 CPU = list(range(32, 48))
 JOB = {"dataset": "News", "candidate": "symbolic_autoregressive_residual",
        "seed": 23, "target_weight": 4.0, "structural_penalty": 0.0}
@@ -112,7 +112,7 @@ def run() -> dict:
                 or receipt["source_sha256"] != sha256(Path(__file__))):
             raise ValueError("prior News confirmation dispatch changed")
         return receipt
-    with (ROOT / "neural-native-v1/fit-machine-2.gpu-reservation").open("a") as stream:
+    with (ROOT / "neural-native-v1/xbabe2.gpu-reservation").open("a") as stream:
         fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
         snapshot = local()
         if not admitted(snapshot):

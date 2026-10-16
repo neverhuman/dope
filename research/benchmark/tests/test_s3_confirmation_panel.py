@@ -350,7 +350,7 @@ class S3ConfirmationPanelTests(unittest.TestCase):
             dependency_hash = put(dependency)
             library = root / 'installed/torch/core.py'
             library_hash = put(library)
-            runtime = root / 's3-native-matched-runtime-v1/fit-machine-2/runtime.lock.json'
+            runtime = root / 's3-native-matched-runtime-v1/xbabe2/runtime.lock.json'
             runtime_hash = put(runtime, json.dumps({'packages': {'torch': {
                 'root': str(library.parent), 'files': {'core.py': library_hash}}}}).encode())
             binary = root / 'bin/generator'

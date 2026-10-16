@@ -359,7 +359,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12563,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/669a5cd4d3767c48aa637304ec8c3c2a8c50ad80a5f593870e519620f7ec89af.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/669a5cd4d3767c48aa637304ec8c3c2a8c50ad80a5f593870e519620f7ec89af.json",
         "sha256": "498318bde42f72e91025074b73d63576519d35b0347d7f969dea8d801d66ccc3"
       },
       "release_safe_l3": null,
@@ -733,7 +733,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12569,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d3fabfee16e5c3a600d52566974c5ca49ca7f3eccded89605216be20e922346e.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d3fabfee16e5c3a600d52566974c5ca49ca7f3eccded89605216be20e922346e.json",
         "sha256": "2fae4ec931886255dbb4bcd3f4a7b2806b46a092f0b6b8f08d713cd5be20e806"
       },
       "release_safe_l3": null,
@@ -1107,7 +1107,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12551,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/453d39c57ed2b7df4003f8b18c2a2e8fd5a083d7c226bedc0d7fb28ed9f0e1b8.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/453d39c57ed2b7df4003f8b18c2a2e8fd5a083d7c226bedc0d7fb28ed9f0e1b8.json",
         "sha256": "9c52bb840a5bde87692c80ea6668373a39780162284faa5dc12c3bf6b7a2027e"
       },
       "release_safe_l3": null,
@@ -1481,7 +1481,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12576,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/594c2f0c2193a71d55c5f606a27d3bae3abd32358129c35c3d90d7554646b7fb.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/594c2f0c2193a71d55c5f606a27d3bae3abd32358129c35c3d90d7554646b7fb.json",
         "sha256": "f475da6f97d21ef1fdc6583039f8d7585835de38194321cf9bed0908fe2604d2"
       },
       "release_safe_l3": null,
@@ -1855,7 +1855,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12573,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/fca0599a21b4f38d8d24c0c060f6fe635b3bf85c484007bb3d4ccf7929e598a3.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/fca0599a21b4f38d8d24c0c060f6fe635b3bf85c484007bb3d4ccf7929e598a3.json",
         "sha256": "d6005eaf1c0e1d2874f5c9a939bdbbb1dd3a41158ffcef261ee1ebe2389146a1"
       },
       "release_safe_l3": null,
@@ -2229,7 +2229,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12584,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/b196ec80d58d83236baad272d9454c49bfd40d377fb442849fc1cb614c3da0e5.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/b196ec80d58d83236baad272d9454c49bfd40d377fb442849fc1cb614c3da0e5.json",
         "sha256": "6d5cf30941c42e089858b7ccb443d77e7c005a6bd5f4a9cce83d246d6b74804d"
       },
       "release_safe_l3": null,
@@ -2618,7 +2618,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13830,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/9b2c187e62e38aee4be4e1f0131f7d7f094f9705ebac27326883d78cbadf3c55.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/9b2c187e62e38aee4be4e1f0131f7d7f094f9705ebac27326883d78cbadf3c55.json",
         "sha256": "430a22cf0bd0c56c25055fb3b090c8e697acaf7f57e3c286872474f13a0a3063"
       },
       "release_safe_l3": null,
@@ -3007,7 +3007,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13874,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/f3841ccbcdde711fc4889b2d090e42e0256d2f185fad090aeeb8711f9f6fc47c.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/f3841ccbcdde711fc4889b2d090e42e0256d2f185fad090aeeb8711f9f6fc47c.json",
         "sha256": "64035fd26c3715723a5805834ffcb11e1eead3af9b43b758a8f44b9a5a396435"
       },
       "release_safe_l3": null,
@@ -3396,7 +3396,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13913,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e0fd8a96e774c0aee53d2a6b11c9e811607f284c1073ae21406532e723336ce1.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e0fd8a96e774c0aee53d2a6b11c9e811607f284c1073ae21406532e723336ce1.json",
         "sha256": "403c4c41af4cc1e601d4c51852b3cadd902b0988c2189ee4de1e6f116be4b3c3"
       },
       "release_safe_l3": null,
@@ -3785,7 +3785,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13909,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d181a51f93ad7647a5d0574d51ea568df4704e9150f8d19ba361f24f13eed4ba.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d181a51f93ad7647a5d0574d51ea568df4704e9150f8d19ba361f24f13eed4ba.json",
         "sha256": "0167af224953f465e534166ea8015960823b17dd063dc46533ed9285b856c519"
       },
       "release_safe_l3": null,
@@ -4174,7 +4174,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13898,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/4faf10d942236955e5d28d5ada6f059e201cf2314c4db22c227250e1dc593f14.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/4faf10d942236955e5d28d5ada6f059e201cf2314c4db22c227250e1dc593f14.json",
         "sha256": "579dfbae1dd330e6680ae7e193f15fccd3ea90121dcb7ca14eef58c602586940"
       },
       "release_safe_l3": null,
@@ -4563,7 +4563,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13883,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/5f87ceef5b890a59fc21176b60b1a2b7a456684dbb874e76e02f6215ce848ce8.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/5f87ceef5b890a59fc21176b60b1a2b7a456684dbb874e76e02f6215ce848ce8.json",
         "sha256": "7986da8076a1f2c8bee21e1fa6074aac08bacf6747aa2eb9f1d668d443a3149d"
       },
       "release_safe_l3": null,
@@ -4886,7 +4886,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12149,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/1494e7f604d0b7f841c1946c7a65140b5cf9f271f28cc4442648c117eacb60c5.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/1494e7f604d0b7f841c1946c7a65140b5cf9f271f28cc4442648c117eacb60c5.json",
         "sha256": "bea393202a1c3dc8712f0ff371275e23f4686353ec68186ed8d59e1e05b8b845"
       },
       "release_safe_l3": null,
@@ -5209,7 +5209,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12202,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/c578baa1d3fc49366020ab30931a0e2f7627012b73cf09ff9237c4398138b34e.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/c578baa1d3fc49366020ab30931a0e2f7627012b73cf09ff9237c4398138b34e.json",
         "sha256": "b4f25768d956489b7338a29d0841d946ea39db8ae85986fe68ded7a92752e584"
       },
       "release_safe_l3": null,
@@ -5532,7 +5532,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12194,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e2a49d4e934240a0a1f34dcd925c9eda80cf4bb95a4145c328fcb36da1bde4dd.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e2a49d4e934240a0a1f34dcd925c9eda80cf4bb95a4145c328fcb36da1bde4dd.json",
         "sha256": "4316eccbafb5b6c27c97c9bb8058404ec576cabe8ff84eef77ad32ddc74b98bf"
       },
       "release_safe_l3": null,
@@ -5855,7 +5855,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12212,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/9e546e5e3461f7a1aa216179bc13c3e1cc8d9c4864d24c34fd2815a21af2e3c3.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/9e546e5e3461f7a1aa216179bc13c3e1cc8d9c4864d24c34fd2815a21af2e3c3.json",
         "sha256": "efd8e3b089e6d6f8071619dd9ce753afdffcec9078a8e71a34c1c2f559af20ea"
       },
       "release_safe_l3": null,
@@ -6178,7 +6178,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12173,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/5b2704b805296f4f48572ccc1cabe230f2f48ee84b3f61ed0a2c2da48fc3741a.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/5b2704b805296f4f48572ccc1cabe230f2f48ee84b3f61ed0a2c2da48fc3741a.json",
         "sha256": "001dffdbb0f09e84c64a8700ac151093d2d5a21677304b3d3630e3f7ef64509a"
       },
       "release_safe_l3": null,
@@ -6501,7 +6501,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12160,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e09bd0213d42816381149cc8b06b75f4aafbcfafe3b393a38eefe15f373ea8b1.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e09bd0213d42816381149cc8b06b75f4aafbcfafe3b393a38eefe15f373ea8b1.json",
         "sha256": "48e459e492423c62cf7c252b810f5d9ba6bf2924b70adc95ee9620b785c9498b"
       },
       "release_safe_l3": null,
@@ -6878,7 +6878,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13591,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/0ab7e9d12ba5418b73f488354947a931c77a39ebe83f9693e0402fabfae21292.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/0ab7e9d12ba5418b73f488354947a931c77a39ebe83f9693e0402fabfae21292.json",
         "sha256": "423a5f0cd852f9061834811762cee2f688695e2932f6b2a0eb0d8ed0ddcc216e"
       },
       "release_safe_l3": null,
@@ -7255,7 +7255,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13601,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/b735033dac9aef150c4b11dec2a6a369c6a7cb097007e69359ccf0dc56d5cb05.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/b735033dac9aef150c4b11dec2a6a369c6a7cb097007e69359ccf0dc56d5cb05.json",
         "sha256": "8c234f00ffdef75b0980341b96ebf6dd212f3f64bcc42446b9d61d3c2f33fabc"
       },
       "release_safe_l3": null,
@@ -7632,7 +7632,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13620,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/6cfd75db1ddd47d4bdbf8d7211260de62bb1b90bcafcef09a0f46ad97cf08f81.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/6cfd75db1ddd47d4bdbf8d7211260de62bb1b90bcafcef09a0f46ad97cf08f81.json",
         "sha256": "bef39b5a2993ea26c849f50b5a91e014bff444be4ba8ada092e4e9f6d878f3a4"
       },
       "release_safe_l3": null,
@@ -8009,7 +8009,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13582,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/b0d915c784d3f9d136f032997f6800e9aeb3d2eb64376f4ae60433a7d96bf6fd.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/b0d915c784d3f9d136f032997f6800e9aeb3d2eb64376f4ae60433a7d96bf6fd.json",
         "sha256": "8c80078118c6e8b20d36561cdc25da8369d22ef6b1092a6a9928da44adf43204"
       },
       "release_safe_l3": null,
@@ -8386,7 +8386,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13590,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/bb84ddfe089683b44d8b0c146a0ac2a9cacb9f3d8c17ac26796cae4cf2022a3f.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/bb84ddfe089683b44d8b0c146a0ac2a9cacb9f3d8c17ac26796cae4cf2022a3f.json",
         "sha256": "133c368953781deaaa946095ad2411122a0d8501baeb57913cb7f7148e69becf"
       },
       "release_safe_l3": null,
@@ -8763,7 +8763,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13565,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/3419731efaa08511ab9e0c84e497e9d798c312ded1daa08b0d661ab07ce846e4.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/3419731efaa08511ab9e0c84e497e9d798c312ded1daa08b0d661ab07ce846e4.json",
         "sha256": "a95daa56499208ef31050d9b7c0ccd05826babb5e3eeada448db3f2619976355"
       },
       "release_safe_l3": null,
@@ -9230,7 +9230,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 15967,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/6a800ee62331a5d8f012f58362c469c19b5bd2e3fc74f932f6962ad1129888ee.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/6a800ee62331a5d8f012f58362c469c19b5bd2e3fc74f932f6962ad1129888ee.json",
         "sha256": "0fc56d367a4097e3b3dc7a0750789f5922b84c167b5278c3c98ea086898d8af6"
       },
       "release_safe_l3": null,
@@ -9697,7 +9697,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 15976,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e055c0b23a8779bc2b7e114dfbc532b613631a43738eaf5704964df7edb3fd0e.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e055c0b23a8779bc2b7e114dfbc532b613631a43738eaf5704964df7edb3fd0e.json",
         "sha256": "7b219731c451ac59aafc68a5c1a448a3fb4cbe09bbf2f735be4e0afc3a37b59d"
       },
       "release_safe_l3": null,
@@ -10164,7 +10164,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 15988,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/397b4c51ddb5ed295844c6630b880e8f81dc0cf94fc168d63cbf250385085f60.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/397b4c51ddb5ed295844c6630b880e8f81dc0cf94fc168d63cbf250385085f60.json",
         "sha256": "ed4e2d3823acf574d2a558147b7a7f7ae676272d1782dd1babd773b902955c90"
       },
       "release_safe_l3": null,
@@ -10631,7 +10631,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 15923,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/7df4a11ab1d4cee0e509d62a20578523699d9dda4eb3abbe5f14a57762119c12.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/7df4a11ab1d4cee0e509d62a20578523699d9dda4eb3abbe5f14a57762119c12.json",
         "sha256": "80c4facec67dda5ed0265f472c1b4c4f46cc109d71db474510ef325c9ee7b9b1"
       },
       "release_safe_l3": null,
@@ -11098,7 +11098,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 15958,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d7b97077848dc2c9cf2d97f0319617f46362097c1eb3d6207b2bd382aec2107e.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d7b97077848dc2c9cf2d97f0319617f46362097c1eb3d6207b2bd382aec2107e.json",
         "sha256": "e55da8531c0486a2c04d2c058e7454d7c2e7da0db12813e30e0cc11e4adc6472"
       },
       "release_safe_l3": null,
@@ -11565,7 +11565,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 15965,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/a9a95a8ea3699f933b30af63fe3d2614fdfea81b75dcaf67bb5841194bf9d392.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/a9a95a8ea3699f933b30af63fe3d2614fdfea81b75dcaf67bb5841194bf9d392.json",
         "sha256": "fadf1ea2cebd61c1d218a05d63cac0e4ee8332aa36a14824399d7be2092a15d1"
       },
       "release_safe_l3": null,
@@ -11944,7 +11944,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12700,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d5d342292a22470aa1faec3add69c30d56a5c992cc414531d50a3e2e6ed36a9e.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d5d342292a22470aa1faec3add69c30d56a5c992cc414531d50a3e2e6ed36a9e.json",
         "sha256": "1ea3446a7260f498c8be9bb95f5f1280cf3d829caf1d881de8223624f2c29e35"
       },
       "release_safe_l3": null,
@@ -12323,7 +12323,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12654,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/0a66ba9a1e4ba44e8ca2b671709b581d04964048d6531a090dddd9485939101a.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/0a66ba9a1e4ba44e8ca2b671709b581d04964048d6531a090dddd9485939101a.json",
         "sha256": "7cc314bf3005e0ae696de6efcf5c6f5cb9a03b973093e8700f040cf1fc2d418b"
       },
       "release_safe_l3": null,
@@ -12702,7 +12702,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12733,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/7a70661a95926f10b0cc30f827430d10f1fe5fca28aad24e724afa485c325283.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/7a70661a95926f10b0cc30f827430d10f1fe5fca28aad24e724afa485c325283.json",
         "sha256": "448a2651574c022086c8da9d0877b8e40f80af79ec165dabd5c270b34da3f636"
       },
       "release_safe_l3": null,
@@ -13081,7 +13081,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12730,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/23cc5d83d5768cc24ef5cedd7cc805616ae01d91a43835f9d37cb10a1a5f91a4.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/23cc5d83d5768cc24ef5cedd7cc805616ae01d91a43835f9d37cb10a1a5f91a4.json",
         "sha256": "273b66d88541853399f6794a85a2a7ff9f2a5ce9812023b17465aeb0d52798ff"
       },
       "release_safe_l3": null,
@@ -13460,7 +13460,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12754,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/572cc6a66e52fc052bb072317939ac817347e7bd9f66127b47f268723d9004bc.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/572cc6a66e52fc052bb072317939ac817347e7bd9f66127b47f268723d9004bc.json",
         "sha256": "86d35a833d7b8674fdd91dc8364eefc4ab67712a390a9432fc5a968de7b9a546"
       },
       "release_safe_l3": null,
@@ -13839,7 +13839,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12748,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/9b6e4813480a52ffc69b1fd22599fcaecc06f9d4911d7edf0f976dccc9051fd0.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/9b6e4813480a52ffc69b1fd22599fcaecc06f9d4911d7edf0f976dccc9051fd0.json",
         "sha256": "8ef38c37903bdf9ecd5b0dcec996f6a16da55e31cd8debee26f2f366e2802401"
       },
       "release_safe_l3": null,
@@ -14162,7 +14162,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12003,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/7f3da29a4c37f5dc9977c42c5b9a94dbe398d35a1e47d43c48cab5b64461627a.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/7f3da29a4c37f5dc9977c42c5b9a94dbe398d35a1e47d43c48cab5b64461627a.json",
         "sha256": "0e3388616584e45a810636c864816cdcebbebdaa92e986c477eae0681a017f10"
       },
       "release_safe_l3": null,
@@ -14485,7 +14485,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11927,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/a75b21796709cc83d1bbff222bc32a1705f6fa836514895f785a6347763571bb.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/a75b21796709cc83d1bbff222bc32a1705f6fa836514895f785a6347763571bb.json",
         "sha256": "2e83225d5afdae970715bb6a25c6b7f73a1d2a9caa8a8176f252e94faa181b5f"
       },
       "release_safe_l3": null,
@@ -14808,7 +14808,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11990,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d55675a31b318ed377d98785b8a8911c752c2acc4c4fb91465c3e72e56ac4633.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/d55675a31b318ed377d98785b8a8911c752c2acc4c4fb91465c3e72e56ac4633.json",
         "sha256": "811fae353f1ef2e41514944b804d76a3456dd40dc9f72c195d26ed479f1e4b5d"
       },
       "release_safe_l3": null,
@@ -15131,7 +15131,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11948,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e30666a62965fb3dc39694b263a4c4785a343fba05ee565cd8db70bcd2b8b261.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e30666a62965fb3dc39694b263a4c4785a343fba05ee565cd8db70bcd2b8b261.json",
         "sha256": "cd612928dc64e0286d1413946b6cfb0870e7723e883b8ac84286531617190871"
       },
       "release_safe_l3": null,
@@ -15454,7 +15454,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11919,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/b905445cd45c251e5073e047c67cece53e9d65ef54adaed910d84953652789ff.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/b905445cd45c251e5073e047c67cece53e9d65ef54adaed910d84953652789ff.json",
         "sha256": "0cf579e745f4a5f43bf0a27ef41409c4134e898cc28065fe8c381b75091b4e4c"
       },
       "release_safe_l3": null,
@@ -15777,7 +15777,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11916,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/5de8efd28460e9ab43ee07536d2ce61899a53e8ac429735366fe7b90e86b8666.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/5de8efd28460e9ab43ee07536d2ce61899a53e8ac429735366fe7b90e86b8666.json",
         "sha256": "1c1e98666177da6fdf6000628e1c28f76441cbcce50212e5de8af713eb9d2233"
       },
       "release_safe_l3": null,
@@ -16154,7 +16154,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13638,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/0bbbbd829a86174cd61d612395ef7ee5f2a76d287624a8606aebf61424171140.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/0bbbbd829a86174cd61d612395ef7ee5f2a76d287624a8606aebf61424171140.json",
         "sha256": "f4a6d5a9a98e326f0c4339db34858b3c93887f340b02a0a91fb072b93c6c3276"
       },
       "release_safe_l3": null,
@@ -16531,7 +16531,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13627,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e0b53244023549d86f7fded977427ae0b0e2bb13794b16c7c52d8906fec14d00.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/e0b53244023549d86f7fded977427ae0b0e2bb13794b16c7c52d8906fec14d00.json",
         "sha256": "b14b0a0d595ade42707e4ef4fbccc77c14d33cee2e2f20169e1915a0b3a3eb4f"
       },
       "release_safe_l3": null,
@@ -16908,7 +16908,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13649,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/8fcf9b2deb6060dc6e91339d0096eba4342f2efefed63da1b2fb9cbc6be8a858.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/8fcf9b2deb6060dc6e91339d0096eba4342f2efefed63da1b2fb9cbc6be8a858.json",
         "sha256": "7a2a7e72e35490849bcdfd2dbdbea2e0f592627c040e102a4d95617d12a34a43"
       },
       "release_safe_l3": null,
@@ -17285,7 +17285,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13615,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/8c55002c15c091f9ec9d20f9c95722ece140110e8d08523ca874a0c686ddb26b.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/8c55002c15c091f9ec9d20f9c95722ece140110e8d08523ca874a0c686ddb26b.json",
         "sha256": "7ec8197dd81f51fb0c709874aab1afc60a7ee0782d3f7017e2ccadb9facd19a7"
       },
       "release_safe_l3": null,
@@ -17662,7 +17662,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13649,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/32557849574dde4680adffab7885edb96daa955c857a8b744ed5757786f2ec02.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/32557849574dde4680adffab7885edb96daa955c857a8b744ed5757786f2ec02.json",
         "sha256": "bfc6ba8cd8fa97d9ce4089d2ba1d88db5fb2e5b737d4bf3cd6a45effe8e81f52"
       },
       "release_safe_l3": null,
@@ -18039,7 +18039,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 13628,
-        "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/435bdee2d943dad96e3eb3c320bc094f5ceff04934770642123ce12eb1177856.json",
+        "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/435bdee2d943dad96e3eb3c320bc094f5ceff04934770642123ce12eb1177856.json",
         "sha256": "7705cc160ceb078f676b38ce51d9ded77ba65879119bfaf863d6547d5404c735"
       },
       "release_safe_l3": null,
@@ -18058,18 +18058,18 @@
   "comparison_scope": "training_derived_validation_only",
   "executed_driver_ref": {
     "bytes": 11019,
-    "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/source/measure_retained_samples.py",
+    "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/source/measure_retained_samples.py",
     "sha256": "0d9bce814c22656a171ed98c40e2784c8ee0efaf3592b8eb78f3017f919dd96a"
   },
   "execution_ref": {
     "bytes": 2584,
-    "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/execution.actual.v2.json",
+    "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/execution.actual.v2.json",
     "sha256": "dba021575580d31aa3cc5e36a511d1f00e2475beada49c1da8e4a0490abce791"
   },
   "format": "dope-retained-validation-panel",
   "input_manifest_ref": {
     "bytes": 662413,
-    "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/source/metric-inputs48.actual.v1.json",
+    "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/source/metric-inputs48.actual.v1.json",
     "sha256": "0ad652fe51a068215fdac4827cba56ba26a7e098bd63985bf0e19ee6d44e1b04"
   },
   "lineages": 8,
@@ -18079,13 +18079,13 @@
   "ptf_v1": null,
   "receipt_lock_ref": {
     "bytes": 13930,
-    "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/receipt-lock.json",
+    "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/receipts/receipt-lock.json",
     "sha256": "39faea430dc3e64bca4be4c28ba922bf553b2542c96ed6f4744b91857bc1ba13"
   },
   "release_safe_l3": null,
   "runtime_inventory_ref": {
     "bytes": 840075,
-    "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/eight-complete-tabsyn-metrics-v1/common-runtime-inventory.actual.json",
+    "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/eight-complete-tabsyn-metrics-v1/common-runtime-inventory.actual.json",
     "sha256": "8f9189d7dd1596d7ea5c7b4b166582a37d7573f1d62d0aa24a364488c3e984c2"
   },
   "sample_cells": 48,
@@ -18093,12 +18093,12 @@
   "source_refs": {
     "expanded_validation_metrics": {
       "bytes": 13747,
-      "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/source/expanded_validation_metrics.py",
+      "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/source/expanded_validation_metrics.py",
       "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
     },
     "pilot_metrics": {
       "bytes": 6986,
-      "path": "/path/to/operator-home/dope-scratch-x1/ts-eight-lineage-metrics-v1/source/pilot_metrics.py",
+      "path": "/home/ubuntu/dope-scratch-x1/ts-eight-lineage-metrics-v1/source/pilot_metrics.py",
       "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3"
     }
   },

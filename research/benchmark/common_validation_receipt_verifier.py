@@ -47,6 +47,16 @@ def validate_jobs(lock):
             and lock['max_cores'] == 16 and lock['gpu_allowed'] is False, 'frozen_caps_changed')
 
 
+def _resolve_ref(ref):
+    path = ref.get('path', '')
+    if isinstance(path, str) and path.startswith('/path/to/operator-home/'):
+        import os
+        home = os.environ.get('DOPE_OPERATOR_HOME', '').strip().rstrip('/')
+        require(bool(home), 'operator_home_env_unset')
+        return {**ref, 'path': path.replace('/path/to/operator-home', home, 1)}
+    return ref
+
+
 def positive(lock, record, checked: Callable[[dict[str, object]], dict[str, object]]):
     """Authenticate a completed one-action result; never turn a failure into reuse."""
     config = checked(record['config_ref'])
@@ -54,9 +64,9 @@ def positive(lock, record, checked: Callable[[dict[str, object]], dict[str, obje
     operation = checked(record['operation_ref'])
     stdout = checked(record['stdout_ref'])
     reused_kind = config['action'] == 'kind-one'
-    baseline = checked(LEGACY_BASE_CONFIG if reused_kind else TS_CONFIG
-                       if config['action'] == 'tabsyn-metric-one' else BASE_CONFIG)
-    original = checked(LEGACY_ROOT_ROUND) if reused_kind else lock
+    baseline = checked(_resolve_ref(LEGACY_BASE_CONFIG if reused_kind else TS_CONFIG
+                                    if config['action'] == 'tabsyn-metric-one' else BASE_CONFIG))
+    original = checked(_resolve_ref(LEGACY_ROOT_ROUND)) if reused_kind else lock
     if reused_kind:
         bridge = checked(KIND_PROVENANCE_BRIDGE)
         require(lock['kind_jobs'] == original['kind_jobs'] and lock['kind_rule'] == original['kind_rule']

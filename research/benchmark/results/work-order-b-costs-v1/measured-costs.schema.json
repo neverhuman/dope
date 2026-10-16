@@ -148,7 +148,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-2"
+                  "const": "xbabe2"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -255,7 +255,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -390,13 +390,13 @@
                 "items": {
                   "anyOf": [
                     {
-                      "const": "fit-machine-1"
+                      "const": "xbabe1"
                     },
                     {
-                      "const": "fit-machine-2"
+                      "const": "xbabe2"
                     },
                     {
-                      "const": "fit-machine-3"
+                      "const": "xbabe3"
                     }
                   ]
                 },
@@ -505,7 +505,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -633,7 +633,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -855,7 +855,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-2"
+                  "const": "xbabe2"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -962,7 +962,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -1068,7 +1068,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -1174,7 +1174,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -1384,7 +1384,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-2"
+                  "const": "xbabe2"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -1491,7 +1491,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -1626,13 +1626,13 @@
                 "items": {
                   "anyOf": [
                     {
-                      "const": "fit-machine-1"
+                      "const": "xbabe1"
                     },
                     {
-                      "const": "fit-machine-2"
+                      "const": "xbabe2"
                     },
                     {
-                      "const": "fit-machine-3"
+                      "const": "xbabe3"
                     }
                   ]
                 },
@@ -1741,7 +1741,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -1864,7 +1864,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-1"
+                  "const": "xbabe1"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -2086,7 +2086,7 @@
               },
               "hosts": {
                 "items": {
-                  "const": "fit-machine-2"
+                  "const": "xbabe2"
                 },
                 "maxItems": 1,
                 "minItems": 1,
@@ -2223,18 +2223,18 @@
               "host_operation_seconds": {
                 "additionalProperties": false,
                 "properties": {
-                  "fit-machine-1": {
+                  "xbabe1": {
                     "minimum": 0,
                     "type": "number"
                   },
-                  "fit-machine-2": {
+                  "xbabe2": {
                     "minimum": 0,
                     "type": "number"
                   }
                 },
                 "required": [
-                  "fit-machine-1",
-                  "fit-machine-2"
+                  "xbabe1",
+                  "xbabe2"
                 ],
                 "type": "object"
               },
@@ -2279,7 +2279,7 @@
             "additionalProperties": false,
             "properties": {
               "host": {
-                "const": "fit-machine-2"
+                "const": "xbabe2"
               },
               "identity": {
                 "const": "dope_population_validation_v1"
@@ -2319,23 +2319,23 @@
               "host_operation_seconds": {
                 "additionalProperties": false,
                 "properties": {
-                  "fit-machine-1": {
+                  "xbabe1": {
                     "minimum": 0,
                     "type": "number"
                   },
-                  "fit-machine-2": {
+                  "xbabe2": {
                     "minimum": 0,
                     "type": "number"
                   },
-                  "fit-machine-3": {
+                  "xbabe3": {
                     "minimum": 0,
                     "type": "number"
                   }
                 },
                 "required": [
-                  "fit-machine-1",
-                  "fit-machine-2",
-                  "fit-machine-3"
+                  "xbabe1",
+                  "xbabe2",
+                  "xbabe3"
                 ],
                 "type": "object"
               },
@@ -2480,7 +2480,7 @@
             "additionalProperties": false,
             "properties": {
               "host": {
-                "const": "fit-machine-2"
+                "const": "xbabe2"
               },
               "identity": {
                 "const": "forest_shared_validation_v1"

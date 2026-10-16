@@ -29,6 +29,16 @@ OFM_CODE = Path("/path/to/operator-home/jopedime_probe_exp/ofm-20261008/code")
 OFM_SRC = Path("/path/to/operator-home/jopedime_probe_exp/ofm-20261008/src/structured-data-models")
 
 
+def _resolve_operator_path(path: Path) -> Path:
+    text = str(path)
+    if text.startswith("/path/to/operator-home/"):
+        home = os.environ.get("DOPE_OPERATOR_HOME", "").strip().rstrip("/")
+        if not home:
+            raise RuntimeError("DOPE_OPERATOR_HOME must be set to resolve operator path")
+        return Path(text.replace("/path/to/operator-home", home, 1))
+    return path
+
+
 def gpu_snapshot() -> dict:
     import subprocess
 
@@ -89,8 +99,8 @@ class KumoLarge:
 
     def __init__(self) -> None:
         os.environ["HF_HUB_OFFLINE"] = "1"
-        sys.path.insert(0, str(OFM_CODE))
-        sys.path.insert(0, str(OFM_SRC))
+        sys.path.insert(0, str(_resolve_operator_path(OFM_CODE)))
+        sys.path.insert(0, str(_resolve_operator_path(OFM_SRC)))
         weight = WEIGHT_ROOT / MODEL_FILES[self.name]
         if not weight.is_file():
             raise FileNotFoundError(weight)
@@ -208,7 +218,7 @@ class _OfmAuditor:
     def __init__(self) -> None:
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
-        sys.path.insert(0, str(OFM_CODE))
+        sys.path.insert(0, str(_resolve_operator_path(OFM_CODE)))
         weight = WEIGHT_ROOT / MODEL_FILES[self.name]
         if not weight.is_file():
             raise FileNotFoundError(weight)

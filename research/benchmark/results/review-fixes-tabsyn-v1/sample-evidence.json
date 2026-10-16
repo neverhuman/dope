@@ -6601,7 +6601,7 @@
       "synthetic_sha256": "16bd8d8db2f619f16c4bf99be4cb460380185938d605b782fb172fae18f16eb9"
     }
   ],
-  "fit_registry_sha256": "0ae182ceb2602a542f77d8936518c5ca5a7fbba8761b2d2051f0c11c24d257f0",
+  "fit_registry_sha256": "cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272",
   "formal_dp": false,
   "format": "dope-wave2-tabsyn-sample-evidence-v1",
   "official_tests_opened": false,

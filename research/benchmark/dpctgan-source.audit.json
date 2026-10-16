@@ -70,7 +70,7 @@
     "audit gradient-noise/update ordering, accountant equivalence, sampling rate, complete preprocessing/selection accounting and actual epsilon overshoot before any formal privacy claim",
     "freeze author-native validation scalar/direction/ties/grid separately per fixed epsilon; regression has no verified author objective, use author default and mark tuning inapplicable",
     "bind grouped official-training-derived fit/validation, full charged bytes, all seeds/replay/rows and external whole-phase600s timeout; epochs argument does not bound this fit",
-    "fresh aggregate study-owner CPU/RAM/scratch/GPU admission on fit-machine-1/2/3 only; never bypass live predecessor/reservation locks"
+    "fresh aggregate study-owner CPU/RAM/scratch/GPU admission on xbabe1/2/3 only; never bypass live predecessor/reservation locks"
   ],
   "fit_sample_contract": {
     "artifact_only_reload_verified": false,

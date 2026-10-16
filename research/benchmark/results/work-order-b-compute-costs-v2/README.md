@@ -39,7 +39,7 @@ Existing publisher SHA256: `d90e275318b8eb766fb340334103060de8aeb3c81f65728e2831
 
 `source-proof.json` retains exact frozen source receipts and anchored indexes. The 21KiB raw preparer remains private, with original input hashing, source/result pins and observed operator provenance in the immutable custody receipt:
 
-`/path/to/operator-home/dope/.agent/worktrees/integration/target/work-order-b-compute-cost-report-item6-v1/private-receipt-custody-v1/receipt-custody.json`.
+`/home/ubuntu/dope/.agent/worktrees/integration/target/work-order-b-compute-cost-report-item6-v1/private-receipt-custody-v1/receipt-custody.json`.
 
 Custody receipt SHA256: `3213cf6f1252f523f3ba47f59040deec4e9d92263c9481dfea7529c4fbe4d9a2`.
 

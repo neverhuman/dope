@@ -20,7 +20,7 @@
       "contamination_review_sha256": null,
       "id": "catboost",
       "display": "CatBoost",
-      "family": "boosting",
+      "family": "tree",
       "status": "specified",
       "panel": "core",
       "tasks": [
@@ -54,7 +54,7 @@
       "contamination_review_sha256": null,
       "id": "lightgbm",
       "display": "LightGBM",
-      "family": "boosting",
+      "family": "tree",
       "status": "specified",
       "panel": "core",
       "tasks": [
@@ -88,7 +88,7 @@
       "contamination_review_sha256": null,
       "id": "xgboost",
       "display": "XGBoost",
-      "family": "boosting",
+      "family": "tree",
       "status": "specified",
       "panel": "core",
       "tasks": [
@@ -156,7 +156,7 @@
       "contamination_review_sha256": null,
       "id": "elastic_net",
       "display": "Elastic net",
-      "family": "transparent",
+      "family": "linear",
       "status": "specified",
       "panel": "core",
       "tasks": [
@@ -190,7 +190,7 @@
       "contamination_review_sha256": null,
       "id": "ebm",
       "display": "Explainable Boosting Machine",
-      "family": "transparent",
+      "family": "linear",
       "status": "specified",
       "panel": "core",
       "tasks": [
@@ -224,7 +224,7 @@
       "contamination_review_sha256": null,
       "id": "kumo_tabular",
       "display": "Kumo Tabular",
-      "family": "kumo",
+      "family": "foundation_tabular",
       "status": "specified",
       "panel": "frontier",
       "tasks": [
@@ -258,7 +258,7 @@
       "contamination_review_sha256": null,
       "id": "tabicl_v2",
       "display": "TabICLv2",
-      "family": "tabicl",
+      "family": "foundation_tabular",
       "status": "specified",
       "panel": "frontier",
       "tasks": [
@@ -292,7 +292,7 @@
       "contamination_review_sha256": null,
       "id": "mitra_v2",
       "display": "Mitra-v2",
-      "family": "mitra",
+      "family": "foundation_tabular",
       "status": "specified",
       "panel": "frontier",
       "tasks": [
@@ -326,7 +326,7 @@
       "contamination_review_sha256": null,
       "id": "limix",
       "display": "LimiX",
-      "family": "limix",
+      "family": "foundation_tabular",
       "status": "specified",
       "panel": "frontier",
       "tasks": [
@@ -360,7 +360,7 @@
       "contamination_review_sha256": null,
       "id": "tabpfn_3",
       "display": "TabPFN-3.x",
-      "family": "tabpfn",
+      "family": "foundation_tabular",
       "status": "specified",
       "panel": "frontier",
       "tasks": [
@@ -394,7 +394,7 @@
       "contamination_review_sha256": null,
       "id": "tabdpt",
       "display": "TabDPT",
-      "family": "tabdpt",
+      "family": "foundation_tabular",
       "status": "specified",
       "panel": "frontier",
       "tasks": [
@@ -428,7 +428,7 @@
       "contamination_review_sha256": null,
       "id": "tabfm",
       "display": "TabFM",
-      "family": "tabfm",
+      "family": "foundation_tabular",
       "status": "specified",
       "panel": "frontier",
       "tasks": [

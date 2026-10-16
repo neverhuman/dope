@@ -6,9 +6,9 @@
     "gpu_foreign_owner_check_before_each_launch": true,
     "gpu_process_cap_bytes": 17179869184,
     "hosts": [
-      "fit-machine-1",
-      "fit-machine-2",
-      "fit-machine-3"
+      "xbabe1",
+      "xbabe2",
+      "xbabe3"
     ],
     "maximum_study_cpu_slots": 4,
     "neural_fit_cap_seconds": 600,
@@ -16,7 +16,7 @@
     "prior_failed_trial_and_cost_carry_required": true,
     "tuning_cell_wall_cap_seconds": 43200,
     "tuning_trials_per_cell_max": 8,
-    "fit-machine-0_allowed": false,
+    "xbabe0_allowed": false,
     "yield_to_jope_dltrain_or_hyperion": true
   },
   "amended_campaigns": [
@@ -25,7 +25,7 @@
     "TabSyn 100-lineage native/default"
   ],
   "ceiling_bytes": 200000000000,
-  "ceiling_scope": "aggregate new scratch root on fit-machine-3 local filesystem, counting new artifacts and full active/requested local reservations",
+  "ceiling_scope": "aggregate new scratch root on xbabe3 local filesystem, counting new artifacts and full active/requested local reservations",
   "du_semantics": [
     "--apparent-size",
     "--count-links",
@@ -53,30 +53,30 @@
     "root_inode": 17208287,
     "root_uid": 1000
   },
-  "forest_new_large_artifacts_storage_policy": "hash and charge all bytes; retain only on fit-machine-3 local disk within its ceiling",
+  "forest_new_large_artifacts_storage_policy": "hash and charge all bytes; retain only on xbabe3 local disk within its ceiling",
   "format": "dope-owner-local-filesystem-capacity-amendment",
   "full_campaign_admitted": false,
-  "host": "fit-machine-3",
+  "host": "xbabe3",
   "mfs_v2": null,
-  "new_scratch_root": "/path/to/operator-home/dope-scratch-x3",
+  "new_scratch_root": "/home/ubuntu/dope-scratch-x3",
   "official_tests_opened": false,
-  "old_fit-machine-2_fast_scratch_budget_separate": {
+  "old_xbabe2_fast_scratch_budget_separate": {
     "ceiling_bytes": 200000000000,
     "existing_artifacts_moved_or_deleted": false,
     "permitted_new_contents": "hashes, byte counts, small summaries only",
     "root": "/mnt/fast-scratch/dope-benchmark",
-    "shared_sshfs_alias_is_not_fit-machine-3_local_disk": true
+    "shared_sshfs_alias_is_not_xbabe3_local_disk": true
   },
   "owner": "ENG:watcher",
   "owner_note_time": "2026-10-05 21:09 MT",
-  "owner_ruling_verbatim": "[OWNER ENG:watcher 9:09pm MT, not typed by Jepson] Owner ruling on the 200 GB storage cap, plus your next work order (B lane only: baselines/harness/campaign; don't touch docs/whitepaper/, that's the paper lane). fit-machine-3's GPU is idle right now and nothing is running there, so let's get the baselines moving again.\n\nRULING: the 200 GB scratch ceiling is a resource-admission control, not a scientific property, and it's tied to fit-machine-2 /mnt/fast-scratch (96G free, which fit-machine-3 sshfs-mounts). I'm authorizing a documented capacity amendment: the TabDDPM and Forest-Flow continuations (and the TabSyn run below) write their fit/sample artifacts to a NEW scratch root on fit-machine-3's LOCAL disk (/ has about 434G free), e.g. /path/to/operator-home/dope-scratch-x3/<campaign>, with its own 200 GB ceiling and the same admission checks against THAT filesystem. Record the amendment (reason, new root, ceiling, owner ENG:watcher, timestamp) in the campaign receipts/manifest so the paper can cite it. Do NOT delete or move anything already in /mnt/fast-scratch/dope-benchmark (pilot-24h etc. stay put), and keep only hashes, byte counts and small summaries on fast-scratch. Forest-Flow artifacts are 0.1-1 GB each, so measure bytes+SHA-256 and keep them only on fit-machine-3 local.\n",
+  "owner_ruling_verbatim": "[OWNER ENG:watcher 9:09pm MT, not typed by Jepson] Owner ruling on the 200 GB storage cap, plus your next work order (B lane only: baselines/harness/campaign; don't touch docs/whitepaper/, that's the paper lane). xbabe3's GPU is idle right now and nothing is running there, so let's get the baselines moving again.\n\nRULING: the 200 GB scratch ceiling is a resource-admission control, not a scientific property, and it's tied to xbabe2 /mnt/fast-scratch (96G free, which xbabe3 sshfs-mounts). I'm authorizing a documented capacity amendment: the TabDDPM and Forest-Flow continuations (and the TabSyn run below) write their fit/sample artifacts to a NEW scratch root on xbabe3's LOCAL disk (/ has about 434G free), e.g. /home/ubuntu/dope-scratch-x3/<campaign>, with its own 200 GB ceiling and the same admission checks against THAT filesystem. Record the amendment (reason, new root, ceiling, owner ENG:watcher, timestamp) in the campaign receipts/manifest so the paper can cite it. Do NOT delete or move anything already in /mnt/fast-scratch/dope-benchmark (pilot-24h etc. stay put), and keep only hashes, byte counts and small summaries on fast-scratch. Forest-Flow artifacts are 0.1-1 GB each, so measure bytes+SHA-256 and keep them only on xbabe3 local.\n",
   "projection_and_model_bytes_charged": true,
   "ptf_v1": null,
   "reason": "Resume benchmark continuations on a separate local filesystem with available capacity; resource admission amendment only; scientific objectives, evidence and gates unchanged.",
   "recorded_utc": "2026-10-06T03:12:29.579657+00:00",
   "release_safe": null,
   "scientific_configuration_changed_by_amendment": false,
-  "shared_gpu_fit_lease_path": "/path/to/operator-home/dope-scratch-x3/.gpu-fit.lock",
+  "shared_gpu_fit_lease_path": "/home/ubuntu/dope-scratch-x3/.gpu-fit.lock",
   "superiority": null,
   "version": 1
 }

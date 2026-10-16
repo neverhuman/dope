@@ -34,7 +34,7 @@
   ],
   "validation_pin_source": {
     "path": "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json",
-    "sha256": "e797f3ef0c1907d51caddb06c7669683afaf96274a2af5a885ab5dd7abdaf13e"
+    "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
   },
   "validation_sha256_by_dataset": {
     "02a45777900441ce": "2abba07745e38a042ac6b03f8ec12f02a7ef3043c5d434f3b38b4a0db0809fd7",

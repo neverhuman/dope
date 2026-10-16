@@ -13,7 +13,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GRAPH = REPO / 'research/benchmark/review_fixes/paper-build.json'
 LOCK = REPO / 'ops/ci/paper-review-inputs.json'
-LOCK_SHA256 = 'd6d48728b7df212656de52f59178729af38084a6a6fd04ec00d7acd5d01e1871'
+LOCK_SHA256 = 'e17f3461f1d322abe036e9c7c80e5abf3b0534d91563ff4b6b30a7a914629b96'
 NATIVE_BYTE_PIN = 'docs/whitepaper/receipts/native-byte-conformance-v1.json'
 NATIVE_BYTE_CHECKER = 'docs/whitepaper/scripts/native_byte_conformance.py'
 CONTROL_LEDGER = 'research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl'

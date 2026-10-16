@@ -1,8 +1,8 @@
 {
   "allowed_gpu_hosts": [
-    "fit-machine-1",
-    "fit-machine-2",
-    "fit-machine-3"
+    "xbabe1",
+    "xbabe2",
+    "xbabe3"
   ],
   "baseline_native_selection_changed": false,
   "baseline_selected_by_common_utility": false,
@@ -884,7 +884,7 @@
       "fit_seed": 11,
       "foreign_processes_signaled": false,
       "gpu_target_operator_verified": false,
-      "host": "fit-machine-2",
+      "host": "xbabe2",
       "job_sha256": "325dd8af5dfc20185b4689015d9cfa54007e18ae153d21f03f88a74176b91ac0",
       "model_bytes": null,
       "operation_seconds": 6.59387297811918,
@@ -904,7 +904,7 @@
       "fit_seed": 11,
       "foreign_processes_signaled": false,
       "gpu_target_operator_verified": true,
-      "host": "fit-machine-1",
+      "host": "xbabe1",
       "job_sha256": "d77f3819ff090ebd1f22406036df7c1dae8692f3fdb600292143639ec8001bad",
       "model_bytes": 312,
       "operation_seconds": 26.309324231930077,
@@ -924,7 +924,7 @@
       "fit_seed": 11,
       "foreign_processes_signaled": false,
       "gpu_target_operator_verified": true,
-      "host": "fit-machine-1",
+      "host": "xbabe1",
       "job_sha256": "f618b08348903374860ba2450ff131725ca857db6d675aa0b59332a3ed406b5a",
       "model_bytes": 415,
       "operation_seconds": 22.278176659019664,
@@ -944,7 +944,7 @@
       "fit_seed": 11,
       "foreign_processes_signaled": false,
       "gpu_target_operator_verified": true,
-      "host": "fit-machine-2",
+      "host": "xbabe2",
       "job_sha256": "f96cc08c6a9a92e62d48488bda1aca8c5f93eaf2ef1796f98ae66debecca69d7",
       "model_bytes": 415,
       "operation_seconds": 15.544517778092995,

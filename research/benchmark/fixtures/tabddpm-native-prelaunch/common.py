@@ -11,7 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT.parent
-HOSTS = ('fit-machine-1', 'fit-machine-2', 'fit-machine-3')
+HOSTS = ('xbabe1', 'xbabe2', 'xbabe3')
 
 def sha(path):
     h = hashlib.sha256()
@@ -90,7 +90,7 @@ def load_file(name, path):
     return module
 
 def ssh(lock, host, argv, **kwargs):
-    assert host in HOSTS and host != 'fit-machine-2'
+    assert host in HOSTS and host != 'xbabe2'
     return subprocess.run([lock['ssh_binary'], '-o','BatchMode=yes','-o','ConnectTimeout=8',
         '-o','StrictHostKeyChecking=yes','-o','HostKeyAlias='+host,
         '-o','UserKnownHostsFile='+lock['known_hosts'],host,*argv], **kwargs)

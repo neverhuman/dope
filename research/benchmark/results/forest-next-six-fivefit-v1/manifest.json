@@ -30,9 +30,9 @@
       "sha256": "a513de0ac846ceba93f15454b21370afd733ac249216e6a985e45fc7b6cebf25"
     },
     "checkpoint-kpis.csv": {
-      "bytes": 14759,
+      "bytes": 14459,
       "path": "research/benchmark/results/forest-next-six-fivefit-v1/checkpoint-kpis.csv",
-      "sha256": "7819706f05a7ea7c473206d0324d50e0bc076c0bcbb6411fa9d77fd39d4ec079"
+      "sha256": "7a46c339fb1f8752178c7e32b706a87c893668fd9d9eb45801a11f9f5f52b7f6"
     },
     "figure-kpis.csv": {
       "bytes": 21082,
@@ -55,14 +55,14 @@
       "sha256": "25b5be7a04fba23d73662eefa8ca57a854733e1f2644035881235991e4245cab"
     },
     "original-verification.json": {
-      "bytes": 65149,
+      "bytes": 62899,
       "path": "research/benchmark/results/forest-next-six-fivefit-v1/original-verification.json",
-      "sha256": "2161800158059cf442c29d4175f4c292b24fc4ae28d6cb70dca008aab070856e"
+      "sha256": "84f12d5d4e6f1efb1d8d98e4a85b72c4b75228c6eab4a8f56ef359b73732ebeb"
     },
     "panel.json": {
-      "bytes": 2762234,
+      "bytes": 2750434,
       "path": "research/benchmark/results/forest-next-six-fivefit-v1/panel.json",
-      "sha256": "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"
+      "sha256": "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"
     },
     "panel.schema.json": {
       "bytes": 6374,
@@ -70,14 +70,14 @@
       "sha256": "634b07dba6d3ca1e8c850a410a05bb65d7333acc3b1a126ace1c08b2c2b9a093"
     },
     "timeout-dispositions.json": {
-      "bytes": 25003,
+      "bytes": 24483,
       "path": "research/benchmark/results/forest-next-six-fivefit-v1/timeout-dispositions.json",
-      "sha256": "cf19e0fbf9baf858b108b3a51fc4dea67d6311ea690005c3df218e44fbd4b3f3"
+      "sha256": "3fe01aa4c761a05c0be101212e9c184edadb250458877ff51ea085e9d8c1cf03"
     },
     "timeout-dispositions.schema.json": {
-      "bytes": 6166,
+      "bytes": 6126,
       "path": "research/benchmark/results/forest-next-six-fivefit-v1/timeout-dispositions.schema.json",
-      "sha256": "d68df0d9933a38e59f82418ea50afecd7d3bd20354306a16a2b02d6de1efe43b"
+      "sha256": "450d1abf62d38e28ded25f901c6075834872cece3b94a33b5eb825c49db02dad"
     }
   },
   "format": "forest-next-six-fivefit-publication-v1",
@@ -94,9 +94,9 @@
   "official_tests_opened": false,
   "original_checkpoints_sha_verified": 30,
   "original_verification_ref": {
-    "bytes": 65149,
+    "bytes": 62899,
     "path": "research/benchmark/results/forest-next-six-fivefit-v1/original-verification.json",
-    "sha256": "2161800158059cf442c29d4175f4c292b24fc4ae28d6cb70dca008aab070856e"
+    "sha256": "84f12d5d4e6f1efb1d8d98e4a85b72c4b75228c6eab4a8f56ef359b73732ebeb"
   },
   "producer_refs": {
     "plot_forest_fit_variance.py": {

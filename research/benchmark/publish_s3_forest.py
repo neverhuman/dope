@@ -330,8 +330,8 @@ def build():
                                         'historical_full_executable_closure_certified': False, 'system_dynamic_library_closure_certified': False,
                                         'external_receipt_digests_verified_before_metric_reads': True},
               'cost': {'forest_new_gpu_fits': 12, 'forest_fit_core_seconds': sum(row[1]['fit_seconds'] for row in fits.values()),
-                       'forest_fit_native_sample_operation_seconds': operation_cost, 'forest_gpu_host': 'fit-machine-1',
-                       'forest_shared_evaluator_seconds': common_report['shared_evaluator_seconds'], 'shared_evaluator_host': 'fit-machine-2',
+                       'forest_fit_native_sample_operation_seconds': operation_cost, 'forest_gpu_host': 'xbabe1',
+                       'forest_shared_evaluator_seconds': common_report['shared_evaluator_seconds'], 'shared_evaluator_host': 'xbabe2',
                        'forest_peak_gpu_used_mib': max(peaks), 'forest_whole_device_energy_estimate_joules': sum(device_energy)
                        if all(v is not None for v in device_energy) else None, 'forest_cpu_energy_joules': None,
                        'prior_comparison_new_fits': 0, 'prior_comparison_new_tuning_trials': 0,

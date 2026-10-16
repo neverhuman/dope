@@ -137,7 +137,7 @@
           "type": "boolean"
         },
         "host": {
-          "const": "fit-machine-2",
+          "const": "xbabe2",
           "type": "string"
         },
         "model_plus_projection_byte_cap": {
@@ -578,7 +578,7 @@
             "type": "boolean"
           },
           "host": {
-            "const": "fit-machine-2",
+            "const": "xbabe2",
             "type": "string"
           },
           "job_sha256": {
@@ -817,7 +817,7 @@
           "type": "boolean"
         },
         "host": {
-          "const": "fit-machine-2",
+          "const": "xbabe2",
           "type": "string"
         },
         "max_of_observed_own_GPU_resident_mib": {

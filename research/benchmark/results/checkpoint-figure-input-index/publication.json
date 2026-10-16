@@ -63,17 +63,17 @@
     "current_artifact_hash_remeasured": false,
     "format": "Forest-Flow-checkpoint-key-error-coverage",
     "inventory_ref": {
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoints.frozen-v24.v3.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoints.frozen-v24.v3.json",
       "sha256": "ea5d6c70e4f560749575c5d8bb2de9eb3c879aa81e66ca7ed42aed716c523728"
     },
     "job36": "raw fit worker0/watchdog1 remains permanently incomplete; no later phase and no quality upgrade",
     "key_error_csv": {
       "bytes": 27645,
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoint-key-errors.frozen-v24.v1.csv",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoint-key-errors.frozen-v24.v1.csv",
       "sha256": "a8304a407337594bbdcc0c1ec3d089b99f4238705aaa00932fce0c8035e39e4b"
     },
     "metric_equation_source": {
-      "local_path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3/source/pilot_metrics.py",
+      "local_path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3/source/pilot_metrics.py",
       "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3",
       "source_inspected_without_import": true
     },
@@ -100,67 +100,67 @@
   "private_inputs": {
     "checkpoint_actual_receipt": {
       "bytes": 1479,
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/actual.receipt.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/actual.receipt.json",
       "sha256": "3f6620dbf6d48b4b3a3d5ca28505da5f5a7227a60aebf4da2b320dfd96e41946"
     },
     "checkpoint_index": {
       "bytes": 15137552,
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/checkpoints.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/checkpoints.json",
       "sha256": "a9dccced93d2be2bc44be76c8f99b14ce3435d823c333969b5f28b9577b4c67b"
     },
     "forest_coverage": {
       "bytes": 2123,
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/checkpoint-key-errors.coverage.receipt.v1.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/checkpoint-key-errors.coverage.receipt.v1.json",
       "sha256": "708990f2a615520078300825fcdc8f42ddd051654d116716dc8924457a7edcfd"
     },
     "forest_key_errors": {
       "bytes": 27645,
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoint-key-errors.frozen-v24.v1.csv",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/checkpoint-evidence-index-v1/Forest-Flow.checkpoint-key-errors.frozen-v24.v1.csv",
       "sha256": "a8304a407337594bbdcc0c1ec3d089b99f4238705aaa00932fce0c8035e39e4b"
     },
     "metadata_readset": {
       "bytes": 887520,
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/metadata-readset.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/checkpoint-index.actual.20261006T215146Z/metadata-readset.json",
       "sha256": "4df012a79e2edcc07f803e3d5e7ffc71b66322d08e0cb02ebe63fd14875f07ce"
     },
     "tabddpm_actual_validation": {
       "bytes": 9716,
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-index.actual-validation.receipt.v1.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-index.actual-validation.receipt.v1.json",
       "sha256": "7121cfc48209981b8252cd598d1d662df6b09d5c2c475366da3b719864fe5c2a"
     },
     "tabddpm_current_index": {
       "bytes": 156048,
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/current-provider-index-v1/checkpoints-and-native-errors.actual.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/current-provider-index-v1/checkpoints-and-native-errors.actual.json",
       "sha256": "1f24d5df19890b9389ce5a8dba642e862aeb58053ad7b8acb433cf80c5192b5d"
     },
     "tabddpm_current_metadata_readset": {
       "bytes": 17801,
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/current-provider-index-v1/publication-metadata-readset.frozen.v1.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/current-provider-index-v1/publication-metadata-readset.frozen.v1.json",
       "sha256": "bf3ab52d2e237e5e4ded4e397719fce459f7694e020bf1a154f2936e86c3482b"
     },
     "tabddpm_current_operations": {
       "bytes": 27189,
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.current-operation-receipts.v1.csv",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.current-operation-receipts.v1.csv",
       "sha256": "d3a30086cc37783055c21188ddafeb00d710c376e8df7fc2c88c3e6fe7e07a92"
     },
     "tabddpm_current_plan": {
       "bytes": 931857,
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/continuation.plan.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/continuation.plan.json",
       "sha256": "2bb62890adc6e0ebc5ea1a80eb6ff98cd3ae899739fadc4e96198a12c02b6178"
     },
     "tabddpm_current_round": {
       "bytes": 1514698,
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/round.lock.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/ieee-evidence-status-v1/td14-current-metadata-custody-v1/round.lock.json",
       "sha256": "cfa86976a2681f1c988962b1f5dc16f855a0e9f5471b5952f31ccbc1f96ab54b"
     },
     "tabddpm_historical_checkpoints": {
       "bytes": 95507,
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.historical-v8-recorded-provider-checkpoints.v1.csv",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.historical-v8-recorded-provider-checkpoints.v1.csv",
       "sha256": "98d414d4262d431e0a1f8cafad7f45d12939fdfdcc8e95ae0f96f38ec1ae64eb"
     },
     "tabddpm_partial_index": {
       "bytes": 151314,
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-metadata.partial.v1.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/next37-accounted-prefix-disabled-v25/TD14-checkpoint-metadata-index-v1/TD14.checkpoint-metadata.partial.v1.json",
       "sha256": "066b62908eb05d16381e88bd0ab58166c8a363e968df24721c4a13c92c43996f"
     }
   },
@@ -178,35 +178,35 @@
   "source_publications": {
     "arf-matched-population-validation.json": {
       "path": "research/benchmark/results/arf-matched-population-validation.json",
-      "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+      "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
     },
     "arf-s3-population-native.json": {
       "path": "research/benchmark/results/arf-s3-population-native.json",
-      "sha256": "11394f3aa0edfd35521cd8773a7db89919ea2a554ccef5f0c8e16e4538225f2e"
+      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
     },
     "density-matched-population-validation.json": {
       "path": "research/benchmark/results/density-matched-population-validation.json",
-      "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
     },
     "dope-s3-population-validation.json": {
       "path": "research/benchmark/results/dope-s3-population-validation.json",
-      "sha256": "9d6a20ceb57a6f5ac3d7127c666fac23ce1b0215e703608985fbfb691d06beb2"
+      "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
     },
     "dope-target-refinement-population-fits.json": {
       "path": "research/benchmark/results/dope-target-refinement-population-fits.json",
-      "sha256": "4327e94f833dc8c0ed4100958eacca14626ddd68b4f9531cc3ebfa20a49d3867"
+      "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
     },
     "dope-target-refinement-population-validation.json": {
       "path": "research/benchmark/results/dope-target-refinement-population-validation.json",
-      "sha256": "e40d69a8c9a383f953fbaa6d20db9ac649b9d02802b65f59b5b4c0eac7f7e1ea"
+      "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
     },
     "tabsyn-default100-native-audit.json": {
       "path": "research/benchmark/results/tabsyn-default100-native-audit.json",
-      "sha256": "d0f4eb03f7d9eb0cb3717ee31b39484adace5eb89148a2a6771da0854f7feaba"
+      "sha256": "be455dfc3b9caf15db72646e8c07aa3c5c17cf49df46c8906ddff25d2c3dcac9"
     },
     "tabsyn-default100-scaled-cuda-fits.json": {
       "path": "research/benchmark/results/tabsyn-default100-scaled-cuda-fits.json",
-      "sha256": "0ae182ceb2602a542f77d8936518c5ca5a7fbba8761b2d2051f0c11c24d257f0"
+      "sha256": "cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272"
     }
   },
   "superiority": null,

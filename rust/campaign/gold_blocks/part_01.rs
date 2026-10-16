@@ -240,7 +240,7 @@ pub fn sign_gold_blocks(
     router_bundle: Option<&Path>,
     receipt_key: &Path,
 ) -> Result<GoldReceiptSummary> {
-    if !matches!(worker, "fit-machine-1" | "fit-machine-2" | "fit-machine-3")
+    if !crate::production::is_valid_campaign_worker(worker)
         || !is_lower_hex(source_sha256, &[64])
         || !is_lower_hex(evaluator_binary_sha256, &[64])
     {

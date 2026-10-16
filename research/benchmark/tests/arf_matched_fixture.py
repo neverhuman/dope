@@ -77,7 +77,7 @@ def closed_fixture(base, input_rows, reference_rows, sampling_fit_seed=11, sampl
         files['sample-batch.json'] = record(out / 'sample-batch.json', batch)
         receipt = out / 'receipt.json'; pin = record(receipt, dict(job=job, job_sha256=key,
             status='ok', round_sha256=sample_round, result=batch, evidence_files=files,
-            operation=dict(new_operation_started=True, elapsed_seconds=0, exit_code=0, host='fit-machine-2'),
+            operation=dict(new_operation_started=True, elapsed_seconds=0, exit_code=0, host='xbabe2'),
             official_tests_opened=False, new_generator_fits_started=0, native_selection_changed=False,
             mfs_v2=None, ptf_v1=None, release_safe=None, superiority=None))
         sampling_batches.append(dict(job=job, job_sha256=key, samples=samples, status='ok',
@@ -160,7 +160,7 @@ def closed_fixture(base, input_rows, reference_rows, sampling_fit_seed=11, sampl
         batch = out / 'batch.json'; files[batch.name] = record(batch, dict(job_sha256=key,
             metric_source_sha256=metric_source, samples=records))
         receipt_value = dict(job=job, round_sha256=common_round, status='ok', evidence_files=dict(files),
-            operation=dict(new_operation_started=True, elapsed_seconds=0, exit_code=0, host='fit-machine-2'),
+            operation=dict(new_operation_started=True, elapsed_seconds=0, exit_code=0, host='xbabe2'),
             new_generator_fits_started=0, native_selection_changed=False, global_family_selected=False,
             official_tests_opened=False, mfs_v2=None, ptf_v1=None, release_safe=None, superiority=None)
         if common_mutation and not receipt_pins: common_mutation(receipt_value)

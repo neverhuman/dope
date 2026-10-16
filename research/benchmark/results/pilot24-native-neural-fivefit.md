@@ -93,36 +93,36 @@ Summed comparator fixed-fit time: 9060.89s. Summed complete attempt time: 9726.2
 
 | Dataset | Method | Configuration | Fit seed | Host | Fit status | Fit seconds | Peak GPU MiB |
 |---|---|---|---:|---|---|---:|---:|
-| Adult | CTGAN | default | 11 | fit-machine-1 | timeout | 600.67 | 664 |
-| Adult | CTGAN | tuned | 11 | fit-machine-1 | ok | 156.12 | 664 |
-| Adult | TVAE | default_and_tuned | 11 | fit-machine-1 | ok | 377.00 | 630 |
-| Adult | CTGAN | default | 37 | fit-machine-1 | timeout | 600.69 | 664 |
-| Adult | CTGAN | tuned | 37 | fit-machine-1 | ok | 155.17 | 664 |
-| Adult | TVAE | default_and_tuned | 37 | fit-machine-1 | ok | 391.11 | 630 |
-| Adult | CTGAN | default | 53 | fit-machine-1 | timeout | 600.76 | 664 |
-| Adult | CTGAN | tuned | 53 | fit-machine-1 | ok | 157.95 | 664 |
-| Adult | TVAE | default_and_tuned | 53 | fit-machine-1 | ok | 391.64 | 630 |
-| Adult | CTGAN | default | 71 | fit-machine-1 | timeout | 600.33 | 664 |
-| Adult | CTGAN | tuned | 71 | fit-machine-1 | ok | 157.18 | 664 |
-| Adult | TVAE | default_and_tuned | 71 | fit-machine-1 | ok | 390.53 | 630 |
-| Adult | CTGAN | default | 23 | fit-machine-1 | timeout | 600.50 | 664 |
-| Adult | CTGAN | tuned | 23 | fit-machine-1 | ok | 153.04 | 664 |
-| Adult | TVAE | default_and_tuned | 23 | fit-machine-1 | ok | 375.15 | 630 |
-| California | CTGAN | default_and_tuned | 11 | fit-machine-3 | ok | 213.30 | 476 |
-| California | TVAE | default | 11 | fit-machine-3 | ok | 144.04 | 466 |
-| California | TVAE | tuned | 11 | fit-machine-3 | ok | 312.62 | 462 |
-| California | CTGAN | default_and_tuned | 37 | fit-machine-3 | ok | 211.30 | 476 |
-| California | TVAE | default | 37 | fit-machine-3 | ok | 142.46 | 466 |
-| California | TVAE | tuned | 37 | fit-machine-3 | ok | 311.89 | 462 |
-| California | CTGAN | default_and_tuned | 53 | fit-machine-3 | ok | 211.39 | 476 |
-| California | TVAE | default | 53 | fit-machine-3 | ok | 122.09 | 466 |
-| California | TVAE | tuned | 53 | fit-machine-3 | ok | 321.10 | 462 |
-| California | CTGAN | default_and_tuned | 71 | fit-machine-3 | ok | 202.07 | 476 |
-| California | TVAE | default | 71 | fit-machine-3 | ok | 130.25 | 466 |
-| California | TVAE | tuned | 71 | fit-machine-3 | ok | 307.68 | 462 |
-| California | CTGAN | default_and_tuned | 23 | fit-machine-3 | ok | 208.68 | 476 |
-| California | TVAE | default | 23 | fit-machine-3 | ok | 144.04 | 466 |
-| California | TVAE | tuned | 23 | fit-machine-3 | ok | 370.12 | 462 |
+| Adult | CTGAN | default | 11 | xbabe1 | timeout | 600.67 | 664 |
+| Adult | CTGAN | tuned | 11 | xbabe1 | ok | 156.12 | 664 |
+| Adult | TVAE | default_and_tuned | 11 | xbabe1 | ok | 377.00 | 630 |
+| Adult | CTGAN | default | 37 | xbabe1 | timeout | 600.69 | 664 |
+| Adult | CTGAN | tuned | 37 | xbabe1 | ok | 155.17 | 664 |
+| Adult | TVAE | default_and_tuned | 37 | xbabe1 | ok | 391.11 | 630 |
+| Adult | CTGAN | default | 53 | xbabe1 | timeout | 600.76 | 664 |
+| Adult | CTGAN | tuned | 53 | xbabe1 | ok | 157.95 | 664 |
+| Adult | TVAE | default_and_tuned | 53 | xbabe1 | ok | 391.64 | 630 |
+| Adult | CTGAN | default | 71 | xbabe1 | timeout | 600.33 | 664 |
+| Adult | CTGAN | tuned | 71 | xbabe1 | ok | 157.18 | 664 |
+| Adult | TVAE | default_and_tuned | 71 | xbabe1 | ok | 390.53 | 630 |
+| Adult | CTGAN | default | 23 | xbabe1 | timeout | 600.50 | 664 |
+| Adult | CTGAN | tuned | 23 | xbabe1 | ok | 153.04 | 664 |
+| Adult | TVAE | default_and_tuned | 23 | xbabe1 | ok | 375.15 | 630 |
+| California | CTGAN | default_and_tuned | 11 | xbabe3 | ok | 213.30 | 476 |
+| California | TVAE | default | 11 | xbabe3 | ok | 144.04 | 466 |
+| California | TVAE | tuned | 11 | xbabe3 | ok | 312.62 | 462 |
+| California | CTGAN | default_and_tuned | 37 | xbabe3 | ok | 211.30 | 476 |
+| California | TVAE | default | 37 | xbabe3 | ok | 142.46 | 466 |
+| California | TVAE | tuned | 37 | xbabe3 | ok | 311.89 | 462 |
+| California | CTGAN | default_and_tuned | 53 | xbabe3 | ok | 211.39 | 476 |
+| California | TVAE | default | 53 | xbabe3 | ok | 122.09 | 466 |
+| California | TVAE | tuned | 53 | xbabe3 | ok | 321.10 | 462 |
+| California | CTGAN | default_and_tuned | 71 | xbabe3 | ok | 202.07 | 476 |
+| California | TVAE | default | 71 | xbabe3 | ok | 130.25 | 466 |
+| California | TVAE | tuned | 71 | xbabe3 | ok | 307.68 | 462 |
+| California | CTGAN | default_and_tuned | 23 | xbabe3 | ok | 208.68 | 476 |
+| California | TVAE | default | 23 | xbabe3 | ok | 144.04 | 466 |
+| California | TVAE | tuned | 23 | xbabe3 | ok | 370.12 | 462 |
 
 ## Copy controls and artifact limits
 

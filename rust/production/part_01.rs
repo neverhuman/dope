@@ -70,6 +70,55 @@ pub fn file_hashes(path: &Path) -> Result<ContentHashes> {
     Ok(hashes(&bytes))
 }
 
+pub const LEGACY_HOST_1_SHA256: &str =
+    "f35c7c1c20bcc30c030e3c95ab9290c7d422421c5699875244df100bcf057b08";
+pub const LEGACY_HOST_2_SHA256: &str =
+    "1b5fb9b323509a84a2bef5e6f0b3ab979ebca71aee700a74761f8af4dea78df5";
+pub const LEGACY_HOST_3_SHA256: &str =
+    "8fb535ec12ff2dcfef6eb10618f6afda7ceb5fb6c2b47f197c2c07e6eafac914";
+
+pub fn configured_host_role(role: u8) -> Result<String> {
+    let var = match role {
+        1 => "DOPE_FIT_HOST_1",
+        2 => "DOPE_FIT_HOST_2",
+        3 => "DOPE_EVAL_HOST",
+        _ => return Err(DopeError::Data("unsupported campaign host role".into())),
+    };
+    std::env::var(var)
+        .ok()
+        .map(|s| s.trim().to_owned())
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| DopeError::Data(format!("{var} must be set for runtime host check")))
+}
+
+pub fn matches_host_role(candidate: &str, role: u8) -> bool {
+    let placeholder = match role {
+        1 => "fit-machine-1",
+        2 => "fit-machine-2",
+        3 => "fit-machine-3",
+        _ => return false,
+    };
+    if candidate == placeholder {
+        return true;
+    }
+    if let Ok(configured) = configured_host_role(role)
+        && candidate == configured
+    {
+        return true;
+    }
+    let legacy_sha = match role {
+        1 => LEGACY_HOST_1_SHA256,
+        2 => LEGACY_HOST_2_SHA256,
+        3 => LEGACY_HOST_3_SHA256,
+        _ => return false,
+    };
+    hashes(candidate.as_bytes()).sha256 == legacy_sha
+}
+
+pub fn is_valid_campaign_worker(worker: &str) -> bool {
+    matches_host_role(worker, 1) || matches_host_role(worker, 2) || matches_host_role(worker, 3)
+}
+
 pub fn write_canonical<T: Serialize>(path: &Path, value: &T) -> Result<ContentHashes> {
     let bytes = canonical_json(value)?;
     static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);
@@ -365,9 +414,10 @@ impl RunContract {
             || self.generation_seeds_per_lineage != GENERATION_REPEATS
             || self.auditor_seeds != AUDITOR_SEEDS
             || self.artifact_ceiling_bytes != EMPIRICAL_ARTIFACT_CEILING_BYTES
-            || self.controller != "fit-machine-1"
-            || self.primary_worker != "fit-machine-1"
-            || self.guarded_evaluator != "fit-machine-3"
+            || !matches_host_role(&self.controller, 1)
+            || !matches_host_role(&self.primary_worker, 1)
+            || self.controller != self.primary_worker
+            || !matches_host_role(&self.guarded_evaluator, 3)
             || self.lease_seconds != 600
             || self.heartbeat_seconds != 30
             || self.infrastructure_retries != 2

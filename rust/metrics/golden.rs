@@ -96,14 +96,32 @@ mod tests {
     #[test]
     fn rust_matches_golden_parity_corpus() {
         let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        let local_golden = manifest_dir.join("tests/golden");
-        let rt_l1_golden = manifest_dir.join("../rt-L1/tests/golden");
-        let root = if !discover_cases(&local_golden).is_empty() {
-            local_golden
-        } else {
-            rt_l1_golden
-        };
+        let root = manifest_dir.join("tests/golden");
         let count = verify_golden_corpus(&root).expect("golden parity corpus must pass in Rust");
         assert!(count >= 40, "expected full golden corpus, got {count}");
+    }
+
+    #[test]
+    fn rust_matches_json_admission_corpus() {
+        let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let path = manifest_dir.join("tests/golden/t122-json-admission.json");
+        let text = fs::read_to_string(&path).expect("t122-json-admission.json must be readable");
+        let fixture = strict_parse_json(&text).expect("fixture outer JSON must parse");
+        let cases = fixture["cases"].as_array().expect("cases must be an array");
+        assert!(!cases.is_empty(), "expected non-empty admission cases");
+        for case in cases {
+            let case_id = case["case_id"].as_str().expect("case_id");
+            let input_json = case["input_json"].as_str().expect("input_json");
+            let res = strict_parse_json(input_json);
+            if let Some(expected_err) = case.get("expected_error").and_then(Value::as_str) {
+                let err = res.expect_err(&format!("case `{case_id}` should fail"));
+                assert_eq!(err.reason, expected_err, "case `{case_id}` reason mismatch");
+            } else if let Some(expected_val) = case.get("expected_value") {
+                let val = res.expect(&format!("case `{case_id}` should parse"));
+                assert_eq!(&val, expected_val, "case `{case_id}` value mismatch");
+            } else {
+                panic!("case `{case_id}` missing expected_error or expected_value");
+            }
+        }
     }
 }

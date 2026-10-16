@@ -19,7 +19,7 @@ from research.benchmark.tabsyn_runtime_guard import bound, require, safe
 
 AUTHOR = 'cb5ac0f74ec36ee88e7a974a393dfbef50d42da7'
 LEASE = '/path/to/operator-home/dope-scratch-x3/.gpu-fit.lock'
-OWNER_ONE_POLICY_SHA256 = '813429a331a4135dd68b250920f17c0b83cca4c4d2e22efa4cdf8c55d38bd63d'
+OWNER_ONE_POLICY_SHA256 = '3b5e46786727a6f09938ea4276c37070fae63824c7b1e6ff5b0ea8be88012f94'
 
 
 class _VerifiedGuardLoader(SourceFileLoader):
@@ -45,9 +45,18 @@ def identity(pid):
     return dict(pid=pid, uid=path.stat().st_uid, start_ticks=tail[19])
 
 
+def _resolve_lease_path(path):
+    text = str(path)
+    if text.startswith('/path/to/operator-home/'):
+        home = os.environ.get('DOPE_OPERATOR_HOME', '').strip().rstrip('/')
+        require(bool(home), 'DOPE_OPERATOR_HOME must be set for TabSyn lease path')
+        return text.replace('/path/to/operator-home', home, 1)
+    return text
+
+
 def held_lease(fd, path=LEASE):
     require(type(fd) is int and fd >= 3, 'TabSyn inherited lease descriptor differs')
-    path = safe(path)
+    path = safe(_resolve_lease_path(path))
     expected, actual = path.stat(), os.fstat(fd)
     require(stat.S_ISREG(actual.st_mode) and actual.st_uid == os.getuid()
             and (actual.st_dev, actual.st_ino) == (expected.st_dev, expected.st_ino),
@@ -151,7 +160,9 @@ def verify_operation(admission, mode, config_sha256, runtime_sha256, code_path, 
     require(scope['source_commit'] == AUTHOR and scope['real_data_allowed'] is True
             and scope['partition'] == 'official_training_derived_validation'
             and scope['official_tests_opened'] is False
-            and scope['gpu_lease_path'] == LEASE
+            and (scope['gpu_lease_path'] == LEASE
+                 or (bool(os.environ.get('DOPE_OPERATOR_HOME', '').strip())
+                     and scope['gpu_lease_path'] == _resolve_lease_path(LEASE)))
             and scope['maximum_trials'] == 8 and type(scope['maximum_trials']) is int
             and scope['maximum_lineage_seconds'] == 43200
             and type(scope['maximum_lineage_seconds']) is int

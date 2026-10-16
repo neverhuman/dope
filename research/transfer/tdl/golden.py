@@ -27,7 +27,11 @@ def strict_load(text):
         result = float(value)
         require(math.isfinite(result), "nonstandard_json_number")
         return result
-    return json.loads(text, parse_constant=reject, parse_float=finite_float, object_pairs_hook=_object)
+    def bounded_int(value):
+        result = int(value)
+        require(-(1 << 63) <= result <= (1 << 64) - 1, "invalid_json")
+        return result
+    return json.loads(text, parse_constant=reject, parse_float=finite_float, parse_int=bounded_int, object_pairs_hook=_object)
 
 
 def close(actual, expected, tolerance=1e-12):

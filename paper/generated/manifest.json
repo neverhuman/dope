@@ -1,6 +1,6 @@
 {
   "format": "dope-generated-claims-v1",
-  "source_sha256": "4a75008ead24fc1ab5f7c7ef631d2c8dec3653f68d4a7df1ee7fd2e9fd150b94",
+  "source_sha256": "36687931e58ce62a95c4e697e06388ac8b4afe5e9065084afd2c55721d60d27e",
   "files": {
     "STATUS.md": "2cabd7db7d516507cd2d56853f2bf7a7d570fb793482fa6bae4890e4931fe7b8",
     "paper/generated/headline-macros.tex": "22f898ab0069c06b92b44e430b1457d07343bb9ea1bfc02e4c87bc0d4d7ad9da",
@@ -8,7 +8,7 @@
     "paper/generated/hero-frontier.pdf": "12ee4952035da51a53219b2d5422dc2a6a3ed3a7dd0fa10348f80334d36f163b",
     "paper/generated/hero-frontier.png": "6d929a8dce3980a7fad2467dd2a511098a9bc8fff3c07003d82dcb6e14f1a8eb",
     "paper/generated/hero-frontier.svg": "102829e36b3ecd66f3fe3d58ea333ff248d87c0a8ac8bda19330a774297a67e4",
-    "paper/generated/readme-demo-notes.md": "431d9094417a89108059196787a686b1193066316b229209607306cda9d9d536",
+    "paper/generated/readme-demo-notes.md": "95066ff8833c88df5dc82f0e870bfaaccfc580308f628003d6c78df22ccd42b1",
     "paper/generated/readme-result-card.md": "90e9b04c188613ea48288cee577b225f10f759ee5252ab1a57b12583a5620da4",
     "paper/generated/result-card.tex": "a40ddcb8c5a59045fb8c3f464af9c1adad7831adc46f48bb76bd7b326399bbba"
   }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Owner-authorized fit-machine-3 local resource-capacity amendment",
+  "title": "Owner-authorized xbabe3 local resource-capacity amendment",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -20,7 +20,7 @@
     "execution_order",
     "du_semantics",
     "filesystem",
-    "old_fit-machine-2_fast_scratch_budget_separate",
+    "old_xbabe2_fast_scratch_budget_separate",
     "forest_new_large_artifacts_storage_policy",
     "shared_gpu_fit_lease_path",
     "projection_and_model_bytes_charged",
@@ -59,10 +59,10 @@
       "minLength": 1
     },
     "host": {
-      "const": "fit-machine-3"
+      "const": "xbabe3"
     },
     "new_scratch_root": {
-      "const": "/path/to/operator-home/dope-scratch-x3"
+      "const": "/home/ubuntu/dope-scratch-x3"
     },
     "ceiling_bytes": {
       "const": 200000000000
@@ -87,7 +87,7 @@
         "prior_failed_trial_and_cost_carry_required",
         "tuning_cell_wall_cap_seconds",
         "tuning_trials_per_cell_max",
-        "fit-machine-0_allowed",
+        "xbabe0_allowed",
         "yield_to_jope_dltrain_or_hyperion"
       ],
       "properties": {
@@ -108,9 +108,9 @@
         },
         "hosts": {
           "const": [
-            "fit-machine-1",
-            "fit-machine-2",
-            "fit-machine-3"
+            "xbabe1",
+            "xbabe2",
+            "xbabe3"
           ]
         },
         "maximum_study_cpu_slots": {
@@ -131,7 +131,7 @@
         "tuning_trials_per_cell_max": {
           "const": 8
         },
-        "fit-machine-0_allowed": {
+        "xbabe0_allowed": {
           "const": false
         },
         "yield_to_jope_dltrain_or_hyperion": {
@@ -239,7 +239,7 @@
         }
       }
     },
-    "old_fit-machine-2_fast_scratch_budget_separate": {
+    "old_xbabe2_fast_scratch_budget_separate": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -247,7 +247,7 @@
         "existing_artifacts_moved_or_deleted",
         "permitted_new_contents",
         "root",
-        "shared_sshfs_alias_is_not_fit-machine-3_local_disk"
+        "shared_sshfs_alias_is_not_xbabe3_local_disk"
       ],
       "properties": {
         "ceiling_bytes": {
@@ -263,7 +263,7 @@
         "root": {
           "const": "/mnt/fast-scratch/dope-benchmark"
         },
-        "shared_sshfs_alias_is_not_fit-machine-3_local_disk": {
+        "shared_sshfs_alias_is_not_xbabe3_local_disk": {
           "const": true
         }
       }
@@ -273,7 +273,7 @@
       "minLength": 1
     },
     "shared_gpu_fit_lease_path": {
-      "const": "/path/to/operator-home/dope-scratch-x3/.gpu-fit.lock"
+      "const": "/home/ubuntu/dope-scratch-x3/.gpu-fit.lock"
     },
     "projection_and_model_bytes_charged": {
       "const": true

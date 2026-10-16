@@ -73,10 +73,10 @@
     "required_families": [
       "tree",
       "linear",
-      "foundation_tabular"
+      "neural"
     ],
     "held_out_families": [
-      "neural"
+      "foundation_tabular"
     ],
     "learner_portfolio": [
       "catboost",

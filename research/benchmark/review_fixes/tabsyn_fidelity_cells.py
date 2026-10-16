@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 DECLARATION_SHA256 = '686742975a461e59ac486997a637ab0e817d89141159a1da0f48adfb6eaeaec0'
-SAMPLES = Path('/path/to/operator-home/dope-scratch-x1/dope-rf-tabsyn-sample-v1')
+SAMPLES = Path('/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-sample-v1')
 WORKERS = Path('/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker')
 
 
@@ -84,8 +84,8 @@ def main():
     parser.add_argument('--out', required=True, type=Path)
     parser.add_argument('--implementation', required=True, type=Path)
     args = parser.parse_args()
-    if os.uname().nodename != 'fit-machine-1':
-        raise ValueError('fidelity row computation is restricted to fit-machine-1')
+    if os.uname().nodename != 'xbabe1':
+        raise ValueError('fidelity row computation is restricted to xbabe1')
     declaration = json.loads(authenticated(args.declaration, DECLARATION_SHA256))
     if declaration['official_tests_opened'] is not False or declaration['formal_dp'] is not False:
         raise ValueError('official test or formal privacy flag refused')

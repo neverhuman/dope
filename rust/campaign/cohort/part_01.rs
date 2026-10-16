@@ -27,7 +27,14 @@ fn require_named_host(actual: &str, expected: &str, operation: &str) -> Result<(
 }
 
 fn require_host(expected: &str, operation: &str) -> Result<()> {
-    require_named_host(&current_hostname()?, expected, operation)
+    let role = match expected {
+        "fit-machine-1" => 1,
+        "fit-machine-2" => 2,
+        "fit-machine-3" => 3,
+        _ => return require_named_host(&current_hostname()?, expected, operation),
+    };
+    let configured = crate::production::configured_host_role(role)?;
+    require_named_host(&current_hostname()?, &configured, operation)
 }
 
 pub fn available_bytes(path: &Path) -> Result<u64> {

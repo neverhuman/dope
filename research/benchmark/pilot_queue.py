@@ -145,8 +145,13 @@ def run_cell(cell: dict, deadline_epoch: float, semaphores: dict, cpu_pools: dic
         job_path = directory / "jobs" / f"{name}.json"
         if not job_path.exists():
             atomic_json(job_path, job)
-        python = ("/path/to/operator-home/dope/.agent/worktrees/integration/target/bench-venv/bin/python"
-                  if cell["method"] == "GaussianCopula" else "/usr/bin/python3")
+        if cell["method"] == "GaussianCopula":
+            op_home = os.environ.get("DOPE_OPERATOR_HOME", "").strip().rstrip("/")
+            if not op_home:
+                raise ValueError("DOPE_OPERATOR_HOME must be set for GaussianCopula bench-venv")
+            python = f"{op_home}/dope/.agent/worktrees/integration/target/bench-venv/bin/python"
+        else:
+            python = "/usr/bin/python3"
         command = ["env", f"PYTHONPATH={PACKAGE}", "CUDA_VISIBLE_DEVICES=",
                    "OMP_NUM_THREADS=16", "OPENBLAS_NUM_THREADS=16", "MKL_NUM_THREADS=16",
                    python, "-m", "research.benchmark.runner", str(job_path),
@@ -154,11 +159,22 @@ def run_cell(cell: dict, deadline_epoch: float, semaphores: dict, cpu_pools: dic
         cap = min(remaining, 2700 if cell["method"] == "GaussianCopula" else 1200)
         command = ["timeout", "--signal=TERM", "--kill-after=20s", str(cap),
                    "/usr/bin/time", "-v", "taskset", "-c", common["cpu_affinity"], *command]
-        if host != "fit-machine-2":
-            command = ["ssh", "-o", "BatchMode=yes", host, shlex.join(command)]
+        raw_hosts = os.environ.get("DOPE_COMPUTE_HOSTS", "").strip().replace(",", " ").split()
+        host_map = (dict(zip(("fit-machine-1", "fit-machine-2", "fit-machine-3"), raw_hosts))
+                    if len(raw_hosts) == 3 else {
+                        "fit-machine-1": os.environ.get("DOPE_FIT_HOST_1", "").strip(),
+                        "fit-machine-2": os.environ.get("DOPE_FIT_HOST_2", "").strip(),
+                        "fit-machine-3": os.environ.get("DOPE_EVAL_HOST", "").strip(),
+                    })
+        target_host = host_map.get(host, "")
+        if not target_host:
+            raise ValueError(f"Set DOPE_COMPUTE_HOSTS or role host env var for {host}")
+        is_local = target_host == os.uname().nodename.split(".")[0]
+        if not is_local:
+            command = ["ssh", "-o", "BatchMode=yes", target_host, shlex.join(command)]
         try:
             result = subprocess.run(command, capture_output=True, text=True, timeout=cap + 35,
-                                    cwd=str(PACKAGE) if host == "fit-machine-2" else None)
+                                    cwd=str(PACKAGE) if is_local else None)
             log_path = directory / ("repair-logs" if repair_digest_mismatch else "logs") / f"{name}.log"
             log_path.write_text(result.stdout + "\n--- stderr ---\n" + result.stderr)
             child = json.loads(result.stdout.strip().splitlines()[-1]) if result.returncode == 0 else []

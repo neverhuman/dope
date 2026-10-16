@@ -24,7 +24,7 @@ The three displayed receipts record `co_tenant=false` and `shared_GPU_cost=false
 
 The 430 MiB values are maximum **observed** owned process GPU residency, using verified PID/start identities. Recorded maximum sampling gaps are retained in JSON and CSV. These values are not true peaks, complete host RSS measurements, or capacity qualification for another dataset.
 
-The profile retains CPU80–95 on fit-machine-2, GPU0, a declared 16 GiB RAM envelope, 8 trials per cell, 43,200 inclusive seconds per cell, a 600 second operation ceiling, and a 240,000 second new operation budget. The stored `native_operations_started=0` counter is explicitly non-authoritative; receipt and charged trial joins determine progress.
+The profile retains CPU80–95 on xbabe2, GPU0, a declared 16 GiB RAM envelope, 8 trials per cell, 43,200 inclusive seconds per cell, a 600 second operation ceiling, and a 240,000 second new operation budget. The stored `native_operations_started=0` counter is explicitly non-authoritative; receipt and charged trial joins determine progress.
 
 Official TEST data remains sealed. MFS v2, PTF v1, release safety, superiority, native winner, sample completeness, fivefit stability, and method completion remain null.
 

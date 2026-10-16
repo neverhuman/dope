@@ -193,21 +193,30 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         _ => 0.70,
     };
 
+    let mut parsed_ceilings: BTreeMap<String, f64> = BTreeMap::new();
+    for comp in &required {
+        if let Some(v) = ceilings.get(comp)
+            && !v.is_null()
+        {
+            parsed_ceilings.insert(comp.clone(), unit(v)?);
+        }
+    }
+    if required
+        .iter()
+        .any(|comp| ceilings.get(comp).is_none_or(Value::is_null))
+    {
+        return Err(MetricError::with_status(
+            "missing_driver_component",
+            "incomplete",
+        ));
+    }
+
     let mut raw_out = Map::new();
     let mut normalized_out = Map::new();
     let mut min_score = f64::INFINITY;
 
     for comp in &required {
-        let ceil_val = match ceilings.get(comp) {
-            None | Some(Value::Null) => {
-                return Err(MetricError::with_status(
-                    "missing_driver_component",
-                    "incomplete",
-                ));
-            }
-            Some(v) => v,
-        };
-        let ceiling = unit(ceil_val)?;
+        let ceiling = parsed_ceilings[comp];
         if ceiling <= 0.0 || ceiling < floor {
             return Err(MetricError::with_status(
                 "unstable_real_drivers",

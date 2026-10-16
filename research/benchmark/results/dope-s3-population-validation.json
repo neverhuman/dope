@@ -161866,15 +161866,15 @@
       "coordinator_wall_seconds": 6372.402748367982,
       "energy_attributable_to_job": null,
       "host_operation_seconds": {
-        "fit-machine-1": 1760.775001832284,
-        "fit-machine-2": 1360.2606038847007
+        "xbabe1": 1760.775001832284,
+        "xbabe2": 1360.2606038847007
       },
       "new_fit_operation_seconds": 3121.0356057169847,
       "peak_observed_device_used_mib": 1067,
       "prior_closed_fit_seconds": 226.02740479726344,
       "prior_wrapper_new_operation_transport_seconds": 76.67627994180657
     },
-    "host": "fit-machine-2",
+    "host": "xbabe2",
     "job_attributed_energy_joules": null,
     "new_generator_fits": 0,
     "new_gpu_fit_operation_seconds": 3121.0356057169847,

@@ -330,7 +330,7 @@
         "freeze whole-process fit RNG initialization and sample seed wrapper; verify exact finite n/2n/4n/8n outputs and replay",
         "verify safe artifact-only local loading and full model/config/group-statistics/preprocessing/projection bytes; exclude original rows from inference state",
         "run copy/leakage/privacy and real-vs-real controls; missing-value generation must conform to the selected numeric representation",
-        "fresh aggregate owner admission on fit-machine-1/2/3,disjointCPU/RAM/scratch,whole-fit600s/16GiB GPU caps"
+        "fresh aggregate owner admission on xbabe1/2/3,disjointCPU/RAM/scratch,whole-fit600s/16GiB GPU caps"
       ]
     },
     "ptf_v1": {

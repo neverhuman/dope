@@ -1,16 +1,17 @@
 # Large retained result artifacts
 
 T-084 records the tracked-tree inventory. No data is removed or moved by this PR.
-The byte counts and SHA256 digests below describe the public tree after the
-T-080 metadata scrub; original byte identities are retained in git history and
-[the scrub inventory](../../evidence/tree-scrub.json).
+The byte counts and SHA256 digests below describe the retained frozen result
+files, which preserve their exact `b8340ec` byte identities (enforced by
+`ops/ci/check-frozen-evidence.py`) and are documented alongside the active-tree
+scrub in [the scrub inventory](../../evidence/tree-scrub.json).
 
 | Tracked result | Bytes | SHA256 |
 |---|---:|---|
 | `research/benchmark/results/review-fixes-v2/scalar-cells.jsonl` | 24121982 | `ea4168621dfaadfb5735d5df74d384e57f46f8e16b8053402b663a6960a94745` |
-| `research/benchmark/results/density-matched-population-validation.json` | 21794636 | `8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177` |
-| `research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json` | 21478208 | `e797f3ef0c1907d51caddb06c7669683afaf96274a2af5a885ab5dd7abdaf13e` |
-| `research/benchmark/results/retained-classical-validation/physical-metrics.jsonl` | 21410189 | `835f4d456a909662104546c2644f6269169ab3aae4f571dbde089db3adddecb4` |
+| `research/benchmark/results/density-matched-population-validation.json` | 21794615 | `5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a` |
+| `research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json` | 21453198 | `069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a` |
+| `research/benchmark/results/retained-classical-validation/physical-metrics.jsonl` | 21314459 | `07c815bd2d6f9c6ee6e39bd71d19ec606ff63be5f327e7a521360427128e6e5c` |
 
 Proposed follow-on: publish a versioned release asset with the exact bytes,
 SHA256, evidence status, license/rights review and source-commit binding; retain
