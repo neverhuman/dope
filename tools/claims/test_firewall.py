@@ -34,7 +34,8 @@ class FirewallTests(unittest.TestCase):
                          'research/transfer/locks', 'research/transfer/manifests'):
                 shutil.copytree(ROOT / name, root / name)
             inputs = {'README.md', 'Cargo.toml', 'pyproject.toml', 'CITATION.cff',
-                      'contracts/tdl-contract-v1.json', 'evidence/status.json', C.REGISTRY['sources']['headline']}
+                      'contracts/tdl-contract-v1.json', 'evidence/status.json', C.REGISTRY['sources']['headline'],
+                      'research/benchmark/results/review-fixes-v2/scalar-cells.jsonl'}
             inputs.update(pin['path'] for pin in self.data['demo_notes']['pins'])
             for name in inputs:
                 path = root / name
