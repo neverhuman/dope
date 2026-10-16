@@ -11,7 +11,7 @@ production release, no privacy status and no final-test admission.
 
 ## Status
 
-- The v2 validation panel (`review_fixes/`) is the active evidence, labelled
+- The v2 validation panel (`review_fixes/`) is the active evidence, labeled
   `selection_exposed_validation`.
 - The public-core and matched S3 comparisons are not admitted, and the official test
   partitions are unopened.
@@ -27,7 +27,7 @@ production release, no privacy status and no final-test admission.
 | --- | --- |
 | `PROTOCOL.md` | generator benchmark protocol v1: questions, endpoints, frozen thresholds |
 | `RESULTS_STATUS.md` | campaign status ledger and remaining admission work |
-| `*_SOURCE_AUDIT.md`, `*.audit.json` | per-method source, licence and runtime audits |
+| `*_SOURCE_AUDIT.md`, `*.audit.json` | per-method source, license and runtime audits |
 | `methods.lock.json`, `method-locks/` | method identities and lock state |
 | `review_fixes/` | the v2 review panel: pre-declarations (`predeclare_v2.json`), cell binders, statistics, sealed-once handling |
 | `results/` | committed, hash-pinned result publications, each with its own README and replay command |

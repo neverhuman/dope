@@ -90,7 +90,7 @@ against this tree:
 
 The five specifications in `docs/review-inputs/2026-10-15/` found the gaps below in the project
 as a whole rather than in the historical paper. Task IDs refer to
-[docs/TODO-2026-10-15.md](../TODO-2026-10-15.md); `FOLLOW-*` items need compute, licences or owner
+[docs/TODO-2026-10-15.md](../TODO-2026-10-15.md); `FOLLOW-*` items need compute, licenses or owner
 decisions and are not done in the rebuild PR.
 
 | ID | Gap | Fix / acceptance | Status |
@@ -98,14 +98,14 @@ decisions and are not done in the rebuild PR.
 | S-01 | The public metric is a weighted seven-term master score (MFS-v4) whose weights carry the argument and allow compensation | TDL contract and Rust/Python metric core with golden parity (T-020, T-030 to T-037); MFS-v4 frozen as historical (T-003, T-004) | open: in progress in the rebuild PR |
 | S-02 | Three public truths: README on v4, paper on v3, evidence on v2 | One narrative: README, docs and the new paper say v2 is active evidence, v3/v4 historical, TDL unmeasured (T-100, T-110, T-111) | open: addressed by L3 in the rebuild PR, closes on merge |
 | S-03 | The compactness score improves when rows are duplicated or values are packed (bits per cell, `encoded_numbers`, log-byte term) | Exact charged bytes as the rate; encoded counts diagnostic only; adversarial accounting tests (T-005, T-034, T-035) | open |
-| S-04 | The headline is CatBoost retention, not cross-model transfer | Qualified multi-family auditor panel and campaign (FOLLOW-AUDQ, FOLLOW-CAMPAIGN); hero figure labelled historical until then (T-072) | open |
+| S-04 | The headline is CatBoost retention, not cross-model transfer | Qualified multi-family auditor panel and campaign (FOLLOW-AUDQ, FOLLOW-CAMPAIGN); hero figure labeled historical until then (T-072) | open |
 | S-05 | One encoder's representation distance is a headline component | Demote representation metrics to diagnostics (T-038) | open |
 | S-06 | Byte scopes are not defined across methods; a small file can hide a large runtime or checkpoint | Payload and sampling-closure scopes, charge manifest, traced clean-room sampling (T-022, T-034, T-035) | open |
 | S-07 | Driver agreement compares one importance vector pair with no real-versus-real calibration | Grouped permutation importance per auditor with real-real ceilings (T-032, T-036) | open |
 | S-08 | Frontier foundation models are named in contracts before qualification | Registry and lock state machine (T-060, T-061); planned/unqualified labels on every public table (T-065) | open: labels done in docs; qualification is FOLLOW-AUDQ |
 | S-09 | Public numbers are typed by hand in places | One results file renders README and paper numbers; CI refuses hand-typed numbers (T-070, T-071, T-072) | open |
 | S-10 | Private host names, operator paths and a bucket name appear in the tracked tree | Tree scrub (T-080); no history rewrite (D-06) | open |
-| S-11 | No governance files, fork-safe CI or licence inventory | T-081, T-082, T-083 | open |
+| S-11 | No governance files, fork-safe CI or license inventory | T-081, T-082, T-083 | open |
 | S-12 | The benchmark is PMLB-dominated with no shift cohort | RealCore, ShiftCore, MechanismLab and StressCore manifests (T-064); curation is FOLLOW-DATA | open |
 | S-13 | The null is a mean predictor even for foundation models, and low-signal tasks have unstable denominators | Strongest no-table-learning null and the informative-task gate (T-030) | open |
-| S-14 | The public CLI needs pre-normalised headerless numeric input, and categorical hashing reads as secrecy | Design note for ordinary CSV with explicit categorical modes (T-092); implementation is follow-on | open |
+| S-14 | The public CLI needs pre-normalized headerless numeric input, and categorical hashing reads as secrecy | Design note for ordinary CSV with explicit categorical modes (T-092); implementation is follow-on | open |

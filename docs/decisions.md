@@ -18,7 +18,7 @@ Each item is **pending Jepson**. This PR uses the working default and freezes no
 | D-04 | Historical tag before file moves | e.g. `mfs-history-2026-10-15` at `353120f` | tag created locally only; pushed only after approval |
 | D-05 | Repository split | separate product, benchmark and paper repositories, or one repository | one repository with `bench/` and `paper/` directories (S2 §12.2) |
 | D-06 | Public exposure and history | private repository plus a history scrub (needs a force-push) | scrub the tracked tree only; no history rewrite |
-| D-07 | Foundation-model licences and GPU qualification budget | — | registry entries at `specified`; no qualification runs |
+| D-07 | Foundation-model licenses and GPU qualification budget | — | registry entries at `specified`; no qualification runs |
 | D-08 | When to open the sealed test (CM-09) | — | not opened; contract field only |
 | D-09 | Public binary name | retire `dope-kernel-v1`, add `dope` | add the `dope` alias; keep the old names as legacy shims |
 

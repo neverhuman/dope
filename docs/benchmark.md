@@ -1,7 +1,7 @@
 # Benchmark
 
-**Active evidence:** the v2 validation panel, labelled `selection_exposed_validation`.
-**Planned:** the TDL benchmark, labelled `specified_unrun`. The official test split is
+**Active evidence:** the v2 validation panel, labeled `selection_exposed_validation`.
+**Planned:** the TDL benchmark, labeled `specified_unrun`. The official test split is
 sealed. Labels and wording rules are in the [claims policy](claims-policy.md). The metric
 is defined in [metric](metric.md).
 
@@ -18,7 +18,7 @@ paper's tables come from the same committed ledgers.
 | Fit seeds | DOPE, ARF and TabSyn use five fit seeds (11, 23, 37, 53, 71); every other comparator has one |
 | Auditors | CatBoost, linear regression and an MLP, each trained on synthetic rows and scored on real validation rows |
 | Synthetic sizes | `n` and `4n` |
-| Quantity | null-normalised retention: the share of a real-trained auditor's gain over the null that the synthetic-trained auditor recovers |
+| Quantity | null-normalized retention: the share of a real-trained auditor's gain over the null that the synthetic-trained auditor recovers |
 | Comparison | paired Hodges–Lehmann differences on shared lineages, with 95% nested bootstrap intervals (simulated-family cluster, then lineage, then fit seed) |
 | Controls | resampled real rows (a row-count diagnostic, not a generator) and a predictor-only control |
 | Bytes | the encoded `.dpk` file plus `projection.json`: every byte that sampling reads |
@@ -41,7 +41,7 @@ TabSyn author-default, Forest-Flow under the common budget, TabDiff, GReaT, synt
 SMOTE, the ablation grid and the stress suite. A missing or failed cell is never a DOPE
 win.
 
-**What the panel does not show.** It is CatBoost-centred. It has no held-out learner
+**What the panel does not show.** It is CatBoost-centered. It has no held-out learner
 family and no held-out source family, and it does not measure driver fidelity. Empirical
 attacks cover only the stated cells, and measured copy, membership and attribute gates
 already fail on some of them. It therefore supports no TDL, cross-model or privacy claim.
@@ -61,7 +61,7 @@ already fail on some of them. It therefore supports no TDL, cross-model or priva
 An auditor counts toward TDL only after its lock reaches `qualified`. The lock path is
 `specified`, `source_verified`, `weights_verified`, `environment_verified`,
 `parity_verified`, `resource_verified`, `qualified`. Qualification needs owner decision
-D-07 (licences and GPU budget) and is follow-on work (FOLLOW-AUDQ).
+D-07 (licenses and GPU budget) and is follow-on work (FOLLOW-AUDQ).
 
 ## 3. Reproduce the v2 numbers
 
@@ -81,7 +81,7 @@ with its ledger. The public data path needs no credentials:
 ## 4. The TDL benchmark (specified, not run)
 
 The design comes from the 2026-10-15 specifications. Execution is follow-on work that
-needs compute, licences or owner decisions.
+needs compute, licenses or owner decisions.
 
 - **Tracks.**
   - Author-default: each method in its published configuration.
@@ -103,7 +103,7 @@ needs compute, licences or owner decisions.
   - Compression controls.
   - Classical generators: copula, CART or synthpop, ARF, SMOTE.
   - Neural generators: CTGAN, TVAE, TabDDPM, TabSyn, TabDiff, GReaT, Forest-Flow.
-  - Every generator is admitted through the same source, licence and parity checks.
+  - Every generator is admitted through the same source, license and parity checks.
 - **Failure accounting.**
   - Every scheduled cell ends in a terminal disposition.
   - Failures, timeouts and refusals stay in every denominator.

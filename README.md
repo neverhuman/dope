@@ -7,7 +7,7 @@
 
 DOPE stands for **Downstream Objective-Preserving Encoding**. The artifact is a small **sampling program**, not a synthetic table. Train on generated rows. Test on untouched real rows. Count every byte that sampling reads.
 
-> **Evidence status (2026-10-15).** The active evidence is the v2 validation panel: 100 PMLB regression tables, CatBoost-centred and selection-exposed. The MFS-v3 and MFS-v4 release scores are historical and null for every method. The new metric, TDL, is specified and unmeasured. The official test split is sealed. Every result carries a label from the [claims policy](docs/claims-policy.md).
+> **Evidence status (2026-10-15).** The active evidence is the v2 validation panel: 100 PMLB regression tables, CatBoost-centered and selection-exposed. The MFS-v3 and MFS-v4 release scores are historical and null for every method. The new metric, TDL, is specified and unmeasured. The official test split is sealed. Every result carries a label from the [claims policy](docs/claims-policy.md).
 
 <!-- HERO FIGURE (T-072): the transfer-versus-bytes frontier rendered from paper/generated/headline-results.json goes here. -->
 > **Figure placeholder.** The transfer-versus-bytes frontier (T-072) has not been generated yet. Until it is, the only figures on this page are the historical CatBoost plots in the panel below.
@@ -19,7 +19,7 @@ TDL is the smallest tested number of dataset-specific bytes for which models tra
 - recover at least 90% of the real data's predictive gain over a null, at the lower confidence bound, in every required model family (trees, neural, linear, tabular foundation models); and
 - rely on the same feature drivers, at 80% or more of the agreement two real-trained models reach.
 
-The artifact must also pass the copy, cleartext, control-lift and byte-accounting gates. The public form is `KiB@T90/D80`. When no tested budget qualifies, the result is "not reached in the tested range", never zero. Bytes are the quantity being reduced, transfer and drivers are constraints, and nothing is averaged. The definitions are in [docs/metric.md](docs/metric.md). The name and thresholds are working defaults pending owner decisions D-01 and D-02 ([docs/decisions.md](docs/decisions.md)).
+The artifact must also pass the copy, cleartext, control-lift and byte-accounting gates. The public form is `KiB@T90/D80`. When no tested budget qualifies, the result is "not reached in the tested range", never zero. Bytes are the quantity being reduced; transfer and drivers are constraints, and no weight trades one against another. The definitions are in [docs/metric.md](docs/metric.md). The name and thresholds are working defaults pending owner decisions D-01 and D-02 ([docs/decisions.md](docs/decisions.md)).
 
 ## Current result card
 
