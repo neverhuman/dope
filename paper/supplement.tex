@@ -36,9 +36,15 @@ false. The human-readable definitions are in \path{docs/metric.md}.
 
 \section{Result states and gates}
 \label{app:states}
-A cell or method reports exactly one state: \texttt{qualified},
-\texttt{not\_reached\_in\_tested\_range}, \texttt{unqualified}, \texttt{incomplete} or
-\texttt{failed}. Hard gates are conjunctive: exact and near copy, cleartext scan, positive
+A cell or method reports exactly one state:
+\begin{itemize}
+  \item \texttt{qualified};
+  \item \texttt{not\_reached\_in\_tested\_range};
+  \item \texttt{unqualified};
+  \item \texttt{incomplete};
+  \item \texttt{failed}.
+\end{itemize}
+Hard gates are conjunctive: exact and near copy, cleartext scan, positive
 lift over the predictor-only and independent-marginal controls, a reconciled byte ledger,
 verified clean-room sampling, and complete qualified auditor families. The empirical attack
 panel is required for release certification, which is reported separately.
@@ -50,15 +56,19 @@ the charge manifests.}
 
 \section{Statistical plan}
 \label{app:stats}
-Cluster bootstrap over source family, dataset and seed with a fixed generator seed and shared
-resample indices across auditor families; the one-sided lower bound is the nearest-rank lower
-quantile. Golden fixtures hold the Rust core and the Python mirror to identical outputs.
-\pending{Resample count, interval level and multiplicity family from the frozen contract.}
+Cluster bootstrap over source family, dataset and seed with \BootstrapReplicates{} replicates, a
+fixed generator seed (\BootstrapSeed) and shared resample indices across auditor families; the
+one-sided \LowerBoundLevel{} lower bound is a lower order statistic of the replicates, and a
+driver component counts only when its real-versus-real ceiling reaches \StabilityFloor. These values
+are read from the \ContractState{} contract \ContractId. Golden fixtures hold the Rust core and the
+Python mirror to identical outputs. \pending{Multiplicity family, fixed when the contract freezes.}
 
 \section{Auditor and generator registries}
 \label{app:registries}
 \GeneratedTable{auditor-registry-table.tex}{Auditor registry: identity, license, qualification
 state. Frontier foundation models are planned and unqualified.}
+
+\medskip
 \GeneratedTable{generator-registry-table.tex}{Generator registry and admission state.}
 
 \section{Per-dataset results and failure dispositions}
