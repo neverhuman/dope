@@ -1,5 +1,14 @@
 {
-  "allowlist": {},
+  "allowlist": {
+    "docs/whitepaper/generated/readme-figure-hashes.json": {
+      "reason": "Upgraded README money plot (docs/readme/pareto.png) to two-panel multi-model, zero-shot foundation-model (Kumo, TabICL, Mitra), and holdout driver-fidelity display from frozen panel.json and mfs-v3-density-panel.json.",
+      "sha256": "5b187e7c8abb010bab0fe3dc3aa1ff4db2d03bc1fd45600726d87d385bb0d26b"
+    },
+    "docs/whitepaper/generated/teaser-figure-hashes.json": {
+      "reason": "Upgraded Page-1 hero figure (docs/whitepaper/figures/teaser.pdf) to two-panel multi-model, zero-shot foundation-model (Kumo, TabICL, Mitra), and holdout driver-fidelity display from frozen panel.json and mfs-v3-density-panel.json.",
+      "sha256": "baa07f5c93b0802fbe87d68272c3d8696f37f1d52fabaf0084f0ba331583b1a0"
+    }
+  },
   "baseline_commit": "b8340ec41799ccfe18d7aeee25bc6a23c2e0a093",
   "files": {
     "docs/whitepaper/generated/architecture-figure-hashes.json": "03e3332e7496fbd98ffbbd64105fad5c48abcfcb26e301a9ab5cc7ec53193636",

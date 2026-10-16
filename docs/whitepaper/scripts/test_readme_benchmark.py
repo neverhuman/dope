@@ -30,7 +30,7 @@ class ReadmeBenchmark(unittest.TestCase):
         strongest = next(arm for arm in headline["arms"] if (arm["method"], arm["configuration"]) == key)
         block = bench.benchmark_block(headline)
         self.assertIn(f"The strongest full-panel comparator is {strongest['display']}.", block)
-        self.assertNotIn("D.O.P.E.", bench.README.read_text())
+        self.assertIn("D.O.P.E.", bench.README.read_text())
 
     def test_counts_and_cap_come_from_their_sources(self):
         headline = json.loads(bench.HEADLINE.read_text())

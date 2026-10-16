@@ -14,6 +14,72 @@ from research.benchmark.mfs_v3_score import _v3_contract
 
 
 class PackagingTests(unittest.TestCase):
+    def test_a_cold_paper_recipe_creates_the_density_table_before_checking_its_numbers(self):
+        """Run Just with real pinned table rendering and the real protocol validator."""
+        repo = check_paper.ROOT.parents[1]
+        just = shutil.which("just")
+        self.assertIsNotNone(just, "canonical paper recipe regression requires Just")
+        target = repo / "target/paper-pipeline-tests"
+        target.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=target) as folder:
+            root = Path(folder)
+            generated = root / "docs/whitepaper/generated"
+            table = generated / "mfs-v3-density-table.tex"
+            generator = "    python3 docs/whitepaper/scripts/mfs_v3_table.py\n"
+            validator = "    python3 research/benchmark/verify_paper_numbers.py\n"
+            current = (repo / "Justfile").read_text()
+            # Reintroduce the ordering bug without changing either real Python implementation.
+            late = current.replace(generator, "", 1).replace(validator, validator + generator, 1)
+            runner = root / "recipe-runner.py"
+            runner.write_text(f"""import os, pathlib, sys
+sys.path[:0] = [{str(repo)!r}, {str(repo / 'docs/whitepaper/scripts')!r}]
+args = sys.argv[1:]
+if args[:1] == ['-B']:
+    args = args[1:]
+table = pathlib.Path({str(table)!r})
+if args == ['ops/ci/paper-prepare.py']:
+    table.parent.mkdir(parents=True, exist_ok=True)
+elif args == ['docs/whitepaper/scripts/mfs_v3_table.py']:
+    import mfs_v3_table as mfs
+    text = mfs.table_tex(mfs.measure(mfs.load_receipt()))
+    table.write_text('corrupt table' if os.environ.get('CORRUPT_DENSITY_TABLE') else text)
+elif args == ['research/benchmark/verify_paper_numbers.py']:
+    import research.benchmark.verify_paper_numbers as verify
+    original = verify._must_contain
+    def check(path, snippet, failures):
+        original(table if path.name == table.name else path, snippet, failures)
+    verify._must_contain = check
+    verify.protocol_tokens()
+""")
+            binary = root / "bin"
+            binary.mkdir()
+            shim = binary / "python3"
+            shim.write_text(f'#!/bin/sh\nexec "{sys.executable}" -B "{runner}" "$@"\n')
+            shim.chmod(0o755)
+            env = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ["PATH"])
+            env.pop("CORRUPT_DENSITY_TABLE", None)
+
+            def run_paper(text, *, corrupt=False):
+                shutil.rmtree(generated, ignore_errors=True)
+                justfile = root / "Justfile"
+                justfile.write_text(text)
+                return subprocess.run(
+                    [just, "--justfile", str(justfile), "--working-directory", str(root), "paper"],
+                    env=dict(env, CORRUPT_DENSITY_TABLE="1") if corrupt else env,
+                    capture_output=True, text=True, timeout=120,
+                )
+
+            bad = run_paper(late)
+            self.assertNotEqual(bad.returncode, 0)
+            self.assertIn("FileNotFoundError", bad.stderr)
+            self.assertIn(table.name, bad.stderr)
+            good = run_paper(current)
+            self.assertEqual(good.returncode, 0, good.stderr)
+            self.assertEqual(table.read_bytes(), (repo / table.relative_to(root)).read_bytes())
+            corrupt = run_paper(current, corrupt=True)
+            self.assertNotEqual(corrupt.returncode, 0)
+            self.assertIn("does not contain", corrupt.stderr)
+
     def test_canonical_recipes_execute_one_real_replay_and_reject_the_old_path(self):
         # Import inside the test so discovery does not also collect the shared
         # PipelineTests class. Run the same real Just/reducer/PDF assertions once.
@@ -267,7 +333,7 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
         cited = re.search(r"preferred-citation:.*?\n  title: \"([^\"]*)\"", citation, re.S)
         self.assertIsNotNone(cited)
         self.assertEqual(cited.group(1), title)
-        self.assertTrue(title.startswith("DOPE: "))
+        self.assertTrue(title.startswith("D.O.P.E.: "))
         self.assertNotIn("Kilobyte", title)
         self.assertIn("Downstream Objective-Preserving Encoding", main)
         # The round records keep all four profiles and record no selection, so these statements are withdrawn.
@@ -287,10 +353,10 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
         title = re.search(r"\\title\{\\texorpdfstring\{.*?\}\{([^{}]*)\}\}", main, re.S).group(1)
         self.assertIn(r"pdftitle={" + title + "}", main)
         self.assertIn(r"pdftitle={Supplement: " + title + "}", supplement)
-        self.assertEqual(readme.splitlines()[0], "# DOPE — " + title.removeprefix("DOPE: "))
+        self.assertEqual(readme.splitlines()[0], "# " + title.split(" -- ")[0])
         bibtex = re.search(r"@misc\{taylor2026dope,\n  title  = \{(.*)\},\n", readme)
         self.assertIsNotNone(bibtex)
-        self.assertEqual(bibtex.group(1), "{DOPE}: " + title.removeprefix("DOPE: "))
+        self.assertEqual(bibtex.group(1), "{D.O.P.E.}: " + title.removeprefix("D.O.P.E.: "))
         prose = readme.split("<!-- BEGIN BENCHMARK -->")[0] + readme.split("<!-- END BENCHMARK -->")[1]
         for text in (prose, citation, title):
             self.assertNotRegex(text.lower(), r"kilobyte[- ]scale|kilobyte generator")

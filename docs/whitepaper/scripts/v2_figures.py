@@ -58,19 +58,59 @@ INTERVAL_LEVEL = declared_facts.interval_level(declared_facts.read(declared_fact
 FOREST_TICKS = (0.0, 0.3, 0.6)
 # Readability floor for the page-1 hero at its printed size (ledger C053).
 HERO_MIN_POINTS = 7.0
-HERO_HEIGHT_IN = 2.65
+HERO_HEIGHT_IN = 2.58
 # Table 1 reports all rows; HERO_OMITTED_ROWS guards the forest window contract.
 HERO_OMITTED_ROWS = ("Ind", "Ctgan")
 AUDITORS = (("catboost", "CatBoost"), ("linear", "Linear"), ("mlp", "MLP"))
 # The figures draw these arms only; every other arm stays in the supplement tables.
 FIGURE_CODES = ("TabSyn", "Arf", "Gauss", "Chow", "Ind", "Tvae", "Ctgan", "Forest", "TabDdpm", "TabDiff",
                 "Great", "Synthpop", "Smote", "Pred", "Boot")
+V2_PANEL = REPO / "research" / "benchmark" / "results" / "review-fixes-v2" / "panel.json"
+MFS_PANEL = REPO / "research" / "benchmark" / "results" / "mfs-v3-density-panel.json"
 OUTPUTS = {
     "teaser.pdf": (FIG, "teaser-figure-hashes.json"),
     "pareto.pdf": (FIG, "pareto-figure-hashes.json"),
     "paired.png": (README_DIR, "readme-figure-hashes.json"),
     "pareto.png": (README_DIR, "readme-figure-hashes.json"),
 }
+
+
+def _multimodel_summary() -> dict:
+    """Load multi-model (CatBoost, Linear, MLP) and foundation-model (Kumo, TabICL, Mitra) + driver stats."""
+    classical: dict[tuple[str, str], dict[str, tuple[float, float, float]]] = {}
+    if V2_PANEL.is_file():
+        v2 = json.loads(V2_PANEL.read_text())
+        for row in v2.get("levels", ()):
+            if row.get("size") == 4:
+                key = (row["method"], row["configuration"])
+                classical.setdefault(key, {})[row["auditor"]] = (
+                    float(row["median"]), float(row["lo"]), float(row["hi"])
+                )
+    tfm: dict[str, dict[str, tuple[float, float, float]]] = {}
+    driver: dict[str, float] = {}
+    if MFS_PANEL.is_file():
+        mfs = json.loads(MFS_PANEL.read_text())
+        for aud, block in mfs.get("retention_summary", {}).items():
+            tfm[aud] = {
+                m: (float(v["median"]), float(v["lo"]), float(v["hi"]))
+                for m, v in block.get("methods", {}).items()
+            }
+        by_method: dict[str, list[float]] = {}
+        for lin in mfs.get("lineages", ()):
+            vals = sorted(
+                float(s["holdout"]["driver_fidelity"])
+                for s in lin.get("seeds", ())
+                if isinstance(s.get("holdout", {}).get("driver_fidelity"), (int, float))
+            )
+            if vals:
+                mid = len(vals) // 2
+                med = vals[mid] if len(vals) % 2 == 1 else 0.5 * (vals[mid - 1] + vals[mid])
+                by_method.setdefault(lin["method"], []).append(med)
+        for m, vals in by_method.items():
+            vals.sort()
+            mid = len(vals) // 2
+            driver[m] = vals[mid] if len(vals) % 2 == 1 else 0.5 * (vals[mid - 1] + vals[mid])
+    return {"classical": classical, "tfm": tfm, "driver": driver}
 
 
 def _rows(headline: dict) -> list[dict]:
@@ -148,26 +188,94 @@ def _forest_panels(axes, rows: list[dict], margin: float, value_size: float, cou
     axes[0].set_ylim(-TEASER_ROW_PAD, len(rows) - 1 + TEASER_ROW_PAD)
 
 
+def _architecture_panel(axis, summary: dict, font_size: float, compact: bool = False) -> None:
+    """Panel (b): Zero-shot tabular foundation models, classical learners, and holdout driver fidelity."""
+    figure_style.panel(axis, grid="x")
+    classical = summary["classical"]
+    tfm = summary["tfm"]
+    driver = summary["driver"]
+
+    if compact:
+        metrics = [
+            ("Driver fidelity", "driver", "driver"),
+            ("Mitra-v2 (TFM)", "tfm", "mitra_v2"),
+            ("TabICLv2 (TFM)", "tfm", "tabicl2"),
+            ("NVIDIA Kumo-L", "tfm", "kumo_tabular_l"),
+        ]
+    else:
+        metrics = [
+            ("CatBoost (4n)", "classical", "catboost"),
+            ("Linear (4n)", "classical", "linear"),
+            ("Neural MLP (4n)", "classical", "mlp"),
+            ("Driver fidelity", "driver", "driver"),
+            ("Mitra-v2 (TFM)", "tfm", "mitra_v2"),
+            ("TabICLv2 (TFM)", "tfm", "tabicl2"),
+            ("NVIDIA Kumo-L", "tfm", "kumo_tabular_l"),
+        ]
+    methods = [
+        ("DOPE (1.9 KB)", ("DOPE", "headline"), "DOPE", ACCENT, ACCENT_EDGE, "o", 5.8, False, 4),
+        ("TabSyn (42.3 MB)", ("TabSyn", "scaled_200_vae_1000_diffusion"), None, "#3B5B8C", "#3B5B8C", "s", 4.4, False, 3),
+        ("ARF (1.4 MB)", ("ARF", "author_default"), None, "#756BB1", "#756BB1", "D", 4.2, False, 3),
+        ("Copula (5.5 KB)", ("GaussianCopula", "native_selected"), "GaussianCopula", "#525252", "#525252", "^", 4.5, False, 2),
+        ("Chow-Liu (29.9 KB)", ("Chow-Liu", "native_selected"), "Chow-Liu", "#8C8C8C", "#8C8C8C", "o", 4.2, True, 2),
+    ]
+    axis.axvline(1.0, color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.8, zorder=1)
+    for m_label, cls_key, tfm_key, face, edge, marker, msize, hollow, z in methods:
+        xs, ys = [], []
+        for idx, (_, kind, key) in enumerate(metrics):
+            val = None
+            if kind == "classical" and cls_key in classical and key in classical[cls_key]:
+                val = classical[cls_key][key][0]
+            elif kind == "tfm" and tfm_key and key in tfm and tfm_key in tfm[key]:
+                val = tfm[key][tfm_key][0]
+            elif kind == "driver" and tfm_key and tfm_key in driver:
+                val = driver[tfm_key]
+            if val is not None:
+                xs.append(val)
+                ys.append(idx)
+        if xs:
+            axis.plot(
+                xs, ys, linestyle="none", marker=marker, markersize=msize,
+                markerfacecolor="white" if hollow else face, markeredgecolor=edge,
+                markeredgewidth=1.0, label=m_label, zorder=z
+            )
+    axis.set_yticks(range(len(metrics)))
+    axis.set_yticklabels([m[0] for m in metrics], fontsize=font_size)
+    axis.set_ylim(-TEASER_ROW_PAD, len(metrics) - 1 + TEASER_ROW_PAD)
+    x_bounds = (0.31, 1.18)
+    axis.set_xlim(*x_bounds)
+    axis.set_xticks((0.4, 0.6, 0.8, 1.0, 1.1))
+    axis.set_xlabel("holdout retention / feature driver agreement (1.0 = real-trained parity)", labelpad=1.2, fontsize=font_size)
+    axis.set_title("(b) Zero-shot foundation models (TFM) & holdout driver fidelity" if compact else
+                   "(b) Zero-shot foundation models (TFM), classical learners & driver fidelity",
+                   loc="left", pad=2.0, fontweight="bold", fontsize=font_size)
+    axis.legend(loc="lower left", frameon=True, facecolor="white", edgecolor="none",
+                fontsize=font_size, handletextpad=0.3, borderpad=0.15, labelspacing=0.12)
+
+
 def draw_hero(headline: dict, path: Path) -> Path:
-    """Page-1 hero: single clear plot of CatBoost retention at 4n against median charged artifact bytes."""
+    """Page-1 hero: two-panel Money Plot showing (a) utility vs. bytes and (b) multi-model & TFM transfer."""
     _, right = TEASER_X_LIM
     for arm in _rows(headline):
         if arm["code"] in HERO_OMITTED_ROWS and any(
                 row is None or row["hl_lo"] <= right for row in (arm["contrasts"][key] for key, _ in AUDITORS)):
             raise ValueError(f"{arm['display']} is omitted from the hero but an interval reaches its window")
+    summary = _multimodel_summary()
     floor = HERO_MIN_POINTS
     sizes = {key: floor for key in ("font.size", "axes.labelsize", "axes.titlesize", "xtick.labelsize",
-                                    "ytick.labelsize", "legend.fontsize")}
+                                     "ytick.labelsize", "legend.fontsize")}
     with matplotlib.rc_context(sizes):
         figure = plt.figure(figsize=(figure_style.TEASER_WIDTH_IN, HERO_HEIGHT_IN))
-        axis = figure.add_gridspec(1, 1, left=0.1, right=0.985, top=0.90, bottom=0.175).subplots()
-        _frontier(axis, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.8, control_size=floor,
+        axis_a = figure.add_axes([0.105, 0.565, 0.87, 0.38])
+        axis_b = figure.add_axes([0.215, 0.13, 0.76, 0.245])
+        _frontier(axis_a, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.6, control_size=floor,
                   offsets=HERO_LABEL_OFFSETS, names=HERO_NAMES,
-                  dope_offsets=((-6, 1, "right", "bottom"), (-2, 7, "center", "bottom")) + HERO_LABEL_OFFSETS)
-        axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)", labelpad=2.0)
-        axis.set_ylabel("CatBoost retention at 4n")
-        axis.set_title("CatBoost retention at 4n against median charged artifact bytes", loc="left", pad=4,
-                       fontweight="bold")
+                  summary=summary)
+        axis_a.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)", labelpad=1.0)
+        axis_a.set_ylabel("Retention (4n)")
+        axis_a.set_title("(a) Retention at 4n vs. artifact bytes (DOPE 1.9 KB: \u25b2 MLP, \u25a0 Linear, \u25cf CatBoost)",
+                         loc="left", pad=2.0, fontweight="bold")
+        _architecture_panel(axis_b, summary, font_size=floor, compact=True)
         return _save(figure, path, None)
 
 
@@ -189,7 +297,7 @@ LABEL_OFFSETS = ((4, 3, "left", "bottom"), (4, -3, "left", "top"), (-4, 3, "righ
                  (-4, -3, "right", "top"), (0, 7, "center", "bottom"), (0, -7, "center", "top"),
                  (6, 9, "left", "bottom"), (6, -9, "left", "top"), (-6, 9, "right", "bottom"),
                  (-6, -9, "right", "top"))
-CONTROL_POSITIONS = (0.02, 0.98, 0.5, 0.26, 0.74)
+CONTROL_POSITIONS = (0.62, 0.98, 0.02, 0.26, 0.74)
 # The hero's labels are larger, so they are shorter and also try offsets one label height further out.
 # Panel (b) and the results figure keep the full names, including each configuration.
 HERO_NAMES = {"DopeDef": "DOPE untuned", "TabSyn": "TabSyn", "Arf": "ARF", "Forest": "Forest-Flow", "Tvae": "TVAE",
@@ -228,23 +336,34 @@ def _place(axis, text: str, anchors, placed: list, avoid=(), **style):
 
 def draw_pareto(headline: dict, path: Path, width: float = 5.5, dpi: int | None = None,
                 floor: float | None = None) -> Path:
+    summary = _multimodel_summary()
+    if floor is None:
+        figure = plt.figure(figsize=(width, 4.7))
+        axis_a = figure.add_axes([0.09, 0.55, 0.88, 0.39])
+        axis_b = figure.add_axes([0.18, 0.11, 0.79, 0.33])
+        _frontier(axis_a, headline, cap_size=7.2, label_size=7.0, dope_size=7.8, control_size=7.0,
+                  offsets=HERO_LABEL_OFFSETS, names=HERO_NAMES, summary=summary)
+        axis_a.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)", fontsize=7.6)
+        axis_a.set_ylabel("Retention at 4n", fontsize=7.6)
+        axis_a.set_title("(a) Multi-model retention at 4n vs. artifact bytes (DOPE 1.9 KB: \u25b2 MLP, \u25a0 Linear, \u25cf CatBoost)",
+                         loc="left", pad=3.5, fontweight="bold", fontsize=8.2)
+        _architecture_panel(axis_b, summary, font_size=7.4)
+        return _save(figure, path, dpi)
     figure, axis = plt.subplots(figsize=(width, 2.7))
     # The frame is final before any label is measured.
     figure.subplots_adjust(left=0.1, right=0.98, bottom=0.17, top=0.95)
-    if floor is None:
-        _frontier(axis, headline, cap_size=6.4, label_size=6.2, dope_size=6.6, control_size=6.4)
-    else:
-        # The paper figure prints at the text width, so its labels keep the page-1 floor.
-        _frontier(axis, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.6, control_size=floor,
-                  offsets=HERO_LABEL_OFFSETS)
+    # The paper figure prints at the text width, so its labels keep the page-1 floor.
+    _frontier(axis, headline, cap_size=floor, label_size=floor, dope_size=floor + 0.6, control_size=floor,
+              offsets=HERO_LABEL_OFFSETS)
     axis.set_xlabel("median charged artifact bytes (log scale; bar = interquartile range)")
     axis.set_ylabel("CatBoost retention at 4n")
     return _save(figure, path, dpi)
 
 
 def _frontier(axis, headline: dict, cap_size: float, label_size: float, dope_size: float,
-              control_size: float, offsets=LABEL_OFFSETS, names=None, dope_offsets=None) -> None:
-    """CatBoost retention at 4n against median charged bytes, labels placed after every mark and limit."""
+              control_size: float, offsets=LABEL_OFFSETS, names=None, dope_offsets=None,
+              summary: dict | None = None) -> None:
+    """Retention at 4n against median charged bytes, labels placed after every mark and limit."""
     figure = axis.figure
     figure_style.panel(axis, grid="both")
     axis.set_xscale("log")
@@ -265,6 +384,7 @@ def _frontier(axis, headline: dict, cap_size: float, label_size: float, dope_siz
     for arm in controls:
         axis.axhline(arm["level"]["median"], color=CONTROL, linestyle=(0, (2, 2)), linewidth=0.9, zorder=1)
     marks: dict[str, list] = {}
+    dope_cls = (summary or {}).get("classical", {}).get(("DOPE", "headline"), {})
     for arm in plotted:
         level, size = arm["level"], arm["bytes"]["median"]
         is_dope = arm["code"] == "Dope"
@@ -277,9 +397,17 @@ def _frontier(axis, headline: dict, cap_size: float, label_size: float, dope_siz
         drawn_marks += axis.plot([size], [level["median"]], marker="o", markersize=6.5 if is_dope else 4.8, zorder=3,
                                  markerfacecolor="white" if hollow else colour,
                                  markeredgecolor=ACCENT_EDGE if is_dope else colour, markeredgewidth=1.0)
+        if is_dope and dope_cls:
+            if "mlp" in dope_cls:
+                drawn_marks += axis.plot([size, size], [level["median"], dope_cls["mlp"][0] + 0.04],
+                                         color=ACCENT, linewidth=1.0, linestyle=(0, (1.5, 1.5)), zorder=2)
+            for aud, mk in (("linear", "s"), ("mlp", "^")):
+                if aud in dope_cls:
+                    drawn_marks += axis.plot([size], [dope_cls[aud][0]], marker=mk, markersize=4.8, zorder=4,
+                                             markerfacecolor=ACCENT, markeredgecolor=ACCENT_EDGE, markeredgewidth=0.9)
         marks[arm["code"]] = drawn_marks
     renderer = figure.canvas.get_renderer()
-    boxes = {code: [line.get_window_extent(renderer) for line in lines] for code, lines in marks.items()}
+    boxes = {code: [line.get_window_extent(renderer).padded(2.5) for line in lines] for code, lines in marks.items()}
     # Labels go on after every mark and limit is fixed, DOPE first, then by retention.
     placed: list = []
     _place(axis, f"{CAP:,}-byte cap", [((CAP, 1.0), ("data", "axes fraction"), ((3, -3, "left", "top"),))],

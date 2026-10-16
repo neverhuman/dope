@@ -369,6 +369,12 @@ def protocol_tokens():
     _must_contain(root / "research/benchmark/review_fixes/predeclare_v2.json", "1,800 s per fit", failures)
     _must_contain(root / "research/benchmark/publish_tabsyn_population_fits.py",
                   "'author_default_epochs': {'vae': 4000, 'diffusion': 10001}", failures)
+    _must_contain(root / "docs/whitepaper/generated/mfs-v3-density-table.tex",
+                  r"97 & \textbf{0.863} [0.809, 0.880]", failures)
+    _must_contain(root / "docs/whitepaper/generated/mfs-v3-density-table.tex",
+                  r"97 & \textbf{0.871} [0.835, 0.893]", failures)
+    _must_contain(root / "docs/whitepaper/generated/mfs-v3-density-table.tex",
+                  r"97 & \textbf{0.858} [0.803, 0.887]", failures)
     if failures:
         raise ValueError("; ".join(failures))
     tokens = {
@@ -377,7 +383,10 @@ def protocol_tokens():
         "0.002", "0.01", "0.05", "0.10", "0.15", "0.20", "0.25", "0.30", "0.35", "0.45",
         "0.70", "0.75", "0.80", "0.85", "0.90", "0.95", "1.0", "1.5", "1.6", "2.569",
         "82.40", "0.14", "101", "211", "307", "11", "95", "0", "20",
-        "9", "23", "71", "90", "200", "512", "1000", "1729", "1800", "4000", "10001",
+        "9", "23", "71", "90", "94", "97", "200", "512", "1000", "1729", "1800", "4000", "10001",
+        "0.863", "0.809", "0.880", "0.871", "0.835", "0.893", "0.858", "0.803", "0.887",
+        "0.905", "0.737", "0.948", "0.923", "0.728", "0.955", "0.775", "0.562", "0.899",
+        "0.304", "0.145", "0.491",
     }
     rounded = f"{illustration_value():.2f}"
     if rounded != "82.40":

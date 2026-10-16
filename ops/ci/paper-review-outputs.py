@@ -258,6 +258,9 @@ def code_snapshot():
     paths.update(REPO / name for name in ('docs/whitepaper/scripts/build_pdf.sh',
                                          'ops/ci/paper-architecture.tex',
                                          'production/kpi-contract.json'))
+    mfs_panel = REPO / 'research/benchmark/results/mfs-v3-density-panel.json'
+    if mfs_panel.is_file():
+        paths.add(mfs_panel)
     return tuple((p.relative_to(REPO).as_posix(), safe_bytes(REPO, p.relative_to(REPO)))
                  for p in sorted(paths))
 

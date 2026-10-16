@@ -170,6 +170,25 @@ fn run(command: Command) -> Result<()> {
             )?;
             println!("{}", serde_json::to_string(&inspection)?);
         }
+        Command::CompileCsv {
+            csv,
+            target,
+            out,
+            seed,
+            candidate,
+            max_complete_bytes,
+            deadline_seconds,
+        } => {
+            compile_csv_command(
+                csv,
+                target,
+                out,
+                seed,
+                candidate,
+                max_complete_bytes,
+                deadline_seconds,
+            )?;
+        }
         Command::CompileRaw {
             csv,
             schema,
@@ -553,11 +572,31 @@ fn run(command: Command) -> Result<()> {
             );
         }
         Command::Inspect { kernel, out } => {
-            let inspection = inspect_kernel(&kernel)?;
-            if let Some(path) = out {
-                write_json(&path, &inspection)?;
+            let raw_bytes =
+                fs::read(&kernel).map_err(|error| dope_kernel::error::io_error(&kernel, error))?;
+            if raw_bytes.starts_with(b"DOPERAW1") || raw_bytes.starts_with(b"DOPERAW2") {
+                let bytes = dope_kernel::typed_data::workflow::read_raw_artifact(&kernel)?;
+                let inspection = dope_kernel::typed_data::workflow::inspect_raw(&bytes)?;
+                if let Some(path) = out {
+                    write_json(&path, &inspection)?;
+                } else {
+                    println!("{}", serde_json::to_string_pretty(&inspection)?);
+                }
+            } else if raw_bytes.starts_with(b"DOPEMIX1") {
+                let bytes = dope_kernel::typed_data::mixed::read_mixed_artifact(&kernel)?;
+                let inspection = dope_kernel::typed_data::mixed::inspect_mixed(&bytes)?;
+                if let Some(path) = out {
+                    write_json(&path, &inspection)?;
+                } else {
+                    println!("{}", serde_json::to_string_pretty(&inspection)?);
+                }
             } else {
-                println!("{}", serde_json::to_string_pretty(&inspection)?);
+                let inspection = inspect_kernel(&kernel)?;
+                if let Some(path) = out {
+                    write_json(&path, &inspection)?;
+                } else {
+                    println!("{}", serde_json::to_string_pretty(&inspection)?);
+                }
             }
         }
         Command::Sample {
@@ -566,12 +605,48 @@ fn run(command: Command) -> Result<()> {
             out,
             seed,
         } => {
-            let loaded = load_kernel(&kernel)?;
-            sample_kernel_to_csv(&loaded, SampleOptions { rows, seed }, &out)?;
-            println!(
-                "{{\"out\":{},\"rows\":{rows}}}",
-                serde_json::to_string(&out)?
-            );
+            let raw_bytes =
+                fs::read(&kernel).map_err(|error| dope_kernel::error::io_error(&kernel, error))?;
+            if raw_bytes.starts_with(b"DOPERAW1") || raw_bytes.starts_with(b"DOPERAW2") {
+                let bytes = dope_kernel::typed_data::workflow::read_raw_artifact(&kernel)?;
+                let inspection = dope_kernel::typed_data::workflow::inspect_raw(&bytes)?;
+                let columns = inspection
+                    .schema
+                    .iter()
+                    .filter(|c| {
+                        matches!(
+                            c.role,
+                            dope_kernel::schema::ColumnRole::Feature
+                                | dope_kernel::schema::ColumnRole::Target
+                        )
+                    })
+                    .count();
+                let samples =
+                    dope_kernel::typed_data::workflow::sample_raw_detailed(&bytes, rows, seed)?;
+                let file =
+                    fs::File::create(&out).map_err(|e| dope_kernel::error::io_error(&out, e))?;
+                let mut writer = csv::WriterBuilder::new()
+                    .has_headers(false)
+                    .from_writer(file);
+                for row in samples.values.chunks_exact(columns) {
+                    writer.write_record(row.iter().map(ToString::to_string))?;
+                }
+                writer
+                    .flush()
+                    .map_err(|e| dope_kernel::error::io_error(&out, e))?;
+                println!(
+                    "{{\"out\":{},\"rows\":{rows},\"complete_sampling_bytes\":{}}}",
+                    serde_json::to_string(&out)?,
+                    inspection.accounting.complete_sampling_bytes
+                );
+            } else {
+                let loaded = load_kernel(&kernel)?;
+                sample_kernel_to_csv(&loaded, SampleOptions { rows, seed }, &out)?;
+                println!(
+                    "{{\"out\":{},\"rows\":{rows}}}",
+                    serde_json::to_string(&out)?
+                );
+            }
         }
         Command::PackCorpus {
             corpus,
