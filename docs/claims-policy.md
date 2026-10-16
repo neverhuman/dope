@@ -140,7 +140,8 @@ exempt result numbers from the generated-claims gate.
 | Paper historical card: "four times the fit rows" | The same historical reducer selects size four (the `HEADLINE, 4, catboost` cells). This is the v2 validation panel's sample-size setting; the TDL contract's primary sample size is one times the real fit rows. |
 
 The README family/input/noise counts above require a default-search qualifier.
-Proposed wording is coordinated with L3 in `COMMS.md`; paper and README prose
-remain under L3 ownership. Demo license, DOI and positional-feature counts (U5)
+README.md states it directly below the table (L3, 2026-10-16): the counts describe
+the default compile search, and historical research and refined profiles can differ.
+Paper and README prose remain under L3 ownership. Demo license, DOI and positional-feature counts (U5)
 are checked against the native pin's `source_data` and `INSPECT.txt` by the public
 claims registry, including missing or contradictory metadata.

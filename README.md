@@ -144,6 +144,8 @@ The installed public demo in [examples/public-regression](examples/public-regres
 | Target | a compact residual model on at most twelve screened inputs |
 | Noise | a heteroscedastic scale fitted on up to four screened features |
 
+The family, input and noise counts in this table describe the default compile search; historical research and refined profiles can differ.
+
 Sampling reads only the artifact. No training row is stored or read when sampling. Two byte scopes are reported: the **dataset-specific payload**, which is the primary axis, and the **cold sampling closure**, which adds the decoder and runtime. The v2 panel's charge is the encoded `.dpk` file plus `projection.json`. Byte accounting is defined in [docs/metric.md](docs/metric.md#5-byte-scopes).
 
 ## Reproduce
