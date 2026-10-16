@@ -218,7 +218,7 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
             return Err(MetricError::with_status(bad_reason, bad_state));
         }
     }
-    if &budgets != &declared_grid {
+    if budgets != declared_grid {
         return Err(MetricError::with_status(
             "missing_budget_cell",
             "incomplete",
