@@ -3,6 +3,9 @@
 
 The table rows, the strongest comparator, and every interval come from
 docs/whitepaper/generated/v2-headline.json, written by review_v2_emit.py.
+The panel size, fit-seed count and interval level come from the pre-declaration
+(research/benchmark/review_fixes/predeclare_v2.json), and the byte cap from the
+embedded release contract (production/kpi-contract.json); no count is typed here.
 The two images are drawn by v2_figures.py from that same file, so the README
 and the paper cannot disagree. `--check` compares the committed block.
 """
@@ -10,6 +13,7 @@ and the paper cannot disagree. `--check` compares the committed block.
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -22,7 +26,9 @@ README = REPO / "README.md"
 PNGS = (REPO / "docs" / "readme" / "pareto.png", REPO / "docs" / "readme" / "paired.png")
 BEGIN = "<!-- BEGIN BENCHMARK -->"
 END = "<!-- END BENCHMARK -->"
-CAP = 10240
+PREDECLARE = REPO / "research" / "benchmark" / "review_fixes" / "predeclare_v2.json"
+CONTRACT = REPO / "production" / "kpi-contract.json"
+COUNT_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten"}
 ORDER = ("Dope", "TabSyn", "Arf", "ArfNat", "Gauss", "Chow", "Ind", "Tvae", "Ctgan", "Forest", "TabDdpm",
          "TabDiff", "Great", "Synthpop", "Smote", "Boot", "Pred")
 
@@ -45,16 +51,41 @@ def size(value) -> str:
     return f"{int(round(value))} B"
 
 
-def benchmark_block(headline: dict) -> str:
+def panel_facts(headline: dict, predeclare: dict, contract: dict) -> dict:
+    """Panel size, fit seeds, interval level and byte cap from their sources; disagreement fails."""
+    sizes = {method["lineages"] for method in predeclare["methods"]["primary"].values()}
+    if len(sizes) != 1:
+        raise ValueError("predeclare_v2 primary methods disagree on the panel size")
+    panel = sizes.pop()
+    dope = next(arm for arm in headline["arms"] if arm["code"] == "Dope")
+    if dope["bytes"]["n"] != panel:
+        raise ValueError("v2-headline.json DOPE lineage count differs from the declared panel")
+    seeds = len(predeclare["dope"]["fit_seeds"])
+    if seeds not in COUNT_WORDS:
+        raise ValueError("fit-seed count has no README wording")
+    match = re.search(r"percentile (\d+)% interval", predeclare["estimands"]["uncertainty"])
+    if match is None:
+        raise ValueError("predeclare_v2 does not state the interval level")
+    return {"panel": panel, "fit_seeds": COUNT_WORDS[seeds], "level": int(match.group(1)),
+            "cap": contract["tier_byte_limits"]["l3"]}
+
+
+def load_facts(headline: dict) -> dict:
+    return panel_facts(headline, json.loads(PREDECLARE.read_text()), json.loads(CONTRACT.read_text()))
+
+
+def benchmark_block(headline: dict, facts: dict | None = None) -> str:
+    facts = load_facts(headline) if facts is None else facts
+    cap = f"{facts['cap']:,}"
     arms = {arm["code"]: arm for arm in headline["arms"]}
     dope = arms["Dope"]
     lines = [
-        "Validation panel: 100 PMLB regression tables, CatBoost auditor, synthetic size 4n. "
-        "DOPE uses five fit seeds; intervals are 95% nested bootstrap intervals "
+        f"Validation panel: {facts['panel']} PMLB regression tables, CatBoost auditor, synthetic size 4n. "
+        f"DOPE uses {facts['fit_seeds']} fit seeds; intervals are {facts['level']}% nested bootstrap intervals "
         "(simulated-family clusters, then lineages, then fit seeds). "
         "The difference column is DOPE minus the method on shared lineages (Hodges–Lehmann).",
         "",
-        "| Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Lineage medians within 10,240 B |",
+        f"| Method | Lineages | CatBoost retention, 4n | DOPE − method | W/T/L | Median artifact | Lineage medians within {cap} B |",
         "| --- | ---: | --- | --- | ---: | ---: | ---: |",
     ]
     for code in ORDER:
@@ -83,7 +114,7 @@ def benchmark_block(headline: dict) -> str:
         f"DOPE's median artifact is {size(dope['bytes']['median'])}; the other generators' medians run from "
         f"{size(min(others))} to {size(max(others))}.](docs/readme/pareto.png)",
         "",
-        "![DOPE minus each comparator, Hodges–Lehmann retention difference with 95% nested intervals, "
+        f"![DOPE minus each comparator, Hodges–Lehmann retention difference with {facts['level']}% nested intervals, "
         "under the CatBoost, linear, and MLP auditors.](docs/readme/paired.png)",
         "",
         f"In the paired chart the axis runs from {TEASER_X_LIM[0]:g} to {TEASER_X_LIM[1]:g}: an interval end beyond it "
@@ -96,7 +127,7 @@ def benchmark_block(headline: dict) -> str:
         "because its prerequisites and cleartext scan are unmeasured, and measured copy, membership, and "
         "attribute gates already fail on some cells. DOPE's median artifact is "
         f"{size(dope['bytes']['median'])}, and {dope['bytes']['fits_within_cap']} of {dope['bytes']['fits_ok']} "
-        "individual DOPE fits are within the 10,240-byte release cap; the paper names the lineages above it.",
+        f"individual DOPE fits are within the {cap}-byte release cap; the paper names the lineages above it.",
     ]
     return "\n".join(lines)
 
