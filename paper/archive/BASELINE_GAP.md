@@ -1,3 +1,7 @@
+> **Archived 2026-10-15 (T-111). Historical.** This review ledger belongs to the frozen v2 validation paper
+> (`docs/whitepaper/dope-mfs.tex`) and moved here from `docs/whitepaper/BASELINE_GAP.md` unchanged. It is not the
+> current paper's status; see [paper/README.md](../README.md) and [docs/claims-policy.md](../../docs/claims-policy.md).
+
 # Baseline coverage and remaining evidence
 
 Updated 2026-10-08 from authenticated validation publications. Official
@@ -49,7 +53,7 @@ the follow-on completes their common-metric coverage rather than fitting again.
 The newer receipt-backed checkpoint is
 `research/benchmark/results/baseline-completion-20261008-v1/completion.md`.
 It separates fit dispositions from metric cells and retains all 75 observed
-Forest-Flow timeouts. [The protocol addendum](BASELINE_PROTOCOL.md) keeps the
+Forest-Flow timeouts. [The protocol addendum](../../docs/whitepaper/BASELINE_PROTOCOL.md) keeps the
 original 600-second canonical fit cap and forbids selective higher-limit
 replacement of those timeouts. This decision was recorded after observing
 them; it is not retroactive preregistration.
