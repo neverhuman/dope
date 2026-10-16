@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 root=$PWD
 source ops/ci/lib.sh
-for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg tar gzip; do
+for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg strace tar gzip; do
   ci_require_command "$tool"
 done
 python3 -B -m unittest discover -s ops/ci -p test_frozen_evidence.py -v
