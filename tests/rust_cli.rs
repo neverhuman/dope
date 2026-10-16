@@ -24,6 +24,37 @@ fn text(path: &Path) -> String {
 }
 
 #[test]
+fn inspect_bare_tdl1_keeps_sampling_closure_unmeasured() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("target/cli-inspect-closure")
+        .join(std::process::id().to_string());
+    fs::create_dir_all(&root).unwrap();
+    let artifact = root.join("bare.tdl1");
+    let inspection = root.join("inspect.json");
+    let bytes = dope_kernel::metrics::artifact_charge::canonical_container(&serde_json::json!([
+        {"name": "weights", "hex": "010203"}
+    ]))
+    .unwrap();
+    fs::write(&artifact, &bytes).unwrap();
+    run(
+        env!("CARGO_BIN_EXE_dope"),
+        &[
+            "inspect",
+            "--artifact",
+            &text(&artifact),
+            "--out",
+            &text(&inspection),
+        ],
+    );
+    let inspected: serde_json::Value =
+        serde_json::from_slice(&fs::read(inspection).unwrap()).unwrap();
+    assert_eq!(inspected["format"], "tdl-container-v1");
+    assert_eq!(inspected["byte_scopes"]["payload_bytes"], bytes.len());
+    assert!(inspected["byte_scopes"]["sampling_closure_bytes"].is_null());
+    assert_eq!(inspected["metric_status"]["status"], "unmeasured");
+}
+
+#[test]
 fn explicit_fit_seed_preserves_historical_seed_11_artifact_bytes() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("target/cli-fit-seed-conformance")
