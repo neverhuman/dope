@@ -207,6 +207,19 @@
         "source_family": "s2",
         "transfer": 0.9
       }
+    ],
+    "required_auditors": {
+      "tree": [
+        "tree"
+      ],
+      "linear": [
+        "linear"
+      ]
+    },
+    "required_seeds": [
+      1,
+      2,
+      3
     ]
   },
   "purpose": "Nonfinite transfer cannot qualify.",

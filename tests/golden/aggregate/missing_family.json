@@ -111,6 +111,19 @@
         "source_family": "s2",
         "transfer": 1.0
       }
+    ],
+    "required_auditors": {
+      "tree": [
+        "tree"
+      ],
+      "linear": [
+        "linear"
+      ]
+    },
+    "required_seeds": [
+      1,
+      2,
+      3
     ]
   },
   "purpose": "Required auditor family cannot be silently omitted.",

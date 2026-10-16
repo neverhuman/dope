@@ -81,6 +81,13 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         _ => obj.get("declared_grid_bytes"),
     };
     let declared_grid = parse_grid(raw_grid)?;
+    // T-122 B5: byte_grid is mandatory; do not invent it from cell budgets or artifact sizes.
+    let Some(declared_grid) = declared_grid else {
+        return Err(MetricError::with_status(
+            "missing_budget_cell",
+            "incomplete",
+        ));
+    };
     let tt = match obj.get("transfer_threshold") {
         Some(v) if !v.is_null() => unit(v)?,
         _ => 0.90,
@@ -89,12 +96,12 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         Some(v) if !v.is_null() => unit(v)?,
         _ => 0.80,
     };
-    let has_grid = declared_grid.is_some()
-        || cells.iter().any(|c| {
-            c.as_object()
-                .and_then(|m| m.get("budget_bytes"))
-                .is_some_and(|v| !v.is_null())
-        });
+    // Budget-grid claim mode vs artifact-only; byte_grid is mandatory in both (above).
+    let has_grid = cells.iter().any(|c| {
+        c.as_object()
+            .and_then(|m| m.get("budget_bytes"))
+            .is_some_and(|v| !v.is_null())
+    });
 
     let mut budgets = BTreeSet::new();
     type AdmittedCell = (u64, u64, f64, f64, bool, BTreeMap<String, bool>);
@@ -127,9 +134,7 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
                 (s, Some(s))
             }
         };
-        if let Some(ref grid) = declared_grid {
-            require(grid.contains(&budget), "undeclared_budget")?;
-        }
+        require(declared_grid.contains(&budget), "undeclared_budget")?;
         require(budgets.insert(budget), "duplicate_budget")?;
         let state = match cell.get("status").and_then(Value::as_str) {
             Some("complete") => "complete",
@@ -213,9 +218,7 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
             return Err(MetricError::with_status(bad_reason, bad_state));
         }
     }
-    if let Some(ref grid) = declared_grid
-        && &budgets != grid
-    {
+    if &budgets != &declared_grid {
         return Err(MetricError::with_status(
             "missing_budget_cell",
             "incomplete",

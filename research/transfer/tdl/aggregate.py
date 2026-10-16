@@ -53,6 +53,11 @@ def evaluate(data):
         families = _names(data.get("required_families"))
         declared_auditors = _parse_required_auditors(data.get("required_auditors"), families)
         declared_seeds = _parse_required_seeds(data.get("required_seeds"))
+        # T-122 B2: design rosters are mandatory; observations must not invent the panel.
+        if declared_auditors is None or declared_seeds is None:
+            return failure("missing_family_or_cell", "incomplete")
+        required_auditors = declared_auditors
+        required_seeds = declared_seeds
         rows = data.get("rows")
         if rows is None:
             return failure("missing_family_or_cell", "incomplete")
@@ -60,17 +65,14 @@ def evaluate(data):
         if not rows:
             return failure("missing_family_or_cell", "incomplete")
         tree, seen = {}, set()
-        observed_auditors = {f: set() for f in families}
         for row in rows:
             require(type(row) is dict, "invalid_rows")
             for key in ("source_family", "dataset", "family", "auditor"):
                 require(type(row.get(key)) is str and bool(row[key]), "invalid_cluster")
             require(row["family"] in families, "unexpected_family")
-            if declared_auditors is not None:
-                require(row["auditor"] in declared_auditors[row["family"]], "unexpected_auditor")
+            require(row["auditor"] in required_auditors[row["family"]], "unexpected_auditor")
             seed = count(row.get("seed"))
-            if declared_seeds is not None:
-                require(seed in declared_seeds, "unexpected_seed")
+            require(seed in required_seeds, "unexpected_seed")
             key = (row["source_family"], row["dataset"], seed, row["family"], row["auditor"])
             require(key not in seen, "duplicate_observation")
             seen.add(key)
@@ -85,16 +87,14 @@ def evaluate(data):
             if row.get("informative") is False or row.get("transfer") is None:
                 return failure("missing_family_or_cell", "incomplete")
             value = min(1.0, number(row["transfer"]))
-            observed_auditors[row["family"]].add(row["auditor"])
             cell = tree.setdefault(key[0], {}).setdefault(key[1], {}).setdefault(seed, {})
             cell.setdefault(row["family"], {})[row["auditor"]] = value
-        required_auditors = declared_auditors if declared_auditors is not None else observed_auditors
         if any(not required_auditors[f] for f in families):
             return failure("missing_family_or_cell", "incomplete")
         # Every seed is a paired block containing every required family and every required auditor.
         for datasets in tree.values():
             for seeds in datasets.values():
-                expected_seeds = declared_seeds if declared_seeds is not None else set(seeds)
+                expected_seeds = required_seeds
                 if set(seeds) != expected_seeds:
                     return failure("missing_family_or_cell", "incomplete")
                 for cell in seeds.values():
