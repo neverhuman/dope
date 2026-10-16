@@ -235,7 +235,7 @@ def build():
         paired_descriptive=paired(groups),
         source_locks=dict(validation_round=ROUND, validation_receipts=RECEIPTS,
             fit_receipts=FIT_RECEIPTS, matched_reference=REFERENCE, metric_source=lock['metric_source_sha256']),
-        allowed_gpu_hosts=['xbabe1', 'xbabe2', 'xbabe3'], original_attempts_preserved=True,
+        allowed_gpu_hosts=['fit-machine-1', 'fit-machine-2', 'fit-machine-3'], original_attempts_preserved=True,
         original_interruption_is_method_failure=False, baseline_native_selection_changed=False,
         baseline_selected_by_common_utility=False, native_kpis_never_ranked_across_methods=True,
         confirmation_complete=False, global_family_selected=False, full_campaign_admitted=False,

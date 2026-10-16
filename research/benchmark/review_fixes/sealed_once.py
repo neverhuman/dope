@@ -32,7 +32,7 @@ from research.benchmark.review_fixes.stats import cluster_of, median_ci
 
 PILOT_PATH = HERE.parent / "pilot_metrics.py"
 RESULTS = REPO / "research" / "benchmark" / "results"
-APPROVED_HOST = "xbabe3"
+APPROVED_HOST = "fit-machine-3"
 CANONICAL_REGISTRY = Path("/mnt/fast-scratch/dope-benchmark/review-fixes-lane-b/sealed-v1")
 REGISTRY = CANONICAL_REGISTRY
 FREEZE_COMMIT = "c36d7f21b8ce62af81bc1f538e332c180e22eb95"

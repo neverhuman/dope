@@ -45,7 +45,7 @@ MODEL_FILES = {
     "mitra_v2": "models/autogluon__mitra-regressor-2/model.safetensors",
     "tabicl2": "models/jingang__TabICL/tabicl-regressor-v2-20260212.ckpt",
 }
-WEIGHT_ROOT = Path("/home/ubuntu/jopedime_probe_exp/ofm-20261008")
+WEIGHT_ROOT = Path("/path/to/operator-home/jopedime_probe_exp/ofm-20261008")
 INFORMATIVE_FRACTION = 0.01
 BYTE_CAP = 10240
 VRAM_START_MIB = 10240

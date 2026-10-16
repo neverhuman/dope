@@ -58,7 +58,7 @@ PUBLICATIONS = (
 # Byte length and sha256 of every admitted publication under RESULTS.
 PINS = Registry(RESULTS, {
     "arf-matched-population-validation.json": (
-        6807387, "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"),
+        6807397, "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"),
 })
 
 # The manuscript's displayed generator. Other profiles in a receipt are not rows.

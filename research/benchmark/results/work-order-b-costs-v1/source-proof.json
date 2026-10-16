@@ -21,39 +21,39 @@
   "public_source_reports": [
     {
       "path": "research/benchmark/results/arf-s3-population-native.json",
-      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
+      "sha256": "11394f3aa0edfd35521cd8773a7db89919ea2a554ccef5f0c8e16e4538225f2e"
     },
     {
       "path": "research/benchmark/results/density-matched-population-validation.json",
-      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
+      "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
     },
     {
       "path": "research/benchmark/results/dope-s3-population-gpu-fits.json",
-      "sha256": "df4a370ba66a595f665bf2f45d8a183dde9955b6ab65d7c28df0ec8ae24d4c21"
+      "sha256": "376c9c218466541332b8c14344c4256238b078ec962f5bb6dfa91abc336b67fb"
     },
     {
       "path": "research/benchmark/results/dope-s3-population-validation.json",
-      "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
+      "sha256": "9d6a20ceb57a6f5ac3d7127c666fac23ce1b0215e703608985fbfb691d06beb2"
     },
     {
       "path": "research/benchmark/results/dope-target-refinement-population-fits.json",
-      "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
+      "sha256": "4327e94f833dc8c0ed4100958eacca14626ddd68b4f9531cc3ebfa20a49d3867"
     },
     {
       "path": "research/benchmark/results/dope-target-refinement-population-validation.json",
-      "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+      "sha256": "e40d69a8c9a383f953fbaa6d20db9ac649b9d02802b65f59b5b4c0eac7f7e1ea"
     },
     {
       "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
-      "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
+      "sha256": "941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2"
     },
     {
       "path": "research/benchmark/results/sdv-matched-population-validation.json",
-      "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
+      "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
     },
     {
       "path": "research/benchmark/results/sdv-s3-population-native.json",
-      "sha256": "635fd4273886d59691356b85d2fad58eae596ef74a48dc0bfb5bffee653bacc3"
+      "sha256": "3b895d6ab39052cf4aa82a8bd740b3e62dda92e25307b1a8e45aad031c1ae7ac"
     }
   ],
   "release_safe": null,

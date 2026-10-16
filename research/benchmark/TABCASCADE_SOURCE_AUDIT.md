@@ -79,6 +79,6 @@ files. The loader explicitly uses `weights_only=False`; safe local loading and
 round-trip custody remain unverified. Learned state, errors and detailed logs
 stay private on scratch.
 
-Copy/leakage/privacy, real-vs-real and fresh aggregate xbabe1/2/3 CPU/RAM/scratch
+Copy/leakage/privacy, real-vs-real and fresh aggregate fit-machine-1/2/3 CPU/RAM/scratch
 admission remain required, with the unchanged 600-second fit and 16-GiB GPU
 caps. The audit contains no measured benchmark values or formal DP claim.

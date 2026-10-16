@@ -54,7 +54,7 @@ closure; native admission additionally requires the original auditor closure.
 Generated CPU checks, mocked grants and numerical fixtures establish source
 contracts only. Every caller must preserve referenced qualification receipts,
 actual process exits, source/runtime/artifact hashes and final deadline checks.
-Bulk output stays on the owner-amended xbabe3 local scratch filesystem, under
+Bulk output stays on the owner-amended fit-machine-3 local scratch filesystem, under
 its independent 200,000,000,000-byte aggregate admission ceiling.
 
 Official tests stay sealed. MFS-v2, PTF-v1, release-safe L3 and superiority

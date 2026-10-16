@@ -33,7 +33,7 @@ class NativeSamplerControls(unittest.TestCase):
         self.job = {'fit_seed': 11, 'final': False, 'track': 'common-numeric',
             'original_generator_binary_sha256': sha(self.binary),
             'original_product_source_files_sha256': copy.deepcopy(self.fit['binary_product_source_sha256'])}
-        self.proposal = {'host': 'xbabe2', 'root': str(self.root), 'entry': str(self.root / 'source/entry.py'),
+        self.proposal = {'host': 'fit-machine-2', 'root': str(self.root), 'entry': str(self.root / 'source/entry.py'),
             'python': '/usr/bin/python3.12', 'empty_bytecode_cache': str(self.root / 'empty-cache'),
             'native_library_directory': '/opaque/frozen-library', 'round_sha256': 'a' * 64,
             'attempt': 1, 'batch_cap_seconds': 600, 'execution_admitted': False,

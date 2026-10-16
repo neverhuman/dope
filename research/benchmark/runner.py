@@ -395,7 +395,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
         start = time.perf_counter()
         attempt_path = _attempt_path(directory / "fit-attempts")
         try:
-            if os.uname().nodename == "xbabe2":
+            if os.uname().nodename == "fit-machine-2":
                 reserve_scratch(scratch_root, 0, 0)
             artifact_dir.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(worker / "projection.json", artifact_dir / "projection.json")
@@ -464,7 +464,7 @@ def run(job: dict, methods: dict, output_root: Path) -> list[dict]:
             attempt_path = _attempt_path(directory / "sample-attempts" / key)
             repeat = directory / f"{key}.repeat.csv"
             try:
-                if os.uname().nodename == "xbabe2":
+                if os.uname().nodename == "fit-machine-2":
                     reserve_scratch(scratch_root, row_count, projection["output_features"] + 1)
                 sample_request = {"action": "sample", "method": method,
                                   "artifact_dir": str(artifact_dir), "row_count": row_count,

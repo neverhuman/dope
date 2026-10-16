@@ -4,10 +4,10 @@ Four authenticated closed CPU evaluation scopes add no generator fit or sampling
 
 | Evaluation scope | New physical actions | Full-panel logical aliases | Metric timer wall seconds | Outer runner seconds | Process high-water RSS bytes | Host / CPU cores |
 |---|---:|---:|---:|---:|---:|---|
-| TabSyn | 48 | 48 | 49.574226 | null | 318398464 | xbabe1 / 96–103 |
-| ARF | 1116 | 1200 | 1396.094902 | null | 768512000 | xbabe2 / 104–111 |
-| GaussianCopula+Chow-Liu | 2017 | 2400 | 2239.001908 | null | 845471744 | xbabe1 / 96–103 |
-| GaussianCopula+Chow-Liu utility only | 5 | — | 2.723124 | 7.970948 | 297795584 | xbabe2 / 104–111 |
+| TabSyn | 48 | 48 | 49.574226 | null | 318398464 | fit-machine-1 / 96–103 |
+| ARF | 1116 | 1200 | 1396.094902 | null | 768512000 | fit-machine-2 / 104–111 |
+| GaussianCopula+Chow-Liu | 2017 | 2400 | 2239.001908 | null | 845471744 | fit-machine-1 / 96–103 |
+| GaussianCopula+Chow-Liu utility only | 5 | — | 2.723124 | 7.970948 | 297795584 | fit-machine-2 / 104–111 |
 
 The new per-job timers sum to **3687.3941588359885 seconds**. These are wall durations from `time.perf_counter`, not CPU time or elapsed campaign time. The diagnostic driver timers include input verification/decoding, A952 diagnostics, utility auditors and final verification/capacity checks; preliminary capacity checks, module setup and receipt writing are outside those timers. The utility-only timer covers input verification/decoding and utility; its separate 7.970948356203735-second outer runner includes setup and postchecks. That outer clock is not added to the timer sum.
 

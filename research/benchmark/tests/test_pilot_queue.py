@@ -14,7 +14,7 @@ class PilotQueueTests(unittest.TestCase):
         self.assertEqual(sum(cell["host"] is not None for cell in cells), 12)
         self.assertTrue(all(cell["host"] is None for cell in cells
                             if cell["method_status"] != "locked"))
-        self.assertTrue(all(cell["host"] == "xbabe2" for cell in cells
+        self.assertTrue(all(cell["host"] == "fit-machine-2" for cell in cells
                             if cell["method"] == "GaussianCopula"))
         self.assertTrue(all("test" not in str(cell).lower() for cell in cells))
 
@@ -22,7 +22,7 @@ class PilotQueueTests(unittest.TestCase):
         pool = queue.Queue()
         pool.put(1)
         with self.assertRaisesRegex(RuntimeError, "worker"):
-            with pilot_queue.cpu_slot("xbabe2", {"xbabe2": pool}) as slot:
+            with pilot_queue.cpu_slot("fit-machine-2", {"fit-machine-2": pool}) as slot:
                 self.assertEqual(slot, 1)
                 raise RuntimeError("worker")
         self.assertEqual(pool.get_nowait(), 1)

@@ -8,19 +8,19 @@ import hashlib
 import json
 from typing import Callable
 
-BASE_CONFIG = {'path': '/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-evaluator-round-candidate-v3/ROOT.operation-template.DISABLED.v3.json', 'bytes': 9509, 'sha256': '35d2093808020d4421542355f0823a8b7b37125282dd750e3b25d15ff8e04130'}
+BASE_CONFIG = {'path': '/path/to/operator-home/dope/.agent/worktrees/integration/target/tabsyn-common-evaluator-round-candidate-v3/ROOT.operation-template.DISABLED.v3.json', 'bytes': 9509, 'sha256': '35d2093808020d4421542355f0823a8b7b37125282dd750e3b25d15ff8e04130'}
 
 
-TS_CONFIG = {'path': '/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-evaluator-round-candidate-v3/TS143.operation-template.DISABLED.v3.json', 'bytes': 9551, 'sha256': '6deb28b186ce98a68625f55a55667ab6ffdd3173ab4a670d9f1b15eec9b1af69'}
+TS_CONFIG = {'path': '/path/to/operator-home/dope/.agent/worktrees/integration/target/tabsyn-common-evaluator-round-candidate-v3/TS143.operation-template.DISABLED.v3.json', 'bytes': 9551, 'sha256': '6deb28b186ce98a68625f55a55667ab6ffdd3173ab4a670d9f1b15eec9b1af69'}
 
 
-LEGACY_BASE_CONFIG = {'bytes': 14650, 'path': '/home/ubuntu/dope/.agent/worktrees/integration/target/work-order-b-expanded-metric-round-v1/runtime-final-rehash-repair-v3/kind-one.runtime-final-v3.config.disabled.json', 'sha256': 'fcddb060479cd6697f50ef047b15e97f98384d63d8fe932062e7a123ac1f4d22'}
+LEGACY_BASE_CONFIG = {'bytes': 14650, 'path': '/path/to/operator-home/dope/.agent/worktrees/integration/target/work-order-b-expanded-metric-round-v1/runtime-final-rehash-repair-v3/kind-one.runtime-final-v3.config.disabled.json', 'sha256': 'fcddb060479cd6697f50ef047b15e97f98384d63d8fe932062e7a123ac1f4d22'}
 
 
-LEGACY_ROOT_ROUND = {'bytes': 3401474, 'path': '/home/ubuntu/dope/.agent/worktrees/integration/target/work-order-b-expanded-metric-round-v1/runtime-final-rehash-repair-v3/round-proposal-v5.runtime-final.json', 'sha256': '3f4781dea37756382f1a92f249060766236980e65bf17c258b88f833831a0fe9'}
+LEGACY_ROOT_ROUND = {'bytes': 3401474, 'path': '/path/to/operator-home/dope/.agent/worktrees/integration/target/work-order-b-expanded-metric-round-v1/runtime-final-rehash-repair-v3/round-proposal-v5.runtime-final.json', 'sha256': '3f4781dea37756382f1a92f249060766236980e65bf17c258b88f833831a0fe9'}
 
 
-KIND_PROVENANCE_BRIDGE = {'path': '/home/ubuntu/dope/.agent/worktrees/integration/target/tabsyn-common-evaluator-round-candidate-v3/kind-map-provenance.bridge.DISABLED.v3.json', 'bytes': 113539, 'sha256': '64dfa7448a87bbef14a205e270a6be56b9ff0e1c4eec7cf68b15f8dac266dd55'}
+KIND_PROVENANCE_BRIDGE = {'path': '/path/to/operator-home/dope/.agent/worktrees/integration/target/tabsyn-common-evaluator-round-candidate-v3/kind-map-provenance.bridge.DISABLED.v3.json', 'bytes': 113539, 'sha256': '64dfa7448a87bbef14a205e270a6be56b9ff0e1c4eec7cf68b15f8dac266dd55'}
 
 
 def canonical(value):
@@ -66,7 +66,7 @@ def positive(lock, record, checked: Callable[[dict[str, object]], dict[str, obje
             and config['source_files'] == baseline['source_files']
             and config['source_root'] == baseline['source_root']
             and config['runtime_ref'] == baseline['runtime_ref']
-            and config['preparation_root'] in (baseline['preparation_root'], '/home/ubuntu/dope-scratch-x2/work-order-b-expanded-metric-serial-v1'), 'positive_frozen_science_changed')
+            and config['preparation_root'] in (baseline['preparation_root'], '/path/to/operator-home/dope-scratch-x2/work-order-b-expanded-metric-serial-v1'), 'positive_frozen_science_changed')
     action = config['action']
     require(action in ('kind-one', 'metric-one', 'tabsyn-metric-one'), 'unrecognized_positive_action')
     if action == 'tabsyn-metric-one':

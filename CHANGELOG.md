@@ -24,7 +24,7 @@
 - Block B: TabSyn's scaled arm (200 VAE and at most 1,000 diffusion
   epochs, which the authors' early stop can end sooner) is fit at seeds 23,
   37, 53, and 71 under its seed-11 caps. It is scored by the pinned evaluator,
-  which matches bit for bit across xbabe1 and xbabe3 on 200 seeded cells, and
+  which matches bit for bit across fit-machine-1 and fit-machine-3 on 200 seeded cells, and
   it enters the v2 panel under the five-seed design, with missing fits and
   unscored sample cells disclosed. The paper's TabSyn rows,
   intervals, bytes, and seed text follow the panel.

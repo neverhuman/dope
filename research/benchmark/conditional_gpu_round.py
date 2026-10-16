@@ -59,7 +59,7 @@ def run(stage: str, root: Path, binary: Path, trigger: str) -> None:
     library = str(Path(torch.__file__).parent / "lib")
     env = {**os.environ, "LD_LIBRARY_PATH": library + ":" + os.environ.get("LD_LIBRARY_PATH", ""),
            "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"}
-    with (SCRATCH / "neural-native-v1/xbabe2.gpu-reservation").open("a") as guard:
+    with (SCRATCH / "neural-native-v1/fit-machine-2.gpu-reservation").open("a") as guard:
         fcntl.flock(guard, fcntl.LOCK_EX | fcntl.LOCK_NB)
         for index, job in enumerate(locked["gpu_jobs"]):
             output = root / stage / f"cell-{index:02d}.json"

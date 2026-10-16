@@ -156,7 +156,7 @@ def verify_frozen_sources(locks, refs):
         for name, expected in files.items():
             check(root / name, expected, dependency=True, publish=False)
     runtimes = list(fit['host_runtime_locks'].values()) + [{
-        'path': str(BASE / 's3-native-matched-runtime-v1/xbabe2/runtime.lock.json'),
+        'path': str(BASE / 's3-native-matched-runtime-v1/fit-machine-2/runtime.lock.json'),
         'sha256': samples['runtime_sha256']}]
     for runtime in runtimes:
         check(runtime['path'], runtime['sha256'])

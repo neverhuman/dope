@@ -2065,7 +2065,7 @@
         "stderr": "7005d3016b442dfc6fe455497ac3eab0a84ba1ce6ce16305bb903e100da1b585",
         "stdout": "6df352e7a00d8ae65f9164cf1d3d2b9bc53ec2e79a545fe60ee443f5f1dce6c7"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -2127,7 +2127,7 @@
         "stderr": "e23bca4f52d896af6d2a26fb499d4ef707d59fef7f2b1d3ade51e6a7ad7586f6",
         "stdout": "38ebc662765574e932ba659fe592478546d670a99c7ef026d69746b0cefcd17e"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -2192,7 +2192,7 @@
         "stderr": "423fd228af696fc4b6be53fa6a49110432089930e71f505d6794aa98f44634c9",
         "stdout": "18eada58f8e2617c956e38da840cf04388dda69d8d287205bde6c54662ab5909"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -2266,7 +2266,7 @@
         "stderr": "544d320fd22e113e963acc7152b025a132afe25e4bd27863e585bf7521819c03",
         "stdout": "e31f49fe534b75d370494c5f5dea6ca39617789c3de9521df01efc80829c05a4"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -2328,7 +2328,7 @@
         "stderr": "e23bca4f52d896af6d2a26fb499d4ef707d59fef7f2b1d3ade51e6a7ad7586f6",
         "stdout": "38ebc662765574e932ba659fe592478546d670a99c7ef026d69746b0cefcd17e"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -2393,7 +2393,7 @@
         "stderr": "9045e0cdb0651a64e57e2387329ee97be52714016c79a0bd64b1751f11397724",
         "stdout": "edbbae9491ec6357f135269067807dc409288fb6b2bb96ab286156390ae629ba"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -2467,7 +2467,7 @@
         "stderr": "5a609ab9569d7613d01d5a0d578d71d6f670fff44dfef01bb0b60b066637ed8d",
         "stdout": "814e0d67be955b4a272b31da9149125336a31be5eb7bade7099dc2d3cfd04f5c"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 512,
@@ -2529,7 +2529,7 @@
         "stderr": "e23bca4f52d896af6d2a26fb499d4ef707d59fef7f2b1d3ade51e6a7ad7586f6",
         "stdout": "38ebc662765574e932ba659fe592478546d670a99c7ef026d69746b0cefcd17e"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 512,
@@ -2594,7 +2594,7 @@
         "stderr": "034c658f55c890ad9063597eaab309530c9e258e751b905c79ab536ba9107783",
         "stdout": "025006dcf5a7be668287838d767ba882d9728095a55f590576bea93f3cc1b7dc"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 512,
@@ -2668,7 +2668,7 @@
         "stderr": "ccc06fa18443daead79b4eea27b7299a6e924d92cdcc740dc04dcf9ebe56becb",
         "stdout": "38c09433aef0340ddade6609d24a7054eab69259226c0a81bac54e39acd2bcf6"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 64,
@@ -2730,7 +2730,7 @@
         "stderr": "e23bca4f52d896af6d2a26fb499d4ef707d59fef7f2b1d3ade51e6a7ad7586f6",
         "stdout": "38ebc662765574e932ba659fe592478546d670a99c7ef026d69746b0cefcd17e"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 64,
@@ -2783,7 +2783,7 @@
         "stderr": "8e50f6f6758ed87e8570ef42c9a8a435f8cbfd41ab3af52149a1c11a3cba3978",
         "stdout": "146e970023332e30be6a41b7d5392a55f5d7093d1c1fa96ad3a484cd833d8570"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 64,
@@ -2848,7 +2848,7 @@
         "stderr": "e58c784c949add532a11d10463cec86d108129d30588fc624eba9c4d3cf5f0a9",
         "stdout": "1f12ec8003201462c121da067c0c56dc8d2292cd830581c97427d90b67e375a8"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -2910,7 +2910,7 @@
         "stderr": "e23bca4f52d896af6d2a26fb499d4ef707d59fef7f2b1d3ade51e6a7ad7586f6",
         "stdout": "38ebc662765574e932ba659fe592478546d670a99c7ef026d69746b0cefcd17e"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -2975,7 +2975,7 @@
         "stderr": "f75725c081871a361b076584d4aafc276baedb3d19c72139c20f0a464fb2c373",
         "stdout": "b35aacb9beef0d578a90bcc80261400f8b2e1d7e855f20c4e8ef8daf02b89b62"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -3049,7 +3049,7 @@
         "stderr": "8267e02ce0d95d0063036a66de2044cce17db5edad1eb57192ff99b3b284a7ac",
         "stdout": "624717379ed93fa2d382248981a7f0e3ff515a7eff79cb972ac2eb36f39547c2"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 512,
@@ -3111,7 +3111,7 @@
         "stderr": "e23bca4f52d896af6d2a26fb499d4ef707d59fef7f2b1d3ade51e6a7ad7586f6",
         "stdout": "38ebc662765574e932ba659fe592478546d670a99c7ef026d69746b0cefcd17e"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 512,
@@ -3176,7 +3176,7 @@
         "stderr": "b4b1d917070a7f346fdbb4e885660c0791acba0a84ae490117f6e0c6d7de9fbd",
         "stdout": "e108d5c9f870e5b047b2eddac741f2c245e5516d904ddc2cd22c1aa5c58aa8d9"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 512,
@@ -3250,7 +3250,7 @@
         "stderr": "46d93f6d30435147a9b6e655f6b0bc45c75ed8053c080d14224068a3f2e0df3b",
         "stdout": "0431bad5cedf582a303e7443b6bc944fcceffb3b1ce59ff6af0cb5a5e769b036"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 64,
@@ -3312,7 +3312,7 @@
         "stderr": "e23bca4f52d896af6d2a26fb499d4ef707d59fef7f2b1d3ade51e6a7ad7586f6",
         "stdout": "38ebc662765574e932ba659fe592478546d670a99c7ef026d69746b0cefcd17e"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 64,
@@ -3365,7 +3365,7 @@
         "stderr": "6c4dadb9f8556c76f8bc3c04a38321a60ffa97065ff0ca993cfdc68793ee5f06",
         "stdout": "6cccfe06cb0c470eef56a2f5fde65e1a0f81f785cc4444e118e70ad1ca7af533"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 64,
@@ -3430,7 +3430,7 @@
         "stderr": "7979f4f0c7772e8d1ea65692a044309306aefcf409ceff5f8b65e9354f09590c",
         "stdout": "20b1de7d4328bc007152c9a5be34855d2a5c00cbbb379ec165a2f19c83fd0639"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -3492,7 +3492,7 @@
         "stderr": "e23bca4f52d896af6d2a26fb499d4ef707d59fef7f2b1d3ade51e6a7ad7586f6",
         "stdout": "38ebc662765574e932ba659fe592478546d670a99c7ef026d69746b0cefcd17e"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,
@@ -3545,7 +3545,7 @@
         "stderr": "ea1be9300085a3f6d04cf81e596e8effab4e4d489ff6c05eb0368cd0c241f7d8",
         "stdout": "11cc0a97eeb1d4df6b21e8cbb75e3e826c817fda441a4f68463713fb50f5b127"
       },
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "job": {
         "config": {
           "batch_size": 256,

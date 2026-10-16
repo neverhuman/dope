@@ -186150,7 +186150,7 @@
   },
   "native_selection_changed": false,
   "native_selection_reference": {
-    "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/arf-s3-population-native.json",
+    "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/arf-s3-population-native.json",
     "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
   },
   "native_values_ranked_across_methods": false,

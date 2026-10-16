@@ -49,16 +49,16 @@
         "method": "CTGAN",
         "sample_sha256": "a88eb1862810c47d95b285e4c955b9067bce51b98744baa190f679e2009debd8",
         "source_attempt": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/17a3002f32526a9880fef6a76937791ac4db593c680555c1807b991577b8d778/attempt-0001/receipt.json",
-        "source_host": "xbabe3",
-        "verification_host": "xbabe2"
+        "source_host": "fit-machine-3",
+        "verification_host": "fit-machine-2"
       },
       {
         "exact_match": true,
         "method": "TVAE",
         "sample_sha256": "a91ffee7011e610283e13c7aa635004e006a7835fa10a40ab34cfd3aa8bdcace",
         "source_attempt": "/mnt/fast-scratch/dope-benchmark/neural-native-v1/jobs/00449c5c2c378891db9d4399781cfe46797121300c2812e65e7fe156d36b8d60/attempt-0001/receipt.json",
-        "source_host": "xbabe2",
-        "verification_host": "xbabe3"
+        "source_host": "fit-machine-2",
+        "verification_host": "fit-machine-3"
       }
     ],
     "format": "dope-sdv-cross-host-sampling",

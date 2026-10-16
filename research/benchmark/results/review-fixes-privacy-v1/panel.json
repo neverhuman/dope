@@ -532,7 +532,7 @@
     }
   ],
   "note": "distance_mia_auc is an empirical attack AUC. It is not formal differential privacy and not HIPAA de-identification. c2st_catboost_auc is the GBDT detector. Stored logistic C2ST is a different column.",
-  "predeclaration_sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5",
+  "predeclaration_sha256": "e64a73897a0282bcf3604b175f5c90955022f12a8dc5167eb2e1da3c2687d2d3",
   "rows_per_class": {
     "dataset_size_seed_disagreements": 0,
     "max": 200,

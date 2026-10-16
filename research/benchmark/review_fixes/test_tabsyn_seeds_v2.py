@@ -95,7 +95,7 @@ class AmendmentTests(unittest.TestCase):
             with self.subTest(action), patch.object(T.os, "uname") as uname, \
                     patch.object(T.W, "checked", side_effect=AssertionError("read a pin")), \
                     patch("sys.argv", ["tabsyn_seeds_v2", action]):
-                uname.return_value.nodename = "xbabe2"
+                uname.return_value.nodename = "fit-machine-2"
                 with self.assertRaisesRegex(SystemExit, "refusing to run"):
                     T.main()
 

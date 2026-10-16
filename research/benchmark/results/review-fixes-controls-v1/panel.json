@@ -325,7 +325,7 @@
       "wins": 55
     }
   ],
-  "predeclaration_sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5",
+  "predeclaration_sha256": "e64a73897a0282bcf3604b175f5c90955022f12a8dc5167eb2e1da3c2687d2d3",
   "predictor_fit_seeds": [
     {
       "auditor": "catboost",

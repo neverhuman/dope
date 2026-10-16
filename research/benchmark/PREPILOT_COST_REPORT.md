@@ -14,8 +14,8 @@ privacy, or superiority claim. The public test partitions remain sealed.
 
 The three source archives, transformations, rights evidence, 60/20/20 grouped
 split hashes, and projected file hashes are frozen in `pilot-datasets.lock.json`.
-Workers received only the train and validation projections. `xbabe1` ran Adult
-on an RTX 4090, `xbabe2` ran California on an RTX 3090, and `xbabe3` ran News on
+Workers received only the train and validation projections. `fit-machine-1` ran Adult
+on an RTX 4090, `fit-machine-2` ran California on an RTX 3090, and `fit-machine-3` ran News on
 an RTX 3090. `host-inventory-20260929.json` under the external data root records
 the observed drivers, free GPU memory, active workloads, memory, and disk. The
 prepilot worker source tar SHA-256 was
@@ -35,9 +35,9 @@ matched their recorded SHA-256. Timing is wall-clock seconds.
 
 | Dataset / host | Train rows | Fit seconds, seeds 11 / 23 | Sampling seconds for eight cells, seeds 11 / 23 | Model-only bytes | Projection bytes | Charged bytes under revised runner |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Adult / xbabe1 | 29,306 | 27.28 / 27.11 | 31.46 / 31.74 | 737 | 4,534 | 5,271 |
-| California / xbabe2 | 12,384 | 4.49 / 4.48 | 1.89 / 1.84 | 1,162 | 1,591 | 2,753 |
-| News / xbabe3 | 23,787 | 14.26 / 14.52 | 17.51 / 17.44 | 2,731 | 9,770 | 12,501 |
+| Adult / fit-machine-1 | 29,306 | 27.28 / 27.11 | 31.46 / 31.74 | 737 | 4,534 | 5,271 |
+| California / fit-machine-2 | 12,384 | 4.49 / 4.48 | 1.89 / 1.84 | 1,162 | 1,591 | 2,753 |
+| News / fit-machine-3 | 23,787 | 14.26 / 14.52 | 17.51 / 17.44 | 2,731 | 9,770 | 12,501 |
 
 The first probe recorded model-only bytes. After the byte-accounting review,
 the worker was changed to charge the dataset-specific projection map for every
@@ -64,7 +64,7 @@ fit California seed 11 in 361.13 seconds. Its serialized model was 1,617,839 B;
 the additional 1,591 B projection map would make a charged artifact of
 1,619,430 B with the revised runner. Either count exceeds both compact byte
 caps. The first `n = 12,384` sample cell was still running beyond eight minutes
-on `xbabe2`; its result and operator cap are recorded in the external failure
+on `fit-machine-2`; its result and operator cap are recorded in the external failure
 ledger. This cell ran with the pre-timeout worker source, so it is cost evidence
 and does not satisfy the current method lock.
 

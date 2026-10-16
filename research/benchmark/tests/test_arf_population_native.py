@@ -32,7 +32,7 @@ class LedgerControls(unittest.TestCase):
                     mfs_v2=None, ptf_v1=None, release_safe=None, superiority=None,
                     result=dict(native_kpi=metric, artifact_bytes=20000,
                         artifact_inventory={'model.json':dict(bytes=19990), 'projection.json':dict(bytes=10)}),
-                    operation=dict(host='xbabe2', new_operation_started=True),
+                    operation=dict(host='fit-machine-2', new_operation_started=True),
                     common_retention=1e6 if t==0 else -1e6)
                 self.lock['jobs'].append(dict(job=job, job_sha256=key))
                 self.receipts[key]=r; jobs.append(job); rows.append(r)

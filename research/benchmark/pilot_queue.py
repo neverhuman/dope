@@ -24,7 +24,7 @@ DATASETS = ("Adult", "California", "News")
 FIT_SEEDS = (11, 23)
 SAMPLE_SEEDS = (101, 211)
 SIZES = (1, 2, 4, 8)
-HOST_SLOTS = {"xbabe1": 2, "xbabe2": 2, "xbabe3": 2}
+HOST_SLOTS = {"fit-machine-1": 2, "fit-machine-2": 2, "fit-machine-3": 2}
 ROOT = Path("/mnt/fast-scratch/dope-benchmark")
 PACKAGE = ROOT / "pilot-4h" / "package"
 RESULTS = ROOT / "pilot-4h" / "results"
@@ -73,9 +73,9 @@ def verify_inputs(lock: dict) -> None:
 
 def host_for(dataset: str, method: str, seed: int) -> str:
     if method == "GaussianCopula":
-        return "xbabe2"
+        return "fit-machine-2"
     # The two 3090s were occupied at admission; DOPE is a CPU job.
-    return ("xbabe1", "xbabe3")[(DATASETS.index(dataset) + FIT_SEEDS.index(seed)) % 2]
+    return ("fit-machine-1", "fit-machine-3")[(DATASETS.index(dataset) + FIT_SEEDS.index(seed)) % 2]
 
 
 def matrix(methods: dict) -> list[dict]:
@@ -145,7 +145,7 @@ def run_cell(cell: dict, deadline_epoch: float, semaphores: dict, cpu_pools: dic
         job_path = directory / "jobs" / f"{name}.json"
         if not job_path.exists():
             atomic_json(job_path, job)
-        python = ("/home/ubuntu/dope/.agent/worktrees/integration/target/bench-venv/bin/python"
+        python = ("/path/to/operator-home/dope/.agent/worktrees/integration/target/bench-venv/bin/python"
                   if cell["method"] == "GaussianCopula" else "/usr/bin/python3")
         command = ["env", f"PYTHONPATH={PACKAGE}", "CUDA_VISIBLE_DEVICES=",
                    "OMP_NUM_THREADS=16", "OPENBLAS_NUM_THREADS=16", "MKL_NUM_THREADS=16",
@@ -154,11 +154,11 @@ def run_cell(cell: dict, deadline_epoch: float, semaphores: dict, cpu_pools: dic
         cap = min(remaining, 2700 if cell["method"] == "GaussianCopula" else 1200)
         command = ["timeout", "--signal=TERM", "--kill-after=20s", str(cap),
                    "/usr/bin/time", "-v", "taskset", "-c", common["cpu_affinity"], *command]
-        if host != "xbabe2":
+        if host != "fit-machine-2":
             command = ["ssh", "-o", "BatchMode=yes", host, shlex.join(command)]
         try:
             result = subprocess.run(command, capture_output=True, text=True, timeout=cap + 35,
-                                    cwd=str(PACKAGE) if host == "xbabe2" else None)
+                                    cwd=str(PACKAGE) if host == "fit-machine-2" else None)
             log_path = directory / ("repair-logs" if repair_digest_mismatch else "logs") / f"{name}.log"
             log_path.write_text(result.stdout + "\n--- stderr ---\n" + result.stderr)
             child = json.loads(result.stdout.strip().splitlines()[-1]) if result.returncode == 0 else []

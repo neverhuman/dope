@@ -8,7 +8,7 @@
    ],
    "binary": "B_new (predeclare_v2 binaries.diagnostic)",
    "commit": "c41b876781d3ffdf31c20f6a11ac53adfdbdad76",
-   "host": "xbabe1",
+   "host": "fit-machine-1",
    "runner": "research/benchmark/review_fixes/fit_seeds_v2.py"
   },
   "aprime_replay": {
@@ -16,7 +16,7 @@
     "fourseed_bnew"
    ],
    "commit": "c41b876781d3ffdf31c20f6a11ac53adfdbdad76",
-   "host": "xbabe1",
+   "host": "fit-machine-1",
    "note": "re-scores the stored four-seed samples; no refit",
    "runner": "research/benchmark/review_fixes/rescore_cells.py",
    "runner_sha256": "9fae43e16a149f2637090fee4934d7576952450e5084e53f1446a91622c897e2"
@@ -28,7 +28,7 @@
    ],
    "binary": "B_hist (predeclare_v2 binaries.headline)",
    "commit": "b288c648d9f0a1f44649f76b6cf3905807e85c0c",
-   "host": "xbabe1",
+   "host": "fit-machine-1",
    "runner": "research/benchmark/review_fixes/fit_seeds_v2.py",
    "runner_sha256": "0159c0373836b046c21d1b4344f94c4fbcc4a44d2ad01f712bee7e06899acc25"
   },
@@ -49,8 +49,8 @@
    "cross_host_check": {
     "cells": 200,
     "hosts": [
-     "xbabe1",
-     "xbabe3"
+     "fit-machine-1",
+     "fit-machine-3"
     ],
     "method": "joined by exact selection path and identity; same key sets and same Python types at every node; each float compared by struct.pack('>d') bytes and float.hex(); metric_seconds excluded; retained payloads only, no rescoring",
     "negative_controls": {
@@ -95,14 +95,14 @@
     53,
     71
    ],
-   "host": "xbabe1",
+   "host": "fit-machine-1",
    "k0": {
     "adapters_sha256": "466a50ca8cc21cc1255482468fb40963baf9ee88bc5fa4b8c398d727c91cef53",
     "auditor_seed": 1729,
     "cells": 2400,
     "commit": "f427efe462ac6d78dfb2302415f3d0e4bd5a1c6d",
     "finished_utc": "2026-10-13T18:43:55Z",
-    "host": "xbabe1",
+    "host": "fit-machine-1",
     "manifest": "manifest-tabsyn-seeds.json",
     "manifest_sha256": "df4fc19f52257f8c218de4b07d7bf1749c5ec417253083c8780417bbd14c7c00",
     "ok": 2394,
@@ -117,19 +117,19 @@
      "main_pid": 833878,
      "pass": "first",
      "result": "success",
-     "window_utc_xbabe1_clock": [
+     "window_utc_fit-machine-1_clock": [
       "2026-10-13T08:42:49Z",
       "2026-10-13T18:04:16Z"
      ]
     },
     {
-     "authorization": "COORD watcher OWNER-DECISION blockB-retry, stamped 18:35Z on the watcher clock; it precedes the launch receipt in COORD order, and the watcher clock led the xbabe1 and xbabe2 clocks by about 7 to 8 minutes",
+     "authorization": "COORD watcher OWNER-DECISION blockB-retry, stamped 18:35Z on the watcher clock; it precedes the launch receipt in COORD order, and the watcher clock led the fit-machine-1 and fit-machine-2 clocks by about 7 to 8 minutes",
      "campaign_receipt": "campaign-20261013T182825Z-2488536.json",
      "invocation": "ac13382e0a8947b0b70e71d5884d82fd",
      "main_pid": 2488536,
      "pass": "retry",
      "result": "success",
-     "window_utc_xbabe1_clock": [
+     "window_utc_fit-machine-1_clock": [
       "2026-10-13T18:28:25Z",
       "2026-10-13T18:37:20Z"
      ]
@@ -562,7 +562,7 @@
    "adapters_sha256": "f6e71a6ad148edbbf183f3b40f58c25087d0a39f0774c707c08be0ca8b268ef7",
    "auditor_seed": 1729,
    "commit": "56ec6d2",
-   "host": "xbabe3",
+   "host": "fit-machine-3",
    "manifests": {
     "manifest-arf.json": {
      "cells": 6000,

@@ -38,7 +38,7 @@
         102,
         103
       ],
-      "cpu_host": "xbabe1",
+      "cpu_host": "fit-machine-1",
       "energy_joules": null,
       "evidence_sha256": [
         "dba021575580d31aa3cc5e36a511d1f00e2475beada49c1da8e4a0490abce791",
@@ -84,7 +84,7 @@
         110,
         111
       ],
-      "cpu_host": "xbabe2",
+      "cpu_host": "fit-machine-2",
       "energy_joules": null,
       "evidence_sha256": [
         "c525dabd54eea49be04adc6450e8c34f157c28a8dd843b5d83feef9c70b51536",
@@ -130,7 +130,7 @@
         102,
         103
       ],
-      "cpu_host": "xbabe1",
+      "cpu_host": "fit-machine-1",
       "energy_joules": null,
       "evidence_sha256": [
         "8b88bfb39eb52a16184251b3c1c78a483f075da84441ea67344be30c7aeb3dd8",
@@ -176,7 +176,7 @@
         110,
         111
       ],
-      "cpu_host": "xbabe2",
+      "cpu_host": "fit-machine-2",
       "energy_joules": null,
       "evidence_sha256": [
         "77c6c2cf3549137175a55ae02a47aa1527b7819271b2f151edb1babde8b11e1f",

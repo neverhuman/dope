@@ -131,7 +131,7 @@ unadopted.
 
 BeyondArena is not one of the 3,859 catalog rows. The pinned snapshot is
 TabArena/BeyondArena revision `2ecfe882ccfb814fc27c4de10a64ceefd5d7655c` at
-`s3://veox-jopedime-datasets-use2/benchmarks/BeyondArena/2ecfe882ccfb814fc27c4de10a64ceefd5d7655c/`.
+`s3://DOPE_DATASET_BUCKET/benchmarks/BeyondArena/2ecfe882ccfb814fc27c4de10a64ceefd5d7655c/`.
 The index lists 142 families, 19,676,576 rows, and 3,722 verified official
 folds: 73 binary, 44 regression, 25 multiclass; 103 IID, 21 temporal, and 18
 grouped. Raw tables are under `raw/BeyondArena/` at the same revision.
@@ -323,11 +323,11 @@ at 1.029 (293,868 bytes). These selected examples illustrate mixed outcomes;
 the complete table retains every configuration and failure. They are
 null-normalized utility estimates, without fit uncertainty or paired superiority.
 
-Successful DOPE fit entrypoints totaled 111.043 seconds on xbabe1/xbabe3.
+Successful DOPE fit entrypoints totaled 111.043 seconds on fit-machine-1/fit-machine-3.
 Dispatch, hash and admission overhead totaled 2,119.258 seconds, including
 130.203 seconds for the two failed admissions. The declared GPU fit ceiling
 was 14,400 seconds; the original frozen grid, fit deadlines and VRAM cap were
-preserved. Sampling and metric replays use xbabe2. Device-wide energy estimates
+preserved. Sampling and metric replays use fit-machine-2. Device-wide energy estimates
 include idle and do not provide full campaign or baseline-attributed energy.
 Original native tuning and earlier DOPE architecture research are separate costs.
 

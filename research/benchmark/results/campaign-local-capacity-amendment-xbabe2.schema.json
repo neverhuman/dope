@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Owner-authorized xbabe2 local100GB capacity amendment",
+  "title": "Owner-authorized fit-machine-2 local100GB capacity amendment",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -20,7 +20,7 @@
     "execution_order",
     "du_semantics",
     "filesystem",
-    "old_xbabe2_fast_scratch_budget_separate",
+    "old_fit-machine-2_fast_scratch_budget_separate",
     "shared_gpu_fit_lease_path",
     "projection_and_model_bytes_charged",
     "scientific_configuration_changed_by_amendment",
@@ -58,10 +58,10 @@
       "minLength": 1
     },
     "host": {
-      "const": "xbabe2"
+      "const": "fit-machine-2"
     },
     "new_scratch_root": {
-      "const": "/home/ubuntu/dope-scratch-x2"
+      "const": "/path/to/operator-home/dope-scratch-x2"
     },
     "ceiling_bytes": {
       "const": 100000000000
@@ -86,7 +86,7 @@
         "prior_failed_trial_and_cost_carry_required",
         "tuning_cell_wall_cap_seconds",
         "tuning_trials_per_cell_max",
-        "xbabe0_allowed",
+        "fit-machine-0_allowed",
         "yield_to_jope_dltrain_or_hyperion"
       ],
       "properties": {
@@ -107,9 +107,9 @@
         },
         "hosts": {
           "const": [
-            "xbabe1",
-            "xbabe2",
-            "xbabe3"
+            "fit-machine-1",
+            "fit-machine-2",
+            "fit-machine-3"
           ]
         },
         "maximum_study_cpu_slots": {
@@ -130,7 +130,7 @@
         "tuning_trials_per_cell_max": {
           "const": 8
         },
-        "xbabe0_allowed": {
+        "fit-machine-0_allowed": {
           "const": false
         },
         "yield_to_jope_dltrain_or_hyperion": {
@@ -141,7 +141,7 @@
     "amended_campaigns": {
       "const": [
         "TabSyn qualification and 100-lineage native/default",
-        "TabDDPM continuation when xbabe3 remains held",
+        "TabDDPM continuation when fit-machine-3 remains held",
         "DOPE fit-seed23 and37 CPU refits on 100 matched lineages"
       ]
     },
@@ -239,7 +239,7 @@
         }
       }
     },
-    "old_xbabe2_fast_scratch_budget_separate": {
+    "old_fit-machine-2_fast_scratch_budget_separate": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -265,7 +265,7 @@
       }
     },
     "shared_gpu_fit_lease_path": {
-      "const": "/home/ubuntu/dope-scratch-x2/.gpu-fit.lock"
+      "const": "/path/to/operator-home/dope-scratch-x2/.gpu-fit.lock"
     },
     "projection_and_model_bytes_charged": {
       "const": true

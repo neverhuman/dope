@@ -39,7 +39,7 @@
       "type": "array"
     },
     "metric_directory": {
-      "const": "/home/ubuntu/dope-scratch-x2/tabddpm-retained-common-validation-v1/publication-receipts-v1"
+      "const": "/path/to/operator-home/dope-scratch-x2/tabddpm-retained-common-validation-v1/publication-receipts-v1"
     },
     "official_tests_opened": {
       "const": false

@@ -55,7 +55,7 @@
           "default": true,
           "energy_joules_estimate": 1540.262527541509,
           "fit_seconds": 16.407039652578533,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -125,7 +125,7 @@
           "default": false,
           "energy_joules_estimate": 1503.1984993084707,
           "fit_seconds": 16.931269632652402,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -177,7 +177,7 @@
           "default": false,
           "energy_joules_estimate": 1266.0060791498422,
           "fit_seconds": 14.882868045940995,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -229,7 +229,7 @@
           "default": false,
           "energy_joules_estimate": 1041.2471027314011,
           "fit_seconds": 13.309446246363223,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -302,7 +302,7 @@
           "default": true,
           "energy_joules_estimate": 791.1875821907004,
           "fit_seconds": 8.829062244854867,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -367,7 +367,7 @@
           "default": false,
           "energy_joules_estimate": 550.7394169376302,
           "fit_seconds": 7.180707752937451,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -414,7 +414,7 @@
           "default": false,
           "energy_joules_estimate": 902.5079745867406,
           "fit_seconds": 11.325178793165833,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -461,7 +461,7 @@
           "default": false,
           "energy_joules_estimate": 804.7811213277071,
           "fit_seconds": 8.77538114786148,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -539,7 +539,7 @@
           "default": true,
           "energy_joules_estimate": 1931.3179440689644,
           "fit_seconds": 26.781622944399714,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -591,7 +591,7 @@
           "default": false,
           "energy_joules_estimate": 2291.0797306106147,
           "fit_seconds": 32.05627603922039,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -643,7 +643,7 @@
           "default": false,
           "energy_joules_estimate": 6026.705526464024,
           "fit_seconds": 73.31512736342847,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -713,7 +713,7 @@
           "default": false,
           "energy_joules_estimate": 8933.434392908739,
           "fit_seconds": 108.07284183613956,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -786,7 +786,7 @@
           "default": true,
           "energy_joules_estimate": 2427.399566547591,
           "fit_seconds": 24.770274398848414,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -833,7 +833,7 @@
           "default": false,
           "energy_joules_estimate": 3993.2085747026285,
           "fit_seconds": 39.79654108919203,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -898,7 +898,7 @@
           "default": false,
           "energy_joules_estimate": 4599.925726556331,
           "fit_seconds": 43.12673201505095,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -945,7 +945,7 @@
           "default": false,
           "energy_joules_estimate": 4602.931619107826,
           "fit_seconds": 43.10048653651029,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1023,7 +1023,7 @@
           "default": true,
           "energy_joules_estimate": 2213.60475444939,
           "fit_seconds": 23.613661370240152,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -1075,7 +1075,7 @@
           "default": false,
           "energy_joules_estimate": 2205.03483072713,
           "fit_seconds": 23.758779388852417,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1127,7 +1127,7 @@
           "default": false,
           "energy_joules_estimate": 8114.215108756861,
           "fit_seconds": 74.80576176475734,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1179,7 +1179,7 @@
           "default": false,
           "energy_joules_estimate": 8112.483272484012,
           "fit_seconds": 75.29399549867958,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1252,7 +1252,7 @@
           "default": true,
           "energy_joules_estimate": 1785.3409925838166,
           "fit_seconds": 18.082831563195214,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1299,7 +1299,7 @@
           "default": false,
           "energy_joules_estimate": 1769.2014035319955,
           "fit_seconds": 18.013794003985822,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1364,7 +1364,7 @@
           "default": false,
           "energy_joules_estimate": 3345.2224083917845,
           "fit_seconds": 28.81942867091857,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -1411,7 +1411,7 @@
           "default": false,
           "energy_joules_estimate": 3342.0645575012313,
           "fit_seconds": 28.905496795196086,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1489,7 +1489,7 @@
           "default": true,
           "energy_joules_estimate": 6478.17197098368,
           "fit_seconds": 84.96907269768417,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -1541,7 +1541,7 @@
           "default": false,
           "energy_joules_estimate": 2096.509581157025,
           "fit_seconds": 28.129434935748577,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1593,7 +1593,7 @@
           "default": false,
           "energy_joules_estimate": 3130.848707289165,
           "fit_seconds": 42.13843154255301,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1645,7 +1645,7 @@
           "default": false,
           "energy_joules_estimate": 2105.4630341197085,
           "fit_seconds": 27.612782403826714,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1718,7 +1718,7 @@
           "default": true,
           "energy_joules_estimate": 3030.928284872742,
           "fit_seconds": 33.07652032189071,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1765,7 +1765,7 @@
           "default": false,
           "energy_joules_estimate": 1974.1162313591221,
           "fit_seconds": 21.062258976511657,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1812,7 +1812,7 @@
           "default": false,
           "energy_joules_estimate": 3008.392184581365,
           "fit_seconds": 29.72542264778167,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -1877,7 +1877,7 @@
           "default": false,
           "energy_joules_estimate": 3002.6338039283733,
           "fit_seconds": 29.211280131712556,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -1955,7 +1955,7 @@
           "default": true,
           "energy_joules_estimate": 4097.046372516324,
           "fit_seconds": 40.27306385803968,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2007,7 +2007,7 @@
           "default": false,
           "energy_joules_estimate": 3557.4399287340693,
           "fit_seconds": 38.751543371006846,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2059,7 +2059,7 @@
           "default": false,
           "energy_joules_estimate": 9294.802703035242,
           "fit_seconds": 85.60684360004961,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2129,7 +2129,7 @@
           "default": false,
           "energy_joules_estimate": 9781.017170241385,
           "fit_seconds": 89.30490491259843,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -2202,7 +2202,7 @@
           "default": true,
           "energy_joules_estimate": 2041.459728867444,
           "fit_seconds": 18.819425032939762,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2249,7 +2249,7 @@
           "default": false,
           "energy_joules_estimate": 2308.8906553911675,
           "fit_seconds": 22.61572409211658,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2296,7 +2296,7 @@
           "default": false,
           "energy_joules_estimate": 3108.541408741551,
           "fit_seconds": 26.7786792491097,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2361,7 +2361,7 @@
           "default": false,
           "energy_joules_estimate": 3106.6109169495544,
           "fit_seconds": 27.32667624298483,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -2439,7 +2439,7 @@
           "default": true,
           "energy_joules_estimate": 1782.8835368030448,
           "fit_seconds": 17.071790897054598,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2491,7 +2491,7 @@
           "default": false,
           "energy_joules_estimate": 1783.371545783796,
           "fit_seconds": 16.52722733700648,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2561,7 +2561,7 @@
           "default": false,
           "energy_joules_estimate": 7071.635175092806,
           "fit_seconds": 61.3536631281022,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -2613,7 +2613,7 @@
           "default": false,
           "energy_joules_estimate": 7357.269822401187,
           "fit_seconds": 63.2472561430186,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2686,7 +2686,7 @@
           "default": true,
           "energy_joules_estimate": 1413.8863048515375,
           "fit_seconds": 21.506009033881128,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2733,7 +2733,7 @@
           "default": false,
           "energy_joules_estimate": 1418.2886001088286,
           "fit_seconds": 22.028929935768247,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2798,7 +2798,7 @@
           "default": false,
           "energy_joules_estimate": 2514.166194505664,
           "fit_seconds": 33.84497478976846,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -2845,7 +2845,7 @@
           "default": false,
           "energy_joules_estimate": 2878.6193642084586,
           "fit_seconds": 38.3429640205577,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -2923,7 +2923,7 @@
           "default": true,
           "energy_joules_estimate": 1721.6244422053826,
           "fit_seconds": 24.824079015292227,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -2975,7 +2975,7 @@
           "default": false,
           "energy_joules_estimate": 1369.398354667062,
           "fit_seconds": 19.95036640111357,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3027,7 +3027,7 @@
           "default": false,
           "energy_joules_estimate": 3167.427946822336,
           "fit_seconds": 39.90949652064592,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3079,7 +3079,7 @@
           "default": false,
           "energy_joules_estimate": 3210.3001448892333,
           "fit_seconds": 39.391034743748605,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3152,7 +3152,7 @@
           "default": true,
           "energy_joules_estimate": 2282.1189563450034,
           "fit_seconds": 26.7671208800748,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3199,7 +3199,7 @@
           "default": false,
           "energy_joules_estimate": 1987.8509238904062,
           "fit_seconds": 21.426182985305786,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3246,7 +3246,7 @@
           "default": false,
           "energy_joules_estimate": 3702.4733092976367,
           "fit_seconds": 35.865694396197796,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3311,7 +3311,7 @@
           "default": false,
           "energy_joules_estimate": 3265.489317931896,
           "fit_seconds": 30.737215236760676,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -3389,7 +3389,7 @@
           "default": true,
           "energy_joules_estimate": 1565.4418447453274,
           "fit_seconds": 15.652440665988252,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3441,7 +3441,7 @@
           "default": false,
           "energy_joules_estimate": 2046.170165217945,
           "fit_seconds": 19.793781218817458,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3493,7 +3493,7 @@
           "default": false,
           "energy_joules_estimate": 6605.018521348844,
           "fit_seconds": 56.64232796593569,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3563,7 +3563,7 @@
           "default": false,
           "energy_joules_estimate": 6598.471064956228,
           "fit_seconds": 57.14793428406119,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -3636,7 +3636,7 @@
           "default": true,
           "energy_joules_estimate": 1082.3826351701841,
           "fit_seconds": 17.397135238163173,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3683,7 +3683,7 @@
           "default": false,
           "energy_joules_estimate": 1254.2865251729731,
           "fit_seconds": 18.980080517940223,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3730,7 +3730,7 @@
           "default": false,
           "energy_joules_estimate": 2600.9407328588422,
           "fit_seconds": 34.81957318075001,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3795,7 +3795,7 @@
           "default": false,
           "energy_joules_estimate": 2802.6455354380696,
           "fit_seconds": 36.992732274346054,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -3873,7 +3873,7 @@
           "default": true,
           "energy_joules_estimate": 1275.0036745565571,
           "fit_seconds": 14.39321319386363,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -3943,7 +3943,7 @@
           "default": false,
           "energy_joules_estimate": 2336.542484936295,
           "fit_seconds": 31.091291902586818,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -3995,7 +3995,7 @@
           "default": false,
           "energy_joules_estimate": 1267.1900008661485,
           "fit_seconds": 14.873349357396364,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4047,7 +4047,7 @@
           "default": false,
           "energy_joules_estimate": 1272.439197705621,
           "fit_seconds": 14.418811608105898,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4120,7 +4120,7 @@
           "default": true,
           "energy_joules_estimate": 1038.9133103522286,
           "fit_seconds": 10.854512952035293,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -4167,7 +4167,7 @@
           "default": false,
           "energy_joules_estimate": 1042.9691122630588,
           "fit_seconds": 11.397740402957425,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4214,7 +4214,7 @@
           "default": false,
           "energy_joules_estimate": 1295.9185087053222,
           "fit_seconds": 12.846807451918721,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4261,7 +4261,7 @@
           "default": false,
           "energy_joules_estimate": 1308.7511750536876,
           "fit_seconds": 13.449597273021936,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4339,7 +4339,7 @@
           "default": true,
           "energy_joules_estimate": 1293.3200813781493,
           "fit_seconds": 12.457578577799723,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -4391,7 +4391,7 @@
           "default": false,
           "energy_joules_estimate": 820.241274076237,
           "fit_seconds": 9.311154829105362,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4443,7 +4443,7 @@
           "default": false,
           "energy_joules_estimate": 1295.4605473650595,
           "fit_seconds": 12.916466142982244,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4495,7 +4495,7 @@
           "default": false,
           "energy_joules_estimate": 1055.3911626794866,
           "fit_seconds": 11.295042254962027,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4568,7 +4568,7 @@
           "default": true,
           "energy_joules_estimate": 608.704153538011,
           "fit_seconds": 10.798691467382014,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4633,7 +4633,7 @@
           "default": false,
           "energy_joules_estimate": 607.6691719773878,
           "fit_seconds": 10.245155615732074,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -4680,7 +4680,7 @@
           "default": false,
           "energy_joules_estimate": 887.2186442461889,
           "fit_seconds": 14.619655893184245,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4727,7 +4727,7 @@
           "default": false,
           "energy_joules_estimate": 618.7200419936888,
           "fit_seconds": 10.241872432641685,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4805,7 +4805,7 @@
           "default": true,
           "energy_joules_estimate": 1061.2160777565628,
           "fit_seconds": 10.871211625868455,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -4857,7 +4857,7 @@
           "default": false,
           "energy_joules_estimate": 1308.4216869226564,
           "fit_seconds": 13.989763488993049,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4909,7 +4909,7 @@
           "default": false,
           "energy_joules_estimate": 1816.6713699714583,
           "fit_seconds": 17.545786064118147,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -4961,7 +4961,7 @@
           "default": false,
           "energy_joules_estimate": 1566.8360177565364,
           "fit_seconds": 14.945684551028535,
-          "host": "xbabe2",
+          "host": "fit-machine-2",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5034,7 +5034,7 @@
           "default": true,
           "energy_joules_estimate": 1904.4870513135477,
           "fit_seconds": 32.92420366033912,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5081,7 +5081,7 @@
           "default": false,
           "energy_joules_estimate": 611.7752395942435,
           "fit_seconds": 10.252007212489843,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5146,7 +5146,7 @@
           "default": false,
           "energy_joules_estimate": 974.9040242795273,
           "fit_seconds": 14.90610674303025,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -5193,7 +5193,7 @@
           "default": false,
           "energy_joules_estimate": 984.1140055615269,
           "fit_seconds": 14.904173834249377,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5271,7 +5271,7 @@
           "default": true,
           "energy_joules_estimate": 1944.2372251870022,
           "fit_seconds": 28.216206368990242,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5323,7 +5323,7 @@
           "default": false,
           "energy_joules_estimate": 2105.971758863721,
           "fit_seconds": 28.984826234169304,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5375,7 +5375,7 @@
           "default": false,
           "energy_joules_estimate": 7673.368326281412,
           "fit_seconds": 93.78366664797068,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5445,7 +5445,7 @@
           "default": false,
           "energy_joules_estimate": 7642.110070530903,
           "fit_seconds": 92.55450744368136,
-          "host": "xbabe1",
+          "host": "fit-machine-1",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -5518,7 +5518,7 @@
           "default": true,
           "energy_joules_estimate": 2680.3227519858815,
           "fit_seconds": 27.943105873651803,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5565,7 +5565,7 @@
           "default": false,
           "energy_joules_estimate": 2429.605821293257,
           "fit_seconds": 24.692059236578643,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5612,7 +5612,7 @@
           "default": false,
           "energy_joules_estimate": 4600.768184277304,
           "fit_seconds": 44.578857560642064,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": false,
           "native_validation_kpi": {
             "components": {
@@ -5677,7 +5677,7 @@
           "default": false,
           "energy_joules_estimate": 4857.067195907216,
           "fit_seconds": 45.791859983466566,
-          "host": "xbabe3",
+          "host": "fit-machine-3",
           "native_selected": true,
           "native_validation_kpi": {
             "components": {
@@ -5716,7 +5716,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 14.427576933056116,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": -0.13896685420993607,
       "metric_sha256": "27754a04a51720ed241ffaa365e15ab00c23007773fb743f90a799f6dee6312e",
       "mlp_retention": -0.3814280564531654,
@@ -5740,7 +5740,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.6368357399478555,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 1.003941493808609,
       "metric_sha256": "88fd026779871ec48341f1691074605d865b0c85b999b8a60caeb923fe32e1b7",
       "mlp_retention": 1.0255717863991218,
@@ -5764,7 +5764,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 12.325386030599475,
-      "host": "xbabe3",
+      "host": "fit-machine-3",
       "linear_retention": 0.203397487360034,
       "metric_sha256": "8a38e22b087073a0771c1e3119d9a0b1584e98f198fb864cb7d7d7be56aff88e",
       "mlp_retention": -0.8313184878534415,
@@ -5788,7 +5788,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.6371337249875069,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 0.8451791426812245,
       "metric_sha256": "943b19a521a77bf3939cfa66f3b1e6214c5db774ec5f99a5a5b87959e5a5fca5",
       "mlp_retention": 0.7093920076887489,
@@ -5812,7 +5812,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 10.305341331288218,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "linear_retention": 0.19045179454866012,
       "metric_sha256": "4f70740cb112946c1b06c4313f7d8c8f28a015a05fe0f20ab95514b5eaa5f594",
       "mlp_retention": 0.18559718048709858,
@@ -5836,7 +5836,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.48118787119165063,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 0.9979592744964806,
       "metric_sha256": "b3c16f7633dbc0da694cb68b1f76f45ee5b1acca02118e588ebf7929dc019921",
       "mlp_retention": 0.9853890823494483,
@@ -5860,7 +5860,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 12.428855376085266,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": null,
       "metric_sha256": "78940dd43ca5e5a88db0abbdbeaeafbb8eab2ff9fd29bc047ad2c3134748f79f",
       "mlp_retention": -0.0013192590282766212,
@@ -5884,7 +5884,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.4446840069722384,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": null,
       "metric_sha256": "1d3d600aa7b66e68d53bfd093819ed7560164c0fd0530592bb03e2a3b23bb1b7",
       "mlp_retention": 0.5664667298858596,
@@ -5908,7 +5908,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 10.293035630136728,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "linear_retention": 0.09138289398125736,
       "metric_sha256": "831ad4e4eb965ba8638334d91056c215356fe59c5c5b9a71ce310036827035ed",
       "mlp_retention": -0.1428190697532742,
@@ -5932,7 +5932,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.4122835728339851,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": -0.6766742000315427,
       "metric_sha256": "0ba4230539d0e4d6a4b4f2cb779793fad68e758a959ed7c0d840334616debc9d",
       "mlp_retention": 0.7172928091618846,
@@ -5956,7 +5956,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 16.434135515242815,
-      "host": "xbabe3",
+      "host": "fit-machine-3",
       "linear_retention": 0.7085233749726083,
       "metric_sha256": "c81c76f3c44586aac76b85945e85a42e3907f6ba4fc1f2701d43b11c8bcfcf3c",
       "mlp_retention": 0.7539525986039078,
@@ -5980,7 +5980,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.8730357608292252,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 1.002742999106132,
       "metric_sha256": "4171f8edd832d2dd4c5329356c92a913b8b831f07ab4dfea83442bb290a46ed3",
       "mlp_retention": 0.9905490964516417,
@@ -6004,7 +6004,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 10.271820137277246,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "linear_retention": 0.4434881346062001,
       "metric_sha256": "829a0a8fc38800c2b1849f48f862a05fa8c6468841be689e08d224b3b1750ed5",
       "mlp_retention": -3.0491260097166655,
@@ -6028,7 +6028,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.45219966885633767,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 1.1465568339819872,
       "metric_sha256": "af9a9502a6d409e6d63b0944173dc7ea0f8ac290c20c7f16316fadc3c6af4dd0",
       "mlp_retention": 0.6752707749480371,
@@ -6052,7 +6052,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 12.29679661244154,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "linear_retention": -0.612888233819,
       "metric_sha256": "a4f6ff2527bdf09f2b64a07c10e9a96d7e72659e623bb876664ef67734f7ac58",
       "mlp_retention": -3.497877644357395,
@@ -6076,7 +6076,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.8723019191529602,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 0.6041231179885683,
       "metric_sha256": "2be9abd604206917bff9ccf26875f8927782337cf911990fef121a094160bf93",
       "mlp_retention": 0.1464073465912164,
@@ -6100,7 +6100,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 10.252060392871499,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "linear_retention": -0.9717806874173726,
       "metric_sha256": "02a5ab3c189e29d9a38ae55da57a375383d93897d72cc840aacab0c4f2aa1488",
       "mlp_retention": -5.0812628456751785,
@@ -6124,7 +6124,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.6540631100069731,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 0.9889306337807388,
       "metric_sha256": "e82c30d1f7a8058a6effa08f81991a7ea9ddd38a3bfc95ed56a5958d1faed8cb",
       "mlp_retention": -0.3449335586450048,
@@ -6148,7 +6148,7 @@
       "failure_code": "byte_cap",
       "family": "micro_tvae_4_16",
       "fit_seconds": 12.299119665287435,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "linear_retention": null,
       "metric_sha256": null,
       "mlp_retention": null,
@@ -6172,7 +6172,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.6093405089341104,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 0.8149711959285544,
       "metric_sha256": "9a86b70d5208dfbfad1fda8e2925ec18a376fa3e540ec4c503bab0a3fadb861f",
       "mlp_retention": -0.7332805144327045,
@@ -6196,7 +6196,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 10.256208918988705,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "linear_retention": 0.13187257780742564,
       "metric_sha256": "85f8a8e8fbadfcb2c741cfc41a28ce514175e6800c6b966ad754da0c5808993c",
       "mlp_retention": 0.06983218145993858,
@@ -6220,7 +6220,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.560254282085225,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 0.9595538799629153,
       "metric_sha256": "6757d9dbb1d9f177e8c0717c5af818db80fe58568432c3cce11cf6faa38cf364",
       "mlp_retention": 0.8174464398401781,
@@ -6244,7 +6244,7 @@
       "failure_code": null,
       "family": "micro_tvae_4_16",
       "fit_seconds": 14.332424401305616,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "linear_retention": 0.44788107112013575,
       "metric_sha256": "73728b291b0793ddb3793ffd19d4eab203f25f945ca0450e29d06ee549c7340f",
       "mlp_retention": 0.5354013044588061,
@@ -6268,7 +6268,7 @@
       "failure_code": null,
       "family": "symbolic_default",
       "fit_seconds": 0.3981937179341912,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "linear_retention": 0.9992413159506642,
       "metric_sha256": "57725a478fa606a487ac7fb47e1e66f0ff16d20e42978ccb5a47dfec5ea8124c",
       "mlp_retention": 0.9654157107327159,
@@ -6348,7 +6348,7 @@
       "energy_joules_estimate": 232.96750195096712,
       "fit_seconds": 2.0548640838824213,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "e4d0d7e12efcd2672717ee5aaf010d6bcbda70a94b587ff4a7e931c0e06b195b",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -6423,7 +6423,7 @@
       "energy_joules_estimate": 233.41178857004735,
       "fit_seconds": 2.0536595138255507,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "ed462f04b9796d7416fd629f5ec8912019e5f3f7298a44411c715718b23e3d19",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -6498,7 +6498,7 @@
       "energy_joules_estimate": 234.27647857399424,
       "fit_seconds": 2.055500137154013,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "eada3deba730e12827c580edb811530b54446a80c095f949e67c545d2a47fac9",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -6573,7 +6573,7 @@
       "energy_joules_estimate": 234.06183265841798,
       "fit_seconds": 2.0520789639558643,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "4b7edb238b660b4a975dd02c9acb1600eeb91bf393968aa163d83ee332f6b533",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -6648,7 +6648,7 @@
       "energy_joules_estimate": 234.14425210095942,
       "fit_seconds": 2.056606149999425,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "c24d2bdbc40f09bb0e48e8b5f05f48c155165e9e44243e20603f5b67c3e1d7af",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -6723,7 +6723,7 @@
       "energy_joules_estimate": 235.04751331895824,
       "fit_seconds": 2.0534017959143966,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "491c667cf286da6b6454d17549a4b495816b4f3df76ba74d57d7dee277dc5108",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -6798,7 +6798,7 @@
       "energy_joules_estimate": 235.52006899114699,
       "fit_seconds": 2.0548492250964046,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "561bb1149e34c6c5bc294948e36f7faa7844537adf5c90e32812acc970e6719c",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -6873,7 +6873,7 @@
       "energy_joules_estimate": 234.53776450529696,
       "fit_seconds": 2.053508687997237,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "9346e527ff07dc7d74bdfaa9839bfd1497d9599dadd38d7605e23fe5164a7ade",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -6948,7 +6948,7 @@
       "energy_joules_estimate": 234.65466428455431,
       "fit_seconds": 2.0532910160254687,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "30a3a38ff3e073ddafc7a660e4bceef1008b8ffd6581257bf6a59b10eb4f73b0",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7023,7 +7023,7 @@
       "energy_joules_estimate": 235.08294932818504,
       "fit_seconds": 2.0553888760041445,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "405e4c54204c89370f2c0455bf5123bdd1259deb2d3288bf0dfb58a62ea405bd",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7098,7 +7098,7 @@
       "energy_joules_estimate": 234.6630121054407,
       "fit_seconds": 2.05429057800211,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "e319afe5eef8ddf4a719b4bccce1d897e0ad9d2844d4d206e92440d2e0dfd34f",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7173,7 +7173,7 @@
       "energy_joules_estimate": 235.57508916237623,
       "fit_seconds": 2.056182086933404,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "26eaaae372b852b82c701a5aa400e0aa3aa005fd1d31a324887d39ba4d75beb3",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7248,7 +7248,7 @@
       "energy_joules_estimate": 234.79303304547443,
       "fit_seconds": 2.054956184932962,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "02cd62a82d1f753ed653af97727494efc0e3e7dea49a787af22b7502d794245d",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7323,7 +7323,7 @@
       "energy_joules_estimate": 234.91692691850477,
       "fit_seconds": 2.0553239909932017,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "32d1b3551e7160271b0d6b1e25e3d402baa53d8c39f10e06ea14421e97e5a419",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7398,7 +7398,7 @@
       "energy_joules_estimate": 235.2803495761822,
       "fit_seconds": 2.0557702358346432,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "af17780a014a07441ed0aef38ece060a8acb7591014b9d1aba0aea2f8952a477",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7473,7 +7473,7 @@
       "energy_joules_estimate": 235.03331517672402,
       "fit_seconds": 2.0560835090000182,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "bfe22e5ea3624e0afc2011551213622c6cfa621cb837eb8d6a271d3aadd47f44",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7548,7 +7548,7 @@
       "energy_joules_estimate": 235.64537713621743,
       "fit_seconds": 2.054288951912895,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "703aac1752cd2e0d2fbf9803bddda529dd5398c5a618e1a188148d4016720127",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7623,7 +7623,7 @@
       "energy_joules_estimate": 234.4473593454156,
       "fit_seconds": 2.0551473959349096,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "1355064ce3977054f1ee93a8e5bdaf77bbab1314c367564d339401c3ac080264",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7698,7 +7698,7 @@
       "energy_joules_estimate": 235.22446523113177,
       "fit_seconds": 2.057356175966561,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "3c092a72adad64bc0453e795d62002903bc5625cdea2342a62d654e9c5a04ed5",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7773,7 +7773,7 @@
       "energy_joules_estimate": 235.37998471867292,
       "fit_seconds": 2.0560462870635092,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "d2ef30d8279678a4e4b217e523b9b9354386c4eab5eae312bcf7239f019ca7b1",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7848,7 +7848,7 @@
       "energy_joules_estimate": 235.0499504817277,
       "fit_seconds": 2.057773295091465,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "c5e940f43f5c07081606e7ca708da91deee539ad58784d8d7a6183afc53a93cd",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7923,7 +7923,7 @@
       "energy_joules_estimate": 235.25621904669327,
       "fit_seconds": 2.0644107239786536,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "bf8ddda19b44a831877bb455740e23b779b100b07e420eaa5bfd6f188362e6f5",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -7998,7 +7998,7 @@
       "energy_joules_estimate": 235.42841756185516,
       "fit_seconds": 2.0600492709781975,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "d06fed0e3b03d36a93ac0161dd4135171a82960155a6fe02fe5cee6272bdb9b4",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",
@@ -8073,7 +8073,7 @@
       "energy_joules_estimate": 235.9217188684642,
       "fit_seconds": 2.0607315828092396,
       "fit_seed": 11,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "metric_sha256": "340cfefeb754c2216c92e11967bf4d218883cdbd067575c07d40277415a9b80f",
       "peak_gpu_used_mib": 1,
       "revision": "readout_refit",

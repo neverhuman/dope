@@ -25,8 +25,8 @@ from research.benchmark.mfs_v3_panel import (
 )
 from research.benchmark.representation import REFUSED_ENCODERS, unit_half_distance
 
-OFM_CODE = Path("/home/ubuntu/jopedime_probe_exp/ofm-20261008/code")
-OFM_SRC = Path("/home/ubuntu/jopedime_probe_exp/ofm-20261008/src/structured-data-models")
+OFM_CODE = Path("/path/to/operator-home/jopedime_probe_exp/ofm-20261008/code")
+OFM_SRC = Path("/path/to/operator-home/jopedime_probe_exp/ofm-20261008/src/structured-data-models")
 
 
 def gpu_snapshot() -> dict:

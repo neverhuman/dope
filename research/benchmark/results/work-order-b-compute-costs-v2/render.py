@@ -99,7 +99,7 @@ def project(report, base):
         elif key in ('seconds', 'scheduler_seconds', 'peak_rss_bytes', 'peak_device_used_mib'):
             props[key] = {'type': ['number', 'null'], 'minimum': 0}
         elif key == 'statuses': props[key] = {'type': 'object', 'additionalProperties': {'type': 'integer', 'minimum': 0}}
-        elif key == 'hosts': props[key] = {'type': 'array', 'uniqueItems': True, 'items': {'enum': ['xbabe1', 'xbabe2', 'xbabe3']}}
+        elif key == 'hosts': props[key] = {'type': 'array', 'uniqueItems': True, 'items': {'enum': ['fit-machine-1', 'fit-machine-2', 'fit-machine-3']}}
         else: props[key] = {'enum': sorted({r[key] for r in rows})}
     schema['properties']['rows'] = dict(type='array', minItems=len(rows), maxItems=len(rows),
         items=dict(type='object', additionalProperties=False, required=sorted(props), properties=props))

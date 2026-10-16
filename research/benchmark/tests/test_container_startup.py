@@ -29,7 +29,7 @@ class StartupControls(unittest.TestCase):
         self.fs.descriptor_path.write_text(json.dumps(self.fs.descriptor,sort_keys=True))
         self.native.root=self.fs.root
         self.native.proposal=copy.deepcopy(self.fs.f.proposal)
-        self.native.proposal.update(host='xbabe2',round_sha256=sha(self.fs.descriptor_path))
+        self.native.proposal.update(host='fit-machine-2',round_sha256=sha(self.fs.descriptor_path))
         self.native.freeze_job();self.native.freeze();self.native.verify()
         self.fs.request=self.native.request
         self.fs.req=json.loads(self.native.request.read_bytes())

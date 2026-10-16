@@ -55,7 +55,7 @@ def load(name, path):
 
 
 def prepare(root, expected, request):
-    require(socket.gethostname().split('.')[0] in ('xbabe1', 'xbabe2', 'xbabe3'))
+    require(socket.gethostname().split('.')[0] in ('fit-machine-1', 'fit-machine-2', 'fit-machine-3'))
     require(sys.dont_write_bytecode is True)
     root = Path(root)
     base = root.parent

@@ -142,7 +142,7 @@
     "verify fit/sample finite row counts, n/2n/4n/8n sizes and seeded replay",
     "verify safe artifact-only local loading and charge all required weights/config/vocabulary/transformation/projection files",
     "run copy/leakage/privacy and real-vs-real controls before gated claims",
-    "fresh aggregate admission on xbabe1/2/3 with disjoint CPU/RAM/scratch, 600s fit timeout and 16GiB GPU caps"
+    "fresh aggregate admission on fit-machine-1/2/3 with disjoint CPU/RAM/scratch, 600s fit timeout and 16GiB GPU caps"
   ],
   "prior_source_verification": {
     "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/realtabformer-v1/source-verification-v1.json",

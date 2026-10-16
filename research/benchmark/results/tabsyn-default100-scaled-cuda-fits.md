@@ -1,6 +1,6 @@
 # TabSyn default 100 CUDA fit ledger
 
-Fit phase only: 100/100 actual fit exits were zero, at seed 11 on xbabe1 (99 new fits and one retained prior fit).
+Fit phase only: 100/100 actual fit exits were zero, at seed 11 on fit-machine-1 (99 new fits and one retained prior fit).
 
 This is the scaled 200 VAE / 1,000 diffusion epoch track. Author defaults remain a separate 4,000 / 10,001 track; patience 500 is preserved.
 

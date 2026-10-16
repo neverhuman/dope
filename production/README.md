@@ -40,7 +40,7 @@ manifest. Python, sklearn, XGBoost, CatBoost, and TabPFN are not production
 dependencies.
 
 `embed-real-regression-cluster.sh` runs the production action encoder over the
-real regression corpus on xbabe1/2/3. It first asks the native binary to validate
+real regression corpus on fit-machine-1/2/3. It first asks the native binary to validate
 the trained router architecture, artifact formats and hashes, training-evidence
 link, finite evidence, canonical bundle byte count, and fixed 4,168-dimensional
 layout. Measured promotion failures remain visible in every manifest but do not

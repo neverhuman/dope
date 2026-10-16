@@ -14,7 +14,7 @@ Eleven unpaid collector refusals during086–094 have79.21575790969655 seconds o
 
 ## Observed GPU and artifact scope
 
-The nine detailed accepted fits086–094 ran onxbabe2, with nonempty retained GPU-clock observations, verified GPU operator and observed providers. Their charged model-plus-projection bytes total23161 (individual1000–8147 bytes). All nine retained co-tenant/shared-cost flags are false. This describes sampled observations, not whole-system exclusivity, causal zero impact or guaranteed future QoS.
+The nine detailed accepted fits086–094 ran onfit-machine-2, with nonempty retained GPU-clock observations, verified GPU operator and observed providers. Their charged model-plus-projection bytes total23161 (individual1000–8147 bytes). All nine retained co-tenant/shared-cost flags are false. This describes sampled observations, not whole-system exclusivity, causal zero impact or guaranteed future QoS.
 
 Across these nine fits, maximum observed own GPU residency is430MiB and maximum observed own RSS is918138880 bytes. These are samples, not true peaks. The unchanged RAM grant is16GiB, CPU reservation is80–95, fit limit600 seconds and artifact cap10240 bytes. No quality, MFS-v2, PTF-v1, stability, formal privacy, release or superiority score is reported. A retained empirical observation is not formal DP or HIPAA de-identification.
 

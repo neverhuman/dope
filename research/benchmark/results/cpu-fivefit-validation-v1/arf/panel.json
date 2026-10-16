@@ -54524,7 +54524,7 @@
   "comparison_scope": "training_derived_validation_only",
   "executed_driver_ref": {
     "bytes": 11076,
-    "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/measure_retained_samples.py",
+    "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/measure_retained_samples.py",
     "sha256": "553750022364da3c19410887b96b71d4a235bf0cb22cebb2b98df4a76f9a6b1e"
   },
   "execution_ref": {
@@ -54551,7 +54551,7 @@
   "release_safe_l3": null,
   "runtime_inventory_ref": {
     "bytes": 840075,
-    "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/common-runtime-inventory.actual.json",
+    "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/common-runtime-inventory.actual.json",
     "sha256": "8f9189d7dd1596d7ea5c7b4b166582a37d7573f1d62d0aa24a364488c3e984c2"
   },
   "sample_cells": 144,
@@ -54559,12 +54559,12 @@
   "source_refs": {
     "expanded_validation_metrics": {
       "bytes": 13747,
-      "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/expanded_validation_metrics.py",
+      "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/expanded_validation_metrics.py",
       "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
     },
     "pilot_metrics": {
       "bytes": 6986,
-      "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/pilot_metrics.py",
+      "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/pilot_metrics.py",
       "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3"
     }
   },

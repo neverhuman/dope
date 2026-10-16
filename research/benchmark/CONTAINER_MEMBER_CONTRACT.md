@@ -30,7 +30,7 @@ binary/library/runtime, metric implementations, parent job/fit receipts, worker
 partitions, complete sample schedule and retries. Preserve all candidates and
 the original sixteen failures. Finish immutable SDV predecessor closure, honor
 queued density reservations and admit fresh disjoint CPU/RAM/scratch capacity
-under the 200 GB ceiling on xbabe1/2/3 only. No new fit or sample is launched by
+under the 200 GB ceiling on fit-machine-1/2/3 only. No new fit or sample is launched by
 this change; the prepared 32-batch/192-cell validation preview remains unadmitted.
 Actual generation must replay the original kernels and repeated sample seeds.
 Official tests remain sealed. MFS-v2/PTF-v1/release/superiority remain null until

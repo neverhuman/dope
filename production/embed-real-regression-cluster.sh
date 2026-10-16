@@ -4,13 +4,13 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 binary="${DOPE_BINARY:-$repo_root/target/release/dope-kernel}"
-dataset_root="${DOPE_DATASET_ROOT:-/home/ubuntu/remote_super/quant/regression}"
+dataset_root="${DOPE_DATASET_ROOT:?Set DOPE_DATASET_ROOT}"
 router_dir="${DOPE_ROUTER_DIR:-$repo_root/runs/full-rust-metrics-20260718/router/attention-small}"
 method="${DOPE_EMBEDDING_METHOD:-attention-small}"
 expected_dimension="${DOPE_EMBEDDING_DIMENSION:-4168}"
-output_root="${DOPE_EMBEDDING_OUTPUT:-/home/ubuntu/remote_super/quant/regression-embeddings/${method}_${expected_dimension}}"
+output_root="${DOPE_EMBEDDING_OUTPUT:?Set DOPE_EMBEDDING_OUTPUT}"
 jobs="${DOPE_EMBEDDING_JOBS:-32}"
-hosts=(xbabe1 xbabe2 xbabe3)
+read -r -a hosts <<< "${DOPE_COMPUTE_HOSTS:?Set DOPE_COMPUTE_HOSTS to space-separated SSH aliases}"
 expected_count_total=2326
 expected_zero_feature_datasets=7
 expected_promotion_failures='["best_fixed_candidate","paired_hypervolume","profile_regret","router_inference_p95","top_four_oracle_recall"]'

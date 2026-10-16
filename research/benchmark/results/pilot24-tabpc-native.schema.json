@@ -621,7 +621,7 @@
             "type": "object"
           },
           "host": {
-            "const": "xbabe2"
+            "const": "fit-machine-2"
           },
           "job": {
             "additionalProperties": false,

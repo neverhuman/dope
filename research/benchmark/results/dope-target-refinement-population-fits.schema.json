@@ -45,12 +45,12 @@
               "host_operation_seconds": {
                 "additionalProperties": false,
                 "properties": {
-                  "xbabe1": {
+                  "fit-machine-1": {
                     "type": "number"
                   }
                 },
                 "required": [
-                  "xbabe1"
+                  "fit-machine-1"
                 ],
                 "type": "object"
               },
@@ -189,12 +189,12 @@
               "host_operation_seconds": {
                 "additionalProperties": false,
                 "properties": {
-                  "xbabe2": {
+                  "fit-machine-2": {
                     "type": "number"
                   }
                 },
                 "required": [
-                  "xbabe2"
+                  "fit-machine-2"
                 ],
                 "type": "object"
               },
@@ -333,12 +333,12 @@
               "host_operation_seconds": {
                 "additionalProperties": false,
                 "properties": {
-                  "xbabe3": {
+                  "fit-machine-3": {
                     "type": "number"
                   }
                 },
                 "required": [
-                  "xbabe3"
+                  "fit-machine-3"
                 ],
                 "type": "object"
               },
@@ -477,12 +477,12 @@
               "host_operation_seconds": {
                 "additionalProperties": false,
                 "properties": {
-                  "xbabe2": {
+                  "fit-machine-2": {
                     "type": "number"
                   }
                 },
                 "required": [
-                  "xbabe2"
+                  "fit-machine-2"
                 ],
                 "type": "object"
               },
@@ -621,12 +621,12 @@
               "host_operation_seconds": {
                 "additionalProperties": false,
                 "properties": {
-                  "xbabe2": {
+                  "fit-machine-2": {
                     "type": "number"
                   }
                 },
                 "required": [
-                  "xbabe2"
+                  "fit-machine-2"
                 ],
                 "type": "object"
               },
@@ -765,12 +765,12 @@
               "host_operation_seconds": {
                 "additionalProperties": false,
                 "properties": {
-                  "xbabe3": {
+                  "fit-machine-3": {
                     "type": "number"
                   }
                 },
                 "required": [
-                  "xbabe3"
+                  "fit-machine-3"
                 ],
                 "type": "object"
               },
@@ -1031,20 +1031,20 @@
         "host_operation_seconds": {
           "additionalProperties": false,
           "properties": {
-            "xbabe1": {
+            "fit-machine-1": {
               "type": "number"
             },
-            "xbabe2": {
+            "fit-machine-2": {
               "type": "number"
             },
-            "xbabe3": {
+            "fit-machine-3": {
               "type": "number"
             }
           },
           "required": [
-            "xbabe1",
-            "xbabe2",
-            "xbabe3"
+            "fit-machine-1",
+            "fit-machine-2",
+            "fit-machine-3"
           ],
           "type": "object"
         },

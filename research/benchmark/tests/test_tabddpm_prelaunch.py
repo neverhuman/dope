@@ -14,8 +14,8 @@ from research.benchmark.score import sha256
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures/tabddpm-native-prelaunch'
 PINS = {
-    'common.py': '6a4e4103797efc33554c0bd6ca393a3efe40af905eeab86115f9381e2dc68103',
-    'entry.py': '061bd80a5e16af97b7363253c9a4bebbacbf6266d54434de5a8d8d31546485f5',
+    'common.py': 'fe1fe6abe6ca5bded1b5887b0b5b07b50bdb9bdc6d274e5e064e745a37038bb9',
+    'entry.py': '02f1357f70f868e23b63173e511b1a01c517f38c703ace2f673336d6acf2fd1a',
 }
 
 
@@ -74,7 +74,7 @@ class TabDDPMPrelaunchTests(unittest.TestCase):
                 'du_binary': str(command), 'du_binary_sha256': sha256(command),
                 'known_hosts': str(command), 'known_hosts_sha256': sha256(command),
                 'jobs': [job], 'cpu_slots': {host: sorted(os.sched_getaffinity(0))
-                                           for host in ('xbabe1', 'xbabe2')},
+                                           for host in ('fit-machine-1', 'fit-machine-2')},
                 'environment_site': str(environment), 'original_entry': str(original)}
         round_path = root / 'round.lock.json'
         round_path.write_text(json.dumps(lock))
@@ -101,7 +101,7 @@ entry,mode,request,round_digest,common_digest,bypass=sys.argv[1:]
 sys.argv=[entry,mode,request,round_digest,common_digest]
 spec=importlib.util.spec_from_file_location('frozen_entry',entry)
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-module.socket.gethostname=lambda:'xbabe2' if mode=='native' else 'xbabe1'
+module.socket.gethostname=lambda:'fit-machine-2' if mode=='native' else 'fit-machine-1'
 if bypass=='true': module.common.verify_runtime=lambda lock:None
 module.run()
 '''

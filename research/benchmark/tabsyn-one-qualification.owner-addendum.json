@@ -12,9 +12,9 @@
   "owner": "ENG:watcher",
   "owner_order_received_utc": "2026-10-06T08:36:00Z",
   "permitted_hosts": [
-    "xbabe1",
-    "xbabe2",
-    "xbabe3"
+    "fit-machine-1",
+    "fit-machine-2",
+    "fit-machine-3"
   ],
   "production_certification_authorized": false,
   "ptf_v1": null,
@@ -25,7 +25,7 @@
   "sealed_official_tests_opened": false,
   "superseded_required_actual_generated_CUDA_closures": 2,
   "version": 1,
-  "xbabe3_GPU_priority": [
+  "fit-machine-3_GPU_priority": [
     "JopeDime"
   ]
 }

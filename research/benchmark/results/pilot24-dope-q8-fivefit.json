@@ -3176,7 +3176,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/8fc948a680fad5c72fd6260821a3eede81aaa536badb8dde4a8ebeea7dcb9173/attempt-0001.json",
       "fit_receipt_sha256": "7599e292d64fd1307d845780873a9cd73c25792b2f997d69ab511214deaf3b27",
       "fit_seed": 11,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "host_inventory_sha256": "1de48872fe659c6c518ee72c9005728615564f96e260f3417b6428c80fbed22a",
       "model_sha256": "3683ffb93d3a5de7616bd417deb0e4e82cac2c54c73d98699c1c350c7f7503ed",
       "peak_gpu_used_mib": 616
@@ -3197,7 +3197,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/9722d262d1c33360196845871d70c4875bee75b8eba1749ccb66e18d8912e5ce/attempt-0001.json",
       "fit_receipt_sha256": "038b81cb3211087f7d88923d5b2d35689212acf32f83125637b1a9789d97322a",
       "fit_seed": 23,
-      "host": "xbabe3",
+      "host": "fit-machine-3",
       "host_inventory_sha256": "db64e02a048908e1366a490a9d5ab9bc03572ef0e9d57933d82f932d8f349e20",
       "model_sha256": "275a421b547806401494ca335f6f6f5460bb0b8b97dc9ca960c683c0a04bf0ec",
       "peak_gpu_used_mib": 460
@@ -3218,7 +3218,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/f6bf305c94032383ad21adb90cd53710e662485090b69d62051e8909b353b5e5/attempt-0001.json",
       "fit_receipt_sha256": "91916d233e0090e34689f4182999997e9451b95c94d59edff7a06bc3f5aedb2c",
       "fit_seed": 37,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "host_inventory_sha256": "0a7e569ab2762e94e1e10831d00f78d83d0bb126697f5a0b373aa6f5cc2f6c12",
       "model_sha256": "59b52afc4d35e64ff86479b3043e463bd2799a308ee28a6ac3c988630d0315a5",
       "peak_gpu_used_mib": 616
@@ -3239,7 +3239,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/482de48d3aa5f38db206015cc2ab6aae2af447ebb713b75fbad50baeb885202f/attempt-0001.json",
       "fit_receipt_sha256": "1fb9a9d5b9277fe99d2932c2400e1ac733da2cf660799759b097c4b44eff1bc7",
       "fit_seed": 53,
-      "host": "xbabe3",
+      "host": "fit-machine-3",
       "host_inventory_sha256": "771a9b9af3e1b39a8cffbc5f1bec6a72d53c0d960448120631e164b68a8cf8f2",
       "model_sha256": "489875c20e73f28bb0e168e2d06ed54e5e9e3dbeae1b700d0ce628a0a900c87a",
       "peak_gpu_used_mib": 460
@@ -3260,7 +3260,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/4d907739ec33b33e383c1cb7c812633a37b762b6df448e570e0b485364ac2723/attempt-0001.json",
       "fit_receipt_sha256": "697330740ae8b44137b556a0050dfd1418d3393ac023956b6b82359ec5773004",
       "fit_seed": 71,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "host_inventory_sha256": "50fbc301417e531bdfa7d0d4c5044576f6eb35fccee7ae76778cf5be7fb99a12",
       "model_sha256": "2828172db8855780fab47fcda62dbfd9b13a5f653fe6c2e36ab776cec05e65a2",
       "peak_gpu_used_mib": 616
@@ -3281,7 +3281,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/4834802f114fdd0e24e80b9a40c75630e98f85244f723627ef4b4ea6215b11ef/attempt-0001.json",
       "fit_receipt_sha256": "faf5218d3c719fed363557b01675cbc89dd4b674cc3dc4816577f05f3d572d73",
       "fit_seed": 11,
-      "host": "xbabe3",
+      "host": "fit-machine-3",
       "host_inventory_sha256": "3d48072553ec147c15cf70bbe9d863c2e9626a2cdd2b3bd991b46c282af52711",
       "model_sha256": "a2aa45f99f22b6520d7b346eb12122c101918b471cc4953c85a16a960a425271",
       "peak_gpu_used_mib": 1
@@ -3302,7 +3302,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/58ccff7d7484a7c97a5da440e662bfd3b54770fb14415dbb10147411d40003a1/attempt-0001.json",
       "fit_receipt_sha256": "66ec04c9c9c35a06aea79d9584db42999abffc210b4e8b1b1af407cacf392d18",
       "fit_seed": 23,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "host_inventory_sha256": "790e79a88fe4893b17b2217b6a0ccbcd64ea4bc2580b16b709bbe6fd8ff15a64",
       "model_sha256": "54220a42294165376c72e2029da65d58038d3eeed8565f4dc6e4921686c39666",
       "peak_gpu_used_mib": 598
@@ -3323,7 +3323,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/06fe60e83d9679f1c168c46ab06abc617f3e92a4f854356171851fa2372e8340/attempt-0001.json",
       "fit_receipt_sha256": "35a87289b55571d0636b97a71e15a8e7114404ee8d36f2fd1fb0faa30baa5d51",
       "fit_seed": 37,
-      "host": "xbabe3",
+      "host": "fit-machine-3",
       "host_inventory_sha256": "b988dd30d44efe6815b9efd9622a699fb178f924b6bdbb363f21136da469f270",
       "model_sha256": "e333b2ad6bdd5f2195d5271df06d7ddca8a7ba8489c0f6c3ed08eb243a391062",
       "peak_gpu_used_mib": 1
@@ -3344,7 +3344,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/6f32187286f0df697201cd1e70721b168600768e300c19697272c921c5254f1f/attempt-0001.json",
       "fit_receipt_sha256": "5c9c54658a62196aedf7bb76861ee91349e325c42c2ee0c63aa11caa9ec71c22",
       "fit_seed": 53,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "host_inventory_sha256": "f93227176a3f2f335618128fe3d6a31f83d31716e425b748405be297b9f64acc",
       "model_sha256": "30afe616ae45a0fcce2a526353ec0a3c6f5000507dc389ae8754e01eb2e38b92",
       "peak_gpu_used_mib": 9
@@ -3365,7 +3365,7 @@
       "fit_receipt_path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-q8-fivefit-v1/fits/e009978ec3089e32cce9f01c00b83ac485c47b5efda9ee96020b8a7f53f01e26/attempt-0001.json",
       "fit_receipt_sha256": "471ac21eb0b9c7f074014249c2194d8af7ba194fd15b7a50e9ce11e56d5e66ef",
       "fit_seed": 71,
-      "host": "xbabe3",
+      "host": "fit-machine-3",
       "host_inventory_sha256": "ca2923db991489cc0caf851a842fa7bbfdb9660922a5e3bd3e6bd5e71b59005c",
       "model_sha256": "cc257bacff5ea8733ee5de459b2f6a833e164b29604c5ed4bc7dce836e50c385",
       "peak_gpu_used_mib": 442

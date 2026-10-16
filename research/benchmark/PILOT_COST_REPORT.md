@@ -6,7 +6,7 @@ below are withdrawn and cannot enter a comparison or selection. The historical
 fit timings and artifact bytes remain cost evidence for that superseded input.
 The new official-test preparation and hashes are in `pilot-24h-datasets.lock.json`.
 
-Observed 2026-09-30 on `xbabe1`, `xbabe2`, and `xbabe3`. The pilot started at
+Observed 2026-09-30 on `fit-machine-1`, `fit-machine-2`, and `fit-machine-3`. The pilot started at
 13:13 UTC and closed at 15:47 UTC, within its 17:13 UTC hard deadline. The public test
 partition has not been opened. Each worker directory contains only train,
 validation, projection, and its manifest.
@@ -72,7 +72,7 @@ and timed-out attempts, including the four original infrastructure failures.
 | Chow–Liu / News | 0.76 | 61–62 s | 71,671 | Over |
 
 This separate 12-fit matrix completed all 96 artifact-only deterministic
-sample cells on xbabe1. A fresh host rerun of California Chow–Liu seed 11
+sample cells on fit-machine-1. A fresh host rerun of California Chow–Liu seed 11
 returned the same eight sample receipts, and all fit/sample receipt SHA-256
 values remained identical. The methods are study-owned reference
 implementations, labeled as such in the source lock. A byte screen is only one
@@ -95,7 +95,7 @@ California fit in 67.16 s, produced a 14,554-byte charged artifact, and
 completed eight deterministic sample cells in 7.78 s total. Adult and News
 fits each reached their 1,200 s child-process hard cap, with peak resident
 sets of 14,858,676 and 18,902,724 KiB respectively. The first Adult attempt
-failed because xbabe3 lacked `cycler`; that failure and the dependency-fixed
+failed because fit-machine-3 lacked `cycler`; that failure and the dependency-fixed
 timeout are both retained. Train-fitted common projection bounds prevent an
 end-to-end formal DP claim for this AIM path.
 
@@ -146,16 +146,16 @@ consume about 10.5 GB of sample/results space, before the TabPC, AIM, and
 dependency snapshots. A naive per-fit extrapolation to 1,100 fits would be
 roughly 640 GB, not a forecast because datasets and methods vary, but enough
 to show that full CSV retention requires streaming evaluation and an explicit
-archival policy under the 100 GB xbabe2 benchmark-scratch ceiling. The
+archival policy under the 100 GB fit-machine-2 benchmark-scratch ceiling. The
 reconciled pilot snapshot is 13,178,599,395 bytes, below that ceiling, with about 265 GB
 free on the filesystem at closure. All bulk inputs, fits, dependencies,
 samples, and results are under `/mnt/fast-scratch/dope-benchmark`; no bulk
 data was written into a worktree or `/tmp`.
 
-At pilot admission xbabe1's RTX 4090 was available and was used for the TabPC
-probe. The RTX 3090s on xbabe2 and xbabe3 had unrelated owners' jobs; the
+At pilot admission fit-machine-1's RTX 4090 was available and was used for the TabPC
+probe. The RTX 3090s on fit-machine-2 and fit-machine-3 had unrelated owners' jobs; the
 pilot did not preempt them. CPU jobs used the three hosts with a 16-core cap
-per job, and xbabe1/xbabe3 accessed the coordinator's benchmark scratch via
+per job, and fit-machine-1/fit-machine-3 accessed the coordinator's benchmark scratch via
 SSHFS. The host inventory records GPU models, drivers, memory, disk, and
 active workloads. Full runtime/container digests still need qualification.
 The frozen queue's two simultaneous GaussianCopula workers both selected CPU
@@ -166,9 +166,9 @@ costs are bounds for this actual schedule, not standalone single-job timings.
 
 | Host | GPU / driver at admission | Pilot use |
 | --- | --- | --- |
-| xbabe1 | RTX 4090 / 570.153.02 | TabPC GPU probe; DOPE and reference compact CPU jobs |
-| xbabe2 | RTX 3090 / 595.99.02 | GaussianCopula and AIM CPU jobs; owner GPU workload left in place |
-| xbabe3 | RTX 3090 / 580.126.09 | DOPE and AIM CPU jobs; owner GPU workload left in place |
+| fit-machine-1 | RTX 4090 / 570.153.02 | TabPC GPU probe; DOPE and reference compact CPU jobs |
+| fit-machine-2 | RTX 3090 / 595.99.02 | GaussianCopula and AIM CPU jobs; owner GPU workload left in place |
+| fit-machine-3 | RTX 3090 / 580.126.09 | DOPE and AIM CPU jobs; owner GPU workload left in place |
 
 ## Admission work left
 

@@ -182,8 +182,8 @@ def build():
     guard.require(report['all_frozen_fit_cells_accounted'] is True and report['closed_fit_cells'] == 200
         and report['datasets'] == 100 and report['shared_validation_evaluation_complete'] is False
         and all(report[k] is v for k, v in GATES.items() if k != 'production_certified')
-        and lock['allowed_gpu_hosts'] == ['xbabe1', 'xbabe2', 'xbabe3']
-        and lock['blocked_gpu_hosts'] == ['xbabe0'] and lock['artifact_cap_bytes'] == 10240
+        and lock['allowed_gpu_hosts'] == ['fit-machine-1', 'fit-machine-2', 'fit-machine-3']
+        and lock['blocked_gpu_hosts'] == ['fit-machine-0'] and lock['artifact_cap_bytes'] == 10240
         and lock['fit_timeout_seconds'] == 600 and lock['gpu_vram_limit_mib'] == 16384
         and report['cumulative_operation_seconds'] <= lock['whole_refinement_operation_ceiling_seconds'],
         'bounded fit scope differs')
