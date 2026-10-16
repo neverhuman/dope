@@ -9,7 +9,7 @@ import json
 import sys
 from pathlib import Path
 
-REPORT_SHA = '9ffb69a46f509fc9c2a0da8efdf81bc6ccf1bbfe97c8491a5439f910cb1f42a4'
+REPORT_SHA = '369256415c35657b6d206e7b3972c9bf6240769c69cd34723a8fef60f4e74515'
 PUBLISHER_SHA = 'd90e275318b8eb766fb340334103060de8aeb3c81f65728e28314b2da4f34e01'
 FIELDS = ('id', 'method', 'phase', 'receipts', 'started', 'seconds', 'clock',
           'scheduler_seconds', 'peak_rss_bytes', 'peak_device_used_mib', 'hosts',

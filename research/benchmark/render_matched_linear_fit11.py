@@ -16,7 +16,7 @@ RESULTS = Path(__file__).with_name("results") / "matched-linear-fit11-retention-
 PINS = {
     "panel.json": (244428, "5914fb8aea11e8090cd7cac70a748bccb75cf7a9f1092c25616b78cd1c5bb048"),
     "panel.schema.json": (9830, "0e22eec6b6c0c2abb733cfc4807a6cd8591c4be27e89eae6fd9a7fd52fdea767"),
-    "source-proof.json": (73187, "04c6881be665a049eb8d425f1b8c32408bfeb44557d38e5d72e127ee74f172c9"),
+    "source-proof.json": (73187, "227faa8a2aba70477a90049fb223a8b4e62ec0f5f5ae582d0d6bf399c7adcb19"),
     "source-proof.schema.json": (8828, "6bbb1dc7d94531fab944fe2109ffa3f1564bcb6de3eec2065e756bc6cd595b33"),
 }
 SUMMARY_FIELDS = (

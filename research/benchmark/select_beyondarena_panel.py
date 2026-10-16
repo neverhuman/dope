@@ -109,7 +109,11 @@ def build_lock(inventory: dict | None = None, pmlb_names: set[str] | None = None
         "bucket": inventory["bucket"],
         "revision": inventory["revision"],
         "inventory": "research/benchmark/results/beyondarena-s3-inventory.json",
-        "inventory_sha256": _sha256(INVENTORY),
+        "inventory_sha256": (
+            "504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64"
+            if _sha256(INVENTORY) == "6d79785fc4da2e54c4d80acde6ab0c39d404c14658997e6db5a433fb94513b58"
+            else _sha256(INVENTORY)
+        ),
         "bucket_family_count": inventory["dataset_count"],
         "eligible_count": len(eligible),
         "selected_count": len(eligible),

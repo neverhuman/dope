@@ -86,10 +86,9 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         ));
     }
 
-    let mut raw_tree: BTreeMap<
-        String,
-        BTreeMap<String, BTreeMap<u64, BTreeMap<String, BTreeMap<String, f64>>>>,
-    > = BTreeMap::new();
+    type FamilyAuditorCells = BTreeMap<String, BTreeMap<String, f64>>;
+    type RawClusterTree = BTreeMap<String, BTreeMap<String, BTreeMap<u64, FamilyAuditorCells>>>;
+    let mut raw_tree: RawClusterTree = BTreeMap::new();
     let mut seen = BTreeSet::new();
 
     for row_val in rows {

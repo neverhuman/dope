@@ -2360,6 +2360,10 @@
     "THIRD_PARTY_NOTICES.md": {
       "command": "just fast",
       "purpose": "verify third-party dependency and model license notices"
+    },
+    "ops/ci/public-smoke.sh": {
+      "command": "actionlint .github/workflows/*.yml",
+      "purpose": "verify thin public fork smoke script and workflow wiring"
     }
   }
 }

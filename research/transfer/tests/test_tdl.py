@@ -235,7 +235,7 @@ class StandaloneGeneratorTests(unittest.TestCase):
     def test_dope_public_toy_fit_and_fresh_isolated_replay(self):
         binary = ROOT / "target/debug/dope-kernel"
         if not binary.is_file():
-            self.skipTest("build native binary with cargo build --locked --bin dope-kernel")
+            subprocess.run(["cargo", "build", "--locked", "--bin", "dope-kernel"], cwd=ROOT, check=True)
         with workspace() as directory:
             root = Path(directory)
             port = DopeGenerator(binary, root / "fit")

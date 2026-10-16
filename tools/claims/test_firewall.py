@@ -86,7 +86,9 @@ class FirewallTests(unittest.TestCase):
 
     def test_figure_and_card_drift_is_detected_by_same_gate(self):
         from unittest.mock import patch
-        with patch.object(render, 'expected_outputs', return_value={'paper/generated/hero-frontier.png': b'seeded drift'}):
+        outputs = render.expected_outputs()
+        outputs['paper/generated/hero-frontier.png'] = b'seeded drift'
+        with patch.object(render, 'expected_outputs', return_value=outputs):
             self.assertTrue(any('figure hash drift' in f for f in C.public_failures()))
 
 

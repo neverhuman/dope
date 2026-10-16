@@ -1081,7 +1081,7 @@
     "pins": [
       {
         "path": "examples/readme-regression/INSPECT.txt",
-        "sha256": "cf9e9f5a3cafc4bb37d327307e0a047563fa568c219e1c3d5b030ff569c6156c"
+        "sha256": "b23806ac75a88bc6961706528426f2c6996dc6e854462955d16d8dba6401a5e8"
       },
       {
         "path": "docs/whitepaper/receipts/native-byte-conformance-v1.json",

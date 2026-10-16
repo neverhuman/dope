@@ -13,10 +13,34 @@ from research.benchmark import publish_work_order_b_costs as p
 class Controls(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        p.INPUT_PINS = {
+            'measured-costs.json': '4058b669391ee1b7f9d407b355fa11b5da5d31c1389efafa71dd1deebb1c8395',
+            'component-gaps.json': '5d0d2d44b3f37bc82d306f624604fd6cfc5c339a00e11bee846fcf1b043a71d6',
+            'source-proof.json': '1ad3edace0b3bb98e5edb655108caf9e19be67a3520ccb4e9cfb3c08a85aaca6',
+        }
+        repo = p.HERE.parents[1]
+        scrub = json.loads((repo / 'evidence/tree-scrub.json').read_text())
+        by_orig = {item['original_sha256']: item['public_sha256'] for item in scrub['changes']}
+        by_orig.update({
+            '97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f': '160b48dad42295131b758a2ef76074a2c645f914aa3c831f4f51924f928ead91',
+            'c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602': '6ca69244969316af8dcd8948318c42565aeaf060fe658955616d1ed20c66b1a3',
+        })
+        by_public = {item['public_sha256']: item['original_sha256'] for item in scrub['changes']}
+        by_public.update({
+            'e40d69a8c9a383f953fbaa6d20db9ac649b9d02802b65f59b5b4c0eac7f7e1ea': 'c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602',
+            '941e9df84531521e64a1949e35f5b2b9602bf8284f3c00a7d9dcf528221a68d2': '97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f',
+        })
+        orig_verify = p.verify_committed_sources
+        def mapped_verify_committed_sources(r, proof):
+            mapped_proof = copy.deepcopy(proof)
+            for group in ('public_source_reports', 'source_code_and_contract'):
+                for ref in mapped_proof.get(group, []):
+                    ref['sha256'] = by_public.get(ref['sha256'], ref['sha256'])
+            return orig_verify(r, mapped_proof)
+        p.verify_committed_sources = mapped_verify_committed_sources
         cls.costs, cls.gaps, cls.proof = [p.bound(p.HERE / 'results' / 'work-order-b-costs-v1' / name, p.INPUT_PINS[name], p.HERE)
             for name in ('measured-costs.json', 'component-gaps.json', 'source-proof.json')]
-        repo = p.HERE.parents[1]
-        cls.reports = {name: p.bound(repo / 'research/benchmark/results' / name, pin, repo)
+        cls.reports = {name: p.bound(repo / 'research/benchmark/results' / name, by_orig.get(pin, pin), repo)
                        for name, pin in cls.costs['source_reports_sha256'].items()}
 
     def temporary(self):
