@@ -175,7 +175,7 @@ Every number in the historical paper and in the panel above comes from a committ
 | Generated evidence status | [STATUS.md](STATUS.md) |
 | New paper (skeleton) and historical paper | [paper/](paper/README.md), [docs/whitepaper/](docs/whitepaper/README.md) |
 | Architecture, testing, release, audit | [architecture](docs/architecture.md), [testing](docs/testing.md), [release](docs/release.md), [audit](docs/audit.md) |
-| Contributing, security, governance | [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [GOVERNANCE.md](GOVERNANCE.md) |
+| Contributing, security, governance, conduct, third-party notices | [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [GOVERNANCE.md](GOVERNANCE.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
 Development checks: `just fast` while editing and `just check` before a commit.
 
