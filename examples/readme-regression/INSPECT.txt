@@ -1,7 +1,7 @@
 {
   "format": "dope-kernel-v3",
   "version": 3,
-  "artifact_bytes": 196,
+  "artifact_bytes": 151,
   "byte_accounting": {
     "header_bytes": 56,
     "sections": [
@@ -22,33 +22,33 @@
       {
         "tag": 3,
         "framing_bytes": 2,
-        "raw_bytes": 1,
-        "encoded_bytes": 1,
+        "raw_bytes": 11,
+        "encoded_bytes": 11,
         "compressed": false
       },
       {
         "tag": 4,
         "framing_bytes": 2,
-        "raw_bytes": 52,
-        "encoded_bytes": 52,
+        "raw_bytes": 15,
+        "encoded_bytes": 15,
         "compressed": false
       },
       {
         "tag": 5,
         "framing_bytes": 2,
-        "raw_bytes": 21,
-        "encoded_bytes": 21,
+        "raw_bytes": 3,
+        "encoded_bytes": 3,
         "compressed": false
       }
     ],
-    "total_bytes": 196
+    "total_bytes": 151
   },
   "task": "regression",
   "rows_fitted": 400,
   "positional_features": 3,
   "target_position": "last",
   "decoder_id": 1,
-  "quantization_bits": 10,
+  "quantization_bits": 8,
   "compliant": false,
   "schema": [
     "continuous",
@@ -60,8 +60,8 @@
     "quantile_spline",
     "quantile_spline"
   ],
-  "dependence": "independence",
-  "target": "mars",
-  "noise": "heteroscedastic",
-  "sexpr": "(dpk v=3 task=regression n=400 p=3 seed=15109496478743843154 (schema (continuous i=0) (continuous i=1) (continuous i=2)) (marginals (quantile_spline i=0) (quantile_spline i=1) (quantile_spline i=2)) (dependence kind=independence) (target kind=mars) (noise kind=heteroscedastic))"
+  "dependence": "chow_liu",
+  "target": "sparse_linear",
+  "noise": "homoscedastic",
+  "sexpr": "(dpk v=3 task=regression n=400 p=3 seed=15109496478743843154 (schema (continuous i=0) (continuous i=1) (continuous i=2)) (marginals (quantile_spline i=0) (quantile_spline i=1) (quantile_spline i=2)) (dependence kind=chow_liu) (target kind=sparse_linear) (noise kind=homoscedastic))"
 }
