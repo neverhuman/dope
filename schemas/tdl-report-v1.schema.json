@@ -107,23 +107,38 @@
       ],
       "properties": {
         "payload_bytes": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 1
         },
         "sampling_closure_bytes": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 1
         },
         "cold_bundle_bytes": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 1
         },
         "amortized_bytes": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": 1.0
         },
         "section_bytes": {
-          "type": "object",
+          "type": [
+            "object",
+            "null"
+          ],
           "minProperties": 1,
           "additionalProperties": {
             "type": "integer",
@@ -131,18 +146,99 @@
           }
         },
         "framing_bytes": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 8
         },
         "shared_bytes": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 0
         },
         "artifact_sha256": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^[0-9a-f]{64}$"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "payload_bytes": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "section_bytes": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "framing_bytes": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "shared_bytes": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "sampling_closure_bytes": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "cold_bundle_bytes": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "amortized_bytes": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "artifact_sha256": {
+                  "not": {
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                }
+              }
+            }
+          ]
+        }
+      ]
     },
     "diagnostics": {
       "type": "object",
@@ -158,11 +254,17 @@
           "const": true
         },
         "encoded_scalars": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 0
         },
         "encoded_symbols": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 0
         },
         "representation_closeness": {
@@ -176,8 +278,55 @@
               "type": "null"
             }
           ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "encoded_scalars": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "encoded_symbols": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "representation_closeness": {
+                  "not": {
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                }
+              }
+            }
+          ]
+        }
+      ]
     },
     "auditor_reports": {
       "type": "array",
@@ -229,29 +378,183 @@
             ]
           },
           "null_loss": {
-            "type": "number",
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0.0
           },
           "real_loss": {
-            "type": "number",
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0.0
           },
           "synthetic_loss": {
-            "type": "number",
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0.0
           },
           "real_gain": {
-            "type": "number"
+            "type": [
+              "number",
+              "null"
+            ]
           },
           "raw_transfer": {
-            "type": "number"
+            "type": [
+              "number",
+              "null"
+            ]
           },
           "clipped_transfer": {
-            "type": "number",
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0.0,
             "maximum": 1.0
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,127}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
-        }
+        },
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "properties": {
+                  "null_loss": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "real_loss": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "synthetic_loss": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "real_gain": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "raw_transfer": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "clipped_transfer": {
+                    "not": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "informative"
+                  ]
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "null_loss": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "real_loss": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "synthetic_loss": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "real_gain": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "raw_transfer": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "clipped_transfer": {
+                  "not": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "failed",
+                    "incomplete"
+                  ]
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "driver_report": {
@@ -274,7 +577,10 @@
           ]
         },
         "raw_components": {
-          "type": "object",
+          "type": [
+            "object",
+            "null"
+          ],
           "additionalProperties": {
             "type": "number",
             "minimum": 0.0,
@@ -282,7 +588,10 @@
           }
         },
         "normalized_components": {
-          "type": "object",
+          "type": [
+            "object",
+            "null"
+          ],
           "additionalProperties": {
             "type": "number",
             "minimum": 0.0,
@@ -290,14 +599,123 @@
           }
         },
         "driver_fidelity": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": 0.0,
           "maximum": 1.0
         },
         "driver_pass": {
           "type": "boolean"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "raw_components": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "normalized_components": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "driver_fidelity": {
+                  "not": {
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "complete"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "raw_components": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "normalized_components": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "driver_fidelity": {
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "failed",
+                  "incomplete"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "reason"
+            ],
+            "properties": {
+              "reason": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,127}$"
+              }
+            }
+          }
+        }
+      ]
     },
     "aggregate": {
       "type": "object",
@@ -322,28 +740,158 @@
           ]
         },
         "family_means": {
-          "type": "object",
+          "type": [
+            "object",
+            "null"
+          ],
           "minProperties": 1,
           "additionalProperties": {
             "type": "number"
           }
         },
         "robust_transfer": {
-          "type": "number"
+          "type": [
+            "number",
+            "null"
+          ]
         },
         "mean_transfer": {
-          "type": "number"
+          "type": [
+            "number",
+            "null"
+          ]
         },
         "lcb": {
-          "type": "number"
+          "type": [
+            "number",
+            "null"
+          ]
         },
         "driver_gate": {
           "type": "boolean"
         },
         "tdl_pass": {
           "type": "boolean"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "family_means": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "robust_transfer": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "mean_transfer": {
+                  "not": {
+                    "type": "null"
+                  }
+                },
+                "lcb": {
+                  "not": {
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "qualified",
+                  "not_reached_in_tested_range",
+                  "unqualified"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "family_means": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "robust_transfer": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "mean_transfer": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "lcb": {
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "failed",
+                  "incomplete"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "reason"
+            ],
+            "properties": {
+              "reason": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,127}$"
+              }
+            }
+          }
+        }
+      ]
     },
     "release_gates": {
       "type": "object",
@@ -410,5 +958,105 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "aggregate": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "qualified",
+                  "not_reached_in_tested_range",
+                  "unqualified"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "aggregate"
+        ]
+      },
+      "then": {
+        "properties": {
+          "byte_accounting": {
+            "properties": {
+              "payload_bytes": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "section_bytes": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "framing_bytes": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "shared_bytes": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "sampling_closure_bytes": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "cold_bundle_bytes": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "amortized_bytes": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "artifact_sha256": {
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "diagnostics": {
+            "properties": {
+              "encoded_scalars": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "encoded_symbols": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "representation_closeness": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "description": "Result measurements remain required on every status. Unknown measurements are explicit nulls with source-free group reason codes; successful metric groups still require measured numbers."
 }

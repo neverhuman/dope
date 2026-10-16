@@ -1,0 +1,85 @@
+{
+  "aggregate": {
+    "driver_gate": false,
+    "family_means": null,
+    "lcb": null,
+    "mean_transfer": null,
+    "reason": "generator_failed",
+    "robust_transfer": null,
+    "status": "failed",
+    "tdl_pass": false
+  },
+  "auditor_reports": [
+    {
+      "auditor": "fixture",
+      "clipped_transfer": null,
+      "dataset": "fixture",
+      "family": "tree",
+      "null_loss": null,
+      "raw_transfer": null,
+      "real_gain": null,
+      "real_loss": null,
+      "reason": "generator_failed",
+      "seed": 101,
+      "source_family": "fixture",
+      "status": "failed",
+      "synthetic_loss": null
+    }
+  ],
+  "byte_accounting": {
+    "amortized_bytes": null,
+    "artifact_sha256": null,
+    "cold_bundle_bytes": null,
+    "framing_bytes": null,
+    "payload_bytes": null,
+    "reason": "generator_failed",
+    "sampling_closure_bytes": null,
+    "section_bytes": null,
+    "shared_bytes": null
+  },
+  "citable": false,
+  "contract_id": "tdl-contract-v1",
+  "dataset": {
+    "data_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "dataset_id": "fixture",
+    "fit_rows": 10,
+    "query_rows": 2,
+    "query_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "source_family": "fixture",
+    "split_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "diagnostics": {
+    "diagnostic_only": true,
+    "encoded_scalars": null,
+    "encoded_symbols": null,
+    "reason": "generator_failed",
+    "representation_closeness": null
+  },
+  "driver_report": {
+    "driver_fidelity": null,
+    "driver_pass": false,
+    "normalized_components": null,
+    "raw_components": null,
+    "reason": "generator_failed",
+    "status": "failed"
+  },
+  "evidence_status": "failed",
+  "format": "dope-tdl-report",
+  "metric_name": "TDL",
+  "provenance": {
+    "executor_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "generator_id": "fixture",
+    "generator_version": "1",
+    "protocol_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "receipt_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "release_gates": {
+    "attribute_inference_passed": false,
+    "cleartext_absent": false,
+    "exact_row_match_passed": false,
+    "membership_inference_passed": false,
+    "near_copy_passed": false,
+    "sampler_isolation_verified": false
+  },
+  "version": 1
+}
