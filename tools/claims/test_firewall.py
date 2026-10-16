@@ -3,6 +3,7 @@ import copy
 import json
 import sys
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,6 +22,27 @@ class FirewallTests(unittest.TestCase):
     def failures(self):
         return '\n'.join(C.result_failures(self.data, self.auditors, self.status))
 
+    @contextmanager
+    def public_fixture(self):
+        import shutil
+        import tempfile
+        local_tmp = ROOT / 'target/claims-tests'
+        local_tmp.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=local_tmp) as directory:
+            root = Path(directory)
+            for name in ('paper', 'schemas', 'research/transfer/registries',
+                         'research/transfer/locks', 'research/transfer/manifests'):
+                shutil.copytree(ROOT / name, root / name)
+            inputs = {'README.md', 'Cargo.toml', 'pyproject.toml', 'CITATION.cff',
+                      'contracts/tdl-contract-v1.json', 'evidence/status.json', C.REGISTRY['sources']['headline'],
+                      'research/benchmark/results/review-fixes-v2/scalar-cells.jsonl'}
+            inputs.update(pin['path'] for pin in self.data['demo_notes']['pins'])
+            for name in inputs:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / name, path)
+            yield root
+
     def test_current_status_labels_are_consistent(self):
         self.assertEqual(self.failures(), '')
 
@@ -28,6 +50,115 @@ class FirewallTests(unittest.TestCase):
         for phrase in ('privacy-preserving', 'minimum', 'beats TabSyn', 'validated across Kumo', '1.9 KiB cold closure', 'preserves knowledge'):
             with self.subTest(phrase=phrase):
                 self.assertTrue(C.lint_public_text(phrase, 'fixture'))
+
+    def test_hipaa_deidentified_and_mdl_claim_fixtures_fail(self):
+        for phrase in ('HIPAA-safe artifacts.', 'The artifact is hipaa compliant.',
+                       'These artifacts are de-identified.', 'These artifacts are deidentified.',
+                       'These artifacts are de identified.', 'The MDL score is favorable.'):
+            with self.subTest(phrase=phrase):
+                self.assertTrue(any('forbidden claim' in failure for failure in C.lint_public_text(phrase, 'fixture')))
+                self.data['demo_notes']['paragraphs'] = [phrase]
+                self.assertIn('demo_notes[0]: forbidden claim', self.failures())
+
+    def test_direct_negation_does_not_hide_an_affirmative_claim(self):
+        for disclaimer in ('There is no HIPAA de-identification.',
+                           'Empirical attacks are not HIPAA de-identification.',
+                           'The artifact is not HIPAA-safe.', 'The artifact is not HIPAA compliant.',
+                           'The artifact is not de-identified.', 'This score is not MDL.'):
+            with self.subTest(disclaimer=disclaimer):
+                self.assertEqual(C.lint_public_text(disclaimer, 'fixture'), [])
+                for claim in ('It is HIPAA-safe.', 'It is de-identified.', 'It is MDL.'):
+                    self.assertTrue(C.lint_public_text(disclaimer + ' ' + claim, 'fixture'))
+        self.assertTrue(C.lint_public_text('The artifact is not only HIPAA-safe but also de-identified.', 'fixture'))
+        self.assertTrue(C.lint_public_text('There is no HIPAA risk.', 'fixture'))
+
+    def test_nested_paper_claim_fixtures_fail_the_public_gate(self):
+        with self.public_fixture() as root:
+            (root / 'paper/archive/fixture.tex').write_text('Historical privacy-preserving claim.')
+            self.assertEqual(C.public_failures(root, check_render=False), [])
+            # Unknown generated files are prose too; only authenticated renderer outputs are exempt.
+            for name in ('paper/sections/deep/fixture.tex', 'paper/generated/fixture.tex'):
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                for phrase in ('HIPAA-safe artifacts.', 'These artifacts are de-identified.',
+                               'The MDL score is favorable.', 'This is privacy-preserving.',
+                               'Retention is 0.898.'):
+                    with self.subTest(path=name, phrase=phrase):
+                        path.write_text(phrase)
+                        self.assertTrue(any(failure.startswith(name + ':')
+                                            for failure in C.public_failures(root, check_render=False)))
+                path.write_text('No measured claim is available.')
+            self.assertEqual(C.public_failures(root, check_render=False), [])
+
+    def test_demo_metadata_drift_and_contradictions_fail_the_public_gate(self):
+        with self.public_fixture() as root:
+            data_path = root / 'paper/generated/headline-results.json'
+            for original, replacement, expected in (
+                    ('CC BY 4.0', 'CC BY 3.0', 'license'),
+                    ('DOI 10.24432/C5VW2C', 'DOI 10.24432/WRONG', 'DOI'),
+                    ('three positional features', 'four positional features', 'positional feature count'),
+                    ('CC BY 4.0', 'CC BY 4.0; CC BY 3.0', 'license'),
+                    ('DOI 10.24432/C5VW2C', 'DOI 10.24432/C5VW2C; DOI 10.24432/WRONG', 'DOI'),
+                    ('three positional features', 'three positional features and four positional features', 'positional feature count'),
+                    ('CC BY 4.0', '', 'license'),
+                    ('DOI 10.24432/C5VW2C', '', 'DOI'),
+                    ('three positional features', '', 'positional feature count')):
+                with self.subTest(replacement=replacement):
+                    data = copy.deepcopy(self.data)
+                    data['demo_notes']['paragraphs'] = [p.replace(original, replacement)
+                                                        for p in data['demo_notes']['paragraphs']]
+                    data_path.write_text(json.dumps(data))
+                    failures = C.public_failures(root, check_render=False)
+                    self.assertTrue(any('demo_notes: ' + expected in failure for failure in failures), failures)
+
+    def test_demo_metadata_is_compared_with_sources_and_requires_pins(self):
+        import hashlib
+        with self.public_fixture() as root:
+            for relative, field, value, expected in (
+                    ('docs/whitepaper/receipts/native-byte-conformance-v1.json', 'license', 'CC-BY-3.0', 'license'),
+                    ('docs/whitepaper/receipts/native-byte-conformance-v1.json', 'doi', '10.24432/WRONG', 'DOI'),
+                    ('examples/readme-regression/INSPECT.txt', 'positional_features', 4, 'positional feature count')):
+                with self.subTest(field=field):
+                    path = root / relative
+                    original = path.read_bytes()
+                    source = json.loads(original)
+                    (source['source_data'] if 'source_data' in source else source)[field] = value
+                    path.write_text(json.dumps(source))
+                    data = copy.deepcopy(self.data)
+                    for pin in data['demo_notes']['pins']:
+                        if pin['path'] == relative:
+                            pin['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+                    (root / 'paper/generated/headline-results.json').write_text(json.dumps(data))
+                    self.assertTrue(any('demo_notes: ' + expected in failure
+                                        for failure in C.public_failures(root, check_render=False)))
+                    path.write_bytes(original)
+            data = copy.deepcopy(self.data)
+            data['demo_notes']['pins'] = []
+            (root / 'paper/generated/headline-results.json').write_text(json.dumps(data))
+            self.assertTrue(any('metadata source pin' in failure
+                                for failure in C.public_failures(root, check_render=False)))
+
+    def test_contract_macros_need_reproduced_bytes_before_lint_exemption(self):
+        with self.public_fixture() as root:
+            generator = root / 'paper/scripts/contract_macros.py'
+            generator.parent.mkdir(parents=True, exist_ok=True)
+            generator.write_text('def render(contract):\n    return "\\\\newcommand{\\\\ContractVersion}{%d}\\n" % contract["version"]\n')
+            path = root / 'paper/generated/contract-macros.tex'
+            path.write_text('\\newcommand{\\ContractVersion}{1}\n')
+            self.assertEqual(C.public_failures(root, check_render=False), [])
+            path.write_text('\\newcommand{\\ContractVersion}{2}\n')
+            self.assertTrue(any('contract macro drift' in failure
+                                for failure in C.public_failures(root, check_render=False)))
+            path.write_text('\\newcommand{\\ContractVersion}{1}\n')
+            contract_path = root / 'contracts/tdl-contract-v1.json'
+            contract = json.loads(contract_path.read_text())
+            contract['version'] = 2
+            contract_path.write_text(json.dumps(contract))
+            self.assertTrue(any('contract macro drift' in failure
+                                for failure in C.public_failures(root, check_render=False)))
+            generator.rename(generator.with_suffix('.disabled'))
+            self.assertTrue(any('contract-macros.tex: hand-typed' in failure
+                                for failure in C.public_failures(root, check_render=False)))
 
     def test_hand_typed_numbers_fail_but_cli_and_citation_numbers_are_not_claims(self):
         self.assertTrue(C.lint_public_text('Retention is 0.898.', 'fixture'))

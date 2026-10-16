@@ -3,3 +3,5 @@
 # Frozen-evidence SHA-256 digest for research/benchmark/results/checkpoint-figure-input-index/forest-key-errors.csv ("key" in filename triggers generic-api-key).
 3f29bcf7ccab91edd52e22f69b8f2747ffe0f29e:ops/ci/frozen-evidence.json:generic-api-key:160
 43170d78dcf3d58d0254b94babe0db581e46cb78:ops/ci/frozen-evidence.json:generic-api-key:160
+# Same frozen-evidence checksum after PR #250's rebase merge onto main.
+8c51e463828bcc30500a212d49d89915ecb4ce00:ops/ci/frozen-evidence.json:generic-api-key:160

@@ -280,10 +280,14 @@ LEGACY_README_PROSE_SHA256 = "8d90e1fc7dd3a910a3c01b721fd29a8a0329d67ce646aeb54d
 PUBLIC_BANNED = (r"privacy[- ]preserving", r"\bminimum\b", r"\bbeats\s+TabSyn\b",
                  r"validated\s+across\s+(?:Kumo|Mitra|TabICL|TabPFN)",
                  r"1\.9\s*(?:KiB|KB)\s+(?:cold\s+closure|standalone)", r"\boutperforms\b",
+                 r"\bHIPAA\b", r"\bde[-\s]?identified\b", r"\bMDL\b",
                  *REGISTRY["forbidden_language"]["patterns"])
 # Result prose must use generated values. Structural names (TDL-v1, D-01, T90),
 # URLs, citations, CLI code examples and TeX layout dimensions are not results.
 PUBLIC_NUMBER = re.compile(r"(?<![\w./#-])(?:[+-]?\d+(?:[.,]\d+)*|\.\d+)(?:%|\s*(?:KiB|MiB|GiB|bytes))?(?![\w/-]|\.\d)")
+DEMO_INSPECT = "examples/readme-regression/INSPECT.txt"
+DEMO_NATIVE_PIN = "docs/whitepaper/receipts/native-byte-conformance-v1.json"
+COUNT_WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve")
 
 
 def public_prose(text: str, tex: bool = False) -> str:
@@ -300,16 +304,43 @@ def public_prose(text: str, tex: bool = False) -> str:
     return text
 
 
+def public_language_failures(text: str, label: str) -> list[str]:
+    # Keep direct disclaimers such as "not HIPAA de-identification" valid.
+    # Negation elsewhere must not exempt an affirmative claim in the same text.
+    claims = re.sub(r"\b(?:no|not)\s+(?:HIPAA[-\s]+(?:safe|compliant|de-identification)|de[-\s]?identified|MDL)\b",
+                    " ", text, flags=re.I)
+    return [f"{label}: forbidden claim /{pattern}/" for pattern in PUBLIC_BANNED
+            if re.search(pattern, claims, re.I)]
+
+
 def lint_public_text(text: str, label: str, held_out_knowledge: bool = False) -> list[str]:
-    failures = []
+    failures = public_language_failures(text, label)
     prose = public_prose(text, tex=label.endswith(".tex"))
-    for pattern in PUBLIC_BANNED:
-        if re.search(pattern, text, re.I):
-            failures.append(f"{label}: forbidden claim /{pattern}/")
     if not held_out_knowledge and re.search(r"\bknowledge\b", text, re.I):
         failures.append(f"{label}: knowledge claim lacks held-out evidence")
     for match in PUBLIC_NUMBER.finditer(prose):
         failures.append(f"{label}: hand-typed result number {match.group()!r}; use generated input")
+    return failures
+
+
+def demo_metadata_failures(data: dict, inspected: dict, native_pin: dict) -> list[str]:
+    """Check descriptive demo facts against the same sources as its result numbers."""
+    text = "\n".join(data["demo_notes"]["paragraphs"])
+    source = native_pin["source_data"]
+    def normalize_license(value):
+        return re.sub(r"[-\s]+", " ", value).casefold()
+    licenses = re.findall(r"\bCC[ -]+[A-Z]+(?:[ -]+[A-Z]+)*[ -]+\d+(?:\.\d+)*\b", text, re.I)
+    dois = re.findall(r"\bDOI\s+([^\s)]+)", text, re.I)
+    counts = re.findall(r"\b([a-z]+|\d+)\s+positional features\b", text, re.I)
+    values = {int(value) if value.isdigit() else COUNT_WORDS.index(value.casefold())
+              if value.casefold() in COUNT_WORDS else None for value in counts}
+    failures = []
+    if {normalize_license(value) for value in licenses} != {normalize_license(source["license"])}:
+        failures.append("demo_notes: license differs from native pin source_data")
+    if {value.rstrip('.,;') for value in dois} != {source["doi"]}:
+        failures.append("demo_notes: DOI differs from native pin source_data")
+    if values != {inspected["positional_features"]}:
+        failures.append("demo_notes: positional feature count differs from INSPECT.txt")
     return failures
 
 
@@ -355,9 +386,7 @@ def result_failures(data: dict, auditors: dict, status: dict) -> list[str]:
         if row.get("tdl_bytes") is not None and (row.get("driver_gate") is not True or not row.get("complete_budget_grid")):
             failures.append(f"{name}: TDL bytes lack required gates")
     for idx, para in enumerate(data.get("demo_notes", {}).get("paragraphs", [])):
-        for pattern in PUBLIC_BANNED:
-            if re.search(pattern, para, re.I):
-                failures.append(f"demo_notes[{idx}]: forbidden claim /{pattern}/")
+        failures.extend(public_language_failures(para, f"demo_notes[{idx}]"))
     if status.get("allowed_statuses") is None or set(status["allowed_statuses"]) != EVIDENCE_STATUSES:
         failures.append("status: evidence vocabulary differs from registry")
     return failures
@@ -404,6 +433,13 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
         path = root / pin["path"]
         if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != pin["sha256"]:
             failures.append("historical demo source pin drift")
+    if not {DEMO_INSPECT, DEMO_NATIVE_PIN}.issubset({pin["path"] for pin in data.get("demo_notes", {}).get("pins", [])}):
+        failures.append("demo_notes: metadata source pin is missing")
+    try:
+        failures.extend(demo_metadata_failures(data, json.loads((root / DEMO_INSPECT).read_text()),
+                                                json.loads((root / DEMO_NATIVE_PIN).read_text())))
+    except (OSError, KeyError, ValueError, TypeError):
+        failures.append("demo_notes: source metadata is missing or invalid")
     outputs = render.expected_outputs(root) if check_render else render.text_outputs(data, status)
     if check_render:
         for name, expected in outputs.items():
@@ -442,8 +478,26 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
         failures.append("README: generated result card markers are missing")
     elif hashlib.sha256(readme_prose(readme).encode()).hexdigest() != LEGACY_README_PROSE_SHA256:
         failures.append("README: changed prose must adopt the generated TDL result card")
-    for path in sorted((root / "paper").glob("*.tex")):
-        failures.extend(lint_public_text(path.read_text(), str(path.relative_to(root))))
+    verified_outputs = set(outputs)
+    contract_generator = root / "paper/scripts/contract_macros.py"
+    if contract_generator.is_file():
+        import runpy
+        contract_name = "paper/generated/contract-macros.tex"
+        try:
+            expected = runpy.run_path(str(contract_generator))["render"](
+                json.loads((root / "contracts/tdl-contract-v1.json").read_text())).encode()
+            if not (root / contract_name).is_file() or (root / contract_name).read_bytes() != expected:
+                failures.append(f"{contract_name}: generated contract macro drift")
+            else:
+                verified_outputs.add(contract_name)
+        except (OSError, KeyError, ValueError, TypeError):
+            failures.append(f"{contract_name}: generator or contract is missing or invalid")
+    for path in sorted((root / "paper").rglob("*.tex")):
+        relative = path.relative_to(root)
+        # Historical archives are exempt; renderer outputs are authenticated above.
+        if relative.is_relative_to("paper/archive") or relative.as_posix() in verified_outputs:
+            continue
+        failures.extend(lint_public_text(path.read_text(), str(relative)))
     return failures
 
 
