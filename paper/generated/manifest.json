@@ -2,7 +2,7 @@
   "format": "dope-generated-claims-v1",
   "source_sha256": "9866158eea8894d5058c55052ba3ecae73b31e49573952cf79fa0798e70c550c",
   "files": {
-    "STATUS.md": "a75983886e1b9f943714a5ba553cd57046b1024ca78abf50b1e70c6db5ed4337",
+    "STATUS.md": "2cabd7db7d516507cd2d56853f2bf7a7d570fb793482fa6bae4890e4931fe7b8",
     "paper/generated/headline-macros.tex": "22f898ab0069c06b92b44e430b1457d07343bb9ea1bfc02e4c87bc0d4d7ad9da",
     "paper/generated/hero-frontier.csv": "54ded2f4cd8543c64c36f90c36c1032f0b5ef1ec82a135d2fe7cdce603744b0c",
     "paper/generated/hero-frontier.pdf": "12ee4952035da51a53219b2d5422dc2a6a3ed3a7dd0fa10348f80334d36f163b",
