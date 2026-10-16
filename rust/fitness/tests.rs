@@ -539,4 +539,123 @@ mod tests {
                 .any(|term| term == "utility_transfer"));
         }
     }
+
+    fn v4_lineage_seeds() -> Vec<V4SeedObservation> {
+        let mut s101 = v4_observation();
+        s101.retention = 0.88;
+        s101.artifact_bytes = 1_024;
+        s101.encoded_numbers = 64;
+
+        let mut s211 = v4_observation();
+        s211.retention = 0.90;
+        s211.artifact_bytes = 1_536;
+        s211.encoded_numbers = 80;
+        s211.synthetic_importances = vec![0.35, 0.35, 0.20, 0.10];
+
+        let mut s307 = v4_observation();
+        s307.retention = 0.92;
+        s307.artifact_bytes = 2_048;
+        s307.encoded_numbers = 96;
+
+        vec![
+            V4SeedObservation {
+                sample_seed: 307,
+                components: v4_components(),
+                observation: s307,
+            },
+            V4SeedObservation {
+                sample_seed: 101,
+                components: v4_components(),
+                observation: s101,
+            },
+            V4SeedObservation {
+                sample_seed: 211,
+                components: v4_components(),
+                observation: s211,
+            },
+        ]
+    }
+
+    #[test]
+    fn v4_lineage_evaluates_three_seeds_and_reports_seed_variance() {
+        let contract = v4_contract();
+        let seeds = v4_lineage_seeds();
+        let lineage = evaluate_v4_lineage(&contract, &seeds, |_rets| Some(0.86));
+        assert!(lineage.report.eligible);
+        assert!(lineage.report.score.is_some());
+        assert!(lineage.report.hard_gates["complete_seed_set"]);
+        assert!(lineage.report.hard_gates["lineage_schema_consistent"]);
+        assert!(lineage.report.hard_gates["all_seeds_eligible"]);
+        assert!(lineage.report.hard_gates["utility_lcb_valid"]);
+        let comp = lineage.report.compression_metrics.unwrap();
+        assert_eq!(comp.encoded_numbers, 96);
+        let var = lineage.seed_variance.expect("seed variance must be present");
+        assert_eq!(var.sample_seeds, V4_SAMPLE_SEEDS);
+        assert!((var.retention_mean - 0.90).abs() < 1e-12);
+        assert!((var.retention_sample_sd - 0.02).abs() < 1e-12);
+        assert!((var.retention_min - 0.88).abs() < 1e-12);
+        assert!((var.retention_max - 0.92).abs() < 1e-12);
+        assert!((var.retention_lcb - 0.86).abs() < 1e-12);
+        assert!(var.driver_fidelity_sample_sd > 0.0);
+        assert!(
+            (lineage.report.driver_fidelity.unwrap() - var.driver_fidelity_min).abs() < 1e-12
+        );
+        assert!(var.seed_score_sample_sd > 0.0);
+    }
+
+    #[test]
+    fn v4_lineage_enforces_exact_lcb_boundary_and_worst_seed_controls() {
+        let contract = v4_contract();
+        let seeds = v4_lineage_seeds();
+
+        // Exact boundary: lcb == mean (0.90) passes; lcb > mean + 1e-12 fails closed.
+        let at_mean = evaluate_v4_lineage(&contract, &seeds, |rets| {
+            Some(rets.iter().sum::<f64>() / rets.len() as f64)
+        });
+        assert!(at_mean.report.eligible);
+        assert!(at_mean.report.hard_gates["utility_lcb_valid"]);
+
+        let above_mean = evaluate_v4_lineage(&contract, &seeds, |rets| {
+            Some(rets.iter().sum::<f64>() / rets.len() as f64 + 2e-12)
+        });
+        assert!(!above_mean.report.eligible);
+        assert_eq!(above_mean.report.score, None);
+        assert!(!above_mean.report.hard_gates["utility_lcb_valid"]);
+        assert_eq!(above_mean.seed_variance, None);
+
+        // Worst-seed control baseline: seed 211 has predictor_only_retention = 0.87 (still < 0.90 on that seed),
+        // but lineage LCB is 0.86 <= 0.87, so lineage fails positive_predictor_lift.
+        let mut tough_control = v4_lineage_seeds();
+        tough_control[2].observation.predictor_only_retention = 0.87;
+        let failed_control = evaluate_v4_lineage(&contract, &tough_control, |_rets| Some(0.86));
+        assert!(!failed_control.report.eligible);
+        assert_eq!(failed_control.report.score, None);
+        assert!(!failed_control.report.hard_gates["positive_predictor_lift"]);
+        assert_eq!(failed_control.report.utility_transfer, None);
+
+        // Single-seed failure cannot be hidden even if LCB > worst control baseline.
+        let mut one_bad_seed = v4_lineage_seeds();
+        one_bad_seed[1].observation.retention = 0.68; // <= 0.70 on seed 101
+        let bad_seed_lineage = evaluate_v4_lineage(&contract, &one_bad_seed, |_rets| Some(0.80));
+        assert!(!bad_seed_lineage.report.eligible);
+        assert_eq!(bad_seed_lineage.report.score, None);
+        assert!(!bad_seed_lineage.report.hard_gates["all_seeds_eligible"]);
+        assert!(!bad_seed_lineage.report.hard_gates["positive_predictor_lift"]);
+        assert_eq!(bad_seed_lineage.report.utility_transfer, None);
+        assert_eq!(bad_seed_lineage.seed_variance, None);
+
+        // Schema inconsistency across seeds fails closed.
+        let mut mismatch = v4_lineage_seeds();
+        mismatch[0].observation.real_rows = 2_048;
+        let mismatch_lineage = evaluate_v4_lineage(&contract, &mismatch, |_rets| Some(0.86));
+        assert!(!mismatch_lineage.report.eligible);
+        assert!(!mismatch_lineage.report.hard_gates["lineage_schema_consistent"]);
+        assert_eq!(mismatch_lineage.report.score, None);
+
+        // Incomplete seed set fails closed.
+        let incomplete = evaluate_v4_lineage(&contract, &seeds[..2], |_rets| Some(0.86));
+        assert!(!incomplete.report.eligible);
+        assert!(!incomplete.report.hard_gates["complete_seed_set"]);
+        assert_eq!(incomplete.report.score, None);
+    }
 }
