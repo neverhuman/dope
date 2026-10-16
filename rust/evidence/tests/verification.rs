@@ -146,9 +146,18 @@ fn draft_contract_preserves_historical_bytes_and_rejects_false_freeze() {
             expected.as_str().unwrap()
         );
     }
-    let mut invalid = c;
+    let mut invalid = c.clone();
     invalid["status"] = "frozen".into();
     invalid["protocol_frozen"] = true.into();
     invalid["confirmation_allowed"] = true.into();
     assert!(validate_behavior_contract(&invalid).is_err());
+
+    let tbds: Vec<(&str, &str)> = c["freeze_requirements"]
+        .as_object()
+        .unwrap()
+        .iter()
+        .filter_map(|(k, v)| v.as_str().filter(|s| s.starts_with("TBD-")).map(|s| (k.as_str(), s)))
+        .collect();
+    assert_eq!(tbds.len(), 13);
+    assert!(tbds.iter().all(|(_, s)| matches!(*s, "TBD-D02" | "TBD-D06" | "TBD-D07" | "TBD-D08")));
 }

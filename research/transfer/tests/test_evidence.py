@@ -42,6 +42,13 @@ class BehaviorContractTests(unittest.TestCase):
                 broken[section][key] = None
                 with self.assertRaises(EvidenceError):
                     validate_behavior_contract(broken)
+                broken_tbd = copy.deepcopy(resolved)
+                broken_tbd[section][key] = 'TBD-D02'
+                with self.assertRaises(EvidenceError):
+                    validate_behavior_contract(broken_tbd)
+        tbds = {k: v for k, v in self.contract['freeze_requirements'].items()
+                if isinstance(v, str) and v.startswith('TBD-')}
+        self.assertEqual(len(tbds), 13)
 
     def test_score_and_prerequisite_booleans_cannot_grant_authority(self):
         for field in ('active_production_tier', 'confirmation_allowed'):
@@ -192,7 +199,7 @@ class ReceiptTests(unittest.TestCase):
         f = ReceiptFixture()
         identity = EvaluationIdentity(f.receipt['identity'])
         key = scientific_cache_key(identity)
-        self.assertEqual(key, '43b5caa1ed64df2fc60133d256ffc7d5e5afdd0866c1abec8c4f82b19176994f')
+        self.assertEqual(key, '9d06cdc4bf77403bed33e67da087e02cc524cdf20f97a3b4c0a2bcf667fea0e4')
         self.assertEqual(fit_replicate_key(identity), '6774caa4afc0fcad64da7139d288b94a849ecc786c7a0cfa45112e36175da5a1')
         for field in identity.value:
             changed = identity.value

@@ -334,7 +334,8 @@ def verify_receipt(unverified: UnverifiedReceipt, root: Path,
     for declared, actual in (('table_schema_hash', 'schema_hash'), ('task_manifest_hash', 'task_hash'), ('population_history_hash', 'source_family_hash')):
         if protocol['workload'][declared] is not None and protocol['workload'][declared] != identity[actual]:
             _fail('protocol_workload_mismatch')
-    commitments = {v for v in protocol['freeze_requirements'].values() if v is not None}
+    commitments = {v for v in protocol['freeze_requirements'].values()
+                   if v is not None and not (isinstance(v, str) and v.startswith('TBD-'))}
     commitments.update(v for k, v in protocol['workload'].items() if k.endswith('_hash') and v is not None)
     commitments.update(v for k, v in protocol['disclosure'].items() if k.endswith('_hash') and v is not None)
     if not commitments <= set(nodes[identity['protocol_hash']]['requires']):

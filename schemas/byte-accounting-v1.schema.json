@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:byte-accounting:v1",
+  "title": "ByteAccountingV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "reason",
+    "payload_bytes",
+    "section_bytes",
+    "framing_bytes",
+    "shared_bytes",
+    "sampling_closure_bytes",
+    "cold_bundle_bytes",
+    "amortized_bytes",
+    "artifact_sha256"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "complete",
+        "incomplete",
+        "failed"
+      ]
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "payload_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "section_bytes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      }
+    },
+    "framing_bytes": {
+      "type": "integer",
+      "minimum": 8,
+      "maximum": 9007199254740991
+    },
+    "shared_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "sampling_closure_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "cold_bundle_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "amortized_bytes": {
+      "type": "number",
+      "minimum": 1.0
+    },
+    "artifact_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "charge_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "container_magic",
+        "sections",
+        "closure_files"
+      ],
+      "properties": {
+        "container_magic": {
+          "const": "TDL1"
+        },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/ManifestEntry"
+          }
+        },
+        "closure_files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestEntry"
+          }
+        }
+      }
+    },
+    "shared_prior_disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uses_pretrained_prior",
+        "disclosed_closure_sha256"
+      ],
+      "properties": {
+        "uses_pretrained_prior": {
+          "type": "boolean"
+        },
+        "disclosed_closure_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "ManifestEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

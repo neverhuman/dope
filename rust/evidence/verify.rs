@@ -156,7 +156,10 @@ pub fn verify_receipt(
             .ok_or_else(|| error("schema_mismatch"))?
         {
             if (section == "freeze_requirements" || field.ends_with("_hash")) && !value.is_null() {
-                commitments.insert(text(value)?);
+                let s = text(value)?;
+                if !s.starts_with("TBD-") {
+                    commitments.insert(s);
+                }
             }
         }
     }
