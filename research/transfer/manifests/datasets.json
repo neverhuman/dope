@@ -1,0 +1,132 @@
+{
+  "format": "dope-dataset-manifest-v1",
+  "version": 1,
+  "protocol_frozen": false,
+  "entries": [
+    {
+      "id": "realcore_candidate",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "pending_observational_source",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "per-dataset review pending",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "pending",
+      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+    },
+    {
+      "id": "shiftcore_candidate",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "pending_shift_source",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "per-dataset review pending",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "pending",
+      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+    },
+    {
+      "id": "sealed_candidate",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "pending_independent_source",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "per-dataset review pending",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "pending",
+      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+    },
+    {
+      "id": "pmlb_mechanism",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "pmlb",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "per-dataset review pending",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "pending",
+      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+    },
+    {
+      "id": "stress_candidate",
+      "cohort": "StressCore",
+      "campaign_alias": "stress_only",
+      "source_family": "pending_stress_source",
+      "source_url": "https://github.com/neverhuman/dope",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "per-dataset review pending",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "pending",
+      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+    }
+  ]
+}

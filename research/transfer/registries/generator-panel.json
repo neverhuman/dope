@@ -1,0 +1,213 @@
+{
+  "format": "dope-generator-registry-v1",
+  "version": 1,
+  "protocol_frozen": false,
+  "entries": [
+    {
+      "source_revision": null,
+      "model_version": null,
+      "code_license": "MIT",
+      "weight_license": "not_applicable",
+      "mode": "author_default",
+      "last_verified": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "dependency_closure_sha256": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "id": "dope",
+      "display": "DOPE",
+      "family": "symbolic",
+      "status": "specified",
+      "panel": "baseline",
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "source_url": "https://github.com/neverhuman/dope",
+      "license_source": "https://github.com/neverhuman/dope",
+      "context_cap": null,
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "adapter": {
+        "class_path": "research.transfer.tdl.generators.DopeGenerator",
+        "kwargs": {},
+        "runtime_arguments": [
+          "binary",
+          "workdir"
+        ]
+      }
+    },
+    {
+      "source_revision": null,
+      "model_version": null,
+      "code_license": "MIT",
+      "weight_license": "not_applicable",
+      "mode": "author_default",
+      "last_verified": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "dependency_closure_sha256": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "id": "copied_rows",
+      "display": "Copied rows",
+      "family": "compression_control",
+      "status": "specified",
+      "panel": "control",
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "source_url": "https://github.com/neverhuman/dope",
+      "license_source": "https://github.com/neverhuman/dope",
+      "context_cap": null,
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "adapter": {
+        "class_path": "research.transfer.tdl.generators.LiteralGenerator",
+        "kwargs": {
+          "method": "copied_rows"
+        },
+        "runtime_arguments": []
+      }
+    },
+    {
+      "source_revision": null,
+      "model_version": null,
+      "code_license": "MIT",
+      "weight_license": "not_applicable",
+      "mode": "author_default",
+      "last_verified": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "dependency_closure_sha256": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "id": "gzip_original",
+      "display": "gzip original",
+      "family": "compression_control",
+      "status": "specified",
+      "panel": "control",
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "source_url": "https://github.com/neverhuman/dope",
+      "license_source": "https://github.com/neverhuman/dope",
+      "context_cap": null,
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "adapter": {
+        "class_path": "research.transfer.tdl.generators.LiteralGenerator",
+        "kwargs": {
+          "method": "gzip_original"
+        },
+        "runtime_arguments": []
+      }
+    },
+    {
+      "source_revision": null,
+      "model_version": null,
+      "code_license": "MIT",
+      "weight_license": "not_applicable",
+      "mode": "author_default",
+      "last_verified": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "dependency_closure_sha256": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "id": "gaussian_copula",
+      "display": "Gaussian copula",
+      "family": "classical",
+      "status": "specified",
+      "panel": "baseline",
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "source_url": "https://github.com/sdv-dev/Copulas",
+      "license_source": "https://github.com/sdv-dev/Copulas",
+      "context_cap": null,
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "adapter": {
+        "class_path": "research.transfer.tdl.generators.SpecifiedGenerator",
+        "kwargs": {
+          "method": "gaussian_copula"
+        },
+        "runtime_arguments": []
+      }
+    },
+    {
+      "source_revision": null,
+      "model_version": null,
+      "code_license": "unreviewed",
+      "weight_license": "not_applicable",
+      "mode": "author_default",
+      "last_verified": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "dependency_closure_sha256": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "id": "arf",
+      "display": "ARF",
+      "family": "classical",
+      "status": "specified",
+      "panel": "baseline",
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "source_url": "https://github.com/bips-hb/arfpy",
+      "license_source": "https://github.com/bips-hb/arfpy",
+      "context_cap": null,
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "adapter": {
+        "class_path": "research.transfer.tdl.generators.SpecifiedGenerator",
+        "kwargs": {
+          "method": "arf"
+        },
+        "runtime_arguments": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "protocol_frozen",
+    "entries"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-dataset-manifest-v1"
+    },
+    "version": {
+      "const": 1
+    },
+    "protocol_frozen": {
+      "const": false
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "cohort",
+          "campaign_alias",
+          "source_family",
+          "source_url",
+          "source_sha256",
+          "split_sha256",
+          "rights",
+          "contamination",
+          "status",
+          "headline_eligible",
+          "sealed_test_opened",
+          "task",
+          "split_policy"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "cohort": {
+            "enum": [
+              "RealCore",
+              "ShiftCore",
+              "MechanismLab",
+              "StressCore"
+            ]
+          },
+          "campaign_alias": {
+            "enum": [
+              "Quick-12",
+              "Open-60",
+              "Sealed-24",
+              "mechanism_only",
+              "stress_only"
+            ]
+          },
+          "source_family": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "source_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "split_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "rights": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "license",
+              "training",
+              "redistribution",
+              "review_status"
+            ],
+            "properties": {
+              "license": {
+                "type": "string",
+                "minLength": 1
+              },
+              "training": {
+                "type": "string",
+                "minLength": 1
+              },
+              "redistribution": {
+                "type": "string",
+                "minLength": 1
+              },
+              "review_status": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "contamination": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "review_sha256",
+              "pretraining_exposure"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "pending",
+                  "reviewed"
+                ]
+              },
+              "review_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "pretraining_exposure": {
+                "type": "string"
+              }
+            }
+          },
+          "status": {
+            "const": "specified_unrun"
+          },
+          "headline_eligible": {
+            "const": false
+          },
+          "sealed_test_opened": {
+            "const": false
+          },
+          "task": {
+            "enum": [
+              "regression",
+              "classification",
+              "pending"
+            ]
+          },
+          "split_policy": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

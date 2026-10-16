@@ -1,0 +1,125 @@
+{
+  "format": "dope-lock-state-index-v1",
+  "entries": [
+    {
+      "path": "research/transfer/locks/kumo-tabular.json",
+      "sha256": "e3a2b6eb40849c506d36a1c3a217bb23873380376e2de5626bc97779c78d8a6b",
+      "legacy_format": "dope-kumo-lock-v1",
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "model_version": "dope-kumo-lock-v1",
+      "source_revision": "d50589692dbbbad4852eb1d9627f3b40c2673b63",
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "code_license": "unreviewed",
+      "weight_license": "unreviewed",
+      "dependency_closure_sha256": null,
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "mode": "legacy_reference",
+      "context_cap": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "last_verified": null
+    },
+    {
+      "path": "research/transfer/locks/neural-generators.json",
+      "sha256": "0a1e4dbe60b559981f7712faa429834ff12990cc0b58e30349a56df511ae74f5",
+      "legacy_format": "dope-neural-generator-lock-v1",
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "model_version": "dope-neural-generator-lock-v1",
+      "source_revision": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "code_license": "unreviewed",
+      "weight_license": "unreviewed",
+      "dependency_closure_sha256": null,
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "mode": "legacy_reference",
+      "context_cap": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "last_verified": null
+    },
+    {
+      "path": "research/transfer/locks/other-auditors.json",
+      "sha256": "ae7c3de3096e3802e18e491bf26328e61c97541c1fcf51b1a24230e1c1831c84",
+      "legacy_format": "dope-other-auditors-lock-v1",
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "model_version": "dope-other-auditors-lock-v1",
+      "source_revision": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "code_license": "unreviewed",
+      "weight_license": "unreviewed",
+      "dependency_closure_sha256": null,
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "mode": "legacy_reference",
+      "context_cap": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "last_verified": null
+    },
+    {
+      "path": "research/transfer/locks/structured-generators.json",
+      "sha256": "15a24a595d005b115dc22231d199610e47747a6987343466f2c9ccc3cea81319",
+      "legacy_format": "dope-structured-generators",
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "model_version": "dope-structured-generators",
+      "source_revision": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "code_license": "unreviewed",
+      "weight_license": "unreviewed",
+      "dependency_closure_sha256": null,
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "mode": "legacy_reference",
+      "context_cap": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "last_verified": null
+    }
+  ]
+}
