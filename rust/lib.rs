@@ -60,7 +60,7 @@ pub use embedding::{
     qualify_embedding_router, write_embedding_csv,
 };
 pub use error::{DopeError, Result};
-pub use inspect::{Inspection, inspect_kernel};
+pub use inspect::{Inspection, inspect_charge, inspect_kernel};
 pub use ledger::{CampaignLedger, LedgerStatus};
 pub use metrics::{METRIC_NAME, artifact_charge};
 pub use model::{JointGenerator, Kernel, KernelProgram, NeuralArchitecture, Task};
