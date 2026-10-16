@@ -1,0 +1,47 @@
+{
+  "case_id": "drivers_nan_string",
+  "citable": false,
+  "component": "drivers",
+  "expected": {
+    "reason": "nonfinite_or_invalid_number",
+    "status": "failed"
+  },
+  "input": {
+    "real_importances": [
+      8.0,
+      2.0,
+      0.0
+    ],
+    "real_interactions": [
+      4.0,
+      1.0
+    ],
+    "real_real_ceiling": {
+      "interaction": 0.9,
+      "mass": 0.9,
+      "rank": 0.9,
+      "sign": 0.9
+    },
+    "real_signs": [
+      1,
+      -1,
+      0
+    ],
+    "synthetic_importances": [
+      "NaN",
+      1.0,
+      0.0
+    ],
+    "synthetic_interactions": [
+      4.0,
+      1.0
+    ],
+    "synthetic_signs": [
+      1,
+      -1,
+      0
+    ]
+  },
+  "purpose": "Grouped real-test permutation importances; first group represents correlated features.",
+  "schema_version": 1
+}

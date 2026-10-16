@@ -1,0 +1,65 @@
+{
+  "case_id": "frontier_failed",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "reason": "budget_cell_failed",
+    "status": "failed"
+  },
+  "input": {
+    "cells": [
+      {
+        "artifact_bytes": 1024,
+        "driver_fidelity": 0.9,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.85,
+        "status": "failed"
+      },
+      {
+        "artifact_bytes": 2048,
+        "driver_fidelity": 0.9,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.95,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 4096,
+        "driver_fidelity": 0.9,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.9,
+        "status": "complete"
+      }
+    ],
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "required_gates": [
+      "closure",
+      "privacy"
+    ]
+  },
+  "purpose": "Required family/gate/finite cell must be present.",
+  "schema_version": 1
+}

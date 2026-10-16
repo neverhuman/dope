@@ -1,0 +1,61 @@
+{
+  "case_id": "drivers_interaction_strength_loss",
+  "citable": false,
+  "component": "drivers",
+  "expected": {
+    "driver_fidelity": 0.01111111111111111,
+    "driver_pass": false,
+    "normalized_components": {
+      "interaction": 0.01111111111111111,
+      "mass": 1.0,
+      "rank": 1.0,
+      "sign": 1.0
+    },
+    "raw_components": {
+      "interaction": 0.009999999999999998,
+      "mass": 1.0,
+      "rank": 1.0,
+      "sign": 1.0
+    },
+    "reason": null,
+    "status": "complete"
+  },
+  "input": {
+    "real_importances": [
+      8.0,
+      2.0,
+      0.0
+    ],
+    "real_interactions": [
+      4.0,
+      1.0
+    ],
+    "real_real_ceiling": {
+      "interaction": 0.9,
+      "mass": 0.9,
+      "rank": 0.9,
+      "sign": 0.9
+    },
+    "real_signs": [
+      1,
+      -1,
+      0
+    ],
+    "synthetic_importances": [
+      8.0,
+      2.0,
+      0.0
+    ],
+    "synthetic_interactions": [
+      0.04,
+      0.01
+    ],
+    "synthetic_signs": [
+      1,
+      -1,
+      0
+    ]
+  },
+  "purpose": "Grouped real-test permutation importances; first group represents correlated features.",
+  "schema_version": 1
+}

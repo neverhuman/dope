@@ -1,0 +1,24 @@
+{
+  "case_id": "transfer_missing_cell",
+  "citable": false,
+  "component": "transfer",
+  "expected": {
+    "reason": "missing_transfer_cell",
+    "status": "incomplete"
+  },
+  "input": {
+    "constant_target": false,
+    "null_losses": [
+      10.0,
+      10.0
+    ],
+    "real_gain_lcb": 7.0,
+    "real_losses": [
+      2.0,
+      2.0
+    ],
+    "synthetic_losses": null
+  },
+  "purpose": "Original-unit paired retention and informative-task refusal.",
+  "schema_version": 1
+}

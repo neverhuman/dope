@@ -1,0 +1,43 @@
+{
+  "case_id": "drivers_missing_sign",
+  "citable": false,
+  "component": "drivers",
+  "expected": {
+    "reason": "missing_driver_component",
+    "status": "incomplete"
+  },
+  "input": {
+    "real_importances": [
+      8.0,
+      2.0,
+      0.0
+    ],
+    "real_interactions": [
+      4.0,
+      1.0
+    ],
+    "real_real_ceiling": {
+      "interaction": 0.9,
+      "mass": 0.9,
+      "rank": 0.9,
+      "sign": 0.9
+    },
+    "real_signs": [
+      1,
+      -1,
+      0
+    ],
+    "synthetic_importances": [
+      8.0,
+      2.0,
+      0.0
+    ],
+    "synthetic_interactions": [
+      4.0,
+      1.0
+    ],
+    "synthetic_signs": null
+  },
+  "purpose": "Grouped real-test permutation importances; first group represents correlated features.",
+  "schema_version": 1
+}

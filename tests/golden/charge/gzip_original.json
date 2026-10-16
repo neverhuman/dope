@@ -1,0 +1,30 @@
+{
+  "case_id": "charge_gzip_original",
+  "citable": false,
+  "component": "charge",
+  "expected": {
+    "amortized_bytes": 428.0,
+    "artifact_sha256": "e7bf0fa53d94fbb25e1f27f1eb2d9d26fa4b747ac9036e2d5ea30b51500308f2",
+    "cold_bundle_bytes": 428,
+    "framing_bytes": 35,
+    "payload_bytes": 428,
+    "reason": null,
+    "sampling_closure_bytes": 428,
+    "section_bytes": {
+      "literal_payload": 393
+    },
+    "shared_bytes": 0,
+    "status": "complete"
+  },
+  "input": {
+    "closure_files": [],
+    "sections": [
+      {
+        "hex": "1f8b08000000000002039d93d96e84201440ff8567c708b834fe4adb1846991912048b68c64ee6df0b5ec0a42f5d1e34773b1c632e0f74d1666416b5c80ef22485e586c9d38a5186466e6f7a709deba7983a6dc45528265d23865d3fafae7dc7d99d64db9b2af2220b8f4f30a95cb8bf6853f9ca1efb075257dde30cfb595fa9761e035f471e47be011e07fe25f204781cfcc4f3f8f013e071f4931cd2e4a791073f053ef969e4839f063ef94be049f0979e2787bf049e447f99439afc55e4c15f019ffc55e483bf0a7cf2d7c0d3e0af3d4f0f7f0d3c8dfe3a8734f99bc883bf013ef99bc8077f13f8e47f01deadc6dcdff8c850fb40bd96cba866d4be3ed060b789bb4de9b5b2422d7a99dda8f0abd51745e177cd68e9072e9cd9c5707f903bc60df79d64672e51ab16295d552fa6e79d6223df17cf0d2e4ad819facfec2715f9b78afc55450f9565e6caed2f4ddb37d17b765cd1414ffc64d959f253f8d1fb2d6503b3ac5bc52ccec2dde0cd4dea897d2cbc1383ffa6959b5968855afc7c7e016e8a4eb6f1030000",
+        "name": "literal_payload"
+      }
+    ]
+  },
+  "purpose": "All retained literal rows/schema/framing count; compression is charged at exact stored length.",
+  "schema_version": 1
+}

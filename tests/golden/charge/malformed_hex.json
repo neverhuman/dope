@@ -1,0 +1,31 @@
+{
+  "case_id": "charge_malformed_hex",
+  "citable": false,
+  "component": "charge",
+  "expected": {
+    "reason": "invalid_section_hex",
+    "status": "failed"
+  },
+  "input": {
+    "closure_files": [
+      {
+        "dataset_specific": false,
+        "hex": "0000000000000000000000000000000000",
+        "name": "runtime",
+        "scope": "runtime"
+      }
+    ],
+    "sections": [
+      {
+        "hex": "not-hex",
+        "name": "z"
+      },
+      {
+        "hex": "04",
+        "name": "a"
+      }
+    ]
+  },
+  "purpose": "Noncanonical encodings are rejected.",
+  "schema_version": 1
+}

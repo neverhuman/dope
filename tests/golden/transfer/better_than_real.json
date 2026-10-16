@@ -1,0 +1,33 @@
+{
+  "case_id": "transfer_better_than_real",
+  "citable": false,
+  "component": "transfer",
+  "expected": {
+    "clipped_transfer": 1.0,
+    "null_loss": 10.0,
+    "raw_transfer": 1.25,
+    "real_gain": 8.0,
+    "real_loss": 2.0,
+    "reason": null,
+    "status": "informative",
+    "synthetic_loss": 0.0
+  },
+  "input": {
+    "constant_target": false,
+    "null_losses": [
+      10.0,
+      10.0
+    ],
+    "real_gain_lcb": 7.0,
+    "real_losses": [
+      2.0,
+      2.0
+    ],
+    "synthetic_losses": [
+      0.0,
+      0.0
+    ]
+  },
+  "purpose": "Original-unit paired retention and informative-task refusal.",
+  "schema_version": 1
+}

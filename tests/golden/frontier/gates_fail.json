@@ -1,0 +1,90 @@
+{
+  "case_id": "frontier_gates_fail",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "frontier": [
+      {
+        "artifact_bytes": 1024,
+        "driver_fidelity": 0.9,
+        "frontier_transfer": null,
+        "lcb_transfer": 0.85,
+        "tdl_pass": false
+      },
+      {
+        "artifact_bytes": 2048,
+        "driver_fidelity": 0.9,
+        "frontier_transfer": null,
+        "lcb_transfer": 0.95,
+        "tdl_pass": false
+      },
+      {
+        "artifact_bytes": 4096,
+        "driver_fidelity": 0.9,
+        "frontier_transfer": 0.9,
+        "lcb_transfer": 0.9,
+        "tdl_pass": true
+      }
+    ],
+    "largest_tested_bytes": 4096,
+    "reason": null,
+    "status": "qualified",
+    "tdl_bytes": 4096
+  },
+  "input": {
+    "cells": [
+      {
+        "artifact_bytes": 1024,
+        "driver_fidelity": 0.9,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": false
+        },
+        "lcb_transfer": 0.85,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 2048,
+        "driver_fidelity": 0.9,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": false,
+          "privacy": true
+        },
+        "lcb_transfer": 0.95,
+        "status": "complete"
+      },
+      {
+        "artifact_bytes": 4096,
+        "driver_fidelity": 0.9,
+        "families": [
+          "tree",
+          "linear"
+        ],
+        "gates": {
+          "closure": true,
+          "privacy": true
+        },
+        "lcb_transfer": 0.9,
+        "status": "complete"
+      }
+    ],
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "required_gates": [
+      "closure",
+      "privacy"
+    ]
+  },
+  "purpose": "Failed mandatory gates cannot be overcome by transfer.",
+  "schema_version": 1
+}

@@ -1,0 +1,26 @@
+{
+  "case_id": "transfer_overflow_ratio",
+  "citable": false,
+  "component": "transfer",
+  "expected": {
+    "reason": "nonfinite_or_invalid_number",
+    "status": "failed"
+  },
+  "input": {
+    "absolute_gain_floor": 0.0,
+    "constant_target": false,
+    "null_losses": [
+      1e-308
+    ],
+    "real_gain_lcb": 1e-308,
+    "real_losses": [
+      0.0
+    ],
+    "relative_gain_floor": 0.0,
+    "synthetic_losses": [
+      1e+308
+    ]
+  },
+  "purpose": "Original-unit paired retention and informative-task refusal.",
+  "schema_version": 1
+}

@@ -1,0 +1,42 @@
+{
+  "case_id": "charge_canonical",
+  "citable": false,
+  "component": "charge",
+  "expected": {
+    "amortized_bytes": 55.0,
+    "artifact_sha256": "fe37ae1071ef6889e36d1b097ce9247dba45bcc56d542d48a05ec27ceb1a9b1a",
+    "cold_bundle_bytes": 55,
+    "framing_bytes": 34,
+    "payload_bytes": 38,
+    "reason": null,
+    "sampling_closure_bytes": 55,
+    "section_bytes": {
+      "a": 1,
+      "z": 3
+    },
+    "shared_bytes": 17,
+    "status": "complete"
+  },
+  "input": {
+    "closure_files": [
+      {
+        "dataset_specific": false,
+        "hex": "0000000000000000000000000000000000",
+        "name": "runtime",
+        "scope": "runtime"
+      }
+    ],
+    "sections": [
+      {
+        "hex": "010203",
+        "name": "z"
+      },
+      {
+        "hex": "04",
+        "name": "a"
+      }
+    ]
+  },
+  "purpose": "Canonical section ordering and framing count toward the full payload.",
+  "schema_version": 1
+}
