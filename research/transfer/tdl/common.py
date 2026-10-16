@@ -69,3 +69,19 @@ def mean(values):
 def failure(reason, status="failed"):
     return {"status": status, "reason": reason}
 
+
+MASK = (1 << 64) - 1
+
+
+class XorShift64:
+    """Explicit portable RNG; zero seed maps to one. Modulo indexing is frozen."""
+    def __init__(self, seed):
+        self.state = count(seed) or 1
+
+    def index(self, length):
+        x = self.state
+        x ^= (x << 13) & MASK
+        x ^= x >> 7
+        x ^= (x << 17) & MASK
+        self.state = x & MASK
+        return self.state % length
