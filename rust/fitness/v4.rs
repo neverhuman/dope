@@ -199,7 +199,7 @@ pub fn evaluate_v4(
         .filter(|item| item.positive_predictor_lift && item.positive_dependence_lift)
         .and_then(|item| component_in_unit(Some(item.contrastive_utility_score)));
     let driver_attr = if observation.model_driver_attribution_measured
-        && observation.real_columns >= observation.real_importances.len() as u64
+        && (observation.real_columns as usize) > observation.real_importances.len()
     {
         crate::transfer_metrics::driver_attribution_agreement(
             &observation.real_importances,
@@ -211,8 +211,9 @@ pub fn evaluate_v4(
     } else {
         None
     };
-    let driver_fidelity =
-        driver_attr.and_then(|item| component_in_unit(Some(item.composite_driver_fidelity)));
+    let driver_fidelity = driver_attr
+        .filter(|item| item.top_k_overlap > 0.0 && item.composite_driver_fidelity > 0.0)
+        .and_then(|item| component_in_unit(Some(item.composite_driver_fidelity)));
     let compression = crate::transfer_metrics::knowledge_compression_metrics(
         observation.artifact_bytes,
         observation.encoded_numbers,
@@ -223,7 +224,7 @@ pub fn evaluate_v4(
     )
     .ok();
     let knowledge_compression = compression
-        .filter(|item| item.knowledge_compression_score > 0.0)
+        .filter(|item| utility_transfer.is_some() && item.knowledge_compression_score > 0.0)
         .and_then(|item| component_in_unit(Some(item.knowledge_compression_score)));
     let distribution_fidelity = component_in_unit(components.distribution_fidelity);
     let structure_fidelity = component_in_unit(components.structure_fidelity);

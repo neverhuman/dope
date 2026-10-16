@@ -532,12 +532,33 @@ mod tests {
             &[0.6, 0.4, 0.0, 0.0, 0.0],
             &[0.0, 0.0, 0.5, 0.5, 0.0],
             Some(&[1, -1, 0, 0, 0]),
-            Some(&[0, 0, 1, -1, 0]),
+            Some(&[1, -1, 1, -1, 0]),
         )
         .unwrap();
         assert_eq!(disjoint.k, 2);
         assert_eq!(disjoint.top_k_jaccard, 0.0);
         assert_eq!(disjoint.top_k_overlap, 0.0);
         assert_eq!(disjoint.ndcg_at_k, 0.0);
+        assert_eq!(disjoint.sign_agreement, 0.0);
+        assert_eq!(disjoint.composite_driver_fidelity, 0.0);
+
+        assert!(
+            driver_attribution_agreement(
+                &[0.6, 0.4, 0.0, 0.0],
+                &[0.0, 0.0, 0.5, 0.5],
+                Some(&[1, -1, 0, 0]),
+                Some(&[0, 0, 0, -1]),
+            )
+            .is_err()
+        );
+        assert!(
+            driver_attribution_agreement(
+                &[0.6, 0.4, 0.0, 0.0],
+                &[0.6, 0.4, 0.0, 0.0],
+                Some(&[1, -1, 1, 0]),
+                Some(&[1, -1, 1, 0]),
+            )
+            .is_err()
+        );
     }
 }

@@ -264,7 +264,9 @@ class MfsV3Tests(unittest.TestCase):
         self.assertFalse(failed["eligible"])
         self.assertIsNone(failed["score"])
         self.assertIsNone(failed["utility_transfer"])
+        self.assertIsNone(failed["knowledge_compression"])
         self.assertIn("utility_transfer", failed["unavailable_terms"])
+        self.assertIn("knowledge_compression", failed["unavailable_terms"])
         self.assertIn("positive_predictor_lift", failed["failed_gates"])
 
         over_budget = dict(obs, artifact_bytes=12288)
@@ -274,11 +276,29 @@ class MfsV3Tests(unittest.TestCase):
         self.assertIn("knowledge_compression", over_budget_report["unavailable_terms"])
         self.assertIn("tier_bytes", over_budget_report["failed_gates"])
 
-        too_few_cols = dict(obs, real_columns=2)
-        col_report = evaluate_v4(too_few_cols)
+        eq_cols = dict(obs, real_columns=len(obs["real_importances"]))
+        col_report = evaluate_v4(eq_cols)
         self.assertFalse(col_report["eligible"])
         self.assertIsNone(col_report["driver_fidelity"])
         self.assertIn("model_driver_attribution_measured", col_report["failed_gates"])
+
+        plus_one_cols = dict(obs, real_columns=len(obs["real_importances"]) + 1)
+        plus_one_report = evaluate_v4(plus_one_cols)
+        self.assertTrue(plus_one_report["eligible"])
+        self.assertIsNotNone(plus_one_report["score"])
+
+        disjoint_obs = dict(
+            obs,
+            real_importances=[0.60, 0.40, 0.0, 0.0],
+            synthetic_importances=[0.0, 0.0, 0.50, 0.50],
+            real_signs=[1, -1, 0, 0],
+            synthetic_signs=[1, -1, 1, -1],
+        )
+        disjoint_report = evaluate_v4(disjoint_obs)
+        self.assertFalse(disjoint_report["eligible"])
+        self.assertIsNone(disjoint_report["score"])
+        self.assertIsNone(disjoint_report["driver_fidelity"])
+        self.assertIn("driver_fidelity", disjoint_report["unavailable_terms"])
 
         missing_retention = dict(obs)
         del missing_retention["retention"]

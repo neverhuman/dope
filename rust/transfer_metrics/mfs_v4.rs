@@ -97,20 +97,30 @@ pub fn driver_attribution_agreement(
             if real_importances
                 .iter()
                 .zip(real_s.iter())
-                .any(|(&imp, &sign)| imp > 1e-12 && sign == 0)
+                .any(|(&imp, &sign)| (imp > 1e-12 && sign == 0) || (imp <= 1e-12 && sign != 0))
+                || synthetic_importances
+                    .iter()
+                    .zip(syn_s.iter())
+                    .any(|(&imp, &sign)| imp > 1e-12 && sign == 0)
             {
                 return Err(MetricError::InvalidEvidence);
             }
-            let active: Vec<(i8, i8)> = real_s
+            let active: Vec<(usize, i8, i8)> = real_s
                 .iter()
                 .copied()
                 .zip(syn_s.iter().copied())
-                .filter(|(r, _)| *r != 0)
+                .enumerate()
+                .filter_map(|(idx, (r, s))| (r != 0).then_some((idx, r, s)))
                 .collect();
             if active.is_empty() {
                 return Err(MetricError::InvalidEvidence);
             }
-            let matches = active.iter().filter(|(r, s)| r == s).count();
+            let matches = active
+                .iter()
+                .filter(|&&(idx, r, s)| {
+                    r == s && (idx >= features || synthetic_importances[idx] > 1e-12)
+                })
+                .count();
             matches as f64 / active.len() as f64
         }
         _ => return Err(MetricError::InvalidEvidence),

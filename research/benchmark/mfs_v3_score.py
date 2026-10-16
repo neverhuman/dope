@@ -210,7 +210,7 @@ def evaluate_v4(evidence: dict) -> dict:
         evidence.get("model_driver_attribution_measured") is True
         and type(real_cols) is int
         and isinstance(real_imp, (list, tuple))
-        and real_cols >= len(real_imp)
+        and real_cols > len(real_imp)
     ):
         try:
             driver_attr = driver_attribution_agreement(
@@ -221,7 +221,13 @@ def evaluate_v4(evidence: dict) -> dict:
             )
         except (KeyError, TypeError, ValueError):
             driver_attr = None
-    driver_fidelity = driver_attr["composite_driver_fidelity"] if driver_attr is not None else None
+    driver_fidelity = (
+        driver_attr["composite_driver_fidelity"]
+        if driver_attr is not None
+        and driver_attr["top_k_overlap"] > 0.0
+        and driver_attr["composite_driver_fidelity"] > 0.0
+        else None
+    )
     compression = None
     try:
         compression = knowledge_compression_metrics(
@@ -236,7 +242,9 @@ def evaluate_v4(evidence: dict) -> dict:
         compression = None
     knowledge_compression = (
         compression["knowledge_compression_score"]
-        if compression is not None and compression["knowledge_compression_score"] > 0.0
+        if compression is not None
+        and utility_transfer is not None
+        and compression["knowledge_compression_score"] > 0.0
         else None
     )
     vector = evidence.get("mfs_components")
