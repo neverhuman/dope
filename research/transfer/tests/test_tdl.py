@@ -212,6 +212,25 @@ class ChargeAndTraceTests(unittest.TestCase):
 
 
 class StandaloneGeneratorTests(unittest.TestCase):
+    def test_literal_worker_rejects_malformed_payloads_without_private_diagnostics(self):
+        worker = ROOT / "research/transfer/tdl/literal_worker.py"
+        gzip_header = bytes.fromhex("1f8b0800000000000003")
+        cases = (("copied_rows", b'{"private-source": invalid}'),
+                 ("gzip_original", b"private-source-header"),
+                 ("gzip_original", gzip_header),
+                 ("gzip_original", gzip_header + b"\x07private-source-deflate"))
+        for method, content in cases:
+            with self.subTest(method=method, content=content), workspace() as directory:
+                artifact = Path(directory) / "private-source-artifact"
+                artifact.write_bytes(charge.canonical_container(
+                    [{"name": "literal_payload", "hex": content.hex()}]))
+                result = subprocess.run([sys.executable, "-S", "-B", str(worker),
+                                         str(artifact), method, "1", "1"],
+                                        capture_output=True, cwd=directory)
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(result.stdout, b"")
+                self.assertEqual(result.stderr, b"")
+
     def test_literal_controls_export_reload_in_fresh_process_with_access_trace(self):
         for method in ("copied_rows", "gzip_original"):
             with self.subTest(method=method), workspace() as directory:
