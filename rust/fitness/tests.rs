@@ -400,6 +400,10 @@ mod tests {
         let contract: MasterFitnessV4Contract =
             serde_json::from_value(parsed["master_fitness"].clone()).unwrap();
         assert!(contract.is_frozen());
+        let lineage_contract: V4LineageAggregationContract =
+            serde_json::from_value(parsed["lineage_aggregation"].clone()).unwrap();
+        assert!(lineage_contract.is_frozen());
+        assert_eq!(lineage_contract.sample_seeds, V4_SAMPLE_SEEDS);
     }
 
     #[test]
@@ -545,17 +549,20 @@ mod tests {
         s101.retention = 0.88;
         s101.artifact_bytes = 1_024;
         s101.encoded_numbers = 64;
+        s101.real_bootstrap_4n_retention = Some(0.81);
 
         let mut s211 = v4_observation();
         s211.retention = 0.90;
         s211.artifact_bytes = 1_536;
         s211.encoded_numbers = 80;
+        s211.real_bootstrap_4n_retention = Some(0.85);
         s211.synthetic_importances = vec![0.35, 0.35, 0.20, 0.10];
 
         let mut s307 = v4_observation();
         s307.retention = 0.92;
         s307.artifact_bytes = 2_048;
         s307.encoded_numbers = 96;
+        s307.real_bootstrap_4n_retention = Some(0.83);
 
         vec![
             V4SeedObservation {
@@ -589,6 +596,11 @@ mod tests {
         assert!(lineage.report.hard_gates["utility_lcb_valid"]);
         let comp = lineage.report.compression_metrics.unwrap();
         assert_eq!(comp.encoded_numbers, 96);
+        let lift = lineage.report.control_contrastive_lift.unwrap();
+        assert!(
+            (lift.lift_vs_real_bootstrap_4n.unwrap() - (0.86 - 0.85)).abs() < 1e-12,
+            "real_bootstrap_4n_retention must aggregate with max across seeds"
+        );
         let var = lineage.seed_variance.expect("seed variance must be present");
         assert_eq!(var.sample_seeds, V4_SAMPLE_SEEDS);
         assert!((var.retention_mean - 0.90).abs() < 1e-12);
@@ -632,6 +644,7 @@ mod tests {
         assert_eq!(failed_control.report.score, None);
         assert!(!failed_control.report.hard_gates["positive_predictor_lift"]);
         assert_eq!(failed_control.report.utility_transfer, None);
+        assert_eq!(failed_control.report.knowledge_compression, None);
 
         // Single-seed failure cannot be hidden even if LCB > worst control baseline.
         let mut one_bad_seed = v4_lineage_seeds();
@@ -642,6 +655,7 @@ mod tests {
         assert!(!bad_seed_lineage.report.hard_gates["all_seeds_eligible"]);
         assert!(!bad_seed_lineage.report.hard_gates["positive_predictor_lift"]);
         assert_eq!(bad_seed_lineage.report.utility_transfer, None);
+        assert_eq!(bad_seed_lineage.report.knowledge_compression, None);
         assert_eq!(bad_seed_lineage.seed_variance, None);
 
         // Schema inconsistency across seeds fails closed.
@@ -652,10 +666,29 @@ mod tests {
         assert!(!mismatch_lineage.report.hard_gates["lineage_schema_consistent"]);
         assert_eq!(mismatch_lineage.report.score, None);
 
-        // Incomplete seed set fails closed.
+        // Incomplete seed set fails closed and marks all 7 component terms unavailable (matching Python).
         let incomplete = evaluate_v4_lineage(&contract, &seeds[..2], |_rets| Some(0.86));
         assert!(!incomplete.report.eligible);
         assert!(!incomplete.report.hard_gates["complete_seed_set"]);
         assert_eq!(incomplete.report.score, None);
+        assert_eq!(incomplete.report.utility_transfer, None);
+        assert_eq!(incomplete.report.driver_fidelity, None);
+        assert_eq!(incomplete.report.representation_closeness, None);
+        assert_eq!(incomplete.report.knowledge_compression, None);
+        assert_eq!(incomplete.report.control_contrastive_lift, None);
+        assert_eq!(incomplete.report.driver_attribution, None);
+        assert_eq!(incomplete.report.compression_metrics, None);
+        assert_eq!(
+            incomplete.report.unavailable_terms,
+            vec![
+                "utility_transfer",
+                "driver_fidelity",
+                "representation_closeness",
+                "knowledge_compression",
+                "distribution_fidelity",
+                "structure_fidelity",
+                "coverage_realism",
+            ]
+        );
     }
 }
