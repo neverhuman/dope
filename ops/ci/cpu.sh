@@ -6,6 +6,8 @@ source ops/ci/lib.sh
 for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg tar gzip; do
   ci_require_command "$tool"
 done
+python3 -B -m unittest discover -s ops/ci -p test_frozen_evidence.py -v
+python3 -B ops/ci/check-frozen-evidence.py
 bash ops/ci/test-cpu-tool-readiness.sh
 sha256sum --check --status scripts/native-legal.sha256
 bash ops/ci/check-budgets.sh
