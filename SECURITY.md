@@ -17,9 +17,10 @@ the reporter, and publish an advisory after a fix can be deployed. There is no
 promised response SLA or bug bounty. An empirical privacy evaluation does not
 establish formal differential privacy or regulatory de-identification.
 
-Fork pull requests run only on GitHub-hosted runners with read-only repository
-permissions and no deployment secrets; `pull_request` workflows on public
-repositories run on untrusted fork branches and must not receive write tokens
-or secrets. Sealed evaluation labels and vendor weights are excluded from
-public smoke tests. Only reviewed, same-repository changes may use private
-runners. Keep dependency and workflow checks enabled.
+Fork pull requests run only the `public-smoke` job on GitHub-hosted runners,
+with read-only repository permissions and no repository or deployment secrets.
+Checkout credentials are not persisted. The private-runner `cpu`, `paper-clean`,
+`security`, and `jankurai-audit` jobs skip fork pull requests and run for
+same-repository pull requests and configured branch pushes. Sealed evaluation
+labels and vendor weights are excluded from public smoke tests. Keep dependency
+and workflow checks enabled.

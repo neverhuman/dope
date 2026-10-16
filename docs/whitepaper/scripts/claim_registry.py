@@ -280,6 +280,7 @@ LEGACY_README_PROSE_SHA256 = "8d90e1fc7dd3a910a3c01b721fd29a8a0329d67ce646aeb54d
 PUBLIC_BANNED = (r"privacy[- ]preserving", r"\bminimum\b", r"\bbeats\s+TabSyn\b",
                  r"validated\s+across\s+(?:Kumo|Mitra|TabICL|TabPFN)",
                  r"1\.9\s*(?:KiB|KB)\s+(?:cold\s+closure|standalone)", r"\boutperforms\b",
+                 r"\bHIPAA\b", r"\bde[-\s]?identified\b", r"\bMDL\b",
                  *REGISTRY["forbidden_language"]["patterns"])
 # Result prose must use generated values. Structural names (TDL-v1, D-01, T90),
 # URLs, citations, CLI code examples and TeX layout dimensions are not results.
@@ -300,12 +301,18 @@ def public_prose(text: str, tex: bool = False) -> str:
     return text
 
 
+def public_language_failures(text: str, label: str) -> list[str]:
+    # Keep direct disclaimers such as "not HIPAA de-identification" valid.
+    # Negation elsewhere must not exempt an affirmative claim in the same text.
+    claims = re.sub(r"\b(?:no|not)\s+(?:HIPAA[-\s]+(?:safe|compliant|de-identification)|de[-\s]?identified|MDL)\b",
+                    " ", text, flags=re.I)
+    return [f"{label}: forbidden claim /{pattern}/" for pattern in PUBLIC_BANNED
+            if re.search(pattern, claims, re.I)]
+
+
 def lint_public_text(text: str, label: str, held_out_knowledge: bool = False) -> list[str]:
-    failures = []
+    failures = public_language_failures(text, label)
     prose = public_prose(text, tex=label.endswith(".tex"))
-    for pattern in PUBLIC_BANNED:
-        if re.search(pattern, text, re.I):
-            failures.append(f"{label}: forbidden claim /{pattern}/")
     if not held_out_knowledge and re.search(r"\bknowledge\b", text, re.I):
         failures.append(f"{label}: knowledge claim lacks held-out evidence")
     for match in PUBLIC_NUMBER.finditer(prose):
@@ -355,9 +362,7 @@ def result_failures(data: dict, auditors: dict, status: dict) -> list[str]:
         if row.get("tdl_bytes") is not None and (row.get("driver_gate") is not True or not row.get("complete_budget_grid")):
             failures.append(f"{name}: TDL bytes lack required gates")
     for idx, para in enumerate(data.get("demo_notes", {}).get("paragraphs", [])):
-        for pattern in PUBLIC_BANNED:
-            if re.search(pattern, para, re.I):
-                failures.append(f"demo_notes[{idx}]: forbidden claim /{pattern}/")
+        failures.extend(public_language_failures(para, f"demo_notes[{idx}]"))
     if status.get("allowed_statuses") is None or set(status["allowed_statuses"]) != EVIDENCE_STATUSES:
         failures.append("status: evidence vocabulary differs from registry")
     return failures
@@ -442,8 +447,12 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
         failures.append("README: generated result card markers are missing")
     elif hashlib.sha256(readme_prose(readme).encode()).hexdigest() != LEGACY_README_PROSE_SHA256:
         failures.append("README: changed prose must adopt the generated TDL result card")
-    for path in sorted((root / "paper").glob("*.tex")):
-        failures.extend(lint_public_text(path.read_text(), str(path.relative_to(root))))
+    for path in sorted((root / "paper").rglob("*.tex")):
+        relative = path.relative_to(root)
+        # Historical archives are exempt; renderer outputs are authenticated above.
+        if relative.is_relative_to("paper/archive") or relative.as_posix() in outputs:
+            continue
+        failures.extend(lint_public_text(path.read_text(), str(relative)))
     return failures
 
 
