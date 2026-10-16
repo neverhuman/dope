@@ -140,7 +140,7 @@ class NativeFileControls(TemporaryEvidence):
 
 
 def operation_fixture(status='ok', outer=5., inner=4., cap=600):
-    op = dict(status=status, exit_code=0 if status == 'ok' else 124, host='xbabe2',
+    op = dict(status=status, exit_code=0 if status == 'ok' else 124, host='fit-machine-2',
               elapsed_seconds=outer, timeout_seconds=cap, new_operation_started=True,
               official_tests_opened=False, foreign_processes_signaled=False)
     receipt = dict(status=status, operation=op, round_sha256=m.owned.ROUND, evidence_files={})
@@ -184,7 +184,7 @@ class CostControls(unittest.TestCase):
             values = list(operation_fixture()); values[1] = value
             with self.subTest(value=str(value)[:20]), self.assertRaises(ValueError): m.execution_cost(*values)
         for key, value in (('new_operation_started', 1), ('timeout_seconds', True),
-                            ('timeout_seconds', 601), ('host', 'xbabe0'), ('official_tests_opened', 0),
+                            ('timeout_seconds', 601), ('host', 'fit-machine-0'), ('official_tests_opened', 0),
                             ('foreign_processes_signaled', 0), ('exit_code', False), ('status', 'timeout')):
             values = list(operation_fixture()); values[0]['operation'][key] = value
             values[4] = copy.deepcopy(values[0]['operation'])
@@ -216,7 +216,7 @@ class ClosedCostControls(TemporaryEvidence):
         super().setUp()
         self.root = self.base / 'closed'
         self.jobs, self.batches = [], []
-        role = dict(cpu_slot=list(range(80, 96)), host='xbabe2', ram_bytes=1 << 34,
+        role = dict(cpu_slot=list(range(80, 96)), host='fit-machine-2', ram_bytes=1 << 34,
                     requires_gpu=False, scratch_bytes=10_000_000_000)
         self.lock = dict(jobs=self.jobs, runtime_lock_files={'opaque-runtime':'a'*64},
                          roles={'coordinator':role})
@@ -232,7 +232,7 @@ class ClosedCostControls(TemporaryEvidence):
             request_sha = self.json(out / 'request.json', dict(job=job, round_sha256=m.owned.ROUND))
             log_sha = self.put(out / 'worker.log', b'opaque log, never parsed')
             admission = dict(admitted=True, blockers=[], round_sha256=m.owned.ROUND,
-                             host='xbabe2', requested=role | dict(pid=43210))
+                             host='fit-machine-2', requested=role | dict(pid=43210))
             admission_sha = self.json(out / 'admission-0001.json', admission)
             op.update(runtime_lock_files=self.lock['runtime_lock_files'], request_sha256=request_sha,
                       worker_log_sha256=log_sha, admission_sha256=admission_sha,

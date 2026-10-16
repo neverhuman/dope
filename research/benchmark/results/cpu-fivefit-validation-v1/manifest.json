@@ -12,9 +12,9 @@
       "sha256": "d0d9317e3dd10d3fe9923cb2906d9d8425d791403c3570edeec4f6384b0a70d0"
     },
     "arf/panel.json": {
-      "bytes": 1751802,
+      "bytes": 1751842,
       "path": "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json",
-      "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
+      "sha256": "0b8b6191be188cbc7abf7412e80cae028f4b8bc3e8ecbc5332370a945e9e4f0f"
     },
     "forest/figure-kpis.csv": {
       "bytes": 24590,
@@ -22,9 +22,9 @@
       "sha256": "277eb4ba3546cca582938dd5794e68a12d0f07477fd79be6358ccb27b06a5037"
     },
     "forest/panel.json": {
-      "bytes": 556101,
+      "bytes": 556651,
       "path": "research/benchmark/results/cpu-fivefit-validation-v1/forest/panel.json",
-      "sha256": "a4af32f29918ee299a86ef4ff0fb59408dcdd187c7c11a074be9229b2ece7423"
+      "sha256": "0b6ed6ea95778893852dbe3ea346d0d3ee27fdb26f77cc9e3d6a574349a70374"
     },
     "manifest.schema.json": {
       "bytes": 2180,
@@ -97,32 +97,32 @@
     "forest": {
       "actual_replay_record": {
         "bytes": 1707,
-        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/publication-batch1-v2/replay.actual.json",
+        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/publication-batch1-v2/replay.actual.json",
         "sha256": "54ca41ad4fa73d21d9c497b5614355160de7b1663d934eef6c749351bb4992cd"
       },
       "execution_record": {
         "bytes": 2383,
-        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/publication-batch1-v1/execution.actual.json",
+        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/publication-batch1-v1/execution.actual.json",
         "sha256": "bc22b3c27d7530c62462875ded17409f6fc31f750a9635a2054242b869b0a13b"
       },
       "input_manifest": {
         "bytes": 180161,
-        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/common-metrics-inputs.lock.json",
+        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/common-metrics-inputs.lock.json",
         "sha256": "a466ec88d5a42313439324408b5de50bee2a75c4393b6553a0bda2e081adcce5"
       },
       "process_exit_record": {
         "bytes": 332,
-        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metrics-exit.actual.json",
+        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metrics-exit.actual.json",
         "sha256": "df8a4950d0693ff6c95cb88965d5c85c3f3e77d66726c55b0b391f03466afac4"
       },
       "published_fit_panel": {
-        "bytes": 19948,
+        "bytes": 20268,
         "path": "research/benchmark/results/cpu-fivefit-progress-v1/forest/panel.json",
-        "sha256": "557592f589a9b61e71e26254572a330c0e8d3aa9ce5d8ce568ad8d14990eed04"
+        "sha256": "3f283ef7a222a0fdd3f93e84bc35746047209d29e3196f8d90a74de8faf03339"
       },
       "receipt_lock": {
         "bytes": 14355,
-        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/receipt-lock.json",
+        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/receipt-lock.json",
         "sha256": "1b5d3e97367366658f8e6fedea1f28d4833a250f5f98666ef42f809d7baf4a14"
       }
     }

@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
 OUT="${OUT:-runs/kernel_tuner_long_random_synth}"
-CORPUS="${CORPUS:-/home/ubuntu/remote_super/quant}"
+CORPUS="${CORPUS:?Set CORPUS to the input corpus directory}"
 DEVICE="${DEVICE:-cuda}"
 
 if ! grep -q -- "--synthetic-mode" src/dope_kernel/cli.py 2>/dev/null || ! grep -q "train eval regret" src/dope_kernel/tuner.py 2>/dev/null; then

@@ -224,16 +224,16 @@ class LayoutTests(unittest.TestCase):
         self.assertNotIn("split_seed", R.cell_record(boot, "failed", "x", LEDGER, CONTRACT))
 
     def test_locations_mark_other_hosts_private_disks(self):
-        self.assertEqual(A.location("/home/ubuntu/dope-scratch-x1/a/b.csv"), "xbabe1")
-        self.assertTrue(A.remote_elsewhere("/home/ubuntu/dope-scratch-x1/a/b.csv", "xbabe2"))
-        self.assertFalse(A.remote_elsewhere("/home/ubuntu/dope-scratch-x1/a/b.csv", "xbabe1"))
-        self.assertFalse(A.remote_elsewhere("/mnt/fast-scratch/dope-benchmark/a.csv", "xbabe3"))
+        self.assertEqual(A.location("/path/to/operator-home/dope-scratch-x1/a/b.csv"), "fit-machine-1")
+        self.assertTrue(A.remote_elsewhere("/path/to/operator-home/dope-scratch-x1/a/b.csv", "fit-machine-2"))
+        self.assertFalse(A.remote_elsewhere("/path/to/operator-home/dope-scratch-x1/a/b.csv", "fit-machine-1"))
+        self.assertFalse(A.remote_elsewhere("/mnt/fast-scratch/dope-benchmark/a.csv", "fit-machine-3"))
 
     def test_plan_round_trip_is_bound_to_the_ledger_digest(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "plans" / "fixture.jsonl"
             jobs = [fixture_job("/x/n1-seed101.csv", "a" * 64)]
-            R.write_plan(path, LEDGER, jobs, "xbabe2")
+            R.write_plan(path, LEDGER, jobs, "fit-machine-2")
             self.assertEqual(R.load_plan(path, LEDGER), jobs)
             with self.assertRaises(SystemExit):
                 R.load_plan(path, {**LEDGER, "sha256": "m" * 64})
@@ -298,15 +298,15 @@ class AdapterTests(unittest.TestCase):
                  "metric_receipt_ref": {"path": str(self.root / "receipts" / "lost.json"), "sha256": "0" * 64}}]
         ledger = self.root / "panel.json"
         ledger.write_text(json.dumps({"rows": rows}))
-        jobs = A.arf(ledger, {"host": "xbabe2"})
+        jobs = A.arf(ledger, {"host": "fit-machine-2"})
         self.assertEqual([job["route"] for job in jobs], ["receipt", "sibling"])
         self.assertEqual(jobs[1]["csv_path"], str(sample_dir / "n1-seed211.csv"))
         self.assertEqual(jobs[1]["csv_sha256"], "c" * 64)
         rows[1]["metric_receipt_ref"]["path"] = str(self.root / "remote" / "lost.json")
         ledger.write_text(json.dumps({"rows": rows}))
-        with patch.object(A, "LOCATIONS", ((str(self.root) + "/", "xbabe2"),)):
+        with patch.object(A, "LOCATIONS", ((str(self.root) + "/", "fit-machine-2"),)):
             with self.assertRaises(A.RemoteOnly):
-                A.arf(ledger, {"host": "xbabe3"})
+                A.arf(ledger, {"host": "fit-machine-3"})
 
 
 if __name__ == "__main__":

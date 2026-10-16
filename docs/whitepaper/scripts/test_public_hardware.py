@@ -16,11 +16,11 @@ _LEGACY_CLUSTER_CLAUSE = "The printed family-cluster intervals resample lineages
 class PublicHardware(unittest.TestCase):
     def test_dope_sentence_names_devices_only(self):
         sentence = hardware.public_hardware(
-            ["xbabe1", "xbabe3", "xbabe2"],
+            ["fit-machine-1", "fit-machine-3", "fit-machine-2"],
             {
-                "xbabe1": "NVIDIA GeForce RTX 4090",
-                "xbabe2": "NVIDIA GeForce RTX 3090",
-                "xbabe3": "NVIDIA GeForce RTX 3090",
+                "fit-machine-1": "NVIDIA GeForce RTX 4090",
+                "fit-machine-2": "NVIDIA GeForce RTX 3090",
+                "fit-machine-3": "NVIDIA GeForce RTX 3090",
             },
         )
         self.assertEqual(
@@ -31,7 +31,7 @@ class PublicHardware(unittest.TestCase):
 
     def test_single_gpu_is_the_model_name(self):
         sentence = hardware.public_hardware(
-            ["xbabe1"], {"xbabe1": "NVIDIA GeForce RTX 4090"}
+            ["fit-machine-1"], {"fit-machine-1": "NVIDIA GeForce RTX 4090"}
         )
         self.assertEqual(sentence, "NVIDIA GeForce RTX 4090")
 
@@ -43,7 +43,7 @@ class PublicHardware(unittest.TestCase):
 
     def test_missing_gpu_does_not_invent_a_model(self):
         self.assertEqual(
-            hardware.public_hardware(["xbabe2"], {"xbabe2": None}),
+            hardware.public_hardware(["fit-machine-2"], {"fit-machine-2": None}),
             "GPU model not recorded",
         )
 
@@ -104,7 +104,7 @@ class MfsIllustration(unittest.TestCase):
         self.assertIn("neverhuman", hardware.banned_hits(f"{url} and neverhuman"))
         self.assertIn("neverhuman", hardware.banned_hits(f"{url}\n{url}"))
         self.assertIn("jepsontaylor", hardware.banned_hits(f"{url} jepsontaylor"))
-        self.assertIn("xbabe1", hardware.banned_hits(f"{url} on xbabe1"))
+        self.assertIn("xbabe", hardware.banned_hits(f"{url} on " + "x" + "babe1"))
         self.assertIn("pull request number", hardware.banned_hits(f"{url}. See PR #194."))
         manuscript = (REPO / "docs/whitepaper/dope-mfs.tex").read_text()
         self.assertEqual(manuscript.count(url), 1)

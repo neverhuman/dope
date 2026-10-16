@@ -125,7 +125,7 @@
     "verify fit/sample, complete finite row counts, n/2n/4n/8n schedules and deterministic seed replay",
     "pin artifact-only local weights/tokenizer/config loading and include all state in byte accounting",
     "run copy/leakage/privacy and real-vs-real controls before gated claims",
-    "fresh aggregate admission on xbabe1/2/3 with disjoint CPU/RAM/scratch and 600s/16GiB GPU caps"
+    "fresh aggregate admission on fit-machine-1/2/3 with disjoint CPU/RAM/scratch and 600s/16GiB GPU caps"
   ],
   "pretrained_checkpoint_rights_and_lineage_verified": false,
   "ptf_v1": null,

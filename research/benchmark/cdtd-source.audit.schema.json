@@ -425,7 +425,7 @@
         "remove stored original rows from the inference artifact and verify safe local reload with complete byte accounting",
         "verify finite exact row counts, sample sizes n/2n/4n/8n and deterministic seed replay",
         "run copy/leakage/privacy and real-vs-real controls before gated claims",
-        "fresh aggregate owner admission on xbabe1/2/3, disjoint CPUs/RAM/scratch, whole-fit 600s and 16GiB GPU caps"
+        "fresh aggregate owner admission on fit-machine-1/2/3, disjoint CPUs/RAM/scratch, whole-fit 600s and 16GiB GPU caps"
       ]
     },
     "ptf_v1": {

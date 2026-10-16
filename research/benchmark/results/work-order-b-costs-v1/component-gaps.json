@@ -1,7 +1,7 @@
 {
   "byte_charge_source_result": {
     "path": "research/benchmark/results/dope-target-refinement-population-fits.json",
-    "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
+    "sha256": "4327e94f833dc8c0ed4100958eacca14626ddd68b4f9531cc3ebfa20a49d3867"
   },
   "cap_failed_charges": 2,
   "compactness_formula": "clamp(1 - fullychargedgeneratorbytes/10240,0,1); charged model+projection, no effective byte understatement",
@@ -160,7 +160,7 @@
   "scope": "Component evidence gaps from committed validation-only refinement; no new data, metrics, fits or test access",
   "source_result": {
     "path": "research/benchmark/results/dope-target-refinement-population-validation.json",
-    "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
+    "sha256": "e40d69a8c9a383f953fbaa6d20db9ac649b9d02802b65f59b5b4c0eac7f7e1ea"
   },
   "successful_charges": 136,
   "superiority": null,

@@ -64,7 +64,7 @@ def prepare_invocation(proposal_bytes, proposal_sha256, *, batch_started_at):
                 and type(proposal['batch_cap_seconds']) is int)
         require(proposal['execution_admitted'] is False and proposal['official_tests_opened'] is False)
         require(proposal['gpu_operations_enabled'] is False)
-        require(type(proposal['host']) is str and proposal['host'] in ('xbabe1', 'xbabe2', 'xbabe3'))
+        require(type(proposal['host']) is str and proposal['host'] in ('fit-machine-1', 'fit-machine-2', 'fit-machine-3'))
         require(all(proposal[k] is None for k in ('mfs_v2', 'ptf_v1', 'release_safe', 'superiority')))
         require(type(batch_started_at) in (int, float))
         start = float(batch_started_at)

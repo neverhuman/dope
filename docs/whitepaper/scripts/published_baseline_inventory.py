@@ -20,17 +20,17 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 from research.benchmark.review_fixes.display_names import display  # noqa: E402
 SOURCES = {
-    "tabsyn": ("tabsyn-eight-lineage-validation/panel.json", "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"),
-    "tabddpm": ("tabddpm-twelve-lineage-retained-validation/panel.json", "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"),
-    "forest2": ("forest-first-two-fivefit-v1/panel.json", "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"),
-    "forest6": ("forest-next-six-fivefit-v1/panel.json", "376fc0b3c835e9eadde677d394eff5b56da91f2af3ea876e28f764ffbe1e1d08"),
-    "forest5": ("forest-third-five-fivefit-v1/panel.json", "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"),
-    "classical": ("retained-classical-validation/panel.json", "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"),
-    "arf_prefix": ("cpu-fivefit-validation-v1/arf/panel.json", "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"),
+    "tabsyn": ("tabsyn-eight-lineage-validation/panel.json", "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"),
+    "tabddpm": ("tabddpm-twelve-lineage-retained-validation/panel.json", "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"),
+    "forest2": ("forest-first-two-fivefit-v1/panel.json", "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"),
+    "forest6": ("forest-next-six-fivefit-v1/panel.json", "7e3e5854926a9a489a3f3d160cb6c228b75a2a5d26340819a539aeb79a55c70b"),
+    "forest5": ("forest-third-five-fivefit-v1/panel.json", "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"),
+    "classical": ("retained-classical-validation/panel.json", "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"),
+    "arf_prefix": ("cpu-fivefit-validation-v1/arf/panel.json", "0b8b6191be188cbc7abf7412e80cae028f4b8bc3e8ecbc5332370a945e9e4f0f"),
     "arf_fits": ("arf-complete-additional-fits-v1/panel.json", "7acfd172db6b43537723aff63e47faed35cd1319fb371fef34ad4328ebe46cca"),
-    "forest_legacy": ("s3-matched-forest-confirmation-validation.json", "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"),
-    "forest_pilot": ("pilot24-forestdiffusion-native.json", "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"),
-    "followon": ("arf-tabsyn-followon-validation-v1/panel.json", "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"),
+    "forest_legacy": ("s3-matched-forest-confirmation-validation.json", "160b48dad42295131b758a2ef76074a2c645f914aa3c831f4f51924f928ead91"),
+    "forest_pilot": ("pilot24-forestdiffusion-native.json", "933aeb223777bcfa401c2d49a6ce4e33e659a871652721fe391e2097a8425336"),
+    "followon": ("arf-tabsyn-followon-validation-v1/panel.json", "e797f3ef0c1907d51caddb06c7669683afaf96274a2af5a885ab5dd7abdaf13e"),
 }
 METRICS = ("catboost_retention", "marginal_error_mean", "c2st_catboost_auc", "distance_mia_auc")
 

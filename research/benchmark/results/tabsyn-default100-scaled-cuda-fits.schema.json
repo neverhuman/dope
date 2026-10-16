@@ -746,7 +746,7 @@
       "const": false
     },
     "host": {
-      "const": "xbabe1"
+      "const": "fit-machine-1"
     },
     "immutable_references": {
       "items": {
@@ -838,12 +838,12 @@
     },
     "source_files": {
       "const": {
-        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_controller_v1.py": "f5ef5f996e20a5bc6f6f510bbc6fce61338dc360da7f1b269c2c95cedbb53386",
-        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_entry_v1.py": "5d5ac24fc6e816edef007a3218b2556a4153dcfa395a415875057ef84303d25d",
-        "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
-        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_entry_v2.py": "5c69a932c9125ba59d38ed4b6140973c12c88c3f2f55a66f68cbd76840c1f5a4",
-        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_population_v2.py": "e052cbb95fc22ebb0c90f574366556fa0ecdce2bdfa983bd5b8b6a7c031afe14",
-        "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/tabsyn_native_target.captured.py": "584a1a07320c53d343ee119e5dcb9fc65ca49e19bf8c151e3375d9a05e2c69a7"
+        "/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1/owner_real_controller_v1.py": "f5ef5f996e20a5bc6f6f510bbc6fce61338dc360da7f1b269c2c95cedbb53386",
+        "/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1/owner_real_entry_v1.py": "5d5ac24fc6e816edef007a3218b2556a4153dcfa395a415875057ef84303d25d",
+        "/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
+        "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/owner_real_entry_v2.py": "5c69a932c9125ba59d38ed4b6140973c12c88c3f2f55a66f68cbd76840c1f5a4",
+        "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/owner_real_population_v2.py": "e052cbb95fc22ebb0c90f574366556fa0ecdce2bdfa983bd5b8b6a7c031afe14",
+        "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/tabsyn_native_target.captured.py": "584a1a07320c53d343ee119e5dcb9fc65ca49e19bf8c151e3375d9a05e2c69a7"
       }
     },
     "summary": {

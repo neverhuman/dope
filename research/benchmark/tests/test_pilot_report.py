@@ -17,12 +17,12 @@ class PilotReportTests(unittest.TestCase):
                     for seed in pilot_queue.FIT_SEEDS:
                         name = f"{dataset}-{method}-{seed}"
                         receipt = {"dataset": dataset, "method": method,
-                                   "fit_seed": seed, "host": "xbabe2",
+                                   "fit_seed": seed, "host": "fit-machine-2",
                                    "status": "failed" if name == "Adult-GaussianCopula-11" else "blocked",
                                    "elapsed_seconds": 2.0}
                         (root / "receipts" / f"{name}.json").write_text(json.dumps(receipt))
             repaired = {"dataset": "Adult", "method": "GaussianCopula",
-                        "fit_seed": 11, "host": "xbabe2", "status": "ok",
+                        "fit_seed": 11, "host": "fit-machine-2", "status": "ok",
                         "elapsed_seconds": 5.0}
             (root / "logs").mkdir()
             (root / "logs" / "Adult-GaussianCopula-11.log").write_text(

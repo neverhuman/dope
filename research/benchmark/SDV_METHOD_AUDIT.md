@@ -58,8 +58,8 @@ inside the model are study column identifiers, not original source headers.
 
 Generated-fixture GPU checks passed for both models. Repeated sampling from
 each saved artifact produced identical CSV hashes. Additional real S3 artifact
-checks reproduced an xbabe3 CTGAN sample on xbabe2 and an xbabe2 TVAE sample on
-xbabe3 with identical hashes. Detailed receipts remain under
+checks reproduced an fit-machine-3 CTGAN sample on fit-machine-2 and an fit-machine-2 TVAE sample on
+fit-machine-3 with identical hashes. Detailed receipts remain under
 `target/sdv-adapter-smoke-20261001/` and scratch `neural-native-v1/cross-host/`.
 This is artifact contract evidence; it does not establish all privacy gates.
 

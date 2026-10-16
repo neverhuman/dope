@@ -84,7 +84,7 @@ class NativeChildControls(unittest.TestCase):
 
     def test_non_library_proposal_changes_reject(self):
         old=copy.deepcopy(self.proposal)
-        for key,value in [('host','xbabe3'),('round_sha256','b'*64),('attempt',2),('job_sha256','c'*64)]:
+        for key,value in [('host','fit-machine-3'),('round_sha256','b'*64),('attempt',2),('job_sha256','c'*64)]:
             self.proposal=copy.deepcopy(old);self.proposal[key]=value
             self.proposal_path.write_text(json.dumps(self.proposal));self.lock['proposal_sha256']=sha(self.proposal_path)
             self.freeze();self.rejected()

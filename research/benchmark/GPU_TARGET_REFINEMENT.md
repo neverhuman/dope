@@ -30,7 +30,7 @@ three sample seeds 101/211/307, and `n`/`4n` validation schedule. The proposed
 24-fit ceiling is 14,400 GPU seconds, with 600 seconds per fit and 16 GiB of
 GPU memory. This spend is reported separately from final per-cell tuning
 parity. Fresh GPU ownership, free VRAM, CPU, RAM and scratch admission is
-required for each fit; only xbabe1/2/3 may admit, without foreign preemption.
+required for each fit; only fit-machine-1/2/3 may admit, without foreign preemption.
 
 Charge the sampler plus projection to the 10,240-byte L3 cap. Decode every
 successful artifact to verify that the trained compact neural target was

@@ -129,7 +129,7 @@ locked; retain hashes, byte inventories, and immutable failed attempts while
 keeping bulk rows, fits, weights, samples, and logs outside Git and `/` except
 for a storage root covered by the documented owner capacity amendment below.
 
-The owner-authorized [xbabe3 local capacity amendment](LOCAL_CAPACITY_AMENDMENT.md)
+The owner-authorized [fit-machine-3 local capacity amendment](LOCAL_CAPACITY_AMENDMENT.md)
 adds a separate local storage root for the TabDDPM and Forest-Flow continuations
 and TabSyn population work. Its aggregate ceiling is also 200,000,000,000 bytes;
 admission counts that root's actual bytes and full active/requested reservations

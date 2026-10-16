@@ -219,7 +219,7 @@
       "energy_joules_estimate": 217.16182710949334,
       "fit_receipt_sha256": "96305c20aec51588789623a3225a5451a1ec9af6d211b2a22cc5699a77dceb07",
       "fit_seed": 11,
-      "host": "xbabe1",
+      "host": "fit-machine-1",
       "model_sha256": "f8082dbbd8c98112b4c626ee99c494f4a9d9c766435de33f4e2d8ae528ff612c",
       "peak_gpu_used_mib": 9,
       "status": "ok"
@@ -237,7 +237,7 @@
       "energy_joules_estimate": 281.3972701115813,
       "fit_receipt_sha256": "df68d993fb3b8ceb34c6f812495d17701e7dd9473826228d9161322adcd1d922",
       "fit_seed": 23,
-      "host": "xbabe3",
+      "host": "fit-machine-3",
       "model_sha256": "74393765f57da5b837af0dd84eaed7253f6d76aff5b1b49b084f42e7759fa836",
       "peak_gpu_used_mib": 1,
       "status": "ok"

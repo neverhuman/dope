@@ -22,22 +22,22 @@
         {
           "bytes": 2250,
           "path": "research/benchmark/results/baseline-completion-20261008-v1/inputs.lock.json",
-          "sha256": "3630991b75607ac02c8166c2090b6e4509ecd47cd169b86a11c2b32c02b6db98"
+          "sha256": "5ddae06f78d3bd5e14567ff8c55224640608a2753e413221ed1ef6ed4fac841d"
         },
         {
           "bytes": 2750,
           "path": "research/benchmark/results/baseline-completion-20261008-v1/inputs.lock.schema.json",
-          "sha256": "63ace43937e4d6478c5b17fd6b715e9632c8070a333fae8adf63cf18f2fee243"
+          "sha256": "3ee2ed16f8251c43c2b5e80d999f7d9a88debafe5b261487d296987a887803db"
         },
         {
           "bytes": 5130,
           "path": "research/benchmark/results/baseline-completion-20261008-v1/panel.json",
-          "sha256": "46abb42e01d02babe197c76e11017d8da6c309e2858a5899d6abce5b58c807dc"
+          "sha256": "08d232295ed065b85f089f7419b00cfb33b4640fe956bb9e3d695f77c0dbe3f9"
         },
         {
           "bytes": 6542,
           "path": "research/benchmark/results/baseline-completion-20261008-v1/panel.schema.json",
-          "sha256": "d939fbc1f642e5d11674037191d14c5497d5b593a8351be5780be3cd29cf05af"
+          "sha256": "e11e134b821961db2572221aab0a6d2df29abe25f350250ce5e1dc7c33efd5a4"
         },
         {
           "bytes": 1276,
@@ -50,9 +50,9 @@
           "sha256": "1b1e0fb496c87b6b13c05981bb1ccc66f8c82ce9748ac0a88de3c8703bf96fe1"
         },
         {
-          "bytes": 210528,
+          "bytes": 215028,
           "path": "research/benchmark/results/baseline-completion-20261008-v1/timeout-dispositions.json",
-          "sha256": "03c4fc67f3b5e5148f4189be5610fe319f3bbdcabc7498aac01816ce87a0fb51"
+          "sha256": "93041d58f6732ebb920d4d2615f1f483c1b323a932f5823e6691b6aa6a568b5a"
         },
         {
           "bytes": 4125,

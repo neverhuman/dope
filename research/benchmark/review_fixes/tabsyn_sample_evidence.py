@@ -7,7 +7,7 @@ from pathlib import Path
 
 FITS_SHA256 = 'cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272'
 CONFIG_SHA256 = 'a34729383eac6783c7e754a791094054d54f1062655db9a306cd4cca296c5ebc'
-SAMPLES = Path('/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-sample-v1')
+SAMPLES = Path('/path/to/operator-home/dope-scratch-x1/dope-rf-tabsyn-sample-v1')
 
 
 def capture(fit_bytes, samples=SAMPLES):
@@ -48,8 +48,8 @@ def main():
     parser.add_argument('--fits', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
-    if os.uname().nodename != 'xbabe1':
-        raise ValueError('sample evidence capture is restricted to xbabe1')
+    if os.uname().nodename != 'fit-machine-1':
+        raise ValueError('sample evidence capture is restricted to fit-machine-1')
     if args.fits.is_symlink():
         raise ValueError('redirected fit registry refused')
     result = capture(args.fits.read_bytes())

@@ -23,7 +23,7 @@ class NativeLibraryControls(unittest.TestCase):
         (self.directory / 'alias.so').symlink_to('./liba.so')
         self.validation_path = self.base / 'validation.json'
         self.runtime_path = self.base / 'runtime.json'
-        self.runtime = {'host': 'xbabe2', 'binary': str(self.native.binary),
+        self.runtime = {'host': 'fit-machine-2', 'binary': str(self.native.binary),
             'binary_sha256': fixture.sha(self.native.binary), 'torch_library_directory': str(self.directory),
             'root_inventory_files': {str(self.directory): sorted(str(p) for p in self.directory.iterdir())},
             'files': {str(p): {'resolved_path': str(p.resolve()), 'bytes': p.stat().st_size,
@@ -49,7 +49,7 @@ class NativeLibraryControls(unittest.TestCase):
 
     def freeze_parents(self):
         self.runtime_path.write_text(json.dumps(self.runtime, sort_keys=True))
-        self.validation['host_runtimes'] = {'xbabe2': {'path': str(self.runtime_path),
+        self.validation['host_runtimes'] = {'fit-machine-2': {'path': str(self.runtime_path),
                                                      'sha256': fixture.sha(self.runtime_path)}}
         self.validation_path.write_text(json.dumps(self.validation, sort_keys=True))
         self.lock['validation_sha256'] = fixture.sha(self.validation_path)
@@ -94,7 +94,7 @@ class NativeLibraryControls(unittest.TestCase):
 
     def test_historical_host_and_binary_binding(self):
         old = copy.deepcopy(self.runtime)
-        for key, value in [('host', 'xbabe3'), ('binary', str(self.base / 'other.bin')),
+        for key, value in [('host', 'fit-machine-3'), ('binary', str(self.base / 'other.bin')),
                            ('binary_sha256', '0' * 64), ('torch_library_directory', str(self.base))]:
             self.runtime = copy.deepcopy(old); self.runtime[key] = value
             self.freeze_parents(); self.freeze(); self.rejected()

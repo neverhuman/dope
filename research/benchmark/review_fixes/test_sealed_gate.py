@@ -85,7 +85,7 @@ class SealedGateTests(unittest.TestCase):
             self.assertNotEqual(registry.resolve(), sealed_once.REGISTRY.resolve())
             args = argparse.Namespace(
                 out=registry,
-                host="xbabe3",
+                host="fit-machine-3",
                 predeclare=Path("predeclare.json"),
                 expect_git_blob="deadbeef",
                 expect_sha256="deadbeef",
@@ -176,7 +176,7 @@ class SealedGateTests(unittest.TestCase):
             registry = Path(tmp)
             args = argparse.Namespace(
                 out=registry,
-                host="xbabe3",
+                host="fit-machine-3",
                 predeclare=Path("predeclare.json"),
                 expect_git_blob="deadbeef",
                 expect_sha256="deadbeef",

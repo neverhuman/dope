@@ -42,21 +42,21 @@
       "cargo_features": ["gpu-training", "gpu-research-training"],
       "research_profiles": ["features12_steps512", "features12_steps2048", "features24_steps512", "features24_steps2048"],
       "runtime_lock": {
-        "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-runtime-preparation-v1/xbabe1.runtime.lock.json",
+        "path": "/mnt/fast-scratch/dope-benchmark/dope-s3-population-runtime-preparation-v1/fit-machine-1.runtime.lock.json",
         "sha256": "34f7805f40b523b2c20df86380ca8b533d45e6e922291365738ec11e26ff01db",
         "drift_rule": "The runner hashes every library in the lock before the first fit and records checked, mismatched, and missing counts. Drift is reported, not repaired."
       }
     },
     "diagnostic": {
       "name": "B_new",
-      "path_on_xbabe1": "/home/ubuntu/dope-scratch-x1/dope-rf-seeds-src/target/release/dope-kernel",
+      "path_on_fit-machine-1": "/path/to/operator-home/dope-scratch-x1/dope-rf-seeds-src/target/release/dope-kernel",
       "sha256_prefix": "4347249fa465149f7c6a",
       "role": "Only the 2x2 diagnostic in seed_exchangeability. Never a headline binary."
     },
     "grid": {
       "name": "B_grid",
       "role": "Ablation grid only.",
-      "build_rule": "Built on xbabe1 from a pinned commit before block I starts; its sha256 is written into an amendment file before any grid retention is computed.",
+      "build_rule": "Built on fit-machine-1 from a pinned commit before block I starts; its sha256 is written into an amendment file before any grid retention is computed.",
       "qualification": "B_grid qualifies only if its features12_steps2048 seed-11 artifact bytes equal B_hist's on at least 95 of 98 lineages. The check compares artifact bytes only, before any retention is computed. A failed qualification keeps every grid result in a separately labelled table."
     },
     "rule": "B_hist is the headline binary unconditionally, because it produced the published configuration."
@@ -66,7 +66,7 @@
     "fit_seeds": [11, 23, 37, 53, 71],
     "sample_seeds": [101, 211, 307],
     "sizes": [1, 4],
-    "host": "xbabe1",
+    "host": "fit-machine-1",
     "device": "cuda:0, NVIDIA GeForce RTX 4090, CUBLAS_WORKSPACE_CONFIG=:4096:8",
     "order": "Seed-major, then dataset id. A cutoff drops whole seeds.",
     "compile": {
@@ -86,7 +86,7 @@
         "role": "secondary: the untuned trainer default (width min(features,12) clamped to 4..12, 96 steps). It answers the confound that the headline profile was chosen among four research profiles at fit seed 11 on validation rows."
       }
     },
-    "historical_seed_11": "The historical fit-seed-11 population (hosts xbabe1 and xbabe2) stays a continuity row. It is never pooled with the v2 refits."
+    "historical_seed_11": "The historical fit-seed-11 population (hosts fit-machine-1 and fit-machine-2) stays a continuity row. It is never pooled with the v2 refits."
   },
   "evaluator": {
     "utility": "research/benchmark/pilot_metrics.py",
@@ -98,13 +98,13 @@
     "threads": "BLAS and OpenMP at 1 thread in the scoring process. CatBoost keeps thread_count 4 from the evaluator.",
     "no_producer_reported_values": "A metric cell enters a v2 table only if it carries implementation_sha256 equal to utility_sha256 and the declared dependency versions. A cell without them is refused by the binder.",
     "replay": "The historical fit-seed-11 DOPE cells and the 2,400 four-seed cells are re-scored from their stored synthetic CSVs with this evaluator. Exact equality is expected. Any difference is reported with its maximum, and only re-scored values enter v2 tables.",
-    "cross_host_check": "200 seeded cells are scored on both xbabe1 and xbabe3. Bitwise disagreement is reported."
+    "cross_host_check": "200 seeded cells are scored on both fit-machine-1 and fit-machine-3. Bitwise disagreement is reported."
   },
   "headline_rule": "The abstract, Fig. 1 and Table 1 report the headline arm at size 4n under CatBoost, as the five-seed estimate below, against the strongest comparator. The strongest comparator is computed, never chosen: the comparator arm with the highest CatBoost 4n panel median among arms with at least 90 informative lineages paired with DOPE. Historical seed 11 alone and seeds 23-71 alone are sensitivity rows. The values are reported whatever they are.",
   "seed_exchangeability": {
     "rank_test": "For each lineage with all five headline fits complete (CatBoost, 4n), rank fit seed 11 among the five fit values. Count lineages where seed 11 is highest and report a one-sided binomial test against p = 0.2. Descriptive.",
     "sensitivity": "The headline estimate recomputed on fit seeds 23, 37, 53, and 71 only.",
-    "two_by_two": "Binary (B_hist, B_new) by seed group (11; 23-71), CatBoost 4n medians on the common lineages. B_new seed 11 is refit on xbabe1 for this diagnostic. B_new seeds 23-71 use the stored four-seed CSVs re-scored with the pinned evaluator."
+    "two_by_two": "Binary (B_hist, B_new) by seed group (11; 23-71), CatBoost 4n medians on the common lineages. B_new seed 11 is refit on fit-machine-1 for this diagnostic. B_new seeds 23-71 use the stored four-seed CSVs re-scored with the pinned evaluator."
   },
   "methods": {
     "primary": {
@@ -218,12 +218,12 @@
     "scope": "Every primary and secondary arm with completed fits, every completed fit seed, sizes n and 4n, sample seeds 101, 211, 307, both controls, and the external panel if Go.",
     "manifest": "Every train-only sample is generated before the freeze. sealed-v2-manifest.jsonl lists method, arm, track, dataset, fit seed, size, sample seed, artifact inventory sha256, CSV path, CSV sha256 and shape, target position, validation receipt sha256, and binary and runtime pins. Its sha256 is committed, tagged sealed-v2-freeze, and hard-coded in the runner before the unseal.",
     "regeneration_audit": "A seeded 5% of manifest rows per method is regenerated from the frozen artifacts before the freeze. Deterministic samplers must reproduce byte-identical files; nondeterministic GPU samplers are listed by name.",
-    "run": "Host xbabe3 only, DOPE_RF_UNSEAL=1, an exclusive fsynced registry marker, CPU-only scoring with the pinned evaluator. Every CSV hash and shape is checked before any test.csv is opened. Each test.csv must match its recorded official digest before it is parsed.",
+    "run": "Host fit-machine-3 only, DOPE_RF_UNSEAL=1, an exclusive fsynced registry marker, CPU-only scoring with the pinned evaluator. Every CSV hash and shape is checked before any test.csv is opened. Each test.csv must match its recorded official digest before it is parsed.",
     "resume": "Decided by the owner at the freeze. Proposed: strictly one run; after a crash, resume only with the identical manifest hash and only to fill missing cells, printing the number of sessions.",
     "reporting": "Sealed-test values become the headline. Validation values become development results. A sealed result weaker than validation is reported unchanged."
   },
   "launch_order": [
-    "A: DOPE headline and product_default at five fit seeds on xbabe1",
+    "A: DOPE headline and product_default at five fit seeds on fit-machine-1",
     "A-prime: B_new seed-11 refit and four-seed re-scoring",
     "B: TabSyn scaled seeds 23, 37, 53, 71",
     "B-prime: TabSyn author-default seed 11",

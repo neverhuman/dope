@@ -29,10 +29,10 @@ def run():
     parent = output.parent; assert parent == common.ROOT/'attempts'/common.digest(job)/'attempt-0001'
     assert set(os.sched_getaffinity(0)) == set(lock['cpu_slots'][host])
     if mode in ('fit','sample'):
-        assert host in ('xbabe1','xbabe3')
+        assert host in ('fit-machine-1','fit-machine-3')
         snapshot = common.load_file('frozen_inventory',common.ROOT/'source/inventory_hosts.py').local()
         assert not snapshot['active_gpu_processes'] and snapshot['gpus'][0]['memory_free_mib'] >= 17*1024
-    else: assert mode == 'native' and host == 'xbabe2'
+    else: assert mode == 'native' and host == 'fit-machine-2'
     # The pinned interpreter's isolated startup cannot import site initializers.
     sys.path.insert(0,lock['environment_site'])
     entry = common.load_file('original_entry',lock['original_entry'])

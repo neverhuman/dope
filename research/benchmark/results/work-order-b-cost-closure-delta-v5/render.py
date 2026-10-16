@@ -15,10 +15,10 @@ PINS = {
  'source-proof.schema.json': (9737,'5d20b8861df446801f47e44c533e2b9edb2e0cf27b230d63b4474f429d70cd98'),
 }
 ROWS = {
- 'tabsyn_retained48_evaluation': (48,48,0,'xbabe1',list(range(96,104))),
- 'arf_retained1116_evaluation': (1116,1200,0,'xbabe2',list(range(104,112))),
- 'copula_chow_new2017_evaluation': (2017,2400,5,'xbabe1',list(range(96,104))),
- 'retained5_utility_only1729': (5,None,5,'xbabe2',list(range(104,112))),
+ 'tabsyn_retained48_evaluation': (48,48,0,'fit-machine-1',list(range(96,104))),
+ 'arf_retained1116_evaluation': (1116,1200,0,'fit-machine-2',list(range(104,112))),
+ 'copula_chow_new2017_evaluation': (2017,2400,5,'fit-machine-1',list(range(96,104))),
+ 'retained5_utility_only1729': (5,None,5,'fit-machine-2',list(range(104,112))),
 }
 NULL_ROW_FIELDS = ('CPU_model','GPU_model','GPU_wall_seconds','peak_GPU_used_mib','energy_joules',
                    'core_seconds','co_tenant','shared_gpu_cost','actual_parent_wait_exit','actual_kernel_exit',

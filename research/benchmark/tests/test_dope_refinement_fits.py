@@ -126,7 +126,7 @@ class RefinementFits(unittest.TestCase):
         row = dict(original_fit_job=job, job_sha256=key, dataset='fixture', profile=pub.PROFILES[0], fit_seed=11,
             receipt_path=str(rp), receipt_sha256=sha(rp), status='ok', immutable_prior_fit_reused=False,
             model_path=str(model), model_sha256=sha(model), charged_artifact_bytes=92, projection_bytes_included=True,
-            gpu_target_operator_verified=True, new_operation_seconds=1.0, host_operation_seconds={'xbabe2': 1.0})
+            gpu_target_operator_verified=True, new_operation_seconds=1.0, host_operation_seconds={'fit-machine-2': 1.0})
         # fit.json's identity is transitively anchored by receipt.evidence_files.
         refs = {str(rp): sha(rp), str(model): sha(model), **{str(p): sha(p) for p in worker.iterdir()}}
         return row, refs, fp

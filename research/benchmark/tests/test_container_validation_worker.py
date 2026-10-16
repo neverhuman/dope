@@ -81,7 +81,7 @@ class WorkerControls(unittest.TestCase):
             'metric_source_sha256': w.sha(self.metric), 'gpu_binary_sha256': '0' * 64,
             'native_library_directory': 'opaque-frozen-library-directory'}
         self.request = self.out / 'request.json'
-        self.host = patch.object(w.socket, 'gethostname', return_value='xbabe2')
+        self.host = patch.object(w.socket, 'gethostname', return_value='fit-machine-2')
         self.host.start()
         self.bytecode = patch.object(sys, 'dont_write_bytecode', True)
         self.bytecode.start()
@@ -187,8 +187,8 @@ class WorkerControls(unittest.TestCase):
         self.freeze()
         self.reject_before_initializer()
 
-    def test_xbabe0_is_rejected_even_with_frozen_admission(self):
-        with patch.object(w.socket, 'gethostname', return_value='xbabe0'):
+    def test_fit_machine_0_is_rejected_even_with_frozen_admission(self):
+        with patch.object(w.socket, 'gethostname', return_value='fit-machine-0'):
             self.reject_before_initializer()
 
     def test_bytecode_writes_are_disabled_before_source_initializers(self):

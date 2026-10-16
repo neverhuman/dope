@@ -159,7 +159,7 @@ def build():
         source_locks=dict(validation_round=ROUND, validation_receipts=RECEIPTS, fit_receipts=FIT_RECEIPTS,
             matched_reference=REFERENCE, discovery_report='e0c9cd641ff4975126c0ecd3942315299ba14835b9fdad25df5f10d693b47bc4',
             metric_source=lock['metric_source_sha256']),
-        allowed_gpu_hosts=['xbabe1', 'xbabe2', 'xbabe3'], baseline_native_selection_changed=False,
+        allowed_gpu_hosts=['fit-machine-1', 'fit-machine-2', 'fit-machine-3'], baseline_native_selection_changed=False,
         baseline_selected_by_common_utility=False, native_kpis_never_ranked_across_methods=True,
         confirmation_complete=True, global_family_selected=False, full_campaign_admitted=False,
         sdv_v3_launched=False, official_tests_opened=False, mfs_v2=None, ptf_v1=None,

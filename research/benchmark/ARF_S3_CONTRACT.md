@@ -97,7 +97,7 @@ python3 -B -m unittest research.benchmark.tests.test_arf_contract -v
 
 Before a real S3 round, freeze source/runtime/worker/grid/job/sample identities
 and a capacity registry recognized by every overlapping queue. Preserve the
-healthy DOPE refinement queue, admit only quiet xbabe1/2/3 CPU slots, keep the
+healthy DOPE refinement queue, admit only quiet fit-machine-1/2/3 CPU slots, keep the
 200,000,000,000-byte scratch ceiling, and account for every failure and timeout.
 No SDV rerun is authorized by this preparation. MFS-v2, PTF-v1, release and
 superiority claims remain null.
@@ -151,7 +151,7 @@ exactly between direct and guarded fits. All 12 sample cells match direct FORGE,
 two factor replays, and the guarded sample entry point byte for byte.
 
 The operation took 91.252959 seconds with a 600-second
-outer hard limit, fresh sixteen-core admission on xbabe2, and measured peak
+outer hard limit, fresh sixteen-core admission on fit-machine-2, and measured peak
 resident memory 261275648 bytes. Artifact charges include all six
 files; continuous and categorical fixtures charged 4402 and 1648 bytes respectively.
 These are synthetic API checks, not real dataset quality or L3 certification.

@@ -17,9 +17,9 @@
       "sha256": "a8996981e515b1b142f29c066dd92f84ce6d26c9c9872f48f1c4a75d93a603c4"
     },
     "checkpoint-kpis.csv": {
-      "bytes": 9885,
+      "bytes": 10095,
       "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/checkpoint-kpis.csv",
-      "sha256": "59f3b127d83f8fdd63a1bccae0c5d03d6e90c631fda2cca3fa5a3777c6eb4472"
+      "sha256": "eb439be766fc0dbd256e9fa3e3b58e7f1129661aa5f151c443ae9d2117c53520"
     },
     "figure-kpis.csv": {
       "bytes": 78442,
@@ -27,14 +27,14 @@
       "sha256": "3d2d4887d967ebf03c7d310118752fef6fa69227b1355eb645e61553538596a2"
     },
     "inputs.lock.json": {
-      "bytes": 220194,
+      "bytes": 229874,
       "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/inputs.lock.json",
-      "sha256": "e245b125ffbb29b1685356b9b58659645c890fcbb4fb023c10f1137167a669e8"
+      "sha256": "1d63bd193dd06b16bb927a83e414b4533665cf6ef0783bb58ae62a552e998d07"
     },
     "inputs.lock.schema.json": {
-      "bytes": 1523,
+      "bytes": 1533,
       "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/inputs.lock.schema.json",
-      "sha256": "252060fe85459a3172cafb1c5ffde463d07746156d4431a711ce7425ef684987"
+      "sha256": "10fd1c146f84d310ecfa0622885b7f831688a21ab5d34481b682977e83603dd9"
     },
     "manifest.schema.json": {
       "bytes": 2273,
@@ -42,9 +42,9 @@
       "sha256": "cce6cb24ec3e717fccfa9e8549f55d50d82665c95a4bf61f5639018087d7ac4d"
     },
     "original-verification.json": {
-      "bytes": 646945,
+      "bytes": 663735,
       "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/original-verification.json",
-      "sha256": "9e31868702afe97db9f950e4e23d0377d0fa3ec29d0c58457bceec552c74729c"
+      "sha256": "a6a87f0746f0fe162d1c751a42324b098697b09e45f971ec2ac1be4469efe124"
     },
     "original-verification.schema.json": {
       "bytes": 1905,
@@ -52,9 +52,9 @@
       "sha256": "2217f66c6e09b6f8a213d026fc24cf98ba5d3c21b7f84c8d6dcdbf09824c926c"
     },
     "panel.json": {
-      "bytes": 2426210,
+      "bytes": 2438960,
       "path": "research/benchmark/results/tabddpm-twelve-lineage-retained-validation/panel.json",
-      "sha256": "877317666864c712b84feed7170f9dccd3587780ae3b5ebbb6cecf4513adda13"
+      "sha256": "d80e42a52f8df9387f2dbd135d848c487439193af2fc4eb9ddc362dbfdc4b4cd"
     },
     "panel.schema.json": {
       "bytes": 30790,

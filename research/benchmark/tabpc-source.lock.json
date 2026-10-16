@@ -56,7 +56,7 @@
         "sha256": "40b36da3755b1610b30989997064280d34edc700f78cdc397ba63fb033c9a89e"
       },
       "gpu_elapsed_seconds": 11.316457117907703,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "independent_cuda_hidden_sample_replay": "exact",
       "native_nll_finite": true,
       "peak_gpu_used_mib": 442,
@@ -94,7 +94,7 @@
         "sha256": "c56b83972943b0cc3334b2767bda8064a11371c1403d405892731bd7b370ecf0"
       },
       "gpu_elapsed_seconds": 12.353722939034924,
-      "host": "xbabe2",
+      "host": "fit-machine-2",
       "independent_cuda_hidden_sample_replay": "exact",
       "native_nll_finite": true,
       "peak_gpu_used_mib": 442,

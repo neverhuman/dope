@@ -13,7 +13,7 @@ from research.benchmark import container_bootstrap_invocation as bootstrap
 class BootstrapInvocationControls(unittest.TestCase):
     def setUp(self):
         root = '/mnt/fast-scratch/dope-benchmark/opaque-round'
-        self.proposal = {'host': 'xbabe1', 'root': root, 'entry': root + '/source/entry.py',
+        self.proposal = {'host': 'fit-machine-1', 'root': root, 'entry': root + '/source/entry.py',
             'python': '/usr/bin/python3.12', 'empty_bytecode_cache': root + '/empty-cache',
             'native_library_directory': '/opaque/frozen-library', 'round_sha256': 'a' * 64,
             'job_sha256': 'b' * 64, 'attempt': 1,
@@ -39,7 +39,7 @@ class BootstrapInvocationControls(unittest.TestCase):
                                     'GLIBC_TUNABLES': 'opaque', 'PYTHONPATH': 'opaque',
                                     'PYTHONSTARTUP': 'opaque', 'CUDA_VISIBLE_DEVICES': '0'}):
             plan = self.prepare()
-        self.assertEqual(plan.host, 'xbabe1')
+        self.assertEqual(plan.host, 'fit-machine-1')
         self.assertEqual(plan.argv, ('/usr/bin/python3.12', '-I', '-S', '-B', '-X',
             'pycache_prefix=' + self.proposal['empty_bytecode_cache'], self.proposal['entry'],
             self.proposal['root'], self.proposal['round_sha256'], self.proposal['request']))
@@ -84,7 +84,7 @@ class BootstrapInvocationControls(unittest.TestCase):
         self.rejected(digest_override=Permissive(hashlib.sha256(blob).hexdigest()))
 
     def test_off_limit_hosts_and_nonboolean_claims_rejected(self):
-        for field, value in [('host', 'xbabe0'), ('host', 'unknown'), ('execution_admitted', True),
+        for field, value in [('host', 'fit-machine-0'), ('host', 'unknown'), ('execution_admitted', True),
                              ('execution_admitted', 0), ('execution_admitted', 'false'),
                              ('official_tests_opened', True), ('gpu_operations_enabled', True),
                              ('mfs_v2', 0.99), ('batch_cap_seconds', 601), ('batch_cap_seconds', 600.0)]:

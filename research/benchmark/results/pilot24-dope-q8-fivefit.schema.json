@@ -95,8 +95,8 @@
           },
           "host": {
             "enum": [
-              "xbabe1",
-              "xbabe3"
+              "fit-machine-1",
+              "fit-machine-3"
             ]
           },
           "artifact_bytes": {

@@ -119,7 +119,7 @@ def operation(mode, row, parent, lock, base, refs):
     require(read(proof) == row, 'native operation receipt differs')
     claims_flag = row.get('official_tests_opened')
     require(claims_flag is False and row['host'] in lock['allowed_gpu_hosts']
-            and row['host'] == 'xbabe1' and type(row['timeout_seconds']) is int
+            and row['host'] == 'fit-machine-1' and type(row['timeout_seconds']) is int
             and 0 < row['timeout_seconds'] <= lock['whole_operation_timeout_seconds'] == 600,
             'native operation host or deadline changed')
     request = parent / (mode + '.request.json')
@@ -240,7 +240,7 @@ def trial(job, root, lock, refs):
         fit = read(parent / 'fit.json')
         claims(fit)
         require(fit['status'] == 'ok' and fit['job_sha256'] == key
-                and fit['round_sha256'] == lock['round_sha256'] and fit['host'] == 'xbabe1'
+                and fit['round_sha256'] == lock['round_sha256'] and fit['host'] == 'fit-machine-1'
                 and fit['gpu_fit_required'] is True and fit['source_adapter_unchanged'] is True
                 and fit['projection_bytes_included'] is True and fit['training_rows'] == job['worker']['train_rows']
                 and 0 < fit['peak_torch_allocated_bytes'] <= lock['gpu_vram_limit_mib'] * 2**20

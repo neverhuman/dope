@@ -19,7 +19,7 @@ from .fetch_jope import LIMIT, used_bytes
 from .score import CONTRACT, artifact_inventory, sha256
 
 
-HOSTS = ("xbabe1", "xbabe2", "xbabe3")
+HOSTS = ("fit-machine-1", "fit-machine-2", "fit-machine-3")
 ROOT = Path("/mnt/fast-scratch/dope-benchmark")
 SLOT_CORES = 16
 MAX_SLOTS = 4
@@ -46,7 +46,7 @@ def probe(host: str) -> dict:
     # The script is sent over stdin so probes do not depend on a mutable remote checkout.
     source = Path(__file__).with_name("inventory_hosts.py").read_text()
     command = ["python3", "-", "--local"]
-    if host != "xbabe2":
+    if host != "fit-machine-2":
         command = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5",
                    host, *command]
     result = subprocess.run(command, input=source, text=True, capture_output=True,
@@ -187,7 +187,7 @@ def execute(cell: dict, host: str, slot: tuple[int, ...], attempt: int,
                "/usr/bin/time", "-v", "taskset", "-c", ",".join(map(str, slot)),
                *env, cell["runtime_python"], "-m", "research.benchmark.runner",
                str(job_path), str(package / "research/benchmark/methods.lock.json"), str(results)]
-    if host != "xbabe2":
+    if host != "fit-machine-2":
         command = ["ssh", "-o", "BatchMode=yes", host, shlex.join(command)]
     try:
         process = subprocess.run(command, capture_output=True, text=True,

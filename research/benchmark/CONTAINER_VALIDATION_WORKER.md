@@ -22,7 +22,7 @@ and queued density priority must each be the JSON boolean `true`. These facts
 must be proved by the coordinator and bound to the round; setting flags alone
 is not evidence. The request must live under its canonical complete job digest
 and distinct numbered attempt. Output directories require ownership by the
-worker user and mode 0700. Hosts are limited to xbabe1/2/3.
+worker user and mode 0700. Hosts are limited to fit-machine-1/2/3.
 Request membership uses the canonical complete job digest; equal-valued JSON
 numbers cannot substitute another retry identity. CPU environment checks precede
 all source helper loading and runtime initialization.
@@ -94,7 +94,7 @@ python3 -B -m unittest discover -s research/benchmark/tests \
 `container_bootstrap_invocation.prepare_invocation` consumes owned proposal bytes
 bound by an external digest and prepares immutable interpreter arguments and an
 explicit environment. Proposals remain unadmitted. They retain the exact 600-second
-cap, sealed-test/null-claim flags, xbabe1/2/3 host scope, complete job digest and
+cap, sealed-test/null-claim flags, fit-machine-1/2/3 host scope, complete job digest and
 numbered request path. Arguments use the pinned Python path with `-I -S -B` and
 the declared cache prefix. The environment contains only the fixed PATH/locale,
 declared single library directory, empty CUDA visibility and one-thread limits;

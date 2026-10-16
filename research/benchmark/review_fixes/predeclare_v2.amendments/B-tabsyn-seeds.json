@@ -4,7 +4,7 @@
  "block": "B",
  "amends": {
   "path": "research/benchmark/review_fixes/predeclare_v2.json",
-  "sha256": "851215f70725b49cc74c8768aee45599b480881e5316ffe62d6b8b18862e9a47"
+  "sha256": "ed718312d58e7dc12426f95a1b060a9a2d38b4f1092619e4169dd4c9f811b4b2"
  },
  "rule": "Operational only. It fixes the paths, pins, host, CPU slot, and the operation caps this arm already ran under at fit seed 11. It changes no estimand, margin, seed, family, threshold, configuration, or inclusion rule of predeclare_v2. It is committed and pushed before block B starts.",
  "method": "TabSyn",
@@ -52,18 +52,18 @@
   4
  ],
  "plan": {
-  "path": "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/canonical.plan.json",
+  "path": "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/canonical.plan.json",
   "sha256": "ec3169e0d8881170139a8fbe1b3f8e6c0485325c3ab1cea18774a68169b5a4f4",
   "lineages": 100,
   "role": "The seed-11 lineage list, worker file pins, and joint TRAIN and validation digests. Each new fit must reproduce the seed-11 joint input digests."
  },
- "workers": "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/workers",
+ "workers": "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/workers",
  "runtime": {
   "path": "/mnt/fast-scratch/dope-benchmark/tabsyn-x2-runtime-v1/runtime.lock.json",
   "sha256": "7f64e393995119c7da62a395405dc6d825a98d56cfc885829b8a8253f3d53ede"
  },
  "adapter": {
-  "path": "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py",
+  "path": "/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py",
   "sha256": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
   "repository_copy": "research/benchmark/tabsyn_adapter.py",
   "author_commit": "cb5ac0f74ec36ee88e7a974a393dfbef50d42da7"
@@ -73,7 +73,7 @@
   "fit's seed admission `seed == 11` becomes `seed in [11, 23, 37, 53, 71]`. No model, loss, epoch, optimizer, or sampler statement changes; sample's [101, 211, 307] and native_objective's seed 11 stay as captured."
  ],
  "seed_mapping": "fit(seed=s) seeds Python random, numpy, torch, and CUDA with s before the encoder, decoder, and loaders are built, as at seed 11. Each sample call reseeds with its sample seed.",
- "host": "xbabe1",
+ "host": "fit-machine-1",
  "device": "cuda:0",
  "gpu_memory_cap_bytes": 17179869184,
  "cpu_slot": [
@@ -94,8 +94,8 @@
   94,
   95
  ],
- "gpu_lock": "/home/ubuntu/dope-scratch-x1/.gpu-fit.lock",
- "output": "/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-seeds-v2",
+ "gpu_lock": "/path/to/operator-home/dope-scratch-x1/.gpu-fit.lock",
+ "output": "/path/to/operator-home/dope-scratch-x1/dope-rf-tabsyn-seeds-v2",
  "environment": {
   "PATH": "/usr/bin:/bin",
   "LC_ALL": "C",
@@ -123,7 +123,7 @@
   "header": "stripped into a temporary copy, as for the seed-11 TabSyn cells",
   "workers": "/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker",
   "workers_note": "rescore_ledger.WORKERS, as for the seed-11 TabSyn cells. Each fit worker is the same file with one header row added; the plan action checks this on every lineage.",
-  "host": "xbabe1, CPU only, after the GPU block closes"
+  "host": "fit-machine-1, CPU only, after the GPU block closes"
  },
  "close_utc": "2026-10-22T05:59:00Z",
  "close_rule": "No operation starts at or after close_utc. The controller checks before waiting for the host, again after it takes the GPU lock, and again after publishing the request, immediately before the spawn. A request published after close gets a spawn-refused receipt, no worker runs, and the attempt is recorded as not_started, which is final. Each operation's seconds are fixed at spawn time as the earlier of its cap and close_utc.",

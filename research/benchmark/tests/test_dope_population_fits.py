@@ -64,7 +64,7 @@ class PopulationFits(unittest.TestCase):
    p=out/'receipt.json';p.write_text(json.dumps(receipt))
    row={'job_sha256':key,'dataset':'fixture','profile':pub.PROFILES[0],'fit_seed':11,'receipt_sha256':sha(p),'status':status,'kind':'new_fit',
         'model_path':str(model),'model_sha256':sha(model),'charged_artifact_bytes':10241,'projection_bytes_included':True,'gpu_target_operator_verified':status=='ok',
-        'new_operation_seconds':1.0,'host_operation_seconds':{'xbabe1':1.0},'historical_runtime_closure_upgraded':False}
+        'new_operation_seconds':1.0,'host_operation_seconds':{'fit-machine-1':1.0},'historical_runtime_closure_upgraded':False}
    refs={str(p):sha(p),str(model):sha(model),**{str(p):sha(p) for p in worker.iterdir()}}
    if alias:
     link=base/'linked-model.dpk';link.symlink_to(model);row['model_path']=str(link)

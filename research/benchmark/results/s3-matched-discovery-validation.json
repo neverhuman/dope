@@ -16848,8 +16848,8 @@
     "dope_gpu_fit_seconds": 114.98480828106403,
     "gpu_device_energy_estimate_joules_including_idle": 10694.65019357225,
     "gpu_fit_hosts": [
-      "xbabe1",
-      "xbabe3"
+      "fit-machine-1",
+      "fit-machine-3"
     ],
     "limitations": "Operation wall times include sample and metric replays and exclude admission scans. Prior native trial wall includes fit/sample/native efficacy. Energy and earlier architecture R&D are not fully accounted here. GPU energy is device-wide, includes idle, and is not baseline-attributed; per-cell parity is not equal total R&D spend.",
     "native_new_fits": 0,
@@ -18407,11 +18407,11 @@
       "sha256": "1378099b447bc947b20f965ec80eb23a91ea5944aae6d8caee65e9658f1c8ed7"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/xbabe1/runtime.lock.json",
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/fit-machine-1/runtime.lock.json",
       "sha256": "e2d18b8017301d69f8c0e07aad8e2f2ed9721e0f55db78f57793c55a68796fea"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/xbabe3/runtime.lock.json",
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/fit-machine-3/runtime.lock.json",
       "sha256": "b422a7bdf291d394b8277b73ebac90d96b3e180dfc3b423d71ae60098f46f8db"
     },
     {
@@ -18419,7 +18419,7 @@
       "sha256": "9b9113d026d8bb37a25f3f583b1f373b5911e261f6026006fcf010382ec4a00a"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-runtime-v1/xbabe2/runtime.lock.json",
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-runtime-v1/fit-machine-2/runtime.lock.json",
       "sha256": "4baa0efce0716b165cfe3a1be35cc92c34691109ac835ead07ade36e1d16a7ef"
     },
     {

@@ -327,7 +327,7 @@ def build(repo):
                     and admitted['earlier_owners_absent'] is True
                     and capacity['reserved_ram_bytes'] <= host['memory']['MemTotal']
                     and capacity['allocated_scratch_bytes'] + capacity['reserved_scratch_bytes'] <= 200000000000
-                    and host['host'] == 'xbabe1', 'aggregate common admission gap')
+                    and host['host'] == 'fit-machine-1', 'aggregate common admission gap')
             if op['tag'] in ('sample', 'repeat'):
                 require(not host['active_gpu_processes'] and host['gpus'][0]['memory_free_mib'] >= 17 * 1024
                         and capacity['reserved_gpu_jobs'] == 1, 'sample GPU admission gap')

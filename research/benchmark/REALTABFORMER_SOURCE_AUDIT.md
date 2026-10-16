@@ -57,7 +57,7 @@ selection. Official test rows cannot enter these routines.
 Dependencies have lower bounds rather than exact runtime versions. Before any
 author initializer, inventory interpreter import roots, package source/bytecode
 and pinned model configuration. Verify compatibility, memory, 600-second neural
-fit timeout and process costs on admitted xbabe1/2/3 slots.
+fit timeout and process costs on admitted fit-machine-1/2/3 slots.
 
 Saved state includes model weights and JSON configuration, learned vocabulary
 and transformation state. The save routine can copy auxiliary checkpoints.

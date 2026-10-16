@@ -27,17 +27,17 @@ META = PREFIX + 'review-fixes-tabsyn-fidelity-v1/scalar-cells.meta.json'
 DECLARATION = 'research/benchmark/review_fixes/tabsyn-fidelity-predeclare.json'
 PANEL = PREFIX + 'review-fixes-fidelity-v1/panel.json'
 INPUTS = (RECEIPTS, PRIVACY, EXPANDED, FOLLOWON, RETAINED, NAMES, TABSYN, DIAGNOSTICS, META, DECLARATION)
-SOURCE_SHA256 = {'research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json': '069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a',
- 'research/benchmark/results/expanded-validation-diagnostics.json': 'cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb',
- 'research/benchmark/results/review-fixes-privacy-v1/panel.json': '2caa429ae03b5bbc61b30c4ce9391670f70ec9a991e2d398974a8bf3d76942f8',
+SOURCE_SHA256 = {'research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json': 'e797f3ef0c1907d51caddb06c7669683afaf96274a2af5a885ab5dd7abdaf13e',
+ 'research/benchmark/results/expanded-validation-diagnostics.json': 'd146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796',
+ 'research/benchmark/results/review-fixes-privacy-v1/panel.json': '081e8b87dd31b08b55e107566f847cb610d33e491b91f193b668617d7c1bb463',
  'research/benchmark/results/review-fixes-receipts-v1/panel.json': 'f0ecf5929825f1f07d877d4e01714f1ebd55868db3b863482f46be0f27ffdf47',
  'research/benchmark/results/review-fixes-tabsyn-fidelity-v1/scalar-cells.jsonl': 'f7df39e9a45989fbe9cb8ff127134a3edd284ad72de3530cb63ee462fce50697',
- 'research/benchmark/results/review-fixes-tabsyn-fidelity-v1/scalar-cells.meta.json': 'a18ee597a4c596e8fe840c10ee33b5e977e0111f14b764589edb125d97e6d408',
+ 'research/benchmark/results/review-fixes-tabsyn-fidelity-v1/scalar-cells.meta.json': '1a7f3e892fa0610ba98138b865dff5c2d27ac3c59dc62d4a52ee27bd592de686',
  'research/benchmark/results/review-fixes-tabsyn-v1/scalar-cells.jsonl': 'b9fd4600ec54fc89b938eb627f31d6112176fc4137e040c3686c15efd17d2d62',
  'research/benchmark/results/s3-lineage-record.json': 'bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7',
- 'research/benchmark/results/tabsyn-eight-lineage-validation/panel.json': '3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76',
- 'research/benchmark/review_fixes/tabsyn-fidelity-predeclare.json': '686742975a461e59ac486997a637ab0e817d89141159a1da0f48adfb6eaeaec0'}
-PANEL_SHA256 = 'b1c1890767b3ccd672fa1e95d3f6db9e26003760afc39214940ab308e7bff237'
+ 'research/benchmark/results/tabsyn-eight-lineage-validation/panel.json': 'ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5',
+ 'research/benchmark/review_fixes/tabsyn-fidelity-predeclare.json': 'e58a9ba4a659cfbac43d370d3eda1886254d6cb8327974b324317c67292744c8'}
+PANEL_SHA256 = 'bc2ecd817584cd309c8cd2d06cf5b5e2d6933fb3a538e5285afad60f0a77ff00'
 PRODUCER_SHA256 = '3a0f958b5b1a7b5bf1621baea6d26d48693dbc56ad2f2f8bcb5c609fad17c7a9'
 
 

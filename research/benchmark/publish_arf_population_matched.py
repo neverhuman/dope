@@ -164,7 +164,7 @@ def operation_accounting(receipt, key, pin):
             'operation scope or unstarted cost differs')
     if receipt['status'] == 'ok':
         guard.require(operation is not None and started and type(operation['exit_code']) is int
-            and operation['exit_code'] == 0 and operation['host'] == 'xbabe2' and amount <= 600,
+            and operation['exit_code'] == 0 and operation['host'] == 'fit-machine-2' and amount <= 600,
             'successful receipt lacks bounded actual operation')
     return dict(job_sha256=key, receipt_sha256=pin, status=receipt['status'],
                 operation_seconds=amount, new_operation_started=started)

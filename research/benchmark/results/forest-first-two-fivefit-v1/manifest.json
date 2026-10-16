@@ -28,9 +28,9 @@
       "sha256": "32912def33e8b10c7dc68cb89fbe2915f3d30c471c2c47e570af9285428c35f4"
     },
     "checkpoint-kpis.csv": {
-      "bytes": 4799,
+      "bytes": 4899,
       "path": "research/benchmark/results/forest-first-two-fivefit-v1/checkpoint-kpis.csv",
-      "sha256": "55566de73dc0b46795344434a965f3ec4e686b999d4a50e02e9c4995fa66bdff"
+      "sha256": "8effff1d171542253a9bfd9c237f1ed173dd448db74d28aac14a6752562fe767"
     },
     "figure-kpis.csv": {
       "bytes": 6848,
@@ -53,14 +53,14 @@
       "sha256": "636c5f6143ab69f1464dbcdc34ec14fed3d1ac7ec22b284323228b5162fb457f"
     },
     "original-verification.json": {
-      "bytes": 23158,
+      "bytes": 23998,
       "path": "research/benchmark/results/forest-first-two-fivefit-v1/original-verification.json",
-      "sha256": "a9f55bf74e2279a40caf4a837cc30c9c8207e0ea5b732d9d0dbe83ad059fc029"
+      "sha256": "f9be3b55feaa3fc30288f20835b09828c65b7ba36c3722e9c8dfe559b479e8b6"
     },
     "panel.json": {
-      "bytes": 956753,
+      "bytes": 960803,
       "path": "research/benchmark/results/forest-first-two-fivefit-v1/panel.json",
-      "sha256": "b9dd57b0c1c95ff20105577fb10ba56f6964e6c5bb534900e84a0a35e1456c67"
+      "sha256": "7aa28830a1aa914d48030770f950df63c8bdec4924465ae5f745a07600b94fce"
     },
     "panel.schema.json": {
       "bytes": 6364,
@@ -82,9 +82,9 @@
   "official_tests_opened": false,
   "original_checkpoints_sha_verified": 10,
   "original_verification_ref": {
-    "bytes": 23158,
+    "bytes": 23998,
     "path": "research/benchmark/results/forest-first-two-fivefit-v1/original-verification.json",
-    "sha256": "a9f55bf74e2279a40caf4a837cc30c9c8207e0ea5b732d9d0dbe83ad059fc029"
+    "sha256": "f9be3b55feaa3fc30288f20835b09828c65b7ba36c3722e9c8dfe559b479e8b6"
   },
   "producer_refs": {
     "plot_forest_fit_variance.py": {

@@ -84,7 +84,7 @@ KPI cannot fill this gap.
 5. Capture detailed author errors/logs only on scratch and emit typed public
    failures. Run row-copy, leakage, privacy and real-vs-real controls before
    gated claims. The released privacy metric names establish no formal DP claim.
-6. Admit each operation on xbabe1/2/3 with disjoint CPU/RAM/scratch reservations,
+6. Admit each operation on fit-machine-1/2/3 with disjoint CPU/RAM/scratch reservations,
    the unchanged 600-second neural-fit and 16-GiB GPU limits, and full failure
    accounting. Runtime or sample failure creates an explicit failed cell.
 

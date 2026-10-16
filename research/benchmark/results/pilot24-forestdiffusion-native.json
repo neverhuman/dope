@@ -3830,7 +3830,7 @@
         "dataset": "News",
         "dp_epsilon": null,
         "fit_seed": 23,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "input_files": {
           "projection.json": "369477509a10d424eb8b915a2878935486c09cac4ea9b7dc4f4c53dc74df2bb4",
           "train.csv": "64eeac2059528e44e4451419d05c1d5dd49f699c7b646d5b5971580e1811b376",
@@ -3911,7 +3911,7 @@
         "dataset": "News",
         "dp_epsilon": null,
         "fit_seed": 23,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "input_files": {
           "projection.json": "369477509a10d424eb8b915a2878935486c09cac4ea9b7dc4f4c53dc74df2bb4",
           "train.csv": "64eeac2059528e44e4451419d05c1d5dd49f699c7b646d5b5971580e1811b376",
@@ -3986,7 +3986,7 @@
         "dataset": "Adult",
         "dp_epsilon": null,
         "fit_seed": 23,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "input_files": {
           "projection.json": "f36e2dbd3e5a551e1fd7ad5aa7858769be4529652cfddde02adef52bf26a20f0",
           "train.csv": "96a19af623f408961083ca7888ff4c40f85f402632a44f8bcb3c2e4f7f5d57d1",
@@ -4061,7 +4061,7 @@
         "dataset": "Adult",
         "dp_epsilon": null,
         "fit_seed": 23,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "input_files": {
           "projection.json": "f36e2dbd3e5a551e1fd7ad5aa7858769be4529652cfddde02adef52bf26a20f0",
           "train.csv": "96a19af623f408961083ca7888ff4c40f85f402632a44f8bcb3c2e4f7f5d57d1",
@@ -4143,7 +4143,7 @@
         "dataset": "California",
         "dp_epsilon": null,
         "fit_seed": 23,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "input_files": {
           "projection.json": "1d83f3f11c2a7ff1b9cedcd7a03cd403e3e384d38d353174be26983e22a61214",
           "train.csv": "058e9f95ebb27a40a812f7948c6aeb498bb3593973ebace3a79fbc72277217f7",
@@ -4268,7 +4268,7 @@
         "dataset": "California",
         "dp_epsilon": null,
         "fit_seed": 23,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "input_files": {
           "projection.json": "1d83f3f11c2a7ff1b9cedcd7a03cd403e3e384d38d353174be26983e22a61214",
           "train.csv": "058e9f95ebb27a40a812f7948c6aeb498bb3593973ebace3a79fbc72277217f7",
@@ -9357,7 +9357,7 @@
       "Previously reported reference compute is not counted again as new fits or new sample operations."
     ],
     "report": {
-      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/pilot24-target-gpu-research.json",
+      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/pilot24-target-gpu-research.json",
       "sha256": "5a7605b2bbf3d46635c5d7bbeb4c922149bbd79e3bf75c6269cedd4637447dc3"
     },
     "summaries": [

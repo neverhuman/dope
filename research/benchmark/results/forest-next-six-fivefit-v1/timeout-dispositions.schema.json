@@ -52,7 +52,7 @@
     "round": {
       "const": {
         "bytes": 77991,
-        "path": "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
+        "path": "/path/to/operator-home/dope-scratch-x3/forest-fivefit-cpu-v1/round.lock.json",
         "sha256": "15048401c2966534e5d051aa31da3614a8a30555d163a4f59f38c3eba5f5cea3"
       }
     },
@@ -64,9 +64,9 @@
     },
     "source_files": {
       "const": {
-        "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/adapter.py": "91b5ddb995cedee35551a0c0592d069eef3819739571d4f2e961b3a5830feeba",
-        "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/controls.py": "43d4d3c6b6eeae661f882e89de444c081272f11afc9857ea25a7a7de7389d752",
-        "/home/ubuntu/dope-scratch-x3/forest-fivefit-cpu-v1/worker.py": "4c60dfa3ebdd6c5cf2a8d462ae3952f4170cbcf813763edad3e2664a75efbff1"
+        "/path/to/operator-home/dope-scratch-x3/forest-fivefit-cpu-v1/adapter.py": "91b5ddb995cedee35551a0c0592d069eef3819739571d4f2e961b3a5830feeba",
+        "/path/to/operator-home/dope-scratch-x3/forest-fivefit-cpu-v1/controls.py": "43d4d3c6b6eeae661f882e89de444c081272f11afc9857ea25a7a7de7389d752",
+        "/path/to/operator-home/dope-scratch-x3/forest-fivefit-cpu-v1/worker.py": "4c60dfa3ebdd6c5cf2a8d462ae3952f4170cbcf813763edad3e2664a75efbff1"
       }
     },
     "status_counts": {

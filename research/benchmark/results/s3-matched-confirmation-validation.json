@@ -16853,7 +16853,7 @@
         "dispatch_seconds": 1100.2302316986024,
         "failed_admissions": 1,
         "fit_entry_seconds": 55.50633497349918,
-        "host": "xbabe1",
+        "host": "fit-machine-1",
         "peak_observed_gpu_used_mib": 596,
         "successful_gpu_fits": 11
       },
@@ -16863,7 +16863,7 @@
         "dispatch_seconds": 1019.0280869016424,
         "failed_admissions": 1,
         "fit_entry_seconds": 55.53626154270023,
-        "host": "xbabe3",
+        "host": "fit-machine-3",
         "peak_observed_gpu_used_mib": 440,
         "successful_gpu_fits": 11
       }
@@ -16871,8 +16871,8 @@
     "dope_successful_fit_entry_seconds": 111.04259651619941,
     "gpu_device_energy_estimate_joules_including_idle": 10038.482898411323,
     "gpu_fit_hosts": [
-      "xbabe1",
-      "xbabe3"
+      "fit-machine-1",
+      "fit-machine-3"
     ],
     "limitations": "Operation wall times include sample and metric replays and exclude admission scans. Prior native trial wall includes fit/sample/native efficacy. Energy and earlier architecture R&D are not fully accounted here. GPU energy is device-wide, includes idle, and is not baseline-attributed; per-cell parity is not equal total R&D spend.",
     "native_new_fits": 0,
@@ -16880,7 +16880,7 @@
     "native_prior_48_trial_wall_seconds": 2243.2360990820453,
     "peak_observed_gpu_used_mib": 596,
     "sample_repeat_metric_operation_seconds": 2884.036581525579,
-    "validation_controller_host": "xbabe2",
+    "validation_controller_host": "fit-machine-2",
     "validation_controller_wall_seconds_including_admission": 5226.456210095901
   },
   "counts_as_dope_win": false,
@@ -30220,11 +30220,11 @@
       "sha256": "1378099b447bc947b20f965ec80eb23a91ea5944aae6d8caee65e9658f1c8ed7"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/xbabe1/runtime.lock.json",
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/fit-machine-1/runtime.lock.json",
       "sha256": "e2d18b8017301d69f8c0e07aad8e2f2ed9721e0f55db78f57793c55a68796fea"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/xbabe3/runtime.lock.json",
+      "path": "/mnt/fast-scratch/dope-benchmark/pilot-24h/dope-target-runtime-preflight-v1/fit-machine-3/runtime.lock.json",
       "sha256": "b422a7bdf291d394b8277b73ebac90d96b3e180dfc3b423d71ae60098f46f8db"
     },
     {
@@ -37828,7 +37828,7 @@
       "sha256": "89ffca79be9c2c92ef5735ea9860f26d5ad86245be747123d7ae6a10179de6b9"
     },
     {
-      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-runtime-v1/xbabe2/runtime.lock.json",
+      "path": "/mnt/fast-scratch/dope-benchmark/s3-native-matched-runtime-v1/fit-machine-2/runtime.lock.json",
       "sha256": "4baa0efce0716b165cfe3a1be35cc92c34691109ac835ead07ade36e1d16a7ef"
     },
     {
@@ -37960,7 +37960,7 @@
     "confirmation_trials_verified_here": 48,
     "new_tuning_trials": 0,
     "path": "research/benchmark/results/sdv-native-validation.json",
-    "sha256": "6cdbce873eb5c9df77e4e4f9649201a2da30bd3a1f0a6634a2abe2717e19ce6a"
+    "sha256": "de991009de350504de31122938997892744fa768db83ce45f83843bf157c752f"
   },
   "official_tests_opened": false,
   "paired_superiority": null,

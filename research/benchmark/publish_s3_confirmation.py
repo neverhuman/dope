@@ -169,7 +169,7 @@ def verify_frozen_sources(locks, refs):
         for name, expected in files.items():
             check(root / name, expected, dependency=True, publish=False)
     runtimes = list(fit['host_runtime_locks'].values()) + [{
-        'path': str(BASE / 's3-native-matched-runtime-v1/xbabe2/runtime.lock.json'),
+        'path': str(BASE / 's3-native-matched-runtime-v1/fit-machine-2/runtime.lock.json'),
         'sha256': samples['runtime_sha256']}]
     for runtime in runtimes:
         check(runtime['path'], runtime['sha256'])
@@ -461,7 +461,7 @@ def build():
         'native_prior_48_trial_wall_seconds': sum(f['wall_seconds'] for f in native_fits.values()),
         'native_new_fits': 0, 'native_new_tuning_trials': 0,
         'sample_repeat_metric_operation_seconds': sum(r['elapsed_seconds'] for r in operations),
-        'validation_controller_host': 'xbabe2',
+        'validation_controller_host': 'fit-machine-2',
         'validation_controller_wall_seconds_including_admission': sum(
             read(root / 'controller-attempt-0001-exit.json')['elapsed_seconds']
             for root in (DOPE / 'validation-v2', SDV)),

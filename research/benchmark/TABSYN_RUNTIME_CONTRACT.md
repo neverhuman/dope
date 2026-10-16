@@ -15,7 +15,7 @@ defines the new conditional fit/sample/native interface. Its externally
 anchored guard and actual CUDA qualifications remain required; generated
 CPU evidence does not satisfy them.
 
-The existing xbabe3 preparation provides Python 3.10.19, PyTorch 2.0.1/CUDA
+The existing fit-machine-3 preparation provides Python 3.10.19, PyTorch 2.0.1/CUDA
 11.7, NumPy 1.24.4, pandas 1.5.3, SciPy 1.10.1, sklearn 1.2.2 and XGBoost
 1.7.6. [The requirements lock](requirements-tabsyn.lock.txt) pins all 29
 resolved distributions by wheel hashes. Installed files, Python and system

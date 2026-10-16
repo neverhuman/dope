@@ -53,7 +53,7 @@ def baseline_budget_commands(command):
     """Budget prose uses the same hash-bound completion receipt as its roster."""
     source = Path(__file__).resolve().parents[3] / 'research/benchmark/results/baseline-completion-20261008-v1/panel.json'
     raw = source.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != '46abb42e01d02babe197c76e11017d8da6c309e2858a5899d6abce5b58c807dc':
+    if hashlib.sha256(raw).hexdigest() != '08d232295ed065b85f089f7419b00cfb33b4640fe956bb9e3d695f77c0dbe3f9':
         raise ValueError('baseline completion receipt drift')
     data = json.loads(raw)
     timeouts = next(r['fit_timeouts'] for r in data['rows'] if r['method'] == 'Forest-Flow')

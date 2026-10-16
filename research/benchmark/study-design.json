@@ -21,7 +21,7 @@
     "rights_required": true
   },
   "jopedime_supplement": {
-    "catalog_uri": "s3://veox-jopedime-datasets-use2/catalog/v1/catalog.jsonl",
+    "catalog_uri": "s3://DOPE_DATASET_BUCKET/catalog/v1/catalog.jsonl",
     "catalog_sha256": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120",
     "eligible_license_status": "recorded",
     "eligible_regression_count_at_catalog_freeze": 104,

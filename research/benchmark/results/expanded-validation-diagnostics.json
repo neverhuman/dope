@@ -39795,7 +39795,7 @@
   "harness": "research/benchmark/expanded_validation_metrics.py",
   "harness_sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
   "hipaa_deidentification": false,
-  "measurement_host": "xbabe3",
+  "measurement_host": "fit-machine-3",
   "measurement_python": {
     "catboost": "1.2.10",
     "numpy": "1.26.4",

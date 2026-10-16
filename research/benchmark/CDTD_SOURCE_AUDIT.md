@@ -80,5 +80,5 @@ The Python 3.10 requirements pin many direct versions but omit explicit
 scikit-learn/tqdm versions. Eager imports also reach other baselines and
 vendored code. Verify the complete runtime, import roots, bytecode and rights
 before dependency initializers. Fit/sample replay, finite rows, artifact
-privacy, real-vs-real controls and fresh aggregate xbabe1/2/3 admission remain
+privacy, real-vs-real controls and fresh aggregate fit-machine-1/2/3 admission remain
 pending. This audit establishes no formal DP or measured benchmark result.

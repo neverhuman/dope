@@ -23,7 +23,7 @@ class EnvironmentControls(unittest.TestCase):
         guard = patch.object(environment, 'PRELOAD', str(self.f.f.absent))
         guard.start(); self.addCleanup(guard.stop)
         root = '/mnt/fast-scratch/dope-benchmark/opaque-round'
-        self.proposal = {'host': 'xbabe1', 'root': root, 'entry': root + '/source/entry.py',
+        self.proposal = {'host': 'fit-machine-1', 'root': root, 'entry': root + '/source/entry.py',
             'python': '/usr/bin/python3.12', 'empty_bytecode_cache': root + '/empty-cache',
             'native_library_directory': str(self.f.f.directory_alias), 'round_sha256': 'a' * 64,
             'job_sha256': 'b' * 64, 'attempt': 1,
@@ -130,7 +130,7 @@ class EnvironmentControls(unittest.TestCase):
 
     def test_forbidden_host_retry_and_library_separators_reject(self):
         old = copy.deepcopy(self.proposal)
-        for key, value in [('host', 'xbabe0'), ('attempt', True), ('attempt', 1.0),
+        for key, value in [('host', 'fit-machine-0'), ('attempt', True), ('attempt', 1.0),
                            ('native_library_directory', '/opaque/a:/opaque/b'),
                            ('native_library_directory', '/opaque/$LIB')]:
             self.proposal = copy.deepcopy(old); self.proposal[key] = value

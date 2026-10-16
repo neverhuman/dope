@@ -102,7 +102,7 @@ def reconcile(seal=False):
     accounting.evidence(ROOT / 'round.lock.json', ROUND_SHA, ROOT.parent, refs)
     lock = accounting.read(ROOT / 'round.lock.json')
     accounting.claims(lock)
-    accounting.require(lock['allowed_gpu_hosts'] == ['xbabe1'] and lock['full_campaign_admitted'] is False
+    accounting.require(lock['allowed_gpu_hosts'] == ['fit-machine-1'] and lock['full_campaign_admitted'] is False
                        and lock['shared_kpi_used_for_selection'] is False and lock['native_kpis_cross_ranked'] is False
                        and lock['new_trials_planned'] == len(lock['jobs']) == 704
                        and lock['reused_prior_trials'] == len(lock['prior_trials']) == 96
@@ -173,8 +173,8 @@ def reconcile(seal=False):
         transport = accounting.read(ROOT / 'transport-execution-v1.lock.json')
         supervisor = accounting.read(ROOT / 'supervisor-launch.json')
         accounting.require(transport['round_sha256'] == supervisor['round_sha256'] == ROUND_SHA
-                           and transport['permitted_gpu_hosts'] == ['xbabe1']
-                           and supervisor['gpu_host'] == 'xbabe1'
+                           and transport['permitted_gpu_hosts'] == ['fit-machine-1']
+                           and supervisor['gpu_host'] == 'fit-machine-1'
                            and supervisor['transport_sha256'] == refs[str(ROOT / 'transport-execution-v1.lock.json')]
                            and supervisor['source_sha256'] == transport['launcher_sha256']
                            and transport['bootstrap_sha256'] == refs[str(ROOT / 'transport-bootstrap-v1.py')]
