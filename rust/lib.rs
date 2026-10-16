@@ -22,6 +22,7 @@ pub mod inspect;
 pub mod ledger;
 #[cfg(feature = "gpu-training")]
 mod libtorch;
+pub mod metrics;
 pub mod model;
 pub mod neural;
 pub mod neural_train;
@@ -61,6 +62,7 @@ pub use embedding::{
 pub use error::{DopeError, Result};
 pub use inspect::{Inspection, inspect_kernel};
 pub use ledger::{CampaignLedger, LedgerStatus};
+pub use metrics::{METRIC_NAME, artifact_charge};
 pub use model::{JointGenerator, Kernel, KernelProgram, NeuralArchitecture, Task};
 pub use production::{
     BuildRcOptions, KpiAggregate, KpiCell, KpiContract, KpiSummary, RunContract, build_rc_manifest,
