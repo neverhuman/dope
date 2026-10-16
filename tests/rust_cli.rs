@@ -820,6 +820,31 @@ fn native_cli_end_to_end() {
     assert_eq!(alias_inspected["metric_status"]["metric_name"], "TDL");
     assert_eq!(alias_inspected["metric_status"]["status"], "unmeasured");
     assert_eq!(alias_inspected["metric_status"]["protocol_frozen"], false);
+    let golden_charge =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/golden/charge/canonical.json");
+    let golden_inspect_out = root.join("golden-charge-inspect.json");
+    run(
+        dope_bin,
+        &[
+            "inspect",
+            "--artifact",
+            &text(&golden_charge),
+            "--out",
+            &text(&golden_inspect_out),
+        ],
+    );
+    let golden_inspected: serde_json::Value =
+        serde_json::from_slice(&fs::read(&golden_inspect_out).unwrap()).unwrap();
+    assert_eq!(golden_inspected["format"], "tdl-container-v1");
+    assert_eq!(golden_inspected["byte_scopes"]["payload_bytes"], 38);
+    assert_eq!(
+        golden_inspected["byte_scopes"]["sampling_closure_bytes"],
+        55
+    );
+    assert_eq!(
+        golden_inspected["byte_scopes"]["section_bytes"],
+        serde_json::json!([1, 3])
+    );
     run(
         dope_bin,
         &[
