@@ -154,9 +154,7 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
             Some(Value::Array(arr)) => {
                 let mut obs_set = BTreeSet::new();
                 for item in arr {
-                    let s = item
-                        .as_str()
-                        .ok_or(MetricError::new("invalid_families"))?;
+                    let s = item.as_str().ok_or(MetricError::new("invalid_families"))?;
                     require(!s.is_empty(), "invalid_families")?;
                     obs_set.insert(s);
                 }

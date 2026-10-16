@@ -71,11 +71,7 @@ fn parse_required_auditors(
     )?;
     let mut out = BTreeMap::new();
     for family in families {
-        let names = parse_names(
-            obj.get(family),
-            "invalid_auditors",
-            "duplicate_auditor",
-        )?;
+        let names = parse_names(obj.get(family), "invalid_auditors", "duplicate_auditor")?;
         out.insert(family.clone(), names.into_iter().collect());
     }
     Ok(Some(out))
@@ -165,10 +161,7 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         let auditor = get_str("auditor")?;
         require(family_set.contains(family.as_str()), "unexpected_family")?;
         if let Some(ref decl_aud) = declared_auditors {
-            require(
-                decl_aud[&family].contains(&auditor),
-                "unexpected_auditor",
-            )?;
+            require(decl_aud[&family].contains(&auditor), "unexpected_auditor")?;
         }
         let seed = count(row.get("seed").ok_or(MetricError::new("invalid_count"))?, 0)?;
         if let Some(ref decl_seeds) = declared_seeds {

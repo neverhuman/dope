@@ -227,6 +227,55 @@ pub fn strict_parse_json(text: &str) -> MetricResult<Value> {
         }
     }
 
+    let bytes = text.as_bytes();
+    let mut i = 0;
+    let mut in_string = false;
+    let mut escaped = false;
+    while i < bytes.len() {
+        let b = bytes[i];
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if b == b'\\' {
+                escaped = true;
+            } else if b == b'"' {
+                in_string = false;
+            }
+            i += 1;
+            continue;
+        }
+        if b == b'"' {
+            in_string = true;
+            i += 1;
+            continue;
+        }
+        if b == b'-' || b.is_ascii_digit() {
+            let start = i;
+            i += 1;
+            while i < bytes.len()
+                && (bytes[i].is_ascii_digit()
+                    || matches!(bytes[i], b'.' | b'e' | b'E' | b'+' | b'-'))
+            {
+                i += 1;
+            }
+            let tok = &text[start..i];
+            let has_digit = tok.bytes().any(|c| c.is_ascii_digit());
+            let is_int = has_digit && !tok.bytes().any(|c| matches!(c, b'.' | b'e' | b'E' | b'+'));
+            if is_int {
+                let ok = if tok.starts_with('-') {
+                    tok.parse::<i64>().is_ok()
+                } else {
+                    tok.parse::<u64>().is_ok()
+                };
+                if !ok {
+                    return Err(MetricError::new("invalid_json"));
+                }
+            }
+            continue;
+        }
+        i += 1;
+    }
+
     let mut de = serde_json::Deserializer::from_str(text);
     let value = StrictValue.deserialize(&mut de).map_err(|err| {
         let msg = err.to_string();
