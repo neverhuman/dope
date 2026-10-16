@@ -58,6 +58,7 @@ target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py
 # Contains the independent committed-input replay exactly once; do not also run its old selector.
 target/ci-python/bin/python -B -m unittest discover -s docs/whitepaper/scripts -p 'test_*.py'
 target/ci-python/bin/python -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v
+target/ci-python/bin/python -B -m unittest discover -s tools/claims -p 'test_*.py' -v
 bash ops/ci/check-review-fixes.sh target/ci-python/bin/python
 python3 docs/whitepaper/scripts/publication_rows.py
 git diff --exit-code -- docs/whitepaper/generated/retained-evidence.json docs/whitepaper/generated/retained-*.tex docs/whitepaper/generated/retained-figure-hashes.json docs/whitepaper/generated/baseline-coverage.json docs/whitepaper/generated/baseline-coverage.tex docs/whitepaper/figures/retained-matched-eight.pdf docs/whitepaper/generated/published-baseline-kpis.json docs/whitepaper/generated/published-baseline-kpis.csv docs/whitepaper/generated/published-baseline-figure-hashes.json docs/whitepaper/figures/published-baseline-cohorts.pdf
