@@ -1,6 +1,6 @@
 {
   "format": "dope-evidence-status-v1",
-  "summary": "MFS-v2 current evidence is selection-exposed validation; MFS-v3/v4 are historical drafts; TDL is specified and unrun.",
+  "summary": "The v2 panel is selection-exposed validation. MFS-v2/v3/v4 release scores are historical and null; TDL is specified and unrun.",
   "allowed_statuses": [
     "sealed_test",
     "validation",
@@ -184,6 +184,12 @@
       "display": "Real rows resampled",
       "evidence_status": "selection_exposed_validation",
       "qualification": "historical evidence; TDL unqualified"
+    },
+    {
+      "id": "mfs-v2",
+      "display": "MFS-v2 release score",
+      "evidence_status": "historical",
+      "qualification": "release score null"
     },
     {
       "id": "mfs-v3",
