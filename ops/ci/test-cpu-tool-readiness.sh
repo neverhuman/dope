@@ -8,7 +8,7 @@ fixture=$(mktemp -d "$root/target/cpu-tool-readiness/attempt-XXXXXXXX")
 bash_bin=$(command -v bash)
 dirname_bin=$(command -v dirname)
 mkdir_bin=$(command -v mkdir)
-tools=(cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg tar gzip)
+tools=(cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg strace tar gzip)
 
 for missing in "${tools[@]}"; do
   bin="$fixture/$missing/bin"
