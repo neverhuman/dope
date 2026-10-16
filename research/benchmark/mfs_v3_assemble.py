@@ -345,9 +345,14 @@ def _single_seed_v4_evidence(seed: dict) -> dict:
             "coverage_realism": holdout.get("coverage_realism"),
         }
 
+    legacy_cohort_seed = bool(auditors)
     return {
         **{key: seed.get(key) for key in V4_PREREQUISITES},
-        "encoder": seed.get("encoder", HEADLINE),
+        "encoder": (
+            seed.get("encoder")
+            if "encoder" in seed
+            else (HEADLINE if legacy_cohort_seed else None)
+        ),
         "distance": distance,
         "d_null": d_null,
         "d_match": d_match,
@@ -362,8 +367,16 @@ def _single_seed_v4_evidence(seed: dict) -> dict:
         "encoded_numbers": pick("encoded_numbers"),
         "real_rows": pick("real_rows"),
         "real_columns": pick("real_columns"),
-        "normalizer": seed.get("normalizer", NORMALIZER),
-        "utility_protocol": seed.get("utility_protocol", TABULAR_PROTOCOL),
+        "normalizer": (
+            seed.get("normalizer")
+            if "normalizer" in seed
+            else (NORMALIZER if legacy_cohort_seed else None)
+        ),
+        "utility_protocol": (
+            seed.get("utility_protocol")
+            if "utility_protocol" in seed
+            else (TABULAR_PROTOCOL if legacy_cohort_seed else None)
+        ),
         "utility_auditors": utility_auditors,
         "retention": ret,
         "predictor_only_retention": pick("predictor_only_retention"),
@@ -487,11 +500,11 @@ def score_lineage_v4(seeds: list[dict], bound) -> dict:
     bootstrap_vals = [ev.get("real_bootstrap_4n_retention") for ev in seed_evidences]
     if complete and all(v is not None for v in bootstrap_vals):
         bootstrap_4n = (
-            float(min(float(v) for v in bootstrap_vals))
+            float(max(float(v) for v in bootstrap_vals))
             if all(_finite(v) for v in bootstrap_vals)
             else float("nan")
         )
-    elif any(v is not None and not _finite(v) for v in bootstrap_vals):
+    elif complete and any(v is not None and not _finite(v) for v in bootstrap_vals):
         bootstrap_4n = float("nan")
     else:
         bootstrap_4n = None
