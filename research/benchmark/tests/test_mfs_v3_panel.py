@@ -502,20 +502,49 @@ class AssembleScoreTest(unittest.TestCase):
                 "coverage_realism": 0.75,
             },
         }
-        s101 = dict(base, sample_seed=101, retention=0.88, artifact_bytes=1024, encoded_numbers=64)
+        s101 = dict(
+            base,
+            sample_seed=101,
+            retention=0.88,
+            real_bootstrap_4n_retention=0.81,
+            artifact_bytes=1024,
+            encoded_numbers=64,
+        )
         s211 = dict(
             base,
             sample_seed=211,
             retention=0.90,
+            real_bootstrap_4n_retention=0.85,
             artifact_bytes=1536,
             encoded_numbers=80,
             synthetic_importances=[0.35, 0.35, 0.20, 0.10],
         )
-        s307 = dict(base, sample_seed=307, retention=0.92, artifact_bytes=2048, encoded_numbers=96)
+        s307 = dict(
+            base,
+            sample_seed=307,
+            retention=0.92,
+            real_bootstrap_4n_retention=0.83,
+            artifact_bytes=2048,
+            encoded_numbers=96,
+        )
         return [s307, s101, s211]
 
     def test_mfs_v4_lineage_scoring_and_seed_variance(self):
         from research.benchmark.mfs_v3_assemble import score_lineage_v4
+        from research.benchmark.mfs_v3_score import (
+            V4_PATH,
+            V4_SAMPLE_SEEDS,
+            V4_SEED_VARIANCE_METRICS,
+            v4_lineage_contract_frozen,
+        )
+
+        contract_doc = json.loads(V4_PATH.read_text())
+        self.assertTrue(v4_lineage_contract_frozen(contract_doc))
+        self.assertEqual(
+            list(SAMPLE_SEEDS),
+            contract_doc["lineage_aggregation"]["sample_seeds"],
+        )
+        self.assertEqual(SAMPLE_SEEDS, V4_SAMPLE_SEEDS)
 
         seeds = self._v4_seeds()
         report = score_lineage_v4(seeds, lambda _values: 0.86)
@@ -524,9 +553,22 @@ class AssembleScoreTest(unittest.TestCase):
         self.assertFalse(report["counts_as_dope_win"])
         self.assertFalse(report["official_tests_opened"])
         self.assertEqual(report["compression_metrics"]["encoded_numbers"], 96)
+        # real_bootstrap_4n_retention aggregates with max across seeds (0.85), so lift is 0.86 - 0.85.
+        self.assertAlmostEqual(
+            report["control_contrastive_lift"]["lift_vs_real_bootstrap_4n"],
+            0.86 - 0.85,
+        )
         var = report["seed_variance"]
         self.assertIsNotNone(var)
         self.assertEqual(var["sample_seeds"], list(SAMPLE_SEEDS))
+        self.assertEqual(
+            [k for k in var if k != "sample_seeds"],
+            list(V4_SEED_VARIANCE_METRICS),
+        )
+        self.assertEqual(
+            [k for k in var if k != "sample_seeds"],
+            contract_doc["lineage_aggregation"]["seed_variance_metrics"],
+        )
         self.assertAlmostEqual(var["retention_mean"], 0.90)
         self.assertAlmostEqual(var["retention_sample_sd"], 0.02)
         self.assertAlmostEqual(var["retention_min"], 0.88)
@@ -538,6 +580,7 @@ class AssembleScoreTest(unittest.TestCase):
 
     def test_mfs_v4_lineage_lcb_boundary_and_worst_seed_controls(self):
         from research.benchmark.mfs_v3_assemble import score_lineage, score_lineage_v4
+        from research.benchmark.mfs_v3_score import V4_WEIGHTS
 
         seeds = self._v4_seeds()
         at_mean = score_lineage_v4(seeds, lambda vals: sum(vals) / len(vals))
@@ -563,6 +606,7 @@ class AssembleScoreTest(unittest.TestCase):
         self.assertIsNone(failed_control["score"])
         self.assertIn("positive_predictor_lift", failed_control["failed_gates"])
         self.assertIsNone(failed_control["utility_transfer"])
+        self.assertIsNone(failed_control["knowledge_compression"])
 
         # Single-seed failure cannot be hidden even if LCB > worst control baseline.
         one_bad = self._v4_seeds()
@@ -573,7 +617,30 @@ class AssembleScoreTest(unittest.TestCase):
         self.assertIn("all_seeds_eligible", bad_seed_rep["failed_gates"])
         self.assertIn("positive_predictor_lift", bad_seed_rep["failed_gates"])
         self.assertIsNone(bad_seed_rep["utility_transfer"])
+        self.assertIsNone(bad_seed_rep["knowledge_compression"])
         self.assertIsNone(bad_seed_rep["seed_variance"])
+
+        # Direct-observation seeds missing encoder, normalizer, or utility_protocol fail closed.
+        for missing_key, failed_gate in (
+            ("encoder", "clean_encoder"),
+            ("normalizer", "shared_normalizer"),
+            ("utility_protocol", "tabular_transfer"),
+        ):
+            missing_seeds = self._v4_seeds()
+            del missing_seeds[0][missing_key]
+            missing_rep = score_lineage_v4(missing_seeds, lambda _vals: 0.86)
+            self.assertFalse(missing_rep["eligible"])
+            self.assertIsNone(missing_rep["score"])
+            self.assertIn(failed_gate, missing_rep["failed_gates"])
+            self.assertIn("lineage_schema_consistent", missing_rep["failed_gates"])
+            self.assertIn("all_seeds_eligible", missing_rep["failed_gates"])
+
+        # Incomplete seed set leaves all 7 MFS-v4 components unavailable (matching Rust).
+        incomplete_rep = score_lineage_v4(self._v4_seeds()[:2], lambda _vals: 0.86)
+        self.assertFalse(incomplete_rep["eligible"])
+        self.assertIsNone(incomplete_rep["score"])
+        self.assertIn("complete_seed_set", incomplete_rep["failed_gates"])
+        self.assertEqual(incomplete_rep["unavailable_terms"], list(V4_WEIGHTS))
 
         # Schema mismatch across seeds fails closed.
         mismatch = self._v4_seeds()
