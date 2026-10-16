@@ -1,39 +1,44 @@
+> **Archived 2026-10-15 (T-103).** This is the dated benchmark operations log that was `research/benchmark/README.md`.
+> It is kept for traceability; private host names are replaced by neutral descriptions (T-080), and nothing else is changed.
+> The current overview is [research/benchmark/README.md](../../research/benchmark/README.md); the benchmark protocol and status
+> are in [docs/benchmark.md](../benchmark.md). Entries here are historical and are not current evidence.
+
 # Offline generator benchmark (research only)
 
-[Native fit progress through index094](results/work-order-b-native-through094-fit-progress-and-cost-v1/README.md)
+[Native fit progress through index094](../../research/benchmark/results/work-order-b-native-through094-fit-progress-and-cost-v1/README.md)
 records 195 accepted fit identities out of 500 and 22 lineages with all five
 accepted fit seeds. Its nine detailed operations retain charged bytes, sampled
 GPU observations and exact grants. Fit identity coverage does not establish
 sample completeness, quality or stability; all gated scores remain unavailable.
 
-[Native indices011–014 progress and cost delta](results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/README.md)
+[Native indices011–014 progress and cost delta](../../research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/README.md)
 records three accepted GPU fits and one infrastructure-failed operation, with
 all four whole-parent costs charged. Its fixed snapshot has 115 accepted fits,
 two historical artifact caps, seven unresolved infrastructure slots and 376
 unstarted slots out of 500; subsequent live work is excluded. Quality,
 five-fit stability and gated scores remain unavailable.
 
-[Native indices009–010 GPU progress and cost delta](results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/README.md)
+[Native indices009–010 GPU progress and cost delta](../../research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/README.md)
 records one accepted seed53 fit and one infrastructure-failed seed71 operation,
 with both whole-parent costs retained. Its dated snapshot follows index008;
 partial five-fit coverage and observed residency do not establish stability
 or a gated production score.
 
-The [DOPE additional-four-seed receipt ledger](results/work-order-b-dope-additional-four-seed-dispositions-v1/README.md)
+The [DOPE additional-four-seed receipt ledger](../../research/benchmark/results/work-order-b-dope-additional-four-seed-dispositions-v1/README.md)
 accounts for 400 successful fit receipts and 2,400 sample metric receipts on
 100 lineages. Successful fit wall sums to 1,560.362 seconds; manager CPU
 accounting uses a separate basis. Seed 11 is unjoined, CUDA was requested
 without measured backend proof, and historical attempt completeness and
 gated quality scores remain unavailable. The frozen paper cut is unchanged.
 
-The [Forest-Flow additional-default fit ledger](results/work-order-b-forest400-additional-default-fit-dispositions-v1/README.md)
+The [Forest-Flow additional-default fit ledger](../../research/benchmark/results/work-order-b-forest400-additional-default-fit-dispositions-v1/README.md)
 records 400 closed slots: 291 accepted fit receipts and 109 timeouts. Seventy-one
 lineages have all four additional seeds accepted. Fit seed 11 is unjoined;
 coverage across five fits and quality scores remain null. The 72.869 GB artifact
 total is historical receipt-declared bytes, not verified retained storage.
 
-[Forest-Flow five additional homogeneous five-fit cohorts](results/forest-third-five-fivefit-v1/README.md)
-The [retained TabDDPM cohort](results/tabddpm-twelve-lineage-retained-validation/README.md)
+[Forest-Flow five additional homogeneous five-fit cohorts](../../research/benchmark/results/forest-third-five-fivefit-v1/README.md)
+The [retained TabDDPM cohort](../../research/benchmark/results/tabddpm-twelve-lineage-retained-validation/README.md)
 adds 126 measured n/4n validation cells from 21 existing model records on
 12 S3 lineages. Original author-default and author-R²-selected configurations
 are preserved, including partial successful search pools and historical
@@ -42,28 +47,28 @@ detection and empirical privacy values are reproducible. This is a completed
 available cohort with one fit seed; the 100-lineage population, five-fit
 coverage, official-test evaluation and gated production claims remain unfinished.
 
-[Forest-Flow six additional complete five-fit cohorts](results/forest-next-six-fivefit-v1/README.md)
+[Forest-Flow six additional complete five-fit cohorts](../../research/benchmark/results/forest-next-six-fivefit-v1/README.md)
 reports thirty checkpoints, 180 common validation cells, thirty native author-ML
 objective audits and between-fit SD. Eight earlier timeouts retain explicit,
 unscored dispositions. The full default/native-selected population is incomplete;
 official tests are sealed and gated claims remain null.
 
-[Forest-Flow first complete five-fit cohorts](results/forest-first-two-fivefit-v1/README.md)
+[Forest-Flow first complete five-fit cohorts](../../research/benchmark/results/forest-first-two-fivefit-v1/README.md)
 reports ten real checkpoints, sixty common validation cells, native author-ML
 objective audits and variation across five independent fits on two lineages.
 The 100-lineage matrix and all gated claims remain incomplete/null.
 
-[`LOCAL_CAPACITY_AMENDMENT.md`](LOCAL_CAPACITY_AMENDMENT.md) records the owner's
-separate 200 GB xbabe3 local scratch authorization, its immutable receipt and
+[`LOCAL_CAPACITY_AMENDMENT.md`](../../research/benchmark/LOCAL_CAPACITY_AMENDMENT.md) records the owner's
+separate 200 GB local scratch authorization on one private compute host, its immutable receipt and
 unchanged operation budgets. It grants no scientific or final-test admission.
 
-[`ARF_S3_CONTRACT.md`](ARF_S3_CONTRACT.md) records the guarded ARF fit/sample
+[`ARF_S3_CONTRACT.md`](../../research/benchmark/ARF_S3_CONTRACT.md) records the guarded ARF fit/sample
 contract, native FORDE density objective and measured synthetic serialization
 probes, including exact original-versus-guarded replay on single continuous
 and categorical columns. It prepares the next matched S3 baseline; it admits no real dataset fit
 or official test access.
 
-[`CONTAINER_VALIDATION_WORKER.md`](CONTAINER_VALIDATION_WORKER.md) describes the
+[`CONTAINER_VALIDATION_WORKER.md`](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) describes the
 source-only compressed sampling worker, owned member inputs and exact replay
 controls. Its 32-batch validation preview remains unadmitted; live rounds and
 production scores are unchanged.
@@ -180,18 +185,18 @@ SVG/PDF with `publish_native_neural_fivefit_figure`; `--from-json` regenerates
 tables using committed rights-safe results alone. This descriptive stability
 panel keeps official tests sealed and all gated release scores null.
 
-[`TABSYN_SOURCE_AUDIT.md`](TABSYN_SOURCE_AUDIT.md) records the pinned author
+[`TABSYN_SOURCE_AUDIT.md`](../../research/benchmark/TABSYN_SOURCE_AUDIT.md) records the pinned author
 defaults, native regression evaluator behavior and the remaining representation,
 runtime and sampling gaps. Its 96 source/documentation files match the archive
 and original Git blobs. This source-only audit keeps TabSyn pending and does
 not authorize fits, tuning or final evaluation.
 
-[`GPU_TARGET_REFINEMENT.md`](GPU_TARGET_REFINEMENT.md) documents the separately
+[`GPU_TARGET_REFINEMENT.md`](../../research/benchmark/GPU_TARGET_REFINEMENT.md) documents the separately
 bounded GPU target research feature, its finite training profiles, and the
 required source, runtime, artifact and resource evidence before fit admission.
 
 The complete bounded GPU target research panel is
-[`pilot24-target-gpu-research.md`](results/pilot24-target-gpu-research.md).
+[`pilot24-target-gpu-research.md`](../../research/benchmark/results/pilot24-target-gpu-research.md).
 It accounts for 24 fits and 192 validation identities across Adult, California
 and News, including the eight original raw byte failures and separate lossless
 News packing. Adult/California references retain the prior CTGAN/TVAE native
@@ -244,8 +249,8 @@ refitting. The coordinator's JopeDime fetch requires an explicit validated
 objects are read; `--profile NAME` is optional, with the standard AWS credential
 chain used when omitted. This configuration does not grant data or study admission
 or publish historical partitions; the frozen catalog identity is unchanged. Credentials stay on
-`xbabe2`. `pilot_metrics` consumes validation, never the test partition.
-On `xbabe2`, each fit and sample cell reserves space against the 200 GB scratch
+the private operator host. `pilot_metrics` consumes validation, never the test partition.
+On the operator host, each fit and sample cell reserves space against the 200 GB scratch
 ceiling, counting the whole scratch root (the output root's parent by default).
 `admission` exits nonzero while any final source, data, budget, method matrix,
 or evaluator lock is absent or incomplete; public test evaluation must call it
@@ -767,141 +772,141 @@ This component has no launcher, admitted runtime, measured speedup or campaign
 results. It leaves the live SDV round and density wait gate unchanged. The
 source-versioned execution lock and monitor remain required before use.
 
-The [GReaT source audit](GREAT_SOURCE_AUDIT.md) binds the current MIT author
+The [GReaT source audit](../../research/benchmark/GREAT_SOURCE_AUDIT.md) binds the current MIT author
 implementation and identifies its defaults, required pretrained checkpoint,
 generic native ML utility API and artifact state. It verifies no runtime or
 fit/sample execution and leaves GReaT `source_audit_pending`. A complete author
 default, defensible native scalar or tuning-inapplicable receipt, weights and
 runtime custody remain required before admission.
 
-The [REaLTabFormer source audit](REALTABFORMER_SOURCE_AUDIT.md) binds the MIT
+The [REaLTabFormer source audit](../../research/benchmark/REALTABFORMER_SOURCE_AUDIT.md) binds the MIT
 author tabular implementation, literal defaults and bootstrap sensitivity
 checkpoint policy. Its utility API requires a caller-supplied auditor and
 returns predictions; the native scalar/search/default runtime remain unfrozen.
 It stays `source_audit_pending`; no model or campaign job is admitted.
 
-The [CDTD source audit](CDTD_SOURCE_AUDIT.md) binds the MIT author code and
+The [CDTD source audit](../../research/benchmark/CDTD_SOURCE_AUDIT.md) binds the MIT author code and
 released noise-schedule variants. It identifies the author absolute RMSE-gap
 objective, terminal EMA policy, zero-categorical assumptions and checkpoint
 row retention. Native scalar/search, safe inference artifacts and executable
 runtime remain unfrozen; CDTD stays `source_audit_pending`.
 
-The [TabCascade source audit](TABCASCADE_SOURCE_AUDIT.md) distinguishes the
+The [TabCascade source audit](../../research/benchmark/TABCASCADE_SOURCE_AUDIT.md) distinguishes the
 current author Python discretizer from the paper's R track and records native
 detection quality separately from regression efficacy. Paper/default boosting
 iterations differ; runtime, track equivalence, selection and artifact contracts
 remain unfrozen. TabCascade stays `source_audit_pending`; no job is admitted.
 
-The [CTAB-GAN+ source availability audit](CTABGAN_PLUS_SOURCE_AUDIT.md) binds
+The [CTAB-GAN+ source availability audit](../../research/benchmark/CTABGAN_PLUS_SOURCE_AUDIT.md) binds
 the pinned author snapshot and inspected source-rights gap. Its explicit
 unavailable receipt admits no execution or formal DP claim and contributes
 no DOPE win. Native tuning requires rights and runtime admission first.
 
-The [MST author-source audit](MST_SOURCE_AUDIT.md) pins licensed current-author
+The [MST author-source audit](../../research/benchmark/MST_SOURCE_AUDIT.md) pins licensed current-author
 MBI source, defaults and native marginal-error evidence. Runtime, reusable-model
 adaptation, artifact-only fit/sample and native selection bindings remain
 pending. MST stays `source_audit_pending`; no execution or formal DP is admitted.
 
-The [TAEGAN source availability audit](TAEGAN_SOURCE_AUDIT.md) binds
+The [TAEGAN source availability audit](../../research/benchmark/TAEGAN_SOURCE_AUDIT.md) binds
 the pinned author snapshot, inspected source-rights gap and withheld preprocessing
 and recovery steps. Its unavailable receipt admits no execution and contributes
 no DOPE win. Native selection requires rights, a complete pipeline and runtime first.
 
-The [DP-CTGAN author-source audit](DPCTGAN_SOURCE_AUDIT.md) binds the original
+The [DP-CTGAN author-source audit](../../research/benchmark/DPCTGAN_SOURCE_AUDIT.md) binds the original
 paper-linked DP branch, source defaults and native classification efficacy.
 Source privacy ordering, stored training rows, older runtime and artifact/native
 selection gates remain pending. No formal DP, execution or scored result is admitted.
 
-The [TabbyFlow author-source audit](TABBYFLOW_SOURCE_AUDIT.md) binds the original
+The [TabbyFlow author-source audit](../../research/benchmark/TABBYFLOW_SOURCE_AUDIT.md) binds the original
 EF-VFM release and native XGBoost RMSE/AUROC outcomes. Epoch/checkpoint/sampler,
 validation target-scale, original test-path and runtime/artifact gates remain
 pending. No execution, scored comparison or production claim is admitted.
 
-The [original PATE-GAN source audit](PATEGAN_SOURCE_AUDIT.md) distinguishes the
+The [original PATE-GAN source audit](../../research/benchmark/PATEGAN_SOURCE_AUDIT.md) distinguishes the
 author-lab BSD3 implementation from the later auditing project. Native logistic
 AUC selection, generated-array/row-free artifact, preprocessing/selection privacy,
 legacy runtime and fresh capacity gates remain pending; no execution or DP claim.
 
-The [TabPFGen source/reproduction readiness receipt](TABPFGEN_SOURCE_READINESS.md)
+The [TabPFGen source/reproduction readiness receipt](../../research/benchmark/TABPFGEN_SOURCE_READINESS.md)
 records scoped unavailability for this campaign. The available Apache2 candidate
 is explicitly independent and has no verified two-experiment reproduction;
 original-author implementation/defaults and safe model-context artifacts remain
 unverified. It contributes no DOPE win or win-denominator entry.
 
-The [TabKDE source-rights receipt](TABKDE_SOURCE_RIGHTS.md) binds the already
+The [TabKDE source-rights receipt](../../research/benchmark/TABKDE_SOURCE_RIGHTS.md) binds the already
 recorded original commit and selected rights scope. Execution rights and a
 licensed independent implementation with two reproductions remain unverified;
 this unavailable method contributes no DOPE win or win-denominator entry.
 
-The [GEM-T source/reproduction readiness receipt](GEMT_SOURCE_READINESS.md)
+The [GEM-T source/reproduction readiness receipt](../../research/benchmark/GEMT_SOURCE_READINESS.md)
 records the bounded inspected provenance and an unrelated same-name candidate.
 Original executable source and a two-experiment independent reproduction remain
 unverified; its paper objective is identified without admitting tuning or jobs.
 This unavailable method contributes no DOPE win or win-denominator entry.
 
-The [compressed-member contract](CONTAINER_MEMBER_CONTRACT.md) verifies the
+The [compressed-member contract](../../research/benchmark/CONTAINER_MEMBER_CONTRACT.md) verifies the
 complete encoded byte charge and independently frozen kernel/projection digests
 before returning immutable owned members. It admits no sampler, runtime or job;
 compressed-candidate validation still waits on predecessor closure and capacity.
 
 
-The [compressed-worker startup source gate](CONTAINER_VALIDATION_WORKER.md)
+The [compressed-worker startup source gate](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md)
 checks the exact fifteen application guard files before imports and returns
 immutable owned source bytes on the original whole-batch timer. This source-only
 preparation admits no interpreter, runtime, sampler or dispatch; SDV closure,
 density priority and fresh capacity remain required.
 
 
-The [owned startup code preparation](CONTAINER_VALIDATION_WORKER.md) compiles
+The [owned startup code preparation](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) compiles
 verified guard source bytes without running initializers or reading cached
 bytecode. Compiler flags, source digests and the original deadline remain bound;
 this prepares no executable child, runtime certification or dispatch admission.
 
-The [proposed guard module bindings](CONTAINER_VALIDATION_WORKER.md) pair those
+The [proposed guard module bindings](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) pair those
 owned code objects with verified source paths and fixed private package names.
 Repeated source membership and helper checks retain the original deadline.
 No initializer or namespace is installed; closed imports, runtime/lease/capacity
 and predecessor/density admission remain required before execution.
 
-The [static guard import plan](CONTAINER_VALIDATION_WORKER.md) records import
+The [static guard import plan](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) records import
 declarations from matching owned source bytes and orders declared dependencies.
 It rejects unknown or cyclic guard dependencies without resolving a module or
 running an initializer. Actual imports, runtime and dispatch remain unadmitted.
 
-The [proposed import hook](CONTAINER_VALIDATION_WORKER.md) matches each guard's
+The [proposed import hook](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) matches each guard's
 declared requests to copied preowned references and empty private namespaces.
 It performs no normal import search or initializer execution; module identity,
 actual initialization and runtime/dispatch admission remain separate gates.
 
-The [proposed builtin bindings](CONTAINER_VALIDATION_WORKER.md) copy a fixed
+The [proposed builtin bindings](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) copy a fixed
 selection of caller-owned references and substitute the prepared import hook.
 Dependency-ordered instructions leave namespaces empty; builtin identity,
 actual binding/initialization and runtime/dispatch admission remain separate.
 
-The [private namespace binding](CONTAINER_VALIDATION_WORKER.md) places that
+The [private namespace binding](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) places that
 read-only builtin map in new guard dictionaries with exact metadata checks and
 cleanup of its own bindings on failure. It installs no live registry entry and
 runs no real initializer; actual startup and dispatch remain unadmitted.
 
-The [proposed registry additions](CONTAINER_VALIDATION_WORKER.md) check private
+The [proposed registry additions](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) check private
 package-name exclusion in a caller-owned dictionary before preparation and after
 final custody. Sixteen additions retain the prepared module identities and order;
 no registry write or real initializer runs. Atomic installation and actual startup
 remain separate admission requirements.
 
-The [private registry overlay](CONTAINER_VALIDATION_WORKER.md) combines copied
+The [private registry overlay](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) combines copied
 caller-owned selections with the sixteen proposed guard references in a read-only
 map. Repeated identity checks reject changes to the supplied registry; preparation
 never activates the overlay or runs real guards. Startup remains unadmitted.
 
-The [guard initialization plan](CONTAINER_VALIDATION_WORKER.md) binds owned code
+The [guard initialization plan](../../research/benchmark/CONTAINER_VALIDATION_WORKER.md) binds owned code
 objects to those private module and namespace references in dependency order.
 It recompiles verified source bytes and compares executable metadata and nested
 constants, including floating-point sign bits. Preparation runs no initializer;
 live registry activation and complete execution admission remain prerequisites.
 
 
-The [complete CTGAN / TVAE native ledger](results/sdv-s3-population-native.md)
+The [complete CTGAN / TVAE native ledger](../../research/benchmark/results/sdv-s3-population-native.md)
 accounts for all100 matched S3 lineages and 800 logical tuning trials, including
 704 new attempts and 96 immutable historical reuses. Native selection uses the
 frozen study mean of author-library LR and MLP regression efficacy, with
@@ -1117,7 +1122,7 @@ A research round must freeze its discovery/confirmation cohorts, candidate
 grid, source/binary/runtime hashes, sample schedule and compute ceiling before
 launch. Each fit retains the 600-second and 16-GiB limits, charges model plus
 projection bytes against L3, and rechecks aggregate CPU/RAM/scratch/GPU owners.
-Only quiet xbabe1/2/3 capacity is eligible. All trials and cost remain visible;
+Only quiet capacity on the admitted private hosts is eligible. All trials and cost remain visible;
 official tests stay sealed and gated scores stay null until their evidence is
 complete. Prior frozen rounds and published benchmark values are unchanged.
 
@@ -1138,11 +1143,11 @@ not admit a full campaign, an SDV v3 rerun, sealed tests, or a gated score.
 
 ### Bounded target refinement progress
 
-The [closed progress batch](results/dope-target-refinement-progress.md) contains
+The [closed progress batch](../../research/benchmark/results/dope-target-refinement-progress.md) contains
 three GPU fits on one training-derived S3 discovery lineage and all18 declared
 validation cells, with two distinct artifacts. It retains the recorded
 infrastructure interruption and its separately queued attempt2. Twenty unstarted
-fits continue on freshly admitted xbabe1/2/3 capacity; xbabe0 remains excluded.
+fits continue on freshly admitted private-host capacity; one host remains excluded.
 The full24-fit discovery is pending. This snapshot selects no global family and
 admits no production, release or superiority score. Matched references retain
 their original default/native likelihood selections.
@@ -1155,7 +1160,7 @@ the public manifest pins every published output and its immutable receipt lock.
 
 ### Completed bounded refinement discovery
 
-The [complete discovery panel](results/dope-target-refinement-discovery.md)
+The [complete discovery panel](../../research/benchmark/results/dope-target-refinement-discovery.md)
 supersedes the pending status of the historical progress snapshot above.
 All 24 fit cells on six stratified S3 lineages are accounted: 23 successes and
 one charged artifact rejection. All 25 attempt receipts include the original
@@ -1175,7 +1180,7 @@ receipt locks are rehashed before metrics are read and again before publication.
 
 ## Matched neural S3 validation
 
-[The complete neural/DOPE panel](results/sdv-matched-population-validation.md) accounts for 4,800 logical cells across all 100 rights-cleared S3 lineages: four unchanged DOPE GPU profiles and original default/native-selected CTGAN/TVAE. CTGAN/TVAE maximize their frozen native regression efficacy KPI; common retention never selects their configurations. Only existing sealed samples are scored.
+[The complete neural/DOPE panel](../../research/benchmark/results/sdv-matched-population-validation.md) accounts for 4,800 logical cells across all 100 rights-cleared S3 lineages: four unchanged DOPE GPU profiles and original default/native-selected CTGAN/TVAE. CTGAN/TVAE maximize their frozen native regression efficacy KPI; common retention never selects their configurations. Only existing sealed samples are scored.
 
 SDV supplies 486 measured cells and 1,914 explicitly sample-unavailable cells, with 81/400 configuration bindings available. Its 704 new native attempts retain 154 successes, 524 deadline-unstarted plus 1 deadline-truncated scheduling cutoffs, and 25 infrastructure interruptions. Those cutoffs do not establish method failures. At 4n CatBoost, the fixed DOPE 12/2048 profile and native baselines have 21 complete paired informative lineages; medians 0.953366 (DOPE), −0.0812588 (CTGAN), 0.669033 (TVAE). These descriptive results use one fit seed and an availability-limited subset.
 
@@ -1185,7 +1190,7 @@ Regenerate with `python3 -B -m research.benchmark.publish_sdv_matched --output-d
 
 ### Disjoint GPU refinement confirmation
 
-[`results/dope-target-refinement-confirmation.md`](results/dope-target-refinement-confirmation.md)
+[`results/dope-target-refinement-confirmation.md`](../../research/benchmark/results/dope-target-refinement-confirmation.md)
 reports the completed two-profile, six-lineage confirmation panel: 12 GPU fits
 and all 72 validation sample cells, plus 360 unchanged matched default/native
 density and earlier DOPE reference cells. The confirmation lineages are disjoint
@@ -1210,7 +1215,7 @@ external receipt/reconciliation/recursive-output digests, and the unchanged
 all unavailable outcomes and full model/projection charges before comparing the
 three fixed DOPE research profiles. The publisher refuses a partial live round. Parent receipt references must be consistently covered by the authenticated inventory. Each logical metric is bound to its exact frozen sample, physical job, closed receipt and replay identity; input fit seeds are checked before constructing output cells.
 
-The [complete matched panel](results/arf-matched-population-validation.md)
+The [complete matched panel](../../research/benchmark/results/arf-matched-population-validation.md)
 accounts for all 1,200 logical validation cells. The renderer and manifest
 generator replay descriptive dataset pairs from the committed report. Sample
 seeds reduce within lineage first; availability cohorts remain explicit. At 4n
@@ -1246,7 +1251,7 @@ python3 -B -m research.benchmark.publish_arf_population_matched_manifest \
 
 `results/work-order-b-costs-v1/` records measured closed research costs from immutable receipts and the exact missing evidence for all six MFS-v2 components and hard gates. Physical aliases are charged once; historical shared-GPU timing and hardware remain unknown where receipts omitted them. Scheduling cutoffs carry no method-failure conclusion. MFS-v2, PTF-v1, release-safe and superiority remain null.
 
-[`results/work-order-b-compute-costs-v2/`](results/work-order-b-compute-costs-v2/README.md)
+[`results/work-order-b-compute-costs-v2/`](../../research/benchmark/results/work-order-b-compute-costs-v2/README.md)
 adds completed ARF sampling and measurement, Forest's completed prefix and
 infrastructure attempts, and a frozen TabSyn fit checkpoint. Operation and
 scheduler times, artifact inventories and missing resource evidence are reported
@@ -1257,7 +1262,7 @@ Reproduce the tables and schemas with `python3 -B -m research.benchmark.publish_
 
 ## Complete ARF native population ledger
 
-The [ARF native ledger](results/arf-s3-population-native.md) accounts for all
+The [ARF native ledger](../../research/benchmark/results/arf-s3-population-native.md) accounts for all
 800 fits on the same 100 bounded S3 training-derived lineages. The unchanged
 author ARF implementation (citation key `watson2023adversarial`) is selected by
 held-out FORDE mean log-density from a study implementation of its leaf mixture,
@@ -1282,7 +1287,7 @@ either publisher mode.
 
 ### Complete population refinement training
 
-The [200-cell refinement training ledger](results/dope-target-refinement-population-fits.md)
+The [200-cell refinement training ledger](../../research/benchmark/results/dope-target-refinement-population-fits.md)
 accounts for two previously declared GPU profiles over all 100 bounded S3
 training-derived lineages. It retains 136 OK cells (112 new plus 24 immutable
 prior successes), 61 transport/prelaunch infrastructure failures, one foreign
@@ -1305,7 +1310,7 @@ directories, omitted projection charges and incomplete profile coverage.
 
 ### Complete population refinement common validation
 
-The [matched refinement panel](results/dope-target-refinement-population-validation.md)
+The [matched refinement panel](../../research/benchmark/results/dope-target-refinement-population-validation.md)
 accounts for both previously frozen deeper DOPE GPU profiles across all 100
 bounded S3 training-derived lineages: 1,200 logical cells at n/4n, one fit seed
 and three sample seeds. It binds the complete training ledger above, 112 new
@@ -1380,7 +1385,7 @@ python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics
 
 ### TabSyn default native audit
 
-The [100-lineage native ledger](results/tabsyn-default100-native-audit.md)
+The [100-lineage native ledger](../../research/benchmark/results/tabsyn-default100-native-audit.md)
 records 77 admitted but uninformative author targets, 14 audit-monitoring
 unavailable cases, and nine input-monitoring unavailable cases. All 91 physical
 workers exited zero; monitoring failures remain unavailable. No native winner
@@ -1445,13 +1450,13 @@ Run the generated receipt controls with:
 python3 -B -m unittest research.benchmark.tests.test_tabsyn_metric_operation_inputs research.benchmark.tests.test_tabsyn_closed143_inputs research.benchmark.tests.test_tabsyn_metric_operation_positive -v
 ```
 
-The [complete additional ARF fit ledger](results/arf-complete-additional-fits-v1/README.md) records all 796 physical / 800 logical refits on 100 frozen lineages, with native density values, checkpoint hashes and costs. Common five-fit evaluation coverage remains a separate running matrix.
+The [complete additional ARF fit ledger](../../research/benchmark/results/arf-complete-additional-fits-v1/README.md) records all 796 physical / 800 logical refits on 100 frozen lineages, with native density values, checkpoint hashes and costs. Common five-fit evaluation coverage remains a separate running matrix.
 
-The [six-component coverage ledger](results/work-order-b-six-component-coverage-v1/README.md) maps the exact MFS-v2 components and hard gates to available evidence and missing inputs at the pinned `aca4760` snapshot. Later campaign progress is excluded from its counts. Component, production and superiority scores remain null.
+The [six-component coverage ledger](../../research/benchmark/results/work-order-b-six-component-coverage-v1/README.md) maps the exact MFS-v2 components and hard gates to available evidence and missing inputs at the pinned `aca4760` snapshot. Later campaign progress is excluded from its counts. Component, production and superiority scores remain null.
 
-The [closed operations006–007 cost delta](results/work-order-b-native-indices006-007-cost-delta-v1/README.md) accounts for two infrastructure attempts and the exact 500-slot snapshot: 110 accepted, two historical caps, five unresolved infrastructure slots and 383 snapshot-unstarted. The 118 inclusive budget units and 117 canonical accounted slots use distinct count bases; historical-inclusive and new-parent clocks are alternatives. It adds no quality or production claim.
+The [closed operations006–007 cost delta](../../research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/README.md) accounts for two infrastructure attempts and the exact 500-slot snapshot: 110 accepted, two historical caps, five unresolved infrastructure slots and 383 snapshot-unstarted. The 118 inclusive budget units and 117 canonical accounted slots use distinct count bases; historical-inclusive and new-parent clocks are alternatives. It adds no quality or production claim.
 
-The [index008 GPU operation and progress ledger](results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/README.md) records one measured accepted fit: 424.280 seconds, 5,723 charged artifact bytes and a frozen 111/500 accepted-fit count. Only two lineages have all five accepted seeds; resource observations are not true peaks and gated scores remain null.
+The [index008 GPU operation and progress ledger](../../research/benchmark/results/work-order-b-native-index008-real-GPU-progress-and-cost-v1/README.md) records one measured accepted fit: 424.280 seconds, 5,723 charged artifact bytes and a frozen 111/500 accepted-fit count. Only two lineages have all five accepted seeds; resource observations are not true peaks and gated scores remain null.
 
 ## Auditor resource profile
 
@@ -1459,11 +1464,11 @@ For new measurements, `bounded_auditors._model`, `c2st` and `evaluate` keep CatB
 
 ## BeyondArena training input preparation
 
-The [prospective input rule](beyondarena_train_screen.README.md) keeps at most
+The [prospective input rule](../../research/benchmark/beyondarena_train_screen.README.md) keeps at most
 12 complete raw predictors within the original 2,000-feature projection cap,
 preserves the target and complete TRAIN row groups, and limits successor
 planning to a supplied hash-bound catalog. Authenticated TRAIN exports and
 evaluator intersection receipts are still required. Real family preparation,
 retention and byte charges remain unmeasured; the 73-family lock is unchanged.
 
-The [four-fit producer-reported utility description](results/work-order-b-dope-producer-reported-four-fit-utility-v1/README.md) summarizes 400 additional fit receipts and 2,400 validation sample receipts across all 100 frozen lineages. It retains per-seed results, fixed denominators and unclipped retention, with a reproducible table and SVG. Historical evaluator/runtime identity and compiler equivalence remain unverified; the seed11 join, paired comparisons, production scores, GPU certification and complete artifact-byte claims remain null.
+The [four-fit producer-reported utility description](../../research/benchmark/results/work-order-b-dope-producer-reported-four-fit-utility-v1/README.md) summarizes 400 additional fit receipts and 2,400 validation sample receipts across all 100 frozen lineages. It retains per-seed results, fixed denominators and unclipped retention, with a reproducible table and SVG. Historical evaluator/runtime identity and compiler equivalence remain unverified; the seed11 join, paired comparisons, production scores, GPU certification and complete artifact-byte claims remain null.
