@@ -9,11 +9,13 @@ import json
 from pathlib import Path
 import subprocess
 import struct
+import sys
 
 from .access import AccessTrace
-from .aggregate import XorShift64
 from .charge import canonical_container
 from .common import MetricError, count, number, require
+from .literal_worker import _literal_payload, _rows
+from .runtime import closure_inventory, python_runtime_paths
 
 GENERATOR_REGISTRY = {
     "dope": {"status": "conformance_adapter", "native": True},
@@ -26,27 +28,6 @@ GENERATOR_REGISTRY = {
 
 def _json(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
-
-
-def _rows(text, schema):
-    table = list(csv.reader(io.StringIO(text)))
-    headers = [column["source_name"] for column in schema["columns"]]
-    if table and table[0] == headers:
-        table = table[1:]
-    rows = [[number(float(cell)) for cell in row] for row in table]
-    require(rows and rows[0] and all(len(row) == len(rows[0]) for row in rows), "invalid_table")
-    return rows
-
-
-def _literal_payload(artifact):
-    """Admit the single canonical literal section, including all framing bytes."""
-    name = b"literal_payload"
-    header = b"TDL1" + struct.pack("<II", 1, len(name)) + name
-    require(artifact.startswith(header) and len(artifact) >= len(header) + 8, "invalid_artifact")
-    size = struct.unpack("<Q", artifact[len(header):len(header) + 8])[0]
-    content = artifact[len(header) + 8:]
-    require(len(content) == size, "invalid_artifact")
-    return content
 
 
 class StandaloneGenerator(ABC):
@@ -117,24 +98,21 @@ class LiteralGenerator(StandaloneGenerator):
 
     def sample(self, rows, seed):
         count(rows, 1)
-        rng = XorShift64(seed)
+        count(seed)
         require(self._artifact is not None, "generator_not_loaded")
-        trace = AccessTrace({self._artifact: "payload"})
         try:
-            with trace.activate():
-                payload = self._artifact.read_bytes()
-                content = _literal_payload(payload)
-                raw = content if self.method == "copied_rows" else gzip.decompress(content)
-                document = json.loads(raw)
-                require(document["format"] == "tdl-literal-v1" and document["method"] == self.method,
-                        "invalid_artifact")
-                source = document["rows"] if self.method == "copied_rows" else _rows(document["original_csv"], document["schema"])
-                require(type(source) is list and bool(source), "invalid_table")
-                sampled = [list(source[rng.index(len(source))]) for _ in range(rows)]
+            content = _literal_payload(self._artifact.read_bytes())
+            closure, paths = closure_inventory(python_runtime_paths())
+            manifest = {"sections": [{"name": "literal_payload", "hex": content.hex()}], "closure_files": closure}
+            trace = AccessTrace.from_manifest(self._artifact, manifest, paths)
+            worker = str(Path(__file__).with_name("literal_worker.py"))
+            stdout, receipt = trace.run([sys.executable, "-S", "-B", worker, str(self._artifact),
+                                         self.method, str(rows), str(seed)])
+            sampled = json.loads(stdout)
         except (OSError, ValueError, KeyError, TypeError):
             raise MetricError("generator_sample_failed") from None
         return sampled, {"method": self.method, "rows": rows, "seed": seed,
-                         "payload_bytes": len(payload), "access_trace": trace.receipt(), "citable": False}
+                         **trace.accounting, "access_trace": receipt, "citable": False}
 
 
 class DopeGenerator(StandaloneGenerator):

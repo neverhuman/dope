@@ -212,6 +212,25 @@ class ChargeAndTraceTests(unittest.TestCase):
 
 
 class StandaloneGeneratorTests(unittest.TestCase):
+    def test_literal_worker_rejects_malformed_payloads_without_private_diagnostics(self):
+        worker = ROOT / "research/transfer/tdl/literal_worker.py"
+        gzip_header = bytes.fromhex("1f8b0800000000000003")
+        cases = (("copied_rows", b'{"private-source": invalid}'),
+                 ("gzip_original", b"private-source-header"),
+                 ("gzip_original", gzip_header),
+                 ("gzip_original", gzip_header + b"\x07private-source-deflate"))
+        for method, content in cases:
+            with self.subTest(method=method, content=content), workspace() as directory:
+                artifact = Path(directory) / "private-source-artifact"
+                artifact.write_bytes(charge.canonical_container(
+                    [{"name": "literal_payload", "hex": content.hex()}]))
+                result = subprocess.run([sys.executable, "-S", "-B", str(worker),
+                                         str(artifact), method, "1", "1"],
+                                        capture_output=True, cwd=directory)
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(result.stdout, b"")
+                self.assertEqual(result.stderr, b"")
+
     def test_literal_controls_export_reload_in_fresh_process_with_access_trace(self):
         for method in ("copied_rows", "gzip_original"):
             with self.subTest(method=method), workspace() as directory:
@@ -233,7 +252,13 @@ class StandaloneGeneratorTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout)
                 receipt = json.loads(result.stdout)
                 self.assertEqual(receipt["payload_bytes"], artifact.stat().st_size)
-                self.assertEqual(receipt["access_trace"]["events"], [{"operation": "read", "inventory_id": "payload"}])
+                trace = receipt["access_trace"]
+                self.assertEqual(trace["status"], "passed")
+                self.assertEqual(trace["coverage"], "all_threads_and_native_file_opens")
+                self.assertIn({"operation": "read", "inventory_id": "payload"}, trace["events"])
+                self.assertGreater(receipt["shared_bytes"], 0)
+                self.assertEqual(receipt["sampling_closure_bytes"], receipt["payload_bytes"] + receipt["shared_bytes"])
+                self.assertEqual(trace["byte_accounting"]["artifact_sha256"], inventory["artifact_sha256"])
                 self.assertNotIn(str(root), result.stdout)
                 self.assertEqual(len(output.read_text().splitlines()), 12)
 

@@ -24,6 +24,37 @@ fn text(path: &Path) -> String {
 }
 
 #[test]
+fn inspect_bare_tdl1_keeps_sampling_closure_unmeasured() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("target/cli-inspect-closure")
+        .join(std::process::id().to_string());
+    fs::create_dir_all(&root).unwrap();
+    let artifact = root.join("bare.tdl1");
+    let inspection = root.join("inspect.json");
+    let bytes = dope_kernel::metrics::artifact_charge::canonical_container(&serde_json::json!([
+        {"name": "weights", "hex": "010203"}
+    ]))
+    .unwrap();
+    fs::write(&artifact, &bytes).unwrap();
+    run(
+        env!("CARGO_BIN_EXE_dope"),
+        &[
+            "inspect",
+            "--artifact",
+            &text(&artifact),
+            "--out",
+            &text(&inspection),
+        ],
+    );
+    let inspected: serde_json::Value =
+        serde_json::from_slice(&fs::read(inspection).unwrap()).unwrap();
+    assert_eq!(inspected["format"], "tdl-container-v1");
+    assert_eq!(inspected["byte_scopes"]["payload_bytes"], bytes.len());
+    assert!(inspected["byte_scopes"]["sampling_closure_bytes"].is_null());
+    assert_eq!(inspected["metric_status"]["status"], "unmeasured");
+}
+
+#[test]
 fn explicit_fit_seed_preserves_historical_seed_11_artifact_bytes() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("target/cli-fit-seed-conformance")
@@ -820,6 +851,31 @@ fn native_cli_end_to_end() {
     assert_eq!(alias_inspected["metric_status"]["metric_name"], "TDL");
     assert_eq!(alias_inspected["metric_status"]["status"], "unmeasured");
     assert_eq!(alias_inspected["metric_status"]["protocol_frozen"], false);
+    let golden_charge =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/golden/charge/canonical.json");
+    let golden_inspect_out = root.join("golden-charge-inspect.json");
+    run(
+        dope_bin,
+        &[
+            "inspect",
+            "--artifact",
+            &text(&golden_charge),
+            "--out",
+            &text(&golden_inspect_out),
+        ],
+    );
+    let golden_inspected: serde_json::Value =
+        serde_json::from_slice(&fs::read(&golden_inspect_out).unwrap()).unwrap();
+    assert_eq!(golden_inspected["format"], "tdl-container-v1");
+    assert_eq!(golden_inspected["byte_scopes"]["payload_bytes"], 38);
+    assert_eq!(
+        golden_inspected["byte_scopes"]["sampling_closure_bytes"],
+        55
+    );
+    assert_eq!(
+        golden_inspected["byte_scopes"]["section_bytes"],
+        serde_json::json!([1, 3])
+    );
     run(
         dope_bin,
         &[

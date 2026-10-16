@@ -2,10 +2,11 @@ use std::fs;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::codec::{ArtifactAccounting, LoadedKernel, account_artifact, load_kernel};
-use crate::error::{Result, io_error};
-use crate::metrics::METRIC_NAME;
+use crate::error::{DopeError, Result, io_error};
+use crate::metrics::{METRIC_NAME, artifact_charge};
 use crate::model::{Dependence, KernelProgram, Marginal, NeuralArchitecture, Noise, Target};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -45,10 +46,104 @@ pub struct Inspection {
     pub sexpr: String,
 }
 
+impl Inspection {
+    /// Total framing bytes across the container header and section headers.
+    pub fn framing_bytes(&self) -> Option<usize> {
+        self.byte_accounting.as_ref().map(|acc| {
+            acc.header_bytes
+                + acc
+                    .sections
+                    .iter()
+                    .map(|section| section.framing_bytes)
+                    .sum::<usize>()
+        })
+    }
+}
+
+fn inspect_tdl1_bytes(bytes: &[u8], sampling_closure_bytes: Option<usize>) -> Result<Inspection> {
+    let accounting = artifact_charge::account_tdl1_container(bytes)
+        .map_err(|err| DopeError::Codec(err.reason.into()))?;
+    let payload_bytes = bytes.len();
+    let section_bytes = accounting
+        .sections
+        .iter()
+        .map(|s| s.encoded_bytes)
+        .collect();
+    let section_count = accounting.sections.len();
+    Ok(Inspection {
+        format: "tdl-container-v1".into(),
+        version: 1,
+        artifact_bytes: payload_bytes,
+        byte_scopes: InspectionByteScopes {
+            payload_bytes,
+            sampling_closure_bytes,
+            section_bytes,
+        },
+        byte_accounting: Some(accounting),
+        metric_status: InspectionMetricStatus {
+            metric_name: METRIC_NAME.to_owned(),
+            status: "unmeasured".to_owned(),
+            protocol_frozen: false,
+        },
+        task: "tdl_container".into(),
+        rows_fitted: 0,
+        positional_features: 0,
+        target_position: "none".into(),
+        decoder_id: None,
+        quantization_bits: None,
+        compliant: None,
+        schema: Vec::new(),
+        marginals: Vec::new(),
+        dependence: "tdl1".into(),
+        target: "tdl1".into(),
+        noise: "tdl1".into(),
+        sexpr: format!("(tdl1 v=1 sections={section_count} bytes={payload_bytes})"),
+    })
+}
+
+fn extract_charge_manifest_input(value: &Value) -> Option<&Value> {
+    let obj = value.as_object()?;
+    if obj.contains_key("sections") && obj.contains_key("closure_files") {
+        return Some(value);
+    }
+    if obj.get("component").and_then(Value::as_str) == Some("charge") {
+        let input = obj.get("input")?;
+        let in_obj = input.as_object()?;
+        if in_obj.contains_key("sections") && in_obj.contains_key("closure_files") {
+            return Some(input);
+        }
+    }
+    None
+}
+
 pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
-    let artifact_bytes = fs::metadata(path)
-        .map_err(|error| io_error(path, error))?
-        .len() as usize;
+    let raw_bytes = fs::read(path).map_err(|error| io_error(path, error))?;
+    if raw_bytes.starts_with(artifact_charge::MAGIC) {
+        return inspect_tdl1_bytes(&raw_bytes, None);
+    }
+    if !raw_bytes.starts_with(crate::codec::MAGIC)
+        && !raw_bytes.starts_with(crate::codec::V2_MAGIC)
+        && let Ok(json_val) = serde_json::from_slice::<Value>(&raw_bytes)
+        && let Some(charge_input) = extract_charge_manifest_input(&json_val)
+    {
+        let evaluated = artifact_charge::evaluate(charge_input);
+        if evaluated.get("status").and_then(Value::as_str) != Some("complete") {
+            let reason = evaluated
+                .get("reason")
+                .and_then(Value::as_str)
+                .unwrap_or("invalid_charge_manifest");
+            return Err(DopeError::Codec(reason.into()));
+        }
+        let container = artifact_charge::canonical_container(&charge_input["sections"])
+            .map_err(|err| DopeError::Codec(err.reason.into()))?;
+        let closure_total = evaluated
+            .get("sampling_closure_bytes")
+            .and_then(Value::as_u64)
+            .map(|v| v as usize);
+        return inspect_tdl1_bytes(&container, closure_total);
+    }
+
+    let artifact_bytes = raw_bytes.len();
     let loaded = load_kernel(path)?;
     let native_version = if matches!(loaded, LoadedKernel::V3(_)) {
         3
@@ -56,9 +151,7 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
         2
     };
     let byte_accounting = if native_version == 3 {
-        Some(account_artifact(
-            &fs::read(path).map_err(|error| io_error(path, error))?,
-        )?)
+        Some(account_artifact(&raw_bytes)?)
     } else {
         None
     };
@@ -230,5 +323,283 @@ pub fn inspect_kernel(path: &Path) -> Result<Inspection> {
                 sexpr: value["program"].as_str().unwrap_or("").into(),
             })
         }
+    }
+}
+
+/// Reconcile `inspect_kernel` with `artifact_charge` for a native `DPK3` artifact,
+/// binary `TDL1` container, or JSON `TDL1` charge manifest, returning the exact
+/// `artifact_charge` JSON record after verifying equality with `Inspection`.
+/// Bare artifacts have no closure declaration and return an incomplete charge.
+pub fn inspect_charge(path: &Path) -> Result<Value> {
+    let inspection = inspect_kernel(path)?;
+    let raw_bytes = fs::read(path).map_err(|error| io_error(path, error))?;
+    let charge = if !raw_bytes.starts_with(crate::codec::MAGIC)
+        && !raw_bytes.starts_with(crate::codec::V2_MAGIC)
+        && !raw_bytes.starts_with(artifact_charge::MAGIC)
+        && let Ok(json_val) = serde_json::from_slice::<Value>(&raw_bytes)
+        && let Some(charge_input) = extract_charge_manifest_input(&json_val)
+    {
+        artifact_charge::evaluate(charge_input)
+    } else {
+        artifact_charge::evaluate_artifact_bytes(&raw_bytes, &Value::Null, None)
+    };
+    if charge.get("status").and_then(Value::as_str) == Some("incomplete") {
+        return Ok(charge);
+    }
+    if charge.get("status").and_then(Value::as_str) != Some("complete") {
+        let reason = charge
+            .get("reason")
+            .and_then(Value::as_str)
+            .unwrap_or("invalid_container");
+        return Err(DopeError::Codec(reason.into()));
+    }
+    let charge_payload = charge["payload_bytes"].as_u64().unwrap() as usize;
+    let charge_framing = charge["framing_bytes"].as_u64().unwrap() as usize;
+    let charge_closure = charge["sampling_closure_bytes"].as_u64().unwrap() as usize;
+    let charge_sections: Vec<usize> = charge["section_bytes"]
+        .as_object()
+        .unwrap()
+        .values()
+        .map(|v| v.as_u64().unwrap() as usize)
+        .collect();
+    if inspection.artifact_bytes != charge_payload
+        || inspection.byte_scopes.payload_bytes != charge_payload
+        || inspection.framing_bytes() != Some(charge_framing)
+        || inspection.byte_scopes.section_bytes != charge_sections
+        || inspection.byte_scopes.sampling_closure_bytes != Some(charge_closure)
+    {
+        return Err(DopeError::Codec(
+            "inspect byte accounting disagrees with TDL1 byte charge".into(),
+        ));
+    }
+    Ok(charge)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::compiler::{CompileOptions, compile_kernel_from_dir};
+    use crate::model::Task;
+    use serde_json::json;
+    use std::path::PathBuf;
+
+    fn bare_tdl1_fixture(name: &str) -> (PathBuf, Vec<u8>) {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("target/inspect-closure-tests")
+            .join(std::process::id().to_string());
+        fs::create_dir_all(&root).unwrap();
+        let bytes = artifact_charge::canonical_container(&json!([
+            {"name": "weights", "hex": "010203"}
+        ]))
+        .unwrap();
+        let path = root.join(name);
+        fs::write(&path, &bytes).unwrap();
+        (path, bytes)
+    }
+
+    #[test]
+    fn bare_tdl1_inspection_keeps_sampling_closure_unmeasured() {
+        let (path, bytes) = bare_tdl1_fixture("inspection.tdl1");
+        let inspection = inspect_kernel(&path).unwrap();
+        assert_eq!(inspection.byte_scopes.payload_bytes, bytes.len());
+        assert_eq!(inspection.byte_scopes.sampling_closure_bytes, None);
+        assert_eq!(inspection.byte_scopes.section_bytes, vec![3]);
+        assert_eq!(inspection.framing_bytes(), Some(bytes.len() - 3));
+        let serialized = serde_json::to_value(inspection).unwrap();
+        assert!(serialized["byte_scopes"]["sampling_closure_bytes"].is_null());
+        assert_eq!(serialized["metric_status"]["status"], "unmeasured");
+    }
+
+    #[test]
+    fn bare_tdl1_charge_is_incomplete_without_a_closure_manifest() {
+        let (path, bytes) = bare_tdl1_fixture("charge.tdl1");
+        let charge = inspect_charge(&path).unwrap();
+        assert_eq!(charge["status"], "incomplete");
+        assert_eq!(charge["reason"], "missing_charge_manifest");
+        assert_eq!(charge, artifact_charge::evaluate(&json!({})));
+        assert_eq!(
+            charge,
+            artifact_charge::evaluate_artifact_bytes(&bytes, &Value::Null, None)
+        );
+        let declared_empty = artifact_charge::evaluate_artifact_bytes(&bytes, &json!([]), None);
+        assert_eq!(declared_empty["status"], "complete");
+        assert_eq!(declared_empty["sampling_closure_bytes"], bytes.len());
+    }
+
+    #[test]
+    fn inspect_and_tdl1_charge_report_identical_numbers_on_toy_and_golden_cases() {
+        let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let tmp_dir =
+            std::env::temp_dir().join(format!("dope-inspect-tdl1-{}", std::process::id()));
+        fs::create_dir_all(&tmp_dir).unwrap();
+
+        // 1. Toy case: compile examples/readme-regression -> toy.dpk
+        let toy_dir = manifest_dir.join("examples/readme-regression");
+        let compiled =
+            compile_kernel_from_dir(&toy_dir, Task::Regression, &CompileOptions::default())
+                .expect("toy regression must compile");
+        let toy_dpk_path = tmp_dir.join("toy.dpk");
+        fs::write(&toy_dpk_path, &compiled.artifact).unwrap();
+
+        let committed_inspect: Value = serde_json::from_str(
+            &fs::read_to_string(toy_dir.join("INSPECT.txt")).expect("INSPECT.txt must exist"),
+        )
+        .unwrap();
+        let toy_inspection = inspect_kernel(&toy_dpk_path).expect("toy.dpk must inspect");
+        let toy_inspection_json = serde_json::to_value(&toy_inspection).unwrap();
+        assert_eq!(
+            toy_inspection_json, committed_inspect,
+            "toy.dpk inspection must match committed INSPECT.txt"
+        );
+
+        let missing_charge = artifact_charge::evaluate(&json!({}));
+        assert_eq!(toy_inspection.byte_scopes.sampling_closure_bytes, None);
+        assert_eq!(inspect_charge(&toy_dpk_path).unwrap(), missing_charge);
+        let toy_native_charge =
+            artifact_charge::evaluate_artifact_bytes(&compiled.artifact, &json!([]), None);
+        assert_eq!(toy_native_charge["status"], "complete");
+        assert_eq!(
+            toy_inspection.artifact_bytes as u64,
+            toy_native_charge["payload_bytes"].as_u64().unwrap()
+        );
+        assert_eq!(
+            toy_inspection.byte_scopes.payload_bytes as u64,
+            toy_native_charge["payload_bytes"].as_u64().unwrap()
+        );
+        assert_eq!(
+            toy_inspection.framing_bytes().unwrap() as u64,
+            toy_native_charge["framing_bytes"].as_u64().unwrap()
+        );
+        let native_section_vec: Vec<usize> = toy_native_charge["section_bytes"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v.as_u64().unwrap() as usize)
+            .collect();
+        assert_eq!(toy_inspection.byte_scopes.section_bytes, native_section_vec);
+
+        // Also package the toy DPK sections into a canonical TDL1 container and verify
+        // inspect_kernel and artifact_charge::evaluate report identical numbers on it.
+        let toy_tdl1_sections = artifact_charge::dpk_to_tdl1_sections(&compiled.artifact)
+            .expect("toy DPK sections must convert to TDL1 sections");
+        let toy_tdl1_bytes = artifact_charge::canonical_container(&toy_tdl1_sections)
+            .expect("toy TDL1 container must encode");
+        let toy_tdl1_path = tmp_dir.join("toy.tdl1");
+        fs::write(&toy_tdl1_path, &toy_tdl1_bytes).unwrap();
+        let toy_tdl1_inspect = inspect_kernel(&toy_tdl1_path).expect("toy.tdl1 must inspect");
+        let toy_tdl1_charge = artifact_charge::evaluate(&json!({
+            "sections": toy_tdl1_sections,
+            "closure_files": [],
+        }));
+        assert_eq!(toy_tdl1_charge["status"], "complete");
+        assert_eq!(
+            toy_tdl1_inspect.artifact_bytes as u64,
+            toy_tdl1_charge["payload_bytes"].as_u64().unwrap()
+        );
+        assert_eq!(
+            toy_tdl1_inspect.byte_scopes.payload_bytes as u64,
+            toy_tdl1_charge["payload_bytes"].as_u64().unwrap()
+        );
+        assert_eq!(toy_tdl1_inspect.byte_scopes.sampling_closure_bytes, None);
+        assert_eq!(
+            toy_tdl1_inspect.framing_bytes().unwrap() as u64,
+            toy_tdl1_charge["framing_bytes"].as_u64().unwrap()
+        );
+        assert_eq!(
+            toy_tdl1_inspect.byte_scopes.section_bytes,
+            toy_inspection.byte_scopes.section_bytes
+        );
+        assert_eq!(inspect_charge(&toy_tdl1_path).unwrap(), missing_charge);
+
+        let toy_manifest_path = tmp_dir.join("toy-charge.json");
+        fs::write(
+            &toy_manifest_path,
+            serde_json::to_vec(&json!({
+                "sections": toy_tdl1_sections,
+                "closure_files": [],
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        let declared_toy = inspect_kernel(&toy_manifest_path).unwrap();
+        assert_eq!(
+            declared_toy.byte_scopes.sampling_closure_bytes,
+            Some(toy_tdl1_bytes.len())
+        );
+        assert_eq!(inspect_charge(&toy_manifest_path).unwrap(), toy_tdl1_charge);
+
+        // 2. Golden charge cases: tests/golden/charge/*.json
+        let golden_charge_dir = manifest_dir.join("tests/golden/charge");
+        let mut checked_goldens = 0usize;
+        let mut entries: Vec<_> = fs::read_dir(&golden_charge_dir)
+            .unwrap()
+            .filter_map(|e| e.ok().map(|entry| entry.path()))
+            .filter(|p| p.extension().and_then(|s| s.to_str()) == Some("json"))
+            .collect();
+        entries.sort();
+
+        for golden_path in entries {
+            let case: Value =
+                serde_json::from_str(&fs::read_to_string(&golden_path).unwrap()).unwrap();
+            let expected = &case["expected"];
+            let evaluated = artifact_charge::evaluate(&case["input"]);
+            assert_eq!(&evaluated, expected, "golden charge evaluation must match");
+
+            if expected["status"].as_str() != Some("complete") {
+                assert!(
+                    inspect_kernel(&golden_path).is_err(),
+                    "non-complete golden charge case {} must fail inspect_kernel",
+                    golden_path.display()
+                );
+                continue;
+            }
+            checked_goldens += 1;
+
+            // Inspect the golden JSON manifest directly
+            let manifest_inspect =
+                inspect_kernel(&golden_path).expect("complete golden charge manifest must inspect");
+            let manifest_charge = inspect_charge(&golden_path)
+                .expect("complete golden charge manifest must produce charge");
+            assert_eq!(&manifest_charge, expected);
+
+            let exp_payload = expected["payload_bytes"].as_u64().unwrap() as usize;
+            let exp_framing = expected["framing_bytes"].as_u64().unwrap() as usize;
+            let exp_closure = expected["sampling_closure_bytes"].as_u64().unwrap() as usize;
+            let exp_sections: Vec<usize> = expected["section_bytes"]
+                .as_object()
+                .unwrap()
+                .values()
+                .map(|v| v.as_u64().unwrap() as usize)
+                .collect();
+
+            assert_eq!(manifest_inspect.artifact_bytes, exp_payload);
+            assert_eq!(manifest_inspect.byte_scopes.payload_bytes, exp_payload);
+            assert_eq!(
+                manifest_inspect.byte_scopes.sampling_closure_bytes,
+                Some(exp_closure)
+            );
+            assert_eq!(manifest_inspect.framing_bytes(), Some(exp_framing));
+            assert_eq!(manifest_inspect.byte_scopes.section_bytes, exp_sections);
+
+            // Also write the binary TDL1 container and inspect it directly
+            let container = artifact_charge::canonical_container(&case["input"]["sections"])
+                .expect("golden sections must encode to TDL1 container");
+            let container_path =
+                tmp_dir.join(format!("{}.tdl1", case["case_id"].as_str().unwrap()));
+            fs::write(&container_path, &container).unwrap();
+            let container_inspect =
+                inspect_kernel(&container_path).expect("binary TDL1 container must inspect");
+            assert_eq!(container_inspect.artifact_bytes, exp_payload);
+            assert_eq!(container_inspect.byte_scopes.payload_bytes, exp_payload);
+            assert_eq!(container_inspect.framing_bytes(), Some(exp_framing));
+            assert_eq!(container_inspect.byte_scopes.section_bytes, exp_sections);
+            assert_eq!(container_inspect.byte_scopes.sampling_closure_bytes, None);
+            assert_eq!(inspect_charge(&container_path).unwrap(), missing_charge);
+        }
+        assert!(
+            checked_goldens >= 6,
+            "expected at least 6 complete golden charge cases, got {checked_goldens}"
+        );
+        let _ = fs::remove_dir_all(&tmp_dir);
     }
 }

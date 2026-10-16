@@ -24,3 +24,16 @@ reads traced. Copied rows and gzip-original are literal-storage controls, not
 privacy claims. Gaussian copula and ARF are explicitly specified stubs; DOPE
 uses the native executable and artifact-only isolation. Public toy smoke data
 is in `tests/fixtures/tdl/`, marked citable:false.
+
+Literal controls use a fresh `python -S -B` worker under Linux `strace` (required
+alongside `ldd`). The trace follows native opens and all threads, rejects
+undeclared reads/writes and process/network access, and releases output only
+after verification. This checks trusted sampler behavior; it is not an OS
+sandbox. The interpreter, stdlib, linked libraries, worker source and fixed
+configuration are explicitly inventoried and charged as runtime closure bytes.
+The physical TDL1 artifact is checked against the same canonical payload used
+by Rust byte accounting. Every readable inventory file is hashed before and
+after execution; a missing tracer, changed inventory or incomplete trace fails.
+Public receipts contain opaque inventory IDs, charges and stable reasons, with
+no raw trace, stderr or machine paths. The Python audit context remains a
+diagnostic and reports incomplete coverage, even when no violation occurs.
