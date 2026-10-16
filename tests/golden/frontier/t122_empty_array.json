@@ -1,0 +1,14 @@
+{
+  "case_id": "t122_frontier_empty_array",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "reason": "missing_budget_cell",
+    "status": "incomplete"
+  },
+  "input": {
+    "cells": []
+  },
+  "purpose": "An empty declared observation list is incomplete.",
+  "schema_version": 1
+}

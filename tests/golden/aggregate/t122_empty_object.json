@@ -1,0 +1,26 @@
+{
+  "case_id": "t122_aggregate_empty_object",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "reason": "invalid_rows",
+    "status": "failed"
+  },
+  "input": {
+    "bootstrap_replicates": 1,
+    "required_auditors": {
+      "tree": [
+        "cb"
+      ]
+    },
+    "required_families": [
+      "tree"
+    ],
+    "required_seeds": [
+      101
+    ],
+    "rows": {}
+  },
+  "purpose": "An empty object is malformed, not a missing list.",
+  "schema_version": 1
+}

@@ -1,0 +1,31 @@
+{
+  "case_id": "t122_charge_null_amortization_count",
+  "citable": false,
+  "component": "charge",
+  "expected": {
+    "amortized_bytes": 28.0,
+    "artifact_sha256": "8588b327f4cfa4b7d4ebf343dd2d85ab162cd8b94d4ba6d1de90bc20d329c1c5",
+    "cold_bundle_bytes": 28,
+    "framing_bytes": 27,
+    "payload_bytes": 28,
+    "reason": null,
+    "sampling_closure_bytes": 28,
+    "section_bytes": {
+      "payload": 1
+    },
+    "shared_bytes": 0,
+    "status": "complete"
+  },
+  "input": {
+    "amortization_count": null,
+    "closure_files": [],
+    "sections": [
+      {
+        "hex": "00",
+        "name": "payload"
+      }
+    ]
+  },
+  "purpose": "Explicit null has the same count-option default as Rust.",
+  "schema_version": 1
+}

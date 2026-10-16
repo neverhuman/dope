@@ -1,0 +1,41 @@
+{
+  "case_id": "t122_aggregate_null_bootstrap_replicates",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "family_means": {
+      "tree": 0.75
+    },
+    "lcb": 0.75,
+    "mean_transfer": 0.75,
+    "reason": null,
+    "robust_transfer": 0.75,
+    "status": "complete"
+  },
+  "input": {
+    "bootstrap_replicates": null,
+    "required_auditors": {
+      "tree": [
+        "cb"
+      ]
+    },
+    "required_families": [
+      "tree"
+    ],
+    "required_seeds": [
+      101
+    ],
+    "rows": [
+      {
+        "auditor": "cb",
+        "dataset": "d1",
+        "family": "tree",
+        "seed": 101,
+        "source_family": "s1",
+        "transfer": 0.75
+      }
+    ]
+  },
+  "purpose": "Explicit null has the same numeric-option default as Rust.",
+  "schema_version": 1
+}

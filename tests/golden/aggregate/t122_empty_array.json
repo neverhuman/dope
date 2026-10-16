@@ -1,0 +1,26 @@
+{
+  "case_id": "t122_aggregate_empty_array",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "reason": "missing_family_or_cell",
+    "status": "incomplete"
+  },
+  "input": {
+    "bootstrap_replicates": 1,
+    "required_auditors": {
+      "tree": [
+        "cb"
+      ]
+    },
+    "required_families": [
+      "tree"
+    ],
+    "required_seeds": [
+      101
+    ],
+    "rows": []
+  },
+  "purpose": "An empty declared observation list is incomplete.",
+  "schema_version": 1
+}

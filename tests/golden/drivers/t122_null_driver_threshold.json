@@ -1,0 +1,40 @@
+{
+  "case_id": "t122_drivers_null_driver_threshold",
+  "citable": false,
+  "component": "drivers",
+  "expected": {
+    "driver_fidelity": 1.0,
+    "driver_pass": true,
+    "normalized_components": {
+      "mass": 1.0,
+      "rank": 1.0
+    },
+    "raw_components": {
+      "mass": 1.0,
+      "rank": 1.0
+    },
+    "reason": null,
+    "status": "complete"
+  },
+  "input": {
+    "driver_threshold": null,
+    "real_importances": [
+      2.0,
+      1.0
+    ],
+    "real_real_ceiling": {
+      "mass": 1.0,
+      "rank": 1.0
+    },
+    "required_components": [
+      "mass",
+      "rank"
+    ],
+    "synthetic_importances": [
+      2.0,
+      1.0
+    ]
+  },
+  "purpose": "Explicit null has the same numeric-option default as Rust.",
+  "schema_version": 1
+}
