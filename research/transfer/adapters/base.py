@@ -279,6 +279,25 @@ class ResourceUsage:
         _count(self.gpu_bytes)
 
 
+@dataclass(frozen=True)
+class ImportanceResult:
+    """Grouped real-test loss increases; grouping/perturbations are evaluator pins."""
+    protocol_sha256: str
+    query_sha256: str
+    group_ids: tuple
+    loss_increases: tuple
+
+    def __post_init__(self):
+        _hash(self.protocol_sha256)
+        _hash(self.query_sha256)
+        _require(type(self.group_ids) is tuple and bool(self.group_ids), "invalid_groups")
+        _require(all(type(g) is int and g >= 0 for g in self.group_ids) and
+                 len(set(self.group_ids)) == len(self.group_ids), "invalid_groups")
+        _require(type(self.loss_increases) is tuple and
+                 len(self.loss_increases) == len(self.group_ids) and
+                 all(_finite(v) for v in self.loss_increases), "invalid_importance")
+
+
 @dataclass(frozen=True, repr=False)
 class SampleResult:
     data: TrainingBatch
@@ -371,6 +390,17 @@ class _Adapter(ABC):
                        "fit_seed": self._fit_seed, "request_sha256": request_sha256,
                        "request_seed": seed, "requested_rows": requested_rows})
 
+    def receipt(self):
+        """Portable execution metadata only; independent qualification is required."""
+        self._ready()
+        return {"format": "dope-adapter-execution-v1", "kind": self._kind,
+                "identity_sha256": self.identity.sha256,
+                "provided_sha256": self._provided_sha256,
+                "context_sha256": self._training.sha256,
+                "fit_seed": self._fit_seed, "provided_rows": self._provided_rows,
+                "consumed_rows": len(self._training.targets),
+                "wall_seconds": self._wall_seconds, "citable": False}
+
 
 class LearnerAdapter(_Adapter):
     def __init__(self, identity, admission):
@@ -378,6 +408,11 @@ class LearnerAdapter(_Adapter):
 
     def prepare(self, training, seed):
         self._prepare(training, seed, self._prepare_backend)
+
+    def fit(self, training, seed):
+        """TDL ABI spelling; prepare remains compatible with historical callers."""
+        self.prepare(training, seed)
+        return self.receipt()
 
     @abstractmethod
     def _prepare_backend(self, training, seed, mode):
@@ -400,6 +435,38 @@ class LearnerAdapter(_Adapter):
         _require(result.row_ids == query.row_ids, "prediction_alignment")
         self._usage(result, len(self._training.targets))
         return result
+
+    def importance(self, real_test, perturbations, score_loss, protocol_sha256, seed):
+        """Evaluate frozen grouped/conditional permutations on identical real rows.
+
+        perturbations is ((opaque_group_id, (FeatureBatch, ...)), ...). The
+        evaluator freezes training-only groups and conditional resampling and
+        supplies score_loss(prediction), keeping query labels out of predict.
+        Raw negative loss increases are retained for evaluator diagnostics.
+        """
+        self._ready()
+        _hash(protocol_sha256)
+        _require(type(real_test) is FeatureBatch, "query_features_required")
+        _require(type(perturbations) is tuple and bool(perturbations), "invalid_groups")
+        _require(callable(score_loss), "loss_evaluator_required")
+        baseline = self._call(score_loss, self.predict(real_test, seed))
+        _require(_finite(baseline) and baseline >= 0, "invalid_loss")
+        ids, increases = [], []
+        for group_id, views in perturbations:
+            _count(group_id)
+            _require(group_id not in ids and type(views) is tuple and bool(views), "invalid_groups")
+            losses = []
+            for view in views:
+                _require(type(view) is FeatureBatch and view.row_ids == real_test.row_ids and
+                         view.schema_sha256 == real_test.schema_sha256, "importance_alignment")
+                value = self._call(score_loss, self.predict(view, seed))
+                _require(_finite(value) and value >= 0, "invalid_loss")
+                losses.append(value)
+            increase = sum(value / len(losses) for value in losses) - baseline
+            _require(_finite(increase), "invalid_importance")
+            ids.append(group_id)
+            increases.append(increase)
+        return ImportanceResult(protocol_sha256, real_test.sha256, tuple(ids), tuple(increases))
 
 
 class GeneratorAdapter(_Adapter):

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "citable": false,
+  "synthetic_only": true,
+  "evidence_status": "specified_unrun",
+  "purpose": "deterministic generator ABI fixture; no scientific or privacy claim",
+  "files": [
+    "toy.csv",
+    "schema.json",
+    "correlated_features.json"
+  ]
+}
