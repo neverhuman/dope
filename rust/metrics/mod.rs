@@ -481,6 +481,8 @@ mod tests {
         ]);
         let agg = aggregate::evaluate(&json!({
             "required_families": ["tree", "linear"],
+            "required_auditors": {"tree": ["catboost"], "linear": ["elastic_net"]},
+            "required_seeds": [101, 211],
             "rows": rows,
             "bootstrap_replicates": 200,
             "bootstrap_seed": 1729,

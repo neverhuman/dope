@@ -391,6 +391,8 @@ mod tests {
             let neural_a = (worst_base - worse_delta).max(0.0);
             let base = evaluate(&json!({
                 "required_families": ["tree", "linear"],
+                "required_auditors": {"tree": ["cb"], "linear": ["ridge"]},
+                "required_seeds": [101],
                 "rows": [
                     {"source_family": "s1", "dataset": "d1", "seed": 101, "family": "tree", "auditor": "cb", "transfer": tree_a},
                     {"source_family": "s1", "dataset": "d1", "seed": 101, "family": "linear", "auditor": "ridge", "transfer": linear_a}
@@ -401,6 +403,8 @@ mod tests {
             }));
             let extended = evaluate(&json!({
                 "required_families": ["tree", "linear", "neural"],
+                "required_auditors": {"tree": ["cb"], "linear": ["ridge"], "neural": ["mlp"]},
+                "required_seeds": [101],
                 "rows": [
                     {"source_family": "s1", "dataset": "d1", "seed": 101, "family": "tree", "auditor": "cb", "transfer": tree_a},
                     {"source_family": "s1", "dataset": "d1", "seed": 101, "family": "linear", "auditor": "ridge", "transfer": linear_a},
