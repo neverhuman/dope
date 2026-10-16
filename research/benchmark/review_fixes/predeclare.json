@@ -105,19 +105,19 @@
     "sample_seeds": [101, 211, 307],
     "sizes": [1, 4],
     "per_lineage_timeout_seconds": 180,
-    "host": "fit-machine-1",
+    "host": "xbabe1",
     "read_only_artifact_roots": [
-      "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/operations",
-      "/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1/artifact"
+      "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/operations",
+      "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/artifact"
     ],
-    "output_root": "/path/to/operator-home/dope-scratch-x1/dope-rf-tabsyn-sample-v1",
+    "output_root": "/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-sample-v1",
     "missing_or_timeout_is_not_a_win": true,
     "parser_check": "Score the already published sample-101-4n.csv for dataset 02a45777900441ce and require the CatBoost retention to match the committed eight-lineage panel cell before any new TabSyn cell enters a table."
   },
   "tabddpm": {
-    "intent": "Extend the published retained fits to the remaining lineages only with the author budget already used for those fits, on fit-machine-3, with a 600 second per-lineage timeout. If no executable entry is found outside dl_final, sweep, and HOLD, record the gap and do not invent a shorter run.",
+    "intent": "Extend the published retained fits to the remaining lineages only with the author budget already used for those fits, on xbabe3, with a 600 second per-lineage timeout. If no executable entry is found outside dl_final, sweep, and HOLD, record the gap and do not invent a shorter run.",
     "missing_or_timeout_is_not_a_win": true,
-    "host": "fit-machine-3"
+    "host": "xbabe3"
   },
   "extra_generator_fit_seeds": {
     "population_ledgers": "Fit seed 11 only. The tables say so.",

@@ -13,22 +13,22 @@ from collections import Counter
 from pathlib import Path
 
 _PRIVATE_HOSTS = {
-    "x" + "babe1": "fit-machine-1",
-    "x" + "babe2": "fit-machine-2",
-    "x" + "babe3": "fit-machine-3",
+    "xbabe1": "fit-machine-1",
+    "xbabe2": "fit-machine-2",
+    "xbabe3": "fit-machine-3",
 }
 _PUBLIC_HOST = re.compile(r"^fit-machine-[123]$")
 _COUNT_WORD = {1: "one", 2: "two", 3: "three"}
 _BANNED = (
-    "x" + "babe0",
-    "x" + "babe1",
-    "x" + "babe2",
-    "x" + "babe3",
+    "xbabe0",
+    "xbabe1",
+    "xbabe2",
+    "xbabe3",
     "xbabe",
     "GPU host A",
     "GPU host B",
     "GPU host C",
-    "/home/" + "ubuntu",
+    "/home/ubuntu",
     "/mnt/fast-scratch",
     ".agent",
     "worktree",
@@ -41,7 +41,7 @@ _BANNED = (
     "production_evidence_unmeasured",
 )
 _PULL_REQUEST = re.compile(r"(?i)\b(?:PR|pull request)\s*#\s*\d+")
-_PRIVATE_PATH = ("/home/" + "ubuntu", "/mnt/fast-scratch", ".agent", "worktree", "xbabe")
+_PRIVATE_PATH = ("/home/ubuntu", "/mnt/fast-scratch", ".agent", "worktree", "xbabe")
 _ALLOWED_REPO_URL = "https://github.com/neverhuman/dope"
 _JOURNAL_AVAILABILITY_BEGIN = "% BEGIN JOURNAL AVAILABILITY\n"
 _JOURNAL_AVAILABILITY_END = "% END JOURNAL AVAILABILITY\n"

@@ -114,8 +114,8 @@ def build():
             and not any(p.is_symlink() for p in (ROOT / 'source').rglob('*')),
             'frozen executable source inventory changed')
     jobs = {digest(j): j for j in lock['jobs']}
-    require(len(jobs) == 400 and lock['allowed_gpu_hosts'] == ['fit-machine-1', 'fit-machine-2']
-            and lock['blocked_gpu_hosts'] == ['fit-machine-0', 'fit-machine-3'], 'fit host or matrix scope changed')
+    require(len(jobs) == 400 and lock['allowed_gpu_hosts'] == ['xbabe1', 'xbabe2']
+            and lock['blocked_gpu_hosts'] == ['xbabe0', 'xbabe3'], 'fit host or matrix scope changed')
     cells = [cell(jobs[r['job_sha256']], r, refs) for r in report['fit_cells']]
     summary = summarize(cells)
     counts = dict(Counter(r['status'] for r in cells))

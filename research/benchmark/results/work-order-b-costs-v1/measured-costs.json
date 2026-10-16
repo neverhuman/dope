@@ -51,7 +51,7 @@
       "distinct_phase_receipts": 800,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-2"
+        "xbabe2"
       ],
       "method": "ARF",
       "native_outcome_class_counts": {
@@ -76,7 +76,7 @@
       "distinct_phase_receipts": 352,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "CTGAN",
       "native_outcome_class_counts": {
@@ -106,9 +106,9 @@
       "distinct_phase_receipts": 48,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1",
-        "fit-machine-2",
-        "fit-machine-3"
+        "xbabe1",
+        "xbabe2",
+        "xbabe3"
       ],
       "method": "CTGAN",
       "native_outcome_class_counts": {
@@ -133,7 +133,7 @@
       "distinct_phase_receipts": 82,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "CTGAN",
       "native_outcome_class_counts": {
@@ -162,7 +162,7 @@
       "distinct_phase_receipts": 78,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "CTGAN",
       "native_outcome_class_counts": {
@@ -212,7 +212,7 @@
       "distinct_phase_receipts": 175,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-2"
+        "xbabe2"
       ],
       "method": "Chow-Liu",
       "native_outcome_class_counts": {
@@ -237,7 +237,7 @@
       "distinct_phase_receipts": 12,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "Forest-Flow",
       "native_outcome_class_counts": {
@@ -262,7 +262,7 @@
       "distinct_phase_receipts": 12,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "Forest-Flow",
       "native_outcome_class_counts": {
@@ -287,7 +287,7 @@
       "distinct_phase_receipts": 12,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "Forest-Flow",
       "native_outcome_class_counts": {
@@ -335,7 +335,7 @@
       "distinct_phase_receipts": 162,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-2"
+        "xbabe2"
       ],
       "method": "GaussianCopula",
       "native_outcome_class_counts": {
@@ -360,7 +360,7 @@
       "distinct_phase_receipts": 352,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "TVAE",
       "native_outcome_class_counts": {
@@ -390,9 +390,9 @@
       "distinct_phase_receipts": 48,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1",
-        "fit-machine-2",
-        "fit-machine-3"
+        "xbabe1",
+        "xbabe2",
+        "xbabe3"
       ],
       "method": "TVAE",
       "native_outcome_class_counts": {
@@ -417,7 +417,7 @@
       "distinct_phase_receipts": 83,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "TVAE",
       "native_outcome_class_counts": {
@@ -445,7 +445,7 @@
       "distinct_phase_receipts": 78,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-1"
+        "xbabe1"
       ],
       "method": "TVAE",
       "native_outcome_class_counts": {
@@ -495,7 +495,7 @@
       "distinct_phase_receipts": 165,
       "gpu_model": null,
       "hosts": [
-        "fit-machine-2"
+        "xbabe2"
       ],
       "method": "independent_marginals",
       "native_outcome_class_counts": {
@@ -526,8 +526,8 @@
   "runs": [
     {
       "host_operation_seconds": {
-        "fit-machine-1": 1760.775001832284,
-        "fit-machine-2": 1360.2606038847007
+        "xbabe1": 1760.775001832284,
+        "xbabe2": 1360.2606038847007
       },
       "identity": "dope_population_research_v2",
       "method": "DOPE",
@@ -538,7 +538,7 @@
       "source": "dope-s3-population-gpu-fits.json"
     },
     {
-      "host": "fit-machine-2",
+      "host": "xbabe2",
       "identity": "dope_population_validation_v1",
       "method": "DOPE",
       "operation_wall_seconds": 3826.6965422253124,
@@ -548,9 +548,9 @@
     },
     {
       "host_operation_seconds": {
-        "fit-machine-1": 446.9886174881831,
-        "fit-machine-2": 1436.2978990890551,
-        "fit-machine-3": 1544.4138351229485
+        "xbabe1": 446.9886174881831,
+        "xbabe2": 1436.2978990890551,
+        "xbabe3": 1544.4138351229485
       },
       "identity": "dope_refinement_expansion_v2",
       "method": "DOPE",
@@ -585,7 +585,7 @@
       "source": "density-matched-population-validation.json"
     },
     {
-      "host": "fit-machine-2",
+      "host": "xbabe2",
       "identity": "forest_shared_validation_v1",
       "method": "Forest-Flow",
       "operation_wall_seconds": 228.73225121363066,

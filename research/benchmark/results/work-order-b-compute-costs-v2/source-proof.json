@@ -56,90 +56,90 @@
     }
   },
   "preparer": {
-    "path": "/path/to/operator-home/dope/.agent/worktrees/integration/target/work-order-b-compute-cost-report-item6-v1/final-v1/prepare_report.py",
+    "path": "/home/ubuntu/dope/.agent/worktrees/integration/target/work-order-b-compute-cost-report-item6-v1/final-v1/prepare_report.py",
     "sha256": "77d44a55a29eaa3bfedaacbd8dc33849d9fd42e14cbbda9bee8c71d0386dcb86"
   },
   "publisher": {
-    "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/publish_work_order_b_costs.py",
+    "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/publish_work_order_b_costs.py",
     "sha256": "d90e275318b8eb766fb340334103060de8aeb3c81f65728e28314b2da4f34e01"
   },
   "sources": [
     {
       "bytes": 19519,
       "id": "published_cost_core",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/work-order-b-costs-v1/measured-costs.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/work-order-b-costs-v1/measured-costs.json",
       "sha256": "f017da01be0df7024a7da1837b9ff0dba44961c0f55ca6e458758b0b9942e312"
     },
     {
       "bytes": 5421,
       "id": "published_source_proof",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/work-order-b-costs-v1/source-proof.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/work-order-b-costs-v1/source-proof.json",
       "sha256": "ecc92768307727867e8063b01626555b5b883836f90752ee927923455466cdda"
     },
     {
       "bytes": 1472035,
       "id": "arf-s3-population-native.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/arf-s3-population-native.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/arf-s3-population-native.json",
       "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
     },
     {
       "bytes": 21794615,
       "id": "density-matched-population-validation.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/density-matched-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/density-matched-population-validation.json",
       "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
     },
     {
       "bytes": 461259,
       "id": "dope-s3-population-gpu-fits.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/dope-s3-population-gpu-fits.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-s3-population-gpu-fits.json",
       "sha256": "df4a370ba66a595f665bf2f45d8a183dde9955b6ab65d7c28df0ec8ae24d4c21"
     },
     {
       "bytes": 7352232,
       "id": "dope-s3-population-validation.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/dope-s3-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-s3-population-validation.json",
       "sha256": "06137a347bbfa8efb36007504b8a0325450c1ea6beb1ee02eabe20dd15e201a4"
     },
     {
       "bytes": 273775,
       "id": "dope-target-refinement-population-fits.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/dope-target-refinement-population-fits.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-target-refinement-population-fits.json",
       "sha256": "803283a01292853ec760fec281ffb23474f86fae5866356a872ec313050d6194"
     },
     {
       "bytes": 3901636,
       "id": "dope-target-refinement-population-validation.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/dope-target-refinement-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/dope-target-refinement-population-validation.json",
       "sha256": "c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602"
     },
     {
       "bytes": 1237153,
       "id": "s3-matched-forest-confirmation-validation.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/s3-matched-forest-confirmation-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/s3-matched-forest-confirmation-validation.json",
       "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
     },
     {
       "bytes": 13567823,
       "id": "sdv-matched-population-validation.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/sdv-matched-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/sdv-matched-population-validation.json",
       "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
     },
     {
       "bytes": 2138403,
       "id": "sdv-s3-population-native.json",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/sdv-s3-population-native.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/sdv-s3-population-native.json",
       "sha256": "635fd4273886d59691356b85d2fad58eae596ef74a48dc0bfb5bffee653bacc3"
     },
     {
       "bytes": 6807387,
       "id": "arf_matched",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/arf-matched-population-validation.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/arf-matched-population-validation.json",
       "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
     },
     {
       "bytes": 2356,
       "id": "arf_closed_rounds",
-      "path": "/path/to/operator-home/dope/target/work-order-b-root-readiness-v1/arf-199-final-closure-root-verification.v1.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-root-readiness-v1/arf-199-final-closure-root-verification.v1.json",
       "sha256": "ffbc3ff399a79aadda049e2b6283bc12fab94f6a1666da4d21d53f202f105864"
     },
     {
@@ -181,71 +181,71 @@
     {
       "bytes": 70411,
       "id": "forest_prefix20_index",
-      "path": "/path/to/operator-home/dope/target/work-order-b-root-readiness-v1/forest-prefix20-primary-scalar-custody.v1.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-root-readiness-v1/forest-prefix20-primary-scalar-custody.v1.json",
       "sha256": "2cb2069d0166c3823b73bbca2e3bcb6e8b6f058feff4e77d840cc3d57ede76b2"
     },
     {
       "bytes": 4510,
       "id": "forest_negative22",
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/terminal-job22-unavailable.v15.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/terminal-job22-unavailable.v15.json",
       "sha256": "5cf7510273665a6461e6fd2b071a8633de216584cb65eddbc1cdbd03ef3a065a"
     },
     {
       "bytes": 404,
       "id": "forest22_prior_operation",
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/3f9fc9c82d4f7f17ef9f21da4563364f0ef2dd631fb29df79bd4296f3b1cc50c.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/3f9fc9c82d4f7f17ef9f21da4563364f0ef2dd631fb29df79bd4296f3b1cc50c.json",
       "sha256": "3f9fc9c82d4f7f17ef9f21da4563364f0ef2dd631fb29df79bd4296f3b1cc50c"
     },
     {
       "bytes": 404,
       "id": "forest22_operation",
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/cdc59a5ac0ffa69dc302e1630ce29994f47b4ff3d934f118ce25e2cfe9f6f2a2.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/cdc59a5ac0ffa69dc302e1630ce29994f47b4ff3d934f118ce25e2cfe9f6f2a2.json",
       "sha256": "cdc59a5ac0ffa69dc302e1630ce29994f47b4ff3d934f118ce25e2cfe9f6f2a2"
     },
     {
       "bytes": 422,
       "id": "forest22_watchdog",
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/9b64c272682073db14fed8f349977fac3b04ab863a6f48ff0f2d6bf90f7a7a91.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/9b64c272682073db14fed8f349977fac3b04ab863a6f48ff0f2d6bf90f7a7a91.json",
       "sha256": "9b64c272682073db14fed8f349977fac3b04ab863a6f48ff0f2d6bf90f7a7a91"
     },
     {
       "bytes": 171,
       "id": "forest22_terminal",
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/627e5aca54fa11a38dc0bb4334c7771e91075dee6153d555b447d22e2461e8cc.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/627e5aca54fa11a38dc0bb4334c7771e91075dee6153d555b447d22e2461e8cc.json",
       "sha256": "627e5aca54fa11a38dc0bb4334c7771e91075dee6153d555b447d22e2461e8cc"
     },
     {
       "bytes": 4179,
       "id": "forest22_absence",
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/4566d218754657f1a1e270306ad81fd82f6f73442772fdd1d7ce39aed1f928ea.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/small-receipt-custody/4566d218754657f1a1e270306ad81fd82f6f73442772fdd1d7ce39aed1f928ea.json",
       "sha256": "4566d218754657f1a1e270306ad81fd82f6f73442772fdd1d7ce39aed1f928ea"
     },
     {
       "bytes": 10337,
       "id": "tabsyn_prefix25",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-fit-machine-1-real-owner-v1/readonly-custody/20261006T140948/queue.actual-census.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-xbabe1-real-owner-v1/readonly-custody/20261006T140948/queue.actual-census.json",
       "sha256": "c518920f44813e05cf68071eb13ee6ad7101370a20919c76e25a5e28e6f04e2b"
     },
     {
       "bytes": 3783,
       "id": "tabsyn_source_packet",
-      "path": "/path/to/operator-home/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-fit-machine-1-real-owner-v1/metrics-peer-registration.20261006T141016.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/tabsyn-runtime-adapter/target/tabddpm-capacity-continuation-v1/tabsyn-xbabe1-real-owner-v1/metrics-peer-registration.20261006T141016.json",
       "sha256": "5bb61c0e64d3350808294c480c85d9fcd27c66148df624d3ba7223d5fb1fd20a"
     },
     {
       "bytes": 25080,
       "id": "td14_idle_closed",
-      "path": "/path/to/operator-home/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/TD14-owned-idle-handoff.closed.actual.v15.json",
+      "path": "/home/ubuntu/dope/target/work-order-b-forest-local-continuation-v3-controller-v5/negative-job22-accounting-v15/TD14-owned-idle-handoff.closed.actual.v15.json",
       "sha256": "162729b152be1528a7cf69e773ee90034ba52eee930903d30e6e6a5f3ce6ae2f"
     }
   ],
   "tabsyn_declared_source_hashes": {
-    "/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1/owner_real_controller_v1.py": "f5ef5f996e20a5bc6f6f510bbc6fce61338dc360da7f1b269c2c95cedbb53386",
-    "/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1/owner_real_entry_v1.py": "5d5ac24fc6e816edef007a3218b2556a4153dcfa395a415875057ef84303d25d",
-    "/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
-    "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/owner_real_entry_v2.py": "5c69a932c9125ba59d38ed4b6140973c12c88c3f2f55a66f68cbd76840c1f5a4",
-    "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/owner_real_population_v2.py": "e052cbb95fc22ebb0c90f574366556fa0ecdce2bdfa983bd5b8b6a7c031afe14",
-    "/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/tabsyn_native_target.captured.py": "584a1a07320c53d343ee119e5dcb9fc65ca49e19bf8c151e3375d9a05e2c69a7"
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_controller_v1.py": "f5ef5f996e20a5bc6f6f510bbc6fce61338dc360da7f1b269c2c95cedbb53386",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/owner_real_entry_v1.py": "5d5ac24fc6e816edef007a3218b2556a4153dcfa395a415875057ef84303d25d",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1/tabsyn_adapter.captured.py": "456e9f718daf3a765cd44e25240a339300e3bcdc149b0f3deb4b9ad0fc4444f2",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_entry_v2.py": "5c69a932c9125ba59d38ed4b6140973c12c88c3f2f55a66f68cbd76840c1f5a4",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/owner_real_population_v2.py": "e052cbb95fc22ebb0c90f574366556fa0ecdce2bdfa983bd5b8b6a7c031afe14",
+    "/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/tabsyn_native_target.captured.py": "584a1a07320c53d343ee119e5dcb9fc65ca49e19bf8c151e3375d9a05e2c69a7"
   },
   "tabsyn_mirrored_verified_files": 11,
   "tabsyn_mirrored_verified_set_sha256": "edc9c7857d1e9315208634d4265ed8e336b4ea6132fa5153162be91f008c2b7c",

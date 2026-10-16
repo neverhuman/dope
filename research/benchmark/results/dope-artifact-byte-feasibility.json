@@ -776,7 +776,7 @@
   "codec_sha256": "abd9f16bca49129a4f546a8b6c7477c4db9c2a1744d540d3884712ff3ebcf22e",
   "cost": {
     "byte_analysis_elapsed_seconds": 0.03765597497113049,
-    "host": "fit-machine-2",
+    "host": "xbabe2",
     "new_gpu_fits": 0,
     "parent_training_cost_reused_without_relabeling": true
   },

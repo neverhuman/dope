@@ -3640,16 +3640,16 @@
             "host_operation_seconds": {
               "additionalProperties": false,
               "properties": {
-                "fit-machine-1": {
+                "xbabe1": {
                   "type": "number"
                 },
-                "fit-machine-2": {
+                "xbabe2": {
                   "type": "number"
                 }
               },
               "required": [
-                "fit-machine-1",
-                "fit-machine-2"
+                "xbabe1",
+                "xbabe2"
               ],
               "type": "object"
             },

@@ -128,9 +128,7 @@ class TabSynPopulationFits(unittest.TestCase):
         self.assertEqual(s['prior_unmeasured_allocations'], 35)
         self.assertEqual(s['prior_unmeasured_book_charge_seconds'], 21000)
         self.assertFalse(report['book_charges_are_measured_method_cost'])
-        scrub = json.loads((p.HERE.parents[1] / 'evidence/tree-scrub.json').read_text())
-        by_sha = {item['original_sha256']: item['public_sha256'] for item in scrub['changes']}
-        self.assertEqual(by_sha.get(report['publisher_sha256'], report['publisher_sha256']), hashlib.sha256(Path(p.__file__).read_bytes()).hexdigest())
+        self.assertEqual(report['publisher_sha256'], hashlib.sha256(Path(p.__file__).read_bytes()).hexdigest())
 
     def test_committed_schema_tables_regenerate_and_rights_safe(self):
         report = self.report(); path = p.RESULTS / (p.NAME + '.json')

@@ -775,7 +775,7 @@
       "fit_receipt_sha256": "a799fd7a5de6612c16e59bf8507661695e71d8c8844a07d2a5e5ddbbd2905322",
       "fit_seed": 11,
       "gpu_elapsed_seconds": 10.235415638424456,
-      "gpu_host": "fit-machine-1",
+      "gpu_host": "xbabe1",
       "packed_artifact_bytes": 9201,
       "peak_gpu_used_mib": 616,
       "raw_artifact_bytes": 13709
@@ -785,7 +785,7 @@
       "fit_receipt_sha256": "24484fb57dc641db9ac89d560653aaf30422f8d6edacc6b7881659463794e5e3",
       "fit_seed": 23,
       "gpu_elapsed_seconds": 10.232826963998377,
-      "gpu_host": "fit-machine-1",
+      "gpu_host": "xbabe1",
       "packed_artifact_bytes": 9205,
       "peak_gpu_used_mib": 616,
       "raw_artifact_bytes": 13713
@@ -795,7 +795,7 @@
       "fit_receipt_sha256": "cd6c073408d819b48e266678d72d343327d1586d6e16c587e9a41dbdb7802111",
       "fit_seed": 37,
       "gpu_elapsed_seconds": 10.325732990168035,
-      "gpu_host": "fit-machine-2",
+      "gpu_host": "xbabe2",
       "packed_artifact_bytes": 9204,
       "peak_gpu_used_mib": 460,
       "raw_artifact_bytes": 13712
@@ -805,7 +805,7 @@
       "fit_receipt_sha256": "da938d4409b4155d025eb02f63934b8e833bc0e84982c89ba5af8c8a5e61172e",
       "fit_seed": 53,
       "gpu_elapsed_seconds": 10.299415132030845,
-      "gpu_host": "fit-machine-2",
+      "gpu_host": "xbabe2",
       "packed_artifact_bytes": 9195,
       "peak_gpu_used_mib": 396,
       "raw_artifact_bytes": 13703
@@ -815,7 +815,7 @@
       "fit_receipt_sha256": "d341380d5064a6f19028fcb764c49cb1e434560c65081becf1f30f19bf42bc42",
       "fit_seed": 71,
       "gpu_elapsed_seconds": 10.29094723192975,
-      "gpu_host": "fit-machine-2",
+      "gpu_host": "xbabe2",
       "packed_artifact_bytes": 9201,
       "peak_gpu_used_mib": 396,
       "raw_artifact_bytes": 13709

@@ -18,7 +18,7 @@ from pathlib import Path
 RESULTS = Path(__file__).resolve().parent.parent / "results"
 AUDITORS = ("catboost", "linear", "mlp")
 CONTROLS = Path("/mnt/fast-scratch/dope-benchmark/review-fixes-lane-b/controls")
-TABSYN = Path("/path/to/operator-home/dope-scratch-x1/dope-rf-tabsyn-sample-v1")
+TABSYN = Path("/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-sample-v1")
 DENSITY_METHODS = ("GaussianCopula", "Chow-Liu", "independent_marginals")
 SDV_METHODS = ("CTGAN", "TVAE")
 FOREST = "ForestDiffusion/Forest-Flow"
@@ -26,20 +26,20 @@ HEADLINE_PROFILE = "features12_steps2048"
 # The frozen TabSyn fit registry admits fit seed 11 only (tabsyn_sample_evidence.py).
 TABSYN_FIT_SEED = 11
 # Block B fits seeds 23-71 into its own root (predeclare_v2.amendments/B-tabsyn-seeds.json).
-TABSYN_SEEDS = Path("/path/to/operator-home/dope-scratch-x1/dope-rf-tabsyn-seeds-v2")
+TABSYN_SEEDS = Path("/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-seeds-v2")
 TABSYN_NEW_SEEDS = (23, 37, 53, 71)
 LOCATIONS = (
     ("/mnt/fast-scratch/", "fast-scratch"),
-    ("/path/to/operator-home/dope-scratch-x1/", "fit-machine-1"),
-    ("/path/to/operator-home/dope-scratch-x2/", "fit-machine-2"),
-    ("/path/to/operator-home/dope-scratch-x3/", "fit-machine-3"),
-    ("/path/to/operator-home/dope/", "worktree"),
+    ("/home/ubuntu/dope-scratch-x1/", "xbabe1"),
+    ("/home/ubuntu/dope-scratch-x2/", "xbabe2"),
+    ("/home/ubuntu/dope-scratch-x3/", "xbabe3"),
+    ("/home/ubuntu/dope/", "worktree"),
 )
-HOST_HOMES = ("fit-machine-1", "fit-machine-2", "fit-machine-3")
+HOST_HOMES = ("xbabe1", "xbabe2", "xbabe3")
 # The auditor seed behind each ledger's stored values. container_validation_worker.py and
 # sdv_frozen_sample_validation.py passed the sample seed (101/211/307), so their stored
 # values differ from a seed-1729 replay by construction; at the sample seed they replay
-# bit for bit on fit-machine-2. ARF, TabSyn and the controls used 1729.
+# bit for bit on xbabe2. ARF, TabSyn and the controls used 1729.
 STORED_AUDITOR_SEED = {"density": "sample_seed", "sdv": "sample_seed", "forest": "sample_seed",
                        "dope-historical": "sample_seed", "arf": 1729, "tabsyn": 1729, "controls": 1729,
                        "tabsyn-seeds": None}

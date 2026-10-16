@@ -188,7 +188,10 @@ for host in "${hosts[@]}"; do
     rsync -a "$host:$remote_output/" "$output_root/"
 done
 
-manifest_files=("$output_root"/manifests/xbabe{1,2,3}.json)
+manifest_files=()
+for host in "${hosts[@]}"; do
+    manifest_files+=("$output_root/manifests/$host.json")
+done
 manifest_hashes="$(jq -r '.dataset_ids_sha256' "${manifest_files[@]}" | sort -u | wc -l)"
 assigned_total="$(jq -s 'map(.assigned) | add' "${manifest_files[@]}")"
 success_total="$(jq -s 'map(.success) | add' "${manifest_files[@]}")"

@@ -25,8 +25,8 @@
       95
     ],
     "whole_run_RAM_peak_forecast_bytes": null,
-    "fit-machine-2_aggregate_RAM_reservation_bytes": 52479131648,
-    "fit-machine-2_measured_MemAvailable_bytes": 60002570240
+    "xbabe2_aggregate_RAM_reservation_bytes": 52479131648,
+    "xbabe2_measured_MemAvailable_bytes": 60002570240
   },
   "cost_basis": {
     "all_architecture_R_and_D_cost_complete": false,
@@ -1090,7 +1090,7 @@
     "full_system_runtime_closure_certified": false,
     "gpu_target_operator_verified": true,
     "hardware_model": null,
-    "host": "fit-machine-2",
+    "host": "xbabe2",
     "initial_observed_device_free_mib": 24124,
     "kernel_only_fit_seconds": null,
     "maximum_observed_own_GPU_resident_mib": 430,

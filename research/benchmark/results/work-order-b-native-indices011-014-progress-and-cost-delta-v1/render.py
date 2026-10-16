@@ -47,7 +47,7 @@ def validate(r):
     for s in seeds:assert r['seed_coverage']['accepted_by_seed'][str(s)]==sum(x['seed'+str(s)].startswith('ok')for x in rows)
     assert [x['dataset']for x in rows if x['all_five_accepted']]==r['seed_coverage']['lineages_with_all_five_accepted_seeds']
     ops=r['measured_operations'];assert len(ops)==4 and [x['operation_index']for x in ops]==[11,12,13,14] and [x['fit_seed']for x in ops]==[23,37,53,71]
-    assert all(x['dataset']=='06b0312a585b436e' and x['host']=='fit-machine-2'and x['attempt']==1 and x['paid_trial_increment']==1 for x in ops)
+    assert all(x['dataset']=='06b0312a585b436e' and x['host']=='xbabe2'and x['attempt']==1 and x['paid_trial_increment']==1 for x in ops)
     for o in ops:
         assert o['parent_exit_code']==0 and 0<o['nested_operation_seconds_nonadditive']<=o['parent_wait_seconds']<=600
         assert o['official_tests_opened']is False and o['infrastructure_is_method_failure']is False

@@ -45,7 +45,7 @@ def validate(r):
     assert s['historical_reuse_runtime_upgraded']is False and s['mixed_runtime_equivalence_certified']is False and s['sample_completeness']is None and s['fivefit_stability']is None
     assert len(ops)==9 and [x['operation_index']for x in ops]==list(range(86,95)) and len({x['job_sha256']for x in ops})==9 and len({(x['dataset_lineage_id'],x['fit_seed'])for x in ops})==9
     for o in ops:
-        assert o['status']=='ok' and o['attempt']==1 and o['parent_exit_code']==0 and o['host']=='fit-machine-2'
+        assert o['status']=='ok' and o['attempt']==1 and o['parent_exit_code']==0 and o['host']=='xbabe2'
         assert 0<o['nested_operation_seconds_NONADDITIVE']<=o['parent_wait_seconds']<=600
         assert o['GPU_observation_count']>0 and o['gpu_target_operator_verified']is True and o['observed_providers_verified']is True
         assert 0<o['model_bytes']<=o['charged_model_plus_projection_bytes']<=10240 and o['charged_model_plus_projection_bytes']==o['model_bytes']+o['projection_bytes']

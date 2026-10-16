@@ -4,8 +4,8 @@ Two author-core GPU fits on the same 72-row S3 training-derived regression cohor
 
 | Fit seed | Native five-sample validation R² mean | Charged bytes | GPU training seconds | Fit entrypoint seconds | Host |
 |---:|---:|---:|---:|---:|---|
-| 11 | 0.8035797920 | 500946 | 2.816294 | 107.366174 | fit-machine-3 |
-| 23 | 0.7893576197 | 500979 | 2.830357 | 105.083254 | fit-machine-3 |
+| 11 | 0.8035797920 | 500946 | 2.816294 | 107.366174 | xbabe3 |
+| 23 | 0.7893576197 | 500979 | 2.830357 | 105.083254 | xbabe3 |
 
 Both artifacts exceed the 10,240-byte L3 cap. Sample-seed 0 replay is byte-exact for both fits. All five native synthetic seeds are accounted for each fit; native values are never ranked across methods.
 

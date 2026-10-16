@@ -329,7 +329,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11925,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/d92a273146657710bd2ba39c342feacc7f7f388f6017392454480aaab6de3a57.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/d92a273146657710bd2ba39c342feacc7f7f388f6017392454480aaab6de3a57.json",
         "sha256": "24fb18e3be50d620839ddd3fcde5dee2e566e7eb83097f49bb453fd394aafc23"
       },
       "release_safe_l3": null,
@@ -673,7 +673,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11895,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/5f4f02d939a363774bc79780f43d371e9d9d89042d6f5e73ad231746e8754c50.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/5f4f02d939a363774bc79780f43d371e9d9d89042d6f5e73ad231746e8754c50.json",
         "sha256": "d8ac85cae5e2219b24e18ce2c6be65e508baf96923b6a06a091aca971a678fb3"
       },
       "release_safe_l3": null,
@@ -1017,7 +1017,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11896,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/1bfc8ae95aca3db130c40206c7c95c5f8a5fc8abdffd328db8093a3ee595f2ff.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/1bfc8ae95aca3db130c40206c7c95c5f8a5fc8abdffd328db8093a3ee595f2ff.json",
         "sha256": "e5ece46ab66a39332e5beb53225d8e56b4d31fcffd1805068798803621e650a4"
       },
       "release_safe_l3": null,
@@ -1361,7 +1361,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11915,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/6464f382d61b22027d3487995022de0c882d7d361c38609d12a50b3b878288f1.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/6464f382d61b22027d3487995022de0c882d7d361c38609d12a50b3b878288f1.json",
         "sha256": "d08e206eeb0e94b7fadbe1cfefe31a96e52cbbf2a0bf887b2d59db82ea2f3347"
       },
       "release_safe_l3": null,
@@ -1705,7 +1705,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11965,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/3c5f4af959f9f35783d7bf1fb9b72d2ada979b9eb3a8b8312824ffa1f54db739.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/3c5f4af959f9f35783d7bf1fb9b72d2ada979b9eb3a8b8312824ffa1f54db739.json",
         "sha256": "bb62795338689b9e89414271bcadaf734e1fd145492cc4a5634905eccfdb95b8"
       },
       "release_safe_l3": null,
@@ -2049,7 +2049,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11976,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/b5d4a1c358673d4e719a69b0f4c04c789575cde9528025d250ce844fe635afb3.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/b5d4a1c358673d4e719a69b0f4c04c789575cde9528025d250ce844fe635afb3.json",
         "sha256": "e727fb6878f2fd57a271556e93e31d77ed9fa5f5cfc7d70d2965c9115e697d7a"
       },
       "release_safe_l3": null,
@@ -2393,7 +2393,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12053,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/1d5e0195086dc7eebc3a68c915ee215c52dbe2c61425d931b8aef3c52b0f71b7.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/1d5e0195086dc7eebc3a68c915ee215c52dbe2c61425d931b8aef3c52b0f71b7.json",
         "sha256": "7e8acf02a554e5184d0e96dddfa27b4351dab798226ad07347e6da0e21768160"
       },
       "release_safe_l3": null,
@@ -2737,7 +2737,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12069,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a85680ae8aea05db43f836855d51ffc722a2919f95f323d087ea06b71bd09634.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a85680ae8aea05db43f836855d51ffc722a2919f95f323d087ea06b71bd09634.json",
         "sha256": "2cb543c0d2e83d41a2a39647824221ac9e7c1ad4b67a712b65234a7f8bed60f4"
       },
       "release_safe_l3": null,
@@ -3081,7 +3081,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11965,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a271cf272db86b65520a8840f63c7736f1cdfe3b142adc75086115855ec66dbd.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a271cf272db86b65520a8840f63c7736f1cdfe3b142adc75086115855ec66dbd.json",
         "sha256": "96edc54f444405581002e9b96e27a413b0ceb461d7c415f0357a6c90d979963d"
       },
       "release_safe_l3": null,
@@ -3425,7 +3425,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12011,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/3d42239bd23e92ea4abeb36d1b56d5397a5f151099035d1834d607562eff85d1.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/3d42239bd23e92ea4abeb36d1b56d5397a5f151099035d1834d607562eff85d1.json",
         "sha256": "5c4f3f24a33041a2d08ef6743f0fae812be9abe5bfa9360569a5d93a24e67943"
       },
       "release_safe_l3": null,
@@ -3769,7 +3769,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12021,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/43e90dbf09ba101922d233fe159afa55632581103a269d4306eef48dcadf9034.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/43e90dbf09ba101922d233fe159afa55632581103a269d4306eef48dcadf9034.json",
         "sha256": "784a42ab8dbbd4dee8ed4e6e5435c7ce97be294448f748ea25cc0ff2df2063a3"
       },
       "release_safe_l3": null,
@@ -4113,7 +4113,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12031,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/362ae6bb6c8ca217dd714ea16b3fbd446aa2367081eb18a8cf376ada44184263.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/362ae6bb6c8ca217dd714ea16b3fbd446aa2367081eb18a8cf376ada44184263.json",
         "sha256": "3e08a0eb5ee49f0724ac14474c968c33282555230c5d1deb18986e77d139603c"
       },
       "release_safe_l3": null,
@@ -4457,7 +4457,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11989,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/381db5e5458b1d855f83c42b1ba862a5703858da04e2d834daa62d6aa6ebec46.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/381db5e5458b1d855f83c42b1ba862a5703858da04e2d834daa62d6aa6ebec46.json",
         "sha256": "260490e9d8b010a92ae7c9854303976cf9f50f833d8d880438e8b3f95251a5d9"
       },
       "release_safe_l3": null,
@@ -4801,7 +4801,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12098,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/43915c47f18e1946440ef97a2dc8b0ec6fc8949677e71a06b777e0cb8531b367.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/43915c47f18e1946440ef97a2dc8b0ec6fc8949677e71a06b777e0cb8531b367.json",
         "sha256": "bcc2c5de962c41f615f9e9b63c73966328c7d27db522d04e9c01501fc6fca977"
       },
       "release_safe_l3": null,
@@ -5145,7 +5145,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11988,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/c5d9b9848e1fa0537184a4f58cf3c6b4f9573c4fb60de850c4ff856f7579cdbf.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/c5d9b9848e1fa0537184a4f58cf3c6b4f9573c4fb60de850c4ff856f7579cdbf.json",
         "sha256": "f9ac850761e3c1947b8d3636a34045be2b29f8e28577a7326d2bd940571e0b30"
       },
       "release_safe_l3": null,
@@ -5489,7 +5489,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11968,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/6560651a8ef677cc975e813fb71a689a88f938d761661272a78c445dbe615a71.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/6560651a8ef677cc975e813fb71a689a88f938d761661272a78c445dbe615a71.json",
         "sha256": "b47c2fe10bd30bcc216ebe2b125932d7d81ab46d0205f23462a1337d30e768e3"
       },
       "release_safe_l3": null,
@@ -5833,7 +5833,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11981,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/975c7949faa691c0d7951ad5322512294a12753f8fbde34f7dbbe0cc0e7f3b50.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/975c7949faa691c0d7951ad5322512294a12753f8fbde34f7dbbe0cc0e7f3b50.json",
         "sha256": "249c7ec84e3fde2fa89d430500372122f2ac5c456997cf4591c03eccc92d3517"
       },
       "release_safe_l3": null,
@@ -6177,7 +6177,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11867,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/972184e4344296eda4b635d604069c158053bf32a4444f212aa482884d5fc077.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/972184e4344296eda4b635d604069c158053bf32a4444f212aa482884d5fc077.json",
         "sha256": "fe90dd3cb9377aff32032442b883cf280bfb556faf94ec2e43d0a4b0e4476008"
       },
       "release_safe_l3": null,
@@ -6521,7 +6521,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11947,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/e342d577ba184eb7a8395f579186a477541039d79b172ddbf95cfaf792ff6971.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/e342d577ba184eb7a8395f579186a477541039d79b172ddbf95cfaf792ff6971.json",
         "sha256": "3d9be98e83071bb822de59353ce949ec1bcd196cd98b8b9895c1ff6962447339"
       },
       "release_safe_l3": null,
@@ -6865,7 +6865,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12034,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/b2f1c8ad5a8be748dc58e16fccd45f882f4170448b3a66bba5f59d2cdfb2f862.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/b2f1c8ad5a8be748dc58e16fccd45f882f4170448b3a66bba5f59d2cdfb2f862.json",
         "sha256": "0388cf6d1122ed48a597d8d955ea35aba831061759effa3ac1a702d8b5649d11"
       },
       "release_safe_l3": null,
@@ -7209,7 +7209,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11969,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a1ec87f6a3ff5ece2894b2756c8193d305a14f5b3aec11de961e3b15ddac2b1c.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a1ec87f6a3ff5ece2894b2756c8193d305a14f5b3aec11de961e3b15ddac2b1c.json",
         "sha256": "34586aaf68dc52498f31a13294b43598a7a445a3d603f41c19e5742763b863a6"
       },
       "release_safe_l3": null,
@@ -7553,7 +7553,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12005,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/e6ced5ec1b1e46d93e6950b0960dbfa75d957fdc5fde7f598d645eb1d89602af.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/e6ced5ec1b1e46d93e6950b0960dbfa75d957fdc5fde7f598d645eb1d89602af.json",
         "sha256": "80c856846451458081fa1dfc84255d4dd063c4bc2501fad8ec9c939a5a9a7c14"
       },
       "release_safe_l3": null,
@@ -7897,7 +7897,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 12051,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/d57f4b0a7d58a9393fe04751c9485299bfb712e6d8adf7e776b262e40d381e84.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/d57f4b0a7d58a9393fe04751c9485299bfb712e6d8adf7e776b262e40d381e84.json",
         "sha256": "122f48a264b75a4b61a0af18b60ec4625d1f0a1e5084ccbfb75f2600b7998837"
       },
       "release_safe_l3": null,
@@ -8241,7 +8241,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11909,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/6eca0660fd928778b7b2b71245e0c501ff519aa58848a92d70cd1f96cebf37c1.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/6eca0660fd928778b7b2b71245e0c501ff519aa58848a92d70cd1f96cebf37c1.json",
         "sha256": "f2b56a84d28d09a37c4a58b3d74600867291e3dde7e6eb78f69654bf7a2c134a"
       },
       "release_safe_l3": null,
@@ -8576,7 +8576,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11584,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/0ec7a6491bbb9d8c5314cd4b03135612b8cb60431a5ce5411e9d0074f516639a.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/0ec7a6491bbb9d8c5314cd4b03135612b8cb60431a5ce5411e9d0074f516639a.json",
         "sha256": "b50dde810fffe404d763a3803e83d5f861795bcebba8884e4f18164d03907b77"
       },
       "release_safe_l3": null,
@@ -8911,7 +8911,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11568,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/f5ffe4a0b6b2669725312fbd5db5c227518e1dfce00518db9a14f0a6d5e2c6f7.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/f5ffe4a0b6b2669725312fbd5db5c227518e1dfce00518db9a14f0a6d5e2c6f7.json",
         "sha256": "283809fceeab225f401c33eeca4e3880b63b14ac969b34e950f14ca4dee0b7bd"
       },
       "release_safe_l3": null,
@@ -9246,7 +9246,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11655,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/b4306486d75da0841448063233209ff79c00feaaf1ef07da435cd53a68f4788b.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/b4306486d75da0841448063233209ff79c00feaaf1ef07da435cd53a68f4788b.json",
         "sha256": "c339748c9a659a108d6d61b6e6ae4200ec8d07ca747deb6ebcb84651b4a1d5d1"
       },
       "release_safe_l3": null,
@@ -9581,7 +9581,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11697,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/cc901fc8432a702f27ae6d7990febae0937b5a132a81b4aa144da8536530873e.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/cc901fc8432a702f27ae6d7990febae0937b5a132a81b4aa144da8536530873e.json",
         "sha256": "ee3610f54ae74e41d32d854d8fb13dd3f54bc049a97577a551c94c5af1cdf2d0"
       },
       "release_safe_l3": null,
@@ -9916,7 +9916,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11692,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a0f76415cdc34cf6f2e1405905cdc2a557798254ee849725004f37b0e720e6f8.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a0f76415cdc34cf6f2e1405905cdc2a557798254ee849725004f37b0e720e6f8.json",
         "sha256": "e8a9196ee6ec2c7a5a52187b1709adc1ef1ea48add1302a2dee05f1dc329059d"
       },
       "release_safe_l3": null,
@@ -10251,7 +10251,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11604,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/3c84ddead1dd3eb165f18938568e5734209a168e412c8e8a02948dc5c14a5bb9.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/3c84ddead1dd3eb165f18938568e5734209a168e412c8e8a02948dc5c14a5bb9.json",
         "sha256": "587871e26b0a772c70cad67be94008a2ee2a37a5572c5f7a3dbb8a5a3a254352"
       },
       "release_safe_l3": null,
@@ -10586,7 +10586,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11532,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/bdffcc020893164abf5f15c653a45b52ed2afa445b57b4d8d3705e39a6b8051f.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/bdffcc020893164abf5f15c653a45b52ed2afa445b57b4d8d3705e39a6b8051f.json",
         "sha256": "5e41dfa0b36b6ccfd1bf2232018c46e4969fc78a559af6f17248424c9e644b72"
       },
       "release_safe_l3": null,
@@ -10921,7 +10921,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11722,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/eba999a7b6ff4be1494e97eb415a80c71b3fa7ae48bfe959336df373259d7ce3.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/eba999a7b6ff4be1494e97eb415a80c71b3fa7ae48bfe959336df373259d7ce3.json",
         "sha256": "86b8422f90e223d1c9e5f8ff95eaadb15b5345c47af39733966a9af2f3d80d25"
       },
       "release_safe_l3": null,
@@ -11256,7 +11256,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11668,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a72cdb36364083e6a5a5365dd8b43db75c0581b6861e49701252e741e2a3c7a7.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a72cdb36364083e6a5a5365dd8b43db75c0581b6861e49701252e741e2a3c7a7.json",
         "sha256": "af5c086de26e0c4a6f9fbff9a90f973929b3b45232713edf30ad6489aea6f32a"
       },
       "release_safe_l3": null,
@@ -11591,7 +11591,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11634,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/74725e93a3860159f480da77eedf3f280a3dfbaeb1e5ffab99385e50d3935aa2.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/74725e93a3860159f480da77eedf3f280a3dfbaeb1e5ffab99385e50d3935aa2.json",
         "sha256": "7d7028b92ea7063644df2bc5336fd4de48eb5596fde06525a8649f625d75a246"
       },
       "release_safe_l3": null,
@@ -11926,7 +11926,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11663,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/01fa151b2ec68366b45cb151218528e4308e46e4e1ed7c12990a8267b2718d2f.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/01fa151b2ec68366b45cb151218528e4308e46e4e1ed7c12990a8267b2718d2f.json",
         "sha256": "bd373746a09a6b452f537d662beee9bc3c946830726a07c61509d06bef224810"
       },
       "release_safe_l3": null,
@@ -12261,7 +12261,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11706,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/90eaed51a3db8f0a0c1d457909ced7ba98f1b4c71df99aa16ca8d20d3ba1b42f.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/90eaed51a3db8f0a0c1d457909ced7ba98f1b4c71df99aa16ca8d20d3ba1b42f.json",
         "sha256": "5b45a10d79eece02c38f3f24b8e3ffeb5ee16bc3b52e7ce61ec0d800dabbfe2c"
       },
       "release_safe_l3": null,
@@ -12596,7 +12596,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11723,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/dfa4d88b6016a47776114c5b38a3f82648532bd3f6e265a0c5953911012126d1.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/dfa4d88b6016a47776114c5b38a3f82648532bd3f6e265a0c5953911012126d1.json",
         "sha256": "c089545f0905fd4283ca0af91a00118e8134241b39a8d5b8e3b5e110bea7fc58"
       },
       "release_safe_l3": null,
@@ -12931,7 +12931,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11730,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a894be3ae9d6f4660d8e935158d395f55c9a2bbef3e7ed0705e54e2000a09787.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/a894be3ae9d6f4660d8e935158d395f55c9a2bbef3e7ed0705e54e2000a09787.json",
         "sha256": "41aaa3afc438a6bcbfc9856309134cb4b469e000de3cbd9eb9c3b041bf2a0dc2"
       },
       "release_safe_l3": null,
@@ -13266,7 +13266,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11707,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/5323e7c8061ba2fd51b6238bff0915183f6f53c55708c8783d4ee039d8d8c82d.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/5323e7c8061ba2fd51b6238bff0915183f6f53c55708c8783d4ee039d8d8c82d.json",
         "sha256": "5ae8a4941aa4b869663f9ba89404cf11786f9e65c4c43d1e1afcc34692158aa7"
       },
       "release_safe_l3": null,
@@ -13601,7 +13601,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11628,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/c820f53cf57d1eb8e32e281305f594132880eb8c029cb73d2006028118c54b89.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/c820f53cf57d1eb8e32e281305f594132880eb8c029cb73d2006028118c54b89.json",
         "sha256": "b0bf8149a16cb09a7708a8ea127ec2324f1ce53e1462aebf54c7d0bd2deba109"
       },
       "release_safe_l3": null,
@@ -13936,7 +13936,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11531,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/776c147b7463585ebe4cd0b7da23958d00bfc6c71641332d64f6dc6c52d7cfdf.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/776c147b7463585ebe4cd0b7da23958d00bfc6c71641332d64f6dc6c52d7cfdf.json",
         "sha256": "b485fdf2d6635305e1a51168cc89a782ebb335effe6cbbce8bc9a62e6399ecdb"
       },
       "release_safe_l3": null,
@@ -14271,7 +14271,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11636,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/686022126ae277a8838005453043ab2e4a72a0f827cf9354bd7708129a69199c.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/686022126ae277a8838005453043ab2e4a72a0f827cf9354bd7708129a69199c.json",
         "sha256": "df93a2169ab05019f840daf990ff8dcd75686c3f1928abbd7f8da8a874d700da"
       },
       "release_safe_l3": null,
@@ -14606,7 +14606,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11713,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/fb678213c1e56696ef066bec0be463e38ebf39d1a1524478362941d3f482ad5a.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/fb678213c1e56696ef066bec0be463e38ebf39d1a1524478362941d3f482ad5a.json",
         "sha256": "b61a7e32e474df8a3ffeabb3ae72786086d91bd8b277ce7eabf1c3f60ba501e0"
       },
       "release_safe_l3": null,
@@ -14941,7 +14941,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11714,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/ebc7f8833b088fa412b3ff65bf826a60c017197b2eac6093ad6247e6d42fa1f6.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/ebc7f8833b088fa412b3ff65bf826a60c017197b2eac6093ad6247e6d42fa1f6.json",
         "sha256": "00adbabc5ccfa011ace89fe0dd5f655c5830e2a86acf89b47cdf1c1022b10569"
       },
       "release_safe_l3": null,
@@ -15276,7 +15276,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11633,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/3e6b4f5f0006ee7207e2f6e2e1a99ac62b34c1aae5df48fc2eeedf54aa3211e7.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/3e6b4f5f0006ee7207e2f6e2e1a99ac62b34c1aae5df48fc2eeedf54aa3211e7.json",
         "sha256": "65064a5da2c9e80de3badbd9d524bfc7a7a7db1a457d9bd17f3c65b364d83014"
       },
       "release_safe_l3": null,
@@ -15611,7 +15611,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11790,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/2e24472eaab0ae877412ca4b01dc70f844719903cdb588d3d27a77bf7ed5cd1b.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/2e24472eaab0ae877412ca4b01dc70f844719903cdb588d3d27a77bf7ed5cd1b.json",
         "sha256": "c02f45c6425a7b9d5900a6eea0d3eeff91d31c98f4b64edc52dc6b693421c650"
       },
       "release_safe_l3": null,
@@ -15946,7 +15946,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11656,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/d19de9d7a5ee8184d89b3bdee2a9bec2028b52d36c661f39e4fa262ffa72ebaa.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/d19de9d7a5ee8184d89b3bdee2a9bec2028b52d36c661f39e4fa262ffa72ebaa.json",
         "sha256": "70edaa65403c4ed6f70a80806a351f87cee42c8ac43097eeae5282f495cef69b"
       },
       "release_safe_l3": null,
@@ -16281,7 +16281,7 @@
       "ptf_v1": null,
       "receipt_ref": {
         "bytes": 11675,
-        "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/fe041a745c5b276ba14db79bf8dbb54fa5a397a36cc7070842cda58d52d421a7.json",
+        "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/fe041a745c5b276ba14db79bf8dbb54fa5a397a36cc7070842cda58d52d421a7.json",
         "sha256": "8a09aa91b8b99798ec8a34f0538e297e524d0420084cc144958d523052011839"
       },
       "release_safe_l3": null,
@@ -16300,18 +16300,18 @@
   "comparison_scope": "training_derived_validation_only",
   "executed_driver_ref": {
     "bytes": 11076,
-    "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/measure_retained_samples.py",
+    "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/measure_retained_samples.py",
     "sha256": "553750022364da3c19410887b96b71d4a235bf0cb22cebb2b98df4a76f9a6b1e"
   },
   "execution_ref": {
     "bytes": 2383,
-    "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/publication-batch1-v1/execution.actual.json",
+    "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/publication-batch1-v1/execution.actual.json",
     "sha256": "bc22b3c27d7530c62462875ded17409f6fc31f750a9635a2054242b869b0a13b"
   },
   "format": "dope-retained-validation-panel",
   "input_manifest_ref": {
     "bytes": 180161,
-    "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/common-metrics-inputs.lock.json",
+    "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/common-metrics-inputs.lock.json",
     "sha256": "a466ec88d5a42313439324408b5de50bee2a75c4393b6553a0bda2e081adcce5"
   },
   "lineages": 2,
@@ -16321,13 +16321,13 @@
   "ptf_v1": null,
   "receipt_lock_ref": {
     "bytes": 14355,
-    "path": "/path/to/operator-home/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/receipt-lock.json",
+    "path": "/home/ubuntu/dope-scratch-x2/forest-fivefit-metrics-batch1/metric-receipts/receipt-lock.json",
     "sha256": "1b5d3e97367366658f8e6fedea1f28d4833a250f5f98666ef42f809d7baf4a14"
   },
   "release_safe_l3": null,
   "runtime_inventory_ref": {
     "bytes": 840075,
-    "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/common-runtime-inventory.actual.json",
+    "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/common-runtime-inventory.actual.json",
     "sha256": "8f9189d7dd1596d7ea5c7b4b166582a37d7573f1d62d0aa24a364488c3e984c2"
   },
   "sample_cells": 48,
@@ -16335,12 +16335,12 @@
   "source_refs": {
     "expanded_validation_metrics": {
       "bytes": 13747,
-      "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/expanded_validation_metrics.py",
+      "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/expanded_validation_metrics.py",
       "sha256": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f"
     },
     "pilot_metrics": {
       "bytes": 6986,
-      "path": "/path/to/operator-home/dope-scratch-x2/arf-retained-metrics-v1/source/pilot_metrics.py",
+      "path": "/home/ubuntu/dope-scratch-x2/arf-retained-metrics-v1/source/pilot_metrics.py",
       "sha256": "6c03892685df856f7a491ca79acb1c28fe8270ead8bbfea1ba50228cb6f0e7e3"
     }
   },

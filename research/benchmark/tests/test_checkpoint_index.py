@@ -167,22 +167,10 @@ class CheckpointIndex(unittest.TestCase):
 
     def test_committed_figure_kpis_regenerate_from_existing_publications(self):
         report = self.report(); rows = []
-        scrub = json.loads((p.HERE.parents[1] / 'evidence/tree-scrub.json').read_text())
-        by_public = {item['public_sha256']: item['original_sha256'] for item in scrub['changes']}
-        by_public['e40d69a8c9a383f953fbaa6d20db9ac649b9d02802b65f59b5b4c0eac7f7e1ea'] = (
-            'c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602'
-        )
-        repinned_disk = {
-            'e40d69a8c9a383f953fbaa6d20db9ac649b9d02802b65f59b5b4c0eac7f7e1ea': (
-                '6ca69244969316af8dcd8948318c42565aeaf060fe658955616d1ed20c66b1a3'
-            ),
-        }
         for name in p.PANELS:
             ref = report['source_publications'][name]
-            disk_sha = repinned_disk.get(ref['sha256'], ref['sha256'])
-            orig_sha = by_public.get(ref['sha256'], ref['sha256'])
-            panel = p.guard.decode(p.bound_bytes((p.RESULTS / name).absolute(), disk_sha))
-            rows.extend(dict(source_panel=name, source_sha256=orig_sha, **r) for r in p.grouped(panel))
+            panel = p.guard.decode(p.bound_bytes((p.RESULTS / name).absolute(), ref['sha256']))
+            rows.extend(dict(source_panel=name, source_sha256=ref['sha256'], **r) for r in p.grouped(panel))
         actual = (p.RESULTS / p.NAME / 'figure-kpis.csv').read_bytes()
         self.assertEqual(actual, p.csv_text(rows, tuple(rows[0])))
         self.assertEqual(len(rows), 3600)
@@ -212,8 +200,6 @@ class CheckpointIndex(unittest.TestCase):
 
     def test_committed_schema_hashes_source_and_claims(self):
         report = self.report(); root = p.RESULTS / p.NAME
-        scrub = json.loads((p.HERE.parents[1] / 'evidence/tree-scrub.json').read_text())
-        by_sha = {item['original_sha256']: item for item in scrub['changes']}
         self.assertEqual(report['publisher_sha256'], hashlib.sha256(Path(p.__file__).read_bytes()).hexdigest())
         self.assertEqual(report['inputs_lock_sha256'], p.INPUT_SHA)
         spec = json.loads((root / 'publication.schema.json').read_bytes())
@@ -222,10 +208,7 @@ class CheckpointIndex(unittest.TestCase):
                             json.loads((root / 'inputs.lock.schema.json').read_bytes()))
         for name, pin in report['artifact_tables'].items():
             body = (root / name).read_bytes()
-            mapped = by_sha.get(pin['sha256'])
-            expected_sha = mapped['public_sha256'] if mapped else pin['sha256']
-            expected_bytes = mapped['public_bytes'] if mapped else pin['bytes']
-            self.assertEqual(hashlib.sha256(body).hexdigest(), expected_sha); self.assertEqual(len(body), expected_bytes)
+            self.assertEqual(hashlib.sha256(body).hexdigest(), pin['sha256']); self.assertEqual(len(body), pin['bytes'])
         for name, expected in p.CLAIMS.items():
             self.assertIs(report[name], expected)
             bad = deepcopy(report); bad[name] = True if expected is None or expected is False else False

@@ -30,9 +30,9 @@
       "sha256": "1ace0d29b2f26e1f02a590ac018ebe651f1a230166bd67c08f325222b906b8cb"
     },
     "checkpoint-kpis.csv": {
-      "bytes": 12410,
+      "bytes": 12160,
       "path": "research/benchmark/results/forest-third-five-fivefit-v1/checkpoint-kpis.csv",
-      "sha256": "aaf411fa5fa701978245802eb0fec8b8bc2e1ca324e1c6e290d5835c571bf60d"
+      "sha256": "5519215a7d6f515206e36d5d11bb7db4ac5a08bec7a4c8b874a36aed2c9c89a3"
     },
     "figure-kpis.csv": {
       "bytes": 17892,
@@ -50,9 +50,9 @@
       "sha256": "827ec8bd6f0d61a2cb99f6565f1c6d33ee45628255bc0bf9060eb171adaeb441"
     },
     "inputs.lock.json": {
-      "bytes": 65142,
+      "bytes": 63792,
       "path": "research/benchmark/results/forest-third-five-fivefit-v1/inputs.lock.json",
-      "sha256": "a955587b1fd4dd9c0a45a88f8d1b426fd5e23418964e007bdac0fdebdd555aed"
+      "sha256": "abde27da0caa541c2477ce1d36cce172ee03a1c68e86cac00935db1149088a62"
     },
     "manifest.schema.json": {
       "bytes": 2281,
@@ -60,14 +60,14 @@
       "sha256": "4da7269daa5aa0e22266dc0cbaeee8fe6092ddf82e21e494ce119b30fc198015"
     },
     "original-verification.json": {
-      "bytes": 55355,
+      "bytes": 53455,
       "path": "research/benchmark/results/forest-third-five-fivefit-v1/original-verification.json",
-      "sha256": "4150072856f4bac25f14c24b639073f47ce29785bedd517985169ae72bac3391"
+      "sha256": "137c5ee6edbf8410229a8144cf4675c257558500f40b9b14f438b67756a4f47c"
     },
     "panel.json": {
-      "bytes": 2377921,
+      "bytes": 2368071,
       "path": "research/benchmark/results/forest-third-five-fivefit-v1/panel.json",
-      "sha256": "73ed40da3763836cfa16176eb605fc4dd69e3ecd2f8e003f838840b4c272767b"
+      "sha256": "311af74fe4ba6635bf736b28c4436afe64f47ff017b2ae018c33bbf3ce69cd8b"
     },
     "panel.schema.json": {
       "bytes": 6374,
@@ -89,9 +89,9 @@
   "official_tests_opened": false,
   "original_checkpoints_sha_verified": 25,
   "original_verification_ref": {
-    "bytes": 55355,
+    "bytes": 53455,
     "path": "research/benchmark/results/forest-third-five-fivefit-v1/original-verification.json",
-    "sha256": "4150072856f4bac25f14c24b639073f47ce29785bedd517985169ae72bac3391"
+    "sha256": "137c5ee6edbf8410229a8144cf4675c257558500f40b9b14f438b67756a4f47c"
   },
   "producer_refs": {
     "plot_forest_fit_variance.py": {

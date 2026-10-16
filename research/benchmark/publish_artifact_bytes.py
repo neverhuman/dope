@@ -79,7 +79,7 @@ def build():
             and analysis['codec_sha256'] == grid['codec_source_sha256']
             == sha256(ROOT / 'codec.py') == sha256(Path(codec.__file__)), 'declared byte analysis changed')
     require(type(analysis['elapsed_seconds']) in (int, float) and math.isfinite(analysis['elapsed_seconds'])
-            and 0 <= analysis['elapsed_seconds'] <= 60 and analysis['host'] in ('fit-machine-1', 'fit-machine-2', 'fit-machine-3'),
+            and 0 <= analysis['elapsed_seconds'] <= 60 and analysis['host'] in ('xbabe1', 'xbabe2', 'xbabe3'),
             'byte analysis cost or host changed')
     parent = base / 'dope-s3-population-research-v2'
     for name, expected in PARENT_ANCHORS.items(): checked(parent / name, expected, base)

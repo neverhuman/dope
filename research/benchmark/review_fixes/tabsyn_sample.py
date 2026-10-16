@@ -39,12 +39,12 @@ import types
 from pathlib import Path
 
 RUNTIME_LOCK = Path("/mnt/fast-scratch/dope-benchmark/tabsyn-x2-runtime-v1/runtime.lock.json")
-QUEUE = Path("/path/to/operator-home/dope-scratch-x1/ts100-owner-queue-v2/operations")
-DIRECT = Path("/path/to/operator-home/dope-scratch-x1/ts100-owner-direct-v1")
-OUTPUT = Path("/path/to/operator-home/dope-scratch-x1/dope-rf-tabsyn-sample-v1")
+QUEUE = Path("/home/ubuntu/dope-scratch-x1/ts100-owner-queue-v2/operations")
+DIRECT = Path("/home/ubuntu/dope-scratch-x1/ts100-owner-direct-v1")
+OUTPUT = Path("/home/ubuntu/dope-scratch-x1/dope-rf-tabsyn-sample-v1")
 PANEL_DATASET = "02a45777900441ce"
 PUBLISHED_CSV = Path(
-    "/path/to/operator-home/dope-scratch-x1/ts-GPU-default-samples-v3/operations/"
+    "/home/ubuntu/dope-scratch-x1/ts-GPU-default-samples-v3/operations/"
     "0001-02a45777900441ce-sample/sample-101-4n.csv"
 )
 WORKERS = Path("/mnt/fast-scratch/dope-benchmark/s3-v1/prepared/worker")
@@ -97,8 +97,8 @@ def _belongs_to_us(pid: int) -> bool:
 
 
 def _host_gate() -> None:
-    if os.uname().nodename != "fit-machine-1" or os.getuid() != 1000:
-        raise SystemExit("TabSyn sampling is pinned to ubuntu on fit-machine-1")
+    if os.uname().nodename != "xbabe1" or os.getuid() != 1000:
+        raise SystemExit("TabSyn sampling is pinned to ubuntu on xbabe1")
     if _memory_fraction() < 0.15:
         raise SystemExit("refusing: less than 15 percent of RAM is free")
     foreign = [pid for pid in _gpu_pids() if not _belongs_to_us(pid)]

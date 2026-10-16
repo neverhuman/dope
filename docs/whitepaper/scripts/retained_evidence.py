@@ -19,17 +19,17 @@ from research.benchmark.review_fixes.display_names import display  # noqa: E402
 OUT = REPO / "docs/whitepaper/generated"
 SOURCES = {
     "classical": ("research/benchmark/results/retained-classical-validation/panel.json",
-                  "a9e302a0efdafec7ba0888f12adfd94496ded921c9c40ebd805d2e5290be49aa"),
+                  "f841daea8de49ef6a8f0d1d05159050981ebe80661ead64fc84ecbf9c0b29680"),
     "tabsyn": ("research/benchmark/results/tabsyn-eight-lineage-validation/panel.json",
-               "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"),
+               "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"),
     "first12": ("research/benchmark/results/common-A952-validation-v1/first12.completed.json",
                 "8e039b1d57298f10bf7c05c2f3a8b14481a60ed663c1063ed30c273854f3bdfe"),
     "arf": ("research/benchmark/results/arf-matched-population-validation.json",
-            "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"),
+            "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"),
     "forest": ("research/benchmark/results/s3-matched-forest-confirmation-validation.json",
-               "160b48dad42295131b758a2ef76074a2c645f914aa3c831f4f51924f928ead91"),
+               "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"),
     "forest_pilot": ("research/benchmark/results/pilot24-forestdiffusion-native.json",
-                     "933aeb223777bcfa401c2d49a6ce4e33e659a871652721fe391e2097a8425336"),
+                     "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"),
 }
 FIELDS = ("catboost_retention", "linear_retention", "mlp_retention",
           "marginal_error_mean", "pairwise_pearson_difference_mean", "contingency_tv_mean",

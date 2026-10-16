@@ -5,36 +5,36 @@
       "sha256": "c4771f0b0723c2ecae086da1ec71df286b690e60d67dc4fe921982619327a4e6"
     },
     "research/benchmark/results/arf-matched-population-validation.json": {
-      "bytes": 6807397,
-      "sha256": "fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46"
+      "bytes": 6807387,
+      "sha256": "c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7"
     },
     "research/benchmark/results/arf-s3-population-native.json": {
-      "bytes": 1477635,
-      "sha256": "11394f3aa0edfd35521cd8773a7db89919ea2a554ccef5f0c8e16e4538225f2e"
+      "bytes": 1472035,
+      "sha256": "3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba335692e"
     },
     "research/benchmark/results/arf-tabsyn-followon-validation-v1/panel.json": {
-      "bytes": 21478208,
-      "sha256": "e797f3ef0c1907d51caddb06c7669683afaf96274a2af5a885ab5dd7abdaf13e"
+      "bytes": 21453198,
+      "sha256": "069eea5d428fe76e5fcb1c100845d067d3add4cfb2df2c53d08e1451fa29324a"
     },
     "research/benchmark/results/cpu-fivefit-validation-v1/arf/panel.json": {
-      "bytes": 1751842,
-      "sha256": "0b8b6191be188cbc7abf7412e80cae028f4b8bc3e8ecbc5332370a945e9e4f0f"
+      "bytes": 1751802,
+      "sha256": "d4a72b56358346346fc4643dfdd499aa06c92e803a71af3f8ecc8127e8b52ab9"
     },
     "research/benchmark/results/cpu-fivefit-validation-v1/forest/panel.json": {
-      "bytes": 556651,
-      "sha256": "0b6ed6ea95778893852dbe3ea346d0d3ee27fdb26f77cc9e3d6a574349a70374"
+      "bytes": 556101,
+      "sha256": "a4af32f29918ee299a86ef4ff0fb59408dcdd187c7c11a074be9229b2ece7423"
     },
     "research/benchmark/results/density-matched-population-validation.json": {
-      "bytes": 21794636,
-      "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+      "bytes": 21794615,
+      "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
     },
     "research/benchmark/results/expanded-validation-diagnostics.json": {
-      "bytes": 1563424,
-      "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+      "bytes": 1563417,
+      "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
     },
     "research/benchmark/results/review-fixes-controls-v1/panel.json": {
       "bytes": 21280,
-      "sha256": "0d1804d4b3b74efd4efee2147af8d1a3f75376b83dab358e256e0d17274de092"
+      "sha256": "3d6f32bb8a1276993de2d2527b95633a4aadb2e0b622dc4f8a1f7574eff87e21"
     },
     "research/benchmark/results/review-fixes-controls-v1/scalar-cells.jsonl": {
       "bytes": 5382380,
@@ -42,11 +42,11 @@
     },
     "research/benchmark/results/review-fixes-fidelity-v1/panel.json": {
       "bytes": 47247,
-      "sha256": "bc2ecd817584cd309c8cd2d06cf5b5e2d6933fb3a538e5285afad60f0a77ff00"
+      "sha256": "b1c1890767b3ccd672fa1e95d3f6db9e26003760afc39214940ab308e7bff237"
     },
     "research/benchmark/results/review-fixes-privacy-v1/panel.json": {
       "bytes": 48890,
-      "sha256": "081e8b87dd31b08b55e107566f847cb610d33e491b91f193b668617d7c1bb463"
+      "sha256": "2caa429ae03b5bbc61b30c4ce9391670f70ec9a991e2d398974a8bf3d76942f8"
     },
     "research/benchmark/results/review-fixes-privacy-v1/scalar-cells.jsonl": {
       "bytes": 2627173,
@@ -62,7 +62,7 @@
     },
     "research/benchmark/results/review-fixes-tabsyn-fidelity-v1/scalar-cells.meta.json": {
       "bytes": 596,
-      "sha256": "1a7f3e892fa0610ba98138b865dff5c2d27ac3c59dc62d4a52ee27bd592de686"
+      "sha256": "a18ee597a4c596e8fe840c10ee33b5e977e0111f14b764589edb125d97e6d408"
     },
     "research/benchmark/results/review-fixes-tabsyn-seeds-v2/fits.jsonl": {
       "bytes": 173775,
@@ -78,7 +78,7 @@
     },
     "research/benchmark/results/review-fixes-tabsyn-v1/sample-evidence.json": {
       "bytes": 189857,
-      "sha256": "f71ae4e90d77b7c5a769d7afe56533571cfd64f866c45b97c2017a584130f4aa"
+      "sha256": "274b6eef4ce95545ded969763ffffa3e1154a2d9192c1e2867dd7ddcb719e0e3"
     },
     "research/benchmark/results/review-fixes-tabsyn-v1/sampling-receipts.json": {
       "bytes": 163185,
@@ -90,11 +90,11 @@
     },
     "research/benchmark/results/review-fixes-v2/all-five.json": {
       "bytes": 102106,
-      "sha256": "2b44b36e2558fa9b18991c6420d8048c540a1dc1ce0e5116c2cbb96a52615ee4"
+      "sha256": "a8cff2b30d99318db2565b3b3c4f33f1a749eb5f5b498a442216456f1a8d7128"
     },
     "research/benchmark/results/review-fixes-v2/family.json": {
       "bytes": 210453,
-      "sha256": "840a6d1711a13477dfe3793ecbf59bf5ffa1a2fb18802cfcb04ada5c8bff312b"
+      "sha256": "244665a35f19791ef763eadbd0f3c102e8954ad0f626103f676686b66e12bd40"
     },
     "research/benchmark/results/review-fixes-v2/fits.jsonl": {
       "bytes": 501159,
@@ -102,7 +102,7 @@
     },
     "research/benchmark/results/review-fixes-v2/panel.json": {
       "bytes": 556137,
-      "sha256": "5c84877bd0465c6e951d683b7003afccb13c3b83eb343f1b2e681692a92ce288"
+      "sha256": "049e81158c6d2265f52a474bdd4532a09be3c3d734f034a36ecc7de2bbb610d5"
     },
     "research/benchmark/results/review-fixes-v2/scalar-cells.jsonl": {
       "bytes": 24121982,
@@ -113,36 +113,36 @@
       "sha256": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7"
     },
     "research/benchmark/results/s3-matched-forest-confirmation-validation.json": {
-      "bytes": 1237755,
-      "sha256": "160b48dad42295131b758a2ef76074a2c645f914aa3c831f4f51924f928ead91"
+      "bytes": 1237153,
+      "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
     },
     "research/benchmark/results/sdv-matched-population-validation.json": {
-      "bytes": 13571834,
-      "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+      "bytes": 13567823,
+      "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
     },
     "research/benchmark/results/tabsyn-default100-scaled-cuda-fits.json": {
-      "bytes": 568028,
-      "sha256": "0ae182ceb2602a542f77d8936518c5ca5a7fbba8761b2d2051f0c11c24d257f0"
+      "bytes": 555911,
+      "sha256": "cb2c1c134ccd1af9865e156faee8796143c212d1f76e70ab70f7048f82a08272"
     },
     "research/benchmark/results/tabsyn-eight-lineage-validation/panel.json": {
-      "bytes": 583249,
-      "sha256": "ee1f26ceddf0c5ba82d6d0ce5da2d1f956a44b4a8ce9413f8f4a6d223676ccb5"
+      "bytes": 582699,
+      "sha256": "3e49c1f8f99615f21abee3504afb645e6b61eaab2d88be2e279be0c0c1b91d76"
     },
     "research/benchmark/review_fixes/paper-build.json": {
       "bytes": 4358,
       "sha256": "af2482420e24bc5bda8e097074a5c0471a02f89689237ca61b040be554edd54e"
     },
     "research/benchmark/review_fixes/predeclare.json": {
-      "bytes": 12053,
-      "sha256": "e64a73897a0282bcf3604b175f5c90955022f12a8dc5167eb2e1da3c2687d2d3"
+      "bytes": 12002,
+      "sha256": "921865c374bc4f0d6dd88f3450409ea3c35a84ff9e8ce206d5772b7710dca3e5"
     },
     "research/benchmark/review_fixes/predeclare_v2.json": {
-      "bytes": 21817,
-      "sha256": "ed718312d58e7dc12426f95a1b060a9a2d38b4f1092619e4169dd4c9f811b4b2"
+      "bytes": 21730,
+      "sha256": "851215f70725b49cc74c8768aee45599b480881e5316ffe62d6b8b18862e9a47"
     },
     "research/benchmark/review_fixes/tabsyn-fidelity-predeclare.json": {
       "bytes": 11711,
-      "sha256": "e58a9ba4a659cfbac43d370d3eda1886254d6cb8327974b324317c67292744c8"
+      "sha256": "686742975a461e59ac486997a637ab0e817d89141159a1da0f48adfb6eaeaec0"
     }
   },
   "format": "dope-paper-review-inputs-v1"

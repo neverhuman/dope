@@ -199,7 +199,7 @@ def contract(data, proof):
     }, 'budget_join')
     require(snapshot['anchor_receipt_sha256'] == rows[2]['receipt_ref']['sha256'], 'snapshot_receipt')
     resource = data['resource_profile']
-    require(resource['declared_RAM_envelope_bytes'] == 17179869184 and resource['host'] == 'fit-machine-2'
+    require(resource['declared_RAM_envelope_bytes'] == 17179869184 and resource['host'] == 'xbabe2'
             and resource['GPU_device'] == 0 and resource['CPU_affinity'] == list(range(80, 96))
             and resource['cell_trial_cap'] == 8 and resource['cell_inclusive_seconds_cap'] == 43200
             and resource['new_operation_ceiling_seconds'] == 600 and
@@ -275,7 +275,7 @@ The three displayed receipts record `co_tenant=false` and `shared_GPU_cost=false
 
 The 430 MiB values are maximum **observed** owned process GPU residency, using verified PID/start identities. Recorded maximum sampling gaps are retained in JSON and CSV. These values are not true peaks, complete host RSS measurements, or capacity qualification for another dataset.
 
-The profile retains CPU80–95 on fit-machine-2, GPU0, a declared 16 GiB RAM envelope, 8 trials per cell, 43,200 inclusive seconds per cell, a 600 second operation ceiling, and a 240,000 second new operation budget. The stored `native_operations_started=0` counter is explicitly non-authoritative; receipt and charged trial joins determine progress.
+The profile retains CPU80–95 on xbabe2, GPU0, a declared 16 GiB RAM envelope, 8 trials per cell, 43,200 inclusive seconds per cell, a 600 second operation ceiling, and a 240,000 second new operation budget. The stored `native_operations_started=0` counter is explicitly non-authoritative; receipt and charged trial joins determine progress.
 
 Official TEST data remains sealed. MFS v2, PTF v1, release safety, superiority, native winner, sample completeness, fivefit stability, and method completion remain null.
 

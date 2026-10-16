@@ -95,10 +95,15 @@ fn handle_request(
 ) -> Result<ControllerResponse> {
     match request {
         ControllerRequest::Lease { worker } => {
+            if !crate::production::is_valid_campaign_worker(&worker) {
+                return Err(DopeError::Data(
+                    "unrecognized campaign worker identity".into(),
+                ));
+            }
             require_durable_space(state_dir)?;
             ledger.reclaim_expired(unix_now())?;
             let state = load_state(state_dir)?;
-            let phases: &[&str] = if worker == "fit-machine-3" {
+            let phases: &[&str] = if crate::production::matches_host_role(&worker, 3) {
                 if state.phase != CampaignPhase::ValidationCertOpen {
                     &[]
                 } else {

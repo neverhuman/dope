@@ -44,7 +44,7 @@ NATIVE_PUBLICATION = '3bac30656933cac2c243b7bf6af654025a0930ed94828dd371c6fb2ba3
 DOPE_PUBLICATION = 'c79804a8745197094ce1233544964872f2bd9857a93b6808d5c551b7662ce602'
 NAME = 'arf-matched-population-validation'
 HISTORICAL_PUBLISHER_SHA = '7ba486e01ded70cae07192fb7545340cfb3f6feb07089a72e168a3de1054fa05'
-HISTORICAL_PUBLICATION_SHA = 'fc975388bc8d1f69ae48beb2fcba483c1581d1da1954fdfd1cdabf54c0f8be46'
+HISTORICAL_PUBLICATION_SHA = 'c69ce66e79b234bf5d1f9d56938450ba253ae39a3f6655a6fd586f890b8992f7'
 CONFIGS = ('author_default', 'native_selected')
 PROFILES = ('features12_steps2048', *dope.fits.PROFILES)
 GATES = dict(dope.fits.GATES, native_selection_changed=False, native_values_ranked_across_methods=False,
@@ -164,7 +164,7 @@ def operation_accounting(receipt, key, pin):
             'operation scope or unstarted cost differs')
     if receipt['status'] == 'ok':
         guard.require(operation is not None and started and type(operation['exit_code']) is int
-            and operation['exit_code'] == 0 and operation['host'] == 'fit-machine-2' and amount <= 600,
+            and operation['exit_code'] == 0 and operation['host'] == 'xbabe2' and amount <= 600,
             'successful receipt lacks bounded actual operation')
     return dict(job_sha256=key, receipt_sha256=pin, status=receipt['status'],
                 operation_seconds=amount, new_operation_started=started)
@@ -640,11 +640,7 @@ def public_accounting(records, expected_count):
 
 def frozen_native_cost():
     directory = Path(native.__file__).with_name('results')
-    publication = guard.bound(
-        directory / (native.NAME + '.json'),
-        '11394f3aa0edfd35521cd8773a7db89919ea2a554ccef5f0c8e16e4538225f2e',
-        directory,
-    )
+    publication = guard.bound(directory / (native.NAME + '.json'), NATIVE_PUBLICATION, directory)
     cost = publication['cost']
     guard.require(type(cost) is dict and set(cost) == {'operation_seconds', 'scheduler_wall_seconds'},
                   'frozen native cost fields differ')

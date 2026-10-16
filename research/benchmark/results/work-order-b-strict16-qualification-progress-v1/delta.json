@@ -165,7 +165,7 @@
     "cell_trial_cap": 8,
     "custody_source_sha256": "fc5a05a2732a679b42ea353beba7d6237d1ec059f78300d55464e58715a0c261",
     "declared_RAM_envelope_bytes": 17179869184,
-    "host": "fit-machine-2",
+    "host": "xbabe2",
     "new_operation_budget_seconds": 240000,
     "new_operation_ceiling_seconds": 600,
     "runtime_binding_sha256": "4a03b321a54b45ea672830c06d3c4d267b77a0790730c76b612c1b09cf9c8901"

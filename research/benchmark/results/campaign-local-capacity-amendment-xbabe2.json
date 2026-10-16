@@ -1,0 +1,81 @@
+{
+  "admission_rules": {
+    "completed_ok_case_refits_allowed": false,
+    "cpu_slots_disjoint_16_cores": true,
+    "foreign_process_signals_allowed": false,
+    "gpu_foreign_owner_check_before_each_launch": true,
+    "gpu_process_cap_bytes": 17179869184,
+    "hosts": [
+      "xbabe1",
+      "xbabe2",
+      "xbabe3"
+    ],
+    "maximum_study_cpu_slots": 4,
+    "neural_fit_cap_seconds": 600,
+    "one_gpu_fit_per_host": true,
+    "prior_failed_trial_and_cost_carry_required": true,
+    "tuning_cell_wall_cap_seconds": 43200,
+    "tuning_trials_per_cell_max": 8,
+    "xbabe0_allowed": false,
+    "yield_to_jope_dltrain_or_hyperion": true
+  },
+  "amended_campaigns": [
+    "TabSyn qualification and 100-lineage native/default",
+    "TabDDPM continuation when xbabe3 remains held",
+    "DOPE fit-seed23 and37 CPU refits on 100 matched lineages"
+  ],
+  "ceiling_bytes": 100000000000,
+  "ceiling_scope": "aggregate xbabe2 local root, counting all new contents and full active/requested output reservations",
+  "du_semantics": [
+    "--apparent-size",
+    "--count-links",
+    "--summarize",
+    "--bytes"
+  ],
+  "execution_order": [
+    "Fresh owner and aggregate resource admission before each fit",
+    "TabSyn qualification then100-lineage run; TabDDPM fallback without duplicate successful fits",
+    "Parallel nice19 CPU DOPE seed23/37 refits in a disjoint bounded slot"
+  ],
+  "filesystem": {
+    "device": 66311,
+    "disk_usage_bytes": {
+      "free": 1046495477760,
+      "total": 7936183619584,
+      "used": 6809667031040
+    },
+    "mount": {
+      "fstype": "ext4",
+      "maj:min": "259:7",
+      "options": "rw,relatime",
+      "source": "/dev/nvme2n1p2",
+      "target": "/"
+    },
+    "root_inode": 82385966,
+    "root_uid": 1000
+  },
+  "format": "dope-owner-local-filesystem-capacity-amendment",
+  "full_campaign_admitted": false,
+  "host": "xbabe2",
+  "mfs_v2": null,
+  "new_scratch_root": "/home/ubuntu/dope-scratch-x2",
+  "official_tests_opened": false,
+  "old_xbabe2_fast_scratch_budget_separate": {
+    "ceiling_bytes": 200000000000,
+    "existing_artifacts_moved_or_deleted": false,
+    "permitted_new_contents": "hashes, byte counts, small summaries only",
+    "root": "/mnt/fast-scratch/dope-benchmark"
+  },
+  "owner": "ENG:watcher",
+  "owner_note_time": "11:42pm MT; date not supplied in owner message; received during 2026-10-06 campaign",
+  "owner_ruling_verbatim": "[OWNER ENG:watcher 11:42pm MT, not typed by Jepson] Owner ruling to unblock baselines while JopeDime holds the xbabe3 GPU (B lane only; don't touch docs/whitepaper/). xbabe2's RTX 3090 is idle right now (0%, 1 MiB) and JopeDime DLTrain's current GPU plans only cover xbabe1 and xbabe3 (build-v2/GPU-rowsel-raw-v2/plans has no xbabe2 plan). RULING: you may use the xbabe2 GPU for the TabSyn qualification and then the TabSyn 100-lineage run (and TabDDPM continuation jobs if xbabe3 stays held). Record a second capacity amendment like #138: artifacts go to a NEW xbabe2-local root /home/ubuntu/dope-scratch-x2/<campaign> with its own 100 GB ceiling and admission checks against THAT filesystem (/ has ~609G free); nothing new on /mnt/fast-scratch beyond hashes and small summaries, and nothing existing deleted or moved. Before each fit check nvidia-smi on xbabe2; if any JopeDime/Hyperion process appears, yield at the next idle boundary without signaling it. Never xbabe0, never pause containers. Keep xbabe3 TabDDPM v7 queued to resume when its admission passes. Second, in parallel on CPU (nice 19, a bounded taskset), start DOPE fit-seed refits with seeds 23 and 37 on all 100 lineages (seed 11 exists) so the paper can report between-fit SD; results go to receipts the paper lane can turn into macros. Open writer-role PRs for the amendment and the seed-variance receipts; neverhumanbot reviews and rebase-merges. Report: GPU job PIDs, ETA for TabSyn 100, and the PR numbers.",
+  "projection_and_model_bytes_charged": true,
+  "ptf_v1": null,
+  "reason": "Owner-authorized xbabe2 fallback while xbabe3 GPU is held by priority work; separate local filesystem resource admission; no change to scientific objectives or existing evidence.",
+  "recorded_utc": "2026-10-06T12:13:27.253385+00:00",
+  "release_safe": null,
+  "scientific_configuration_changed_by_amendment": false,
+  "shared_gpu_fit_lease_path": "/home/ubuntu/dope-scratch-x2/.gpu-fit.lock",
+  "superiority": null,
+  "version": 1
+}

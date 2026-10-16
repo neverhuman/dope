@@ -7,7 +7,7 @@ import hashlib
 import re
 import struct
 
-from .common import MetricError, count, failure, require
+from .common import MetricError, count, failure, opt_default, require
 
 MAGIC = b"TDL1"
 
@@ -55,7 +55,7 @@ def evaluate(data):
         payload = len(artifact)
         runtime = sum(len(content) for _, content in closure)
         total = count(payload + runtime)
-        users = count(data.get("amortization_count", 1), 1)
+        users = count(opt_default(data, "amortization_count", 1), 1)
         return {"status": "complete", "reason": None, "payload_bytes": payload,
                 "section_bytes": {name: len(content) for name, content in sections},
                 "framing_bytes": payload - sum(len(content) for _, content in sections),

@@ -2476,11 +2476,11 @@
       },
       {
         "path": "research/benchmark/methods.lock.json",
-        "sha256": "df3d14c28a9eb00d26ef2a75a949dbae35043273e181434e17c2b2bc7b38ca91"
+        "sha256": "899c355cb55769710ed369fea6b082589b31858860fb74929bf4190de28aca33"
       },
       {
         "path": "research/benchmark/results/expanded-validation-diagnostics.json",
-        "sha256": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796"
+        "sha256": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb"
       },
       {
         "path": "research/benchmark/results/s3-coreset-procedure.json",
@@ -2492,15 +2492,15 @@
       },
       {
         "path": "research/benchmark/results/density-matched-population-validation.json",
-        "sha256": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177"
+        "sha256": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a"
       },
       {
         "path": "research/benchmark/results/sdv-matched-population-validation.json",
-        "sha256": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+        "sha256": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
       },
       {
         "path": "research/benchmark/results/s3-matched-forest-confirmation-validation.json",
-        "sha256": "160b48dad42295131b758a2ef76074a2c645f914aa3c831f4f51924f928ead91"
+        "sha256": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f"
       },
       {
         "path": "research/benchmark/results/s3-data.lock.json",
@@ -2508,11 +2508,11 @@
       },
       {
         "path": "research/benchmark/results/arf-native-closure-watch-v1.receipt.json",
-        "sha256": "873f005d79338da9d922475d8f4d7fef564116eda0b61d12541f4344ae4d8d24"
+        "sha256": "7e8eeb1ba94ca747367e98d5a016d2ed3ed4c40c5a98ca76d7a5fe27ce9c173c"
       },
       {
         "path": "research/benchmark/results/beyondarena-s3-inventory.json",
-        "sha256": "6d79785fc4da2e54c4d80acde6ab0c39d404c14658997e6db5a433fb94513b58"
+        "sha256": "504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64"
       },
       {
         "path": "docs/whitepaper/generated/fit-trace.json",

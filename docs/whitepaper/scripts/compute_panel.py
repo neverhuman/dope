@@ -42,14 +42,14 @@ ANCHORS = {
 
 
 INPUT_SHA256 = {
-    "density-matched-population-validation.json": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177",
-    "expanded-validation-diagnostics.json": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796",
+    "density-matched-population-validation.json": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a",
+    "expanded-validation-diagnostics.json": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb",
     "mfs-v3-density-panel.json": "d2cbbb5c08d045c161e3809e150efeacafadcfbee5e2accde6ed39cc46fe9c25",
     "s3-coreset-procedure.json": "73251e43cf7838687427569931bf6127f42e932374af33137c57fd8fe8544704",
     "s3-data.lock.json": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
     "s3-lineage-record.json": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7",
-    "s3-matched-forest-confirmation-validation.json": "160b48dad42295131b758a2ef76074a2c645f914aa3c831f4f51924f928ead91",
-    "sdv-matched-population-validation.json": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e",
+    "s3-matched-forest-confirmation-validation.json": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f",
+    "sdv-matched-population-validation.json": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e",
     "review-fixes-receipts-v1/panel.json": "f0ecf5929825f1f07d877d4e01714f1ebd55868db3b863482f46be0f27ffdf47"
 }
 
@@ -94,17 +94,17 @@ HASH_INPUT_SHA256 = {
     "docs/whitepaper/generated/replay-cost.json": "faf77e7ce1ed1d22127701bf68bbfe2f8d183f89cbd3475dd80094888c36f086",
     "docs/whitepaper/scripts/paper_receipts.py": "a2d6d45e3ff06a38ed61ab029fadfd14529978bcfc89618aa9ceb3fbe57238ee",
     "research/benchmark/expanded_validation_metrics.py": "a952062c0f83805f6442a440a5ae15293a843349d423eaa106a9c56a20d14c0f",
-    "research/benchmark/methods.lock.json": "df3d14c28a9eb00d26ef2a75a949dbae35043273e181434e17c2b2bc7b38ca91",
-    "research/benchmark/results/arf-native-closure-watch-v1.receipt.json": "873f005d79338da9d922475d8f4d7fef564116eda0b61d12541f4344ae4d8d24",
-    "research/benchmark/results/beyondarena-s3-inventory.json": "6d79785fc4da2e54c4d80acde6ab0c39d404c14658997e6db5a433fb94513b58",
-    "research/benchmark/results/density-matched-population-validation.json": "8e59083c5e4262e6cdcdb93ac6192ffabaf572704b2c0e8055a541838d7af177",
-    "research/benchmark/results/expanded-validation-diagnostics.json": "d146d9333dae187ec7c8a2f2c1d26acc15f50c988d8cd74117e834ab5249c796",
+    "research/benchmark/methods.lock.json": "899c355cb55769710ed369fea6b082589b31858860fb74929bf4190de28aca33",
+    "research/benchmark/results/arf-native-closure-watch-v1.receipt.json": "7e8eeb1ba94ca747367e98d5a016d2ed3ed4c40c5a98ca76d7a5fe27ce9c173c",
+    "research/benchmark/results/beyondarena-s3-inventory.json": "504166764631dbdf5e02d116334af5cc587731fcf3efe130d62240e6dd512d64",
+    "research/benchmark/results/density-matched-population-validation.json": "5264b88a40ad5efb21d9b119789caeb13e71e911a17f1d8b57f1d8e8ac31732a",
+    "research/benchmark/results/expanded-validation-diagnostics.json": "cd20ac0d07a1dcab7c5e46db195adb463172b5174387bb71a054b2e5f340beeb",
     "research/benchmark/results/paper-original-metadata-v1/index.json": "6d73d5f7b37849526a98a451b41a49e045ef21e911058d920940c5ea989f7fd9",
     "research/benchmark/results/s3-coreset-procedure.json": "73251e43cf7838687427569931bf6127f42e932374af33137c57fd8fe8544704",
     "research/benchmark/results/s3-data.lock.json": "857b61324d0a5b7dbbb98e0c147fcc79c5bb8616e7ca61afd6785469c17f038f",
     "research/benchmark/results/s3-lineage-record.json": "bbd0852c49f595315104261efa4eaa6f50db257e323b8c002aac6737a2dbe7d7",
-    "research/benchmark/results/s3-matched-forest-confirmation-validation.json": "160b48dad42295131b758a2ef76074a2c645f914aa3c831f4f51924f928ead91",
-    "research/benchmark/results/sdv-matched-population-validation.json": "770b5519014868fc78dde55730c03b0c4405883b364e9f8ce7da4a5671e3d57e"
+    "research/benchmark/results/s3-matched-forest-confirmation-validation.json": "97a25be902954cad16c5b5802d0e0ba468dea104221efa2465434c94e6774a1f",
+    "research/benchmark/results/sdv-matched-population-validation.json": "4dc367eb78159a0386882d23ae1f99b0aa2cc9f425d1aae499b6f3453222a44e"
 }
 
 

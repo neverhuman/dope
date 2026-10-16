@@ -42,17 +42,38 @@ def write_once(path: Path, value: dict) -> None:
         os.fsync(stream.fileno())
 
 
+def _resolve_dispatch_host(logical_host: str) -> tuple[str, bool]:
+    raw = os.environ.get("DOPE_COMPUTE_HOSTS", "").strip()
+    if raw:
+        parts = raw.replace(",", " ").split()
+        if len(parts) != 3:
+            raise ValueError("DOPE_COMPUTE_HOSTS must list exactly three hosts")
+        mapping = dict(zip(HOSTS, parts))
+    else:
+        mapping = {
+            "fit-machine-1": os.environ.get("DOPE_FIT_HOST_1", "").strip(),
+            "fit-machine-2": os.environ.get("DOPE_FIT_HOST_2", "").strip(),
+            "fit-machine-3": os.environ.get("DOPE_EVAL_HOST", "").strip(),
+        }
+    target = mapping.get(logical_host, "")
+    if not target:
+        raise ValueError(f"Set DOPE_COMPUTE_HOSTS or role host env var for {logical_host}")
+    local_node = os.uname().nodename.split(".")[0]
+    return target, target == local_node
+
+
 def probe(host: str) -> dict:
     # The script is sent over stdin so probes do not depend on a mutable remote checkout.
+    target, is_local = _resolve_dispatch_host(host)
     source = Path(__file__).with_name("inventory_hosts.py").read_text()
     command = ["python3", "-", "--local"]
-    if host != "fit-machine-2":
+    if not is_local:
         command = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5",
-                   host, *command]
+                   target, *command]
     result = subprocess.run(command, input=source, text=True, capture_output=True,
                             check=True, timeout=25)
     snapshot = json.loads(result.stdout)
-    if snapshot["host"].split(".")[0] != host:
+    if snapshot["host"].split(".")[0] != target:
         raise ValueError("host inventory identity mismatch")
     return snapshot
 
@@ -187,8 +208,9 @@ def execute(cell: dict, host: str, slot: tuple[int, ...], attempt: int,
                "/usr/bin/time", "-v", "taskset", "-c", ",".join(map(str, slot)),
                *env, cell["runtime_python"], "-m", "research.benchmark.runner",
                str(job_path), str(package / "research/benchmark/methods.lock.json"), str(results)]
-    if host != "fit-machine-2":
-        command = ["ssh", "-o", "BatchMode=yes", host, shlex.join(command)]
+    is_local, target = _resolve_dispatch_host(host)
+    if not is_local:
+        command = ["ssh", "-o", "BatchMode=yes", target, shlex.join(command)]
     try:
         process = subprocess.run(command, capture_output=True, text=True,
                                  timeout=cell["timeout_seconds"] + 40)

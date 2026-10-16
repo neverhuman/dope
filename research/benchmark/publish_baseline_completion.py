@@ -26,11 +26,6 @@ def canonical(value):
 
 
 def load_sources(repo=REPO):
-    scrubbed_digests = {
-        LOCK_SHA256: '5ddae06f78d3bd5e14567ff8c55224640608a2753e413221ed1ef6ed4fac841d',
-        '10e4b8c9cab2058b323d0ac157342f43bc6fa9ddd792d78267c89fe815084e45': 'e797f3ef0c1907d51caddb06c7669683afaf96274a2af5a885ab5dd7abdaf13e',
-        '88d8757e121326aa824144e8f00b15a5edf02929df110b03b84e2820cd83b49d': 'dc1f64fe12d975588c9c5a2e13eed71a8e8a58594b2d439e49ebc5b83f5ff49d',
-    }
     def verified(relative, expected):
         path = repo / relative
         require(not Path(relative).is_absolute() and '..' not in Path(relative).parts
@@ -38,8 +33,7 @@ def load_sources(repo=REPO):
                 and not any(p.is_symlink() for p in (path, *path.parents)), 'invalid source path')
         require(path.stat().st_size <= 32_000_000, 'oversized metadata')
         raw = path.read_bytes()
-        actual = digest(raw)
-        require(actual == expected or actual == scrubbed_digests.get(expected), 'frozen metadata drift')
+        require(digest(raw) == expected, 'frozen metadata drift')
         return raw
 
     lock = json.loads(verified(RELATIVE+'/inputs.lock.json', LOCK_SHA256))
@@ -54,12 +48,6 @@ def load_sources(repo=REPO):
                 raw = stream.read(8_000_001)
             require(len(raw) <= 8_000_000, 'oversized receipt archive')
         docs[name] = json.loads(raw)
-    if lock['sources'].get('followon', {}).get('sha256') == '10e4b8c9cab2058b323d0ac157342f43bc6fa9ddd792d78267c89fe815084e45':
-        lock['sources']['followon'] = dict(
-            lock['sources']['followon'],
-            bytes=27050750,
-            sha256='7e87b5fd790f2b36743f2ff41b6c150943131011edb0d6371409925cf348aa66',
-        )
     return lock, docs
 
 

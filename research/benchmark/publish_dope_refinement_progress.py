@@ -141,7 +141,7 @@ def build():
         scope='One discovery lineage; three completed GPU profiles; eighteen completed validation cells. Full24-fit discovery is pending; this is a progress batch, not a final benchmark.',
         planned_discovery_fits=24, closed_successful_fits_at_snapshot=3,
         original_infrastructure_interrupted_attempts=1, infrastructure_retry_queued=1,
-        unstarted_fits_carried_forward=20, allowed_gpu_hosts=['fit-machine-1', 'fit-machine-2', 'fit-machine-3'],
+        unstarted_fits_carried_forward=20, allowed_gpu_hosts=['xbabe1', 'xbabe2', 'xbabe3'],
         original_job_identities_preserved=True, original_attempts_preserved=True,
         original_interruption_is_method_failure=False, full_discovery_complete=False,
         fit_compute_ceiling_seconds=14400, conservative_operation_seconds_bound=gpu['conservative_total_operation_seconds_bound'],

@@ -51,6 +51,6 @@ models, samples or external scratch receipts.
 [source-proof.json](source-proof.json) pins the original receipts and their
 scope. [publication-manifest.json](publication-manifest.json) binds every
 generated file and points to private, hash-verified restore custody:
-`/path/to/operator-home/dope-scratch-x2/work-order-b-publication-custody/cost-closure-delta-v3/receipt-custody.json`
+`/home/ubuntu/dope-scratch-x2/work-order-b-publication-custody/cost-closure-delta-v3/receipt-custody.json`
 (SHA256 `82a242912c572e3c886852525c446506b038be59817cc8ab91f05ce66082321d`).
 The private archive contains metadata/source receipts; restricted rows,+weights and samples stay outside this publication.

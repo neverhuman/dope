@@ -29,7 +29,7 @@
   "format": "dope-forestdiffusion-publication-manifest",
   "immutable_references": [
     {
-      "path": "/path/to/operator-home/dope/.agent/worktrees/integration/research/benchmark/results/pilot24-target-gpu-research.json",
+      "path": "/home/ubuntu/dope/.agent/worktrees/integration/research/benchmark/results/pilot24-target-gpu-research.json",
       "sha256": "5a7605b2bbf3d46635c5d7bbeb4c922149bbd79e3bf75c6269cedd4637447dc3"
     },
     {

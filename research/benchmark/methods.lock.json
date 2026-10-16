@@ -477,7 +477,7 @@
       "sampling_command": null,
       "source_audit": {
         "path": "research/benchmark/cdtd-source.audit.json",
-        "sha256": "722e488d80d362ddc61ef78c22fa96abf8483ec19d67e52fa0114f6790e276e9"
+        "sha256": "b1f5c9efc7eb11c391138848073a79fb537bc90af0465d56a872d6e25f0a432c"
       },
       "source_contract_pending": [
         "inventory the complete executable runtime, bytecode, interpreter import roots and eager baseline imports before initializers",
@@ -489,7 +489,7 @@
         "remove stored original rows from the inference artifact and verify safe local reload with complete byte accounting",
         "verify finite exact row counts, sample sizes n/2n/4n/8n and deterministic seed replay",
         "run copy/leakage/privacy and real-vs-real controls before gated claims",
-        "fresh aggregate owner admission on fit-machine-1/2/3, disjoint CPUs/RAM/scratch, whole-fit 600s and 16GiB GPU caps"
+        "fresh aggregate owner admission on xbabe1/2/3, disjoint CPUs/RAM/scratch, whole-fit 600s and 16GiB GPU caps"
       ],
       "status": "source_audit_pending",
       "tuning_search_space": {
@@ -858,7 +858,7 @@
       "sampling_command": null,
       "source_audit": {
         "path": "research/benchmark/dpctgan-source.audit.json",
-        "sha256": "275cd994035ae93f387515e8c6c808749555f89e84075f79303a17560a00393e"
+        "sha256": "e822d0a7a53d3bc8beb191f1db07fafcc36da649a29cd178ebdf7ed43f66bf19"
       },
       "source_verification": {
         "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/dp-ctgan-v1/source-verification-v2.json",
@@ -918,11 +918,11 @@
       "pilot_evidence": [
         {
           "path": "research/benchmark/results/pilot24-forestdiffusion-native.json",
-          "sha256": "933aeb223777bcfa401c2d49a6ce4e33e659a871652721fe391e2097a8425336"
+          "sha256": "8024a22fd5cf9b83894bfea06414465b3f0265fc9a316602ad05f7c3323145b2"
         },
         {
           "path": "research/benchmark/results/pilot24-forestdiffusion-native.manifest.json",
-          "sha256": "671bd43844d1e9759c657da2fc99892acfd87ea958e5a784c175e209fb0b0c8c"
+          "sha256": "9e21edb20f7acd5e44e981c9e3e4c3eed80e908fdf534cc160da7bf20014763b"
         }
       ],
       "sampling_command": "python -m research.benchmark.forestdiffusion_adapter sample --request VERIFIED_REQUEST --receipt RECEIPT",
@@ -1021,7 +1021,7 @@
       "tuning_search_space": null,
       "unavailable_receipt": {
         "path": "research/benchmark/results/gemt-unavailable.json",
-        "sha256": "c12c178d17247af7ab716c42b666ce452b60410d7e420f25446f07d095263ad3"
+        "sha256": "f63080712249288da9ea61f0016dfe179f7839ddd039c7a1e60f265ae83bcbf9"
       },
       "upstream_commit": null,
       "upstream_url": null
@@ -1114,7 +1114,7 @@
         "archive_sha256": "ce072fea32dbfebcee5c61f4454ae901fba26b7a54ae01caa4fe04f73b3d70a4",
         "license_sha256": "8cca1b8d2a9b78541e2ed5a92b5133a87ba535a64565d2b8aee2f520dcf49f23",
         "path": "research/benchmark/great-source.audit.json",
-        "sha256": "c6731bb1c045d6daed3498fce1a51aac9ee0886e0579ac660b656facc0f85d86",
+        "sha256": "6e7092861808ef5995293abcf9ad2212dcc5674ded76186219554c495c18b523",
         "source_verification_path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/great-v1/source-verification-v1.json",
         "source_verification_sha256": "003f0978d24e7a13e72433ab3ea3a2d8cedd9422d00c4573ae13982198295d50"
       },
@@ -1286,7 +1286,7 @@
       "separate_auditing_project_url": "https://github.com/spalabucr/pategan-audit",
       "source_audit": {
         "path": "research/benchmark/pategan-source.audit.json",
-        "sha256": "572abc68a3a5bb6099529e76cde05314fa96271a60f323e8ce38eeeadf931cc3"
+        "sha256": "e4c4b46b214ddd1df7cab174f449d5e5dee75b424df7ae01a5fbf0d1d8c12722"
       },
       "source_verification": {
         "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/pate-gan-v1/source-verification-v1.json",
@@ -1427,7 +1427,7 @@
         "archive_sha256": "cacab76af35f104b210e0326a4c37ed2aae824663559b3eaa6a3da33aa69b4b5",
         "license_sha256": "fb11fe9573168aa7f96555f0e7cafa8c9a8b44089646692626cf12fb95bf9db4",
         "path": "research/benchmark/realtabformer-source.audit.json",
-        "sha256": "8c7c9e963a023969e03ff1119aa0d48654b0258877b8f27fd77ee2490dd5ab43",
+        "sha256": "51f44224b593ed348e6313363134239bdc17caf3d4976c2ac6f32ff84535dd5d",
         "source_verification_path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/realtabformer-v1/source-verification-v2.json",
         "source_verification_sha256": "cc017bbbd6353928e6323aff6540a77f73c949d667149067b9bf65cd1d75747b"
       },
@@ -1895,7 +1895,7 @@
       "sampling_command": null,
       "source_audit": {
         "path": "research/benchmark/tabcascade-source.audit.json",
-        "sha256": "131861d9f13f46a05ca6c2cb39b6811913fa568488884e2036f1e9344d7ba957"
+        "sha256": "c33832b5767a932e248b8b8917491a16d348ef4940856bcdab040e5ccd6438a4"
       },
       "source_contract_pending": [
         "verify complete source/runtime/bytecode/import roots and selected third-party Python/R dependency rights before initializers",
@@ -1906,7 +1906,7 @@
         "freeze whole-process fit RNG initialization and sample seed wrapper; verify exact finite n/2n/4n/8n outputs and replay",
         "verify safe artifact-only local loading and full model/config/group-statistics/preprocessing/projection bytes; exclude original rows from inference state",
         "run copy/leakage/privacy and real-vs-real controls; missing-value generation must conform to the selected numeric representation",
-        "fresh aggregate owner admission on fit-machine-1/2/3,disjointCPU/RAM/scratch,whole-fit600s/16GiB GPU caps"
+        "fresh aggregate owner admission on xbabe1/2/3,disjointCPU/RAM/scratch,whole-fit600s/16GiB GPU caps"
       ],
       "status": "source_audit_pending",
       "tuning_search_space": {
@@ -2177,7 +2177,7 @@
       "tuning_search_space": null,
       "unavailable_receipt": {
         "path": "research/benchmark/results/tabkde-unavailable.json",
-        "sha256": "63b1e70619f06d09e81e125c72d733ffaa3c8e767ab8461ff0403159811ea47e"
+        "sha256": "ce239521cc2c15c4246f38315e27dac5fc0891a510d6b24e6bf874febb570066"
       },
       "upstream_commit": "9d9e6cce0f8ecd97d8a10c52755b8c14482e028d",
       "upstream_tree": "3f44a8875e6dcb5cc1cb4d63d0e826442a19ee8b",
@@ -2235,7 +2235,7 @@
       "pilot_evidence": [
         {
           "path": "research/benchmark/results/pilot24-tabpc-native.json",
-          "sha256": "7865842c10327df2f725a7be322ee1ccda513cde2e6afaa4d16b0005fa1a002a"
+          "sha256": "8ea6ca0d8e8e36f661d0ffcdb9b5227d35a62398655e666dae93e7c9bdbc187c"
         }
       ],
       "runtime_dependency_source_file_count": 5465,
@@ -2407,7 +2407,7 @@
       "tuning_search_space": null,
       "unavailable_receipt": {
         "path": "research/benchmark/results/tabpfgen-unavailable.json",
-        "sha256": "86d5508381011e5651280690604080d753ffd2d6ddfecf5df4d010f771b83e46"
+        "sha256": "048b2e63b8d565533d3c3cc373a3b252273848cf67b822773c95e288a67da2e8"
       },
       "upstream_commit": null,
       "upstream_url": null
@@ -2584,7 +2584,7 @@
       "sampling_command": null,
       "source_audit": {
         "path": "research/benchmark/tabbyflow-source.audit.json",
-        "sha256": "125ea48341c04016a564001e5db21e8c15a7ee066b0d6dd4ec0ab9a9bcf19178"
+        "sha256": "4a537c272b2d457b8f7afb0259c4e0ac79f46d5986547237056c6a0448ca982a"
       },
       "source_verification": {
         "path": "/mnt/fast-scratch/dope-benchmark/method-source-audits/tabbyflow-v1/source-verification-v2.json",

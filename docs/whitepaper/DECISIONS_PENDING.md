@@ -31,7 +31,7 @@ procedure is fixed in the `sealed_test_v2` section of
    must reproduce byte-identical files.
 3. The manifest digest is committed, tagged `sealed-v2-freeze`, and
    hard-coded in the runner.
-4. The run happens on fit-machine-3 only, with `DOPE_RF_UNSEAL=1` and an exclusive,
+4. The run happens on xbabe3 only, with `DOPE_RF_UNSEAL=1` and an exclusive,
    fsynced registry marker. It checks every CSV digest and shape before any
    `test.csv` is opened and checks each `test.csv` against its recorded
    official digest. It scores with the pinned evaluator on CPU.

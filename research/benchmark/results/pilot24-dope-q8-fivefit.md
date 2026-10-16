@@ -28,16 +28,16 @@ Ten successful fits consumed 116.88 seconds of summed fit elapsed time under a f
 
 | Dataset | Fit seed | Host | Fit seconds | Peak GPU MiB | Estimated joules |
 |---|---:|---|---:|---:|---:|
-| Adult | 11 | fit-machine-1 | 18.43 | 616 | 927.96 |
-| Adult | 23 | fit-machine-3 | 18.48 | 460 | 1179.44 |
-| Adult | 37 | fit-machine-1 | 18.43 | 616 | 924.52 |
-| Adult | 53 | fit-machine-3 | 18.48 | 460 | 1179.95 |
-| Adult | 71 | fit-machine-1 | 18.44 | 616 | 920.06 |
-| California | 11 | fit-machine-3 | 4.10 | 1 | 282.75 |
-| California | 23 | fit-machine-1 | 6.15 | 598 | 326.41 |
-| California | 37 | fit-machine-3 | 4.11 | 1 | 282.60 |
-| California | 53 | fit-machine-1 | 4.10 | 9 | 217.07 |
-| California | 71 | fit-machine-3 | 6.16 | 442 | 411.90 |
+| Adult | 11 | xbabe1 | 18.43 | 616 | 927.96 |
+| Adult | 23 | xbabe3 | 18.48 | 460 | 1179.44 |
+| Adult | 37 | xbabe1 | 18.43 | 616 | 924.52 |
+| Adult | 53 | xbabe3 | 18.48 | 460 | 1179.95 |
+| Adult | 71 | xbabe1 | 18.44 | 616 | 920.06 |
+| California | 11 | xbabe3 | 4.10 | 1 | 282.75 |
+| California | 23 | xbabe1 | 6.15 | 598 | 326.41 |
+| California | 37 | xbabe3 | 4.11 | 1 | 282.60 |
+| California | 53 | xbabe1 | 4.10 | 9 | 217.07 |
+| California | 71 | xbabe3 | 6.16 | 442 | 411.90 |
 
 Three preflight launch failures started no GPU fit or metric evaluation. Their source and failure receipts remain linked in the JSON.
 

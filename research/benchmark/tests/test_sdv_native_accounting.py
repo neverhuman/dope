@@ -31,9 +31,9 @@ class NativeAccounting(unittest.TestCase):
                     'final': False, 'fit_seed': 11, 'track': 'common-numeric', 'native_objective': objective,
                     'worker': {'path': str(self.worker), 'train_rows': 80,
                                'files': {p.name: m.sha256(p) for p in self.worker.iterdir()}}}
-        self.lock = {'round_sha256': 'round', 'allowed_gpu_hosts': ['fit-machine-1'], 'whole_operation_timeout_seconds': 600,
+        self.lock = {'round_sha256': 'round', 'allowed_gpu_hosts': ['xbabe1'], 'whole_operation_timeout_seconds': 600,
                      'gpu_vram_limit_mib': 16384, 'adapter_sha256': 'adapter', 'native_metric_seed': 1729,
-                     'cpu_slots': {'fit-machine-1': list(range(16, 32))},
+                     'cpu_slots': {'xbabe1': list(range(16, 32))},
                      'roles': {'gpu_worker': {'ram_bytes': 24 * 2**30, 'scratch_bytes': 5000000000}},
                      'common_sample_schedule': [{'name': n, 'multiplier': z, 'seed': s} for n, z, s in
                          [('n-seed101', 1, 101), ('n-seed211', 1, 211), ('n-seed307', 1, 307),
@@ -46,7 +46,7 @@ class NativeAccounting(unittest.TestCase):
             (artifact / name).write_bytes(b'opaque fixture')
         self.flags = {'official_tests_opened': False, 'mfs_v2': None, 'ptf_v1': None}
         self.identity = self.flags | {'status': 'ok', 'job_sha256': m.digest(self.job),
-                                     'round_sha256': 'round', 'host': 'fit-machine-1'}
+                                     'round_sha256': 'round', 'host': 'xbabe1'}
         inventory = [{'path': p.name, 'sha256': m.sha256(p), 'bytes': p.stat().st_size} for p in sorted(artifact.iterdir())]
         self.put('fit.json', self.identity | {'gpu_fit_required': True, 'source_adapter_unchanged': True,
              'projection_bytes_included': True, 'training_rows': 80, 'peak_torch_allocated_bytes': 100,
@@ -77,20 +77,20 @@ class NativeAccounting(unittest.TestCase):
             (self.parent / (mode + '.worker.log')).write_bytes(b'opaque worker log')
             (self.parent / (mode + '.transport.log')).write_bytes(b'opaque transport log')
             request_sha = m.sha256(self.parent / (mode + '.request.json'))
-            self.put(mode + '.fit-machine-1.admission-0001.json', {'admitted': True, 'blockers': [],
-                'round_sha256': 'round', 'host': 'fit-machine-1', 'official_tests_opened': False,
-                'requested': self.lock['roles']['gpu_worker'] | {'host': 'fit-machine-1', 'requires_gpu': True,
-                                                               'cpu_slot': self.lock['cpu_slots']['fit-machine-1']}})
+            self.put(mode + '.xbabe1.admission-0001.json', {'admitted': True, 'blockers': [],
+                'round_sha256': 'round', 'host': 'xbabe1', 'official_tests_opened': False,
+                'requested': self.lock['roles']['gpu_worker'] | {'host': 'xbabe1', 'requires_gpu': True,
+                                                               'cpu_slot': self.lock['cpu_slots']['xbabe1']}})
             self.put(mode + '.monitor.json', self.flags | {'operation': mode, 'status': 'ok', 'exit_code': 0,
-                'round_sha256': 'round', 'host': 'fit-machine-1', 'foreign_processes_signaled': False,
+                'round_sha256': 'round', 'host': 'xbabe1', 'foreign_processes_signaled': False,
                 'energy_attributable_to_job': None, 'request_sha256': request_sha,
                 'worker_log_sha256': m.sha256(self.parent / (mode + '.worker.log')),
                 'timeout_seconds': 600, 'elapsed_seconds': 12, 'peak_gpu_used_mib': 1000,
                 'peak_resident_bytes': 2**30, 'gpu_process_observed': True})
             op = {'status': 'ok', 'exit_code': 0, 'new_operation_started': True, 'elapsed_seconds': 14,
-                'host': 'fit-machine-1', 'timeout_seconds': 600, 'request_sha256': request_sha, 'official_tests_opened': False,
+                'host': 'xbabe1', 'timeout_seconds': 600, 'request_sha256': request_sha, 'official_tests_opened': False,
                 'transport_log_sha256': m.sha256(self.parent / (mode + '.transport.log')),
-                'admission_sha256': m.sha256(self.parent / (mode + '.fit-machine-1.admission-0001.json'))}
+                'admission_sha256': m.sha256(self.parent / (mode + '.xbabe1.admission-0001.json'))}
             self.put(mode + '.operation.json', op)
             self.operations.append(op)
         self.receipt = self.flags | {'job': self.job, 'round_sha256': 'round', 'attempt': 1, 'status': 'ok',
@@ -181,9 +181,9 @@ class NativeAccounting(unittest.TestCase):
             self.refresh()
             with self.subTest(field=field), self.assertRaises(ValueError): self.call()
             self.put(name, original)
-        admission = m.read(self.parent / 'fit.fit-machine-1.admission-0001.json')
-        self.put('fit.fit-machine-1.admission-0001.json', admission | {'admitted': False})
-        self.operations[0]['admission_sha256'] = m.sha256(self.parent / 'fit.fit-machine-1.admission-0001.json')
+        admission = m.read(self.parent / 'fit.xbabe1.admission-0001.json')
+        self.put('fit.xbabe1.admission-0001.json', admission | {'admitted': False})
+        self.operations[0]['admission_sha256'] = m.sha256(self.parent / 'fit.xbabe1.admission-0001.json')
         self.put('fit.operation.json', self.operations[0])
         self.refresh()
         with self.assertRaises(ValueError): self.call()
@@ -270,7 +270,7 @@ class NativeAccounting(unittest.TestCase):
                 path.unlink()
                 if path.parent != parent: path.parent.rmdir()
             (parent / (mode + '.request.json')).write_text('{}')
-            (parent / (mode + '.fit-machine-1.admission-0001.json')).write_text('{}')
+            (parent / (mode + '.xbabe1.admission-0001.json')).write_text('{}')
             self.assertEqual(m.operation(mode, row, parent, self.lock, self.base, {}), 0)
 
     def test_omitted_later_phase_cannot_hide_execution_outputs(self):

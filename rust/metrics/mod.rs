@@ -70,6 +70,15 @@ pub fn failure_with_status(reason: &str, status: &str) -> Value {
 pub fn number(value: &Value) -> MetricResult<f64> {
     match value {
         Value::Number(n) => {
+            if !n.is_f64() {
+                let i = n
+                    .as_i64()
+                    .ok_or(MetricError::new("nonfinite_or_invalid_number"))?;
+                require(
+                    (-MAX_SAFE_INTEGER..=MAX_SAFE_INTEGER).contains(&i),
+                    "nonfinite_or_invalid_number",
+                )?;
+            }
             let v = n
                 .as_f64()
                 .ok_or(MetricError::new("nonfinite_or_invalid_number"))?;

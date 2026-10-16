@@ -168,8 +168,8 @@
           },
           "cpu_host": {
             "enum": [
-              "fit-machine-1",
-              "fit-machine-2"
+              "xbabe1",
+              "xbabe2"
             ],
             "type": "string"
           },

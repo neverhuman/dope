@@ -1,5 +1,5 @@
 """Paired original-unit losses and informative-task admission (T-030/T-036)."""
-from .common import MetricError, failure, mean, number, require, vector
+from .common import MetricError, failure, mean, number, opt_default, require, vector
 
 
 def evaluate(data):
@@ -14,8 +14,8 @@ def evaluate(data):
         require(len(null) == len(real) == len(syn), "unpaired_losses")
         require(type(data["constant_target"]) is bool, "invalid_constant_target")
         lcb = number(data["real_gain_lcb"])
-        absolute = number(data.get("absolute_gain_floor", 1e-12))
-        relative = number(data.get("relative_gain_floor", 0.01))
+        absolute = number(opt_default(data, "absolute_gain_floor", 1e-12))
+        relative = number(opt_default(data, "relative_gain_floor", 0.01))
         require(absolute >= 0 and relative >= 0, "invalid_gain_floor")
         ln, lr, ls = mean(null), mean(real), mean(syn)
         gain = number(ln - lr)
