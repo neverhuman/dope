@@ -1,5 +1,9 @@
 # Deep-review gap ledger
 
+> **Ledger count (2026-10-15):** 44 historical rows (40 closed, 4 open: CM-09, PR-07, PR-08, PR-11) plus 14 spec-derived rows
+> (S-01 to S-14) from the 2026-10-15 rebuild, all open. The historical rows belong to the frozen v2 paper; the S rows track
+> the TDL rebuild in [docs/TODO-2026-10-15.md](../TODO-2026-10-15.md).
+
 An external adversarial review of `dope-mfs.pdf` at b774807 found the gaps below, and the
 later grades and audits added G-01 to G-08. Each row closes with
 the change that fixed it or states what is still open and why. When a new result weakens a
@@ -16,7 +20,7 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
 | CM-06 | "Each method selected on its own objective" overstates | Per-method selection rule | closed: `method_registry.py` holds each arm's selection rule; supplement C prints it |
 | CM-07 | Holm family undocumented | Declare the family per table | closed: every caption states its Holm family or that it has none; `review_tex.longtable` refuses a caption without one |
 | CM-08 | Pre-registered size-n endpoint not reported | Report size n next to 4n | closed: main Table 2 prints every arm at n and 4n |
-| CM-09 | Endpoint is validation; official test sealed | One sealed run of the frozen configuration | authorized 2026-10-09 as one run after the Stage 2 freeze (`predeclare_v2.json`, `sealed_test_v2`); not run, so no official-test number is printed |
+| CM-09 | Endpoint is validation; official test sealed | One sealed run of the frozen configuration | authorized 2026-10-09 as one run after the Stage 2 freeze (`predeclare_v2.json`, `sealed_test_v2`); not run, so no official-test number is printed. Rebuild (2026-10-15): FOLLOW-SEAL; the TDL contract carries the sealed-test field (T-020), decision D-08 |
 | CM-10 | Supplement style; no anonymous supplement | ICLR-style supplement and anonymous build | closed in 62f93e0 |
 | CM-11 | `just paper` does not regenerate everything | Complete build graph and a clean-rebuild CI job | closed: `paper-clean` deletes `generated/`, rebuilds, and requires a zero diff; the v2 panel replays from its scalar ledger |
 | CM-12 | Byte charge omits projection.json | Bytes are model plus projection | closed; the v2 fit ledger checks each model file's size |
@@ -39,11 +43,11 @@ claim, the paper weakens the claim; the v2 prose takes every data-dependent word
 | G-08 | Codex review of 3df964a (2026-10-10). F1: the supplement RMSE table caption said the target was projected to [0, 1], while its producer (`receipt_panel.lineage_error(..., "original")`) and `predeclare.json` `original_unit_rmse` give original target units. F2: `compute_cost.py` decoded its receipt bundle and ledgers without expected digests, re-collected unpinned scratch receipts whenever scratch was mounted, and admitted a `results-other` sibling by string prefix; `publication_rows.load_publication` decoded a receipt it had not authenticated | Correct the caption from the producer; read every paper input through a declared length and digest | closed: the caption states original target units and how they are formed, and `test_rmse_units.py` holds the producer, the declaration, and the caption together; `pinned_inputs.read_pinned` authenticates the cost bundle, both cost ledgers, and the ARF publication before decoding, with each registry bound to its declared root and every directory from `/` to the leaf held open and opened without following links; the presence probe takes the same walk, so a redirected ancestor is refused rather than read as absent; the scratch re-collection is held because no pinned scratch inventory exists; refusal tests cover sibling, traversal, symlink, redirected-ancestor presence, wrong-digest, direct-load, missing-registered, and absent-optional cases; every number is unchanged |
 | PR-05 | Size n and a real-row ×4 control | Tables state the size | closed: both controls are in main Tables 1–2, the abstract, and Fig. 1 |
 | PR-06 | Predictor-only control | Paired CI in every retention table | closed: five predictor fit seeds in the v2 panel; supplement F keeps the split-seed rows |
-| PR-07 | One fit seed; no clustering; no final test | Five seeds, nested bootstrap, family sensitivity, sealed run | five DOPE fit seeds with the historical binary, five TabSyn fit seeds (block B), a cluster→lineage→fit-seed bootstrap, seed-exchangeability diagnostics, the five-seed source-family sensitivity (`tab:v2-family`), and the pre-declared all-five-fits sensitivity (`tab:v2-all-five`) are in the paper; the sealed run is CM-09 |
-| PR-08 | TabSyn on 8 lineages; TabDDPM not run | Full panel and a budget ledger | TabSyn's scaled-schedule full panel is in the main tables and names its epochs. TabDDPM v5 failed (472 attempt failures, no new success), so TabDDPM v6, TabDiff, GReaT, synthpop, SMOTE, the author-default TabSyn schedule, and Forest-Flow under the common budget are Stage 2 blocks with no number |
+| PR-07 | One fit seed; no clustering; no final test | Five seeds, nested bootstrap, family sensitivity, sealed run | five DOPE fit seeds with the historical binary, five TabSyn fit seeds (block B), a cluster→lineage→fit-seed bootstrap, seed-exchangeability diagnostics, the five-seed source-family sensitivity (`tab:v2-family`), and the pre-declared all-five-fits sensitivity (`tab:v2-all-five`) are in the paper; the sealed run is CM-09. Rebuild (2026-10-15): cluster bootstrap in T-031; the full five-fit by three-sample matrix is FOLLOW-CAMPAIGN |
+| PR-08 | TabSyn on 8 lineages; TabDDPM not run | Full panel and a budget ledger | TabSyn's scaled-schedule full panel is in the main tables and names its epochs. TabDDPM v5 failed (472 attempt failures, no new success), so TabDDPM v6, TabDiff, GReaT, synthpop, SMOTE, the author-default TabSyn schedule, and Forest-Flow under the common budget are Stage 2 blocks with no number. Rebuild (2026-10-15): generator adapter protocol T-063 and byte charge T-034; the full panel is FOLLOW-BASELINES |
 | PR-09 | No privacy or fidelity panel | DCR/NNDR/MIA with CI; C2ST | closed for empirical black-box attacks: main Table 3 and supplement G; supplement G also gives KS, pair fidelity, the CatBoost detector, and α-precision/β-recall for every method with samples. Shadow-model, attribute-inference, and artifact attacks (P2–P4) are Stage 2 |
 | PR-10 | "Ties" read off non-significant tests | Pre-declared equivalence | closed: the Hodges–Lehmann 90% rule of predeclare_v2 decides equivalence; the v1 mean TOST is a continuity table |
-| PR-11 | No stress suite or ablations | XOR/parity/product; k, blocks, budget | two axes are printed (step budget and the untuned default); the grid and stress suite are Stage 2 blocks I and J |
+| PR-11 | No stress suite or ablations | XOR/parity/product; k, blocks, budget | two axes are printed (step budget and the untuned default); the grid and stress suite are Stage 2 blocks I and J. Rebuild (2026-10-15): MechanismLab and StressCore manifests T-064; the stress runs are FOLLOW-DATA (the TODO's T-113 line calls this FOLLOW-STRESS) |
 | PR-12 | Credentialed data path | PMLB fetch path; artifact statement | closed in 62f93e0 |
 | PR-13 | Novelty claimed on the metric; marginal-median teaser | Credit TSTR/TRTR; paired teaser | closed: Fig. 1 is the paired forest plot of DOPE minus every comparator and control |
 | RS-01 | ARF missing from the abstract and Fig. 1 | Paired ARF difference in both | closed |
@@ -81,3 +85,27 @@ against this tree:
 | Fit-referenced NNDR is not holdout-referenced NNDR | open: main Table 3 names its NNDR as fit-referenced; holdout-referenced NNDR is part of privacy P1 in Stage 2 block L |
 | Forest-Flow CatBoost-detector and alpha/beta cells | open: supplement G prints them as unavailable; only the stored logistic detector, KS, and pair fidelity have Forest-Flow values (RS-03) |
 | Fit-seed uncertainty, attribute and shipped-predictor attacks, stress units, equal budgets, artifact packaging | fit-seed uncertainty is closed for DOPE and ARF (five seeds, nested bootstrap); the rest are the Stage 2 blocks above and Stage 4 publication |
+
+## 2026-10-15 rebuild: spec-derived gaps
+
+The five specifications in `docs/review-inputs/2026-10-15/` found the gaps below in the project
+as a whole rather than in the historical paper. Task IDs refer to
+[docs/TODO-2026-10-15.md](../TODO-2026-10-15.md); `FOLLOW-*` items need compute, licences or owner
+decisions and are not done in the rebuild PR.
+
+| ID | Gap | Fix / acceptance | Status |
+|---|---|---|---|
+| S-01 | The public metric is a weighted seven-term master score (MFS-v4) whose weights carry the argument and allow compensation | TDL contract and Rust/Python metric core with golden parity (T-020, T-030 to T-037); MFS-v4 frozen as historical (T-003, T-004) | open: in progress in the rebuild PR |
+| S-02 | Three public truths: README on v4, paper on v3, evidence on v2 | One narrative: README, docs and the new paper say v2 is active evidence, v3/v4 historical, TDL unmeasured (T-100, T-110, T-111) | open: addressed by L3 in the rebuild PR, closes on merge |
+| S-03 | The compactness score improves when rows are duplicated or values are packed (bits per cell, `encoded_numbers`, log-byte term) | Exact charged bytes as the rate; encoded counts diagnostic only; adversarial accounting tests (T-005, T-034, T-035) | open |
+| S-04 | The headline is CatBoost retention, not cross-model transfer | Qualified multi-family auditor panel and campaign (FOLLOW-AUDQ, FOLLOW-CAMPAIGN); hero figure labelled historical until then (T-072) | open |
+| S-05 | One encoder's representation distance is a headline component | Demote representation metrics to diagnostics (T-038) | open |
+| S-06 | Byte scopes are not defined across methods; a small file can hide a large runtime or checkpoint | Payload and sampling-closure scopes, charge manifest, traced clean-room sampling (T-022, T-034, T-035) | open |
+| S-07 | Driver agreement compares one importance vector pair with no real-versus-real calibration | Grouped permutation importance per auditor with real-real ceilings (T-032, T-036) | open |
+| S-08 | Frontier foundation models are named in contracts before qualification | Registry and lock state machine (T-060, T-061); planned/unqualified labels on every public table (T-065) | open: labels done in docs; qualification is FOLLOW-AUDQ |
+| S-09 | Public numbers are typed by hand in places | One results file renders README and paper numbers; CI refuses hand-typed numbers (T-070, T-071, T-072) | open |
+| S-10 | Private host names, operator paths and a bucket name appear in the tracked tree | Tree scrub (T-080); no history rewrite (D-06) | open |
+| S-11 | No governance files, fork-safe CI or licence inventory | T-081, T-082, T-083 | open |
+| S-12 | The benchmark is PMLB-dominated with no shift cohort | RealCore, ShiftCore, MechanismLab and StressCore manifests (T-064); curation is FOLLOW-DATA | open |
+| S-13 | The null is a mean predictor even for foundation models, and low-signal tasks have unstable denominators | Strongest no-table-learning null and the informative-task gate (T-030) | open |
+| S-14 | The public CLI needs pre-normalised headerless numeric input, and categorical hashing reads as secrecy | Design note for ordinary CSV with explicit categorical modes (T-092); implementation is follow-on | open |
