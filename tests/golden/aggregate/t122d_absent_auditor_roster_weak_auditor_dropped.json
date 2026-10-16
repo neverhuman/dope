@@ -1,0 +1,75 @@
+{
+  "case_id": "t122d_aggregate_absent_auditor_roster_weak_auditor_dropped",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "reason": "missing_family_or_cell",
+    "status": "incomplete"
+  },
+  "input": {
+    "alpha": 0.05,
+    "bootstrap_replicates": 9,
+    "bootstrap_seed": 1729,
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "required_seeds": [
+      101,
+      211,
+      307
+    ],
+    "rows": [
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 0.95
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 211,
+        "source_family": "source1",
+        "transfer": 0.95
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 211,
+        "source_family": "source1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 0.95
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 0.9
+      }
+    ]
+  },
+  "purpose": "Dropping the weak auditor and its declaration must not certify inflated robust transfer.",
+  "schema_version": 1
+}

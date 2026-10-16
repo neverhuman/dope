@@ -1,0 +1,70 @@
+{
+  "case_id": "t122d_aggregate_absent_both_rosters",
+  "citable": false,
+  "component": "aggregate",
+  "expected": {
+    "reason": "missing_family_or_cell",
+    "status": "incomplete"
+  },
+  "input": {
+    "alpha": 0.05,
+    "bootstrap_replicates": 9,
+    "bootstrap_seed": 1729,
+    "required_families": [
+      "tree",
+      "linear"
+    ],
+    "rows": [
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 0.95
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 101,
+        "source_family": "source1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 211,
+        "source_family": "source1",
+        "transfer": 0.95
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 211,
+        "source_family": "source1",
+        "transfer": 0.9
+      },
+      {
+        "auditor": "cb",
+        "dataset": "dataset1",
+        "family": "tree",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 0.95
+      },
+      {
+        "auditor": "en",
+        "dataset": "dataset1",
+        "family": "linear",
+        "seed": 307,
+        "source_family": "source1",
+        "transfer": 0.9
+      }
+    ]
+  },
+  "purpose": "Required auditor and seed rosters must not be inferred from the surviving rows.",
+  "schema_version": 1
+}
