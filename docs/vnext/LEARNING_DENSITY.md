@@ -1,3 +1,7 @@
+> **Promoted 2026-10-15 (T-008).** The active definitions (transfer, drivers, byte scopes, thresholds and the
+> result states that replace the states below) are in [docs/metric.md](../metric.md). This exploratory record is
+> kept for its adversarial examples and its N02 history.
+
 # Learning per byte: frontier, `B*_tested`, and the unadopted QLD
 
 N02 decision record for the metric semantics. It defines terms; it does not adopt a headline metric. Nothing here is measured, and no paper sentence rests on it. The implementation belongs to the transfer owner (`research/transfer/`); this file is the interface it must satisfy.
