@@ -463,3 +463,123 @@ class AssembleScoreTest(unittest.TestCase):
             path.write_text(json.dumps({"counts_as_dope_win": True, "official_tests_opened": False, "cells": []}))
             with self.assertRaises(ValueError):
                 collect_panel(path, lambda values: 0.0)
+
+    @staticmethod
+    def _v4_seeds():
+        from research.benchmark.mfs_v3_score import V4_PREREQUISITES, V4_TABULAR_AUDITORS
+
+        base = {
+            **{key: True for key in V4_PREREQUISITES},
+            "encoder": "kumo_tabular_l",
+            "distance": 0.2,
+            "d_null": 0.5,
+            "d_match": 0.4,
+            "gap_mitra": -0.1,
+            "gap_tabicl": -0.2,
+            "exact_row_matches": 0,
+            "near_copy_ok": True,
+            "cleartext_absent": True,
+            "membership_auc": 0.50,
+            "attribute_inference_advantage": 0.01,
+            "artifact_bytes": 1024,
+            "encoded_numbers": 64,
+            "real_rows": 1024,
+            "real_columns": 8,
+            "normalizer": "empirical_midrank_quantile_v1",
+            "utility_protocol": "train_on_synthetic_score_on_real",
+            "utility_auditors": list(V4_TABULAR_AUDITORS),
+            "retention": 0.90,
+            "predictor_only_retention": 0.70,
+            "independent_marginals_retention": 0.65,
+            "real_bootstrap_4n_retention": 0.85,
+            "real_importances": [0.40, 0.30, 0.20, 0.10],
+            "synthetic_importances": [0.45, 0.25, 0.20, 0.10],
+            "real_signs": [1, -1, 1, -1],
+            "synthetic_signs": [1, -1, 1, 1],
+            "mfs_components": {
+                "distribution_fidelity": 0.85,
+                "structure_fidelity": 0.80,
+                "coverage_realism": 0.75,
+            },
+        }
+        s101 = dict(base, sample_seed=101, retention=0.88, artifact_bytes=1024, encoded_numbers=64)
+        s211 = dict(
+            base,
+            sample_seed=211,
+            retention=0.90,
+            artifact_bytes=1536,
+            encoded_numbers=80,
+            synthetic_importances=[0.35, 0.35, 0.20, 0.10],
+        )
+        s307 = dict(base, sample_seed=307, retention=0.92, artifact_bytes=2048, encoded_numbers=96)
+        return [s307, s101, s211]
+
+    def test_mfs_v4_lineage_scoring_and_seed_variance(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage_v4
+
+        seeds = self._v4_seeds()
+        report = score_lineage_v4(seeds, lambda _values: 0.86)
+        self.assertTrue(report["eligible"])
+        self.assertIsNotNone(report["score"])
+        self.assertFalse(report["counts_as_dope_win"])
+        self.assertFalse(report["official_tests_opened"])
+        self.assertEqual(report["compression_metrics"]["encoded_numbers"], 96)
+        var = report["seed_variance"]
+        self.assertIsNotNone(var)
+        self.assertEqual(var["sample_seeds"], list(SAMPLE_SEEDS))
+        self.assertAlmostEqual(var["retention_mean"], 0.90)
+        self.assertAlmostEqual(var["retention_sample_sd"], 0.02)
+        self.assertAlmostEqual(var["retention_min"], 0.88)
+        self.assertAlmostEqual(var["retention_max"], 0.92)
+        self.assertAlmostEqual(var["retention_lcb"], 0.86)
+        self.assertGreater(var["driver_fidelity_sample_sd"], 0.0)
+        self.assertAlmostEqual(report["driver_fidelity"], var["driver_fidelity_min"])
+        self.assertGreater(var["seed_score_sample_sd"], 0.0)
+
+    def test_mfs_v4_lineage_lcb_boundary_and_worst_seed_controls(self):
+        from research.benchmark.mfs_v3_assemble import score_lineage, score_lineage_v4
+
+        seeds = self._v4_seeds()
+        at_mean = score_lineage_v4(seeds, lambda vals: sum(vals) / len(vals))
+        self.assertTrue(at_mean["eligible"])
+        self.assertTrue(at_mean["gates"]["utility_lcb_valid"])
+
+        above_mean = score_lineage_v4(seeds, lambda vals: sum(vals) / len(vals) + 2e-12)
+        self.assertFalse(above_mean["eligible"])
+        self.assertIsNone(above_mean["score"])
+        self.assertIn("utility_lcb_valid", above_mean["failed_gates"])
+        self.assertIsNone(above_mean["seed_variance"])
+
+        # v3 score_lineage also refuses an optimistic bound > mean + 1e-12.
+        v3_above = score_lineage(self.complete_seeds(), lambda vals: sum(vals) / len(vals) + 2e-12)
+        self.assertIsNone(v3_above["score"])
+        self.assertIn("mfs_components_complete", v3_above["failed_gates"])
+
+        # Worst-seed control baseline refusal: LCB (0.86) <= max predictor_only_retention (0.87).
+        tough_control = self._v4_seeds()
+        tough_control[2]["predictor_only_retention"] = 0.87
+        failed_control = score_lineage_v4(tough_control, lambda _vals: 0.86)
+        self.assertFalse(failed_control["eligible"])
+        self.assertIsNone(failed_control["score"])
+        self.assertIn("positive_predictor_lift", failed_control["failed_gates"])
+        self.assertIsNone(failed_control["utility_transfer"])
+
+        # Single-seed failure cannot be hidden even if LCB > worst control baseline.
+        one_bad = self._v4_seeds()
+        one_bad[1]["retention"] = 0.68
+        bad_seed_rep = score_lineage_v4(one_bad, lambda _vals: 0.80)
+        self.assertFalse(bad_seed_rep["eligible"])
+        self.assertIsNone(bad_seed_rep["score"])
+        self.assertIn("all_seeds_eligible", bad_seed_rep["failed_gates"])
+        self.assertIn("positive_predictor_lift", bad_seed_rep["failed_gates"])
+        self.assertIsNone(bad_seed_rep["utility_transfer"])
+        self.assertIsNone(bad_seed_rep["seed_variance"])
+
+        # Schema mismatch across seeds fails closed.
+        mismatch = self._v4_seeds()
+        mismatch[0]["real_rows"] = 2048
+        mismatch_rep = score_lineage_v4(mismatch, lambda _vals: 0.86)
+        self.assertFalse(mismatch_rep["eligible"])
+        self.assertIn("lineage_schema_consistent", mismatch_rep["failed_gates"])
+        self.assertIsNone(mismatch_rep["score"])
+
