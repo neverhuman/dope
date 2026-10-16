@@ -69,7 +69,8 @@ L_{\mathrm{null}} - L_{\mathrm{real}} \ge \max(\epsilon_{\mathrm{abs}},\ \epsilo
 An uninformative cell is marked `uninformative` and left out of that auditor's estimate.
 It is not scored as zero, as a failure or as a win. Low-signal coverage is reported
 separately, and a method cannot improve its result by creating more excluded cells. A
-constant target is refused outright.
+constant target is refused outright. The conformance defaults are `absolute_gain_floor = 1e-12`
+and `relative_gain_floor = 0.01`; the contract fixes the final values.
 
 ### 3.3 Family aggregation
 
@@ -116,7 +117,7 @@ With `p_real` and `p_syn` the normalized non-negative importance vectors over gr
 | Mass agreement | `1 − ½‖p_real − p_syn‖₁` (one minus total variation) | required |
 | Rank agreement | tie-aware pairwise rank agreement of the two orders (NDCG@k is reported beside it) | required |
 | Sign agreement | direction agreement on drivers whose real-trained sign is stable across real replicates | required where defined |
-| Interaction agreement | mass agreement over the top pairwise interactions | secondary in v1 |
+| Interaction agreement | mass agreement over the top pairwise interactions, times the strength ratio `min(total_real, total_syn) / max(total_real, total_syn)`, so losing an interaction cannot pass on its rank alone | listed in `required_components`; S4 proposes it as secondary in v1 |
 
 No sign is required for unordered categoricals, inactive groups, or drivers whose real
 sign is unstable.
@@ -126,12 +127,13 @@ sign is unstable.
 Feature importance is noisy even between two models trained on real data. The evaluator
 therefore fits two matched real instances and records each component's real-versus-real
 agreement as the ceiling `c`. Each synthetic component is divided by its declared
-ceiling and clipped to `[0, 1]`. When a ceiling is below the stability floor, the cell is
-`uninformative` for drivers.
+ceiling and clipped to `[0, 1]`. When a ceiling is below the stability floor (conformance
+default 0.70), the cell is `uninformative` for drivers.
 
 ### 4.4 Driver score
 
-The auditor driver score is the smallest normalized required component. The family
+The contract lists the `required_components`; the conformance default is mass, rank, sign
+and interaction. The auditor driver score is the smallest normalized required component. The family
 score is the mean over the family's auditors. `D_robust` is the worst family score. A
 missing required component makes the cell `incomplete`, never zero.
 
@@ -228,20 +230,18 @@ is not a code-length optimum, a causal claim, or a measure of general dataset qu
 It is not a weighted score: distribution, structure, coverage, representation distance,
 runtime and encoded-value counts are diagnostics.
 
-## 10. Working field names
+## 10. Field names
 
-These names follow L1's conformance package and the golden envelope. T-008 requires the
-notation to match the T-020 and T-023 schemas, so this table is reconciled when those
-schemas land.
+These are the names in the Python conformance package (`research/transfer/tdl/`, T-036) and
+the golden corpus (`tests/golden/`, T-037). T-008 requires the notation to match the T-020 and
+T-023 schemas, so this table is checked again when the Rust core and schemas land.
 
-| Symbol | Field |
+| Quantity | Fields |
 | --- | --- |
-| `L_null`, `L_real`, `L_syn` | `null_losses`, `real_losses`, `synthetic_losses` (per query row) |
-| real-gain lower bound | `real_gain_lcb` |
-| `T_{d,m}` | `transfer_retention` (unclipped) |
-| `T_robust`, its lower bound | `robust_transfer`, `robust_transfer_lcb` |
-| `D_robust` | `driver_fidelity` with per-component `mass_agreement`, `rank_agreement`, `sign_agreement`, `interaction_agreement`, `real_real_ceiling` |
-| payload, closure | `payload_bytes`, `sampling_closure_bytes` |
-| thresholds | `transfer_threshold` (`τ_T`), `driver_threshold` (`τ_D`) |
-| state | `state` ∈ {`qualified`, `not_reached_in_tested_range`, `unqualified`, `incomplete`, `failed`} |
-| freeze flag | `protocol_frozen` |
+| Transfer inputs | `null_losses`, `real_losses`, `synthetic_losses` (per query row), `real_gain_lcb`, `constant_target`, `absolute_gain_floor`, `relative_gain_floor` |
+| Transfer outputs | `status` (`informative`, `uninformative`, `incomplete`), `null_loss`, `real_loss`, `synthetic_loss`, `real_gain`, `raw_transfer` (unclipped `T`), `clipped_transfer` (display only) |
+| Aggregation | `family_means`, `robust_transfer` (worst family), `mean_transfer` (reported, never certifying), `lcb` |
+| Drivers | inputs `real_importances`, `synthetic_importances`, `real_signs`, `synthetic_signs`, `real_interactions`, `synthetic_interactions`, `real_real_ceiling` (per component), `stability_floor`, `driver_threshold`, `required_components`; outputs `raw_components`, `normalized_components`, `driver_fidelity` (`D`), `driver_pass` |
+| Bytes | `payload_bytes`, `section_bytes`, `framing_bytes`, `shared_bytes`, `sampling_closure_bytes`, `cold_bundle_bytes`, `amortized_bytes` |
+| Frontier | `status` (`qualified`, `not_reached_in_tested_range`, `unqualified`, `incomplete`, `failed`), `tdl_bytes`, `largest_tested_bytes`, and per budget `artifact_bytes`, `lcb_transfer`, `driver_fidelity`, `tdl_pass`, `frontier_transfer` |
+| Contract | `transfer_threshold` (`τ_T`), `driver_threshold` (`τ_D`), `protocol_frozen` |
