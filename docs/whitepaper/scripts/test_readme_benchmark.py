@@ -1,5 +1,6 @@
 """The README benchmark block and figures come from v2-headline.json, like the paper."""
 
+import copy
 import importlib.util
 import json
 import tempfile
@@ -30,6 +31,66 @@ class ReadmeBenchmark(unittest.TestCase):
         block = bench.benchmark_block(headline)
         self.assertIn(f"The strongest full-panel comparator is {strongest['display']}.", block)
         self.assertNotIn("D.O.P.E.", bench.README.read_text())
+
+    def test_counts_and_cap_come_from_their_sources(self):
+        headline = json.loads(bench.HEADLINE.read_text())
+        predeclare = json.loads(bench.PREDECLARE.read_text())
+        contract = json.loads(bench.CONTRACT.read_text())
+        facts = bench.load_facts(headline)
+        self.assertEqual(facts["panel"], next(iter(predeclare["methods"]["primary"].values()))["lineages"])
+        self.assertEqual(facts["fit_seeds"], bench.COUNT_WORDS[len(predeclare["dope"]["fit_seeds"])])
+        self.assertIn(f"percentile {facts['level']}% interval", predeclare["estimands"]["uncertainty"])
+        self.assertEqual(facts["cap"], contract["tier_byte_limits"]["l3"])
+        block = bench.benchmark_block(headline)
+        self.assertIn(f"{facts['panel']} PMLB regression tables", block)
+        self.assertIn(f"DOPE uses {facts['fit_seeds']} fit seeds", block)
+        self.assertIn(f"{facts['level']}% nested bootstrap intervals", block)
+        self.assertIn(f"within the {facts['cap']:,}-byte release cap", block)
+        source = Path(bench.__file__).read_text()
+        for literal in ("10240", "10,240", "100 PMLB", "five fit seeds", "95%"):
+            self.assertNotIn(literal, source, f"renderer types {literal!r} instead of reading it")
+
+    def test_a_drifted_source_breaks_the_readme_check(self):
+        headline = json.loads(bench.HEADLINE.read_text())
+        predeclare = json.loads(bench.PREDECLARE.read_text())
+        contract = json.loads(bench.CONTRACT.read_text())
+        committed = bench.readme_block(bench.README.read_text())
+        self.assertEqual(committed, bench.expected_readme_block(headline))
+
+        def rendered(h, p, c):
+            return bench.BEGIN + "\n" + bench.benchmark_block(h, bench.panel_facts(h, p, c)).rstrip() + "\n" + bench.END
+
+        h2, p2 = copy.deepcopy(headline), copy.deepcopy(predeclare)
+        for method in p2["methods"]["primary"].values():
+            method["lineages"] = 101
+        next(arm for arm in h2["arms"] if arm["code"] == "Dope")["bytes"]["n"] = 101
+        p3 = copy.deepcopy(predeclare)
+        p3["dope"]["fit_seeds"] = p3["dope"]["fit_seeds"][:4]
+        p4 = copy.deepcopy(predeclare)
+        p4["estimands"]["uncertainty"] = p4["estimands"]["uncertainty"].replace("percentile 95% interval",
+                                                                                "percentile 90% interval")
+        c2 = copy.deepcopy(contract)
+        c2["tier_byte_limits"]["l3"] = 32768
+        for label, h, p, c, text in (("panel", h2, p2, contract, "101 PMLB"), ("seeds", headline, p3, contract, "four fit seeds"),
+                                     ("level", headline, p4, contract, "90% nested"), ("cap", headline, predeclare, c2, "32,768-byte")):
+            with self.subTest(label=label):
+                block = rendered(h, p, c)
+                self.assertIn(text, block)
+                self.assertNotEqual(block, committed)
+
+    def test_disagreeing_sources_are_refused(self):
+        headline = json.loads(bench.HEADLINE.read_text())
+        predeclare = json.loads(bench.PREDECLARE.read_text())
+        contract = json.loads(bench.CONTRACT.read_text())
+        split = copy.deepcopy(predeclare)
+        next(iter(split["methods"]["primary"].values()))["lineages"] = 99
+        mismatch = copy.deepcopy(headline)
+        next(arm for arm in mismatch["arms"] if arm["code"] == "Dope")["bytes"]["n"] = 98
+        unstated = copy.deepcopy(predeclare)
+        unstated["estimands"]["uncertainty"] = "Nested bootstrap."
+        for h, p in ((headline, split), (mismatch, predeclare), (headline, unstated)):
+            with self.assertRaises(ValueError):
+                bench.panel_facts(h, p, contract)
 
     def test_splice_refuses_duplicate_markers(self):
         with self.assertRaises(ValueError):
