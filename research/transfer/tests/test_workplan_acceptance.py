@@ -406,5 +406,63 @@ class TestD19AndBlockerUnblockMatrix(unittest.TestCase):
             self.assertTrue(any(p.is_file() and "D19" in p.read_text() for p in d19_candidates))
 
 
+PREFLIGHT_SPECS = {
+    "W01": ("PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_kumo_tabular research.transfer.tests.test_other_auditors research.transfer.tests.test_worker_abi research.transfer.tests.test_workplan_acceptance.TestW01CpuPreflight -v", "D10/D12 vendor Kumo/TabICL runtime and weights"),
+    "E03": ("PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_e03_pilot_manifest research.transfer.tests.test_pilot_admission research.transfer.tests.test_privacy research.transfer.tests.test_calibration_receipt research.transfer.tests.test_workplan_acceptance.TestE03CpuPreflight -v", "D10/D19 GPU schedule hold and source/model rights"),
+    "E04": ("PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_precommit research.transfer.tests.test_scheduler research.transfer.tests.test_executor research.transfer.tests.test_workplan_acceptance.TestE04CpuPreflight -v", "D19 precommit review and E03 completion"),
+    "E05": ("PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_lineage research.transfer.tests.test_bundle_isolation research.transfer.tests.test_evidence research.transfer.tests.test_workplan_acceptance.TestE05CpuPreflight -v", "D18 custody fence and D19 unlock token after E03/E04"),
+    "E06": ("PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_frontier_coverage research.transfer.tests.test_claims research.transfer.tests.test_learning_density research.transfer.tests.test_workplan_acceptance.TestE06CpuPreflight -v", "D19/D05 L2-L4 campaign artifacts from E03-E05"),
+    "E07": ("PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_cpu_smoke_lane research.transfer.tests.test_workplan_acceptance.TestE07CpuPreflight -v", "D19 post-release observation window and external feed"),
+}
+
+
+def emit_cpu_preflight_receipts(out_dir: Path) -> dict[str, dict]:
+    out_dir = Path(out_dir)
+    logs_dir = out_dir / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    head_sha = subprocess.run(["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
+    results = {}
+    for task_id, (cmd, gate_note) in PREFLIGHT_SPECS.items():
+        res = subprocess.run(cmd, shell=True, cwd=str(REPO_ROOT), capture_output=True, text=True, check=True)
+        combined = (res.stdout or "") + (res.stderr or "")
+        log_path = logs_dir / f"{task_id}_preflight.log"
+        log_path.write_text(combined)
+        log_sha = hashlib.sha256(log_path.read_bytes()).hexdigest()
+        receipt = {
+            "schema": "dope.cpu-preflight-readiness-receipt/v1",
+            "task_id": task_id,
+            "status": "cpu_preflight_passed_external_campaign_gated",
+            "gpu_utilization_percent": 0,
+            "head_sha": head_sha,
+            "command": cmd,
+            "exit_code": res.returncode,
+            "log_path": str(log_path),
+            "log_sha256": log_sha,
+            "external_gate_disclosure": f"CPU preflight harness verified (0% GPU); full multi-seed GPU campaign / vendor runtime execution remains gated on D10/D18/D19/D05 ({gate_note}).",
+        }
+        (out_dir / f"{task_id}_preflight.json").write_text(json.dumps(receipt, indent=2) + "\n")
+        results[task_id] = receipt
+    return results
+
+
+class TestBlockedCampaignCpuReadinessHarness(unittest.TestCase):
+    def test_blocked_tasks_w01_e03_to_e07_cpu_preflight_receipts(self):
+        self.assertEqual(set(PREFLIGHT_SPECS), {"W01", "E03", "E04", "E05", "E06", "E07"})
+        if PACKET_DIR.is_dir():
+            pdir = PACKET_DIR / "verify/preflight_31966ba2"
+            if pdir.is_dir():
+                for tid in PREFLIGHT_SPECS:
+                    rfile = pdir / f"{tid}_preflight.json"
+                    self.assertTrue(rfile.is_file(), f"Missing {rfile}")
+                    doc = json.loads(rfile.read_text())
+                    self.assertEqual(doc["exit_code"], 0)
+                    self.assertEqual(doc["gpu_utilization_percent"], 0)
+                    self.assertIn("D10/D18/D19/D05", doc["external_gate_disclosure"])
+
+
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    if len(sys.argv) == 3 and sys.argv[1] == "--emit-preflight-receipts":
+        emit_cpu_preflight_receipts(Path(sys.argv[2]))
+    else:
+        unittest.main(verbosity=2)
+
