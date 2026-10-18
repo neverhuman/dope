@@ -2640,6 +2640,10 @@
     "research/transfer/tests/test_workplan_acceptance.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance -v",
       "purpose": "verify durable workplan acceptance and deterministic CPU preflight gates without GPU or sealed data"
+    },
+    "research/transfer/tests/test_workplan_r_and_v_lanes.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_r_and_v_lanes -v",
+      "purpose": "verify R01/R02/R05/R09 deterministic Rust research pilots and V00 frozen-evidence and CPU-readiness gates"
     }
   }
 }

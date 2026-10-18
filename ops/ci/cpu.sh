@@ -41,6 +41,7 @@ uv pip install --python target/ci-python/bin/python --constraint validation/requ
 mkdir -p target/transfer-test-tmp
 TMPDIR="$PWD/target/transfer-test-tmp" PYTHONPATH=. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 target/ci-python/bin/python -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
 TMPDIR="$PWD/target/transfer-test-tmp" PYTHONPATH=. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 target/ci-python/bin/python -B -m unittest research.transfer.tests.test_workplan_acceptance -v
+TMPDIR="$PWD/target/transfer-test-tmp" PYTHONPATH=. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 target/ci-python/bin/python -B -m unittest research.transfer.tests.test_workplan_r_and_v_lanes -v
 target/ci-python/bin/python docs/whitepaper/scripts/retained_evidence.py
 target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py
 # Required paper-tests gate: same commands as Justfile, using the V1 interpreter.
