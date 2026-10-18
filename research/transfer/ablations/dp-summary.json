@@ -1,0 +1,75 @@
+{
+  "format": "dope-dp-summary-ablation-v1",
+  "status": "admission_blocked",
+  "hypothesis": "Given one independently reviewed bounded entity-level DP summary, pure postprocessing with AIM or MST compression may reduce serialized bytes versus its uncompressed form while preserving downstream utility within the preregistered margin. No private-data read or extra privacy loss is permitted after summary creation.",
+  "null_hypothesis": "Neither compressed arm improves bytes at matched downstream utility; retain the uncompressed reference and make no mechanism claim.",
+  "no_win_rule": "No arm wins unless an independent accountant review, identical mechanism and adjacency, exact epsilon/delta match, held-out source/model evaluation, utility noninferiority, and validity/compatibility gates all pass. Otherwise preserve the negative or blocked result.",
+  "design": {
+    "protected_unit": "entity",
+    "adjacency": "add_remove",
+    "contribution_bound": "must be fixed and independently reviewed before any private access; currently absent",
+    "mechanism": "one frozen Gaussian mechanism implementation and one frozen bounded summary definition shared by every arm",
+    "comparison_arms": ["uncompressed", "AIM", "MST"],
+    "matched_privacy": "identical adjacency, contribution bound, mechanism hash, epsilon, delta, clipping/bounds provenance, and complete composed access history across arms",
+    "postprocessing": "candidate transforms receive only the already produced bounded entity-DP summary; all source-derived preprocessing, selection, serialization length, status, metrics, failures, and retries must be included in the reviewed composition before any access",
+    "utility_margin": 0.01,
+    "primary_measure": "serialized summary bytes at utility no worse than the uncompressed arm by more than utility_margin",
+    "secondary_measures": ["downstream task utility", "serialized bytes", "validity and compatibility pass rate"],
+    "invalid_or_failed_artifacts": "retain the original artifact and outcome; include failure/status/length observability in the privacy ledger"
+  },
+  "holdouts": {
+    "source_registry": "research/transfer/registries/sources.json",
+    "candidate_source_families": ["dev-lineage-alpha", "dev-lineage-beta"],
+    "source_planned_roles": {"fit": "dev-lineage-alpha", "source_holdout": "dev-lineage-beta"},
+    "source_holdout_status": "not_admitted: registry rights and lineage evidence are unresolved; no vetted DP summary is registered",
+    "model_registry": "research/transfer/registries/models.json",
+    "candidate_model_families": ["linear", "independent_boosting", "independent_neural"],
+    "model_planned_roles": {"development": "linear", "model_family_holdout": "independent_boosting and independent_neural"},
+    "model_holdout_status": "not_admitted: all candidate registry identities and eligibility evidence are unresolved"
+  },
+  "candidates": [
+    {"id": "uncompressed", "representation": "frozen bounded summary as emitted", "source_reads_after_summary": 0},
+    {"id": "AIM", "representation": "AIM compression of the same frozen summary", "source_reads_after_summary": 0},
+    {"id": "MST", "representation": "MST compression of the same frozen summary", "source_reads_after_summary": 0}
+  ],
+  "bytes_and_cost": {
+    "byte_accounting": "count the complete encoded artifact, metadata, integrity/framing bytes, and any required decoder sidecar; report raw totals for every arm",
+    "candidate_cost_cap_usd": 0.0,
+    "development_cpu_cap_seconds": 30,
+    "development_wall_cap_seconds": 120,
+    "pilot_cpu_cap_seconds": 10,
+    "pilot_wall_cap_seconds": 30,
+    "pilot_scope": "one deterministic synthetic postprocessing-boundary fixture only; no source rows, accountant claims, utility comparison, or campaign"
+  },
+  "seed_schedule": {"pilot": [1701], "development": [1701, 1702, 1703], "seed_policy": "freeze before admission; paired identical seeds across all arms"},
+  "stop_rule": "Do not access private data until the accountant, summary bounds, source/model holdouts, and complete output-channel ledger receive independent review. Stop on any mismatch, budget overrun, invalid output, private read after summary creation, or failed gate. Preserve all outputs; no unchanged expensive retry and no automatic campaign.",
+  "admission_blockers": [
+    "The repository accountant default-denies proof and has no independently reviewed signoff for this mechanism or summary.",
+    "No vetted bounded entity-DP summary schema, contribution bound, mechanism implementation identity, or composed epsilon/delta profile is available.",
+    "No source/model holdouts are admitted: source rights/lineage evidence and model identities/eligibility are unresolved in their registries.",
+    "AIM and MST implementations and measured compatibility/validity gates are not present for this frozen summary input."
+  ],
+  "pilot_result": {
+    "status": "passed_synthetic_interface_fixture_only",
+    "command": "ulimit -t 10; timeout 30s /usr/bin/time -v env CARGO_BUILD_JOBS=2 RAYON_NUM_THREADS=2 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 python3 -m unittest research.transfer.privacy.test_summary_study",
+    "exit_code": 0,
+    "user_cpu_seconds": 0.10,
+    "system_cpu_seconds": 0.02,
+    "wall_seconds": 0.12,
+    "max_rss_kb": 21504,
+    "monetary_cost_usd": 0.0,
+    "result_scope": "three deterministic pure-interface fixtures; no private data, utility comparison, accountant verification, or mechanism result",
+    "preflight_failure": "An initial fixture exposed that the interface accepted replace_one despite the preregistered add_remove adjacency. The gate was narrowed to add_remove before the one recorded pilot; initial failed preflight preserved here.",
+    "campaign_started": false
+  },
+  "development_result": null,
+  "implementation_boundary": "No AIM/MST arm is wired into rust/compiler because no arm is admitted or measured; the existing compiler and release gates remain authoritative.",
+  "validation": {
+    "summary_fixture_pilot": "PASS; one recorded run",
+    "just_fast": "PASS",
+    "just_check": "FAIL at tests/rust_cli.rs::native_cli_end_to_end: expected auditor coverage text; observed release_authorization_required. Rust compiler/CLI/test files are unchanged by this attempt.",
+    "git_diff_check": "PASS",
+    "manifest_json_parse": "PASS"
+  },
+  "claims": {"formal_dp": "unverified", "release_authorized": false, "utility_winner": null}
+}
