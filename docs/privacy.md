@@ -98,3 +98,109 @@ the unresolved custody incidents unchanged. Fixture validation commands are
 `cargo test --locked --lib release::` and
 `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v`.
 Neither these fixtures nor the schema certify a dataset or permit publication.
+
+## Formal DP profile and complete private-read ledger
+
+`schemas/dp-profile-v1.schema.json` is a closed Draft 2020-12 design profile.
+`research.transfer.privacy.accountant.account` evaluates its complete ledger.
+The trusted caller supplies `expected_adjacency`: `unit` (`row`, `entity`, or
+`user_group`), `relation` (`add_remove` or `replace_one`), and the pre-specified
+`max_rows_per_unit`. Every private mechanism must prove its sensitivity for
+that exact contract. Row privacy never silently becomes entity or group privacy;
+a unit, relation, or contribution-cap mismatch forces `formal_dp_status=not_dp`.
+Contribution caps and sensitivity bounds require proof, not observed row counts.
+
+The profile pins clipping norm/bound, sensitivity, noise scale and implementation,
+the accountant, total public `(epsilon, delta)` budget, complete release history,
+cryptographic PRNG implementation, and floating-point discretization assumptions.
+Secret DP noise randomness must use a cryptographic PRNG and remain secret; a
+public deterministic sampling seed cannot supply it. No noise seed is accepted
+in this closed profile or emitted in the accounting report.
+Bounds are either strictly public and fixed before source access or obtained by
+an accounted DP mechanism. The accountant never discovers source extrema or
+quantiles. Supplied bounds, noise labels and cost numbers are proof obligations;
+their schema validity does not establish the implemented mechanism's guarantee.
+
+The ledger explicitly covers all seven decision stages, including unused stages
+with evidence of a public pre-specified choice:
+
+| Stage | Private dependency that must be charged |
+| --- | --- |
+| `domain_discovery` | Sample min/max, category discovery, missingness discovery |
+| `binning` | Sample quantile edges or other data-dependent bins |
+| `winsorization_clipping_bounds` | Sample extrema, quantiles or learned clip bounds |
+| `transform_fitting` | Learned scaling, imputation, feature or coordinate transforms |
+| `structure_selection` | Structure search or model/hyperparameter choices |
+| `parameter_fitting` | Every private fit, refit or sufficient-statistic query |
+| `candidate_selection` | Private scoring, validation or selection, including rejected candidates |
+
+Four further mandatory entries account for observable channels and later reads:
+`source_derived_lengths`, `source_derived_statuses`, `source_derived_metrics`,
+and `post_summary_private_reads`. An unused channel needs an explicit pinned
+public constant/empty specification. A source-dependent artifact length, failure
+status or metric requires a charged mechanism; private access after a DP summary
+does not inherit the summary's guarantee. Every such event is composed.
+
+Each step declares `public_prespecified`, `accounted_dp`, or `unaccounted_private`.
+Public choices need pinned provenance; a private mechanism needs pinned proof
+evidence and a positive cost in the selected accountant. Public clipping bounds
+only exempt the choice of bounds: private fitting still needs its mechanism cost.
+An accounted private bound also needs a charged clipping-bound stage. A non-DP
+min/max scan, quantile query, structure search or candidate selection is an
+`unaccounted_private` read, even when its result is never separately published.
+One such read immediately forces `not_dp`, overriding an audit flag or empirical
+screen. Missing stage coverage, incompatible costs and excess budgets also refuse.
+
+## Composition, audit signoff and integration boundary
+
+All steps use the same adjacency and accountant. RDP adds per-order epsilon
+vectors at common orders `alpha > 1`, then minimizes
+`sum_rdp(alpha) + log(1/delta)/(alpha-1)` over the declared grid. See
+[Mironov, Propositions 1 and 3](https://arxiv.org/html/1702.07476v3).
+zCDP adds `rho`, converting with `rho + 2*sqrt(rho*log(1/delta))`; see
+[Bun and Steinke, Proposition 1.3 and Lemma 2.3](https://arxiv.org/abs/1605.02065).
+Both conversions require positive delta when private mechanisms are present.
+The `pld` route accepts independently proved per-step privacy-loss envelopes
+`(epsilon, delta)` and adds both coordinates conservatively by sequential
+composition. It does not implement PLD convolution or claim tighter PLD bounds;
+see the composition discussion in [Mironov](https://arxiv.org/html/1702.07476v3).
+No route infers subsampling amplification, disjointness or independence. Sums
+and conversion operations use upward floating-point margins; that precaution
+does not replace an independent numerical/discretization proof audit.
+
+Supply every adaptive query, failure, retry, rejected candidate and earlier
+release in the ledger, bound to `release_history_sha256`. Costs must hold
+conditionally for each adaptive step. Reassessing a truncated ledger cannot
+reset a real privacy budget. This declarative module performs no source reads
+and cannot detect accesses omitted or falsely marked public by external code.
+The trusted producer and independent audit must establish complete coverage,
+public provenance, contribution enforcement, cost derivation and history.
+
+Even when `composition_passed=true`, verification requires all of:
+`independent_cryptographic_audit=independently_audited`, the explicit trusted
+`independent_audit_passed=True` argument, and a trusted `audit_verifier` returning
+exactly `True` for an authenticated independent proof signoff. The verifier
+receives the full profile digest, accountant and schema code digests, and composed
+budget. The profile digest covers every step, history, bounds, implementation
+and discretization pin. The default verifier denies; a JSON status or boolean
+alone cannot pass. Signoff must check actual PRNG security, finite precision
+noise, sensitivity and composition of the implemented mechanism, not fixtures.
+
+Without signoff the result is `unverified_design`. `empirical_screened_only`
+always leaves `formal_dp_verified=false`, including with a fixture audit adapter
+(D15). Refusal reasons and exceptions are fixed codes. Reports expose only
+states, public budget parameters and a profile digest; errors and reports never
+copy source values, headers, extrema, private paths, callback errors or the input
+profile (CR-04). No result grants legal authorization or sets
+`release_authorized=true`.
+
+This is a draft S02 interface for S00/D02 integration. S00's trusted
+`ReleaseEvidenceVerifier` must independently bind a substantive formal receipt
+to the release accounting, mechanism, accountant, proof and `(epsilon, delta)`;
+this module does not populate or promote S00 profiles. D02's source-manifest
+admission must supply the protected hierarchy, pre-specified bounds provenance
+and source rights/custody context without copying its private mapping into this
+profile. The integrator must also bind S00's complete observable-channel/history
+accounting. No trusted product audit adapter or noise sampler ships here. Unit-test
+audit callbacks recognize synthetic identities only. Deterministic validation:
+`PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_dp_accountant research.transfer.tests.test_privacy -v`.
