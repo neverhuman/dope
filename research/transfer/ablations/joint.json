@@ -1,0 +1,119 @@
+{
+  "format": "dope-joint-ablation-study-v1",
+  "status": "pilot_complete_development_blocked",
+  "claims": {
+    "privacy": false,
+    "generalization": false,
+    "tier_qualification": false
+  },
+  "hypotheses": {
+    "primary": "At equal encoded bytes, retaining X dependence improves prediction of a fixed target-conditional teacher over independent X plus the same predictor, when the teacher, residual law, support, precision, sample size and random streams are held constant.",
+    "alternatives": [
+      "Any apparent gain is finite-sample variation across generated source families.",
+      "The target mechanism or inductive bias, rather than X dependence, explains the difference.",
+      "Optimization or quantization changes effective capacity despite equal encoded byte budgets.",
+      "The teacher is not representable by one or more candidate families at the frozen budget."
+    ]
+  },
+  "design": {
+    "precision": "float64",
+    "byte_budget": 128,
+    "byte_accounting": "canonical encoded artifact bytes including all sampling dependencies; reject over-budget cells",
+    "source_holdouts": {
+      "development": [
+        "synthetic-source-a",
+        "synthetic-source-b",
+        "synthetic-source-c"
+      ],
+      "held_out": [
+        "synthetic-source-d",
+        "synthetic-source-e"
+      ],
+      "rule": "generated mechanisms are split by source seed before fitting; rows from one source seed never cross partitions"
+    },
+    "model_holdouts": {
+      "development": [
+        "additive_teacher",
+        "quadratic_interaction_teacher"
+      ],
+      "held_out": [
+        "threshold_gate_teacher"
+      ],
+      "rule": "teacher families are frozen before candidate fitting; held-out teacher cells are descriptive validity checks only"
+    },
+    "task": "regression",
+    "teacher": "same frozen target-conditional function and intercept in every X-dependence arm",
+    "residual_law": "same homoscedastic Gaussian residual draw per row and seed in every arm",
+    "support": "same ordered feature support in every arm",
+    "sample_size": 256,
+    "seed_schedule": [
+      11,
+      29,
+      47
+    ],
+    "varied_factor": "X dependence only: independent marginals versus fixed correlated-X copula; full-joint candidates also model X and Y jointly",
+    "search_budget": 1,
+    "stop_rule": "Run one priced correctness pilot only. Stop if it exceeds its 2 CPU-second cap, fails exact normal-equation checks, or reports nonfinite values. Do not retry unchanged. Admit the development factorial only after the common matched-byte harness, model holdout construction, and resource quote are reviewed; unsupported cells remain in the denominator. No automatic campaign or roster expansion."
+  },
+  "candidates": [
+    {
+      "id": "independent_x_predictor",
+      "status": "control_design_only",
+      "description": "Independent X marginals plus the identical fixed predictor; charge predictor and sampling dependencies."
+    },
+    {
+      "id": "correlated_x",
+      "status": "component_exists_study_harness_missing",
+      "description": "Fixed correlated X model plus the identical target predictor."
+    },
+    {
+      "id": "full_joint",
+      "status": "component_exists_study_harness_missing",
+      "description": "Joint X,Y generator; compare at the same complete encoded-byte cap."
+    },
+    {
+      "id": "sparse_tree",
+      "status": "component_exists_study_harness_missing",
+      "description": "Sparse oblivious-tree target with the same X and residual draws."
+    },
+    {
+      "id": "ga2m",
+      "status": "component_exists_study_harness_missing",
+      "description": "Sparse GA2M target with fixed interaction support budget."
+    },
+    {
+      "id": "circuit",
+      "status": "unsupported_preserved",
+      "description": "No circuit target representation or sampler is implemented."
+    },
+    {
+      "id": "low_rank_residual",
+      "status": "unsupported_preserved",
+      "description": "No low-rank residual target representation or sampler is implemented."
+    },
+    {
+      "id": "ridge_xtx_xty",
+      "status": "pilot_correctness_control_only",
+      "description": "Exact float64 XTX/XTy ridge solution with lambda 1 and unpenalized intercept, checked before f32 quantization; not a privacy or generalization comparator."
+    }
+  ],
+  "cost_cap": {
+    "unit": "single-thread CPU seconds",
+    "pilot_max": 2,
+    "development_max": 60,
+    "acquisition_cost": 0,
+    "external_data_access": 0,
+    "gpu_seconds": 0,
+    "development_price_basis": "hard CPU-time cap only; development study is not admitted until a measured per-candidate price and common artifact harness are recorded"
+  },
+  "pilot": {
+    "id": "ridge-xtx-xty-math-control",
+    "result": "passed",
+    "test_runtime_seconds": 0.0,
+    "command_wall_seconds_including_cold_rebuild": 37.98,
+    "disposition": "correctness_control_only; factorial_development_study_not_admitted",
+    "evidence": "cargo test --locked --lib joint_ablation_tests -- --nocapture; 2 deterministic fixtures passed",
+    "note": "The fixed two-CPU-second cap applies to pilot test execution, not one-time compilation; the command wall time is retained separately and excluded from model-fit cost."
+  },
+  "admission_blocker": "The current compiler has no shared harness that freezes the same teacher, X support, residual draws, source/model holdouts, and complete encoded-byte cap across predictor, dependence-only, joint, and target-mechanism candidates. Circuit and low-rank residual candidates are unsupported. Only the narrow ridge normal-equation control is admitted as a correctness pilot; the factorial development study remains blocked."
+}
