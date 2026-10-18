@@ -1,0 +1,59 @@
+{
+  "format": "dope-scientific-pilot-manifest-v1",
+  "version": 1,
+  "campaign": "E03-smallest-observational-adverse-mechanism-pilot",
+  "status": "blocked_prelaunch",
+  "execution_authorized": false,
+  "launch_command": null,
+  "preflight_command": "python3 -m unittest research.transfer.tests.test_e03_pilot_manifest research.transfer.tests.test_pilot_admission",
+  "preflight_must_pass_before_native_launch": true,
+  "gates": {
+    "observational_source_rights": "pending",
+    "mechanism_source_rights": "pending",
+    "model_rights_and_native_parity": "pending",
+    "source_ownership_and_collision_review": "pending",
+    "resource_budget_and_owner_admission": "pending",
+    "protected_owner_admission": "pending",
+    "w03_modern_panel_and_scheduler_admission": "pending"
+  },
+  "smoke": {
+    "observational_tasks": 1,
+    "adverse_mechanism_tasks": 1,
+    "generators": ["dope", "gaussian_copula_control"],
+    "budgets": ["small", "large"],
+    "required_non_generator_control": "compressed_real_row_reference",
+    "required_trace": [
+      "prepare", "compile", "reload", "source_free_sample",
+      "real_null_synthetic_models", "driver_analysis", "rust_receipt", "report"
+    ]
+  },
+  "next_smoke_suggestion": {
+    "tasks": 3,
+    "budgets": 2,
+    "models": 2,
+    "status": "proposal_only"
+  },
+  "quick12_price": {
+    "tasks": 12,
+    "budgets_per_task": 3,
+    "fits_per_cell": 1,
+    "observed_time_seconds": null,
+    "uncertainty_and_driver_privacy_cost": null,
+    "status": "not_estimable_before_admitted_smoke"
+  },
+  "receipts": {
+    "per_query": "private",
+    "aggregate": "public_redacted",
+    "actual_cost_required": true
+  },
+  "stop_conditions": [
+    "inadequate_reference",
+    "weak_attack_power",
+    "critical_rare_slice",
+    "unresolved_identity",
+    "unbounded_cost",
+    "unqualified_required_model"
+  ],
+  "scientific_admission": false,
+  "panel_pass": false
+}
