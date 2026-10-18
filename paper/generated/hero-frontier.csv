@@ -1,12 +1,7 @@
-id,method,artifact_bytes,retention,interval_lo,interval_hi,observed_lineages,prepared_lineages,evidence_status,cohort_id,complete_budget_grid,driver_gate,cohort_complete
-Dope,DOPE (ours),1895.0,0.898170827619396,0.8039037291006366,0.9719353159481083,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
-DopeDef,"DOPE, untuned default",1660.5,0.7039398384416241,0.42395421590584487,0.8768901931379116,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
-TabSyn,TabSyn (scaled schedule),42261045.5,0.9240695923067241,0.8142261789641545,0.964784107476397,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
-Arf,ARF (author default),1438304.5,0.8224144967169416,0.6886489590460345,0.8943111358999637,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
-ArfNat,ARF (native selected),1627718.5,0.8040514194638223,0.6473544399453184,0.8854103100080929,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
-Gauss,Gaussian copula,5464.5,0.6694654307455047,0.36945274735021405,0.8669514529126394,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
-Chow,Chow-Liu tree,29865.0,0.5756921422142081,0.29448130701116293,0.638324269163479,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
-Ind,Independent marginals,2549.5,-0.011986971805031716,-0.04031737293677982,-0.002334590784225717,99,100,selection_exposed_validation,legacy-v2-catboost-99,false,unmeasured,true
-Ctgan,CTGAN (native selected),730999.0,-0.07954816473487325,-0.28157444132042014,0.22331969914584035,21,100,selection_exposed_validation,legacy-v2-catboost-21,false,unmeasured,false
-Tvae,TVAE (native selected),308629.5,0.6736705986320002,0.45211352660470355,0.7760902457365483,21,100,selection_exposed_validation,legacy-v2-catboost-21,false,unmeasured,false
-Forest,Forest-Flow (historical),325848913.5,1.0110782839271955,0.9053171959560922,1.0407646059536928,6,100,selection_exposed_validation,legacy-v2-catboost-6,false,unmeasured,false
+id,auditor_id,auditor_display,method,method_display,artifact_bytes,matched_artifact_bytes,retention,interval_lo,interval_hi,retention_pct,interval_lo_pct,interval_hi_pct,observed_lineages,prepared_lineages,paired_median_difference,paired_lo,paired_hi,evidence_status,cohort_id,complete_budget_grid,driver_gate,cohort_complete
+kumo_tabular_l:DOPE,kumo_tabular_l,Kumo Large,DOPE,DOPE (ours),1844,1844,0.863459,0.809489,0.880337,86.3459,80.9489,88.0337,97,97,0.059198,0.009804,0.116323,selection_exposed_validation,mfs-v3-foundation-97,false,unmeasured,true
+kumo_tabular_l:GaussianCopula,kumo_tabular_l,Kumo Large,GaussianCopula,Gaussian copula,5464,5464,0.747248,0.668494,0.778417,74.7248,66.8494,77.8417,97,97,0.059198,0.009804,0.116323,selection_exposed_validation,mfs-v3-foundation-97,false,unmeasured,true
+tabicl2:DOPE,tabicl2,TabICLv2,DOPE,DOPE (ours),1844,1844,0.870944,0.835302,0.892965,87.0944,83.5302,89.2965,97,97,0.078975,0.009473,0.116395,selection_exposed_validation,mfs-v3-foundation-97,false,unmeasured,true
+tabicl2:GaussianCopula,tabicl2,TabICLv2,GaussianCopula,Gaussian copula,5464,5464,0.753767,0.672367,0.786664,75.3767,67.2367,78.6664,97,97,0.078975,0.009473,0.116395,selection_exposed_validation,mfs-v3-foundation-97,false,unmeasured,true
+mitra_v2:DOPE,mitra_v2,Mitra-v2,DOPE,DOPE (ours),1844,1844,0.858146,0.802607,0.887084,85.8146,80.2607,88.7084,97,97,0.066154,0.022632,0.135423,selection_exposed_validation,mfs-v3-foundation-97,false,unmeasured,true
+mitra_v2:GaussianCopula,mitra_v2,Mitra-v2,GaussianCopula,Gaussian copula,5464,5464,0.712899,0.585158,0.770903,71.2899,58.5158,77.0903,97,97,0.066154,0.022632,0.135423,selection_exposed_validation,mfs-v3-foundation-97,false,unmeasured,true
