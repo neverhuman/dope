@@ -19,32 +19,24 @@ use std::fs;
 use std::path::{Path, PathBuf};
 pub mod profile;
 #[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+#[rustfmt::skip]
 pub struct OperationRights {
-    pub model_redistribution: bool,
-    pub model_commercial: bool,
-    pub model_distillation: bool,
-    pub source_redistribution: bool,
-    pub source_commercial: bool,
-    pub source_distillation: bool,
-    pub organization_authorized: bool,
-    pub operation_scope_sha256: String,
+    pub model_redistribution: bool, pub model_commercial: bool, pub model_distillation: bool,
+    pub source_redistribution: bool, pub source_commercial: bool, pub source_distillation: bool,
+    pub organization_authorized: bool, pub operation_scope_sha256: String,
 }
 impl OperationRights {
+    #[rustfmt::skip]
     pub fn model_allowed(&self) -> bool {
-        self.model_redistribution && self.model_commercial && self.model_distillation
-    }
+        self.model_redistribution && self.model_commercial && self.model_distillation }
+    #[rustfmt::skip]
     pub fn source_allowed(&self) -> bool {
-        self.source_redistribution && self.source_commercial && self.source_distillation
-    }
+        self.source_redistribution && self.source_commercial && self.source_distillation }
+    #[rustfmt::skip]
     pub fn permits_export(&self) -> bool {
-        self.model_allowed()
-            && self.source_allowed()
-            && self.organization_authorized
+        self.model_allowed() && self.source_allowed() && self.organization_authorized
             && self.operation_scope_sha256.len() == 64
-            && self
-                .operation_scope_sha256
-                .bytes()
-                .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+            && self.operation_scope_sha256.bytes().all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
     }
 }
 #[derive(Clone, Debug)]
