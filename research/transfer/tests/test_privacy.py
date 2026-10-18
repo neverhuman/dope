@@ -7,10 +7,14 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
+from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
+
 from research.transfer.privacy.attacks import (AttackCalibration, AttackEvidence, DisclosurePolicy,
     DisclosureThreatModel, EmpiricalPrivacyStatus, PrivacyError, ScoreView, auc, rate_bounds, uncalibrated)
 from research.transfer.privacy.controls import (DistanceRecipe, FeatureView, RowView, ShadowMembershipAttack,
     attribute_increment, attribute_inference, control_check, holdout_nndr, membership_features, run_shadow_mia)
+from research.transfer.privacy.release_profile import AXES, ReleaseProfile
 
 
 def h(value):
@@ -175,7 +179,7 @@ class CalibrationTests(unittest.TestCase):
         schema = json.loads((root / "schemas/privacy-evidence-v1.schema.json").read_text())
         evidence = calibration().evaluate(view((2.,), (0.,), "schema"), threat()).value
         self.assertFalse(schema["additionalProperties"])
-        self.assertEqual(set(schema["required"]), set(evidence))
+        self.assertEqual(set(schema["required"]), set(evidence) - {"release_profile"})
         policy = json.loads((root / "research/transfer/privacy/policy.json").read_text())
         self.assertIsNone(policy["empirical_pass_margins"])
         self.assertFalse(policy["release_authorized"])
@@ -330,6 +334,145 @@ class ControlTests(unittest.TestCase):
         self.assertEqual(result["status"], "inconclusive")
         with self.assertRaisesRegex(PrivacyError, "attack_observation_overlap"):
             holdout_nndr(syn, fit, replace(fit, role="attack_evaluation"), DistanceRecipe(("numeric",), (1.,)))
+
+
+class ReleaseProfileTests(unittest.TestCase):
+    def setUp(self):
+        self.accounting = {k: str(i) * 64 for i, k in enumerate(("artifact_inventory_sha256", "release_history_sha256",
+            "source_derived_lengths_sha256", "source_derived_statuses_sha256", "source_derived_metrics_sha256"), 1)}
+        self.accounting["release_count"] = 2
+        self.profile = ReleaseProfile.local_research(self.accounting)
+        self.scope = hashlib.sha256(json.dumps(self.accounting, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        self.receipts = {axis: {"axis": axis, "receipt_sha256": "6" * 64, "accounting_sha256": self.scope} for axis in AXES}
+        self.receipts["empirical_privacy"].update(threat_model_sha256="7" * 64, attack_power_sha256="7" * 64)
+        self.receipts["formal_dp"].update(mechanism_sha256="7" * 64, accountant_sha256="7" * 64,
+                                         proof_sha256="7" * 64, epsilon=1., delta=.00001)
+        self.receipts["legal_release"].update(rights_owner_sha256="7" * 64)
+        root = Path(__file__).resolve().parents[3] / "schemas"
+        self.schema = json.loads((root / "release-profile-v1.schema.json").read_text())
+        Draft202012Validator.check_schema(self.schema)
+        registry = Registry().with_resource(self.schema["$id"], Resource.from_contents(self.schema))
+        self.validator = Draft202012Validator(self.schema)
+        self.evidence_validator = Draft202012Validator(json.loads((root / "privacy-evidence-v1.schema.json").read_text()), registry=registry)
+
+    def verify(self, evidence):
+        return evidence == self.receipts[evidence["axis"]]
+
+    def assessed(self, axes):
+        result = self.profile
+        for axis in axes:
+            result = result.begin(axis).complete(self.receipts[axis], self.verify)
+        return result
+
+    def test_all_subsets_keep_axes_independent_and_surfaces_agree(self):
+        for mask in range(16):
+            result = self.assessed([axis for i, axis in enumerate(AXES) if mask & (1 << i)])
+            self.validator.validate(result.value)
+            for dp in (False, True):
+                allowed = mask & 11 == 11 and (not dp or bool(mask & 4))
+                for surface in ("cli", "service", "ui", "report"):
+                    self.assertEqual(result.view(surface, dp, self.verify)["release_authorized"], allowed)
+                if allowed:
+                    self.assertTrue(result.view("export", dp, self.verify)["release_authorized"])
+                else:
+                    with self.assertRaisesRegex(PrivacyError, "release_authorization_required"):
+                        result.view("export", dp, self.verify)
+
+    def test_default_missing_and_pending_evidence_cannot_become_positive(self):
+        result = ReleaseProfile.local_research()
+        self.assertTrue(all(result.value[field] == "unassessed" for field, _, _ in AXES.values()))
+        for axis in AXES:
+            with self.assertRaises(PrivacyError):
+                result.complete(self.receipts[axis], self.verify)
+            with self.assertRaises(PrivacyError):
+                self.profile.begin(axis).complete(self.receipts[axis])
+            with self.assertRaises(PrivacyError):
+                result.begin(axis).view("export")
+        for field in result.value:
+            value = result.value
+            del value[field]
+            self.assertFalse(self.validator.is_valid(value))
+            with self.assertRaises(PrivacyError):
+                ReleaseProfile._from_value(value)
+
+    def test_forged_states_scope_changes_and_duplicate_receipts_are_rejected(self):
+        full = self.assessed(AXES)
+        for mutation in ({"formal_dp_state": True}, {"artifact_bytes": 1}, {"evidence": []}, {"version": True},
+                         {"evidence": full.value["evidence"] * 2}, {"accounting": self.accounting | {"release_count": 3}}):
+            with self.assertRaises(PrivacyError):
+                ReleaseProfile._from_value(full.value | mutation)
+        with self.assertRaises(PrivacyError):
+            full.view("report")
+        reset = ReleaseProfile.local_research(self.accounting | {"release_count": 3})
+        with self.assertRaises(PrivacyError):
+            reset.begin("utility").complete(self.receipts["utility"], self.verify)
+        self.assertEqual(reset.value["evidence"], [])
+
+    def test_failed_revoked_and_inconclusive_states_block_release(self):
+        full = self.assessed(AXES)
+        for axis in AXES:
+            pending = full.begin(axis)
+            with self.assertRaises(PrivacyError):
+                pending.view("export", verifier=self.verify)
+            with self.assertRaises(PrivacyError):
+                pending.reject(axis).view("export", verifier=self.verify)
+        with self.assertRaises(PrivacyError):
+            full.begin("empirical_privacy").empirical_inconclusive().view("export", verifier=self.verify)
+
+    def test_claims_epsilon_and_verifier_failures_omit_source_canaries(self):
+        full = self.assessed(AXES)
+        for label in ("HIPAA", "anonymous", "de-identified", "safe-share", "PRIVATE_HEADER_97531", "/private/source.csv", "-987654.25"):
+            with self.assertRaises(PrivacyError) as error:
+                full.check_claim(label, verifier=self.verify)
+            self.assertNotIn(label, str(error.exception))
+            self.assertNotIn(label, str(full.view("report", verifier=self.verify)))
+            with self.assertRaises(PrivacyError) as error:
+                ReleaseProfile.local_research(self.accounting | {"source_derived_lengths_sha256": label})
+            self.assertNotIn(label, str(error.exception))
+        for epsilon in (True, 0., -1., 2., float("nan"), float("inf")):
+            with self.assertRaises(PrivacyError):
+                full.check_claim("formal_dp_verified", epsilon, self.verify)
+        full.check_claim("formal_dp_verified", 1., self.verify)
+        with self.assertRaises(PrivacyError):
+            self.assessed(["utility"]).check_claim("utility_qualified", 1., self.verify)
+        def broken(_):
+            raise ValueError("PRIVATE_HEADER_97531")
+        with self.assertRaisesRegex(PrivacyError, "^release_evidence_unverified$"):
+            full.view("report", verifier=broken)
+
+    def test_schema_is_closed_and_legacy_attack_measurements_remain_readable(self):
+        def closed(schema):
+            if isinstance(schema, dict):
+                if schema.get("type") == "object":
+                    self.assertIs(schema.get("additionalProperties"), False)
+                for value in schema.values():
+                    closed(value)
+            elif isinstance(schema, list):
+                for value in schema:
+                    closed(value)
+        closed(self.schema)
+        evidence = calibration().evaluate(view((2.,), (0.,), "aligned-profile"), threat()).value
+        self.evidence_validator.validate(evidence)
+        self.assertEqual(evidence["release_profile"]["empirical_privacy_state"], "inconclusive")
+        del evidence["release_profile"]
+        self.evidence_validator.validate(evidence)
+        AttackEvidence(json.dumps(evidence).encode())
+        evidence["release_profile"] = self.assessed(AXES).value
+        self.assertFalse(self.evidence_validator.is_valid(evidence))
+        with self.assertRaises(PrivacyError):
+            AttackEvidence(json.dumps(evidence).encode())
+
+    def test_source_derived_channels_and_repeated_artifacts_are_threat_inputs(self):
+        original = threat()
+        accounted = replace(original, source_derived_lengths_sha256=h("lengths"), source_derived_statuses_sha256=h("statuses"),
+                            source_derived_metrics_sha256=h("metrics"))
+        self.assertNotEqual(original.sha256, accounted.sha256)
+        first = calibration().evaluate(view((2.,), (0.,), "channels"), original).value
+        self.assertIn("release_channels_unaccounted", first["reasons"])
+        repeated = calibration().evaluate(view((2.,), (0.,), "repeated-channels"), replace(accounted, repeated_releases=2)).value
+        self.assertNotIn("release_channels_unaccounted", repeated["reasons"])
+        self.assertIsNone(repeated["tpr_bounds"])
+        self.assertFalse(repeated["release_authorized"])
 
 
 if __name__ == "__main__":
