@@ -392,6 +392,9 @@ class TestE07CpuPreflight(unittest.TestCase):
         self.assertEqual(proto["selection"]["rows_consumed_for_selection"], 0)
         res = subprocess.run([sys.executable, "-B", str(obs_dir / "test_runner.py")], cwd=str(obs_dir), capture_output=True, text=True, check=True)
         self.assertEqual(res.returncode, 0)
+        runner_output = res.stdout + res.stderr
+        self.assertRegex(runner_output, r"Ran [1-9]\d* tests? in ")
+        self.assertIn("OK", runner_output)
 
 
 class TestD19AndBlockerUnblockMatrix(unittest.TestCase):
