@@ -423,7 +423,8 @@ def emit_cpu_preflight_receipts(out_dir: Path) -> dict[str, dict]:
     head_sha = subprocess.run(["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
     results = {}
     for task_id, (cmd, gate_note) in PREFLIGHT_SPECS.items():
-        res = subprocess.run(cmd, shell=True, cwd=str(REPO_ROOT), capture_output=True, text=True, check=True)
+        argv = cmd.replace("PYTHONPATH=. ", "").split()
+        res = subprocess.run(argv, cwd=str(REPO_ROOT), env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}, capture_output=True, text=True, check=True)
         combined = (res.stdout or "") + (res.stderr or "")
         log_path = logs_dir / f"{task_id}_preflight.log"
         log_path.write_text(combined)
