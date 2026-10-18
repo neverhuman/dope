@@ -15,6 +15,7 @@ from research.transfer.adapters.base import (
     GeneratorAdapter, LearnerAdapter, ModelIdentity, PredictionResult,
     REFUSED_ENCODERS, ResourceLimits, ResourceUsage, SampleResult, TrainingBatch,
 )
+from research.transfer.adapters.auditors.challengers import validate_model_registry
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -398,6 +399,27 @@ class AdmissionTests(unittest.TestCase):
                 model = identity(name=entry["name"])
                 with self.assertRaises(AdapterUnavailable):
                     AdapterAdmission.from_registry(policy, model, kind)
+
+    def test_frozen_panel_roles_match_schema_and_reject_drift(self):
+        panel = json.loads((ROOT / "schemas/panel-v1.schema.json").read_bytes())["examples"][0]
+        registry = json.loads((ROOT / "research/transfer/registries/models.json").read_bytes())
+        checkpoints = {entry["id"]: entry for entry in panel["checkpoints"]}
+        for candidate in registry["entries"]:
+            frozen = checkpoints[candidate["name"]]
+            self.assertEqual(candidate["panel_edition"], panel["edition"])
+            self.assertEqual(candidate["roles_by_workload"], frozen["roles_by_workload"])
+        self.assertTrue(all(set(entry) == {
+            "name", "status", "identity_sha256", "eligibility_sha256",
+            "native_reference_sha256", "license_status"}
+            for entry in validate_model_registry(registry)["entries"]))
+        changed = copy.deepcopy(registry["entries"][0]["roles_by_workload"])
+        changed["regression"]["compiler_teacher"] = not changed["regression"]["compiler_teacher"]
+        with self.assertRaises(AssertionError):
+            self.assertEqual(changed, checkpoints[registry["entries"][0]["name"]]["roles_by_workload"])
+        broken = copy.deepcopy(registry)
+        broken["entries"][0]["roles_by_workload"]["regression"]["compiler_teacher"] = "drift"
+        with self.assertRaises(AdapterError):
+            validate_model_registry(broken)
 
     def test_refused_encoders_preserve_historical_set_even_with_reviewed_entry(self):
         tree = ast.parse((ROOT / "research/benchmark/representation.py").read_text())
