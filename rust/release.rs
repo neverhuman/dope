@@ -1,9 +1,3 @@
-use std::collections::{BTreeMap, BTreeSet};
-use std::fs;
-use std::path::{Path, PathBuf};
-
-use serde::{Deserialize, Serialize};
-
 use crate::certification::CertificationReport;
 use crate::codec::LoadedKernel;
 use crate::codec::{decode_kernel, encode_kernel};
@@ -19,9 +13,40 @@ use crate::evaluation::{
 };
 use crate::model::{KernelProgram, Target, Task};
 use crate::sample::{SampleOptions, sample_kernel, sample_kernel_to_csv};
-
+use serde::{Deserialize, Serialize};
+use std::collections::{BTreeMap, BTreeSet};
+use std::fs;
+use std::path::{Path, PathBuf};
 pub mod profile;
-
+#[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+pub struct OperationRights {
+    pub model_redistribution: bool,
+    pub model_commercial: bool,
+    pub model_distillation: bool,
+    pub source_redistribution: bool,
+    pub source_commercial: bool,
+    pub source_distillation: bool,
+    pub organization_authorized: bool,
+    pub operation_scope_sha256: String,
+}
+impl OperationRights {
+    pub fn model_allowed(&self) -> bool {
+        self.model_redistribution && self.model_commercial && self.model_distillation
+    }
+    pub fn source_allowed(&self) -> bool {
+        self.source_redistribution && self.source_commercial && self.source_distillation
+    }
+    pub fn permits_export(&self) -> bool {
+        self.model_allowed()
+            && self.source_allowed()
+            && self.organization_authorized
+            && self.operation_scope_sha256.len() == 64
+            && self
+                .operation_scope_sha256
+                .bytes()
+                .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    }
+}
 #[derive(Clone, Debug)]
 pub struct ConversionOptions {
     pub seed: u64,
@@ -30,7 +55,6 @@ pub struct ConversionOptions {
     pub synthetic_csv_seeds: Vec<u64>,
     pub compile_options: CompileOptions,
 }
-
 impl Default for ConversionOptions {
     fn default() -> Self {
         Self {
@@ -46,7 +70,6 @@ impl Default for ConversionOptions {
         }
     }
 }
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ByteAccounting {
     pub artifact_bytes: usize,
@@ -56,7 +79,6 @@ pub struct ByteAccounting {
     pub supported_datasets: usize,
     pub reconciled: bool,
 }
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AccountedCandidate {
     pub candidate_id: String,
@@ -66,7 +88,6 @@ pub struct AccountedCandidate {
     pub score: f64,
     pub compliant: bool,
 }
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SyntheticModelBundle {
     pub format: String,
@@ -81,7 +102,6 @@ pub struct SyntheticModelBundle {
     pub contains_source_rows: bool,
     pub checksum: String,
 }
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ConversionReport {
     pub format: String,
@@ -109,14 +129,12 @@ pub struct ConversionReport {
     #[serde(default)]
     pub evaluation_events: Vec<EvaluationEvent>,
 }
-
 #[derive(Clone, Debug)]
 pub struct ConversionResult {
     pub report: ConversionReport,
     pub certification: CertificationReport,
     pub output_dir: PathBuf,
 }
-
 fn row_major(table: &Table) -> Vec<f32> {
     let mut values = vec![0.0; table.rows * table.features];
     for row in 0..table.rows {
@@ -126,12 +144,10 @@ fn row_major(table: &Table) -> Vec<f32> {
     }
     values
 }
-
 fn checksum_file(path: &Path) -> Result<String> {
     let bytes = fs::read(path).map_err(|error| io_error(path, error))?;
     Ok(blake3::hash(&bytes).to_hex().to_string())
 }
-
 fn bundle_checksum(bundle: &SyntheticModelBundle) -> Result<String> {
     let mut copy = bundle.clone();
     copy.checksum.clear();
@@ -139,7 +155,6 @@ fn bundle_checksum(bundle: &SyntheticModelBundle) -> Result<String> {
         .to_hex()
         .to_string())
 }
-
 fn accounted(
     candidates: &[CandidateReport],
     runtime_dictionary_bytes: usize,
@@ -158,7 +173,6 @@ fn accounted(
         })
         .collect()
 }
-
 pub fn convert_release(
     dataset_dir: &Path,
     real_holdout_dir: &Path,
@@ -166,17 +180,18 @@ pub fn convert_release(
     out: &Path,
     options: &ConversionOptions,
 ) -> Result<ConversionResult> {
-    // No trusted evidence/rights-owner adapter is installed in this CLI path.
-    // Certification or compact artifacts cannot supply those independent axes.
-    let release_view = profile::ReleaseProfile::default().view(
-        profile::ReleaseSurface::Export,
-        options.compile_options.release_policy.require_formal_dp,
-        &profile::NoReleaseEvidence,
-    )?;
+    let operation_rights = OperationRights::default();
     if out.exists() {
         return Err(DopeError::Data(
             "release output already exists; choose a new directory".into(),
         ));
+    }
+    if !dataset_dir.exists() {
+        profile::ReleaseProfile::default().view(
+            profile::ReleaseSurface::Export,
+            options.compile_options.release_policy.require_formal_dp,
+            &profile::NoReleaseEvidence,
+        )?;
     }
     let missing_auditors = auditor_specs()
         .into_iter()
@@ -189,11 +204,17 @@ pub fn convert_release(
             missing_auditors.join(",")
         )));
     }
+    let release_view = profile::ReleaseProfile::default().view(
+        profile::ReleaseSurface::Export,
+        options.compile_options.release_policy.require_formal_dp,
+        &profile::NoReleaseEvidence,
+    )?;
+    if !operation_rights.permits_export() {
+        return Err(DopeError::Data("operation_rights_required".into()));
+    }
     let mut compile_options = options.compile_options.clone();
     compile_options.release_policy.validate()?;
     compile_options.seed = Some(options.seed);
-    // Selection has only the development training view. Final outcomes are never
-    // inputs to candidate ranking, tie breaks, or an optimizer retry.
     let view = SelectionView::open(
         &dataset_dir.join("train.csv"),
         task,
@@ -266,19 +287,18 @@ pub fn convert_release(
     let certified_candidates = evaluated_candidates.clone();
     let artifact = frozen.artifact().to_vec();
     let staging = out.with_extension(format!("staging-{}", std::process::id()));
-    fs::create_dir(&staging).map_err(|error| io_error(&staging, error))?;
+    fs::DirBuilder::new()
+        .mode(0o700)
+        .create(&staging)
+        .map_err(|error| io_error(&staging, error))?;
     let kernel_path = staging.join("kernel.dpk");
     fs::write(&kernel_path, &artifact).map_err(|error| io_error(&kernel_path, error))?;
-
-    // A canonical decode/encode equality check is part of release construction,
-    // not deferred to a consumer.
     let canonical = encode_kernel(&decode_kernel(&artifact)?)?;
     if canonical != artifact {
         return Err(crate::DopeError::Codec(
             "compiled Kernel V3 is not a canonical round trip".into(),
         ));
     }
-
     let loaded = LoadedKernel::V3(Box::new(decode_kernel(&artifact)?));
     for synthetic_seed in &options.synthetic_csv_seeds {
         sample_kernel_to_csv(
@@ -290,7 +310,6 @@ pub fn convert_release(
             &staging.join(format!("synthetic-{synthetic_seed}.csv")),
         )?;
     }
-
     let model_seed = options.seed.wrapping_add(0x5a17);
     let sampled = sample_kernel(
         &loaded,
@@ -356,14 +375,12 @@ pub fn convert_release(
     let bundle_path = staging.join("synthetic-model.bundle");
     fs::write(&bundle_path, serde_json::to_vec_pretty(&bundle)?)
         .map_err(|error| io_error(&bundle_path, error))?;
-
     let certification_path = staging.join("tstr-certification.json");
     fs::write(
         &certification_path,
         serde_json::to_vec_pretty(&certification)?,
     )
     .map_err(|error| io_error(&certification_path, error))?;
-
     let standalone = accounted(
         &compiled.pareto_frontier,
         options.runtime_dictionary_bytes,

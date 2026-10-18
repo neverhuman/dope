@@ -118,3 +118,27 @@ allowlisted files, then verify every restored hash against that manifest.
 Record the withdrawn and restored digest in the incident log. An old receipt
 keeps its original contract and tier lineage. Formal DP and HIPAA
 de-identification are unsupported claims.
+
+## Operation rights and private local research
+
+Before assembling a shareable bundle, review its actual operation scope: exact
+model and source assets, recipients, files/sidecars, and intended use. Record
+model redistribution, commercial use, and distillation permissions separately
+from those same three source permissions. Record organization authorization as
+its own decision for the reviewed operation. Unknown or denied permission
+blocks only the affected model/source export; work whose inputs remain admitted
+may continue. A `public` label, successful simulation, score, ordinary CI, or
+certification result supplies none of these grants. The current CLI has no
+trusted rights-manifest ingress and therefore refuses shareable export before
+source reads or staging.
+
+Local research packages may contain only assets whose redistribution is
+granted. Include a clear notice that local research output carries no privacy,
+anonymity, de-identification, legal-readiness, or HIPAA assurance. Clinical use
+and any HIPAA safe-harbor or expert-determination pathway require actual
+external legal and clinical review; the application never infers either.
+
+Keep generated source maps, source-derived caches, logs, crash dumps, temporary
+files, and report projections private and access-restricted. Do not send data or
+telemetry off-host by default. Review generated report projections and all
+sidecars as part of the operation scope before making any bundle shareable.
