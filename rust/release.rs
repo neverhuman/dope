@@ -166,6 +166,13 @@ pub fn convert_release(
     out: &Path,
     options: &ConversionOptions,
 ) -> Result<ConversionResult> {
+    // No trusted evidence/rights-owner adapter is installed in this CLI path.
+    // Certification or compact artifacts cannot supply those independent axes.
+    let release_view = profile::ReleaseProfile::default().view(
+        profile::ReleaseSurface::Export,
+        options.compile_options.release_policy.require_formal_dp,
+        &profile::NoReleaseEvidence,
+    )?;
     if out.exists() {
         return Err(DopeError::Data(
             "release output already exists; choose a new directory".into(),
