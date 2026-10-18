@@ -3,6 +3,53 @@
 
 type AllocationFamily = (u8, usize);
 
+/// Cheap stage-1 proposals from a fit-only symbolic recipe. This never refits
+/// on selection data; exact wire sizing and development scoring follow later.
+pub fn development_structural_proposals(
+    fit_kernel: &Kernel,
+    quantization_profiles: &[u8],
+) -> Result<Vec<Kernel>> {
+    fit_kernel
+        .validate()
+        .map_err(|_| search_error("invalid_candidate_proposal"))?;
+    if fit_kernel.symbolic().is_none()
+        || quantization_profiles.is_empty()
+        || quantization_profiles.len() > QUANTIZATION_LADDER.len()
+        || quantization_profiles
+            .iter()
+            .any(|bits| !QUANTIZATION_LADDER.contains(bits))
+    {
+        return Err(search_error("invalid_structural_proposal_profiles"));
+    }
+    Ok(quantization_profiles
+        .iter()
+        .map(|&bits| {
+            let mut proposal = quantized_kernel(fit_kernel, bits);
+            proposal.compliant = false;
+            proposal
+        })
+        .collect())
+}
+
+// Development-only lexicographic selection: measured TSTR loss, then driver
+// agreement, then exact bytes. This is not a calibrated certification frontier.
+fn development_candidate_order(
+    left: &DevelopmentObservation,
+    right: &DevelopmentObservation,
+) -> std::cmp::Ordering {
+    left.metrics
+        .tstr_loss
+        .total_cmp(&right.metrics.tstr_loss)
+        .then_with(|| {
+            right
+                .metrics
+                .driver_agreement
+                .total_cmp(&left.metrics.driver_agreement)
+        })
+        .then_with(|| left.wire_bytes.cmp(&right.wire_bytes))
+        .then_with(|| left.candidate_digest.cmp(&right.candidate_digest))
+}
+
 #[derive(Clone)]
 struct AllocationPoint {
     score: f64,
