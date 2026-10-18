@@ -1,12 +1,12 @@
 {
-  "caption_sha256": "56b49864ecde99f72ddf831e76eb75ad59b67f71debffb61a9113707f21fa3b0",
+  "caption_sha256": "f0e56cc4fc7e63385cd0ecfe89ee119b019a60c68a8efc2ee2fe6ec6cb9f69f6",
   "evidence_admitted": false,
   "files": {
-    "pdf": "67b02a2fd774bc174fa9ccd28977fb0ed22318b8433fb09f32d9208d1a7d6268",
-    "png": "835a18115d265f7cf2a62ad444766a119270efde1dd24517de1189c82df29a81",
-    "svg": "b768d0b183de9abdea2d6065c18d60bda2c2d8a99ca4edfa8c7109747aa7c56d"
+    "pdf": "01ec11ebf5b9126e622847dfa4c88743a2b8e5675b97f7e18ef94d498f7a7fd3",
+    "png": "0ccaa1877661547058e49e6a1abe476a1c6678c0300fdc654c5f736100baad3b",
+    "svg": "627b8f6732bd1fc04257bd943de1fbcd6e7409ac4380b40bfe932f43103ff1e6"
   },
   "format": "dope-figure-one-hashes-v1",
-  "ledger_sha256": "b810a7c0aee85371008a5bd2bbe1904db283b7c8134bb915c21eb0622a8ea4e3",
+  "ledger_sha256": "ded340e6159fc623f734cda02bf86ed8dca7378f29736f7c000288712e483d46",
   "publication_mode": "protocol_schematic"
 }

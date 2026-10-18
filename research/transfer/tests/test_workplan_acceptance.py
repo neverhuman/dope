@@ -16,8 +16,34 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 MAIN_REPO = Path("/home/ubuntu/dope")
 _LOCAL_PKT = REPO_ROOT / "target/unified-spec-workplan-20261017/packet-v2-9e11fd166f5f"
 _MAIN_PKT = MAIN_REPO / "target/unified-spec-workplan-20261017/packet-v2-9e11fd166f5f"
-_ENV_PKT = os.environ.get("DOPE_PACKET_DIR")
-PACKET_DIR = Path(_ENV_PKT) if _ENV_PKT else (_LOCAL_PKT if _LOCAL_PKT.is_dir() else _MAIN_PKT)
+
+
+def _safe_is_dir(p: Path) -> bool:
+    try:
+        return p.is_dir()
+    except OSError:
+        return False
+
+
+def _safe_is_file(p: Path) -> bool:
+    try:
+        return p.is_file()
+    except OSError:
+        return False
+
+
+def _resolve_packet_dir() -> Path:
+    env_pkt = os.environ.get("DOPE_PACKET_DIR")
+    if env_pkt:
+        p = Path(env_pkt)
+        return p if _safe_is_dir(p) else (_LOCAL_PKT / "_missing_packet_dir_")
+    for cand in (_LOCAL_PKT, _MAIN_PKT):
+        if _safe_is_dir(cand):
+            return cand
+    return _LOCAL_PKT
+
+
+PACKET_DIR = _resolve_packet_dir()
 
 
 def find_dope_kernel_bin() -> Path:
@@ -27,14 +53,14 @@ def find_dope_kernel_bin() -> Path:
         MAIN_REPO / "target/debug/dope-kernel",
         MAIN_REPO / "target/release/dope-kernel",
     ):
-        if cand.is_file() and cand.stat().st_size > 0:
+        if _safe_is_file(cand) and cand.stat().st_size > 0:
             return cand
     subprocess.run(["cargo", "build", "--locked", "--bin", "dope-kernel"], cwd=str(REPO_ROOT), check=True)
     return REPO_ROOT / "target/debug/dope-kernel"
 
 
 def run_validate_plan() -> str:
-    if not (PACKET_DIR / "validate_plan.py").is_file():
+    if not _safe_is_file(PACKET_DIR / "validate_plan.py"):
         return "VALID_CLEAN_CHECKOUT"
     res = subprocess.run(["python3", str(PACKET_DIR / "validate_plan.py")], cwd=str(PACKET_DIR), capture_output=True, text=True, check=True)
     assert "VALID" in res.stdout.upper() or res.returncode == 0
@@ -313,26 +339,47 @@ class TestC05RustPythonGoldenParity(unittest.TestCase):
 
 class TestQ02FreshUserAndPdfQa(unittest.TestCase):
     def test_q02_paper_pdf_and_fresh_user_qa_report(self):
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             qa_report = PACKET_DIR / "handoff/Q02_FRESH_USER_PDF_QA_402954e_20261018.md"
             self.assertTrue(qa_report.is_file())
             self.assertGreater(len(qa_report.read_text()), 500)
-        readme_candidates = [REPO_ROOT / "README.md", MAIN_REPO / ".agent/worktrees/pr-273/README.md", MAIN_REPO / "README.md"]
-        readme_path = next((p for p in readme_candidates if p.is_file() and "dope-kernel compile-csv" in p.read_text()), REPO_ROOT / "README.md")
+        readme_candidates = [REPO_ROOT / "README.md", MAIN_REPO / "README.md"]
+        readme_path = next((p for p in readme_candidates if _safe_is_file(p) and "dope-kernel compile-csv" in p.read_text()), REPO_ROOT / "README.md")
         readme_text = readme_path.read_text()
-        if "dope-kernel compile-csv" in readme_text:
-            self.assertNotIn("dope compile-csv", readme_text)
-            stripped = re.sub(r"<!-- BEGIN (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->.*?<!-- END (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->", "", readme_text, flags=re.S)
-            self.assertTrue(650 <= len(stripped.split()) <= 900)
-        res_rb = subprocess.run([sys.executable, "-B", "-m", "unittest", "test_readme_benchmark", "-v"], cwd=str(REPO_ROOT), env={**os.environ, "PYTHONPATH": str(REPO_ROOT / "docs/whitepaper/scripts")}, capture_output=True, text=True, check=True)
-        self.assertEqual(res_rb.returncode, 0)
+        self.assertIn("dope-kernel compile-csv", readme_text)
+        self.assertNotIn("dope compile-csv", readme_text)
+        self.assertIn("cross-model feature-driver preservation: not yet measured", readme_text)
+        self.assertIn("Feature-Target Correlation Proxy", readme_text)
+        self.assertIn("strongest measured comparator on this historical block", readme_text)
+        self.assertIn("paper/main.tex", readme_text)
+        stripped = re.sub(r"<!-- BEGIN (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->.*?<!-- END (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->", "", readme_text, flags=re.S)
+        self.assertTrue(650 <= len(stripped.split()) <= 900)
+        wp_env = {**os.environ, "PYTHONPATH": str(REPO_ROOT / "docs/whitepaper/scripts")}
+        for mod in ("test_readme_benchmark", "test_figure_one", "test_hero_figure"):
+            res = subprocess.run([sys.executable, "-B", "-m", "unittest", mod, "-v"], cwd=str(REPO_ROOT), env=wp_env, capture_output=True, text=True, check=True)
+            self.assertEqual(res.returncode, 0)
+        res_f1 = subprocess.run([sys.executable, "-B", str(REPO_ROOT / "docs/whitepaper/scripts/figure_one.py"), "--check"], cwd=str(REPO_ROOT), env=wp_env, capture_output=True, text=True, check=True)
+        self.assertEqual(res_f1.returncode, 0)
         wp_scripts = str(REPO_ROOT / "docs/whitepaper/scripts")
         if wp_scripts not in sys.path:
             sys.path.insert(0, wp_scripts)
+        if str(REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(REPO_ROOT))
         import claim_registry
         import paper_v2_guards
+        from tools.claims import foundation, render
         self.assertEqual(claim_registry.publication_failures(), [])
         self.assertEqual(paper_v2_guards.run_v2_lint(REPO_ROOT / "docs/whitepaper"), [])
+        f_sum = foundation.load_foundation_summary(REPO_ROOT)
+        self.assertEqual(f_sum["hero_title"], "More predictive gain. About one-third the state.")
+        self.assertAlmostEqual(f_sum["target_correlation_proxy"]["GaussianCopula"]["median"], 0.975, places=3)
+        self.assertAlmostEqual(f_sum["target_correlation_proxy"]["GaussianCopula"]["median_of_seed_mins"], 0.923106, places=5)
+        self.assertAlmostEqual(f_sum["target_correlation_proxy"]["GaussianCopula"]["pooled_seed_median"], 0.973214, places=5)
+        hero_svg = (REPO_ROOT / "paper/generated/hero-frontier.svg").read_text()
+        for tok in ("More predictive gain. About one-third the state.", "DOPE (1,844 B)", "Gaussian copula (5,464 B)", "86.3%", "74.7%", "87.1%", "75.4%", "85.8%", "71.3%", "Cross-model driver preservation: not yet measured"):
+            self.assertIn(tok, hero_svg)
+        self.assertNotIn("Proposed T90", hero_svg)
+        self.assertEqual([k for k, v in render.expected_outputs(REPO_ROOT).items() if (REPO_ROOT / k).read_bytes() != v], [])
 
 
 class TestW01CpuPreflight(unittest.TestCase):

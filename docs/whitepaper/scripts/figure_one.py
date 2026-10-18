@@ -36,6 +36,15 @@ DEFAULT_LEDGER_TEXT = '''{
     "bytes": "complete recipient-read dataset-specific payload; no extrapolated B90",
     "panel": "source-balanced; no independent median-x/median-y point"
   },
+  "provenance_audit": {
+    "historical_tfm_panel": "research/benchmark/results/mfs-v3-density-panel.json",
+    "matched_lineages": 97,
+    "fit_seed": 11,
+    "sample_seeds": [101, 211, 307],
+    "synthetic_context": "4n",
+    "strongest_historical_block_comparator": "GaussianCopula",
+    "driver_proxy_disclosure": "historical driver_fidelity column is an absolute feature-target correlation proxy (0.975 median of per-lineage seed medians vs 0.923 median of per-lineage seed minima under the legacy _min reducer for GaussianCopula; pooled-seed median is 0.973); cross-model feature-driver preservation is not yet measured"
+  },
   "retained_states": ["unsupported", "failed", "missing", "native_large", "not_reached", "eligible"],
   "compressed_data_controls": "nonrelease_only",
   "points": [],
@@ -45,7 +54,8 @@ DEFAULT_LEDGER_TEXT = '''{
 CAPTION = ("Figure 1. How few complete dataset-specific bytes preserve learning across required models? "
            "Protocol schematic only; measured inputs await E05 admission. The planned x-axis is actual "
            "complete recipient bytes and the y-axis is source-balanced eligible-task C(B), requiring "
-           "T90 and D80 across every mandatory model. No empirical privacy claim is made.")
+           "T90 and D80 across every mandatory model. Cross-model feature-driver preservation is not yet "
+           "measured (historical correlation proxy is not cross-model driver agreement). No empirical privacy claim is made.")
 STATES = {"unsupported", "failed", "missing", "native_large", "not_reached", "eligible"}
 REQUIRED = ("transfer", "drivers", "privacy", "bytes", "denominator", "panel", "uncertainty")
 
@@ -70,6 +80,11 @@ def validate(data: dict, *, allow_fixture: bool = False) -> None:
         raise ValueError("byte definition must use complete bytes and forbid extrapolated B90")
     if "source-balanced" not in contract.get("panel", "") or "no independent median" not in contract.get("panel", ""):
         raise ValueError("panel must preserve paired source-balanced points")
+    prov = data.get("provenance_audit", {})
+    if (prov.get("matched_lineages") != 97 or prov.get("fit_seed") != 11
+            or prov.get("sample_seeds") != [101, 211, 307] or prov.get("synthetic_context") != "4n"
+            or "cross-model feature-driver preservation is not yet measured" not in prov.get("driver_proxy_disclosure", "")):
+        raise ValueError("provenance_audit missing required historical TFM audit fields")
     for state in data.get("retained_states", []):
         if state not in STATES:
             raise ValueError(f"unknown retained state: {state}")
@@ -97,13 +112,15 @@ def draw():
     axis.set_ylabel("Source-balanced eligible-task C(B), T90/D80 across all mandatory models")
     axis.set_title("How few bytes preserve learning across required models?", pad=16, weight="bold")
     axis.grid(True, which="both", color="#e2e8f0", linewidth=.6)
-    axis.text(.5, .57, "PROTOCOL SCHEMATIC", transform=axis.transAxes, ha="center", va="center",
+    axis.text(.5, .60, "PROTOCOL SCHEMATIC", transform=axis.transAxes, ha="center", va="center",
               fontsize=19, weight="bold", color="#334155")
-    axis.text(.5, .45, "T90 and D80 required for every mandatory model", transform=axis.transAxes,
+    axis.text(.5, .48, "T90 and D80 required for every mandatory model", transform=axis.transAxes,
               ha="center", va="center", fontsize=13)
-    axis.text(.5, .36, "No measured points admitted; E05 confirmation pending", transform=axis.transAxes,
+    axis.text(.5, .38, "No measured points admitted; E05 confirmation pending", transform=axis.transAxes,
               ha="center", va="center", fontsize=12)
-    axis.text(.5, .23, "Illustrative design only", transform=axis.transAxes,
+    axis.text(.5, .27, "Cross-model feature-driver preservation: not yet measured (10,240 B L3 cap reference)",
+              transform=axis.transAxes, ha="center", va="center", fontsize=10.5, color="#475569")
+    axis.text(.5, .17, "Illustrative design only", transform=axis.transAxes,
               ha="center", va="center", fontsize=11, color="#64748b")
     figure.text(.5, .015, "Empirical privacy unmeasured · no formal DP claim", ha="center", fontsize=10)
     figure.tight_layout(rect=(0, .05, 1, 1))

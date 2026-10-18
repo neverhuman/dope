@@ -29,11 +29,18 @@ class HeroFigureTests(unittest.TestCase):
         self.assertEqual(render.figure_bound_failures(self.rows, self.data["thresholds"]), [])
         self.assertEqual(render.threshold_label(self.data["thresholds"]), "Proposed T90; driver gate unmeasured")
 
-    def test_threshold_line_follows_the_results_file(self):
+    def test_threshold_label_and_hero_visual_qa_contract(self):
         moved = dict(self.data["thresholds"], transfer=0.95)
+        self.assertEqual(render.threshold_label(moved), "Proposed T95; driver gate unmeasured")
         svg = render.figure_outputs(self.csv, moved)["paper/generated/hero-frontier.svg"].decode()
-        self.assertIn("Proposed T95", svg)
+        self.assertIn("More predictive gain. About one-third the state.", svg)
+        self.assertIn("DOPE (1,844 B)", svg)
+        self.assertIn("Gaussian copula (5,464 B)", svg)
+        for pct in ("86.3%", "74.7%", "87.1%", "75.4%", "85.8%", "71.3%"):
+            self.assertIn(pct, svg)
         self.assertNotIn("Proposed T90", svg)
+        self.assertNotIn("Proposed T95", svg)
+        self.assertIn("Cross-model driver preservation: not yet measured", svg)
 
     def test_point_outside_either_axis_is_refused(self):
         for key, value in (("artifact_bytes", "5e9"), ("artifact_bytes", "500"), ("retention", "-0.6"),
