@@ -118,9 +118,7 @@ class AdapterAdmission:
         _require(type(registry["entries"]) is list, "invalid_registry")
         seen, entry = set(), None
         for candidate in registry["entries"]:
-            _require(type(candidate) is dict and set(candidate) == {
-                "name", "status", "identity_sha256", "eligibility_sha256",
-                "native_reference_sha256", "license_status"}, "invalid_registry")
+            _require(type(candidate) is dict and {"name", "status", "identity_sha256", "eligibility_sha256", "native_reference_sha256", "license_status"} <= set(candidate) <= {"name", "status", "identity_sha256", "eligibility_sha256", "native_reference_sha256", "license_status", "pretraining_corpus_disclosure", "qualification_state", "panel_edition", "architecture_family", "checkpoint_sha256", "teacher_lineage_overlap", "roles_by_workload", "rights_status"}, "invalid_registry")
             name = candidate["name"]
             _require(type(name) is str and name not in seen, "invalid_registry")
             seen.add(name)

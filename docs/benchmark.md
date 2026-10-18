@@ -46,7 +46,17 @@ family and no held-out source family, and it does not measure driver fidelity. E
 attacks cover only the stated cells, and measured copy, membership and attribute gates
 already fail on some of them. It therefore supports no TDL, cross-model or privacy claim.
 
-## 2. Auditor status (T-065)
+## 2. Frozen TDL panel edition (2026-10-18)
+
+The immutable `tdl-panel-2026-10-18-edition-1` role roster is specified in the example in [`panel-v1.schema.json`](../schemas/panel-v1.schema.json) and bound to each checkpoint in `research/transfer/registries/models.json`. The edition fixes regression and classification as mandatory workloads at equal weight (1.0 each), uses real-only references for eligibility, and lists CatBoost, LightGBM, XGBoost, RealMLP, linear, independent boosting, and independent neural as mandatory models. These commitments precede generator outcomes.
+
+For every checkpoint and workload, the panel roster declares `compiler_teacher`, `selection`, `required_confirmatory`, `challenger_only`, and `native_recipe_sensitivity`. CatBoost, LightGBM, XGBoost, RealMLP, and linear are compiler teachers; Kumo Tabular, Mitra-v2, and TabICLv2 are selection exposed. Independent boosting and independent neural are mandatory confirmation-only families, held out from compiler-teacher and selection roles. KNN and kernel are challenger-only. Teacher lineage overlap is explicit per checkpoint (`known_none` or `unknown`); unknown foundation-model overlap remains a conflict and cannot be read as clean independence.
+
+The panel is specified and unqualified. Role, conflict, and rights signatures are SHA-256 content digests over the roster assertions; they provide integrity fingerprints, not external approval or proof of rights. Rights and checkpoint identities remain unresolved where the registry has no evidence. Recursive resolution and all three signatures are prerequisites for qualification. Missing mandatory native qualification blocks a panel-qualified pass; family averages cannot rescue it.
+
+Future challenge panels append a new immutable edition against the same artifact zoo. They do not recompile that zoo or overwrite historical scores. A new model edition schedules only its newly required evaluation cells. Historical panel scores retain their original edition and interpretation.
+
+## 3. Auditor status (T-065)
 
 | Auditor | Where it appears | Status |
 | --- | --- | --- |
@@ -63,7 +73,7 @@ An auditor counts toward TDL only after its lock reaches `qualified`. The lock p
 `parity_verified`, `resource_verified`, `qualified`. Qualification needs owner decision
 D-07 (licenses and GPU budget) and is follow-on work (FOLLOW-AUDQ).
 
-## 3. Reproduce the v2 numbers
+## 4. Reproduce the v2 numbers
 
 ```bash
 just setup          # Python environment for the paper scripts
@@ -78,7 +88,7 @@ with its ledger. The public data path needs no credentials:
 `python3 -m research.benchmark.fetch_pmlb --list` lists the tables, and
 `python3 -m research.benchmark.fetch_pmlb DATASET_ID OUTPUT_DIRECTORY` fetches one.
 
-## 4. The TDL benchmark (specified, not run)
+## 5. The TDL benchmark (specified, not run)
 
 The design comes from the 2026-10-15 specifications. Execution is follow-on work that
 needs compute, licenses or owner decisions.
@@ -146,7 +156,7 @@ owner assertions, not source bytes, legal clearance or actual transform executio
 `confirmation_allowed=false` and `sealed_source_claims=false`. No sealed source is
 opened, reconstructed, or qualified by this manifest or its signature.
 
-## 5. Where the operational detail lives
+## 6. Where the operational detail lives
 
 The benchmark tooling overview is in
 [`research/benchmark/README.md`](../research/benchmark/README.md). The dated campaign

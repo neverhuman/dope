@@ -31,6 +31,10 @@ PARAMETERS = {"catboost": {"iterations": 500, "depth": 8},
 LEGACY_KEYS = {"name", "status", "identity_sha256", "eligibility_sha256",
                "native_reference_sha256", "license_status"}
 METADATA_KEYS = {"pretraining_corpus_disclosure", "qualification_state"}
+PANEL_KEYS = {"panel_edition", "architecture_family", "checkpoint_sha256",
+              "teacher_lineage_overlap", "roles_by_workload", "rights_status"}
+PANEL_ROLE_KEYS = {"compiler_teacher", "selection", "required_confirmatory",
+                   "challenger_only", "native_recipe_sensitivity"}
 QUALIFICATIONS = {"fixture_verified_only", "native_runtime_qualified"}
 
 
@@ -57,7 +61,8 @@ def validate_model_registry(value):
     _require(type(value["entries"]) is list and bool(value["entries"]), "invalid_registry")
     names, entries = set(), []
     for entry in value["entries"]:
-        _require(type(entry) is dict and set(entry) == LEGACY_KEYS | METADATA_KEYS, "invalid_registry")
+        _require(type(entry) is dict and set(entry) == LEGACY_KEYS | METADATA_KEYS | PANEL_KEYS,
+                 "invalid_registry")
         name = entry["name"]
         _require(type(name) is str and re.fullmatch(r"[a-z0-9_]+", name) and name not in names,
                  "invalid_registry")
@@ -76,6 +81,19 @@ def validate_model_registry(value):
         _require(state != "native_runtime_qualified" or
                  (entry["status"] == "reviewed" and entry["license_status"] == "compatible"),
                  "native_evidence_required")
+        _require(type(entry["panel_edition"]) is str and bool(entry["panel_edition"]) and
+                 type(entry["architecture_family"]) is str and bool(entry["architecture_family"]) and
+                 type(entry["teacher_lineage_overlap"]) is str and
+                 entry["teacher_lineage_overlap"] in {"known_none", "overlapping", "unknown"} and
+                 type(entry["rights_status"]) is str and
+                 entry["rights_status"] in {"reviewed", "unresolved", "restricted"}, "invalid_registry")
+        if entry["checkpoint_sha256"] is not None:
+            _hash(entry["checkpoint_sha256"])
+        roles = entry["roles_by_workload"]
+        _require(type(roles) is dict and bool(roles), "invalid_registry")
+        for role_flags in roles.values():
+            _require(type(role_flags) is dict and set(role_flags) == PANEL_ROLE_KEYS and
+                     all(type(flag) is bool for flag in role_flags.values()), "invalid_registry")
         entries.append({key: entry[key] for key in sorted(LEGACY_KEYS)})
     return {"format": value["format"], "kind": "learner", "entries": entries}
 
