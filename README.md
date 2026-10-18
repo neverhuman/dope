@@ -5,36 +5,42 @@
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**A company's tabular data is its accumulated operational experience and its competitive moat—yet security, compliance, and legal barriers routinely lock that data inside silos where external researchers, benchmarks, and modern AI models cannot touch it.**
+**Tabular data is an organization's accumulated operational experience, yet security, compliance, and legal barriers routinely lock tables inside silos where external researchers, benchmarks, and foundation models cannot access them.**
 
-Copying a raw table is unsafe, and shipping a multi-megabyte neural generator is bloated, opaque, and prone to row memorization. **D.O.P.E. (`Downstream Objective-Preserving Encoding`)** takes the opposite path: it compiles a private table into a self-contained small **sampling program** under a strict byte budget, then measures how much real-world predictive lift and feature-driver structure survive when downstream learners train only on synthetic draws and evaluate on untouched real data.
+Copying raw rows is unsafe, while shipping multi-megabyte neural generators is bloated, opaque, and prone to memorization. **D.O.P.E. (`Downstream Objective-Preserving Encoding`)** compiles a private table into a compact **sampling program** under a strict byte budget, then measures how much predictive lift and feature-driver structure survive when downstream learners train only on synthetic draws and evaluate on untouched real rows.
 
-- **Compact encoding budget:** Instead of shipping rows or megabytes of neural weights, D.O.P.E. quantizes feature marginals, a structural dependence graph, a screened target residual, and heteroscedastic noise into a tiny binary artifact. Every byte read at sample time is charged.
-- **Beyond a single tree learner—evaluated across tabular foundation and classical models:** Synthetic data must transfer across the strongest learning paradigms, including zero-shot tabular foundation models (**NVIDIA Kumo Tabular Large**, **TabICLv2**, **AutoGluon Mitra-v2**), **neural networks (MLP)**, **linear models**, and **gradient-boosted trees (CatBoost)**.
-- **Transfer lift and feature-driver fidelity:** Models trained on synthetic draws must both achieve positive lift over marginal and predictor-only controls on unseen real data and recover the same feature-importance drivers as models trained on the real table.
-- **Whitepaper & supplement:** Read the full paper in [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf) and the [technical supplement](docs/whitepaper/supplement.pdf).
+- **Compact encoding budget:** Quantizes feature marginals, a structural dependence graph, a screened target residual, and heteroscedastic noise into a self-contained binary artifact where every byte read at sample time is charged.
+- **Multi-model and foundation-model transfer:** Evaluates synthetic draws across zero-shot tabular foundation models (**NVIDIA Kumo Tabular Large**, **TabICLv2**, **AutoGluon Mitra-v2**), **neural networks (MLP)**, **linear models**, and **gradient-boosted trees (CatBoost)**.
+- **Whitepaper & supplement:** Read [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf) and [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf).
 
 ![Multi-model & foundation-model transfer vs. median charged artifact bytes (selection-exposed validation across NVIDIA Kumo-L, TabICLv2, Mitra-v2, Neural MLP, Linear, CatBoost, and holdout driver fidelity).](paper/generated/hero-frontier.png)
 
 ---
 
-## Quick Start: Compile, Inspect, and Sample Any CSV
+## Quick Start: Compile, Inspect, and Sample
 
-Build the native Rust CLI and compile any CSV table into a self-contained `.dpk` sampling program in three commands. Source column names and raw strings never enter the compiled artifact (`OpaqueIds` schema hygiene is enforced by default):
+Build the native Rust CLI binaries and run the four-step simulated healthcare workflow (`dope-kernel compile-csv` and `sample-mixed` on a headered CSV table with patient-disjoint and later-time evaluation; source column names never enter the compiled artifact):
 
 ```bash
-# 1. Build the release binary
-cargo build --locked --release --bin dope
+# 1. Build the native release binaries
+cargo build --locked --release --bin dope-kernel --bin dope
 
-# 2. Compile a CSV table into a compact .dpk sampling program (target defaults to last column, or pass --target <col>)
-target/release/dope compile-csv --csv examples/readme-regression/train.csv --out model.dpk
+# 2. Prepare a headered CSV table and compile a compact .dpk sampling program
+python3 -B examples/healthcare-sim/demo.py prepare --out target/healthcare-sim
+target/release/dope-kernel compile-csv --csv target/healthcare-sim/fit.csv \
+  --target event_30d --candidate chow_liu --seed 1729 --deadline-seconds 60 \
+  --out target/healthcare-sim/model.dpk
 
-# 3. Inspect the compiled artifact's byte charge and structural summary, then draw fresh synthetic rows
-target/release/dope inspect --kernel model.dpk
-target/release/dope sample --kernel model.dpk --rows 500 --seed 1729 --out synthetic.csv
+# 3. Sample synthetic draws and evaluate holdout transfer
+target/release/dope-kernel sample-mixed --artifact target/healthcare-sim/model.dpk \
+  --rows 640 --seed 1729 --out target/healthcare-sim/sampled.json
+python3 -B examples/healthcare-sim/demo.py evaluate \
+  --out target/healthcare-sim --sampled target/healthcare-sim/sampled.json
 ```
 
-For pre-projected unit-interval benchmark directories (`train.csv` in `[0, 1]`), you can also invoke `compile` directly:
+This simulation demo makes no clinical or real-patient claim, no HIPAA-de-identification claim, no formal-DP claim, and no observational-confirmation claim; see [docs/cli.md](docs/cli.md) and [examples/healthcare-sim/](examples/healthcare-sim/).
+
+For pre-projected unit-interval benchmark directories (`train.csv` without headers), invoke `dope compile`, `inspect`, and `sample`:
 
 ```bash
 target/release/dope compile --dataset-dir examples/readme-regression --task regression --out examples/readme-regression/toy.dpk
@@ -42,20 +48,11 @@ target/release/dope inspect --kernel examples/readme-regression/toy.dpk
 target/release/dope sample --kernel examples/readme-regression/toy.dpk --rows 200 --out examples/readme-regression/synth.csv
 ```
 
-### Offline simulated healthcare workflow
-
-Run the [four-step deterministic simulation demo](examples/healthcare-sim/)
-with simulated patients, patient-disjoint and later-time evaluation, and
-preprediction-time features. The CPU smoke uses the native compiler and sampler
-plus a small classical evaluator. It makes no clinical or real-patient claim, no HIPAA-de-identification claim,
-no formal-DP claim, and no observational-confirmation claim. See
-[docs/cli.md](docs/cli.md) for commands and evidence limits.
-
 ---
 
 ## Benchmark: Multi-Model Transfer, Tabular Foundation Models, and Artifact Bytes
 
-The benchmark block and figures below are generated directly from the SHA-pinned ledgers (`docs/whitepaper/generated/v2-headline.json`, `research/benchmark/results/review-fixes-v2/panel.json`, and `research/benchmark/results/mfs-v3-density-panel.json`) that build the whitepaper ([docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf)).
+The benchmark block and figures below are generated from the SHA-pinned ledgers (`docs/whitepaper/generated/v2-headline.json`, `research/benchmark/results/review-fixes-v2/panel.json`, and `research/benchmark/results/mfs-v3-density-panel.json`) that build [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf).
 
 <!-- BEGIN BENCHMARK -->
 ![Multi-model retention at synthetic size 4n against median charged artifact bytes on a log axis, and cross-architecture transfer across zero-shot tabular foundation models (NVIDIA Kumo-L, TabICLv2, Mitra-v2), classical learners, and feature driver fidelity. DOPE's median artifact is 1.9 KB; the other generators' medians run from 2.5 KB to 325.8 MB.](docs/readme/pareto.png)
@@ -99,18 +96,16 @@ The strongest full-panel comparator is TabSyn (scaled schedule). These are valid
 
 ## The Ultimate Synthetic KPI: Transfer Description Length (`TDL`)
 
-Why should synthetic data care deeply about encoding length? Because copying an entire dataset takes zero modeling insight, whereas packing the predictive regularities and feature drivers of a table into the smallest possible byte program is a direct complement to generalization.
+Copying raw rows takes no modeling insight; compressing predictive structure into a small byte program tests genuine generalization. **Transfer Description Length (`TDL`)** is the smallest tested payload (`KiB@T90/D80`) where synthetic-trained learners satisfy two holdout gates on untouched real rows:
 
-**Transfer Description Length (`TDL`)** is the smallest tested number of dataset-specific charged bytes (`KiB@T90/D80`) for which models trained or conditioned only on synthetic draws satisfy two holdout requirements on untouched real rows:
+- **Multi-Model Transfer (T90):** Recover at least nine-tenths of real-trained predictive lift over a null model at the lower confidence bound across diverse learner families.
+- **Feature Driver Fidelity (D80):** Recover at least four-fifths of real-trained holdout permutation attribution agreement.
 
-- **Multi-Model Transfer (T90):** Recover at least nine-tenths of a real-trained learner's predictive gain over a null model, at the lower confidence bound, across diverse model families (gradient-boosted trees, linear models, neural networks, and tabular foundation models).
-- **Feature Driver Fidelity (D80):** Rely on the same holdout feature drivers (permutation attribution rank correlation), reaching at least four-fifths of the agreement two real-trained models reach on the real table.
-
-The artifact must simultaneously clear exact-copy, near-copy, cleartext-absence, positive control-lift, and strict byte-accounting gates. When no tested budget clears every gate, the outcome is reported as unreached rather than zero. Full formal definitions are in [docs/metric.md](docs/metric.md), and protocol decisions (`D-01` to `D-09`) are tracked in [docs/decisions.md](docs/decisions.md).
+Artifacts must also pass exact-copy, near-copy, cleartext-absence, positive control-lift, and byte-accounting gates; unreached budgets are reported as unreached rather than zero ([docs/metric.md](docs/metric.md), [docs/decisions.md](docs/decisions.md) `D-01` to `D-09`).
 
 ### Historical Validation Card & Evidence Status
 
-> **Evidence discipline.** Every public number in this repository is generated from a hash-pinned receipt and carries an explicit label from the [claims policy](docs/claims-policy.md). The active panel above and the summary card below are selection-exposed validation estimates; the official test split remains sealed for one pre-registered run.
+> **Evidence discipline.** Every public figure is generated from a hash-pinned receipt under [docs/claims-policy.md](docs/claims-policy.md). The active validation panel is selection-exposed; the official test split remains sealed.
 
 <!-- BEGIN TDL RESULTS -->
 <!-- Generated by tools/claims/render.py; edit headline-results.json. -->
@@ -140,14 +135,12 @@ Smaller cohorts are separate comparisons. These points do not establish a TDL fr
 
 | Component | Stored Representation |
 | --- | --- |
-| **Marginals** | A quantized marginal distribution, a monotone transform onto `[0, 1]`, and a missing-value rate per feature |
-| **Dependence** | One of seven compact dependence families (independence, Chow–Liu tree, triangular autoregression, sparse Gaussian copula, factor model, truncated vine, or two-component mixture) selected on fit rows |
-| **Target residual** | A compact nonlinear residual network over at most twelve screened input features |
-| **Noise model** | A heteroscedastic residual scale fitted on up to four screened features |
+| **Marginals** | Quantized marginals, monotone unit-interval transforms, and missingness rates per feature |
+| **Dependence** | Seven candidate dependence families (independence, Chow–Liu tree, triangular autoregression, sparse Gaussian copula, factor model, truncated vine, or two-component mixture) |
+| **Target residual** | Screened nonlinear residual network over at most twelve input features |
+| **Noise model** | Heteroscedastic residual scale fitted on up to four screened features |
 
-The family, input and noise counts in this table describe the default compile search; historical research and refined profiles can differ.
-
-Sampling reads **only** the compiled artifact—no training row is ever stored or read during sampling. Two byte scopes are tracked in [docs/metric.md](docs/metric.md#5-byte-scopes): the **dataset-specific payload** (the primary axis) and the **cold sampling closure** (which adds the standalone runtime binary).
+Sampling reads **only** the compiled artifact—never training rows—and [docs/metric.md](docs/metric.md#5-byte-scopes) tracks both dataset-specific payload bytes and cold sampling closure bytes.
 
 ### One measured native artifact
 
@@ -165,35 +158,28 @@ The installed public demo in [examples/public-regression](examples/public-regres
 
 ## Scope, Governance, and Honest Boundaries
 
-- **Selection-exposed validation:** The active benchmark panel is evaluated on validation splits that also informed profile selection; the sealed official test split is reserved for one pre-registered run.
-- **Empirical privacy vs. formal certificates:** Measured distance, membership-inference, and attribute-inference checks are empirical diagnostics on sampled rows. They are not formal differential privacy and not HIPAA de-identification.
-- **Release gate fails closed:** The composite release score (`MFS-v3`) returns null whenever any prerequisite or gate (such as the cleartext scan or copy/membership thresholds) is unmeasured or fails on a cell.
-- **Target-conditioned program:** Each compiled artifact targets a declared predictive task (`regression` or `classification`) and is designed to preserve downstream learning and feature drivers for that workload.
+- **Selection-exposed validation:** Active benchmark splits also informed profile selection; the official test split remains sealed.
+- **Empirical privacy vs. formal certificates:** Copy, membership, and attribute checks are empirical diagnostics on sampled rows—not formal differential privacy and not HIPAA de-identification.
+- **Fail-closed release gate:** `MFS-v3` returns null whenever a prerequisite (such as the cleartext scan) is unmeasured or a measured gate fails.
+- **Target-conditioned program:** Each artifact targets a declared task (`regression` or `classification`).
 
 ---
 
 ## Reproduce Everything From Scratch
 
 ```bash
-just setup          # Create the Python environment for research and paper scripts
-just paper          # Regenerate all paper macros, figures, README benchmark blocks, and PDFs
-just paper-check    # Verify all macros, figure hashes, claim-firewall rules, and LaTeX logs
-just fast           # Run fast Rust + Python verification gates while editing
+just setup          # Create the Python environment
+just paper          # Regenerate paper macros, figures, README blocks, and PDFs
+just paper-check    # Verify macros, figure hashes, claim-firewall rules, and LaTeX logs
+just fast           # Run fast Rust + Python verification gates
 just check          # Run the full pre-commit verification suite
 ```
 
----
-
 ## Documentation Map
 
-| Topic | Location |
-| --- | --- |
-| Whitepaper & technical supplement | [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf), [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf) |
-| Metric specification (`TDL`, byte scopes, gates) | [docs/metric.md](docs/metric.md) |
-| Benchmark protocol & auditor registry | [docs/benchmark.md](docs/benchmark.md), [STATUS.md](STATUS.md) |
-| Claims policy & future claim ledger | [docs/claims-policy.md](docs/claims-policy.md), [docs/vnext/CLAIMS.md](docs/vnext/CLAIMS.md) |
-| Architecture, testing, release, and audit | [AGENTS.md](AGENTS.md), [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md), [docs/release.md](docs/release.md), [docs/audit.md](docs/audit.md) |
-| Historical MFS algebra & command catalog | [docs/archive/mfs-history.md](docs/archive/mfs-history.md) |
+- **Whitepaper & supplement:** [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf), [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf)
+- **Metric, benchmark, & claims:** [docs/metric.md](docs/metric.md), [docs/benchmark.md](docs/benchmark.md), [STATUS.md](STATUS.md), [docs/claims-policy.md](docs/claims-policy.md), [docs/vnext/CLAIMS.md](docs/vnext/CLAIMS.md)
+- **Engineering & audit:** [AGENTS.md](AGENTS.md), [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md), [docs/release.md](docs/release.md), [docs/audit.md](docs/audit.md), [docs/archive/mfs-history.md](docs/archive/mfs-history.md)
 
 ## Citation
 
@@ -206,8 +192,5 @@ just check          # Run the full pre-commit verification suite
 }
 ```
 
-See also [CITATION.cff](CITATION.cff).
+See [CITATION.cff](CITATION.cff). Licensed under [MIT](LICENSE).
 
-## License
-
-[MIT](LICENSE).
