@@ -16,7 +16,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 MAIN_REPO = Path("/home/ubuntu/dope")
 _LOCAL_PKT = REPO_ROOT / "target/unified-spec-workplan-20261017/packet-v2-9e11fd166f5f"
 _MAIN_PKT = MAIN_REPO / "target/unified-spec-workplan-20261017/packet-v2-9e11fd166f5f"
-PACKET_DIR = _LOCAL_PKT if _LOCAL_PKT.is_dir() else _MAIN_PKT
+_ENV_PKT = os.environ.get("DOPE_PACKET_DIR")
+PACKET_DIR = Path(_ENV_PKT) if _ENV_PKT else (_LOCAL_PKT if _LOCAL_PKT.is_dir() else _MAIN_PKT)
 
 
 def find_dope_kernel_bin() -> Path:
@@ -391,6 +392,18 @@ class TestE07CpuPreflight(unittest.TestCase):
         self.assertEqual(proto["selection"]["rows_consumed_for_selection"], 0)
         res = subprocess.run([sys.executable, "-B", str(obs_dir / "test_runner.py")], cwd=str(obs_dir), capture_output=True, text=True, check=True)
         self.assertEqual(res.returncode, 0)
+
+
+class TestD19AndBlockerUnblockMatrix(unittest.TestCase):
+    def test_d19_governance_hold_and_blocker_unblock_matrix(self):
+        dec_text = (REPO_ROOT / "docs/decisions.md").read_text()
+        self.assertIn("D19", dec_text)
+        for tid in ("W01", "E03", "E04", "E05", "E06", "E07"):
+            self.assertIn(f"**{tid}**", dec_text)
+        if PACKET_DIR.is_dir():
+            self.assertTrue((PACKET_DIR / "DECISIONS.json").is_file())
+            d19_candidates = [PACKET_DIR / "DECISIONS_D19_PROPOSED.json", PACKET_DIR / "DECISIONS.json"]
+            self.assertTrue(any(p.is_file() and "D19" in p.read_text() for p in d19_candidates))
 
 
 if __name__ == "__main__":
