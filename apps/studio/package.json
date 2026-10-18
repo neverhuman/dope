@@ -1,1 +1,1 @@
-{"name":"@dope/studio","private":true,"version":"0.1.0","scripts":{"typecheck":"node --check studio.ts","build":"npm run typecheck"}}
+{"name":"@dope/studio","private":true,"version":"0.1.0","scripts":{"typecheck":"node --check studio.ts && node -e \"const fs=require('fs'),h=fs.readFileSync('index.html','utf8'),s=fs.readFileSync('studio.ts','utf8').trim(),m=h.match(/<script type=\\\"module\\\">([\\\\s\\\\S]*?)<\\\\/script>/);if(!m||m[1].trim()!==s){console.error('studio.ts and index.html script differ');process.exit(1)}\"","build":"npm run typecheck"}}

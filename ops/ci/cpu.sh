@@ -20,23 +20,11 @@ cargo run --locked --offline --bin dope-native-notices -- --check
 cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
 cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
 cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard
-python3 -m venv --system-site-packages target/ci-python
+/usr/bin/python3 -m venv --system-site-packages target/ci-python
 bash ops/ci/install-python-v1.sh target/ci-python/bin/python
 PYTHONPATH=src target/ci-python/bin/python -m pytest -q tests
 uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'jsonschema==4.26.0'
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_checkpoint_index -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_validation_figure -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_retained_metrics -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_tabddpm_retained -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_tabddpm_matched_coverage -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_forest_fit_variance -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_forest_complete_cohort -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_forest_projected_cohort -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_retained_comparison -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_arf_tabsyn_followon -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_cpu_fit_batch research.benchmark.tests.test_arf_contract -q
-PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -q
+PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_checkpoint_index research.benchmark.tests.test_validation_figure research.benchmark.tests.test_retained_metrics research.benchmark.tests.test_tabddpm_retained research.benchmark.tests.test_tabddpm_matched_coverage research.benchmark.tests.test_baseline_completion research.benchmark.tests.test_forest_fit_variance research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_projected_cohort research.benchmark.tests.test_retained_comparison research.benchmark.tests.test_arf_tabsyn_followon research.benchmark.tests.test_cpu_fit_batch research.benchmark.tests.test_arf_contract research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -q
 cd validation/external
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --locked --extra xgboost --extra lightgbm
 UV_PROJECT_ENVIRONMENT=../../target/external-venv uv sync --offline --locked --extra xgboost --extra lightgbm
@@ -72,3 +60,5 @@ PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests
 export PATH="$PWD/target/ci-python/bin:$PATH"
 bash docs/whitepaper/scripts/build_pdf.sh
 python3 docs/whitepaper/scripts/check_paper.py
+rm -rf target/external-venv target/paper-render target/paper-build target/transfer-test-tmp target/cpu-tool-readiness target/review-test-tmp target/claims-tests target/tmp
+find target/debug/deps -maxdepth 1 -type f -executable ! -name '*.so' -delete || true
