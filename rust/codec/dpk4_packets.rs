@@ -131,3 +131,111 @@ pub fn decode_kernel(artifact: &[u8]) -> Result<Kernel> {
     }
     Ok(kernel)
 }
+
+#[cfg(test)]
+mod bitpacking_study {
+    use super::*;
+    use crate::codec;
+    use crate::model::{
+        ColumnSchema, Dependence, KernelProgram, LinearTerm, Marginal, Noise, SchemaKind, Target,
+        Task, Transform,
+    };
+
+    fn study_model(features: usize, bits: u8, seed: u64, task: Task) -> Kernel {
+        let schema = (0..features)
+            .map(|_| ColumnSchema {
+                kind: SchemaKind::Continuous,
+                missing_probability: 0.0,
+                impute: 0.5,
+                transform: Transform::Identity,
+            })
+            .collect();
+        let marginals = (0..features)
+            .map(|_| Marginal::QuantileSpline {
+                values: vec![0.0, 0.2, 0.5, 0.8, 1.0],
+            })
+            .collect();
+        let terms = (0..features)
+            .map(|index| LinearTerm {
+                feature: index as u32,
+                coefficient: ((index as f32 + 1.0) / features as f32)
+                    * if (index as u64 + seed) % 2 == 0 {
+                        1.0
+                    } else {
+                        -1.0
+                    },
+            })
+            .collect();
+        let target = match task {
+            Task::Regression => Target::SparseLinear {
+                intercept: -0.375,
+                terms,
+            },
+            Task::Binary => Target::SparseLogistic {
+                intercept: 0.375,
+                terms,
+            },
+        };
+        Kernel {
+            task,
+            rows_fitted: 512,
+            features: features as u32,
+            seed,
+            seed_policy: 0,
+            quantization_bits: bits,
+            compliant: false,
+            schema,
+            marginals,
+            program: KernelProgram::Symbolic {
+                dependence: Dependence::Independent,
+                target,
+                noise: match task {
+                    Task::Regression => Noise::Homoscedastic { sigma: 0.125 },
+                    Task::Binary => Noise::BernoulliCalibration { base_rate: 0.5 },
+                },
+            },
+        }
+    }
+
+    #[test]
+    fn preregistered_full_artifact_bitpacking_pilot() {
+        let mut measurements = Vec::new();
+        let mut win_count = 0usize;
+        let mut count = 0usize;
+        for task in [Task::Regression, Task::Binary] {
+            for features in [4, 12, 24] {
+                for bits in [4, 8] {
+                    for seed in [17, 29, 43] {
+                        let model = study_model(features, bits, seed, task);
+                        model.validate().unwrap();
+                        let baseline = codec::encode_kernel(&model).unwrap();
+                        let candidate = encode_kernel(&model).unwrap();
+                        let decoded = decode_kernel(&candidate).unwrap();
+                        assert_eq!(encode_kernel(&decoded).unwrap(), candidate);
+                        assert_eq!(decoded, model);
+                        assert_eq!(
+                            codec::encode_kernel(&codec::decode_kernel(&baseline).unwrap())
+                                .unwrap(),
+                            baseline
+                        );
+                        let savings = (baseline.len() as f64 - candidate.len() as f64)
+                            / baseline.len() as f64;
+                        win_count += usize::from(savings >= 0.20);
+                        count += 1;
+                        measurements.push((
+                            task.as_str(),
+                            features,
+                            bits,
+                            seed,
+                            baseline.len(),
+                            candidate.len(),
+                        ));
+                    }
+                }
+            }
+        }
+        eprintln!("R01 pilot rows: {measurements:?}");
+        eprintln!("R01 pilot >=20% rows: {win_count}/{count}");
+        assert_eq!(count, 36);
+    }
+}
