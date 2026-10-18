@@ -45,7 +45,7 @@ def loss_ratio(real: float, synthetic: float) -> GuardedRatio:
 def loss_summary(pairs: PairedLosses, scale: TrainingScale) -> dict:
     real, synthetic, null = pairs.means
     gap = finite_number(synthetic - real)
-    denominator, numerator = null - real, null - synthetic
+    denominator, numerator = finite_number(null - real), finite_number(null - synthetic)
     informative = denominator > 0 and denominator >= 0.01 * abs(null)
     normalized = finite_number(gap / scale.value) if scale.value is not None else None
     ratio = loss_ratio(real, synthetic)
