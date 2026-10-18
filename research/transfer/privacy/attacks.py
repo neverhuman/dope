@@ -353,3 +353,16 @@ def uncalibrated(view):
     return {"status": "inconclusive", "reason": "direction_evidence_missing", "raw_auc": raw,
             "reversible_diagnostic_auc": max(raw, 1 - raw), "formal_dp": "unverified", "release_authorized": False,
             "release_profile": local_empirical_profile()}
+
+
+def run_whitebox_disclosure(*args, **kwargs):
+    """Run the bounded S01 harness without changing historical evidence decoding.
+
+    The typed parameter adapter and planted-control assumptions are documented
+    in attack_harness. This entry never promotes a ReleaseProfile or opens data.
+    """
+    from .attack_harness import run_harness
+    try:
+        return run_harness(*args, **kwargs)
+    except TypeError:
+        raise PrivacyError("harness_input_invalid") from None
