@@ -467,3 +467,6 @@ fn source_free_sampling_uses_a_network_and_mount_namespace_when_available() {
     );
     fs::write(&receipt, record).unwrap();
 }
+
+#[path = "../rust/bundle/closure_integration_tests.rs"]
+mod closure_tests;
