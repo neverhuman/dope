@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:dp-profile:v1",
+  "title": "Formal DP design and complete composition ledger",
+  "description": "Schema validity grants no DP or release authority. Costs, public provenance, sensitivity, implementation assumptions and ledger completeness require independent proof audit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "adjacency", "bounds", "noise_mechanism", "composition", "budget", "implementation_assumptions", "release_history_sha256", "independent_cryptographic_audit", "steps"],
+  "properties": {
+    "format": {"const": "dope-dp-profile"},
+    "version": {"type": "integer", "const": 1},
+    "adjacency": {"$ref": "#/$defs/adjacency"},
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provenance", "clipping_norm", "clipping_bound", "sensitivity_bound", "evidence_sha256"],
+      "properties": {
+        "provenance": {"enum": ["public_prespecified", "accounted_dp"]},
+        "clipping_norm": {"enum": ["l1", "l2"]},
+        "clipping_bound": {"$ref": "#/$defs/positive"},
+        "sensitivity_bound": {"$ref": "#/$defs/positive"},
+        "evidence_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "noise_mechanism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "scale", "implementation_sha256"],
+      "properties": {
+        "name": {"enum": ["gaussian", "laplace", "discrete_gaussian"]},
+        "scale": {"$ref": "#/$defs/positive"},
+        "implementation_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accountant"],
+      "properties": {
+        "accountant": {"enum": ["rdp", "zcdp", "pld"]},
+        "rdp_orders": {
+          "type": "array", "minItems": 1, "maxItems": 128, "uniqueItems": true,
+          "items": {"type": "number", "exclusiveMinimum": 1, "maximum": 1000000}
+        }
+      },
+      "if": {"properties": {"accountant": {"const": "rdp"}}},
+      "then": {"required": ["rdp_orders"]},
+      "else": {"not": {"required": ["rdp_orders"]}}
+    },
+    "budget": {"$ref": "#/$defs/epsilon_delta"},
+    "implementation_assumptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prng", "prng_implementation_sha256", "floating_point", "discretization_sha256"],
+      "properties": {
+        "prng": {"const": "cryptographically_secure_required"},
+        "prng_implementation_sha256": {"$ref": "#/$defs/sha256"},
+        "floating_point": {"const": "audited_discretization_required"},
+        "discretization_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "release_history_sha256": {"$ref": "#/$defs/sha256"},
+    "independent_cryptographic_audit": {"enum": ["unverified_design", "independently_audited"]},
+    "steps": {
+      "type": "array", "minItems": 11, "maxItems": 10000,
+      "items": {"$ref": "#/$defs/step"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "positive": {"type": "number", "exclusiveMinimum": 0, "maximum": 1e100},
+    "nonnegative": {"type": "number", "minimum": 0, "maximum": 1e100},
+    "adjacency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "relation", "max_rows_per_unit"],
+      "properties": {
+        "unit": {"enum": ["row", "entity", "user_group"]},
+        "relation": {"enum": ["add_remove", "replace_one"]},
+        "max_rows_per_unit": {"type": "integer", "minimum": 1, "maximum": 1000000}
+      },
+      "if": {"properties": {"unit": {"const": "row"}}},
+      "then": {"properties": {"max_rows_per_unit": {"const": 1}}}
+    },
+    "epsilon_delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["epsilon", "delta"],
+      "properties": {
+        "epsilon": {"$ref": "#/$defs/positive"},
+        "delta": {"type": "number", "minimum": 0, "exclusiveMaximum": 1}
+      }
+    },
+    "rdp_cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rdp"],
+      "properties": {
+        "rdp": {"type": "array", "minItems": 1, "maxItems": 128, "items": {"$ref": "#/$defs/nonnegative"}}
+      }
+    },
+    "zcdp_cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rho"],
+      "properties": {"rho": {"$ref": "#/$defs/positive"}}
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "access", "adjacency", "evidence_sha256", "cost"],
+      "properties": {
+        "stage": {"enum": ["domain_discovery", "binning", "winsorization_clipping_bounds", "transform_fitting", "structure_selection", "parameter_fitting", "candidate_selection", "source_derived_lengths", "source_derived_statuses", "source_derived_metrics", "post_summary_private_reads"]},
+        "access": {"enum": ["public_prespecified", "accounted_dp", "unaccounted_private"]},
+        "adjacency": {"$ref": "#/$defs/adjacency"},
+        "evidence_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "cost": {"anyOf": [{"$ref": "#/$defs/rdp_cost"}, {"$ref": "#/$defs/zcdp_cost"}, {"$ref": "#/$defs/epsilon_delta"}, {"type": "null"}]}
+      },
+      "if": {"properties": {"access": {"const": "accounted_dp"}}},
+      "then": {"properties": {"evidence_sha256": {"$ref": "#/$defs/sha256"}}},
+      "else": {
+        "properties": {"cost": {"type": "null"}},
+        "if": {"properties": {"access": {"const": "public_prespecified"}}},
+        "then": {"properties": {"evidence_sha256": {"$ref": "#/$defs/sha256"}}}
+      }
+    }
+  }
+}
