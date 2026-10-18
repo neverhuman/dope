@@ -1,4 +1,13 @@
-"""Descriptive tested-budget frontier. No coined density scalar and no interpolation.
+"""Historical family-coverage diagnostics, plus the canonical receipt entry point.
+
+``evaluate`` is a direct alias of ``tdl.frontier.evaluate``: JSON component
+receipts have one Python implementation, checked against the Rust reducer.
+The ScheduledTask helpers below retain their historical diagnostic API and
+denominator/censoring rules. They do not consume TDL receipts, estimate a
+transfer bound, certify a candidate, or authorize a release. Their coverage
+and B*_tested states must not be substituted for canonical TDL receipt states.
+
+Descriptive tested-budget frontier. No density scalar and no interpolation.
 
 Family weights are frozen with the schedule. Pending work refuses B*_tested.
 Terminal failures stay in the denominator. Only a measured, qualified, attempted,
@@ -17,6 +26,7 @@ from collections import Counter
 from dataclasses import dataclass
 
 from .losses import finite_number
+from .tdl.frontier import evaluate  # Canonical receipt compatibility alias.
 
 
 _TERMINAL = {"measured", "technical_failure", "unsupported", "unresolved", "unfitted"}

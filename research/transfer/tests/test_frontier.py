@@ -1,6 +1,10 @@
 import unittest
+from pathlib import Path
 
+from research.transfer import frontier as historical
 from research.transfer.frontier import ScheduledTask, tested_budget_frontier
+from research.transfer.tdl import frontier as canonical
+from research.transfer.tdl.golden import close, strict_load
 
 
 def task(name, family, status="measured", bytes_=40, qualified=True, attempted=True, weight=1.0):
@@ -8,6 +12,18 @@ def task(name, family, status="measured", bytes_=40, qualified=True, attempted=T
 
 
 class FrontierTests(unittest.TestCase):
+    def test_receipt_entry_point_delegates_to_canonical_reducer(self):
+        self.assertIs(historical.evaluate, canonical.evaluate)
+
+    def test_receipt_alias_preserves_shared_frontier_goldens(self):
+        root = Path(__file__).resolve().parents[3] / "tests/golden/frontier"
+        paths = sorted(root.glob("*.json"))
+        self.assertTrue(paths)
+        for path in paths:
+            case = strict_load(path.read_text())
+            with self.subTest(case=case["case_id"]):
+                self.assertTrue(close(historical.evaluate(case["input"]), case["expected"]))
+
     def test_full_denominator_and_frontier_states(self):
         tasks = [task("ok", "f"), task("fail", "g", status="technical_failure", bytes_=None, qualified=False)]
         report = tested_budget_frontier(tasks, (64, 128))
